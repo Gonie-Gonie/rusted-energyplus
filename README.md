@@ -9,13 +9,14 @@ execution plans, structured diagnostics, and reproducible releases.
 
 ## Current Scope
 
-This repository is at the v0.1.0 setup stage:
+This repository is at the v0.2.0 RawModel inspection stage:
 
 - Rust toolchain pinned in `rust-toolchain.toml`
 - Cargo workspace skeleton
 - portable EnergyPlus oracle setup
 - reference EnergyPlus source setup
 - docs skeleton and copied development plan
+- epJSON RawModel inspection CLI
 - smoke/check scripts
 
 ## Quick Start
@@ -25,6 +26,8 @@ This repository is at the v0.1.0 setup stage:
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
 .\scripts\v0.1-verify.cmd
+.\scripts\raw-model-smoke.cmd
+.\scripts\v0.2-verify.cmd
 ```
 
 On Windows, the pinned Rust toolchain uses the GNU target so the early
@@ -43,15 +46,16 @@ It does not use a globally installed EnergyPlus as the oracle.
 
 ## Core Commands
 
-The CLI is a placeholder at this stage:
+The CLI can inspect epJSON into a RawModel summary:
 
 ```powershell
 cargo run -p ep_cli -- --version
 cargo run -p ep_cli -- oracle-info
+cargo run -p ep_cli -- model inspect .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 ```
 
-Unsupported runtime/model commands should fail explicitly until their milestone
-is implemented.
+Unsupported runtime commands should fail explicitly until their milestone is
+implemented.
 
 ## Documentation
 
@@ -61,3 +65,4 @@ is implemented.
 - Oracle setup: `docs/src/operations/oracle-setup.md`
 - External review log: `docs/src/operations/external-checkpoints.md`
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
+- v0.2 readiness: `docs/src/operations/v0.2.0-readiness.md`

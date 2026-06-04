@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.2.0 - 2026-06-04
+
+RawModel / epJSON inspection.
+
+### Added
+
+- epJSON loader in `ep_raw_model`.
+- Raw value preservation for strings, booleans, nulls, numbers, arrays, and nested objects.
+- RawModel summary with version, object type count, object count, and per-type counts.
+- `eplus-rs model inspect <input.epJSON>` CLI command.
+- Seed tracked/untracked object reporting in model inspection.
+- v0.2 verification gate.
+- v0.2 readiness and release documentation.
+
+### Notes
+
+- v0.2.0 does not perform schema validation or typed conversion yet.
+- v0.3.0 starts TypedModel / Reference Resolution.
+
 ## v0.1.0 - 2026-06-04
 
 Reproducible setup / oracle release.
@@ -23,4 +42,3 @@ Reproducible setup / oracle release.
 
 - v0.1.0 does not implement simulation behavior in Rust yet.
 - v0.2.0 starts RawModel and epJSON inspection.
-

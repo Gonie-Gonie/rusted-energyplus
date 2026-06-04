@@ -22,6 +22,8 @@ Use the same scripts locally and in CI:
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
 .\scripts\v0.1-verify.cmd
+.\scripts\raw-model-smoke.cmd
+.\scripts\v0.2-verify.cmd
 ```
 
 ## Commit Message Shape

@@ -11,7 +11,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "BSD-3-Clause"
 repository = "https://github.com/Gonie-Gonie/rusted-energyplus"
@@ -26,4 +26,3 @@ unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"
 todo = "deny"
-

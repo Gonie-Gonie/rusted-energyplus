@@ -21,15 +21,18 @@ Initial table:
 
 | Object | Parse | Validate | Typed | Ref | Graph | Plan | Simulate | Compare | Notes |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| Version | planned | planned | planned | n/a | n/a | n/a | n/a | planned | v0.2 |
-| Building | planned | planned | planned | n/a | partial | partial | partial | partial | v0.3+ |
-| Timestep | planned | planned | planned | n/a | n/a | planned | planned | planned | v0.3+ |
-| RunPeriod | planned | planned | planned | n/a | n/a | planned | planned | planned | v0.5 |
-| Site:Location | planned | planned | planned | n/a | n/a | planned | planned | planned | v0.5 |
-| Zone | planned | planned | planned | planned | planned | planned | planned | planned | v0.6+ |
-| BuildingSurface:Detailed | planned | planned | planned | planned | planned | planned | partial | partial | v0.7+ |
-| Schedule:Constant | planned | planned | planned | planned | n/a | planned | planned | planned | v0.5 |
-| Schedule:Compact | planned | planned | planned | planned | n/a | partial | partial | partial | v0.5 |
-| ZoneHVAC:IdealLoadsAirSystem | planned | planned | planned | planned | planned | planned | planned | planned | v0.9 |
-| PlantLoop | planned | planned | planned | planned | planned | no | no | no | v0.11 preview |
+| Version | yes | planned | planned | n/a | n/a | n/a | n/a | planned | RawModel generic parse in v0.2 |
+| Building | yes | planned | planned | n/a | partial | partial | partial | partial | RawModel generic parse in v0.2 |
+| Timestep | yes | planned | planned | n/a | n/a | planned | planned | planned | RawModel generic parse in v0.2 |
+| RunPeriod | yes | planned | planned | n/a | n/a | planned | planned | planned | RawModel generic parse in v0.2 |
+| Site:Location | yes | planned | planned | n/a | n/a | planned | planned | planned | RawModel generic parse in v0.2 |
+| Zone | yes | planned | planned | planned | planned | planned | planned | planned | RawModel generic parse in v0.2 |
+| BuildingSurface:Detailed | yes | planned | planned | planned | planned | planned | partial | partial | RawModel generic parse in v0.2 |
+| Schedule:Constant | yes | planned | planned | planned | n/a | planned | planned | planned | RawModel generic parse in v0.2 |
+| Schedule:Compact | yes | planned | planned | planned | n/a | partial | partial | partial | RawModel generic parse in v0.2 |
+| ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |
+| PlantLoop | yes | planned | planned | planned | planned | no | no | no | generic raw parse only |
 
+v0.2.0 parse support is intentionally generic: unknown object types are
+preserved in RawModel and reported as untracked by the CLI until an object
+family receives typed/model support.

@@ -1,0 +1,35 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "Building": {
+    "Minimal RawModel Fixture": {
+      "north_axis": 0,
+      "terrain": "Suburbs"
+    }
+  },
+  "Timestep": {
+    "Timestep 1": {
+      "number_of_timesteps_per_hour": 6
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {
+      "hourly_value": 1.0,
+      "schedule_type_limits_name": "Any Number"
+    }
+  },
+  "Unknown:Diagnostic": {
+    "Preserved Object": {
+      "nested_values": [
+        {
+          "flag": true,
+          "value": 3.5
+        }
+      ]
+    }
+  }
+}
+
