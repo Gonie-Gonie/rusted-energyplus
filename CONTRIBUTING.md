@@ -21,6 +21,7 @@ Use the same scripts locally and in CI:
 .\scripts\setup.cmd -InstallRust -InstallDocsTools
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
+.\scripts\v0.1-verify.cmd
 ```
 
 ## Commit Message Shape

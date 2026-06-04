@@ -1,0 +1,23 @@
+id = "minimal_1zone_uncontrolled_oracle_smoke"
+milestone = "v0.1.0"
+purpose = "Verify the portable EnergyPlus 26.1.0 oracle can run a bundled minimal IDF and convert it to epJSON."
+oracle_version = "26.1.0"
+oracle_commit = "6f2e40d10250a105b49966baa24d843711e61048"
+input_runtime_idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+input_source_idf = ".reference/energyplus-src/26.1.0/testfiles/1ZoneUncontrolled.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+output_dir = ".runtime/oracle-smoke/26.1.0"
+expected_outputs = [
+  "eplusout.err",
+  "eplusout.eso",
+  "eplusout.mtr",
+  "eplustbl.csv",
+  "convert/smoke.epJSON",
+]
+
+[checks]
+energyplus_run_completes = true
+eplusout_err_created = true
+idf_to_epjson_conversion_completes = true
+uses_portable_oracle = true
+

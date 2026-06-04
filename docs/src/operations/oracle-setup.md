@@ -42,3 +42,16 @@ Run:
 
 The smoke test should execute the portable `energyplus.exe` from `.runtime`,
 not any EnergyPlus installation on PATH.
+
+## Source Smoke
+
+Run:
+
+```powershell
+.\scripts\source-smoke.cmd
+```
+
+This verifies that the reference source contains the expected 26.1.0 source
+tree, source testfiles, epJSON schema generation tools, and plant/HVAC source
+files used by early issue-driven planning. It also verifies that the packaged
+runtime contains `Energy+.schema.epJSON`.

@@ -6,5 +6,6 @@
 - [Oracle Setup](operations/oracle-setup.md)
 - [External Checkpoints](operations/external-checkpoints.md)
 - [Team Workflow](operations/team-workflow.md)
+- [v0.1.0 Readiness](operations/v0.1.0-readiness.md)
 - [Supported Object Coverage](operations/supported-object-coverage.md)
 - [Porting Map](porting-map/README.md)

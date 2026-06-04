@@ -1,0 +1,58 @@
+[CmdletBinding()]
+param(
+    [switch]$SkipOracleSmoke
+)
+
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "common.ps1")
+Add-CargoBinToPath
+
+$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+Set-Location $RepoRoot
+
+function Assert-FileExists {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing $Description`: $Path"
+    }
+    Write-Host "OK $Description`: $Path"
+}
+
+function Assert-DirectoryExists {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+        throw "Missing $Description`: $Path"
+    }
+    Write-Host "OK $Description`: $Path"
+}
+
+Assert-FileExists -Path "rust-toolchain.toml" -Description "pinned Rust toolchain"
+Assert-FileExists -Path "Cargo.toml" -Description "Cargo workspace"
+Assert-FileExists -Path "Cargo.lock" -Description "Cargo lock"
+Assert-FileExists -Path "docs\src\architecture\rust-only-policy.md" -Description "Rust-only policy"
+Assert-FileExists -Path "docs\src\development-plan-v2.md" -Description "copied development plan"
+Assert-FileExists -Path "tools\oracle\energyplus.lock.toml" -Description "EnergyPlus oracle lock"
+Assert-FileExists -Path "tools\oracle\NOTICE.md" -Description "EnergyPlus oracle notice"
+Assert-FileExists -Path "tools\docs\docs.lock.toml" -Description "docs tool lock"
+Assert-FileExists -Path "config\local.toml" -Description "generated local config"
+Assert-FileExists -Path ".reference\energyplus-src\26.1.0\source.sha256" -Description "reference source bootstrap digest"
+Assert-DirectoryExists -Path ".runtime\energyplus\26.1.0" -Description "portable oracle runtime"
+Assert-DirectoryExists -Path ".reference\energyplus-src\26.1.0" -Description "reference source tree"
+Assert-FileExists -Path "data\testcases\minimal\case.toml" -Description "minimal testcase manifest"
+
+& (Join-Path $RepoRoot "scripts\source-smoke.ps1")
+& (Join-Path $RepoRoot "scripts\check.ps1")
+
+if (-not $SkipOracleSmoke) {
+    & (Join-Path $RepoRoot "scripts\oracle-smoke.ps1")
+}
+
+Write-Host "v0.1.0 verification passed."
+

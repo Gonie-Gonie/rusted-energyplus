@@ -24,6 +24,7 @@ This repository is at the v0.1.0 setup stage:
 .\scripts\setup.cmd -InstallRust -InstallDocsTools
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
+.\scripts\v0.1-verify.cmd
 ```
 
 On Windows, the pinned Rust toolchain uses the GNU target so the early
@@ -59,3 +60,4 @@ is implemented.
 - Data architecture: `docs/src/architecture/data-architecture.md`
 - Oracle setup: `docs/src/operations/oracle-setup.md`
 - External review log: `docs/src/operations/external-checkpoints.md`
+- v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
