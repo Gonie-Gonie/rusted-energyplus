@@ -32,4 +32,22 @@ v0.1.0 RawModel inspection CLI + typed compile preview
 - model compile preview command
 - epJSON RawModel parse
 - release zip artifact
-- Git tag and GitHub Release, when authentication is available
+- Git tag push triggers `.github/workflows/release.yml`
+- GitHub Release and zip asset are created by the workflow
+
+## Release Publishing
+
+Normal release path:
+
+```text
+commit -> push main -> annotated vX.Y.Z tag -> push tag -> GitHub Actions release workflow
+```
+
+Manual fallback:
+
+```text
+scripts\github-release.cmd
+```
+
+The manual fallback requires `GH_TOKEN` or `GITHUB_TOKEN` and should only be
+used when the workflow path is unavailable.

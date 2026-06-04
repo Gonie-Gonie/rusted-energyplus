@@ -19,6 +19,7 @@ First runnable RawModel / epJSON inspection release with a typed compile preview
 - TypedModel valid and negative preview fixtures.
 - release package creation.
 - v0.1 runnable release verification gate.
+- tag-push GitHub Actions release workflow.
 - v0.1 readiness and release documentation.
 
 ### Notes

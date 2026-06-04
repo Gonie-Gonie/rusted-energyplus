@@ -61,6 +61,16 @@ cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.
 Unsupported runtime commands should fail explicitly until their milestone is
 implemented.
 
+## Release Publishing
+
+Public releases are published by `.github/workflows/release.yml` when a
+`vX.Y.Z` tag is pushed. The workflow prepares the toolchain and oracle, runs the
+matching `scripts\vX.Y-verify.ps1`, builds the zip artifact, and creates or
+updates the GitHub Release.
+
+`scripts\github-release.cmd` is kept as a local manual fallback for token-based
+publishing.
+
 ## Documentation
 
 - Development plan: `docs/src/development-plan-v2.md`

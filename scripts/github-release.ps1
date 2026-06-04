@@ -7,6 +7,9 @@ param(
     [string]$NotesFile = "docs/src/releases/v0.1.0.md"
 )
 
+# Local/manual fallback publisher.
+# Normal releases are created by .github/workflows/release.yml when a vX.Y.Z tag is pushed.
+
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 

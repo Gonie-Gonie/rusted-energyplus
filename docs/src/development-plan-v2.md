@@ -2854,7 +2854,8 @@ eplus-rs-v0.1.0-windows-x64-offline-oracle.zip
 .\scripts\compare-regression.ps1
 .\scripts\perf.ps1
 .\scripts\package.ps1
-.\scripts\github-release.ps1
+git tag -a vX.Y.Z -m "eplus-rs vX.Y.Z"
+git push origin vX.Y.Z
 ```
 
 필수 확인:
@@ -2871,10 +2872,14 @@ eplus-rs-v0.1.0-windows-x64-offline-oracle.zip
 - performance report 생성
 - package zip 압축 해제 후 smoke test 통과
 - release note 작성
-- GitHub Release 생성 또는 인증 불가 사유 기록
+- tag push 기반 .github/workflows/release.yml 실행
+- GitHub Release 생성 및 zip asset 업로드
 - supported object table 최신화
 - known limitations 최신화
 ```
+
+`scripts\github-release.ps1`는 GitHub Actions 경로를 사용할 수 없을 때의
+local/manual fallback으로만 사용한다.
 
 ### 23.4 release note 필수 항목
 
