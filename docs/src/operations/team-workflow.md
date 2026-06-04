@@ -12,18 +12,24 @@
 - 새 기능은 구현, test, docs, porting-map, supported object coverage를 함께
   갱신한다.
 
-## 현재 v0.1.0 단위
+## Public Version Rule
 
-첫 commit 후보:
+public `vX.Y.Z` tag는 build artifact와 사용자-visible command가 있는 경우에만 만든다.
+setup-only, docs-only, oracle-only 단계는 foundation checkpoint로 관리한다.
+
+## 첫 public release 단위
+
+첫 public release:
 
 ```text
-Initialize reproducible setup skeleton
+v0.1.0 RawModel inspection CLI + typed compile preview
 ```
 
 포함 범위:
 
-- Rust workspace skeleton
-- setup/check/oracle smoke scripts
-- EnergyPlus 26.1.0 oracle lock
-- copied development plan
-- docs skeleton
+- eplus-rs.exe build
+- model inspect command
+- model compile preview command
+- epJSON RawModel parse
+- release zip artifact
+- Git tag and GitHub Release, when authentication is available

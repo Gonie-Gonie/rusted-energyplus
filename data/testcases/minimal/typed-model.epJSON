@@ -1,0 +1,74 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "Building": {
+    "Defaulted Building": {
+      "terrain": "Suburbs"
+    }
+  },
+  "Timestep": {
+    "Timestep 1": {}
+  },
+  "Site:Location": {
+    "Denver Site": {
+      "latitude": 39.74,
+      "longitude": -105.18
+    }
+  },
+  "Material:NoMass": {
+    "R13": {}
+  },
+  "Construction": {
+    "Wall Construction": {
+      "outside_layer": "R13"
+    }
+  },
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "numeric_type": "Continuous",
+      "upper_limit_value": 1.0
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {
+      "schedule_type_limits_name": "Fraction"
+    }
+  },
+  "Zone": {
+    "Zone One": {}
+  },
+  "BuildingSurface:Detailed": {
+    "Wall One": {
+      "construction_name": "Wall Construction",
+      "outside_boundary_condition": "Outdoors",
+      "surface_type": "Wall",
+      "vertices": [
+        {
+          "vertex_x_coordinate": 0.0,
+          "vertex_y_coordinate": 0.0,
+          "vertex_z_coordinate": 0.0
+        },
+        {
+          "vertex_x_coordinate": 1.0,
+          "vertex_y_coordinate": 0.0,
+          "vertex_z_coordinate": 0.0
+        },
+        {
+          "vertex_x_coordinate": 1.0,
+          "vertex_y_coordinate": 1.0,
+          "vertex_z_coordinate": 0.0
+        },
+        {
+          "vertex_x_coordinate": 0.0,
+          "vertex_y_coordinate": 1.0,
+          "vertex_z_coordinate": 0.0
+        }
+      ],
+      "zone_name": "Zone One"
+    }
+  }
+}

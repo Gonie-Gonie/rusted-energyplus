@@ -1,0 +1,34 @@
+id = "minimal_typed_model_preview"
+milestone = "v0.1.0-preview"
+purpose = "Verify the v0.1 TypedModel preview can convert seed objects, apply defaults, parse enums, resolve typed IDs, and report missing reference diagnostics."
+valid_input_epjson = "data/testcases/minimal/typed-model.epJSON"
+missing_reference_epjson = "data/testcases/minimal/missing-reference.epJSON"
+oracle_generated_epjson = ".runtime/oracle-smoke/26.1.0/convert/smoke.epJSON"
+
+[expected_valid]
+version = "26.1.0"
+raw_object_count = 10
+typed_object_count = 9
+zone_count = 1
+surface_count = 1
+diagnostic_count = 0
+default_count = 21
+
+[expected_missing_reference]
+diagnostic_code = "MissingReference"
+object_type = "BuildingSurface:Detailed"
+object_name = "Broken Surface"
+field = "zone_name"
+target_name = "Missing Zone"
+
+[expected_oracle_smoke]
+version = "26.1.0"
+raw_object_count = 88
+typed_object_count = 19
+material_count = 3
+construction_count = 3
+schedule_type_limit_count = 2
+schedule_count = 1
+zone_count = 1
+surface_count = 6
+diagnostic_count = 0

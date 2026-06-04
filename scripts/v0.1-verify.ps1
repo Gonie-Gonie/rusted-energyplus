@@ -46,6 +46,14 @@ Assert-FileExists -Path ".reference\energyplus-src\26.1.0\source.sha256" -Descri
 Assert-DirectoryExists -Path ".runtime\energyplus\26.1.0" -Description "portable oracle runtime"
 Assert-DirectoryExists -Path ".reference\energyplus-src\26.1.0" -Description "reference source tree"
 Assert-FileExists -Path "data\testcases\minimal\case.toml" -Description "minimal testcase manifest"
+Assert-FileExists -Path "data\testcases\minimal\raw-model.case.toml" -Description "RawModel testcase manifest"
+Assert-FileExists -Path "data\testcases\minimal\typed-model.case.toml" -Description "TypedModel testcase manifest"
+Assert-FileExists -Path "data\testcases\minimal\minimal.epJSON" -Description "RawModel fixture"
+Assert-FileExists -Path "data\testcases\minimal\typed-model.epJSON" -Description "TypedModel fixture"
+Assert-FileExists -Path "data\testcases\minimal\missing-reference.epJSON" -Description "TypedModel negative fixture"
+Assert-FileExists -Path "docs\src\operations\v0.1.0-readiness.md" -Description "v0.1 readiness document"
+Assert-FileExists -Path "docs\src\releases\v0.1.0.md" -Description "v0.1 release note"
+Assert-FileExists -Path "scripts\typed-model-smoke.ps1" -Description "TypedModel smoke script"
 
 & (Join-Path $RepoRoot "scripts\source-smoke.ps1")
 & (Join-Path $RepoRoot "scripts\check.ps1")
@@ -54,5 +62,11 @@ if (-not $SkipOracleSmoke) {
     & (Join-Path $RepoRoot "scripts\oracle-smoke.ps1")
 }
 
-Write-Host "v0.1.0 verification passed."
+& (Join-Path $RepoRoot "scripts\raw-model-smoke.ps1")
+& (Join-Path $RepoRoot "scripts\typed-model-smoke.ps1")
+& (Join-Path $RepoRoot "scripts\package.ps1") -Version "0.1.0"
 
+$package = Join-Path $RepoRoot "dist\eplus-rs-v0.1.0-windows-x64.zip"
+Assert-FileExists -Path $package -Description "v0.1 release package"
+
+Write-Host "v0.1.0 runnable release verification passed."

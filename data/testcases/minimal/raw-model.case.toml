@@ -1,5 +1,5 @@
 id = "minimal_raw_model_epjson_inspection"
-milestone = "v0.2.0"
+milestone = "v0.1.0"
 purpose = "Verify RawModel can parse epJSON, preserve unknown objects, extract version, and report object counts."
 input_epjson = "data/testcases/minimal/minimal.epJSON"
 oracle_generated_epjson = ".runtime/oracle-smoke/26.1.0/convert/smoke.epJSON"
@@ -15,4 +15,3 @@ untracked_objects = ["Unknown:Diagnostic"]
 version = "26.1"
 object_type_count = 28
 object_count = 88
-

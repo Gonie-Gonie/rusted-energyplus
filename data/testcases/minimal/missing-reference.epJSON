@@ -1,0 +1,40 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "Material:NoMass": {
+    "R13": {}
+  },
+  "Construction": {
+    "Wall Construction": {
+      "outside_layer": "R13"
+    }
+  },
+  "BuildingSurface:Detailed": {
+    "Broken Surface": {
+      "construction_name": "Wall Construction",
+      "outside_boundary_condition": "Outdoors",
+      "surface_type": "Wall",
+      "vertices": [
+        {
+          "vertex_x_coordinate": 0.0,
+          "vertex_y_coordinate": 0.0,
+          "vertex_z_coordinate": 0.0
+        },
+        {
+          "vertex_x_coordinate": 1.0,
+          "vertex_y_coordinate": 0.0,
+          "vertex_z_coordinate": 0.0
+        },
+        {
+          "vertex_x_coordinate": 1.0,
+          "vertex_y_coordinate": 1.0,
+          "vertex_z_coordinate": 0.0
+        }
+      ],
+      "zone_name": "Missing Zone"
+    }
+  }
+}

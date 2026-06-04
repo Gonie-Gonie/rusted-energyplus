@@ -1,5 +1,5 @@
 id = "minimal_1zone_uncontrolled_oracle_smoke"
-milestone = "v0.1.0"
+milestone = "F0-foundation"
 purpose = "Verify the portable EnergyPlus 26.1.0 oracle can run a bundled minimal IDF and convert it to epJSON."
 oracle_version = "26.1.0"
 oracle_commit = "6f2e40d10250a105b49966baa24d843711e61048"
@@ -20,4 +20,3 @@ energyplus_run_completes = true
 eplusout_err_created = true
 idf_to_epjson_conversion_completes = true
 uses_portable_oracle = true
-

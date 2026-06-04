@@ -2,6 +2,7 @@
 .reference/
 target/
 docs/book/
+dist/
 config/local.toml
 *.log
 *.tmp

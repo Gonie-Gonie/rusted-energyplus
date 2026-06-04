@@ -23,7 +23,8 @@ Use the same scripts locally and in CI:
 .\scripts\oracle-smoke.cmd
 .\scripts\v0.1-verify.cmd
 .\scripts\raw-model-smoke.cmd
-.\scripts\v0.2-verify.cmd
+.\scripts\typed-model-smoke.cmd
+.\scripts\package.cmd
 ```
 
 ## Commit Message Shape

@@ -1,5 +1,7 @@
 //! Command line entry point for eplus-rs.
 
+use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
+use ep_model::TypedModel;
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::SimulationMode;
@@ -28,6 +30,7 @@ fn run(args: &[String]) -> i32 {
             print_modes();
             0
         }
+        Some("compile") => run_compile_command(&args[1..]),
         Some("model") => run_model_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported command: {command}");
@@ -56,17 +59,45 @@ fn run_model_command(args: &[String]) -> i32 {
                 }
             }
         }
+        Some("compile") => run_compile_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported model command: {command}");
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
+            eprintln!("usage: eplus-rs model compile <input.epJSON>");
             2
         }
         None => {
             eprintln!("missing model command");
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
+            eprintln!("usage: eplus-rs model compile <input.epJSON>");
             2
         }
     }
+}
+
+fn run_compile_command(args: &[String]) -> i32 {
+    let Some(path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs model compile <input.epJSON>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let result = compile_raw_model(&raw_model);
+    if let Some(model) = result.model.as_ref() {
+        print_typed_model_summary(model, &result.report);
+        return 0;
+    }
+
+    print_compile_diagnostics(&result.report);
+    1
 }
 
 fn print_help() {
@@ -76,10 +107,11 @@ fn print_help() {
     println!("  oracle-info   print locked EnergyPlus oracle metadata");
     println!("  modes         print planned simulation modes");
     println!("  model inspect <input.epJSON>");
+    println!("  model compile <input.epJSON>");
+    println!("  compile <input.epJSON>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
-    println!("  compile <input.epJSON>");
     println!("  graph validate <input.epJSON>");
     println!("  run <input.epJSON>");
 }
@@ -96,6 +128,50 @@ fn print_raw_model_summary(summary: &RawModelSummary) {
     for (object_type, count) in &summary.object_type_counts {
         let coverage = seed_coverage_status(object_type);
         println!("    {object_type}: {count} [{coverage}]");
+    }
+}
+
+fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
+    println!("TypedModel");
+    println!("  version: {}", model.version);
+    println!("  raw_objects: {}", report.raw_object_count);
+    println!("  typed_objects: {}", report.typed_object_count);
+    println!("  building: {}", usize::from(model.building.is_some()));
+    println!(
+        "  timestep: {}",
+        model.timestep.number_of_timesteps_per_hour
+    );
+    println!("  site_locations: {}", usize::from(model.site.is_some()));
+    println!("  materials: {}", model.materials.len());
+    println!("  constructions: {}", model.constructions.len());
+    println!(
+        "  schedule_type_limits: {}",
+        model.schedule_type_limits.len()
+    );
+    println!("  schedules: {}", model.schedules.len());
+    println!("  zones: {}", model.zones.len());
+    println!("  surfaces: {}", model.surfaces.len());
+    println!("  diagnostics: {}", report.diagnostics.len());
+    println!("  defaults_applied: {}", report.defaults_applied.len());
+}
+
+fn print_compile_diagnostics(report: &CompileReport) {
+    println!("Compile diagnostics");
+    println!("  raw_objects: {}", report.raw_object_count);
+    println!("  typed_objects: {}", report.typed_object_count);
+    println!("  diagnostics: {}", report.diagnostics.len());
+    println!("  defaults_applied: {}", report.defaults_applied.len());
+    for diagnostic in &report.diagnostics {
+        let severity = match diagnostic.severity {
+            DiagnosticSeverity::Error => "error",
+            DiagnosticSeverity::Warning => "warning",
+        };
+        let object_name = diagnostic.object_name.as_deref().unwrap_or("*");
+        let field = diagnostic.field.as_deref().unwrap_or("*");
+        println!(
+            "    {severity} {} {}/{} field {}: {}",
+            diagnostic.code, diagnostic.object_type, object_name, field, diagnostic.message
+        );
     }
 }
 
@@ -167,6 +243,13 @@ mod tests {
     #[test]
     fn missing_model_inspect_path_fails() {
         let args = vec!["model".to_string(), "inspect".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_model_compile_path_fails() {
+        let args = vec!["model".to_string(), "compile".to_string()];
 
         assert_eq!(run(&args), 2);
     }

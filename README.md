@@ -9,7 +9,7 @@ execution plans, structured diagnostics, and reproducible releases.
 
 ## Current Scope
 
-This repository is at the v0.2.0 RawModel inspection stage:
+This repository is at the v0.1.0 RawModel inspection and typed compile preview stage:
 
 - Rust toolchain pinned in `rust-toolchain.toml`
 - Cargo workspace skeleton
@@ -17,6 +17,8 @@ This repository is at the v0.2.0 RawModel inspection stage:
 - reference EnergyPlus source setup
 - docs skeleton and copied development plan
 - epJSON RawModel inspection CLI
+- typed compile preview CLI for the first seed object families
+- preview missing reference diagnostics
 - smoke/check scripts
 
 ## Quick Start
@@ -27,7 +29,8 @@ This repository is at the v0.2.0 RawModel inspection stage:
 .\scripts\oracle-smoke.cmd
 .\scripts\v0.1-verify.cmd
 .\scripts\raw-model-smoke.cmd
-.\scripts\v0.2-verify.cmd
+.\scripts\typed-model-smoke.cmd
+.\scripts\package.cmd
 ```
 
 On Windows, the pinned Rust toolchain uses the GNU target so the early
@@ -46,12 +49,13 @@ It does not use a globally installed EnergyPlus as the oracle.
 
 ## Core Commands
 
-The CLI can inspect epJSON into a RawModel summary:
+The CLI can inspect epJSON into a RawModel summary and compile the first typed subset:
 
 ```powershell
 cargo run -p ep_cli -- --version
 cargo run -p ep_cli -- oracle-info
 cargo run -p ep_cli -- model inspect .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
+cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 ```
 
 Unsupported runtime commands should fail explicitly until their milestone is
@@ -64,5 +68,5 @@ implemented.
 - Data architecture: `docs/src/architecture/data-architecture.md`
 - Oracle setup: `docs/src/operations/oracle-setup.md`
 - External review log: `docs/src/operations/external-checkpoints.md`
+- Foundation checkpoints: `docs/src/operations/foundation-checkpoints.md`
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
-- v0.2 readiness: `docs/src/operations/v0.2.0-readiness.md`

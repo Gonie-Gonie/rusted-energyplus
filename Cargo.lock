@@ -4,8 +4,10 @@ version = 4
 
 [[package]]
 name = "ep_cli"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
+ "ep_compiler",
+ "ep_model",
  "ep_oracle",
  "ep_raw_model",
  "ep_runtime",
@@ -13,11 +15,11 @@ dependencies = [
 
 [[package]]
 name = "ep_compare"
-version = "0.2.0"
+version = "0.1.0"
 
 [[package]]
 name = "ep_compiler"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
  "ep_model",
  "ep_raw_model",
@@ -25,22 +27,22 @@ dependencies = [
 
 [[package]]
 name = "ep_model"
-version = "0.2.0"
+version = "0.1.0"
 
 [[package]]
 name = "ep_oracle"
-version = "0.2.0"
+version = "0.1.0"
 
 [[package]]
 name = "ep_raw_model"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
  "serde_json",
 ]
 
 [[package]]
 name = "ep_runtime"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
  "ep_model",
 ]
