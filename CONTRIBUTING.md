@@ -18,9 +18,9 @@ For this repository, that means:
 Use the same scripts locally and in CI:
 
 ```powershell
-.\scripts\setup.ps1
-.\scripts\check.ps1
-.\scripts\oracle-smoke.ps1
+.\scripts\setup.cmd
+.\scripts\check.cmd
+.\scripts\oracle-smoke.cmd
 ```
 
 ## Commit Message Shape
@@ -32,4 +32,3 @@ Initialize reproducible setup skeleton
 Add oracle smoke script
 Document Rust-only architecture policy
 ```
-

@@ -27,4 +27,3 @@ Initialize reproducible setup skeleton
 - EnergyPlus 26.1.0 oracle lock
 - copied development plan
 - docs skeleton
-

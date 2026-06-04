@@ -29,7 +29,7 @@ bootstrap digest after first download.
 Run:
 
 ```powershell
-.\scripts\oracle-smoke.ps1
+.\scripts\oracle-smoke.cmd
 ```
 
 The smoke test should execute the portable `energyplus.exe` from `.runtime`,

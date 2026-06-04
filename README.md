@@ -21,13 +21,17 @@ This repository is at the v0.1.0 setup stage:
 ## Quick Start
 
 ```powershell
-.\scripts\setup.ps1 -InstallRust
-.\scripts\check.ps1
-.\scripts\oracle-smoke.ps1
+.\scripts\setup.cmd -InstallRust
+.\scripts\check.cmd
+.\scripts\oracle-smoke.cmd
 ```
 
 On Windows, the pinned Rust toolchain uses the GNU target so the early
 workspace can build without requiring Visual Studio Build Tools.
+
+The `.cmd` wrappers call the PowerShell scripts with `-ExecutionPolicy Bypass`
+for the current process only. You can also call the `.ps1` files directly when
+your shell policy allows it.
 
 The setup script keeps external oracle assets inside repo-local directories:
 
