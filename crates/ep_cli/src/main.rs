@@ -94,7 +94,31 @@ fn print_raw_model_summary(summary: &RawModelSummary) {
     println!("  objects: {}", summary.object_count);
     println!("  object_type_counts:");
     for (object_type, count) in &summary.object_type_counts {
-        println!("    {object_type}: {count}");
+        let coverage = seed_coverage_status(object_type);
+        println!("    {object_type}: {count} [{coverage}]");
+    }
+}
+
+fn seed_coverage_status(object_type: &str) -> &'static str {
+    const TRACKED_OBJECT_TYPES: &[&str] = &[
+        "Version",
+        "Building",
+        "Timestep",
+        "RunPeriod",
+        "Site:Location",
+        "Zone",
+        "BuildingSurface:Detailed",
+        "FenestrationSurface:Detailed",
+        "Schedule:Constant",
+        "Schedule:Compact",
+        "ZoneHVAC:IdealLoadsAirSystem",
+        "PlantLoop",
+    ];
+
+    if TRACKED_OBJECT_TYPES.contains(&object_type) {
+        "tracked"
+    } else {
+        "untracked"
     }
 }
 
@@ -145,5 +169,11 @@ mod tests {
         let args = vec!["model".to_string(), "inspect".to_string()];
 
         assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn seed_coverage_reports_tracked_objects() {
+        assert_eq!(super::seed_coverage_status("Version"), "tracked");
+        assert_eq!(super::seed_coverage_status("Output:Variable"), "untracked");
     }
 }
