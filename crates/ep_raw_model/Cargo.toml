@@ -1,0 +1,11 @@
+[package]
+name = "ep_raw_model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+

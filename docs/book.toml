@@ -1,0 +1,10 @@
+[book]
+title = "rusted-energyplus Development Docs"
+authors = ["rusted-energyplus contributors"]
+language = "ko"
+multilingual = false
+src = "src"
+
+[build]
+build-dir = "book"
+

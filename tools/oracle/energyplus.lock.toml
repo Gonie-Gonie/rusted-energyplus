@@ -1,0 +1,28 @@
+[oracle]
+name = "EnergyPlus"
+version = "26.1.0"
+tag = "v26.1.0"
+commit = "6f2e40d10250a105b49966baa24d843711e61048"
+release_url = "https://github.com/NREL/EnergyPlus/releases/tag/v26.1.0"
+checked_at = "2026-06-04"
+
+[oracle.windows_x86_64_zip]
+file = "EnergyPlus-26.1.0-6f2e40d102-Windows-x86_64.zip"
+url = "https://github.com/NatLabRockies/EnergyPlus/releases/download/v26.1.0/EnergyPlus-26.1.0-6f2e40d102-Windows-x86_64.zip"
+sha256 = "0bb6932d277eed62f996b625f37c533b8c35f9af0c53710d961d8442fc4e70b3"
+size = 242356526
+
+[oracle.windows_x86_64_hardened_runtime_zip]
+file = "EnergyPlus-26.1.0-6f2e40d102-Windows-x86_64-HardenedRuntime.zip"
+url = "https://github.com/NatLabRockies/EnergyPlus/releases/download/v26.1.0/EnergyPlus-26.1.0-6f2e40d102-Windows-x86_64-HardenedRuntime.zip"
+sha256 = "3bd04e9c077fcefd60205d6936dff3791bc3fd882676bc457939ce66bbbd2934"
+size = 242739715
+
+[oracle.source_zip]
+file = "EnergyPlus-v26.1.0-source.zip"
+url = "https://github.com/NREL/EnergyPlus/archive/refs/tags/v26.1.0.zip"
+commit = "6f2e40d10250a105b49966baa24d843711e61048"
+# GitHub generated source archives do not publish release-asset digests.
+# setup.ps1 records and then verifies a repo-local bootstrap digest.
+sha256_bootstrap_file = ".reference/energyplus-src/26.1.0/source.sha256"
+

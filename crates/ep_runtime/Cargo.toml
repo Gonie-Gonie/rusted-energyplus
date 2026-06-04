@@ -1,0 +1,14 @@
+[package]
+name = "ep_runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ep_model = { path = "../ep_model" }
+
+[lints]
+workspace = true
+

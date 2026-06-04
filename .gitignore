@@ -1,0 +1,15 @@
+.runtime/
+.reference/
+target/
+config/local.toml
+*.log
+*.tmp
+*.zip
+*.7z
+*.tar.gz
+*.err
+*.audit
+*.eso
+*.mtr
+*.csv
+*.sql

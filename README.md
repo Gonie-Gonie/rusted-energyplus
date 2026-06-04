@@ -1,0 +1,57 @@
+# rusted-energyplus
+
+Rust-only EnergyPlus-compatible engine prototype.
+
+The project is compatibility-first: the initial oracle is EnergyPlus 26.1.0,
+while the Rust implementation is organized around epJSON/schema-native input,
+a model compiler, typed IDs, explicit simulation state, graph validation,
+execution plans, structured diagnostics, and reproducible releases.
+
+## Current Scope
+
+This repository is at the v0.1.0 setup stage:
+
+- Rust toolchain pinned in `rust-toolchain.toml`
+- Cargo workspace skeleton
+- portable EnergyPlus oracle setup
+- reference EnergyPlus source setup
+- docs skeleton and copied development plan
+- smoke/check scripts
+
+## Quick Start
+
+```powershell
+.\scripts\setup.ps1 -InstallRust
+.\scripts\check.ps1
+.\scripts\oracle-smoke.ps1
+```
+
+On Windows, the pinned Rust toolchain uses the GNU target so the early
+workspace can build without requiring Visual Studio Build Tools.
+
+The setup script keeps external oracle assets inside repo-local directories:
+
+- `.runtime/energyplus/26.1.0`
+- `.reference/energyplus-src/26.1.0`
+
+It does not use a globally installed EnergyPlus as the oracle.
+
+## Core Commands
+
+The CLI is a placeholder at this stage:
+
+```powershell
+cargo run -p ep_cli -- --version
+cargo run -p ep_cli -- oracle-info
+```
+
+Unsupported runtime/model commands should fail explicitly until their milestone
+is implemented.
+
+## Documentation
+
+- Development plan: `docs/src/development-plan-v2.md`
+- Rust-only policy: `docs/src/architecture/rust-only-policy.md`
+- Data architecture: `docs/src/architecture/data-architecture.md`
+- Oracle setup: `docs/src/operations/oracle-setup.md`
+- External review log: `docs/src/operations/external-checkpoints.md`

@@ -1,0 +1,19 @@
+[package]
+name = "ep_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "eplus-rs"
+path = "src/main.rs"
+
+[dependencies]
+ep_oracle = { path = "../ep_oracle" }
+ep_runtime = { path = "../ep_runtime" }
+
+[lints]
+workspace = true
+

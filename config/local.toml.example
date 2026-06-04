@@ -1,0 +1,10 @@
+[local]
+created_by_setup = false
+
+[oracle]
+energyplus_exe = ".runtime/energyplus/26.1.0/energyplus.exe"
+convert_input_format_exe = ".runtime/energyplus/26.1.0/ConvertInputFormat.exe"
+weather_dir = ".runtime/energyplus/26.1.0/WeatherData"
+example_dir = ".runtime/energyplus/26.1.0/ExampleFiles"
+source_dir = ".reference/energyplus-src/26.1.0"
+

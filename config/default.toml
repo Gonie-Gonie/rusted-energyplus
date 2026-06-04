@@ -1,0 +1,15 @@
+[project]
+name = "rusted-energyplus"
+mode_default = "compatibility"
+
+[oracle]
+energyplus_version = "26.1.0"
+source_tag = "v26.1.0"
+source_commit = "6f2e40d10250a105b49966baa24d843711e61048"
+runtime_dir = ".runtime/energyplus/26.1.0"
+source_dir = ".reference/energyplus-src/26.1.0"
+
+[compatibility]
+baseline_mode = "deterministic-scalar"
+legacy_energyplus_install_allowed = false
+

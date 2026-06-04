@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/ep_cli",
+    "crates/ep_raw_model",
+    "crates/ep_model",
+    "crates/ep_compiler",
+    "crates/ep_runtime",
+    "crates/ep_oracle",
+    "crates/ep_compare",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "BSD-3-Clause"
+repository = "https://github.com/Gonie-Gonie/rusted-energyplus"
+rust-version = "1.96.0"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+
