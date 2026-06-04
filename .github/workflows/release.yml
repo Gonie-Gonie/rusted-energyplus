@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -52,8 +52,14 @@ jobs:
           "RELEASE_NOTES=$notesFile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_ARTIFACT=$artifact" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Set up toolchain and oracle
-        run: .\scripts\setup.cmd -InstallRust -InstallDocsTools -SkipOracleSmoke
+      - name: Set up Rust and docs tools
+        run: .\scripts\setup.cmd -InstallRust -InstallDocsTools -SkipOracleDownload -SkipSourceDownload -SkipOracleSmoke
+
+      - name: Set up EnergyPlus oracle
+        run: .\scripts\setup.cmd -SkipSourceDownload -SkipOracleSmoke
+
+      - name: Set up EnergyPlus reference source
+        run: .\scripts\setup.cmd -SkipOracleDownload -SkipOracleSmoke
 
       - name: Verify release
         run: |
