@@ -9,3 +9,5 @@
 - [v0.1.0 Readiness](operations/v0.1.0-readiness.md)
 - [Supported Object Coverage](operations/supported-object-coverage.md)
 - [Porting Map](porting-map/README.md)
+- [Releases](releases/README.md)
+  - [v0.1.0](releases/v0.1.0.md)
