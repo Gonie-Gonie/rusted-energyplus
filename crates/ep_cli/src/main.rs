@@ -1,6 +1,7 @@
 //! Command line entry point for eplus-rs.
 
 use ep_oracle::default_oracle_release;
+use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::SimulationMode;
 
 fn main() {
@@ -27,9 +28,42 @@ fn run(args: &[String]) -> i32 {
             print_modes();
             0
         }
+        Some("model") => run_model_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported command: {command}");
-            eprintln!("This workspace is at the v0.1.0 setup milestone.");
+            eprintln!("Try: eplus-rs model inspect <input.epJSON>");
+            2
+        }
+    }
+}
+
+fn run_model_command(args: &[String]) -> i32 {
+    match args.first().map(String::as_str) {
+        Some("inspect") => {
+            let Some(path) = args.get(1) else {
+                eprintln!("missing input path");
+                eprintln!("usage: eplus-rs model inspect <input.epJSON>");
+                return 2;
+            };
+            match load_epjson_file(path) {
+                Ok(model) => {
+                    print_raw_model_summary(&model.summary());
+                    0
+                }
+                Err(error) => {
+                    eprintln!("{error}");
+                    1
+                }
+            }
+        }
+        Some(command) => {
+            eprintln!("unsupported model command: {command}");
+            eprintln!("usage: eplus-rs model inspect <input.epJSON>");
+            2
+        }
+        None => {
+            eprintln!("missing model command");
+            eprintln!("usage: eplus-rs model inspect <input.epJSON>");
             2
         }
     }
@@ -41,12 +75,27 @@ fn print_help() {
     println!("Commands:");
     println!("  oracle-info   print locked EnergyPlus oracle metadata");
     println!("  modes         print planned simulation modes");
+    println!("  model inspect <input.epJSON>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
     println!("  compile <input.epJSON>");
     println!("  graph validate <input.epJSON>");
     println!("  run <input.epJSON>");
+}
+
+fn print_raw_model_summary(summary: &RawModelSummary) {
+    println!("RawModel");
+    println!(
+        "  version: {}",
+        summary.version.as_deref().unwrap_or("unknown")
+    );
+    println!("  object_types: {}", summary.object_type_count);
+    println!("  objects: {}", summary.object_count);
+    println!("  object_type_counts:");
+    for (object_type, count) in &summary.object_type_counts {
+        println!("    {object_type}: {count}");
+    }
 }
 
 fn print_oracle_info() {
@@ -87,6 +136,13 @@ mod tests {
     #[test]
     fn unknown_command_fails() {
         let args = vec!["run".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_model_inspect_path_fails() {
+        let args = vec!["model".to_string(), "inspect".to_string()];
 
         assert_eq!(run(&args), 2);
     }
