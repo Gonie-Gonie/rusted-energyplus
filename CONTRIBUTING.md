@@ -18,7 +18,7 @@ For this repository, that means:
 Use the same scripts locally and in CI:
 
 ```powershell
-.\scripts\setup.cmd
+.\scripts\setup.cmd -InstallRust -InstallDocsTools
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
 ```

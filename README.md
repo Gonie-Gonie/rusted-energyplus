@@ -21,7 +21,7 @@ This repository is at the v0.1.0 setup stage:
 ## Quick Start
 
 ```powershell
-.\scripts\setup.cmd -InstallRust
+.\scripts\setup.cmd -InstallRust -InstallDocsTools
 .\scripts\check.cmd
 .\scripts\oracle-smoke.cmd
 ```

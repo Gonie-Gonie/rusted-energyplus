@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$InstallRust,
+    [switch]$InstallDocsTools,
     [switch]$SkipOracleDownload,
     [switch]$SkipSourceDownload,
     [switch]$SkipOracleSmoke
@@ -15,6 +16,7 @@ $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $OracleVersion = "26.1.0"
 $OracleCommit = "6f2e40d10250a105b49966baa24d843711e61048"
 $RustToolchain = "1.96.0-x86_64-pc-windows-gnu"
+$MdBookVersion = "0.5.3"
 
 $OracleArchiveName = "EnergyPlus-26.1.0-6f2e40d102-Windows-x86_64.zip"
 $OracleArchiveUrl = "https://github.com/NatLabRockies/EnergyPlus/releases/download/v26.1.0/$OracleArchiveName"
@@ -115,6 +117,28 @@ function Ensure-RustComponents {
 
     Invoke-External -FilePath $rustup.Source -Arguments @("toolchain", "install", $RustToolchain, "--profile", "minimal")
     Invoke-External -FilePath $rustup.Source -Arguments @("component", "add", "rustfmt", "clippy", "--toolchain", $RustToolchain)
+}
+
+function Ensure-DocsTools {
+    Add-CargoBinToPath
+    $mdbook = Get-Command mdbook -ErrorAction SilentlyContinue
+    if ($null -ne $mdbook) {
+        Write-Host "mdBook is available: $($mdbook.Source)"
+        return
+    }
+
+    if (-not $InstallDocsTools) {
+        Write-Warning "mdBook was not found. Re-run setup with -InstallDocsTools to install mdbook $MdBookVersion."
+        return
+    }
+
+    $cargo = Get-Command cargo -ErrorAction SilentlyContinue
+    if ($null -eq $cargo) {
+        throw "cargo is required to install mdbook. Run setup with -InstallRust first."
+    }
+
+    Write-Host "Installing mdbook $MdBookVersion"
+    Invoke-External -FilePath $cargo.Source -Arguments @("install", "mdbook", "--version", $MdBookVersion, "--locked")
 }
 
 function Expand-ArchiveToSingleRoot {
@@ -237,6 +261,7 @@ New-Directory -Path (Join-RepoPath "config")
 
 Install-RustIfRequested
 Ensure-RustComponents
+Ensure-DocsTools
 Ensure-OracleBinary
 Ensure-ReferenceSource
 Write-LocalConfig

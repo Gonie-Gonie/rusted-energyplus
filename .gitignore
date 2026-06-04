@@ -1,6 +1,7 @@
 .runtime/
 .reference/
 target/
+docs/book/
 config/local.toml
 *.log
 *.tmp

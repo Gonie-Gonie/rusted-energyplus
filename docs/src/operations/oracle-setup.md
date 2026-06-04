@@ -4,7 +4,15 @@ The initial oracle is EnergyPlus 26.1.0.
 
 On Windows, `rust-toolchain.toml` pins `1.96.0-x86_64-pc-windows-gnu` for the
 early workspace. This avoids making Visual Studio Build Tools a prerequisite
-for v0.1.0 setup checks.
+for v0.1.0 setup checks. `scripts/setup.ps1 -InstallDocsTools` installs
+`mdbook 0.5.3` so docs checks can build the book instead of only checking file
+structure.
+
+Recommended first run:
+
+```powershell
+.\scripts\setup.cmd -InstallRust -InstallDocsTools
+```
 
 The setup script downloads and verifies the Windows x86_64 release zip using
 the SHA256 published by the GitHub release. It extracts the runtime into:

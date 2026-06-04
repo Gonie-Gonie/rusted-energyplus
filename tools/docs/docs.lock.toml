@@ -1,0 +1,5 @@
+[mdbook]
+version = "0.5.3"
+install = "cargo install mdbook --version 0.5.3 --locked"
+checked_at = "2026-06-04"
+
