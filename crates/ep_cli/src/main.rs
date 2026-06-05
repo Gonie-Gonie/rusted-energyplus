@@ -5,7 +5,7 @@ use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_model::TypedModel;
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
-use ep_runtime::{SimulationMode, simulate_constant_schedules};
+use ep_runtime::{SimulationMode, load_epw_dry_bulb_series, simulate_constant_schedules};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -112,6 +112,7 @@ fn print_help() {
     println!("  model compile <input.epJSON>");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
+    println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -122,14 +123,17 @@ fn print_help() {
 fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
+        Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
         Some(command) => {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             2
         }
         None => {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             2
         }
     }
@@ -211,6 +215,62 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
     if passed { 0 } else { 1 }
+}
+
+fn run_compare_weather_drybulb(args: &[String]) -> i32 {
+    let Some(epw_path) = args.first() else {
+        eprintln!("missing weather path");
+        eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+        return 2;
+    };
+    let Some(eso_path) = args.get(1) else {
+        eprintln!("missing eplusout.eso path");
+        eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+        return 2;
+    };
+
+    let oracle_values = match load_eso_series(
+        eso_path,
+        "Environment",
+        "Site Outdoor Air Drybulb Temperature",
+    ) {
+        Ok(values) => values,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let weather_values = match load_epw_dry_bulb_series(epw_path) {
+        Ok(values) => values,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if weather_values.len() < oracle_values.len() {
+        eprintln!(
+            "EPW dry-bulb series has {} samples but ESO requires {}",
+            weather_values.len(),
+            oracle_values.len()
+        );
+        return 1;
+    }
+
+    let comparison = compare_series(
+        &oracle_values,
+        &weather_values[..oracle_values.len()],
+        Tolerance::default(),
+    );
+
+    println!("Weather Drybulb Comparison");
+    println!("  samples: {}", comparison.samples);
+    println!("  max_abs_delta: {}", comparison.max_abs_delta);
+    println!(
+        "  status: {}",
+        if comparison.passed { "pass" } else { "fail" }
+    );
+
+    if comparison.passed { 0 } else { 1 }
 }
 
 fn print_raw_model_summary(summary: &RawModelSummary) {
