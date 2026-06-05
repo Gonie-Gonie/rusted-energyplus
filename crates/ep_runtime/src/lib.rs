@@ -2,8 +2,8 @@
 
 use ep_model::{
     AutoOrNumber, OtherEquipment, OutputHandle, OutsideBoundaryCondition, Point3, RunPeriod,
-    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SurfaceType, TypedModel,
-    Zone, ZoneId,
+    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SurfaceId, SurfaceType,
+    TypedModel, Zone, ZoneId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -430,6 +430,55 @@ pub struct ZoneGeometrySummary {
     pub exterior_wall_area_m2: f64,
 }
 
+/// Initial heat-balance state shell for the EnergyPlus porting path.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceState {
+    /// Current zone timestep index.
+    pub timestep_index: usize,
+    /// Per-zone heat-balance state.
+    pub zones: Vec<ZoneHeatBalanceState>,
+    /// Per-surface heat-balance state.
+    pub surfaces: Vec<SurfaceHeatBalanceState>,
+}
+
+/// Per-zone heat-balance state shell.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneHeatBalanceState {
+    /// Zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// Current mean air temperature in C.
+    pub mean_air_temperature_c: f64,
+    /// Previous mean air temperature history in C.
+    pub previous_mean_air_temperatures_c: [f64; 3],
+    /// Zone volume in cubic meters.
+    pub volume_m3: f64,
+    /// Air heat capacity in J/K.
+    pub air_heat_capacity_j_per_k: f64,
+    /// First hour-ending convective internal gain in W.
+    pub convective_internal_gain_w: f64,
+}
+
+/// Per-surface heat-balance state shell.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceHeatBalanceState {
+    /// Surface ID.
+    pub surface_id: SurfaceId,
+    /// Owning zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// Surface type.
+    pub surface_type: SurfaceType,
+    /// Surface area in square meters.
+    pub area_m2: f64,
+    /// Current inside face temperature in C.
+    pub inside_face_temperature_c: f64,
+    /// Current outside face temperature in C.
+    pub outside_face_temperature_c: f64,
+}
+
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
@@ -678,6 +727,77 @@ fn internal_gain_for_equipment_w(
     let sensible_fraction = (1.0 - equipment.fraction_latent - equipment.fraction_lost).max(0.0);
 
     equipment.design_level_w * schedule_multiplier * sensible_fraction
+}
+
+/// Initializes the heat-balance state shell without advancing the solver.
+pub fn initialize_heat_balance_state(
+    model: &SimulationModel,
+    initial_zone_air_temperature_c: f64,
+) -> Result<HeatBalanceState, RuntimeError> {
+    let mut zones = Vec::with_capacity(model.typed.zones.len());
+    for zone in &model.typed.zones {
+        let volume_m3 =
+            zone_volume_m3(&model.typed, zone).ok_or_else(|| RuntimeError::MissingZoneVolume {
+                zone_name: zone.name.0.clone(),
+            })?;
+        zones.push(ZoneHeatBalanceState {
+            zone_id: zone.id,
+            zone_name: zone.name.0.clone(),
+            mean_air_temperature_c: initial_zone_air_temperature_c,
+            previous_mean_air_temperatures_c: [initial_zone_air_temperature_c; 3],
+            volume_m3,
+            air_heat_capacity_j_per_k: volume_m3
+                * AIR_DENSITY_KG_PER_M3
+                * AIR_SPECIFIC_HEAT_J_PER_KG_K,
+            convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
+        });
+    }
+
+    let surfaces = model
+        .typed
+        .surfaces
+        .iter()
+        .map(|surface| SurfaceHeatBalanceState {
+            surface_id: surface.id,
+            zone_id: surface.zone,
+            surface_name: surface.name.0.clone(),
+            surface_type: surface.surface_type,
+            area_m2: surface_area_m2(&surface.vertices),
+            inside_face_temperature_c: initial_zone_air_temperature_c,
+            outside_face_temperature_c: initial_zone_air_temperature_c,
+        })
+        .collect();
+
+    Ok(HeatBalanceState {
+        timestep_index: 0,
+        zones,
+        surfaces,
+    })
+}
+
+fn convective_internal_gain_w(model: &TypedModel, zone_id: ZoneId, hour_ending: u32) -> f64 {
+    model
+        .other_equipment
+        .iter()
+        .filter(|equipment| equipment.zone == zone_id)
+        .map(|equipment| convective_internal_gain_for_equipment_w(model, equipment, hour_ending))
+        .sum()
+}
+
+fn convective_internal_gain_for_equipment_w(
+    model: &TypedModel,
+    equipment: &OtherEquipment,
+    hour_ending: u32,
+) -> f64 {
+    let schedule_multiplier = equipment
+        .schedule
+        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
+        .unwrap_or(1.0);
+    let convective_fraction =
+        (1.0 - equipment.fraction_latent - equipment.fraction_radiant - equipment.fraction_lost)
+            .max(0.0);
+
+    equipment.design_level_w * schedule_multiplier * convective_fraction
 }
 
 fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
@@ -1249,9 +1369,10 @@ mod tests {
     use super::{
         ExecutionStep, FirstZoneSimulationOptions, OutputSeries, ResultStore, SimulationMode,
         SimulationState, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series, parse_epw_records,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled, simulate_schedule_values,
-        surface_area_m2, zone_geometry_summaries,
+        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
+        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_schedule_values, surface_area_m2,
+        zone_geometry_summaries,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
@@ -1495,6 +1616,29 @@ DATA PERIODS
         assert_eq!(summaries[0].floor_area_m2, 1.0);
         assert_eq!(summaries[0].volume_m3, Some(1.0));
         assert_eq!(summaries[0].exterior_wall_area_m2, 4.0);
+    }
+
+    #[test]
+    fn heat_balance_state_shell_initializes_cube_metrics() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let model = SimulationModel::from_typed(cube_model());
+
+        let state = initialize_heat_balance_state(&model, 20.0)?;
+
+        assert_eq!(state.timestep_index, 0);
+        assert_eq!(state.zones.len(), 1);
+        assert_eq!(state.zones[0].zone_name, "ZONE ONE");
+        assert_eq!(state.zones[0].mean_air_temperature_c, 20.0);
+        assert_eq!(state.zones[0].previous_mean_air_temperatures_c, [20.0; 3]);
+        assert_eq!(state.zones[0].volume_m3, 1.0);
+        assert!((state.zones[0].air_heat_capacity_j_per_k - 1207.2).abs() < 1.0e-9);
+        assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
+        assert_eq!(state.surfaces.len(), 6);
+        assert_eq!(state.surfaces[0].area_m2, 1.0);
+        assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
+        assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
     }
 
     #[test]

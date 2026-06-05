@@ -25,6 +25,7 @@ compatibility for zone heat balance or HVAC simulation.
 - typed `RunPeriod` intake and hourly time-axis foundation
 - EPW hourly weather record parsing beyond dry-bulb
 - `Schedule:Compact` all-days `Until` segment subset
+- heat-balance state shell for future EnergyPlus-aligned solver work
 - zone geometry summary foundation for future EnergyPlus EIO comparison
 - EnergyPlus oracle comparisons for constant schedules, EIO zone geometry, and
   EPW dry-bulb weather

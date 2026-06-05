@@ -71,6 +71,7 @@ The current Rust runtime has:
 - `SimulationModel`
 - `ExecutionPlan`
 - `SimulationState`
+- `HeatBalanceState` shell
 - `ResultStore`
 - schedule traces
 - EPW weather records
@@ -113,7 +114,8 @@ source-reference comments.
 ## Porting Order
 
 1. Preserve current diagnostic command behavior.
-2. Add heat-balance state structs with no solver changes.
+2. Add heat-balance state structs with no solver changes. Implemented:
+   `ep_runtime::initialize_heat_balance_state`.
 3. Add report-only traces for EnergyPlus inputs already gated by EIO:
    geometry, material resistance, constructions, schedules, and
    `OtherEquipment`.
@@ -185,4 +187,3 @@ Do not mark heat-balance compatibility if:
 - only first/last values are compared
 - EnergyPlus warmup behavior is bypassed without a documented subset boundary
 - any required input interpretation gate is failing
-

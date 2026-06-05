@@ -98,6 +98,7 @@ but that report is still baseline-only evidence.
 | zone geometry summary | implemented foundation | `eplus-rs model geometry` prints zone surface count, floor area, volume, and exterior wall area |
 | EIO geometry comparison | implemented smoke gate | `eplus-rs compare geometry` compares Rust geometry summary with EnergyPlus `Zone Information` |
 | EIO internal gains comparison | implemented smoke gate | `eplus-rs compare internal-gains` compares typed `OtherEquipment` nominal gains with EnergyPlus EIO |
+| heat-balance state shell | implemented foundation | `ep_runtime::initialize_heat_balance_state` initializes zone and surface heat-balance state without advancing a solver |
 
 ## Revised Milestone Intent
 
@@ -285,6 +286,7 @@ P2 compatibility work:
 - [x] add EnergyPlus EIO geometry comparison gate
 - [x] add EnergyPlus EIO `OtherEquipment` nominal internal-gains gate
 - [x] write heat-balance porting map before heat-balance code
+- [x] add heat-balance state shell without solver changes
 
 ## Forbidden Wording
 
