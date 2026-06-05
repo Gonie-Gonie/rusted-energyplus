@@ -76,6 +76,31 @@ pub struct EioZoneGeometry {
     pub exterior_gross_wall_area_m2: f64,
 }
 
+/// OtherEquipment nominal internal gain values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioOtherEquipmentNominal {
+    /// Equipment name.
+    pub equipment_name: String,
+    /// Referenced schedule name.
+    pub schedule_name: String,
+    /// Target zone name.
+    pub zone_name: String,
+    /// EIO `Zone Floor Area {m2}`.
+    pub zone_floor_area_m2: f64,
+    /// EIO `Equipment Level {W}`.
+    pub equipment_level_w: f64,
+    /// EIO `Equipment/Floor Area {W/m2}`.
+    pub equipment_per_floor_area_w_per_m2: f64,
+    /// EIO `Fraction Latent`.
+    pub fraction_latent: f64,
+    /// EIO `Fraction Radiant`.
+    pub fraction_radiant: f64,
+    /// EIO `Fraction Lost`.
+    pub fraction_lost: f64,
+    /// EIO `Fraction Convected`.
+    pub fraction_convected: f64,
+}
+
 /// Compares two equally-sized numeric series.
 #[must_use]
 pub fn compare_series(
@@ -149,8 +174,19 @@ pub enum EioError {
     Io(std::io::Error),
     /// No `Zone Information` rows were present.
     MissingZoneInformation,
+    /// No `OtherEquipment Internal Gains Nominal` rows were present.
+    MissingOtherEquipmentNominal,
     /// A `Zone Information` row could not be parsed.
     InvalidZoneInformation {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// An `OtherEquipment Internal Gains Nominal` row could not be parsed.
+    InvalidOtherEquipmentNominal {
         /// One-based line number.
         line: usize,
         /// Raw line text.
@@ -179,9 +215,19 @@ impl Display for EioError {
         match self {
             Self::Io(error) => write!(formatter, "failed to read EIO: {error}"),
             Self::MissingZoneInformation => write!(formatter, "EIO Zone Information not found"),
+            Self::MissingOtherEquipmentNominal => {
+                write!(
+                    formatter,
+                    "EIO OtherEquipment Internal Gains Nominal not found"
+                )
+            }
             Self::InvalidZoneInformation { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Zone Information at line {line}: {reason}: {text}"
+            ),
+            Self::InvalidOtherEquipmentNominal { line, text, reason } => write!(
+                formatter,
+                "invalid EIO OtherEquipment Internal Gains Nominal at line {line}: {reason}: {text}"
             ),
         }
     }
@@ -200,7 +246,10 @@ impl std::error::Error for EioError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
-            Self::MissingZoneInformation | Self::InvalidZoneInformation { .. } => None,
+            Self::MissingZoneInformation
+            | Self::MissingOtherEquipmentNominal
+            | Self::InvalidZoneInformation { .. }
+            | Self::InvalidOtherEquipmentNominal { .. } => None,
         }
     }
 }
@@ -231,6 +280,14 @@ pub fn load_eso_series(
 pub fn load_eio_zone_geometry(path: impl AsRef<Path>) -> Result<Vec<EioZoneGeometry>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_zone_geometry(&contents)
+}
+
+/// Loads OtherEquipment nominal internal gain rows from an EnergyPlus EIO file.
+pub fn load_eio_other_equipment_nominal(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioOtherEquipmentNominal>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_other_equipment_nominal(&contents)
 }
 
 /// Parses one numeric ESO series by key and variable name.
@@ -330,6 +387,84 @@ pub fn parse_eio_zone_geometry(contents: &str) -> Result<Vec<EioZoneGeometry>, E
     Ok(zones)
 }
 
+/// Parses `OtherEquipment Internal Gains Nominal` rows from EnergyPlus EIO contents.
+pub fn parse_eio_other_equipment_nominal(
+    contents: &str,
+) -> Result<Vec<EioOtherEquipmentNominal>, EioError> {
+    let mut equipment = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("OtherEquipment Internal Gains Nominal,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 12 {
+            return Err(EioError::InvalidOtherEquipmentNominal {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 13 fields, found {}", fields.len()),
+            });
+        }
+
+        equipment.push(EioOtherEquipmentNominal {
+            equipment_name: required_field(&fields, 1).to_ascii_uppercase(),
+            schedule_name: required_field(&fields, 2).to_ascii_uppercase(),
+            zone_name: required_field(&fields, 3).to_ascii_uppercase(),
+            zone_floor_area_m2: parse_other_f64_field(
+                &fields,
+                4,
+                line_number,
+                line,
+                "Zone Floor Area {m2}",
+            )?,
+            equipment_level_w: parse_other_f64_field(
+                &fields,
+                6,
+                line_number,
+                line,
+                "Equipment Level {W}",
+            )?,
+            equipment_per_floor_area_w_per_m2: parse_other_f64_field(
+                &fields,
+                7,
+                line_number,
+                line,
+                "Equipment/Floor Area {W/m2}",
+            )?,
+            fraction_latent: parse_other_f64_field(
+                &fields,
+                9,
+                line_number,
+                line,
+                "Fraction Latent",
+            )?,
+            fraction_radiant: parse_other_f64_field(
+                &fields,
+                10,
+                line_number,
+                line,
+                "Fraction Radiant",
+            )?,
+            fraction_lost: parse_other_f64_field(&fields, 11, line_number, line, "Fraction Lost")?,
+            fraction_convected: parse_other_f64_field(
+                &fields,
+                12,
+                line_number,
+                line,
+                "Fraction Convected",
+            )?,
+        });
+    }
+
+    if equipment.is_empty() {
+        return Err(EioError::MissingOtherEquipmentNominal);
+    }
+
+    Ok(equipment)
+}
+
 fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {
     fields.get(index).copied().unwrap_or("")
 }
@@ -344,6 +479,22 @@ fn parse_f64_field(
     required_field(fields, index)
         .parse::<f64>()
         .map_err(|_error| EioError::InvalidZoneInformation {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_other_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidOtherEquipmentNominal {
             line,
             text: text.to_string(),
             reason: format!("invalid {field}"),
@@ -385,7 +536,10 @@ fn normalize_key(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{Tolerance, compare_series, parse_eio_zone_geometry, parse_eso_series};
+    use super::{
+        Tolerance, compare_series, parse_eio_other_equipment_nominal, parse_eio_zone_geometry,
+        parse_eso_series,
+    };
 
     #[test]
     fn tolerance_accepts_close_values() {
@@ -429,6 +583,29 @@ End of Data Dictionary
         assert_eq!(zones[0].floor_area_m2, 232.26);
         assert_eq!(zones[0].volume_m3, 1061.88);
         assert_eq!(zones[0].exterior_gross_wall_area_m2, 278.71);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_eio_other_equipment_nominal_rows() -> Result<(), Box<dyn std::error::Error>> {
+        let equipment = parse_eio_other_equipment_nominal(
+            r#"! <OtherEquipment Internal Gains Nominal>,Name,...
+ OtherEquipment Internal Gains Nominal, TEST 352A,ALWAYSON,ZONE ONE,232.26,0.0,352.000,1.516,N/A,0.000,0.100,0.200,0.700,352.000,352.000
+"#,
+        )?;
+
+        assert_eq!(equipment.len(), 1);
+        assert_eq!(equipment[0].equipment_name, "TEST 352A");
+        assert_eq!(equipment[0].schedule_name, "ALWAYSON");
+        assert_eq!(equipment[0].zone_name, "ZONE ONE");
+        assert_eq!(equipment[0].zone_floor_area_m2, 232.26);
+        assert_eq!(equipment[0].equipment_level_w, 352.0);
+        assert_eq!(equipment[0].equipment_per_floor_area_w_per_m2, 1.516);
+        assert_eq!(equipment[0].fraction_latent, 0.0);
+        assert_eq!(equipment[0].fraction_radiant, 0.1);
+        assert_eq!(equipment[0].fraction_lost, 0.2);
+        assert_eq!(equipment[0].fraction_convected, 0.7);
 
         Ok(())
     }

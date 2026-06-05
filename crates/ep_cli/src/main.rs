@@ -1,12 +1,15 @@
 //! Command line entry point for eplus-rs.
 
-use ep_compare::{Tolerance, compare_series, load_eio_zone_geometry, load_eso_series};
+use ep_compare::{
+    Tolerance, compare_series, load_eio_other_equipment_nominal, load_eio_zone_geometry,
+    load_eso_series,
+};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, VariableClass,
     load_case_file,
 };
-use ep_model::{SimulationModel, TypedModel};
+use ep_model::{OtherEquipment, ScheduleId, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
@@ -187,6 +190,7 @@ fn print_help() {
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
+    println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
     println!("  conformance validate-case <case.toml>");
@@ -817,12 +821,14 @@ fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
         Some("geometry") => run_compare_geometry(&args[1..]),
+        Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
         Some("zone-temperature") => run_compare_zone_temperature(&args[1..]),
         Some(command) => {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -833,6 +839,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -1041,6 +1048,126 @@ fn run_compare_geometry(args: &[String]) -> i32 {
     if passed { 0 } else { 1 }
 }
 
+fn run_compare_internal_gains(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_equipment = other_equipment_nominal_rows(&model);
+    if rust_equipment.is_empty() {
+        eprintln!("no OtherEquipment objects are available for internal-gains comparison");
+        return 1;
+    }
+
+    let oracle_equipment = match load_eio_other_equipment_nominal(eio_path) {
+        Ok(equipment) => equipment,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let tolerance = Tolerance {
+        absolute: 0.02,
+        relative: 1.0e-6,
+    };
+    let mut passed = rust_equipment.len() == oracle_equipment.len();
+    let mut first_divergence = None;
+    if rust_equipment.len() != oracle_equipment.len() {
+        first_divergence = Some(format!(
+            "other_equipment_count expected {} observed {}",
+            oracle_equipment.len(),
+            rust_equipment.len()
+        ));
+    }
+
+    println!("OtherEquipment Internal Gains Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: absolute-0.02");
+    println!("  other_equipment: {}", rust_equipment.len());
+    println!("  oracle_other_equipment: {}", oracle_equipment.len());
+    for rust_row in &rust_equipment {
+        let Some(oracle_row) = oracle_equipment.iter().find(|row| {
+            row.equipment_name
+                .eq_ignore_ascii_case(&rust_row.equipment_name)
+        }) else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!("other_equipment {} missing_in_eio", rust_row.equipment_name),
+            );
+            println!(
+                "  other_equipment: {} status: fail",
+                rust_row.equipment_name
+            );
+            continue;
+        };
+
+        let row_pass = internal_gain_row_matches(rust_row, oracle_row, tolerance);
+        if !row_pass {
+            passed = false;
+            record_internal_gain_field_divergence(
+                &mut first_divergence,
+                rust_row,
+                oracle_row,
+                tolerance,
+            );
+        }
+
+        println!(
+            "  other_equipment: {} zone: {}/{} schedule: {}/{} design_level_w: {:.6}/{:.6} floor_area_m2: {:.6}/{:.6} equipment_per_floor_area_w_per_m2: {:.6}/{:.6} fractions_latent_radiant_lost_convected: {:.6},{:.6},{:.6},{:.6}/{:.6},{:.6},{:.6},{:.6} status: {}",
+            rust_row.equipment_name,
+            oracle_row.zone_name,
+            rust_row.zone_name,
+            oracle_row.schedule_name,
+            rust_row.schedule_name,
+            oracle_row.equipment_level_w,
+            rust_row.equipment_level_w,
+            oracle_row.zone_floor_area_m2,
+            rust_row.zone_floor_area_m2,
+            oracle_row.equipment_per_floor_area_w_per_m2,
+            rust_row.equipment_per_floor_area_w_per_m2,
+            oracle_row.fraction_latent,
+            oracle_row.fraction_radiant,
+            oracle_row.fraction_lost,
+            oracle_row.fraction_convected,
+            rust_row.fraction_latent,
+            rust_row.fraction_radiant,
+            rust_row.fraction_lost,
+            rust_row.fraction_convected,
+            if row_pass { "pass" } else { "fail" }
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
 fn run_compare_zone_temperature(args: &[String]) -> i32 {
     let Some(input_path) = args.first() else {
         eprintln!("missing input path");
@@ -1222,6 +1349,105 @@ fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     if comparison.passed { 0 } else { 1 }
 }
 
+struct OtherEquipmentNominalRow {
+    equipment_name: String,
+    schedule_name: String,
+    zone_name: String,
+    zone_floor_area_m2: f64,
+    equipment_level_w: f64,
+    equipment_per_floor_area_w_per_m2: f64,
+    fraction_latent: f64,
+    fraction_radiant: f64,
+    fraction_lost: f64,
+    fraction_convected: f64,
+}
+
+fn other_equipment_nominal_rows(model: &TypedModel) -> Vec<OtherEquipmentNominalRow> {
+    let geometry = zone_geometry_summaries(model);
+    model
+        .other_equipment
+        .iter()
+        .map(|equipment| {
+            let zone_name = model
+                .zones
+                .iter()
+                .find(|zone| zone.id == equipment.zone)
+                .map(|zone| zone.name.0.clone())
+                .unwrap_or_else(|| "MISSING ZONE".to_string());
+            let zone_floor_area_m2 = geometry
+                .iter()
+                .find(|summary| summary.zone_id == equipment.zone)
+                .map(|summary| summary.floor_area_m2)
+                .unwrap_or(0.0);
+            let equipment_per_floor_area_w_per_m2 = if zone_floor_area_m2.abs() > f64::EPSILON {
+                equipment.design_level_w / zone_floor_area_m2
+            } else {
+                0.0
+            };
+
+            OtherEquipmentNominalRow {
+                equipment_name: equipment.name.0.clone(),
+                schedule_name: schedule_name_for_id(model, equipment.schedule),
+                zone_name,
+                zone_floor_area_m2,
+                equipment_level_w: equipment.design_level_w,
+                equipment_per_floor_area_w_per_m2,
+                fraction_latent: equipment.fraction_latent,
+                fraction_radiant: equipment.fraction_radiant,
+                fraction_lost: equipment.fraction_lost,
+                fraction_convected: fraction_convected(equipment),
+            }
+        })
+        .collect()
+}
+
+fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> String {
+    let Some(schedule_id) = schedule_id else {
+        return "NONE".to_string();
+    };
+
+    model
+        .schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+        .map(|schedule| schedule.name.0.clone())
+        .or_else(|| {
+            model
+                .compact_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
+        .unwrap_or_else(|| "MISSING SCHEDULE".to_string())
+}
+
+fn fraction_convected(equipment: &OtherEquipment) -> f64 {
+    1.0 - equipment.fraction_latent - equipment.fraction_radiant - equipment.fraction_lost
+}
+
+fn internal_gain_row_matches(
+    rust_row: &OtherEquipmentNominalRow,
+    oracle_row: &ep_compare::EioOtherEquipmentNominal,
+    tolerance: Tolerance,
+) -> bool {
+    oracle_row
+        .zone_name
+        .eq_ignore_ascii_case(&rust_row.zone_name)
+        && oracle_row
+            .schedule_name
+            .eq_ignore_ascii_case(&rust_row.schedule_name)
+        && tolerance.accepts(oracle_row.zone_floor_area_m2, rust_row.zone_floor_area_m2)
+        && tolerance.accepts(oracle_row.equipment_level_w, rust_row.equipment_level_w)
+        && tolerance.accepts(
+            oracle_row.equipment_per_floor_area_w_per_m2,
+            rust_row.equipment_per_floor_area_w_per_m2,
+        )
+        && tolerance.accepts(oracle_row.fraction_latent, rust_row.fraction_latent)
+        && tolerance.accepts(oracle_row.fraction_radiant, rust_row.fraction_radiant)
+        && tolerance.accepts(oracle_row.fraction_lost, rust_row.fraction_lost)
+        && tolerance.accepts(oracle_row.fraction_convected, rust_row.fraction_convected)
+}
+
 fn record_first_divergence(first_divergence: &mut Option<String>, value: String) {
     if first_divergence.is_none() {
         *first_divergence = Some(value);
@@ -1290,6 +1516,113 @@ fn record_geometry_field_divergence(
                 rust_zone.exterior_wall_area_m2
             ),
         );
+    }
+}
+
+fn record_internal_gain_field_divergence(
+    first_divergence: &mut Option<String>,
+    rust_row: &OtherEquipmentNominalRow,
+    oracle_row: &ep_compare::EioOtherEquipmentNominal,
+    tolerance: Tolerance,
+) {
+    if !oracle_row
+        .zone_name
+        .eq_ignore_ascii_case(&rust_row.zone_name)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "other_equipment {} field zone expected {} observed {}",
+                rust_row.equipment_name, oracle_row.zone_name, rust_row.zone_name
+            ),
+        );
+        return;
+    }
+
+    if !oracle_row
+        .schedule_name
+        .eq_ignore_ascii_case(&rust_row.schedule_name)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "other_equipment {} field schedule expected {} observed {}",
+                rust_row.equipment_name, oracle_row.schedule_name, rust_row.schedule_name
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(oracle_row.zone_floor_area_m2, rust_row.zone_floor_area_m2) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "other_equipment {} field zone_floor_area_m2 expected {:.6} observed {:.6}",
+                rust_row.equipment_name, oracle_row.zone_floor_area_m2, rust_row.zone_floor_area_m2
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(oracle_row.equipment_level_w, rust_row.equipment_level_w) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "other_equipment {} field equipment_level_w expected {:.6} observed {:.6}",
+                rust_row.equipment_name, oracle_row.equipment_level_w, rust_row.equipment_level_w
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(
+        oracle_row.equipment_per_floor_area_w_per_m2,
+        rust_row.equipment_per_floor_area_w_per_m2,
+    ) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "other_equipment {} field equipment_per_floor_area_w_per_m2 expected {:.6} observed {:.6}",
+                rust_row.equipment_name,
+                oracle_row.equipment_per_floor_area_w_per_m2,
+                rust_row.equipment_per_floor_area_w_per_m2
+            ),
+        );
+        return;
+    }
+
+    for (field, expected, observed) in [
+        (
+            "fraction_latent",
+            oracle_row.fraction_latent,
+            rust_row.fraction_latent,
+        ),
+        (
+            "fraction_radiant",
+            oracle_row.fraction_radiant,
+            rust_row.fraction_radiant,
+        ),
+        (
+            "fraction_lost",
+            oracle_row.fraction_lost,
+            rust_row.fraction_lost,
+        ),
+        (
+            "fraction_convected",
+            oracle_row.fraction_convected,
+            rust_row.fraction_convected,
+        ),
+    ] {
+        if !tolerance.accepts(expected, observed) {
+            record_first_divergence(
+                first_divergence,
+                format!(
+                    "other_equipment {} field {} expected {:.6} observed {:.6}",
+                    rust_row.equipment_name, field, expected, observed
+                ),
+            );
+            return;
+        }
     }
 }
 
@@ -1526,6 +1859,13 @@ mod tests {
     #[test]
     fn missing_compare_geometry_path_fails() {
         let args = vec!["compare".to_string(), "geometry".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_compare_internal_gains_path_fails() {
+        let args = vec!["compare".to_string(), "internal-gains".to_string()];
 
         assert_eq!(run(&args), 2);
     }
