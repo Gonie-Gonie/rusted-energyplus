@@ -51,6 +51,7 @@ Assert-FileExists -Path "data\testcases\minimal\typed-model.case.toml" -Descript
 Assert-FileExists -Path "data\testcases\minimal\minimal.epJSON" -Description "RawModel fixture"
 Assert-FileExists -Path "data\testcases\minimal\typed-model.epJSON" -Description "TypedModel fixture"
 Assert-FileExists -Path "data\testcases\minimal\missing-reference.epJSON" -Description "TypedModel negative fixture"
+Assert-FileExists -Path "data\testcases\minimal\invalid-enum.epJSON" -Description "TypedModel invalid enum fixture"
 Assert-FileExists -Path "docs\src\operations\v0.1.0-readiness.md" -Description "v0.1 readiness document"
 Assert-FileExists -Path "docs\src\releases\v0.1.0.md" -Description "v0.1 release note"
 Assert-FileExists -Path "scripts\typed-model-smoke.ps1" -Description "TypedModel smoke script"

@@ -14,8 +14,11 @@ For v0.1.0, `typed-model.epJSON` is a repo-owned TypedModel preview fixture
 with deliberately omitted defaultable fields. `missing-reference.epJSON` is the
 negative preview fixture for missing name reference diagnostics.
 
+For v0.2.0 hardening, `invalid-enum.epJSON` verifies that typed compilation
+reports stable enum diagnostics as part of the coverage contract.
+
 Manifests:
 
 - `case.toml`: F0 oracle smoke
 - `raw-model.case.toml`: v0.1.0 RawModel inspection
-- `typed-model.case.toml`: v0.1.0 TypedModel preview
+- `typed-model.case.toml`: v0.1.0 preview and v0.2.0 TypedModel contract

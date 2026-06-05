@@ -1,8 +1,9 @@
-id = "minimal_typed_model_preview"
-milestone = "v0.1.0-preview"
-purpose = "Verify the v0.1 TypedModel preview can convert seed objects, apply defaults, parse enums, resolve typed IDs, and report missing reference diagnostics."
+id = "minimal_typed_model_contract"
+milestone = "v0.2.0-contract"
+purpose = "Verify TypedModel contract coverage, default reporting, enum diagnostics, typed IDs, and missing reference diagnostics."
 valid_input_epjson = "data/testcases/minimal/typed-model.epJSON"
 missing_reference_epjson = "data/testcases/minimal/missing-reference.epJSON"
+invalid_enum_epjson = "data/testcases/minimal/invalid-enum.epJSON"
 oracle_generated_epjson = ".runtime/oracle-smoke/26.1.0/convert/smoke.epJSON"
 
 [expected_valid]
@@ -13,6 +14,8 @@ zone_count = 1
 surface_count = 1
 diagnostic_count = 0
 default_count = 21
+coverage_typed_object = "BuildingSurface:Detailed"
+coverage_raw_only_object = "Output:Variable"
 
 [expected_missing_reference]
 diagnostic_code = "MissingReference"
@@ -20,6 +23,13 @@ object_type = "BuildingSurface:Detailed"
 object_name = "Broken Surface"
 field = "zone_name"
 target_name = "Missing Zone"
+
+[expected_invalid_enum]
+diagnostic_code = "InvalidEnumValue"
+object_type = "Building"
+object_name = "Bad Building"
+field = "terrain"
+bad_value = "MoonBase"
 
 [expected_oracle_smoke]
 version = "26.1.0"

@@ -1,8 +1,8 @@
-# TypedModel Preview
+# TypedModel Contract
 
-v0.1.0 includes a TypedModel preview for the first RawModel object families and
-resolves a small set of name references into typed IDs. v0.2.0 will harden this
-preview into a supported coverage and diagnostics contract.
+v0.1.0 introduced a TypedModel preview for the first RawModel object families.
+v0.2.0 hardens that path into a supported coverage and diagnostics contract for
+the first typed subset.
 
 ## Supported Inputs
 
@@ -35,15 +35,31 @@ Current resolved references:
 - `BuildingSurface:Detailed.construction_name` -> `ConstructionId`
 - `BuildingSurface:Detailed.zone_name` -> `ZoneId`
 
-## Preview Diagnostics
+## Compile Coverage
+
+`eplus-rs model compile <input.epJSON>` reports a deterministic coverage table
+for every object type seen in RawModel:
+
+```text
+coverage:
+  Building: 1 [typed]
+  Output:Variable: 48 [raw-only]
+```
+
+`typed` means the object type is part of the current TypedModel contract.
+`raw-only` means the object type is preserved by RawModel but not converted by
+the typed compiler stage.
+
+## Diagnostics
 
 The compiler reports structured diagnostics with severity, code, object type,
-object name, field, and message. The v0.1.0 preview smoke verifies:
+object name, field, and message. The typed smoke verifies:
 
 - missing references
 - missing required fields in the typed subset
 - invalid enum values
 - invalid numeric field types
+- typed/raw-only coverage output
 
 ## Boundary
 

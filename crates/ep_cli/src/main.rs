@@ -153,6 +153,7 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
     println!("  defaults_applied: {}", report.defaults_applied.len());
+    print_compile_coverage(report);
 }
 
 fn print_compile_diagnostics(report: &CompileReport) {
@@ -161,6 +162,7 @@ fn print_compile_diagnostics(report: &CompileReport) {
     println!("  typed_objects: {}", report.typed_object_count);
     println!("  diagnostics: {}", report.diagnostics.len());
     println!("  defaults_applied: {}", report.defaults_applied.len());
+    print_compile_coverage(report);
     for diagnostic in &report.diagnostics {
         let severity = match diagnostic.severity {
             DiagnosticSeverity::Error => "error",
@@ -171,6 +173,16 @@ fn print_compile_diagnostics(report: &CompileReport) {
         println!(
             "    {severity} {} {}/{} field {}: {}",
             diagnostic.code, diagnostic.object_type, object_name, field, diagnostic.message
+        );
+    }
+}
+
+fn print_compile_coverage(report: &CompileReport) {
+    println!("  coverage:");
+    for entry in &report.coverage {
+        println!(
+            "    {}: {} [{}]",
+            entry.object_type, entry.object_count, entry.status
         );
     }
 }

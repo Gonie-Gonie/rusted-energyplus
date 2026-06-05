@@ -78,6 +78,35 @@ pub struct DefaultApplication {
     pub value: String,
 }
 
+/// Typed compiler coverage status for an object type seen in RawModel.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ObjectCoverageStatus {
+    /// Object type is part of the current TypedModel contract.
+    Typed,
+    /// Object type is preserved in RawModel but not typed by this compiler stage.
+    RawOnly,
+}
+
+impl std::fmt::Display for ObjectCoverageStatus {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Typed => write!(formatter, "typed"),
+            Self::RawOnly => write!(formatter, "raw-only"),
+        }
+    }
+}
+
+/// Coverage entry for one EnergyPlus object type.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ObjectCoverage {
+    /// EnergyPlus object type.
+    pub object_type: String,
+    /// Number of RawModel instances with this type.
+    pub object_count: usize,
+    /// Typed compiler coverage status.
+    pub status: ObjectCoverageStatus,
+}
+
 /// Minimal report for a compiler pass.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CompileReport {
@@ -91,6 +120,8 @@ pub struct CompileReport {
     pub diagnostics: Vec<ModelDiagnostic>,
     /// Defaults applied while building the typed model.
     pub defaults_applied: Vec<DefaultApplication>,
+    /// Object coverage observed for this compile.
+    pub coverage: Vec<ObjectCoverage>,
 }
 
 /// Result of compiling a RawModel.
@@ -118,6 +149,44 @@ impl CompileResult {
 pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
     Compiler::new(raw_model).compile()
 }
+
+/// Returns the current TypedModel coverage status for an object type.
+#[must_use]
+pub fn typed_coverage_status(object_type: &str) -> ObjectCoverageStatus {
+    if TYPED_OBJECT_TYPES.contains(&object_type) {
+        ObjectCoverageStatus::Typed
+    } else {
+        ObjectCoverageStatus::RawOnly
+    }
+}
+
+/// Builds a deterministic object coverage report from RawModel contents.
+#[must_use]
+pub fn compile_coverage(raw_model: &RawModel) -> Vec<ObjectCoverage> {
+    raw_model
+        .object_type_counts()
+        .into_iter()
+        .map(|(object_type, object_count)| ObjectCoverage {
+            status: typed_coverage_status(&object_type),
+            object_type,
+            object_count,
+        })
+        .collect()
+}
+
+const TYPED_OBJECT_TYPES: &[&str] = &[
+    "Version",
+    "Building",
+    "Timestep",
+    "Site:Location",
+    "Material",
+    "Material:NoMass",
+    "Construction",
+    "ScheduleTypeLimits",
+    "Schedule:Constant",
+    "Zone",
+    "BuildingSurface:Detailed",
+];
 
 struct Compiler<'a> {
     raw_model: &'a RawModel,
@@ -171,6 +240,7 @@ impl<'a> Compiler<'a> {
             typed_object_count,
             diagnostics: self.diagnostics,
             defaults_applied: self.defaults_applied,
+            coverage: compile_coverage(self.raw_model),
         };
 
         CompileResult {
@@ -1208,7 +1278,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 
 #[cfg(test)]
 mod tests {
-    use super::{CompileStage, DiagnosticSeverity, compile_raw_model};
+    use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_raw_model::parse_epjson_str;
 
     #[test]
@@ -1257,6 +1327,43 @@ mod tests {
         assert_eq!(model.surfaces.len(), 1);
         assert_eq!(model.surfaces[0].zone.0, 0);
         assert!(!result.report.defaults_applied.is_empty());
+
+        Ok(())
+    }
+
+    #[test]
+    fn compile_report_records_typed_and_raw_only_coverage() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Output:Variable": {"Zone Temp": {"variable_name": "Zone Air Temperature"}}
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        let Some(version) = result
+            .report
+            .coverage
+            .iter()
+            .find(|entry| entry.object_type == "Version")
+        else {
+            return Err(std::io::Error::other("missing Version coverage").into());
+        };
+        assert_eq!(version.object_count, 1);
+        assert_eq!(version.status, ObjectCoverageStatus::Typed);
+
+        let Some(output_variable) = result
+            .report
+            .coverage
+            .iter()
+            .find(|entry| entry.object_type == "Output:Variable")
+        else {
+            return Err(std::io::Error::other("missing Output:Variable coverage").into());
+        };
+        assert_eq!(output_variable.object_count, 1);
+        assert_eq!(output_variable.status, ObjectCoverageStatus::RawOnly);
 
         Ok(())
     }
