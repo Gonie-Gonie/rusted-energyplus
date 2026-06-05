@@ -1,6 +1,6 @@
 //! Command line entry point for eplus-rs.
 
-use ep_compare::{Tolerance, compare_series, load_eso_series};
+use ep_compare::{Tolerance, compare_series, load_eio_zone_geometry, load_eso_series};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, VariableClass,
@@ -186,6 +186,7 @@ fn print_help() {
     println!("  run first-zone <input.epJSON> <weather.epw> [--hours N]");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
+    println!("  compare geometry <input.epJSON> <eplusout.eio>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
     println!("  conformance validate-case <case.toml>");
@@ -815,11 +816,13 @@ fn parse_hours_arg(args: &[String], default: usize) -> Result<usize, String> {
 fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
+        Some("geometry") => run_compare_geometry(&args[1..]),
         Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
         Some("zone-temperature") => run_compare_zone_temperature(&args[1..]),
         Some(command) => {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -829,6 +832,7 @@ fn run_compare_command(args: &[String]) -> i32 {
         None => {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -912,6 +916,126 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
         );
         print_first_divergence("  ", comparison.first_divergence);
     }
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_geometry(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_zones = zone_geometry_summaries(&model);
+    if rust_zones.is_empty() {
+        eprintln!("no Zone objects are available for geometry comparison");
+        return 1;
+    }
+
+    let oracle_zones = match load_eio_zone_geometry(eio_path) {
+        Ok(zones) => zones,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let tolerance = Tolerance {
+        absolute: 0.02,
+        relative: 1.0e-6,
+    };
+    let mut passed = rust_zones.len() == oracle_zones.len();
+    let mut first_divergence = None;
+    if rust_zones.len() != oracle_zones.len() {
+        first_divergence = Some(format!(
+            "zone_count expected {} observed {}",
+            oracle_zones.len(),
+            rust_zones.len()
+        ));
+    }
+
+    println!("Geometry Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: absolute-0.02");
+    println!("  zones: {}", rust_zones.len());
+    println!("  oracle_zones: {}", oracle_zones.len());
+    for rust_zone in &rust_zones {
+        let Some(oracle_zone) = oracle_zones
+            .iter()
+            .find(|zone| zone.zone_name.eq_ignore_ascii_case(&rust_zone.zone_name))
+        else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!("zone {} missing_in_eio", rust_zone.zone_name),
+            );
+            println!("  zone: {} status: fail", rust_zone.zone_name);
+            continue;
+        };
+
+        let surface_pass = oracle_zone.surface_count == rust_zone.surface_count;
+        let floor_area_pass = tolerance.accepts(oracle_zone.floor_area_m2, rust_zone.floor_area_m2);
+        let volume_pass = rust_zone
+            .volume_m3
+            .is_some_and(|volume_m3| tolerance.accepts(oracle_zone.volume_m3, volume_m3));
+        let exterior_wall_area_pass = tolerance.accepts(
+            oracle_zone.exterior_gross_wall_area_m2,
+            rust_zone.exterior_wall_area_m2,
+        );
+        let zone_pass = surface_pass && floor_area_pass && volume_pass && exterior_wall_area_pass;
+        if !zone_pass {
+            passed = false;
+            record_geometry_field_divergence(
+                &mut first_divergence,
+                rust_zone,
+                oracle_zone,
+                tolerance,
+            );
+        }
+
+        let rust_volume = rust_zone
+            .volume_m3
+            .map(|volume_m3| format!("{volume_m3:.6}"))
+            .unwrap_or_else(|| "unavailable".to_string());
+        println!(
+            "  zone: {} surfaces: {}/{} floor_area_m2: {:.6}/{:.6} volume_m3: {:.6}/{} exterior_wall_area_m2: {:.6}/{:.6} status: {}",
+            rust_zone.zone_name,
+            oracle_zone.surface_count,
+            rust_zone.surface_count,
+            oracle_zone.floor_area_m2,
+            rust_zone.floor_area_m2,
+            oracle_zone.volume_m3,
+            rust_volume,
+            oracle_zone.exterior_gross_wall_area_m2,
+            rust_zone.exterior_wall_area_m2,
+            if zone_pass { "pass" } else { "fail" }
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
     if passed { 0 } else { 1 }
@@ -1096,6 +1220,77 @@ fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     );
 
     if comparison.passed { 0 } else { 1 }
+}
+
+fn record_first_divergence(first_divergence: &mut Option<String>, value: String) {
+    if first_divergence.is_none() {
+        *first_divergence = Some(value);
+    }
+}
+
+fn record_geometry_field_divergence(
+    first_divergence: &mut Option<String>,
+    rust_zone: &ZoneGeometrySummary,
+    oracle_zone: &ep_compare::EioZoneGeometry,
+    tolerance: Tolerance,
+) {
+    if oracle_zone.surface_count != rust_zone.surface_count {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "zone {} field surfaces expected {} observed {}",
+                rust_zone.zone_name, oracle_zone.surface_count, rust_zone.surface_count
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(oracle_zone.floor_area_m2, rust_zone.floor_area_m2) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "zone {} field floor_area_m2 expected {:.6} observed {:.6}",
+                rust_zone.zone_name, oracle_zone.floor_area_m2, rust_zone.floor_area_m2
+            ),
+        );
+        return;
+    }
+
+    let Some(volume_m3) = rust_zone.volume_m3 else {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "zone {} field volume_m3 expected {:.6} observed unavailable",
+                rust_zone.zone_name, oracle_zone.volume_m3
+            ),
+        );
+        return;
+    };
+    if !tolerance.accepts(oracle_zone.volume_m3, volume_m3) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "zone {} field volume_m3 expected {:.6} observed {:.6}",
+                rust_zone.zone_name, oracle_zone.volume_m3, volume_m3
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(
+        oracle_zone.exterior_gross_wall_area_m2,
+        rust_zone.exterior_wall_area_m2,
+    ) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "zone {} field exterior_wall_area_m2 expected {:.6} observed {:.6}",
+                rust_zone.zone_name,
+                oracle_zone.exterior_gross_wall_area_m2,
+                rust_zone.exterior_wall_area_m2
+            ),
+        );
+    }
 }
 
 fn delta_summary(expected: &[f64], observed: &[f64]) -> (usize, f64, f64) {
@@ -1324,6 +1519,13 @@ mod tests {
     #[test]
     fn missing_model_geometry_path_fails() {
         let args = vec!["model".to_string(), "geometry".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_compare_geometry_path_fails() {
+        let args = vec!["compare".to_string(), "geometry".to_string()];
 
         assert_eq!(run(&args), 2);
     }

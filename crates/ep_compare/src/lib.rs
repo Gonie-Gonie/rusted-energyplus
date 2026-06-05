@@ -61,6 +61,21 @@ pub struct SeriesDivergence {
     pub abs_delta: Option<f64>,
 }
 
+/// Zone geometry values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioZoneGeometry {
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// EIO `Number of Surfaces`.
+    pub surface_count: usize,
+    /// EIO `Floor Area {m2}`.
+    pub floor_area_m2: f64,
+    /// EIO `Volume {m3}`.
+    pub volume_m3: f64,
+    /// EIO `Exterior Gross Wall Area {m2}`.
+    pub exterior_gross_wall_area_m2: f64,
+}
+
 /// Compares two equally-sized numeric series.
 #[must_use]
 pub fn compare_series(
@@ -127,6 +142,24 @@ pub enum EsoError {
     },
 }
 
+/// Error returned while reading EnergyPlus EIO tabular diagnostics.
+#[derive(Debug)]
+pub enum EioError {
+    /// File read failed.
+    Io(std::io::Error),
+    /// No `Zone Information` rows were present.
+    MissingZoneInformation,
+    /// A `Zone Information` row could not be parsed.
+    InvalidZoneInformation {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+}
+
 impl Display for EsoError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -141,6 +174,19 @@ impl Display for EsoError {
     }
 }
 
+impl Display for EioError {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Io(error) => write!(formatter, "failed to read EIO: {error}"),
+            Self::MissingZoneInformation => write!(formatter, "EIO Zone Information not found"),
+            Self::InvalidZoneInformation { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Zone Information at line {line}: {reason}: {text}"
+            ),
+        }
+    }
+}
+
 impl std::error::Error for EsoError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
@@ -150,7 +196,22 @@ impl std::error::Error for EsoError {
     }
 }
 
+impl std::error::Error for EioError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Io(error) => Some(error),
+            Self::MissingZoneInformation | Self::InvalidZoneInformation { .. } => None,
+        }
+    }
+}
+
 impl From<std::io::Error> for EsoError {
+    fn from(error: std::io::Error) -> Self {
+        Self::Io(error)
+    }
+}
+
+impl From<std::io::Error> for EioError {
     fn from(error: std::io::Error) -> Self {
         Self::Io(error)
     }
@@ -164,6 +225,12 @@ pub fn load_eso_series(
 ) -> Result<Vec<f64>, EsoError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eso_series(&contents, key, variable)
+}
+
+/// Loads zone geometry rows from an EnergyPlus EIO file.
+pub fn load_eio_zone_geometry(path: impl AsRef<Path>) -> Result<Vec<EioZoneGeometry>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_zone_geometry(&contents)
 }
 
 /// Parses one numeric ESO series by key and variable name.
@@ -222,6 +289,83 @@ pub fn parse_eso_series(contents: &str, key: &str, variable: &str) -> Result<Vec
     Ok(values)
 }
 
+/// Parses `Zone Information` rows from EnergyPlus EIO contents.
+pub fn parse_eio_zone_geometry(contents: &str) -> Result<Vec<EioZoneGeometry>, EioError> {
+    let mut zones = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("Zone Information,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 26 {
+            return Err(EioError::InvalidZoneInformation {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 27 fields, found {}", fields.len()),
+            });
+        }
+
+        zones.push(EioZoneGeometry {
+            zone_name: required_field(&fields, 1).to_ascii_uppercase(),
+            volume_m3: parse_f64_field(&fields, 19, line_number, line, "Volume {m3}")?,
+            floor_area_m2: parse_f64_field(&fields, 22, line_number, line, "Floor Area {m2}")?,
+            exterior_gross_wall_area_m2: parse_f64_field(
+                &fields,
+                23,
+                line_number,
+                line,
+                "Exterior Gross Wall Area {m2}",
+            )?,
+            surface_count: parse_usize_field(&fields, 26, line_number, line, "Number of Surfaces")?,
+        });
+    }
+
+    if zones.is_empty() {
+        return Err(EioError::MissingZoneInformation);
+    }
+
+    Ok(zones)
+}
+
+fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {
+    fields.get(index).copied().unwrap_or("")
+}
+
+fn parse_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidZoneInformation {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_usize_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<usize, EioError> {
+    required_field(fields, index)
+        .parse::<usize>()
+        .map_err(|_error| EioError::InvalidZoneInformation {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
 fn matching_dictionary_id(line: &str, normalized_key: &str, variable: &str) -> Option<String> {
     let mut parts = line.splitn(4, ',');
     let id = parts.next()?.trim();
@@ -241,7 +385,7 @@ fn normalize_key(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{Tolerance, compare_series, parse_eso_series};
+    use super::{Tolerance, compare_series, parse_eio_zone_geometry, parse_eso_series};
 
     #[test]
     fn tolerance_accepts_close_values() {
@@ -267,6 +411,24 @@ End of Data Dictionary
         )?;
 
         assert_eq!(values, vec![1.0, 1.0]);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_eio_zone_geometry_rows() -> Result<(), Box<dyn std::error::Error>> {
+        let zones = parse_eio_zone_geometry(
+            r#"! <Zone Information>,Zone Name,...
+ Zone Information, ZONE ONE,0.0,0.00,0.00,0.00,7.62,7.62,2.29,1,1,1,0.00,15.24,0.00,15.24,0.00,4.57,4.57,1061.88,TARP,DOE-2,232.26,278.71,278.71,0.00,6,0,0,Yes
+"#,
+        )?;
+
+        assert_eq!(zones.len(), 1);
+        assert_eq!(zones[0].zone_name, "ZONE ONE");
+        assert_eq!(zones[0].surface_count, 6);
+        assert_eq!(zones[0].floor_area_m2, 232.26);
+        assert_eq!(zones[0].volume_m3, 1061.88);
+        assert_eq!(zones[0].exterior_gross_wall_area_m2, 278.71);
 
         Ok(())
     }
