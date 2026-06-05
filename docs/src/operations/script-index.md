@@ -7,27 +7,53 @@ last_reviewed: 2026-06-05
 
 # Script Index
 
-| Script | Class | Purpose | Blocking release? | Main artifacts |
+All repository tasks are launched through one Windows wrapper:
+
+```powershell
+.\scripts\dev.cmd <command> [args...]
+```
+
+PowerShell users can also call `.\scripts\dev.ps1 <command> [args...]`
+directly. The implementation scripts live in field-specific folders:
+
+- `scripts/setup`
+- `scripts/quality`
+- `scripts/smoke`
+- `scripts/compare`
+- `scripts/conformance`
+- `scripts/release`
+- `scripts/lib`
+
+Run `.\scripts\dev.cmd list` for the command catalog.
+
+| Command | Area | Purpose | Blocking release? | Main artifacts |
 |---|---|---|---:|---|
-| `setup.cmd` | setup | prepare toolchain, oracle, and docs tools | yes | `.runtime`, `.reference` |
-| `check.cmd` | smoke | run fmt, clippy, tests, docs, and guards | yes | console output |
-| `v0.1-verify.cmd` | release gate | verify v0.1 foundation/model-intake release | yes | package inputs |
-| `oracle-smoke.cmd` | smoke | run EnergyPlus oracle example and conversion | no | `.runtime/oracle-smoke` |
-| `source-smoke.cmd` | setup | verify reference source checkout | yes | console output |
-| `compare-schedule-smoke.cmd` | smoke | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
-| `compare-weather-smoke.cmd` | smoke | compare EPW dry-bulb against ESO | no | `.runtime/compare-weather` |
-| `compare-geometry-smoke.cmd` | smoke | compare Rust geometry summary with EIO | no | console output |
-| `compare-internal-gains-smoke.cmd` | smoke | compare nominal OtherEquipment EIO rows | no | console output |
-| `compare-internal-convective-gain-smoke.cmd` | smoke | compare internal convective gain ESO trace | no | `.runtime/compare-internal-convective-gain` |
-| `first-zone-smoke.cmd` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
-| `compare-zone-smoke.cmd` | diagnostic | extract zone-temperature deltas only | no | `.runtime/compare-zone` |
-| `compare-regression.cmd` | regression | run current compare smoke/diagnostic suite and write reports | no | `.runtime/compare-regression` |
-| `conformance-schema-smoke.cmd` | smoke | validate conformance case/suite schema | yes | console output |
-| `conformance-baseline-smoke.cmd` | baseline-only | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
-| `conformance-report-smoke.cmd` | baseline-only | write baseline-only report skeleton | no | `.runtime/conformance-report` |
-| `strict-no-false-conformance.cmd` | release guard | scan for forbidden compatibility wording | yes | failure on wording |
-| `docs-check.cmd` | docs | build mdBook | yes | `docs/book` |
-| `package.cmd` | release utility | build local package artifact | yes for package release | package zip |
+| `setup` | setup | prepare toolchain, oracle, reference source, and docs tools | yes | `.runtime`, `.reference` |
+| `oracle-smoke` | setup | run EnergyPlus oracle example and conversion | no | `.runtime/oracle-smoke` |
+| `source-smoke` | setup | verify reference source checkout | yes | console output |
+| `check` | quality | run fmt, clippy, tests, smoke gates, docs, and guards | yes | console output |
+| `test` | quality | run Rust workspace tests | yes | console output |
+| `docs-check` | quality | build mdBook | yes | `docs/book` |
+| `perf` | quality | run local performance checks | no | console output |
+| `strict-no-false-conformance` | quality | scan for forbidden compatibility wording | yes | failure on wording |
+| `raw-model-smoke` | smoke | inspect RawModel fixtures | no | console output |
+| `typed-model-smoke` | smoke | compile TypedModel fixtures | no | console output |
+| `model-plan-smoke` | smoke | verify graph and execution-plan summaries | no | console output |
+| `schedule-compact-smoke` | smoke | verify `Schedule:Compact` intake | no | console output |
+| `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
+| `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
+| `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
+| `compare-weather-smoke` | compare | compare EPW dry-bulb against ESO | no | `.runtime/compare-weather` |
+| `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
+| `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
+| `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-convective-gain` |
+| `compare-zone-smoke` | diagnostic | extract zone-temperature deltas only | no | `.runtime/compare-zone` |
+| `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
+| `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
+| `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
+| `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
+| `package` | release | build local package artifact | yes for package release | package zip |
+| `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
+| `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 
-No diagnostic script should be listed as conformance evidence.
-
+No diagnostic command should be listed as conformance evidence.

@@ -10,22 +10,21 @@ last_reviewed: 2026-06-05
 Prepare the local toolchain, EnergyPlus oracle, and docs tooling:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 ```
 
 Run the local check suite:
 
 ```powershell
-.\scripts\check.cmd
+.\scripts\dev.cmd check
 ```
 
 Verify the current public foundation/model-intake release gate:
 
 ```powershell
-.\scripts\v0.1-verify.cmd
+.\scripts\dev.cmd v0.1-verify
 ```
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not
 create conformance evidence.
-

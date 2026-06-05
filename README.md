@@ -51,9 +51,9 @@ must not be used as conformance evidence. Their output uses
 ## Quick Start
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
-.\scripts\check.cmd
-.\scripts\v0.1-verify.cmd
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
+.\scripts\dev.cmd check
+.\scripts\dev.cmd v0.1-verify
 ```
 
 The setup script keeps external oracle assets inside repo-local directories:
@@ -77,5 +77,5 @@ Start here:
 Build the book with:
 
 ```powershell
-.\scripts\docs-check.cmd
+.\scripts\dev.cmd docs-check
 ```

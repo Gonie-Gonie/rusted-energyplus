@@ -17,9 +17,9 @@ Purpose:
 Verification:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
-.\scripts\check.cmd
-.\scripts\oracle-smoke.cmd
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
+.\scripts\dev.cmd check
+.\scripts\dev.cmd oracle-smoke
 ```
 
 ## Public Version Rule
@@ -27,4 +27,3 @@ Verification:
 Public `vX.Y.Z` tags start only when there is a built artifact and a user can
 run a visible command from that artifact. Setup-only or docs-only checkpoints do
 not receive public version tags.
-

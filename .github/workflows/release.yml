@@ -35,7 +35,8 @@ jobs:
           }
 
           $version = $tag.Substring(1)
-          $verifyScript = "scripts\v$($Matches.major).$($Matches.minor)-verify.ps1"
+          $verifyCommand = "v$($Matches.major).$($Matches.minor)-verify"
+          $verifyScript = "scripts\release\$verifyCommand.ps1"
           $notesFile = "docs\src\releases\$tag.md"
           $artifact = "dist\eplus-rs-$tag-windows-x64.zip"
 
@@ -48,23 +49,22 @@ jobs:
 
           "RELEASE_TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "VERIFY_COMMAND=$verifyCommand" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "VERIFY_SCRIPT=$verifyScript" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_NOTES=$notesFile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_ARTIFACT=$artifact" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Set up Rust and docs tools
-        run: .\scripts\setup.cmd -InstallRust -InstallDocsTools -SkipOracleDownload -SkipSourceDownload -SkipOracleSmoke
+        run: .\scripts\dev.cmd setup -InstallRust -InstallDocsTools -SkipOracleDownload -SkipSourceDownload -SkipOracleSmoke
 
       - name: Set up EnergyPlus oracle
-        run: .\scripts\setup.cmd -SkipSourceDownload -SkipOracleSmoke
+        run: .\scripts\dev.cmd setup -SkipSourceDownload -SkipOracleSmoke
 
       - name: Set up EnergyPlus reference source
-        run: .\scripts\setup.cmd -SkipOracleDownload -SkipOracleSmoke
+        run: .\scripts\dev.cmd setup -SkipOracleDownload -SkipOracleSmoke
 
       - name: Verify release
-        run: |
-          $verifyScript = (Resolve-Path -LiteralPath $env:VERIFY_SCRIPT).Path
-          & $verifyScript
+        run: .\scripts\dev.cmd $env:VERIFY_COMMAND
 
       - name: Check packaged binary
         run: |

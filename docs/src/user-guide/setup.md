@@ -11,8 +11,7 @@ Use the setup script to install the pinned Rust toolchain and docs tools and to
 prepare repo-local EnergyPlus assets:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 ```
 
 For the release-oriented checklist, see `operations/setup-checklist.md`.
-

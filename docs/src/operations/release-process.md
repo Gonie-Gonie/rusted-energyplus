@@ -14,10 +14,9 @@ Before any release:
 - list supported evidence
 - list non-claims
 - include docs in the release artifact
-- run `scripts/check.cmd`
-- run `scripts/strict-no-false-conformance.cmd`
+- run `scripts/dev.cmd check`
+- run `scripts/dev.cmd strict-no-false-conformance`
 - run the milestone-specific verify script
 
 Compatibility claims require conformance-level evidence. Engineering progress
 can be released without such a claim if the release notes say so clearly.
-

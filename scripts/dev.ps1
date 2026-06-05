@@ -1,0 +1,233 @@
+param(
+    [Parameter(Position = 0)][string]$Command = "list",
+    [Parameter(Position = 1, ValueFromRemainingArguments = $true)][string[]]$CommandArgs = @()
+)
+
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+$ScriptsRoot = $PSScriptRoot
+$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $ScriptsRoot "..")).Path
+
+$Commands = [ordered]@{
+    "setup" = @{
+        Path = "setup\setup.ps1"
+        Group = "setup"
+        Help = "Prepare Rust, docs tools, oracle runtime, and reference source."
+    }
+    "oracle-smoke" = @{
+        Path = "setup\oracle-smoke.ps1"
+        Group = "setup"
+        Help = "Run the EnergyPlus oracle example and IDF to epJSON conversion."
+    }
+    "source-smoke" = @{
+        Path = "setup\source-smoke.ps1"
+        Group = "setup"
+        Help = "Verify the pinned EnergyPlus reference source checkout."
+    }
+    "check" = @{
+        Path = "quality\check.ps1"
+        Group = "quality"
+        Help = "Run fmt, clippy, tests, smoke gates, docs, and guards."
+    }
+    "test" = @{
+        Path = "quality\test.ps1"
+        Group = "quality"
+        Help = "Run the Rust workspace tests."
+    }
+    "docs-check" = @{
+        Path = "quality\docs-check.ps1"
+        Group = "quality"
+        Help = "Build or structurally check the mdBook docs."
+    }
+    "perf" = @{
+        Path = "quality\perf.ps1"
+        Group = "quality"
+        Help = "Run local performance checks."
+    }
+    "strict-no-false-conformance" = @{
+        Path = "quality\strict-no-false-conformance.ps1"
+        Group = "quality"
+        Help = "Guard against unsupported compatibility wording."
+    }
+    "raw-model-smoke" = @{
+        Path = "smoke\raw-model-smoke.ps1"
+        Group = "smoke"
+        Help = "Smoke test RawModel inspection."
+    }
+    "typed-model-smoke" = @{
+        Path = "smoke\typed-model-smoke.ps1"
+        Group = "smoke"
+        Help = "Smoke test TypedModel compile preview."
+    }
+    "model-plan-smoke" = @{
+        Path = "smoke\model-plan-smoke.ps1"
+        Group = "smoke"
+        Help = "Smoke test model graph and execution plan summaries."
+    }
+    "schedule-compact-smoke" = @{
+        Path = "smoke\schedule-compact-smoke.ps1"
+        Group = "smoke"
+        Help = "Smoke test Schedule:Compact intake."
+    }
+    "geometry-smoke" = @{
+        Path = "smoke\geometry-smoke.ps1"
+        Group = "smoke"
+        Help = "Smoke test Rust geometry summaries."
+    }
+    "first-zone-smoke" = @{
+        Path = "smoke\first-zone-smoke.ps1"
+        Group = "smoke"
+        Help = "Run first-zone runtime plumbing diagnostics."
+    }
+    "compare-schedule-smoke" = @{
+        Path = "compare\compare-schedule-smoke.ps1"
+        Group = "compare"
+        Help = "Compare schedule output with the EnergyPlus oracle."
+    }
+    "compare-weather-smoke" = @{
+        Path = "compare\compare-weather-smoke.ps1"
+        Group = "compare"
+        Help = "Compare EPW dry-bulb values with the EnergyPlus oracle."
+    }
+    "compare-geometry-smoke" = @{
+        Path = "compare\compare-geometry-smoke.ps1"
+        Group = "compare"
+        Help = "Compare Rust geometry summary with EnergyPlus EIO."
+    }
+    "compare-internal-gains-smoke" = @{
+        Path = "compare\compare-internal-gains-smoke.ps1"
+        Group = "compare"
+        Help = "Compare OtherEquipment nominal gains with EnergyPlus EIO."
+    }
+    "compare-internal-convective-gain-smoke" = @{
+        Path = "compare\compare-internal-convective-gain-smoke.ps1"
+        Group = "compare"
+        Help = "Compare internal convective gain trace with EnergyPlus ESO."
+    }
+    "compare-zone-smoke" = @{
+        Path = "compare\compare-zone-smoke.ps1"
+        Group = "compare"
+        Help = "Run diagnostic-only zone-temperature extraction comparison."
+    }
+    "compare-regression" = @{
+        Path = "compare\compare-regression.ps1"
+        Group = "compare"
+        Help = "Run compare suite and write regression artifacts."
+    }
+    "conformance-schema-smoke" = @{
+        Path = "conformance\conformance-schema-smoke.ps1"
+        Group = "conformance"
+        Help = "Validate conformance case and suite schema fixtures."
+    }
+    "conformance-baseline-smoke" = @{
+        Path = "conformance\conformance-baseline-smoke.ps1"
+        Group = "conformance"
+        Help = "Generate EnergyPlus baseline artifacts for a fixture case."
+    }
+    "conformance-report-smoke" = @{
+        Path = "conformance\conformance-report-smoke.ps1"
+        Group = "conformance"
+        Help = "Write baseline-only conformance report skeleton."
+    }
+    "package" = @{
+        Path = "release\package.ps1"
+        Group = "release"
+        Help = "Build the local release zip."
+    }
+    "github-release" = @{
+        Path = "release\github-release.ps1"
+        Group = "release"
+        Help = "Publish a release with GitHub CLI."
+    }
+    "v0.1-verify" = @{
+        Path = "release\v0.1-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.1 runnable release contract."
+    }
+}
+
+$Aliases = @{
+    "docs" = "docs-check"
+    "guard" = "strict-no-false-conformance"
+    "verify-v0.1" = "v0.1-verify"
+}
+
+function Show-Commands {
+    Write-Host "Usage: .\scripts\dev.cmd <command> [args...]"
+    Write-Host ""
+    foreach ($group in @("setup", "quality", "smoke", "compare", "conformance", "release")) {
+        Write-Host "[$group]"
+        foreach ($name in $Commands.Keys) {
+            $entry = $Commands[$name]
+            if ($entry.Group -eq $group) {
+                Write-Host ("  {0,-42} {1}" -f $name, $entry.Help)
+            }
+        }
+        Write-Host ""
+    }
+}
+
+function Convert-CommandArguments {
+    param([string[]]$Values)
+
+    $named = @{}
+    $positional = @()
+    for ($index = 0; $index -lt $Values.Count; $index += 1) {
+        $value = $Values[$index]
+        if ($value.StartsWith("-", [System.StringComparison]::Ordinal) -and $value.Length -gt 1) {
+            $name = $value.TrimStart("-")
+            $nextIndex = $index + 1
+            if ($nextIndex -lt $Values.Count -and -not $Values[$nextIndex].StartsWith("-", [System.StringComparison]::Ordinal)) {
+                $named[$name] = $Values[$nextIndex]
+                $index += 1
+            }
+            else {
+                $named[$name] = $true
+            }
+        }
+        else {
+            $positional += $value
+        }
+    }
+
+    return [pscustomobject]@{
+        Named = $named
+        Positional = $positional
+    }
+}
+
+if ($Command -in @("list", "help", "--help", "-h")) {
+    Show-Commands
+    return
+}
+
+$normalized = $Command
+if ($normalized.EndsWith(".cmd", [System.StringComparison]::OrdinalIgnoreCase) -or
+    $normalized.EndsWith(".ps1", [System.StringComparison]::OrdinalIgnoreCase)) {
+    $normalized = [System.IO.Path]::GetFileNameWithoutExtension($normalized)
+}
+
+if ($Aliases.ContainsKey($normalized)) {
+    $normalized = $Aliases[$normalized]
+}
+
+if (-not $Commands.Contains($normalized)) {
+    Write-Error "Unknown script command: $Command"
+    Show-Commands
+    throw "Unknown script command: $Command"
+}
+
+$script = Join-Path $ScriptsRoot $Commands[$normalized].Path
+if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
+    throw "Command target is missing: $script"
+}
+
+Set-Location $RepoRoot
+$bound = Convert-CommandArguments -Values $CommandArgs
+$positionalArguments = $bound.Positional
+$namedArguments = $bound.Named
+& $script @positionalArguments @namedArguments
+if (-not $?) {
+    throw "Script command failed: $normalized"
+}

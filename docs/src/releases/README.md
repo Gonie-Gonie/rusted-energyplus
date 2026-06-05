@@ -16,11 +16,11 @@ checkpoints are documented separately and do not receive semver tags.
 Publishing:
 
 - push an annotated `vX.Y.Z` tag
-- `.github/workflows/release.yml` runs the matching `scripts\vX.Y-verify.ps1`
+- `.github/workflows/release.yml` runs the matching `scripts/dev.cmd vX.Y-verify` command
 - the workflow builds `dist/eplus-rs-vX.Y.Z-windows-x64.zip`
 - the workflow creates or updates the GitHub Release and uploads the zip asset
 
-`scripts\github-release.cmd` remains available only as a local manual fallback
+`scripts/dev.cmd github-release` remains available only as a local manual fallback
 when a token is present.
 
 Release notes:

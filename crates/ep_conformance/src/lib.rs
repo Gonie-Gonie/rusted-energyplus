@@ -709,7 +709,7 @@ format = "markdown"
 path = ".runtime/conformance/schedule_constant_claim/compare-report.md"
 
 [gate]
-script = "scripts/conformance-schema-smoke.ps1"
+script = "scripts/dev.cmd conformance-schema-smoke"
 blocking = true
 "#,
         )?;

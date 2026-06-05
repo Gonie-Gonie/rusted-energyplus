@@ -30,5 +30,5 @@ tolerance_policy: none
 status: extracted
 ```
 
-The implementation lives in `scripts/strict-no-false-conformance.ps1`.
-
+Run it with `.\scripts\dev.cmd strict-no-false-conformance`. The implementation
+file lives under `scripts/quality`.

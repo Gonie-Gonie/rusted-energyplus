@@ -20,6 +20,5 @@ Required setup evidence:
 Primary command:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 ```
-

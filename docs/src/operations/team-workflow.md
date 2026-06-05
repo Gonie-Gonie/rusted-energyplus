@@ -46,7 +46,7 @@ commit -> push main -> annotated vX.Y.Z tag -> push tag -> GitHub Actions releas
 Manual fallback:
 
 ```text
-scripts\github-release.cmd
+scripts\dev.cmd github-release
 ```
 
 The manual fallback requires `GH_TOKEN` or `GITHUB_TOKEN` and should only be

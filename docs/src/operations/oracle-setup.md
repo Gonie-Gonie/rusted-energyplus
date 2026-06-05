@@ -4,14 +4,14 @@ The initial oracle is EnergyPlus 26.1.0.
 
 On Windows, `rust-toolchain.toml` pins `1.96.0-x86_64-pc-windows-gnu` for the
 early workspace. This avoids making Visual Studio Build Tools a prerequisite
-for foundation setup checks. `scripts/setup.ps1 -InstallDocsTools` installs
+for foundation setup checks. `scripts/dev.cmd setup -InstallDocsTools` installs
 `mdbook 0.5.3` so docs checks can build the book instead of only checking file
 structure.
 
 Recommended first run:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 ```
 
 The setup script downloads and verifies the Windows x86_64 release zip using
@@ -29,7 +29,7 @@ into:
 ```
 
 GitHub generated source archives do not publish release-asset SHA256 digests.
-For that archive, `scripts/setup.ps1` locks the tag commit and stores a local
+For that archive, `scripts/dev.cmd setup` locks the tag commit and stores a local
 bootstrap digest after first download.
 
 ## Smoke Test
@@ -37,7 +37,7 @@ bootstrap digest after first download.
 Run:
 
 ```powershell
-.\scripts\oracle-smoke.cmd
+.\scripts\dev.cmd oracle-smoke
 ```
 
 The smoke test should execute the portable `energyplus.exe` from `.runtime`,
@@ -48,7 +48,7 @@ not any EnergyPlus installation on PATH.
 Run:
 
 ```powershell
-.\scripts\source-smoke.cmd
+.\scripts\dev.cmd source-smoke
 ```
 
 This verifies that the reference source contains the expected 26.1.0 source

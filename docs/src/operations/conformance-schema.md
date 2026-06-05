@@ -5,7 +5,7 @@ Status: P1 foundation in progress.
 The conformance schema is the first layer of the reset plan that turns
 comparison work into auditable evidence. It is implemented in
 `crates/ep_conformance` and validated by
-`scripts/conformance-schema-smoke.cmd`.
+`scripts/dev.cmd conformance-schema-smoke`.
 
 Manifest-driven EnergyPlus baseline generation is exposed through:
 
@@ -60,7 +60,7 @@ policy and a blocking release gate are wired.
 The first baseline smoke command is:
 
 ```powershell
-.\scripts\conformance-baseline-smoke.cmd
+.\scripts\dev.cmd conformance-baseline-smoke
 ```
 
 It stages the case IDF and writes EnergyPlus artifacts under:
@@ -78,7 +78,7 @@ yet a tolerance-gated Rust/EnergyPlus comparison report.
 The first report smoke command is:
 
 ```powershell
-.\scripts\conformance-report-smoke.cmd
+.\scripts\dev.cmd conformance-report-smoke
 ```
 
 It writes:
@@ -101,10 +101,10 @@ results yet.
 ## Verification
 
 ```powershell
-.\scripts\conformance-schema-smoke.cmd
-.\scripts\conformance-baseline-smoke.cmd
-.\scripts\conformance-report-smoke.cmd
-.\scripts\check.cmd
+.\scripts\dev.cmd conformance-schema-smoke
+.\scripts\dev.cmd conformance-baseline-smoke
+.\scripts\dev.cmd conformance-report-smoke
+.\scripts\dev.cmd check
 ```
 
 ## Next Steps

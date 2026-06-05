@@ -1,4 +1,0 @@
-@echo off
-setlocal
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0compare-regression.ps1" %*
-exit /b %ERRORLEVEL%
