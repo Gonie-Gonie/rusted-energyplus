@@ -39,8 +39,8 @@ claim numerical compatibility.
 | Zone-temperature smoke must not print a pass that looks like conformance | CLI now prints `comparison_class: diagnostic-only`, `conformance_claim: false`, `tolerance_policy: none`, and `status: extracted` |
 | First-zone runtime is a toy diagnostic, not EnergyPlus heat balance | CLI now prints `runtime_class: diagnostic-toy`, `algorithm_parity: false`, and `status: extracted` |
 | README should separate conformance scope and diagnostics | README now has a development-only diagnostics section |
-| v0.6 should be infrastructure/diagnostic, not a conformance simulation release | v0.6 readiness now calls the path runtime plumbing diagnostics |
-| v0.7 should keep report/trace infrastructure while avoiding false claims | v0.7 readiness clarifies extraction-only semantics for zone temperature |
+| v0.6 should be infrastructure/diagnostic, not a conformance simulation release | v0.6 diagnostic note is archived and labels the path as runtime plumbing diagnostics |
+| v0.7 should keep report/trace infrastructure while avoiding false claims | v0.7 diagnostic note is archived and keeps extraction-only semantics for zone temperature |
 | Release gates need a false-conformance guard | `strict-no-false-conformance` script tracks forbidden wording patterns |
 
 ## Test Taxonomy

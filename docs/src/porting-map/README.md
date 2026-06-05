@@ -1,4 +1,14 @@
-# Porting Map
+---
+status: archived
+claim_level: none
+owner: runtime
+last_reviewed: 2026-06-05
+---
+
+# Porting Map Legacy Note
+
+This note is retained as the original porting-map template. Active maps now
+live under the specific pages linked from `SUMMARY.md`.
 
 Every implementation that follows EnergyPlus behavior should record:
 
@@ -22,4 +32,3 @@ Notes:
   RawModel preserves original epJSON object/field names before typed
   normalization.
 ```
-
