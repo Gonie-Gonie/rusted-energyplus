@@ -26,12 +26,12 @@ Current table:
 | Timestep | yes | partial | yes | n/a | n/a | partial | partial | planned | first-zone run uses zone timesteps per hour |
 | RunPeriod | yes | partial | yes | n/a | n/a | partial | partial | planned | typed date range and hourly time-axis foundation |
 | Site:Location | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Material | yes | partial | yes | n/a | partial | partial | partial | planned | thermal properties used for first-zone UA |
-| Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA |
-| Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA |
+| Material | yes | partial | yes | n/a | partial | partial | partial | planned | thermal properties used for first-zone UA and surface heat-balance state |
+| Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA and surface heat-balance state |
+| Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA and surface heat-balance state |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
 | Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated, regression-traced, geometry-summarized, and EIO-compared |
-| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area used for first-zone UA, trace suite, geometry summary, and EIO comparison |
+| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area and thermal inputs used for first-zone UA, heat-balance state, trace suite, geometry summary, and EIO comparison |
 | Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison in regression trace suite |
 | OtherEquipment | yes | partial | yes | yes | partial | partial | partial | partial | internal gains used for first-zone subset, EIO nominal-gains comparison, and ESO convective-gain trace |
 | Schedule:Compact | yes | partial | yes | yes | n/a | partial | partial | partial | all-days Until segment subset |

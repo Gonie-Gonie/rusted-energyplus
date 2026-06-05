@@ -126,6 +126,9 @@ source-reference comments.
 5. Add an EnergyPlus comparison for `Zone Total Internal Convective Heating
    Rate` before using it to claim zone air parity.
 6. Add opaque surface heat-balance state for the first no-window one-zone case.
+   Implemented state inputs: surface boundary condition, construction,
+   outside-layer material, thermal resistance, optional area heat capacity, and
+   surface conductance.
 7. Add zone air predictor/corrector subset and compare `Zone Mean Air
    Temperature`.
 8. Only after a tolerance-gated report exists, promote any case from

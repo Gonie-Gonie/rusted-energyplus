@@ -289,6 +289,7 @@ P2 compatibility work:
 - [x] write heat-balance porting map before heat-balance code
 - [x] add heat-balance state shell without solver changes
 - [x] port internal convective gains as a separate runtime trace
+- [x] add opaque surface thermal inputs to heat-balance state
 
 ## Forbidden Wording
 

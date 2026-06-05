@@ -1,9 +1,9 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
 use ep_model::{
-    AutoOrNumber, OtherEquipment, OutputHandle, OutsideBoundaryCondition, Point3, RunPeriod,
-    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SurfaceId, SurfaceType,
-    TypedModel, Zone, ZoneId,
+    AutoOrNumber, ConstructionId, MaterialId, OtherEquipment, OutputHandle,
+    OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId,
+    SimulationModel, Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -471,8 +471,24 @@ pub struct SurfaceHeatBalanceState {
     pub surface_name: String,
     /// Surface type.
     pub surface_type: SurfaceType,
+    /// Outside boundary condition.
+    pub outside_boundary_condition: OutsideBoundaryCondition,
+    /// Resolved construction ID.
+    pub construction_id: ConstructionId,
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// Outside layer material ID.
+    pub outside_layer_material_id: MaterialId,
+    /// EnergyPlus-normalized outside layer material name.
+    pub outside_layer_material_name: String,
     /// Surface area in square meters.
     pub area_m2: f64,
+    /// Area-normalized thermal resistance in m2-K/W.
+    pub thermal_resistance_m2_k_per_w: f64,
+    /// Area-normalized heat capacity in J/m2-K when available.
+    pub heat_capacity_j_per_m2_k: Option<f64>,
+    /// Surface conductance in W/K.
+    pub conductance_w_per_k: f64,
     /// Current inside face temperature in C.
     pub inside_face_temperature_c: f64,
     /// Current outside face temperature in C.
@@ -677,30 +693,10 @@ fn exterior_zone_conductance(
             continue;
         }
 
-        let construction = model
-            .typed
-            .constructions
-            .iter()
-            .find(|construction| construction.id == surface.construction)
-            .ok_or_else(|| RuntimeError::MissingConstruction {
-                surface_name: surface.name.0.clone(),
-            })?;
-        let material = model
-            .typed
-            .materials
-            .iter()
-            .find(|material| material.id == construction.outside_layer)
-            .ok_or_else(|| RuntimeError::MissingMaterial {
-                construction_name: construction.name.0.clone(),
-            })?;
-        let resistance = material.thermal_resistance().ok_or_else(|| {
-            RuntimeError::MissingThermalResistance {
-                material_name: material.name.0.clone(),
-            }
-        })?;
+        let thermal = surface_thermal_properties(&model.typed, surface)?;
 
         exterior_area_m2 += area_m2;
-        conductance_w_per_k += area_m2 / resistance;
+        conductance_w_per_k += area_m2 / thermal.thermal_resistance_m2_k_per_w;
     }
 
     Ok((exterior_area_m2, conductance_w_per_k))
@@ -757,21 +753,79 @@ pub fn initialize_heat_balance_state(
         .typed
         .surfaces
         .iter()
-        .map(|surface| SurfaceHeatBalanceState {
-            surface_id: surface.id,
-            zone_id: surface.zone,
-            surface_name: surface.name.0.clone(),
-            surface_type: surface.surface_type,
-            area_m2: surface_area_m2(&surface.vertices),
-            inside_face_temperature_c: initial_zone_air_temperature_c,
-            outside_face_temperature_c: initial_zone_air_temperature_c,
+        .map(|surface| {
+            let area_m2 = surface_area_m2(&surface.vertices);
+            let thermal = surface_thermal_properties(&model.typed, surface)?;
+
+            Ok(SurfaceHeatBalanceState {
+                surface_id: surface.id,
+                zone_id: surface.zone,
+                surface_name: surface.name.0.clone(),
+                surface_type: surface.surface_type,
+                outside_boundary_condition: surface.outside_boundary_condition,
+                construction_id: thermal.construction_id,
+                construction_name: thermal.construction_name,
+                outside_layer_material_id: thermal.outside_layer_material_id,
+                outside_layer_material_name: thermal.outside_layer_material_name,
+                area_m2,
+                thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
+                heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
+                conductance_w_per_k: area_m2 / thermal.thermal_resistance_m2_k_per_w,
+                inside_face_temperature_c: initial_zone_air_temperature_c,
+                outside_face_temperature_c: initial_zone_air_temperature_c,
+            })
         })
-        .collect();
+        .collect::<Result<Vec<_>, RuntimeError>>()?;
 
     Ok(HeatBalanceState {
         timestep_index: 0,
         zones,
         surfaces,
+    })
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct SurfaceThermalProperties {
+    construction_id: ConstructionId,
+    construction_name: String,
+    outside_layer_material_id: MaterialId,
+    outside_layer_material_name: String,
+    thermal_resistance_m2_k_per_w: f64,
+    heat_capacity_j_per_m2_k: Option<f64>,
+}
+
+fn surface_thermal_properties(
+    model: &TypedModel,
+    surface: &Surface,
+) -> Result<SurfaceThermalProperties, RuntimeError> {
+    let construction = model
+        .constructions
+        .iter()
+        .find(|construction| construction.id == surface.construction)
+        .ok_or_else(|| RuntimeError::MissingConstruction {
+            surface_name: surface.name.0.clone(),
+        })?;
+    let material = model
+        .materials
+        .iter()
+        .find(|material| material.id == construction.outside_layer)
+        .ok_or_else(|| RuntimeError::MissingMaterial {
+            construction_name: construction.name.0.clone(),
+        })?;
+    let thermal_resistance_m2_k_per_w =
+        material
+            .thermal_resistance()
+            .ok_or_else(|| RuntimeError::MissingThermalResistance {
+                material_name: material.name.0.clone(),
+            })?;
+
+    Ok(SurfaceThermalProperties {
+        construction_id: construction.id,
+        construction_name: construction.name.0.clone(),
+        outside_layer_material_id: material.id,
+        outside_layer_material_name: material.name.0.clone(),
+        thermal_resistance_m2_k_per_w,
+        heat_capacity_j_per_m2_k: material.heat_capacity_per_area(),
     })
 }
 
@@ -1682,7 +1736,16 @@ DATA PERIODS
         assert!((state.zones[0].air_heat_capacity_j_per_k - 1207.2).abs() < 1.0e-9);
         assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
         assert_eq!(state.surfaces.len(), 6);
+        assert_eq!(
+            state.surfaces[0].outside_boundary_condition,
+            OutsideBoundaryCondition::Outdoors
+        );
+        assert_eq!(state.surfaces[0].construction_name, "WALL");
+        assert_eq!(state.surfaces[0].outside_layer_material_name, "R1");
         assert_eq!(state.surfaces[0].area_m2, 1.0);
+        assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
+        assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
+        assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
 
