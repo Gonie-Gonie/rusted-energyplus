@@ -47,7 +47,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-convective-gain` |
-| `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas only | no | `.runtime/compare-zone` |
+| `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |

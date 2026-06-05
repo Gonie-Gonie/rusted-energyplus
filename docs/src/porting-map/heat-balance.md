@@ -133,8 +133,9 @@ source-reference comments.
    Temperature`. Implemented state advance and diagnostic trace: heat-balance
    timesteps update MAT history, internal convective gains, opaque surface heat
    gain, and zone mean air temperature, then `compare zone-temperature` reports
-   EnergyPlus MAT deltas. The comparison remains diagnostic-only until a
-   tolerance-gated report exists.
+   EnergyPlus MAT deltas and can write diagnostic-only
+   `compare-summary.json`/`compare-report.md` artifacts. The comparison remains
+   diagnostic-only until a tolerance-gated report exists.
 8. Only after a tolerance-gated report exists, promote any case from
    diagnostic-only to conformance.
 

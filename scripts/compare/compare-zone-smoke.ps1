@@ -59,6 +59,17 @@ function Assert-Contains {
     Write-Host "OK $Description`: $Pattern"
 }
 
+function Assert-FileExists {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing $Description`: $Path"
+    }
+    Write-Host "OK $Description`: $Path"
+}
+
 $energyPlus = Join-Path $OracleRoot "energyplus.exe"
 $converter = Join-Path $OracleRoot "ConvertInputFormat.exe"
 $weather = Join-Path $OracleRoot "WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -225,7 +236,8 @@ if ($null -eq $cargo) {
 }
 
 Write-Host "Comparing Rust heat-balance state trace with EnergyPlus ESO zone temperatures."
-$output = & $cargo.Source run -p ep_cli --quiet -- compare zone-temperature $epjson $weather $eso 2>&1
+$reportDir = Join-Path $OutputRoot "compare"
+$output = & $cargo.Source run -p ep_cli --quiet -- compare zone-temperature $epjson $weather $eso --report-dir $reportDir 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
     throw "Zone temperature comparison failed."
@@ -242,9 +254,55 @@ Assert-Contains -Text $text -Pattern "heat_balance_timesteps: 96" -Description "
 Assert-Contains -Text $text -Pattern "zone_count: 1" -Description "zone count"
 Assert-Contains -Text $text -Pattern "surface_count: 6" -Description "surface count"
 Assert-Contains -Text $text -Pattern "samples: 24" -Description "sample count"
+Assert-Contains -Text $text -Pattern "length_match: true" -Description "length match"
 Assert-Contains -Text $text -Pattern "max_abs_delta:" -Description "delta summary"
+Assert-Contains -Text $text -Pattern "first_delta_sample:" -Description "first delta sample"
+Assert-Contains -Text $text -Pattern "max_delta_sample:" -Description "max delta sample"
 Assert-Contains -Text $text -Pattern "exact_match: not_available" -Description "exact-match boundary"
 Assert-Contains -Text $text -Pattern "exit_code_semantics: extraction-only" -Description "exit-code boundary"
+Assert-Contains -Text $text -Pattern "report_dir:" -Description "report directory"
 Assert-Contains -Text $text -Pattern "status: extracted" -Description "comparison status"
+
+$summaryPath = Join-Path $reportDir "compare-summary.json"
+$reportPath = Join-Path $reportDir "compare-report.md"
+Assert-FileExists -Path $summaryPath -Description "diagnostic summary"
+Assert-FileExists -Path $reportPath -Description "diagnostic report"
+
+$summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
+if ($summary.comparison_class -ne "diagnostic-only") {
+    throw "Unexpected diagnostic summary comparison_class: $($summary.comparison_class)"
+}
+if ($summary.conformance_claim -ne $false) {
+    throw "Diagnostic summary must not claim conformance"
+}
+if ($summary.tolerance_policy -ne "none") {
+    throw "Unexpected diagnostic summary tolerance_policy: $($summary.tolerance_policy)"
+}
+if ($summary.status -ne "extracted") {
+    throw "Unexpected diagnostic summary status: $($summary.status)"
+}
+if ($summary.zone -ne "ZONE ONE") {
+    throw "Unexpected diagnostic summary zone: $($summary.zone)"
+}
+if ($summary.samples -ne 24) {
+    throw "Unexpected diagnostic summary samples: $($summary.samples)"
+}
+if ($summary.heat_balance_timesteps -ne 96) {
+    throw "Unexpected diagnostic summary heat_balance_timesteps: $($summary.heat_balance_timesteps)"
+}
+if ($null -eq $summary.first_delta_sample) {
+    throw "Diagnostic summary did not include first_delta_sample"
+}
+if ($null -eq $summary.max_delta_sample) {
+    throw "Diagnostic summary did not include max_delta_sample"
+}
+
+$reportText = Get-Content -LiteralPath $reportPath -Raw
+Assert-Contains -Text $reportText -Pattern "Zone Temperature Diagnostic Report" -Description "report header"
+Assert-Contains -Text $reportText -Pattern "comparison_class: diagnostic-only" -Description "report comparison class"
+Assert-Contains -Text $reportText -Pattern "tolerance_policy: none" -Description "report tolerance boundary"
+Assert-Contains -Text $reportText -Pattern "runtime_class: heat-balance-state-shell" -Description "report runtime class"
+Assert-Contains -Text $reportText -Pattern "first_delta_sample" -Description "report first delta"
+Assert-Contains -Text $reportText -Pattern "max_delta_sample" -Description "report max delta"
 
 Write-Host "Zone temperature comparison smoke passed."

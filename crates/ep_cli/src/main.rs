@@ -22,6 +22,8 @@ use ep_runtime::{
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let exit_code = run(&args);
@@ -195,7 +197,7 @@ fn print_help() {
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
-    println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
+    println!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
     println!("  conformance validate-case <case.toml>");
     println!("  conformance baseline <case.toml> <oracle-root> <output-root>");
     println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
@@ -837,9 +839,7 @@ fn run_compare_command(args: &[String]) -> i32 {
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
             );
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
-            eprintln!(
-                "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
-            );
+            eprintln!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
             2
         }
         None => {
@@ -851,9 +851,7 @@ fn run_compare_command(args: &[String]) -> i32 {
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
             );
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
-            eprintln!(
-                "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
-            );
+            eprintln!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
             2
         }
     }
@@ -1263,28 +1261,100 @@ fn run_compare_internal_convective_gain(args: &[String]) -> i32 {
     if passed { 0 } else { 1 }
 }
 
-fn run_compare_zone_temperature(args: &[String]) -> i32 {
+#[derive(Clone, Debug, PartialEq)]
+struct ZoneTemperatureCompareArgs {
+    input_path: PathBuf,
+    weather_path: PathBuf,
+    eso_path: PathBuf,
+    report_dir: Option<PathBuf>,
+}
+
+fn parse_zone_temperature_compare_args(
+    args: &[String],
+) -> Result<ZoneTemperatureCompareArgs, String> {
     let Some(input_path) = args.first() else {
-        eprintln!("missing input path");
-        eprintln!(
-            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
-        );
-        return 2;
+        return Err("missing input path".to_string());
     };
     let Some(weather_path) = args.get(1) else {
-        eprintln!("missing weather path");
-        eprintln!(
-            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
-        );
-        return 2;
+        return Err("missing weather path".to_string());
     };
     let Some(eso_path) = args.get(2) else {
-        eprintln!("missing eplusout.eso path");
-        eprintln!(
-            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
-        );
-        return 2;
+        return Err("missing eplusout.eso path".to_string());
     };
+
+    let mut report_dir = None;
+    let mut index = 3;
+    while index < args.len() {
+        match args[index].as_str() {
+            "--report-dir" => {
+                let Some(value) = args.get(index + 1) else {
+                    return Err("missing --report-dir value".to_string());
+                };
+                report_dir = Some(PathBuf::from(value));
+                index += 2;
+            }
+            option => {
+                return Err(format!(
+                    "unsupported compare zone-temperature argument: {option}"
+                ));
+            }
+        }
+    }
+
+    Ok(ZoneTemperatureCompareArgs {
+        input_path: PathBuf::from(input_path),
+        weather_path: PathBuf::from(weather_path),
+        eso_path: PathBuf::from(eso_path),
+        report_dir,
+    })
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct DeltaPoint {
+    index: usize,
+    oracle_c: f64,
+    rust_c: f64,
+    abs_delta_c: f64,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct DeltaSummary {
+    samples: usize,
+    max_abs_delta_c: f64,
+    mean_abs_delta_c: f64,
+    first_delta_sample: Option<DeltaPoint>,
+    max_delta_sample: Option<DeltaPoint>,
+    length_match: bool,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct ZoneTemperatureDiagnostic {
+    zone_name: String,
+    samples: usize,
+    heat_balance_timesteps: usize,
+    zone_count: usize,
+    surface_count: usize,
+    oracle_first_c: f64,
+    rust_first_c: f64,
+    oracle_last_c: f64,
+    rust_last_c: f64,
+    delta: DeltaSummary,
+    status: &'static str,
+}
+
+fn run_compare_zone_temperature(args: &[String]) -> i32 {
+    let parsed = match parse_zone_temperature_compare_args(args) {
+        Ok(parsed) => parsed,
+        Err(error) => {
+            eprintln!("{error}");
+            eprintln!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
+            return 2;
+        }
+    };
+
+    let input_path = parsed.input_path.as_path();
+    let weather_path = parsed.weather_path.as_path();
+    let eso_path = parsed.eso_path.as_path();
 
     let raw_model = match load_epjson_file(input_path) {
         Ok(model) => model,
@@ -1352,45 +1422,61 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
         return 1;
     };
 
-    let (samples, max_abs_delta, mean_abs_delta) =
-        delta_summary(&oracle_values, &rust_series.values);
+    let delta = delta_summary(&oracle_values, &rust_series.values);
     let finite = oracle_values
         .iter()
         .chain(rust_series.values.iter())
         .all(|value| value.is_finite());
-    let extracted = finite && samples == oracle_values.len() && samples == rust_series.values.len();
+    let extracted = finite && delta.length_match;
+    let diagnostic = ZoneTemperatureDiagnostic {
+        zone_name,
+        samples: delta.samples,
+        heat_balance_timesteps: simulation.summary.timestep_count,
+        zone_count: simulation.summary.zone_count,
+        surface_count: simulation.summary.surface_count,
+        oracle_first_c: oracle_values[0],
+        rust_first_c: rust_series.values.first().copied().unwrap_or(f64::NAN),
+        oracle_last_c: oracle_values[oracle_values.len() - 1],
+        rust_last_c: rust_series.values.last().copied().unwrap_or(f64::NAN),
+        delta,
+        status: if extracted { "extracted" } else { "failed" },
+    };
+
+    if let Some(report_dir) = &parsed.report_dir
+        && let Err(error) = write_zone_temperature_diagnostic_report(report_dir, &diagnostic)
+    {
+        eprintln!("{error}");
+        return 1;
+    }
 
     println!("Zone Temperature Diagnostic");
     println!("  comparison_class: diagnostic-only");
     println!("  conformance_claim: false");
     println!("  tolerance_policy: none");
     println!("  runtime_class: heat-balance-state-shell");
-    println!("  zone: {zone_name}");
+    println!("  zone: {}", diagnostic.zone_name);
     println!(
         "  heat_balance_timesteps: {}",
-        simulation.summary.timestep_count
+        diagnostic.heat_balance_timesteps
     );
-    println!("  zone_count: {}", simulation.summary.zone_count);
-    println!("  surface_count: {}", simulation.summary.surface_count);
-    println!("  samples: {samples}");
-    println!("  max_abs_delta: {max_abs_delta:.6}");
-    println!("  mean_abs_delta: {mean_abs_delta:.6}");
-    println!("  oracle_first_c: {:.6}", oracle_values[0]);
-    println!("  rust_first_c: {:.6}", rust_series.values[0]);
-    println!(
-        "  oracle_last_c: {:.6}",
-        oracle_values[oracle_values.len() - 1]
-    );
-    println!(
-        "  rust_last_c: {:.6}",
-        rust_series.values[rust_series.values.len() - 1]
-    );
+    println!("  zone_count: {}", diagnostic.zone_count);
+    println!("  surface_count: {}", diagnostic.surface_count);
+    println!("  samples: {}", diagnostic.samples);
+    println!("  length_match: {}", diagnostic.delta.length_match);
+    println!("  max_abs_delta: {:.6}", diagnostic.delta.max_abs_delta_c);
+    println!("  mean_abs_delta: {:.6}", diagnostic.delta.mean_abs_delta_c);
+    print_delta_sample("  first_delta_sample", diagnostic.delta.first_delta_sample);
+    print_delta_sample("  max_delta_sample", diagnostic.delta.max_delta_sample);
+    println!("  oracle_first_c: {:.6}", diagnostic.oracle_first_c);
+    println!("  rust_first_c: {:.6}", diagnostic.rust_first_c);
+    println!("  oracle_last_c: {:.6}", diagnostic.oracle_last_c);
+    println!("  rust_last_c: {:.6}", diagnostic.rust_last_c);
     println!("  exact_match: not_available");
     println!("  exit_code_semantics: extraction-only");
-    println!(
-        "  status: {}",
-        if extracted { "extracted" } else { "failed" }
-    );
+    if let Some(report_dir) = &parsed.report_dir {
+        println!("  report_dir: {}", report_dir.display());
+    }
+    println!("  status: {}", diagnostic.status);
 
     if extracted { 0 } else { 1 }
 }
@@ -1729,21 +1815,247 @@ fn record_internal_gain_field_divergence(
     }
 }
 
-fn delta_summary(expected: &[f64], observed: &[f64]) -> (usize, f64, f64) {
+fn delta_summary(expected: &[f64], observed: &[f64]) -> DeltaSummary {
     let samples = expected.len().min(observed.len());
     if samples == 0 {
-        return (0, 0.0, 0.0);
+        return DeltaSummary {
+            samples: 0,
+            max_abs_delta_c: 0.0,
+            mean_abs_delta_c: 0.0,
+            first_delta_sample: None,
+            max_delta_sample: None,
+            length_match: expected.len() == observed.len(),
+        };
     }
 
     let mut max_abs_delta: f64 = 0.0;
+    let mut max_delta_sample = None;
+    let mut first_delta_sample = None;
     let mut sum_abs_delta = 0.0;
-    for (expected, observed) in expected.iter().zip(observed).take(samples) {
+    for (index, (expected, observed)) in expected.iter().zip(observed).take(samples).enumerate() {
         let delta = (expected - observed).abs();
+        let point = DeltaPoint {
+            index,
+            oracle_c: *expected,
+            rust_c: *observed,
+            abs_delta_c: delta,
+        };
+        if delta > 0.0 && first_delta_sample.is_none() {
+            first_delta_sample = Some(point);
+        }
+        if max_delta_sample.is_none() || delta > max_abs_delta {
+            max_delta_sample = Some(point);
+        }
         max_abs_delta = max_abs_delta.max(delta);
         sum_abs_delta += delta;
     }
 
-    (samples, max_abs_delta, sum_abs_delta / samples as f64)
+    DeltaSummary {
+        samples,
+        max_abs_delta_c: max_abs_delta,
+        mean_abs_delta_c: sum_abs_delta / samples as f64,
+        first_delta_sample,
+        max_delta_sample,
+        length_match: expected.len() == observed.len(),
+    }
+}
+
+fn print_delta_sample(label: &str, point: Option<DeltaPoint>) {
+    let Some(point) = point else {
+        println!("{label}: none");
+        return;
+    };
+
+    println!(
+        "{label}: index {} oracle {:.6} rust {:.6} abs_delta {:.6}",
+        point.index, point.oracle_c, point.rust_c, point.abs_delta_c
+    );
+}
+
+fn write_zone_temperature_diagnostic_report(
+    report_dir: &Path,
+    diagnostic: &ZoneTemperatureDiagnostic,
+) -> Result<(), String> {
+    std::fs::create_dir_all(report_dir)
+        .map_err(|error| format!("failed to create report directory: {error}"))?;
+
+    let summary_path = report_dir.join("compare-summary.json");
+    let report_path = report_dir.join("compare-report.md");
+
+    std::fs::write(
+        &summary_path,
+        render_zone_temperature_summary_json(diagnostic),
+    )
+    .map_err(|error| format!("failed to write zone-temperature summary: {error}"))?;
+    std::fs::write(&report_path, render_zone_temperature_report(diagnostic))
+        .map_err(|error| format!("failed to write zone-temperature report: {error}"))?;
+
+    Ok(())
+}
+
+fn render_zone_temperature_summary_json(diagnostic: &ZoneTemperatureDiagnostic) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str("  \"comparison_class\": \"diagnostic-only\",\n");
+    json.push_str("  \"conformance_claim\": false,\n");
+    json.push_str("  \"tolerance_policy\": \"none\",\n");
+    json.push_str("  \"runtime_class\": \"heat-balance-state-shell\",\n");
+    json.push_str(&format!(
+        "  \"status\": {},\n",
+        json_string(diagnostic.status)
+    ));
+    json.push_str(&format!(
+        "  \"zone\": {},\n",
+        json_string(&diagnostic.zone_name)
+    ));
+    json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
+    json.push_str(&format!(
+        "  \"heat_balance_timesteps\": {},\n",
+        diagnostic.heat_balance_timesteps
+    ));
+    json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
+    json.push_str(&format!(
+        "  \"surface_count\": {},\n",
+        diagnostic.surface_count
+    ));
+    json.push_str(&format!(
+        "  \"length_match\": {},\n",
+        diagnostic.delta.length_match
+    ));
+    json.push_str(&format!(
+        "  \"max_abs_delta_c\": {},\n",
+        json_number(diagnostic.delta.max_abs_delta_c)
+    ));
+    json.push_str(&format!(
+        "  \"mean_abs_delta_c\": {},\n",
+        json_number(diagnostic.delta.mean_abs_delta_c)
+    ));
+    json.push_str(&format!(
+        "  \"first_delta_sample\": {},\n",
+        delta_point_json(diagnostic.delta.first_delta_sample)
+    ));
+    json.push_str(&format!(
+        "  \"max_delta_sample\": {},\n",
+        delta_point_json(diagnostic.delta.max_delta_sample)
+    ));
+    json.push_str(&format!(
+        "  \"oracle_first_c\": {},\n",
+        json_number(diagnostic.oracle_first_c)
+    ));
+    json.push_str(&format!(
+        "  \"rust_first_c\": {},\n",
+        json_number(diagnostic.rust_first_c)
+    ));
+    json.push_str(&format!(
+        "  \"oracle_last_c\": {},\n",
+        json_number(diagnostic.oracle_last_c)
+    ));
+    json.push_str(&format!(
+        "  \"rust_last_c\": {},\n",
+        json_number(diagnostic.rust_last_c)
+    ));
+    json.push_str("  \"artifacts\": {\n");
+    json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
+    json.push_str("    \"compare_summary_json\": \"compare-summary.json\"\n");
+    json.push_str("  }\n");
+    json.push_str("}\n");
+    json
+}
+
+fn render_zone_temperature_report(diagnostic: &ZoneTemperatureDiagnostic) -> String {
+    let mut report = String::new();
+    report.push_str("# Zone Temperature Diagnostic Report\n\n");
+    report.push_str("comparison_class: diagnostic-only\n");
+    report.push_str("conformance_claim: false\n");
+    report.push_str("tolerance_policy: none\n");
+    report.push_str("runtime_class: heat-balance-state-shell\n");
+    report.push_str(&format!("status: {}\n", diagnostic.status));
+    report.push_str(&format!("zone: {}\n", diagnostic.zone_name));
+    report.push_str(&format!("samples: {}\n", diagnostic.samples));
+    report.push_str(&format!(
+        "heat_balance_timesteps: {}\n",
+        diagnostic.heat_balance_timesteps
+    ));
+    report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
+    report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
+    report.push_str(&format!(
+        "length_match: {}\n",
+        diagnostic.delta.length_match
+    ));
+    report.push_str(&format!(
+        "max_abs_delta_c: {:.6}\n",
+        diagnostic.delta.max_abs_delta_c
+    ));
+    report.push_str(&format!(
+        "mean_abs_delta_c: {:.6}\n\n",
+        diagnostic.delta.mean_abs_delta_c
+    ));
+    report.push_str("## Delta Samples\n\n");
+    report.push_str("| sample | index | oracle_c | rust_c | abs_delta_c |\n");
+    report.push_str("|---|---:|---:|---:|---:|\n");
+    report_delta_row(
+        &mut report,
+        "first_delta_sample",
+        diagnostic.delta.first_delta_sample,
+    );
+    report_delta_row(
+        &mut report,
+        "max_delta_sample",
+        diagnostic.delta.max_delta_sample,
+    );
+    report
+}
+
+fn report_delta_row(report: &mut String, label: &str, point: Option<DeltaPoint>) {
+    match point {
+        Some(point) => report.push_str(&format!(
+            "| {label} | {} | {:.6} | {:.6} | {:.6} |\n",
+            point.index, point.oracle_c, point.rust_c, point.abs_delta_c
+        )),
+        None => {
+            report.push_str("| ");
+            report.push_str(label);
+            report.push_str(" | n/a | n/a | n/a | n/a |\n");
+        }
+    }
+}
+
+fn delta_point_json(point: Option<DeltaPoint>) -> String {
+    match point {
+        Some(point) => format!(
+            "{{ \"index\": {}, \"oracle_c\": {}, \"rust_c\": {}, \"abs_delta_c\": {} }}",
+            point.index,
+            json_number(point.oracle_c),
+            json_number(point.rust_c),
+            json_number(point.abs_delta_c)
+        ),
+        None => "null".to_string(),
+    }
+}
+
+fn json_number(value: f64) -> String {
+    if value.is_finite() {
+        format!("{value:.12}")
+    } else {
+        "null".to_string()
+    }
+}
+
+fn json_string(value: &str) -> String {
+    let mut output = String::from("\"");
+    for character in value.chars() {
+        match character {
+            '"' => output.push_str("\\\""),
+            '\\' => output.push_str("\\\\"),
+            '\n' => output.push_str("\\n"),
+            '\r' => output.push_str("\\r"),
+            '\t' => output.push_str("\\t"),
+            character => output.push(character),
+        }
+    }
+    output.push('"');
+    output
 }
 
 fn print_first_divergence(prefix: &str, divergence: Option<ep_compare::SeriesDivergence>) {
@@ -1981,6 +2293,81 @@ mod tests {
         ];
 
         assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn parse_zone_temperature_compare_args_accepts_report_dir()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let args = vec![
+            "input.epJSON".to_string(),
+            "weather.epw".to_string(),
+            "eplusout.eso".to_string(),
+            "--report-dir".to_string(),
+            "reports".to_string(),
+        ];
+
+        let parsed =
+            super::parse_zone_temperature_compare_args(&args).map_err(std::io::Error::other)?;
+
+        assert_eq!(parsed.input_path, std::path::PathBuf::from("input.epJSON"));
+        assert_eq!(parsed.weather_path, std::path::PathBuf::from("weather.epw"));
+        assert_eq!(parsed.eso_path, std::path::PathBuf::from("eplusout.eso"));
+        assert_eq!(parsed.report_dir, Some(std::path::PathBuf::from("reports")));
+
+        Ok(())
+    }
+
+    #[test]
+    fn zone_temperature_delta_summary_tracks_diagnostic_samples() {
+        let summary = super::delta_summary(&[1.0, 3.0, 8.0], &[1.0, 4.5, 4.0]);
+
+        assert_eq!(summary.samples, 3);
+        assert_eq!(summary.mean_abs_delta_c, (0.0 + 1.5 + 4.0) / 3.0);
+        assert_eq!(summary.max_abs_delta_c, 4.0);
+        assert_eq!(
+            summary.first_delta_sample,
+            Some(super::DeltaPoint {
+                index: 1,
+                oracle_c: 3.0,
+                rust_c: 4.5,
+                abs_delta_c: 1.5,
+            })
+        );
+        assert_eq!(
+            summary.max_delta_sample,
+            Some(super::DeltaPoint {
+                index: 2,
+                oracle_c: 8.0,
+                rust_c: 4.0,
+                abs_delta_c: 4.0,
+            })
+        );
+        assert!(summary.length_match);
+    }
+
+    #[test]
+    fn zone_temperature_summary_json_keeps_diagnostic_boundary() {
+        let diagnostic = super::ZoneTemperatureDiagnostic {
+            zone_name: "ZONE ONE".to_string(),
+            samples: 2,
+            heat_balance_timesteps: 8,
+            zone_count: 1,
+            surface_count: 6,
+            oracle_first_c: 21.0,
+            rust_first_c: 20.5,
+            oracle_last_c: 22.0,
+            rust_last_c: 20.8,
+            delta: super::delta_summary(&[21.0, 22.0], &[20.5, 20.8]),
+            status: "extracted",
+        };
+
+        let json = super::render_zone_temperature_summary_json(&diagnostic);
+
+        assert!(json.contains("\"comparison_class\": \"diagnostic-only\""));
+        assert!(json.contains("\"conformance_claim\": false"));
+        assert!(json.contains("\"tolerance_policy\": \"none\""));
+        assert!(json.contains("\"first_delta_sample\""));
+        assert!(json.contains("\"max_delta_sample\""));
     }
 
     #[test]

@@ -292,6 +292,7 @@ P2 compatibility work:
 - [x] add opaque surface thermal inputs to heat-balance state
 - [x] add first heat-balance timestep state advance without conformance claim
 - [x] connect heat-balance zone-air trace to diagnostic-only MAT comparison
+- [x] write diagnostic-only MAT compare summary/report artifacts
 
 ## Forbidden Wording
 

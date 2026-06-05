@@ -17,10 +17,10 @@ Current foundations:
 - `compare-summary.json`
 - `compare-report.md`
 - first-divergence reporting
+- diagnostic-only MAT delta artifacts for `compare zone-temperature --report-dir`
 
 Next evidence target:
 
 - manifest-driven multi-series comparison
 - artifact directories split into `oracle`, `rust`, and `compare`
 - variable-level tolerance summaries
-
