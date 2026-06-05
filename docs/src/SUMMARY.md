@@ -17,5 +17,6 @@
 - [TypedModel Contract](operations/typed-model-resolution.md)
 - [Supported Object Coverage](operations/supported-object-coverage.md)
 - [Porting Map](porting-map/README.md)
+  - [Heat Balance](porting-map/heat-balance.md)
 - [Releases](releases/README.md)
   - [v0.1.0](releases/v0.1.0.md)

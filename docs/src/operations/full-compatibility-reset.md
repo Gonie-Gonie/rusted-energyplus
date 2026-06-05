@@ -284,7 +284,7 @@ P2 compatibility work:
 - [x] add geometry summary foundation
 - [x] add EnergyPlus EIO geometry comparison gate
 - [x] add EnergyPlus EIO `OtherEquipment` nominal internal-gains gate
-- write heat-balance porting map before heat-balance code
+- [x] write heat-balance porting map before heat-balance code
 
 ## Forbidden Wording
 
