@@ -10,9 +10,9 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, build_execution_plan,
-    build_hourly_time_axis, load_epw_dry_bulb_series, simulate_constant_schedules,
-    simulate_first_zone_uncontrolled,
+    ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, ZoneGeometrySummary,
+    build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
+    simulate_constant_schedules, simulate_first_zone_uncontrolled, zone_geometry_summaries,
 };
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -75,11 +75,13 @@ fn run_model_command(args: &[String]) -> i32 {
         }
         Some("compile") => run_compile_command(&args[1..]),
         Some("plan") => run_plan_command(&args[1..]),
+        Some("geometry") => run_geometry_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported model command: {command}");
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
             eprintln!("usage: eplus-rs model compile <input.epJSON>");
             eprintln!("usage: eplus-rs model plan <input.epJSON>");
+            eprintln!("usage: eplus-rs model geometry <input.epJSON>");
             2
         }
         None => {
@@ -87,6 +89,7 @@ fn run_model_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
             eprintln!("usage: eplus-rs model compile <input.epJSON>");
             eprintln!("usage: eplus-rs model plan <input.epJSON>");
+            eprintln!("usage: eplus-rs model geometry <input.epJSON>");
             2
         }
     }
@@ -144,6 +147,32 @@ fn run_plan_command(args: &[String]) -> i32 {
     0
 }
 
+fn run_geometry_command(args: &[String]) -> i32 {
+    let Some(path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs model geometry <input.epJSON>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let summaries = zone_geometry_summaries(&model);
+
+    print_geometry_summary(&summaries);
+    0
+}
+
 fn print_help() {
     println!("eplus-rs");
     println!();
@@ -153,6 +182,7 @@ fn print_help() {
     println!("  model inspect <input.epJSON>");
     println!("  model compile <input.epJSON>");
     println!("  model plan <input.epJSON>");
+    println!("  model geometry <input.epJSON>");
     println!("  run first-zone <input.epJSON> <weather.epw> [--hours N]");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
@@ -194,6 +224,26 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     for stage in &plan.stages {
         println!("    {}: {}", stage.name, stage.steps.len());
     }
+}
+
+fn print_geometry_summary(summaries: &[ZoneGeometrySummary]) {
+    println!("Geometry Summary");
+    println!("  zones: {}", summaries.len());
+    for summary in summaries {
+        let volume_m3 = summary
+            .volume_m3
+            .map(|volume_m3| format!("{volume_m3:.6}"))
+            .unwrap_or_else(|| "unavailable".to_string());
+        println!(
+            "  zone: {} surfaces: {} floor_area_m2: {:.6} volume_m3: {} exterior_wall_area_m2: {:.6}",
+            summary.zone_name,
+            summary.surface_count,
+            summary.floor_area_m2,
+            volume_m3,
+            summary.exterior_wall_area_m2
+        );
+    }
+    println!("  status: summarized");
 }
 
 fn run_conformance_command(args: &[String]) -> i32 {
@@ -1267,6 +1317,13 @@ mod tests {
     #[test]
     fn missing_model_plan_path_fails() {
         let args = vec!["model".to_string(), "plan".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_model_geometry_path_fails() {
+        let args = vec!["model".to_string(), "geometry".to_string()];
 
         assert_eq!(run(&args), 2);
     }

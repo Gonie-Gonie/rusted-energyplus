@@ -25,6 +25,7 @@ compatibility for zone heat balance or HVAC simulation.
 - typed `RunPeriod` intake and hourly time-axis foundation
 - EPW hourly weather record parsing beyond dry-bulb
 - `Schedule:Compact` all-days `Until` segment subset
+- zone geometry summary foundation for future EnergyPlus EIO comparison
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
 - typed conformance case/suite manifests for future tolerance-gated evidence
 - `OutputRegistry` foundation for output-request driven reports
@@ -51,6 +52,7 @@ Development-only diagnostics:
 .\scripts\typed-model-smoke.cmd
 .\scripts\model-plan-smoke.cmd
 .\scripts\schedule-compact-smoke.cmd
+.\scripts\geometry-smoke.cmd
 .\scripts\compare-schedule-smoke.cmd
 .\scripts\compare-weather-smoke.cmd
 .\scripts\first-zone-smoke.cmd
@@ -87,6 +89,7 @@ cargo run -p ep_cli -- oracle-info
 cargo run -p ep_cli -- model inspect .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- model plan .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
+cargo run -p ep_cli -- model geometry .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw --hours 24
 cargo run -p ep_cli -- compare zone-temperature .runtime\compare-zone\26.1.0\zone-temperature.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw .runtime\compare-zone\26.1.0\eplusout.eso
 cargo run -p ep_cli -- conformance validate-case data\conformance_cases\schedule_constant_001\case.toml
@@ -102,6 +105,11 @@ comparison smoke suite and writes `trace.json`, `compare-summary.json`,
 The `first-zone` and `zone-temperature` commands are intentionally labeled as
 diagnostics. They are useful for plumbing and report generation work, but they
 are not release evidence for EnergyPlus heat-balance conformance.
+
+`.\scripts\geometry-smoke.cmd` summarizes zone surface count, floor area,
+derived volume, and exterior wall area from the EnergyPlus-converted oracle
+fixture. This is comparison preparation; it is not yet a tolerance-gated EIO
+comparison.
 
 `.\scripts\conformance-schema-smoke.cmd` validates the current P1
 case/suite manifest schema. The first fixture is intentionally a smoke manifest

@@ -413,6 +413,23 @@ pub struct FirstZoneSimulation {
     pub summary: FirstZoneSimulationSummary,
 }
 
+/// Zone geometry summary used for EnergyPlus EIO/internal-variable comparisons.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneGeometrySummary {
+    /// Zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// Number of surfaces assigned to the zone.
+    pub surface_count: usize,
+    /// Sum of floor surface areas in square meters.
+    pub floor_area_m2: f64,
+    /// Derived or declared zone volume in cubic meters.
+    pub volume_m3: Option<f64>,
+    /// Gross exterior wall area in square meters.
+    pub exterior_wall_area_m2: f64,
+}
+
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
@@ -696,6 +713,49 @@ fn compact_schedule_value(segments: &[ScheduleCompactSegment], minute_of_day: u3
         .or_else(|| segments.last().map(|segment| segment.value))
 }
 
+/// Builds per-zone geometry summaries from the typed model.
+#[must_use]
+pub fn zone_geometry_summaries(model: &TypedModel) -> Vec<ZoneGeometrySummary> {
+    model
+        .zones
+        .iter()
+        .map(|zone| ZoneGeometrySummary {
+            zone_id: zone.id,
+            zone_name: zone.name.0.clone(),
+            surface_count: model
+                .surfaces
+                .iter()
+                .filter(|surface| surface.zone == zone.id)
+                .count(),
+            floor_area_m2: zone_floor_area_m2(model, zone),
+            volume_m3: zone_volume_m3(model, zone),
+            exterior_wall_area_m2: exterior_wall_area_m2(model, zone),
+        })
+        .collect()
+}
+
+fn zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+    model
+        .surfaces
+        .iter()
+        .filter(|surface| surface.zone == zone.id && surface.surface_type == SurfaceType::Floor)
+        .map(|surface| surface_area_m2(&surface.vertices))
+        .sum()
+}
+
+fn exterior_wall_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+    model
+        .surfaces
+        .iter()
+        .filter(|surface| {
+            surface.zone == zone.id
+                && surface.surface_type == SurfaceType::Wall
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors
+        })
+        .map(|surface| surface_area_m2(&surface.vertices))
+        .sum()
+}
+
 fn zone_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
     if let AutoOrNumber::Value(volume_m3) = zone.volume
         && volume_m3 > 0.0
@@ -715,12 +775,7 @@ fn zone_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
     if ceiling_height_m <= 0.0 {
         return None;
     }
-    let floor_area_m2 = model
-        .surfaces
-        .iter()
-        .filter(|surface| surface.zone == zone.id && surface.surface_type == SurfaceType::Floor)
-        .map(|surface| surface_area_m2(&surface.vertices))
-        .sum::<f64>();
+    let floor_area_m2 = zone_floor_area_m2(model, zone);
     if floor_area_m2 > 0.0 {
         Some(floor_area_m2 * ceiling_height_m)
     } else {
@@ -1196,7 +1251,7 @@ mod tests {
         SimulationState, build_execution_plan, build_hourly_time_axis,
         build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled, simulate_schedule_values,
-        surface_area_m2,
+        surface_area_m2, zone_geometry_summaries,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
@@ -1428,6 +1483,18 @@ DATA PERIODS
         ];
 
         assert_eq!(surface_area_m2(&vertices), 6.0);
+    }
+
+    #[test]
+    fn zone_geometry_summary_reports_cube_metrics() {
+        let summaries = zone_geometry_summaries(&cube_model());
+
+        assert_eq!(summaries.len(), 1);
+        assert_eq!(summaries[0].zone_name, "ZONE ONE");
+        assert_eq!(summaries[0].surface_count, 6);
+        assert_eq!(summaries[0].floor_area_m2, 1.0);
+        assert_eq!(summaries[0].volume_m3, Some(1.0));
+        assert_eq!(summaries[0].exterior_wall_area_m2, 4.0);
     }
 
     #[test]

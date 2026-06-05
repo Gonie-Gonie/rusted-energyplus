@@ -95,6 +95,7 @@ but that report is still baseline-only evidence.
 | aligned hourly time axis | implemented foundation | `ep_runtime::build_hourly_time_axis` expands the first run period into EnergyPlus-style hour-ending samples |
 | EPW weather fields | implemented foundation | `ep_runtime::parse_epw_records` reads dry-bulb, dew point, RH, pressure, radiation, and wind fields |
 | `Schedule:Compact` subset | implemented foundation | typed all-days `Until` segments and runtime hourly evaluation |
+| zone geometry summary | implemented foundation | `eplus-rs model geometry` prints zone surface count, floor area, volume, and exterior wall area |
 
 ## Revised Milestone Intent
 
@@ -278,7 +279,8 @@ P2 compatibility work:
 - [x] implement `RunPeriod` and aligned time axis foundation
 - [x] expand EPW weather fields foundation
 - [x] add `Schedule:Compact` subset foundation
-- add geometry/internal-variable comparison
+- [x] add geometry summary foundation
+- [ ] add EnergyPlus EIO/internal-variable comparison gate
 - write heat-balance porting map before heat-balance code
 
 ## Forbidden Wording
