@@ -3,9 +3,10 @@
 use ep_model::{
     AutoOrNumber, Building, Construction, ConstructionId, InternalGainId, Material, MaterialId,
     MaterialKind, NameMap, NormalizedName, NumericType, OtherEquipment, OutsideBoundaryCondition,
-    Point3, RunPeriod, RunPeriodId, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, TimestepConfig, TypedModel, Version, WindExposure, Zone, ZoneId,
+    Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, SolarDistribution,
+    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TimestepConfig, TypedModel, Version,
+    WindExposure, Zone, ZoneId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -185,6 +186,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
+    "Schedule:Compact",
     "OtherEquipment",
     "Zone",
     "BuildingSurface:Detailed",
@@ -219,6 +221,7 @@ impl<'a> Compiler<'a> {
         self.parse_constructions(&mut model);
         self.parse_schedule_type_limits(&mut model);
         self.parse_schedules(&mut model);
+        self.parse_compact_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_other_equipment(&mut model);
         self.parse_surfaces(&mut model);
@@ -575,6 +578,46 @@ impl<'a> Compiler<'a> {
                     "hourly_value",
                     0.0,
                 ),
+            });
+        }
+    }
+
+    fn parse_compact_schedules(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Schedule:Compact") {
+            let schedule_type_limits = match self.optional_string(
+                "Schedule:Compact",
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    "Schedule:Compact",
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let schedule_index = model.schedules.len() + model.compact_schedules.len();
+            let Some(id_value) = self.checked_id("Schedule:Compact", &name, schedule_index) else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name("Schedule:Compact", &name);
+                continue;
+            }
+            let Some(segments) = self.compact_schedule_segments(&name, &object) else {
+                continue;
+            };
+
+            model.compact_schedules.push(ScheduleCompact {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                segments,
             });
         }
     }
@@ -1234,6 +1277,138 @@ impl<'a> Compiler<'a> {
         Some(vertices)
     }
 
+    fn compact_schedule_segments(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<ScheduleCompactSegment>> {
+        let Some(value) = field_value(object, "data") else {
+            self.error(
+                "MissingRequiredField",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!("Schedule:Compact/{object_name} requires field data"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("Schedule:Compact", object_name, "data", "array");
+            return None;
+        };
+
+        let mut segments = Vec::new();
+        let mut pending_until = None;
+        let mut saw_for_all_days = false;
+        for (index, value) in values.iter().enumerate() {
+            let Some(field_value) = compact_data_field(value) else {
+                self.error(
+                    "InvalidFieldType",
+                    "Schedule:Compact",
+                    Some(object_name),
+                    Some("data"),
+                    format!("Schedule:Compact/{object_name} data entry {index} must contain field"),
+                );
+                continue;
+            };
+            match field_value {
+                RawValue::String(text) if compact_directive(text, "For") => {
+                    if !text.to_ascii_lowercase().contains("alldays") {
+                        self.error(
+                            "UnsupportedScheduleCompact",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} supports only For: AllDays in the current subset"
+                            ),
+                        );
+                    }
+                    saw_for_all_days = true;
+                }
+                RawValue::String(text) if compact_directive(text, "Through") => {}
+                RawValue::String(text) if compact_directive(text, "Until") => {
+                    pending_until = parse_until_minute(text);
+                    if pending_until.is_none() {
+                        self.error(
+                            "InvalidScheduleCompactUntil",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} has invalid Until directive '{text}'"
+                            ),
+                        );
+                    }
+                }
+                RawValue::Number(_text) => {
+                    let Some(until_minute_of_day) = pending_until.take() else {
+                        self.error(
+                            "InvalidScheduleCompactValue",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} value appears before an Until directive"
+                            ),
+                        );
+                        continue;
+                    };
+                    let Some(value) =
+                        self.number_value("Schedule:Compact", object_name, "data", field_value)
+                    else {
+                        continue;
+                    };
+                    segments.push(ScheduleCompactSegment {
+                        until_minute_of_day,
+                        value,
+                    });
+                }
+                RawValue::String(text) => {
+                    self.error(
+                        "UnsupportedScheduleCompact",
+                        "Schedule:Compact",
+                        Some(object_name),
+                        Some("data"),
+                        format!(
+                            "Schedule:Compact/{object_name} has unsupported directive '{text}'"
+                        ),
+                    );
+                }
+                _ => self.invalid_field_type(
+                    "Schedule:Compact",
+                    object_name,
+                    "data",
+                    "string or number",
+                ),
+            }
+        }
+
+        if !saw_for_all_days {
+            self.error(
+                "UnsupportedScheduleCompact",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} requires For: AllDays in the current subset"
+                ),
+            );
+        }
+        if segments.is_empty() {
+            self.error(
+                "UnsupportedScheduleCompact",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!("Schedule:Compact/{object_name} has no supported Until/value segments"),
+            );
+            return None;
+        }
+
+        Some(segments)
+    }
+
     fn vertex_coordinate(
         &mut self,
         object_type: &str,
@@ -1337,6 +1512,38 @@ fn format_number(value: f64) -> String {
         format!("{value:.1}")
     } else {
         value.to_string()
+    }
+}
+
+fn compact_data_field(value: &RawValue) -> Option<&RawValue> {
+    let RawValue::Object(fields) = value else {
+        return None;
+    };
+    fields.get(&FieldName("field".to_string()))
+}
+
+fn compact_directive(value: &str, directive: &str) -> bool {
+    value
+        .trim_start()
+        .get(..directive.len())
+        .is_some_and(|prefix| prefix.eq_ignore_ascii_case(directive))
+        && value[directive.len()..].trim_start().starts_with(':')
+}
+
+fn parse_until_minute(value: &str) -> Option<u32> {
+    let (_directive, time) = value.split_once(':')?;
+    let time = time.trim();
+    let (hour, minute) = time.split_once(':')?;
+    let hour = hour.trim().parse::<u32>().ok()?;
+    let minute = minute.trim().parse::<u32>().ok()?;
+    if hour > 24 || minute >= 60 || (hour == 24 && minute != 0) {
+        return None;
+    }
+    let minute_of_day = hour * 60 + minute;
+    if minute_of_day == 0 {
+        None
+    } else {
+        Some(minute_of_day)
     }
 }
 
@@ -1633,6 +1840,59 @@ mod tests {
             model.run_periods[0].day_of_week_for_start_day,
             Some(DayOfWeek::Wednesday)
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_schedule_compact_all_days_segments() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "ScheduleTypeLimits": {
+                    "Fraction": {
+                        "lower_limit_value": 0.0,
+                        "upper_limit_value": 1.0,
+                        "numeric_type": "Continuous"
+                    }
+                },
+                "Schedule:Compact": {
+                    "Office Occupancy": {
+                        "schedule_type_limits_name": "Fraction",
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: AllDays"},
+                            {"field": "Until: 08:00"},
+                            {"field": 0.0},
+                            {"field": "Until: 18:00"},
+                            {"field": 1.0},
+                            {"field": "Until: 24:00"},
+                            {"field": 0.0}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.compact_schedules.len(), 1);
+        assert_eq!(model.compact_schedules[0].name.0, "OFFICE OCCUPANCY");
+        assert_eq!(
+            model.compact_schedules[0]
+                .schedule_type_limits
+                .map(|id| id.0),
+            Some(0)
+        );
+        assert_eq!(model.compact_schedules[0].segments.len(), 3);
+        assert_eq!(
+            model.compact_schedules[0].segments[0].until_minute_of_day,
+            8 * 60
+        );
+        assert_eq!(model.compact_schedules[0].segments[1].value, 1.0);
 
         Ok(())
     }

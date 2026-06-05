@@ -2,7 +2,8 @@
 
 use ep_model::{
     AutoOrNumber, OtherEquipment, OutputHandle, OutsideBoundaryCondition, Point3, RunPeriod,
-    RunPeriodId, ScheduleId, SimulationModel, SurfaceType, TypedModel, Zone, ZoneId,
+    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SurfaceType, TypedModel,
+    Zone, ZoneId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -31,7 +32,7 @@ pub enum SimulationMode {
 pub enum ExecutionStep {
     /// Update weather-derived state.
     UpdateWeather,
-    /// Evaluate one constant schedule.
+    /// Evaluate one schedule.
     EvaluateSchedule(ScheduleId),
     /// Solve one zone.
     SolveZone(ZoneId),
@@ -67,13 +68,7 @@ impl ExecutionPlan {
 #[must_use]
 pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     let mut setup_steps = vec![ExecutionStep::UpdateWeather];
-    setup_steps.extend(
-        model
-            .typed
-            .schedules
-            .iter()
-            .map(|schedule| ExecutionStep::EvaluateSchedule(schedule.id)),
-    );
+    setup_steps.extend(schedule_ids(&model.typed).map(ExecutionStep::EvaluateSchedule));
 
     let zone_steps = model
         .typed
@@ -403,7 +398,7 @@ pub struct FirstZoneSimulationSummary {
     pub conductance_w_per_k: f64,
     /// Air heat capacity in J/K.
     pub air_heat_capacity_j_per_k: f64,
-    /// Constant internal sensible gain in W.
+    /// First-hour internal sensible gain in W.
     pub internal_gain_w: f64,
 }
 
@@ -522,17 +517,20 @@ pub fn simulate_first_zone_uncontrolled(
     let mut zone_temperatures = Vec::with_capacity(options.sample_count);
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
 
-    for outdoor_dry_bulb_c in weather_dry_bulb_c
+    for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
         .iter()
         .copied()
         .take(options.sample_count)
+        .enumerate()
     {
         state.weather.outdoor_dry_bulb_c = outdoor_dry_bulb_c;
+        let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
+        let internal_gain_w = internal_gain_w(&model.typed, zone.id, hour_ending);
         for _substep in 0..zone_steps_per_hour {
             zone_air_temperature_c = step_zone_air_temperature(
                 zone_air_temperature_c,
                 outdoor_dry_bulb_c,
-                characteristics.internal_gain_w,
+                internal_gain_w,
                 characteristics.conductance_w_per_k,
                 characteristics.air_heat_capacity_j_per_k,
                 seconds_per_timestep,
@@ -583,7 +581,7 @@ fn derive_first_zone_characteristics(
     let multiplier = f64::from(zone.multiplier.max(1));
     let air_heat_capacity_j_per_k =
         volume_m3 * multiplier * AIR_DENSITY_KG_PER_M3 * AIR_SPECIFIC_HEAT_J_PER_KG_K;
-    let internal_gain_w = internal_gain_w(&model.typed, zone.id);
+    let internal_gain_w = internal_gain_w(&model.typed, zone.id, 1);
 
     Ok(FirstZoneSimulationSummary {
         zone_id: zone.id,
@@ -642,29 +640,60 @@ fn exterior_zone_conductance(
     Ok((exterior_area_m2, conductance_w_per_k))
 }
 
-fn internal_gain_w(model: &TypedModel, zone_id: ZoneId) -> f64 {
+fn internal_gain_w(model: &TypedModel, zone_id: ZoneId, hour_ending: u32) -> f64 {
     model
         .other_equipment
         .iter()
         .filter(|equipment| equipment.zone == zone_id)
-        .map(|equipment| internal_gain_for_equipment_w(model, equipment))
+        .map(|equipment| internal_gain_for_equipment_w(model, equipment, hour_ending))
         .sum()
 }
 
-fn internal_gain_for_equipment_w(model: &TypedModel, equipment: &OtherEquipment) -> f64 {
+fn internal_gain_for_equipment_w(
+    model: &TypedModel,
+    equipment: &OtherEquipment,
+    hour_ending: u32,
+) -> f64 {
     let schedule_multiplier = equipment
         .schedule
-        .and_then(|schedule_id| {
-            model
-                .schedules
-                .iter()
-                .find(|schedule| schedule.id == schedule_id)
-                .map(|schedule| schedule.hourly_value)
-        })
+        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
         .unwrap_or(1.0);
     let sensible_fraction = (1.0 - equipment.fraction_latent - equipment.fraction_lost).max(0.0);
 
     equipment.design_level_w * schedule_multiplier * sensible_fraction
+}
+
+fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
+    model
+        .schedules
+        .iter()
+        .map(|schedule| schedule.id)
+        .chain(model.compact_schedules.iter().map(|schedule| schedule.id))
+}
+
+fn schedule_value(model: &TypedModel, schedule_id: ScheduleId, hour_ending: u32) -> Option<f64> {
+    if let Some(schedule) = model
+        .schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+    {
+        return Some(schedule.hourly_value);
+    }
+
+    let minute_of_day = hour_ending.clamp(1, 24) * 60;
+    model
+        .compact_schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+        .and_then(|schedule| compact_schedule_value(&schedule.segments, minute_of_day))
+}
+
+fn compact_schedule_value(segments: &[ScheduleCompactSegment], minute_of_day: u32) -> Option<f64> {
+    segments
+        .iter()
+        .find(|segment| minute_of_day <= segment.until_minute_of_day)
+        .map(|segment| segment.value)
+        .or_else(|| segments.last().map(|segment| segment.value))
 }
 
 fn zone_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
@@ -909,6 +938,42 @@ pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> V
         .collect()
 }
 
+/// Simulates constant and supported compact schedules for a fixed number of hourly samples.
+#[must_use]
+pub fn simulate_schedule_values(model: &TypedModel, sample_count: usize) -> Vec<ScheduleTrace> {
+    schedule_ids(model)
+        .filter_map(|schedule_id| {
+            let schedule_name = schedule_name(model, schedule_id)?;
+            let values = (0..sample_count)
+                .map(|index| {
+                    let hour_ending = u32::try_from(index % 24 + 1).unwrap_or(24);
+                    schedule_value(model, schedule_id, hour_ending).unwrap_or(0.0)
+                })
+                .collect();
+            Some(ScheduleTrace {
+                schedule_id,
+                schedule_name,
+                values,
+            })
+        })
+        .collect()
+}
+
+fn schedule_name(model: &TypedModel, schedule_id: ScheduleId) -> Option<String> {
+    model
+        .schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+        .map(|schedule| schedule.name.0.clone())
+        .or_else(|| {
+            model
+                .compact_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
+}
+
 /// Error returned while reading EPW weather data.
 #[derive(Debug)]
 pub enum EpwError {
@@ -1130,13 +1195,15 @@ mod tests {
         ExecutionStep, FirstZoneSimulationOptions, OutputSeries, ResultStore, SimulationMode,
         SimulationState, build_execution_plan, build_hourly_time_axis,
         build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series, parse_epw_records,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled, surface_area_m2,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled, simulate_schedule_values,
+        surface_area_m2,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
         MaterialKind, NormalizedName, OtherEquipment, OutputHandle, OutsideBoundaryCondition,
-        Point3, RunPeriod, RunPeriodId, ScheduleConstant, ScheduleId, SimulationModel, Surface,
-        SurfaceId, SurfaceType, TimestepConfig, TypedModel, Zone, ZoneId,
+        Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
+        ScheduleId, SimulationModel, Surface, SurfaceId, SurfaceType, TimestepConfig, TypedModel,
+        Zone, ZoneId,
     };
 
     #[test]
@@ -1163,6 +1230,38 @@ mod tests {
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].schedule_name, "ALWAYSON");
         assert_eq!(traces[0].values, vec![1.0, 1.0, 1.0]);
+    }
+
+    #[test]
+    fn compact_schedule_trace_uses_until_segments() {
+        let mut model = TypedModel::default();
+        model.compact_schedules.push(ScheduleCompact {
+            id: ScheduleId(0),
+            name: NormalizedName::new("Office Occupancy"),
+            schedule_type_limits: None,
+            segments: vec![
+                ScheduleCompactSegment {
+                    until_minute_of_day: 8 * 60,
+                    value: 0.0,
+                },
+                ScheduleCompactSegment {
+                    until_minute_of_day: 18 * 60,
+                    value: 1.0,
+                },
+                ScheduleCompactSegment {
+                    until_minute_of_day: 24 * 60,
+                    value: 0.0,
+                },
+            ],
+        });
+
+        let traces = simulate_schedule_values(&model, 24);
+
+        assert_eq!(traces.len(), 1);
+        assert_eq!(traces[0].values[7], 0.0);
+        assert_eq!(traces[0].values[8], 1.0);
+        assert_eq!(traces[0].values[17], 1.0);
+        assert_eq!(traces[0].values[18], 0.0);
     }
 
     #[test]

@@ -399,6 +399,28 @@ pub struct ScheduleConstant {
     pub hourly_value: f64,
 }
 
+/// One value segment in a compact schedule day profile.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ScheduleCompactSegment {
+    /// Minute of day at which this segment ends, 1 through 1440.
+    pub until_minute_of_day: u32,
+    /// Segment value.
+    pub value: f64,
+}
+
+/// Compact schedule subset using all-days daily `Until` segments.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleCompact {
+    /// Typed ID.
+    pub id: ScheduleId,
+    /// Schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Daily all-days value segments.
+    pub segments: Vec<ScheduleCompactSegment>,
+}
+
 /// Electric or process equipment represented as a zone internal gain.
 #[derive(Clone, Debug, PartialEq)]
 pub struct OtherEquipment {
@@ -528,6 +550,8 @@ pub struct TypedModel {
     pub schedule_type_limit_names: NameMap<ScheduleTypeLimitId>,
     /// Constant schedules.
     pub schedules: Vec<ScheduleConstant>,
+    /// Compact schedules.
+    pub compact_schedules: Vec<ScheduleCompact>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
     /// Zone internal gains from OtherEquipment objects.
@@ -560,6 +584,7 @@ impl Default for TypedModel {
             schedule_type_limits: Vec::new(),
             schedule_type_limit_names: NameMap::default(),
             schedules: Vec::new(),
+            compact_schedules: Vec::new(),
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
@@ -583,6 +608,7 @@ impl TypedModel {
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.schedules.len()
+            + self.compact_schedules.len()
             + self.other_equipment.len()
             + self.zones.len()
             + self.surfaces.len()

@@ -1,0 +1,45 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "numeric_type": "Continuous",
+      "upper_limit_value": 1.0
+    }
+  },
+  "Schedule:Compact": {
+    "Office Occupancy": {
+      "schedule_type_limits_name": "Fraction",
+      "data": [
+        {
+          "field": "Through: 12/31"
+        },
+        {
+          "field": "For: AllDays"
+        },
+        {
+          "field": "Until: 08:00"
+        },
+        {
+          "field": 0.0
+        },
+        {
+          "field": "Until: 18:00"
+        },
+        {
+          "field": 1.0
+        },
+        {
+          "field": "Until: 24:00"
+        },
+        {
+          "field": 0.0
+        }
+      ]
+    }
+  }
+}

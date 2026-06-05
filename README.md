@@ -24,6 +24,7 @@ compatibility for zone heat balance or HVAC simulation.
 - SimulationModel, ModelGraph, and ExecutionPlan summaries
 - typed `RunPeriod` intake and hourly time-axis foundation
 - EPW hourly weather record parsing beyond dry-bulb
+- `Schedule:Compact` all-days `Until` segment subset
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
 - typed conformance case/suite manifests for future tolerance-gated evidence
 - `OutputRegistry` foundation for output-request driven reports
@@ -49,6 +50,7 @@ Development-only diagnostics:
 .\scripts\raw-model-smoke.cmd
 .\scripts\typed-model-smoke.cmd
 .\scripts\model-plan-smoke.cmd
+.\scripts\schedule-compact-smoke.cmd
 .\scripts\compare-schedule-smoke.cmd
 .\scripts\compare-weather-smoke.cmd
 .\scripts\first-zone-smoke.cmd

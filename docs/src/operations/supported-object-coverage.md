@@ -34,7 +34,7 @@ Current table:
 | BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area used for first-zone UA and trace suite |
 | Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison in regression trace suite |
 | OtherEquipment | yes | partial | yes | yes | partial | partial | partial | planned | internal gains used for first-zone subset |
-| Schedule:Compact | yes | planned | planned | planned | n/a | partial | partial | partial | generic raw parse only |
+| Schedule:Compact | yes | partial | yes | yes | n/a | partial | partial | partial | all-days Until segment subset |
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
 | ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |
 | PlantLoop | yes | planned | planned | planned | planned | no | no | no | generic raw parse only |
