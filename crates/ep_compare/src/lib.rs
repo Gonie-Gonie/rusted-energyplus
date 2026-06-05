@@ -42,8 +42,23 @@ pub struct SeriesComparison {
     pub samples: usize,
     /// Maximum absolute difference.
     pub max_abs_delta: f64,
+    /// First tolerance or length divergence, if any.
+    pub first_divergence: Option<SeriesDivergence>,
     /// True when every sample is within tolerance.
     pub passed: bool,
+}
+
+/// First point where two numeric series diverged.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SeriesDivergence {
+    /// Zero-based sample index where the divergence starts.
+    pub index: usize,
+    /// Expected value, absent when the expected series ended first.
+    pub expected: Option<f64>,
+    /// Observed value, absent when the observed series ended first.
+    pub observed: Option<f64>,
+    /// Absolute delta, absent for length-only divergence.
+    pub abs_delta: Option<f64>,
 }
 
 /// Compares two equally-sized numeric series.
@@ -55,18 +70,38 @@ pub fn compare_series(
 ) -> SeriesComparison {
     let mut max_abs_delta: f64 = 0.0;
     let mut passed = expected.len() == observed.len();
+    let mut first_divergence = None;
 
-    for (left, right) in expected.iter().zip(observed) {
+    for (index, (left, right)) in expected.iter().zip(observed).enumerate() {
         let delta = (left - right).abs();
         max_abs_delta = max_abs_delta.max(delta);
         if !tolerance.accepts(*left, *right) {
             passed = false;
+            if first_divergence.is_none() {
+                first_divergence = Some(SeriesDivergence {
+                    index,
+                    expected: Some(*left),
+                    observed: Some(*right),
+                    abs_delta: Some(delta),
+                });
+            }
         }
     }
 
+    let samples = expected.len().min(observed.len());
+    if expected.len() != observed.len() && first_divergence.is_none() {
+        first_divergence = Some(SeriesDivergence {
+            index: samples,
+            expected: expected.get(samples).copied(),
+            observed: observed.get(samples).copied(),
+            abs_delta: None,
+        });
+    }
+
     SeriesComparison {
-        samples: expected.len().min(observed.len()),
+        samples,
         max_abs_delta,
+        first_divergence,
         passed,
     }
 }
@@ -243,5 +278,39 @@ End of Data Dictionary
         assert!(result.passed);
         assert_eq!(result.samples, 2);
         assert!(result.max_abs_delta > 0.0);
+        assert_eq!(result.first_divergence, None);
+    }
+
+    #[test]
+    fn series_comparison_reports_first_value_divergence() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let result = compare_series(&[1.0, 2.0, 3.0], &[1.0, 2.5, 4.0], Tolerance::default());
+
+        assert!(!result.passed);
+        let divergence = result
+            .first_divergence
+            .ok_or_else(|| std::io::Error::other("expected first divergence"))?;
+        assert_eq!(divergence.index, 1);
+        assert_eq!(divergence.expected, Some(2.0));
+        assert_eq!(divergence.observed, Some(2.5));
+        assert_eq!(divergence.abs_delta, Some(0.5));
+
+        Ok(())
+    }
+
+    #[test]
+    fn series_comparison_reports_length_divergence() -> Result<(), Box<dyn std::error::Error>> {
+        let result = compare_series(&[1.0, 2.0], &[1.0], Tolerance::default());
+
+        assert!(!result.passed);
+        let divergence = result
+            .first_divergence
+            .ok_or_else(|| std::io::Error::other("expected first divergence"))?;
+        assert_eq!(divergence.index, 1);
+        assert_eq!(divergence.expected, Some(2.0));
+        assert_eq!(divergence.observed, None);
+        assert_eq!(divergence.abs_delta, None);
+
+        Ok(())
     }
 }

@@ -398,6 +398,7 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
             comparison.max_abs_delta,
             if comparison.passed { "pass" } else { "fail" }
         );
+        print_first_divergence("  ", comparison.first_divergence);
     }
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
@@ -569,6 +570,7 @@ fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     println!("Weather Drybulb Comparison");
     println!("  samples: {}", comparison.samples);
     println!("  max_abs_delta: {}", comparison.max_abs_delta);
+    print_first_divergence("  ", comparison.first_divergence);
     println!(
         "  status: {}",
         if comparison.passed { "pass" } else { "fail" }
@@ -592,6 +594,44 @@ fn delta_summary(expected: &[f64], observed: &[f64]) -> (usize, f64, f64) {
     }
 
     (samples, max_abs_delta, sum_abs_delta / samples as f64)
+}
+
+fn print_first_divergence(prefix: &str, divergence: Option<ep_compare::SeriesDivergence>) {
+    let Some(divergence) = divergence else {
+        println!("{prefix}first_divergence: none");
+        return;
+    };
+
+    match (
+        divergence.expected,
+        divergence.observed,
+        divergence.abs_delta,
+    ) {
+        (Some(expected), Some(observed), Some(abs_delta)) => println!(
+            "{prefix}first_divergence: index {} expected {:.12} observed {:.12} abs_delta {:.12}",
+            divergence.index, expected, observed, abs_delta
+        ),
+        (expected, observed, None) => println!(
+            "{prefix}first_divergence: index {} expected {} observed {} length_mismatch",
+            divergence.index,
+            optional_number_label(expected),
+            optional_number_label(observed)
+        ),
+        (expected, observed, Some(abs_delta)) => println!(
+            "{prefix}first_divergence: index {} expected {} observed {} abs_delta {:.12}",
+            divergence.index,
+            optional_number_label(expected),
+            optional_number_label(observed),
+            abs_delta
+        ),
+    }
+}
+
+fn optional_number_label(value: Option<f64>) -> String {
+    match value {
+        Some(value) => format!("{value:.12}"),
+        None => "missing".to_string(),
+    }
 }
 
 fn print_raw_model_summary(summary: &RawModelSummary) {
