@@ -15,7 +15,8 @@ use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, ZoneGeometrySummary,
     build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled, zone_geometry_summaries,
+    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    simulate_zone_internal_convective_gains, zone_geometry_summaries,
 };
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -191,6 +192,7 @@ fn print_help() {
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
+    println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
     println!("  conformance validate-case <case.toml>");
@@ -822,6 +824,7 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
         Some("geometry") => run_compare_geometry(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
+        Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
         Some("zone-temperature") => run_compare_zone_temperature(&args[1..]),
         Some(command) => {
@@ -829,6 +832,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
+            );
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -840,6 +846,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
+            );
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!(
                 "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
@@ -1163,6 +1172,91 @@ fn run_compare_internal_gains(args: &[String]) -> i32 {
         "  first_divergence: {}",
         first_divergence.unwrap_or_else(|| "none".to_string())
     );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_internal_convective_gain(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>");
+        return 2;
+    };
+    let Some(eso_path) = args.get(1) else {
+        eprintln!("missing eplusout.eso path");
+        eprintln!("usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model.as_ref() else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    if model.zones.is_empty() {
+        eprintln!("no Zone objects are available for internal-convective-gain comparison");
+        return 1;
+    }
+
+    let mut oracle_series = Vec::new();
+    for zone in &model.zones {
+        let values = match load_eso_series(
+            eso_path,
+            &zone.name.0,
+            "Zone Total Internal Convective Heating Rate",
+        ) {
+            Ok(values) => values,
+            Err(error) => {
+                eprintln!("{error}");
+                return 1;
+            }
+        };
+        oracle_series.push((zone.id, zone.name.0.clone(), values));
+    }
+
+    let sample_count = oracle_series
+        .iter()
+        .map(|(_id, _name, values)| values.len())
+        .max()
+        .unwrap_or(0);
+    let traces = simulate_zone_internal_convective_gains(model, sample_count);
+    let mut passed = true;
+
+    println!("Internal Convective Gain Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: default");
+    println!("  zones: {}", oracle_series.len());
+    for (zone_id, zone_name, expected_values) in oracle_series {
+        let Some(trace) = traces.iter().find(|trace| trace.zone_id == zone_id) else {
+            eprintln!("missing Rust internal convective gain trace: {zone_name}");
+            return 1;
+        };
+        let comparison = compare_series(
+            &expected_values,
+            &trace.values_w[..expected_values.len()],
+            Tolerance::default(),
+        );
+        if !comparison.passed {
+            passed = false;
+        }
+        println!(
+            "  zone: {} samples: {} max_abs_delta: {} status: {}",
+            zone_name,
+            comparison.samples,
+            comparison.max_abs_delta,
+            if comparison.passed { "pass" } else { "fail" }
+        );
+        print_first_divergence("  ", comparison.first_divergence);
+    }
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
     if passed { 0 } else { 1 }
@@ -1866,6 +1960,16 @@ mod tests {
     #[test]
     fn missing_compare_internal_gains_path_fails() {
         let args = vec!["compare".to_string(), "internal-gains".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_compare_internal_convective_gain_path_fails() {
+        let args = vec![
+            "compare".to_string(),
+            "internal-convective-gain".to_string(),
+        ];
 
         assert_eq!(run(&args), 2);
     }

@@ -1099,6 +1099,17 @@ pub struct ScheduleTrace {
     pub values: Vec<f64>,
 }
 
+/// One sampled zone internal-gain output series.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneInternalGainTrace {
+    /// Typed zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// Sampled convective internal gain values in W.
+    pub values_w: Vec<f64>,
+}
+
 /// Simulates constant schedules for a fixed number of samples.
 #[must_use]
 pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> Vec<ScheduleTrace> {
@@ -1130,6 +1141,31 @@ pub fn simulate_schedule_values(model: &TypedModel, sample_count: usize) -> Vec<
                 schedule_name,
                 values,
             })
+        })
+        .collect()
+}
+
+/// Simulates zone total internal convective heating rates for hourly samples.
+#[must_use]
+pub fn simulate_zone_internal_convective_gains(
+    model: &TypedModel,
+    sample_count: usize,
+) -> Vec<ZoneInternalGainTrace> {
+    model
+        .zones
+        .iter()
+        .map(|zone| {
+            let values_w = (0..sample_count)
+                .map(|index| {
+                    let hour_ending = u32::try_from(index % 24 + 1).unwrap_or(24);
+                    convective_internal_gain_w(model, zone.id, hour_ending)
+                })
+                .collect();
+            ZoneInternalGainTrace {
+                zone_id: zone.id,
+                zone_name: zone.name.0.clone(),
+                values_w,
+            }
         })
         .collect()
 }
@@ -1371,8 +1407,8 @@ mod tests {
         SimulationState, build_execution_plan, build_hourly_time_axis,
         build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
         parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_schedule_values, surface_area_m2,
-        zone_geometry_summaries,
+        simulate_first_zone_uncontrolled, simulate_schedule_values,
+        simulate_zone_internal_convective_gains, surface_area_m2, zone_geometry_summaries,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
@@ -1438,6 +1474,18 @@ mod tests {
         assert_eq!(traces[0].values[8], 1.0);
         assert_eq!(traces[0].values[17], 1.0);
         assert_eq!(traces[0].values[18], 0.0);
+    }
+
+    #[test]
+    fn zone_internal_convective_gain_trace_excludes_radiant_fraction() {
+        let mut model = cube_model();
+        model.other_equipment[0].fraction_radiant = 0.25;
+
+        let traces = simulate_zone_internal_convective_gains(&model, 2);
+
+        assert_eq!(traces.len(), 1);
+        assert_eq!(traces[0].zone_name, "ZONE ONE");
+        assert_eq!(traces[0].values_w, vec![9.0, 9.0]);
     }
 
     #[test]

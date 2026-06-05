@@ -24,6 +24,8 @@ Already implemented gates:
   count, floor area, volume, and exterior gross wall area
 - `compare internal-gains`: EIO `OtherEquipment Internal Gains Nominal` parity
   for schedule binding, zone binding, design level, W/m2, and gain fractions
+- `compare internal-convective-gain`: ESO `Zone Total Internal Convective
+  Heating Rate` parity for the typed `OtherEquipment` convective-gain trace
 
 Still diagnostic-only:
 
@@ -119,7 +121,8 @@ source-reference comments.
 3. Add report-only traces for EnergyPlus inputs already gated by EIO:
    geometry, material resistance, constructions, schedules, and
    `OtherEquipment`.
-4. Port internal convective gains as a separate runtime trace.
+4. Port internal convective gains as a separate runtime trace. Implemented:
+   `ep_runtime::simulate_zone_internal_convective_gains`.
 5. Add an EnergyPlus comparison for `Zone Total Internal Convective Heating
    Rate` before using it to claim zone air parity.
 6. Add opaque surface heat-balance state for the first no-window one-zone case.

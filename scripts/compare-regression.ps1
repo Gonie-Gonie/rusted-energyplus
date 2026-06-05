@@ -175,6 +175,12 @@ $suiteCases = @(
         script = "compare-weather-smoke.cmd"
     },
     [pscustomobject]@{
+        id = "internal-convective-gain"
+        kind = "internal-gain"
+        comparison_class = "conformance-smoke"
+        script = "compare-internal-convective-gain-smoke.cmd"
+    },
+    [pscustomobject]@{
         id = "zone-temperature"
         kind = "zone"
         comparison_class = "diagnostic-only"

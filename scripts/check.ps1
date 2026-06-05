@@ -26,6 +26,7 @@ if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
 & (Join-Path $RepoRoot "scripts\geometry-smoke.ps1")
 & (Join-Path $RepoRoot "scripts\compare-geometry-smoke.ps1")
 & (Join-Path $RepoRoot "scripts\compare-internal-gains-smoke.ps1")
+& (Join-Path $RepoRoot "scripts\compare-internal-convective-gain-smoke.ps1")
 & (Join-Path $RepoRoot "scripts\conformance-schema-smoke.ps1")
 & (Join-Path $RepoRoot "scripts\docs-check.ps1")
 & (Join-Path $RepoRoot "scripts\strict-no-false-conformance.ps1")

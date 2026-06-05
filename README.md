@@ -58,6 +58,7 @@ Development-only diagnostics:
 .\scripts\geometry-smoke.cmd
 .\scripts\compare-geometry-smoke.cmd
 .\scripts\compare-internal-gains-smoke.cmd
+.\scripts\compare-internal-convective-gain-smoke.cmd
 .\scripts\compare-schedule-smoke.cmd
 .\scripts\compare-weather-smoke.cmd
 .\scripts\first-zone-smoke.cmd
@@ -97,6 +98,7 @@ cargo run -p ep_cli -- model plan .runtime\oracle-smoke\26.1.0\convert\smoke.epJ
 cargo run -p ep_cli -- model geometry .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- compare geometry .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\oracle-smoke\26.1.0\eplusout.eio
 cargo run -p ep_cli -- compare internal-gains .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\oracle-smoke\26.1.0\eplusout.eio
+cargo run -p ep_cli -- compare internal-convective-gain .runtime\compare-internal-convective-gain\26.1.0\internal-convective-gain.epJSON .runtime\compare-internal-convective-gain\26.1.0\eplusout.eso
 cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw --hours 24
 cargo run -p ep_cli -- compare zone-temperature .runtime\compare-zone\26.1.0\zone-temperature.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw .runtime\compare-zone\26.1.0\eplusout.eso
 cargo run -p ep_cli -- conformance validate-case data\conformance_cases\schedule_constant_001\case.toml
@@ -104,9 +106,9 @@ cargo run -p ep_cli -- conformance baseline data\conformance_cases\schedule_cons
 cargo run -p ep_cli -- conformance report-skeleton data\conformance_cases\schedule_constant_001\case.toml .runtime\conformance-baseline\26.1.0\schedule_constant_001 .runtime\conformance-report\26.1.0
 ```
 
-`.\scripts\compare-regression.cmd` runs the current schedule, weather, and zone
-comparison smoke suite and writes `trace.json`, `compare-summary.json`,
-`compare-report.md`, and `profile-summary.json` under
+`.\scripts\compare-regression.cmd` runs the current schedule, weather,
+internal-gain, and zone comparison smoke suite and writes `trace.json`,
+`compare-summary.json`, `compare-report.md`, and `profile-summary.json` under
 `.runtime\compare-regression\26.1.0`.
 
 The `first-zone` and `zone-temperature` commands are intentionally labeled as
@@ -126,6 +128,10 @@ evidence.
 `.\scripts\compare-internal-gains-smoke.cmd` compares typed `OtherEquipment`
 nominal gains with EnergyPlus `eplusout.eio`. It verifies schedule/zone binding,
 design level, W/m2, and gain fractions as input-interpretation evidence.
+
+`.\scripts\compare-internal-convective-gain-smoke.cmd` compares the Rust
+hourly zone internal convective-gain trace with EnergyPlus
+`Zone Total Internal Convective Heating Rate` from ESO.
 
 `.\scripts\conformance-schema-smoke.cmd` validates the current P1
 case/suite manifest schema. The first fixture is intentionally a smoke manifest

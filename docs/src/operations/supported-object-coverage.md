@@ -33,7 +33,7 @@ Current table:
 | Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated, regression-traced, geometry-summarized, and EIO-compared |
 | BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area used for first-zone UA, trace suite, geometry summary, and EIO comparison |
 | Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison in regression trace suite |
-| OtherEquipment | yes | partial | yes | yes | partial | partial | partial | partial | internal gains used for first-zone subset and EIO nominal-gains comparison |
+| OtherEquipment | yes | partial | yes | yes | partial | partial | partial | partial | internal gains used for first-zone subset, EIO nominal-gains comparison, and ESO convective-gain trace |
 | Schedule:Compact | yes | partial | yes | yes | n/a | partial | partial | partial | all-days Until segment subset |
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
 | ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |
