@@ -24,6 +24,7 @@ compatibility for zone heat balance or HVAC simulation.
 - SimulationModel, ModelGraph, and ExecutionPlan summaries
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
 - typed conformance case/suite manifests for future tolerance-gated evidence
+- `OutputRegistry` foundation for output-request driven reports
 - compare regression artifacts: `trace.json`, `compare-summary.json`,
   `compare-report.md`, and `profile-summary.json`
 - smoke/check scripts

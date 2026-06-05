@@ -78,6 +78,7 @@ The reset plan is now being rebuilt from evidence contracts upward.
 | first fixture | schema-only smoke | `data/conformance_cases/schedule_constant_001/case.toml` |
 | baseline generation | implemented for first fixture | `eplus-rs conformance baseline` writes oracle artifacts from a case manifest |
 | report skeleton | implemented for baseline-only evidence | `eplus-rs conformance report-skeleton` writes output-request rows from ESO |
+| `Output:Variable` registry | implemented foundation | `OutputRegistry` normalizes case output requests and rejects duplicates |
 | release check hook | implemented | `scripts/conformance-schema-smoke.ps1` runs `cargo test -p ep_conformance` |
 
 The first fixture remains `comparison_class = "smoke"` and
@@ -260,7 +261,7 @@ P1 conformance infrastructure:
 - [x] add output request schema
 - [x] add baseline generation script
 - [x] add multi-series compare report skeleton
-- [ ] add `Output:Variable` registry plan
+- [x] add `Output:Variable` registry plan
 - [x] add schedule/weather conformance suite shape
 
 P2 compatibility work:

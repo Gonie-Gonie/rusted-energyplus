@@ -35,6 +35,10 @@ No conformance claim without case + variable list + tolerance + report + gate.
 - smoke and diagnostic-only cases can define output requests without claiming
   numerical compatibility
 
+`OutputRegistry` turns case output requests into stable series identities. It
+normalizes output key, variable name, and frequency for duplicate detection, so
+one report row cannot silently represent the same EnergyPlus series twice.
+
 ## Current Fixtures
 
 `data/conformance_cases/schedule_constant_001/case.toml` is the first schema
@@ -91,7 +95,8 @@ status: baseline-only
 ```
 
 It enumerates the requested output series and EnergyPlus baseline sample count.
-It does not compare Rust results yet.
+It reads requested series through `OutputRegistry` and does not compare Rust
+results yet.
 
 ## Verification
 
@@ -104,7 +109,6 @@ It does not compare Rust results yet.
 
 ## Next Steps
 
-- introduce an `Output:Variable` registry so requested variables are tracked
-  from IDF/epJSON intake through result comparison
+- extend `OutputRegistry` across IDF/epJSON intake and native result comparison
 - promote schedule/weather cases from smoke manifests to tolerance-gated
   conformance cases only when their reports and gates exist

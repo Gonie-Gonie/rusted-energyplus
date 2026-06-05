@@ -3,7 +3,8 @@
 use ep_compare::{Tolerance, compare_series, load_eso_series};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
-    ComparisonClass, ConformanceCase, OutputFrequency, VariableClass, load_case_file,
+    ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, VariableClass,
+    load_case_file,
 };
 use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
@@ -466,8 +467,10 @@ fn generate_conformance_report_skeleton(
         .map_err(|error| format!("failed to create report directory: {error}"))?;
     let report_path = report_dir.join("compare-report.md");
 
+    let registry = OutputRegistry::from_case(manifest)
+        .map_err(|error| format!("invalid registry: {error}"))?;
     let mut rows = Vec::new();
-    for output in &manifest.outputs {
+    for output in registry.series() {
         let values = load_eso_series(&eso, &output.key, &output.variable)
             .map_err(|error| format!("failed to load baseline series: {error}"))?;
         rows.push(ReportSeriesRow {

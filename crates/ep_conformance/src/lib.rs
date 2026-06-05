@@ -1,6 +1,7 @@
 //! Case and suite manifests for EnergyPlus comparison evidence.
 
 use serde::Deserialize;
+use std::collections::BTreeSet;
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
@@ -63,6 +64,7 @@ impl ConformanceCase {
             require_output_non_empty(index, "key", &output.key)?;
             require_output_non_empty(index, "variable", &output.variable)?;
         }
+        validate_unique_outputs(&self.outputs)?;
 
         for (index, tolerance) in self.tolerances.iter().enumerate() {
             tolerance.validate(index)?;
@@ -147,8 +149,98 @@ pub struct OutputRequest {
     pub class: VariableClass,
 }
 
+impl OutputRequest {
+    /// Returns the normalized key used for duplicate detection.
+    #[must_use]
+    pub fn normalized_identity(&self) -> OutputRequestIdentity {
+        OutputRequestIdentity {
+            key: normalize_identity_part(&self.key),
+            variable: normalize_identity_part(&self.variable),
+            frequency: self.frequency,
+        }
+    }
+}
+
+/// Stable identity for one requested output series.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct OutputRequestIdentity {
+    /// Normalized output key.
+    pub key: String,
+    /// Normalized variable name.
+    pub variable: String,
+    /// Output reporting frequency.
+    pub frequency: OutputFrequency,
+}
+
+/// Registry of output series requested by one case.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OutputRegistry {
+    series: Vec<OutputSeriesSpec>,
+}
+
+impl OutputRegistry {
+    /// Builds a registry from validated case output requests.
+    pub fn from_case(case: &ConformanceCase) -> Result<Self, ValidationError> {
+        validate_unique_outputs(&case.outputs)?;
+        Ok(Self {
+            series: case
+                .outputs
+                .iter()
+                .cloned()
+                .map(OutputSeriesSpec::from)
+                .collect(),
+        })
+    }
+
+    /// Returns every registered output series in manifest order.
+    #[must_use]
+    pub fn series(&self) -> &[OutputSeriesSpec] {
+        &self.series
+    }
+
+    /// Returns the number of registered series.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.series.len()
+    }
+
+    /// Returns true when the registry has no series.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.series.is_empty()
+    }
+}
+
+/// Registered output series specification.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OutputSeriesSpec {
+    /// EnergyPlus output key such as a zone name or schedule name.
+    pub key: String,
+    /// EnergyPlus output variable name.
+    pub variable: String,
+    /// Requested reporting frequency.
+    pub frequency: OutputFrequency,
+    /// Semantic variable group used to select tolerance rules.
+    pub class: VariableClass,
+    /// Normalized identity used by comparison reports and gates.
+    pub identity: OutputRequestIdentity,
+}
+
+impl From<OutputRequest> for OutputSeriesSpec {
+    fn from(output: OutputRequest) -> Self {
+        let identity = output.normalized_identity();
+        Self {
+            key: output.key,
+            variable: output.variable,
+            frequency: output.frequency,
+            class: output.class,
+            identity,
+        }
+    }
+}
+
 /// Supported output reporting frequencies.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "kebab-case")]
 pub enum OutputFrequency {
     /// Every simulation timestep.
@@ -368,6 +460,15 @@ pub enum ValidationError {
         /// Field name inside the output request.
         field: &'static str,
     },
+    /// Two output requests resolve to the same identity.
+    DuplicateOutputRequest {
+        /// Zero-based output request index where the duplicate was found.
+        index: usize,
+        /// Normalized output key.
+        key: String,
+        /// Normalized variable name.
+        variable: String,
+    },
     /// A tolerance rule had no threshold.
     EmptyToleranceRule {
         /// Zero-based tolerance rule index.
@@ -413,6 +514,14 @@ impl Display for ValidationError {
             Self::EmptyOutputField { index, field } => {
                 write!(formatter, "output {index} has empty field {field}")
             }
+            Self::DuplicateOutputRequest {
+                index,
+                key,
+                variable,
+            } => write!(
+                formatter,
+                "output {index} duplicates requested series {key}/{variable}"
+            ),
             Self::EmptyToleranceRule { index } => {
                 write!(formatter, "tolerance {index} has no threshold")
             }
@@ -482,11 +591,30 @@ fn validate_non_negative(
     Ok(())
 }
 
+fn validate_unique_outputs(outputs: &[OutputRequest]) -> Result<(), ValidationError> {
+    let mut identities = BTreeSet::new();
+    for (index, output) in outputs.iter().enumerate() {
+        let identity = output.normalized_identity();
+        if !identities.insert(identity.clone()) {
+            return Err(ValidationError::DuplicateOutputRequest {
+                index,
+                key: identity.key,
+                variable: identity.variable,
+            });
+        }
+    }
+    Ok(())
+}
+
+fn normalize_identity_part(value: &str) -> String {
+    value.trim().to_ascii_uppercase()
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
-        ComparisonClass, ManifestError, ValidationError, load_case_file, load_suite_file,
-        parse_case_str,
+        ComparisonClass, ManifestError, OutputRegistry, ValidationError, load_case_file,
+        load_suite_file, parse_case_str,
     };
     use std::path::PathBuf;
 
@@ -500,6 +628,7 @@ mod tests {
         assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
         assert!(!manifest.conformance_claim);
         assert_eq!(manifest.outputs.len(), 1);
+        assert_eq!(manifest.outputs[0].key, "ALWAYSON");
         assert_eq!(manifest.outputs[0].variable, "Schedule Value");
 
         Ok(())
@@ -589,6 +718,57 @@ blocking = true
         assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
 
         Ok(())
+    }
+
+    #[test]
+    fn builds_output_registry_from_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/schedule_constant_001/case.toml"),
+        )?;
+        let registry = OutputRegistry::from_case(&manifest)?;
+
+        assert_eq!(registry.len(), 1);
+        assert_eq!(registry.series()[0].identity.key, "ALWAYSON");
+        assert_eq!(registry.series()[0].identity.variable, "SCHEDULE VALUE");
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_duplicate_output_requests() {
+        let result = parse_case_str(
+            r#"
+id = "duplicate_outputs"
+title = "Duplicate outputs"
+milestone = "P1"
+purpose = "Prove output registry rejects duplicates."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "duplicate.idf"
+
+[[outputs]]
+key = "AlwaysOn"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+
+[[outputs]]
+key = " ALWAYSON "
+variable = "schedule value"
+frequency = "hourly"
+class = "schedule"
+"#,
+        );
+
+        assert!(matches!(
+            result,
+            Err(ManifestError::Validation(
+                ValidationError::DuplicateOutputRequest { .. }
+            ))
+        ));
     }
 
     fn repo_root() -> PathBuf {
