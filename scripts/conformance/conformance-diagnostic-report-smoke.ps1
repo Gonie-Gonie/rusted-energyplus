@@ -101,6 +101,12 @@ Assert-FileExists -Path $summaryPath -Description "diagnostic summary"
 Assert-FileExists -Path $reportPath -Description "diagnostic report"
 
 $summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
+if ($summary.case_id -ne "zone_temperature_diagnostic_001") {
+    throw "Unexpected diagnostic summary case_id: $($summary.case_id)"
+}
+if ($summary.oracle_version -ne "26.1.0") {
+    throw "Unexpected diagnostic summary oracle_version: $($summary.oracle_version)"
+}
 if ($summary.comparison_class -ne "diagnostic-only") {
     throw "Unexpected diagnostic summary comparison_class: $($summary.comparison_class)"
 }
@@ -119,9 +125,34 @@ if ($summary.zone -ne "ZONE ONE") {
 if ($summary.samples -ne 24) {
     throw "Unexpected diagnostic summary samples: $($summary.samples)"
 }
+if ($summary.output.key -ne "ZONE ONE") {
+    throw "Unexpected diagnostic summary output key: $($summary.output.key)"
+}
+if ($summary.output.variable -ne "Zone Mean Air Temperature") {
+    throw "Unexpected diagnostic summary output variable: $($summary.output.variable)"
+}
+if ($summary.output.frequency -ne "hourly") {
+    throw "Unexpected diagnostic summary output frequency: $($summary.output.frequency)"
+}
+if ($summary.output.class -ne "zone-state") {
+    throw "Unexpected diagnostic summary output class: $($summary.output.class)"
+}
+if ($summary.report_contract.format -ne "markdown") {
+    throw "Unexpected diagnostic summary report format: $($summary.report_contract.format)"
+}
+if ($summary.gate.script -ne "scripts/dev.cmd compare-zone-smoke") {
+    throw "Unexpected diagnostic summary gate script: $($summary.gate.script)"
+}
+if ($summary.gate.blocking -ne $false) {
+    throw "Diagnostic summary gate must be non-blocking"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Zone Temperature Diagnostic Report" -Description "report header"
+Assert-Contains -Text $reportText -Pattern "## Manifest" -Description "report manifest section"
+Assert-Contains -Text $reportText -Pattern "case_id: zone_temperature_diagnostic_001" -Description "report case id"
+Assert-Contains -Text $reportText -Pattern "output_variable: Zone Mean Air Temperature" -Description "report output variable"
+Assert-Contains -Text $reportText -Pattern "gate_blocking: false" -Description "report gate boundary"
 Assert-Contains -Text $reportText -Pattern "comparison_class: diagnostic-only" -Description "report comparison class"
 Assert-Contains -Text $reportText -Pattern "tolerance_policy: none" -Description "report tolerance boundary"
 Assert-Contains -Text $reportText -Pattern "status: extracted" -Description "report status"

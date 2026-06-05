@@ -6,7 +6,7 @@ use ep_compare::{
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
-    ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, VariableClass,
+    ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, ReportFormat, VariableClass,
     load_case_file,
 };
 use ep_model::{OtherEquipment, ScheduleId, SimulationModel, TypedModel};
@@ -615,7 +615,7 @@ fn generate_conformance_diagnostic_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<DiagnosticReportSummary, String> {
-    validate_zone_temperature_diagnostic_manifest(manifest)?;
+    let report_context = zone_temperature_report_context_from_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
     let oracle_output_dir = case_output_dir.join("oracle");
@@ -628,7 +628,7 @@ fn generate_conformance_diagnostic_report(
         .as_ref()
         .ok_or_else(|| "zone-temperature diagnostic requires input.weather".to_string())?;
     let diagnostic = build_zone_temperature_diagnostic(&baseline.epjson, weather, &baseline.eso)?;
-    write_zone_temperature_diagnostic_report(&compare_dir, &diagnostic)?;
+    write_zone_temperature_diagnostic_report(&compare_dir, &diagnostic, Some(&report_context))?;
 
     Ok(DiagnosticReportSummary {
         baseline,
@@ -871,6 +871,13 @@ fn variable_class_label(class: VariableClass) -> &'static str {
         VariableClass::Meter => "meter",
         VariableClass::InternalVariable => "internal-variable",
         VariableClass::Diagnostic => "diagnostic",
+    }
+}
+
+fn report_format_label(format: ReportFormat) -> &'static str {
+    match format {
+        ReportFormat::Markdown => "markdown",
+        ReportFormat::Json => "json",
     }
 }
 
@@ -1522,6 +1529,70 @@ struct ZoneTemperatureDiagnostic {
     status: &'static str,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ZoneTemperatureReportContext {
+    case_id: String,
+    oracle_version: String,
+    output: ZoneTemperatureReportOutput,
+    report: Option<ZoneTemperatureReportContract>,
+    gate: Option<ZoneTemperatureGateContract>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ZoneTemperatureReportOutput {
+    key: String,
+    variable: String,
+    frequency: &'static str,
+    class: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ZoneTemperatureReportContract {
+    format: &'static str,
+    path: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ZoneTemperatureGateContract {
+    script: String,
+    blocking: bool,
+}
+
+fn zone_temperature_report_context_from_manifest(
+    manifest: &ConformanceCase,
+) -> Result<ZoneTemperatureReportContext, String> {
+    validate_zone_temperature_diagnostic_manifest(manifest)?;
+    let output = manifest
+        .outputs
+        .first()
+        .ok_or_else(|| "zone-temperature diagnostic requires one output request".to_string())?;
+
+    Ok(ZoneTemperatureReportContext {
+        case_id: manifest.id.clone(),
+        oracle_version: manifest.oracle_version.clone(),
+        output: ZoneTemperatureReportOutput {
+            key: output.key.clone(),
+            variable: output.variable.clone(),
+            frequency: output_frequency_label(output.frequency),
+            class: variable_class_label(output.class),
+        },
+        report: manifest
+            .report
+            .as_ref()
+            .map(|report| ZoneTemperatureReportContract {
+                format: report_format_label(report.format),
+                path: report.path.clone(),
+            }),
+        gate: manifest
+            .gate
+            .as_ref()
+            .map(|gate| ZoneTemperatureGateContract {
+                script: gate.script.clone(),
+                blocking: gate.blocking,
+            }),
+    })
+}
+
 fn build_zone_temperature_diagnostic(
     input_path: &Path,
     weather_path: &Path,
@@ -1612,7 +1683,7 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     };
 
     if let Some(report_dir) = &parsed.report_dir
-        && let Err(error) = write_zone_temperature_diagnostic_report(report_dir, &diagnostic)
+        && let Err(error) = write_zone_temperature_diagnostic_report(report_dir, &diagnostic, None)
     {
         eprintln!("{error}");
         return 1;
@@ -2048,6 +2119,7 @@ fn print_delta_sample(label: &str, point: Option<DeltaPoint>) {
 fn write_zone_temperature_diagnostic_report(
     report_dir: &Path,
     diagnostic: &ZoneTemperatureDiagnostic,
+    context: Option<&ZoneTemperatureReportContext>,
 ) -> Result<(), String> {
     std::fs::create_dir_all(report_dir)
         .map_err(|error| format!("failed to create report directory: {error}"))?;
@@ -2057,19 +2129,56 @@ fn write_zone_temperature_diagnostic_report(
 
     std::fs::write(
         &summary_path,
-        render_zone_temperature_summary_json(diagnostic),
+        render_zone_temperature_summary_json(diagnostic, context),
     )
     .map_err(|error| format!("failed to write zone-temperature summary: {error}"))?;
-    std::fs::write(&report_path, render_zone_temperature_report(diagnostic))
-        .map_err(|error| format!("failed to write zone-temperature report: {error}"))?;
+    std::fs::write(
+        &report_path,
+        render_zone_temperature_report(diagnostic, context),
+    )
+    .map_err(|error| format!("failed to write zone-temperature report: {error}"))?;
 
     Ok(())
 }
 
-fn render_zone_temperature_summary_json(diagnostic: &ZoneTemperatureDiagnostic) -> String {
+fn render_zone_temperature_summary_json(
+    diagnostic: &ZoneTemperatureDiagnostic,
+    context: Option<&ZoneTemperatureReportContext>,
+) -> String {
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
+    match context {
+        Some(context) => {
+            json.push_str(&format!(
+                "  \"case_id\": {},\n",
+                json_string(&context.case_id)
+            ));
+            json.push_str(&format!(
+                "  \"oracle_version\": {},\n",
+                json_string(&context.oracle_version)
+            ));
+            json.push_str(&format!(
+                "  \"output\": {},\n",
+                zone_temperature_output_json(&context.output)
+            ));
+            json.push_str(&format!(
+                "  \"report_contract\": {},\n",
+                zone_temperature_report_contract_json(context.report.as_ref())
+            ));
+            json.push_str(&format!(
+                "  \"gate\": {},\n",
+                zone_temperature_gate_json(context.gate.as_ref())
+            ));
+        }
+        None => {
+            json.push_str("  \"case_id\": null,\n");
+            json.push_str("  \"oracle_version\": null,\n");
+            json.push_str("  \"output\": null,\n");
+            json.push_str("  \"report_contract\": null,\n");
+            json.push_str("  \"gate\": null,\n");
+        }
+    }
     json.push_str("  \"comparison_class\": \"diagnostic-only\",\n");
     json.push_str("  \"conformance_claim\": false,\n");
     json.push_str("  \"tolerance_policy\": \"none\",\n");
@@ -2136,9 +2245,31 @@ fn render_zone_temperature_summary_json(diagnostic: &ZoneTemperatureDiagnostic) 
     json
 }
 
-fn render_zone_temperature_report(diagnostic: &ZoneTemperatureDiagnostic) -> String {
+fn render_zone_temperature_report(
+    diagnostic: &ZoneTemperatureDiagnostic,
+    context: Option<&ZoneTemperatureReportContext>,
+) -> String {
     let mut report = String::new();
     report.push_str("# Zone Temperature Diagnostic Report\n\n");
+    if let Some(context) = context {
+        report.push_str("## Manifest\n\n");
+        report.push_str(&format!("case_id: {}\n", context.case_id));
+        report.push_str(&format!("oracle_version: {}\n", context.oracle_version));
+        report.push_str(&format!("output_key: {}\n", context.output.key));
+        report.push_str(&format!("output_variable: {}\n", context.output.variable));
+        report.push_str(&format!("output_frequency: {}\n", context.output.frequency));
+        report.push_str(&format!("output_class: {}\n", context.output.class));
+        if let Some(report_contract) = &context.report {
+            report.push_str(&format!("report_format: {}\n", report_contract.format));
+            report.push_str(&format!("report_path: {}\n", report_contract.path));
+        }
+        if let Some(gate) = &context.gate {
+            report.push_str(&format!("gate_script: {}\n", gate.script));
+            report.push_str(&format!("gate_blocking: {}\n", gate.blocking));
+        }
+        report.push('\n');
+    }
+    report.push_str("## Diagnostic\n\n");
     report.push_str("comparison_class: diagnostic-only\n");
     report.push_str("conformance_claim: false\n");
     report.push_str("tolerance_policy: none\n");
@@ -2191,6 +2322,38 @@ fn report_delta_row(report: &mut String, label: &str, point: Option<DeltaPoint>)
             report.push_str(label);
             report.push_str(" | n/a | n/a | n/a | n/a |\n");
         }
+    }
+}
+
+fn zone_temperature_output_json(output: &ZoneTemperatureReportOutput) -> String {
+    format!(
+        "{{ \"key\": {}, \"variable\": {}, \"frequency\": {}, \"class\": {} }}",
+        json_string(&output.key),
+        json_string(&output.variable),
+        json_string(output.frequency),
+        json_string(output.class)
+    )
+}
+
+fn zone_temperature_report_contract_json(report: Option<&ZoneTemperatureReportContract>) -> String {
+    match report {
+        Some(report) => format!(
+            "{{ \"format\": {}, \"path\": {} }}",
+            json_string(report.format),
+            json_string(&report.path)
+        ),
+        None => "null".to_string(),
+    }
+}
+
+fn zone_temperature_gate_json(gate: Option<&ZoneTemperatureGateContract>) -> String {
+    match gate {
+        Some(gate) => format!(
+            "{{ \"script\": {}, \"blocking\": {} }}",
+            json_string(&gate.script),
+            gate.blocking
+        ),
+        None => "null".to_string(),
     }
 }
 
@@ -2566,13 +2729,63 @@ mod tests {
             status: "extracted",
         };
 
-        let json = super::render_zone_temperature_summary_json(&diagnostic);
+        let json = super::render_zone_temperature_summary_json(&diagnostic, None);
 
+        assert!(json.contains("\"case_id\": null"));
         assert!(json.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(json.contains("\"conformance_claim\": false"));
         assert!(json.contains("\"tolerance_policy\": \"none\""));
         assert!(json.contains("\"first_delta_sample\""));
         assert!(json.contains("\"max_delta_sample\""));
+    }
+
+    #[test]
+    fn zone_temperature_summary_json_includes_manifest_context() {
+        let diagnostic = super::ZoneTemperatureDiagnostic {
+            zone_name: "ZONE ONE".to_string(),
+            samples: 2,
+            heat_balance_timesteps: 8,
+            zone_count: 1,
+            surface_count: 6,
+            oracle_first_c: 21.0,
+            rust_first_c: 20.5,
+            oracle_last_c: 22.0,
+            rust_last_c: 20.8,
+            delta: super::delta_summary(&[21.0, 22.0], &[20.5, 20.8]),
+            status: "extracted",
+        };
+        let context = super::ZoneTemperatureReportContext {
+            case_id: "zone_temperature_diagnostic_001".to_string(),
+            oracle_version: "26.1.0".to_string(),
+            output: super::ZoneTemperatureReportOutput {
+                key: "ZONE ONE".to_string(),
+                variable: "Zone Mean Air Temperature".to_string(),
+                frequency: "hourly",
+                class: "zone-state",
+            },
+            report: Some(super::ZoneTemperatureReportContract {
+                format: "markdown",
+                path: ".runtime/compare-report.md".to_string(),
+            }),
+            gate: Some(super::ZoneTemperatureGateContract {
+                script: "scripts/dev.cmd compare-zone-smoke".to_string(),
+                blocking: false,
+            }),
+        };
+
+        let json = super::render_zone_temperature_summary_json(&diagnostic, Some(&context));
+        let report = super::render_zone_temperature_report(&diagnostic, Some(&context));
+
+        assert!(json.contains("\"case_id\": \"zone_temperature_diagnostic_001\""));
+        assert!(json.contains("\"oracle_version\": \"26.1.0\""));
+        assert!(json.contains("\"output\""));
+        assert!(json.contains("\"variable\": \"Zone Mean Air Temperature\""));
+        assert!(json.contains("\"gate\""));
+        assert!(json.contains("\"blocking\": false"));
+        assert!(report.contains("## Manifest"));
+        assert!(report.contains("case_id: zone_temperature_diagnostic_001"));
+        assert!(report.contains("output_variable: Zone Mean Air Temperature"));
+        assert!(report.contains("gate_blocking: false"));
     }
 
     #[test]

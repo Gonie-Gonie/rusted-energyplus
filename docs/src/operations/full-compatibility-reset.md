@@ -295,6 +295,7 @@ P2 compatibility work:
 - [x] write diagnostic-only MAT compare summary/report artifacts
 - [x] register diagnostic-only MAT case manifest without tolerance claim
 - [x] generate manifest-driven MAT diagnostic report artifacts
+- [x] embed MAT manifest metadata in diagnostic summary/report artifacts
 
 ## Forbidden Wording
 

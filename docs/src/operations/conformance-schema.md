@@ -136,7 +136,10 @@ and writes diagnostic-only comparison artifacts under:
 ```
 
 The report remains `comparison_class: diagnostic-only`,
-`conformance_claim: false`, and `tolerance_policy: none`.
+`conformance_claim: false`, and `tolerance_policy: none`. The generated
+`compare-summary.json` also records the manifest `case_id`, `oracle_version`,
+single output request, report contract, and non-blocking gate so the artifact
+can be audited without inferring conformance.
 
 ## Verification
 
