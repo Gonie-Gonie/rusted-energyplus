@@ -52,6 +52,7 @@ Development-only diagnostics:
 .\scripts\compare-zone-smoke.cmd
 .\scripts\compare-regression.cmd
 .\scripts\conformance-schema-smoke.cmd
+.\scripts\conformance-baseline-smoke.cmd
 .\scripts\strict-no-false-conformance.cmd
 .\scripts\package.cmd
 ```
@@ -82,6 +83,8 @@ cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.
 cargo run -p ep_cli -- model plan .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw --hours 24
 cargo run -p ep_cli -- compare zone-temperature .runtime\compare-zone\26.1.0\zone-temperature.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw .runtime\compare-zone\26.1.0\eplusout.eso
+cargo run -p ep_cli -- conformance validate-case data\conformance_cases\schedule_constant_001\case.toml
+cargo run -p ep_cli -- conformance baseline data\conformance_cases\schedule_constant_001\case.toml .runtime\energyplus\26.1.0 .runtime\conformance-baseline\26.1.0
 ```
 
 `.\scripts\compare-regression.cmd` runs the current schedule, weather, and zone
@@ -98,6 +101,10 @@ case/suite manifest schema. The first fixture is intentionally a smoke manifest
 with `conformance_claim = false`; tolerance-gated cases must add output
 requests, tolerances, report contract, and a blocking gate before claiming
 EnergyPlus numerical conformance.
+
+`.\scripts\conformance-baseline-smoke.cmd` generates the first manifest-driven
+EnergyPlus baseline under `.runtime\conformance-baseline\26.1.0`. This proves
+case-to-oracle artifact generation, not Rust simulation conformance.
 
 Unsupported runtime commands should fail explicitly until their milestone is
 implemented.

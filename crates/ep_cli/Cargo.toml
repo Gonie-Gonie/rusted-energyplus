@@ -13,6 +13,7 @@ path = "src/main.rs"
 [dependencies]
 ep_compare = { path = "../ep_compare" }
 ep_compiler = { path = "../ep_compiler" }
+ep_conformance = { path = "../ep_conformance" }
 ep_model = { path = "../ep_model" }
 ep_oracle = { path = "../ep_oracle" }
 ep_raw_model = { path = "../ep_raw_model" }

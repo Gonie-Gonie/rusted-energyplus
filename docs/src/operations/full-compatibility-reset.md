@@ -76,12 +76,14 @@ The reset plan is now being rebuilt from evidence contracts upward.
 | false conformance guard | implemented in schema | `conformance_claim=true` is rejected unless class, outputs, tolerances, report, and blocking gate exist |
 | suite shape | implemented | `ConformanceSuite` validates ordered case paths |
 | first fixture | schema-only smoke | `data/conformance_cases/schedule_constant_001/case.toml` |
+| baseline generation | implemented for first fixture | `eplus-rs conformance baseline` writes oracle artifacts from a case manifest |
 | release check hook | implemented | `scripts/conformance-schema-smoke.ps1` runs `cargo test -p ep_conformance` |
 
 The first fixture remains `comparison_class = "smoke"` and
 `conformance_claim = false`. It defines the variable surface for a future
-baseline-generation step without pretending that a tolerance-gated comparison
-already exists.
+multi-series report step without pretending that a tolerance-gated comparison
+already exists. Its EnergyPlus baseline can be generated, but that baseline is
+not yet a conformance report.
 
 ## Revised Milestone Intent
 
@@ -255,7 +257,7 @@ P1 conformance infrastructure:
 
 - [x] add case metadata schema
 - [x] add output request schema
-- [ ] add baseline generation script
+- [x] add baseline generation script
 - [ ] add multi-series compare report skeleton
 - [ ] add `Output:Variable` registry plan
 - [x] add schedule/weather conformance suite shape

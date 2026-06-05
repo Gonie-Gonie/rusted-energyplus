@@ -7,6 +7,12 @@ comparison work into auditable evidence. It is implemented in
 `crates/ep_conformance` and validated by
 `scripts/conformance-schema-smoke.cmd`.
 
+Manifest-driven EnergyPlus baseline generation is exposed through:
+
+```powershell
+cargo run -p ep_cli -- conformance baseline <case.toml> <oracle-root> <output-root>
+```
+
 ## Rule
 
 ```text
@@ -34,22 +40,39 @@ comparison_class = "smoke"
 conformance_claim = false
 ```
 
-This is intentional. The case becomes conformance evidence only after baseline
-generation, multi-series reporting, tolerance policy, and a blocking release
-gate are wired.
+This is intentional. The case becomes conformance evidence only after
+multi-series reporting, tolerance policy, and a blocking release gate are wired.
 
 `data/conformance_suites/foundation.toml` is the first ordered suite manifest.
+
+## Baseline Artifacts
+
+The first baseline smoke command is:
+
+```powershell
+.\scripts\conformance-baseline-smoke.cmd
+```
+
+It stages the case IDF and writes EnergyPlus artifacts under:
+
+```text
+.runtime/conformance-baseline/26.1.0/schedule_constant_001/
+```
+
+Expected artifacts include `input.idf`, `input.epJSON`, `eplusout.eso`, and
+`eplusout.err`. These files prove oracle artifact generation only; they are not
+yet a tolerance-gated Rust/EnergyPlus comparison report.
 
 ## Verification
 
 ```powershell
 .\scripts\conformance-schema-smoke.cmd
+.\scripts\conformance-baseline-smoke.cmd
 .\scripts\check.cmd
 ```
 
 ## Next Steps
 
-- generate EnergyPlus baseline artifacts from case manifests
 - add a multi-series compare report skeleton tied to output requests
 - introduce an `Output:Variable` registry so requested variables are tracked
   from IDF/epJSON intake through result comparison

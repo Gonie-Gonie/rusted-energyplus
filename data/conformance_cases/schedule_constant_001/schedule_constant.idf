@@ -12,6 +12,11 @@ Building,
 
 Timestep,1;
 
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
 RunPeriod,
   Run Period 1,
   1,

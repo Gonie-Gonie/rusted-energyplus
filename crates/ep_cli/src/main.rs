@@ -2,6 +2,9 @@
 
 use ep_compare::{Tolerance, compare_series, load_eso_series};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
+use ep_conformance::{
+    ComparisonClass, ConformanceCase, OutputFrequency, VariableClass, load_case_file,
+};
 use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
@@ -9,6 +12,8 @@ use ep_runtime::{
     ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, build_execution_plan,
     load_epw_dry_bulb_series, simulate_constant_schedules, simulate_first_zone_uncontrolled,
 };
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -35,6 +40,7 @@ fn run(args: &[String]) -> i32 {
             0
         }
         Some("compare") => run_compare_command(&args[1..]),
+        Some("conformance") => run_conformance_command(&args[1..]),
         Some("compile") => run_compile_command(&args[1..]),
         Some("model") => run_model_command(&args[1..]),
         Some("run") => run_run_command(&args[1..]),
@@ -150,6 +156,8 @@ fn print_help() {
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
+    println!("  conformance validate-case <case.toml>");
+    println!("  conformance baseline <case.toml> <oracle-root> <output-root>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -172,6 +180,277 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  steps: {}", plan.step_count());
     for stage in &plan.stages {
         println!("    {}: {}", stage.name, stage.steps.len());
+    }
+}
+
+fn run_conformance_command(args: &[String]) -> i32 {
+    match args.first().map(String::as_str) {
+        Some("validate-case") => run_conformance_validate_case(&args[1..]),
+        Some("baseline") => run_conformance_baseline(&args[1..]),
+        Some(command) => {
+            eprintln!("unsupported conformance command: {command}");
+            eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
+            eprintln!(
+                "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
+            );
+            2
+        }
+        None => {
+            eprintln!("missing conformance command");
+            eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
+            eprintln!(
+                "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
+            );
+            2
+        }
+    }
+}
+
+fn run_conformance_validate_case(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    println!("Conformance Case");
+    print_conformance_case_summary(&manifest);
+    println!("  status: valid");
+    0
+}
+
+fn run_conformance_baseline(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_conformance_baseline(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("Conformance Baseline");
+            print_conformance_case_summary(&manifest);
+            println!("  output_dir: {}", summary.output_dir.display());
+            println!("  idf: {}", summary.idf.display());
+            if let Some(weather) = summary.weather.as_ref() {
+                println!("  weather: {}", weather.display());
+            }
+            println!("  epjson: {}", summary.epjson.display());
+            println!("  eso: {}", summary.eso.display());
+            println!("  status: generated");
+            0
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
+struct BaselineSummary {
+    output_dir: PathBuf,
+    idf: PathBuf,
+    weather: Option<PathBuf>,
+    epjson: PathBuf,
+    eso: PathBuf,
+}
+
+fn generate_conformance_baseline(
+    case_path: &Path,
+    manifest: &ConformanceCase,
+    oracle_root: &Path,
+    output_root: &Path,
+) -> Result<BaselineSummary, String> {
+    let energyplus = oracle_root.join("energyplus.exe");
+    if !energyplus.is_file() {
+        return Err(format!(
+            "missing EnergyPlus executable: {}",
+            energyplus.display()
+        ));
+    }
+    let converter = oracle_root.join("ConvertInputFormat.exe");
+    if !converter.is_file() {
+        return Err(format!("missing IDF converter: {}", converter.display()));
+    }
+
+    let source_idf = resolve_manifest_path(case_path, &manifest.input.idf)
+        .map_err(|error| format!("failed to resolve input.idf: {error}"))?;
+    if !source_idf.is_file() {
+        return Err(format!("missing case IDF: {}", source_idf.display()));
+    }
+    let source_weather = match manifest.input.weather.as_deref() {
+        Some(weather) => {
+            let resolved = resolve_manifest_path(case_path, weather)
+                .map_err(|error| format!("failed to resolve input.weather: {error}"))?;
+            if !resolved.is_file() {
+                return Err(format!("missing case weather: {}", resolved.display()));
+            }
+            Some(resolved)
+        }
+        None => None,
+    };
+
+    let output_dir = output_root.join(&manifest.id);
+    std::fs::create_dir_all(&output_dir)
+        .map_err(|error| format!("failed to create baseline output directory: {error}"))?;
+    let input_idf = output_dir.join("input.idf");
+    std::fs::copy(&source_idf, &input_idf)
+        .map_err(|error| format!("failed to stage case IDF: {error}"))?;
+
+    let mut energyplus_command = Command::new(&energyplus);
+    if let Some(weather) = source_weather.as_ref() {
+        energyplus_command.arg("-w").arg(weather);
+    }
+    energyplus_command
+        .arg("-d")
+        .arg(&output_dir)
+        .arg(&input_idf)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    let energyplus_status = energyplus_command
+        .status()
+        .map_err(|error| format!("failed to start EnergyPlus: {error}"))?;
+    if !energyplus_status.success() {
+        return Err(format!(
+            "EnergyPlus baseline failed with status {energyplus_status}"
+        ));
+    }
+
+    let converter_status = Command::new(&converter)
+        .arg("input.idf")
+        .current_dir(&output_dir)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .map_err(|error| format!("failed to start IDF converter: {error}"))?;
+    if !converter_status.success() {
+        return Err(format!(
+            "IDF conversion failed with status {converter_status}"
+        ));
+    }
+
+    let eso = output_dir.join("eplusout.eso");
+    if !eso.is_file() {
+        return Err(format!("EnergyPlus did not write {}", eso.display()));
+    }
+    let epjson = output_dir.join("input.epJSON");
+    if !epjson.is_file() {
+        return Err(format!("IDF converter did not write {}", epjson.display()));
+    }
+
+    Ok(BaselineSummary {
+        output_dir,
+        idf: input_idf,
+        weather: source_weather,
+        epjson,
+        eso,
+    })
+}
+
+fn resolve_manifest_path(case_path: &Path, value: &str) -> Result<PathBuf, std::io::Error> {
+    let path = PathBuf::from(value);
+    if path.is_absolute() {
+        return Ok(path);
+    }
+
+    let cwd_candidate = std::env::current_dir()?.join(&path);
+    if cwd_candidate.exists() {
+        return Ok(cwd_candidate);
+    }
+
+    let parent = case_path.parent().unwrap_or_else(|| Path::new("."));
+    Ok(parent.join(path))
+}
+
+fn print_conformance_case_summary(manifest: &ConformanceCase) {
+    println!("  id: {}", manifest.id);
+    println!(
+        "  comparison_class: {}",
+        comparison_class_label(manifest.comparison_class)
+    );
+    println!("  conformance_claim: {}", manifest.conformance_claim);
+    println!("  oracle_version: {}", manifest.oracle_version);
+    println!("  outputs: {}", manifest.outputs.len());
+    for output in &manifest.outputs {
+        println!(
+            "    {} / {} / {} / {}",
+            output.key,
+            output.variable,
+            output_frequency_label(output.frequency),
+            variable_class_label(output.class)
+        );
+    }
+}
+
+fn comparison_class_label(class: ComparisonClass) -> &'static str {
+    match class {
+        ComparisonClass::Smoke => "smoke",
+        ComparisonClass::DiagnosticOnly => "diagnostic-only",
+        ComparisonClass::Conformance => "conformance",
+        ComparisonClass::Regression => "regression",
+        ComparisonClass::Performance => "performance",
+    }
+}
+
+fn output_frequency_label(frequency: OutputFrequency) -> &'static str {
+    match frequency {
+        OutputFrequency::Timestep => "timestep",
+        OutputFrequency::Hourly => "hourly",
+        OutputFrequency::Daily => "daily",
+        OutputFrequency::Monthly => "monthly",
+        OutputFrequency::Annual => "annual",
+        OutputFrequency::RunPeriod => "run-period",
+    }
+}
+
+fn variable_class_label(class: VariableClass) -> &'static str {
+    match class {
+        VariableClass::Schedule => "schedule",
+        VariableClass::Weather => "weather",
+        VariableClass::ZoneState => "zone-state",
+        VariableClass::SurfaceState => "surface-state",
+        VariableClass::Meter => "meter",
+        VariableClass::InternalVariable => "internal-variable",
+        VariableClass::Diagnostic => "diagnostic",
     }
 }
 
