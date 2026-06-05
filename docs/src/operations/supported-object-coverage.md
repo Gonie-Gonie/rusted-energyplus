@@ -26,13 +26,14 @@ Current table:
 | Timestep | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
 | RunPeriod | yes | planned | planned | n/a | n/a | planned | planned | planned | generic raw parse only |
 | Site:Location | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Material | yes | partial | yes | n/a | planned | planned | planned | planned | v0.2 typed contract |
-| Material:NoMass | yes | partial | yes | n/a | planned | planned | planned | planned | v0.2 typed contract |
+| Material | yes | partial | yes | n/a | planned | planned | planned | planned | thermal properties typed for first simulation subset |
+| Material:NoMass | yes | partial | yes | n/a | planned | planned | planned | planned | thermal resistance typed for first simulation subset |
 | Construction | yes | partial | yes | yes | planned | planned | planned | planned | v0.2 typed contract |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
 | Zone | yes | partial | yes | n/a | planned | planned | planned | planned | v0.2 typed contract |
 | BuildingSurface:Detailed | yes | partial | yes | yes | planned | planned | partial | partial | v0.2 typed contract |
 | Schedule:Constant | yes | partial | yes | yes | n/a | planned | planned | planned | v0.2 typed contract |
+| OtherEquipment | yes | partial | yes | yes | planned | planned | planned | planned | internal gains typed for first simulation subset |
 | Schedule:Compact | yes | planned | planned | planned | n/a | partial | partial | partial | generic raw parse only |
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
 | ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |

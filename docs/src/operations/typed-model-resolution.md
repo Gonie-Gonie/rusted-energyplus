@@ -17,6 +17,7 @@ The first typed subset is intentionally small:
 - `Construction`
 - `ScheduleTypeLimits`
 - `Schedule:Constant`
+- `OtherEquipment`
 - `Zone`
 - `BuildingSurface:Detailed`
 
@@ -32,6 +33,8 @@ Current resolved references:
 
 - `Construction.outside_layer` -> `MaterialId`
 - `Schedule:Constant.schedule_type_limits_name` -> `ScheduleTypeLimitId`
+- `OtherEquipment.zone_or_zonelist_or_space_or_spacelist_name` -> `ZoneId`
+- `OtherEquipment.schedule_name` -> `ScheduleId`
 - `BuildingSurface:Detailed.construction_name` -> `ConstructionId`
 - `BuildingSurface:Detailed.zone_name` -> `ZoneId`
 

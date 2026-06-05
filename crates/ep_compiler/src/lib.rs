@@ -1,11 +1,11 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AutoOrNumber, Building, Construction, ConstructionId, Material, MaterialId, MaterialKind,
-    NameMap, NormalizedName, NumericType, OutsideBoundaryCondition, Point3, ScheduleConstant,
-    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, SolarDistribution,
-    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TimestepConfig, TypedModel, Version,
-    WindExposure, Zone, ZoneId,
+    AutoOrNumber, Building, Construction, ConstructionId, InternalGainId, Material, MaterialId,
+    MaterialKind, NameMap, NormalizedName, NumericType, OtherEquipment, OutsideBoundaryCondition,
+    Point3, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
+    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TimestepConfig,
+    TypedModel, Version, WindExposure, Zone, ZoneId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -184,6 +184,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
+    "OtherEquipment",
     "Zone",
     "BuildingSurface:Detailed",
 ];
@@ -217,6 +218,7 @@ impl<'a> Compiler<'a> {
         self.parse_schedule_type_limits(&mut model);
         self.parse_schedules(&mut model);
         self.parse_zones(&mut model);
+        self.parse_other_equipment(&mut model);
         self.parse_surfaces(&mut model);
 
         let typed_object_count = model.object_count();
@@ -372,7 +374,7 @@ impl<'a> Compiler<'a> {
             ("Material", MaterialKind::Mass),
             ("Material:NoMass", MaterialKind::NoMass),
         ] {
-            for (name, _object) in self.objects(object_type) {
+            for (name, object) in self.objects(object_type) {
                 let Some(id_value) = self.checked_id(object_type, &name, model.materials.len())
                 else {
                     continue;
@@ -387,6 +389,26 @@ impl<'a> Compiler<'a> {
                     id,
                     name: NormalizedName::new(&name),
                     kind,
+                    conductivity_w_per_m_k: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "conductivity",
+                    ),
+                    density_kg_per_m3: self.optional_number(object_type, &name, &object, "density"),
+                    specific_heat_j_per_kg_k: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "specific_heat",
+                    ),
+                    thickness_m: self.optional_number(object_type, &name, &object, "thickness"),
+                    thermal_resistance_m2_k_per_w: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "thermal_resistance",
+                    ),
                 });
             }
         }
@@ -554,6 +576,86 @@ impl<'a> Compiler<'a> {
                     "volume",
                     AutoOrNumber::AutoCalculate,
                     "Autocalculate",
+                ),
+            });
+        }
+    }
+
+    fn parse_other_equipment(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("OtherEquipment") {
+            let Some(zone_name) = self.required_string(
+                "OtherEquipment",
+                &name,
+                &object,
+                "zone_or_zonelist_or_space_or_spacelist_name",
+            ) else {
+                continue;
+            };
+            let Some(zone) = self.resolve_name(
+                &model.zone_names,
+                "OtherEquipment",
+                &name,
+                "zone_or_zonelist_or_space_or_spacelist_name",
+                &zone_name,
+                "Zone",
+            ) else {
+                continue;
+            };
+            let schedule =
+                match self.optional_string("OtherEquipment", &name, &object, "schedule_name") {
+                    Some(schedule_name) => self.resolve_name(
+                        &model.schedule_names,
+                        "OtherEquipment",
+                        &name,
+                        "schedule_name",
+                        &schedule_name,
+                        "Schedule",
+                    ),
+                    None => None,
+                };
+            let Some(id_value) =
+                self.checked_id("OtherEquipment", &name, model.other_equipment.len())
+            else {
+                continue;
+            };
+            let id = InternalGainId(id_value);
+            if model.other_equipment_names.insert(&name, id).is_some() {
+                self.duplicate_name("OtherEquipment", &name);
+                continue;
+            }
+
+            model.other_equipment.push(OtherEquipment {
+                id,
+                name: NormalizedName::new(&name),
+                zone,
+                schedule,
+                design_level_w: self.number_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "design_level",
+                    0.0,
+                ),
+                fraction_latent: self.number_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "fraction_latent",
+                    0.0,
+                ),
+                fraction_radiant: self.number_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "fraction_radiant",
+                    0.0,
+                ),
+                fraction_lost: self.number_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "fraction_lost",
+                    0.0,
                 ),
             });
         }
@@ -1364,6 +1466,63 @@ mod tests {
         };
         assert_eq!(output_variable.object_count, 1);
         assert_eq!(output_variable.status, ObjectCoverageStatus::RawOnly);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_material_properties_and_other_equipment() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Material": {
+                    "Concrete": {
+                        "conductivity": 2.0,
+                        "density": 2000.0,
+                        "specific_heat": 800.0,
+                        "thickness": 0.1
+                    }
+                },
+                "Material:NoMass": {
+                    "R13": {
+                        "thermal_resistance": 2.29
+                    }
+                },
+                "Schedule:Constant": {
+                    "Always On": {
+                        "hourly_value": 1.0
+                    }
+                },
+                "Zone": {"Zone One": {}},
+                "OtherEquipment": {
+                    "Plug Load": {
+                        "zone_or_zonelist_or_space_or_spacelist_name": "zone one",
+                        "schedule_name": "always on",
+                        "design_level": 125.0,
+                        "fraction_latent": 0.1,
+                        "fraction_radiant": 0.2,
+                        "fraction_lost": 0.3
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.materials.len(), 2);
+        assert_eq!(model.materials[0].thermal_resistance(), Some(0.05));
+        assert_eq!(model.materials[0].heat_capacity_per_area(), Some(160_000.0));
+        assert_eq!(model.materials[1].thermal_resistance(), Some(2.29));
+        assert_eq!(model.other_equipment.len(), 1);
+        assert_eq!(model.other_equipment[0].zone.0, 0);
+        assert_eq!(model.other_equipment[0].schedule.map(|id| id.0), Some(0));
+        assert_eq!(model.other_equipment[0].design_level_w, 125.0);
+        assert_eq!(model.other_equipment[0].fraction_latent, 0.1);
+        assert_eq!(model.other_equipment[0].fraction_radiant, 0.2);
+        assert_eq!(model.other_equipment[0].fraction_lost, 0.3);
 
         Ok(())
     }

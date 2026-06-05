@@ -160,6 +160,7 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  surfaces: {}", model.typed.surfaces.len());
     println!("  constructions: {}", model.typed.constructions.len());
     println!("  materials: {}", model.typed.materials.len());
+    println!("  other_equipment: {}", model.typed.other_equipment.len());
     println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
     println!(
         "  construction_material_edges: {}",
@@ -358,6 +359,7 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.schedule_type_limits.len()
     );
     println!("  schedules: {}", model.schedules.len());
+    println!("  other_equipment: {}", model.other_equipment.len());
     println!("  zones: {}", model.zones.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());

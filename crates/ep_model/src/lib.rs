@@ -55,6 +55,7 @@ typed_id!(ZoneId);
 typed_id!(SurfaceId);
 typed_id!(ConstructionId);
 typed_id!(MaterialId);
+typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(ScheduleId);
 typed_id!(NodeId);
@@ -247,7 +248,7 @@ pub enum MaterialKind {
     NoMass,
 }
 
-/// Minimal material identity.
+/// Minimal material identity and thermal properties.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Material {
     /// Typed ID.
@@ -256,6 +257,55 @@ pub struct Material {
     pub name: NormalizedName,
     /// Material object kind.
     pub kind: MaterialKind,
+    /// Conductivity for Material objects in W/m-K.
+    pub conductivity_w_per_m_k: Option<f64>,
+    /// Density for Material objects in kg/m3.
+    pub density_kg_per_m3: Option<f64>,
+    /// Specific heat for Material objects in J/kg-K.
+    pub specific_heat_j_per_kg_k: Option<f64>,
+    /// Thickness for Material objects in meters.
+    pub thickness_m: Option<f64>,
+    /// Thermal resistance for Material:NoMass objects in m2-K/W.
+    pub thermal_resistance_m2_k_per_w: Option<f64>,
+}
+
+impl Material {
+    /// Returns the area-normalized thermal resistance when available.
+    #[must_use]
+    pub fn thermal_resistance(&self) -> Option<f64> {
+        if let Some(resistance) = self.thermal_resistance_m2_k_per_w
+            && resistance > 0.0
+        {
+            return Some(resistance);
+        }
+
+        let (Some(thickness), Some(conductivity)) = (self.thickness_m, self.conductivity_w_per_m_k)
+        else {
+            return None;
+        };
+        if thickness > 0.0 && conductivity > 0.0 {
+            Some(thickness / conductivity)
+        } else {
+            None
+        }
+    }
+
+    /// Returns the area-normalized heat capacity when available.
+    #[must_use]
+    pub fn heat_capacity_per_area(&self) -> Option<f64> {
+        let (Some(thickness), Some(density), Some(specific_heat)) = (
+            self.thickness_m,
+            self.density_kg_per_m3,
+            self.specific_heat_j_per_kg_k,
+        ) else {
+            return None;
+        };
+        if thickness > 0.0 && density > 0.0 && specific_heat > 0.0 {
+            Some(thickness * density * specific_heat)
+        } else {
+            None
+        }
+    }
 }
 
 /// Construction resolved to an outside layer material.
@@ -304,6 +354,27 @@ pub struct ScheduleConstant {
     pub schedule_type_limits: Option<ScheduleTypeLimitId>,
     /// Constant hourly value.
     pub hourly_value: f64,
+}
+
+/// Electric or process equipment represented as a zone internal gain.
+#[derive(Clone, Debug, PartialEq)]
+pub struct OtherEquipment {
+    /// Typed ID.
+    pub id: InternalGainId,
+    /// Equipment name.
+    pub name: NormalizedName,
+    /// Target zone.
+    pub zone: ZoneId,
+    /// Availability or level schedule.
+    pub schedule: Option<ScheduleId>,
+    /// Design-level heat gain in watts.
+    pub design_level_w: f64,
+    /// Fraction of gain emitted as latent load.
+    pub fraction_latent: f64,
+    /// Fraction of gain emitted as radiant load.
+    pub fraction_radiant: f64,
+    /// Fraction of gain lost outside the zone air balance.
+    pub fraction_lost: f64,
 }
 
 /// Building surface type.
@@ -412,6 +483,10 @@ pub struct TypedModel {
     pub schedules: Vec<ScheduleConstant>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
+    /// Zone internal gains from OtherEquipment objects.
+    pub other_equipment: Vec<OtherEquipment>,
+    /// OtherEquipment names.
+    pub other_equipment_names: NameMap<InternalGainId>,
     /// Zones.
     pub zones: Vec<Zone>,
     /// Zone names.
@@ -437,6 +512,8 @@ impl Default for TypedModel {
             schedule_type_limit_names: NameMap::default(),
             schedules: Vec::new(),
             schedule_names: NameMap::default(),
+            other_equipment: Vec::new(),
+            other_equipment_names: NameMap::default(),
             zones: Vec::new(),
             zone_names: NameMap::default(),
             surfaces: Vec::new(),
@@ -456,6 +533,7 @@ impl TypedModel {
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.schedules.len()
+            + self.other_equipment.len()
             + self.zones.len()
             + self.surfaces.len()
     }
@@ -537,8 +615,8 @@ pub struct ConstructionMaterialEdge {
 #[cfg(test)]
 mod tests {
     use super::{
-        Construction, ConstructionId, MaterialId, ModelGraph, NameMap, Surface, SurfaceId,
-        TypedModel, Version, ZoneId,
+        Construction, ConstructionId, MaterialId, MaterialKind, ModelGraph, NameMap, Surface,
+        SurfaceId, TypedModel, Version, ZoneId,
     };
 
     #[test]
@@ -563,6 +641,23 @@ mod tests {
 
         assert_eq!(names.resolve(" zone one "), Some(ZoneId(0)));
         assert_eq!(names.len(), 1);
+    }
+
+    #[test]
+    fn material_derives_resistance_and_capacity() {
+        let material = super::Material {
+            id: MaterialId(0),
+            name: super::NormalizedName::new("Concrete"),
+            kind: MaterialKind::Mass,
+            conductivity_w_per_m_k: Some(2.0),
+            density_kg_per_m3: Some(2_000.0),
+            specific_heat_j_per_kg_k: Some(800.0),
+            thickness_m: Some(0.1),
+            thermal_resistance_m2_k_per_w: None,
+        };
+
+        assert_eq!(material.thermal_resistance(), Some(0.05));
+        assert_eq!(material.heat_capacity_per_area(), Some(160_000.0));
     }
 
     #[test]
