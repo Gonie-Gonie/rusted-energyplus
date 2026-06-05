@@ -87,6 +87,13 @@ multi-series report step without pretending that a tolerance-gated comparison
 already exists. Its EnergyPlus baseline and report skeleton can be generated,
 but that report is still baseline-only evidence.
 
+## P2 Progress
+
+| Area | Current status | Evidence |
+|---|---|---|
+| `RunPeriod` intake | implemented foundation | `ep_compiler` parses date ranges into `TypedModel.run_periods` |
+| aligned hourly time axis | implemented foundation | `ep_runtime::build_hourly_time_axis` expands the first run period into EnergyPlus-style hour-ending samples |
+
 ## Revised Milestone Intent
 
 The historical milestone docs remain useful as implementation history. Going
@@ -266,7 +273,7 @@ P1 conformance infrastructure:
 
 P2 compatibility work:
 
-- implement `RunPeriod` and aligned time axis
+- [x] implement `RunPeriod` and aligned time axis foundation
 - expand EPW weather fields
 - add `Schedule:Compact` subset
 - add geometry/internal-variable comparison

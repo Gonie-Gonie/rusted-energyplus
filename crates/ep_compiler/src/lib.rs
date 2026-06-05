@@ -3,9 +3,9 @@
 use ep_model::{
     AutoOrNumber, Building, Construction, ConstructionId, InternalGainId, Material, MaterialId,
     MaterialKind, NameMap, NormalizedName, NumericType, OtherEquipment, OutsideBoundaryCondition,
-    Point3, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
-    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TimestepConfig,
-    TypedModel, Version, WindExposure, Zone, ZoneId,
+    Point3, RunPeriod, RunPeriodId, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, TimestepConfig, TypedModel, Version, WindExposure, Zone, ZoneId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -178,6 +178,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Version",
     "Building",
     "Timestep",
+    "RunPeriod",
     "Site:Location",
     "Material",
     "Material:NoMass",
@@ -212,6 +213,7 @@ impl<'a> Compiler<'a> {
 
         self.parse_building(&mut model);
         self.parse_timestep(&mut model);
+        self.parse_run_periods(&mut model);
         self.parse_site_location(&mut model);
         self.parse_materials(&mut model);
         self.parse_constructions(&mut model);
@@ -353,6 +355,50 @@ impl<'a> Compiler<'a> {
                 6,
             ),
         };
+    }
+
+    fn parse_run_periods(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("RunPeriod") {
+            let Some(id_value) = self.checked_id("RunPeriod", &name, model.run_periods.len())
+            else {
+                continue;
+            };
+            let id = RunPeriodId(id_value);
+            if model.run_period_names.insert(&name, id).is_some() {
+                self.duplicate_name("RunPeriod", &name);
+                continue;
+            }
+
+            model.run_periods.push(RunPeriod {
+                id,
+                name: NormalizedName::new(&name),
+                begin_month: self.u32_default("RunPeriod", &name, &object, "begin_month", 1),
+                begin_day_of_month: self.u32_default(
+                    "RunPeriod",
+                    &name,
+                    &object,
+                    "begin_day_of_month",
+                    1,
+                ),
+                begin_year: self.optional_u32("RunPeriod", &name, &object, "begin_year"),
+                end_month: self.u32_default("RunPeriod", &name, &object, "end_month", 12),
+                end_day_of_month: self.u32_default(
+                    "RunPeriod",
+                    &name,
+                    &object,
+                    "end_day_of_month",
+                    31,
+                ),
+                end_year: self.optional_u32("RunPeriod", &name, &object, "end_year"),
+                day_of_week_for_start_day: self.optional_enum(
+                    "RunPeriod",
+                    &name,
+                    &object,
+                    "day_of_week_for_start_day",
+                    parse_day_of_week,
+                ),
+            });
+        }
     }
 
     fn parse_site_location(&mut self, model: &mut TypedModel) {
@@ -944,6 +990,19 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn optional_u32(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<u32> {
+        match field_value(object, field) {
+            Some(value) => self.u32_value(object_type, object_name, field, value),
+            None => None,
+        }
+    }
+
     fn auto_default(
         &mut self,
         object_type: &str,
@@ -1321,6 +1380,19 @@ fn parse_numeric_type(value: &str) -> Option<NumericType> {
     }
 }
 
+fn parse_day_of_week(value: &str) -> Option<ep_model::DayOfWeek> {
+    match value {
+        value if value.eq_ignore_ascii_case("Monday") => Some(ep_model::DayOfWeek::Monday),
+        value if value.eq_ignore_ascii_case("Tuesday") => Some(ep_model::DayOfWeek::Tuesday),
+        value if value.eq_ignore_ascii_case("Wednesday") => Some(ep_model::DayOfWeek::Wednesday),
+        value if value.eq_ignore_ascii_case("Thursday") => Some(ep_model::DayOfWeek::Thursday),
+        value if value.eq_ignore_ascii_case("Friday") => Some(ep_model::DayOfWeek::Friday),
+        value if value.eq_ignore_ascii_case("Saturday") => Some(ep_model::DayOfWeek::Saturday),
+        value if value.eq_ignore_ascii_case("Sunday") => Some(ep_model::DayOfWeek::Sunday),
+        _ => None,
+    }
+}
+
 fn parse_surface_type(value: &str) -> Option<SurfaceType> {
     match value {
         value if value.eq_ignore_ascii_case("Ceiling") => Some(SurfaceType::Ceiling),
@@ -1381,6 +1453,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
+    use ep_model::DayOfWeek;
     use ep_raw_model::parse_epjson_str;
 
     #[test]
@@ -1523,6 +1596,43 @@ mod tests {
         assert_eq!(model.other_equipment[0].fraction_latent, 0.1);
         assert_eq!(model.other_equipment[0].fraction_radiant, 0.2);
         assert_eq!(model.other_equipment[0].fraction_lost, 0.3);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_run_period_dates() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriod": {
+                    "Run Period 1": {
+                        "begin_month": 1,
+                        "begin_day_of_month": 2,
+                        "begin_year": 2013,
+                        "end_month": 1,
+                        "end_day_of_month": 3,
+                        "end_year": 2013,
+                        "day_of_week_for_start_day": "Wednesday"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.run_periods.len(), 1);
+        assert_eq!(model.run_periods[0].begin_month, 1);
+        assert_eq!(model.run_periods[0].begin_day_of_month, 2);
+        assert_eq!(model.run_periods[0].begin_year, Some(2013));
+        assert_eq!(model.run_periods[0].end_day_of_month, 3);
+        assert_eq!(
+            model.run_periods[0].day_of_week_for_start_day,
+            Some(DayOfWeek::Wednesday)
+        );
 
         Ok(())
     }

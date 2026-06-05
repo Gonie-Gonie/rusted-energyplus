@@ -1,8 +1,8 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
 use ep_model::{
-    AutoOrNumber, OtherEquipment, OutputHandle, OutsideBoundaryCondition, Point3, ScheduleId,
-    SimulationModel, SurfaceType, TypedModel, Zone, ZoneId,
+    AutoOrNumber, OtherEquipment, OutputHandle, OutsideBoundaryCondition, Point3, RunPeriod,
+    RunPeriodId, ScheduleId, SimulationModel, SurfaceType, TypedModel, Zone, ZoneId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -10,6 +10,7 @@ use std::path::Path;
 const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
+const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 
 /// Runtime execution mode.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -97,6 +98,171 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
             },
         ],
     }
+}
+
+/// One hourly timestamp aligned to EnergyPlus run-period reporting.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TimePoint {
+    /// Zero-based sample index.
+    pub sample_index: usize,
+    /// Calendar year used for date arithmetic.
+    pub year: u32,
+    /// Month number, 1-12.
+    pub month: u32,
+    /// Day of month.
+    pub day_of_month: u32,
+    /// EnergyPlus-style hour ending, 1-24.
+    pub hour: u32,
+}
+
+/// Hourly time axis for one run period.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TimeAxis {
+    /// Run period name.
+    pub run_period_name: String,
+    /// Hourly samples in output order.
+    pub points: Vec<TimePoint>,
+}
+
+impl TimeAxis {
+    /// Returns the number of hourly samples.
+    #[must_use]
+    pub fn sample_count(&self) -> usize {
+        self.points.len()
+    }
+}
+
+/// Error returned while building a run-period time axis.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum TimeAxisError {
+    /// A run-period date was invalid.
+    InvalidDate {
+        /// Run period name.
+        run_period_name: String,
+        /// Field group, such as begin or end.
+        field: &'static str,
+        /// Calendar year.
+        year: u32,
+        /// Month number.
+        month: u32,
+        /// Day of month.
+        day_of_month: u32,
+    },
+    /// The end date came before the begin date.
+    InvalidRange {
+        /// Run period name.
+        run_period_name: String,
+    },
+}
+
+impl Display for TimeAxisError {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidDate {
+                run_period_name,
+                field,
+                year,
+                month,
+                day_of_month,
+            } => write!(
+                formatter,
+                "run period {run_period_name} has invalid {field} date {year:04}-{month:02}-{day_of_month:02}"
+            ),
+            Self::InvalidRange { run_period_name } => {
+                write!(
+                    formatter,
+                    "run period {run_period_name} ends before it begins"
+                )
+            }
+        }
+    }
+}
+
+impl std::error::Error for TimeAxisError {}
+
+/// Builds the first hourly time axis from the model `RunPeriod` list.
+///
+/// If no `RunPeriod` is present, a one-day default axis is returned so early
+/// diagnostic runtime paths remain explicit and deterministic.
+pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisError> {
+    let fallback;
+    let run_period = if let Some(run_period) = model.run_periods.first() {
+        run_period
+    } else {
+        fallback = default_run_period();
+        &fallback
+    };
+
+    build_hourly_time_axis_for_run_period(run_period)
+}
+
+/// Builds an hourly time axis for one run period.
+pub fn build_hourly_time_axis_for_run_period(
+    run_period: &RunPeriod,
+) -> Result<TimeAxis, TimeAxisError> {
+    let begin_year = run_period
+        .begin_year
+        .or(run_period.end_year)
+        .unwrap_or(DEFAULT_RUN_PERIOD_YEAR);
+    let end_year = run_period
+        .end_year
+        .or(run_period.begin_year)
+        .unwrap_or(begin_year);
+    let begin = Date {
+        year: begin_year,
+        month: run_period.begin_month,
+        day_of_month: run_period.begin_day_of_month,
+    };
+    let end = Date {
+        year: end_year,
+        month: run_period.end_month,
+        day_of_month: run_period.end_day_of_month,
+    };
+
+    let begin_ordinal = date_ordinal(begin).ok_or_else(|| TimeAxisError::InvalidDate {
+        run_period_name: run_period.name.0.clone(),
+        field: "begin",
+        year: begin.year,
+        month: begin.month,
+        day_of_month: begin.day_of_month,
+    })?;
+    let end_ordinal = date_ordinal(end).ok_or_else(|| TimeAxisError::InvalidDate {
+        run_period_name: run_period.name.0.clone(),
+        field: "end",
+        year: end.year,
+        month: end.month,
+        day_of_month: end.day_of_month,
+    })?;
+    if end_ordinal < begin_ordinal {
+        return Err(TimeAxisError::InvalidRange {
+            run_period_name: run_period.name.0.clone(),
+        });
+    }
+
+    let mut points = Vec::new();
+    let mut date = begin;
+    let mut ordinal = begin_ordinal;
+    while ordinal <= end_ordinal {
+        for hour in 1..=24 {
+            points.push(TimePoint {
+                sample_index: points.len(),
+                year: date.year,
+                month: date.month,
+                day_of_month: date.day_of_month,
+                hour,
+            });
+        }
+        if ordinal == end_ordinal {
+            break;
+        }
+        date = next_day(date);
+        ordinal += 1;
+    }
+
+    Ok(TimeAxis {
+        run_period_name: run_period.name.0.clone(),
+        points,
+    })
 }
 
 /// Weather state for the current simulation timestep.
@@ -637,6 +803,87 @@ fn cross(left: Vector3, right: Vector3) -> Vector3 {
     }
 }
 
+#[derive(Clone, Copy)]
+struct Date {
+    year: u32,
+    month: u32,
+    day_of_month: u32,
+}
+
+fn default_run_period() -> RunPeriod {
+    RunPeriod {
+        id: RunPeriodId(0),
+        name: ep_model::NormalizedName::new("Default Run Period"),
+        begin_month: 1,
+        begin_day_of_month: 1,
+        begin_year: Some(DEFAULT_RUN_PERIOD_YEAR),
+        end_month: 1,
+        end_day_of_month: 1,
+        end_year: Some(DEFAULT_RUN_PERIOD_YEAR),
+        day_of_week_for_start_day: None,
+    }
+}
+
+fn date_ordinal(date: Date) -> Option<i64> {
+    let day_of_year = day_of_year(date.year, date.month, date.day_of_month)?;
+    Some(days_before_year(date.year) + i64::from(day_of_year - 1))
+}
+
+fn days_before_year(year: u32) -> i64 {
+    let previous = i64::from(year.saturating_sub(1));
+    365 * previous + previous / 4 - previous / 100 + previous / 400
+}
+
+fn day_of_year(year: u32, month: u32, day_of_month: u32) -> Option<u32> {
+    if !(1..=12).contains(&month) {
+        return None;
+    }
+    let month_days = days_in_month(year, month);
+    if day_of_month == 0 || day_of_month > month_days {
+        return None;
+    }
+    let before_month = (1..month)
+        .map(|value| days_in_month(year, value))
+        .sum::<u32>();
+    Some(before_month + day_of_month)
+}
+
+fn days_in_month(year: u32, month: u32) -> u32 {
+    match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if is_leap_year(year) => 29,
+        2 => 28,
+        _ => 0,
+    }
+}
+
+fn is_leap_year(year: u32) -> bool {
+    year.is_multiple_of(4) && (!year.is_multiple_of(100) || year.is_multiple_of(400))
+}
+
+fn next_day(date: Date) -> Date {
+    let month_days = days_in_month(date.year, date.month);
+    if date.day_of_month < month_days {
+        return Date {
+            day_of_month: date.day_of_month + 1,
+            ..date
+        };
+    }
+    if date.month < 12 {
+        return Date {
+            month: date.month + 1,
+            day_of_month: 1,
+            ..date
+        };
+    }
+    Date {
+        year: date.year + 1,
+        month: 1,
+        day_of_month: 1,
+    }
+}
+
 /// One sampled schedule output series.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleTrace {
@@ -752,14 +999,15 @@ pub fn parse_epw_dry_bulb_series(contents: &str) -> Result<Vec<f64>, EpwError> {
 mod tests {
     use super::{
         ExecutionStep, FirstZoneSimulationOptions, OutputSeries, ResultStore, SimulationMode,
-        SimulationState, build_execution_plan, parse_epw_dry_bulb_series,
+        SimulationState, build_execution_plan, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series,
         simulate_constant_schedules, simulate_first_zone_uncontrolled, surface_area_m2,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
         MaterialKind, NormalizedName, OtherEquipment, OutputHandle, OutsideBoundaryCondition,
-        Point3, ScheduleConstant, ScheduleId, SimulationModel, Surface, SurfaceId, SurfaceType,
-        TimestepConfig, TypedModel, Zone, ZoneId,
+        Point3, RunPeriod, RunPeriodId, ScheduleConstant, ScheduleId, SimulationModel, Surface,
+        SurfaceId, SurfaceType, TimestepConfig, TypedModel, Zone, ZoneId,
     };
 
     #[test]
@@ -786,6 +1034,59 @@ mod tests {
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].schedule_name, "ALWAYSON");
         assert_eq!(traces[0].values, vec![1.0, 1.0, 1.0]);
+    }
+
+    #[test]
+    fn default_time_axis_has_one_day() -> Result<(), Box<dyn std::error::Error>> {
+        let axis = build_hourly_time_axis(&TypedModel::default())?;
+
+        assert_eq!(axis.sample_count(), 24);
+        assert_eq!(axis.points[0].hour, 1);
+        assert_eq!(axis.points[23].hour, 24);
+
+        Ok(())
+    }
+
+    #[test]
+    fn run_period_time_axis_counts_inclusive_days() -> Result<(), Box<dyn std::error::Error>> {
+        let axis = build_hourly_time_axis_for_run_period(&RunPeriod {
+            id: RunPeriodId(0),
+            name: NormalizedName::new("Three Days"),
+            begin_month: 1,
+            begin_day_of_month: 1,
+            begin_year: Some(2013),
+            end_month: 1,
+            end_day_of_month: 3,
+            end_year: Some(2013),
+            day_of_week_for_start_day: None,
+        })?;
+
+        assert_eq!(axis.sample_count(), 72);
+        assert_eq!(axis.points[0].day_of_month, 1);
+        assert_eq!(axis.points[71].day_of_month, 3);
+        assert_eq!(axis.points[71].hour, 24);
+
+        Ok(())
+    }
+
+    #[test]
+    fn run_period_time_axis_handles_leap_year() -> Result<(), Box<dyn std::error::Error>> {
+        let axis = build_hourly_time_axis_for_run_period(&RunPeriod {
+            id: RunPeriodId(0),
+            name: NormalizedName::new("Leap Window"),
+            begin_month: 2,
+            begin_day_of_month: 28,
+            begin_year: Some(2020),
+            end_month: 3,
+            end_day_of_month: 1,
+            end_year: Some(2020),
+            day_of_week_for_start_day: None,
+        })?;
+
+        assert_eq!(axis.sample_count(), 72);
+        assert_eq!(axis.points[24].day_of_month, 29);
+
+        Ok(())
     }
 
     #[test]

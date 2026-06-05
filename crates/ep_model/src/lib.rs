@@ -58,6 +58,7 @@ typed_id!(MaterialId);
 typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(ScheduleId);
+typed_id!(RunPeriodId);
 typed_id!(NodeId);
 typed_id!(ComponentId);
 typed_id!(LoopId);
@@ -201,6 +202,48 @@ impl Default for TimestepConfig {
             number_of_timesteps_per_hour: 6,
         }
     }
+}
+
+/// Calendar day of week used by `RunPeriod`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DayOfWeek {
+    /// Monday.
+    Monday,
+    /// Tuesday.
+    Tuesday,
+    /// Wednesday.
+    Wednesday,
+    /// Thursday.
+    Thursday,
+    /// Friday.
+    Friday,
+    /// Saturday.
+    Saturday,
+    /// Sunday.
+    Sunday,
+}
+
+/// Run period date range.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RunPeriod {
+    /// Typed ID.
+    pub id: RunPeriodId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Begin month.
+    pub begin_month: u32,
+    /// Begin day of month.
+    pub begin_day_of_month: u32,
+    /// Optional begin year.
+    pub begin_year: Option<u32>,
+    /// End month.
+    pub end_month: u32,
+    /// End day of month.
+    pub end_day_of_month: u32,
+    /// Optional end year.
+    pub end_year: Option<u32>,
+    /// Optional declared start day of week.
+    pub day_of_week_for_start_day: Option<DayOfWeek>,
 }
 
 /// Site location.
@@ -465,6 +508,10 @@ pub struct TypedModel {
     pub building: Option<Building>,
     /// Zone timestep config.
     pub timestep: TimestepConfig,
+    /// Run periods.
+    pub run_periods: Vec<RunPeriod>,
+    /// Run period names.
+    pub run_period_names: NameMap<RunPeriodId>,
     /// Site location.
     pub site: Option<SiteLocation>,
     /// Materials.
@@ -503,6 +550,8 @@ impl Default for TypedModel {
             version: Version::oracle_26_1_0(),
             building: None,
             timestep: TimestepConfig::default(),
+            run_periods: Vec::new(),
+            run_period_names: NameMap::default(),
             site: None,
             materials: Vec::new(),
             material_names: NameMap::default(),
@@ -529,6 +578,7 @@ impl TypedModel {
         usize::from(self.building.is_some())
             + usize::from(self.site.is_some())
             + 1
+            + self.run_periods.len()
             + self.materials.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()

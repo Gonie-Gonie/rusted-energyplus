@@ -34,7 +34,7 @@ bad_value = "MoonBase"
 [expected_oracle_smoke]
 version = "26.1.0"
 raw_object_count = 88
-typed_object_count = 21
+typed_object_count = 22
 material_count = 3
 construction_count = 3
 schedule_type_limit_count = 2

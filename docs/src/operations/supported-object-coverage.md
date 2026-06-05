@@ -24,7 +24,7 @@ Current table:
 | Version | yes | partial | yes | n/a | n/a | n/a | n/a | planned | v0.2 typed contract |
 | Building | yes | partial | yes | n/a | partial | partial | partial | partial | first-zone run uses building-level typed context |
 | Timestep | yes | partial | yes | n/a | n/a | partial | partial | planned | first-zone run uses zone timesteps per hour |
-| RunPeriod | yes | planned | planned | n/a | n/a | planned | planned | planned | generic raw parse only |
+| RunPeriod | yes | partial | yes | n/a | n/a | partial | partial | planned | typed date range and hourly time-axis foundation |
 | Site:Location | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
 | Material | yes | partial | yes | n/a | partial | partial | partial | planned | thermal properties used for first-zone UA |
 | Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA |

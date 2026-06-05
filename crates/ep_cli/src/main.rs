@@ -11,7 +11,8 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, build_execution_plan,
-    load_epw_dry_bulb_series, simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    build_hourly_time_axis, load_epw_dry_bulb_series, simulate_constant_schedules,
+    simulate_first_zone_uncontrolled,
 };
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -173,6 +174,7 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  constructions: {}", model.typed.constructions.len());
     println!("  materials: {}", model.typed.materials.len());
     println!("  other_equipment: {}", model.typed.other_equipment.len());
+    println!("  run_periods: {}", model.typed.run_periods.len());
     println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
     println!(
         "  construction_material_edges: {}",
@@ -1117,6 +1119,11 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         "  timestep: {}",
         model.timestep.number_of_timesteps_per_hour
     );
+    println!("  run_periods: {}", model.run_periods.len());
+    match build_hourly_time_axis(model) {
+        Ok(axis) => println!("  time_axis_hours: {}", axis.sample_count()),
+        Err(error) => println!("  time_axis_error: {error}"),
+    }
     println!("  site_locations: {}", usize::from(model.site.is_some()));
     println!("  materials: {}", model.materials.len());
     println!("  constructions: {}", model.constructions.len());
