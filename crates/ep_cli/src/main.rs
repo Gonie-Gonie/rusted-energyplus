@@ -1,10 +1,11 @@
 //! Command line entry point for eplus-rs.
 
+use ep_compare::{Tolerance, compare_series, load_eso_series};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_model::TypedModel;
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
-use ep_runtime::SimulationMode;
+use ep_runtime::{SimulationMode, simulate_constant_schedules};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -30,6 +31,7 @@ fn run(args: &[String]) -> i32 {
             print_modes();
             0
         }
+        Some("compare") => run_compare_command(&args[1..]),
         Some("compile") => run_compile_command(&args[1..]),
         Some("model") => run_model_command(&args[1..]),
         Some(command) => {
@@ -109,11 +111,106 @@ fn print_help() {
     println!("  model inspect <input.epJSON>");
     println!("  model compile <input.epJSON>");
     println!("  compile <input.epJSON>");
+    println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
     println!("  graph validate <input.epJSON>");
     println!("  run <input.epJSON>");
+}
+
+fn run_compare_command(args: &[String]) -> i32 {
+    match args.first().map(String::as_str) {
+        Some("schedule-value") => run_compare_schedule_value(&args[1..]),
+        Some(command) => {
+            eprintln!("unsupported compare command: {command}");
+            eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            2
+        }
+        None => {
+            eprintln!("missing compare command");
+            eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+            2
+        }
+    }
+}
+
+fn run_compare_schedule_value(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+        return 2;
+    };
+    let Some(eso_path) = args.get(1) else {
+        eprintln!("missing eplusout.eso path");
+        eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model.as_ref() else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+
+    if model.schedules.is_empty() {
+        eprintln!("no Schedule:Constant objects are available for comparison");
+        return 1;
+    }
+
+    let mut oracle_series = Vec::new();
+    for schedule in &model.schedules {
+        let values = match load_eso_series(eso_path, &schedule.name.0, "Schedule Value") {
+            Ok(values) => values,
+            Err(error) => {
+                eprintln!("{error}");
+                return 1;
+            }
+        };
+        oracle_series.push((schedule.id, schedule.name.0.clone(), values));
+    }
+
+    let sample_count = oracle_series
+        .iter()
+        .map(|(_id, _name, values)| values.len())
+        .max()
+        .unwrap_or(0);
+    let traces = simulate_constant_schedules(model, sample_count);
+    let mut passed = true;
+
+    println!("Schedule Value Comparison");
+    println!("  schedules: {}", oracle_series.len());
+    for (schedule_id, schedule_name, expected_values) in oracle_series {
+        let Some(trace) = traces.iter().find(|trace| trace.schedule_id == schedule_id) else {
+            eprintln!("missing Rust schedule trace: {schedule_name}");
+            return 1;
+        };
+        let comparison = compare_series(
+            &expected_values,
+            &trace.values[..expected_values.len()],
+            Tolerance::default(),
+        );
+        if !comparison.passed {
+            passed = false;
+        }
+        println!(
+            "  schedule: {} samples: {} max_abs_delta: {} status: {}",
+            schedule_name,
+            comparison.samples,
+            comparison.max_abs_delta,
+            if comparison.passed { "pass" } else { "fail" }
+        );
+    }
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
 }
 
 fn print_raw_model_summary(summary: &RawModelSummary) {

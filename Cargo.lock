@@ -6,6 +6,7 @@ version = 4
 name = "ep_cli"
 version = "0.1.0"
 dependencies = [
+ "ep_compare",
  "ep_compiler",
  "ep_model",
  "ep_oracle",

@@ -30,6 +30,7 @@ This repository is at the v0.1.0 RawModel inspection and typed compile preview s
 .\scripts\v0.1-verify.cmd
 .\scripts\raw-model-smoke.cmd
 .\scripts\typed-model-smoke.cmd
+.\scripts\compare-schedule-smoke.cmd
 .\scripts\package.cmd
 ```
 
