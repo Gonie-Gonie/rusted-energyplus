@@ -93,6 +93,7 @@ but that report is still baseline-only evidence.
 |---|---|---|
 | `RunPeriod` intake | implemented foundation | `ep_compiler` parses date ranges into `TypedModel.run_periods` |
 | aligned hourly time axis | implemented foundation | `ep_runtime::build_hourly_time_axis` expands the first run period into EnergyPlus-style hour-ending samples |
+| EPW weather fields | implemented foundation | `ep_runtime::parse_epw_records` reads dry-bulb, dew point, RH, pressure, radiation, and wind fields |
 
 ## Revised Milestone Intent
 
@@ -274,7 +275,7 @@ P1 conformance infrastructure:
 P2 compatibility work:
 
 - [x] implement `RunPeriod` and aligned time axis foundation
-- expand EPW weather fields
+- [x] expand EPW weather fields foundation
 - add `Schedule:Compact` subset
 - add geometry/internal-variable comparison
 - write heat-balance porting map before heat-balance code

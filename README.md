@@ -23,6 +23,7 @@ compatibility for zone heat balance or HVAC simulation.
 - preview missing reference diagnostics
 - SimulationModel, ModelGraph, and ExecutionPlan summaries
 - typed `RunPeriod` intake and hourly time-axis foundation
+- EPW hourly weather record parsing beyond dry-bulb
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
 - typed conformance case/suite manifests for future tolerance-gated evidence
 - `OutputRegistry` foundation for output-request driven reports

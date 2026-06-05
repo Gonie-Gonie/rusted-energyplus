@@ -914,15 +914,19 @@ pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> V
 pub enum EpwError {
     /// File read failed.
     Io(std::io::Error),
-    /// EPW data row was missing the dry-bulb column.
-    MissingDryBulb {
+    /// EPW data row was missing a required column.
+    MissingField {
         /// One-based line number.
         line: usize,
+        /// EPW field name.
+        field: &'static str,
     },
-    /// EPW dry-bulb value could not be parsed.
-    InvalidDryBulb {
+    /// EPW numeric field could not be parsed.
+    InvalidNumber {
         /// One-based line number.
         line: usize,
+        /// EPW field name.
+        field: &'static str,
         /// Raw field text.
         value: String,
     },
@@ -932,16 +936,13 @@ impl Display for EpwError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Io(error) => write!(formatter, "failed to read EPW: {error}"),
-            Self::MissingDryBulb { line } => {
-                write!(
-                    formatter,
-                    "EPW row at line {line} is missing dry-bulb value"
-                )
+            Self::MissingField { line, field } => {
+                write!(formatter, "EPW row at line {line} is missing {field}")
             }
-            Self::InvalidDryBulb { line, value } => {
+            Self::InvalidNumber { line, field, value } => {
                 write!(
                     formatter,
-                    "EPW row at line {line} has invalid dry-bulb value '{value}'"
+                    "EPW row at line {line} has invalid {field} value '{value}'"
                 )
             }
         }
@@ -952,7 +953,7 @@ impl std::error::Error for EpwError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
-            Self::MissingDryBulb { .. } | Self::InvalidDryBulb { .. } => None,
+            Self::MissingField { .. } | Self::InvalidNumber { .. } => None,
         }
     }
 }
@@ -963,6 +964,104 @@ impl From<std::io::Error> for EpwError {
     }
 }
 
+/// One hourly EPW weather record for the current compatibility subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct EpwRecord {
+    /// Calendar year.
+    pub year: u32,
+    /// Month number, 1-12.
+    pub month: u32,
+    /// Day of month.
+    pub day: u32,
+    /// Hour ending, 1-24.
+    pub hour: u32,
+    /// Minute field from EPW.
+    pub minute: u32,
+    /// Outdoor dry-bulb temperature in C.
+    pub dry_bulb_c: f64,
+    /// Outdoor dew-point temperature in C.
+    pub dew_point_c: f64,
+    /// Relative humidity in percent.
+    pub relative_humidity_percent: f64,
+    /// Atmospheric station pressure in Pa.
+    pub atmospheric_pressure_pa: f64,
+    /// Horizontal infrared radiation intensity in Wh/m2.
+    pub horizontal_infrared_radiation_wh_per_m2: f64,
+    /// Global horizontal radiation in Wh/m2.
+    pub global_horizontal_radiation_wh_per_m2: f64,
+    /// Direct normal radiation in Wh/m2.
+    pub direct_normal_radiation_wh_per_m2: f64,
+    /// Diffuse horizontal radiation in Wh/m2.
+    pub diffuse_horizontal_radiation_wh_per_m2: f64,
+    /// Wind direction in degrees.
+    pub wind_direction_deg: f64,
+    /// Wind speed in m/s.
+    pub wind_speed_m_per_s: f64,
+}
+
+/// Loads hourly EPW records from a weather file.
+pub fn load_epw_records(path: impl AsRef<Path>) -> Result<Vec<EpwRecord>, EpwError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_epw_records(&contents)
+}
+
+/// Parses hourly EPW records from weather text.
+pub fn parse_epw_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
+    let mut records = Vec::new();
+
+    for (line_index, line) in contents.lines().enumerate().skip(8) {
+        let line_number = line_index + 1;
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields = line.split(',').collect::<Vec<_>>();
+        records.push(EpwRecord {
+            year: parse_epw_u32(&fields, line_number, 0, "year")?,
+            month: parse_epw_u32(&fields, line_number, 1, "month")?,
+            day: parse_epw_u32(&fields, line_number, 2, "day")?,
+            hour: parse_epw_u32(&fields, line_number, 3, "hour")?,
+            minute: parse_epw_u32(&fields, line_number, 4, "minute")?,
+            dry_bulb_c: parse_epw_f64(&fields, line_number, 6, "dry-bulb")?,
+            dew_point_c: parse_epw_f64(&fields, line_number, 7, "dew-point")?,
+            relative_humidity_percent: parse_epw_f64(&fields, line_number, 8, "relative humidity")?,
+            atmospheric_pressure_pa: parse_epw_f64(
+                &fields,
+                line_number,
+                9,
+                "atmospheric pressure",
+            )?,
+            horizontal_infrared_radiation_wh_per_m2: parse_epw_f64(
+                &fields,
+                line_number,
+                12,
+                "horizontal infrared radiation",
+            )?,
+            global_horizontal_radiation_wh_per_m2: parse_epw_f64(
+                &fields,
+                line_number,
+                13,
+                "global horizontal radiation",
+            )?,
+            direct_normal_radiation_wh_per_m2: parse_epw_f64(
+                &fields,
+                line_number,
+                14,
+                "direct normal radiation",
+            )?,
+            diffuse_horizontal_radiation_wh_per_m2: parse_epw_f64(
+                &fields,
+                line_number,
+                15,
+                "diffuse horizontal radiation",
+            )?,
+            wind_direction_deg: parse_epw_f64(&fields, line_number, 20, "wind direction")?,
+            wind_speed_m_per_s: parse_epw_f64(&fields, line_number, 21, "wind speed")?,
+        });
+    }
+
+    Ok(records)
+}
+
 /// Loads hourly outdoor dry-bulb values from an EPW file.
 pub fn load_epw_dry_bulb_series(path: impl AsRef<Path>) -> Result<Vec<f64>, EpwError> {
     let contents = std::fs::read_to_string(path)?;
@@ -971,28 +1070,58 @@ pub fn load_epw_dry_bulb_series(path: impl AsRef<Path>) -> Result<Vec<f64>, EpwE
 
 /// Parses hourly outdoor dry-bulb values from EPW text.
 pub fn parse_epw_dry_bulb_series(contents: &str) -> Result<Vec<f64>, EpwError> {
-    let mut values = Vec::new();
+    parse_epw_records(contents).map(|records| {
+        records
+            .into_iter()
+            .map(|record| record.dry_bulb_c)
+            .collect()
+    })
+}
 
-    for (line_index, line) in contents.lines().enumerate().skip(8) {
-        let line_number = line_index + 1;
-        if line.trim().is_empty() {
-            continue;
-        }
-        let mut fields = line.split(',');
-        let dry_bulb = fields
-            .nth(6)
-            .ok_or(EpwError::MissingDryBulb { line: line_number })?;
-        let value = dry_bulb
-            .trim()
-            .parse::<f64>()
-            .map_err(|_error| EpwError::InvalidDryBulb {
-                line: line_number,
-                value: dry_bulb.to_string(),
-            })?;
-        values.push(value);
-    }
+fn parse_epw_u32(
+    fields: &[&str],
+    line: usize,
+    index: usize,
+    field: &'static str,
+) -> Result<u32, EpwError> {
+    let value = epw_field(fields, line, index, field)?;
+    value
+        .trim()
+        .parse::<u32>()
+        .map_err(|_error| EpwError::InvalidNumber {
+            line,
+            field,
+            value: value.to_string(),
+        })
+}
 
-    Ok(values)
+fn parse_epw_f64(
+    fields: &[&str],
+    line: usize,
+    index: usize,
+    field: &'static str,
+) -> Result<f64, EpwError> {
+    let value = epw_field(fields, line, index, field)?;
+    value
+        .trim()
+        .parse::<f64>()
+        .map_err(|_error| EpwError::InvalidNumber {
+            line,
+            field,
+            value: value.to_string(),
+        })
+}
+
+fn epw_field<'a>(
+    fields: &'a [&str],
+    line: usize,
+    index: usize,
+    field: &'static str,
+) -> Result<&'a str, EpwError> {
+    fields
+        .get(index)
+        .copied()
+        .ok_or(EpwError::MissingField { line, field })
 }
 
 #[cfg(test)]
@@ -1000,7 +1129,7 @@ mod tests {
     use super::{
         ExecutionStep, FirstZoneSimulationOptions, OutputSeries, ResultStore, SimulationMode,
         SimulationState, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series,
+        build_hourly_time_axis_for_run_period, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled, surface_area_m2,
     };
     use ep_model::{
@@ -1127,6 +1256,33 @@ mod tests {
     }
 
     #[test]
+    fn parses_epw_records_after_header() -> Result<(), Box<dyn std::error::Error>> {
+        let records = parse_epw_records(
+            r#"LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+1999,1,1,1,0,Source,-3.0,-4.0,50,82000,0,0,300,10,20,30,0,0,0,0,180,2.5
+1999,1,1,2,0,Source,-2.0,-3.0,51,82100,0,0,301,11,21,31,0,0,0,0,190,2.6
+"#,
+        )?;
+
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0].dry_bulb_c, -3.0);
+        assert_eq!(records[0].dew_point_c, -4.0);
+        assert_eq!(records[0].relative_humidity_percent, 50.0);
+        assert_eq!(records[0].atmospheric_pressure_pa, 82_000.0);
+        assert_eq!(records[0].wind_direction_deg, 180.0);
+        assert_eq!(records[0].wind_speed_m_per_s, 2.5);
+
+        Ok(())
+    }
+
+    #[test]
     fn parses_epw_dry_bulb_values_after_header() -> Result<(), Box<dyn std::error::Error>> {
         let values = parse_epw_dry_bulb_series(
             r#"LOCATION,Example
@@ -1137,8 +1293,8 @@ HOLIDAYS/DAYLIGHT SAVINGS
 COMMENTS 1
 COMMENTS 2
 DATA PERIODS
-1999,1,1,1,0,Source,-3.0,-4.0
-1999,1,1,2,0,Source,-2.0,-3.0
+1999,1,1,1,0,Source,-3.0,-4.0,50,82000,0,0,300,10,20,30,0,0,0,0,180,2.5
+1999,1,1,2,0,Source,-2.0,-3.0,51,82100,0,0,301,11,21,31,0,0,0,0,190,2.6
 "#,
         )?;
 
