@@ -38,6 +38,7 @@ runtime path for an uncontrolled one-zone building subset:
 .\scripts\compare-schedule-smoke.cmd
 .\scripts\compare-weather-smoke.cmd
 .\scripts\first-zone-smoke.cmd
+.\scripts\compare-zone-smoke.cmd
 .\scripts\package.cmd
 ```
 
@@ -66,6 +67,7 @@ cargo run -p ep_cli -- model inspect .runtime\oracle-smoke\26.1.0\convert\smoke.
 cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- model plan .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw --hours 24
+cargo run -p ep_cli -- compare zone-temperature .runtime\compare-zone\26.1.0\zone-temperature.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw .runtime\compare-zone\26.1.0\eplusout.eso
 ```
 
 Unsupported runtime commands should fail explicitly until their milestone is

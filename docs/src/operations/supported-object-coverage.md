@@ -30,8 +30,8 @@ Current table:
 | Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA |
 | Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Zone | yes | partial | yes | n/a | partial | partial | partial | planned | first zone simulated in uncontrolled subset |
-| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | planned | exterior area used for first-zone UA |
+| Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated and smoke-compared |
+| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area used for first-zone UA |
 | Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison and first-zone internal gains |
 | OtherEquipment | yes | partial | yes | yes | partial | partial | partial | planned | internal gains used for first-zone subset |
 | Schedule:Compact | yes | planned | planned | planned | n/a | partial | partial | partial | generic raw parse only |

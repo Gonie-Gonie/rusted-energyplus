@@ -149,6 +149,7 @@ fn print_help() {
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
+    println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -303,16 +304,23 @@ fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
         Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
+        Some("zone-temperature") => run_compare_zone_temperature(&args[1..]),
         Some(command) => {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+            eprintln!(
+                "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
+            );
             2
         }
         None => {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+            eprintln!(
+                "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
+            );
             2
         }
     }
@@ -396,6 +404,123 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
     if passed { 0 } else { 1 }
 }
 
+fn run_compare_zone_temperature(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!(
+            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
+        );
+        return 2;
+    };
+    let Some(weather_path) = args.get(1) else {
+        eprintln!("missing weather path");
+        eprintln!(
+            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
+        );
+        return 2;
+    };
+    let Some(eso_path) = args.get(2) else {
+        eprintln!("missing eplusout.eso path");
+        eprintln!(
+            "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>"
+        );
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let Some(zone) = model.zones.first() else {
+        eprintln!("no Zone objects are available for comparison");
+        return 1;
+    };
+
+    let oracle_values = match load_eso_series(eso_path, &zone.name.0, "Zone Mean Air Temperature") {
+        Ok(values) => values,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if oracle_values.is_empty() {
+        eprintln!("EnergyPlus zone temperature series is empty");
+        return 1;
+    }
+
+    let weather_values = match load_epw_dry_bulb_series(weather_path) {
+        Ok(values) => values,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if weather_values.len() < oracle_values.len() {
+        eprintln!(
+            "EPW dry-bulb series has {} samples but ESO requires {}",
+            weather_values.len(),
+            oracle_values.len()
+        );
+        return 1;
+    }
+
+    let simulation_model = SimulationModel::from_typed(model);
+    let simulation = match simulate_first_zone_uncontrolled(
+        &simulation_model,
+        &weather_values,
+        FirstZoneSimulationOptions::hourly_samples(oracle_values.len()),
+    ) {
+        Ok(simulation) => simulation,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let Some(rust_series) = simulation
+        .results
+        .find_series(&simulation.summary.zone_name, "Zone Mean Air Temperature")
+    else {
+        eprintln!("first-zone simulation did not write zone temperature output");
+        return 1;
+    };
+
+    let (samples, max_abs_delta, mean_abs_delta) =
+        delta_summary(&oracle_values, &rust_series.values);
+    let finite = oracle_values
+        .iter()
+        .chain(rust_series.values.iter())
+        .all(|value| value.is_finite());
+    let passed = finite && samples == oracle_values.len() && samples == rust_series.values.len();
+
+    println!("Zone Temperature Smoke Comparison");
+    println!("  zone: {}", simulation.summary.zone_name);
+    println!("  samples: {samples}");
+    println!("  max_abs_delta: {max_abs_delta:.6}");
+    println!("  mean_abs_delta: {mean_abs_delta:.6}");
+    println!("  oracle_first_c: {:.6}", oracle_values[0]);
+    println!("  rust_first_c: {:.6}", rust_series.values[0]);
+    println!(
+        "  oracle_last_c: {:.6}",
+        oracle_values[oracle_values.len() - 1]
+    );
+    println!(
+        "  rust_last_c: {:.6}",
+        rust_series.values[rust_series.values.len() - 1]
+    );
+    println!("  exact_match: future");
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
 fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     let Some(epw_path) = args.first() else {
         eprintln!("missing weather path");
@@ -450,6 +575,23 @@ fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     );
 
     if comparison.passed { 0 } else { 1 }
+}
+
+fn delta_summary(expected: &[f64], observed: &[f64]) -> (usize, f64, f64) {
+    let samples = expected.len().min(observed.len());
+    if samples == 0 {
+        return (0, 0.0, 0.0);
+    }
+
+    let mut max_abs_delta: f64 = 0.0;
+    let mut sum_abs_delta = 0.0;
+    for (expected, observed) in expected.iter().zip(observed).take(samples) {
+        let delta = (expected - observed).abs();
+        max_abs_delta = max_abs_delta.max(delta);
+        sum_abs_delta += delta;
+    }
+
+    (samples, max_abs_delta, sum_abs_delta / samples as f64)
 }
 
 fn print_raw_model_summary(summary: &RawModelSummary) {
