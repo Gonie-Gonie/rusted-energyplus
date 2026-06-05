@@ -13,6 +13,12 @@ Manifest-driven EnergyPlus baseline generation is exposed through:
 cargo run -p ep_cli -- conformance baseline <case.toml> <oracle-root> <output-root>
 ```
 
+Baseline-only report skeleton generation is exposed through:
+
+```powershell
+cargo run -p ep_cli -- conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>
+```
+
 ## Rule
 
 ```text
@@ -40,8 +46,8 @@ comparison_class = "smoke"
 conformance_claim = false
 ```
 
-This is intentional. The case becomes conformance evidence only after
-multi-series reporting, tolerance policy, and a blocking release gate are wired.
+This is intentional. The case becomes conformance evidence only after tolerance
+policy and a blocking release gate are wired.
 
 `data/conformance_suites/foundation.toml` is the first ordered suite manifest.
 
@@ -63,17 +69,41 @@ Expected artifacts include `input.idf`, `input.epJSON`, `eplusout.eso`, and
 `eplusout.err`. These files prove oracle artifact generation only; they are not
 yet a tolerance-gated Rust/EnergyPlus comparison report.
 
+## Report Skeleton
+
+The first report smoke command is:
+
+```powershell
+.\scripts\conformance-report-smoke.cmd
+```
+
+It writes:
+
+```text
+.runtime/conformance-report/26.1.0/schedule_constant_001/compare-report.md
+```
+
+The report is intentionally marked:
+
+```text
+tolerance_policy: none
+status: baseline-only
+```
+
+It enumerates the requested output series and EnergyPlus baseline sample count.
+It does not compare Rust results yet.
+
 ## Verification
 
 ```powershell
 .\scripts\conformance-schema-smoke.cmd
 .\scripts\conformance-baseline-smoke.cmd
+.\scripts\conformance-report-smoke.cmd
 .\scripts\check.cmd
 ```
 
 ## Next Steps
 
-- add a multi-series compare report skeleton tied to output requests
 - introduce an `Output:Variable` registry so requested variables are tracked
   from IDF/epJSON intake through result comparison
 - promote schedule/weather cases from smoke manifests to tolerance-gated

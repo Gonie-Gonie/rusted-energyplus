@@ -14,7 +14,7 @@ idf = "data/conformance_cases/schedule_constant_001/schedule_constant.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
 
 [[outputs]]
-key = "*"
+key = "ALWAYSON"
 variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"

@@ -158,6 +158,7 @@ fn print_help() {
     println!("  compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso>");
     println!("  conformance validate-case <case.toml>");
     println!("  conformance baseline <case.toml> <oracle-root> <output-root>");
+    println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -187,11 +188,15 @@ fn run_conformance_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("validate-case") => run_conformance_validate_case(&args[1..]),
         Some("baseline") => run_conformance_baseline(&args[1..]),
+        Some("report-skeleton") => run_conformance_report_skeleton(&args[1..]),
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
             eprintln!(
                 "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
+            );
+            eprintln!(
+                "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
             );
             2
         }
@@ -200,6 +205,9 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
             eprintln!(
                 "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
+            );
+            eprintln!(
+                "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
             );
             2
         }
@@ -286,12 +294,69 @@ fn run_conformance_baseline(args: &[String]) -> i32 {
     }
 }
 
+fn run_conformance_report_skeleton(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!(
+            "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
+        );
+        return 2;
+    };
+    let Some(baseline_case_dir) = args.get(1) else {
+        eprintln!("missing baseline case directory");
+        eprintln!(
+            "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
+        );
+        return 2;
+    };
+    let Some(report_root) = args.get(2) else {
+        eprintln!("missing report root path");
+        eprintln!(
+            "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
+        );
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    match generate_conformance_report_skeleton(
+        &manifest,
+        Path::new(baseline_case_dir),
+        Path::new(report_root),
+    ) {
+        Ok(summary) => {
+            println!("Conformance Report Skeleton");
+            print_conformance_case_summary(&manifest);
+            println!("  report: {}", summary.report_path.display());
+            println!("  series: {}", summary.series);
+            println!("  tolerance_policy: none");
+            println!("  status: baseline-only");
+            0
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
 struct BaselineSummary {
     output_dir: PathBuf,
     idf: PathBuf,
     weather: Option<PathBuf>,
     epjson: PathBuf,
     eso: PathBuf,
+}
+
+struct ReportSkeletonSummary {
+    report_path: PathBuf,
+    series: usize,
 }
 
 fn generate_conformance_baseline(
@@ -384,6 +449,107 @@ fn generate_conformance_baseline(
         epjson,
         eso,
     })
+}
+
+fn generate_conformance_report_skeleton(
+    manifest: &ConformanceCase,
+    baseline_case_dir: &Path,
+    report_root: &Path,
+) -> Result<ReportSkeletonSummary, String> {
+    let eso = baseline_case_dir.join("eplusout.eso");
+    if !eso.is_file() {
+        return Err(format!("missing baseline ESO: {}", eso.display()));
+    }
+
+    let report_dir = report_root.join(&manifest.id);
+    std::fs::create_dir_all(&report_dir)
+        .map_err(|error| format!("failed to create report directory: {error}"))?;
+    let report_path = report_dir.join("compare-report.md");
+
+    let mut rows = Vec::new();
+    for output in &manifest.outputs {
+        let values = load_eso_series(&eso, &output.key, &output.variable)
+            .map_err(|error| format!("failed to load baseline series: {error}"))?;
+        rows.push(ReportSeriesRow {
+            key: output.key.clone(),
+            variable: output.variable.clone(),
+            frequency: output_frequency_label(output.frequency),
+            variable_class: variable_class_label(output.class),
+            samples: values.len(),
+            first: first_value_label(&values),
+            last: last_value_label(&values),
+        });
+    }
+
+    let report = render_report_skeleton(manifest, &rows);
+    std::fs::write(&report_path, report)
+        .map_err(|error| format!("failed to write report skeleton: {error}"))?;
+
+    Ok(ReportSkeletonSummary {
+        report_path,
+        series: rows.len(),
+    })
+}
+
+struct ReportSeriesRow {
+    key: String,
+    variable: String,
+    frequency: &'static str,
+    variable_class: &'static str,
+    samples: usize,
+    first: String,
+    last: String,
+}
+
+fn render_report_skeleton(manifest: &ConformanceCase, rows: &[ReportSeriesRow]) -> String {
+    let mut report = String::new();
+    report.push_str("# Conformance Report Skeleton\n\n");
+    report.push_str(&format!("case_id: {}\n", manifest.id));
+    report.push_str(&format!(
+        "comparison_class: {}\n",
+        comparison_class_label(manifest.comparison_class)
+    ));
+    report.push_str(&format!(
+        "conformance_claim: {}\n",
+        manifest.conformance_claim
+    ));
+    report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
+    report.push_str("tolerance_policy: none\n");
+    report.push_str("status: baseline-only\n\n");
+    report.push_str("## Series\n\n");
+    report.push_str(
+        "| key | variable | frequency | class | baseline_samples | first | last | status |\n",
+    );
+    report.push_str("|---|---|---|---|---:|---:|---:|---|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | baseline-only |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.variable),
+            row.frequency,
+            row.variable_class,
+            row.samples,
+            row.first,
+            row.last
+        ));
+    }
+    report
+}
+
+fn first_value_label(values: &[f64]) -> String {
+    values
+        .first()
+        .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
+}
+
+fn last_value_label(values: &[f64]) -> String {
+    values
+        .last()
+        .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
+}
+
+fn markdown_cell(value: &str) -> String {
+    value.replace('|', "\\|")
 }
 
 fn resolve_manifest_path(case_path: &Path, value: &str) -> Result<PathBuf, std::io::Error> {
