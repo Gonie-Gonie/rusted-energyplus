@@ -6,8 +6,8 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, SimulationMode, build_execution_plan, load_epw_dry_bulb_series,
-    simulate_constant_schedules,
+    ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, build_execution_plan,
+    load_epw_dry_bulb_series, simulate_constant_schedules, simulate_first_zone_uncontrolled,
 };
 
 fn main() {
@@ -37,6 +37,7 @@ fn run(args: &[String]) -> i32 {
         Some("compare") => run_compare_command(&args[1..]),
         Some("compile") => run_compile_command(&args[1..]),
         Some("model") => run_model_command(&args[1..]),
+        Some("run") => run_run_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported command: {command}");
             eprintln!("Try: eplus-rs model inspect <input.epJSON>");
@@ -144,6 +145,7 @@ fn print_help() {
     println!("  model inspect <input.epJSON>");
     println!("  model compile <input.epJSON>");
     println!("  model plan <input.epJSON>");
+    println!("  run first-zone <input.epJSON> <weather.epw> [--hours N]");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
@@ -151,7 +153,6 @@ fn print_help() {
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
     println!("  graph validate <input.epJSON>");
-    println!("  run <input.epJSON>");
 }
 
 fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
@@ -171,6 +172,131 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     for stage in &plan.stages {
         println!("    {}: {}", stage.name, stage.steps.len());
     }
+}
+
+fn run_run_command(args: &[String]) -> i32 {
+    match args.first().map(String::as_str) {
+        Some("first-zone") => run_first_zone_command(&args[1..]),
+        Some(command) => {
+            eprintln!("unsupported run command: {command}");
+            eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+            2
+        }
+        None => {
+            eprintln!("missing run command");
+            eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+            2
+        }
+    }
+}
+
+fn run_first_zone_command(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+        return 2;
+    };
+    let Some(weather_path) = args.get(1) else {
+        eprintln!("missing weather path");
+        eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+        return 2;
+    };
+    let hours = match parse_hours_arg(&args[2..], 24) {
+        Ok(hours) => hours,
+        Err(error) => {
+            eprintln!("{error}");
+            eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+            return 2;
+        }
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let weather_values = match load_epw_dry_bulb_series(weather_path) {
+        Ok(values) => values,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let simulation_model = SimulationModel::from_typed(model);
+    let simulation = match simulate_first_zone_uncontrolled(
+        &simulation_model,
+        &weather_values,
+        FirstZoneSimulationOptions::hourly_samples(hours),
+    ) {
+        Ok(simulation) => simulation,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let Some(zone_series) = simulation
+        .results
+        .find_series(&simulation.summary.zone_name, "Zone Mean Air Temperature")
+    else {
+        eprintln!("first-zone simulation did not write zone temperature output");
+        return 1;
+    };
+    let first_zone_temp_c = zone_series.values.first().copied().unwrap_or(0.0);
+    let last_zone_temp_c = zone_series.values.last().copied().unwrap_or(0.0);
+
+    println!("First Zone Simulation");
+    println!("  zone: {}", simulation.summary.zone_name);
+    println!("  samples: {}", simulation.summary.samples);
+    println!("  result_series: {}", simulation.results.series.len());
+    println!("  volume_m3: {:.6}", simulation.summary.volume_m3);
+    println!(
+        "  exterior_area_m2: {:.6}",
+        simulation.summary.exterior_area_m2
+    );
+    println!(
+        "  conductance_w_per_k: {:.6}",
+        simulation.summary.conductance_w_per_k
+    );
+    println!(
+        "  internal_gain_w: {:.6}",
+        simulation.summary.internal_gain_w
+    );
+    println!("  first_zone_temp_c: {first_zone_temp_c:.6}");
+    println!("  last_zone_temp_c: {last_zone_temp_c:.6}");
+    println!("  status: pass");
+
+    0
+}
+
+fn parse_hours_arg(args: &[String], default: usize) -> Result<usize, String> {
+    let mut hours = default;
+    let mut index = 0;
+    while index < args.len() {
+        match args[index].as_str() {
+            "--hours" => {
+                let Some(value) = args.get(index + 1) else {
+                    return Err("--hours requires a positive integer".to_string());
+                };
+                hours = value
+                    .parse::<usize>()
+                    .map_err(|_error| "--hours requires a positive integer".to_string())?;
+                if hours == 0 {
+                    return Err("--hours requires a positive integer".to_string());
+                }
+                index += 2;
+            }
+            option => return Err(format!("unsupported option: {option}")),
+        }
+    }
+
+    Ok(hours)
 }
 
 fn run_compare_command(args: &[String]) -> i32 {

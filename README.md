@@ -9,7 +9,8 @@ execution plans, structured diagnostics, and reproducible releases.
 
 ## Current Scope
 
-This repository is at the v0.1.0 RawModel inspection and typed compile preview stage:
+This repository is now past the RawModel/TypedModel seed and has the first
+runtime path for an uncontrolled one-zone building subset:
 
 - Rust toolchain pinned in `rust-toolchain.toml`
 - Cargo workspace skeleton
@@ -19,6 +20,9 @@ This repository is at the v0.1.0 RawModel inspection and typed compile preview s
 - epJSON RawModel inspection CLI
 - typed compile preview CLI for the first seed object families
 - preview missing reference diagnostics
+- SimulationModel, ModelGraph, and ExecutionPlan summaries
+- EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
+- ResultStore output from the first uncontrolled one-zone simulation subset
 - smoke/check scripts
 
 ## Quick Start
@@ -33,6 +37,7 @@ This repository is at the v0.1.0 RawModel inspection and typed compile preview s
 .\scripts\model-plan-smoke.cmd
 .\scripts\compare-schedule-smoke.cmd
 .\scripts\compare-weather-smoke.cmd
+.\scripts\first-zone-smoke.cmd
 .\scripts\package.cmd
 ```
 
@@ -59,6 +64,8 @@ cargo run -p ep_cli -- --version
 cargo run -p ep_cli -- oracle-info
 cargo run -p ep_cli -- model inspect .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
 cargo run -p ep_cli -- model compile .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
+cargo run -p ep_cli -- model plan .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON
+cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw --hours 24
 ```
 
 Unsupported runtime commands should fail explicitly until their milestone is
@@ -83,3 +90,4 @@ publishing.
 - External review log: `docs/src/operations/external-checkpoints.md`
 - Foundation checkpoints: `docs/src/operations/foundation-checkpoints.md`
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
+- v0.6 readiness: `docs/src/operations/v0.6.0-readiness.md`

@@ -22,18 +22,18 @@ Current table:
 | Object | Parse | Validate | Typed | Ref | Graph | Plan | Simulate | Compare | Notes |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | Version | yes | partial | yes | n/a | n/a | n/a | n/a | planned | v0.2 typed contract |
-| Building | yes | partial | yes | n/a | partial | partial | partial | partial | v0.2 typed contract |
-| Timestep | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
+| Building | yes | partial | yes | n/a | partial | partial | partial | partial | first-zone run uses building-level typed context |
+| Timestep | yes | partial | yes | n/a | n/a | partial | partial | planned | first-zone run uses zone timesteps per hour |
 | RunPeriod | yes | planned | planned | n/a | n/a | planned | planned | planned | generic raw parse only |
 | Site:Location | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Material | yes | partial | yes | n/a | planned | planned | planned | planned | thermal properties typed for first simulation subset |
-| Material:NoMass | yes | partial | yes | n/a | planned | planned | planned | planned | thermal resistance typed for first simulation subset |
-| Construction | yes | partial | yes | yes | planned | planned | planned | planned | v0.2 typed contract |
+| Material | yes | partial | yes | n/a | partial | partial | partial | planned | thermal properties used for first-zone UA |
+| Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA |
+| Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Zone | yes | partial | yes | n/a | planned | planned | planned | planned | v0.2 typed contract |
-| BuildingSurface:Detailed | yes | partial | yes | yes | planned | planned | partial | partial | v0.2 typed contract |
-| Schedule:Constant | yes | partial | yes | yes | n/a | planned | planned | planned | v0.2 typed contract |
-| OtherEquipment | yes | partial | yes | yes | planned | planned | planned | planned | internal gains typed for first simulation subset |
+| Zone | yes | partial | yes | n/a | partial | partial | partial | planned | first zone simulated in uncontrolled subset |
+| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | planned | exterior area used for first-zone UA |
+| Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison and first-zone internal gains |
+| OtherEquipment | yes | partial | yes | yes | partial | partial | partial | planned | internal gains used for first-zone subset |
 | Schedule:Compact | yes | planned | planned | planned | n/a | partial | partial | partial | generic raw parse only |
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
 | ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |
