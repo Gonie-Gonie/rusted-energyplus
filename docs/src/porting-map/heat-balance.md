@@ -130,7 +130,10 @@ source-reference comments.
    outside-layer material, thermal resistance, optional area heat capacity, and
    surface conductance.
 7. Add zone air predictor/corrector subset and compare `Zone Mean Air
-   Temperature`.
+   Temperature`. Implemented state advance: one heat-balance timestep updates
+   MAT history, internal convective gains, opaque surface heat gain, and zone
+   mean air temperature. EnergyPlus MAT comparison remains diagnostic-only
+   until a tolerance-gated report exists.
 8. Only after a tolerance-gated report exists, promote any case from
    diagnostic-only to conformance.
 

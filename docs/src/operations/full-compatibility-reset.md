@@ -290,6 +290,7 @@ P2 compatibility work:
 - [x] add heat-balance state shell without solver changes
 - [x] port internal convective gains as a separate runtime trace
 - [x] add opaque surface thermal inputs to heat-balance state
+- [x] add first heat-balance timestep state advance without conformance claim
 
 ## Forbidden Wording
 

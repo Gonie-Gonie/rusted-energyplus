@@ -458,6 +458,10 @@ pub struct ZoneHeatBalanceState {
     pub air_heat_capacity_j_per_k: f64,
     /// First hour-ending convective internal gain in W.
     pub convective_internal_gain_w: f64,
+    /// Sum of opaque surface conductance for this zone in W/K.
+    pub opaque_surface_conductance_w_per_k: f64,
+    /// Current opaque surface heat gain to the zone in W.
+    pub opaque_surface_heat_gain_w: f64,
 }
 
 /// Per-surface heat-balance state shell.
@@ -489,10 +493,23 @@ pub struct SurfaceHeatBalanceState {
     pub heat_capacity_j_per_m2_k: Option<f64>,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
+    /// Current opaque heat transfer to the owning zone in W.
+    pub heat_gain_to_zone_w: f64,
     /// Current inside face temperature in C.
     pub inside_face_temperature_c: f64,
     /// Current outside face temperature in C.
     pub outside_face_temperature_c: f64,
+}
+
+/// Inputs for advancing the first heat-balance timestep shell.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceStepInput {
+    /// Outdoor dry-bulb temperature in C for this timestep.
+    pub outdoor_dry_bulb_c: f64,
+    /// EnergyPlus-style hour ending, 1-24.
+    pub hour_ending: u32,
+    /// Timestep duration in seconds.
+    pub timestep_seconds: f64,
 }
 
 /// Runtime error for the first simulation subset.
@@ -746,6 +763,8 @@ pub fn initialize_heat_balance_state(
                 * AIR_DENSITY_KG_PER_M3
                 * AIR_SPECIFIC_HEAT_J_PER_KG_K,
             convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
+            opaque_surface_conductance_w_per_k: 0.0,
+            opaque_surface_heat_gain_w: 0.0,
         });
     }
 
@@ -771,17 +790,121 @@ pub fn initialize_heat_balance_state(
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 conductance_w_per_k: area_m2 / thermal.thermal_resistance_m2_k_per_w,
+                heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
                 outside_face_temperature_c: initial_zone_air_temperature_c,
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
 
+    for zone in &mut zones {
+        zone.opaque_surface_conductance_w_per_k = surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone.zone_id)
+            .map(|surface| surface.conductance_w_per_k)
+            .sum();
+    }
+
     Ok(HeatBalanceState {
         timestep_index: 0,
         zones,
         surfaces,
     })
+}
+
+/// Advances the heat-balance state by one timestep without making a
+/// conformance claim.
+///
+/// This is the first zone-air predictor/corrector-shaped state update. It uses
+/// the currently supported opaque surface conductance and internal convective
+/// gains while keeping the public zone-temperature comparison diagnostic-only.
+pub fn advance_heat_balance_state_one_timestep(
+    model: &TypedModel,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+) {
+    let hour_ending = input.hour_ending.clamp(1, 24);
+    let previous_zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+        .collect::<Vec<_>>();
+
+    for surface in &mut state.surfaces {
+        let zone_temperature_c = previous_zone_temperatures
+            .iter()
+            .find(|(zone_id, _temperature)| *zone_id == surface.zone_id)
+            .map(|(_zone_id, temperature)| *temperature)
+            .unwrap_or(surface.inside_face_temperature_c);
+
+        surface.inside_face_temperature_c = zone_temperature_c;
+        if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
+            surface.outside_face_temperature_c = input.outdoor_dry_bulb_c;
+        }
+    }
+
+    for zone in &mut state.zones {
+        let previous_temperature_c = zone.mean_air_temperature_c;
+        zone.previous_mean_air_temperatures_c = [
+            previous_temperature_c,
+            zone.previous_mean_air_temperatures_c[0],
+            zone.previous_mean_air_temperatures_c[1],
+        ];
+        zone.convective_internal_gain_w =
+            convective_internal_gain_w(model, zone.zone_id, hour_ending);
+
+        let conductance_w_per_k = state
+            .surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone.zone_id)
+            .map(|surface| surface.conductance_w_per_k)
+            .sum::<f64>();
+        let conductance_weighted_outside_temperature = state
+            .surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone.zone_id)
+            .map(|surface| surface.conductance_w_per_k * surface.outside_face_temperature_c)
+            .sum::<f64>();
+        let equivalent_outside_temperature_c = if conductance_w_per_k > 0.0 {
+            conductance_weighted_outside_temperature / conductance_w_per_k
+        } else {
+            previous_temperature_c
+        };
+
+        zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
+        zone.mean_air_temperature_c = step_zone_air_temperature(
+            previous_temperature_c,
+            equivalent_outside_temperature_c,
+            zone.convective_internal_gain_w,
+            conductance_w_per_k,
+            zone.air_heat_capacity_j_per_k,
+            input.timestep_seconds,
+        );
+    }
+
+    for surface in &mut state.surfaces {
+        let zone_temperature_c = state
+            .zones
+            .iter()
+            .find(|zone| zone.zone_id == surface.zone_id)
+            .map(|zone| zone.mean_air_temperature_c)
+            .unwrap_or(surface.inside_face_temperature_c);
+
+        surface.inside_face_temperature_c = zone_temperature_c;
+        surface.heat_gain_to_zone_w =
+            surface.conductance_w_per_k * (surface.outside_face_temperature_c - zone_temperature_c);
+    }
+
+    for zone in &mut state.zones {
+        zone.opaque_surface_heat_gain_w = state
+            .surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone.zone_id)
+            .map(|surface| surface.heat_gain_to_zone_w)
+            .sum();
+    }
+
+    state.timestep_index += 1;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1457,11 +1580,11 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        ExecutionStep, FirstZoneSimulationOptions, OutputSeries, ResultStore, SimulationMode,
-        SimulationState, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
-        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_schedule_values,
+        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceStepInput, OutputSeries, ResultStore,
+        SimulationMode, SimulationState, advance_heat_balance_state_one_timestep,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        initialize_heat_balance_state, parse_epw_dry_bulb_series, parse_epw_records,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled, simulate_schedule_values,
         simulate_zone_internal_convective_gains, surface_area_m2, zone_geometry_summaries,
     };
     use ep_model::{
@@ -1735,6 +1858,8 @@ DATA PERIODS
         assert_eq!(state.zones[0].volume_m3, 1.0);
         assert!((state.zones[0].air_heat_capacity_j_per_k - 1207.2).abs() < 1.0e-9);
         assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
+        assert_eq!(state.zones[0].opaque_surface_conductance_w_per_k, 6.0);
+        assert_eq!(state.zones[0].opaque_surface_heat_gain_w, 0.0);
         assert_eq!(state.surfaces.len(), 6);
         assert_eq!(
             state.surfaces[0].outside_boundary_condition,
@@ -1746,8 +1871,42 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
         assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
+        assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_timestep_advances_zone_air_state() -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+
+        advance_heat_balance_state_one_timestep(
+            &typed,
+            &mut state,
+            HeatBalanceStepInput {
+                outdoor_dry_bulb_c: 10.0,
+                hour_ending: 1,
+                timestep_seconds: 600.0,
+            },
+        );
+
+        assert_eq!(state.timestep_index, 1);
+        assert_eq!(state.zones[0].previous_mean_air_temperatures_c, [20.0; 3]);
+        assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
+        assert_eq!(state.zones[0].opaque_surface_conductance_w_per_k, 6.0);
+        assert!(state.zones[0].mean_air_temperature_c > 12.0);
+        assert!(state.zones[0].mean_air_temperature_c < 20.0);
+        assert!(state.zones[0].opaque_surface_heat_gain_w < 0.0);
+        assert_eq!(state.surfaces[0].outside_face_temperature_c, 10.0);
+        assert_eq!(
+            state.surfaces[0].inside_face_temperature_c,
+            state.zones[0].mean_air_temperature_c
+        );
+        assert!(state.surfaces[0].heat_gain_to_zone_w < 0.0);
 
         Ok(())
     }
