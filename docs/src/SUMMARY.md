@@ -11,6 +11,7 @@
 - [v0.2.0 Readiness](operations/v0.2.0-readiness.md)
 - [v0.3.0 Readiness](operations/v0.3.0-readiness.md)
 - [v0.6.0 Readiness](operations/v0.6.0-readiness.md)
+- [v0.7.0 Readiness](operations/v0.7.0-readiness.md)
 - [TypedModel Contract](operations/typed-model-resolution.md)
 - [Supported Object Coverage](operations/supported-object-coverage.md)
 - [Porting Map](porting-map/README.md)

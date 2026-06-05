@@ -39,6 +39,7 @@ runtime path for an uncontrolled one-zone building subset:
 .\scripts\compare-weather-smoke.cmd
 .\scripts\first-zone-smoke.cmd
 .\scripts\compare-zone-smoke.cmd
+.\scripts\compare-regression.cmd
 .\scripts\package.cmd
 ```
 
@@ -70,6 +71,11 @@ cargo run -p ep_cli -- run first-zone .runtime\oracle-smoke\26.1.0\convert\smoke
 cargo run -p ep_cli -- compare zone-temperature .runtime\compare-zone\26.1.0\zone-temperature.epJSON .runtime\energyplus\26.1.0\WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw .runtime\compare-zone\26.1.0\eplusout.eso
 ```
 
+`.\scripts\compare-regression.cmd` runs the current schedule, weather, and zone
+comparison smoke suite and writes `trace.json`, `compare-summary.json`,
+`compare-report.md`, and `profile-summary.json` under
+`.runtime\compare-regression\26.1.0`.
+
 Unsupported runtime commands should fail explicitly until their milestone is
 implemented.
 
@@ -93,3 +99,4 @@ publishing.
 - Foundation checkpoints: `docs/src/operations/foundation-checkpoints.md`
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
 - v0.6 readiness: `docs/src/operations/v0.6.0-readiness.md`
+- v0.7 readiness: `docs/src/operations/v0.7.0-readiness.md`
