@@ -2,10 +2,13 @@
 
 use ep_compare::{Tolerance, compare_series, load_eso_series};
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
-use ep_model::TypedModel;
+use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
-use ep_runtime::{SimulationMode, load_epw_dry_bulb_series, simulate_constant_schedules};
+use ep_runtime::{
+    ExecutionPlan, SimulationMode, build_execution_plan, load_epw_dry_bulb_series,
+    simulate_constant_schedules,
+};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -62,16 +65,19 @@ fn run_model_command(args: &[String]) -> i32 {
             }
         }
         Some("compile") => run_compile_command(&args[1..]),
+        Some("plan") => run_plan_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported model command: {command}");
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
             eprintln!("usage: eplus-rs model compile <input.epJSON>");
+            eprintln!("usage: eplus-rs model plan <input.epJSON>");
             2
         }
         None => {
             eprintln!("missing model command");
             eprintln!("usage: eplus-rs model inspect <input.epJSON>");
             eprintln!("usage: eplus-rs model compile <input.epJSON>");
+            eprintln!("usage: eplus-rs model plan <input.epJSON>");
             2
         }
     }
@@ -102,6 +108,33 @@ fn run_compile_command(args: &[String]) -> i32 {
     1
 }
 
+fn run_plan_command(args: &[String]) -> i32 {
+    let Some(path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs model plan <input.epJSON>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let simulation_model = SimulationModel::from_typed(model);
+    let plan = build_execution_plan(&simulation_model);
+
+    print_plan_summary(&simulation_model, &plan);
+    0
+}
+
 fn print_help() {
     println!("eplus-rs");
     println!();
@@ -110,6 +143,7 @@ fn print_help() {
     println!("  modes         print planned simulation modes");
     println!("  model inspect <input.epJSON>");
     println!("  model compile <input.epJSON>");
+    println!("  model plan <input.epJSON>");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
@@ -118,6 +152,24 @@ fn print_help() {
     println!("  model validate <input.epJSON>");
     println!("  graph validate <input.epJSON>");
     println!("  run <input.epJSON>");
+}
+
+fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
+    println!("ExecutionPlan");
+    println!("  zones: {}", model.typed.zones.len());
+    println!("  surfaces: {}", model.typed.surfaces.len());
+    println!("  constructions: {}", model.typed.constructions.len());
+    println!("  materials: {}", model.typed.materials.len());
+    println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
+    println!(
+        "  construction_material_edges: {}",
+        model.graph.construction_materials.len()
+    );
+    println!("  stages: {}", plan.stages.len());
+    println!("  steps: {}", plan.step_count());
+    for stage in &plan.stages {
+        println!("    {}: {}", stage.name, stage.steps.len());
+    }
 }
 
 fn run_compare_command(args: &[String]) -> i32 {
@@ -419,6 +471,13 @@ mod tests {
     #[test]
     fn missing_model_compile_path_fails() {
         let args = vec!["model".to_string(), "compile".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_model_plan_path_fails() {
+        let args = vec!["model".to_string(), "plan".to_string()];
 
         assert_eq!(run(&args), 2);
     }

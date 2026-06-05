@@ -461,9 +461,85 @@ impl TypedModel {
     }
 }
 
+/// Runtime-ready immutable model plus graph relations.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SimulationModel {
+    /// Typed model payload.
+    pub typed: TypedModel,
+    /// Static model graph.
+    pub graph: ModelGraph,
+}
+
+impl SimulationModel {
+    /// Builds a runtime-ready model from an already reference-resolved typed model.
+    #[must_use]
+    pub fn from_typed(typed: TypedModel) -> Self {
+        let graph = ModelGraph::from_typed(&typed);
+        Self { typed, graph }
+    }
+}
+
+/// Static model graph used for validation and execution planning.
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct ModelGraph {
+    /// Zone to surface edges.
+    pub zone_surfaces: Vec<ZoneSurfaceEdge>,
+    /// Construction to material edges.
+    pub construction_materials: Vec<ConstructionMaterialEdge>,
+}
+
+impl ModelGraph {
+    /// Builds static graph edges from the typed subset.
+    #[must_use]
+    pub fn from_typed(model: &TypedModel) -> Self {
+        Self {
+            zone_surfaces: model
+                .surfaces
+                .iter()
+                .map(|surface| ZoneSurfaceEdge {
+                    zone: surface.zone,
+                    surface: surface.id,
+                })
+                .collect(),
+            construction_materials: model
+                .constructions
+                .iter()
+                .map(|construction| ConstructionMaterialEdge {
+                    construction: construction.id,
+                    material: construction.outside_layer,
+                    layer_index: 0,
+                })
+                .collect(),
+        }
+    }
+}
+
+/// Zone/surface relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ZoneSurfaceEdge {
+    /// Zone ID.
+    pub zone: ZoneId,
+    /// Surface ID.
+    pub surface: SurfaceId,
+}
+
+/// Construction/material relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ConstructionMaterialEdge {
+    /// Construction ID.
+    pub construction: ConstructionId,
+    /// Material ID.
+    pub material: MaterialId,
+    /// Zero-based layer index.
+    pub layer_index: u32,
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{NameMap, TypedModel, Version, ZoneId};
+    use super::{
+        Construction, ConstructionId, MaterialId, ModelGraph, NameMap, Surface, SurfaceId,
+        TypedModel, Version, ZoneId,
+    };
 
     #[test]
     fn default_model_uses_oracle_version() {
@@ -487,5 +563,34 @@ mod tests {
 
         assert_eq!(names.resolve(" zone one "), Some(ZoneId(0)));
         assert_eq!(names.len(), 1);
+    }
+
+    #[test]
+    fn model_graph_links_surfaces_and_constructions() {
+        let mut model = TypedModel::default();
+        model.constructions.push(Construction {
+            id: ConstructionId(0),
+            name: super::NormalizedName::new("Wall"),
+            outside_layer: MaterialId(0),
+        });
+        model.surfaces.push(Surface {
+            id: SurfaceId(0),
+            name: super::NormalizedName::new("Surface"),
+            surface_type: super::SurfaceType::Wall,
+            construction: ConstructionId(0),
+            zone: ZoneId(0),
+            outside_boundary_condition: super::OutsideBoundaryCondition::Outdoors,
+            outside_boundary_condition_object: None,
+            sun_exposure: super::SunExposure::SunExposed,
+            wind_exposure: super::WindExposure::WindExposed,
+            view_factor_to_ground: super::AutoOrNumber::AutoCalculate,
+            vertices: Vec::new(),
+        });
+
+        let graph = ModelGraph::from_typed(&model);
+
+        assert_eq!(graph.zone_surfaces[0].zone, ZoneId(0));
+        assert_eq!(graph.zone_surfaces[0].surface, SurfaceId(0));
+        assert_eq!(graph.construction_materials[0].material, MaterialId(0));
     }
 }

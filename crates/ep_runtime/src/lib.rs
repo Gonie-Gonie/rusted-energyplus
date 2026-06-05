@@ -1,6 +1,6 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
-use ep_model::{OutputHandle, ScheduleId, TypedModel, ZoneId};
+use ep_model::{OutputHandle, ScheduleId, SimulationModel, TypedModel, ZoneId};
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
@@ -23,10 +23,73 @@ pub enum SimulationMode {
 pub enum ExecutionStep {
     /// Update weather-derived state.
     UpdateWeather,
+    /// Evaluate one constant schedule.
+    EvaluateSchedule(ScheduleId),
     /// Solve one zone.
     SolveZone(ZoneId),
     /// Write one output handle.
     WriteOutput(OutputHandle),
+}
+
+/// Named runtime execution stage.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ExecutionStage {
+    /// Stage name.
+    pub name: String,
+    /// Ordered execution steps in this stage.
+    pub steps: Vec<ExecutionStep>,
+}
+
+/// Minimal deterministic execution plan.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ExecutionPlan {
+    /// Ordered stages.
+    pub stages: Vec<ExecutionStage>,
+}
+
+impl ExecutionPlan {
+    /// Returns the total step count across all stages.
+    #[must_use]
+    pub fn step_count(&self) -> usize {
+        self.stages.iter().map(|stage| stage.steps.len()).sum()
+    }
+}
+
+/// Builds the first deterministic execution plan for the typed subset.
+#[must_use]
+pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
+    let mut setup_steps = vec![ExecutionStep::UpdateWeather];
+    setup_steps.extend(
+        model
+            .typed
+            .schedules
+            .iter()
+            .map(|schedule| ExecutionStep::EvaluateSchedule(schedule.id)),
+    );
+
+    let zone_steps = model
+        .typed
+        .zones
+        .iter()
+        .map(|zone| ExecutionStep::SolveZone(zone.id))
+        .collect();
+
+    ExecutionPlan {
+        stages: vec![
+            ExecutionStage {
+                name: "environment".to_string(),
+                steps: setup_steps,
+            },
+            ExecutionStage {
+                name: "zone".to_string(),
+                steps: zone_steps,
+            },
+            ExecutionStage {
+                name: "output".to_string(),
+                steps: vec![ExecutionStep::WriteOutput(OutputHandle(0))],
+            },
+        ],
+    }
 }
 
 /// Minimal explicit simulation state.
@@ -163,9 +226,12 @@ pub fn parse_epw_dry_bulb_series(contents: &str) -> Result<Vec<f64>, EpwError> {
 #[cfg(test)]
 mod tests {
     use super::{
-        SimulationMode, SimulationState, parse_epw_dry_bulb_series, simulate_constant_schedules,
+        ExecutionStep, SimulationMode, SimulationState, build_execution_plan,
+        parse_epw_dry_bulb_series, simulate_constant_schedules,
     };
-    use ep_model::{NormalizedName, ScheduleConstant, ScheduleId, TypedModel};
+    use ep_model::{
+        NormalizedName, ScheduleConstant, ScheduleId, SimulationModel, TypedModel, Zone, ZoneId,
+    };
 
     #[test]
     fn state_defaults_to_first_timestep() {
@@ -190,6 +256,43 @@ mod tests {
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].schedule_name, "ALWAYSON");
         assert_eq!(traces[0].values, vec![1.0, 1.0, 1.0]);
+    }
+
+    #[test]
+    fn execution_plan_orders_weather_schedule_zone_and_output() {
+        let mut typed = TypedModel::default();
+        typed.schedules.push(ScheduleConstant {
+            id: ScheduleId(0),
+            name: NormalizedName::new("AlwaysOn"),
+            schedule_type_limits: None,
+            hourly_value: 1.0,
+        });
+        typed.zones.push(Zone {
+            id: ZoneId(0),
+            name: NormalizedName::new("Zone One"),
+            direction_of_relative_north_deg: 0.0,
+            origin: ep_model::Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: ep_model::AutoOrNumber::AutoCalculate,
+            volume: ep_model::AutoOrNumber::AutoCalculate,
+        });
+        let model = SimulationModel::from_typed(typed);
+
+        let plan = build_execution_plan(&model);
+
+        assert_eq!(plan.stages.len(), 3);
+        assert_eq!(plan.step_count(), 4);
+        assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
+        assert_eq!(
+            plan.stages[0].steps[1],
+            ExecutionStep::EvaluateSchedule(ScheduleId(0))
+        );
+        assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
     }
 
     #[test]
