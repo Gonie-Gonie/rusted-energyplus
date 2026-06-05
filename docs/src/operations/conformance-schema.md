@@ -53,6 +53,16 @@ conformance_claim = false
 This is intentional. The case becomes conformance evidence only after tolerance
 policy and a blocking release gate are wired.
 
+`data/conformance_cases/zone_temperature_diagnostic_001/case.toml` tracks the
+heat-balance `Zone Mean Air Temperature` diagnostic path. It declares the MAT
+output request, the diagnostic report path, and the non-blocking
+`compare-zone-smoke` gate, but it remains:
+
+```toml
+comparison_class = "diagnostic-only"
+conformance_claim = false
+```
+
 `data/conformance_suites/foundation.toml` is the first ordered suite manifest.
 
 ## Baseline Artifacts

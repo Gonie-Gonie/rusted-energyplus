@@ -135,7 +135,10 @@ source-reference comments.
    gain, and zone mean air temperature, then `compare zone-temperature` reports
    EnergyPlus MAT deltas and can write diagnostic-only
    `compare-summary.json`/`compare-report.md` artifacts. The comparison remains
-   diagnostic-only until a tolerance-gated report exists.
+   diagnostic-only until a tolerance-gated report exists. The diagnostic MAT
+   case is now represented by
+   `data/conformance_cases/zone_temperature_diagnostic_001/case.toml` with
+   `conformance_claim = false`.
 8. Only after a tolerance-gated report exists, promote any case from
    diagnostic-only to conformance.
 

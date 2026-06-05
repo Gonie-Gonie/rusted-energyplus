@@ -613,8 +613,8 @@ fn normalize_identity_part(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        ComparisonClass, ManifestError, OutputRegistry, ValidationError, load_case_file,
-        load_suite_file, parse_case_str,
+        ComparisonClass, ManifestError, OutputFrequency, OutputRegistry, ValidationError,
+        VariableClass, load_case_file, load_suite_file, parse_case_str,
     };
     use std::path::PathBuf;
 
@@ -635,13 +635,43 @@ mod tests {
     }
 
     #[test]
+    fn loads_zone_temperature_diagnostic_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/zone_temperature_diagnostic_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "zone_temperature_diagnostic_001");
+        assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+        assert!(!manifest.conformance_claim);
+        assert!(manifest.tolerances.is_empty());
+        assert_eq!(manifest.outputs.len(), 1);
+        assert_eq!(manifest.outputs[0].key, "ZONE ONE");
+        assert_eq!(manifest.outputs[0].variable, "Zone Mean Air Temperature");
+        assert_eq!(manifest.outputs[0].frequency, OutputFrequency::Hourly);
+        assert_eq!(manifest.outputs[0].class, VariableClass::ZoneState);
+        let report = manifest.report.as_ref().ok_or_else(|| {
+            std::io::Error::other("zone diagnostic case should declare diagnostic report path")
+        })?;
+        assert!(report.path.ends_with("compare-report.md"));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("zone diagnostic case should declare diagnostic gate")
+        })?;
+        assert!(!gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
     fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
         let manifest =
             load_suite_file(repo_root().join("data/conformance_suites/foundation.toml"))?;
 
         assert_eq!(manifest.id, "foundation");
         assert_eq!(manifest.oracle_version, "26.1.0");
-        assert_eq!(manifest.cases.len(), 1);
+        assert_eq!(manifest.cases.len(), 2);
+        assert!(manifest.cases.iter().any(|case| {
+            case.ends_with("data/conformance_cases/zone_temperature_diagnostic_001/case.toml")
+        }));
 
         Ok(())
     }
