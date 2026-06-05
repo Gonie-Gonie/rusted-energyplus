@@ -1,15 +1,15 @@
 //! Command line entry point for eplus-rs.
 
 use ep_compare::{
-    Tolerance, compare_series, load_eio_other_equipment_nominal, load_eio_zone_geometry,
-    load_eso_series,
+    Tolerance, compare_series, load_eio_construction_ctf, load_eio_material_ctf_summary,
+    load_eio_other_equipment_nominal, load_eio_zone_geometry, load_eso_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, ReportFormat, VariableClass,
     load_case_file,
 };
-use ep_model::{OtherEquipment, ScheduleId, SimulationModel, TypedModel};
+use ep_model::{Construction, Material, OtherEquipment, ScheduleId, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
@@ -19,6 +19,7 @@ use ep_runtime::{
     simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
     zone_geometry_summaries,
 };
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
@@ -196,6 +197,7 @@ fn print_help() {
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
+    println!("  compare construction-materials <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
@@ -1013,6 +1015,7 @@ fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
         Some("geometry") => run_compare_geometry(&args[1..]),
+        Some("construction-materials") => run_compare_construction_materials(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
@@ -1021,6 +1024,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
+            );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
@@ -1033,6 +1039,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
+            );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
@@ -1231,6 +1240,160 @@ fn run_compare_geometry(args: &[String]) -> i32 {
             oracle_zone.exterior_gross_wall_area_m2,
             rust_zone.exterior_wall_area_m2,
             if zone_pass { "pass" } else { "fail" }
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_construction_materials(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_rows = match construction_material_rows(&model) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if rust_rows.is_empty() {
+        eprintln!("no Construction objects are available for construction/material comparison");
+        return 1;
+    }
+
+    let oracle_constructions = match load_eio_construction_ctf(eio_path) {
+        Ok(constructions) => constructions,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let oracle_materials = match load_eio_material_ctf_summary(eio_path) {
+        Ok(materials) => materials,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let rust_material_count = rust_rows
+        .iter()
+        .map(|row| row.outside_layer_material_name.as_str())
+        .collect::<BTreeSet<_>>()
+        .len();
+    let tolerance = Tolerance {
+        absolute: 0.001,
+        relative: 1.0e-6,
+    };
+    let mut passed = rust_rows.len() == oracle_constructions.len();
+    let mut first_divergence = None;
+    if rust_rows.len() != oracle_constructions.len() {
+        first_divergence = Some(format!(
+            "construction_count expected {} observed {}",
+            oracle_constructions.len(),
+            rust_rows.len()
+        ));
+    }
+
+    println!("Construction Material Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: absolute-0.001");
+    println!("  constructions: {}", rust_rows.len());
+    println!("  oracle_constructions: {}", oracle_constructions.len());
+    println!("  materials: {}", rust_material_count);
+    println!("  oracle_materials: {}", oracle_materials.len());
+    for rust_row in &rust_rows {
+        let Some(oracle_construction) = oracle_constructions.iter().find(|row| {
+            row.construction_name
+                .eq_ignore_ascii_case(&rust_row.construction_name)
+        }) else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!("construction {} missing_in_eio", rust_row.construction_name),
+            );
+            println!(
+                "  construction: {} status: fail",
+                rust_row.construction_name
+            );
+            continue;
+        };
+        let Some(oracle_material) = oracle_materials.iter().find(|row| {
+            row.material_name
+                .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
+        }) else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!(
+                    "construction {} material {} missing_in_eio",
+                    rust_row.construction_name, rust_row.outside_layer_material_name
+                ),
+            );
+            println!(
+                "  construction: {} status: fail",
+                rust_row.construction_name
+            );
+            continue;
+        };
+
+        let row_pass = construction_material_row_matches(
+            rust_row,
+            oracle_construction,
+            oracle_material,
+            tolerance,
+        );
+        if !row_pass {
+            passed = false;
+            record_construction_material_field_divergence(
+                &mut first_divergence,
+                rust_row,
+                oracle_construction,
+                oracle_material,
+                tolerance,
+            );
+        }
+
+        println!(
+            "  construction: {} layers: {}/{} material: {}/{} thermal_conductance_w_per_m2_k: {:.6}/{:.6} material_resistance_m2_k_per_w: {:.6}/{:.6} status: {}",
+            rust_row.construction_name,
+            oracle_construction.layer_count,
+            rust_row.layer_count,
+            oracle_material.material_name,
+            rust_row.outside_layer_material_name,
+            oracle_construction.thermal_conductance_w_per_m2_k,
+            rust_row.thermal_conductance_w_per_m2_k,
+            oracle_material.thermal_resistance_m2_k_per_w,
+            rust_row.material_thermal_resistance_m2_k_per_w,
+            if row_pass { "pass" } else { "fail" }
         );
     }
 
@@ -1782,6 +1945,67 @@ fn run_compare_weather_drybulb(args: &[String]) -> i32 {
     if comparison.passed { 0 } else { 1 }
 }
 
+struct ConstructionMaterialRow {
+    construction_name: String,
+    layer_count: usize,
+    outside_layer_material_name: String,
+    thermal_conductance_w_per_m2_k: f64,
+    material_thickness_m: Option<f64>,
+    material_conductivity_w_per_m_k: Option<f64>,
+    material_density_kg_per_m3: Option<f64>,
+    material_specific_heat_j_per_kg_k: Option<f64>,
+    material_thermal_resistance_m2_k_per_w: f64,
+}
+
+fn construction_material_rows(model: &TypedModel) -> Result<Vec<ConstructionMaterialRow>, String> {
+    model
+        .constructions
+        .iter()
+        .map(|construction| construction_material_row(model, construction))
+        .collect()
+}
+
+fn construction_material_row(
+    model: &TypedModel,
+    construction: &Construction,
+) -> Result<ConstructionMaterialRow, String> {
+    let material = material_for_construction(model, construction)?;
+    let material_thermal_resistance_m2_k_per_w =
+        material.thermal_resistance().ok_or_else(|| {
+            format!(
+                "construction {} outside layer {} has no positive thermal resistance",
+                construction.name.0, material.name.0
+            )
+        })?;
+    Ok(ConstructionMaterialRow {
+        construction_name: construction.name.0.clone(),
+        layer_count: 1,
+        outside_layer_material_name: material.name.0.clone(),
+        thermal_conductance_w_per_m2_k: 1.0 / material_thermal_resistance_m2_k_per_w,
+        material_thickness_m: material.thickness_m,
+        material_conductivity_w_per_m_k: material.conductivity_w_per_m_k,
+        material_density_kg_per_m3: material.density_kg_per_m3,
+        material_specific_heat_j_per_kg_k: material.specific_heat_j_per_kg_k,
+        material_thermal_resistance_m2_k_per_w,
+    })
+}
+
+fn material_for_construction<'a>(
+    model: &'a TypedModel,
+    construction: &Construction,
+) -> Result<&'a Material, String> {
+    model
+        .materials
+        .iter()
+        .find(|material| material.id == construction.outside_layer)
+        .ok_or_else(|| {
+            format!(
+                "construction {} references missing outside layer material",
+                construction.name.0
+            )
+        })
+}
+
 struct OtherEquipmentNominalRow {
     equipment_name: String,
     schedule_name: String,
@@ -1881,6 +2105,50 @@ fn internal_gain_row_matches(
         && tolerance.accepts(oracle_row.fraction_convected, rust_row.fraction_convected)
 }
 
+fn construction_material_row_matches(
+    rust_row: &ConstructionMaterialRow,
+    oracle_construction: &ep_compare::EioConstructionCtf,
+    oracle_material: &ep_compare::EioMaterialCtfSummary,
+    tolerance: Tolerance,
+) -> bool {
+    oracle_construction.layer_count == rust_row.layer_count
+        && oracle_material
+            .material_name
+            .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
+        && tolerance.accepts(
+            oracle_construction.thermal_conductance_w_per_m2_k,
+            rust_row.thermal_conductance_w_per_m2_k,
+        )
+        && material_field_matches(
+            oracle_material.thickness_m,
+            rust_row.material_thickness_m,
+            tolerance,
+        )
+        && material_field_matches(
+            oracle_material.conductivity_w_per_m_k,
+            rust_row.material_conductivity_w_per_m_k,
+            tolerance,
+        )
+        && material_field_matches(
+            oracle_material.density_kg_per_m3,
+            rust_row.material_density_kg_per_m3,
+            tolerance,
+        )
+        && material_field_matches(
+            oracle_material.specific_heat_j_per_kg_k,
+            rust_row.material_specific_heat_j_per_kg_k,
+            tolerance,
+        )
+        && tolerance.accepts(
+            oracle_material.thermal_resistance_m2_k_per_w,
+            rust_row.material_thermal_resistance_m2_k_per_w,
+        )
+}
+
+fn material_field_matches(expected: f64, observed: Option<f64>, tolerance: Tolerance) -> bool {
+    tolerance.accepts(expected, observed.unwrap_or(0.0))
+}
+
 fn record_first_divergence(first_divergence: &mut Option<String>, value: String) {
     if first_divergence.is_none() {
         *first_divergence = Some(value);
@@ -1947,6 +2215,109 @@ fn record_geometry_field_divergence(
                 rust_zone.zone_name,
                 oracle_zone.exterior_gross_wall_area_m2,
                 rust_zone.exterior_wall_area_m2
+            ),
+        );
+    }
+}
+
+fn record_construction_material_field_divergence(
+    first_divergence: &mut Option<String>,
+    rust_row: &ConstructionMaterialRow,
+    oracle_construction: &ep_compare::EioConstructionCtf,
+    oracle_material: &ep_compare::EioMaterialCtfSummary,
+    tolerance: Tolerance,
+) {
+    if oracle_construction.layer_count != rust_row.layer_count {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "construction {} field layer_count expected {} observed {}",
+                rust_row.construction_name, oracle_construction.layer_count, rust_row.layer_count
+            ),
+        );
+        return;
+    }
+
+    if !oracle_material
+        .material_name
+        .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "construction {} field outside_layer expected {} observed {}",
+                rust_row.construction_name,
+                oracle_material.material_name,
+                rust_row.outside_layer_material_name
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(
+        oracle_construction.thermal_conductance_w_per_m2_k,
+        rust_row.thermal_conductance_w_per_m2_k,
+    ) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "construction {} field thermal_conductance_w_per_m2_k expected {:.6} observed {:.6}",
+                rust_row.construction_name,
+                oracle_construction.thermal_conductance_w_per_m2_k,
+                rust_row.thermal_conductance_w_per_m2_k
+            ),
+        );
+        return;
+    }
+
+    for (field, expected, observed) in [
+        (
+            "material_thickness_m",
+            oracle_material.thickness_m,
+            rust_row.material_thickness_m,
+        ),
+        (
+            "material_conductivity_w_per_m_k",
+            oracle_material.conductivity_w_per_m_k,
+            rust_row.material_conductivity_w_per_m_k,
+        ),
+        (
+            "material_density_kg_per_m3",
+            oracle_material.density_kg_per_m3,
+            rust_row.material_density_kg_per_m3,
+        ),
+        (
+            "material_specific_heat_j_per_kg_k",
+            oracle_material.specific_heat_j_per_kg_k,
+            rust_row.material_specific_heat_j_per_kg_k,
+        ),
+    ] {
+        if !material_field_matches(expected, observed, tolerance) {
+            record_first_divergence(
+                first_divergence,
+                format!(
+                    "construction {} field {} expected {:.6} observed {:.6}",
+                    rust_row.construction_name,
+                    field,
+                    expected,
+                    observed.unwrap_or(0.0)
+                ),
+            );
+            return;
+        }
+    }
+
+    if !tolerance.accepts(
+        oracle_material.thermal_resistance_m2_k_per_w,
+        rust_row.material_thermal_resistance_m2_k_per_w,
+    ) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "construction {} field material_thermal_resistance_m2_k_per_w expected {:.6} observed {:.6}",
+                rust_row.construction_name,
+                oracle_material.thermal_resistance_m2_k_per_w,
+                rust_row.material_thermal_resistance_m2_k_per_w
             ),
         );
     }

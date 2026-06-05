@@ -26,6 +26,7 @@ if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
 Invoke-DevCommand -Command "schedule-compact-smoke"
 Invoke-DevCommand -Command "geometry-smoke"
 Invoke-DevCommand -Command "compare-geometry-smoke"
+Invoke-DevCommand -Command "compare-construction-materials-smoke"
 Invoke-DevCommand -Command "compare-internal-gains-smoke"
 Invoke-DevCommand -Command "compare-internal-convective-gain-smoke"
 Invoke-DevCommand -Command "conformance-schema-smoke"

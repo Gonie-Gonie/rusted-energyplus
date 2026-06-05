@@ -26,9 +26,9 @@ Current table:
 | Timestep | yes | partial | yes | n/a | n/a | partial | partial | planned | first-zone run uses zone timesteps per hour |
 | RunPeriod | yes | partial | yes | n/a | n/a | partial | partial | planned | typed date range and hourly time-axis foundation |
 | Site:Location | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Material | yes | partial | yes | n/a | partial | partial | partial | planned | thermal properties used for first-zone UA and surface heat-balance state |
-| Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA and surface heat-balance state |
-| Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA and surface heat-balance state |
+| Material | yes | partial | yes | n/a | partial | partial | partial | partial | thermal properties used for first-zone UA and compared against EIO `Material CTF Summary` |
+| Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | partial | thermal resistance used for first-zone UA and compared against EIO `Material CTF Summary` |
+| Construction | yes | partial | yes | yes | partial | partial | partial | partial | outside layer used for first-zone UA and compared against EIO `Construction CTF` |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
 | Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated, heat-balance MAT trace compared diagnostically, regression-traced, geometry-summarized, and EIO-compared |
 | BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area, thermal inputs, and heat gains used for first-zone UA, heat-balance MAT trace, geometry summary, and EIO comparison |

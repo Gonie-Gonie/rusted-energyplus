@@ -101,6 +101,50 @@ pub struct EioOtherEquipmentNominal {
     pub fraction_convected: f64,
 }
 
+/// Construction transfer-function summary values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioConstructionCtf {
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// EIO construction index.
+    pub index: usize,
+    /// EIO number of construction layers.
+    pub layer_count: usize,
+    /// EIO number of CTF terms.
+    pub ctf_count: usize,
+    /// CTF timestep in hours.
+    pub timestep_hours: f64,
+    /// EIO `ThermalConductance {w/m2-K}`.
+    pub thermal_conductance_w_per_m2_k: f64,
+    /// Outer thermal absorptance.
+    pub outer_thermal_absorptance: f64,
+    /// Inner thermal absorptance.
+    pub inner_thermal_absorptance: f64,
+    /// Outer solar absorptance.
+    pub outer_solar_absorptance: f64,
+    /// Inner solar absorptance.
+    pub inner_solar_absorptance: f64,
+    /// EIO roughness label.
+    pub roughness: String,
+}
+
+/// Material CTF summary values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioMaterialCtfSummary {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// EIO material thickness in meters.
+    pub thickness_m: f64,
+    /// EIO conductivity in W/m-K.
+    pub conductivity_w_per_m_k: f64,
+    /// EIO density in kg/m3.
+    pub density_kg_per_m3: f64,
+    /// EIO specific heat in J/kg-K.
+    pub specific_heat_j_per_kg_k: f64,
+    /// EIO `ThermalResistance {m2-K/w}`.
+    pub thermal_resistance_m2_k_per_w: f64,
+}
+
 /// Compares two equally-sized numeric series.
 #[must_use]
 pub fn compare_series(
@@ -176,6 +220,10 @@ pub enum EioError {
     MissingZoneInformation,
     /// No `OtherEquipment Internal Gains Nominal` rows were present.
     MissingOtherEquipmentNominal,
+    /// No `Construction CTF` rows were present.
+    MissingConstructionCtf,
+    /// No `Material CTF Summary` rows were present.
+    MissingMaterialCtfSummary,
     /// A `Zone Information` row could not be parsed.
     InvalidZoneInformation {
         /// One-based line number.
@@ -187,6 +235,24 @@ pub enum EioError {
     },
     /// An `OtherEquipment Internal Gains Nominal` row could not be parsed.
     InvalidOtherEquipmentNominal {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// A `Construction CTF` row could not be parsed.
+    InvalidConstructionCtf {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// A `Material CTF Summary` row could not be parsed.
+    InvalidMaterialCtfSummary {
         /// One-based line number.
         line: usize,
         /// Raw line text.
@@ -221,6 +287,10 @@ impl Display for EioError {
                     "EIO OtherEquipment Internal Gains Nominal not found"
                 )
             }
+            Self::MissingConstructionCtf => write!(formatter, "EIO Construction CTF not found"),
+            Self::MissingMaterialCtfSummary => {
+                write!(formatter, "EIO Material CTF Summary not found")
+            }
             Self::InvalidZoneInformation { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Zone Information at line {line}: {reason}: {text}"
@@ -228,6 +298,14 @@ impl Display for EioError {
             Self::InvalidOtherEquipmentNominal { line, text, reason } => write!(
                 formatter,
                 "invalid EIO OtherEquipment Internal Gains Nominal at line {line}: {reason}: {text}"
+            ),
+            Self::InvalidConstructionCtf { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Construction CTF at line {line}: {reason}: {text}"
+            ),
+            Self::InvalidMaterialCtfSummary { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Material CTF Summary at line {line}: {reason}: {text}"
             ),
         }
     }
@@ -249,7 +327,11 @@ impl std::error::Error for EioError {
             Self::MissingZoneInformation
             | Self::MissingOtherEquipmentNominal
             | Self::InvalidZoneInformation { .. }
-            | Self::InvalidOtherEquipmentNominal { .. } => None,
+            | Self::MissingConstructionCtf
+            | Self::MissingMaterialCtfSummary
+            | Self::InvalidOtherEquipmentNominal { .. }
+            | Self::InvalidConstructionCtf { .. }
+            | Self::InvalidMaterialCtfSummary { .. } => None,
         }
     }
 }
@@ -288,6 +370,22 @@ pub fn load_eio_other_equipment_nominal(
 ) -> Result<Vec<EioOtherEquipmentNominal>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_other_equipment_nominal(&contents)
+}
+
+/// Loads construction CTF rows from an EnergyPlus EIO file.
+pub fn load_eio_construction_ctf(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioConstructionCtf>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_construction_ctf(&contents)
+}
+
+/// Loads material CTF summary rows from an EnergyPlus EIO file.
+pub fn load_eio_material_ctf_summary(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioMaterialCtfSummary>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_material_ctf_summary(&contents)
 }
 
 /// Parses one numeric ESO series by key and variable name.
@@ -465,6 +563,145 @@ pub fn parse_eio_other_equipment_nominal(
     Ok(equipment)
 }
 
+/// Parses `Construction CTF` rows from EnergyPlus EIO contents.
+pub fn parse_eio_construction_ctf(contents: &str) -> Result<Vec<EioConstructionCtf>, EioError> {
+    let mut constructions = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("Construction CTF,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 11 {
+            return Err(EioError::InvalidConstructionCtf {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 12 fields, found {}", fields.len()),
+            });
+        }
+
+        constructions.push(EioConstructionCtf {
+            construction_name: required_field(&fields, 1).to_ascii_uppercase(),
+            index: parse_construction_usize_field(&fields, 2, line_number, line, "Index")?,
+            layer_count: parse_construction_usize_field(&fields, 3, line_number, line, "#Layers")?,
+            ctf_count: parse_construction_usize_field(&fields, 4, line_number, line, "#CTFs")?,
+            timestep_hours: parse_construction_f64_field(
+                &fields,
+                5,
+                line_number,
+                line,
+                "Time Step {hours}",
+            )?,
+            thermal_conductance_w_per_m2_k: parse_construction_f64_field(
+                &fields,
+                6,
+                line_number,
+                line,
+                "ThermalConductance {w/m2-K}",
+            )?,
+            outer_thermal_absorptance: parse_construction_f64_field(
+                &fields,
+                7,
+                line_number,
+                line,
+                "OuterThermalAbsorptance",
+            )?,
+            inner_thermal_absorptance: parse_construction_f64_field(
+                &fields,
+                8,
+                line_number,
+                line,
+                "InnerThermalAbsorptance",
+            )?,
+            outer_solar_absorptance: parse_construction_f64_field(
+                &fields,
+                9,
+                line_number,
+                line,
+                "OuterSolarAbsorptance",
+            )?,
+            inner_solar_absorptance: parse_construction_f64_field(
+                &fields,
+                10,
+                line_number,
+                line,
+                "InnerSolarAbsorptance",
+            )?,
+            roughness: required_field(&fields, 11).to_string(),
+        });
+    }
+
+    if constructions.is_empty() {
+        return Err(EioError::MissingConstructionCtf);
+    }
+
+    Ok(constructions)
+}
+
+/// Parses `Material CTF Summary` rows from EnergyPlus EIO contents.
+pub fn parse_eio_material_ctf_summary(
+    contents: &str,
+) -> Result<Vec<EioMaterialCtfSummary>, EioError> {
+    let mut materials = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("Material CTF Summary,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 6 {
+            return Err(EioError::InvalidMaterialCtfSummary {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 7 fields, found {}", fields.len()),
+            });
+        }
+
+        materials.push(EioMaterialCtfSummary {
+            material_name: required_field(&fields, 1).to_ascii_uppercase(),
+            thickness_m: parse_material_f64_field(&fields, 2, line_number, line, "Thickness {m}")?,
+            conductivity_w_per_m_k: parse_material_f64_field(
+                &fields,
+                3,
+                line_number,
+                line,
+                "Conductivity {w/m-K}",
+            )?,
+            density_kg_per_m3: parse_material_f64_field(
+                &fields,
+                4,
+                line_number,
+                line,
+                "Density {kg/m3}",
+            )?,
+            specific_heat_j_per_kg_k: parse_material_f64_field(
+                &fields,
+                5,
+                line_number,
+                line,
+                "Specific Heat {J/kg-K}",
+            )?,
+            thermal_resistance_m2_k_per_w: parse_material_f64_field(
+                &fields,
+                6,
+                line_number,
+                line,
+                "ThermalResistance {m2-K/w}",
+            )?,
+        });
+    }
+
+    if materials.is_empty() {
+        return Err(EioError::MissingMaterialCtfSummary);
+    }
+
+    Ok(materials)
+}
+
 fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {
     fields.get(index).copied().unwrap_or("")
 }
@@ -495,6 +732,54 @@ fn parse_other_f64_field(
     required_field(fields, index)
         .parse::<f64>()
         .map_err(|_error| EioError::InvalidOtherEquipmentNominal {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_construction_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidConstructionCtf {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_material_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidMaterialCtfSummary {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_construction_usize_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<usize, EioError> {
+    required_field(fields, index)
+        .parse::<usize>()
+        .map_err(|_error| EioError::InvalidConstructionCtf {
             line,
             text: text.to_string(),
             reason: format!("invalid {field}"),
@@ -537,8 +822,8 @@ fn normalize_key(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        Tolerance, compare_series, parse_eio_other_equipment_nominal, parse_eio_zone_geometry,
-        parse_eso_series,
+        Tolerance, compare_series, parse_eio_construction_ctf, parse_eio_material_ctf_summary,
+        parse_eio_other_equipment_nominal, parse_eio_zone_geometry, parse_eso_series,
     };
 
     #[test]
@@ -606,6 +891,45 @@ End of Data Dictionary
         assert_eq!(equipment[0].fraction_radiant, 0.1);
         assert_eq!(equipment[0].fraction_lost, 0.2);
         assert_eq!(equipment[0].fraction_convected, 0.7);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_eio_construction_ctf_rows() -> Result<(), Box<dyn std::error::Error>> {
+        let constructions = parse_eio_construction_ctf(
+            r#"! <Construction CTF>,Construction Name,...
+ Construction CTF,R13WALL,   1,   1,   1,   0.250,         0.4365,   0.900,   0.900,   0.750,   0.750,Rough
+"#,
+        )?;
+
+        assert_eq!(constructions.len(), 1);
+        assert_eq!(constructions[0].construction_name, "R13WALL");
+        assert_eq!(constructions[0].index, 1);
+        assert_eq!(constructions[0].layer_count, 1);
+        assert_eq!(constructions[0].ctf_count, 1);
+        assert_eq!(constructions[0].timestep_hours, 0.25);
+        assert_eq!(constructions[0].thermal_conductance_w_per_m2_k, 0.4365);
+        assert_eq!(constructions[0].roughness, "Rough");
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_eio_material_ctf_summary_rows() -> Result<(), Box<dyn std::error::Error>> {
+        let materials = parse_eio_material_ctf_summary(
+            r#"! <Material CTF Summary>,Material Name,...
+ Material CTF Summary,R13LAYER,  0.0000,         0.000,      0.000,        0.000,       2.291
+"#,
+        )?;
+
+        assert_eq!(materials.len(), 1);
+        assert_eq!(materials[0].material_name, "R13LAYER");
+        assert_eq!(materials[0].thickness_m, 0.0);
+        assert_eq!(materials[0].conductivity_w_per_m_k, 0.0);
+        assert_eq!(materials[0].density_kg_per_m3, 0.0);
+        assert_eq!(materials[0].specific_heat_j_per_kg_k, 0.0);
+        assert_eq!(materials[0].thermal_resistance_m2_k_per_w, 2.291);
 
         Ok(())
     }

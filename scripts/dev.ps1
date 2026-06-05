@@ -95,6 +95,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Compare Rust geometry summary with EnergyPlus EIO."
     }
+    "compare-construction-materials-smoke" = @{
+        Path = "compare\compare-construction-materials-smoke.ps1"
+        Group = "compare"
+        Help = "Compare construction/material thermal inputs with EnergyPlus EIO."
+    }
     "compare-internal-gains-smoke" = @{
         Path = "compare\compare-internal-gains-smoke.ps1"
         Group = "compare"

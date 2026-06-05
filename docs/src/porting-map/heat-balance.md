@@ -22,6 +22,9 @@ Already implemented gates:
 - `model geometry`: Rust zone geometry summary
 - `compare geometry`: EIO `Zone Information` parity for zone count, surface
   count, floor area, volume, and exterior gross wall area
+- `compare construction-materials`: EIO `Construction CTF` and
+  `Material CTF Summary` parity for first-layer thermal conductance and
+  material resistance/properties
 - `compare internal-gains`: EIO `OtherEquipment Internal Gains Nominal` parity
   for schedule binding, zone binding, design level, W/m2, and gain fractions
 - `compare internal-convective-gain`: ESO `Zone Total Internal Convective
@@ -120,7 +123,8 @@ source-reference comments.
    `ep_runtime::initialize_heat_balance_state`.
 3. Add report-only traces for EnergyPlus inputs already gated by EIO:
    geometry, material resistance, constructions, schedules, and
-   `OtherEquipment`.
+   `OtherEquipment`. Implemented EIO gates: geometry, construction/material
+   thermal inputs, and `OtherEquipment` nominal gains.
 4. Port internal convective gains as a separate runtime trace. Implemented:
    `ep_runtime::simulate_zone_internal_convective_gains`.
 5. Add an EnergyPlus comparison for `Zone Total Internal Convective Heating

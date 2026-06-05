@@ -176,6 +176,24 @@ $suiteCases = @(
         command = "compare-weather-smoke"
     },
     [pscustomobject]@{
+        id = "geometry"
+        kind = "geometry"
+        comparison_class = "input-static-smoke"
+        command = "compare-geometry-smoke"
+    },
+    [pscustomobject]@{
+        id = "construction-materials"
+        kind = "construction"
+        comparison_class = "input-static-smoke"
+        command = "compare-construction-materials-smoke"
+    },
+    [pscustomobject]@{
+        id = "internal-gains"
+        kind = "internal-gain"
+        comparison_class = "input-static-smoke"
+        command = "compare-internal-gains-smoke"
+    },
+    [pscustomobject]@{
         id = "internal-convective-gain"
         kind = "internal-gain"
         comparison_class = "conformance-smoke"
