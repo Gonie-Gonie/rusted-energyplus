@@ -1,0 +1,6 @@
+id = "foundation"
+title = "Foundation comparison evidence suite"
+oracle_version = "26.1.0"
+cases = [
+  "data/conformance_cases/schedule_constant_001/case.toml",
+]

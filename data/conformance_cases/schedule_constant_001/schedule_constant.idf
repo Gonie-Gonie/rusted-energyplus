@@ -1,0 +1,41 @@
+Version,26.1;
+
+Building,
+  Schedule Constant Schema Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,1;
+
+RunPeriod,
+  Run Period 1,
+  1,
+  1,
+  2013,
+  1,
+  1,
+  2013,
+  Tuesday,
+  Yes,
+  Yes,
+  No,
+  Yes,
+  Yes;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:Constant,
+  AlwaysOn,
+  Any Number,
+  1.0;
+
+Output:Variable,
+  *,
+  Schedule Value,
+  Hourly;

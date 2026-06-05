@@ -1,0 +1,28 @@
+id = "schedule_constant_001"
+title = "Schedule:Constant hourly output request"
+milestone = "P1-conformance-infrastructure"
+purpose = "Define the first case manifest with explicit output requests before tolerance-gated conformance is claimed."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This fixture is schema evidence only until baseline generation and report gates are wired.",
+]
+
+[input]
+idf = "data/conformance_cases/schedule_constant_001/schedule_constant.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "*"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/schedule_constant_001/compare-report.md"
+
+[gate]
+script = "scripts/conformance-schema-smoke.ps1"
+blocking = false

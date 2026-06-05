@@ -23,6 +23,7 @@ compatibility for zone heat balance or HVAC simulation.
 - preview missing reference diagnostics
 - SimulationModel, ModelGraph, and ExecutionPlan summaries
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
+- typed conformance case/suite manifests for future tolerance-gated evidence
 - compare regression artifacts: `trace.json`, `compare-summary.json`,
   `compare-report.md`, and `profile-summary.json`
 - smoke/check scripts
@@ -50,6 +51,7 @@ Development-only diagnostics:
 .\scripts\first-zone-smoke.cmd
 .\scripts\compare-zone-smoke.cmd
 .\scripts\compare-regression.cmd
+.\scripts\conformance-schema-smoke.cmd
 .\scripts\strict-no-false-conformance.cmd
 .\scripts\package.cmd
 ```
@@ -91,6 +93,12 @@ The `first-zone` and `zone-temperature` commands are intentionally labeled as
 diagnostics. They are useful for plumbing and report generation work, but they
 are not release evidence for EnergyPlus heat-balance conformance.
 
+`.\scripts\conformance-schema-smoke.cmd` validates the current P1
+case/suite manifest schema. The first fixture is intentionally a smoke manifest
+with `conformance_claim = false`; tolerance-gated cases must add output
+requests, tolerances, report contract, and a blocking gate before claiming
+EnergyPlus numerical conformance.
+
 Unsupported runtime commands should fail explicitly until their milestone is
 implemented.
 
@@ -115,4 +123,5 @@ publishing.
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
 - v0.6 readiness: `docs/src/operations/v0.6.0-readiness.md`
 - v0.7 readiness: `docs/src/operations/v0.7.0-readiness.md`
+- Conformance schema: `docs/src/operations/conformance-schema.md`
 - full compatibility reset: `docs/src/operations/full-compatibility-reset.md`

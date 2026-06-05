@@ -20,6 +20,7 @@ Good foundation already exists:
 - compare regression driver with `trace.json`, `compare-summary.json`,
   `compare-report.md`, and `profile-summary.json`
 - numeric first-divergence reporting in `ep_compare`
+- typed conformance case/suite manifests in `ep_conformance`
 
 Important boundary:
 
@@ -63,6 +64,24 @@ oracle_version: 26.1.0
 tolerance_policy: none | case.toml | default-<milestone>
 status: extracted | pass | fail | skipped | unsupported
 ```
+
+## P1 Progress
+
+The reset plan is now being rebuilt from evidence contracts upward.
+
+| Area | Current status | Evidence |
+|---|---|---|
+| case metadata schema | implemented | `crates/ep_conformance` parses and validates `ConformanceCase` |
+| output request schema | implemented | `OutputRequest` requires key, variable, frequency, and variable class |
+| false conformance guard | implemented in schema | `conformance_claim=true` is rejected unless class, outputs, tolerances, report, and blocking gate exist |
+| suite shape | implemented | `ConformanceSuite` validates ordered case paths |
+| first fixture | schema-only smoke | `data/conformance_cases/schedule_constant_001/case.toml` |
+| release check hook | implemented | `scripts/conformance-schema-smoke.ps1` runs `cargo test -p ep_conformance` |
+
+The first fixture remains `comparison_class = "smoke"` and
+`conformance_claim = false`. It defines the variable surface for a future
+baseline-generation step without pretending that a tolerance-gated comparison
+already exists.
 
 ## Revised Milestone Intent
 
@@ -234,12 +253,12 @@ P0 false-conformance cleanup:
 
 P1 conformance infrastructure:
 
-- add case metadata schema
-- add output request schema
-- add baseline generation script
-- add multi-series compare report skeleton
-- add `Output:Variable` registry plan
-- add schedule/weather conformance suite shape
+- [x] add case metadata schema
+- [x] add output request schema
+- [ ] add baseline generation script
+- [ ] add multi-series compare report skeleton
+- [ ] add `Output:Variable` registry plan
+- [x] add schedule/weather conformance suite shape
 
 P2 compatibility work:
 
