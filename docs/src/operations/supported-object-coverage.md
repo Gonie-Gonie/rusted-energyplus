@@ -30,8 +30,8 @@ Current table:
 | Material:NoMass | yes | partial | yes | n/a | partial | partial | partial | planned | thermal resistance used for first-zone UA and surface heat-balance state |
 | Construction | yes | partial | yes | yes | partial | partial | partial | planned | outside layer used for first-zone UA and surface heat-balance state |
 | ScheduleTypeLimits | yes | partial | yes | n/a | n/a | planned | planned | planned | v0.2 typed contract |
-| Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated, heat-balance timestep advanced, regression-traced, geometry-summarized, and EIO-compared |
-| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area, thermal inputs, and heat gains used for first-zone UA, heat-balance state, trace suite, geometry summary, and EIO comparison |
+| Zone | yes | partial | yes | n/a | partial | partial | partial | partial | first zone simulated, heat-balance MAT trace compared diagnostically, regression-traced, geometry-summarized, and EIO-compared |
+| BuildingSurface:Detailed | yes | partial | yes | yes | partial | partial | partial | partial | exterior area, thermal inputs, and heat gains used for first-zone UA, heat-balance MAT trace, geometry summary, and EIO comparison |
 | Schedule:Constant | yes | partial | yes | yes | n/a | partial | partial | partial | exact comparison in regression trace suite |
 | OtherEquipment | yes | partial | yes | yes | partial | partial | partial | partial | internal gains used for first-zone subset, EIO nominal-gains comparison, and ESO convective-gain trace |
 | Schedule:Compact | yes | partial | yes | yes | n/a | partial | partial | partial | all-days Until segment subset |

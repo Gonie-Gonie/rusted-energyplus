@@ -13,10 +13,11 @@ use ep_model::{OtherEquipment, ScheduleId, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, FirstZoneSimulationOptions, SimulationMode, ZoneGeometrySummary,
-    build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
+    ExecutionPlan, FirstZoneSimulationOptions, HeatBalanceSimulationOptions, SimulationMode,
+    ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
     simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_zone_internal_convective_gains, zone_geometry_summaries,
+    simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
+    zone_geometry_summaries,
 };
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -1301,8 +1302,9 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
         eprintln!("no Zone objects are available for comparison");
         return 1;
     };
+    let zone_name = zone.name.0.clone();
 
-    let oracle_values = match load_eso_series(eso_path, &zone.name.0, "Zone Mean Air Temperature") {
+    let oracle_values = match load_eso_series(eso_path, &zone_name, "Zone Mean Air Temperature") {
         Ok(values) => values,
         Err(error) => {
             eprintln!("{error}");
@@ -1331,10 +1333,10 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     }
 
     let simulation_model = SimulationModel::from_typed(model);
-    let simulation = match simulate_first_zone_uncontrolled(
+    let simulation = match simulate_heat_balance_zone_air_temperatures(
         &simulation_model,
         &weather_values,
-        FirstZoneSimulationOptions::hourly_samples(oracle_values.len()),
+        HeatBalanceSimulationOptions::hourly_samples(oracle_values.len()),
     ) {
         Ok(simulation) => simulation,
         Err(error) => {
@@ -1344,9 +1346,9 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     };
     let Some(rust_series) = simulation
         .results
-        .find_series(&simulation.summary.zone_name, "Zone Mean Air Temperature")
+        .find_series(&zone_name, "Zone Mean Air Temperature")
     else {
-        eprintln!("first-zone simulation did not write zone temperature output");
+        eprintln!("heat-balance simulation did not write zone temperature output");
         return 1;
     };
 
@@ -1362,7 +1364,14 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     println!("  comparison_class: diagnostic-only");
     println!("  conformance_claim: false");
     println!("  tolerance_policy: none");
-    println!("  zone: {}", simulation.summary.zone_name);
+    println!("  runtime_class: heat-balance-state-shell");
+    println!("  zone: {zone_name}");
+    println!(
+        "  heat_balance_timesteps: {}",
+        simulation.summary.timestep_count
+    );
+    println!("  zone_count: {}", simulation.summary.zone_count);
+    println!("  surface_count: {}", simulation.summary.surface_count);
     println!("  samples: {samples}");
     println!("  max_abs_delta: {max_abs_delta:.6}");
     println!("  mean_abs_delta: {mean_abs_delta:.6}");

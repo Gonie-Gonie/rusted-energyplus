@@ -512,6 +512,50 @@ pub struct HeatBalanceStepInput {
     pub timestep_seconds: f64,
 }
 
+/// Options for the heat-balance zone-air diagnostic trace.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceSimulationOptions {
+    /// Number of hourly weather samples to execute.
+    pub sample_count: usize,
+    /// Initial zone mean air temperature in C.
+    pub initial_zone_air_temperature_c: f64,
+}
+
+impl HeatBalanceSimulationOptions {
+    /// Creates options with a fixed hourly sample count.
+    #[must_use]
+    pub const fn hourly_samples(sample_count: usize) -> Self {
+        Self {
+            sample_count,
+            initial_zone_air_temperature_c: 20.0,
+        }
+    }
+}
+
+/// Summary for the heat-balance zone-air diagnostic trace.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceSimulationSummary {
+    /// Hourly output sample count.
+    pub samples: usize,
+    /// Number of executed zone timesteps.
+    pub timestep_count: usize,
+    /// Number of zones represented in the state.
+    pub zone_count: usize,
+    /// Number of surfaces represented in the state.
+    pub surface_count: usize,
+}
+
+/// Result of the heat-balance zone-air diagnostic trace.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceSimulation {
+    /// Final heat-balance state.
+    pub state: HeatBalanceState,
+    /// Native output results.
+    pub results: ResultStore,
+    /// Trace summary.
+    pub summary: HeatBalanceSimulationSummary,
+}
+
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
@@ -905,6 +949,106 @@ pub fn advance_heat_balance_state_one_timestep(
     }
 
     state.timestep_index += 1;
+}
+
+/// Simulates hourly zone mean air temperatures through the heat-balance state
+/// shell without making a conformance claim.
+///
+/// This diagnostic trace runs every configured zone timestep, samples hourly
+/// MAT values, and stores EnergyPlus-style result series for all zones.
+pub fn simulate_heat_balance_zone_air_temperatures(
+    model: &SimulationModel,
+    weather_dry_bulb_c: &[f64],
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    if weather_dry_bulb_c.is_empty() {
+        return Err(RuntimeError::NoWeatherData);
+    }
+    if options.sample_count > weather_dry_bulb_c.len() {
+        return Err(RuntimeError::SampleCountExceedsWeather {
+            requested: options.sample_count,
+            available: weather_dry_bulb_c.len(),
+        });
+    }
+    if model.typed.zones.is_empty() {
+        return Err(RuntimeError::NoZones);
+    }
+
+    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
+    let mut state = initialize_heat_balance_state(model, options.initial_zone_air_temperature_c)?;
+    let mut zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| {
+            (
+                zone.zone_id,
+                zone.zone_name.clone(),
+                Vec::with_capacity(options.sample_count),
+            )
+        })
+        .collect::<Vec<_>>();
+    let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
+
+    for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
+        .iter()
+        .copied()
+        .take(options.sample_count)
+        .enumerate()
+    {
+        let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
+        for _substep in 0..zone_steps_per_hour {
+            advance_heat_balance_state_one_timestep(
+                &model.typed,
+                &mut state,
+                HeatBalanceStepInput {
+                    outdoor_dry_bulb_c,
+                    hour_ending,
+                    timestep_seconds: seconds_per_timestep,
+                },
+            );
+        }
+
+        for (zone_id, _zone_name, values) in &mut zone_temperatures {
+            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                values.push(zone_state.mean_air_temperature_c);
+            }
+        }
+        outdoor_temperatures.push(outdoor_dry_bulb_c);
+    }
+
+    let mut results = ResultStore::new();
+    let mut handle_index = 0;
+    for (_zone_id, zone_name, values) in zone_temperatures {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name,
+            variable_name: "Zone Mean Air Temperature".to_string(),
+            units: "C".to_string(),
+            values,
+        });
+        handle_index += 1;
+    }
+    results.add_series(OutputSeries {
+        handle: OutputHandle(handle_index),
+        key: "Environment".to_string(),
+        variable_name: "Site Outdoor Air Drybulb Temperature".to_string(),
+        units: "C".to_string(),
+        values: outdoor_temperatures,
+    });
+
+    let summary = HeatBalanceSimulationSummary {
+        samples: options.sample_count,
+        timestep_count: state.timestep_index,
+        zone_count: state.zones.len(),
+        surface_count: state.surfaces.len(),
+    };
+
+    Ok(HeatBalanceSimulation {
+        state,
+        results,
+        summary,
+    })
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1580,12 +1724,14 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceStepInput, OutputSeries, ResultStore,
-        SimulationMode, SimulationState, advance_heat_balance_state_one_timestep,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        initialize_heat_balance_state, parse_epw_dry_bulb_series, parse_epw_records,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled, simulate_schedule_values,
-        simulate_zone_internal_convective_gains, surface_area_m2, zone_geometry_summaries,
+        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+        HeatBalanceStepInput, OutputSeries, ResultStore, SimulationMode, SimulationState,
+        advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
+        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
+        zone_geometry_summaries,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
@@ -1907,6 +2053,46 @@ DATA PERIODS
             state.zones[0].mean_air_temperature_c
         );
         assert!(state.surfaces[0].heat_gain_to_zone_w < 0.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_trace_writes_zone_air_temperature_results()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+
+        let simulation = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[10.0, 12.0],
+            HeatBalanceSimulationOptions::hourly_samples(2),
+        )?;
+
+        assert_eq!(simulation.summary.samples, 2);
+        assert_eq!(simulation.summary.timestep_count, 12);
+        assert_eq!(simulation.summary.zone_count, 1);
+        assert_eq!(simulation.summary.surface_count, 6);
+        assert_eq!(simulation.state.timestep_index, 12);
+        assert_eq!(simulation.results.sample_count(), 2);
+        assert_eq!(simulation.results.series.len(), 2);
+
+        let Some(zone_series) = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing zone series").into());
+        };
+        assert!(zone_series.values[0] > 11.9);
+        assert!(zone_series.values[0] < 20.0);
+        assert!(zone_series.values[1] > zone_series.values[0]);
+
+        let Some(weather_series) = simulation
+            .results
+            .find_series("Environment", "Site Outdoor Air Drybulb Temperature")
+        else {
+            return Err(std::io::Error::other("missing weather series").into());
+        };
+        assert_eq!(weather_series.values, vec![10.0, 12.0]);
 
         Ok(())
     }

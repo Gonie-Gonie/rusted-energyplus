@@ -224,7 +224,7 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Comparing Rust first-zone result store with EnergyPlus ESO zone temperatures."
+Write-Host "Comparing Rust heat-balance state trace with EnergyPlus ESO zone temperatures."
 $output = & $cargo.Source run -p ep_cli --quiet -- compare zone-temperature $epjson $weather $eso 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
@@ -236,7 +236,11 @@ Assert-Contains -Text $text -Pattern "Zone Temperature Diagnostic" -Description 
 Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "conformance boundary"
 Assert-Contains -Text $text -Pattern "tolerance_policy: none" -Description "tolerance boundary"
+Assert-Contains -Text $text -Pattern "runtime_class: heat-balance-state-shell" -Description "runtime class"
 Assert-Contains -Text $text -Pattern "zone: ZONE ONE" -Description "zone name"
+Assert-Contains -Text $text -Pattern "heat_balance_timesteps: 96" -Description "heat-balance timestep count"
+Assert-Contains -Text $text -Pattern "zone_count: 1" -Description "zone count"
+Assert-Contains -Text $text -Pattern "surface_count: 6" -Description "surface count"
 Assert-Contains -Text $text -Pattern "samples: 24" -Description "sample count"
 Assert-Contains -Text $text -Pattern "max_abs_delta:" -Description "delta summary"
 Assert-Contains -Text $text -Pattern "exact_match: not_available" -Description "exact-match boundary"

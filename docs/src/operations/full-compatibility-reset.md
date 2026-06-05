@@ -291,6 +291,7 @@ P2 compatibility work:
 - [x] port internal convective gains as a separate runtime trace
 - [x] add opaque surface thermal inputs to heat-balance state
 - [x] add first heat-balance timestep state advance without conformance claim
+- [x] connect heat-balance zone-air trace to diagnostic-only MAT comparison
 
 ## Forbidden Wording
 
