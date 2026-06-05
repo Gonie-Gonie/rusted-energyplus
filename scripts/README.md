@@ -14,6 +14,6 @@ The task implementations are grouped by area:
 - `quality`: checks, docs, tests, performance, and wording guards
 - `smoke`: foundation smoke and diagnostic plumbing checks
 - `compare`: EnergyPlus oracle comparison smoke and regression commands
-- `conformance`: manifest, baseline, and report skeleton checks
+- `conformance`: manifest, baseline, report skeleton, and diagnostic report checks
 - `release`: packaging and release verification
 - `lib`: shared PowerShell helpers

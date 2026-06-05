@@ -18,6 +18,7 @@ Current foundations:
 - `compare-report.md`
 - first-divergence reporting
 - diagnostic-only MAT delta artifacts for `compare zone-temperature --report-dir`
+- manifest-driven diagnostic MAT report generation
 
 Next evidence target:
 

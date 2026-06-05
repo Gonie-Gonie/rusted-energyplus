@@ -19,6 +19,12 @@ Baseline-only report skeleton generation is exposed through:
 cargo run -p ep_cli -- conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>
 ```
 
+Diagnostic-only report generation is exposed through:
+
+```powershell
+cargo run -p ep_cli -- conformance diagnostic-report <case.toml> <oracle-root> <output-root>
+```
+
 ## Rule
 
 ```text
@@ -108,12 +114,37 @@ It enumerates the requested output series and EnergyPlus baseline sample count.
 It reads requested series through `OutputRegistry` and does not compare Rust
 results yet.
 
+## Diagnostic Report
+
+The first manifest-driven diagnostic report smoke command is:
+
+```powershell
+.\scripts\dev.cmd conformance-diagnostic-report-smoke
+```
+
+It runs `zone_temperature_diagnostic_001`, writes EnergyPlus oracle artifacts
+under:
+
+```text
+.runtime/conformance-diagnostic/26.1.0/zone_temperature_diagnostic_001/oracle/
+```
+
+and writes diagnostic-only comparison artifacts under:
+
+```text
+.runtime/conformance-diagnostic/26.1.0/zone_temperature_diagnostic_001/compare/
+```
+
+The report remains `comparison_class: diagnostic-only`,
+`conformance_claim: false`, and `tolerance_policy: none`.
+
 ## Verification
 
 ```powershell
 .\scripts\dev.cmd conformance-schema-smoke
 .\scripts\dev.cmd conformance-baseline-smoke
 .\scripts\dev.cmd conformance-report-smoke
+.\scripts\dev.cmd conformance-diagnostic-report-smoke
 .\scripts\dev.cmd check
 ```
 

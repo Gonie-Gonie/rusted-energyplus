@@ -294,6 +294,7 @@ P2 compatibility work:
 - [x] connect heat-balance zone-air trace to diagnostic-only MAT comparison
 - [x] write diagnostic-only MAT compare summary/report artifacts
 - [x] register diagnostic-only MAT case manifest without tolerance claim
+- [x] generate manifest-driven MAT diagnostic report artifacts
 
 ## Forbidden Wording
 

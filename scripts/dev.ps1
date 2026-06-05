@@ -130,6 +130,11 @@ $Commands = [ordered]@{
         Group = "conformance"
         Help = "Write baseline-only conformance report skeleton."
     }
+    "conformance-diagnostic-report-smoke" = @{
+        Path = "conformance\conformance-diagnostic-report-smoke.ps1"
+        Group = "conformance"
+        Help = "Generate diagnostic-only comparison artifacts from a case manifest."
+    }
     "package" = @{
         Path = "release\package.ps1"
         Group = "release"

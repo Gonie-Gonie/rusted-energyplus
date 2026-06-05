@@ -23,6 +23,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
+const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
+    "usage: eplus-rs conformance diagnostic-report <case.toml> <oracle-root> <output-root>";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -201,6 +203,7 @@ fn print_help() {
     println!("  conformance validate-case <case.toml>");
     println!("  conformance baseline <case.toml> <oracle-root> <output-root>");
     println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
+    println!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -261,6 +264,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
         Some("validate-case") => run_conformance_validate_case(&args[1..]),
         Some("baseline") => run_conformance_baseline(&args[1..]),
         Some("report-skeleton") => run_conformance_report_skeleton(&args[1..]),
+        Some("diagnostic-report") => run_conformance_diagnostic_report(&args[1..]),
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
@@ -270,6 +274,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!(
                 "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
             );
+            eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             2
         }
         None => {
@@ -281,6 +286,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!(
                 "usage: eplus-rs conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>"
             );
+            eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             2
         }
     }
@@ -418,6 +424,64 @@ fn run_conformance_report_skeleton(args: &[String]) -> i32 {
     }
 }
 
+fn run_conformance_diagnostic_report(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_conformance_diagnostic_report(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("Conformance Diagnostic Report");
+            print_conformance_case_summary(&manifest);
+            println!("  baseline_dir: {}", summary.baseline.output_dir.display());
+            println!("  report_dir: {}", summary.report_dir.display());
+            println!("  compare_report: {}", summary.compare_report.display());
+            println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  samples: {}", summary.samples);
+            println!("  tolerance_policy: none");
+            println!("  status: {}", summary.status);
+            0
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
 struct BaselineSummary {
     output_dir: PathBuf,
     idf: PathBuf,
@@ -431,11 +495,34 @@ struct ReportSkeletonSummary {
     series: usize,
 }
 
+struct DiagnosticReportSummary {
+    baseline: BaselineSummary,
+    report_dir: PathBuf,
+    compare_report: PathBuf,
+    compare_summary: PathBuf,
+    samples: usize,
+    status: &'static str,
+}
+
 fn generate_conformance_baseline(
     case_path: &Path,
     manifest: &ConformanceCase,
     oracle_root: &Path,
     output_root: &Path,
+) -> Result<BaselineSummary, String> {
+    generate_conformance_baseline_in_dir(
+        case_path,
+        manifest,
+        oracle_root,
+        &output_root.join(&manifest.id),
+    )
+}
+
+fn generate_conformance_baseline_in_dir(
+    case_path: &Path,
+    manifest: &ConformanceCase,
+    oracle_root: &Path,
+    output_dir: &Path,
 ) -> Result<BaselineSummary, String> {
     let energyplus = oracle_root.join("energyplus.exe");
     if !energyplus.is_file() {
@@ -466,8 +553,7 @@ fn generate_conformance_baseline(
         None => None,
     };
 
-    let output_dir = output_root.join(&manifest.id);
-    std::fs::create_dir_all(&output_dir)
+    std::fs::create_dir_all(output_dir)
         .map_err(|error| format!("failed to create baseline output directory: {error}"))?;
     let input_idf = output_dir.join("input.idf");
     std::fs::copy(&source_idf, &input_idf)
@@ -479,7 +565,7 @@ fn generate_conformance_baseline(
     }
     energyplus_command
         .arg("-d")
-        .arg(&output_dir)
+        .arg(output_dir)
         .arg(&input_idf)
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -494,7 +580,7 @@ fn generate_conformance_baseline(
 
     let converter_status = Command::new(&converter)
         .arg("input.idf")
-        .current_dir(&output_dir)
+        .current_dir(output_dir)
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status()
@@ -515,12 +601,106 @@ fn generate_conformance_baseline(
     }
 
     Ok(BaselineSummary {
-        output_dir,
+        output_dir: output_dir.to_path_buf(),
         idf: input_idf,
         weather: source_weather,
         epjson,
         eso,
     })
+}
+
+fn generate_conformance_diagnostic_report(
+    case_path: &Path,
+    manifest: &ConformanceCase,
+    oracle_root: &Path,
+    output_root: &Path,
+) -> Result<DiagnosticReportSummary, String> {
+    validate_zone_temperature_diagnostic_manifest(manifest)?;
+
+    let case_output_dir = output_root.join(&manifest.id);
+    let oracle_output_dir = case_output_dir.join("oracle");
+    let compare_dir = case_output_dir.join("compare");
+
+    let baseline =
+        generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
+    let weather = baseline
+        .weather
+        .as_ref()
+        .ok_or_else(|| "zone-temperature diagnostic requires input.weather".to_string())?;
+    let diagnostic = build_zone_temperature_diagnostic(&baseline.epjson, weather, &baseline.eso)?;
+    write_zone_temperature_diagnostic_report(&compare_dir, &diagnostic)?;
+
+    Ok(DiagnosticReportSummary {
+        baseline,
+        report_dir: compare_dir.clone(),
+        compare_report: compare_dir.join("compare-report.md"),
+        compare_summary: compare_dir.join("compare-summary.json"),
+        samples: diagnostic.samples,
+        status: diagnostic.status,
+    })
+}
+
+fn validate_zone_temperature_diagnostic_manifest(manifest: &ConformanceCase) -> Result<(), String> {
+    if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
+        return Err(format!(
+            "diagnostic report requires comparison_class diagnostic-only, got {}",
+            comparison_class_label(manifest.comparison_class)
+        ));
+    }
+    if manifest.conformance_claim {
+        return Err("diagnostic report cannot claim conformance".to_string());
+    }
+    if !manifest.tolerances.is_empty() {
+        return Err("diagnostic report must not declare tolerance rules".to_string());
+    }
+    if manifest.outputs.len() != 1 {
+        return Err(format!(
+            "zone-temperature diagnostic requires exactly one output request, got {}",
+            manifest.outputs.len()
+        ));
+    }
+
+    let output = &manifest.outputs[0];
+    if !output
+        .variable
+        .eq_ignore_ascii_case("Zone Mean Air Temperature")
+    {
+        return Err(format!(
+            "zone-temperature diagnostic requires Zone Mean Air Temperature, got {}",
+            output.variable
+        ));
+    }
+    if output.frequency != OutputFrequency::Hourly {
+        return Err(format!(
+            "zone-temperature diagnostic requires hourly output, got {}",
+            output_frequency_label(output.frequency)
+        ));
+    }
+    if output.class != VariableClass::ZoneState {
+        return Err(format!(
+            "zone-temperature diagnostic requires zone-state class, got {}",
+            variable_class_label(output.class)
+        ));
+    }
+
+    let Some(report) = manifest.report.as_ref() else {
+        return Err("diagnostic report requires a report contract".to_string());
+    };
+    if report.path.trim().is_empty() {
+        return Err("diagnostic report contract has an empty path".to_string());
+    }
+
+    let Some(gate) = manifest.gate.as_ref() else {
+        return Err("diagnostic report requires a non-blocking gate contract".to_string());
+    };
+    if gate.script.trim().is_empty() {
+        return Err("diagnostic gate contract has an empty script".to_string());
+    }
+    if gate.blocking {
+        return Err("diagnostic report gate must be non-blocking".to_string());
+    }
+
+    Ok(())
 }
 
 fn generate_conformance_report_skeleton(
@@ -1342,6 +1522,73 @@ struct ZoneTemperatureDiagnostic {
     status: &'static str,
 }
 
+fn build_zone_temperature_diagnostic(
+    input_path: &Path,
+    weather_path: &Path,
+    eso_path: &Path,
+) -> Result<ZoneTemperatureDiagnostic, String> {
+    let raw_model = load_epjson_file(input_path).map_err(|error| error.to_string())?;
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        return Err(format_compile_diagnostics(&result.report));
+    };
+    let Some(zone) = model.zones.first() else {
+        return Err("no Zone objects are available for comparison".to_string());
+    };
+    let zone_name = zone.name.0.clone();
+
+    let oracle_values = load_eso_series(eso_path, &zone_name, "Zone Mean Air Temperature")
+        .map_err(|error| error.to_string())?;
+    if oracle_values.is_empty() {
+        return Err("EnergyPlus zone temperature series is empty".to_string());
+    }
+
+    let weather_values =
+        load_epw_dry_bulb_series(weather_path).map_err(|error| error.to_string())?;
+    if weather_values.len() < oracle_values.len() {
+        return Err(format!(
+            "EPW dry-bulb series has {} samples but ESO requires {}",
+            weather_values.len(),
+            oracle_values.len()
+        ));
+    }
+
+    let simulation_model = SimulationModel::from_typed(model);
+    let simulation = simulate_heat_balance_zone_air_temperatures(
+        &simulation_model,
+        &weather_values,
+        HeatBalanceSimulationOptions::hourly_samples(oracle_values.len()),
+    )
+    .map_err(|error| error.to_string())?;
+    let Some(rust_series) = simulation
+        .results
+        .find_series(&zone_name, "Zone Mean Air Temperature")
+    else {
+        return Err("heat-balance simulation did not write zone temperature output".to_string());
+    };
+
+    let delta = delta_summary(&oracle_values, &rust_series.values);
+    let finite = oracle_values
+        .iter()
+        .chain(rust_series.values.iter())
+        .all(|value| value.is_finite());
+    let extracted = finite && delta.length_match;
+
+    Ok(ZoneTemperatureDiagnostic {
+        zone_name,
+        samples: delta.samples,
+        heat_balance_timesteps: simulation.summary.timestep_count,
+        zone_count: simulation.summary.zone_count,
+        surface_count: simulation.summary.surface_count,
+        oracle_first_c: oracle_values[0],
+        rust_first_c: rust_series.values.first().copied().unwrap_or(f64::NAN),
+        oracle_last_c: oracle_values[oracle_values.len() - 1],
+        rust_last_c: rust_series.values.last().copied().unwrap_or(f64::NAN),
+        delta,
+        status: if extracted { "extracted" } else { "failed" },
+    })
+}
+
 fn run_compare_zone_temperature(args: &[String]) -> i32 {
     let parsed = match parse_zone_temperature_compare_args(args) {
         Ok(parsed) => parsed,
@@ -1356,90 +1603,12 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     let weather_path = parsed.weather_path.as_path();
     let eso_path = parsed.eso_path.as_path();
 
-    let raw_model = match load_epjson_file(input_path) {
-        Ok(model) => model,
+    let diagnostic = match build_zone_temperature_diagnostic(input_path, weather_path, eso_path) {
+        Ok(diagnostic) => diagnostic,
         Err(error) => {
             eprintln!("{error}");
             return 1;
         }
-    };
-    let result = compile_raw_model(&raw_model);
-    let Some(model) = result.model else {
-        print_compile_diagnostics(&result.report);
-        return 1;
-    };
-    let Some(zone) = model.zones.first() else {
-        eprintln!("no Zone objects are available for comparison");
-        return 1;
-    };
-    let zone_name = zone.name.0.clone();
-
-    let oracle_values = match load_eso_series(eso_path, &zone_name, "Zone Mean Air Temperature") {
-        Ok(values) => values,
-        Err(error) => {
-            eprintln!("{error}");
-            return 1;
-        }
-    };
-    if oracle_values.is_empty() {
-        eprintln!("EnergyPlus zone temperature series is empty");
-        return 1;
-    }
-
-    let weather_values = match load_epw_dry_bulb_series(weather_path) {
-        Ok(values) => values,
-        Err(error) => {
-            eprintln!("{error}");
-            return 1;
-        }
-    };
-    if weather_values.len() < oracle_values.len() {
-        eprintln!(
-            "EPW dry-bulb series has {} samples but ESO requires {}",
-            weather_values.len(),
-            oracle_values.len()
-        );
-        return 1;
-    }
-
-    let simulation_model = SimulationModel::from_typed(model);
-    let simulation = match simulate_heat_balance_zone_air_temperatures(
-        &simulation_model,
-        &weather_values,
-        HeatBalanceSimulationOptions::hourly_samples(oracle_values.len()),
-    ) {
-        Ok(simulation) => simulation,
-        Err(error) => {
-            eprintln!("{error}");
-            return 1;
-        }
-    };
-    let Some(rust_series) = simulation
-        .results
-        .find_series(&zone_name, "Zone Mean Air Temperature")
-    else {
-        eprintln!("heat-balance simulation did not write zone temperature output");
-        return 1;
-    };
-
-    let delta = delta_summary(&oracle_values, &rust_series.values);
-    let finite = oracle_values
-        .iter()
-        .chain(rust_series.values.iter())
-        .all(|value| value.is_finite());
-    let extracted = finite && delta.length_match;
-    let diagnostic = ZoneTemperatureDiagnostic {
-        zone_name,
-        samples: delta.samples,
-        heat_balance_timesteps: simulation.summary.timestep_count,
-        zone_count: simulation.summary.zone_count,
-        surface_count: simulation.summary.surface_count,
-        oracle_first_c: oracle_values[0],
-        rust_first_c: rust_series.values.first().copied().unwrap_or(f64::NAN),
-        oracle_last_c: oracle_values[oracle_values.len() - 1],
-        rust_last_c: rust_series.values.last().copied().unwrap_or(f64::NAN),
-        delta,
-        status: if extracted { "extracted" } else { "failed" },
     };
 
     if let Some(report_dir) = &parsed.report_dir
@@ -1478,7 +1647,11 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     }
     println!("  status: {}", diagnostic.status);
 
-    if extracted { 0 } else { 1 }
+    if diagnostic.status == "extracted" {
+        0
+    } else {
+        1
+    }
 }
 
 fn run_compare_weather_drybulb(args: &[String]) -> i32 {
@@ -2168,6 +2341,31 @@ fn print_compile_diagnostics(report: &CompileReport) {
     }
 }
 
+fn format_compile_diagnostics(report: &CompileReport) -> String {
+    let mut message = String::new();
+    message.push_str("Compile diagnostics\n");
+    message.push_str(&format!("  raw_objects: {}\n", report.raw_object_count));
+    message.push_str(&format!("  typed_objects: {}\n", report.typed_object_count));
+    message.push_str(&format!("  diagnostics: {}\n", report.diagnostics.len()));
+    message.push_str(&format!(
+        "  defaults_applied: {}\n",
+        report.defaults_applied.len()
+    ));
+    for diagnostic in &report.diagnostics {
+        let severity = match diagnostic.severity {
+            DiagnosticSeverity::Error => "error",
+            DiagnosticSeverity::Warning => "warning",
+        };
+        let object_name = diagnostic.object_name.as_deref().unwrap_or("*");
+        let field = diagnostic.field.as_deref().unwrap_or("*");
+        message.push_str(&format!(
+            "    {severity} {} {}/{} field {}: {}\n",
+            diagnostic.code, diagnostic.object_type, object_name, field, diagnostic.message
+        ));
+    }
+    message
+}
+
 fn print_compile_coverage(report: &CompileReport) {
     println!("  coverage:");
     for entry in &report.coverage {
@@ -2291,6 +2489,13 @@ mod tests {
             "compare".to_string(),
             "internal-convective-gain".to_string(),
         ];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_conformance_diagnostic_report_path_fails() {
+        let args = vec!["conformance".to_string(), "diagnostic-report".to_string()];
 
         assert_eq!(run(&args), 2);
     }

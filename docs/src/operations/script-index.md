@@ -52,6 +52,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
 | `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
+| `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
