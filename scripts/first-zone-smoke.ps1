@@ -46,7 +46,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $text = ($output -join "`n")
-Assert-Contains -Text $text -Pattern "First Zone Simulation" -Description "run header"
+Assert-Contains -Text $text -Pattern "First Zone Runtime Diagnostic" -Description "run header"
+Assert-Contains -Text $text -Pattern "runtime_class: diagnostic-toy" -Description "runtime class"
+Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "conformance boundary"
+Assert-Contains -Text $text -Pattern "algorithm_parity: false" -Description "algorithm parity boundary"
 Assert-Contains -Text $text -Pattern "zone: ZONE ONE" -Description "zone name"
 Assert-Contains -Text $text -Pattern "samples: 24" -Description "sample count"
 Assert-Contains -Text $text -Pattern "result_series: 2" -Description "result series count"
@@ -54,6 +57,6 @@ Assert-Contains -Text $text -Pattern "volume_m3:" -Description "derived zone vol
 Assert-Contains -Text $text -Pattern "conductance_w_per_k:" -Description "derived conductance"
 Assert-Contains -Text $text -Pattern "first_zone_temp_c:" -Description "first zone temperature"
 Assert-Contains -Text $text -Pattern "last_zone_temp_c:" -Description "last zone temperature"
-Assert-Contains -Text $text -Pattern "status: pass" -Description "run status"
+Assert-Contains -Text $text -Pattern "status: extracted" -Description "run status"
 
 Write-Host "First-zone simulation smoke passed."

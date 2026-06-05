@@ -252,7 +252,10 @@ fn run_first_zone_command(args: &[String]) -> i32 {
     let first_zone_temp_c = zone_series.values.first().copied().unwrap_or(0.0);
     let last_zone_temp_c = zone_series.values.last().copied().unwrap_or(0.0);
 
-    println!("First Zone Simulation");
+    println!("First Zone Runtime Diagnostic");
+    println!("  runtime_class: diagnostic-toy");
+    println!("  conformance_claim: false");
+    println!("  algorithm_parity: false");
     println!("  zone: {}", simulation.summary.zone_name);
     println!("  samples: {}", simulation.summary.samples);
     println!("  result_series: {}", simulation.results.series.len());
@@ -271,7 +274,7 @@ fn run_first_zone_command(args: &[String]) -> i32 {
     );
     println!("  first_zone_temp_c: {first_zone_temp_c:.6}");
     println!("  last_zone_temp_c: {last_zone_temp_c:.6}");
-    println!("  status: pass");
+    println!("  status: extracted");
 
     0
 }
@@ -499,9 +502,12 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
         .iter()
         .chain(rust_series.values.iter())
         .all(|value| value.is_finite());
-    let passed = finite && samples == oracle_values.len() && samples == rust_series.values.len();
+    let extracted = finite && samples == oracle_values.len() && samples == rust_series.values.len();
 
-    println!("Zone Temperature Smoke Comparison");
+    println!("Zone Temperature Diagnostic");
+    println!("  comparison_class: diagnostic-only");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: none");
     println!("  zone: {}", simulation.summary.zone_name);
     println!("  samples: {samples}");
     println!("  max_abs_delta: {max_abs_delta:.6}");
@@ -516,10 +522,14 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
         "  rust_last_c: {:.6}",
         rust_series.values[rust_series.values.len() - 1]
     );
-    println!("  exact_match: future");
-    println!("  status: {}", if passed { "pass" } else { "fail" });
+    println!("  exact_match: not_available");
+    println!("  exit_code_semantics: extraction-only");
+    println!(
+        "  status: {}",
+        if extracted { "extracted" } else { "failed" }
+    );
 
-    if passed { 0 } else { 1 }
+    if extracted { 0 } else { 1 }
 }
 
 fn run_compare_weather_drybulb(args: &[String]) -> i32 {

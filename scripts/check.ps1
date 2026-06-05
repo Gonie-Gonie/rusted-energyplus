@@ -23,6 +23,7 @@ cargo test --workspace
 if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
 
 & (Join-Path $RepoRoot "scripts\docs-check.ps1")
+& (Join-Path $RepoRoot "scripts\strict-no-false-conformance.ps1")
 & (Join-Path $RepoRoot "scripts\source-smoke.ps1")
 
 Write-Host "Check complete."

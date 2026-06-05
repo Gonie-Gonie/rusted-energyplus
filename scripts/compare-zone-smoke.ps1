@@ -231,11 +231,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $text = ($output -join "`n")
-Assert-Contains -Text $text -Pattern "Zone Temperature Smoke Comparison" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "Zone Temperature Diagnostic" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
+Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "conformance boundary"
+Assert-Contains -Text $text -Pattern "tolerance_policy: none" -Description "tolerance boundary"
 Assert-Contains -Text $text -Pattern "zone: ZONE ONE" -Description "zone name"
 Assert-Contains -Text $text -Pattern "samples: 24" -Description "sample count"
 Assert-Contains -Text $text -Pattern "max_abs_delta:" -Description "delta summary"
-Assert-Contains -Text $text -Pattern "exact_match: future" -Description "exact-match boundary"
-Assert-Contains -Text $text -Pattern "status: pass" -Description "comparison status"
+Assert-Contains -Text $text -Pattern "exact_match: not_available" -Description "exact-match boundary"
+Assert-Contains -Text $text -Pattern "exit_code_semantics: extraction-only" -Description "exit-code boundary"
+Assert-Contains -Text $text -Pattern "status: extracted" -Description "comparison status"
 
 Write-Host "Zone temperature comparison smoke passed."

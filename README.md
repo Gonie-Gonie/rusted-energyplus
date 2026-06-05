@@ -10,7 +10,8 @@ execution plans, structured diagnostics, and reproducible releases.
 ## Current Scope
 
 This repository is now past the RawModel/TypedModel seed and has the first
-runtime path for an uncontrolled one-zone building subset:
+traceable comparison diagnostics. It does not yet claim EnergyPlus numerical
+compatibility for zone heat balance or HVAC simulation.
 
 - Rust toolchain pinned in `rust-toolchain.toml`
 - Cargo workspace skeleton
@@ -22,8 +23,17 @@ runtime path for an uncontrolled one-zone building subset:
 - preview missing reference diagnostics
 - SimulationModel, ModelGraph, and ExecutionPlan summaries
 - EnergyPlus oracle comparisons for constant schedules and EPW dry-bulb weather
-- ResultStore output from the first uncontrolled one-zone simulation subset
+- compare regression artifacts: `trace.json`, `compare-summary.json`,
+  `compare-report.md`, and `profile-summary.json`
 - smoke/check scripts
+
+Development-only diagnostics:
+
+- `run first-zone` exercises runtime plumbing with a deterministic RC-style toy
+  model and writes a `ResultStore`
+- `compare zone-temperature` extracts EnergyPlus and Rust zone-temperature
+  series and reports deltas, but it is diagnostic-only and does not enforce a
+  tolerance or claim EnergyPlus heat-balance compatibility
 
 ## Quick Start
 
@@ -40,6 +50,7 @@ runtime path for an uncontrolled one-zone building subset:
 .\scripts\first-zone-smoke.cmd
 .\scripts\compare-zone-smoke.cmd
 .\scripts\compare-regression.cmd
+.\scripts\strict-no-false-conformance.cmd
 .\scripts\package.cmd
 ```
 
@@ -76,6 +87,10 @@ comparison smoke suite and writes `trace.json`, `compare-summary.json`,
 `compare-report.md`, and `profile-summary.json` under
 `.runtime\compare-regression\26.1.0`.
 
+The `first-zone` and `zone-temperature` commands are intentionally labeled as
+diagnostics. They are useful for plumbing and report generation work, but they
+are not release evidence for EnergyPlus heat-balance conformance.
+
 Unsupported runtime commands should fail explicitly until their milestone is
 implemented.
 
@@ -100,3 +115,4 @@ publishing.
 - v0.1 readiness: `docs/src/operations/v0.1.0-readiness.md`
 - v0.6 readiness: `docs/src/operations/v0.6.0-readiness.md`
 - v0.7 readiness: `docs/src/operations/v0.7.0-readiness.md`
+- full compatibility reset: `docs/src/operations/full-compatibility-reset.md`

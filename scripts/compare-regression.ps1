@@ -123,11 +123,11 @@ function Write-CompareArtifacts {
         "",
         "## Cases",
         "",
-        "| Case | Kind | Status | Duration ms |",
-        "|---|---|---:|---:|"
+        "| Case | Kind | Class | Status | Duration ms |",
+        "|---|---|---|---:|---:|"
     )
     foreach ($case in $Cases) {
-        $report += "| $($case.id) | $($case.kind) | $($case.status) | $($case.duration_ms) |"
+        $report += "| $($case.id) | $($case.kind) | $($case.comparison_class) | $($case.status) | $($case.duration_ms) |"
     }
     $report += ""
     $report += "## First Divergence"
@@ -165,16 +165,19 @@ $suiteCases = @(
     [pscustomobject]@{
         id = "schedule-value"
         kind = "schedule"
+        comparison_class = "conformance-smoke"
         script = "compare-schedule-smoke.cmd"
     },
     [pscustomobject]@{
         id = "weather-drybulb"
         kind = "weather"
+        comparison_class = "conformance-smoke"
         script = "compare-weather-smoke.cmd"
     },
     [pscustomobject]@{
         id = "zone-temperature"
         kind = "zone"
+        comparison_class = "diagnostic-only"
         script = "compare-zone-smoke.cmd"
     }
 )
@@ -207,12 +210,18 @@ foreach ($case in $suiteCases) {
         $ErrorActionPreference = $previousErrorActionPreference
     }
     $caseTimer.Stop()
-    $status = if ($exitCode -eq 0) { "pass" } else { "fail" }
+    $status = if ($exitCode -eq 0) {
+        if ($case.comparison_class -eq "diagnostic-only") { "extracted" } else { "pass" }
+    }
+    else {
+        "fail"
+    }
     $traceEvents += New-TraceEvent -CaseId $case.id -Phase "finish" -Status $status -DurationMs ([int]$caseTimer.ElapsedMilliseconds)
 
     $result = [pscustomobject]@{
         id = $case.id
         kind = $case.kind
+        comparison_class = $case.comparison_class
         command = $case.script
         status = $status
         exit_code = $exitCode
