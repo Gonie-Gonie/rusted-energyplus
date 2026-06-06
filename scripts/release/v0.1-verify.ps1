@@ -55,10 +55,27 @@ Assert-FileExists -Path "data\testcases\minimal\missing-reference.epJSON" -Descr
 Assert-FileExists -Path "data\testcases\minimal\invalid-enum.epJSON" -Description "TypedModel invalid enum fixture"
 Assert-FileExists -Path "docs\src\operations\v0.1.0-readiness.md" -Description "v0.1 readiness document"
 Assert-FileExists -Path "docs\src\releases\v0.1.0.md" -Description "v0.1 release note"
+Assert-FileExists -Path "scripts\smoke\raw-model-smoke.ps1" -Description "RawModel smoke script"
 Assert-FileExists -Path "scripts\smoke\typed-model-smoke.ps1" -Description "TypedModel smoke script"
 
+Write-Host "milestone: v0.1"
+Write-Host "scope: model intake release, RawModel inspection, TypedModel preview, package basics, no runtime or simulation claim"
+Write-Host "required commands:"
+Write-Host "- source-smoke"
+Write-Host "- test"
+Write-Host "- docs-check"
+Write-Host "- strict-no-false-conformance"
+if (-not $SkipOracleSmoke) {
+    Write-Host "- oracle-smoke"
+}
+Write-Host "- raw-model-smoke"
+Write-Host "- typed-model-smoke"
+Write-Host "- package -Version 0.1.0"
+
 Invoke-DevCommand -Command "source-smoke"
-Invoke-DevCommand -Command "check"
+Invoke-DevCommand -Command "test"
+Invoke-DevCommand -Command "docs-check"
+Invoke-DevCommand -Command "strict-no-false-conformance"
 
 if (-not $SkipOracleSmoke) {
     Invoke-DevCommand -Command "oracle-smoke"
@@ -71,4 +88,5 @@ Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.1.0")
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.1.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.1 release package"
 
-Write-Host "v0.1.0 runnable release verification passed."
+Write-Host "result: pass"
+Write-Host "v0.1.0 model intake release verification passed."

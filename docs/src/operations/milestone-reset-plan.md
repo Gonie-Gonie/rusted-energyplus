@@ -115,9 +115,9 @@ Forbidden shortcuts:
 
 v0.1:
 
-- [ ] keep graph/runtime/ResultStore out of public v0.1 scope
-- [ ] ensure `v0.1-verify` checks only model intake and package basics
-- [ ] state no simulation claim in release notes
+- [x] keep graph/runtime/ResultStore out of public v0.1 scope
+- [x] ensure `v0.1-verify` checks only model intake and package basics
+- [x] state no simulation claim in release notes
 
 v0.2:
 

@@ -158,7 +158,7 @@ $Commands = [ordered]@{
     "v0.1-verify" = @{
         Path = "release\v0.1-verify.ps1"
         Group = "release"
-        Help = "Verify the v0.1 runnable release contract."
+        Help = "Verify the v0.1 model intake release contract."
     }
     "v0.2-verify" = @{
         Path = "release\v0.2-verify.ps1"
