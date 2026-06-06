@@ -26,6 +26,9 @@ Write-Host "scope: conformance harness, baseline-only reports, no Rust-vs-Energy
 
 Assert-FileExists -Path "docs\src\operations\v0.2.0-plan.md" -Description "v0.2 plan"
 Assert-FileExists -Path "docs\src\operations\v0.2.0-readiness.md" -Description "v0.2 readiness"
+Assert-FileExists -Path "docs\src\conformance\baseline-generation.md" -Description "baseline artifact contract"
+Assert-FileExists -Path "docs\src\conformance\output-requests.md" -Description "output request source contract"
+Assert-FileExists -Path "docs\src\conformance\report-format.md" -Description "report artifact contract"
 Assert-FileExists -Path "crates\ep_conformance\src\lib.rs" -Description "conformance schema crate"
 Assert-FileExists -Path "data\conformance_cases\schedule_constant_001\case.toml" -Description "schedule case manifest"
 Assert-FileExists -Path "data\conformance_cases\weather_fields_001\case.toml" -Description "weather case manifest"

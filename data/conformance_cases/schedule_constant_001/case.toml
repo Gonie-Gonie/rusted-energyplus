@@ -18,6 +18,7 @@ key = "ALWAYSON"
 variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"
+source = "eso"
 
 [report]
 format = "markdown"

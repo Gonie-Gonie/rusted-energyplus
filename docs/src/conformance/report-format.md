@@ -47,6 +47,13 @@ Current scripts still write milestone-specific `.runtime/compare-*` and
 `.runtime/conformance-*` directories. Those are acceptable smoke artifacts
 until the canonical evidence layout is implemented.
 
+For the v0.2 baseline-only harness, `conformance baseline` writes
+`case-expanded.toml` beside the EnergyPlus artifacts, and `conformance
+report-skeleton` writes both `compare-report.md` and `compare-summary.json`.
+Those files are report-contract evidence only; they are not numerical
+conformance evidence until Rust artifacts, tolerances, and a blocking gate are
+present.
+
 ## Summary JSON
 
 `compare-summary.json` should include:

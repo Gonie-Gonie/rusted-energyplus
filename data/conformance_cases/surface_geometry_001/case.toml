@@ -19,18 +19,21 @@ key = "*"
 variable = "HeatTransfer Surface Area (Net)"
 frequency = "static"
 class = "surface-state"
+source = "eio"
 
 [[outputs]]
 key = "*"
 variable = "HeatTransfer Surface Azimuth"
 frequency = "static"
 class = "surface-state"
+source = "eio"
 
 [[outputs]]
 key = "*"
 variable = "HeatTransfer Surface Tilt"
 frequency = "static"
 class = "surface-state"
+source = "eio"
 
 [report]
 format = "markdown"

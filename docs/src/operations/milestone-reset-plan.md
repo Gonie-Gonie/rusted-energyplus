@@ -123,8 +123,8 @@ v0.2:
 
 - [x] align plan/readiness around conformance harness only
 - [x] add `v0.2-verify`
-- [ ] fix baseline artifact contract to include expanded manifest and report JSON
-- [ ] document source-file target for output requests: ESO/EIO/MTR/SQL/CSV
+- [x] fix baseline artifact contract to include expanded manifest and report JSON
+- [x] document source-file target for output requests: ESO/EIO/MTR/SQL/CSV
 
 v0.3:
 

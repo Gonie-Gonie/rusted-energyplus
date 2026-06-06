@@ -19,6 +19,7 @@ key = "ZONE ONE"
 variable = "Zone Mean Air Temperature"
 frequency = "hourly"
 class = "zone-state"
+source = "eso"
 
 [report]
 format = "markdown"

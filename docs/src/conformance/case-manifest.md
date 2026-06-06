@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: conformance
-last_reviewed: 2026-06-05
+last_reviewed: 2026-06-07
 ---
 
 # Case Manifest
@@ -21,6 +21,13 @@ conformance_claim = true
 [input]
 idf = "input.idf"
 weather = "weather.epw"
+
+[[outputs]]
+key = "*"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
 
 [gate]
 blocking = true

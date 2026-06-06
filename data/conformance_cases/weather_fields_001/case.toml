@@ -19,36 +19,42 @@ key = "Environment"
 variable = "Site Outdoor Air Drybulb Temperature"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [[outputs]]
 key = "Environment"
 variable = "Site Outdoor Air Dewpoint Temperature"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [[outputs]]
 key = "Environment"
 variable = "Site Outdoor Air Relative Humidity"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [[outputs]]
 key = "Environment"
 variable = "Site Outdoor Air Barometric Pressure"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [[outputs]]
 key = "Environment"
 variable = "Site Wind Speed"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [[outputs]]
 key = "Environment"
 variable = "Site Wind Direction"
 frequency = "hourly"
 class = "weather"
+source = "eso"
 
 [report]
 format = "markdown"

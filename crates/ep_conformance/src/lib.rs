@@ -147,6 +147,8 @@ pub struct OutputRequest {
     pub frequency: OutputFrequency,
     /// Semantic variable group used to select tolerance rules.
     pub class: VariableClass,
+    /// EnergyPlus artifact that should be used as the oracle source.
+    pub source: SourceArtifact,
 }
 
 impl OutputRequest {
@@ -157,6 +159,7 @@ impl OutputRequest {
             key: normalize_identity_part(&self.key),
             variable: normalize_identity_part(&self.variable),
             frequency: self.frequency,
+            source: self.source,
         }
     }
 }
@@ -170,6 +173,8 @@ pub struct OutputRequestIdentity {
     pub variable: String,
     /// Output reporting frequency.
     pub frequency: OutputFrequency,
+    /// Oracle artifact source.
+    pub source: SourceArtifact,
 }
 
 /// Registry of output series requested by one case.
@@ -222,6 +227,8 @@ pub struct OutputSeriesSpec {
     pub frequency: OutputFrequency,
     /// Semantic variable group used to select tolerance rules.
     pub class: VariableClass,
+    /// Oracle artifact source.
+    pub source: SourceArtifact,
     /// Normalized identity used by comparison reports and gates.
     pub identity: OutputRequestIdentity,
 }
@@ -234,6 +241,7 @@ impl From<OutputRequest> for OutputSeriesSpec {
             variable: output.variable,
             frequency: output.frequency,
             class: output.class,
+            source: output.source,
             identity,
         }
     }
@@ -257,6 +265,22 @@ pub enum OutputFrequency {
     Annual,
     /// Run-period reporting.
     RunPeriod,
+}
+
+/// EnergyPlus artifact that contains a requested oracle output.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "kebab-case")]
+pub enum SourceArtifact {
+    /// EnergyPlus input/output summary file.
+    Eio,
+    /// EnergyPlus time-series output file.
+    Eso,
+    /// EnergyPlus meter output file.
+    Mtr,
+    /// EnergyPlus SQLite output.
+    Sql,
+    /// Selected CSV extracted from one or more EnergyPlus outputs.
+    Csv,
 }
 
 /// Semantic variable groups for comparison policies.
@@ -615,8 +639,8 @@ fn normalize_identity_part(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        ComparisonClass, ManifestError, OutputFrequency, OutputRegistry, ValidationError,
-        VariableClass, load_case_file, load_suite_file, parse_case_str,
+        ComparisonClass, ManifestError, OutputFrequency, OutputRegistry, SourceArtifact,
+        ValidationError, VariableClass, load_case_file, load_suite_file, parse_case_str,
     };
     use std::path::PathBuf;
 
@@ -632,6 +656,7 @@ mod tests {
         assert_eq!(manifest.outputs.len(), 1);
         assert_eq!(manifest.outputs[0].key, "ALWAYSON");
         assert_eq!(manifest.outputs[0].variable, "Schedule Value");
+        assert_eq!(manifest.outputs[0].source, SourceArtifact::Eso);
 
         Ok(())
     }
@@ -678,6 +703,7 @@ mod tests {
             output.key == "Environment"
                 && output.frequency == OutputFrequency::Hourly
                 && output.class == VariableClass::Weather
+                && output.source == SourceArtifact::Eso
         }));
         assert!(
             manifest
@@ -704,6 +730,7 @@ mod tests {
             output.key == "*"
                 && output.frequency == OutputFrequency::Static
                 && output.class == VariableClass::SurfaceState
+                && output.source == SourceArtifact::Eio
         }));
         assert!(
             manifest
@@ -759,6 +786,7 @@ key = "*"
 variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"
+source = "eso"
 "#,
         );
 
@@ -792,6 +820,7 @@ key = "*"
 variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"
+source = "eso"
 
 [[tolerances]]
 variable_class = "schedule"
@@ -847,12 +876,14 @@ key = "AlwaysOn"
 variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"
+source = "eso"
 
 [[outputs]]
 key = " ALWAYSON "
 variable = "schedule value"
 frequency = "hourly"
 class = "schedule"
+source = "eso"
 "#,
         );
 

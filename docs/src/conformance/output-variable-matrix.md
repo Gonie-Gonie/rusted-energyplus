@@ -37,7 +37,8 @@ Requested variables must record:
 - domain
 - evidence level
 - absolute and relative tolerance, when conformance-level
-- source file target: EIO, ESO, MTR, SQL, or selected CSV
+- source file target through `source = "eio"`, `source = "eso"`,
+  `source = "mtr"`, `source = "sql"`, or `source = "csv"`
 
 `level = "diagnostic"` means values may be compared and deltas may be reported,
 but the result must not be described as an EnergyPlus compatibility pass.
