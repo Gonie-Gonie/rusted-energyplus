@@ -30,6 +30,8 @@ Assert-FileExists -Path "data\testcases\minimal\minimal.epJSON" -Description "Ra
 Assert-FileExists -Path "data\testcases\minimal\typed-model.epJSON" -Description "TypedModel fixture"
 Assert-FileExists -Path "data\testcases\minimal\missing-reference.epJSON" -Description "missing-reference fixture"
 Assert-FileExists -Path "data\testcases\minimal\invalid-enum.epJSON" -Description "invalid-enum fixture"
+Assert-FileExists -Path "data\testcases\minimal\duplicate-normalized-name.epJSON" -Description "duplicate normalized-name fixture"
+Assert-FileExists -Path "data\testcases\minimal\invalid-numeric-field.epJSON" -Description "invalid numeric fixture"
 
 Write-Host "required commands:"
 Write-Host "- raw-model-smoke"

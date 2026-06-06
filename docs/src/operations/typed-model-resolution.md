@@ -59,12 +59,15 @@ The compiler reports structured diagnostics with severity, code, object type,
 object name, field, and message. The typed smoke verifies:
 
 - missing references
+- duplicate normalized names
 - missing required fields in the typed subset
 - invalid enum values
-- invalid numeric field types
+- invalid numeric field types and unsigned-integer constraints
 - typed/raw-only coverage output
 
 ## Boundary
 
 This is not full schema validation. Graph validation, topology validation,
 execution plan generation, and simulation begin in later milestones.
+Unit conversion and physical/domain range validation are also outside this
+contract until the corresponding validators are implemented.

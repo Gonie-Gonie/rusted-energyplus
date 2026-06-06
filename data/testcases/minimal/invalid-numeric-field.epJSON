@@ -1,0 +1,12 @@
+{
+  "Timestep": {
+    "Timestep 1": {
+      "number_of_timesteps_per_hour": -1
+    }
+  },
+  "Site:Location": {
+    "Bad Site": {
+      "latitude": "north"
+    }
+  }
+}

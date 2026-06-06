@@ -1,9 +1,11 @@
 id = "minimal_typed_model_contract"
-milestone = "v0.2.0-contract"
-purpose = "Verify TypedModel contract coverage, default reporting, enum diagnostics, typed IDs, and missing reference diagnostics."
+milestone = "v0.3.0-input-interpretation"
+purpose = "Verify TypedModel contract coverage, default reporting, enum diagnostics, duplicate-name diagnostics, typed IDs, and missing reference diagnostics."
 valid_input_epjson = "data/testcases/minimal/typed-model.epJSON"
 missing_reference_epjson = "data/testcases/minimal/missing-reference.epJSON"
 invalid_enum_epjson = "data/testcases/minimal/invalid-enum.epJSON"
+duplicate_normalized_name_epjson = "data/testcases/minimal/duplicate-normalized-name.epJSON"
+invalid_numeric_field_epjson = "data/testcases/minimal/invalid-numeric-field.epJSON"
 oracle_generated_epjson = ".runtime/oracle-smoke/26.1.0/convert/smoke.epJSON"
 
 [expected_valid]
@@ -30,6 +32,15 @@ object_type = "Building"
 object_name = "Bad Building"
 field = "terrain"
 bad_value = "MoonBase"
+
+[expected_duplicate_normalized_name]
+diagnostic_code = "DuplicateName"
+object_type = "Zone"
+object_name = "zone one"
+
+[expected_invalid_numeric_field]
+integer_diagnostic_code = "InvalidInteger"
+field_type_diagnostic_code = "InvalidFieldType"
 
 [expected_oracle_smoke]
 version = "26.1.0"

@@ -83,6 +83,30 @@ Assert-Contains -Text $invalidEnumOutput -Pattern "diagnostics: 1" -Description 
 Assert-Contains -Text $invalidEnumOutput -Pattern "InvalidEnumValue Building/Bad Building field terrain" -Description "invalid-enum diagnostic"
 Assert-Contains -Text $invalidEnumOutput -Pattern "Building: 1 [typed]" -Description "invalid-enum typed coverage"
 
+$duplicateNameFixture = "data\testcases\minimal\duplicate-normalized-name.epJSON"
+if (-not (Test-Path -LiteralPath $duplicateNameFixture -PathType Leaf)) {
+    throw "Missing TypedModel duplicate-name fixture: $duplicateNameFixture"
+}
+
+Write-Host "Compiling duplicate-name fixture: $duplicateNameFixture"
+$duplicateNameOutput = Invoke-Compile -Path $duplicateNameFixture -ExpectedExitCode 1
+Assert-Contains -Text $duplicateNameOutput -Pattern "Compile diagnostics" -Description "duplicate-name diagnostics header"
+Assert-Contains -Text $duplicateNameOutput -Pattern "diagnostics: 1" -Description "duplicate-name diagnostic count"
+Assert-Contains -Text $duplicateNameOutput -Pattern "DuplicateName Zone/zone one field *" -Description "duplicate-name diagnostic"
+Assert-Contains -Text $duplicateNameOutput -Pattern "Zone: 2 [typed]" -Description "duplicate-name typed coverage"
+
+$invalidNumericFixture = "data\testcases\minimal\invalid-numeric-field.epJSON"
+if (-not (Test-Path -LiteralPath $invalidNumericFixture -PathType Leaf)) {
+    throw "Missing TypedModel invalid numeric fixture: $invalidNumericFixture"
+}
+
+Write-Host "Compiling invalid-numeric fixture: $invalidNumericFixture"
+$invalidNumericOutput = Invoke-Compile -Path $invalidNumericFixture -ExpectedExitCode 1
+Assert-Contains -Text $invalidNumericOutput -Pattern "Compile diagnostics" -Description "invalid-numeric diagnostics header"
+Assert-Contains -Text $invalidNumericOutput -Pattern "diagnostics: 2" -Description "invalid-numeric diagnostic count"
+Assert-Contains -Text $invalidNumericOutput -Pattern "InvalidInteger Timestep/Timestep 1 field number_of_timesteps_per_hour" -Description "invalid-integer diagnostic"
+Assert-Contains -Text $invalidNumericOutput -Pattern "InvalidFieldType Site:Location/Bad Site field latitude" -Description "invalid-field-type diagnostic"
+
 $oracleEpjson = ".runtime\oracle-smoke\26.1.0\convert\smoke.epJSON"
 if (-not (Test-Path -LiteralPath $oracleEpjson -PathType Leaf)) {
     Write-Host "Oracle smoke epJSON is missing; running oracle smoke first."

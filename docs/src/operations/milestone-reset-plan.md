@@ -130,8 +130,8 @@ v0.3:
 
 - [x] align plan/readiness around input interpretation only
 - [x] add `v0.3-verify`
-- [ ] decide whether graph/ExecutionPlan remains v0.3 foundation or moves fully to v0.6
-- [ ] add duplicate-normalized-name and invalid-unit/range negative fixtures if supported
+- [x] decide whether graph/ExecutionPlan remains v0.3 foundation or moves fully to v0.6
+- [x] add duplicate-normalized-name and supported invalid-numeric negative fixtures; defer unit/range until validators exist
 
 v0.4:
 
