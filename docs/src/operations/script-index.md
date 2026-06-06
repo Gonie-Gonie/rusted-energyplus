@@ -43,7 +43,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
-| `compare-weather-smoke` | compare | compare EPW dry-bulb against ESO | no | `.runtime/compare-weather` |
+| `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
 | `compare-construction-materials-smoke` | compare | compare construction/material thermal inputs with EIO | no | console output |
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
@@ -57,5 +57,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
+| `v0.4-verify` | release | verify v0.4 time/weather/schedule evidence | yes | `.runtime/compare-*`, `.runtime/conformance-report` |
 
 No diagnostic command should be listed as conformance evidence.

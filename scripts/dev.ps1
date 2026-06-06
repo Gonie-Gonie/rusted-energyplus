@@ -155,12 +155,18 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.1 runnable release contract."
     }
+    "v0.4-verify" = @{
+        Path = "release\v0.4-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.4 time/weather/schedule evidence contract."
+    }
 }
 
 $Aliases = @{
     "docs" = "docs-check"
     "guard" = "strict-no-false-conformance"
     "verify-v0.1" = "v0.1-verify"
+    "verify-v0.4" = "v0.4-verify"
 }
 
 function Show-Commands {
