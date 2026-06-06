@@ -29,7 +29,6 @@ blocking = true
 Diagnostic-only cases must use:
 
 ```toml
-comparison_class = "diagnostic"
+comparison_class = "diagnostic-only"
 conformance_claim = false
 ```
-

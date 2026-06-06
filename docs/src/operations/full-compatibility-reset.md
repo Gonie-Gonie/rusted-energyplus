@@ -288,6 +288,7 @@ P2 compatibility work:
 - [x] add `Schedule:Compact` subset foundation
 - [x] add geometry summary foundation
 - [x] add EnergyPlus EIO geometry comparison gate
+- [x] add EnergyPlus EIO surface area/tilt/azimuth comparison gate
 - [x] add EnergyPlus EIO construction/material thermal input gate
 - [x] add EnergyPlus EIO `OtherEquipment` nominal internal-gains gate
 - [x] write heat-balance porting map before heat-balance code

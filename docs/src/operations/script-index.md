@@ -45,6 +45,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
+| `compare-surface-geometry-smoke` | compare | compare Rust surface area, azimuth, and tilt with EIO | no | `.runtime/compare-surface-geometry` |
 | `compare-construction-materials-smoke` | compare | compare construction/material thermal inputs with EIO | no | console output |
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-convective-gain` |
@@ -58,5 +59,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 | `v0.4-verify` | release | verify v0.4 time/weather/schedule evidence | yes | `.runtime/compare-*`, `.runtime/conformance-report` |
+| `v0.5-verify` | release | verify v0.5 geometry/internal-variable evidence | yes | `.runtime/compare-*` |
 
 No diagnostic command should be listed as conformance evidence.

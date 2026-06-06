@@ -69,6 +69,8 @@
 - [v0.3.0 Plan](operations/v0.3.0-plan.md)
 - [v0.4.0 Plan](operations/v0.4.0-plan.md)
 - [v0.4.0 Readiness](operations/v0.4.0-readiness.md)
+- [v0.5.0 Plan](operations/v0.5.0-plan.md)
+- [v0.5.0 Readiness](operations/v0.5.0-readiness.md)
 
 # Archive
 

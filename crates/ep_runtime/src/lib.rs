@@ -2107,14 +2107,15 @@ DATA PERIODS
     }
 
     #[test]
-    fn surface_geometry_summary_reports_cube_orientation() {
+    fn surface_geometry_summary_reports_cube_orientation() -> Result<(), Box<dyn std::error::Error>>
+    {
         let summaries = surface_geometry_summaries(&cube_model());
 
         assert_eq!(summaries.len(), 6);
         let floor = summaries
             .iter()
             .find(|surface| surface.surface_name == "FLOOR")
-            .expect("floor surface");
+            .ok_or_else(|| std::io::Error::other("missing floor surface"))?;
         assert_eq!(floor.zone_name, "ZONE ONE");
         assert_eq!(floor.surface_type, SurfaceType::Floor);
         assert_eq!(floor.area_m2, 1.0);
@@ -2124,7 +2125,7 @@ DATA PERIODS
         let roof = summaries
             .iter()
             .find(|surface| surface.surface_name == "ROOF")
-            .expect("roof surface");
+            .ok_or_else(|| std::io::Error::other("missing roof surface"))?;
         assert_eq!(roof.surface_type, SurfaceType::Roof);
         assert_eq!(roof.area_m2, 1.0);
         assert!((roof.azimuth_deg - 0.0).abs() < 1.0e-9);
@@ -2140,12 +2141,14 @@ DATA PERIODS
             let wall = summaries
                 .iter()
                 .find(|surface| surface.surface_name == surface_name)
-                .expect("wall surface");
+                .ok_or_else(|| std::io::Error::other(format!("missing {surface_name} surface")))?;
             assert_eq!(wall.surface_type, SurfaceType::Wall);
             assert_eq!(wall.area_m2, 1.0);
             assert!((wall.azimuth_deg - azimuth_deg).abs() < 1.0e-9);
             assert!((wall.tilt_deg - 90.0).abs() < 1.0e-9);
         }
+
+        Ok(())
     }
 
     #[test]

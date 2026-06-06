@@ -24,7 +24,15 @@ key = "*"
 variable = "Site Outdoor Air Drybulb Temperature"
 frequency = "Hourly"
 class = "weather"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Azimuth"
+frequency = "static"
+class = "surface-state"
 ```
 
 Each output request must define key, variable, frequency, and variable class.
 
+Use `static` for EIO/static report rows that do not have a timestep axis, such
+as surface geometry fields.
