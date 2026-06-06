@@ -1,23 +1,26 @@
 //! Command line entry point for eplus-rs.
 
 use ep_compare::{
-    Tolerance, compare_series, load_eio_construction_ctf, load_eio_material_ctf_summary,
-    load_eio_other_equipment_nominal, load_eio_zone_geometry, load_eso_series,
+    Tolerance, compare_series, load_eio_construction_ctf, load_eio_heat_transfer_surfaces,
+    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_zone_geometry,
+    load_eso_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, ReportFormat, VariableClass,
     load_case_file,
 };
-use ep_model::{Construction, Material, OtherEquipment, ScheduleId, SimulationModel, TypedModel};
+use ep_model::{
+    Construction, Material, OtherEquipment, ScheduleId, SimulationModel, SurfaceType, TypedModel,
+};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, FirstZoneSimulationOptions, HeatBalanceSimulationOptions, SimulationMode,
-    ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
-    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
-    zone_geometry_summaries,
+    SurfaceGeometrySummary, ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis,
+    load_epw_dry_bulb_series, load_epw_records, simulate_constant_schedules,
+    simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+    simulate_zone_internal_convective_gains, surface_geometry_summaries, zone_geometry_summaries,
 };
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -197,6 +200,7 @@ fn print_help() {
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
+    println!("  compare surface-geometry <input.epJSON> <eplusout.eio>");
     println!("  compare construction-materials <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
@@ -856,6 +860,7 @@ fn comparison_class_label(class: ComparisonClass) -> &'static str {
 
 fn output_frequency_label(frequency: OutputFrequency) -> &'static str {
     match frequency {
+        OutputFrequency::Static => "static",
         OutputFrequency::Timestep => "timestep",
         OutputFrequency::Hourly => "hourly",
         OutputFrequency::Daily => "daily",
@@ -1016,6 +1021,7 @@ fn run_compare_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("schedule-value") => run_compare_schedule_value(&args[1..]),
         Some("geometry") => run_compare_geometry(&args[1..]),
+        Some("surface-geometry") => run_compare_surface_geometry(&args[1..]),
         Some("construction-materials") => run_compare_construction_materials(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
@@ -1025,6 +1031,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("unsupported compare command: {command}");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
             );
@@ -1041,6 +1048,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("missing compare command");
             eprintln!("usage: eplus-rs compare schedule-value <input.epJSON> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare geometry <input.epJSON> <eplusout.eio>");
+            eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
             );
@@ -1243,6 +1251,119 @@ fn run_compare_geometry(args: &[String]) -> i32 {
             oracle_zone.exterior_gross_wall_area_m2,
             rust_zone.exterior_wall_area_m2,
             if zone_pass { "pass" } else { "fail" }
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_surface_geometry(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_surfaces = surface_geometry_summaries(&model);
+    if rust_surfaces.is_empty() {
+        eprintln!(
+            "no BuildingSurface:Detailed objects are available for surface geometry comparison"
+        );
+        return 1;
+    }
+
+    let oracle_surfaces = match load_eio_heat_transfer_surfaces(eio_path) {
+        Ok(surfaces) => surfaces,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let tolerance = Tolerance {
+        absolute: 0.01,
+        relative: 1.0e-6,
+    };
+    let mut passed = rust_surfaces.len() == oracle_surfaces.len();
+    let mut first_divergence = None;
+    if rust_surfaces.len() != oracle_surfaces.len() {
+        first_divergence = Some(format!(
+            "surface_count expected {} observed {}",
+            oracle_surfaces.len(),
+            rust_surfaces.len()
+        ));
+    }
+
+    println!("Surface Geometry Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: absolute-0.01-relative-0.000001");
+    println!("  surfaces: {}", rust_surfaces.len());
+    println!("  oracle_surfaces: {}", oracle_surfaces.len());
+    for rust_surface in &rust_surfaces {
+        let Some(oracle_surface) = oracle_surfaces.iter().find(|surface| {
+            surface
+                .surface_name
+                .eq_ignore_ascii_case(&rust_surface.surface_name)
+        }) else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!("surface {} missing_in_eio", rust_surface.surface_name),
+            );
+            println!("  surface: {} status: fail", rust_surface.surface_name);
+            continue;
+        };
+
+        let surface_pass = surface_geometry_row_matches(rust_surface, oracle_surface, tolerance);
+        if !surface_pass {
+            passed = false;
+            record_surface_geometry_field_divergence(
+                &mut first_divergence,
+                rust_surface,
+                oracle_surface,
+                tolerance,
+            );
+        }
+
+        println!(
+            "  surface: {} class: {}/{} area_net_m2: {:.6}/{:.6} area_gross_m2: {:.6}/{:.6} azimuth_deg: {:.6}/{:.6} tilt_deg: {:.6}/{:.6} zone: {} status: {}",
+            rust_surface.surface_name,
+            oracle_surface.surface_class,
+            surface_type_label(rust_surface.surface_type),
+            oracle_surface.area_net_m2,
+            rust_surface.area_m2,
+            oracle_surface.area_gross_m2,
+            rust_surface.area_m2,
+            oracle_surface.azimuth_deg,
+            rust_surface.azimuth_deg,
+            oracle_surface.tilt_deg,
+            rust_surface.tilt_deg,
+            rust_surface.zone_name,
+            if surface_pass { "pass" } else { "fail" }
         );
     }
 
@@ -2276,6 +2397,117 @@ fn record_geometry_field_divergence(
     }
 }
 
+fn surface_geometry_row_matches(
+    rust_surface: &SurfaceGeometrySummary,
+    oracle_surface: &ep_compare::EioHeatTransferSurface,
+    tolerance: Tolerance,
+) -> bool {
+    oracle_surface
+        .surface_class
+        .eq_ignore_ascii_case(surface_type_label(rust_surface.surface_type))
+        && tolerance.accepts(oracle_surface.area_net_m2, rust_surface.area_m2)
+        && tolerance.accepts(oracle_surface.area_gross_m2, rust_surface.area_m2)
+        && angle_accepts(
+            oracle_surface.azimuth_deg,
+            rust_surface.azimuth_deg,
+            tolerance,
+        )
+        && angle_accepts(oracle_surface.tilt_deg, rust_surface.tilt_deg, tolerance)
+}
+
+fn record_surface_geometry_field_divergence(
+    first_divergence: &mut Option<String>,
+    rust_surface: &SurfaceGeometrySummary,
+    oracle_surface: &ep_compare::EioHeatTransferSurface,
+    tolerance: Tolerance,
+) {
+    let rust_class = surface_type_label(rust_surface.surface_type);
+    if !oracle_surface
+        .surface_class
+        .eq_ignore_ascii_case(rust_class)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field class expected {} observed {}",
+                rust_surface.surface_name, oracle_surface.surface_class, rust_class
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(oracle_surface.area_net_m2, rust_surface.area_m2) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field area_net_m2 expected {:.6} observed {:.6}",
+                rust_surface.surface_name, oracle_surface.area_net_m2, rust_surface.area_m2
+            ),
+        );
+        return;
+    }
+
+    if !tolerance.accepts(oracle_surface.area_gross_m2, rust_surface.area_m2) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field area_gross_m2 expected {:.6} observed {:.6}",
+                rust_surface.surface_name, oracle_surface.area_gross_m2, rust_surface.area_m2
+            ),
+        );
+        return;
+    }
+
+    if !angle_accepts(
+        oracle_surface.azimuth_deg,
+        rust_surface.azimuth_deg,
+        tolerance,
+    ) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field azimuth_deg expected {:.6} observed {:.6}",
+                rust_surface.surface_name, oracle_surface.azimuth_deg, rust_surface.azimuth_deg
+            ),
+        );
+        return;
+    }
+
+    if !angle_accepts(oracle_surface.tilt_deg, rust_surface.tilt_deg, tolerance) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field tilt_deg expected {:.6} observed {:.6}",
+                rust_surface.surface_name, oracle_surface.tilt_deg, rust_surface.tilt_deg
+            ),
+        );
+    }
+}
+
+fn surface_type_label(surface_type: SurfaceType) -> &'static str {
+    match surface_type {
+        SurfaceType::Ceiling => "Ceiling",
+        SurfaceType::Floor => "Floor",
+        SurfaceType::Roof => "Roof",
+        SurfaceType::Wall => "Wall",
+    }
+}
+
+fn angle_accepts(expected: f64, observed: f64, tolerance: Tolerance) -> bool {
+    let delta = angle_abs_delta_deg(expected, observed);
+    if delta <= tolerance.absolute {
+        return true;
+    }
+
+    let scale = expected.abs().max(observed.abs());
+    delta <= tolerance.relative * scale
+}
+
+fn angle_abs_delta_deg(expected: f64, observed: f64) -> f64 {
+    let delta = (expected - observed).rem_euclid(360.0);
+    delta.min(360.0 - delta)
+}
+
 fn record_construction_material_field_divergence(
     first_divergence: &mut Option<String>,
     rust_row: &ConstructionMaterialRow,
@@ -3062,6 +3294,13 @@ mod tests {
     #[test]
     fn missing_compare_geometry_path_fails() {
         let args = vec!["compare".to_string(), "geometry".to_string()];
+
+        assert_eq!(run(&args), 2);
+    }
+
+    #[test]
+    fn missing_compare_surface_geometry_path_fails() {
+        let args = vec!["compare".to_string(), "surface-geometry".to_string()];
 
         assert_eq!(run(&args), 2);
     }

@@ -1,0 +1,41 @@
+id = "surface_geometry_001"
+title = "Surface geometry EIO static inputs"
+milestone = "v0.5-geometry-internal-variables"
+purpose = "Compare Rust surface area, azimuth, and tilt summaries with EnergyPlus HeatTransfer Surface EIO rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The smoke gate compares static surface geometry fields from Output:Surfaces:List,Details.",
+  "The case remains non-blocking evidence until broader coordinate-system and geometry-rule coverage is added.",
+]
+
+[input]
+idf = "data/conformance_cases/surface_geometry_001/surface_geometry.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Net)"
+frequency = "static"
+class = "surface-state"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Azimuth"
+frequency = "static"
+class = "surface-state"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Tilt"
+frequency = "static"
+class = "surface-state"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/surface_geometry_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-surface-geometry-smoke"
+blocking = false

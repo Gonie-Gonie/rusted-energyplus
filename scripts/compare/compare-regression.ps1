@@ -182,6 +182,12 @@ $suiteCases = @(
         command = "compare-geometry-smoke"
     },
     [pscustomobject]@{
+        id = "surface-geometry"
+        kind = "geometry"
+        comparison_class = "input-static-smoke"
+        command = "compare-surface-geometry-smoke"
+    },
+    [pscustomobject]@{
         id = "construction-materials"
         kind = "construction"
         comparison_class = "input-static-smoke"

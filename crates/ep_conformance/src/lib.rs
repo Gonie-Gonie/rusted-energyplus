@@ -243,6 +243,8 @@ impl From<OutputRequest> for OutputSeriesSpec {
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "kebab-case")]
 pub enum OutputFrequency {
+    /// Static input/report rows with no timestep axis.
+    Static,
     /// Every simulation timestep.
     Timestep,
     /// Hourly reporting.
@@ -688,19 +690,48 @@ mod tests {
     }
 
     #[test]
+    fn loads_surface_geometry_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/surface_geometry_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "surface_geometry_001");
+        assert_eq!(manifest.milestone, "v0.5-geometry-internal-variables");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
+        assert!(!manifest.conformance_claim);
+        assert_eq!(manifest.outputs.len(), 3);
+        assert!(manifest.outputs.iter().all(|output| {
+            output.key == "*"
+                && output.frequency == OutputFrequency::Static
+                && output.class == VariableClass::SurfaceState
+        }));
+        assert!(
+            manifest
+                .outputs
+                .iter()
+                .any(|output| { output.variable == "HeatTransfer Surface Azimuth" })
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
         let manifest =
             load_suite_file(repo_root().join("data/conformance_suites/foundation.toml"))?;
 
         assert_eq!(manifest.id, "foundation");
         assert_eq!(manifest.oracle_version, "26.1.0");
-        assert_eq!(manifest.cases.len(), 3);
+        assert_eq!(manifest.cases.len(), 4);
         assert!(
             manifest
                 .cases
                 .iter()
                 .any(|case| case.ends_with("data/conformance_cases/weather_fields_001/case.toml"))
         );
+        assert!(manifest.cases.iter().any(|case| {
+            case.ends_with("data/conformance_cases/surface_geometry_001/case.toml")
+        }));
         assert!(manifest.cases.iter().any(|case| {
             case.ends_with("data/conformance_cases/zone_temperature_diagnostic_001/case.toml")
         }));

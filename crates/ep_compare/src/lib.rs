@@ -76,6 +76,25 @@ pub struct EioZoneGeometry {
     pub exterior_gross_wall_area_m2: f64,
 }
 
+/// Surface geometry values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioHeatTransferSurface {
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EIO surface class.
+    pub surface_class: String,
+    /// EIO construction name.
+    pub construction_name: String,
+    /// EIO `Area (Net) {m2}`.
+    pub area_net_m2: f64,
+    /// EIO `Area (Gross) {m2}`.
+    pub area_gross_m2: f64,
+    /// EIO `Azimuth {deg}`.
+    pub azimuth_deg: f64,
+    /// EIO `Tilt {deg}`.
+    pub tilt_deg: f64,
+}
+
 /// OtherEquipment nominal internal gain values read from EnergyPlus `eplusout.eio`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioOtherEquipmentNominal {
@@ -218,6 +237,8 @@ pub enum EioError {
     Io(std::io::Error),
     /// No `Zone Information` rows were present.
     MissingZoneInformation,
+    /// No `HeatTransfer Surface` rows were present.
+    MissingHeatTransferSurface,
     /// No `OtherEquipment Internal Gains Nominal` rows were present.
     MissingOtherEquipmentNominal,
     /// No `Construction CTF` rows were present.
@@ -226,6 +247,15 @@ pub enum EioError {
     MissingMaterialCtfSummary,
     /// A `Zone Information` row could not be parsed.
     InvalidZoneInformation {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// A `HeatTransfer Surface` row could not be parsed.
+    InvalidHeatTransferSurface {
         /// One-based line number.
         line: usize,
         /// Raw line text.
@@ -281,6 +311,9 @@ impl Display for EioError {
         match self {
             Self::Io(error) => write!(formatter, "failed to read EIO: {error}"),
             Self::MissingZoneInformation => write!(formatter, "EIO Zone Information not found"),
+            Self::MissingHeatTransferSurface => {
+                write!(formatter, "EIO HeatTransfer Surface not found")
+            }
             Self::MissingOtherEquipmentNominal => {
                 write!(
                     formatter,
@@ -294,6 +327,10 @@ impl Display for EioError {
             Self::InvalidZoneInformation { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Zone Information at line {line}: {reason}: {text}"
+            ),
+            Self::InvalidHeatTransferSurface { line, text, reason } => write!(
+                formatter,
+                "invalid EIO HeatTransfer Surface at line {line}: {reason}: {text}"
             ),
             Self::InvalidOtherEquipmentNominal { line, text, reason } => write!(
                 formatter,
@@ -325,8 +362,10 @@ impl std::error::Error for EioError {
         match self {
             Self::Io(error) => Some(error),
             Self::MissingZoneInformation
+            | Self::MissingHeatTransferSurface
             | Self::MissingOtherEquipmentNominal
             | Self::InvalidZoneInformation { .. }
+            | Self::InvalidHeatTransferSurface { .. }
             | Self::MissingConstructionCtf
             | Self::MissingMaterialCtfSummary
             | Self::InvalidOtherEquipmentNominal { .. }
@@ -362,6 +401,14 @@ pub fn load_eso_series(
 pub fn load_eio_zone_geometry(path: impl AsRef<Path>) -> Result<Vec<EioZoneGeometry>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_zone_geometry(&contents)
+}
+
+/// Loads heat-transfer surface rows from an EnergyPlus EIO file.
+pub fn load_eio_heat_transfer_surfaces(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioHeatTransferSurface>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_heat_transfer_surfaces(&contents)
 }
 
 /// Loads OtherEquipment nominal internal gain rows from an EnergyPlus EIO file.
@@ -483,6 +530,51 @@ pub fn parse_eio_zone_geometry(contents: &str) -> Result<Vec<EioZoneGeometry>, E
     }
 
     Ok(zones)
+}
+
+/// Parses `HeatTransfer Surface` rows from EnergyPlus EIO contents.
+pub fn parse_eio_heat_transfer_surfaces(
+    contents: &str,
+) -> Result<Vec<EioHeatTransferSurface>, EioError> {
+    let mut surfaces = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("HeatTransfer Surface,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 13 {
+            return Err(EioError::InvalidHeatTransferSurface {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 14 fields, found {}", fields.len()),
+            });
+        }
+
+        surfaces.push(EioHeatTransferSurface {
+            surface_name: required_field(&fields, 1).to_ascii_uppercase(),
+            surface_class: required_field(&fields, 2).to_string(),
+            construction_name: required_field(&fields, 5).to_ascii_uppercase(),
+            area_net_m2: parse_surface_f64_field(&fields, 9, line_number, line, "Area (Net) {m2}")?,
+            area_gross_m2: parse_surface_f64_field(
+                &fields,
+                10,
+                line_number,
+                line,
+                "Area (Gross) {m2}",
+            )?,
+            azimuth_deg: parse_surface_f64_field(&fields, 12, line_number, line, "Azimuth {deg}")?,
+            tilt_deg: parse_surface_f64_field(&fields, 13, line_number, line, "Tilt {deg}")?,
+        });
+    }
+
+    if surfaces.is_empty() {
+        return Err(EioError::MissingHeatTransferSurface);
+    }
+
+    Ok(surfaces)
 }
 
 /// Parses `OtherEquipment Internal Gains Nominal` rows from EnergyPlus EIO contents.
@@ -738,6 +830,22 @@ fn parse_other_f64_field(
         })
 }
 
+fn parse_surface_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidHeatTransferSurface {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
 fn parse_construction_f64_field(
     fields: &[&str],
     index: usize,
@@ -822,8 +930,9 @@ fn normalize_key(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        Tolerance, compare_series, parse_eio_construction_ctf, parse_eio_material_ctf_summary,
-        parse_eio_other_equipment_nominal, parse_eio_zone_geometry, parse_eso_series,
+        Tolerance, compare_series, parse_eio_construction_ctf, parse_eio_heat_transfer_surfaces,
+        parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal, parse_eio_zone_geometry,
+        parse_eso_series,
     };
 
     #[test]
@@ -868,6 +977,26 @@ End of Data Dictionary
         assert_eq!(zones[0].floor_area_m2, 232.26);
         assert_eq!(zones[0].volume_m3, 1061.88);
         assert_eq!(zones[0].exterior_gross_wall_area_m2, 278.71);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_eio_heat_transfer_surface_rows() -> Result<(), Box<dyn std::error::Error>> {
+        let surfaces = parse_eio_heat_transfer_surfaces(
+            r#"! <HeatTransfer Surface>,Surface Name,...
+ HeatTransfer Surface,WALL X0,Wall,,CTF - ConductionTransferFunction,WALL CONSTRUCTION,1.000,0.870,,1.00,1.00,1.00,90.00,90.00,1.00,1.00,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,NoSun,NoWind,0.50,0.50,0.50,0.50,4
+"#,
+        )?;
+
+        assert_eq!(surfaces.len(), 1);
+        assert_eq!(surfaces[0].surface_name, "WALL X0");
+        assert_eq!(surfaces[0].surface_class, "Wall");
+        assert_eq!(surfaces[0].construction_name, "WALL CONSTRUCTION");
+        assert_eq!(surfaces[0].area_net_m2, 1.0);
+        assert_eq!(surfaces[0].area_gross_m2, 1.0);
+        assert_eq!(surfaces[0].azimuth_deg, 90.0);
+        assert_eq!(surfaces[0].tilt_deg, 90.0);
 
         Ok(())
     }

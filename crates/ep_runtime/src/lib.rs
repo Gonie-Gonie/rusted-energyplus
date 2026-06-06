@@ -430,6 +430,25 @@ pub struct ZoneGeometrySummary {
     pub exterior_wall_area_m2: f64,
 }
 
+/// Surface geometry summary used for EnergyPlus EIO static-input comparisons.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceGeometrySummary {
+    /// Surface ID.
+    pub surface_id: SurfaceId,
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// Surface type.
+    pub surface_type: SurfaceType,
+    /// Net surface area in square meters.
+    pub area_m2: f64,
+    /// Surface azimuth in degrees clockwise from north.
+    pub azimuth_deg: f64,
+    /// Surface tilt in degrees.
+    pub tilt_deg: f64,
+}
+
 /// Initial heat-balance state shell for the EnergyPlus porting path.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeatBalanceState {
@@ -1175,6 +1194,33 @@ pub fn zone_geometry_summaries(model: &TypedModel) -> Vec<ZoneGeometrySummary> {
         .collect()
 }
 
+/// Builds per-surface geometry summaries from the typed model.
+#[must_use]
+pub fn surface_geometry_summaries(model: &TypedModel) -> Vec<SurfaceGeometrySummary> {
+    model
+        .surfaces
+        .iter()
+        .map(|surface| {
+            let zone_name = model
+                .zones
+                .iter()
+                .find(|zone| zone.id == surface.zone)
+                .map(|zone| zone.name.0.clone())
+                .unwrap_or_else(|| "UNKNOWN".to_string());
+
+            SurfaceGeometrySummary {
+                surface_id: surface.id,
+                surface_name: surface.name.0.clone(),
+                zone_name,
+                surface_type: surface.surface_type,
+                area_m2: surface_area_m2(&surface.vertices),
+                azimuth_deg: surface_azimuth_deg(&surface.vertices),
+                tilt_deg: surface_tilt_deg(&surface.vertices),
+            }
+        })
+        .collect()
+}
+
 fn zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
     model
         .surfaces
@@ -1274,6 +1320,77 @@ pub fn surface_area_m2(vertices: &[Point3]) -> f64 {
             cross(first, second).magnitude() * 0.5
         })
         .sum()
+}
+
+fn surface_azimuth_deg(vertices: &[Point3]) -> f64 {
+    let Some(normal) = polygon_normal(vertices) else {
+        return 0.0;
+    };
+
+    let horizontal_magnitude = normal.x.hypot(normal.y);
+    if horizontal_magnitude > 1.0e-12 {
+        return normalize_degrees(normal.x.atan2(normal.y).to_degrees());
+    }
+
+    first_horizontal_edge(vertices)
+        .map(|edge| normalize_degrees((-edge.x).atan2(edge.y).to_degrees()))
+        .unwrap_or(0.0)
+}
+
+fn surface_tilt_deg(vertices: &[Point3]) -> f64 {
+    let Some(normal) = polygon_normal(vertices) else {
+        return 0.0;
+    };
+    let magnitude = normal.magnitude();
+    if magnitude <= 1.0e-12 {
+        return 0.0;
+    }
+
+    (-normal.z / magnitude).clamp(-1.0, 1.0).acos().to_degrees()
+}
+
+fn polygon_normal(vertices: &[Point3]) -> Option<Vector3> {
+    if vertices.len() < 3 {
+        return None;
+    }
+
+    let origin = vertices[0];
+    let mut normal = Vector3 {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
+    for window in vertices[1..].windows(2) {
+        let first = vector_between(origin, window[0]);
+        let second = vector_between(origin, window[1]);
+        let triangle_normal = cross(first, second);
+        normal.x += triangle_normal.x;
+        normal.y += triangle_normal.y;
+        normal.z += triangle_normal.z;
+    }
+
+    if normal.magnitude() > 1.0e-12 {
+        Some(normal)
+    } else {
+        None
+    }
+}
+
+fn first_horizontal_edge(vertices: &[Point3]) -> Option<Vector3> {
+    vertices
+        .windows(2)
+        .map(|window| vector_between(window[0], window[1]))
+        .chain(
+            vertices
+                .first()
+                .zip(vertices.last())
+                .map(|(first, last)| vector_between(*last, *first)),
+        )
+        .find(|edge| edge.x.hypot(edge.y) > 1.0e-12)
+}
+
+fn normalize_degrees(value: f64) -> f64 {
+    value.rem_euclid(360.0)
 }
 
 fn step_zone_air_temperature(
@@ -1731,7 +1848,7 @@ mod tests {
         parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
         simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
-        zone_geometry_summaries,
+        surface_geometry_summaries, zone_geometry_summaries,
     };
     use ep_model::{
         AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
@@ -1990,6 +2107,48 @@ DATA PERIODS
     }
 
     #[test]
+    fn surface_geometry_summary_reports_cube_orientation() {
+        let summaries = surface_geometry_summaries(&cube_model());
+
+        assert_eq!(summaries.len(), 6);
+        let floor = summaries
+            .iter()
+            .find(|surface| surface.surface_name == "FLOOR")
+            .expect("floor surface");
+        assert_eq!(floor.zone_name, "ZONE ONE");
+        assert_eq!(floor.surface_type, SurfaceType::Floor);
+        assert_eq!(floor.area_m2, 1.0);
+        assert!((floor.azimuth_deg - 270.0).abs() < 1.0e-9);
+        assert!((floor.tilt_deg - 180.0).abs() < 1.0e-9);
+
+        let roof = summaries
+            .iter()
+            .find(|surface| surface.surface_name == "ROOF")
+            .expect("roof surface");
+        assert_eq!(roof.surface_type, SurfaceType::Roof);
+        assert_eq!(roof.area_m2, 1.0);
+        assert!((roof.azimuth_deg - 0.0).abs() < 1.0e-9);
+        assert!((roof.tilt_deg - 0.0).abs() < 1.0e-9);
+
+        let wall_azimuths = [
+            ("WALL X0", 90.0),
+            ("WALL X1", 270.0),
+            ("WALL Y0", 0.0),
+            ("WALL Y1", 180.0),
+        ];
+        for (surface_name, azimuth_deg) in wall_azimuths {
+            let wall = summaries
+                .iter()
+                .find(|surface| surface.surface_name == surface_name)
+                .expect("wall surface");
+            assert_eq!(wall.surface_type, SurfaceType::Wall);
+            assert_eq!(wall.area_m2, 1.0);
+            assert!((wall.azimuth_deg - azimuth_deg).abs() < 1.0e-9);
+            assert!((wall.tilt_deg - 90.0).abs() < 1.0e-9);
+        }
+    }
+
+    #[test]
     fn heat_balance_state_shell_initializes_cube_metrics() -> Result<(), Box<dyn std::error::Error>>
     {
         let model = SimulationModel::from_typed(cube_model());
@@ -2223,9 +2382,9 @@ DATA PERIODS
                 SurfaceType::Roof,
                 [
                     point(0.0, 0.0, 1.0),
-                    point(1.0, 0.0, 1.0),
-                    point(1.0, 1.0, 1.0),
                     point(0.0, 1.0, 1.0),
+                    point(1.0, 1.0, 1.0),
+                    point(1.0, 0.0, 1.0),
                 ],
             ),
             surface(
@@ -2245,9 +2404,9 @@ DATA PERIODS
                 SurfaceType::Wall,
                 [
                     point(1.0, 0.0, 0.0),
-                    point(1.0, 1.0, 0.0),
-                    point(1.0, 1.0, 1.0),
                     point(1.0, 0.0, 1.0),
+                    point(1.0, 1.0, 1.0),
+                    point(1.0, 1.0, 0.0),
                 ],
             ),
             surface(
@@ -2256,9 +2415,9 @@ DATA PERIODS
                 SurfaceType::Wall,
                 [
                     point(0.0, 0.0, 0.0),
-                    point(1.0, 0.0, 0.0),
-                    point(1.0, 0.0, 1.0),
                     point(0.0, 0.0, 1.0),
+                    point(1.0, 0.0, 1.0),
+                    point(1.0, 0.0, 0.0),
                 ],
             ),
             surface(
