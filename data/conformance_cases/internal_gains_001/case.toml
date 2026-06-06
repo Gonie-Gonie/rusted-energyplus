@@ -1,0 +1,82 @@
+id = "internal_gains_001"
+title = "OtherEquipment internal gains smoke inputs"
+milestone = "v0.5-geometry-internal-variables"
+purpose = "Compare Rust OtherEquipment nominal gains with EnergyPlus EIO rows and the first internal convective gain ESO trace."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The nominal gate compares OtherEquipment Internal Gains Nominal EIO rows from the dedicated internal_gains_001 fixture.",
+  "The convective trace gate compares Zone Total Internal Convective Heating Rate from the same fixture family.",
+  "The ESO trace is still smoke evidence for internal-gain plumbing, not heat-balance conformance.",
+  "This remains non-blocking evidence until report artifacts, declared tolerances, and blocking gates are promoted.",
+]
+
+[input]
+idf = "data/conformance_cases/internal_gains_001/internal_gains.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-internal-gains/26.1.0/internal-gains.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Zone Floor Area"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Equipment Level"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Equipment per Floor Area"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Latent"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Radiant"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Lost"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Convected"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Total Internal Convective Heating Rate"
+frequency = "hourly"
+class = "internal-gain"
+source = "eso"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/internal_gains_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-internal-gains-smoke; scripts/dev.cmd compare-internal-convective-gain-smoke"
+blocking = false

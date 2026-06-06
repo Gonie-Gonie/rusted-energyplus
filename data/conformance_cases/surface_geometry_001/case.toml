@@ -16,7 +16,21 @@ weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3
 
 [[outputs]]
 key = "*"
+variable = "HeatTransfer Surface Class"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+
+[[outputs]]
+key = "*"
 variable = "HeatTransfer Surface Area (Net)"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Gross)"
 frequency = "static"
 class = "surface-state"
 source = "eio"

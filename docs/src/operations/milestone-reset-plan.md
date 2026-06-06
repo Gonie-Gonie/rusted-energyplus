@@ -142,10 +142,10 @@ v0.4:
 
 v0.5:
 
-- [ ] add dedicated `construction_materials_001` and `internal_gains_001` manifests
-- [ ] document EIO parser trust boundaries
-- [ ] lock geometry, construction/material, and internal-gain variable lists
-- [ ] document unsupported `GlobalGeometryRules`, coordinate-system, rotation, and fenestration boundaries
+- [x] add dedicated `construction_materials_001` and `internal_gains_001` manifests
+- [x] document EIO parser trust boundaries
+- [x] lock geometry, construction/material, and internal-gain variable lists
+- [x] document unsupported `GlobalGeometryRules`, coordinate-system, rotation, and fenestration boundaries
 
 v0.6+:
 

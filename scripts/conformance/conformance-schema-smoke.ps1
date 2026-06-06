@@ -19,6 +19,10 @@ $required = @(
     "data\conformance_cases\weather_fields_001\weather_fields.idf",
     "data\conformance_cases\surface_geometry_001\case.toml",
     "data\conformance_cases\surface_geometry_001\surface_geometry.idf",
+    "data\conformance_cases\construction_materials_001\case.toml",
+    "data\conformance_cases\construction_materials_001\construction_materials.idf",
+    "data\conformance_cases\internal_gains_001\case.toml",
+    "data\conformance_cases\internal_gains_001\internal_gains.idf",
     "data\conformance_cases\zone_temperature_diagnostic_001\case.toml",
     "data\conformance_cases\zone_temperature_diagnostic_001\zone_temperature.idf",
     "data\conformance_suites\foundation.toml"

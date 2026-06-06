@@ -8,7 +8,43 @@ $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
-Set-Location $RepoRoot
+$OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
+$OutputRoot = Join-Path $RepoRoot ".runtime\compare-construction-materials\26.1.0"
+
+function Assert-RepoSubPath {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $root = [System.IO.Path]::GetFullPath($RepoRoot)
+    if (-not $full.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to operate outside repository: $full"
+    }
+}
+
+function Remove-RepoDirectory {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    if (Test-Path -LiteralPath $Path) {
+        Assert-RepoSubPath -Path $Path
+        Remove-Item -LiteralPath $Path -Recurse -Force
+    }
+}
+
+function New-Directory {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    if (-not (Test-Path -LiteralPath $Path)) {
+        New-Item -ItemType Directory -Force -Path $Path | Out-Null
+    }
+}
+
+function Invoke-External {
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath,
+        [Parameter(Mandatory = $true)][string[]]$Arguments
+    )
+    & $FilePath @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "Command failed ($LASTEXITCODE): $FilePath $($Arguments -join ' ')"
+    }
+}
 
 function Assert-Contains {
     param(
@@ -23,19 +59,44 @@ function Assert-Contains {
     Write-Host "OK $Description`: $Pattern"
 }
 
-$fixture = ".runtime\oracle-smoke\26.1.0\convert\smoke.epJSON"
-$eio = ".runtime\oracle-smoke\26.1.0\eplusout.eio"
-if (
-    -not (Test-Path -LiteralPath $fixture -PathType Leaf) -or
-    -not (Test-Path -LiteralPath $eio -PathType Leaf)
-) {
-    Write-Host "Oracle construction/material artifacts are missing; running oracle smoke first."
-    Invoke-DevCommand -Command "oracle-smoke"
-}
-foreach ($path in @($fixture, $eio)) {
+$energyPlus = Join-Path $OracleRoot "energyplus.exe"
+$converter = Join-Path $OracleRoot "ConvertInputFormat.exe"
+$weather = Join-Path $OracleRoot "WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw"
+foreach ($path in @($energyPlus, $converter, $weather)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        throw "Missing oracle construction/material artifact: $path"
+        throw "Missing required oracle file: $path"
     }
+}
+
+Remove-RepoDirectory -Path $OutputRoot
+New-Directory -Path $OutputRoot
+
+$fixtureIdf = Join-Path $RepoRoot "data\conformance_cases\construction_materials_001\construction_materials.idf"
+if (-not (Test-Path -LiteralPath $fixtureIdf -PathType Leaf)) {
+    throw "Missing construction/material fixture: $fixtureIdf"
+}
+$idf = Join-Path $OutputRoot "construction-materials.idf"
+Copy-Item -LiteralPath $fixtureIdf -Destination $idf -Force
+
+Write-Host "Running EnergyPlus construction/material comparison oracle case."
+Invoke-External -FilePath $energyPlus -Arguments @("-w", $weather, "-d", $OutputRoot, $idf)
+
+$eio = Join-Path $OutputRoot "eplusout.eio"
+if (-not (Test-Path -LiteralPath $eio -PathType Leaf)) {
+    throw "EnergyPlus did not produce eplusout.eio"
+}
+
+Push-Location $OutputRoot
+try {
+    Invoke-External -FilePath $converter -Arguments @("construction-materials.idf")
+}
+finally {
+    Pop-Location
+}
+
+$epjson = Join-Path $OutputRoot "construction-materials.epJSON"
+if (-not (Test-Path -LiteralPath $epjson -PathType Leaf)) {
+    throw "ConvertInputFormat did not produce construction-materials.epJSON"
 }
 
 $cargo = Get-Command cargo -ErrorAction SilentlyContinue
@@ -44,7 +105,7 @@ if ($null -eq $cargo) {
 }
 
 Write-Host "Comparing Rust construction/material thermal inputs with EnergyPlus EIO."
-$output = & $cargo.Source run -p ep_cli --quiet -- compare construction-materials $fixture $eio 2>&1
+$output = & $cargo.Source run -p ep_cli --quiet -- compare construction-materials $epjson $eio 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
     throw "Construction/material comparison smoke failed."

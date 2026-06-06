@@ -1,0 +1,75 @@
+id = "construction_materials_001"
+title = "Construction and material EIO static inputs"
+milestone = "v0.5-geometry-internal-variables"
+purpose = "Compare Rust construction/material thermal-input interpretation with EnergyPlus Construction CTF and Material CTF Summary EIO rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The smoke gate uses the dedicated construction_materials_001 fixture and EnergyPlus EIO rows.",
+  "The EIO parser is treated as an oracle extractor only; it does not establish Rust heat-transfer conformance.",
+  "The v0.5 comparison locks construction count, outside material identity, layer count, thermal conductance, and material thermal fields.",
+  "This remains non-blocking evidence until report artifacts, declared tolerances, and blocking gates are promoted.",
+]
+
+[input]
+idf = "data/conformance_cases/construction_materials_001/construction_materials.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-construction-materials/26.1.0/construction-materials.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Construction CTF Thermal Conductance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Thickness"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Conductivity"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Density"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Specific Heat"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/construction_materials_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-construction-materials-smoke"
+blocking = false

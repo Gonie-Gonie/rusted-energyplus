@@ -291,6 +291,10 @@ pub enum VariableClass {
     Schedule,
     /// Weather values.
     Weather,
+    /// Construction and material static input summaries.
+    ConstructionMaterial,
+    /// Internal gains and their derived trace values.
+    InternalGain,
     /// Zone-level state variables.
     ZoneState,
     /// Surface-level state variables.
@@ -725,7 +729,7 @@ mod tests {
         assert_eq!(manifest.milestone, "v0.5-geometry-internal-variables");
         assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
         assert!(!manifest.conformance_claim);
-        assert_eq!(manifest.outputs.len(), 3);
+        assert_eq!(manifest.outputs.len(), 5);
         assert!(manifest.outputs.iter().all(|output| {
             output.key == "*"
                 && output.frequency == OutputFrequency::Static
@@ -743,13 +747,64 @@ mod tests {
     }
 
     #[test]
+    fn loads_construction_materials_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/construction_materials_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "construction_materials_001");
+        assert_eq!(manifest.milestone, "v0.5-geometry-internal-variables");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
+        assert!(!manifest.conformance_claim);
+        assert_eq!(manifest.outputs.len(), 7);
+        assert!(manifest.outputs.iter().all(|output| {
+            output.key == "*"
+                && output.frequency == OutputFrequency::Static
+                && output.class == VariableClass::ConstructionMaterial
+                && output.source == SourceArtifact::Eio
+        }));
+        assert!(
+            manifest
+                .outputs
+                .iter()
+                .any(|output| { output.variable == "Material CTF Summary Thermal Resistance" })
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn loads_internal_gains_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/internal_gains_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "internal_gains_001");
+        assert_eq!(manifest.milestone, "v0.5-geometry-internal-variables");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
+        assert!(!manifest.conformance_claim);
+        assert_eq!(manifest.outputs.len(), 8);
+        assert!(manifest.outputs.iter().all(|output| {
+            output.class == VariableClass::InternalGain
+                && (output.source == SourceArtifact::Eio || output.source == SourceArtifact::Eso)
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.variable == "Zone Total Internal Convective Heating Rate"
+                && output.frequency == OutputFrequency::Hourly
+                && output.source == SourceArtifact::Eso
+        }));
+
+        Ok(())
+    }
+
+    #[test]
     fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
         let manifest =
             load_suite_file(repo_root().join("data/conformance_suites/foundation.toml"))?;
 
         assert_eq!(manifest.id, "foundation");
         assert_eq!(manifest.oracle_version, "26.1.0");
-        assert_eq!(manifest.cases.len(), 4);
+        assert_eq!(manifest.cases.len(), 6);
         assert!(
             manifest
                 .cases
@@ -759,6 +814,14 @@ mod tests {
         assert!(manifest.cases.iter().any(|case| {
             case.ends_with("data/conformance_cases/surface_geometry_001/case.toml")
         }));
+        assert!(manifest.cases.iter().any(|case| {
+            case.ends_with("data/conformance_cases/construction_materials_001/case.toml")
+        }));
+        assert!(
+            manifest.cases.iter().any(|case| {
+                case.ends_with("data/conformance_cases/internal_gains_001/case.toml")
+            })
+        );
         assert!(manifest.cases.iter().any(|case| {
             case.ends_with("data/conformance_cases/zone_temperature_diagnostic_001/case.toml")
         }));

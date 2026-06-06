@@ -1047,6 +1047,8 @@ fn variable_class_label(class: VariableClass) -> &'static str {
     match class {
         VariableClass::Schedule => "schedule",
         VariableClass::Weather => "weather",
+        VariableClass::ConstructionMaterial => "construction-material",
+        VariableClass::InternalGain => "internal-gain",
         VariableClass::ZoneState => "zone-state",
         VariableClass::SurfaceState => "surface-state",
         VariableClass::Meter => "meter",

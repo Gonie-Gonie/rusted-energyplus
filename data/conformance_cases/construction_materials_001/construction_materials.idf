@@ -1,0 +1,150 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Construction Materials Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material:NoMass,R13LAYER,Rough,2.290965,0.9000000,0.7500000,0.7500000;
+
+Material:NoMass,R31LAYER,Rough,5.456,0.9000000,0.7500000,0.7500000;
+
+Material,
+  C5 - 4 IN HW CONCRETE,
+  MediumRough,
+  0.1014984,
+  1.729577,
+  2242.585,
+  836.8000,
+  0.9000000,
+  0.6500000,
+  0.6500000;
+
+Construction,R13WALL,R13LAYER;
+
+Construction,FLOOR,C5 - 4 IN HW CONCRETE;
+
+Construction,ROOF31,R31LAYER;
+
+Zone,ZONE ONE,0,0,0,0,1,1,1,1;
+
+BuildingSurface:Detailed,
+  Floor,
+  Floor,
+  FLOOR,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  0,0,0,
+  1,0,0,
+  1,1,0,
+  0,1,0;
+
+BuildingSurface:Detailed,
+  Roof,
+  Roof,
+  ROOF31,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.0,
+  4,
+  0,0,1,
+  0,1,1,
+  1,1,1,
+  1,0,1;
+
+BuildingSurface:Detailed,
+  Wall X0,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,1,0,
+  0,1,1,
+  0,0,1;
+
+BuildingSurface:Detailed,
+  Wall X1,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  1,0,1,
+  1,1,1,
+  1,1,0;
+
+BuildingSurface:Detailed,
+  Wall Y0,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,0,1,
+  1,0,1,
+  1,0,0;
+
+BuildingSurface:Detailed,
+  Wall Y1,
+  Wall,
+  R13WALL,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,1,0,
+  1,1,0,
+  1,1,1,
+  0,1,1;
+
+Output:Surfaces:List,Details;
+
+Output:Diagnostics,DisplayAdvancedReportVariables;
+
+Output:Constructions,Constructions;

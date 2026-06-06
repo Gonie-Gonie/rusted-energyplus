@@ -9,7 +9,7 @@ Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
-$OutputRoot = Join-Path $RepoRoot ".runtime\compare-internal-convective-gain\26.1.0"
+$OutputRoot = Join-Path $RepoRoot ".runtime\compare-internal-gains\26.1.0"
 
 function Assert-RepoSubPath {
     param([Parameter(Mandatory = $true)][string]$Path)
@@ -71,149 +71,12 @@ foreach ($path in @($energyPlus, $converter, $weather)) {
 Remove-RepoDirectory -Path $OutputRoot
 New-Directory -Path $OutputRoot
 
-$idf = Join-Path $OutputRoot "internal-convective-gain.idf"
-@"
-Version,26.1;
-
-SimulationControl,No,No,No,No,Yes,No;
-
-Building,Internal Convective Gain Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
-
-Timestep,1;
-
-Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
-
-RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
-
-GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
-
-ScheduleTypeLimits,Fraction,0,1,Continuous;
-
-Schedule:Constant,AlwaysOn,Fraction,1.0;
-
-Material:NoMass,R1,Rough,1.0,0.9,0.7,0.7;
-
-Construction,Wall Construction,R1;
-
-Zone,ZONE ONE,0,0,0,0,1,1,1,1;
-
-BuildingSurface:Detailed,
-  Floor,
-  Floor,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  1.0,
-  4,
-  0,0,0,
-  1,0,0,
-  1,1,0,
-  0,1,0;
-
-BuildingSurface:Detailed,
-  Roof,
-  Roof,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  0.0,
-  4,
-  0,0,1,
-  0,1,1,
-  1,1,1,
-  1,0,1;
-
-BuildingSurface:Detailed,
-  Wall X0,
-  Wall,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  0.5,
-  4,
-  0,0,0,
-  0,1,0,
-  0,1,1,
-  0,0,1;
-
-BuildingSurface:Detailed,
-  Wall X1,
-  Wall,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  0.5,
-  4,
-  1,0,0,
-  1,0,1,
-  1,1,1,
-  1,1,0;
-
-BuildingSurface:Detailed,
-  Wall Y0,
-  Wall,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  0.5,
-  4,
-  0,0,0,
-  0,0,1,
-  1,0,1,
-  1,0,0;
-
-BuildingSurface:Detailed,
-  Wall Y1,
-  Wall,
-  Wall Construction,
-  ZONE ONE,
-  ,
-  Outdoors,
-  ,
-  NoSun,
-  NoWind,
-  0.5,
-  4,
-  0,1,0,
-  1,1,0,
-  1,1,1,
-  0,1,1;
-
-OtherEquipment,
-  Plug Load,
-  None,
-  ZONE ONE,
-  AlwaysOn,
-  EquipmentLevel,
-  12.0,
-  ,
-  ,
-  0.0,
-  0.25,
-  0.0;
-
-Output:Variable,ZONE ONE,Zone Total Internal Convective Heating Rate,Hourly;
-"@ | Set-Content -LiteralPath $idf -Encoding ASCII
+$fixtureIdf = Join-Path $RepoRoot "data\conformance_cases\internal_gains_001\internal_gains.idf"
+if (-not (Test-Path -LiteralPath $fixtureIdf -PathType Leaf)) {
+    throw "Missing internal-gains fixture: $fixtureIdf"
+}
+$idf = Join-Path $OutputRoot "internal-gains.idf"
+Copy-Item -LiteralPath $fixtureIdf -Destination $idf -Force
 
 Write-Host "Running EnergyPlus internal convective gain oracle case."
 Invoke-External -FilePath $energyPlus -Arguments @("-w", $weather, "-d", $OutputRoot, $idf)
@@ -225,15 +88,15 @@ if (-not (Test-Path -LiteralPath $eso -PathType Leaf)) {
 
 Push-Location $OutputRoot
 try {
-    Invoke-External -FilePath $converter -Arguments @("internal-convective-gain.idf")
+    Invoke-External -FilePath $converter -Arguments @("internal-gains.idf")
 }
 finally {
     Pop-Location
 }
 
-$epjson = Join-Path $OutputRoot "internal-convective-gain.epJSON"
+$epjson = Join-Path $OutputRoot "internal-gains.epJSON"
 if (-not (Test-Path -LiteralPath $epjson -PathType Leaf)) {
-    throw "ConvertInputFormat did not produce internal-convective-gain.epJSON"
+    throw "ConvertInputFormat did not produce internal-gains.epJSON"
 }
 
 $cargo = Get-Command cargo -ErrorAction SilentlyContinue

@@ -33,11 +33,27 @@ variable = "HeatTransfer Surface Azimuth"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "Construction CTF Thermal Conductance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Equipment Level"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
 ```
 
 Each output request must define key, variable, frequency, variable class, and
-source artifact. Supported source values are `eso`, `eio`, `mtr`, `sql`, and
-`csv`.
+source artifact. Supported variable class values are `schedule`, `weather`,
+`construction-material`, `internal-gain`, `zone-state`, `surface-state`,
+`meter`, `internal-variable`, and `diagnostic`. Supported source values are
+`eso`, `eio`, `mtr`, `sql`, and `csv`.
 
 Use `static` for EIO/static report rows that do not have a timestep axis, such
 as surface geometry fields.

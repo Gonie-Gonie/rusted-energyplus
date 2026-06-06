@@ -17,18 +17,18 @@ not claim runtime conformance.
 
 Already implemented gates:
 
-- `compare schedule-value`: constant schedule ESO parity
-- `compare weather-fields`: EPW weather field ESO parity
+- `compare schedule-value`: constant schedule ESO smoke comparison
+- `compare weather-fields`: EPW weather field ESO smoke comparison
 - `model geometry`: Rust zone geometry summary
-- `compare geometry`: EIO `Zone Information` parity for zone count, surface
-  count, floor area, volume, and exterior gross wall area
+- `compare geometry`: EIO `Zone Information` smoke comparison for zone count,
+  surface count, floor area, volume, and exterior gross wall area
 - `compare construction-materials`: EIO `Construction CTF` and
-  `Material CTF Summary` parity for first-layer thermal conductance and
+  `Material CTF Summary` smoke comparison for first-layer thermal conductance and
   material resistance/properties
-- `compare internal-gains`: EIO `OtherEquipment Internal Gains Nominal` parity
-  for schedule binding, zone binding, design level, W/m2, and gain fractions
+- `compare internal-gains`: EIO `OtherEquipment Internal Gains Nominal` smoke
+  comparison for schedule binding, zone binding, design level, W/m2, and gain fractions
 - `compare internal-convective-gain`: ESO `Zone Total Internal Convective
-  Heating Rate` parity for the typed `OtherEquipment` convective-gain trace
+  Heating Rate` smoke comparison for the typed `OtherEquipment` convective-gain trace
 
 Still diagnostic-only:
 

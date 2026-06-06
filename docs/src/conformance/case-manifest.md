@@ -30,6 +30,7 @@ class = "schedule"
 source = "eso"
 
 [gate]
+script = "scripts/dev.cmd compare-schedule-smoke"
 blocking = true
 ```
 

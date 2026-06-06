@@ -47,6 +47,12 @@ The repository currently uses `data/conformance_cases/<case_id>/case.toml`.
 Future ExampleFiles cases should keep that convention and may add separate
 request files when the schema supports them.
 
+Current v0.5 static-input evidence cases:
+
+- `surface_geometry_001`
+- `construction_materials_001`
+- `internal_gains_001`
+
 Planned fields:
 
 - source family and source file
