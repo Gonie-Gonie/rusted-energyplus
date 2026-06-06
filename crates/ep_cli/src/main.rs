@@ -1298,6 +1298,9 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
     let mut passed = true;
 
     println!("Schedule Value Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: default");
     println!("  schedules: {}", oracle_series.len());
     for (schedule_id, schedule_name, expected_values) in oracle_series {
         let Some(trace) = traces.iter().find(|trace| trace.schedule_id == schedule_id) else {

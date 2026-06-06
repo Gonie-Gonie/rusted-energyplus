@@ -166,13 +166,13 @@ $suiteCases = @(
     [pscustomobject]@{
         id = "schedule-value"
         kind = "schedule"
-        comparison_class = "conformance-smoke"
+        comparison_class = "time-series-smoke"
         command = "compare-schedule-smoke"
     },
     [pscustomobject]@{
         id = "weather-fields"
         kind = "weather"
-        comparison_class = "conformance-smoke"
+        comparison_class = "time-series-smoke"
         command = "compare-weather-smoke"
     },
     [pscustomobject]@{
@@ -202,7 +202,7 @@ $suiteCases = @(
     [pscustomobject]@{
         id = "internal-convective-gain"
         kind = "internal-gain"
-        comparison_class = "conformance-smoke"
+        comparison_class = "time-series-smoke"
         command = "compare-internal-convective-gain-smoke"
     },
     [pscustomobject]@{

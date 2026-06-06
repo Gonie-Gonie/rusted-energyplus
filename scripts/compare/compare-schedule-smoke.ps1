@@ -111,6 +111,9 @@ if ($LASTEXITCODE -ne 0) {
 
 $text = ($output -join "`n")
 Assert-Contains -Text $text -Pattern "Schedule Value Comparison" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "comparison_class: smoke" -Description "comparison class"
+Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "conformance boundary"
+Assert-Contains -Text $text -Pattern "tolerance_policy: default" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "schedule: ALWAYSON" -Description "schedule name"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "comparison status"
 

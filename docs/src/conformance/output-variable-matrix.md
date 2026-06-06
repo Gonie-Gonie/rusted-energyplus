@@ -14,7 +14,8 @@ conformance claim.
 | Domain | Initial variables or meters | Source | Earliest intended level |
 |---|---|---|---|
 | weather | Site Outdoor Air Drybulb Temperature; Site Outdoor Air Dewpoint Temperature; Site Outdoor Air Relative Humidity; Site Outdoor Air Barometric Pressure; Site Wind Speed; Site Wind Direction | ESO | smoke, then conformance candidate |
-| solar weather | Site Direct Solar Radiation Rate per Area; Site Diffuse Solar Radiation Rate per Area; Site Solar Azimuth Angle | ESO | diagnostic |
+| weather radiation parser | horizontal infrared radiation intensity; global horizontal radiation; direct normal radiation; diffuse horizontal radiation | EPW | parser-only smoke |
+| solar weather | Site Direct Solar Radiation Rate per Area; Site Diffuse Solar Radiation Rate per Area; Site Solar Altitude Angle; Site Solar Azimuth Angle | ESO | diagnostic |
 | schedule | Schedule Value | ESO | smoke, then conformance candidate |
 | static zone | Zone Information fields such as floor area, volume, and surface count | EIO | smoke |
 | static surface | HeatTransfer Surface class, area, azimuth, and tilt | EIO | smoke |

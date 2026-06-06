@@ -55,6 +55,7 @@ Assert-DoesNotContain -Path "crates\ep_cli\src\main.rs" -Pattern "Zone Temperatu
 Assert-DoesNotContain -Path "crates\ep_cli\src\main.rs" -Pattern "exact_match: future" -Description "zone diagnostic CLI"
 Assert-DoesNotContain -Path "scripts\compare\compare-zone-smoke.ps1" -Pattern "status: pass" -Description "zone diagnostic smoke"
 Assert-DoesNotContain -Path "scripts\compare\compare-zone-smoke.ps1" -Pattern "exact_match: future" -Description "zone diagnostic smoke"
+Assert-DoesNotContain -Path "scripts\compare\compare-regression.ps1" -Pattern "conformance-smoke" -Description "compare regression class names"
 Assert-DoesNotContain -Path "docs\src\archive\old-readiness-notes\v0.6.0-diagnostic-runtime-note.md" -Pattern "first executable building simulation subset" -Description "v0.6 scope"
 Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.6.0-diagnostic-runtime-note.md" -Pattern "Historical diagnostic note" -Description "v0.6 archive boundary"
 Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.7.0-compare-diagnostic-note.md" -Pattern "Historical diagnostic note" -Description "v0.7 archive boundary"

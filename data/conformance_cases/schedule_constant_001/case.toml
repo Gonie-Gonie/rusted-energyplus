@@ -1,12 +1,13 @@
 id = "schedule_constant_001"
 title = "Schedule:Constant hourly output request"
-milestone = "P1-conformance-infrastructure"
-purpose = "Define the first case manifest with explicit output requests before tolerance-gated conformance is claimed."
+milestone = "v0.4-time-weather-schedule"
+purpose = "Define the v0.4 Schedule:Constant hourly evidence surface before tolerance-gated conformance is claimed."
 comparison_class = "smoke"
 conformance_claim = false
 oracle_version = "26.1.0"
 notes = [
-  "This fixture is schema evidence only until baseline generation and report gates are wired.",
+  "The smoke gate compares Schedule Value with EnergyPlus ESO for the first constant schedule subset.",
+  "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
 ]
 
 [input]
@@ -25,5 +26,5 @@ format = "markdown"
 path = ".runtime/conformance/schedule_constant_001/compare-report.md"
 
 [gate]
-script = "scripts/dev.cmd conformance-schema-smoke"
+script = "scripts/dev.cmd compare-schedule-smoke"
 blocking = false

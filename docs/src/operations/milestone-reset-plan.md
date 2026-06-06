@@ -135,10 +135,10 @@ v0.3:
 
 v0.4:
 
-- [ ] lock the complete weather variable list, including radiation fields
-- [ ] document timestamp alignment and hour-ending semantics
-- [ ] decide which weather/schedule cases are smoke and which become conformance
-- [ ] add tolerance-gated report artifacts before using conformance language
+- [x] lock the complete weather variable list, including radiation fields
+- [x] document timestamp alignment and hour-ending semantics
+- [x] decide which weather/schedule cases are smoke and which become conformance
+- [x] keep conformance language out until tolerance-gated report artifacts exist
 
 v0.5:
 

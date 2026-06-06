@@ -112,6 +112,8 @@ if ($LASTEXITCODE -ne 0) {
 
 $text = ($output -join "`n")
 Assert-Contains -Text $text -Pattern "Weather Field Comparison" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "comparison_class: smoke" -Description "comparison class"
+Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "conformance boundary"
 Assert-Contains -Text $text -Pattern "tolerance_policy: absolute-0.00001-relative-0.000001" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "fields: 6" -Description "field count"
 Assert-Contains -Text $text -Pattern "samples: 72" -Description "sample count"
