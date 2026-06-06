@@ -59,6 +59,46 @@ Already-written code must be handled in one of three ways:
 | demote | the behavior is diagnostic/dev-only | remove it from public scope and keep `conformance_claim: false` |
 | defer | the behavior exists but is ungated | move it to a future milestone as existing but ungated |
 
+## ExampleFiles-Based Conformance Expansion
+
+Milestones must eventually be backed by selected EnergyPlus ExampleFiles or
+testfiles, not only reduced hand-built fixtures. ExampleFiles evidence expands
+by tier:
+
+| Tier | Purpose | Release use |
+|---|---|---|
+| Tier A | small deterministic release-gate candidates | may become blocking after reports and tolerances exist |
+| Tier B | scheduled diagnostics and broader coverage | non-blocking by default |
+| Tier C | complex coverage exploration | baseline-only by default |
+
+Every ExampleFiles case must declare:
+
+- source IDF and weather file
+- feature flags such as surfaces, fenestration, HVAC, plant, EMS, plugins, and
+  daylighting
+- requested output variables and meters
+- frequency and source artifact: EIO, ESO, MTR, SQL, or selected CSV
+- evidence level for each output: baseline-only, diagnostic-only, or
+  conformance
+- report and summary artifact paths
+- release gate and CI gate policy
+
+The detailed policy lives in:
+
+- `docs/src/conformance/examplefiles-coverage-plan.md`
+- `docs/src/conformance/case-tier-policy.md`
+- `docs/src/conformance/output-variable-matrix.md`
+- `docs/src/conformance/report-format.md`
+
+Forbidden shortcuts:
+
+- treating finite samples as conformance
+- printing deltas and marking a diagnostic comparison as pass
+- running an ExampleFile without recording requested outputs
+- comparing only total energy while omitting declared zone, surface, node,
+  component, or meter outputs
+- using `matches` without a tolerance policy and report
+
 ## Required Evidence By Class
 
 | Class | Meaning | Can support public compatibility claim? |

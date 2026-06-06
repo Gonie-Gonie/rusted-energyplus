@@ -28,3 +28,8 @@ compare-report.md
 blocking script or CI gate
 ```
 
+EnergyPlus ExampleFiles and testfiles are the long-term source of release
+evidence. They must be introduced through the ExampleFiles coverage plan and
+case tier policy so that each case records source IDF, requested outputs,
+baseline artifacts, Rust artifacts, reports, and known gaps before it supports
+any compatibility claim.

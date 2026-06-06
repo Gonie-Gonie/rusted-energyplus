@@ -30,6 +30,10 @@
 - [Comparison Reports](conformance/comparison-reports.md)
 - [Supported Object Matrix](conformance/supported-object-matrix.md)
 - [ExampleFile Suite](conformance/examplefile-suite.md)
+- [ExampleFiles Coverage Plan](conformance/examplefiles-coverage-plan.md)
+- [Case Tier Policy](conformance/case-tier-policy.md)
+- [Output Variable Matrix](conformance/output-variable-matrix.md)
+- [Report Format](conformance/report-format.md)
 - [Release Gates](conformance/release-gates.md)
 
 # Architecture

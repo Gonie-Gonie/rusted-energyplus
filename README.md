@@ -97,6 +97,7 @@ Start here:
 - `docs/src/project-scope/milestone-map.md`
 - `docs/src/operations/milestone-reset-plan.md`
 - `docs/src/conformance/overview.md`
+- `docs/src/conformance/examplefiles-coverage-plan.md`
 - `docs/src/operations/script-index.md`
 - `docs/src/porting-map/heat-balance.md`
 
