@@ -18,7 +18,7 @@ not claim runtime conformance.
 Already implemented gates:
 
 - `compare schedule-value`: constant schedule ESO parity
-- `compare weather-drybulb`: EPW dry-bulb ESO parity
+- `compare weather-fields`: EPW weather field ESO parity
 - `model geometry`: Rust zone geometry summary
 - `compare geometry`: EIO `Zone Information` parity for zone count, surface
   count, floor area, volume, and exterior gross wall area

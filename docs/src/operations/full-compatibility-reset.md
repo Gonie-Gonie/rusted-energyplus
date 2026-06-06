@@ -94,6 +94,7 @@ but that report is still baseline-only evidence.
 | `RunPeriod` intake | implemented foundation | `ep_compiler` parses date ranges into `TypedModel.run_periods` |
 | aligned hourly time axis | implemented foundation | `ep_runtime::build_hourly_time_axis` expands the first run period into EnergyPlus-style hour-ending samples |
 | EPW weather fields | implemented foundation | `ep_runtime::parse_epw_records` reads dry-bulb, dew point, RH, pressure, radiation, and wind fields |
+| EPW weather field comparison | implemented smoke gate | `eplus-rs compare weather-fields` compares dry-bulb, dew point, RH, pressure, wind speed, and wind direction with EnergyPlus ESO |
 | `Schedule:Compact` subset | implemented foundation | typed all-days `Until` segments and runtime hourly evaluation |
 | zone geometry summary | implemented foundation | `eplus-rs model geometry` prints zone surface count, floor area, volume, and exterior wall area |
 | EIO geometry comparison | implemented smoke gate | `eplus-rs compare geometry` compares Rust geometry summary with EnergyPlus `Zone Information` |
@@ -210,7 +211,7 @@ Goal:
 Current implemented subset:
 
 - schedule comparison
-- weather dry-bulb comparison
+- weather field comparison
 - diagnostic-only zone temperature extraction
 - first numeric divergence for series comparisons
 
@@ -283,6 +284,7 @@ P2 compatibility work:
 
 - [x] implement `RunPeriod` and aligned time axis foundation
 - [x] expand EPW weather fields foundation
+- [x] expand weather comparison smoke beyond dry-bulb
 - [x] add `Schedule:Compact` subset foundation
 - [x] add geometry summary foundation
 - [x] add EnergyPlus EIO geometry comparison gate

@@ -170,7 +170,7 @@ $suiteCases = @(
         command = "compare-schedule-smoke"
     },
     [pscustomobject]@{
-        id = "weather-drybulb"
+        id = "weather-fields"
         kind = "weather"
         comparison_class = "conformance-smoke"
         command = "compare-weather-smoke"

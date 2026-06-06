@@ -15,7 +15,7 @@ use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, FirstZoneSimulationOptions, HeatBalanceSimulationOptions, SimulationMode,
     ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
     zone_geometry_summaries,
 };
@@ -200,6 +200,7 @@ fn print_help() {
     println!("  compare construction-materials <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
+    println!("  compare weather-fields <weather.epw> <eplusout.eso>");
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
     println!("  conformance validate-case <case.toml>");
@@ -1018,7 +1019,7 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("construction-materials") => run_compare_construction_materials(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
-        Some("weather-drybulb") => run_compare_weather_drybulb(&args[1..]),
+        Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
         Some("zone-temperature") => run_compare_zone_temperature(&args[1..]),
         Some(command) => {
             eprintln!("unsupported compare command: {command}");
@@ -1031,6 +1032,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
             );
+            eprintln!("usage: eplus-rs compare weather-fields <weather.epw> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
             2
@@ -1046,6 +1048,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
             );
+            eprintln!("usage: eplus-rs compare weather-fields <weather.epw> <eplusout.eso>");
             eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
             eprintln!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
             2
@@ -1888,62 +1891,115 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     }
 }
 
-fn run_compare_weather_drybulb(args: &[String]) -> i32 {
+fn run_compare_weather_fields(args: &[String]) -> i32 {
     let Some(epw_path) = args.first() else {
         eprintln!("missing weather path");
-        eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+        eprintln!("usage: eplus-rs compare weather-fields <weather.epw> <eplusout.eso>");
         return 2;
     };
     let Some(eso_path) = args.get(1) else {
         eprintln!("missing eplusout.eso path");
-        eprintln!("usage: eplus-rs compare weather-drybulb <weather.epw> <eplusout.eso>");
+        eprintln!("usage: eplus-rs compare weather-fields <weather.epw> <eplusout.eso>");
         return 2;
     };
 
-    let oracle_values = match load_eso_series(
-        eso_path,
-        "Environment",
-        "Site Outdoor Air Drybulb Temperature",
-    ) {
-        Ok(values) => values,
+    let weather_records = match load_epw_records(epw_path) {
+        Ok(records) => records,
         Err(error) => {
             eprintln!("{error}");
             return 1;
         }
     };
-    let weather_values = match load_epw_dry_bulb_series(epw_path) {
-        Ok(values) => values,
-        Err(error) => {
-            eprintln!("{error}");
+
+    let tolerance = Tolerance {
+        absolute: 1.0e-5,
+        relative: 1.0e-6,
+    };
+    let mut passed = true;
+    println!("Weather Field Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  tolerance_policy: absolute-0.00001-relative-0.000001");
+    println!("  fields: {}", WEATHER_COMPARE_FIELDS.len());
+    for field in WEATHER_COMPARE_FIELDS {
+        let oracle_values = match load_eso_series(eso_path, "Environment", field.variable_name) {
+            Ok(values) => values,
+            Err(error) => {
+                eprintln!("{error}");
+                return 1;
+            }
+        };
+        if weather_records.len() < oracle_values.len() {
+            eprintln!(
+                "EPW {} series has {} samples but ESO requires {}",
+                field.label,
+                weather_records.len(),
+                oracle_values.len()
+            );
             return 1;
         }
-    };
-    if weather_values.len() < oracle_values.len() {
-        eprintln!(
-            "EPW dry-bulb series has {} samples but ESO requires {}",
-            weather_values.len(),
-            oracle_values.len()
+
+        let weather_values = weather_records
+            .iter()
+            .take(oracle_values.len())
+            .map(|record| (field.epw_value)(record))
+            .collect::<Vec<_>>();
+        let comparison = compare_series(&oracle_values, &weather_values, tolerance);
+        passed &= comparison.passed;
+
+        println!(
+            "  field: {} variable: {} samples: {} max_abs_delta: {} status: {}",
+            field.label,
+            field.variable_name,
+            comparison.samples,
+            comparison.max_abs_delta,
+            if comparison.passed { "pass" } else { "fail" }
         );
-        return 1;
+        print_first_divergence("    ", comparison.first_divergence);
     }
+    println!("  status: {}", if passed { "pass" } else { "fail" });
 
-    let comparison = compare_series(
-        &oracle_values,
-        &weather_values[..oracle_values.len()],
-        Tolerance::default(),
-    );
-
-    println!("Weather Drybulb Comparison");
-    println!("  samples: {}", comparison.samples);
-    println!("  max_abs_delta: {}", comparison.max_abs_delta);
-    print_first_divergence("  ", comparison.first_divergence);
-    println!(
-        "  status: {}",
-        if comparison.passed { "pass" } else { "fail" }
-    );
-
-    if comparison.passed { 0 } else { 1 }
+    if passed { 0 } else { 1 }
 }
+
+struct WeatherCompareField {
+    label: &'static str,
+    variable_name: &'static str,
+    epw_value: fn(&ep_runtime::EpwRecord) -> f64,
+}
+
+const WEATHER_COMPARE_FIELDS: &[WeatherCompareField] = &[
+    WeatherCompareField {
+        label: "dry_bulb_c",
+        variable_name: "Site Outdoor Air Drybulb Temperature",
+        epw_value: |record| record.dry_bulb_c,
+    },
+    WeatherCompareField {
+        label: "dew_point_c",
+        variable_name: "Site Outdoor Air Dewpoint Temperature",
+        epw_value: |record| record.dew_point_c,
+    },
+    WeatherCompareField {
+        label: "relative_humidity_percent",
+        variable_name: "Site Outdoor Air Relative Humidity",
+        epw_value: |record| record.relative_humidity_percent,
+    },
+    WeatherCompareField {
+        label: "barometric_pressure_pa",
+        variable_name: "Site Outdoor Air Barometric Pressure",
+        epw_value: |record| record.atmospheric_pressure_pa,
+    },
+    WeatherCompareField {
+        label: "wind_speed_m_per_s",
+        variable_name: "Site Wind Speed",
+        epw_value: |record| record.wind_speed_m_per_s,
+    },
+    WeatherCompareField {
+        label: "wind_direction_deg",
+        variable_name: "Site Wind Direction",
+        epw_value: |record| record.wind_direction_deg,
+    },
+];
 
 struct ConstructionMaterialRow {
     construction_name: String,

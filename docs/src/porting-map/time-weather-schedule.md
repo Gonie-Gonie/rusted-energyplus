@@ -14,11 +14,12 @@ Implemented foundations:
 - EPW weather record parsing beyond dry-bulb
 - `Schedule:Constant`
 - `Schedule:Compact` all-days `Until` subset
-- schedule and weather ESO smoke comparisons
+- schedule ESO smoke comparison
+- weather ESO smoke comparison for dry-bulb, dew point, relative humidity,
+  barometric pressure, wind speed, and wind direction
 
 Next evidence target:
 
 - declared conformance cases for timestamp alignment
-- broader EPW field comparisons
+- solar/radiation EPW field comparisons
 - Schedule:Compact day-type expansion
-

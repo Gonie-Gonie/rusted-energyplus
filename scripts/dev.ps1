@@ -88,7 +88,7 @@ $Commands = [ordered]@{
     "compare-weather-smoke" = @{
         Path = "compare\compare-weather-smoke.ps1"
         Group = "compare"
-        Help = "Compare EPW dry-bulb values with the EnergyPlus oracle."
+        Help = "Compare selected EPW weather fields with the EnergyPlus oracle."
     }
     "compare-geometry-smoke" = @{
         Path = "compare\compare-geometry-smoke.ps1"

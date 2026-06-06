@@ -70,7 +70,7 @@ foreach ($path in @($energyPlus, $weather)) {
 Remove-RepoDirectory -Path $OutputRoot
 New-Directory -Path $OutputRoot
 
-$idf = Join-Path $OutputRoot "weather-drybulb.idf"
+$idf = Join-Path $OutputRoot "weather-fields.idf"
 @"
 Version,26.1;
 
@@ -83,6 +83,11 @@ GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
 RunPeriod,Run Period 1,1,1,2013,1,3,2013,Tuesday,Yes,Yes,No,Yes,Yes;
 
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
+Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Hourly;
+Output:Variable,*,Site Outdoor Air Relative Humidity,Hourly;
+Output:Variable,*,Site Outdoor Air Barometric Pressure,Hourly;
+Output:Variable,*,Site Wind Speed,Hourly;
+Output:Variable,*,Site Wind Direction,Hourly;
 "@ | Set-Content -LiteralPath $idf -Encoding ASCII
 
 Write-Host "Running EnergyPlus weather comparison oracle case."
@@ -98,16 +103,24 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Comparing Rust EPW dry-bulb reader with EnergyPlus ESO."
-$output = & $cargo.Source run -p ep_cli --quiet -- compare weather-drybulb $weather $eso 2>&1
+Write-Host "Comparing Rust EPW weather fields with EnergyPlus ESO."
+$output = & $cargo.Source run -p ep_cli --quiet -- compare weather-fields $weather $eso 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
     throw "Weather comparison failed."
 }
 
 $text = ($output -join "`n")
-Assert-Contains -Text $text -Pattern "Weather Drybulb Comparison" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "Weather Field Comparison" -Description "comparison header"
+Assert-Contains -Text $text -Pattern "tolerance_policy: absolute-0.00001-relative-0.000001" -Description "tolerance policy"
+Assert-Contains -Text $text -Pattern "fields: 6" -Description "field count"
 Assert-Contains -Text $text -Pattern "samples: 72" -Description "sample count"
+Assert-Contains -Text $text -Pattern "field: dry_bulb_c" -Description "dry-bulb field"
+Assert-Contains -Text $text -Pattern "field: dew_point_c" -Description "dew-point field"
+Assert-Contains -Text $text -Pattern "field: relative_humidity_percent" -Description "relative humidity field"
+Assert-Contains -Text $text -Pattern "field: barometric_pressure_pa" -Description "barometric pressure field"
+Assert-Contains -Text $text -Pattern "field: wind_speed_m_per_s" -Description "wind speed field"
+Assert-Contains -Text $text -Pattern "field: wind_direction_deg" -Description "wind direction field"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "comparison status"
 
 Write-Host "Weather comparison smoke passed."
