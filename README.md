@@ -50,9 +50,10 @@ must not be used as conformance evidence. Their output uses
 
 ## Quick Start
 
+Public setup and current release checks:
+
 ```powershell
 .\scripts\dev.cmd setup -InstallRust -InstallDocsTools
-.\scripts\dev.cmd check
 .\scripts\dev.cmd v0.1-verify
 ```
 
@@ -63,6 +64,30 @@ The setup script keeps external oracle assets inside repo-local directories:
 
 It does not use a globally installed EnergyPlus as the oracle.
 
+Current development evidence checks:
+
+```powershell
+.\scripts\dev.cmd v0.2-verify
+.\scripts\dev.cmd v0.3-verify
+.\scripts\dev.cmd v0.4-verify
+.\scripts\dev.cmd v0.5-verify
+```
+
+Developer-only diagnostics:
+
+```powershell
+.\scripts\dev.cmd first-zone-smoke
+.\scripts\dev.cmd compare-zone-smoke
+```
+
+Those diagnostics are not public compatibility evidence.
+
+Full local quality check:
+
+```powershell
+.\scripts\dev.cmd check
+```
+
 ## Documentation
 
 Start here:
@@ -70,6 +95,7 @@ Start here:
 - `docs/src/project-scope/compatibility-contract.md`
 - `docs/src/project-scope/evidence-levels.md`
 - `docs/src/project-scope/milestone-map.md`
+- `docs/src/operations/milestone-reset-plan.md`
 - `docs/src/conformance/overview.md`
 - `docs/src/operations/script-index.md`
 - `docs/src/porting-map/heat-balance.md`

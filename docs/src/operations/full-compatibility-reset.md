@@ -3,9 +3,10 @@
 Status: active feedback incorporated.
 
 This document records the June 2026 compatibility reset feedback and maps it
-onto the current repository state. The goal is to keep the project
-compatibility-first without accidentally presenting diagnostic plumbing as
-EnergyPlus numerical conformance.
+onto the current repository state. The canonical milestone rewrite lives in
+`milestone-reset-plan.md`. The goal is to keep the project compatibility-first
+without accidentally presenting diagnostic plumbing as EnergyPlus numerical
+conformance.
 
 ## Current State
 
@@ -50,7 +51,8 @@ Every comparison or report must belong to one of these classes:
 | Class | Meaning | Exit-code semantics |
 |---|---|---|
 | smoke | Execution or extraction succeeded | `0` on successful execution |
-| diagnostic | Values were extracted and deltas may be reported, but no tolerance is enforced | `0` on successful extraction |
+| diagnostic-only | Values were extracted and deltas may be reported, but no tolerance is enforced | `0` on successful extraction |
+| baseline-only | EnergyPlus oracle artifacts were generated from a manifest | `0` on successful generation |
 | conformance | EnergyPlus oracle values are compared against declared tolerances | `1` when tolerance fails |
 | regression | Current eplus-rs behavior is compared against an eplus-rs baseline | `1` when regression policy fails |
 | performance | Runtime, memory, or profile counters are compared | `1` when performance gate fails |
@@ -158,7 +160,7 @@ Goal:
 - reference diagnostics
 - unsupported object classification
 
-### v0.4 Time, Weather, Schedule Parity
+### v0.4 Time, Weather, Schedule Evidence
 
 Goal:
 

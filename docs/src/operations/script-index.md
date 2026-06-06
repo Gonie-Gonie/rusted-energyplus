@@ -58,6 +58,8 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
+| `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
+| `v0.3-verify` | release | verify v0.3 input interpretation evidence | yes | console output |
 | `v0.4-verify` | release | verify v0.4 time/weather/schedule evidence | yes | `.runtime/compare-*`, `.runtime/conformance-report` |
 | `v0.5-verify` | release | verify v0.5 geometry/internal-variable evidence | yes | `.runtime/compare-*` |
 
