@@ -1,0 +1,59 @@
+id = "weather_fields_001"
+title = "Weather hourly field output requests"
+milestone = "v0.4-time-weather-schedule"
+purpose = "Define the v0.4 weather field evidence surface before tolerance-gated conformance is claimed."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The smoke gate compares EPW weather fields against EnergyPlus ESO with an explicit small weather tolerance.",
+  "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
+]
+
+[input]
+idf = "data/conformance_cases/weather_fields_001/weather_fields.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Dewpoint Temperature"
+frequency = "hourly"
+class = "weather"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Relative Humidity"
+frequency = "hourly"
+class = "weather"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Barometric Pressure"
+frequency = "hourly"
+class = "weather"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Wind Speed"
+frequency = "hourly"
+class = "weather"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Wind Direction"
+frequency = "hourly"
+class = "weather"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/weather_fields_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-weather-smoke"
+blocking = false
