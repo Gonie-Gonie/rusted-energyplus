@@ -185,6 +185,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.6 output/trace/report diagnostic contract."
     }
+    "v0.7-verify" = @{
+        Path = "release\v0.7-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.7 EnergyPlus source mapping gate."
+    }
 }
 
 $Aliases = @{
@@ -196,6 +201,7 @@ $Aliases = @{
     "verify-v0.4" = "v0.4-verify"
     "verify-v0.5" = "v0.5-verify"
     "verify-v0.6" = "v0.6-verify"
+    "verify-v0.7" = "v0.7-verify"
 }
 
 function Show-Commands {

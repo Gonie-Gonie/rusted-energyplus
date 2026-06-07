@@ -63,5 +63,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.4-verify` | release | verify v0.4 time/weather/schedule evidence | yes | `.runtime/compare-*`, `.runtime/conformance-report` |
 | `v0.5-verify` | release | verify v0.5 geometry/internal-variable evidence | yes | `.runtime/compare-*` |
 | `v0.6-verify` | release | verify v0.6 output/trace/report diagnostic infrastructure | yes | `.runtime/compare-zone`, `.runtime/conformance-diagnostic`, `.runtime/compare-regression` |
+| `v0.7-verify` | release | verify v0.7 source mapping and algorithm readiness gate | yes | source-map docs |
 
 No diagnostic command should be listed as conformance evidence.

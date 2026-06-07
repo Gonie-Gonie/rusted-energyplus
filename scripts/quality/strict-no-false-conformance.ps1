@@ -61,6 +61,8 @@ Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.6.0-diagnostic-ru
 Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.7.0-compare-diagnostic-note.md" -Pattern "Historical diagnostic note" -Description "v0.7 archive boundary"
 Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "diagnostic-ready" -Description "v0.6 active readiness boundary"
 Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "tolerance_policy: none" -Description "v0.6 tolerance boundary"
+Assert-Contains -Path "docs\src\operations\v0.7.0-readiness.md" -Pattern "planning-ready" -Description "v0.7 active readiness boundary"
+Assert-Contains -Path "docs\src\porting-map\algorithm-porting-readiness.md" -Pattern "zone-temperature pass wording" -Description "v0.7 algorithm boundary"
 
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "comparison_class: diagnostic-only" -Description "zone diagnostic CLI"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "conformance_claim: false" -Description "diagnostic CLI"

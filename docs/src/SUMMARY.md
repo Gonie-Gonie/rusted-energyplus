@@ -55,6 +55,9 @@
 - [Time, Weather, and Schedule](porting-map/time-weather-schedule.md)
 - [Geometry](porting-map/geometry.md)
 - [Heat Balance](porting-map/heat-balance.md)
+- [Heat Balance Source Map](porting-map/heat-balance-source-map.md)
+- [Output Variable Source Map](porting-map/output-variable-source-map.md)
+- [Algorithm Porting Readiness](porting-map/algorithm-porting-readiness.md)
 - [HVAC](porting-map/hvac.md)
 - [Plant](porting-map/plant.md)
 - [Output and Reporting](porting-map/output-reporting.md)
@@ -80,6 +83,8 @@
 - [v0.5.0 Readiness](operations/v0.5.0-readiness.md)
 - [v0.6.0 Plan](operations/v0.6.0-plan.md)
 - [v0.6.0 Readiness](operations/v0.6.0-readiness.md)
+- [v0.7.0 Plan](operations/v0.7.0-plan.md)
+- [v0.7.0 Readiness](operations/v0.7.0-readiness.md)
 
 # Archive
 

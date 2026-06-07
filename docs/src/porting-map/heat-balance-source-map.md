@@ -1,0 +1,94 @@
+---
+status: active
+claim_level: planning-guard
+owner: runtime
+last_reviewed: 2026-06-07
+---
+
+# Heat Balance Source Map
+
+Reference version: EnergyPlus 26.1.0
+
+Reference source root:
+
+```text
+.reference/energyplus-src/26.1.0/
+```
+
+Purpose: record the EnergyPlus source files, routines, data structures, and
+call order that must be reviewed before any v0.8 heat-balance algorithm work is
+promoted beyond diagnostics. This map is a planning guard, not a conformance
+claim.
+
+## Primary Source Files
+
+| Area | EnergyPlus source | Rust target |
+|---|---|---|
+| heat-balance orchestration | `src/EnergyPlus/HeatBalanceManager.cc` | `ep_runtime::heat_balance` |
+| heat-balance declarations | `src/EnergyPlus/HeatBalanceManager.hh` | `ep_runtime::heat_balance` |
+| global heat-balance data | `src/EnergyPlus/DataHeatBalance.hh` | `ep_model`, `ep_runtime::HeatBalanceState` |
+| surface heat balance | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ep_runtime::surface_balance` |
+| surface heat-balance declarations | `src/EnergyPlus/HeatBalanceSurfaceManager.hh` | `ep_runtime::surface_balance` |
+| zone air predictor/corrector | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ep_runtime::zone_air` |
+| zone air declarations | `src/EnergyPlus/ZoneTempPredictorCorrector.hh` | `ep_runtime::zone_air` |
+| internal gains input summaries | `src/EnergyPlus/HeatBalanceInternalHeatGains.cc` | `ep_compiler`, `ep_runtime::internal_gains` |
+| internal gains runtime sums | `src/EnergyPlus/InternalHeatGains.cc` | `ep_runtime::internal_gains` |
+| output variable registration | `src/EnergyPlus/OutputProcessor.cc` | `ep_conformance`, `ep_runtime::ResultStore` |
+
+## Required Routine Map
+
+| Porting area | EnergyPlus routine or symbol | Current Rust status |
+|---|---|---|
+| heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
+| project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
+| material input | `Material::GetMaterialData` | typed subset exists; source map required before expansion |
+| construction input | `GetConstructData` | typed first-layer subset exists; source map required before expansion |
+| zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
+| heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
+| outside surface balance | `CalcHeatBalanceOutsideSurf` | mapped-not-ported |
+| inside surface balance | `CalcHeatBalanceInsideSurf` | mapped-not-ported |
+| zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
+| zone air correction | `correctZoneAirTemps` | mapped-not-ported |
+| internal convective gains | `zoneSumAllInternalConvectionGains` | smoke trace exists |
+| space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
+
+## Call Order Boundary
+
+The first v0.8 heat-balance candidate must preserve this source-derived order
+unless the deviation is documented in a case-specific waiver:
+
+1. `ManageHeatBalance`
+2. input acquisition through project controls, materials, constructions, and zones
+3. `InitHeatBalance`
+4. outside opaque surface balance
+5. inside opaque surface balance
+6. internal convective gain summation
+7. zone air predictor/corrector update
+8. output variable registration and sampling
+
+## Data Structure Map
+
+| EnergyPlus data | Rust target | Boundary |
+|---|---|---|
+| `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
+| `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only |
+| construction/material CTF data | `ep_model::Construction`, `ep_model::Material` | first-layer smoke evidence only |
+| zone predictor histories such as `MAT`, `XMAT`, and `DSXMAT` | future `ep_runtime::zone_air` histories | diagnostic shell only |
+| internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace smoke only |
+
+## Required Cases Before Porting
+
+- `heat_balance_uncontrolled_001`: one-zone uncontrolled, no HVAC, opaque
+  surfaces only
+- `heat_balance_nomass_001`: `Material:NoMass` variant
+- `heat_balance_mass_001`: simple mass material variant
+
+These cases may remain diagnostic-only until v0.8 declares tolerances and
+blocking gates.
+
+## Stop Rule
+
+No heat-balance algorithm change may be promoted as conformance work unless the
+changed behavior has a source-map entry in this document, an output-variable
+entry in `output-variable-source-map.md`, and a readiness note in
+`algorithm-porting-readiness.md`.
