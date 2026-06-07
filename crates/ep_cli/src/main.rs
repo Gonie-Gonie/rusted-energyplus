@@ -29,8 +29,9 @@ use ep_runtime::{
     ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
     HeatBalanceWarmupSummary, NodeStateProjection, NodeStateProjectionOptions,
     PlantStateProjection, PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary,
-    ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
-    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
+    build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
+    simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
     simulate_plant_state_projection, surface_geometry_summaries, zone_geometry_summaries,
 };
@@ -3290,6 +3291,8 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case("Surface Outside Face Conduction Heat Loss Rate")
         || variable
             .eq_ignore_ascii_case("Surface Outside Face Conduction Heat Transfer Rate per Area")
+        || variable
+            .eq_ignore_ascii_case("Surface Outside Face Incident Solar Radiation Rate per Area")
         || variable.eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Rate")
         || variable
             .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Gain Rate")
@@ -3389,8 +3392,11 @@ fn build_heat_balance_conformance_diagnostic(
         .max()
         .unwrap_or(0);
 
-    let weather_values =
-        load_epw_dry_bulb_series(weather_path).map_err(|error| error.to_string())?;
+    let weather_records = load_epw_records(weather_path).map_err(|error| error.to_string())?;
+    let weather_values = weather_records
+        .iter()
+        .map(|record| record.dry_bulb_c)
+        .collect::<Vec<_>>();
     if weather_values.len() < sample_count {
         return Err(format!(
             "EPW dry-bulb series has {} samples but ESO requires {}",
@@ -3408,12 +3414,18 @@ fn build_heat_balance_conformance_diagnostic(
             sample_count,
         )
     };
-    let simulation = simulate_heat_balance_zone_air_temperatures(
+    let mut simulation = simulate_heat_balance_zone_air_temperatures(
         &simulation_model,
         &weather_values,
         simulation_options,
     )
     .map_err(|error| error.to_string())?;
+    append_surface_incident_solar_radiation_series(
+        &mut simulation.results,
+        &simulation_model,
+        &weather_records,
+        sample_count,
+    );
     let mut heat_balance_warmup: HeatBalanceWarmupDiagnostic = simulation.summary.warmup.into();
     heat_balance_warmup.oracle_run_period_day_count =
         eio_run_period_warmup_days(eio_path).map_err(|error| error.to_string())?;

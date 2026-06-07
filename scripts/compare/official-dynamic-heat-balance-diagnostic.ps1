@@ -130,7 +130,7 @@ if ($summary.heat_balance_warmup.timestep_count -le 0) {
 if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
     throw "Expected oracle run-period warmup days 20, got $($summary.heat_balance_warmup.oracle_run_period_day_count)"
 }
-if ($summary.series_count -ne 8) {
+if ($summary.series_count -ne 9) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -144,6 +144,9 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Insid
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Outside Face Temperature series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Incident Solar Radiation Rate per Area" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Surface Outside Face Incident Solar Radiation Rate per Area series"
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Conduction Heat Transfer Rate series"
@@ -163,6 +166,7 @@ Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "mark
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 

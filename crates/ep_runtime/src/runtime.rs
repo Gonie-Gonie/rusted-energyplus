@@ -5,8 +5,8 @@ use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
     IdealLoadsAirSystemId, LoopId, MaterialId, NodeId, NormalizedName, OtherEquipment,
     OutputHandle, OutsideBoundaryCondition, PlantBranchComponent, PlantLoop, Point3, RunPeriod,
-    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, Surface, SurfaceId,
-    SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, Surface,
+    SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -16,6 +16,7 @@ const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
+const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -679,6 +680,55 @@ struct SurfaceHeatBalanceTrace {
     outside_conduction_gain_rate_w: Vec<f64>,
     outside_conduction_loss_rate_w: Vec<f64>,
     outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
+}
+
+/// Appends diagnostic surface incident solar radiation series for all opaque
+/// surfaces with a declared site location.
+///
+/// The calculation is intentionally a forcing diagnostic: direct normal
+/// radiation is projected with a compact solar-position model, diffuse sky is
+/// isotropic, and ground reflection uses a fixed default reflectance. It is not
+/// a full EnergyPlus solar distribution or shadowing claim.
+pub fn append_surface_incident_solar_radiation_series(
+    results: &mut ResultStore,
+    model: &SimulationModel,
+    weather_records: &[EpwRecord],
+    sample_count: usize,
+) -> usize {
+    let Some(site) = model.typed.site.as_ref() else {
+        return 0;
+    };
+    if weather_records.is_empty() || sample_count == 0 {
+        return 0;
+    }
+
+    let mut added = 0;
+    let mut handle_index = results
+        .series
+        .iter()
+        .map(|series| series.handle.0)
+        .max()
+        .map_or(0, |handle| handle + 1);
+
+    for surface in &model.typed.surfaces {
+        let values = weather_records
+            .iter()
+            .take(sample_count)
+            .map(|record| surface_incident_solar_radiation_w_per_m2(surface, site, record))
+            .collect::<Vec<_>>();
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface.name.0.clone(),
+            variable_name: "Surface Outside Face Incident Solar Radiation Rate per Area"
+                .to_string(),
+            units: "W/m2".to_string(),
+            values,
+        });
+        handle_index += 1;
+        added += 1;
+    }
+
+    added
 }
 
 /// Diagnostic role assigned to one plant equipment projection row.
@@ -2645,6 +2695,65 @@ fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
     if area_m2 > 0.0 { rate_w / area_m2 } else { 0.0 }
 }
 
+fn surface_incident_solar_radiation_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    record: &EpwRecord,
+) -> f64 {
+    let Some((solar_altitude_rad, solar_azimuth_rad)) = solar_position_rad(site, record) else {
+        return 0.0;
+    };
+    if solar_altitude_rad <= 0.0 {
+        return 0.0;
+    }
+
+    let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
+    let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
+    let direct_normal = record.direct_normal_radiation_wh_per_m2.max(0.0);
+    let diffuse_horizontal = record.diffuse_horizontal_radiation_wh_per_m2.max(0.0);
+    let global_horizontal = record.global_horizontal_radiation_wh_per_m2.max(0.0);
+
+    let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
+        + solar_altitude_rad.cos()
+            * tilt_rad.sin()
+            * (solar_azimuth_rad - surface_azimuth_rad).cos();
+    let beam = direct_normal * cos_incidence.max(0.0);
+    let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
+    let ground_reflected =
+        global_horizontal * DEFAULT_SOLAR_GROUND_REFLECTANCE * (1.0 - tilt_rad.cos()) * 0.5;
+
+    beam + sky_diffuse + ground_reflected
+}
+
+fn solar_position_rad(site: &SiteLocation, record: &EpwRecord) -> Option<(f64, f64)> {
+    let day = day_of_year(record.year, record.month, record.day)?;
+    let day_angle_rad = (360.0 * (f64::from(day) - 81.0) / 364.0).to_radians();
+    let equation_of_time_min =
+        9.87 * (2.0 * day_angle_rad).sin() - 7.53 * day_angle_rad.cos() - 1.5 * day_angle_rad.sin();
+    let local_standard_meridian_deg = 15.0 * site.time_zone_hours;
+    let time_correction_min =
+        4.0 * (site.longitude_deg - local_standard_meridian_deg) + equation_of_time_min;
+    let local_mid_hour = f64::from(record.hour.clamp(1, 24)) - 0.5;
+    let solar_time_hours = local_mid_hour + time_correction_min / 60.0;
+    let hour_angle_rad = (15.0 * (solar_time_hours - 12.0)).to_radians();
+    let declination_rad = (23.45
+        * (360.0 * (284.0 + f64::from(day)) / 365.0)
+            .to_radians()
+            .sin())
+    .to_radians();
+    let latitude_rad = site.latitude_deg.to_radians();
+
+    let sin_altitude = latitude_rad.sin() * declination_rad.sin()
+        + latitude_rad.cos() * declination_rad.cos() * hour_angle_rad.cos();
+    let altitude_rad = sin_altitude.clamp(-1.0, 1.0).asin();
+    let mut azimuth_rad = hour_angle_rad.sin().atan2(
+        hour_angle_rad.cos() * latitude_rad.sin() - declination_rad.tan() * latitude_rad.cos(),
+    ) + std::f64::consts::PI;
+    azimuth_rad = azimuth_rad.rem_euclid(2.0 * std::f64::consts::PI);
+
+    Some((altitude_rad, azimuth_rad))
+}
+
 fn heat_gain_rate_w(rate_w: f64) -> f64 {
     rate_w.max(0.0)
 }
@@ -3391,14 +3500,14 @@ mod tests {
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
-        advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
-        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
-        simulate_plant_state_projection, simulate_schedule_values,
-        simulate_zone_internal_convective_gains, surface_area_m2, surface_geometry_summaries,
-        zone_geometry_summaries,
+        advance_heat_balance_state_one_timestep, append_surface_incident_solar_radiation_series,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        initialize_heat_balance_state, node_temperature_setpoint_from_energyplus,
+        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
+        simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
+        surface_geometry_summaries, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -3410,10 +3519,11 @@ mod tests {
         OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition, PlantBranch,
         PlantBranchComponent, PlantBranchList, PlantLoop, Point3, RunPeriod, RunPeriodId,
         ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel,
-        Surface, SurfaceId, SurfaceType, ThermostatControlObjectType, ThermostatDualSetpoint,
-        ThermostatSetpointId, TimestepConfig, TypedModel, Zone, ZoneEquipmentConnection,
-        ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-        ZoneEquipmentObjectType, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+        SiteLocation, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
+        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Zone,
+        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
+        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
 
     #[test]
@@ -4477,6 +4587,63 @@ DATA PERIODS
     }
 
     #[test]
+    fn surface_incident_solar_diagnostic_appends_roof_series()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.site = Some(SiteLocation {
+            name: NormalizedName::new("Solar Test Site"),
+            latitude_deg: 39.75,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        });
+        let model = SimulationModel::from_typed(typed);
+        let records = parse_epw_records(
+            r#"LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+2013,6,21,12,0,Source,25.0,5.0,30,82000,0,0,300,900,800,100,0,0,0,0,180,2.5
+2013,6,21,13,0,Source,26.0,5.0,30,82000,0,0,300,920,820,100,0,0,0,0,180,2.5
+"#,
+        )?;
+        let weather_values = records
+            .iter()
+            .map(|record| record.dry_bulb_c)
+            .collect::<Vec<_>>();
+        let mut simulation = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &weather_values,
+            HeatBalanceSimulationOptions::hourly_samples(2),
+        )?;
+
+        let added = append_surface_incident_solar_radiation_series(
+            &mut simulation.results,
+            &model,
+            &records,
+            2,
+        );
+
+        assert_eq!(added, 6);
+        let Some(roof_solar) = simulation.results.find_series(
+            "ROOF",
+            "Surface Outside Face Incident Solar Radiation Rate per Area",
+        ) else {
+            return Err(std::io::Error::other("missing roof solar series").into());
+        };
+        assert_eq!(roof_solar.units, "W/m2");
+        assert_eq!(roof_solar.values.len(), 2);
+        assert!(roof_solar.values[0].is_finite());
+        assert!(roof_solar.values[0] > 600.0);
+
+        Ok(())
+    }
+
+    #[test]
     fn result_store_finds_series_case_insensitively() {
         let mut store = ResultStore::new();
         store.add_series(OutputSeries {
@@ -4500,7 +4667,7 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 66);
+        assert_eq!(registry.len(), 72);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
@@ -4514,11 +4681,15 @@ DATA PERIODS
                 "zone one",
                 "Zone Opaque Surface Inside Faces Conduction Rate",
             ),
+            RuntimeOutputRequest::hourly(
+                "floor",
+                "Surface Outside Face Incident Solar Radiation Rate per Area",
+            ),
             RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Drybulb Temperature"),
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 5);
+        assert_eq!(resolution.resolved.len(), 6);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

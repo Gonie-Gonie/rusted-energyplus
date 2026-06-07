@@ -62,6 +62,15 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"

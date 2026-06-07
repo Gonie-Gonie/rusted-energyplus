@@ -421,6 +421,13 @@ impl RuntimeOutputRegistry {
                 RuntimeOutputFrequency::Hourly,
                 RuntimeOutputSource::RuntimeState,
             );
+            self.push_output(
+                &surface.name.0,
+                "Surface Outside Face Incident Solar Radiation Rate per Area",
+                "W/m2",
+                RuntimeOutputFrequency::Hourly,
+                RuntimeOutputSource::WeatherInput,
+            );
             for (variable_name, units) in [
                 ("Surface Inside Face Conduction Heat Transfer Rate", "W"),
                 ("Surface Inside Face Conduction Heat Gain Rate", "W"),
