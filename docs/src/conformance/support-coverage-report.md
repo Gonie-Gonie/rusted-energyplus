@@ -16,16 +16,16 @@ The support coverage report is the user-facing answer to three questions:
 Generate it through the standard release wrapper:
 
 ```powershell
-.\scripts\dev.cmd support-coverage-report -Version 0.27.0
+.\scripts\dev.cmd support-coverage-report -Version 0.28.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.27.0/support-coverage.md
-.runtime/release-evidence/v0.27.0/support-coverage-report.html
-.runtime/release-evidence/v0.27.0/support-coverage-report.pdf
-.runtime/release-evidence/v0.27.0/support-coverage-report.json
+.runtime/release-evidence/v0.28.0/support-coverage.md
+.runtime/release-evidence/v0.28.0/support-coverage-report.html
+.runtime/release-evidence/v0.28.0/support-coverage-report.pdf
+.runtime/release-evidence/v0.28.0/support-coverage-report.json
 ```
 
 The PDF and HTML are generated with `oodocs` and matplotlib from repository
@@ -38,7 +38,7 @@ The generator reads:
 
 | Source | Purpose |
 |---|---|
-| `specs/object_coverage.toml` | input object support |
+| `specs/object_coverage.toml` | input object support, first evidence, and support boundary |
 | `specs/variable_coverage.toml` | named output variable support |
 | `specs/algorithm_ledger.toml` | algorithm status, source maps, proof variables |
 | `data/conformance_cases/*/case.toml` | case tiers, domains, requested outputs, gates, and claim boundaries |
@@ -59,7 +59,10 @@ The generator reads:
 The report is a coverage map. It does not create new conformance claims. A
 supported row is only as strong as its status, first case, tolerance, and gate.
 
-As of v0.27.0, the report explicitly does not claim full EnergyPlus
+As of v0.28.0, every tracked input object includes a first evidence reference
+and a support boundary in `specs/object_coverage.toml`.
+
+The report explicitly does not claim full EnergyPlus
 compatibility, broad ExampleFiles numerical compatibility, HVAC numerical
 conformance, plant numerical conformance, meter conformance, sizing, EMS,
 PythonPlugin, daylighting, fenestration, solar, or warmup compatibility.

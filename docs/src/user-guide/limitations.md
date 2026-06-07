@@ -32,6 +32,8 @@ internal gains, radiant/latent coupling, HVAC, plant, meters, or broad
 heat-balance compatibility.
 
 v0.27 adds a user-facing support coverage report for tracked inputs, outputs,
-and algorithm families. It does not promote new numerical conformance.
+and algorithm families. v0.28 enriches input object coverage metadata with
+first evidence and support boundaries. These reporting updates do not promote
+new numerical conformance.
 
 For the formal non-goals list, see `project-scope/non-goals.md`.

@@ -89,7 +89,7 @@ CASE_SPECS = (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build release numerical conformance evidence.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.27.0")
+    parser.add_argument("--version", default="0.28.0")
     parser.add_argument("--skip-gate-run", action="store_true")
     return parser.parse_args()
 

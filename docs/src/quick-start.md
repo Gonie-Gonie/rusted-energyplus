@@ -35,6 +35,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.25-verify
 .\scripts\dev.cmd v0.26-verify
 .\scripts\dev.cmd v0.27-verify
+.\scripts\dev.cmd v0.28-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -84,6 +85,9 @@ declared `Zone Total Internal Convective Heating Rate` hourly series for
 v0.27 is the user support coverage report gate. It generates oodocs
 PDF/HTML/JSON/Markdown coverage for supported inputs, outputs, and algorithm
 families without adding a new numerical conformance claim.
+
+v0.28 enriches input object coverage with first evidence and support-boundary
+metadata so the support coverage report is readable from a user perspective.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

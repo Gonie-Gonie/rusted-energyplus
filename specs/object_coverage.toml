@@ -2,98 +2,138 @@
 name = "Version"
 family = "project"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Accepted for oracle-version tracking; no runtime compatibility claim by itself."
 
 [[object]]
 name = "Building"
 family = "building"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Typed for model metadata and simple building scope; no global building simulation claim."
 
 [[object]]
 name = "Timestep"
 family = "time"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Typed for fixed time-axis plumbing; no full EnergyPlus timestep-manager parity claim."
 
 [[object]]
 name = "RunPeriod"
 family = "time"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Typed for simple run-period time axes; no design-day, sizing-period, or warmup claim."
 
 [[object]]
 name = "Site:Location"
 family = "site"
 status = "typed"
+first_evidence = "weather_fields_001"
+support_boundary = "Typed for location metadata; weather conformance is limited to declared dry-bulb output."
 
 [[object]]
 name = "Material"
 family = "material"
 status = "typed"
+first_evidence = "construction_materials_001"
+support_boundary = "Typed for static material and construction evidence; no broad dynamic material algorithm claim."
 
 [[object]]
 name = "Material:NoMass"
 family = "material"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Typed for declared opaque no-mass heat-balance cases only."
 
 [[object]]
 name = "Construction"
 family = "construction"
 status = "typed"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Typed for surface/material links and declared static construction evidence."
 
 [[object]]
 name = "ScheduleTypeLimits"
 family = "schedule"
 status = "typed"
+first_evidence = "schedule_constant_001"
+support_boundary = "Typed for schedule metadata; no full schedule validation claim."
 
 [[object]]
 name = "Schedule:Constant"
 family = "schedule"
 status = "typed"
+first_evidence = "schedule_constant_001"
+support_boundary = "Typed and tolerance-gated for declared Schedule Value evidence."
 
 [[object]]
 name = "Schedule:Compact"
 family = "schedule"
 status = "typed"
+first_evidence = "ideal_loads_thermostat_001"
+support_boundary = "Typed for selected AllDays/Until segments; no broad compact-schedule grammar claim."
 
 [[object]]
 name = "OtherEquipment"
 family = "internal_gains"
 status = "typed"
+first_evidence = "internal_gains_001"
+support_boundary = "Typed for nominal EIO evidence and declared convective-gain trace only."
 
 [[object]]
 name = "ThermostatSetpoint:DualSetpoint"
 family = "thermostat"
 status = "typed"
+first_evidence = "ideal_loads_thermostat_001"
+support_boundary = "Typed for thermostat graph wiring; no HVAC control algorithm conformance."
 
 [[object]]
 name = "ZoneControl:Thermostat"
 family = "thermostat"
 status = "typed"
+first_evidence = "ideal_loads_thermostat_001"
+support_boundary = "Typed for thermostat references; no load-control numerical conformance."
 
 [[object]]
 name = "ZoneHVAC:IdealLoadsAirSystem"
 family = "hvac"
 status = "typed_graph_only"
+first_evidence = "ideal_loads_thermostat_001"
+support_boundary = "Typed graph only; no IdealLoads load or HVAC numerical conformance."
 
 [[object]]
 name = "NodeList"
 family = "hvac"
 status = "typed_graph_only"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "Typed graph and node expansion only; node outputs remain diagnostic."
 
 [[object]]
 name = "PlantLoop"
 family = "plant"
 status = "typed_graph_only"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "Typed graph and diagnostic projection only; no plant loop simulation conformance."
 
 [[object]]
 name = "Pump:ConstantSpeed"
 family = "plant"
 status = "typed_graph_only"
+first_evidence = "plant-loop-skeleton-smoke"
+support_boundary = "Typed graph equipment reference only; no pump performance or flow-control algorithm."
 
 [[object]]
 name = "Boiler:HotWater"
 family = "plant"
 status = "typed_graph_only"
+first_evidence = "plant-loop-skeleton-smoke"
+support_boundary = "Typed graph equipment reference only; no boiler performance algorithm."
 
 [[object]]
 name = "Chiller:Electric:EIR"
 family = "plant"
 status = "typed_graph_only"
+first_evidence = "plant-loop-skeleton-smoke"
+support_boundary = "Typed graph equipment reference only; no chiller performance algorithm."

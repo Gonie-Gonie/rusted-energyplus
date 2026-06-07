@@ -34,6 +34,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.25 | Opaque No-Mass Heat Balance Generalization | complete | limited-conformance | heat_balance_nomass_001, surface_temperature_nomass_001 | general heat-balance compatibility, HVAC compatibility, plant compatibility |
 | 0.26 | Internal Convective Gains Conformance | complete | declared-variables-only | internal_gains_001 | zone air temperature response to internal gains, radiant internal-gain coupling, latent or moisture coupling, HVAC compatibility, plant compatibility, meter conformance, general heat-balance compatibility |
 | 0.27 | User Support Coverage Report | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
+| 0.28 | Input Object Coverage Metadata | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 
 ## Long-Term Targets
 

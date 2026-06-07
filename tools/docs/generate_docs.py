@@ -191,6 +191,8 @@ def object_coverage(repo_root: Path) -> str:
             str(item.get("name", "")),
             str(item.get("family", "")),
             str(item.get("status", "")),
+            str(item.get("first_evidence", item.get("first_case", ""))),
+            str(item.get("support_boundary", "")),
         ]
         for item in spec.get("object", [])
     ]
@@ -198,7 +200,7 @@ def object_coverage(repo_root: Path) -> str:
         GENERATED_NOTICE
         + "# Object Coverage\n\n"
         + "Object coverage is maintained in `specs/object_coverage.toml`.\n\n"
-        + table(["Object", "Family", "Status"], rows)
+        + table(["Object", "Family", "Status", "First evidence", "Boundary"], rows)
     )
 
 

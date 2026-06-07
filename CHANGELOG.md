@@ -4,6 +4,32 @@
 
 No unreleased changes.
 
+## v0.28.0 - 2026-06-08
+
+Input object coverage metadata.
+
+### Added
+
+- v0.28 input coverage metadata milestone.
+- `first_evidence` and `support_boundary` fields for all tracked input
+  objects.
+- generated mdBook object coverage columns for first evidence and support
+  boundary.
+- support coverage report input tables that expose first evidence and
+  boundaries in PDF/HTML/JSON/Markdown.
+- v0.28 release verification script.
+
+### Changed
+
+- Release evidence report defaults now target v0.28.0.
+- Support coverage JSON now reports how many input objects have first evidence.
+
+### Scope
+
+- v0.28.0 is reporting metadata work and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.27.0 - 2026-06-08
 
 User support coverage reporting.

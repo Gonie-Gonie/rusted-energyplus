@@ -7,12 +7,13 @@ last_reviewed: 2026-06-08
 
 # Current Status
 
-The current public release line is v0.27.0. It adds a user-facing support
-coverage report for supported inputs, outputs, and algorithm scope on top of
-v0.26 internal convective gain conformance, v0.25 opaque no-mass heat-balance
-boundary handling, v0.24 runtime registry infrastructure, v0.23 official
-ExampleFile static model evidence, and v0.22 declared time, weather, and
-schedule numerical conformance.
+The current public release line is v0.28.0. It enriches input object coverage
+with first evidence and support-boundary metadata on top of the v0.27
+user-facing support coverage report, v0.26 internal convective gain
+conformance, v0.25 opaque no-mass heat-balance boundary handling, v0.24
+runtime registry infrastructure, v0.23 official ExampleFile static model
+evidence, and v0.22 declared time, weather, and schedule numerical
+conformance.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:

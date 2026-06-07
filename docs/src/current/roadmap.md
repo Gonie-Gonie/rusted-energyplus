@@ -36,6 +36,8 @@ Current direction:
   compatibility.
 - v0.27 added a user-facing support coverage report generated with `oodocs`
   from specs and case manifests, without adding new numerical conformance.
+- v0.28 enriched input object coverage with first evidence and support-boundary
+  metadata for user-facing report generation.
 
 The long-term targets remain:
 

@@ -55,7 +55,7 @@ ALGORITHM_STATUS_LABELS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the user support coverage report.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.27.0")
+    parser.add_argument("--version", default="0.28.0")
     return parser.parse_args()
 
 
@@ -164,7 +164,8 @@ def collect_object_rows(repo_root: Path) -> list[dict[str, Any]]:
                 "status": status,
                 "user_status": status_label(status, OBJECT_STATUS_LABELS),
                 "notes": list_value(item.get("notes", [])),
-                "first_case": str(item.get("first_case", "")),
+                "first_evidence": str(item.get("first_evidence", item.get("first_case", ""))),
+                "support_boundary": str(item.get("support_boundary", "")),
             }
         )
     return sorted(rows, key=lambda row: (support_rank(row["status"]), row["family"], row["name"]))
@@ -281,6 +282,9 @@ def build_support_coverage(repo_root: Path, version: str) -> dict[str, Any]:
             "input_object_count": len(object_rows),
             "typed_input_count": object_counts.get("typed", 0),
             "typed_graph_only_input_count": object_counts.get("typed_graph_only", 0),
+            "input_objects_with_first_evidence_count": sum(
+                1 for row in object_rows if row["first_evidence"]
+            ),
             "tracked_output_variable_count": len(variable_rows),
             "manifest_output_request_count": len(output_rows),
             "conformance_output_variable_count": variable_counts.get("conformance", 0),
@@ -356,11 +360,17 @@ def build_metric_table(report: dict[str, Any]) -> Table:
 
 def build_input_table(report: dict[str, Any]) -> Table:
     rows = [
-        [row["name"], row["family"], row["user_status"], row["first_case"], row["notes"]]
+        [
+            row["name"],
+            row["family"],
+            row["user_status"],
+            row["first_evidence"],
+            row["support_boundary"],
+        ]
         for row in report["input_objects"]
     ]
     return doc_table(
-        ["Input object", "Family", "Support", "First case", "Notes"],
+        ["Input object", "Family", "Support", "First evidence", "Boundary"],
         rows,
         "Supported input object coverage.",
     )
@@ -555,7 +565,13 @@ def markdown_table(headers: list[str], rows: list[list[Any]]) -> str:
 def render_markdown(report: dict[str, Any]) -> str:
     aggregate = report["aggregate"]
     input_rows = [
-        [row["name"], row["family"], row["user_status"], row["first_case"]]
+        [
+            row["name"],
+            row["family"],
+            row["user_status"],
+            row["first_evidence"],
+            row["support_boundary"],
+        ]
         for row in report["input_objects"]
     ]
     output_rows = [
@@ -592,7 +608,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- algorithms: {aggregate['algorithm_count']}\n"
         f"- cases: {aggregate['case_count']}\n\n"
         "## Supported Inputs\n\n"
-        + markdown_table(["Input", "Family", "Support", "First case"], input_rows)
+        + markdown_table(["Input", "Family", "Support", "First evidence", "Boundary"], input_rows)
         + "\n## Supported Outputs\n\n"
         + markdown_table(["Output", "Domain", "Support", "First case", "Freq", "Source"], output_rows)
         + "\n## Supported Algorithms\n\n"
