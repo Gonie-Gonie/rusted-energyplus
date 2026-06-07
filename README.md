@@ -33,6 +33,7 @@ EnergyPlus 26.1.0 oracle:
 - baseline-only thermostat and IdealLoads evidence, plus diagnostic-only
   air-side node baseline/projection evidence
 - smoke-level PlantLoop typed graph skeleton evidence
+- planning-guard plant source map for future plant diagnostics
 
 This public scope does not claim:
 
@@ -94,7 +95,8 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.11-verify
 .\scripts\dev.cmd v0.12-verify
 .\scripts\dev.cmd v0.13-verify
-.\scripts\dev.cmd conformance-evidence-report -Version 0.13.0
+.\scripts\dev.cmd v0.14-verify
+.\scripts\dev.cmd conformance-evidence-report -Version 0.14.0
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
@@ -106,7 +108,9 @@ evidence-policy release; it also packages the promoted v0.8/v0.9 numerical
 evidence as PDF/HTML/JSON under `evidence/v0.12.0`. v0.13 is a PlantLoop
 typed graph skeleton smoke gate and still makes no plant numerical conformance
 claim; it packages the same promoted numerical evidence set under
-`evidence/v0.13.0`.
+`evidence/v0.13.0`. v0.14 is a PlantLoop source-mapping planning guard and
+still makes no plant numerical conformance claim; it packages the same
+promoted numerical evidence set under `evidence/v0.14.0`.
 
 Developer-only diagnostics:
 
@@ -135,6 +139,7 @@ Start here:
 - `docs/src/conformance/examplefiles-coverage-plan.md`
 - `docs/src/operations/script-index.md`
 - `docs/src/porting-map/heat-balance.md`
+- `docs/src/porting-map/plant-source-map.md`
 
 Build the book with:
 

@@ -25,6 +25,7 @@ Milestones are organized around evidence, not demos.
 | v0.11 Air-side Node Diagnostic | baseline-only node output diagnostics plus Rust projection plumbing for the typed IdealLoads node graph | `air_side_node_diagnostic_001` diagnostic-only; no node conformance |
 | v0.12 Node Source Mapping | source-function map for node registration, update, and output sampling paths | planning guard for future node conformance |
 | v0.13 Plant Loop Skeleton | typed plant loop graph, branch/connector references, node registration, and first pump/boiler/chiller identity records | smoke only; no plant numerical conformance |
+| v0.14 Plant Source Mapping | source-function map for plant loop input, loop-side simulation, component dispatch, plant utilities, and first equipment output paths | planning guard for future plant diagnostics and conformance |
 | v1.0 Stable Compatibility Subset | public subset with locked object matrix and CI reports | declared subset only |
 
 Historical readiness notes are archived when they describe diagnostic runtime

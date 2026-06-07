@@ -48,6 +48,7 @@ separate in docs, scripts, and release language.
 | v0.11 | Air-side node diagnostic release | baseline-only node evidence and diagnostic Rust projection only |
 | v0.12 | Node source mapping release | planning guard before node or IdealLoads numerical conformance |
 | v0.13 | Plant loop skeleton release | typed graph smoke only; no plant numerical conformance |
+| v0.14 | Plant source mapping release | planning guard before plant diagnostics or numerical conformance |
 | v1.0 | Declared compatibility subset release | locked supported subset only |
 
 ## Retroactive Audit Rules
@@ -193,6 +194,11 @@ v0.13 decision: `plant-loop-skeleton.epJSON` is a typed graph smoke fixture for
 PlantLoop, branch, connector, and first pump/boiler/chiller identity records.
 It is not an EnergyPlus baseline case and is not a plant numerical conformance
 claim.
+
+v0.14 decision: plant source mapping is a planning guard. It locks EnergyPlus
+26.1.0 plant loop input, loop-side simulation, component dispatch, plant
+utilities, and first pump/boiler/chiller output paths before any future plant
+diagnostic or numerical claim may be promoted.
 
 ## Immediate Work Order
 

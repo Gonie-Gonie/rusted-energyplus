@@ -255,6 +255,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.13 plant-loop skeleton gate."
     }
+    "v0.14-verify" = @{
+        Path = "release\v0.14-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.14 plant source mapping gate."
+    }
 }
 
 $Aliases = @{
@@ -273,6 +278,7 @@ $Aliases = @{
     "verify-v0.11" = "v0.11-verify"
     "verify-v0.12" = "v0.12-verify"
     "verify-v0.13" = "v0.13-verify"
+    "verify-v0.14" = "v0.14-verify"
 }
 
 function Show-Commands {

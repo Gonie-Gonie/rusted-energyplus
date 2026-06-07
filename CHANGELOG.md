@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.14.0 - 2026-06-07
+
+Plant source mapping release.
+
+### Added
+
+- `plant-source-map.md` source-function map for EnergyPlus plant manager,
+  loop-side simulation, component dispatch, plant utilities, and first
+  pump/boiler/chiller output paths.
+- v0.14 plan, readiness, release notes, verification gate, and package checks.
+- plant output-variable matrix entries for future diagnostic-only plant loop
+  and first equipment outputs.
+
+### Notes
+
+- v0.14.0 is a planning-guard release, not a plant numerical conformance claim.
+- No plant flow balancing, operation scheme, pump electricity, boiler load,
+  chiller load, plant node-state, meter, sizing, or ExampleFiles compatibility
+  claim is made.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.13.0 - 2026-06-07
 
 PlantLoop typed graph skeleton release.

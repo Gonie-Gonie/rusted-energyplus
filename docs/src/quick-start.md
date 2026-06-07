@@ -2,7 +2,7 @@
 status: active
 claim_level: setup
 owner: docs
-last_reviewed: 2026-06-05
+last_reviewed: 2026-06-07
 ---
 
 # Quick Start
@@ -19,10 +19,10 @@ Run the local check suite:
 .\scripts\dev.cmd check
 ```
 
-Verify the current public foundation/model-intake release gate:
+Verify the current public release gate:
 
 ```powershell
-.\scripts\dev.cmd v0.1-verify
+.\scripts\dev.cmd v0.14-verify
 ```
 
 Development-only diagnostic scripts are listed in

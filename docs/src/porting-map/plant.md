@@ -44,6 +44,22 @@ The fixture proves typed object intake, reference resolution, node
 registration, and graph edge summaries. It does not execute plant hydraulics,
 operation schemes, equipment loads, meters, or node-state output comparisons.
 
+## v0.14 Plant Source Map
+
+The v0.14 planning guard locks the EnergyPlus 26.1.0 source paths that must be
+cited before future plant diagnostics or conformance work can move beyond typed
+graph evidence:
+
+```text
+docs/src/porting-map/plant-source-map.md
+```
+
+The source map covers plant manager input, loop-side simulation, component
+dispatch, plant utilities, and first pump/boiler/chiller output paths. It keeps
+plant loop loads, plant node state, pump electricity, boiler load, chiller
+load, and plant meters at future diagnostic-only status until manifests,
+Rust result artifacts, reports, tolerances, and gates exist.
+
 ## Reference Source Targets
 
 Future plant work must be ported against the locked EnergyPlus 26.1.0 source

@@ -77,5 +77,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.11-verify` | release | verify v0.11 air-side node diagnostic and projection evidence | yes | `.runtime/air-side-node-diagnostic` |
 | `v0.12-verify` | release | verify v0.12 node source mapping evidence and numeric evidence packaging | yes | source-map docs, `.runtime/release-evidence` |
 | `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and numeric evidence packaging | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
+| `v0.14-verify` | release | verify v0.14 plant source mapping and numeric evidence packaging | yes | plant source-map docs, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.
