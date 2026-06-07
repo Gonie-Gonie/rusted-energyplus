@@ -59,6 +59,8 @@ Assert-DoesNotContain -Path "scripts\compare\compare-regression.ps1" -Pattern "c
 Assert-DoesNotContain -Path "docs\src\archive\old-readiness-notes\v0.6.0-diagnostic-runtime-note.md" -Pattern "first executable building simulation subset" -Description "v0.6 scope"
 Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.6.0-diagnostic-runtime-note.md" -Pattern "Historical diagnostic note" -Description "v0.6 archive boundary"
 Assert-Contains -Path "docs\src\archive\old-readiness-notes\v0.7.0-compare-diagnostic-note.md" -Pattern "Historical diagnostic note" -Description "v0.7 archive boundary"
+Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "diagnostic-ready" -Description "v0.6 active readiness boundary"
+Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "tolerance_policy: none" -Description "v0.6 tolerance boundary"
 
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "comparison_class: diagnostic-only" -Description "zone diagnostic CLI"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "conformance_claim: false" -Description "diagnostic CLI"

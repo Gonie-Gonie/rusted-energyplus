@@ -199,23 +199,25 @@ Goal:
 
 No heat-balance conformance claim.
 
-### v0.7 Compare Release
+Current implemented subset:
+
+- native `ResultStore` diagnostic path
+- diagnostic-only zone temperature extraction
+- manifest-driven diagnostic MAT reports
+- compare regression `trace.json`, `compare-summary.json`,
+  `compare-report.md`, and `profile-summary.json`
+- schedule comparison
+- weather field comparison
+- first numeric divergence for series comparisons
+
+### v0.7 Source Mapping Release
 
 Goal:
 
-- `trace.json`
-- `compare-summary.json`
-- `compare-report.md`
-- profile summary skeleton
-- first divergence detection
-- variable-level comparison schema
-
-Current implemented subset:
-
-- schedule comparison
-- weather field comparison
-- diagnostic-only zone temperature extraction
-- first numeric divergence for series comparisons
+- EnergyPlus source/function maps for heat-balance work
+- output-variable to Rust state/source maps
+- no algorithm port without a source-map entry
+- blocking source-map gate before heat-balance conformance work
 
 ### v0.8 Heat Balance Mapping
 

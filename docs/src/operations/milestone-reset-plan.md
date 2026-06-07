@@ -149,9 +149,13 @@ v0.5:
 
 v0.6+:
 
-- [ ] keep `compare zone-temperature` diagnostic-only until v0.8 heat-balance conformance
-- [ ] decide whether `run first-zone` moves under a dev-only CLI namespace
+- [x] keep `compare zone-temperature` diagnostic-only until v0.8 heat-balance conformance
+- [x] decide whether `run first-zone` moves under a dev-only CLI namespace
 - [ ] make v0.7 source maps a blocking gate before heat-balance algorithm work
+
+v0.6 decision: keep `run first-zone` callable for developer diagnostics in the
+current CLI, but require docs, smoke output, and release verification to label
+it as diagnostic infrastructure rather than public simulation compatibility.
 
 ## Immediate Work Order
 

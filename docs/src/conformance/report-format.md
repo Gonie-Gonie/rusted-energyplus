@@ -47,6 +47,13 @@ Current scripts still write milestone-specific `.runtime/compare-*` and
 `.runtime/conformance-*` directories. Those are acceptable smoke artifacts
 until the canonical evidence layout is implemented.
 
+For the v0.6 diagnostic infrastructure release, `compare-zone-smoke` and
+`conformance-diagnostic-report-smoke` write diagnostic-only MAT reports, while
+`compare-regression` writes suite-level trace, summary, markdown report, and
+profile skeleton artifacts. These artifacts are release infrastructure
+evidence; they do not become heat-balance conformance without tolerances, Rust
+result artifacts for the declared outputs, and blocking gates.
+
 For the v0.2 baseline-only harness, `conformance baseline` writes
 `case-expanded.toml` beside the EnergyPlus artifacts, and `conformance
 report-skeleton` writes both `compare-report.md` and `compare-summary.json`.
