@@ -1,0 +1,115 @@
+id = "air_side_node_diagnostic_001"
+title = "One-zone IdealLoads air-side node diagnostic"
+milestone = "v0.11-air-side-node-diagnostic"
+purpose = "Record baseline-only node output evidence for the first air-side HVAC node subset without claiming numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This v0.11 case is diagnostic-only node output evidence, not node or HVAC numerical conformance.",
+  "The fixture reuses the v0.10 thermostat and IdealLoads graph shape so node outputs have thermostat and equipment context.",
+  "System Node Setpoint Temperature is intentionally excluded from this first node gate because inlet and return nodes emit the EnergyPlus -999 sentinel."
+]
+
+[input]
+idf = "data/conformance_cases/air_side_node_diagnostic_001/air_side_node_diagnostic.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Humidity Ratio"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Mass Flow Rate"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Humidity Ratio"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Mass Flow Rate"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Humidity Ratio"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Mass Flow Rate"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+
+[report]
+format = "markdown"
+path = ".runtime/air-side-node-diagnostic/26.1.0/report-skeleton/air_side_node_diagnostic_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd air-side-node-diagnostic-smoke"
+blocking = true

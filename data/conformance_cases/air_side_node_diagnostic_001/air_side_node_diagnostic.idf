@@ -1,0 +1,316 @@
+Version,26.1;
+
+SimulationControl,
+  No,                      !- Do Zone Sizing Calculation
+  No,                      !- Do System Sizing Calculation
+  No,                      !- Do Plant Sizing Calculation
+  No,                      !- Run Simulation for Sizing Periods
+  Yes;                     !- Run Simulation for Weather File Run Periods
+
+Building,
+  Rusted EnergyPlus v0.10 IdealLoads Thermostat,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+RunPeriod,
+  Run Period 1,
+  1,
+  1,
+  2013,
+  1,
+  1,
+  2013,
+  Tuesday,
+  Yes,
+  Yes,
+  No,
+  Yes,
+  Yes;
+
+Site:Location,
+  Golden CO USA,
+  39.74,
+  -105.18,
+  -7.0,
+  1829.0;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+ScheduleTypeLimits,
+  Control Type,
+  0,
+  4,
+  DISCRETE;
+
+ScheduleTypeLimits,
+  Temperature,
+  -60,
+  200,
+  CONTINUOUS;
+
+ScheduleTypeLimits,
+  Fraction,
+  0,
+  1,
+  CONTINUOUS;
+
+Schedule:Constant,
+  Zone Control Type Schedule,
+  Control Type,
+  4;
+
+Schedule:Constant,
+  Heating Setpoint,
+  Temperature,
+  21;
+
+Schedule:Constant,
+  Cooling Setpoint,
+  Temperature,
+  24;
+
+Schedule:Compact,
+  Internal Gain Schedule,
+  Fraction,
+  Through: 12/31,
+  For: AllDays,
+  Until: 06:00,
+  0.0,
+  Until: 18:00,
+  1.0,
+  Until: 24:00,
+  0.0;
+
+Material,
+  Mass Layer,
+  Rough,
+  0.10,
+  1.40,
+  2200,
+  900,
+  0.9,
+  0.7,
+  0.7;
+
+Construction,
+  Wall,
+  Mass Layer;
+
+Zone,
+  ZONE ONE,
+  0,
+  0,
+  0,
+  0,
+  1,
+  1,
+  1,
+  1;
+
+BuildingSurface:Detailed,
+  FLOOR,
+  Floor,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  0,1,0,
+  1,1,0,
+  1,0,0,
+  0,0,0;
+
+BuildingSurface:Detailed,
+  ROOF,
+  Roof,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.0,
+  4,
+  1,0,1,
+  1,1,1,
+  0,1,1,
+  0,0,1;
+
+BuildingSurface:Detailed,
+  WALL X0,
+  Wall,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,1,0,
+  0,1,1,
+  0,0,1;
+
+BuildingSurface:Detailed,
+  WALL X1,
+  Wall,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  1,0,1,
+  1,1,1,
+  1,1,0;
+
+BuildingSurface:Detailed,
+  WALL Y0,
+  Wall,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,0,1,
+  1,0,1,
+  1,0,0;
+
+BuildingSurface:Detailed,
+  WALL Y1,
+  Wall,
+  Wall,
+  ZONE ONE,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,1,0,
+  1,1,0,
+  1,1,1,
+  0,1,1;
+
+OtherEquipment,
+  Noon Plug Load,
+  None,
+  ZONE ONE,
+  Internal Gain Schedule,
+  EquipmentLevel,
+  500.0,
+  ,
+  ,
+  0.0,
+  0.20,
+  0.0;
+
+ZoneControl:Thermostat,
+  ZONE ONE CONTROLS,
+  ZONE ONE,
+  Zone Control Type Schedule,
+  ThermostatSetpoint:DualSetpoint,
+  ZONE ONE SETPOINTS;
+
+ThermostatSetpoint:DualSetpoint,
+  ZONE ONE SETPOINTS,
+  Heating Setpoint,
+  Cooling Setpoint;
+
+ZoneHVAC:EquipmentConnections,
+  ZONE ONE,
+  ZONE ONE EQUIPMENT,
+  ZONE ONE INLETS,
+  ,
+  ZONE ONE AIR NODE,
+  ZONE ONE RETURN;
+
+ZoneHVAC:EquipmentList,
+  ZONE ONE EQUIPMENT,
+  SequentialLoad,
+  ZoneHVAC:IdealLoadsAirSystem,
+  ZONE ONE IDEAL LOADS,
+  1,
+  1,
+  ,
+  ;
+
+ZoneHVAC:IdealLoadsAirSystem,
+  ZONE ONE IDEAL LOADS,
+  ,
+  ZONE ONE INLETS,
+  ,
+  ,
+  50,
+  13,
+  0.0156,
+  0.0077,
+  NoLimit,
+  ,
+  ,
+  NoLimit,
+  ,
+  ,
+  ,
+  ,
+  ConstantSensibleHeatRatio,
+  0.7,
+  None,
+  ,
+  ,
+  None,
+  NoEconomizer,
+  None,
+  0.7,
+  0.65,
+  ,
+  ,
+  DistrictHeatingWater,
+  ,
+  DistrictCooling;
+
+NodeList,
+  ZONE ONE INLETS,
+  ZONE ONE INLET;
+
+Output:VariableDictionary,Regular;
+Output:Variable,ZONE ONE,Zone Thermostat Heating Setpoint Temperature,Hourly;
+Output:Variable,ZONE ONE,Zone Thermostat Cooling Setpoint Temperature,Hourly;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Total Heating Rate,Hourly;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Total Cooling Rate,Hourly;
+Output:Variable,ZONE ONE INLET,System Node Temperature,Hourly;
+Output:Variable,ZONE ONE INLET,System Node Humidity Ratio,Hourly;
+Output:Variable,ZONE ONE INLET,System Node Mass Flow Rate,Hourly;
+Output:Variable,ZONE ONE AIR NODE,System Node Temperature,Hourly;
+Output:Variable,ZONE ONE AIR NODE,System Node Humidity Ratio,Hourly;
+Output:Variable,ZONE ONE AIR NODE,System Node Mass Flow Rate,Hourly;
+Output:Variable,ZONE ONE RETURN,System Node Temperature,Hourly;
+Output:Variable,ZONE ONE RETURN,System Node Humidity Ratio,Hourly;
+Output:Variable,ZONE ONE RETURN,System Node Mass Flow Rate,Hourly;

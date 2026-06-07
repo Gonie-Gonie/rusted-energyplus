@@ -65,6 +65,10 @@ Current v0.10 IdealLoads thermostat smoke case:
 
 - `ideal_loads_thermostat_001`
 
+Current v0.11 air-side node diagnostic case:
+
+- `air_side_node_diagnostic_001`
+
 Planned fields:
 
 - source family and source file

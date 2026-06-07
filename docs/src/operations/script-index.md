@@ -43,6 +43,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
 | `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, IdealLoads typed graph, warning policy, and nonzero baseline signal | yes | `.runtime/ideal-loads-thermostat` |
+| `air-side-node-diagnostic-smoke` | smoke | gate the v0.11 air-side node diagnostic baseline evidence | yes | `.runtime/air-side-node-diagnostic` |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
@@ -70,5 +71,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.8-verify` | release | verify v0.8 heat-balance conformance evidence | yes | `.runtime/heat-balance-conformance` |
 | `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
 | `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
+| `v0.11-verify` | release | verify v0.11 air-side node diagnostic evidence | yes | `.runtime/air-side-node-diagnostic` |
 
 No diagnostic command should be listed as conformance evidence.

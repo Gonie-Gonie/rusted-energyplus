@@ -25,7 +25,7 @@ conformance claim.
 | surface heat balance | Surface Inside Face Temperature; Surface Outside Face Temperature; Surface Inside Face Conduction Heat Transfer Rate; Surface Outside Face Conduction Heat Transfer Rate | ESO | conformance for `surface_temperature_nomass_001` inside/outside face temperatures; conduction rates otherwise diagnostic |
 | fenestration/solar | Surface Window Transmitted Solar Radiation Rate; Surface Inside Face Solar Radiation Heat Gain Rate; Surface Outside Face Incident Solar Radiation Rate per Area | ESO | diagnostic until a separate declared case exists |
 | thermostat and IdealLoads | Zone Thermostat Heating Setpoint Temperature; Zone Thermostat Cooling Setpoint Temperature; Zone Ideal Loads Zone Total Heating Rate; Zone Ideal Loads Zone Total Cooling Rate | ESO | smoke and baseline-only for `ideal_loads_thermostat_001`; not an IdealLoads load-conformance claim |
-| node | System Node Temperature; System Node Humidity Ratio; System Node Mass Flow Rate; System Node Setpoint Temperature | ESO | diagnostic until v0.11 |
+| node | System Node Temperature; System Node Humidity Ratio; System Node Mass Flow Rate; System Node Setpoint Temperature | ESO | diagnostic-only for `air_side_node_diagnostic_001`; setpoint temperature remains future-gated; no node numerical conformance claim |
 | component | Fan Electricity Rate; Cooling Coil Total Cooling Rate; Heating Coil Heating Rate | ESO | diagnostic until component port |
 | facility meter | Electricity:Facility; Gas:Facility; Heating:EnergyTransfer; Cooling:EnergyTransfer | MTR, SQL, CSV | diagnostic until meter contract |
 

@@ -63,6 +63,29 @@ tolerance_policy: none
 status: baseline-only
 ```
 
+## v0.11 Air-Side Node Diagnostic
+
+`air_side_node_diagnostic_001` is the first node-owned HVAC diagnostic case. It
+keeps `comparison_class = "diagnostic-only"`, `conformance_claim = false`,
+`tolerance_policy: none`, and `status: baseline-only`.
+
+The case records EnergyPlus baseline-only ESO evidence for:
+
+- `ZONE ONE INLET`
+- `ZONE ONE AIR NODE`
+- `ZONE ONE RETURN`
+
+Requested node-state variables:
+
+- `System Node Temperature`
+- `System Node Humidity Ratio`
+- `System Node Mass Flow Rate`
+
+`System Node Setpoint Temperature` remains future-gated because the current
+inlet and return nodes emit the EnergyPlus `-999` sentinel. The v0.11 gate does
+not claim node, IdealLoads, fan, coil, air-loop, sizing, availability, or meter
+numerical compatibility.
+
 ## EnergyPlus Source Areas To Map Next
 
 Before a load-conformance claim, the source map must identify the specific

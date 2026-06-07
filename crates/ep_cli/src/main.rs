@@ -1439,6 +1439,7 @@ fn variable_class_label(class: VariableClass) -> &'static str {
         VariableClass::InternalGain => "internal-gain",
         VariableClass::ZoneState => "zone-state",
         VariableClass::SurfaceState => "surface-state",
+        VariableClass::NodeState => "node-state",
         VariableClass::HvacState => "hvac-state",
         VariableClass::Meter => "meter",
         VariableClass::InternalVariable => "internal-variable",

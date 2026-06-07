@@ -2483,6 +2483,13 @@ v0.11 진입 전 hardening:
   - NodeList와 node registry는 v0.11 진입 전 typed foundation으로
     고정하되, node temperature/flow/humidity conformance claim에는
     포함하지 않는다.
+
+v0.11:
+  air_side_node_diagnostic_001의 node-state baseline-only diagnostic gate.
+  ZONE ONE INLET, ZONE ONE AIR NODE, ZONE ONE RETURN의 System Node
+  Temperature, Humidity Ratio, Mass Flow Rate를 기록한다.
+  node/HVAC numerical conformance claim이 아니며, System Node Setpoint
+  Temperature는 -999 sentinel 처리 전까지 future-gated로 둔다.
 ```
 
 이 보정은 false conformance를 막기 위한 release 운영 기준이다.

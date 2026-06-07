@@ -299,6 +299,8 @@ pub enum VariableClass {
     ZoneState,
     /// Surface-level state variables.
     SurfaceState,
+    /// Air-side node state variables.
+    NodeState,
     /// HVAC control or component state variables.
     HvacState,
     /// EnergyPlus meters.
@@ -802,6 +804,53 @@ mod tests {
             std::io::Error::other("IdealLoads thermostat smoke should declare a gate")
         })?;
         assert_eq!(gate.script, "scripts/dev.cmd ideal-loads-thermostat-smoke");
+        assert!(gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
+    fn loads_air_side_node_diagnostic_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/air_side_node_diagnostic_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "air_side_node_diagnostic_001");
+        assert_eq!(manifest.milestone, "v0.11-air-side-node-diagnostic");
+        assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+        assert!(!manifest.conformance_claim);
+        assert!(manifest.tolerances.is_empty());
+        assert_eq!(manifest.outputs.len(), 13);
+        assert_eq!(
+            manifest
+                .outputs
+                .iter()
+                .filter(|output| output.class == VariableClass::NodeState)
+                .count(),
+            9
+        );
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE INLET"
+                && output.variable == "System Node Temperature"
+                && output.class == VariableClass::NodeState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE AIR NODE"
+                && output.variable == "System Node Mass Flow Rate"
+                && output.class == VariableClass::NodeState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE RETURN"
+                && output.variable == "System Node Humidity Ratio"
+                && output.class == VariableClass::NodeState
+        }));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("air-side node diagnostic should declare a gate")
+        })?;
+        assert_eq!(
+            gate.script,
+            "scripts/dev.cmd air-side-node-diagnostic-smoke"
+        );
         assert!(gate.blocking);
 
         Ok(())

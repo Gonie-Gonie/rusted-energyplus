@@ -85,6 +85,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.10 thermostat, equipment, and IdealLoads typed graph."
     }
+    "air-side-node-diagnostic-smoke" = @{
+        Path = "smoke\air-side-node-diagnostic-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate the v0.11 air-side node diagnostic baseline evidence."
+    }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
         Group = "compare"
@@ -220,6 +225,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.10 IdealLoads thermostat typed-graph gate."
     }
+    "v0.11-verify" = @{
+        Path = "release\v0.11-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.11 air-side node diagnostic gate."
+    }
 }
 
 $Aliases = @{
@@ -235,6 +245,7 @@ $Aliases = @{
     "verify-v0.8" = "v0.8-verify"
     "verify-v0.9" = "v0.9-verify"
     "verify-v0.10" = "v0.10-verify"
+    "verify-v0.11" = "v0.11-verify"
 }
 
 function Show-Commands {
