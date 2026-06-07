@@ -304,12 +304,37 @@ not_claimed = [
 [[milestone]]
 version = "0.23"
 title = "Static Model Evidence Expansion"
-status = "planned"
+status = "complete"
 claim_level = "static-evidence"
-required_cases = []
-required_variables = []
+required_cases = [
+  "official_1zone_static_model_001",
+]
+required_variables = [
+  "HeatTransfer Surface Class",
+  "HeatTransfer Surface Area (Net)",
+  "HeatTransfer Surface Area (Gross)",
+  "HeatTransfer Surface Azimuth",
+  "HeatTransfer Surface Tilt",
+  "Construction CTF Layer Count",
+  "Construction CTF Thermal Conductance",
+  "Material CTF Summary Thickness",
+  "Material CTF Summary Conductivity",
+  "Material CTF Summary Density",
+  "Material CTF Summary Specific Heat",
+  "Material CTF Summary Thermal Resistance",
+  "OtherEquipment Internal Gains Nominal Zone Floor Area",
+  "OtherEquipment Internal Gains Nominal Equipment Level",
+  "OtherEquipment Internal Gains Nominal Equipment per Floor Area",
+  "OtherEquipment Internal Gains Nominal Fraction Latent",
+  "OtherEquipment Internal Gains Nominal Fraction Radiant",
+  "OtherEquipment Internal Gains Nominal Fraction Lost",
+  "OtherEquipment Internal Gains Nominal Fraction Convected",
+]
 not_claimed = [
   "dynamic heat-balance compatibility",
+  "HVAC compatibility",
+  "plant compatibility",
+  "meter conformance",
 ]
 
 [[milestone]]

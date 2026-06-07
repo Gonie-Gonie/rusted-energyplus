@@ -22,10 +22,14 @@ tolerance, and code organization.
 - release conformance index and coverage matrix report generation
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
+- official ExampleFile static model EIO conformance report gate
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
   declared v0.22 `Schedule Value` / dry-bulb hourly variables
+- static EIO model conformance only for the declared v0.23 official
+  `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
+  nominal fields
 
 Not claimed:
 
@@ -53,8 +57,9 @@ Useful focused checks:
 .\scripts\dev.cmd algorithm-ledger-check
 .\scripts\dev.cmd compare-schedule-conformance
 .\scripts\dev.cmd compare-weather-conformance
-.\scripts\dev.cmd conformance-index-report -Version 0.22.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.22.0
+.\scripts\dev.cmd compare-static-model-conformance
+.\scripts\dev.cmd conformance-index-report -Version 0.23.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.23.0
 ```
 
 ## Documentation

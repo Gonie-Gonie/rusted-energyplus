@@ -1,6 +1,6 @@
 ---
 status: active
-claim_level: smoke
+claim_level: static-evidence
 owner: runtime
 last_reviewed: 2026-06-07
 ---
@@ -19,6 +19,9 @@ Implemented evidence:
   static summaries
 - `internal_gains_001` case manifest for nominal internal gains and the first
   internal convective gain trace
+- `official_1zone_static_model_001` conformance case for declared official
+  ExampleFile static EIO surface, construction/material, and OtherEquipment
+  nominal fields
 
 EnergyPlus evidence source:
 
@@ -41,12 +44,20 @@ Locked v0.5 geometry/static fields:
   latent/radiant/lost/convected fractions, and first hourly convective gain
   trace
 
+Locked v0.23 static evidence fields:
+
+- official `1ZoneUncontrolled` heat-transfer surface class, area, azimuth, and
+  tilt
+- official `1ZoneUncontrolled` Construction CTF and Material CTF Summary rows
+- official `1ZoneUncontrolled` OtherEquipment Internal Gains Nominal rows
+
 EIO parser trust boundary:
 
 - EIO rows are treated as EnergyPlus oracle extraction artifacts for selected
   static input summaries.
 - Matching EIO rows is evidence that Rust input interpretation agrees with the
-  selected EnergyPlus summaries for these fixtures.
+  selected EnergyPlus summaries for the declared fixture or official
+  ExampleFile case.
 - Matching EIO rows is not evidence of surface heat-transfer, solar,
   fenestration, zone heat-balance, HVAC, or plant conformance.
 
@@ -64,4 +75,4 @@ Next evidence target:
 
 - coordinate-system and `GlobalGeometryRules` variants
 - fenestration and shading surface geometry rows
-- declared tolerances and blocking report gates for a future conformance class
+- broader official ExampleFile static variants beyond `1ZoneUncontrolled`

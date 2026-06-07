@@ -18,9 +18,9 @@ conformance claim.
 | solar weather | Site Direct Solar Radiation Rate per Area; Site Diffuse Solar Radiation Rate per Area; Site Solar Altitude Angle; Site Solar Azimuth Angle | ESO | diagnostic |
 | schedule | Schedule Value | ESO | conformance for `schedule_constant_001` |
 | static zone | Zone Information surface count, floor area, volume, exterior gross wall area | EIO | smoke |
-| static surface | HeatTransfer Surface class, net area, gross area, azimuth, tilt | EIO | smoke |
-| construction/material | Construction CTF layer count and thermal conductance; Material CTF Summary thickness, conductivity, density, specific heat, thermal resistance | EIO | smoke |
-| internal gains | OtherEquipment Internal Gains Nominal zone floor area, equipment level, equipment per floor area, latent/radiant/lost/convected fractions; Zone Total Internal Convective Heating Rate | EIO, ESO | smoke |
+| static surface | HeatTransfer Surface class, net area, gross area, azimuth, tilt | EIO | conformance for `official_1zone_static_model_001`; local fixture checks remain smoke |
+| construction/material | Construction CTF layer count and thermal conductance; Material CTF Summary thickness, conductivity, density, specific heat, thermal resistance | EIO | conformance for `official_1zone_static_model_001`; local fixture checks remain smoke |
+| internal gains | OtherEquipment Internal Gains Nominal zone floor area, equipment level, equipment per floor area, latent/radiant/lost/convected fractions; Zone Total Internal Convective Heating Rate | EIO, ESO | EIO nominal fields conformance for `official_1zone_static_model_001`; ESO convective trace remains smoke/diagnostic |
 | zone heat balance | Zone Mean Air Temperature; Zone Air Heat Balance Surface Convection Rate; Zone Air Heat Balance Air Energy Storage Rate | ESO | conformance for `heat_balance_nomass_001` `Zone Mean Air Temperature`; otherwise diagnostic |
 | surface heat balance | Surface Inside Face Temperature; Surface Outside Face Temperature; Surface Inside Face Conduction Heat Transfer Rate; Surface Outside Face Conduction Heat Transfer Rate | ESO | conformance for `surface_temperature_nomass_001` inside/outside face temperatures; conduction rates otherwise diagnostic |
 | fenestration/solar | Surface Window Transmitted Solar Radiation Rate; Surface Inside Face Solar Radiation Heat Gain Rate; Surface Outside Face Incident Solar Radiation Rate per Area | ESO | diagnostic until a separate declared case exists |

@@ -22,8 +22,12 @@ Current direction:
 - v0.21 made the algorithm ledger a source-map validation gate.
 - v0.22 promoted declared `Schedule Value` and dry-bulb hourly conformance
   using timestamp-aligned ESO comparisons.
-- v0.23 should expand static model evidence without claiming dynamic
-  heat-balance compatibility unless a declared gate supports it.
+- v0.23 promoted official `1ZoneUncontrolled` static EIO model evidence for
+  declared surface, construction/material, and OtherEquipment nominal fields
+  without claiming dynamic heat-balance compatibility.
+- v0.24 should harden runtime state, output registry, meter registry, result
+  storage, diagnostics, and profiling scaffolds without adding new numerical
+  conformance unless a declared gate supports it.
 
 The long-term targets remain:
 

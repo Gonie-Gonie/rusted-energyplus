@@ -22,6 +22,8 @@ Current foundations:
 - diagnostic-only MAT delta artifacts for `compare zone-temperature --report-dir`
 - manifest-driven diagnostic MAT report generation
 - manifest metadata in diagnostic MAT `compare-summary.json` and report
+- manifest-driven static model `compare-summary.json` and `compare-report.md`
+  generation for declared EIO rows
 
 Current v0.6 artifact contract:
 
@@ -40,3 +42,5 @@ Next evidence target:
 - manifest-driven multi-series comparison
 - artifact directories split into `oracle`, `rust`, and `compare`
 - variable-level tolerance summaries
+- static and time-series report schemas that can be merged into higher-level
+  release evidence without mixing claim classes

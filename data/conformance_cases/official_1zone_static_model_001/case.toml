@@ -1,0 +1,266 @@
+id = "official_1zone_static_model_001"
+title = "Official 1ZoneUncontrolled static model evidence"
+milestone = "v0.23-static-model-evidence"
+purpose = "Compare Rust static model interpretation with EnergyPlus EIO surface, construction/material, and OtherEquipment nominal rows for the official 1ZoneUncontrolled ExampleFile."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The source IDF is an official EnergyPlus ExampleFiles input staged from the repo-local oracle installation.",
+  "The gate compares static EIO rows only; it does not claim dynamic heat-balance, HVAC, plant, solar, fenestration, sizing, warmup, or meter conformance.",
+  "Surface geometry evidence uses Output:Surfaces:List,Details injected into the staged IDF when absent.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "energy-plus-examplefile"
+source_file = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "surface", "construction", "internal-gain"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Class"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.01
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Net)"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.01
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Gross)"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.01
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Azimuth"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.01
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Tilt"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.01
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Construction CTF Thermal Conductance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Thickness"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Conductivity"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Density"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Specific Heat"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "conformance"
+abs_tol = 0.001
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Zone Floor Area"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Equipment Level"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Equipment per Floor Area"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Latent"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Radiant"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Lost"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[outputs]]
+key = "*"
+variable = "OtherEquipment Internal Gains Nominal Fraction Convected"
+frequency = "static"
+class = "internal-gain"
+source = "eio"
+domain = "internal-gain"
+level = "conformance"
+abs_tol = 0.02
+rel_tol = 0.001
+
+[[tolerances]]
+variable_class = "surface-state"
+max_abs = 0.01
+max_rel = 0.001
+
+[[tolerances]]
+variable_class = "construction-material"
+max_abs = 0.001
+max_rel = 0.001
+
+[[tolerances]]
+variable_class = "internal-gain"
+max_abs = 0.02
+max_rel = 0.001
+
+[report]
+format = "markdown"
+path = ".runtime/static-model-conformance/26.1.0/official_1zone_static_model_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-static-model-conformance"
+blocking = true
+

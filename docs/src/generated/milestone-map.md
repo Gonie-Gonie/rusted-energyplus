@@ -29,7 +29,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.20 | Conformance Report Generator | complete | reporting-infrastructure |  | new numerical conformance unless backed by generated evidence |
 | 0.21 | Source Map and Algorithm Ledger v1 | complete | planning-guard |  | algorithm completion without source map |
 | 0.22 | Time, Weather, and Schedule Conformance Expansion | complete | declared-variables-only | schedule_constant_001, weather_fields_001 | general runtime compatibility |
-| 0.23 | Static Model Evidence Expansion | planned | static-evidence |  | dynamic heat-balance compatibility |
+| 0.23 | Static Model Evidence Expansion | complete | static-evidence | official_1zone_static_model_001 | dynamic heat-balance compatibility, HVAC compatibility, plant compatibility, meter conformance |
 | 0.24 | Runtime State and Output Registry Hardening | planned | runtime-infrastructure |  | new numerical conformance |
 | 0.25 | Opaque No-Mass Heat Balance Generalization | planned | limited-conformance | heat_balance_nomass_001, surface_temperature_nomass_001 | general heat-balance compatibility, HVAC compatibility, plant compatibility |
 

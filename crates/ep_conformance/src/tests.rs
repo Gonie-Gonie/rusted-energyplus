@@ -396,12 +396,78 @@ fn loads_internal_gains_case_fixture() -> Result<(), Box<dyn std::error::Error>>
 }
 
 #[test]
+fn loads_official_static_model_conformance_case_fixture() -> Result<(), Box<dyn std::error::Error>>
+{
+    let manifest = load_case_file(
+        repo_root().join("data/conformance_cases/official_1zone_static_model_001/case.toml"),
+    )?;
+
+    assert_eq!(manifest.id, "official_1zone_static_model_001");
+    assert_eq!(manifest.milestone, "v0.23-static-model-evidence");
+    assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+    assert!(manifest.conformance_claim);
+    assert_eq!(manifest.outputs.len(), 19);
+    assert!(manifest.outputs.iter().all(|output| {
+        output.key == "*"
+            && output.frequency == OutputFrequency::Static
+            && output.source == SourceArtifact::Eio
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| output.class == VariableClass::SurfaceState)
+            .count(),
+        5
+    );
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| output.class == VariableClass::ConstructionMaterial)
+            .count(),
+        7
+    );
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| output.class == VariableClass::InternalGain)
+            .count(),
+        7
+    );
+    assert_eq!(manifest.tolerances.len(), 3);
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceState && tolerance.max_abs == Some(0.01)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::ConstructionMaterial
+            && tolerance.max_abs == Some(0.001)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::InternalGain && tolerance.max_abs == Some(0.02)
+    }));
+    let gate = manifest
+        .gate
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("static model conformance should declare a gate"))?;
+    assert_eq!(
+        gate.script,
+        "scripts/dev.cmd compare-static-model-conformance"
+    );
+    assert!(gate.blocking);
+
+    Ok(())
+}
+
+#[test]
 fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
     let manifest = load_suite_file(repo_root().join("data/conformance_suites/foundation.toml"))?;
 
     assert_eq!(manifest.id, "foundation");
     assert_eq!(manifest.oracle_version, "26.1.0");
-    assert_eq!(manifest.cases.len(), 6);
+    assert_eq!(manifest.cases.len(), 7);
     assert!(
         manifest
             .cases
@@ -415,6 +481,9 @@ fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
     );
     assert!(manifest.cases.iter().any(|case| {
         case.ends_with("data/conformance_cases/construction_materials_001/case.toml")
+    }));
+    assert!(manifest.cases.iter().any(|case| {
+        case.ends_with("data/conformance_cases/official_1zone_static_model_001/case.toml")
     }));
     assert!(
         manifest

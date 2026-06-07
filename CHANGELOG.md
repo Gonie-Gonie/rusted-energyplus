@@ -4,6 +4,32 @@
 
 No unreleased changes.
 
+## v0.23.0 - 2026-06-07
+
+Static model evidence expansion.
+
+### Added
+
+- `conformance static-model-report` command.
+- Blocking `compare-static-model-conformance` gate.
+- Official ExampleFile case `official_1zone_static_model_001`.
+- Static EIO report artifacts for declared surface, construction/material, and
+  OtherEquipment nominal fields.
+- Surface detail EIO staging via `Output:Surfaces:List,Details` injection.
+
+### Changed
+
+- The conformance index now includes the v0.23 static model evidence case.
+- Default release evidence report version is v0.23.0.
+
+### Boundaries
+
+- v0.23.0 is static-evidence only.
+- The numeric conformance evidence PDF remains limited to promoted numerical
+  v0.8/v0.9/v0.22 cases.
+- No dynamic heat-balance, HVAC, plant, meter, solar, fenestration, sizing,
+  warmup, or broad ExampleFiles compatibility is claimed.
+
 ## v0.22.0 - 2026-06-07
 
 Time, weather, and schedule conformance expansion.

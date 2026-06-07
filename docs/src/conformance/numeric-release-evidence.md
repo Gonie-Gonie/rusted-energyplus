@@ -15,15 +15,15 @@ Release assets beside the binary zip.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.22.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.23.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.22.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.22.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.22.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.23.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.23.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.23.0/numeric-conformance-evidence.json
 ```
 
 Current GitHub Release asset names:
@@ -37,8 +37,10 @@ numeric-conformance-evidence.json
 ## Included Cases
 
 Only promoted, tolerance-gated numerical conformance cases enter the release
-PDF. v0.22.0 adds declared time/weather/schedule variables to the earlier
-v0.8/v0.9 no-mass cases:
+PDF. v0.22.0 added declared time/weather/schedule variables to the earlier
+v0.8/v0.9 no-mass cases. v0.23.0 adds static EIO evidence, but that evidence
+is intentionally excluded from this numerical PDF and represented instead by
+`compare-static-model-conformance` plus the conformance index:
 
 Historical note: v0.12 through v0.21 release evidence kept the earlier
 v0.8/v0.9 cases only.

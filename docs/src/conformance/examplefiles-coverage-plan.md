@@ -49,6 +49,7 @@ Each selected case must answer:
 | v0.20 | conformance report generator | all tracked case manifests and requested evidence surfaces | release coverage matrices only |
 | v0.21 | source-map and algorithm ledger | mapped algorithm entries and promoted/diagnostic first cases | planning guard only |
 | v0.22 | time/weather/schedule conformance | `schedule_constant_001`, `weather_fields_001` | declared variables only: `Schedule Value` and dry-bulb |
+| v0.23 | static model evidence | official `1ZoneUncontrolled.idf` | static EIO fields only: surface, construction/material, OtherEquipment nominal |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -139,6 +140,14 @@ Current v0.22 declared-variable conformance evidence:
 - `compare-schedule-conformance`
 - `compare-weather-conformance`
 - `v0.22-verify`
+
+Current v0.23 static model evidence:
+
+- `data/conformance_cases/official_1zone_static_model_001/case.toml`
+- official EnergyPlus `ExampleFiles/1ZoneUncontrolled.idf`
+- staged `Output:Surfaces:List,Details` injection for surface EIO rows
+- `compare-static-model-conformance`
+- `v0.23-verify`
 
 Post-v0.15 plant diagnostic addendum evidence:
 

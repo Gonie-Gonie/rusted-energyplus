@@ -7,9 +7,9 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.22.0. It gates declared time, weather,
-and schedule numerical conformance on top of the source-map and algorithm
-ledger validation.
+The current public release line is v0.23.0. It gates official ExampleFile
+static model EIO evidence on top of the v0.22 declared time, weather, and
+schedule numerical conformance.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:
@@ -20,9 +20,17 @@ variables:
 - `weather_fields_001` dry-bulb only
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
-model intake, additional weather variables, geometry, internal gains, node projection, IdealLoads
-typed graph work, and plant-loop diagnostic plumbing. Those artifacts are
-useful development evidence, but they are not general compatibility claims.
+model intake, additional weather variables, local fixture geometry/internal
+gain checks, node projection, IdealLoads typed graph work, and plant-loop
+diagnostic plumbing. Those artifacts are useful development evidence, but
+they are not general compatibility claims.
+
+Current static model conformance is limited to:
+
+- `official_1zone_static_model_001`
+- declared static EIO surface geometry fields
+- declared Construction CTF and Material CTF Summary fields
+- declared OtherEquipment Internal Gains Nominal fields
 The historical v0.1 through v0.15 boundaries are summarized in
 `specs/milestones.toml`; their old planning pages are intentionally not
 retained in the docs tree.
@@ -44,6 +52,8 @@ The current public scope includes:
   gates
 - timestamp-aligned conformance reports for declared schedule and dry-bulb
   hourly series
+- static EIO model conformance reports for the official `1ZoneUncontrolled`
+  ExampleFile
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
@@ -54,4 +64,5 @@ Not claimed:
 - HVAC compatibility
 - plant compatibility
 - node, IdealLoads, meter, or broad weather conformance
+- dynamic compatibility for the v0.23 static model case
 - broad ExampleFiles compatibility

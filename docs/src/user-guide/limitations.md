@@ -12,4 +12,9 @@ or ExampleFiles conformance. Tolerance-gated numerical conformance is limited
 to the declared v0.8/v0.9 no-mass cases plus the v0.22 `Schedule Value` and
 dry-bulb hourly variables.
 
+v0.23 adds static EIO model evidence for the official `1ZoneUncontrolled`
+ExampleFile only. That does not imply dynamic heat-balance, HVAC, plant,
+solar, fenestration, sizing, warmup, meter, or broad ExampleFiles
+compatibility.
+
 For the formal non-goals list, see `project-scope/non-goals.md`.

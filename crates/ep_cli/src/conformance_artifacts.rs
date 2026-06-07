@@ -16,9 +16,11 @@ pub(crate) struct BaselineSummary {
     pub(crate) weather: Option<PathBuf>,
     pub(crate) epjson: PathBuf,
     pub(crate) eso: PathBuf,
+    pub(crate) eio: PathBuf,
     pub(crate) expanded_manifest: PathBuf,
     pub(crate) injected_outputs: usize,
     pub(crate) injected_meters: usize,
+    pub(crate) injected_surface_details: bool,
 }
 
 pub(crate) struct ReportSkeletonSummary {
@@ -119,6 +121,10 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     if !eso.is_file() {
         return Err(format!("EnergyPlus did not write {}", eso.display()));
     }
+    let eio = output_dir.join("eplusout.eio");
+    if !eio.is_file() {
+        return Err(format!("EnergyPlus did not write {}", eio.display()));
+    }
     let err = output_dir.join("eplusout.err");
     if !err.is_file() {
         return Err(format!("EnergyPlus did not write {}", err.display()));
@@ -140,15 +146,18 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         weather: source_weather,
         epjson,
         eso,
+        eio,
         expanded_manifest,
         injected_outputs: injection.outputs,
         injected_meters: injection.meters,
+        injected_surface_details: injection.surface_details,
     })
 }
 
 struct OutputInjectionSummary {
     outputs: usize,
     meters: usize,
+    surface_details: bool,
 }
 
 fn stage_idf_with_output_requests(
@@ -170,6 +179,7 @@ fn stage_idf_with_output_requests(
     Ok(OutputInjectionSummary {
         outputs: injection.outputs,
         meters: injection.meters,
+        surface_details: injection.surface_details,
     })
 }
 
@@ -177,6 +187,7 @@ struct RenderedOutputInjection {
     text: String,
     outputs: usize,
     meters: usize,
+    surface_details: bool,
 }
 
 fn render_output_request_injection(
@@ -186,18 +197,28 @@ fn render_output_request_injection(
     let mut text = String::new();
     let existing_outputs = existing_output_variables(existing_idf);
     let existing_meters = existing_output_meters(existing_idf);
+    let existing_surface_details = has_existing_output_surfaces_details(existing_idf);
     let requested_output_count = manifest
         .outputs
         .iter()
         .filter(|output| output.source == SourceArtifact::Eso)
         .count();
     let requested_meter_count = manifest.meters.len();
+    let requested_surface_details = manifest.outputs.iter().any(|output| {
+        output.source == SourceArtifact::Eio
+            && output
+                .variable
+                .trim()
+                .to_ascii_lowercase()
+                .starts_with("heattransfer surface")
+    });
 
-    if requested_output_count == 0 && requested_meter_count == 0 {
+    if requested_output_count == 0 && requested_meter_count == 0 && !requested_surface_details {
         return RenderedOutputInjection {
             text,
             outputs: 0,
             meters: 0,
+            surface_details: false,
         };
     }
 
@@ -206,6 +227,11 @@ fn render_output_request_injection(
     text.push_str("!- source: case manifest outputs/meters\n");
     let mut output_count = 0;
     let mut meter_count = 0;
+    let mut surface_details = false;
+    if requested_surface_details && !existing_surface_details {
+        text.push_str("Output:Surfaces:List,Details;\n\n");
+        surface_details = true;
+    }
     for output in &manifest.outputs {
         if output.source != SourceArtifact::Eso {
             continue;
@@ -240,7 +266,7 @@ fn render_output_request_injection(
         ));
         meter_count += 1;
     }
-    if output_count == 0 && meter_count == 0 {
+    if output_count == 0 && meter_count == 0 && !surface_details {
         text.push_str("!- no new output requests; staged IDF already contains manifest requests\n");
     }
     text.push_str("!- eplus-rs output request injection end\n");
@@ -249,6 +275,7 @@ fn render_output_request_injection(
         text,
         outputs: output_count,
         meters: meter_count,
+        surface_details,
     }
 }
 
@@ -276,6 +303,16 @@ fn existing_output_meters(idf: &str) -> Vec<String> {
             }
         })
         .collect()
+}
+
+fn has_existing_output_surfaces_details(idf: &str) -> bool {
+    idf_objects(idf, "Output:Surfaces:List")
+        .into_iter()
+        .any(|fields| {
+            fields
+                .get(1)
+                .is_some_and(|field| field.eq_ignore_ascii_case("details"))
+        })
 }
 
 fn idf_objects(idf: &str, object_type: &str) -> Vec<Vec<String>> {
@@ -371,7 +408,11 @@ fn render_expanded_case_manifest(
     toml.push_str("schema = \"rusted-energyplus.output-injection.v1\"\n");
     toml.push_str("staged_idf_contains_manifest_requests = true\n");
     toml.push_str(&format!("outputs = {}\n", injection.outputs));
-    toml.push_str(&format!("meters = {}\n\n", injection.meters));
+    toml.push_str(&format!("meters = {}\n", injection.meters));
+    toml.push_str(&format!(
+        "surface_details = {}\n\n",
+        injection.surface_details
+    ));
 
     toml.push_str("[artifacts]\n");
     push_toml_string_field(&mut toml, "err", "eplusout.err");
