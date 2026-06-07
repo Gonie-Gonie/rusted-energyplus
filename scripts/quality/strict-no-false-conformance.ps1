@@ -95,6 +95,7 @@ Assert-Contains -Path "data\conformance_cases\air_side_node_diagnostic_001\case.
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "status: baseline-only" -Description "v0.11 smoke gate baseline-only status"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "baseline_nonzero_count" -Description "v0.11 nonzero node baseline gate"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "algorithm_parity: false" -Description "v0.11 node projection algorithm boundary"
+Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "state_nodes: 3" -Description "v0.11 node projection state count"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "status: projected" -Description "v0.11 node projection status"
 
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "comparison_class: diagnostic-only" -Description "zone diagnostic CLI"

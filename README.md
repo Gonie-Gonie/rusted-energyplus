@@ -89,8 +89,8 @@ Current development evidence checks:
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
 their declared variables. v0.10 is a baseline-only typed-graph gate for
 thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
-baseline evidence plus Rust projection plumbing, with no node numerical
-conformance claim.
+baseline evidence plus `NodeStateStore`-backed Rust projection plumbing, with
+no node numerical conformance claim.
 
 Developer-only diagnostics:
 

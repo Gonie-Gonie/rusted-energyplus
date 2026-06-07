@@ -97,6 +97,7 @@ Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "CalcZoneLeavingConditions" -Description "node map return routine"
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "setTotalInletFlows" -Description "node map flow aggregation"
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "TempSetPoint" -Description "node map setpoint boundary"
+Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "NodeStateStore" -Description "node map Rust state store"
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "Stop Rule" -Description "node map stop rule"
 
 Assert-Contains -Path "docs\src\operations\v0.12.0-readiness.md" -Pattern "planning-ready" -Description "v0.12 readiness status"

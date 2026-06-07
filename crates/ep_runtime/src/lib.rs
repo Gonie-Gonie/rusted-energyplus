@@ -652,6 +652,88 @@ impl NodeStateProjectionOptions {
     }
 }
 
+/// Runtime scalar state for one air-side node.
+#[derive(Clone, Debug, PartialEq)]
+pub struct AirNodeState {
+    /// Resolved typed node ID.
+    pub node_id: NodeId,
+    /// EnergyPlus-normalized node key.
+    pub node_name: String,
+    /// Current node temperature in C.
+    pub temperature_c: f64,
+    /// Current node humidity ratio in kgWater/kgDryAir.
+    pub humidity_ratio: f64,
+    /// Current node mass flow rate in kg/s.
+    pub mass_flow_rate_kg_per_s: f64,
+    /// Optional node temperature setpoint in C.
+    pub temperature_setpoint_c: Option<f64>,
+}
+
+/// Diagnostic air-side node state store.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NodeStateStore {
+    /// Air-side node states in typed-node order.
+    pub air_nodes: Vec<AirNodeState>,
+}
+
+impl NodeStateStore {
+    /// Initializes one diagnostic air-node state for each typed model node.
+    #[must_use]
+    pub fn from_typed_model(
+        model: &TypedModel,
+        default_temperature_c: f64,
+        default_humidity_ratio: f64,
+    ) -> Self {
+        Self {
+            air_nodes: model
+                .nodes
+                .iter()
+                .map(|node| AirNodeState {
+                    node_id: node.id,
+                    node_name: node.name.0.clone(),
+                    temperature_c: default_temperature_c,
+                    humidity_ratio: default_humidity_ratio,
+                    mass_flow_rate_kg_per_s: 0.0,
+                    temperature_setpoint_c: None,
+                })
+                .collect(),
+        }
+    }
+
+    /// Number of stored air nodes.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.air_nodes.len()
+    }
+
+    /// Returns true when no air nodes are stored.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.air_nodes.is_empty()
+    }
+
+    /// Finds an air-node state by typed node ID.
+    #[must_use]
+    pub fn find_by_id(&self, node_id: NodeId) -> Option<&AirNodeState> {
+        self.air_nodes.iter().find(|node| node.node_id == node_id)
+    }
+
+    /// Finds an air-node state by EnergyPlus key.
+    #[must_use]
+    pub fn find_by_key(&self, key: &str) -> Option<&AirNodeState> {
+        let normalized = NormalizedName::new(key);
+        self.air_nodes
+            .iter()
+            .find(|node| node.node_name == normalized.0)
+    }
+
+    fn find_mut_by_id(&mut self, node_id: NodeId) -> Option<&mut AirNodeState> {
+        self.air_nodes
+            .iter_mut()
+            .find(|node| node.node_id == node_id)
+    }
+}
+
 /// One resolved node represented by the node-state projection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NodeStateProjectionNode {
@@ -672,6 +754,8 @@ pub struct NodeStateProjectionSummary {
     pub node_count: usize,
     /// Number of output series written.
     pub series_count: usize,
+    /// Number of air nodes initialized in the runtime state store.
+    pub state_node_count: usize,
     /// Resolved nodes in output order.
     pub nodes: Vec<NodeStateProjectionNode>,
 }
@@ -679,6 +763,8 @@ pub struct NodeStateProjectionSummary {
 /// Result of the diagnostic IdealLoads node-state projection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NodeStateProjection {
+    /// Final diagnostic node state.
+    pub state: NodeStateStore,
     /// Native output results.
     pub results: ResultStore,
     /// Projection summary.
@@ -857,6 +943,11 @@ pub fn simulate_ideal_loads_node_state_projection(
     model: &SimulationModel,
     options: NodeStateProjectionOptions,
 ) -> Result<NodeStateProjection, RuntimeError> {
+    let mut state = NodeStateStore::from_typed_model(
+        &model.typed,
+        options.default_zone_air_temperature_c,
+        options.default_zone_air_humidity_ratio,
+    );
     let mut projected_nodes = Vec::new();
 
     for connection in &model.typed.zone_equipment_connections {
@@ -879,15 +970,19 @@ pub fn simulate_ideal_loads_node_state_projection(
         let supply_node_count = supply_nodes.len().max(1) as f64;
         for node_id in supply_nodes {
             if let Some(node_name) = node_name_for_id(&model.typed, node_id) {
-                push_or_accumulate_projected_node(
+                apply_node_state_update(
+                    &mut state,
+                    node_id,
+                    supply_temperature_c,
+                    supply_humidity_ratio,
+                    supply_mass_flow_rate_kg_per_s / supply_node_count,
+                );
+                push_projected_node_assignment(
                     &mut projected_nodes,
-                    ProjectedNodeState {
+                    ProjectedNodeAssignment {
                         node_id,
                         node_name,
                         role: NodeStateRole::Supply,
-                        temperature_c: supply_temperature_c,
-                        humidity_ratio: supply_humidity_ratio,
-                        mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s / supply_node_count,
                     },
                 );
             }
@@ -899,15 +994,19 @@ pub fn simulate_ideal_loads_node_state_projection(
             .resolve(&connection.zone_air_node_name.0)
             && let Some(node_name) = node_name_for_id(&model.typed, zone_air_node_id)
         {
-            push_or_accumulate_projected_node(
+            apply_node_state_update(
+                &mut state,
+                zone_air_node_id,
+                options.default_zone_air_temperature_c,
+                options.default_zone_air_humidity_ratio,
+                supply_mass_flow_rate_kg_per_s,
+            );
+            push_projected_node_assignment(
                 &mut projected_nodes,
-                ProjectedNodeState {
+                ProjectedNodeAssignment {
                     node_id: zone_air_node_id,
                     node_name,
                     role: NodeStateRole::ZoneAir,
-                    temperature_c: options.default_zone_air_temperature_c,
-                    humidity_ratio: options.default_zone_air_humidity_ratio,
-                    mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s,
                 },
             );
         }
@@ -919,15 +1018,19 @@ pub fn simulate_ideal_loads_node_state_projection(
             .unwrap_or_default();
         for node_id in return_nodes {
             if let Some(node_name) = node_name_for_id(&model.typed, node_id) {
-                push_or_accumulate_projected_node(
+                apply_node_state_update(
+                    &mut state,
+                    node_id,
+                    options.default_zone_air_temperature_c,
+                    options.default_zone_air_humidity_ratio,
+                    supply_mass_flow_rate_kg_per_s,
+                );
+                push_projected_node_assignment(
                     &mut projected_nodes,
-                    ProjectedNodeState {
+                    ProjectedNodeAssignment {
                         node_id,
                         node_name,
                         role: NodeStateRole::ReturnAir,
-                        temperature_c: options.default_zone_air_temperature_c,
-                        humidity_ratio: options.default_zone_air_humidity_ratio,
-                        mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s,
                     },
                 );
             }
@@ -941,13 +1044,16 @@ pub fn simulate_ideal_loads_node_state_projection(
     let mut results = ResultStore::new();
     let mut handle_index = 0_u32;
     for node in &projected_nodes {
+        let Some(node_state) = state.find_by_id(node.node_id) else {
+            continue;
+        };
         add_constant_output_series(
             &mut results,
             &mut handle_index,
             &node.node_name,
             "System Node Temperature",
             "C",
-            node.temperature_c,
+            node_state.temperature_c,
             options.sample_count,
         );
         add_constant_output_series(
@@ -956,7 +1062,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             &node.node_name,
             "System Node Humidity Ratio",
             "kgWater/kgDryAir",
-            node.humidity_ratio,
+            node_state.humidity_ratio,
             options.sample_count,
         );
         add_constant_output_series(
@@ -965,7 +1071,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             &node.node_name,
             "System Node Mass Flow Rate",
             "kg/s",
-            node.mass_flow_rate_kg_per_s,
+            node_state.mass_flow_rate_kg_per_s,
             options.sample_count,
         );
     }
@@ -975,6 +1081,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             samples: options.sample_count,
             node_count: projected_nodes.len(),
             series_count: results.series.len(),
+            state_node_count: state.len(),
             nodes: projected_nodes
                 .iter()
                 .map(|node| NodeStateProjectionNode {
@@ -984,50 +1091,79 @@ pub fn simulate_ideal_loads_node_state_projection(
                 })
                 .collect(),
         },
+        state,
         results,
     })
 }
 
 #[derive(Clone, Debug, PartialEq)]
-struct ProjectedNodeState {
+struct ProjectedNodeAssignment {
     node_id: NodeId,
     node_name: String,
     role: NodeStateRole,
-    temperature_c: f64,
-    humidity_ratio: f64,
-    mass_flow_rate_kg_per_s: f64,
 }
 
-fn push_or_accumulate_projected_node(
-    nodes: &mut Vec<ProjectedNodeState>,
-    node: ProjectedNodeState,
+fn push_projected_node_assignment(
+    nodes: &mut Vec<ProjectedNodeAssignment>,
+    node: ProjectedNodeAssignment,
 ) {
     if let Some(existing) = nodes
         .iter_mut()
         .find(|existing| existing.node_id == node.node_id)
     {
-        let total_flow = existing.mass_flow_rate_kg_per_s + node.mass_flow_rate_kg_per_s;
-        if total_flow > 0.0 {
-            existing.temperature_c = weighted_value(
-                existing.temperature_c,
-                existing.mass_flow_rate_kg_per_s,
-                node.temperature_c,
-                node.mass_flow_rate_kg_per_s,
-                total_flow,
-            );
-            existing.humidity_ratio = weighted_value(
-                existing.humidity_ratio,
-                existing.mass_flow_rate_kg_per_s,
-                node.humidity_ratio,
-                node.mass_flow_rate_kg_per_s,
-                total_flow,
-            );
-        }
-        existing.mass_flow_rate_kg_per_s = total_flow;
+        existing.role = merged_node_state_role(existing.role, node.role);
         return;
     }
 
     nodes.push(node);
+}
+
+fn merged_node_state_role(existing: NodeStateRole, next: NodeStateRole) -> NodeStateRole {
+    if existing == next {
+        return existing;
+    }
+
+    match (existing, next) {
+        (NodeStateRole::ZoneAir, _) | (_, NodeStateRole::ZoneAir) => NodeStateRole::ZoneAir,
+        (NodeStateRole::Supply, NodeStateRole::ReturnAir)
+        | (NodeStateRole::ReturnAir, NodeStateRole::Supply) => NodeStateRole::Supply,
+        _ => existing,
+    }
+}
+
+fn apply_node_state_update(
+    state: &mut NodeStateStore,
+    node_id: NodeId,
+    temperature_c: f64,
+    humidity_ratio: f64,
+    mass_flow_rate_kg_per_s: f64,
+) {
+    let Some(node_state) = state.find_mut_by_id(node_id) else {
+        return;
+    };
+
+    let previous_flow = node_state.mass_flow_rate_kg_per_s;
+    let total_flow = previous_flow + mass_flow_rate_kg_per_s;
+    if previous_flow > 0.0 && total_flow > 0.0 {
+        node_state.temperature_c = weighted_value(
+            node_state.temperature_c,
+            previous_flow,
+            temperature_c,
+            mass_flow_rate_kg_per_s,
+            total_flow,
+        );
+        node_state.humidity_ratio = weighted_value(
+            node_state.humidity_ratio,
+            previous_flow,
+            humidity_ratio,
+            mass_flow_rate_kg_per_s,
+            total_flow,
+        );
+    } else {
+        node_state.temperature_c = temperature_c;
+        node_state.humidity_ratio = humidity_ratio;
+    }
+    node_state.mass_flow_rate_kg_per_s = total_flow;
 }
 
 fn weighted_value(
@@ -2614,6 +2750,8 @@ mod tests {
         assert_eq!(projection.summary.samples, 4);
         assert_eq!(projection.summary.node_count, 3);
         assert_eq!(projection.summary.series_count, 9);
+        assert_eq!(projection.summary.state_node_count, 3);
+        assert_eq!(projection.state.len(), 3);
         assert_eq!(
             projection
                 .summary
@@ -2650,12 +2788,24 @@ mod tests {
                 .iter()
                 .all(|value| (*value - 0.3).abs() < 1.0e-12)
         );
+        let inlet_state = projection
+            .state
+            .find_by_key("ZONE ONE INLET")
+            .ok_or_else(|| std::io::Error::other("missing inlet node state"))?;
+        assert!((inlet_state.mass_flow_rate_kg_per_s - 0.3).abs() < 1.0e-12);
+        assert!((inlet_state.temperature_c - 50.0).abs() < 1.0e-12);
+        assert_eq!(inlet_state.temperature_setpoint_c, None);
 
         let zone_air_temperature = projection
             .results
             .find_series("ZONE ONE AIR NODE", "System Node Temperature")
             .ok_or_else(|| std::io::Error::other("missing zone air temperature series"))?;
         assert_eq!(zone_air_temperature.values, vec![23.0; 4]);
+        let zone_air_state = projection
+            .state
+            .find_by_key("ZONE ONE AIR NODE")
+            .ok_or_else(|| std::io::Error::other("missing zone air node state"))?;
+        assert!((zone_air_state.humidity_ratio - 0.008).abs() < 1.0e-12);
 
         let return_mass_flow = projection
             .results

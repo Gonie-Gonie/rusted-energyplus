@@ -23,9 +23,9 @@ numerical conformance claim is promoted. This map is a planning guard.
 
 | Area | EnergyPlus source | Rust target |
 |---|---|---|
-| node registration and output registration | `src/EnergyPlus/NodeInputManager.cc` | `ep_compiler` node registry; `ep_runtime::simulate_ideal_loads_node_state_projection` diagnostic output writer |
+| node registration and output registration | `src/EnergyPlus/NodeInputManager.cc` | `ep_compiler` node registry; `ep_runtime::NodeStateStore`; `ep_runtime::simulate_ideal_loads_node_state_projection` diagnostic output writer |
 | node registration declarations | `src/EnergyPlus/NodeInputManager.hh` | `ep_model::Node`, `ep_model::NodeList` |
-| node storage | `src/EnergyPlus/DataLoopNode.hh` | future persistent `ep_runtime::NodeState`; current diagnostic `ResultStore` projection |
+| node storage | `src/EnergyPlus/DataLoopNode.hh` | current diagnostic `ep_runtime::NodeStateStore`; future conformance-grade node state |
 | zone equipment node links | `src/EnergyPlus/DataZoneEquipment.hh`; `src/EnergyPlus/DataZoneEquipment.cc` | `ep_model::ModelGraph`; future zone node flow aggregation |
 | zone air node temperature and humidity | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | future node-state projection from zone air balance |
 | zone equipment orchestration and return node update | `src/EnergyPlus/ZoneEquipmentManager.cc` | future zone equipment runtime |
@@ -39,7 +39,7 @@ numerical conformance claim is promoted. This map is a planning guard.
 | node list/name lookup | `GetNodeNums`; `GetOnlySingleNode` | typed NodeList and node registry exist |
 | node allocation | `AssignNodeNumber` | compiler-side node names exist; runtime state not ported |
 | report variable registration | `SetupOutputVariable` in `NodeInputManager.cc` | manifest output class exists; diagnostic Rust projection writes requested node samples |
-| node scalar storage | `Node::NodeData::Temp`, `MassFlowRate`, `HumRat`, `TempSetPoint` | diagnostic projection writes `Temp`, `MassFlowRate`, and `HumRat` series; persistent node state and `TempSetPoint` remain future work |
+| node scalar storage | `Node::NodeData::Temp`, `MassFlowRate`, `HumRat`, `TempSetPoint` | diagnostic `NodeStateStore` tracks `Temp`, `MassFlowRate`, and `HumRat`; `TempSetPoint` remains future work |
 | derived node reporting | `CalcMoreNodeInfo` | not ported |
 | zone equipment connections | `EquipConfiguration::ZoneNode`, `InletNode`, `ReturnNode` | graph edges exist for v0.10/v0.11 fixture |
 | zone node number | `ZoneData::SystemZoneNodeNumber` | represented through zone air node graph edge only |
@@ -73,9 +73,9 @@ manager writes it, and how `SensedNodeFlagValue` sentinel values are filtered.
 
 | Fixture key | EnergyPlus source path | Current Rust evidence |
 |---|---|---|
-| `ZONE ONE INLET` | `ZoneHVAC:IdealLoadsAirSystem` input through `GetOnlySingleNode`; `CalcPurchAirLoads` writes supply node temperature, humidity ratio, and mass flow | typed node, baseline-only ESO rows, and diagnostic Rust projection rows |
-| `ZONE ONE AIR NODE` | `ZoneEquipConfig.ZoneNode` and `ZoneData::SystemZoneNodeNumber`; zone predictor/corrector writes temperature and humidity; `setTotalInletFlows` aggregates inlet flow to the zone node | typed zone air node graph edge, baseline-only ESO rows, and diagnostic Rust projection rows |
-| `ZONE ONE RETURN` | `ZoneEquipConfig.ReturnNode`; `CalcPurchAirLoads` writes recirculation flow; `CalcZoneLeavingConditions` writes return temperature and humidity | typed return node, baseline-only ESO rows, and diagnostic Rust projection rows |
+| `ZONE ONE INLET` | `ZoneHVAC:IdealLoadsAirSystem` input through `GetOnlySingleNode`; `CalcPurchAirLoads` writes supply node temperature, humidity ratio, and mass flow | typed node, baseline-only ESO rows, diagnostic `NodeStateStore` row, and Rust projection rows |
+| `ZONE ONE AIR NODE` | `ZoneEquipConfig.ZoneNode` and `ZoneData::SystemZoneNodeNumber`; zone predictor/corrector writes temperature and humidity; `setTotalInletFlows` aggregates inlet flow to the zone node | typed zone air node graph edge, baseline-only ESO rows, diagnostic `NodeStateStore` row, and Rust projection rows |
+| `ZONE ONE RETURN` | `ZoneEquipConfig.ReturnNode`; `CalcPurchAirLoads` writes recirculation flow; `CalcZoneLeavingConditions` writes return temperature and humidity | typed return node, baseline-only ESO rows, diagnostic `NodeStateStore` row, and Rust projection rows |
 
 ## Porting Order
 

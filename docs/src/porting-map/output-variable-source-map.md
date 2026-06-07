@@ -31,9 +31,9 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Thermostat Cooling Setpoint Temperature` | hourly | thermostat setup/output registration in EnergyPlus HVAC/zone predictor code | future thermostat result state | baseline-only for `ideal_loads_thermostat_001` |
 | `Zone Ideal Loads Zone Total Heating Rate` | hourly | IdealLoads HVAC component implementation and zone equipment managers | future IdealLoads result state | baseline-only for `ideal_loads_thermostat_001`; mapped-not-ported |
 | `Zone Ideal Loads Zone Total Cooling Rate` | hourly | IdealLoads HVAC component implementation and zone equipment managers | future IdealLoads result state | baseline-only for `ideal_loads_thermostat_001`; mapped-not-ported |
-| `System Node Temperature` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `simulate_ideal_loads_node_state_projection` diagnostic ResultStore series | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
-| `System Node Humidity Ratio` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `simulate_ideal_loads_node_state_projection` diagnostic ResultStore series | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
-| `System Node Mass Flow Rate` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `DataZoneEquipment.cc`; `PurchasedAirManager.cc` | `simulate_ideal_loads_node_state_projection` diagnostic ResultStore series | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
+| `System Node Temperature` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | diagnostic `NodeStateStore` sampled by `simulate_ideal_loads_node_state_projection` | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
+| `System Node Humidity Ratio` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | diagnostic `NodeStateStore` sampled by `simulate_ideal_loads_node_state_projection` | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
+| `System Node Mass Flow Rate` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `DataZoneEquipment.cc`; `PurchasedAirManager.cc` | diagnostic `NodeStateStore` sampled by `simulate_ideal_loads_node_state_projection` | diagnostic-only for `air_side_node_diagnostic_001`; mapped-not-conformance |
 | `System Node Setpoint Temperature` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc` | future node-state result store | future-gated; sentinel handling required |
 | `Site Outdoor Air Drybulb Temperature` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW weather trace | smoke |
 | `Schedule Value` | hourly | output processor plus schedule managers | schedule trace | smoke |
@@ -82,6 +82,6 @@ It is not an IdealLoads load-conformance claim and keeps
 
 The v0.11 `air_side_node_diagnostic_001` report is diagnostic-only node output
 evidence. The v0.12 source map identifies where EnergyPlus registers and
-updates those node fields, and the Rust node-state projection adds diagnostic
-samples with `algorithm_parity: false`; it does not add tolerances or node
-numerical conformance.
+updates those node fields, and the Rust `NodeStateStore`-backed projection
+adds diagnostic samples with `algorithm_parity: false`; it does not add
+tolerances or node numerical conformance.

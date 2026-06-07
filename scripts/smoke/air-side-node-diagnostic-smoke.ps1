@@ -264,6 +264,7 @@ Assert-Contains -Text $projectionText -Pattern "conformance_claim: false" -Descr
 Assert-Contains -Text $projectionText -Pattern "algorithm_parity: false" -Description "projection algorithm boundary"
 Assert-Contains -Text $projectionText -Pattern "tolerance_policy: none" -Description "projection tolerance boundary"
 Assert-Contains -Text $projectionText -Pattern "nodes: 3" -Description "projection node count"
+Assert-Contains -Text $projectionText -Pattern "state_nodes: 3" -Description "projection state node count"
 Assert-Contains -Text $projectionText -Pattern "samples: 24" -Description "projection sample count"
 Assert-Contains -Text $projectionText -Pattern "series: 9" -Description "projection series count"
 Assert-Contains -Text $projectionText -Pattern "status: projected" -Description "projection status"
@@ -298,6 +299,9 @@ if ($projection.status -ne "projected") {
 }
 if ([int]$projection.nodes -ne 3) {
     throw "Unexpected v0.11 projection node count: $($projection.nodes)"
+}
+if ([int]$projection.state_nodes -ne 3) {
+    throw "Unexpected v0.11 projection state node count: $($projection.state_nodes)"
 }
 if ([int]$projection.samples -ne 24) {
     throw "Unexpected v0.11 projection sample count: $($projection.samples)"

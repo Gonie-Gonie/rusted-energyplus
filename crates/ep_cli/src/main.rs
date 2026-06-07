@@ -1404,6 +1404,10 @@ fn render_node_state_projection_markdown(projection: &NodeStateProjection) -> St
     report.push_str("status: projected\n");
     report.push_str(&format!("samples: {}\n", projection.summary.samples));
     report.push_str(&format!("nodes: {}\n", projection.summary.node_count));
+    report.push_str(&format!(
+        "state_nodes: {}\n",
+        projection.summary.state_node_count
+    ));
     report.push_str(&format!("series: {}\n\n", projection.summary.series_count));
     report.push_str(
         "| key | role | variable | units | samples | first | last | nonzero_count | status |\n",
@@ -1439,6 +1443,10 @@ fn render_node_state_projection_summary_json(projection: &NodeStateProjection) -
     json.push_str(&format!(
         "  \"nodes\": {},\n",
         projection.summary.node_count
+    ));
+    json.push_str(&format!(
+        "  \"state_nodes\": {},\n",
+        projection.summary.state_node_count
     ));
     json.push_str(&format!(
         "  \"series\": {},\n",
@@ -1782,6 +1790,7 @@ fn run_node_state_projection_command(args: &[String]) -> i32 {
     println!("  algorithm_parity: false");
     println!("  tolerance_policy: none");
     println!("  nodes: {}", projection.summary.node_count);
+    println!("  state_nodes: {}", projection.summary.state_node_count);
     println!("  samples: {}", projection.summary.samples);
     println!("  series: {}", projection.summary.series_count);
     println!(
