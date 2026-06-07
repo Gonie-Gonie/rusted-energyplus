@@ -34,7 +34,7 @@ Each selected case must answer:
 | v0.5 | Tier A0/A1 static input | one-zone, window variants, simple shading; `5ZoneAirCooled` baseline-only | geometry, construction/material, nominal gains |
 | v0.6 | Tier A/B report infrastructure | one-zone, window variants, simple shading, `5ZoneAirCooled` | automatic compare reports and summary JSON |
 | v0.7 | Tier A source mapping | uncontrolled and no-HVAC heat-balance candidates | source/function and output-variable maps |
-| v0.8 | Tier A heat balance | one-zone uncontrolled candidates | first tolerance-gated zone/surface heat-balance subset |
+| v0.8 | Tier A heat balance | one-zone no-mass adiabatic candidate | first tolerance-gated `Zone Mean Air Temperature` subset |
 | v0.9 | Tier A/B fenestration | simple window and shading cases | window, solar, and shading diagnostics or conformance |
 | v0.10 | Tier A/B IdealLoads | selected IdealLoads and thermostat cases | setpoints, zone temperature, loads, energy |
 | v0.11 | Tier B air-side HVAC | `5ZoneAirCooled`, PTAC, selected CAV cases | node and component diagnostics |
@@ -52,6 +52,10 @@ Current v0.5 static-input evidence cases:
 - `surface_geometry_001`
 - `construction_materials_001`
 - `internal_gains_001`
+
+Current v0.8 heat-balance conformance case:
+
+- `heat_balance_nomass_001`
 
 Planned fields:
 

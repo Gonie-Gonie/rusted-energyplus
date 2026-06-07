@@ -1,0 +1,35 @@
+id = "heat_balance_nomass_001"
+title = "No-mass adiabatic zone heat-balance equilibrium"
+milestone = "v0.8-heat-balance"
+purpose = "Tolerance-gate the first EnergyPlus-aligned Zone Mean Air Temperature subset for an uncontrolled no-mass adiabatic zone."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This v0.8 case is intentionally narrow: one zone, no internal gains, no HVAC, no windows, no solar, no infiltration, and adiabatic opaque surfaces.",
+  "The runtime uses EnergyPlus DataHeatBalance ZoneInitialTemp and SurfInitialTemp defaults for this first equilibrium gate.",
+]
+
+[input]
+idf = "data/conformance_cases/heat_balance_nomass_001/heat_balance_nomass.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[report]
+format = "markdown"
+path = ".runtime/heat-balance-conformance/26.1.0/heat_balance_nomass_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-heat-balance-conformance"
+blocking = true

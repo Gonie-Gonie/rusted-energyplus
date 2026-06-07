@@ -11,6 +11,7 @@ use std::path::Path;
 const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
+const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 
 /// Runtime execution mode.
@@ -546,7 +547,7 @@ impl HeatBalanceSimulationOptions {
     pub const fn hourly_samples(sample_count: usize) -> Self {
         Self {
             sample_count,
-            initial_zone_air_temperature_c: 20.0,
+            initial_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
         }
     }
 }

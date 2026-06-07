@@ -85,6 +85,8 @@
 - [v0.6.0 Readiness](operations/v0.6.0-readiness.md)
 - [v0.7.0 Plan](operations/v0.7.0-plan.md)
 - [v0.7.0 Readiness](operations/v0.7.0-readiness.md)
+- [v0.8.0 Plan](operations/v0.8.0-plan.md)
+- [v0.8.0 Readiness](operations/v0.8.0-readiness.md)
 
 # Archive
 

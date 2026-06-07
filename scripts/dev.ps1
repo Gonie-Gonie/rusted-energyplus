@@ -120,6 +120,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run diagnostic-only zone-temperature extraction comparison."
     }
+    "compare-heat-balance-conformance" = @{
+        Path = "compare\compare-heat-balance-conformance.ps1"
+        Group = "compare"
+        Help = "Run the v0.8 tolerance-gated heat-balance conformance case."
+    }
     "compare-regression" = @{
         Path = "compare\compare-regression.ps1"
         Group = "compare"
@@ -190,6 +195,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.7 EnergyPlus source mapping gate."
     }
+    "v0.8-verify" = @{
+        Path = "release\v0.8-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.8 heat-balance conformance gate."
+    }
 }
 
 $Aliases = @{
@@ -202,6 +212,7 @@ $Aliases = @{
     "verify-v0.5" = "v0.5-verify"
     "verify-v0.6" = "v0.6-verify"
     "verify-v0.7" = "v0.7-verify"
+    "verify-v0.8" = "v0.8-verify"
 }
 
 function Show-Commands {

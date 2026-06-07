@@ -11,13 +11,13 @@ Reference version: EnergyPlus 26.1.0
 
 Purpose: map the first heat-balance candidate output variables to EnergyPlus
 source files and Rust result locations before v0.8 conformance work begins.
-This map does not claim any variable is tolerance-gated today.
+Only `heat_balance_nomass_001` promotes a mapped variable in v0.8.
 
 ## Candidate Variables
 
 | Variable | Frequency | EnergyPlus source | Rust source or target | Current level |
 |---|---|---|---|---|
-| `Zone Mean Air Temperature` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ResultStore` series from diagnostic heat-balance trace | diagnostic-only |
+| `Zone Mean Air Temperature` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ResultStore` series from heat-balance trace | conformance for `heat_balance_nomass_001`; diagnostic otherwise |
 | `Zone Total Internal Convective Heating Rate` | hourly | `src/EnergyPlus/InternalHeatGains.cc` | `simulate_zone_internal_convective_gains` | smoke |
 | `Zone Air Heat Balance Internal Convective Heat Gain Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/InternalHeatGains.cc` | future `ep_runtime::zone_air` report state | mapped-not-ported |
 | `Zone Air Heat Balance Surface Convection Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future surface convection sum | mapped-not-ported |
@@ -55,3 +55,7 @@ when all of these exist:
 The current `Zone Mean Air Temperature` diagnostic report has
 `tolerance_policy: none` and `status: extracted`. It is useful for locating
 deltas, but it is not a zone heat-balance conformance result.
+
+The v0.8 `heat_balance_nomass_001` report is a separate conformance result for
+hourly `Zone Mean Air Temperature` only. It requires a case manifest,
+zone-state tolerance, markdown/JSON report artifacts, and a blocking gate.

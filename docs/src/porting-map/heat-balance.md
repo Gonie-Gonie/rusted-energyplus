@@ -1,6 +1,6 @@
 # Heat Balance Porting Map
 
-Status: planning guard before native heat-balance implementation.
+Status: v0.8 first narrow conformance gate plus ongoing porting map.
 
 EnergyPlus reference version:
 
@@ -44,8 +44,14 @@ Still diagnostic-only:
 - `run first-zone`
 - `compare zone-temperature`
 
-Those commands must stay `conformance_claim: false` until this map is
-implemented behind tolerance-gated reports.
+Those commands must stay `conformance_claim: false` unless a separate
+case-specific tolerance-gated report exists.
+
+v0.8 promoted case: `heat_balance_nomass_001`.
+
+This case claims only hourly `Zone Mean Air Temperature` for one no-mass
+adiabatic zone with no internal gains, windows, solar, infiltration, HVAC,
+plant, or dynamic exterior heat-balance claim.
 
 ## EnergyPlus Source Map
 
@@ -153,7 +159,8 @@ source-reference comments.
    `data/conformance_cases/zone_temperature_diagnostic_001/case.toml` with
    `conformance_claim = false`.
 8. Only after a tolerance-gated report exists, promote any case from
-   diagnostic-only to conformance.
+   diagnostic-only to conformance. Implemented first narrow promotion:
+   `heat_balance_nomass_001` hourly `Zone Mean Air Temperature`.
 
 ## First Declared Runtime Subset
 
@@ -161,6 +168,7 @@ Allowed:
 
 - one or more `Zone` objects
 - `BuildingSurface:Detailed` opaque floors, roofs, ceilings, and walls
+- adiabatic opaque surfaces for the first v0.8 equilibrium gate
 - `Construction` with first-layer material resistance
 - `Material` and `Material:NoMass`
 - `Schedule:Constant`
@@ -195,7 +203,7 @@ A heat-balance claim needs all of these:
 
 Minimum first variables:
 
-- `Zone Mean Air Temperature`
+- `Zone Mean Air Temperature`: conformance only for `heat_balance_nomass_001`
 - `Zone Total Internal Convective Heating Rate`
 - `Site Outdoor Air Drybulb Temperature`
 

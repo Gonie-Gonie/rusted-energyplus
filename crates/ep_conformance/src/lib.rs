@@ -693,6 +693,38 @@ mod tests {
     }
 
     #[test]
+    fn loads_heat_balance_nomass_conformance_case_fixture() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/heat_balance_nomass_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "heat_balance_nomass_001");
+        assert_eq!(manifest.milestone, "v0.8-heat-balance");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+        assert!(manifest.conformance_claim);
+        assert_eq!(manifest.outputs.len(), 1);
+        assert_eq!(manifest.outputs[0].key, "ZONE ONE");
+        assert_eq!(manifest.outputs[0].variable, "Zone Mean Air Temperature");
+        assert_eq!(manifest.outputs[0].frequency, OutputFrequency::Hourly);
+        assert_eq!(manifest.outputs[0].class, VariableClass::ZoneState);
+        assert_eq!(manifest.outputs[0].source, SourceArtifact::Eso);
+        assert_eq!(manifest.tolerances.len(), 1);
+        assert_eq!(
+            manifest.tolerances[0].variable_class,
+            VariableClass::ZoneState
+        );
+        assert_eq!(manifest.tolerances[0].max_abs, Some(0.000001));
+        assert_eq!(manifest.tolerances[0].max_rmse, Some(0.000001));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("heat-balance conformance should declare a gate")
+        })?;
+        assert!(gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
     fn loads_weather_fields_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
         let manifest = load_case_file(
             repo_root().join("data/conformance_cases/weather_fields_001/case.toml"),

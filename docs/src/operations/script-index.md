@@ -50,6 +50,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-gains` |
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
+| `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
@@ -64,5 +65,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.5-verify` | release | verify v0.5 geometry/internal-variable evidence | yes | `.runtime/compare-*` |
 | `v0.6-verify` | release | verify v0.6 output/trace/report diagnostic infrastructure | yes | `.runtime/compare-zone`, `.runtime/conformance-diagnostic`, `.runtime/compare-regression` |
 | `v0.7-verify` | release | verify v0.7 source mapping and algorithm readiness gate | yes | source-map docs |
+| `v0.8-verify` | release | verify v0.8 heat-balance conformance evidence | yes | `.runtime/heat-balance-conformance` |
 
 No diagnostic command should be listed as conformance evidence.

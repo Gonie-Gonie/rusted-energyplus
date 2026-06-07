@@ -63,10 +63,18 @@ Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "diagno
 Assert-Contains -Path "docs\src\operations\v0.6.0-readiness.md" -Pattern "tolerance_policy: none" -Description "v0.6 tolerance boundary"
 Assert-Contains -Path "docs\src\operations\v0.7.0-readiness.md" -Pattern "planning-ready" -Description "v0.7 active readiness boundary"
 Assert-Contains -Path "docs\src\porting-map\algorithm-porting-readiness.md" -Pattern "zone-temperature pass wording" -Description "v0.7 algorithm boundary"
+Assert-Contains -Path "docs\src\operations\v0.8.0-readiness.md" -Pattern "conformance-ready" -Description "v0.8 active readiness boundary"
+Assert-Contains -Path "docs\src\operations\v0.8.0-readiness.md" -Pattern "not a dynamic exterior heat-balance claim" -Description "v0.8 claim boundary"
+Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "v0.8 case class"
+Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "conformance_claim = true" -Description "v0.8 manifest claim"
+Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "max_abs = 0.000001" -Description "v0.8 tolerance"
+Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "blocking = true" -Description "v0.8 blocking gate"
 
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "comparison_class: diagnostic-only" -Description "zone diagnostic CLI"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "conformance_claim: false" -Description "diagnostic CLI"
+Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "Conformance Heat Balance Report" -Description "v0.8 conformance CLI"
 Assert-Contains -Path "scripts\compare\compare-zone-smoke.ps1" -Pattern "status: extracted" -Description "zone diagnostic smoke"
+Assert-Contains -Path "scripts\compare\compare-heat-balance-conformance.ps1" -Pattern "status: pass" -Description "v0.8 conformance gate"
 Assert-Contains -Path "docs\src\operations\full-compatibility-reset.md" -Pattern "No conformance claim without case + variable list + tolerance + report + gate." -Description "reset policy"
 
 Write-Host "False-conformance guard passed."

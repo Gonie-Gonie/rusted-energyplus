@@ -52,3 +52,15 @@ The first v0.8 heat-balance implementation PR must name:
 
 If any item is missing, the change stays diagnostic-only or is blocked from the
 heat-balance conformance path.
+
+## v0.8 Applied Entry
+
+`heat_balance_nomass_001` is the first applied entry. It names:
+
+- EnergyPlus source: `DataHeatBalance.hh`
+- reference constants: `DataHeatBalance::ZoneInitialTemp` and
+  `DataHeatBalance::SurfInitialTemp`
+- Rust state: `HeatBalanceSimulationOptions` and `HeatBalanceState`
+  initialization
+- output variable: hourly `Zone Mean Air Temperature`
+- evidence level: conformance for the declared no-mass adiabatic case only

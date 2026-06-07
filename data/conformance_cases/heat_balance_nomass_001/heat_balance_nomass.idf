@@ -1,0 +1,123 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Heat Balance Nomass,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material:NoMass,R1,Rough,1.0,0.9,0.7,0.7;
+
+Construction,Wall Construction,R1;
+
+Zone,ZONE ONE,0,0,0,0,1,1,1,1;
+
+BuildingSurface:Detailed,
+  Floor,
+  Floor,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  0,0,0,
+  1,0,0,
+  1,1,0,
+  0,1,0;
+
+BuildingSurface:Detailed,
+  Roof,
+  Roof,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  0.0,
+  4,
+  0,0,1,
+  0,1,1,
+  1,1,1,
+  1,0,1;
+
+BuildingSurface:Detailed,
+  Wall X0,
+  Wall,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,1,0,
+  0,1,1,
+  0,0,1;
+
+BuildingSurface:Detailed,
+  Wall X1,
+  Wall,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  1,0,1,
+  1,1,1,
+  1,1,0;
+
+BuildingSurface:Detailed,
+  Wall Y0,
+  Wall,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,0,1,
+  1,0,1,
+  1,0,0;
+
+BuildingSurface:Detailed,
+  Wall Y1,
+  Wall,
+  Wall Construction,
+  ZONE ONE,
+  ,
+  Adiabatic,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,1,0,
+  1,1,0,
+  1,1,1,
+  0,1,1;
+
+Output:Variable,ZONE ONE,Zone Mean Air Temperature,Hourly;
