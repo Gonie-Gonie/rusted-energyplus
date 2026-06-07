@@ -8,6 +8,7 @@ oracle_version = "26.1.0"
 notes = [
   "This case is the official dynamic heat-balance diagnostic gate before any conformance_claim=true promotion.",
   "The report filters EnergyPlus ESO samples to the reported RUN PERIOD environment so sizing/design-day samples do not hide the real hourly delta.",
+  "The report records Rust first-run-period-day warmup metadata and EnergyPlus EIO run-period warmup day counts for parity diagnosis.",
   "Current expected status is fail. Promotion requires source-map-backed warmup, surface balance, CTF/conduction, solar, and convection parity before changing the claim boundary.",
 ]
 

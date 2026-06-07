@@ -2,8 +2,8 @@ use crate::{
     SeriesAlignment, SeriesDivergenceKind, SeriesSample, Tolerance, compare_series,
     compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
     parse_eio_heat_transfer_surfaces, parse_eio_material_ctf_summary,
-    parse_eio_other_equipment_nominal, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series,
+    parse_eio_other_equipment_nominal, parse_eio_warmup_environments, parse_eio_zone_geometry,
+    parse_eso_series, parse_eso_time_series,
 };
 
 #[test]
@@ -255,6 +255,28 @@ fn parses_eio_material_ctf_summary_rows() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(materials[0].density_kg_per_m3, 0.0);
     assert_eq!(materials[0].specific_heat_j_per_kg_k, 0.0);
     assert_eq!(materials[0].thermal_resistance_m2_k_per_w, 2.291);
+
+    Ok(())
+}
+
+#[test]
+fn parses_eio_warmup_environment_rows() -> Result<(), Box<dyn std::error::Error>> {
+    let rows = parse_eio_warmup_environments(
+        r#"! <Environment>,Environment Name,Environment Type
+Environment,DENVER ANN HTG,SizingPeriod:DesignDay,12/21,12/21
+Environment:WarmupDays, 22
+Environment,RUN PERIOD 1,WeatherFileRunPeriod,01/01/2013,12/31/2013
+Environment:WarmupDays, 20
+"#,
+    )?;
+
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0].environment_name, "DENVER ANN HTG");
+    assert_eq!(rows[0].environment_type, "SizingPeriod:DesignDay");
+    assert_eq!(rows[0].warmup_days, 22);
+    assert_eq!(rows[1].environment_name, "RUN PERIOD 1");
+    assert_eq!(rows[1].environment_type, "WeatherFileRunPeriod");
+    assert_eq!(rows[1].warmup_days, 20);
 
     Ok(())
 }

@@ -38,5 +38,7 @@ An official ExampleFile zone-air series may become conformance only after:
 
 `Zone Mean Air Temperature` is conformance only for the declared no-mass local
 cases. Official `1ZoneUncontrolled` zone temperature is a baseline and failing
-diagnostic candidate until this map is implemented beyond the scalar
-conductance shell.
+diagnostic candidate. The diagnostic now records run-period filtering and
+Rust/oracle warmup day metadata, but it remains below promotion until the
+predictor/corrector histories, surface coupling, and warmup convergence match
+EnergyPlus.

@@ -82,8 +82,9 @@ blocking gate.
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
 weather, internal gain, and surface conduction hourly oracle series. The
 dynamic diagnostic case compares run-period-filtered zone/surface/conduction
-deltas. These are conformance candidates, but they remain non-claiming until
-Rust produces matching hourly series under a blocking gate.
+deltas and records Rust/oracle warmup day metadata. These are conformance
+candidates, but they remain non-claiming until Rust produces matching hourly
+series under a blocking gate.
 
 The v0.10 `ideal_loads_thermostat_001` report is baseline-only smoke evidence
 for thermostat and IdealLoads output availability plus typed graph coverage.

@@ -106,6 +106,17 @@ pub struct EioMaterialCtfSummary {
     pub thermal_resistance_m2_k_per_w: f64,
 }
 
+/// Warmup day counts read from EnergyPlus `eplusout.eio` environment sections.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWarmupEnvironment {
+    /// EnergyPlus environment name.
+    pub environment_name: String,
+    /// EnergyPlus environment type.
+    pub environment_type: String,
+    /// EIO `Environment:WarmupDays` count.
+    pub warmup_days: u32,
+}
+
 /// Error returned while reading EnergyPlus EIO tabular diagnostics.
 #[derive(Debug)]
 pub enum EioError {
@@ -121,6 +132,15 @@ pub enum EioError {
     MissingConstructionCtf,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
+    /// An `Environment:WarmupDays` row could not be parsed.
+    InvalidWarmupEnvironment {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `Zone Information` row could not be parsed.
     InvalidZoneInformation {
         /// One-based line number.
@@ -206,6 +226,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO Material CTF Summary at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWarmupEnvironment { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Environment:WarmupDays at line {line}: {reason}: {text}"
+            ),
         }
     }
 }
@@ -223,7 +247,8 @@ impl std::error::Error for EioError {
             | Self::MissingMaterialCtfSummary
             | Self::InvalidOtherEquipmentNominal { .. }
             | Self::InvalidConstructionCtf { .. }
-            | Self::InvalidMaterialCtfSummary { .. } => None,
+            | Self::InvalidMaterialCtfSummary { .. }
+            | Self::InvalidWarmupEnvironment { .. } => None,
         }
     }
 }
@@ -270,6 +295,14 @@ pub fn load_eio_material_ctf_summary(
 ) -> Result<Vec<EioMaterialCtfSummary>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_material_ctf_summary(&contents)
+}
+
+/// Loads warmup environment rows from an EnergyPlus EIO file.
+pub fn load_eio_warmup_environments(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWarmupEnvironment>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_warmup_environments(&contents)
 }
 
 /// Parses `Zone Information` rows from EnergyPlus EIO contents.
@@ -573,6 +606,55 @@ pub fn parse_eio_material_ctf_summary(
     }
 
     Ok(materials)
+}
+
+/// Parses `Environment` and following `Environment:WarmupDays` rows.
+pub fn parse_eio_warmup_environments(
+    contents: &str,
+) -> Result<Vec<EioWarmupEnvironment>, EioError> {
+    let mut rows = Vec::new();
+    let mut current_environment: Option<(String, String)> = None;
+
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if trimmed.starts_with("Environment,") {
+            let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+            if fields.len() > 2 {
+                current_environment = Some((
+                    required_field(&fields, 1).to_ascii_uppercase(),
+                    required_field(&fields, 2).to_string(),
+                ));
+            }
+            continue;
+        }
+        if !trimmed.starts_with("Environment:WarmupDays,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        let Some((environment_name, environment_type)) = current_environment.clone() else {
+            return Err(EioError::InvalidWarmupEnvironment {
+                line: line_number,
+                text: line.to_string(),
+                reason: "warmup row appeared before any Environment row".to_string(),
+            });
+        };
+        let warmup_days = required_field(&fields, 1)
+            .parse::<u32>()
+            .map_err(|_error| EioError::InvalidWarmupEnvironment {
+                line: line_number,
+                text: line.to_string(),
+                reason: "invalid warmup day count".to_string(),
+            })?;
+        rows.push(EioWarmupEnvironment {
+            environment_name,
+            environment_type,
+            warmup_days,
+        });
+    }
+
+    Ok(rows)
 }
 
 fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {

@@ -42,7 +42,8 @@ tolerance, and code organization.
   conduction series; this remains baseline-only until a Rust hourly comparison
   gate passes
 - official `1ZoneUncontrolled` dynamic heat-balance diagnostic report for
-  run-period-filtered zone temperature and surface conduction deltas; this is
+  run-period-filtered zone temperature and surface conduction deltas, including
+  Rust warmup metadata and oracle run-period warmup day counts; this is
   explicitly `conformance_claim=false`
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
@@ -104,6 +105,7 @@ Useful focused checks:
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
+.\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
 .\scripts\dev.cmd conformance-index-report -Version 0.32.0
 .\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
 .\scripts\dev.cmd support-coverage-report -Version 0.32.0

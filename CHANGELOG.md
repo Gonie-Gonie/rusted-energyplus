@@ -2,7 +2,18 @@
 
 ## Unreleased
 
-No unreleased changes.
+### Added
+
+- Official dynamic heat-balance diagnostic now executes a Rust run-period
+  warmup loop before reporting samples.
+- EnergyPlus EIO `Environment:WarmupDays` parsing and report fields for
+  oracle run-period warmup day counts.
+
+### Changed
+
+- `official_1zone_uncontrolled_dynamic_diagnostic_001` remains
+  `conformance_claim=false`, but now reports Rust/oracle warmup metadata in
+  stdout, JSON, and Markdown evidence.
 
 ## v0.32.0 - 2026-06-08
 

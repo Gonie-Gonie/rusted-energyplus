@@ -87,6 +87,8 @@ Assert-Contains -Text $text -Pattern "Diagnostic Heat Balance Report" -Descripti
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
+Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup enabled"
+Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
 Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagnostic status"
 
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
@@ -113,6 +115,21 @@ if ($summary.status -ne "fail") {
 if ($summary.samples -ne 8760) {
     throw "Expected RUN PERIOD filtered sample count 8760, got $($summary.samples)"
 }
+if ($summary.heat_balance_run_period_timesteps -ne 35040) {
+    throw "Expected run-period timestep count 35040, got $($summary.heat_balance_run_period_timesteps)"
+}
+if ($summary.heat_balance_timesteps -le $summary.heat_balance_run_period_timesteps) {
+    throw "Expected heat_balance_timesteps to include warmup, got total $($summary.heat_balance_timesteps) and run-period $($summary.heat_balance_run_period_timesteps)"
+}
+if ($summary.heat_balance_warmup.enabled -ne $true) {
+    throw "Expected Rust warmup to be enabled"
+}
+if ($summary.heat_balance_warmup.timestep_count -le 0) {
+    throw "Expected Rust warmup timesteps to be recorded"
+}
+if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
+    throw "Expected oracle run-period warmup days 20, got $($summary.heat_balance_warmup.oracle_run_period_day_count)"
+}
 if ($summary.series_count -ne 6) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
@@ -133,6 +150,8 @@ $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Diagnostic Report" -Description "markdown report header"
 Assert-Contains -Text $reportText -Pattern "comparison_class: diagnostic-only" -Description "markdown comparison class"
 Assert-Contains -Text $reportText -Pattern "conformance_claim: false" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "warmup_enabled: true" -Description "markdown warmup enabled"
+Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -Description "markdown oracle warmup days"
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"

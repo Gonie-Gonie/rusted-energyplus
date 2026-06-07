@@ -11,8 +11,8 @@ use conformance_artifacts::{
 };
 use ep_compare::{
     Tolerance, compare_series, load_eio_construction_ctf, load_eio_heat_transfer_surfaces,
-    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_zone_geometry,
-    load_eso_series, load_eso_time_series,
+    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_warmup_environments,
+    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -27,10 +27,10 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-    NodeStateProjection, NodeStateProjectionOptions, PlantStateProjection,
-    PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary, ZoneGeometrySummary,
-    build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    HeatBalanceWarmupSummary, NodeStateProjection, NodeStateProjectionOptions,
+    PlantStateProjection, PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary,
+    ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
+    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
     simulate_plant_state_projection, surface_geometry_summaries, zone_geometry_summaries,
 };
@@ -717,6 +717,15 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
             println!("  samples: {}", summary.samples);
+            println!(
+                "  heat_balance_timesteps: {}",
+                summary.heat_balance_timesteps
+            );
+            println!(
+                "  heat_balance_run_period_timesteps: {}",
+                summary.heat_balance_run_period_timesteps
+            );
+            print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
@@ -775,6 +784,15 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
             println!("  samples: {}", summary.samples);
+            println!(
+                "  heat_balance_timesteps: {}",
+                summary.heat_balance_timesteps
+            );
+            println!(
+                "  heat_balance_run_period_timesteps: {}",
+                summary.heat_balance_run_period_timesteps
+            );
+            print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  status: {}", summary.status);
             0
@@ -978,6 +996,9 @@ struct HeatBalanceReportSummary {
     compare_report: PathBuf,
     compare_summary: PathBuf,
     samples: usize,
+    heat_balance_timesteps: usize,
+    heat_balance_run_period_timesteps: usize,
+    heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     tolerance_policy: String,
     status: &'static str,
 }
@@ -1034,6 +1055,7 @@ fn generate_conformance_heat_balance_report(
     let diagnostic = build_heat_balance_conformance_diagnostic(
         &baseline.epjson,
         weather,
+        &baseline.eio,
         &baseline.eso,
         &report_context,
     )?;
@@ -1046,6 +1068,9 @@ fn generate_conformance_heat_balance_report(
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
         samples: diagnostic.samples,
+        heat_balance_timesteps: diagnostic.heat_balance_timesteps,
+        heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
+        heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         status: conformance.status,
     })
@@ -1072,6 +1097,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
     let diagnostic = build_heat_balance_conformance_diagnostic(
         &baseline.epjson,
         weather,
+        &baseline.eio,
         &baseline.eso,
         &report_context,
     )?;
@@ -1084,6 +1110,9 @@ fn generate_conformance_heat_balance_diagnostic_report(
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
         samples: diagnostic.samples,
+        heat_balance_timesteps: diagnostic.heat_balance_timesteps,
+        heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
+        heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         status: conformance.status,
     })
@@ -2969,6 +2998,8 @@ struct ZoneTemperatureDiagnostic {
     zone_name: String,
     samples: usize,
     heat_balance_timesteps: usize,
+    heat_balance_run_period_timesteps: usize,
+    heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     zone_count: usize,
     surface_count: usize,
     oracle_first_c: f64,
@@ -3111,10 +3142,37 @@ struct HeatBalanceSeriesDiagnostic {
 struct HeatBalanceConformanceDiagnostic {
     samples: usize,
     heat_balance_timesteps: usize,
+    heat_balance_run_period_timesteps: usize,
+    heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     zone_count: usize,
     surface_count: usize,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceWarmupDiagnostic {
+    enabled: bool,
+    day_count: u32,
+    timestep_count: usize,
+    hours_per_day: usize,
+    converged: bool,
+    final_max_zone_temperature_delta_c: f64,
+    oracle_run_period_day_count: Option<u32>,
+}
+
+impl From<HeatBalanceWarmupSummary> for HeatBalanceWarmupDiagnostic {
+    fn from(summary: HeatBalanceWarmupSummary) -> Self {
+        Self {
+            enabled: summary.enabled,
+            day_count: summary.day_count,
+            timestep_count: summary.timestep_count,
+            hours_per_day: summary.hours_per_day,
+            converged: summary.converged,
+            final_max_zone_temperature_delta_c: summary.final_max_zone_temperature_delta_c,
+            oracle_run_period_day_count: None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3302,6 +3360,7 @@ fn evaluate_heat_balance_conformance<'a>(
 fn build_heat_balance_conformance_diagnostic(
     input_path: &Path,
     weather_path: &Path,
+    eio_path: &Path,
     eso_path: &Path,
     context: &HeatBalanceConformanceContext,
 ) -> Result<HeatBalanceConformanceDiagnostic, String> {
@@ -3341,12 +3400,23 @@ fn build_heat_balance_conformance_diagnostic(
     }
 
     let simulation_model = SimulationModel::from_typed(model);
+    let simulation_options = if context.conformance_claim {
+        HeatBalanceSimulationOptions::hourly_samples(sample_count)
+    } else {
+        HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+            &simulation_model,
+            sample_count,
+        )
+    };
     let simulation = simulate_heat_balance_zone_air_temperatures(
         &simulation_model,
         &weather_values,
-        HeatBalanceSimulationOptions::hourly_samples(sample_count),
+        simulation_options,
     )
     .map_err(|error| error.to_string())?;
+    let mut heat_balance_warmup: HeatBalanceWarmupDiagnostic = simulation.summary.warmup.into();
+    heat_balance_warmup.oracle_run_period_day_count =
+        eio_run_period_warmup_days(eio_path).map_err(|error| error.to_string())?;
 
     let mut series = Vec::with_capacity(oracle_series.len());
     for (output, oracle_values) in oracle_series {
@@ -3384,6 +3454,8 @@ fn build_heat_balance_conformance_diagnostic(
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
+        heat_balance_run_period_timesteps: simulation.summary.run_period_timestep_count,
+        heat_balance_warmup,
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         series,
@@ -3420,6 +3492,19 @@ fn eso_timestamp_environment(timestamp: &str) -> Option<&str> {
         .split(';')
         .next()
         .filter(|environment| !environment.is_empty())
+}
+
+fn eio_run_period_warmup_days(path: &Path) -> Result<Option<u32>, ep_compare::EioError> {
+    let rows = load_eio_warmup_environments(path)?;
+    Ok(rows
+        .iter()
+        .rev()
+        .find(|row| {
+            row.environment_type
+                .eq_ignore_ascii_case("WeatherFileRunPeriod")
+                || row.environment_name.starts_with("RUN PERIOD")
+        })
+        .map(|row| row.warmup_days))
 }
 
 fn heat_balance_max_abs_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
@@ -3502,6 +3587,8 @@ fn build_zone_temperature_diagnostic(
         zone_name,
         samples: delta.samples,
         heat_balance_timesteps: simulation.summary.timestep_count,
+        heat_balance_run_period_timesteps: simulation.summary.run_period_timestep_count,
+        heat_balance_warmup: simulation.summary.warmup.into(),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         oracle_first_c: oracle_values[0],
@@ -3552,6 +3639,11 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
         "  heat_balance_timesteps: {}",
         diagnostic.heat_balance_timesteps
     );
+    println!(
+        "  heat_balance_run_period_timesteps: {}",
+        diagnostic.heat_balance_run_period_timesteps
+    );
+    print_heat_balance_warmup("  ", &diagnostic.heat_balance_warmup);
     println!("  zone_count: {}", diagnostic.zone_count);
     println!("  surface_count: {}", diagnostic.surface_count);
     println!("  samples: {}", diagnostic.samples);
@@ -4365,6 +4457,37 @@ fn print_delta_sample(label: &str, point: Option<DeltaPoint>) {
     );
 }
 
+fn print_heat_balance_warmup(prefix: &str, warmup: &HeatBalanceWarmupDiagnostic) {
+    println!("{prefix}warmup_enabled: {}", warmup.enabled);
+    println!("{prefix}warmup_days: {}", warmup.day_count);
+    println!(
+        "{prefix}oracle_run_period_warmup_days: {}",
+        warmup
+            .oracle_run_period_day_count
+            .map(|days| days.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    );
+    println!(
+        "{prefix}warmup_day_count_delta: {}",
+        heat_balance_warmup_day_count_delta(warmup)
+            .map(|delta| delta.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    );
+    println!("{prefix}warmup_timesteps: {}", warmup.timestep_count);
+    println!("{prefix}warmup_hours_per_day: {}", warmup.hours_per_day);
+    println!("{prefix}warmup_converged: {}", warmup.converged);
+    println!(
+        "{prefix}warmup_final_max_zone_temperature_delta_c: {:.12}",
+        warmup.final_max_zone_temperature_delta_c
+    );
+}
+
+fn heat_balance_warmup_day_count_delta(warmup: &HeatBalanceWarmupDiagnostic) -> Option<i64> {
+    warmup
+        .oracle_run_period_day_count
+        .map(|oracle_days| i64::from(warmup.day_count) - i64::from(oracle_days))
+}
+
 fn write_zone_temperature_diagnostic_report(
     report_dir: &Path,
     diagnostic: &ZoneTemperatureDiagnostic,
@@ -4444,6 +4567,14 @@ fn render_zone_temperature_summary_json(
     json.push_str(&format!(
         "  \"heat_balance_timesteps\": {},\n",
         diagnostic.heat_balance_timesteps
+    ));
+    json.push_str(&format!(
+        "  \"heat_balance_run_period_timesteps\": {},\n",
+        diagnostic.heat_balance_run_period_timesteps
+    ));
+    json.push_str(&format!(
+        "  \"heat_balance_warmup\": {},\n",
+        heat_balance_warmup_json(&diagnostic.heat_balance_warmup)
     ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
@@ -4538,6 +4669,50 @@ fn render_zone_temperature_report(
     report.push_str(&format!(
         "heat_balance_timesteps: {}\n",
         diagnostic.heat_balance_timesteps
+    ));
+    report.push_str(&format!(
+        "heat_balance_run_period_timesteps: {}\n",
+        diagnostic.heat_balance_run_period_timesteps
+    ));
+    report.push_str(&format!(
+        "warmup_enabled: {}\n",
+        diagnostic.heat_balance_warmup.enabled
+    ));
+    report.push_str(&format!(
+        "warmup_days: {}\n",
+        diagnostic.heat_balance_warmup.day_count
+    ));
+    report.push_str(&format!(
+        "oracle_run_period_warmup_days: {}\n",
+        diagnostic
+            .heat_balance_warmup
+            .oracle_run_period_day_count
+            .map(|days| days.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "warmup_day_count_delta: {}\n",
+        heat_balance_warmup_day_count_delta(&diagnostic.heat_balance_warmup)
+            .map(|delta| delta.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "warmup_timesteps: {}\n",
+        diagnostic.heat_balance_warmup.timestep_count
+    ));
+    report.push_str(&format!(
+        "warmup_hours_per_day: {}\n",
+        diagnostic.heat_balance_warmup.hours_per_day
+    ));
+    report.push_str(&format!(
+        "warmup_converged: {}\n",
+        diagnostic.heat_balance_warmup.converged
+    ));
+    report.push_str(&format!(
+        "warmup_final_max_zone_temperature_delta_c: {:.12}\n",
+        diagnostic
+            .heat_balance_warmup
+            .final_max_zone_temperature_delta_c
     ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
@@ -4667,6 +4842,14 @@ fn render_heat_balance_conformance_summary_json(
         "  \"heat_balance_timesteps\": {},\n",
         diagnostic.heat_balance_timesteps
     ));
+    json.push_str(&format!(
+        "  \"heat_balance_run_period_timesteps\": {},\n",
+        diagnostic.heat_balance_run_period_timesteps
+    ));
+    json.push_str(&format!(
+        "  \"heat_balance_warmup\": {},\n",
+        heat_balance_warmup_json(&diagnostic.heat_balance_warmup)
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -4756,6 +4939,50 @@ fn render_heat_balance_conformance_report(
         "heat_balance_timesteps: {}\n",
         diagnostic.heat_balance_timesteps
     ));
+    report.push_str(&format!(
+        "heat_balance_run_period_timesteps: {}\n",
+        diagnostic.heat_balance_run_period_timesteps
+    ));
+    report.push_str(&format!(
+        "warmup_enabled: {}\n",
+        diagnostic.heat_balance_warmup.enabled
+    ));
+    report.push_str(&format!(
+        "warmup_days: {}\n",
+        diagnostic.heat_balance_warmup.day_count
+    ));
+    report.push_str(&format!(
+        "oracle_run_period_warmup_days: {}\n",
+        diagnostic
+            .heat_balance_warmup
+            .oracle_run_period_day_count
+            .map(|days| days.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "warmup_day_count_delta: {}\n",
+        heat_balance_warmup_day_count_delta(&diagnostic.heat_balance_warmup)
+            .map(|delta| delta.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "warmup_timesteps: {}\n",
+        diagnostic.heat_balance_warmup.timestep_count
+    ));
+    report.push_str(&format!(
+        "warmup_hours_per_day: {}\n",
+        diagnostic.heat_balance_warmup.hours_per_day
+    ));
+    report.push_str(&format!(
+        "warmup_converged: {}\n",
+        diagnostic.heat_balance_warmup.converged
+    ));
+    report.push_str(&format!(
+        "warmup_final_max_zone_temperature_delta_c: {:.12}\n",
+        diagnostic
+            .heat_balance_warmup
+            .final_max_zone_temperature_delta_c
+    ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
     report.push_str(&format!(
@@ -4829,6 +5056,25 @@ fn zone_temperature_gate_json(gate: Option<&ZoneTemperatureGateContract>) -> Str
         ),
         None => "null".to_string(),
     }
+}
+
+fn heat_balance_warmup_json(warmup: &HeatBalanceWarmupDiagnostic) -> String {
+    format!(
+        concat!(
+            "{{ \"enabled\": {}, \"day_count\": {}, \"timestep_count\": {}, ",
+            "\"hours_per_day\": {}, \"converged\": {}, ",
+            "\"final_max_zone_temperature_delta_c\": {}, ",
+            "\"oracle_run_period_day_count\": {}, \"day_count_delta\": {} }}"
+        ),
+        warmup.enabled,
+        warmup.day_count,
+        warmup.timestep_count,
+        warmup.hours_per_day,
+        warmup.converged,
+        json_number(warmup.final_max_zone_temperature_delta_c),
+        json_optional_u32(warmup.oracle_run_period_day_count),
+        json_optional_i64(heat_balance_warmup_day_count_delta(warmup))
+    )
 }
 
 fn heat_balance_tolerance_json(tolerance: HeatBalanceToleranceReport) -> String {
@@ -5047,6 +5293,14 @@ fn delta_points_json(points: &[DeltaPoint]) -> String {
 
 fn json_optional_number(value: Option<f64>) -> String {
     value.map_or_else(|| "null".to_string(), json_number)
+}
+
+fn json_optional_u32(value: Option<u32>) -> String {
+    value.map_or_else(|| "null".to_string(), |value| value.to_string())
+}
+
+fn json_optional_i64(value: Option<i64>) -> String {
+    value.map_or_else(|| "null".to_string(), |value| value.to_string())
 }
 
 fn json_number(value: f64) -> String {
@@ -5326,6 +5580,18 @@ fn print_modes() {
 mod tests {
     use super::run;
 
+    fn disabled_heat_balance_warmup() -> super::HeatBalanceWarmupDiagnostic {
+        super::HeatBalanceWarmupDiagnostic {
+            enabled: false,
+            day_count: 0,
+            timestep_count: 0,
+            hours_per_day: 0,
+            converged: false,
+            final_max_zone_temperature_delta_c: 0.0,
+            oracle_run_period_day_count: None,
+        }
+    }
+
     #[test]
     fn version_command_succeeds() {
         let args = vec!["--version".to_string()];
@@ -5462,6 +5728,8 @@ mod tests {
             zone_name: "ZONE ONE".to_string(),
             samples: 2,
             heat_balance_timesteps: 8,
+            heat_balance_run_period_timesteps: 8,
+            heat_balance_warmup: disabled_heat_balance_warmup(),
             zone_count: 1,
             surface_count: 6,
             oracle_first_c: 21.0,
@@ -5488,6 +5756,8 @@ mod tests {
             zone_name: "ZONE ONE".to_string(),
             samples: 2,
             heat_balance_timesteps: 8,
+            heat_balance_run_period_timesteps: 8,
+            heat_balance_warmup: disabled_heat_balance_warmup(),
             zone_count: 1,
             surface_count: 6,
             oracle_first_c: 21.0,
@@ -5539,6 +5809,8 @@ mod tests {
         let diagnostic = super::HeatBalanceConformanceDiagnostic {
             samples: 2,
             heat_balance_timesteps: 8,
+            heat_balance_run_period_timesteps: 8,
+            heat_balance_warmup: disabled_heat_balance_warmup(),
             zone_count: 1,
             surface_count: 6,
             series: vec![
@@ -5643,6 +5915,16 @@ mod tests {
         let diagnostic = super::HeatBalanceConformanceDiagnostic {
             samples: 1,
             heat_balance_timesteps: 4,
+            heat_balance_run_period_timesteps: 4,
+            heat_balance_warmup: super::HeatBalanceWarmupDiagnostic {
+                enabled: true,
+                day_count: 6,
+                timestep_count: 576,
+                hours_per_day: 24,
+                converged: true,
+                final_max_zone_temperature_delta_c: 0.0005,
+                oracle_run_period_day_count: Some(20),
+            },
             zone_count: 1,
             surface_count: 6,
             series: vec![super::HeatBalanceSeriesDiagnostic {
@@ -5691,9 +5973,13 @@ mod tests {
         assert_eq!(comparison.status, "fail");
         assert!(json.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(json.contains("\"conformance_claim\": false"));
+        assert!(json.contains("\"oracle_run_period_day_count\": 20"));
+        assert!(json.contains("\"day_count_delta\": -14"));
         assert!(report.contains("Heat Balance Diagnostic Report"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));
+        assert!(report.contains("oracle_run_period_warmup_days: 20"));
+        assert!(report.contains("warmup_day_count_delta: -14"));
         assert!(report.contains("status: fail"));
     }
 

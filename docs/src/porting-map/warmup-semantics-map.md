@@ -19,6 +19,13 @@ Warmup iterations are not represented as Rust output samples. This is acceptable
 only for the currently declared local no-mass, schedule, weather, and internal
 gain cases.
 
+`official_1zone_uncontrolled_dynamic_diagnostic_001` now runs a diagnostic
+Rust warmup loop before recording run-period samples. The loop repeats the
+first run-period weather day, records Rust warmup days/timesteps/convergence,
+and stores the EnergyPlus EIO run-period `Environment:WarmupDays` value in the
+compare summary. This is instrumentation for diagnosis only; it is not
+EnergyPlus warmup parity.
+
 ## Required Official ExampleFile Work
 
 | Topic | Requirement |
@@ -33,6 +40,8 @@ gain cases.
 
 Official `1ZoneUncontrolled` dynamic outputs are baseline and diagnostic
 candidates. `official_1zone_uncontrolled_dynamic_diagnostic_001` currently
-keeps the case `conformance_claim=false` while reporting first-hour and
-run-period-filtered deltas. Large first-hour or warmup-sensitive deltas must
-keep the case diagnostic until this map is implemented.
+keeps the case `conformance_claim=false` while reporting first-hour,
+run-period-filtered deltas, Rust warmup metadata, and oracle run-period warmup
+days. If Rust warmup day count, initial histories, surface CTF history, or
+post-warmup hourly values differ from EnergyPlus, the case must remain
+diagnostic.

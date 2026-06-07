@@ -543,6 +543,66 @@ pub struct HeatBalanceSimulationOptions {
     pub sample_count: usize,
     /// Initial zone mean air temperature in C.
     pub initial_zone_air_temperature_c: f64,
+    /// Optional run-period warmup loop.
+    pub warmup: HeatBalanceWarmupOptions,
+}
+
+/// Warmup settings for heat-balance diagnostic traces.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceWarmupOptions {
+    /// Whether to execute a warmup loop before reported samples are recorded.
+    pub enabled: bool,
+    /// Minimum number of repeated warmup days.
+    pub minimum_days: u32,
+    /// Maximum number of repeated warmup days.
+    pub maximum_days: u32,
+    /// Zone end-state convergence tolerance in delta C.
+    pub temperature_convergence_tolerance_delta_c: f64,
+}
+
+impl HeatBalanceWarmupOptions {
+    /// Creates disabled warmup settings.
+    #[must_use]
+    pub const fn disabled() -> Self {
+        Self {
+            enabled: false,
+            minimum_days: 0,
+            maximum_days: 0,
+            temperature_convergence_tolerance_delta_c: 0.0,
+        }
+    }
+}
+
+/// Summary of the executed heat-balance warmup loop.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceWarmupSummary {
+    /// Whether warmup was requested.
+    pub enabled: bool,
+    /// Number of warmup days actually executed.
+    pub day_count: u32,
+    /// Number of timesteps executed during warmup.
+    pub timestep_count: usize,
+    /// Number of weather hours repeated for one warmup day.
+    pub hours_per_day: usize,
+    /// Whether the repeated-day end state converged before max days.
+    pub converged: bool,
+    /// Final max zone air temperature delta between repeated-day end states.
+    pub final_max_zone_temperature_delta_c: f64,
+}
+
+impl HeatBalanceWarmupSummary {
+    /// Creates a disabled warmup summary.
+    #[must_use]
+    pub const fn disabled() -> Self {
+        Self {
+            enabled: false,
+            day_count: 0,
+            timestep_count: 0,
+            hours_per_day: 0,
+            converged: false,
+            final_max_zone_temperature_delta_c: 0.0,
+        }
+    }
 }
 
 impl HeatBalanceSimulationOptions {
@@ -552,6 +612,28 @@ impl HeatBalanceSimulationOptions {
         Self {
             sample_count,
             initial_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            warmup: HeatBalanceWarmupOptions::disabled(),
+        }
+    }
+
+    /// Creates options with a run-period warmup loop based on typed Building settings.
+    #[must_use]
+    pub fn hourly_samples_with_model_warmup(model: &SimulationModel, sample_count: usize) -> Self {
+        let Some(building) = model.typed.building.as_ref() else {
+            return Self::hourly_samples(sample_count);
+        };
+        let minimum_days = building.minimum_number_of_warmup_days;
+        let maximum_days = building.maximum_number_of_warmup_days.max(minimum_days);
+        Self {
+            sample_count,
+            initial_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            warmup: HeatBalanceWarmupOptions {
+                enabled: maximum_days > 0,
+                minimum_days,
+                maximum_days,
+                temperature_convergence_tolerance_delta_c: building
+                    .temperature_convergence_tolerance_delta_c,
+            },
         }
     }
 }
@@ -563,6 +645,10 @@ pub struct HeatBalanceSimulationSummary {
     pub samples: usize,
     /// Number of executed zone timesteps.
     pub timestep_count: usize,
+    /// Number of reported run-period zone timesteps.
+    pub run_period_timestep_count: usize,
+    /// Warmup execution summary.
+    pub warmup: HeatBalanceWarmupSummary,
     /// Number of zones represented in the state.
     pub zone_count: usize,
     /// Number of surfaces represented in the state.
@@ -2056,6 +2142,15 @@ pub fn simulate_heat_balance_zone_air_temperatures(
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let mut state = initialize_heat_balance_state(model, options.initial_zone_air_temperature_c)?;
+    let warmup = run_heat_balance_run_period_warmup(
+        &model.typed,
+        &mut state,
+        weather_dry_bulb_c,
+        zone_steps_per_hour,
+        seconds_per_timestep,
+        options.warmup,
+    );
+    let run_period_timestep_start = state.timestep_index;
     let mut zone_temperatures = state
         .zones
         .iter()
@@ -2312,6 +2407,8 @@ pub fn simulate_heat_balance_zone_air_temperatures(
     let summary = HeatBalanceSimulationSummary {
         samples: options.sample_count,
         timestep_count: state.timestep_index,
+        run_period_timestep_count: state.timestep_index - run_period_timestep_start,
+        warmup,
         zone_count: state.zones.len(),
         surface_count: state.surfaces.len(),
     };
@@ -2321,6 +2418,91 @@ pub fn simulate_heat_balance_zone_air_temperatures(
         results,
         summary,
     })
+}
+
+fn run_heat_balance_run_period_warmup(
+    model: &TypedModel,
+    state: &mut HeatBalanceState,
+    weather_dry_bulb_c: &[f64],
+    zone_steps_per_hour: u32,
+    seconds_per_timestep: f64,
+    options: HeatBalanceWarmupOptions,
+) -> HeatBalanceWarmupSummary {
+    if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
+        return HeatBalanceWarmupSummary::disabled();
+    }
+
+    let hours_per_day = weather_dry_bulb_c.len().min(24);
+    let maximum_days = options.maximum_days.max(options.minimum_days).max(1);
+    let tolerance = options.temperature_convergence_tolerance_delta_c.max(0.0);
+    let timestep_start = state.timestep_index;
+    let mut previous_day_end_temperatures: Option<Vec<f64>> = None;
+    let mut final_delta = f64::INFINITY;
+
+    for day in 1..=maximum_days {
+        for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
+            .iter()
+            .copied()
+            .take(hours_per_day)
+            .enumerate()
+        {
+            let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
+            for _substep in 0..zone_steps_per_hour {
+                advance_heat_balance_state_one_timestep(
+                    model,
+                    state,
+                    HeatBalanceStepInput {
+                        outdoor_dry_bulb_c,
+                        hour_ending,
+                        timestep_seconds: seconds_per_timestep,
+                    },
+                );
+            }
+        }
+
+        let day_end_temperatures = heat_balance_zone_temperature_snapshot(state);
+        if let Some(previous_temperatures) = &previous_day_end_temperatures {
+            final_delta = max_abs_pair_delta(
+                previous_temperatures.as_slice(),
+                day_end_temperatures.as_slice(),
+            );
+            if day >= options.minimum_days && final_delta <= tolerance {
+                return HeatBalanceWarmupSummary {
+                    enabled: true,
+                    day_count: day,
+                    timestep_count: state.timestep_index - timestep_start,
+                    hours_per_day,
+                    converged: true,
+                    final_max_zone_temperature_delta_c: final_delta,
+                };
+            }
+        }
+        previous_day_end_temperatures = Some(day_end_temperatures);
+    }
+
+    HeatBalanceWarmupSummary {
+        enabled: true,
+        day_count: maximum_days,
+        timestep_count: state.timestep_index - timestep_start,
+        hours_per_day,
+        converged: false,
+        final_max_zone_temperature_delta_c: final_delta,
+    }
+}
+
+fn heat_balance_zone_temperature_snapshot(state: &HeatBalanceState) -> Vec<f64> {
+    state
+        .zones
+        .iter()
+        .map(|zone| zone.mean_air_temperature_c)
+        .collect()
+}
+
+fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
+    left.iter()
+        .zip(right.iter())
+        .map(|(left, right)| (left - right).abs())
+        .fold(0.0, f64::max)
 }
 
 #[derive(Clone, Debug, PartialEq)]
