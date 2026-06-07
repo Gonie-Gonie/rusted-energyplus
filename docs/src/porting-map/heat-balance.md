@@ -61,6 +61,18 @@ Temperature`, and `Surface Outside Face Temperature` for the same no-mass
 adiabatic surface equilibrium subset. It does not claim fenestration, solar
 radiation, conduction-rate, or dynamic exterior heat-balance parity.
 
+## Porting Status Table
+
+| Area | EnergyPlus source routines | Rust target | Current evidence | Status |
+|---|---|---|---|---|
+| Heat-balance orchestration | `ManageHeatBalance`, `InitHeatBalance` | heat-balance timestep driver and state init | source map plus v0.8/v0.9 narrow gates | partial, no general claim |
+| Zone air update | `ManageZoneAirUpdates`, `correctZoneAirTemps` | zone MAT state advance | `heat_balance_nomass_001` MAT tolerance gate | conformance only for declared no-mass case |
+| Surface inside/outside balance | `CalcHeatBalanceInsideSurf`, `CalcHeatBalanceOutsideSurf` | surface temperature trace | `surface_temperature_nomass_001` tolerance gate | conformance only for declared surface variables |
+| Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | ESO smoke comparison | diagnostic support, not zone air parity alone |
+| Weather and schedules | weather/schedule managers, source map pending expansion | typed weather and schedule traces | smoke comparisons | input evidence only |
+| Dynamic envelope behavior | multiple surface and material managers | not fully ported | none | no claim |
+| Solar, fenestration, infiltration, HVAC coupling | multiple domain managers | not ported for heat-balance conformance | none | no claim |
+
 ## EnergyPlus Source Map
 
 Primary files:

@@ -73,6 +73,12 @@ Charts are built as matplotlib figure objects and inserted directly into
 or a LaTeX toolchain. Numeric labels stay in tables below the figures instead
 of being drawn densely on top of the charts.
 
+This is now the standard framework for scripted documentation. PowerShell entry
+points remain stable user-facing commands, while Python generators under
+`tools/reporting` own document layout, charting, data aggregation, and
+serialization. See
+[Documentation Framework](../operations/documentation-framework.md).
+
 ## Excluded Evidence
 
 The PDF must not accumulate every development check. These remain outside the

@@ -129,5 +129,11 @@ Assert-Contains -Path "scripts\compare\compare-zone-smoke.ps1" -Pattern "status:
 Assert-Contains -Path "scripts\compare\compare-heat-balance-conformance.ps1" -Pattern "status: pass" -Description "v0.8 conformance gate"
 Assert-Contains -Path "scripts\compare\compare-surface-temperature-conformance.ps1" -Pattern "status: pass" -Description "v0.9 conformance gate"
 Assert-Contains -Path "docs\src\operations\full-compatibility-reset.md" -Pattern "No conformance claim without case + variable list + tolerance + report + gate." -Description "reset policy"
+Assert-Contains -Path "docs\src\architecture\performance-stability-core-porting-philosophy.md" -Pattern "default = SimulationMode::Compatibility" -Description "compatibility mode default"
+Assert-Contains -Path "docs\src\architecture\performance-stability-core-porting-philosophy.md" -Pattern "No source map, no algorithm port." -Description "source-map algorithm boundary"
+Assert-Contains -Path "docs\src\porting-map\algorithm-ledger.md" -Pattern "No source map, no algorithm port." -Description "algorithm ledger boundary"
+Assert-Contains -Path "docs\src\operations\documentation-framework.md" -Pattern "PowerShell entry points are orchestration wrappers." -Description "documentation wrapper boundary"
+Assert-Contains -Path "docs\src\operations\documentation-framework.md" -Pattern "oodocs" -Description "oodocs documentation framework"
+Assert-Contains -Path "tools\reporting\README.md" -Pattern "structured HTML/PDF output" -Description "reporting generator policy"
 
 Write-Host "False-conformance guard passed."

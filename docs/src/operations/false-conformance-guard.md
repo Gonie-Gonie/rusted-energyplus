@@ -32,3 +32,7 @@ status: extracted
 
 Run it with `.\scripts\dev.cmd strict-no-false-conformance`. The implementation
 file lives under `scripts/quality`.
+
+The guard also checks core policy anchors such as compatibility-mode default,
+the source-map requirement for algorithm ports, and the oodocs-based scripted
+documentation framework.

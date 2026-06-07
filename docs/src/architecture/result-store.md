@@ -18,3 +18,13 @@ public claim that zone air temperature matches EnergyPlus.
 
 Future conformance cases should write Rust result artifacts from `ResultStore`
 or successor output stores and compare them through declared output requests.
+
+## Output Handles
+
+The long-term result path should use an `OutputRegistry` to resolve output
+requests during initialization, then write series through stable handles. The
+runtime hot path should avoid ad hoc string lookup for every reported sample.
+
+Selected output can be stored column-wise or through another handle-based
+layout as long as the exported artifacts keep timestamp, key, variable,
+frequency, class, and tolerance mapping intact for comparison reports.

@@ -21,6 +21,17 @@ epJSON
 - Derived data belongs in explicit cache structures.
 - Legacy files are export targets, not the native result model.
 
+## Hot Path Rule
+
+Runtime code should consume typed IDs, typed handles, and precomputed caches.
+It should not repeatedly normalize names, inspect object type strings, or
+resolve references after initialization. `RawModel` and `TypedModel` may retain
+source-level shape for diagnostics, but `SimulationModel`, `ModelGraph`,
+`ExecutionPlan`, and `SimulationState` are the runtime boundary.
+
+When a future optimization changes layout or cache strategy, it must preserve
+EnergyPlus-compatible algorithm order in `SimulationMode::Compatibility`.
+
 ## Stage Contracts
 
 | Stage | Input | Output | First tests |
@@ -33,4 +44,3 @@ epJSON
 | Graph build | SimulationModel | ModelGraph | zone/surface/node graph |
 | Execution plan | ModelGraph | ExecutionPlan | deterministic order |
 | Runtime init | ExecutionPlan | SimulationState | initial states, output handles |
-

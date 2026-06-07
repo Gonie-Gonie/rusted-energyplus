@@ -47,6 +47,7 @@
 - [Output Registry](architecture/output-registry.md)
 - [Result Store](architecture/result-store.md)
 - [Diagnostics and Trace](architecture/diagnostics-trace.md)
+- [Performance, Stability, and Core Porting Philosophy](architecture/performance-stability-core-porting-philosophy.md)
 - [Performance Optimization Boundaries](architecture/performance-optimization-boundaries.md)
 
 # Porting Map
@@ -59,6 +60,7 @@
 - [Heat Balance Source Map](porting-map/heat-balance-source-map.md)
 - [Output Variable Source Map](porting-map/output-variable-source-map.md)
 - [Algorithm Porting Readiness](porting-map/algorithm-porting-readiness.md)
+- [Algorithm Ledger](porting-map/algorithm-ledger.md)
 - [Node State Source Map](porting-map/node-state-source-map.md)
 - [HVAC](porting-map/hvac.md)
 - [Plant](porting-map/plant.md)
@@ -72,6 +74,7 @@
 - [False Conformance Guard](operations/false-conformance-guard.md)
 - [Milestone Reset Plan](operations/milestone-reset-plan.md)
 - [Script Index](operations/script-index.md)
+- [Documentation Framework](operations/documentation-framework.md)
 - [Foundation Checkpoints](operations/foundation-checkpoints.md)
 - [External Checkpoints](operations/external-checkpoints.md)
 - [Team Workflow](operations/team-workflow.md)

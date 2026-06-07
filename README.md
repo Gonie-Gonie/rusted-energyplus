@@ -140,9 +140,12 @@ Start here:
 - `docs/src/project-scope/evidence-levels.md`
 - `docs/src/project-scope/milestone-map.md`
 - `docs/src/operations/milestone-reset-plan.md`
+- `docs/src/architecture/performance-stability-core-porting-philosophy.md`
 - `docs/src/conformance/overview.md`
 - `docs/src/conformance/examplefiles-coverage-plan.md`
 - `docs/src/operations/script-index.md`
+- `docs/src/operations/documentation-framework.md`
+- `docs/src/porting-map/algorithm-ledger.md`
 - `docs/src/porting-map/heat-balance.md`
 - `docs/src/porting-map/plant-source-map.md`
 

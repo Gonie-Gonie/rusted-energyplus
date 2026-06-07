@@ -26,6 +26,11 @@ directly. The implementation scripts live in field-specific folders:
 
 Run `.\scripts\dev.cmd list` for the command catalog.
 
+Scripted release and evidence documents follow the
+[Documentation Framework](documentation-framework.md): PowerShell entry points
+orchestrate repo-local Python, and Python generators use `oodocs` plus
+matplotlib for document layout and charts.
+
 | Command | Area | Purpose | Blocking release? | Main artifacts |
 |---|---|---|---:|---|
 | `setup` | setup | prepare toolchain, oracle, reference source, docs tools, portable Python, and report venv | yes | `.runtime`, `.reference` |
