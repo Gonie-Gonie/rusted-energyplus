@@ -7,8 +7,8 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.18.0. It gates manifest-owned output
-request injection and official EnergyPlus ExampleFiles oracle baseline staging.
+The current public release line is v0.19.0. It gates timestamp-aware selected
+series reading and the compare engine v2 metric layer.
 
 Current numerical conformance is limited to the promoted v0.8 and v0.9 no-mass
 cases and their declared variables:
@@ -32,6 +32,8 @@ The current public scope includes:
 - RawModel and TypedModel intake for declared seed objects
 - conformance manifests, output requests, tolerance rules, gates, and reports
 - output request injection for staged oracle baselines
+- selected-series timestamp alignment, RMSE, relative-delta, and first
+  divergence reporting
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 

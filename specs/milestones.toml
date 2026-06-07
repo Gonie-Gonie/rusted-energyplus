@@ -253,7 +253,7 @@ not_claimed = [
 [[milestone]]
 version = "0.19"
 title = "Series Reader and Compare Engine v2"
-status = "planned"
+status = "complete"
 claim_level = "comparison-infrastructure"
 required_cases = []
 required_variables = []

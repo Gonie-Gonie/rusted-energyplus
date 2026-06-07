@@ -26,6 +26,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.16-verify
 .\scripts\dev.cmd v0.17-verify
 .\scripts\dev.cmd v0.18-verify
+.\scripts\dev.cmd v0.19-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -39,6 +40,10 @@ tracked case manifests.
 v0.18 is the output request injection and official oracle baseline gate. It
 stages an official ExampleFiles IDF with manifest-owned output requests, but
 does not add ExampleFiles numerical conformance.
+
+v0.19 is the series reader and compare engine v2 gate. It adds timestamp-aware
+selected-series parsing and richer comparison metrics, but does not add a new
+numerical conformance claim.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

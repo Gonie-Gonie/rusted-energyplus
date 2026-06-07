@@ -18,6 +18,7 @@ tolerance, and code organization.
 - epJSON RawModel inspection and TypedModel compile preview
 - conformance manifests, output requests, tolerance policy, and report gates
 - manifest-owned output request injection for staged oracle baselines
+- timestamp-aware selected series reader and compare metrics v2
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
@@ -44,7 +45,8 @@ Useful focused checks:
 .\scripts\dev.cmd manifest-validate-all
 .\scripts\dev.cmd strict-no-false-conformance
 .\scripts\dev.cmd official-baseline-smoke
-.\scripts\dev.cmd conformance-evidence-report -Version 0.18.0
+.\scripts\dev.cmd compare-series-v2-smoke
+.\scripts\dev.cmd conformance-evidence-report -Version 0.19.0
 ```
 
 ## Documentation

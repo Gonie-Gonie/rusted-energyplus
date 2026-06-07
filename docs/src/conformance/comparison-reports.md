@@ -31,6 +31,11 @@ evidence artifacts once a case becomes conformance-level. Promoted numerical
 cases are also summarized in the generated release PDF/HTML/JSON evidence pack
 described in `numeric-release-evidence.md`.
 
+v0.19 adds the compare engine v2 metric layer for future reports. It can align
+selected series by timestamp when both sides provide timestamp labels, falls
+back to index alignment otherwise, and records RMSE, maximum relative delta,
+status, and first divergence reason.
+
 ExampleFiles-based reports should also summarize stage status, requested output
 coverage, meter coverage, surface-level details, node-level details,
 component-level details, known gaps, and the final gate decision. The canonical

@@ -66,6 +66,7 @@ matplotlib for document layout and charts.
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
+| `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
@@ -92,5 +93,6 @@ matplotlib for document layout and charts.
 | `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and release evidence assets | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
 | `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
 | `v0.18-verify` | release | verify v0.18 output request injection and official baseline gate | yes | official baseline, `.runtime/release-evidence` |
+| `v0.19-verify` | release | verify v0.19 series reader and compare engine v2 gate | yes | compare-series-v2 smoke, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

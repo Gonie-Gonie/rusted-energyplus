@@ -175,6 +175,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run compare suite and write regression artifacts."
     }
+    "compare-series-v2-smoke" = @{
+        Path = "compare\compare-series-v2-smoke.ps1"
+        Group = "compare"
+        Help = "Gate timestamp-aware series reader and comparison metrics v2."
+    }
     "conformance-schema-smoke" = @{
         Path = "conformance\conformance-schema-smoke.ps1"
         Group = "conformance"
@@ -310,6 +315,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.18 output injection and official baseline gate."
     }
+    "v0.19-verify" = @{
+        Path = "release\v0.19-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.19 series reader and compare engine v2 gate."
+    }
 }
 
 $Aliases = @{
@@ -333,6 +343,7 @@ $Aliases = @{
     "verify-v0.16" = "v0.16-verify"
     "verify-v0.17" = "v0.17-verify"
     "verify-v0.18" = "v0.18-verify"
+    "verify-v0.19" = "v0.19-verify"
 }
 
 function Show-Commands {

@@ -78,6 +78,11 @@ present.
 - EnergyPlus ERR warning counts and warning excerpts for baseline-only reports
 - unsupported or skipped outputs
 
+The v0.19 compare engine v2 supplies the timestamp-aware alignment mode,
+compared-sample count, maximum absolute delta, RMSE, maximum relative delta,
+status, and first divergence reason that future selected output and meter
+reports should serialize.
+
 ## Markdown Report
 
 `compare-report.md` must include:

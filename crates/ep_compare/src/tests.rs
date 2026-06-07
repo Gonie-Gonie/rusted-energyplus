@@ -1,7 +1,9 @@
 use crate::{
-    Tolerance, compare_series, parse_eio_construction_ctf, parse_eio_heat_transfer_surfaces,
-    parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal, parse_eio_zone_geometry,
-    parse_eso_series,
+    SeriesAlignment, SeriesDivergenceKind, SeriesSample, Tolerance, compare_series,
+    compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
+    parse_eio_heat_transfer_surfaces, parse_eio_material_ctf_summary,
+    parse_eio_other_equipment_nominal, parse_eio_zone_geometry, parse_eso_series,
+    parse_eso_time_series,
 };
 
 #[test]
@@ -33,6 +35,55 @@ End of Data Dictionary
 }
 
 #[test]
+fn parses_eso_time_series_with_hourly_timestamps() -> Result<(), Box<dyn std::error::Error>> {
+    let series = parse_eso_time_series(
+        r#"Program Version,EnergyPlus
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+7,1,ALWAYSON,Schedule Value [] !Hourly
+End of Data Dictionary
+1,RUN PERIOD 1,39.74,-105.18,-7.00,1829.00
+2,1,1,1,0,1,0.00,60.00,Tuesday
+7,1.0
+2,1,1,1,0,2,0.00,60.00,Tuesday
+7,2.0
+"#,
+        "AlwaysOn",
+        "Schedule Value",
+    )?;
+
+    assert_eq!(series.metadata.id, "7");
+    assert_eq!(series.metadata.key, "ALWAYSON");
+    assert_eq!(series.metadata.variable, "Schedule Value");
+    assert_eq!(series.metadata.units, None);
+    assert_eq!(series.metadata.frequency.as_deref(), Some("Hourly"));
+    assert_eq!(
+        series
+            .samples
+            .iter()
+            .map(|sample| sample.value)
+            .collect::<Vec<_>>(),
+        vec![1.0, 2.0]
+    );
+    assert!(
+        series.samples[0]
+            .timestamp
+            .as_deref()
+            .unwrap_or_default()
+            .contains("hour=1")
+    );
+    assert!(
+        series.samples[1]
+            .timestamp
+            .as_deref()
+            .unwrap_or_default()
+            .contains("hour=2")
+    );
+
+    Ok(())
+}
+
+#[test]
 fn parses_eio_zone_geometry_rows() -> Result<(), Box<dyn std::error::Error>> {
     let zones = parse_eio_zone_geometry(
         r#"! <Zone Information>,Zone Name,...
@@ -46,6 +97,82 @@ fn parses_eio_zone_geometry_rows() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(zones[0].floor_area_m2, 232.26);
     assert_eq!(zones[0].volume_m3, 1061.88);
     assert_eq!(zones[0].exterior_gross_wall_area_m2, 278.71);
+
+    Ok(())
+}
+
+#[test]
+fn series_v2_reports_rmse_and_relative_delta() -> Result<(), Box<dyn std::error::Error>> {
+    let result = compare_series_v2(&[10.0, 20.0], &[10.0, 22.0], Tolerance::default());
+
+    assert_eq!(result.alignment, SeriesAlignment::Index);
+    assert_eq!(result.expected_samples, 2);
+    assert_eq!(result.observed_samples, 2);
+    assert_eq!(result.compared_samples, 2);
+    assert!(!result.passed());
+    assert_eq!(result.max_abs_delta, 2.0);
+    assert!((result.rmse_delta - 2.0_f64.sqrt()).abs() < 1.0e-12);
+    assert!((result.max_rel_delta - (2.0 / 22.0)).abs() < 1.0e-12);
+
+    let divergence = result
+        .first_divergence
+        .ok_or_else(|| std::io::Error::other("expected first divergence"))?;
+    assert_eq!(divergence.kind, SeriesDivergenceKind::Tolerance);
+    assert_eq!(divergence.index, 1);
+    assert_eq!(divergence.expected, Some(20.0));
+    assert_eq!(divergence.observed, Some(22.0));
+    assert_eq!(divergence.abs_delta, Some(2.0));
+
+    Ok(())
+}
+
+#[test]
+fn series_v2_aligns_timestamped_samples() -> Result<(), Box<dyn std::error::Error>> {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t2", 2.0),
+        SeriesSample::timestamped(1, "t1", 1.0),
+    ];
+    let observed = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.5),
+    ];
+
+    let result = compare_series_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert_eq!(result.alignment, SeriesAlignment::Timestamp);
+    assert_eq!(result.compared_samples, 2);
+    assert!(!result.passed());
+    let divergence = result
+        .first_divergence
+        .ok_or_else(|| std::io::Error::other("expected first divergence"))?;
+    assert_eq!(divergence.kind, SeriesDivergenceKind::Tolerance);
+    assert_eq!(divergence.timestamp.as_deref(), Some("t2"));
+    assert_eq!(divergence.expected, Some(2.0));
+    assert_eq!(divergence.observed, Some(2.5));
+
+    Ok(())
+}
+
+#[test]
+fn series_v2_reports_missing_observed_timestamp() -> Result<(), Box<dyn std::error::Error>> {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+    let observed = vec![SeriesSample::timestamped(0, "t1", 1.0)];
+
+    let result = compare_series_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert_eq!(result.alignment, SeriesAlignment::Timestamp);
+    assert_eq!(result.compared_samples, 1);
+    assert!(!result.passed());
+    let divergence = result
+        .first_divergence
+        .ok_or_else(|| std::io::Error::other("expected first divergence"))?;
+    assert_eq!(divergence.kind, SeriesDivergenceKind::MissingObservedSample);
+    assert_eq!(divergence.timestamp.as_deref(), Some("t2"));
+    assert_eq!(divergence.expected, Some(2.0));
+    assert_eq!(divergence.observed, None);
 
     Ok(())
 }

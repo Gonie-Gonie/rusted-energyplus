@@ -4,6 +4,29 @@
 
 No unreleased changes.
 
+## v0.19.0 - 2026-06-07
+
+Series reader and compare engine v2 release.
+
+### Added
+
+- `SeriesComparisonV2` with index or timestamp alignment, compared sample
+  counts, max absolute delta, RMSE, max relative delta, status, and first
+  divergence reason.
+- `SeriesSample` and timestamp-aware comparison helpers for selected output
+  series.
+- timestamp-aware ESO selected-series parsing with dictionary metadata,
+  hourly timestamp labels, units, and frequency extraction.
+- `compare-series-v2-smoke` and `v0.19-verify` gates.
+
+### Notes
+
+- v0.19.0 is comparison infrastructure work, not a new numerical conformance
+  release.
+- Meter conformance remains explicitly out of scope for this milestone.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.18.0 - 2026-06-07
 
 Output request injection and official oracle baseline pipeline release.

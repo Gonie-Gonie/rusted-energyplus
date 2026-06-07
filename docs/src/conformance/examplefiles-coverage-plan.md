@@ -45,6 +45,7 @@ Each selected case must answer:
 | v0.16 | roadmap cleanup | legacy evidence reclassification and Road to v1.0 plan reset; plant projection remains an addendum | planning/documentation gate; no new numerical conformance |
 | v0.17 | manifest schema | Case Manifest and Output Request Schema v2 | infrastructure only |
 | v0.18 | output injection and oracle baseline | official IDF output request patching and selected oracle artifacts | complete; baseline-only |
+| v0.19 | series reader and compare engine v2 | selected ESO series and future meter series | comparison infrastructure only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -102,6 +103,15 @@ Current v0.18 official baseline evidence:
 - manifest-owned staged IDF output request injection
 - `official-baseline-smoke`
 - `v0.18-verify`
+
+Current v0.19 comparison infrastructure evidence:
+
+- timestamp-aware selected ESO series parser
+- index and timestamp alignment for selected numeric series
+- max absolute delta, RMSE, max relative delta, status, and first divergence
+  reason in `SeriesComparisonV2`
+- `compare-series-v2-smoke`
+- `v0.19-verify`
 
 Post-v0.15 plant diagnostic addendum evidence:
 

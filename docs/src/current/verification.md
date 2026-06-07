@@ -35,7 +35,14 @@ The false-claim guard is:
 Release evidence documents use the repo-local Python environment and oodocs:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.18.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.19.0
+```
+
+The current comparison-infrastructure gate is:
+
+```powershell
+.\scripts\dev.cmd compare-series-v2-smoke
+.\scripts\dev.cmd v0.19-verify
 ```
 
 Numerical conformance requires a generated report plus a blocking gate. Smoke
