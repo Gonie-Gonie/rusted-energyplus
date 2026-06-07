@@ -86,10 +86,30 @@ inlet and return nodes emit the EnergyPlus `-999` sentinel. The v0.11 gate does
 not claim node, IdealLoads, fan, coil, air-loop, sizing, availability, or meter
 numerical compatibility.
 
+## v0.12 Node Source Map
+
+`node-state-source-map.md` records the first EnergyPlus 26.1.0 source-function
+map for system-node registration, storage, update, and output registration. It
+maps:
+
+- `NodeInputManager.cc` for `SetupOutputVariable`, `AssignNodeNumber`, and
+  `CalcMoreNodeInfo`
+- `DataLoopNode.hh` for `Node::NodeData::Temp`, `MassFlowRate`, `HumRat`, and
+  `TempSetPoint`
+- `PurchasedAirManager.cc` for IdealLoads supply and return node writes
+- `DataZoneEquipment.cc` and `ZoneEquipmentManager.cc` for zone node flow and
+  return node updates
+- `ZoneTempPredictorCorrector.cc` for zone node temperature, humidity, and
+  setpoint writes
+
+This is a planning guard only. It does not port the node update algorithms and
+does not promote `air_side_node_diagnostic_001` beyond diagnostic-only
+evidence.
+
 ## EnergyPlus Source Areas To Map Next
 
-Before a load-conformance claim, the source map must identify the specific
-EnergyPlus 26.1.0 functions and state transitions for:
+Before a load-conformance claim, the remaining source maps must identify the
+specific EnergyPlus 26.1.0 functions and state transitions for:
 
 - zone thermostat control type and setpoint selection
 - IdealLoads sensible and latent load calculation
@@ -97,14 +117,13 @@ EnergyPlus 26.1.0 functions and state transitions for:
 - sizing interactions with autosized flow and capacity fields
 - outdoor air, demand controlled ventilation, economizer, and heat recovery
 - humidification and dehumidification control
-- system-node temperature, humidity ratio, and mass-flow registration
 - output variable registration and meter accounting
 
 Likely source areas include `ZoneTempPredictorCorrector`,
 `ZoneEquipmentManager`, `ZoneAirLoopEquipmentManager`, `HVACManager`, and the
 IdealLoads component implementation in the EnergyPlus HVAC source tree. The
-exact source-function map must be recorded before any v0.11 or later numerical
-claim is promoted.
+exact source-function map must be recorded before any numerical claim is
+promoted.
 
 ## Promotion Requirements
 

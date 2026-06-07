@@ -72,5 +72,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
 | `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
 | `v0.11-verify` | release | verify v0.11 air-side node diagnostic evidence | yes | `.runtime/air-side-node-diagnostic` |
+| `v0.12-verify` | release | verify v0.12 node source mapping evidence | yes | source-map docs |
 
 No diagnostic command should be listed as conformance evidence.

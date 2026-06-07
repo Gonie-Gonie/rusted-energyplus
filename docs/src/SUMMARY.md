@@ -58,6 +58,7 @@
 - [Heat Balance Source Map](porting-map/heat-balance-source-map.md)
 - [Output Variable Source Map](porting-map/output-variable-source-map.md)
 - [Algorithm Porting Readiness](porting-map/algorithm-porting-readiness.md)
+- [Node State Source Map](porting-map/node-state-source-map.md)
 - [HVAC](porting-map/hvac.md)
 - [Plant](porting-map/plant.md)
 - [Output and Reporting](porting-map/output-reporting.md)
@@ -93,6 +94,8 @@
 - [v0.10.0 Readiness](operations/v0.10.0-readiness.md)
 - [v0.11.0 Plan](operations/v0.11.0-plan.md)
 - [v0.11.0 Readiness](operations/v0.11.0-readiness.md)
+- [v0.12.0 Plan](operations/v0.12.0-plan.md)
+- [v0.12.0 Readiness](operations/v0.12.0-readiness.md)
 
 # Archive
 

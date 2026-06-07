@@ -2,12 +2,13 @@
 status: draft
 claim_level: none
 owner: runtime
-last_reviewed: 2026-06-05
+last_reviewed: 2026-06-07
 ---
 
 # Plant
 
-Plant loops are not in the current public compatibility scope.
+Plant loops are not in the current public compatibility scope. Plant work now
+follows the v0.12 node source mapping guard.
 
 Before plant implementation claims, this map must identify:
 
@@ -17,4 +18,3 @@ Before plant implementation claims, this map must identify:
 - node temperature and mass-flow variables
 - meter variables
 - tolerance policy
-
