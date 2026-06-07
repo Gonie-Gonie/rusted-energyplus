@@ -65,6 +65,7 @@ typed_id!(IdealLoadsAirSystemId);
 typed_id!(ZoneEquipmentListId);
 typed_id!(ZoneEquipmentConnectionId);
 typed_id!(NodeId);
+typed_id!(NodeListId);
 typed_id!(ComponentId);
 typed_id!(LoopId);
 typed_id!(OutputHandle);
@@ -674,6 +675,26 @@ pub struct IdealLoadsAirSystem {
     pub cooling_fuel_type: IdealLoadsFuelType,
 }
 
+/// Typed air-side node discovered from node lists and HVAC node references.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Node {
+    /// Typed ID.
+    pub id: NodeId,
+    /// Node name.
+    pub name: NormalizedName,
+}
+
+/// Typed `NodeList` input.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct NodeList {
+    /// Typed ID.
+    pub id: NodeListId,
+    /// NodeList name.
+    pub name: NormalizedName,
+    /// Member nodes in declared order.
+    pub nodes: Vec<NodeId>,
+}
+
 /// Zone equipment load distribution scheme.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum LoadDistributionScheme {
@@ -881,6 +902,14 @@ pub struct TypedModel {
     pub zone_equipment_list_names: NameMap<ZoneEquipmentListId>,
     /// Zone equipment connections.
     pub zone_equipment_connections: Vec<ZoneEquipmentConnection>,
+    /// Discovered air-side nodes.
+    pub nodes: Vec<Node>,
+    /// Node names.
+    pub node_names: NameMap<NodeId>,
+    /// Node lists.
+    pub node_lists: Vec<NodeList>,
+    /// NodeList names.
+    pub node_list_names: NameMap<NodeListId>,
     /// Zones.
     pub zones: Vec<Zone>,
     /// Zone names.
@@ -920,6 +949,10 @@ impl Default for TypedModel {
             zone_equipment_lists: Vec::new(),
             zone_equipment_list_names: NameMap::default(),
             zone_equipment_connections: Vec::new(),
+            nodes: Vec::new(),
+            node_names: NameMap::default(),
+            node_lists: Vec::new(),
+            node_list_names: NameMap::default(),
             zones: Vec::new(),
             zone_names: NameMap::default(),
             surfaces: Vec::new(),
@@ -947,6 +980,7 @@ impl TypedModel {
             + self.ideal_loads_air_systems.len()
             + self.zone_equipment_lists.len()
             + self.zone_equipment_connections.len()
+            + self.node_lists.len()
             + self.zones.len()
             + self.surfaces.len()
     }
@@ -983,6 +1017,12 @@ pub struct ModelGraph {
     pub thermostat_setpoints: Vec<ThermostatSetpointEdge>,
     /// Zone to IdealLoads equipment edges through equipment connections/lists.
     pub zone_ideal_loads: Vec<ZoneIdealLoadsEdge>,
+    /// NodeList membership edges.
+    pub node_list_members: Vec<NodeListMemberEdge>,
+    /// IdealLoads supply-node edges.
+    pub ideal_loads_supply_nodes: Vec<IdealLoadsSupplyNodeEdge>,
+    /// Zone air-node edges.
+    pub zone_air_nodes: Vec<ZoneAirNodeEdge>,
 }
 
 impl ModelGraph {
@@ -1028,28 +1068,122 @@ impl ModelGraph {
                         })
                 })
                 .collect(),
-            zone_ideal_loads: model
+            zone_ideal_loads: sorted_zone_ideal_loads(model),
+            node_list_members: model
+                .node_lists
+                .iter()
+                .flat_map(|node_list| {
+                    node_list
+                        .nodes
+                        .iter()
+                        .enumerate()
+                        .map(move |(index, node)| NodeListMemberEdge {
+                            node_list: node_list.id,
+                            node: *node,
+                            index: index as u32,
+                        })
+                })
+                .collect(),
+            ideal_loads_supply_nodes: model
+                .ideal_loads_air_systems
+                .iter()
+                .flat_map(|system| {
+                    resolve_node_or_list(model, &system.zone_supply_air_node_name)
+                        .into_iter()
+                        .map(move |node| IdealLoadsSupplyNodeEdge {
+                            ideal_loads_air_system: system.id,
+                            node,
+                        })
+                })
+                .collect(),
+            zone_air_nodes: model
                 .zone_equipment_connections
                 .iter()
-                .flat_map(|connection| {
+                .filter_map(|connection| {
                     model
-                        .zone_equipment_lists
-                        .iter()
-                        .find(move |list| list.id == connection.equipment_list)
-                        .into_iter()
-                        .flat_map(move |list| {
-                            list.equipment.iter().map(move |entry| ZoneIdealLoadsEdge {
-                                zone: connection.zone,
-                                equipment_list: list.id,
-                                ideal_loads_air_system: entry.ideal_loads_air_system,
-                                cooling_sequence: entry.cooling_sequence,
-                                heating_or_no_load_sequence: entry.heating_or_no_load_sequence,
-                            })
+                        .node_names
+                        .resolve(&connection.zone_air_node_name.0)
+                        .map(|node| ZoneAirNodeEdge {
+                            zone: connection.zone,
+                            node,
                         })
                 })
                 .collect(),
         }
     }
+}
+
+fn sorted_zone_ideal_loads(model: &TypedModel) -> Vec<ZoneIdealLoadsEdge> {
+    let mut edges: Vec<_> = model
+        .zone_equipment_connections
+        .iter()
+        .flat_map(|connection| {
+            model
+                .zone_equipment_lists
+                .iter()
+                .find(move |list| list.id == connection.equipment_list)
+                .into_iter()
+                .flat_map(move |list| {
+                    list.equipment.iter().map(move |entry| ZoneIdealLoadsEdge {
+                        zone: connection.zone,
+                        equipment_list: list.id,
+                        ideal_loads_air_system: entry.ideal_loads_air_system,
+                        cooling_sequence: entry.cooling_sequence,
+                        heating_or_no_load_sequence: entry.heating_or_no_load_sequence,
+                    })
+                })
+        })
+        .collect();
+    edges.sort_by_key(|edge| {
+        (
+            edge.zone,
+            edge.heating_or_no_load_sequence,
+            edge.cooling_sequence,
+            edge.ideal_loads_air_system,
+        )
+    });
+    edges
+}
+
+fn resolve_node_or_list(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
+    if let Some(node) = model.node_names.resolve(&name.0) {
+        return vec![node];
+    }
+    if let Some(node_list) = model.node_list_names.resolve(&name.0)
+        && let Some(list) = model.node_lists.iter().find(|list| list.id == node_list)
+    {
+        return list.nodes.clone();
+    }
+    Vec::new()
+}
+
+/// NodeList membership relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NodeListMemberEdge {
+    /// NodeList ID.
+    pub node_list: NodeListId,
+    /// Member node ID.
+    pub node: NodeId,
+    /// Zero-based member index.
+    pub index: u32,
+}
+
+/// IdealLoads supply-node relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IdealLoadsSupplyNodeEdge {
+    /// IdealLoads system ID.
+    pub ideal_loads_air_system: IdealLoadsAirSystemId,
+    /// Resolved supply node ID.
+    pub node: NodeId,
+}
+
+/// Zone air-node relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ZoneAirNodeEdge {
+    /// Zone ID.
+    pub zone: ZoneId,
+    /// Node ID.
+    pub node: NodeId,
 }
 
 /// Zone/surface relation.

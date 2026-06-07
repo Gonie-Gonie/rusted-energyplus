@@ -38,6 +38,7 @@ Current table:
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
 | ThermostatSetpoint:DualSetpoint | yes | partial | yes | yes | partial | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`; no thermostat numerical parity claim |
 | ZoneControl:Thermostat | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone thermostat graph edge to dual setpoint and zone |
+| NodeList | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 NodeList members resolve to typed nodes and IdealLoads supply-node graph edges; no node output parity claim |
 | ZoneHVAC:EquipmentList | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 equipment list resolves IdealLoads equipment entries and validates sequence integrity before v0.11 |
 | ZoneHVAC:EquipmentConnections | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone equipment connection resolves zone and equipment list; duplicate zone connections are rejected before v0.11 |
 | ZoneHVAC:IdealLoadsAirSystem | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`, with nonzero baseline signal and range diagnostics; not an IdealLoads load-conformance claim |

@@ -254,6 +254,8 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         "  zone_equipment_connections: {}",
         model.typed.zone_equipment_connections.len()
     );
+    println!("  nodes: {}", model.typed.nodes.len());
+    println!("  node_lists: {}", model.typed.node_lists.len());
     println!("  run_periods: {}", model.typed.run_periods.len());
     println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
     println!(
@@ -271,6 +273,18 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!(
         "  zone_ideal_loads_edges: {}",
         model.graph.zone_ideal_loads.len()
+    );
+    println!(
+        "  node_list_member_edges: {}",
+        model.graph.node_list_members.len()
+    );
+    println!(
+        "  ideal_loads_supply_node_edges: {}",
+        model.graph.ideal_loads_supply_nodes.len()
+    );
+    println!(
+        "  zone_air_node_edges: {}",
+        model.graph.zone_air_nodes.len()
     );
     println!("  stages: {}", plan.stages.len());
     println!("  steps: {}", plan.step_count());
@@ -4450,6 +4464,8 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         "  zone_equipment_connections: {}",
         model.zone_equipment_connections.len()
     );
+    println!("  nodes: {}", model.nodes.len());
+    println!("  node_lists: {}", model.node_lists.len());
     println!("  zones: {}", model.zones.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
@@ -4527,6 +4543,7 @@ fn seed_coverage_status(object_type: &str) -> &'static str {
         "Schedule:Compact",
         "ThermostatSetpoint:DualSetpoint",
         "ZoneControl:Thermostat",
+        "NodeList",
         "ZoneHVAC:EquipmentConnections",
         "ZoneHVAC:EquipmentList",
         "ZoneHVAC:IdealLoadsAirSystem",

@@ -2480,8 +2480,9 @@ v0.11 진입 전 hardening:
     EnergyPlus warning summary를 기록한다.
   - compiler는 HVAC numeric range, equipment sequence, duplicate
     connection, missing reference, unsupported object type negative test를 갖는다.
-  - NodeList와 node registry는 v0.11의 선행 조건으로 남기고,
-    v0.10 claim에는 포함하지 않는다.
+  - NodeList와 node registry는 v0.11 진입 전 typed foundation으로
+    고정하되, node temperature/flow/humidity conformance claim에는
+    포함하지 않는다.
 ```
 
 이 보정은 false conformance를 막기 위한 release 운영 기준이다.

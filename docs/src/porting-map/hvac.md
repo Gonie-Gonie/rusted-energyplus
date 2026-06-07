@@ -23,12 +23,16 @@ Typed objects:
 - `ZoneHVAC:IdealLoadsAirSystem`
 - `ZoneHVAC:EquipmentList`
 - `ZoneHVAC:EquipmentConnections`
+- `NodeList`
 
 Graph edges:
 
 - zone to thermostat
 - thermostat to dual setpoint
 - zone to IdealLoads equipment through equipment connections and equipment list
+- NodeList to member node
+- IdealLoads to resolved supply node
+- zone to zone air node
 
 Execution-plan placeholders:
 

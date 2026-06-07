@@ -49,7 +49,9 @@ Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.to
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct IdealLoadsAirSystem" -Description "v0.10 IdealLoads typed model"
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct ZoneThermostat" -Description "v0.10 thermostat typed model"
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct ZoneEquipmentConnection" -Description "v0.10 equipment connection typed model"
+Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct NodeList" -Description "v0.10 NodeList typed model"
 Assert-Contains -Path "crates\ep_compiler\src\lib.rs" -Pattern '"ZoneHVAC:IdealLoadsAirSystem"' -Description "v0.10 IdealLoads compiler coverage"
+Assert-Contains -Path "crates\ep_compiler\src\lib.rs" -Pattern '"NodeList"' -Description "v0.10 NodeList compiler coverage"
 Assert-Contains -Path "crates\ep_runtime\src\lib.rs" -Pattern "EvaluateZoneThermostat" -Description "v0.10 thermostat execution step"
 Assert-Contains -Path "crates\ep_runtime\src\lib.rs" -Pattern "EvaluateIdealLoadsAirSystem" -Description "v0.10 IdealLoads execution step"
 

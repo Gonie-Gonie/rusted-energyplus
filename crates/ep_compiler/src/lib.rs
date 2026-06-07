@@ -5,14 +5,15 @@ use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind,
-    NameMap, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
-    ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
+    OutdoorAirEconomizerType, OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId,
+    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -196,6 +197,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "OtherEquipment",
     "ThermostatSetpoint:DualSetpoint",
     "ZoneControl:Thermostat",
+    "NodeList",
     "ZoneHVAC:IdealLoadsAirSystem",
     "ZoneHVAC:EquipmentList",
     "ZoneHVAC:EquipmentConnections",
@@ -236,6 +238,7 @@ impl<'a> Compiler<'a> {
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
+        self.parse_node_lists(&mut model);
         self.parse_ideal_loads_air_systems(&mut model);
         self.parse_zone_equipment_lists(&mut model);
         self.parse_zone_equipment_connections(&mut model);
@@ -838,6 +841,38 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_node_lists(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("NodeList") {
+            if model.node_names.resolve(&name).is_some() {
+                self.error(
+                    "DuplicateNodeOrNodeListName",
+                    "NodeList",
+                    Some(&name),
+                    None,
+                    format!("NodeList/{name} duplicates an existing node name"),
+                );
+                continue;
+            }
+            let Some(nodes) = self.node_list_members(model, &name, &object) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id("NodeList", &name, model.node_lists.len()) else {
+                continue;
+            };
+            let id = NodeListId(id_value);
+            if model.node_list_names.insert(&name, id).is_some() {
+                self.duplicate_name("NodeList", &name);
+                continue;
+            }
+
+            model.node_lists.push(NodeList {
+                id,
+                name: NormalizedName::new(&name),
+                nodes,
+            });
+        }
+    }
+
     fn parse_ideal_loads_air_systems(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("ZoneHVAC:IdealLoadsAirSystem") {
             let Some(zone_supply_air_node_name) = self.required_string(
@@ -848,6 +883,40 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            self.register_node_or_nodelist_name(model, &zone_supply_air_node_name);
+            let zone_exhaust_air_node_name = self
+                .optional_string(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "zone_exhaust_air_node_name",
+                )
+                .map(|value| {
+                    self.register_node(model, &value);
+                    NormalizedName::new(&value)
+                });
+            let system_inlet_air_node_name = self
+                .optional_string(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "system_inlet_air_node_name",
+                )
+                .map(|value| {
+                    self.register_node(model, &value);
+                    NormalizedName::new(&value)
+                });
+            let outdoor_air_inlet_node_name = self
+                .optional_string(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "outdoor_air_inlet_node_name",
+                )
+                .map(|value| {
+                    self.register_node(model, &value);
+                    NormalizedName::new(&value)
+                });
             let Some(id_value) = self.checked_id(
                 "ZoneHVAC:IdealLoadsAirSystem",
                 &name,
@@ -876,22 +945,8 @@ impl<'a> Compiler<'a> {
                     "availability_schedule_name",
                 ),
                 zone_supply_air_node_name: NormalizedName::new(&zone_supply_air_node_name),
-                zone_exhaust_air_node_name: self
-                    .optional_string(
-                        "ZoneHVAC:IdealLoadsAirSystem",
-                        &name,
-                        &object,
-                        "zone_exhaust_air_node_name",
-                    )
-                    .map(|value| NormalizedName::new(&value)),
-                system_inlet_air_node_name: self
-                    .optional_string(
-                        "ZoneHVAC:IdealLoadsAirSystem",
-                        &name,
-                        &object,
-                        "system_inlet_air_node_name",
-                    )
-                    .map(|value| NormalizedName::new(&value)),
+                zone_exhaust_air_node_name,
+                system_inlet_air_node_name,
                 maximum_heating_supply_air_temperature_c: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
@@ -1012,14 +1067,7 @@ impl<'a> Compiler<'a> {
                         "design_specification_outdoor_air_object_name",
                     )
                     .map(|value| NormalizedName::new(&value)),
-                outdoor_air_inlet_node_name: self
-                    .optional_string(
-                        "ZoneHVAC:IdealLoadsAirSystem",
-                        &name,
-                        &object,
-                        "outdoor_air_inlet_node_name",
-                    )
-                    .map(|value| NormalizedName::new(&value)),
+                outdoor_air_inlet_node_name,
                 demand_controlled_ventilation_type: self.enum_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
@@ -1179,6 +1227,51 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            self.register_node(model, &zone_air_node_name);
+            let zone_air_inlet_node_or_nodelist_name = self
+                .optional_string(
+                    "ZoneHVAC:EquipmentConnections",
+                    &name,
+                    &object,
+                    "zone_air_inlet_node_or_nodelist_name",
+                )
+                .map(|value| {
+                    self.register_node_or_nodelist_name(model, &value);
+                    NormalizedName::new(&value)
+                });
+            let zone_air_exhaust_node_or_nodelist_name = self
+                .optional_string(
+                    "ZoneHVAC:EquipmentConnections",
+                    &name,
+                    &object,
+                    "zone_air_exhaust_node_or_nodelist_name",
+                )
+                .map(|value| {
+                    self.register_node_or_nodelist_name(model, &value);
+                    NormalizedName::new(&value)
+                });
+            let zone_return_air_node_or_nodelist_name = self
+                .optional_string(
+                    "ZoneHVAC:EquipmentConnections",
+                    &name,
+                    &object,
+                    "zone_return_air_node_or_nodelist_name",
+                )
+                .map(|value| {
+                    self.register_node_or_nodelist_name(model, &value);
+                    NormalizedName::new(&value)
+                });
+            let zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name = self
+                .optional_string(
+                    "ZoneHVAC:EquipmentConnections",
+                    &name,
+                    &object,
+                    "zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name",
+                )
+                .map(|value| {
+                    self.register_node_or_nodelist_name(model, &value);
+                    NormalizedName::new(&value)
+                });
             let Some(id_value) = self.checked_id(
                 "ZoneHVAC:EquipmentConnections",
                 &name,
@@ -1209,31 +1302,10 @@ impl<'a> Compiler<'a> {
                     id: ZoneEquipmentConnectionId(id_value),
                     zone,
                     equipment_list,
-                    zone_air_inlet_node_or_nodelist_name: self
-                        .optional_string(
-                            "ZoneHVAC:EquipmentConnections",
-                            &name,
-                            &object,
-                            "zone_air_inlet_node_or_nodelist_name",
-                        )
-                        .map(|value| NormalizedName::new(&value)),
-                    zone_air_exhaust_node_or_nodelist_name: self
-                        .optional_string(
-                            "ZoneHVAC:EquipmentConnections",
-                            &name,
-                            &object,
-                            "zone_air_exhaust_node_or_nodelist_name",
-                        )
-                        .map(|value| NormalizedName::new(&value)),
+                    zone_air_inlet_node_or_nodelist_name,
+                    zone_air_exhaust_node_or_nodelist_name,
                     zone_air_node_name: NormalizedName::new(&zone_air_node_name),
-                    zone_return_air_node_or_nodelist_name: self
-                        .optional_string(
-                            "ZoneHVAC:EquipmentConnections",
-                            &name,
-                            &object,
-                            "zone_return_air_node_or_nodelist_name",
-                        )
-                        .map(|value| NormalizedName::new(&value)),
+                    zone_return_air_node_or_nodelist_name,
                     zone_return_air_node_1_flow_rate_fraction_schedule: self
                         .optional_schedule_reference(
                             model,
@@ -1242,14 +1314,7 @@ impl<'a> Compiler<'a> {
                             &object,
                             "zone_return_air_node_1_flow_rate_fraction_schedule_name",
                         ),
-                    zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: self
-                        .optional_string(
-                            "ZoneHVAC:EquipmentConnections",
-                            &name,
-                            &object,
-                            "zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name",
-                        )
-                        .map(|value| NormalizedName::new(&value)),
+                    zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name,
                 });
         }
     }
@@ -1596,6 +1661,80 @@ impl<'a> Compiler<'a> {
         Some(entries)
     }
 
+    fn node_list_members(
+        &mut self,
+        model: &mut TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<NodeId>> {
+        let Some(value) = field_value(object, "nodes") else {
+            self.error(
+                "MissingRequiredField",
+                "NodeList",
+                Some(object_name),
+                Some("nodes"),
+                format!("NodeList/{object_name} requires field nodes"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("NodeList", object_name, "nodes", "array");
+            return None;
+        };
+
+        let mut nodes = Vec::new();
+        let mut seen = std::collections::BTreeSet::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    "NodeList",
+                    Some(object_name),
+                    Some("nodes"),
+                    format!("NodeList/{object_name} node entry {index} must be an object"),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(node_name) =
+                self.required_string("NodeList", &entry_name, &entry_object, "node_name")
+            else {
+                continue;
+            };
+            let normalized = NormalizedName::new(&node_name);
+            if !seen.insert(normalized.clone()) {
+                self.error(
+                    "DuplicateNodeListMember",
+                    "NodeList",
+                    Some(object_name),
+                    Some("node_name"),
+                    format!("NodeList/{object_name} duplicates node '{}'", normalized.0),
+                );
+                continue;
+            }
+            if let Some(node) = self.register_node(model, &node_name) {
+                nodes.push(node);
+            }
+        }
+
+        if nodes.is_empty() {
+            self.error(
+                "MissingNodeListMember",
+                "NodeList",
+                Some(object_name),
+                Some("nodes"),
+                format!("NodeList/{object_name} has no valid node members"),
+            );
+            return None;
+        }
+
+        Some(nodes)
+    }
+
     fn objects(&self, object_type: &str) -> Vec<(String, RawObject)> {
         self.raw_model
             .objects
@@ -1662,6 +1801,40 @@ impl<'a> Compiler<'a> {
             ),
         );
         None
+    }
+
+    fn register_node(&mut self, model: &mut TypedModel, node_name: &str) -> Option<NodeId> {
+        if let Some(node) = model.node_names.resolve(node_name) {
+            return Some(node);
+        }
+        if model.node_list_names.resolve(node_name).is_some() {
+            self.error(
+                "DuplicateNodeOrNodeListName",
+                "Node",
+                Some(node_name),
+                None,
+                format!("Node '{node_name}' duplicates an existing NodeList name"),
+            );
+            return None;
+        }
+
+        let id_value = self.checked_id("Node", node_name, model.nodes.len())?;
+        let id = NodeId(id_value);
+        if model.node_names.insert(node_name, id).is_some() {
+            self.duplicate_name("Node", node_name);
+            return None;
+        }
+        model.nodes.push(Node {
+            id,
+            name: NormalizedName::new(node_name),
+        });
+        Some(id)
+    }
+
+    fn register_node_or_nodelist_name(&mut self, model: &mut TypedModel, name: &str) {
+        if model.node_list_names.resolve(name).is_none() {
+            self.register_node(model, name);
+        }
     }
 
     fn required_schedule_reference(
@@ -2952,9 +3125,16 @@ mod tests {
                         "temperature_difference_between_cutout_and_setpoint": 0.5
                     }
                 },
+                "NodeList": {
+                    "Zone Inlets": {
+                        "nodes": [
+                            {"node_name": "Zone One Inlet"}
+                        ]
+                    }
+                },
                 "ZoneHVAC:IdealLoadsAirSystem": {
                     "Zone Ideal Loads": {
-                        "zone_supply_air_node_name": "Zone One Inlet",
+                        "zone_supply_air_node_name": "Zone Inlets",
                         "maximum_heating_supply_air_temperature": 50,
                         "minimum_cooling_supply_air_temperature": 13,
                         "maximum_heating_supply_air_humidity_ratio": 0.015,
@@ -2986,7 +3166,7 @@ mod tests {
                     "Zone One": {
                         "zone_name": "Zone One",
                         "zone_conditioning_equipment_list_name": "Zone Equipment",
-                        "zone_air_inlet_node_or_nodelist_name": "Zone One Inlet",
+                        "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
                         "zone_air_node_name": "Zone One Air Node",
                         "zone_return_air_node_or_nodelist_name": "Zone One Return"
                     }
@@ -3005,6 +3185,9 @@ mod tests {
         assert_eq!(model.ideal_loads_air_systems.len(), 1);
         assert_eq!(model.zone_equipment_lists.len(), 1);
         assert_eq!(model.zone_equipment_connections.len(), 1);
+        assert_eq!(model.nodes.len(), 3);
+        assert_eq!(model.node_lists.len(), 1);
+        assert_eq!(model.node_lists[0].nodes.len(), 1);
         assert_eq!(model.zone_thermostats[0].zone.0, 0);
         assert_eq!(model.zone_thermostats[0].controls[0].dual_setpoint.0, 0);
         assert_eq!(
@@ -3044,6 +3227,9 @@ mod tests {
         assert_eq!(graph.zone_thermostats.len(), 1);
         assert_eq!(graph.thermostat_setpoints.len(), 1);
         assert_eq!(graph.zone_ideal_loads.len(), 1);
+        assert_eq!(graph.node_list_members.len(), 1);
+        assert_eq!(graph.ideal_loads_supply_nodes.len(), 1);
+        assert_eq!(graph.zone_air_nodes.len(), 1);
         assert_eq!(graph.zone_ideal_loads[0].cooling_sequence, 1);
         assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
 
@@ -3188,6 +3374,88 @@ mod tests {
     }
 
     #[test]
+    fn rejects_nodelist_name_that_duplicates_registered_node()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "NodeList": {
+                    "A Source List": {
+                        "nodes": [{"node_name": "Shared Name"}]
+                    },
+                    "Shared Name": {
+                        "nodes": [{"node_name": "Other Node"}]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "DuplicateNodeOrNodeListName"
+                && diagnostic.object_type == "NodeList"
+                && diagnostic.object_name.as_deref() == Some("Shared Name")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_direct_node_name_that_duplicates_nodelist() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Zone": {"Zone One": {}},
+                "NodeList": {
+                    "Zone Air Node": {
+                        "nodes": [{"node_name": "Zone Inlet Node"}]
+                    }
+                },
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads": {
+                        "zone_supply_air_node_name": "Zone Inlet Node"
+                    }
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone Connection": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_node_name": "Zone Air Node"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "DuplicateNodeOrNodeListName"
+                && diagnostic.object_type == "Node"
+                && diagnostic.object_name.as_deref() == Some("Zone Air Node")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
     fn rejects_ideal_loads_invalid_numeric_ranges() -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
@@ -3286,6 +3554,60 @@ mod tests {
                 && diagnostic.code == "DuplicateZoneEquipmentConnection"
                 && diagnostic.object_type == "ZoneHVAC:EquipmentConnections"
         }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn sorts_ideal_loads_graph_edges_by_equipment_sequence()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Zone": {"Zone One": {}},
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads First": {"zone_supply_air_node_name": "Zone Inlet 1"},
+                    "Zone Ideal Loads Second": {"zone_supply_air_node_name": "Zone Inlet 2"}
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads Second",
+                                "zone_equipment_cooling_sequence": 2,
+                                "zone_equipment_heating_or_no_load_sequence": 2
+                            },
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads First",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone Connection": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_node_name": "Zone Air Node"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        let graph = ModelGraph::from_typed(&model);
+        assert_eq!(graph.zone_ideal_loads.len(), 2);
+        assert_eq!(graph.zone_ideal_loads[0].ideal_loads_air_system.0, 0);
+        assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
+        assert_eq!(graph.zone_ideal_loads[1].ideal_loads_air_system.0, 1);
+        assert_eq!(graph.zone_ideal_loads[1].heating_or_no_load_sequence, 2);
 
         Ok(())
     }
