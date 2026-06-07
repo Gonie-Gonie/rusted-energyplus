@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.16.0 - 2026-06-07
+
+Plant-state diagnostic projection release.
+
+### Added
+
+- `run plant-state-projection` diagnostic command for the v0.15
+  PlantLoadProfile fixture.
+- `PlantStateProjectionEvidencePolicy` with source-map, timestamp, warmup, and
+  sizing-period policy fields.
+- `plant-loop-projection-smoke` gate for Rust plant projection artifacts.
+- v0.16 plan, readiness, release notes, verification gate, and package checks.
+
+### Notes
+
+- v0.16.0 is a diagnostic projection release, not a plant numerical
+  conformance claim.
+- Projected plant rows keep `algorithm_parity: false`,
+  `conformance_claim: false`, and `tolerance_policy: none`.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.15.0 - 2026-06-07
 
 Plant-loop diagnostic baseline release.

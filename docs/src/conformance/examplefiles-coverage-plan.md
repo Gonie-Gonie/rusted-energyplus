@@ -42,6 +42,7 @@ Each selected case must answer:
 | v0.13 | Tier B plant foundation | `plant-loop-skeleton.epJSON` typed graph smoke first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant graph intake only; no plant numerical conformance |
 | v0.14 | Tier B plant source mapping | v0.13 plant fixture and EnergyPlus plant source paths | plant source-function map only; no plant numerical conformance |
 | v0.15 | Tier B plant diagnostic | `plant_loop_diagnostic_001` PlantLoadProfile baseline first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant oracle baseline and report skeleton only; no plant numerical conformance |
+| v0.16 | Tier B plant diagnostic projection | Rust projection artifacts for `plant_loop_diagnostic_001` before plant algorithms are ported | projection artifact shape only; `algorithm_parity: false`; no plant numerical conformance |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -92,6 +93,13 @@ Current v0.15 plant diagnostic evidence:
 - `data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf`
 - `plant-loop-diagnostic-smoke`
 - `v0.15-verify`
+
+Current v0.16 plant diagnostic evidence:
+
+- `run plant-state-projection`
+- `plant-state-summary.md` and `plant-state-summary.json`
+- `plant-loop-projection-smoke`
+- `v0.16-verify`
 
 Planned fields:
 

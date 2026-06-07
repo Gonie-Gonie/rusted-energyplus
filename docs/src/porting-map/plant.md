@@ -84,6 +84,27 @@ load-profile heat transfer. It does not provide Rust plant result artifacts,
 plant solver parity, pump electricity parity, equipment load parity, plant
 node-state parity, or plant meter parity.
 
+## v0.16 Plant State Projection
+
+The v0.16 diagnostic gate adds a Rust-side projection for the same
+`plant_loop_diagnostic_001` fixture:
+
+```powershell
+.\scripts\dev.cmd plant-loop-projection-smoke
+```
+
+The projection writes:
+
+```text
+.runtime/plant-loop-diagnostic/26.1.0/plant-state-projection/plant-state-summary.md
+.runtime/plant-loop-diagnostic/26.1.0/plant-state-projection/plant-state-summary.json
+```
+
+The Rust artifact records `algorithm_parity: false`, `conformance_claim:
+false`, source-map, timestamp, warmup, and sizing-period policy fields. It
+exercises plant output registration and result artifact shape, but it does not
+execute EnergyPlus plant loop algorithms.
+
 ## Reference Source Targets
 
 Future plant work must be ported against the locked EnergyPlus 26.1.0 source
@@ -110,6 +131,9 @@ Current Rust coverage:
   branch lists to branches, connector lists to connectors, and branch
   components to plant nodes.
 - `ep_cli` reports typed plant counts and graph edge counts.
+- `ep_runtime` can write a diagnostic plant-state projection for the v0.15
+  PlantLoadProfile fixture with 5 plant-loop series and 3 plant-equipment
+  series.
 
 Current non-claims:
 
@@ -121,6 +145,8 @@ Current non-claims:
 - no plant ExampleFiles compatibility
 - v0.15 plant diagnostic rows are EnergyPlus oracle baseline-only evidence,
   not Rust plant numerical conformance
+- v0.16 plant projection rows are Rust diagnostic artifact plumbing with
+  `algorithm_parity: false`, not plant numerical conformance
 
 ## Promotion Requirements
 

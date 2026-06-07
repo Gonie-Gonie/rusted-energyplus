@@ -23,6 +23,7 @@ Verify the current public release gate:
 
 ```powershell
 .\scripts\dev.cmd v0.15-verify
+.\scripts\dev.cmd v0.16-verify
 ```
 
 Development-only diagnostic scripts are listed in

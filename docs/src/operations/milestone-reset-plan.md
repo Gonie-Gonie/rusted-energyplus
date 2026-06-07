@@ -50,6 +50,7 @@ separate in docs, scripts, and release language.
 | v0.13 | Plant loop skeleton release | typed graph smoke only; no plant numerical conformance |
 | v0.14 | Plant source mapping release | planning guard before plant diagnostics or numerical conformance |
 | v0.15 | Plant loop diagnostic release | oracle baseline and report skeleton only; no plant numerical conformance |
+| v0.16 | Plant state projection release | Rust projection artifact only; `algorithm_parity: false`; no plant numerical conformance |
 | v1.0 | Declared compatibility subset release | locked supported subset only |
 
 ## Retroactive Audit Rules
@@ -206,6 +207,11 @@ records EnergyPlus oracle baseline rows for plant supply-side demand/state,
 pump electricity, district heating rate, and load-profile heat transfer, but it
 does not provide Rust plant result artifacts, tolerances, or plant numerical
 conformance.
+
+v0.16 decision: `run plant-state-projection` writes Rust `ResultStore`
+projection artifacts for the v0.15 fixture, but keeps `algorithm_parity:
+false`, `conformance_claim: false`, and `tolerance_policy: none`. This is
+artifact plumbing for future plant work, not plant algorithm parity.
 
 ## Immediate Work Order
 

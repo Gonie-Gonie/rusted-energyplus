@@ -44,6 +44,7 @@ No source map, no algorithm port.
 | PlantLoop typed graph | plant manager source map pending at v0.13 | typed PlantLoop graph edges | v0.13 smoke gate | no plant loop simulation |
 | Plant manager and flow source map | `ManagePlantLoops`, `SetComponentFlowRate` | plant source-map planning guard | v0.14 planning-ready evidence | no plant numerical claim |
 | PlantLoadProfile baseline | plant loop and component reporting anchors | plant diagnostic output classes | v0.15 baseline-only diagnostic | not plant, equipment, meter, or flow conformance |
+| PlantLoadProfile projection | same source-map anchors, algorithms not ported | `simulate_plant_state_projection` and `run plant-state-projection` | v0.16 projected diagnostic artifact | `algorithm_parity: false`; not plant numerical conformance |
 
 ## Ledger Maintenance
 

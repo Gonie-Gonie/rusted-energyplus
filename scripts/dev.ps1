@@ -105,6 +105,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.15 PlantLoadProfile baseline-only plant diagnostic."
     }
+    "plant-loop-projection-smoke" = @{
+        Path = "smoke\plant-loop-projection-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate the v0.16 Rust plant-state diagnostic projection."
+    }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
         Group = "compare"
@@ -270,6 +275,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.15 plant-loop diagnostic gate."
     }
+    "v0.16-verify" = @{
+        Path = "release\v0.16-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.16 plant-state projection gate."
+    }
 }
 
 $Aliases = @{
@@ -290,6 +300,7 @@ $Aliases = @{
     "verify-v0.13" = "v0.13-verify"
     "verify-v0.14" = "v0.14-verify"
     "verify-v0.15" = "v0.15-verify"
+    "verify-v0.16" = "v0.16-verify"
 }
 
 function Show-Commands {
