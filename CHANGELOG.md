@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.12.0 - 2026-06-07
+
+Node source mapping and diagnostic projection evidence-policy release.
+
+### Added
+
+- v0.12 node-state source-function map for EnergyPlus 26.1.0 node registration, storage, update, and output paths.
+- `NodeStateProjectionEvidencePolicy` for the Rust node-state projection artifact.
+- source-map, timestamp, warmup, sentinel, and excluded-variable fields in node-state projection markdown/JSON artifacts.
+- EnergyPlus `SensedNodeFlagValue` handling boundary for future `System Node Setpoint Temperature` sampling.
+- strengthened v0.12 verification gate that runs the air-side node diagnostic smoke and checks projection policy markers.
+- v0.12 release notes and package metadata.
+
+### Notes
+
+- v0.12.0 is a planning-guard release, not a node, IdealLoads, HVAC, plant, meter, or general ExampleFiles numerical conformance claim.
+- `System Node Setpoint Temperature` remains excluded until setpoint ownership and sentinel filtering are ported.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9 no-mass cases.
+
 ## v0.11.0 - 2026-06-07
 
 Air-side node diagnostic release for the typed IdealLoads node graph.

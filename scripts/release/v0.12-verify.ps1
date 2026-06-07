@@ -35,6 +35,31 @@ function Assert-Contains {
     Write-Host "OK $Description marker: $Pattern"
 }
 
+function Assert-ZipEntry {
+    param(
+        [Parameter(Mandatory = $true)][string]$ZipPath,
+        [Parameter(Mandatory = $true)][string]$Entry,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    Assert-FileExists -Path $ZipPath -Description $Description
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $ZipPath).Path)
+    try {
+        $expected = $Entry.Replace("/", "\")
+        $match = $archive.Entries | Where-Object {
+            $_.FullName.Replace("/", "\") -eq $expected
+        }
+        if ($null -eq $match) {
+            throw "Missing $Description zip entry in $ZipPath`: $Entry"
+        }
+        Write-Host "OK $Description zip entry: $Entry"
+    }
+    finally {
+        $archive.Dispose()
+    }
+}
+
 $SourceRoot = ".reference\energyplus-src\26.1.0"
 
 Assert-FileExists -Path "docs\src\operations\v0.12.0-plan.md" -Description "v0.12 plan"
@@ -119,6 +144,13 @@ Invoke-DevCommand -Command "air-side-node-diagnostic-smoke"
 Invoke-DevCommand -Command "test"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
+Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.12.0")
+
+$package = Join-Path $RepoRoot "dist\eplus-rs-v0.12.0-windows-x64.zip"
+Assert-FileExists -Path $package -Description "v0.12 release package"
+Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.12.0.md" -Description "v0.12 packaged release note"
+Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/node-state-source-map.md" -Description "v0.12 packaged node source map"
+Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/air_side_node_diagnostic_001/case.toml" -Description "v0.12 packaged node case manifest"
 
 Write-Host "result: pass"
 Write-Host "v0.12.0 node source mapping verification passed."

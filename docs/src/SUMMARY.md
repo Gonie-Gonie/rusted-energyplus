@@ -108,3 +108,4 @@
 - [Releases](releases/README.md)
   - [v0.1.0](releases/v0.1.0.md)
   - [v0.11.0](releases/v0.11.0.md)
+  - [v0.12.0](releases/v0.12.0.md)
