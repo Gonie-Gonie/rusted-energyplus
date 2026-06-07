@@ -20,6 +20,8 @@ tolerance, and code organization.
 - manifest-owned output request injection for staged oracle baselines
 - timestamp-aware selected series reader and compare metrics v2
 - release conformance index and coverage matrix report generation
+- user-facing support coverage report generation for inputs, outputs, and
+  algorithm scope
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
 - official ExampleFile static model EIO conformance report gate
@@ -42,6 +44,8 @@ tolerance, and code organization.
   cases and variables
 - v0.26 internal convective gain conformance only for `internal_gains_001` /
   `Zone Total Internal Convective Heating Rate`
+- v0.27 support coverage report only as release documentation infrastructure;
+  it does not promote new numerical conformance
 
 Not claimed:
 
@@ -73,8 +77,9 @@ Useful focused checks:
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
-.\scripts\dev.cmd conformance-index-report -Version 0.26.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.26.0
+.\scripts\dev.cmd conformance-index-report -Version 0.27.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.27.0
+.\scripts\dev.cmd support-coverage-report -Version 0.27.0
 ```
 
 ## Documentation

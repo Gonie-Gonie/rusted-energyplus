@@ -391,6 +391,21 @@ not_claimed = [
   "general heat-balance compatibility",
 ]
 
+[[milestone]]
+version = "0.27"
+title = "User Support Coverage Report"
+status = "complete"
+claim_level = "reporting-infrastructure"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance",
+  "full EnergyPlus compatibility",
+  "HVAC numerical conformance",
+  "plant numerical conformance",
+  "meter conformance",
+]
+
 [[target]]
 version = "1.0"
 title = "Substantial Compatibility Draft"

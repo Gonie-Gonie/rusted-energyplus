@@ -2,7 +2,7 @@
 status: active
 claim_level: conformance-boundary
 owner: conformance
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Numeric Release Evidence
@@ -15,15 +15,15 @@ Release assets beside the binary zip.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.26.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.27.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.27.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.27.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.27.0/numeric-conformance-evidence.json
 ```
 
 Current GitHub Release asset names:
@@ -40,10 +40,11 @@ Only promoted, tolerance-gated numerical conformance cases enter the release
 PDF. v0.22.0 added declared time/weather/schedule variables to the earlier
 v0.8/v0.9 no-mass cases. v0.26.0 adds the declared internal convective gain
 hourly series. v0.23.0 added static EIO evidence, v0.24.0 added runtime
-registry infrastructure, and v0.25.0 generalized no-mass opaque boundary
-handling; those infrastructure/static changes do not add series to this
-numerical PDF and are represented instead by their gates plus the conformance
-index:
+registry infrastructure, v0.25.0 generalized no-mass opaque boundary
+handling, and v0.27.0 added user support coverage reporting; those
+infrastructure/static/reporting changes do not add series to this numerical
+PDF and are represented instead by their gates plus the conformance index and
+support coverage report:
 
 Historical note: v0.12 through v0.21 release evidence kept the earlier
 v0.8/v0.9 cases only.

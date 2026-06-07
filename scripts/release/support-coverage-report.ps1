@@ -17,14 +17,14 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
     throw "Report Python environment is missing. Run .\scripts\dev.cmd setup first."
 }
 
-$script = Join-Path $RepoRoot "tools\reporting\conformance_index_report.py"
+$script = Join-Path $RepoRoot "tools\reporting\support_coverage_report.py"
 if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
-    throw "Missing conformance index generator: $script"
+    throw "Missing support coverage generator: $script"
 }
 
 $arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version)
 
 & $python @arguments
 if ($LASTEXITCODE -ne 0) {
-    throw "Conformance index report generation failed with exit code $LASTEXITCODE"
+    throw "Support coverage report generation failed with exit code $LASTEXITCODE"
 }

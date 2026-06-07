@@ -2,7 +2,7 @@
 status: active
 claim_level: setup
 owner: docs
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Quick Start
@@ -34,6 +34,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.24-verify
 .\scripts\dev.cmd v0.25-verify
 .\scripts\dev.cmd v0.26-verify
+.\scripts\dev.cmd v0.27-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -79,6 +80,10 @@ declared existing no-mass variables.
 v0.26 is the internal convective gains conformance gate. It promotes only the
 declared `Zone Total Internal Convective Heating Rate` hourly series for
 `internal_gains_001`.
+
+v0.27 is the user support coverage report gate. It generates oodocs
+PDF/HTML/JSON/Markdown coverage for supported inputs, outputs, and algorithm
+families without adding a new numerical conformance claim.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

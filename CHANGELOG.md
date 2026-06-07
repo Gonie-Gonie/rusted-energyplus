@@ -4,6 +4,31 @@
 
 No unreleased changes.
 
+## v0.27.0 - 2026-06-08
+
+User support coverage reporting.
+
+### Added
+
+- v0.27 user support coverage report milestone.
+- `support-coverage-report` release command.
+- `tools/reporting/support_coverage_report.py` oodocs/matplotlib generator.
+- PDF/HTML/JSON/Markdown support coverage artifacts for tracked inputs,
+  outputs, algorithms, cases, and explicit gaps.
+- v0.27 release verification script.
+
+### Changed
+
+- Release evidence report defaults now target v0.27.0.
+- `check` now generates the user support coverage report.
+- mdBook navigation exposes the Support Coverage Report page.
+
+### Scope
+
+- v0.27.0 is reporting infrastructure and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.26.0 - 2026-06-07
 
 Internal convective gains conformance.

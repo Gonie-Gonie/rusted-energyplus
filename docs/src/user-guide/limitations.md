@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Limitations
@@ -30,5 +30,8 @@ v0.26 promotes only `Zone Total Internal Convective Heating Rate` for
 `internal_gains_001`. It does not claim zone air temperature response to
 internal gains, radiant/latent coupling, HVAC, plant, meters, or broad
 heat-balance compatibility.
+
+v0.27 adds a user-facing support coverage report for tracked inputs, outputs,
+and algorithm families. It does not promote new numerical conformance.
 
 For the formal non-goals list, see `project-scope/non-goals.md`.

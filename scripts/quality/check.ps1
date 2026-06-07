@@ -56,5 +56,6 @@ Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "python-smoke"
 Invoke-DevCommand -Command "conformance-index-report"
+Invoke-DevCommand -Command "support-coverage-report"
 
 Write-Host "Check complete."

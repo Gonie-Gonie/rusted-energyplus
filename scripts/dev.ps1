@@ -260,6 +260,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Generate oodocs PDF/HTML/JSON/Markdown conformance index coverage."
     }
+    "support-coverage-report" = @{
+        Path = "release\support-coverage-report.ps1"
+        Group = "release"
+        Help = "Generate oodocs PDF/HTML/JSON/Markdown user-facing support coverage."
+    }
     "github-release" = @{
         Path = "release\github-release.ps1"
         Group = "release"
@@ -395,6 +400,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.26 internal convective gains conformance gate."
     }
+    "v0.27-verify" = @{
+        Path = "release\v0.27-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.27 user support coverage report gate."
+    }
 }
 
 $Aliases = @{
@@ -426,6 +436,7 @@ $Aliases = @{
     "verify-v0.24" = "v0.24-verify"
     "verify-v0.25" = "v0.25-verify"
     "verify-v0.26" = "v0.26-verify"
+    "verify-v0.27" = "v0.27-verify"
 }
 
 function Show-Commands {

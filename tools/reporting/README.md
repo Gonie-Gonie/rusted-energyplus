@@ -17,5 +17,7 @@ Current generators:
   promoted tolerance-gated cases.
 - `conformance_index_report.py` builds the release conformance index and
   coverage matrices for all tracked manifests.
+- `support_coverage_report.py` builds the user-facing input, output, and
+  algorithm support coverage report from specs plus case manifests.
 
 Pinned dependencies live in `tools/python/requirements-report.txt`.

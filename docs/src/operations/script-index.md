@@ -82,6 +82,7 @@ matplotlib for document layout and charts.
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
 | `conformance-index-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown conformance index coverage matrices | yes for release coverage | `.runtime/release-evidence` |
+| `support-coverage-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user-facing support coverage for inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 | `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
@@ -109,5 +110,6 @@ matplotlib for document layout and charts.
 | `v0.24-verify` | release | verify v0.24 runtime state and output registry hardening gate | yes | runtime registry smoke, `.runtime/release-evidence` |
 | `v0.25-verify` | release | verify v0.25 opaque no-mass heat-balance generalization gate | yes | heat-balance generalization smoke, `.runtime/release-evidence` |
 | `v0.26-verify` | release | verify v0.26 internal convective gains conformance gate | yes | internal-gains conformance report, `.runtime/release-evidence` |
+| `v0.27-verify` | release | verify v0.27 user support coverage report gate | yes | support coverage PDF/HTML/JSON/Markdown, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

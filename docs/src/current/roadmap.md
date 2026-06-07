@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Roadmap
@@ -34,6 +34,8 @@ Current direction:
   hourly series for `internal_gains_001`, without claiming zone temperature
   response, radiant/latent coupling, HVAC, plant, meter, or broad heat-balance
   compatibility.
+- v0.27 added a user-facing support coverage report generated with `oodocs`
+  from specs and case manifests, without adding new numerical conformance.
 
 The long-term targets remain:
 

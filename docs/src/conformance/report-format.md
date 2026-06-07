@@ -111,6 +111,10 @@ reports/<version>/
   conformance-index-report.html
   conformance-index-report.pdf
   conformance-index-report.json
+  support-coverage.md
+  support-coverage-report.html
+  support-coverage-report.pdf
+  support-coverage-report.json
   cases/<case_id>/compare-report.md
   cases/<case_id>/compare-summary.json
 ```
@@ -119,3 +123,8 @@ The index should summarize case tier counts, pass/fail/diagnostic/baseline-only
 status, variable coverage, object coverage, report contracts, gate contracts,
 and known gaps. v0.20 implements the release-level `conformance-index-report.pdf`
 and companion HTML/JSON/Markdown artifacts under `.runtime/release-evidence`.
+
+v0.27 adds the user-facing support coverage report under the same release
+evidence root. It is generated with `oodocs` from object coverage, variable
+coverage, the algorithm ledger, and case manifests, and it answers which input
+objects, output variables, and algorithm families are currently supported.

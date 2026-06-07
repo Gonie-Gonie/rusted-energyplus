@@ -16,6 +16,10 @@
 - [Developer Workflow](guides/developer-workflow.md)
 - [Release Process](guides/release-process.md)
 
+# User Coverage
+
+- [Support Coverage Report](conformance/support-coverage-report.md)
+
 # Generated References
 
 - [Milestone Map](generated/milestone-map.md)

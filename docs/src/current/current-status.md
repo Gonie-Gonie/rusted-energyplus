@@ -2,13 +2,14 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Current Status
 
-The current public release line is v0.26.0. It promotes the declared internal
-convective gain hourly trace on top of v0.25 opaque no-mass heat-balance
+The current public release line is v0.27.0. It adds a user-facing support
+coverage report for supported inputs, outputs, and algorithm scope on top of
+v0.26 internal convective gain conformance, v0.25 opaque no-mass heat-balance
 boundary handling, v0.24 runtime registry infrastructure, v0.23 official
 ExampleFile static model evidence, and v0.22 declared time, weather, and
 schedule numerical conformance.
@@ -50,6 +51,8 @@ The current public scope includes:
   divergence reporting
 - release conformance index reports with case, output, meter, domain, report,
   and gate coverage matrices
+- user-facing support coverage reports with input object, output variable, and
+  algorithm support matrices
 - source-map and algorithm ledger checks that validate EnergyPlus source
   anchors, Rust target anchors, first cases, proof variables, and blocking
   gates
@@ -80,4 +83,5 @@ Not claimed:
 - zone air temperature response to internal gains, radiant/latent internal
   gain coupling, or broader heat-balance compatibility from the v0.26
   internal-gain milestone
+- new numerical conformance from the v0.27 support coverage report
 - broad ExampleFiles compatibility

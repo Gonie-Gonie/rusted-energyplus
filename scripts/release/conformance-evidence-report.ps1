@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = "0.26.0",
+    [string]$Version = "0.27.0",
     [switch]$SkipGateRun
 )
 
