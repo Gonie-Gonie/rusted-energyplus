@@ -100,6 +100,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Run first-zone runtime plumbing diagnostics."
     }
+    "runtime-registry-smoke" = @{
+        Path = "smoke\runtime-registry-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate v0.24 runtime output/meter registry and ResultStore diagnostics."
+    }
     "ideal-loads-thermostat-smoke" = @{
         Path = "smoke\ideal-loads-thermostat-smoke.ps1"
         Group = "smoke"
@@ -365,6 +370,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.23 static model evidence gate."
     }
+    "v0.24-verify" = @{
+        Path = "release\v0.24-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.24 runtime state and output registry hardening gate."
+    }
 }
 
 $Aliases = @{
@@ -393,6 +403,7 @@ $Aliases = @{
     "verify-v0.21" = "v0.21-verify"
     "verify-v0.22" = "v0.22-verify"
     "verify-v0.23" = "v0.23-verify"
+    "verify-v0.24" = "v0.24-verify"
 }
 
 function Show-Commands {

@@ -7,9 +7,10 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.23.0. It gates official ExampleFile
-static model EIO evidence on top of the v0.22 declared time, weather, and
-schedule numerical conformance.
+The current public release line is v0.24.0. It hardens runtime state, output
+registry, meter registry, result-store diagnostics, and profiling scaffolds on
+top of the v0.23 official ExampleFile static model evidence and v0.22 declared
+time, weather, and schedule numerical conformance.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:
@@ -54,6 +55,10 @@ The current public scope includes:
   hourly series
 - static EIO model conformance reports for the official `1ZoneUncontrolled`
   ExampleFile
+- runtime output registry handles for currently implemented output variables
+- explicit unavailable-output and unavailable-meter runtime diagnostics
+- ResultStore duplicate-handle/duplicate-series diagnostics and profile
+  scaffolding
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
@@ -65,4 +70,5 @@ Not claimed:
 - plant compatibility
 - node, IdealLoads, meter, or broad weather conformance
 - dynamic compatibility for the v0.23 static model case
+- new numerical conformance from the v0.24 runtime-infrastructure milestone
 - broad ExampleFiles compatibility

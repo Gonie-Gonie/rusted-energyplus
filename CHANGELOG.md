@@ -4,6 +4,35 @@
 
 No unreleased changes.
 
+## v0.24.0 - 2026-06-07
+
+Runtime state and output registry hardening.
+
+### Added
+
+- `ep_runtime::RuntimeOutputRegistry` for model-derived output handles.
+- `ep_runtime::RuntimeMeterRegistry` with explicit unavailable-meter diagnostics.
+- Runtime diagnostic codes for unavailable outputs/meters and duplicate output
+  handles or series.
+- `ResultStoreProfile` and duplicate-handle/duplicate-series diagnostics.
+- `runtime-registry-smoke` gate.
+- v0.24 release verification script.
+
+### Changed
+
+- `build_execution_plan` now writes registry-derived `WriteOutput` handles
+  instead of a placeholder `OutputHandle(0)`.
+- `ep_runtime::ResultStore` and output primitives are split into
+  `crates/ep_runtime/src/output.rs`.
+- `model-plan-smoke` now checks registry-backed output steps.
+- Default release evidence report version is v0.24.0.
+
+### Boundaries
+
+- v0.24.0 is runtime-infrastructure only.
+- No new numerical conformance, meter conformance, or general runtime
+  compatibility is claimed.
+
 ## v0.23.0 - 2026-06-07
 
 Static model evidence expansion.

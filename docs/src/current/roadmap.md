@@ -25,9 +25,11 @@ Current direction:
 - v0.23 promoted official `1ZoneUncontrolled` static EIO model evidence for
   declared surface, construction/material, and OtherEquipment nominal fields
   without claiming dynamic heat-balance compatibility.
-- v0.24 should harden runtime state, output registry, meter registry, result
+- v0.24 hardened runtime state, output registry, meter registry, result
   storage, diagnostics, and profiling scaffolds without adding new numerical
-  conformance unless a declared gate supports it.
+  conformance.
+- v0.25 should use the hardened runtime path to generalize opaque no-mass
+  heat-balance cases for declared variables only.
 
 The long-term targets remain:
 

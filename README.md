@@ -23,6 +23,8 @@ tolerance, and code organization.
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
 - official ExampleFile static model EIO conformance report gate
+- runtime output registry, meter registry diagnostics, ResultStore duplicate
+  checks, and profile scaffolding
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
@@ -30,6 +32,8 @@ tolerance, and code organization.
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
+- v0.24 runtime registry hardening only as infrastructure; no new numerical
+  conformance
 
 Not claimed:
 
@@ -58,8 +62,9 @@ Useful focused checks:
 .\scripts\dev.cmd compare-schedule-conformance
 .\scripts\dev.cmd compare-weather-conformance
 .\scripts\dev.cmd compare-static-model-conformance
-.\scripts\dev.cmd conformance-index-report -Version 0.23.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.23.0
+.\scripts\dev.cmd runtime-registry-smoke
+.\scripts\dev.cmd conformance-index-report -Version 0.24.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.24.0
 ```
 
 ## Documentation

@@ -10,11 +10,17 @@ last_reviewed: 2026-06-07
 Runtime state is being built in layers:
 
 - `SimulationState` for current diagnostic execution
+- `RuntimeOutputRegistry` and `RuntimeMeterRegistry` for output handle
+  resolution before output steps are written
 - `HeatBalanceState` shell for future EnergyPlus-aligned heat-balance work
 - future zone/surface/HVAC/plant state structs as porting maps mature
 
 The current heat-balance state shell initializes zone and surface state without
 advancing a solver.
+
+v0.24 keeps registry, diagnostic, profile, and `ResultStore` primitives in
+`crates/ep_runtime/src/output.rs` so mutable simulation state and output
+contract state can evolve separately.
 
 ## State Ownership
 

@@ -12,7 +12,9 @@ frequency semantics.
 
 Current foundations:
 
-- `OutputRegistry`
+- `ep_conformance::OutputRegistry`
+- `ep_runtime::RuntimeOutputRegistry`
+- `ep_runtime::RuntimeMeterRegistry`
 - `ResultStore`
 - `trace.json`
 - `compare-summary.json`
@@ -24,6 +26,7 @@ Current foundations:
 - manifest metadata in diagnostic MAT `compare-summary.json` and report
 - manifest-driven static model `compare-summary.json` and `compare-report.md`
   generation for declared EIO rows
+- runtime unavailable-output and unavailable-meter diagnostics
 
 Current v0.6 artifact contract:
 
@@ -34,6 +37,9 @@ Current v0.6 artifact contract:
   manifest-driven diagnostic MAT report for `zone_temperature_diagnostic_001`.
 - `compare-regression` writes suite-level `trace.json`,
   `compare-summary.json`, `compare-report.md`, and `profile-summary.json`.
+- `runtime-registry-smoke` verifies registry-backed output handles,
+  unavailable-output diagnostics, unavailable-meter diagnostics, and
+  ResultStore duplicate-handle checks.
 - Zone-temperature artifacts must remain `diagnostic-only`,
   `conformance_claim: false`, and `tolerance_policy: none`.
 

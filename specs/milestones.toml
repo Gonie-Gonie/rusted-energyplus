@@ -340,12 +340,14 @@ not_claimed = [
 [[milestone]]
 version = "0.24"
 title = "Runtime State and Output Registry Hardening"
-status = "planned"
+status = "complete"
 claim_level = "runtime-infrastructure"
 required_cases = []
 required_variables = []
 not_claimed = [
   "new numerical conformance",
+  "meter conformance",
+  "general runtime compatibility",
 ]
 
 [[milestone]]

@@ -1,5 +1,6 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
+use crate::{OutputSeries, ResultStore, RuntimeOutputRegistry};
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
     IdealLoadsAirSystemId, LoopId, MaterialId, NodeId, NormalizedName, OtherEquipment,
@@ -137,7 +138,11 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
             },
             ExecutionStage {
                 name: "output".to_string(),
-                steps: vec![ExecutionStep::WriteOutput(OutputHandle(0))],
+                steps: RuntimeOutputRegistry::from_model(model)
+                    .outputs()
+                    .iter()
+                    .map(|output| ExecutionStep::WriteOutput(output.handle))
+                    .collect(),
             },
         ],
     }
@@ -349,60 +354,6 @@ impl SimulationState {
             },
             zones: Vec::new(),
         }
-    }
-}
-
-/// One output series stored by the runtime.
-#[derive(Clone, Debug, PartialEq)]
-pub struct OutputSeries {
-    /// Stable output handle for the current run.
-    pub handle: OutputHandle,
-    /// EnergyPlus-style output key.
-    pub key: String,
-    /// Output variable name.
-    pub variable_name: String,
-    /// Display units.
-    pub units: String,
-    /// Sampled output values.
-    pub values: Vec<f64>,
-}
-
-/// Structured output store for runtime-native results.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct ResultStore {
-    /// Output series in handle order.
-    pub series: Vec<OutputSeries>,
-}
-
-impl ResultStore {
-    /// Creates an empty result store.
-    #[must_use]
-    pub fn new() -> Self {
-        Self { series: Vec::new() }
-    }
-
-    /// Adds a complete output series.
-    pub fn add_series(&mut self, series: OutputSeries) {
-        self.series.push(series);
-    }
-
-    /// Returns the maximum sample count across all output series.
-    #[must_use]
-    pub fn sample_count(&self) -> usize {
-        self.series
-            .iter()
-            .map(|series| series.values.len())
-            .max()
-            .unwrap_or(0)
-    }
-
-    /// Finds one output series by EnergyPlus-style key and variable name.
-    #[must_use]
-    pub fn find_series(&self, key: &str, variable_name: &str) -> Option<&OutputSeries> {
-        self.series.iter().find(|series| {
-            series.key.eq_ignore_ascii_case(key)
-                && series.variable_name.eq_ignore_ascii_case(variable_name)
-        })
     }
 }
 
@@ -2931,15 +2882,17 @@ mod tests {
         HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        ResultStore, SimulationMode, SimulationState, advance_heat_balance_state_one_timestep,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        initialize_heat_balance_state, node_temperature_setpoint_from_energyplus,
-        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
-        simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
-        simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
-        surface_geometry_summaries, zone_geometry_summaries,
+        ResultStore, RuntimeOutputRegistry, SimulationMode, SimulationState,
+        advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
+        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
+        simulate_plant_state_projection, simulate_schedule_values,
+        simulate_zone_internal_convective_gains, surface_area_m2, surface_geometry_summaries,
+        zone_geometry_summaries,
     };
+    use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
         AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, Construction, ConstructionId,
         DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
@@ -3106,13 +3059,26 @@ mod tests {
         let plan = build_execution_plan(&model);
 
         assert_eq!(plan.stages.len(), 3);
-        assert_eq!(plan.step_count(), 4);
+        assert_eq!(plan.step_count(), 6);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
             plan.stages[0].steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
+        assert_eq!(plan.stages[2].steps.len(), 3);
+        assert_eq!(
+            plan.stages[2].steps[0],
+            ExecutionStep::WriteOutput(OutputHandle(0))
+        );
+        assert_eq!(
+            plan.stages[2].steps[1],
+            ExecutionStep::WriteOutput(OutputHandle(1))
+        );
+        assert_eq!(
+            plan.stages[2].steps[2],
+            ExecutionStep::WriteOutput(OutputHandle(2))
+        );
     }
 
     #[test]
@@ -3871,6 +3837,89 @@ DATA PERIODS
                 .find_series("zone one", "zone mean air temperature")
                 .is_some()
         );
+    }
+
+    #[test]
+    fn runtime_output_registry_resolves_declared_model_outputs() {
+        let model = SimulationModel::from_typed(cube_model());
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        assert_eq!(registry.len(), 15);
+        assert!(registry.meter_registry().is_empty());
+
+        let resolution = registry.resolve_output_requests(&[
+            RuntimeOutputRequest::hourly("zone one", "Zone Mean Air Temperature"),
+            RuntimeOutputRequest::hourly("floor", "Surface Inside Face Temperature"),
+            RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Drybulb Temperature"),
+        ]);
+
+        assert!(resolution.diagnostics.is_empty());
+        assert_eq!(resolution.resolved.len(), 3);
+        assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
+        assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
+    }
+
+    #[test]
+    fn runtime_output_registry_diagnoses_unavailable_output() {
+        let model = SimulationModel::from_typed(cube_model());
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        let resolution = registry.resolve_output_requests(&[RuntimeOutputRequest::hourly(
+            "ZONE ONE",
+            "Zone Lights Electricity Energy",
+        )]);
+
+        assert!(resolution.resolved.is_empty());
+        assert!(resolution.diagnostics.has_errors());
+        assert_eq!(
+            resolution.diagnostics.diagnostics[0].code,
+            RuntimeDiagnosticCode::OutputVariableUnavailable
+        );
+    }
+
+    #[test]
+    fn runtime_meter_registry_diagnoses_unavailable_meter() {
+        let model = SimulationModel::from_typed(cube_model());
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        let resolution = registry
+            .meter_registry()
+            .resolve_meter_requests(&[RuntimeMeterRequest::hourly("Electricity:Facility")]);
+
+        assert!(resolution.resolved.is_empty());
+        assert!(resolution.diagnostics.has_errors());
+        assert_eq!(
+            resolution.diagnostics.diagnostics[0].code,
+            RuntimeDiagnosticCode::MeterUnavailable
+        );
+    }
+
+    #[test]
+    fn result_store_diagnostics_report_duplicate_handles() {
+        let mut store = ResultStore::new();
+        store.add_series(OutputSeries {
+            handle: OutputHandle(0),
+            key: "ZONE ONE".to_string(),
+            variable_name: "Zone Mean Air Temperature".to_string(),
+            units: "C".to_string(),
+            values: vec![20.0],
+        });
+        store.add_series(OutputSeries {
+            handle: OutputHandle(0),
+            key: "Environment".to_string(),
+            variable_name: "Site Outdoor Air Drybulb Temperature".to_string(),
+            units: "C".to_string(),
+            values: vec![10.0],
+        });
+
+        let diagnostics = store.diagnostics();
+
+        assert!(diagnostics.has_errors());
+        assert_eq!(
+            diagnostics.diagnostics[0].code,
+            RuntimeDiagnosticCode::DuplicateOutputHandle
+        );
+        assert_eq!(store.profile().series_count, 2);
     }
 
     #[test]

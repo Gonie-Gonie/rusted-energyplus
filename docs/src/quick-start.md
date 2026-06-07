@@ -31,6 +31,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.21-verify
 .\scripts\dev.cmd v0.22-verify
 .\scripts\dev.cmd v0.23-verify
+.\scripts\dev.cmd v0.24-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -64,6 +65,10 @@ EnergyPlus ESO comparisons.
 v0.23 is the static model evidence gate. It promotes official
 `1ZoneUncontrolled` static EIO fields for surface geometry,
 construction/material summaries, and OtherEquipment nominal inputs only.
+
+v0.24 is the runtime state and output registry hardening gate. It adds
+registry-backed output handles, explicit unavailable-output/meter diagnostics,
+and ResultStore profiling scaffolds without adding new numerical conformance.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

@@ -17,4 +17,8 @@ ExampleFile only. That does not imply dynamic heat-balance, HVAC, plant,
 solar, fenestration, sizing, warmup, meter, or broad ExampleFiles
 compatibility.
 
+v0.24 adds runtime output registry, meter diagnostic, and ResultStore
+infrastructure. It does not add new numerical conformance or meter
+conformance.
+
 For the formal non-goals list, see `project-scope/non-goals.md`.

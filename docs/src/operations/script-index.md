@@ -51,6 +51,7 @@ matplotlib for document layout and charts.
 | `schedule-compact-smoke` | smoke | verify `Schedule:Compact` intake | no | console output |
 | `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
+| `runtime-registry-smoke` | smoke | gate runtime output/meter registry and ResultStore diagnostics | yes | cargo test filters |
 | `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, IdealLoads typed graph, warning policy, and nonzero baseline signal | yes | `.runtime/ideal-loads-thermostat` |
 | `air-side-node-diagnostic-smoke` | smoke | gate the v0.11 air-side node baseline evidence and diagnostic Rust projection | yes | `.runtime/air-side-node-diagnostic` |
 | `plant-loop-skeleton-smoke` | smoke | gate the v0.13 PlantLoop typed graph skeleton fixture | yes | console output |
@@ -103,5 +104,6 @@ matplotlib for document layout and charts.
 | `v0.21-verify` | release | verify v0.21 source-map and algorithm ledger validation gate | yes | algorithm ledger, generated docs, `.runtime/release-evidence` |
 | `v0.22-verify` | release | verify v0.22 declared time/weather/schedule conformance gates | yes | schedule/weather reports, `.runtime/release-evidence` |
 | `v0.23-verify` | release | verify v0.23 official ExampleFile static model evidence gate | yes | static model reports, `.runtime/release-evidence` |
+| `v0.24-verify` | release | verify v0.24 runtime state and output registry hardening gate | yes | runtime registry smoke, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.
