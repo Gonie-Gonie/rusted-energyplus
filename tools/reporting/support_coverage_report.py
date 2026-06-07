@@ -55,7 +55,7 @@ ALGORITHM_STATUS_LABELS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the user support coverage report.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.29.0")
+    parser.add_argument("--version", default="0.30.0")
     return parser.parse_args()
 
 
@@ -279,9 +279,11 @@ def collect_algorithm_rows(repo_root: Path) -> list[dict[str, Any]]:
                 "user_status": status_label(status, ALGORITHM_STATUS_LABELS),
                 "claim_level": str(item.get("claim_level", "")),
                 "first_case": str(item.get("first_case", "")),
+                "first_evidence": str(item.get("first_evidence", item.get("first_case", ""))),
                 "proof_variables": [str(value) for value in item.get("proof_variables", [])],
                 "source_map": str(item.get("source_map", "")),
                 "rust_target": [str(value) for value in item.get("rust_target", [])],
+                "support_boundary": str(item.get("support_boundary", "")),
             }
         )
     return sorted(rows, key=lambda row: (support_rank(row["status"]), row["domain"], row["id"]))
@@ -329,6 +331,12 @@ def build_support_coverage(repo_root: Path, version: str) -> dict[str, Any]:
             "conformance_output_request_count": output_counts.get("conformance", 0),
             "diagnostic_output_request_count": output_counts.get("diagnostic", 0),
             "algorithm_count": len(algorithm_rows),
+            "algorithms_with_first_evidence_count": sum(
+                1 for row in algorithm_rows if row["first_evidence"]
+            ),
+            "algorithms_with_boundary_count": sum(
+                1 for row in algorithm_rows if row["support_boundary"]
+            ),
             "conformance_algorithm_count": algorithm_counts.get("conformance", 0),
             "diagnostic_algorithm_count": algorithm_counts.get("diagnostic_only", 0),
             "case_count": len(case_rows),
@@ -452,14 +460,24 @@ def build_algorithm_table(report: dict[str, Any]) -> Table:
             row["domain"],
             row["user_status"],
             row["claim_level"],
-            row["first_case"],
+            row["first_evidence"],
             ", ".join(row["proof_variables"]),
             row["source_map"],
+            row["support_boundary"],
         ]
         for row in report["algorithms"]
     ]
     return doc_table(
-        ["Algorithm", "Domain", "Support", "Claim level", "First case", "Proof outputs", "Source map"],
+        [
+            "Algorithm",
+            "Domain",
+            "Support",
+            "Claim level",
+            "First evidence",
+            "Proof outputs",
+            "Source map",
+            "Boundary",
+        ],
         rows,
         "Supported algorithm coverage.",
     )
@@ -642,8 +660,9 @@ def render_markdown(report: dict[str, Any]) -> str:
             row["domain"],
             row["user_status"],
             row["claim_level"],
-            row["first_case"],
+            row["first_evidence"],
             ", ".join(row["proof_variables"]),
+            row["support_boundary"],
         ]
         for row in report["algorithms"]
     ]
@@ -666,7 +685,10 @@ def render_markdown(report: dict[str, Any]) -> str:
             output_rows,
         )
         + "\n## Supported Algorithms\n\n"
-        + markdown_table(["Algorithm", "Domain", "Support", "Claim level", "First case", "Proof outputs"], algorithm_rows)
+        + markdown_table(
+            ["Algorithm", "Domain", "Support", "Claim level", "First evidence", "Proof outputs", "Boundary"],
+            algorithm_rows,
+        )
         + "\n## Explicit Gaps\n\n"
         + "\n".join(f"- {gap}" for gap in report["known_gaps"])
         + "\n"

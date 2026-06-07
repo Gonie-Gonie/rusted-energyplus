@@ -36,6 +36,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.27 | User Support Coverage Report | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 | 0.28 | Input Object Coverage Metadata | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 | 0.29 | Output Variable Coverage Metadata | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
+| 0.30 | Algorithm Coverage Metadata | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 
 ## Long-Term Targets
 

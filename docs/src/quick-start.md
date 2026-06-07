@@ -37,6 +37,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.27-verify
 .\scripts\dev.cmd v0.28-verify
 .\scripts\dev.cmd v0.29-verify
+.\scripts\dev.cmd v0.30-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -93,6 +94,10 @@ metadata so the support coverage report is readable from a user perspective.
 v0.29 enriches output variable coverage with strongest-evidence first
 references and support boundaries so diagnostic and conformance rows are not
 misread as the same level of support.
+
+v0.30 enriches algorithm coverage with first evidence and support boundaries
+so limited-conformance algorithms and diagnostic projections are separated in
+the user-facing report.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

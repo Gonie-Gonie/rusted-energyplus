@@ -4,6 +4,31 @@
 
 No unreleased changes.
 
+## v0.30.0 - 2026-06-08
+
+Algorithm coverage metadata.
+
+### Added
+
+- v0.30 algorithm coverage metadata milestone.
+- `first_evidence` and `support_boundary` metadata for all tracked algorithms.
+- generated mdBook algorithm ledger columns for first evidence and support
+  boundary.
+- support coverage report algorithm table boundary column.
+- support coverage JSON aggregates for algorithm first-evidence and boundary
+  completeness.
+- v0.30 release verification script.
+
+### Changed
+
+- Release evidence report defaults now target v0.30.0.
+
+### Scope
+
+- v0.30.0 is reporting metadata work and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.29.0 - 2026-06-08
 
 Output variable coverage metadata.

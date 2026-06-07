@@ -415,6 +415,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.29 output variable coverage metadata gate."
     }
+    "v0.30-verify" = @{
+        Path = "release\v0.30-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.30 algorithm coverage metadata gate."
+    }
 }
 
 $Aliases = @{
@@ -449,6 +454,7 @@ $Aliases = @{
     "verify-v0.27" = "v0.27-verify"
     "verify-v0.28" = "v0.28-verify"
     "verify-v0.29" = "v0.29-verify"
+    "verify-v0.30" = "v0.30-verify"
 }
 
 function Show-Commands {

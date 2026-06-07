@@ -12,10 +12,12 @@ rust_target = [
 ]
 status = "conformance"
 first_case = "heat_balance_nomass_001"
+first_evidence = "heat_balance_nomass_001"
 proof_variables = [
   "Zone Mean Air Temperature",
 ]
 claim_level = "limited-conformance"
+support_boundary = "Limited conformance only for declared no-mass zone-air heat-balance proof variables; no general heat-balance, HVAC, warmup, or sizing claim."
 
 [[algorithm]]
 id = "surface_inside_temperature"
@@ -30,10 +32,12 @@ rust_target = [
 ]
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
 proof_variables = [
   "Surface Inside Face Temperature",
 ]
 claim_level = "limited-conformance"
+support_boundary = "Limited conformance only for declared opaque no-mass surface face-temperature proof variables; no solar, fenestration, or general exterior boundary claim."
 
 [[algorithm]]
 id = "air_side_node_state"
@@ -49,11 +53,13 @@ rust_target = [
 ]
 status = "diagnostic_only"
 first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
 proof_variables = [
   "System Node Temperature",
   "System Node Mass Flow Rate",
 ]
 claim_level = "none"
+support_boundary = "Diagnostic node-state projection only; no HVAC loop, node, or flow numerical conformance."
 
 [[algorithm]]
 id = "plant_loop_state_projection"
@@ -70,8 +76,10 @@ rust_target = [
 ]
 status = "diagnostic_only"
 first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
 proof_variables = [
   "Plant Supply Side Inlet Temperature",
   "Plant Supply Side Outlet Temperature",
 ]
 claim_level = "none"
+support_boundary = "Diagnostic plant-state projection only; no plant loop, equipment, flow, or load numerical conformance."

@@ -116,9 +116,10 @@ def algorithm_ledger(repo_root: Path) -> str:
                 str(item.get("source_map", "")),
                 list_value(item.get("energyplus_source", [])),
                 list_value(item.get("rust_target", [])),
-                str(item.get("first_case", "")),
+                str(item.get("first_evidence", item.get("first_case", ""))),
                 list_value(item.get("proof_variables", [])),
                 str(item.get("claim_level", "")),
+                str(item.get("support_boundary", "")),
             ]
         )
 
@@ -134,9 +135,10 @@ def algorithm_ledger(repo_root: Path) -> str:
                 "Source map",
                 "EnergyPlus source",
                 "Rust target",
-                "First case",
+                "First evidence",
                 "Proof variables",
                 "Claim level",
+                "Boundary",
             ],
             rows,
         )

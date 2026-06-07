@@ -40,6 +40,8 @@ Current direction:
   metadata for user-facing report generation.
 - v0.29 enriched output variable coverage with strongest-evidence first
   references and support-boundary metadata.
+- v0.30 enriched algorithm coverage with first evidence and support-boundary
+  metadata for the user-facing report.
 
 The long-term targets remain:
 
