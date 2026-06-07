@@ -1,15 +1,14 @@
 id = "weather_fields_001"
 title = "Weather hourly field output requests"
-milestone = "v0.4-time-weather-schedule"
-purpose = "Define the v0.4 weather field evidence surface before tolerance-gated conformance is claimed."
-comparison_class = "smoke"
-conformance_claim = false
+milestone = "v0.22-time-weather-schedule-conformance"
+purpose = "Tolerance-gate the declared Site Outdoor Air Drybulb Temperature hourly series against the EnergyPlus oracle for the weather fixture."
+comparison_class = "conformance"
+conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "The smoke gate compares EPW weather fields against EnergyPlus ESO with an explicit small weather tolerance.",
-  "The blocking v0.4 smoke list is dry-bulb, dew point, relative humidity, barometric pressure, wind speed, and wind direction.",
-  "Radiation EPW fields are parser evidence in v0.4 and require separate ESO report promotion before they become comparison evidence.",
-  "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
+  "The v0.22 conformance claim is limited to dry-bulb temperature.",
+  "Dew point, relative humidity, barometric pressure, wind speed, and wind direction remain diagnostic rows in the same report.",
+  "Radiation EPW fields remain parser evidence and require separate ESO report promotion before they become comparison evidence.",
 ]
 
 [manifest_v2]
@@ -40,7 +39,10 @@ frequency = "hourly"
 class = "weather"
 source = "eso"
 domain = "weather"
-level = "diagnostic"
+level = "conformance"
+abs_tol = 0.00001
+rmse_tol = 0.00001
+rel_tol = 0.000001
 
 [[outputs]]
 key = "Environment"
@@ -87,10 +89,16 @@ source = "eso"
 domain = "weather"
 level = "diagnostic"
 
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.00001
+max_rmse = 0.00001
+max_rel = 0.000001
+
 [report]
 format = "markdown"
-path = ".runtime/conformance/weather_fields_001/compare-report.md"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/weather_fields_001/compare/compare-report.md"
 
 [gate]
-script = "scripts/dev.cmd compare-weather-smoke"
-blocking = false
+script = "scripts/dev.cmd compare-weather-conformance"
+blocking = true

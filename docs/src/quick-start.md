@@ -29,6 +29,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.19-verify
 .\scripts\dev.cmd v0.20-verify
 .\scripts\dev.cmd v0.21-verify
+.\scripts\dev.cmd v0.22-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -54,6 +55,10 @@ artifacts without adding a new numerical conformance claim.
 v0.21 is the source-map and algorithm ledger gate. It validates that algorithm
 ledger entries have EnergyPlus source files, source-map docs, Rust target
 anchors, first-case manifests, proof variables, and claim-appropriate gates.
+
+v0.22 is the declared time/weather/schedule conformance gate. It promotes
+`Schedule Value` and dry-bulb hourly series only, using timestamp-aligned
+EnergyPlus ESO comparisons.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

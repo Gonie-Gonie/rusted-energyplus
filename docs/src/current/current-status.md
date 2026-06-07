@@ -7,17 +7,20 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.21.0. It gates source-map and algorithm
+The current public release line is v0.22.0. It gates declared time, weather,
+and schedule numerical conformance on top of the source-map and algorithm
 ledger validation.
 
-Current numerical conformance is limited to the promoted v0.8 and v0.9 no-mass
-cases and their declared variables:
+Current numerical conformance is limited to promoted cases and their declared
+variables:
 
 - `heat_balance_nomass_001`
 - `surface_temperature_nomass_001`
+- `schedule_constant_001`
+- `weather_fields_001` dry-bulb only
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
-model intake, schedules, geometry, internal gains, node projection, IdealLoads
+model intake, additional weather variables, geometry, internal gains, node projection, IdealLoads
 typed graph work, and plant-loop diagnostic plumbing. Those artifacts are
 useful development evidence, but they are not general compatibility claims.
 The historical v0.1 through v0.15 boundaries are summarized in
@@ -39,13 +42,16 @@ The current public scope includes:
 - source-map and algorithm ledger checks that validate EnergyPlus source
   anchors, Rust target anchors, first cases, proof variables, and blocking
   gates
+- timestamp-aligned conformance reports for declared schedule and dry-bulb
+  hourly series
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
 Not claimed:
 
 - general EnergyPlus heat-balance compatibility
+- general runtime compatibility
 - HVAC compatibility
 - plant compatibility
-- node, IdealLoads, meter, or full runtime conformance
+- node, IdealLoads, meter, or broad weather conformance
 - broad ExampleFiles compatibility

@@ -58,6 +58,8 @@ matplotlib for document layout and charts.
 | `plant-loop-projection-smoke` | smoke | gate the diagnostic Rust plant-state projection addendum | yes | `.runtime/plant-loop-diagnostic/plant-state-projection` |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
+| `compare-schedule-conformance` | compare | run the v0.22 tolerance-gated `Schedule Value` conformance case | yes | `.runtime/time-weather-schedule-conformance` |
+| `compare-weather-conformance` | compare | run the v0.22 tolerance-gated dry-bulb conformance case | yes | `.runtime/time-weather-schedule-conformance` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
 | `compare-surface-geometry-smoke` | compare | compare Rust surface area, azimuth, and tilt with EIO | no | `.runtime/compare-surface-geometry` |
 | `compare-construction-materials-smoke` | compare | compare construction/material thermal inputs with EIO | no | console output |
@@ -98,5 +100,6 @@ matplotlib for document layout and charts.
 | `v0.19-verify` | release | verify v0.19 series reader and compare engine v2 gate | yes | compare-series-v2 smoke, `.runtime/release-evidence` |
 | `v0.20-verify` | release | verify v0.20 conformance report generator and coverage matrix gate | yes | conformance index report, `.runtime/release-evidence` |
 | `v0.21-verify` | release | verify v0.21 source-map and algorithm ledger validation gate | yes | algorithm ledger, generated docs, `.runtime/release-evidence` |
+| `v0.22-verify` | release | verify v0.22 declared time/weather/schedule conformance gates | yes | schedule/weather reports, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

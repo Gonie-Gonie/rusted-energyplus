@@ -4,6 +4,33 @@
 
 No unreleased changes.
 
+## v0.22.0 - 2026-06-07
+
+Time, weather, and schedule conformance expansion.
+
+### Added
+
+- Timestamp-aligned `conformance time-weather-schedule-report` command.
+- Blocking `compare-schedule-conformance` and `compare-weather-conformance`
+  gates.
+- v0.22 release evidence coverage for `Schedule Value` and
+  `Site Outdoor Air Drybulb Temperature`.
+
+### Changed
+
+- `schedule_constant_001` and `weather_fields_001` are promoted to
+  conformance cases for declared variables only.
+- Numeric conformance evidence PDF/HTML/JSON now includes the v0.22 promoted
+  schedule and dry-bulb series.
+- `ep_cli` time/weather/schedule report logic is split into
+  `time_weather_schedule.rs`.
+
+### Boundaries
+
+- v0.22.0 does not claim general runtime compatibility.
+- Weather variables other than dry-bulb remain diagnostic rows in the weather
+  report.
+
 ## v0.21.0 - 2026-06-07
 
 Source map and algorithm ledger release.

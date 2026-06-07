@@ -11,12 +11,24 @@ fn loads_foundation_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
         load_case_file(repo_root().join("data/conformance_cases/schedule_constant_001/case.toml"))?;
 
     assert_eq!(manifest.id, "schedule_constant_001");
-    assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
-    assert!(!manifest.conformance_claim);
+    assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+    assert!(manifest.conformance_claim);
     assert_eq!(manifest.outputs.len(), 1);
     assert_eq!(manifest.outputs[0].key, "ALWAYSON");
     assert_eq!(manifest.outputs[0].variable, "Schedule Value");
     assert_eq!(manifest.outputs[0].source, SourceArtifact::Eso);
+    assert_eq!(manifest.outputs[0].level, Some(OutputLevel::Conformance));
+    assert_eq!(manifest.tolerances.len(), 1);
+    assert_eq!(
+        manifest.tolerances[0].variable_class,
+        VariableClass::Schedule
+    );
+    let gate = manifest
+        .gate
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("schedule conformance should declare a gate"))?;
+    assert_eq!(gate.script, "scripts/dev.cmd compare-schedule-conformance");
+    assert!(gate.blocking);
 
     Ok(())
 }
@@ -268,9 +280,12 @@ fn loads_weather_fields_case_fixture() -> Result<(), Box<dyn std::error::Error>>
         load_case_file(repo_root().join("data/conformance_cases/weather_fields_001/case.toml"))?;
 
     assert_eq!(manifest.id, "weather_fields_001");
-    assert_eq!(manifest.milestone, "v0.4-time-weather-schedule");
-    assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
-    assert!(!manifest.conformance_claim);
+    assert_eq!(
+        manifest.milestone,
+        "v0.22-time-weather-schedule-conformance"
+    );
+    assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+    assert!(manifest.conformance_claim);
     assert_eq!(manifest.outputs.len(), 6);
     assert!(manifest.outputs.iter().all(|output| {
         output.key == "Environment"
@@ -278,12 +293,28 @@ fn loads_weather_fields_case_fixture() -> Result<(), Box<dyn std::error::Error>>
             && output.class == VariableClass::Weather
             && output.source == SourceArtifact::Eso
     }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.variable == "Site Outdoor Air Drybulb Temperature"
+            && output.level == Some(OutputLevel::Conformance)
+    }));
     assert!(
         manifest
             .outputs
             .iter()
-            .any(|output| output.variable == "Site Wind Direction")
+            .any(|output| output.variable == "Site Wind Direction"
+                && output.level == Some(OutputLevel::Diagnostic))
     );
+    assert_eq!(manifest.tolerances.len(), 1);
+    assert_eq!(
+        manifest.tolerances[0].variable_class,
+        VariableClass::Weather
+    );
+    let gate = manifest
+        .gate
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("weather conformance should declare a gate"))?;
+    assert_eq!(gate.script, "scripts/dev.cmd compare-weather-conformance");
+    assert!(gate.blocking);
 
     Ok(())
 }

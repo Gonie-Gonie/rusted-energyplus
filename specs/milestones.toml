@@ -287,9 +287,12 @@ not_claimed = [
 [[milestone]]
 version = "0.22"
 title = "Time, Weather, and Schedule Conformance Expansion"
-status = "planned"
+status = "complete"
 claim_level = "declared-variables-only"
-required_cases = []
+required_cases = [
+  "schedule_constant_001",
+  "weather_fields_001",
+]
 required_variables = [
   "Site Outdoor Air Drybulb Temperature",
   "Schedule Value",

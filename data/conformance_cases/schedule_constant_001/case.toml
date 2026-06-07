@@ -1,13 +1,13 @@
 id = "schedule_constant_001"
 title = "Schedule:Constant hourly output request"
-milestone = "v0.4-time-weather-schedule"
-purpose = "Define the v0.4 Schedule:Constant hourly evidence surface before tolerance-gated conformance is claimed."
-comparison_class = "smoke"
-conformance_claim = false
+milestone = "v0.22-time-weather-schedule-conformance"
+purpose = "Tolerance-gate the declared Schedule Value hourly series against the EnergyPlus oracle for the constant schedule subset."
+comparison_class = "conformance"
+conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "The smoke gate compares Schedule Value with EnergyPlus ESO for the first constant schedule subset.",
-  "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
+  "The v0.22 gate compares Schedule Value with EnergyPlus ESO using timestamp-aligned hourly samples.",
+  "This claim is limited to the declared Schedule Value series for this local fixture.",
 ]
 
 [manifest_v2]
@@ -38,12 +38,19 @@ frequency = "hourly"
 class = "schedule"
 source = "eso"
 domain = "schedule"
-level = "diagnostic"
+level = "conformance"
+abs_tol = 0.000000000001
+rmse_tol = 0.000000000001
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.000000000001
+max_rmse = 0.000000000001
 
 [report]
 format = "markdown"
-path = ".runtime/conformance/schedule_constant_001/compare-report.md"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/schedule_constant_001/compare/compare-report.md"
 
 [gate]
-script = "scripts/dev.cmd compare-schedule-smoke"
-blocking = false
+script = "scripts/dev.cmd compare-schedule-conformance"
+blocking = true

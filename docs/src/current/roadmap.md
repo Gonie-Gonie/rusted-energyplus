@@ -20,8 +20,10 @@ Current direction:
 - v0.19 hardened selected series readers and comparison metrics.
 - v0.20 promoted release conformance index generation and coverage matrices.
 - v0.21 made the algorithm ledger a source-map validation gate.
-- v0.22 should expand time, weather, and schedule conformance only where
-  declared variables and gates exist.
+- v0.22 promoted declared `Schedule Value` and dry-bulb hourly conformance
+  using timestamp-aligned ESO comparisons.
+- v0.23 should expand static model evidence without claiming dynamic
+  heat-balance compatibility unless a declared gate supports it.
 
 The long-term targets remain:
 

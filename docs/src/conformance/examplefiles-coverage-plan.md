@@ -48,6 +48,7 @@ Each selected case must answer:
 | v0.19 | series reader and compare engine v2 | selected ESO series and future meter series | comparison infrastructure only |
 | v0.20 | conformance report generator | all tracked case manifests and requested evidence surfaces | release coverage matrices only |
 | v0.21 | source-map and algorithm ledger | mapped algorithm entries and promoted/diagnostic first cases | planning guard only |
+| v0.22 | time/weather/schedule conformance | `schedule_constant_001`, `weather_fields_001` | declared variables only: `Schedule Value` and dry-bulb |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -130,6 +131,14 @@ Current v0.21 source-map ledger evidence:
 - `docs/src/generated/algorithm-ledger.md`
 - `algorithm-ledger-check`
 - `v0.21-verify`
+
+Current v0.22 declared-variable conformance evidence:
+
+- `data/conformance_cases/schedule_constant_001/case.toml`
+- `data/conformance_cases/weather_fields_001/case.toml`
+- `compare-schedule-conformance`
+- `compare-weather-conformance`
+- `v0.22-verify`
 
 Post-v0.15 plant diagnostic addendum evidence:
 

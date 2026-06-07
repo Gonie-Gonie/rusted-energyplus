@@ -91,8 +91,8 @@ function Invoke-ReportSkeletonCase {
     Assert-FileExists -Path $reportPath -Description "$CaseId report skeleton"
     Assert-FileExists -Path $summaryPath -Description "$CaseId report summary"
     $report = Get-Content -Raw -LiteralPath $reportPath
-    Assert-Contains -Text $report -Pattern "comparison_class: smoke" -Description "$CaseId report class"
-    Assert-Contains -Text $report -Pattern "conformance_claim: false" -Description "$CaseId report claim"
+    Assert-Contains -Text $report -Pattern "comparison_class: conformance" -Description "$CaseId report class"
+    Assert-Contains -Text $report -Pattern "conformance_claim: true" -Description "$CaseId report claim"
     Assert-Contains -Text $report -Pattern $ExpectedVariable -Description "$CaseId report variable"
     Assert-Contains -Text $report -Pattern "energyplus_warnings:" -Description "$CaseId report warning summary"
     Assert-Contains -Text $report -Pattern "| key | variable | frequency | class | source | baseline_samples | first | last | baseline_min | baseline_max | baseline_nonzero_count | status |" -Description "$CaseId report source column"

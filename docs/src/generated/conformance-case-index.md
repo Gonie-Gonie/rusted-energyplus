@@ -14,8 +14,8 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | internal_gains_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface, internal-gain | diagnostic | data/conformance_cases/internal_gains_001/case.toml |
 | official_1zone_uncontrolled_baseline_001 | v0.18-output-injection-baseline | smoke | false | B | weather, zone, internal-gain | baseline | data/conformance_cases/official_1zone_uncontrolled_baseline_001/case.toml |
 | plant_loop_diagnostic_001 | v0.15-plant-loop-diagnostic | diagnostic-only | false | B | plant | baseline | data/conformance_cases/plant_loop_diagnostic_001/case.toml |
-| schedule_constant_001 | v0.4-time-weather-schedule | smoke | false | A | schedule | diagnostic | data/conformance_cases/schedule_constant_001/case.toml |
+| schedule_constant_001 | v0.22-time-weather-schedule-conformance | conformance | true | A | schedule | conformance | data/conformance_cases/schedule_constant_001/case.toml |
 | surface_geometry_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface | diagnostic | data/conformance_cases/surface_geometry_001/case.toml |
 | surface_temperature_nomass_001 | v0.9-surface-temperature | conformance | true | A | zone, surface | conformance | data/conformance_cases/surface_temperature_nomass_001/case.toml |
-| weather_fields_001 | v0.4-time-weather-schedule | smoke | false | A | weather | diagnostic | data/conformance_cases/weather_fields_001/case.toml |
+| weather_fields_001 | v0.22-time-weather-schedule-conformance | conformance | true | A | weather | conformance, diagnostic | data/conformance_cases/weather_fields_001/case.toml |
 | zone_temperature_diagnostic_001 | P2-heat-balance-diagnostics | diagnostic-only | false | B | zone, surface | diagnostic | data/conformance_cases/zone_temperature_diagnostic_001/case.toml |

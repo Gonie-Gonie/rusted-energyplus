@@ -21,9 +21,11 @@ tolerance, and code organization.
 - timestamp-aware selected series reader and compare metrics v2
 - release conformance index and coverage matrix report generation
 - source-map and algorithm ledger validation gate
+- timestamp-aligned time/weather/schedule conformance report gate
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
-- tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
+- tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
+  declared v0.22 `Schedule Value` / dry-bulb hourly variables
 
 Not claimed:
 
@@ -49,8 +51,10 @@ Useful focused checks:
 .\scripts\dev.cmd official-baseline-smoke
 .\scripts\dev.cmd compare-series-v2-smoke
 .\scripts\dev.cmd algorithm-ledger-check
-.\scripts\dev.cmd conformance-index-report -Version 0.21.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.21.0
+.\scripts\dev.cmd compare-schedule-conformance
+.\scripts\dev.cmd compare-weather-conformance
+.\scripts\dev.cmd conformance-index-report -Version 0.22.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.22.0
 ```
 
 ## Documentation

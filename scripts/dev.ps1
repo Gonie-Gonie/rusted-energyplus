@@ -135,6 +135,16 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Compare selected EPW weather fields with the EnergyPlus oracle."
     }
+    "compare-schedule-conformance" = @{
+        Path = "compare\compare-schedule-conformance.ps1"
+        Group = "compare"
+        Help = "Run the v0.22 tolerance-gated schedule conformance case."
+    }
+    "compare-weather-conformance" = @{
+        Path = "compare\compare-weather-conformance.ps1"
+        Group = "compare"
+        Help = "Run the v0.22 tolerance-gated weather dry-bulb conformance case."
+    }
     "compare-geometry-smoke" = @{
         Path = "compare\compare-geometry-smoke.ps1"
         Group = "compare"
@@ -340,6 +350,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.21 source map and algorithm ledger gate."
     }
+    "v0.22-verify" = @{
+        Path = "release\v0.22-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.22 time/weather/schedule conformance gate."
+    }
 }
 
 $Aliases = @{
@@ -366,6 +381,7 @@ $Aliases = @{
     "verify-v0.19" = "v0.19-verify"
     "verify-v0.20" = "v0.20-verify"
     "verify-v0.21" = "v0.21-verify"
+    "verify-v0.22" = "v0.22-verify"
 }
 
 function Show-Commands {

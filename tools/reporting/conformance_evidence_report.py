@@ -33,8 +33,8 @@ from matplotlib.ticker import FuncFormatter
 
 ORACLE_VERSION = "26.1.0"
 CLAIM_BOUNDARY = (
-    "Only declared v0.8/v0.9 no-mass heat-balance numerical conformance "
-    "cases are promoted."
+    "Only declared v0.8/v0.9 no-mass heat-balance and v0.22 time/weather/schedule "
+    "numerical conformance variables are promoted."
 )
 
 
@@ -62,13 +62,27 @@ CASE_SPECS = (
         oracle_end_path=r".runtime\surface-temperature-conformance\26.1.0\surface_temperature_nomass_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\surface-temperature-conformance\26.1.0\surface_temperature_nomass_001\oracle\eplusout.err",
     ),
+    CaseSpec(
+        milestone="v0.22",
+        command="compare-schedule-conformance",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\schedule_constant_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\schedule_constant_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\schedule_constant_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="v0.22",
+        command="compare-weather-conformance",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_fields_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_fields_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_fields_001\oracle\eplusout.err",
+    ),
 )
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build release numerical conformance evidence.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.17.0")
+    parser.add_argument("--version", default="0.22.0")
     parser.add_argument("--skip-gate-run", action="store_true")
     return parser.parse_args()
 
@@ -126,6 +140,61 @@ def tolerance_for_class(summary: dict[str, Any], output_class: str) -> float | N
     return None
 
 
+def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for series in summary.get("series", []):
+        if "output" in series:
+            output = series["output"]
+            tolerance = tolerance_for_class(summary, output["class"])
+            first_delta = series.get("first_delta_sample") or {}
+            max_delta = series.get("max_delta_sample") or {}
+            rows.append(
+                {
+                    "key": output.get("key"),
+                    "variable": output.get("variable"),
+                    "class": output.get("class"),
+                    "frequency": output.get("frequency"),
+                    "source": output.get("source"),
+                    "level": "conformance",
+                    "samples": int(series.get("samples", 0)),
+                    "status": series.get("status"),
+                    "max_abs_delta_c": float(series.get("max_abs_delta_c", 0.0)),
+                    "mean_abs_delta_c": float(series.get("mean_abs_delta_c", 0.0)),
+                    "rmse_delta_c": float(series.get("rmse_delta_c", 0.0)),
+                    "max_rel_delta": float(series.get("max_rel_delta", 0.0)),
+                    "tolerance_max_abs_c": float(tolerance if tolerance is not None else 0.0),
+                    "tolerance_max_rmse_c": float(tolerance if tolerance is not None else 0.0),
+                    "first_delta_index": first_delta.get("index"),
+                    "max_delta_index": max_delta.get("index"),
+                }
+            )
+            continue
+
+        if series.get("level") != "conformance":
+            continue
+        rows.append(
+            {
+                "key": series.get("key"),
+                "variable": series.get("variable"),
+                "class": series.get("class"),
+                "frequency": series.get("frequency"),
+                "source": series.get("source"),
+                "level": series.get("level"),
+                "samples": int(series.get("compared_samples", series.get("observed_samples", 0))),
+                "status": series.get("status"),
+                "max_abs_delta_c": float(series.get("max_abs_delta", 0.0)),
+                "mean_abs_delta_c": 0.0,
+                "rmse_delta_c": float(series.get("rmse_delta", 0.0)),
+                "max_rel_delta": float(series.get("max_rel_delta", 0.0)),
+                "tolerance_max_abs_c": float(series.get("max_abs_tolerance", 0.0)),
+                "tolerance_max_rmse_c": float(series.get("max_rmse_tolerance", 0.0)),
+                "first_delta_index": (series.get("first_divergence") or {}).get("index"),
+                "max_delta_index": None,
+            }
+        )
+    return rows
+
+
 def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> dict[str, Any]:
     gate_elapsed = 0.0 if skip_gate_run else run_dev_command(repo_root, spec.command)
     summary_path = repo_path(repo_root, spec.summary_path)
@@ -138,32 +207,13 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
     if summary.get("status") != "pass":
         raise ValueError(f"Conformance summary did not pass: {summary.get('case_id')}")
 
-    series_reports: list[dict[str, Any]] = []
-    for series in summary.get("series", []):
-        output = series["output"]
-        tolerance = tolerance_for_class(summary, output["class"])
-        first_delta = series.get("first_delta_sample") or {}
-        max_delta = series.get("max_delta_sample") or {}
-        series_reports.append(
-            {
-                "key": output.get("key"),
-                "variable": output.get("variable"),
-                "class": output.get("class"),
-                "frequency": output.get("frequency"),
-                "source": output.get("source"),
-                "samples": int(series.get("samples", 0)),
-                "status": series.get("status"),
-                "max_abs_delta_c": float(series.get("max_abs_delta_c", 0.0)),
-                "mean_abs_delta_c": float(series.get("mean_abs_delta_c", 0.0)),
-                "rmse_delta_c": float(series.get("rmse_delta_c", 0.0)),
-                "max_rel_delta": float(series.get("max_rel_delta", 0.0)),
-                "tolerance_max_abs_c": float(tolerance if tolerance is not None else 0.0),
-                "first_delta_index": first_delta.get("index"),
-                "max_delta_index": max_delta.get("index"),
-            }
-        )
+    series_reports = promoted_series(summary)
+    if not series_reports:
+        raise ValueError(f"Conformance summary has no promoted conformance series: {summary_path}")
 
     err = error_summary(repo_path(repo_root, spec.oracle_err_path))
+    max_abs_delta = max((series["max_abs_delta_c"] for series in series_reports), default=0.0)
+    rmse_delta = max((series["rmse_delta_c"] for series in series_reports), default=0.0)
     return {
         "milestone": spec.milestone,
         "case_id": summary.get("case_id"),
@@ -171,16 +221,19 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
         "comparison_class": summary.get("comparison_class"),
         "conformance_claim": bool(summary.get("conformance_claim")),
         "status": summary.get("status"),
-        "runtime_class": summary.get("runtime_class"),
+        "runtime_class": summary.get("runtime_class") or "time-weather-schedule",
         "tolerance_policy_label": summary.get("tolerance_policy_label"),
-        "samples": int(summary.get("samples", 0)),
+        "samples": int(summary.get("samples", summary.get("time_axis_samples", 0))),
         "heat_balance_timesteps": int(summary.get("heat_balance_timesteps", 0)),
         "zone_count": int(summary.get("zone_count", 0)),
         "surface_count": int(summary.get("surface_count", 0)),
-        "series_count": int(summary.get("series_count", 0)),
-        "max_abs_delta_c": float(summary.get("max_abs_delta_c", 0.0)),
-        "rmse_delta_c": float(summary.get("rmse_delta_c", 0.0)),
-        "max_rel_delta": float(summary.get("max_rel_delta", 0.0)),
+        "series_count": len(series_reports),
+        "reported_series_count": int(summary.get("series_count", len(series_reports))),
+        "max_abs_delta_c": float(summary.get("max_abs_delta_c", max_abs_delta)),
+        "rmse_delta_c": float(summary.get("rmse_delta_c", rmse_delta)),
+        "max_rel_delta": float(
+            summary.get("max_rel_delta", max((series["max_rel_delta"] for series in series_reports), default=0.0))
+        ),
         "gate_elapsed_seconds": gate_elapsed,
         "energyplus_elapsed_seconds": elapsed_seconds(repo_path(repo_root, spec.oracle_end_path)),
         "energyplus_warnings": err["warnings"],
@@ -315,9 +368,9 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     accuracy = build_dual_bar_figure(
         "Accuracy Against Declared Tolerance",
         accuracy_rows,
-        "Declared tolerance C",
-        "Observed max abs delta C",
-        "Temperature delta (C)",
+        "Declared tolerance",
+        "Observed max abs delta",
+        "Numeric delta",
         "#c9d8e8",
         "#1f7a5a",
     )
@@ -376,8 +429,8 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
             "Series",
             "Samples",
             "Rust timesteps",
-            "Max abs C",
-            "RMSE C",
+            "Max abs",
+            "RMSE",
             "Gate wall",
             "E+ elapsed",
         ],
@@ -405,7 +458,7 @@ def build_accuracy_values(evidence: dict[str, Any]) -> Table:
             )
             series_index += 1
     return table(
-        ["ID", "Milestone", "Case", "Key", "Variable", "Observed max abs C", "Tolerance C", "Utilization"],
+        ["ID", "Milestone", "Case", "Key", "Variable", "Observed max abs", "Tolerance", "Utilization"],
         rows,
         "Accuracy values backing the chart.",
     )
@@ -462,9 +515,9 @@ def build_series_detail(evidence: dict[str, Any]) -> Table:
             "Variable",
             "Class",
             "Samples",
-            "Max abs C",
-            "RMSE C",
-            "Max abs tolerance C",
+            "Max abs",
+            "RMSE",
+            "Max abs tolerance",
             "Status",
         ],
         rows,
@@ -477,8 +530,8 @@ def build_metric_table(evidence: dict[str, Any]) -> Table:
     rows = [
         ["Cases", aggregate["case_count"]],
         ["Series", aggregate["series_count"]],
-        ["Max abs delta C", number_label(aggregate["max_abs_delta_c"], 12)],
-        ["Max RMSE C", number_label(aggregate["rmse_delta_c"], 12)],
+        ["Max abs delta", number_label(aggregate["max_abs_delta_c"], 12)],
+        ["Max RMSE", number_label(aggregate["rmse_delta_c"], 12)],
         ["Gate status", aggregate["status"]],
     ]
     return table(["Metric", "Value"], rows, "Release evidence summary metrics.")

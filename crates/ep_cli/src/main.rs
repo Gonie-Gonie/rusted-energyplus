@@ -1,6 +1,7 @@
 //! Command line entry point for eplus-rs.
 
 mod conformance_artifacts;
+mod time_weather_schedule;
 
 use conformance_artifacts::{
     BaselineSummary, generate_conformance_baseline, generate_conformance_baseline_in_dir,
@@ -34,12 +35,14 @@ use ep_runtime::{
 };
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
+use time_weather_schedule::generate_time_weather_schedule_report;
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
     "usage: eplus-rs conformance diagnostic-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_HEAT_BALANCE_REPORT_USAGE: &str =
     "usage: eplus-rs conformance heat-balance-report <case.toml> <oracle-root> <output-root>";
+const CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE: &str = "usage: eplus-rs conformance time-weather-schedule-report <case.toml> <oracle-root> <output-root>";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -226,6 +229,7 @@ fn print_help() {
     println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
     println!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
     println!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+    println!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -389,6 +393,9 @@ fn run_conformance_command(args: &[String]) -> i32 {
         Some("report-skeleton") => run_conformance_report_skeleton(&args[1..]),
         Some("diagnostic-report") => run_conformance_diagnostic_report(&args[1..]),
         Some("heat-balance-report") => run_conformance_heat_balance_report(&args[1..]),
+        Some("time-weather-schedule-report") => {
+            run_conformance_time_weather_schedule_report(&args[1..])
+        }
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
@@ -401,6 +408,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             );
             eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             2
         }
         None => {
@@ -415,6 +423,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             );
             eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             2
         }
     }
@@ -688,6 +697,64 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             println!("  compare_summary: {}", summary.compare_summary.display());
             println!("  samples: {}", summary.samples);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
+            println!("  status: {}", summary.status);
+            if summary.status == "pass" { 0 } else { 1 }
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
+fn run_conformance_time_weather_schedule_report(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_time_weather_schedule_report(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("Time, Weather, and Schedule Conformance Report");
+            print_conformance_case_summary(&manifest);
+            println!("  baseline_dir: {}", summary.baseline.output_dir.display());
+            println!("  report_dir: {}", summary.report_dir.display());
+            println!("  compare_report: {}", summary.compare_report.display());
+            println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  series: {}", summary.series_count);
+            println!("  conformance_series: {}", summary.conformance_series_count);
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
