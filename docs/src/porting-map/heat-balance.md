@@ -135,9 +135,9 @@ Recommended Rust module split:
 | `ep_runtime::zone_air` | zone air predictor/corrector subset |
 | `ep_compare` | EIO/ESO parsers and tolerance summaries |
 
-These modules can begin inside `crates/ep_runtime/src/lib.rs` only if the code
-stays small. Split once the implementation needs multiple state structs or
-source-reference comments.
+These modules can begin inside `crates/ep_runtime/src/runtime.rs` only if the
+code stays small. Split once the implementation needs multiple state structs
+or source-reference comments.
 
 ## Porting Order
 
