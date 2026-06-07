@@ -50,8 +50,22 @@ separate in docs, scripts, and release language.
 | v0.13 | Plant loop skeleton release | typed graph smoke only; no plant numerical conformance |
 | v0.14 | Plant source mapping release | planning guard before plant diagnostics or numerical conformance |
 | v0.15 | Plant loop diagnostic release | oracle baseline and report skeleton only; no plant numerical conformance |
-| v0.16 | Plant state projection release | Rust projection artifact only; `algorithm_parity: false`; no plant numerical conformance |
-| v1.0 | Declared compatibility subset release | locked supported subset only |
+| v0.16 | Versioning and evidence cleanup release | planning/documentation gate; no new numerical conformance |
+| v0.17 | Case manifest and output request schema v2 | infrastructure only |
+| v0.18 | Output request injection and oracle baseline pipeline | baseline-only |
+| v0.19 | Series reader and compare engine v2 | comparison infrastructure |
+| v0.20 | Conformance report generator | reporting infrastructure |
+| v0.21 | Source map and algorithm ledger v1 | planning guard |
+| v0.22-v0.59 | Road to v1.0 numerical conformance expansion and stabilization | declared cases and variables only |
+| v0.80-v0.99 | v1.0 release candidates and freeze | v1 candidate claims only |
+| v1.0 | Substantial compatibility draft | locked supported subset only |
+| v2.0 | EnergyPlus 26.1 full compatibility target | compatibility mode only, with evidence |
+| v3.0 | fast modernized successor target | mode-specific claims only |
+
+The Rust plant-state projection artifacts added after v0.15 are retained as an
+additional diagnostic addendum. They are useful runtime plumbing, but they are
+not the official meaning of v0.16 and do not create plant numerical
+conformance.
 
 ## Retroactive Audit Rules
 
@@ -208,15 +222,22 @@ pump electricity, district heating rate, and load-profile heat transfer, but it
 does not provide Rust plant result artifacts, tolerances, or plant numerical
 conformance.
 
-v0.16 decision: `run plant-state-projection` writes Rust `ResultStore`
-projection artifacts for the v0.15 fixture, but keeps `algorithm_parity:
-false`, `conformance_claim: false`, and `tolerance_policy: none`. This is
-artifact plumbing for future plant work, not plant algorithm parity.
+v0.16 decision: v0.16 is Versioning and Evidence Cleanup. It adds the
+canonical versioning reset, legacy milestone interpretation, v1/v2/v3 target
+scope documents, and first Road to v1.0 plan entries. The already-added
+`run plant-state-projection` work remains an additional diagnostic addendum for
+the v0.15 fixture, with `algorithm_parity: false`, `conformance_claim: false`,
+and `tolerance_policy: none`. This is artifact plumbing for future plant work,
+not plant algorithm parity.
 
 ## Immediate Work Order
 
-1. Keep this reset plan linked from the mdBook.
-2. Split README quick start into public release, developer diagnostics, and conformance infrastructure.
-3. Keep v0.2 and v0.3 scope separate from v0.4/v0.5 evidence.
-4. Add verify scripts for each active milestone before calling it ready.
-5. Move heat-balance conformance attempts to v0.8 or later.
+1. Keep `versioning-reset-v2.md`, `legacy-milestones.md`, and this reset plan
+   linked from the mdBook.
+2. Keep README split into public release, developer diagnostics, and
+   conformance infrastructure.
+3. Keep v0.1-v0.15 language historical and evidence-level based.
+4. Use v0.17 for manifest/output schema v2 rather than adding more cases on
+   the old manifest contract.
+5. Use v0.18 for official-file output injection and oracle baseline pipeline.
+6. Add verify scripts for each active milestone before calling it ready.

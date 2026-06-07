@@ -9,7 +9,12 @@
 - [Non-goals](project-scope/non-goals.md)
 - [Terminology](project-scope/terminology.md)
 - [Evidence Levels](project-scope/evidence-levels.md)
+- [Versioning Reset v2](project-scope/versioning-reset-v2.md)
 - [Milestone Map](project-scope/milestone-map.md)
+- [Legacy Milestones](project-scope/legacy-milestones.md)
+- [v1 Scope](project-scope/v1-scope.md)
+- [v2 Full Compatibility](project-scope/v2-full-compatibility.md)
+- [v3 Fast Successor](project-scope/v3-fast-successor.md)
 
 # User Guide
 
@@ -109,6 +114,8 @@
 - [v0.15.0 Readiness](operations/v0.15.0-readiness.md)
 - [v0.16.0 Plan](operations/v0.16.0-plan.md)
 - [v0.16.0 Readiness](operations/v0.16.0-readiness.md)
+- [v0.17.0 Plan](operations/v0.17.0-plan.md)
+- [v0.18.0 Plan](operations/v0.18.0-plan.md)
 
 # Archive
 

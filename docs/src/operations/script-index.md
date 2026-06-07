@@ -52,7 +52,7 @@ matplotlib for document layout and charts.
 | `air-side-node-diagnostic-smoke` | smoke | gate the v0.11 air-side node baseline evidence and diagnostic Rust projection | yes | `.runtime/air-side-node-diagnostic` |
 | `plant-loop-skeleton-smoke` | smoke | gate the v0.13 PlantLoop typed graph skeleton fixture | yes | console output |
 | `plant-loop-diagnostic-smoke` | smoke | gate the v0.15 PlantLoadProfile baseline-only plant diagnostic | yes | `.runtime/plant-loop-diagnostic` |
-| `plant-loop-projection-smoke` | smoke | gate the v0.16 Rust plant-state diagnostic projection | yes | `.runtime/plant-loop-diagnostic/plant-state-projection` |
+| `plant-loop-projection-smoke` | smoke | gate the diagnostic Rust plant-state projection addendum | yes | `.runtime/plant-loop-diagnostic/plant-state-projection` |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
@@ -86,6 +86,6 @@ matplotlib for document layout and charts.
 | `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and numeric evidence packaging | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
 | `v0.14-verify` | release | verify v0.14 plant source mapping and numeric evidence packaging | yes | plant source-map docs, `.runtime/release-evidence` |
 | `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and numeric evidence packaging | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
-| `v0.16-verify` | release | verify v0.16 plant-state projection and numeric evidence packaging | yes | plant projection artifacts, `.runtime/release-evidence` |
+| `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and numeric evidence packaging | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

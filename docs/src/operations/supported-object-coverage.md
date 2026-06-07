@@ -42,9 +42,9 @@ Current table:
 | ZoneHVAC:EquipmentList | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 equipment list resolves IdealLoads equipment entries and validates sequence integrity before v0.11 |
 | ZoneHVAC:EquipmentConnections | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone equipment connection resolves zone and equipment list; duplicate zone connections are rejected; v0.11 records zone air-node diagnostic outputs and NodeStateStore projection |
 | ZoneHVAC:IdealLoadsAirSystem | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`, with nonzero baseline signal and range diagnostics; not an IdealLoads load-conformance claim |
-| PlantLoop | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke, v0.15 baseline-only plant output rows, and v0.16 Rust projection artifacts; no plant loop algorithm parity |
-| Branch | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke; component nodes register, and v0.16 projection uses branch component order for artifact shape only |
-| BranchList | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke; branch members resolve and feed v0.16 projection order |
+| PlantLoop | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke, v0.15 baseline-only plant output rows, and post-v0.15 Rust projection addendum artifacts; no plant loop algorithm parity |
+| Branch | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke; component nodes register, and the projection addendum uses branch component order for artifact shape only |
+| BranchList | yes | partial | yes | yes | yes | partial | projection-only | diagnostic-only | v0.13 typed graph smoke; branch members resolve and feed the projection addendum order |
 | Connector:Splitter | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; inlet/outlet branch references resolve |
 | Connector:Mixer | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; inlet/outlet branch references resolve |
 | ConnectorList | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; connector entries resolve |

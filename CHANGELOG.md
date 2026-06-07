@@ -2,21 +2,27 @@
 
 ## v0.16.0 - 2026-06-07
 
-Plant-state diagnostic projection release.
+Versioning and evidence cleanup release.
 
 ### Added
 
+- `versioning-reset-v2.md` canonical roadmap reset.
+- `legacy-milestones.md` classification of v0.1 through v0.15 as the
+  Historical Pre-Alpha Evidence Series.
+- rewritten milestone map around Road to v1.0 and v1/v2/v3 target boundaries.
+- v1, v2, and v3 scope documents.
+- v0.17 and v0.18 plan seeds for manifest v2, output request schema, output
+  injection, and oracle baseline pipeline.
 - `run plant-state-projection` diagnostic command for the v0.15
-  PlantLoadProfile fixture.
-- `PlantStateProjectionEvidencePolicy` with source-map, timestamp, warmup, and
-  sizing-period policy fields.
-- `plant-loop-projection-smoke` gate for Rust plant projection artifacts.
-- v0.16 plan, readiness, release notes, verification gate, and package checks.
+  PlantLoadProfile fixture as an additional addendum.
+- `plant-loop-projection-smoke` gate for the diagnostic plant projection
+  artifact.
 
 ### Notes
 
-- v0.16.0 is a diagnostic projection release, not a plant numerical
-  conformance claim.
+- v0.16.0 is a versioning/evidence cleanup release, not a new numerical
+  conformance release.
+- The plant projection addendum is not the defining purpose of v0.16.
 - Projected plant rows keep `algorithm_parity: false`,
   `conformance_claim: false`, and `tolerance_policy: none`.
 - Tolerance-gated conformance remains limited to the declared v0.8 and v0.9

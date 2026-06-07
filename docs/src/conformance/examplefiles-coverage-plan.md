@@ -42,7 +42,9 @@ Each selected case must answer:
 | v0.13 | Tier B plant foundation | `plant-loop-skeleton.epJSON` typed graph smoke first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant graph intake only; no plant numerical conformance |
 | v0.14 | Tier B plant source mapping | v0.13 plant fixture and EnergyPlus plant source paths | plant source-function map only; no plant numerical conformance |
 | v0.15 | Tier B plant diagnostic | `plant_loop_diagnostic_001` PlantLoadProfile baseline first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant oracle baseline and report skeleton only; no plant numerical conformance |
-| v0.16 | Tier B plant diagnostic projection | Rust projection artifacts for `plant_loop_diagnostic_001` before plant algorithms are ported | projection artifact shape only; `algorithm_parity: false`; no plant numerical conformance |
+| v0.16 | roadmap cleanup | legacy evidence reclassification and Road to v1.0 plan reset; plant projection remains an addendum | planning/documentation gate; no new numerical conformance |
+| v0.17 | manifest schema | Case Manifest and Output Request Schema v2 | infrastructure only |
+| v0.18 | output injection and oracle baseline | official IDF output request patching and selected oracle artifacts | baseline-only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -94,12 +96,12 @@ Current v0.15 plant diagnostic evidence:
 - `plant-loop-diagnostic-smoke`
 - `v0.15-verify`
 
-Current v0.16 plant diagnostic evidence:
+Post-v0.15 plant diagnostic addendum evidence:
 
 - `run plant-state-projection`
 - `plant-state-summary.md` and `plant-state-summary.json`
 - `plant-loop-projection-smoke`
-- `v0.16-verify`
+- `v0.16-verify` packaging and guard checks
 
 Planned fields:
 
@@ -129,7 +131,7 @@ baseline-only, or diagnostic-only.
 
 ## Immediate Backlog
 
-- define an output request file schema or extend `case.toml`
+- define Case Manifest and Output Request Schema v2
 - design `conformance patch-outputs`
 - generate selected output CSV files from oracle artifacts
 - generate a release-level conformance index

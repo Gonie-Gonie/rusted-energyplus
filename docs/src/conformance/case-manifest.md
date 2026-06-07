@@ -10,6 +10,11 @@ last_reviewed: 2026-06-07
 Every conformance case needs a manifest. Diagnostic-only cases also need to say
 that they do not make a claim.
 
+v0.17 will replace this minimal manifest contract with Case Manifest v2. The
+v2 schema must make case tier, source kind, output requests, tolerance policy,
+waivers, and release/CI gate policy explicit before more ExampleFiles are
+promoted.
+
 Example:
 
 ```toml
@@ -40,3 +45,37 @@ Diagnostic-only cases must use:
 comparison_class = "diagnostic-only"
 conformance_claim = false
 ```
+
+## Planned Manifest v2 Fields
+
+The planned v2 contract is:
+
+```toml
+[case]
+id = "tf_1zone_uncontrolled_001"
+source_kind = "energyplus-testfile"
+source_file = "1ZoneUncontrolled.idf"
+oracle_version = "26.1.0"
+weather = "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
+tier = "A"
+comparison_class = "conformance"
+conformance_claim = true
+
+[scope]
+domains = ["weather", "schedule", "zone", "surface", "meter"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+
+[gate]
+ci_gate = true
+release_gate = true
+manual_review_required = false
+```
+
+The v2 validator must reject `conformance_claim = true` unless variables or
+meters, tolerances, report artifacts, and a blocking gate are all present.

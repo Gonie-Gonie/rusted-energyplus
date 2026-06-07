@@ -41,7 +41,7 @@ Related policy documents:
 | fenestration/radiation | simple window and shading cases | v0.9 |
 | IdealLoads | thermostat and IdealLoads typed graph, then load diagnostics | v0.10 |
 | air-side HVAC | selected fan/coil/PTAC cases | v0.11 |
-| plant | typed graph skeleton, source-map guard, selected plant-loop diagnostics, then Rust projection artifacts | v0.13/v0.14/v0.15/v0.16 |
+| plant | typed graph skeleton, source-map guard, selected plant-loop diagnostics, then diagnostic Rust projection addendum artifacts | v0.13/v0.14/v0.15 plus post-v0.15 addendum |
 
 Each tier must declare its variables and meters before it supports a claim.
 Running an EnergyPlus example, producing finite samples, or matching sample

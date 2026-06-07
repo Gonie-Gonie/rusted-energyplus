@@ -35,8 +35,9 @@ EnergyPlus 26.1.0 oracle:
 - smoke-level PlantLoop typed graph skeleton evidence
 - planning-guard plant source map for future plant diagnostics
 - diagnostic-only PlantLoadProfile plant-loop oracle baseline evidence
-- diagnostic-only Rust plant-state projection artifacts with
+- additional diagnostic-only Rust plant-state projection artifacts with
   `algorithm_parity: false`
+- versioning/evidence cleanup docs for Road to v1.0 and v1/v2/v3 targets
 
 This public scope does not claim:
 
@@ -105,22 +106,16 @@ Current development evidence checks:
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
-their declared variables. v0.10 is a baseline-only typed-graph gate for
-thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
-baseline evidence plus `NodeStateStore`-backed Rust projection plumbing, with
-no node numerical conformance claim. v0.12 is a node source-mapping and
-evidence-policy release; it also packages the promoted v0.8/v0.9 numerical
-evidence as PDF/HTML/JSON under `evidence/v0.12.0`. v0.13 is a PlantLoop
-typed graph skeleton smoke gate and still makes no plant numerical conformance
-claim; it packages the same promoted numerical evidence set under
-`evidence/v0.13.0`. v0.14 is a PlantLoop source-mapping planning guard and
-still makes no plant numerical conformance claim; it packages the same
-promoted numerical evidence set under `evidence/v0.14.0`. v0.15 adds the
-first PlantLoadProfile plant-loop diagnostic oracle baseline and still makes
-no plant numerical conformance claim; it packages the promoted numerical
-evidence set under `evidence/v0.15.0`. v0.16 adds Rust-side plant-state
-projection artifacts for the same fixture, keeps `algorithm_parity: false`,
-and packages the promoted numerical evidence set under `evidence/v0.16.0`.
+their declared variables. v0.10 through v0.15 are Historical Pre-Alpha Evidence
+Series milestones: typed graph, baseline-only, diagnostic-only, source-map, and
+smoke evidence that must not be read as IdealLoads, node, HVAC, or plant
+implementation completion. The Rust-side plant-state projection artifacts added
+after v0.15 are retained as additional diagnostic plumbing with
+`algorithm_parity: false`.
+
+v0.16 is the Versioning and Evidence Cleanup milestone. It reclassifies the
+historical evidence series, records the Road to v1.0, and packages the promoted
+v0.8/v0.9 numerical evidence set under `evidence/v0.16.0`.
 
 Developer-only diagnostics:
 
@@ -143,7 +138,10 @@ Start here:
 
 - `docs/src/project-scope/compatibility-contract.md`
 - `docs/src/project-scope/evidence-levels.md`
+- `docs/src/project-scope/versioning-reset-v2.md`
 - `docs/src/project-scope/milestone-map.md`
+- `docs/src/project-scope/legacy-milestones.md`
+- `docs/src/project-scope/v1-scope.md`
 - `docs/src/operations/milestone-reset-plan.md`
 - `docs/src/architecture/performance-stability-core-porting-philosophy.md`
 - `docs/src/conformance/overview.md`

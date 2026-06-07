@@ -67,7 +67,7 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Writing v0.16 Rust plant-state projection."
+Write-Host "Writing diagnostic Rust plant-state projection addendum."
 $projectionOutput = & $cargo.Source run -p ep_cli --quiet -- run plant-state-projection $EpJsonPath $ProjectionRoot 2>&1
 if ($LASTEXITCODE -ne 0) {
     $projectionOutput | ForEach-Object { Write-Host $_ }
@@ -88,8 +88,8 @@ Assert-Contains -Text $projectionText -Pattern "status: projected" -Description 
 
 $ProjectionMarkdown = Join-Path $ProjectionRoot "plant-state-summary.md"
 $ProjectionSummary = Join-Path $ProjectionRoot "plant-state-summary.json"
-Assert-FileExists -Path $ProjectionMarkdown -Description "v0.16 Rust plant-state markdown summary"
-Assert-FileExists -Path $ProjectionSummary -Description "v0.16 Rust plant-state JSON summary"
+Assert-FileExists -Path $ProjectionMarkdown -Description "Rust plant-state addendum markdown summary"
+Assert-FileExists -Path $ProjectionSummary -Description "Rust plant-state addendum JSON summary"
 
 $projectionMarkdownText = Get-Content -LiteralPath $ProjectionMarkdown -Raw
 Assert-Contains -Text $projectionMarkdownText -Pattern "comparison_class: diagnostic-only" -Description "projection markdown diagnostic class"
@@ -107,31 +107,31 @@ Assert-Contains -Text $projectionMarkdownText -Pattern "Plant Load Profile Heat 
 
 $projection = Get-Content -LiteralPath $ProjectionSummary -Raw | ConvertFrom-Json
 if ($projection.comparison_class -ne "diagnostic-only") {
-    throw "Unexpected v0.16 projection comparison_class: $($projection.comparison_class)"
+    throw "Unexpected projection addendum comparison_class: $($projection.comparison_class)"
 }
 if ($projection.conformance_claim -ne $false) {
-    throw "v0.16 plant projection must keep conformance_claim=false"
+    throw "plant projection addendum must keep conformance_claim=false"
 }
 if ($projection.algorithm_parity -ne $false) {
-    throw "v0.16 plant projection must keep algorithm_parity=false"
+    throw "plant projection addendum must keep algorithm_parity=false"
 }
 if ($projection.tolerance_policy -ne "none") {
-    throw "v0.16 plant projection must keep tolerance_policy=none"
+    throw "plant projection addendum must keep tolerance_policy=none"
 }
 if ($projection.status -ne "projected") {
-    throw "Unexpected v0.16 projection status: $($projection.status)"
+    throw "Unexpected projection addendum status: $($projection.status)"
 }
 if ([int]$projection.loops -ne 1) {
-    throw "Unexpected v0.16 projection loop count: $($projection.loops)"
+    throw "Unexpected projection addendum loop count: $($projection.loops)"
 }
 if ([int]$projection.equipment -ne 3) {
-    throw "Unexpected v0.16 projection equipment count: $($projection.equipment)"
+    throw "Unexpected projection addendum equipment count: $($projection.equipment)"
 }
 if ([int]$projection.samples -ne 48) {
-    throw "Unexpected v0.16 projection sample count: $($projection.samples)"
+    throw "Unexpected projection addendum sample count: $($projection.samples)"
 }
 if ([int]$projection.series -ne 8) {
-    throw "Unexpected v0.16 projection series count: $($projection.series)"
+    throw "Unexpected projection addendum series count: $($projection.series)"
 }
 if ($projection.evidence_policy.source_map -ne "docs/src/porting-map/plant-source-map.md") {
     throw "Unexpected plant projection source map: $($projection.evidence_policy.source_map)"
@@ -146,13 +146,13 @@ if (-not $projection.evidence_policy.sizing_rule.StartsWith("PlantLoop sizing-pe
     throw "Unexpected plant projection sizing rule: $($projection.evidence_policy.sizing_rule)"
 }
 if ($projection.loop_order.Count -ne 1) {
-    throw "Unexpected v0.16 projection loop order count: $($projection.loop_order.Count)"
+    throw "Unexpected projection addendum loop order count: $($projection.loop_order.Count)"
 }
 if ($projection.equipment_order.Count -ne 3) {
-    throw "Unexpected v0.16 projection equipment order count: $($projection.equipment_order.Count)"
+    throw "Unexpected projection addendum equipment order count: $($projection.equipment_order.Count)"
 }
 if ($projection.result_series.Count -ne 8) {
-    throw "Unexpected v0.16 projection result series count: $($projection.result_series.Count)"
+    throw "Unexpected projection addendum result series count: $($projection.result_series.Count)"
 }
 
 foreach ($spec in @(
@@ -172,7 +172,7 @@ foreach ($spec in @(
         $_.key -eq $key -and $_.variable -eq $variable -and $_.class -eq $class
     }
     if (-not $row) {
-        throw "Missing v0.16 Rust projection row for $key / $variable / $class"
+        throw "Missing Rust projection addendum row for $key / $variable / $class"
     }
     if ([int]$row.samples -ne 48) {
         throw "Unexpected Rust projection sample count for $key / $variable`: $($row.samples)"

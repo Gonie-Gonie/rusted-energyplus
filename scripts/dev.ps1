@@ -108,7 +108,7 @@ $Commands = [ordered]@{
     "plant-loop-projection-smoke" = @{
         Path = "smoke\plant-loop-projection-smoke.ps1"
         Group = "smoke"
-        Help = "Gate the v0.16 Rust plant-state diagnostic projection."
+        Help = "Gate the diagnostic Rust plant-state projection addendum."
     }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
@@ -278,7 +278,7 @@ $Commands = [ordered]@{
     "v0.16-verify" = @{
         Path = "release\v0.16-verify.ps1"
         Group = "release"
-        Help = "Verify the v0.16 plant-state projection gate."
+        Help = "Verify v0.16 versioning/evidence cleanup and diagnostic addendum gates."
     }
 }
 

@@ -701,7 +701,7 @@ pub struct PlantStateProjectionEvidencePolicy {
 }
 
 impl PlantStateProjectionEvidencePolicy {
-    /// Returns the diagnostic-only v0.16 plant-state evidence policy.
+    /// Returns the diagnostic-only plant-state evidence policy.
     #[must_use]
     pub const fn diagnostic() -> Self {
         Self {

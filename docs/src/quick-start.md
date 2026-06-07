@@ -26,6 +26,11 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.16-verify
 ```
 
+v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
+post-v0.15 plant-state projection as diagnostic-only addendum evidence, but it
+does not add plant, HVAC, node, meter, sizing, autosizing, or ExampleFiles
+numerical conformance.
+
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not
 create conformance evidence.

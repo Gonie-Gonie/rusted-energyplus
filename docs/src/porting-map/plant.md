@@ -84,10 +84,11 @@ load-profile heat transfer. It does not provide Rust plant result artifacts,
 plant solver parity, pump electricity parity, equipment load parity, plant
 node-state parity, or plant meter parity.
 
-## v0.16 Plant State Projection
+## Plant State Projection Addendum
 
-The v0.16 diagnostic gate adds a Rust-side projection for the same
-`plant_loop_diagnostic_001` fixture:
+The post-v0.15 diagnostic addendum adds a Rust-side projection for the same
+`plant_loop_diagnostic_001` fixture. This addendum is kept in the v0.16 release
+gate, but v0.16 itself is the versioning and evidence cleanup milestone:
 
 ```powershell
 .\scripts\dev.cmd plant-loop-projection-smoke
@@ -145,7 +146,7 @@ Current non-claims:
 - no plant ExampleFiles compatibility
 - v0.15 plant diagnostic rows are EnergyPlus oracle baseline-only evidence,
   not Rust plant numerical conformance
-- v0.16 plant projection rows are Rust diagnostic artifact plumbing with
+- post-v0.15 plant projection rows are Rust diagnostic artifact plumbing with
   `algorithm_parity: false`, not plant numerical conformance
 
 ## Promotion Requirements
