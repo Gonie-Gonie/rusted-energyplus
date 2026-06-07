@@ -495,6 +495,12 @@ pub struct SurfaceHeatBalanceState {
     pub surface_type: SurfaceType,
     /// Outside boundary condition.
     pub outside_boundary_condition: OutsideBoundaryCondition,
+    /// Optional outside boundary object name.
+    pub outside_boundary_condition_object_name: Option<String>,
+    /// Resolved adjacent surface for interzone surface boundaries.
+    pub outside_boundary_target_surface_id: Option<SurfaceId>,
+    /// Resolved adjacent zone for interzone surface, zone, or space boundaries.
+    pub outside_boundary_target_zone_id: Option<ZoneId>,
     /// Resolved construction ID.
     pub construction_id: ConstructionId,
     /// EnergyPlus-normalized construction name.
@@ -1030,6 +1036,20 @@ pub enum RuntimeError {
         /// Material name.
         material_name: String,
     },
+    /// A surface boundary references a target surface that is not available.
+    MissingSurfaceBoundaryTarget {
+        /// Surface name.
+        surface_name: String,
+        /// Referenced target name.
+        target_name: String,
+    },
+    /// A surface boundary references a target zone or space that is not available.
+    MissingZoneBoundaryTarget {
+        /// Surface name.
+        surface_name: String,
+        /// Referenced target name.
+        target_name: String,
+    },
 }
 
 impl Display for RuntimeError {
@@ -1070,6 +1090,20 @@ impl Display for RuntimeError {
             Self::MissingThermalResistance { material_name } => write!(
                 formatter,
                 "material {material_name} has no positive thermal resistance"
+            ),
+            Self::MissingSurfaceBoundaryTarget {
+                surface_name,
+                target_name,
+            } => write!(
+                formatter,
+                "surface {surface_name} references missing outside boundary surface {target_name}"
+            ),
+            Self::MissingZoneBoundaryTarget {
+                surface_name,
+                target_name,
+            } => write!(
+                formatter,
+                "surface {surface_name} references missing outside boundary zone {target_name}"
             ),
         }
     }
@@ -1827,6 +1861,7 @@ pub fn initialize_heat_balance_state(
         .map(|surface| {
             let area_m2 = surface_area_m2(&surface.vertices);
             let thermal = surface_thermal_properties(&model.typed, surface)?;
+            let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
 
             Ok(SurfaceHeatBalanceState {
                 surface_id: surface.id,
@@ -1834,6 +1869,12 @@ pub fn initialize_heat_balance_state(
                 surface_name: surface.name.0.clone(),
                 surface_type: surface.surface_type,
                 outside_boundary_condition: surface.outside_boundary_condition,
+                outside_boundary_condition_object_name: surface
+                    .outside_boundary_condition_object
+                    .as_ref()
+                    .map(|name| name.0.clone()),
+                outside_boundary_target_surface_id: boundary.surface_id,
+                outside_boundary_target_zone_id: boundary.zone_id,
                 construction_id: thermal.construction_id,
                 construction_name: thermal.construction_name,
                 outside_layer_material_id: thermal.outside_layer_material_id,
@@ -1890,9 +1931,12 @@ pub fn advance_heat_balance_state_one_timestep(
             .unwrap_or(surface.inside_face_temperature_c);
 
         surface.inside_face_temperature_c = zone_temperature_c;
-        if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
-            surface.outside_face_temperature_c = input.outdoor_dry_bulb_c;
-        }
+        surface.outside_face_temperature_c = surface_boundary_temperature_c(
+            surface,
+            &previous_zone_temperatures,
+            input.outdoor_dry_bulb_c,
+            zone_temperature_c,
+        );
     }
 
     for zone in &mut state.zones {
@@ -1934,6 +1978,12 @@ pub fn advance_heat_balance_state_one_timestep(
         );
     }
 
+    let current_zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+        .collect::<Vec<_>>();
+
     for surface in &mut state.surfaces {
         let zone_temperature_c = state
             .zones
@@ -1943,6 +1993,12 @@ pub fn advance_heat_balance_state_one_timestep(
             .unwrap_or(surface.inside_face_temperature_c);
 
         surface.inside_face_temperature_c = zone_temperature_c;
+        surface.outside_face_temperature_c = surface_boundary_temperature_c(
+            surface,
+            &current_zone_temperatures,
+            input.outdoor_dry_bulb_c,
+            zone_temperature_c,
+        );
         surface.heat_gain_to_zone_w =
             surface.conductance_w_per_k * (surface.outside_face_temperature_c - zone_temperature_c);
     }
@@ -2110,6 +2166,12 @@ struct SurfaceThermalProperties {
     heat_capacity_j_per_m2_k: Option<f64>,
 }
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+struct SurfaceBoundaryTarget {
+    surface_id: Option<SurfaceId>,
+    zone_id: Option<ZoneId>,
+}
+
 fn surface_thermal_properties(
     model: &TypedModel,
     surface: &Surface,
@@ -2143,6 +2205,83 @@ fn surface_thermal_properties(
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k: material.heat_capacity_per_area(),
     })
+}
+
+fn resolve_surface_boundary_target(
+    model: &TypedModel,
+    surface: &Surface,
+) -> Result<SurfaceBoundaryTarget, RuntimeError> {
+    match surface.outside_boundary_condition {
+        OutsideBoundaryCondition::Surface => {
+            let target_name = boundary_object_name(surface);
+            let target_surface = model
+                .surfaces
+                .iter()
+                .find(|candidate| candidate.name == NormalizedName::new(&target_name))
+                .ok_or_else(|| RuntimeError::MissingSurfaceBoundaryTarget {
+                    surface_name: surface.name.0.clone(),
+                    target_name: target_name.clone(),
+                })?;
+            Ok(SurfaceBoundaryTarget {
+                surface_id: Some(target_surface.id),
+                zone_id: Some(target_surface.zone),
+            })
+        }
+        OutsideBoundaryCondition::Zone | OutsideBoundaryCondition::Space => {
+            let target_name = boundary_object_name(surface);
+            let target_zone = model
+                .zones
+                .iter()
+                .find(|zone| zone.name == NormalizedName::new(&target_name))
+                .ok_or_else(|| RuntimeError::MissingZoneBoundaryTarget {
+                    surface_name: surface.name.0.clone(),
+                    target_name: target_name.clone(),
+                })?;
+            Ok(SurfaceBoundaryTarget {
+                surface_id: None,
+                zone_id: Some(target_zone.id),
+            })
+        }
+        OutsideBoundaryCondition::Adiabatic
+        | OutsideBoundaryCondition::Foundation
+        | OutsideBoundaryCondition::Ground
+        | OutsideBoundaryCondition::Outdoors
+        | OutsideBoundaryCondition::Other => Ok(SurfaceBoundaryTarget::default()),
+    }
+}
+
+fn boundary_object_name(surface: &Surface) -> String {
+    surface
+        .outside_boundary_condition_object
+        .as_ref()
+        .map(|name| name.0.clone())
+        .unwrap_or_default()
+}
+
+fn surface_boundary_temperature_c(
+    surface: &SurfaceHeatBalanceState,
+    previous_zone_temperatures: &[(ZoneId, f64)],
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+) -> f64 {
+    match surface.outside_boundary_condition {
+        OutsideBoundaryCondition::Outdoors => outdoor_dry_bulb_c,
+        OutsideBoundaryCondition::Adiabatic => owning_zone_temperature_c,
+        OutsideBoundaryCondition::Surface
+        | OutsideBoundaryCondition::Zone
+        | OutsideBoundaryCondition::Space => surface
+            .outside_boundary_target_zone_id
+            .and_then(|target_zone_id| {
+                previous_zone_temperatures
+                    .iter()
+                    .find(|(zone_id, _temperature)| *zone_id == target_zone_id)
+                    .map(|(_zone_id, temperature)| *temperature)
+            })
+            .unwrap_or(owning_zone_temperature_c),
+        OutsideBoundaryCondition::Foundation
+        | OutsideBoundaryCondition::Ground
+        | OutsideBoundaryCondition::Other => surface.outside_face_temperature_c,
+    }
 }
 
 fn convective_internal_gain_w(model: &TypedModel, zone_id: ZoneId, hour_ending: u32) -> f64 {
@@ -2882,7 +3021,7 @@ mod tests {
         HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        ResultStore, RuntimeOutputRegistry, SimulationMode, SimulationState,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
         build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
@@ -3764,6 +3903,122 @@ DATA PERIODS
     }
 
     #[test]
+    fn heat_balance_adiabatic_surfaces_do_not_create_artificial_losses()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        for surface in &mut typed.surfaces {
+            surface.outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
+            surface.outside_boundary_condition_object = None;
+        }
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+
+        advance_heat_balance_state_one_timestep(
+            &typed,
+            &mut state,
+            HeatBalanceStepInput {
+                outdoor_dry_bulb_c: -10.0,
+                hour_ending: 1,
+                timestep_seconds: 600.0,
+            },
+        );
+
+        assert!(state.zones[0].mean_air_temperature_c > 20.0);
+        assert!((state.zones[0].opaque_surface_heat_gain_w).abs() < 1.0e-9);
+        for surface in &state.surfaces {
+            assert_eq!(
+                surface.outside_boundary_condition,
+                OutsideBoundaryCondition::Adiabatic
+            );
+            assert_eq!(
+                surface.outside_face_temperature_c,
+                surface.inside_face_temperature_c
+            );
+            assert!(surface.heat_gain_to_zone_w.abs() < 1.0e-9);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_interzone_surface_uses_adjacent_zone_temperature()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = two_zone_interzone_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        state.zones[0].mean_air_temperature_c = 20.0;
+        state.zones[1].mean_air_temperature_c = 10.0;
+
+        advance_heat_balance_state_one_timestep(
+            &typed,
+            &mut state,
+            HeatBalanceStepInput {
+                outdoor_dry_bulb_c: 0.0,
+                hour_ending: 1,
+                timestep_seconds: 60.0,
+            },
+        );
+
+        let warm_zone = state
+            .zones
+            .iter()
+            .find(|zone| zone.zone_name == "ZONE A")
+            .ok_or_else(|| std::io::Error::other("missing warm zone"))?;
+        let cool_zone = state
+            .zones
+            .iter()
+            .find(|zone| zone.zone_name == "ZONE B")
+            .ok_or_else(|| std::io::Error::other("missing cool zone"))?;
+        assert!(warm_zone.mean_air_temperature_c < 20.0);
+        assert!(cool_zone.mean_air_temperature_c > 10.0);
+
+        let warm_surface = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "A WALL")
+            .ok_or_else(|| std::io::Error::other("missing A WALL"))?;
+        assert_eq!(
+            warm_surface.outside_boundary_target_surface_id,
+            Some(SurfaceId(1))
+        );
+        assert_eq!(
+            warm_surface.outside_boundary_target_zone_id,
+            Some(ZoneId(1))
+        );
+        assert_eq!(
+            warm_surface.outside_face_temperature_c,
+            cool_zone.mean_air_temperature_c
+        );
+        assert!(warm_surface.heat_gain_to_zone_w < 0.0);
+
+        let cool_surface = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "B WALL")
+            .ok_or_else(|| std::io::Error::other("missing B WALL"))?;
+        assert_eq!(
+            cool_surface.outside_face_temperature_c,
+            warm_zone.mean_air_temperature_c
+        );
+        assert!(cool_surface.heat_gain_to_zone_w > 0.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_missing_interzone_surface_target_fails() {
+        let mut typed = two_zone_interzone_model();
+        typed.surfaces[0].outside_boundary_condition_object =
+            Some(NormalizedName::new("Missing Surface"));
+        let model = SimulationModel::from_typed(typed);
+
+        assert!(matches!(
+            initialize_heat_balance_state(&model, 20.0),
+            Err(RuntimeError::MissingSurfaceBoundaryTarget { .. })
+        ));
+    }
+
+    #[test]
     fn heat_balance_trace_writes_zone_air_temperature_results()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
@@ -4010,6 +4265,75 @@ DATA PERIODS
         model
     }
 
+    fn two_zone_interzone_model() -> TypedModel {
+        let mut model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 1,
+            },
+            ..TypedModel::default()
+        };
+        model.materials.push(Material {
+            id: MaterialId(0),
+            name: NormalizedName::new("R1"),
+            kind: MaterialKind::NoMass,
+            conductivity_w_per_m_k: None,
+            density_kg_per_m3: None,
+            specific_heat_j_per_kg_k: None,
+            thickness_m: None,
+            thermal_resistance_m2_k_per_w: Some(1.0),
+        });
+        model.constructions.push(Construction {
+            id: ConstructionId(0),
+            name: NormalizedName::new("Wall"),
+            outside_layer: MaterialId(0),
+        });
+        model.zones.push(Zone {
+            id: ZoneId(0),
+            name: NormalizedName::new("Zone A"),
+            direction_of_relative_north_deg: 0.0,
+            origin: point(0.0, 0.0, 0.0),
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::Value(1.0),
+        });
+        model.zones.push(Zone {
+            id: ZoneId(1),
+            name: NormalizedName::new("Zone B"),
+            direction_of_relative_north_deg: 0.0,
+            origin: point(1.0, 0.0, 0.0),
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::Value(1.0),
+        });
+        model.surfaces.push(interzone_surface(
+            0,
+            "A Wall",
+            ZoneId(0),
+            "B Wall",
+            [
+                point(1.0, 0.0, 0.0),
+                point(1.0, 1.0, 0.0),
+                point(1.0, 1.0, 1.0),
+                point(1.0, 0.0, 1.0),
+            ],
+        ));
+        model.surfaces.push(interzone_surface(
+            1,
+            "B Wall",
+            ZoneId(1),
+            "A Wall",
+            [
+                point(0.0, 0.0, 0.0),
+                point(0.0, 0.0, 1.0),
+                point(0.0, 1.0, 1.0),
+                point(0.0, 1.0, 0.0),
+            ],
+        ));
+        model
+    }
+
     fn cube_surfaces() -> Vec<Surface> {
         vec![
             surface(
@@ -4092,6 +4416,28 @@ DATA PERIODS
             outside_boundary_condition_object: None,
             sun_exposure: ep_model::SunExposure::SunExposed,
             wind_exposure: ep_model::WindExposure::WindExposed,
+            view_factor_to_ground: AutoOrNumber::AutoCalculate,
+            vertices: vertices.to_vec(),
+        }
+    }
+
+    fn interzone_surface(
+        id: u32,
+        name: &str,
+        zone: ZoneId,
+        target_surface: &str,
+        vertices: [Point3; 4],
+    ) -> Surface {
+        Surface {
+            id: SurfaceId(id),
+            name: NormalizedName::new(name),
+            surface_type: SurfaceType::Wall,
+            construction: ConstructionId(0),
+            zone,
+            outside_boundary_condition: OutsideBoundaryCondition::Surface,
+            outside_boundary_condition_object: Some(NormalizedName::new(target_surface)),
+            sun_exposure: ep_model::SunExposure::NoSun,
+            wind_exposure: ep_model::WindExposure::NoWind,
             view_factor_to_ground: AutoOrNumber::AutoCalculate,
             vertices: vertices.to_vec(),
         }

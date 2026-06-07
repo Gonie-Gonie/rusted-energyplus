@@ -1,6 +1,6 @@
 # Heat Balance Porting Map
 
-Status: v0.9 first narrow surface-temperature conformance gate plus ongoing
+Status: v0.25 opaque no-mass heat-balance boundary generalization plus ongoing
 porting map.
 
 EnergyPlus reference version:
@@ -61,13 +61,23 @@ Temperature`, and `Surface Outside Face Temperature` for the same no-mass
 adiabatic surface equilibrium subset. It does not claim fenestration, solar
 radiation, conduction-rate, or dynamic exterior heat-balance parity.
 
+v0.25 keeps the promoted numerical case set unchanged, but generalizes the
+runtime state for opaque no-mass boundaries:
+
+- adiabatic surfaces follow the owning zone air temperature and do not create
+  artificial no-mass heat gain/loss
+- `Surface`, `Zone`, and `Space` boundary objects are resolved to adjacent
+  surface/zone IDs before timestep advancement
+- missing adjacent boundary targets fail explicitly during heat-balance state
+  initialization
+
 ## Porting Status Table
 
 | Area | EnergyPlus source routines | Rust target | Current evidence | Status |
 |---|---|---|---|---|
 | Heat-balance orchestration | `ManageHeatBalance`, `InitHeatBalance` | heat-balance timestep driver and state init | source map plus v0.8/v0.9 narrow gates | partial, no general claim |
 | Zone air update | `ManageZoneAirUpdates`, `correctZoneAirTemps` | zone MAT state advance | `heat_balance_nomass_001` MAT tolerance gate | conformance only for declared no-mass case |
-| Surface inside/outside balance | `CalcHeatBalanceInsideSurf`, `CalcHeatBalanceOutsideSurf` | surface temperature trace | `surface_temperature_nomass_001` tolerance gate | conformance only for declared surface variables |
+| Surface inside/outside balance | `CalcHeatBalanceInsideSurf`, `CalcHeatBalanceOutsideSurf` | surface temperature trace plus adiabatic/interzone boundary target state | `surface_temperature_nomass_001` tolerance gate plus v0.25 boundary smoke | conformance only for declared surface variables |
 | Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | ESO smoke comparison | diagnostic support, not zone air parity alone |
 | Weather and schedules | weather/schedule managers, source map pending expansion | typed weather and schedule traces | smoke comparisons | input evidence only |
 | Dynamic envelope behavior | multiple surface and material managers | not fully ported | none | no claim |
@@ -167,7 +177,8 @@ or source-reference comments.
 6. Add opaque surface heat-balance state for the first no-window one-zone case.
    Implemented state inputs: surface boundary condition, construction,
    outside-layer material, thermal resistance, optional area heat capacity, and
-   surface conductance.
+   surface conductance. v0.25 also resolves adiabatic and interzone boundary
+   targets for opaque no-mass surfaces.
 7. Add zone air predictor/corrector subset and compare `Zone Mean Air
    Temperature`. Implemented state advance and diagnostic trace: heat-balance
    timesteps update MAT history, internal convective gains, opaque surface heat

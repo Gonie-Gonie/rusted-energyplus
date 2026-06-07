@@ -28,8 +28,10 @@ Current direction:
 - v0.24 hardened runtime state, output registry, meter registry, result
   storage, diagnostics, and profiling scaffolds without adding new numerical
   conformance.
-- v0.25 should use the hardened runtime path to generalize opaque no-mass
-  heat-balance cases for declared variables only.
+- v0.25 generalized opaque no-mass heat-balance boundary handling for declared
+  variables only.
+- v0.26 should continue building-physics expansion only where source-map,
+  case, variable, tolerance, report, and gate evidence are ready.
 
 The long-term targets remain:
 

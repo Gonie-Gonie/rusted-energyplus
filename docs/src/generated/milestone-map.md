@@ -31,7 +31,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.22 | Time, Weather, and Schedule Conformance Expansion | complete | declared-variables-only | schedule_constant_001, weather_fields_001 | general runtime compatibility |
 | 0.23 | Static Model Evidence Expansion | complete | static-evidence | official_1zone_static_model_001 | dynamic heat-balance compatibility, HVAC compatibility, plant compatibility, meter conformance |
 | 0.24 | Runtime State and Output Registry Hardening | complete | runtime-infrastructure |  | new numerical conformance, meter conformance, general runtime compatibility |
-| 0.25 | Opaque No-Mass Heat Balance Generalization | planned | limited-conformance | heat_balance_nomass_001, surface_temperature_nomass_001 | general heat-balance compatibility, HVAC compatibility, plant compatibility |
+| 0.25 | Opaque No-Mass Heat Balance Generalization | complete | limited-conformance | heat_balance_nomass_001, surface_temperature_nomass_001 | general heat-balance compatibility, HVAC compatibility, plant compatibility |
 
 ## Long-Term Targets
 

@@ -105,6 +105,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate v0.24 runtime output/meter registry and ResultStore diagnostics."
     }
+    "heat-balance-generalization-smoke" = @{
+        Path = "smoke\heat-balance-generalization-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate v0.25 opaque no-mass heat-balance boundary generalization."
+    }
     "ideal-loads-thermostat-smoke" = @{
         Path = "smoke\ideal-loads-thermostat-smoke.ps1"
         Group = "smoke"
@@ -375,6 +380,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.24 runtime state and output registry hardening gate."
     }
+    "v0.25-verify" = @{
+        Path = "release\v0.25-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.25 opaque no-mass heat-balance generalization gate."
+    }
 }
 
 $Aliases = @{
@@ -404,6 +414,7 @@ $Aliases = @{
     "verify-v0.22" = "v0.22-verify"
     "verify-v0.23" = "v0.23-verify"
     "verify-v0.24" = "v0.24-verify"
+    "verify-v0.25" = "v0.25-verify"
 }
 
 function Show-Commands {

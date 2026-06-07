@@ -4,6 +4,36 @@
 
 No unreleased changes.
 
+## v0.25.0 - 2026-06-07
+
+Opaque no-mass heat-balance generalization.
+
+### Added
+
+- Adiabatic opaque surface boundary handling that keeps no-mass heat gain at
+  zero when the boundary follows the owning zone air temperature.
+- Interzone opaque surface boundary target resolution for `Surface`, `Zone`,
+  and `Space` boundary objects.
+- Explicit missing interzone surface/zone boundary target errors.
+- Runtime tests for adiabatic, interzone, and missing boundary target behavior.
+- `heat-balance-generalization-smoke` gate.
+- v0.25 release verification script.
+
+### Changed
+
+- Heat-balance surface state now stores outside boundary object names and
+  resolved adjacent surface/zone IDs.
+- Existing v0.8/v0.9 heat-balance conformance gates remain blocking and are
+  included in the v0.25 smoke path.
+- Default release evidence report version is v0.25.0.
+
+### Boundaries
+
+- v0.25.0 remains limited-conformance for declared no-mass heat-balance cases
+  and variables only.
+- No general heat-balance, HVAC, plant, meter, fenestration, solar, sizing,
+  warmup, or broad ExampleFiles compatibility is claimed.
+
 ## v0.24.0 - 2026-06-07
 
 Runtime state and output registry hardening.

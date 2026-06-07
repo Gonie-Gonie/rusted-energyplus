@@ -35,7 +35,7 @@ The false-claim guard is:
 Release evidence documents use the repo-local Python environment and oodocs:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.24.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.25.0
 ```
 
 The current declared conformance gates are:
@@ -45,7 +45,8 @@ The current declared conformance gates are:
 .\scripts\dev.cmd compare-weather-conformance
 .\scripts\dev.cmd compare-static-model-conformance
 .\scripts\dev.cmd runtime-registry-smoke
-.\scripts\dev.cmd v0.24-verify
+.\scripts\dev.cmd heat-balance-generalization-smoke
+.\scripts\dev.cmd v0.25-verify
 ```
 
 The source-map and algorithm-ledger gate remains:

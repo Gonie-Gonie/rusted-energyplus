@@ -7,10 +7,10 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.24.0. It hardens runtime state, output
-registry, meter registry, result-store diagnostics, and profiling scaffolds on
-top of the v0.23 official ExampleFile static model evidence and v0.22 declared
-time, weather, and schedule numerical conformance.
+The current public release line is v0.25.0. It generalizes opaque no-mass
+heat-balance boundary handling on top of the v0.24 runtime registry
+infrastructure, v0.23 official ExampleFile static model evidence, and v0.22
+declared time, weather, and schedule numerical conformance.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:
@@ -59,6 +59,8 @@ The current public scope includes:
 - explicit unavailable-output and unavailable-meter runtime diagnostics
 - ResultStore duplicate-handle/duplicate-series diagnostics and profile
   scaffolding
+- opaque no-mass adiabatic and interzone surface boundary target handling in
+  heat-balance state
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
@@ -71,4 +73,6 @@ Not claimed:
 - node, IdealLoads, meter, or broad weather conformance
 - dynamic compatibility for the v0.23 static model case
 - new numerical conformance from the v0.24 runtime-infrastructure milestone
+- new numerical conformance beyond the declared v0.8/v0.9/v0.22 promoted
+  variables from the v0.25 generalization milestone
 - broad ExampleFiles compatibility

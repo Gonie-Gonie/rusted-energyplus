@@ -21,4 +21,8 @@ v0.24 adds runtime output registry, meter diagnostic, and ResultStore
 infrastructure. It does not add new numerical conformance or meter
 conformance.
 
+v0.25 adds opaque no-mass adiabatic and interzone boundary handling for the
+runtime heat-balance state. It does not add general heat-balance compatibility
+or new promoted numerical variables beyond the declared existing cases.
+
 For the formal non-goals list, see `project-scope/non-goals.md`.
