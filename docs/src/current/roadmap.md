@@ -18,7 +18,7 @@ Current direction:
 - v0.18 connected manifest-owned output-request injection to the oracle
   baseline pipeline.
 - v0.19 hardened selected series readers and comparison metrics.
-- v0.20 should promote release report generation and coverage matrices.
+- v0.20 promoted release conformance index generation and coverage matrices.
 - v0.21 should make the algorithm ledger a stronger source-map gate.
 
 The long-term targets remain:

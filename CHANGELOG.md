@@ -4,6 +4,29 @@
 
 No unreleased changes.
 
+## v0.20.0 - 2026-06-07
+
+Conformance report generator release.
+
+### Added
+
+- Python `oodocs` conformance index report generator.
+- release-level case, output, meter, domain, report, and gate coverage
+  matrices.
+- `conformance-index.md`, `conformance-index-report.html`,
+  `conformance-index-report.pdf`, and `conformance-index-report.json`
+  artifacts under `.runtime/release-evidence/vX.Y.Z`.
+- `conformance-index-report` and `v0.20-verify` gates.
+
+### Notes
+
+- v0.20.0 is reporting infrastructure work, not a new numerical conformance
+  release.
+- The conformance index maps coverage and report/gate contracts; it does not
+  promote cases by itself.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.19.0 - 2026-06-07
 
 Series reader and compare engine v2 release.

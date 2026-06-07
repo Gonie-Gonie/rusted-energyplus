@@ -11,4 +11,11 @@ and serialization. Use `oodocs` for structured HTML/PDF output and matplotlib
 figure objects for charts. Emit JSON for durable evidence data when the report
 supports release or conformance claims.
 
+Current generators:
+
+- `conformance_evidence_report.py` builds numerical conformance evidence for
+  promoted tolerance-gated cases.
+- `conformance_index_report.py` builds the release conformance index and
+  coverage matrices for all tracked manifests.
+
 Pinned dependencies live in `tools/python/requirements-report.txt`.

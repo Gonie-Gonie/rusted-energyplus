@@ -7,8 +7,8 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.19.0. It gates timestamp-aware selected
-series reading and the compare engine v2 metric layer.
+The current public release line is v0.20.0. It gates the release conformance
+index report generator and coverage matrices.
 
 Current numerical conformance is limited to the promoted v0.8 and v0.9 no-mass
 cases and their declared variables:
@@ -34,6 +34,8 @@ The current public scope includes:
 - output request injection for staged oracle baselines
 - selected-series timestamp alignment, RMSE, relative-delta, and first
   divergence reporting
+- release conformance index reports with case, output, meter, domain, report,
+  and gate coverage matrices
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 

@@ -220,6 +220,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Generate oodocs PDF/HTML/JSON numerical conformance evidence."
     }
+    "conformance-index-report" = @{
+        Path = "release\conformance-index-report.ps1"
+        Group = "release"
+        Help = "Generate oodocs PDF/HTML/JSON/Markdown conformance index coverage."
+    }
     "github-release" = @{
         Path = "release\github-release.ps1"
         Group = "release"
@@ -320,6 +325,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.19 series reader and compare engine v2 gate."
     }
+    "v0.20-verify" = @{
+        Path = "release\v0.20-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.20 conformance report generator gate."
+    }
 }
 
 $Aliases = @{
@@ -344,6 +354,7 @@ $Aliases = @{
     "verify-v0.17" = "v0.17-verify"
     "verify-v0.18" = "v0.18-verify"
     "verify-v0.19" = "v0.19-verify"
+    "verify-v0.20" = "v0.20-verify"
 }
 
 function Show-Commands {

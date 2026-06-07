@@ -48,5 +48,6 @@ Invoke-DevCommand -Command "file-size-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "python-smoke"
+Invoke-DevCommand -Command "conformance-index-report"
 
 Write-Host "Check complete."

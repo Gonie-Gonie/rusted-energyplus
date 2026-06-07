@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = "0.20.0",
-    [switch]$SkipGateRun
+    [string]$Version = "0.20.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,17 +17,14 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
     throw "Report Python environment is missing. Run .\scripts\dev.cmd setup first."
 }
 
-$script = Join-Path $RepoRoot "tools\reporting\conformance_evidence_report.py"
+$script = Join-Path $RepoRoot "tools\reporting\conformance_index_report.py"
 if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
-    throw "Missing report generator: $script"
+    throw "Missing conformance index generator: $script"
 }
 
 $arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version)
-if ($SkipGateRun) {
-    $arguments += "--skip-gate-run"
-}
 
 & $python @arguments
 if ($LASTEXITCODE -ne 0) {
-    throw "Conformance evidence report generation failed with exit code $LASTEXITCODE"
+    throw "Conformance index report generation failed with exit code $LASTEXITCODE"
 }

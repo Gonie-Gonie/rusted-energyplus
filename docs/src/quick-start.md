@@ -27,6 +27,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.17-verify
 .\scripts\dev.cmd v0.18-verify
 .\scripts\dev.cmd v0.19-verify
+.\scripts\dev.cmd v0.20-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -44,6 +45,10 @@ does not add ExampleFiles numerical conformance.
 v0.19 is the series reader and compare engine v2 gate. It adds timestamp-aware
 selected-series parsing and richer comparison metrics, but does not add a new
 numerical conformance claim.
+
+v0.20 is the conformance report generator gate. It creates the release
+conformance index, coverage matrices, and companion PDF/HTML/JSON/Markdown
+artifacts without adding a new numerical conformance claim.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

@@ -265,7 +265,7 @@ not_claimed = [
 [[milestone]]
 version = "0.20"
 title = "Conformance Report Generator"
-status = "planned"
+status = "complete"
 claim_level = "reporting-infrastructure"
 required_cases = []
 required_variables = []

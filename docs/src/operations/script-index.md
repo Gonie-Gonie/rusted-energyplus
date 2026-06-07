@@ -74,6 +74,7 @@ matplotlib for document layout and charts.
 | `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
+| `conformance-index-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown conformance index coverage matrices | yes for release coverage | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 | `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
@@ -94,5 +95,6 @@ matplotlib for document layout and charts.
 | `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
 | `v0.18-verify` | release | verify v0.18 output request injection and official baseline gate | yes | official baseline, `.runtime/release-evidence` |
 | `v0.19-verify` | release | verify v0.19 series reader and compare engine v2 gate | yes | compare-series-v2 smoke, `.runtime/release-evidence` |
+| `v0.20-verify` | release | verify v0.20 conformance report generator and coverage matrix gate | yes | conformance index report, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

@@ -26,7 +26,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.17 | Case Manifest and Output Request Schema v2 | complete | infrastructure-only | heat_balance_nomass_001, surface_temperature_nomass_001 | new numerical conformance, ExampleFiles compatibility, meter conformance |
 | 0.18 | Output Request Injection and Oracle Baseline Pipeline | complete | baseline-only | official_1zone_uncontrolled_baseline_001 | new numerical conformance unless promoted by report and gate, ExampleFiles numerical conformance, general heat-balance compatibility, HVAC compatibility, plant compatibility |
 | 0.19 | Series Reader and Compare Engine v2 | complete | comparison-infrastructure |  | new numerical conformance unless a case is explicitly promoted, meter conformance |
-| 0.20 | Conformance Report Generator | planned | reporting-infrastructure |  | new numerical conformance unless backed by generated evidence |
+| 0.20 | Conformance Report Generator | complete | reporting-infrastructure |  | new numerical conformance unless backed by generated evidence |
 | 0.21 | Source Map and Algorithm Ledger v1 | planned | planning-guard |  | algorithm completion without source map |
 | 0.22 | Time, Weather, and Schedule Conformance Expansion | planned | declared-variables-only |  | general runtime compatibility |
 | 0.23 | Static Model Evidence Expansion | planned | static-evidence |  | dynamic heat-balance compatibility |

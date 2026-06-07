@@ -108,10 +108,14 @@ Each release should eventually publish:
 ```text
 reports/<version>/
   conformance-index.md
-  conformance-summary.json
+  conformance-index-report.html
+  conformance-index-report.pdf
+  conformance-index-report.json
   cases/<case_id>/compare-report.md
   cases/<case_id>/compare-summary.json
 ```
 
 The index should summarize case tier counts, pass/fail/diagnostic/baseline-only
-status, variable coverage, object coverage, and known gaps.
+status, variable coverage, object coverage, report contracts, gate contracts,
+and known gaps. v0.20 implements the release-level `conformance-index-report.pdf`
+and companion HTML/JSON/Markdown artifacts under `.runtime/release-evidence`.
