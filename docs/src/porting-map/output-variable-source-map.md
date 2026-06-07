@@ -27,6 +27,10 @@ source files and Rust result locations before promoting conformance claims.
 | `Surface Outside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
 | `Surface Inside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future opaque conduction result | mapped-not-ported |
 | `Surface Outside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future opaque conduction result | mapped-not-ported |
+| `Zone Thermostat Heating Setpoint Temperature` | hourly | thermostat setup/output registration in EnergyPlus HVAC/zone predictor code | future thermostat result state | baseline-only for `ideal_loads_thermostat_001` |
+| `Zone Thermostat Cooling Setpoint Temperature` | hourly | thermostat setup/output registration in EnergyPlus HVAC/zone predictor code | future thermostat result state | baseline-only for `ideal_loads_thermostat_001` |
+| `Zone Ideal Loads Zone Total Heating Rate` | hourly | IdealLoads HVAC component implementation and zone equipment managers | future IdealLoads result state | baseline-only for `ideal_loads_thermostat_001`; mapped-not-ported |
+| `Zone Ideal Loads Zone Total Cooling Rate` | hourly | IdealLoads HVAC component implementation and zone equipment managers | future IdealLoads result state | baseline-only for `ideal_loads_thermostat_001`; mapped-not-ported |
 | `Site Outdoor Air Drybulb Temperature` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW weather trace | smoke |
 | `Schedule Value` | hourly | output processor plus schedule managers | schedule trace | smoke |
 
@@ -66,3 +70,8 @@ result for hourly `Zone Mean Air Temperature`, `Surface Inside Face
 Temperature`, and `Surface Outside Face Temperature` only. It requires
 zone-state and surface-state tolerances, markdown/JSON report artifacts, and a
 blocking gate.
+
+The v0.10 `ideal_loads_thermostat_001` report is baseline-only smoke evidence
+for thermostat and IdealLoads output availability plus typed graph coverage.
+It is not an IdealLoads load-conformance claim and keeps
+`tolerance_policy: none`.

@@ -1,0 +1,51 @@
+id = "ideal_loads_thermostat_001"
+title = "One-zone thermostat and IdealLoads typed graph"
+milestone = "v0.10-ideal-loads-thermostat"
+purpose = "Gate the typed thermostat, zone equipment, and IdealLoads graph foundation before claiming IdealLoads load parity."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This v0.10 case is blocking typed-graph evidence, not IdealLoads numerical conformance.",
+  "Thermostat setpoint and IdealLoads output availability is baseline/report evidence only until a load solver declares tolerances."
+]
+
+[input]
+idf = "data/conformance_cases/ideal_loads_thermostat_001/ideal_loads_thermostat.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-thermostat/26.1.0/report-skeleton/ideal_loads_thermostat_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd ideal-loads-thermostat-smoke"
+blocking = true

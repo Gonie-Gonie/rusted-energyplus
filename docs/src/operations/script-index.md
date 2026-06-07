@@ -42,6 +42,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `schedule-compact-smoke` | smoke | verify `Schedule:Compact` intake | no | console output |
 | `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
+| `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, and IdealLoads typed graph | yes | `.runtime/ideal-loads-thermostat` |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
@@ -68,5 +69,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.7-verify` | release | verify v0.7 source mapping and algorithm readiness gate | yes | source-map docs |
 | `v0.8-verify` | release | verify v0.8 heat-balance conformance evidence | yes | `.runtime/heat-balance-conformance` |
 | `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
+| `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
 
 No diagnostic command should be listed as conformance evidence.

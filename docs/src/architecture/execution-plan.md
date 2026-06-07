@@ -19,3 +19,10 @@ The plan is useful for:
 It does not imply that all EnergyPlus algorithms behind those stages have been
 ported.
 
+v0.10 adds thermostat and IdealLoads ordering placeholders:
+
+- `EvaluateZoneThermostat`
+- `EvaluateIdealLoadsAirSystem`
+
+They are typed-graph readiness markers for `ideal_loads_thermostat_001`, not
+HVAC load-conformance markers.

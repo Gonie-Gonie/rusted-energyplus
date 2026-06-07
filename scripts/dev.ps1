@@ -80,6 +80,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Run first-zone runtime plumbing diagnostics."
     }
+    "ideal-loads-thermostat-smoke" = @{
+        Path = "smoke\ideal-loads-thermostat-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate the v0.10 thermostat, equipment, and IdealLoads typed graph."
+    }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
         Group = "compare"
@@ -210,6 +215,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.9 surface-temperature conformance gate."
     }
+    "v0.10-verify" = @{
+        Path = "release\v0.10-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.10 IdealLoads thermostat typed-graph gate."
+    }
 }
 
 $Aliases = @{
@@ -224,6 +234,7 @@ $Aliases = @{
     "verify-v0.7" = "v0.7-verify"
     "verify-v0.8" = "v0.8-verify"
     "verify-v0.9" = "v0.9-verify"
+    "verify-v0.10" = "v0.10-verify"
 }
 
 function Show-Commands {

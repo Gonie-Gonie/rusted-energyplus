@@ -236,11 +236,40 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.compact_schedules.len()
     );
     println!("  other_equipment: {}", model.typed.other_equipment.len());
+    println!(
+        "  thermostat_dual_setpoints: {}",
+        model.typed.thermostat_dual_setpoints.len()
+    );
+    println!("  zone_thermostats: {}", model.typed.zone_thermostats.len());
+    println!(
+        "  ideal_loads_air_systems: {}",
+        model.typed.ideal_loads_air_systems.len()
+    );
+    println!(
+        "  zone_equipment_lists: {}",
+        model.typed.zone_equipment_lists.len()
+    );
+    println!(
+        "  zone_equipment_connections: {}",
+        model.typed.zone_equipment_connections.len()
+    );
     println!("  run_periods: {}", model.typed.run_periods.len());
     println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
     println!(
         "  construction_material_edges: {}",
         model.graph.construction_materials.len()
+    );
+    println!(
+        "  zone_thermostat_edges: {}",
+        model.graph.zone_thermostats.len()
+    );
+    println!(
+        "  thermostat_setpoint_edges: {}",
+        model.graph.thermostat_setpoints.len()
+    );
+    println!(
+        "  zone_ideal_loads_edges: {}",
+        model.graph.zone_ideal_loads.len()
     );
     println!("  stages: {}", plan.stages.len());
     println!("  steps: {}", plan.step_count());
@@ -1234,6 +1263,7 @@ fn variable_class_label(class: VariableClass) -> &'static str {
         VariableClass::InternalGain => "internal-gain",
         VariableClass::ZoneState => "zone-state",
         VariableClass::SurfaceState => "surface-state",
+        VariableClass::HvacState => "hvac-state",
         VariableClass::Meter => "meter",
         VariableClass::InternalVariable => "internal-variable",
         VariableClass::Diagnostic => "diagnostic",
@@ -4241,6 +4271,23 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     println!("  constant_schedules: {}", model.schedules.len());
     println!("  compact_schedules: {}", model.compact_schedules.len());
     println!("  other_equipment: {}", model.other_equipment.len());
+    println!(
+        "  thermostat_dual_setpoints: {}",
+        model.thermostat_dual_setpoints.len()
+    );
+    println!("  zone_thermostats: {}", model.zone_thermostats.len());
+    println!(
+        "  ideal_loads_air_systems: {}",
+        model.ideal_loads_air_systems.len()
+    );
+    println!(
+        "  zone_equipment_lists: {}",
+        model.zone_equipment_lists.len()
+    );
+    println!(
+        "  zone_equipment_connections: {}",
+        model.zone_equipment_connections.len()
+    );
     println!("  zones: {}", model.zones.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
@@ -4316,6 +4363,10 @@ fn seed_coverage_status(object_type: &str) -> &'static str {
         "FenestrationSurface:Detailed",
         "Schedule:Constant",
         "Schedule:Compact",
+        "ThermostatSetpoint:DualSetpoint",
+        "ZoneControl:Thermostat",
+        "ZoneHVAC:EquipmentConnections",
+        "ZoneHVAC:EquipmentList",
         "ZoneHVAC:IdealLoadsAirSystem",
         "PlantLoop",
     ];
@@ -4664,5 +4715,9 @@ mod tests {
     fn seed_coverage_reports_tracked_objects() {
         assert_eq!(super::seed_coverage_status("Version"), "tracked");
         assert_eq!(super::seed_coverage_status("Output:Variable"), "untracked");
+        assert_eq!(
+            super::seed_coverage_status("ZoneHVAC:IdealLoadsAirSystem"),
+            "tracked"
+        );
     }
 }

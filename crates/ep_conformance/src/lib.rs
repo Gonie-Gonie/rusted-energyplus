@@ -299,6 +299,8 @@ pub enum VariableClass {
     ZoneState,
     /// Surface-level state variables.
     SurfaceState,
+    /// HVAC control or component state variables.
+    HvacState,
     /// EnergyPlus meters.
     Meter,
     /// EnergyPlus internal variables.
@@ -760,6 +762,46 @@ mod tests {
         let gate = manifest.gate.as_ref().ok_or_else(|| {
             std::io::Error::other("surface-temperature conformance should declare a gate")
         })?;
+        assert!(gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
+    fn loads_ideal_loads_thermostat_smoke_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/ideal_loads_thermostat_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "ideal_loads_thermostat_001");
+        assert_eq!(manifest.milestone, "v0.10-ideal-loads-thermostat");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
+        assert!(!manifest.conformance_claim);
+        assert!(manifest.tolerances.is_empty());
+        assert_eq!(manifest.outputs.len(), 4);
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE"
+                && output.variable == "Zone Thermostat Heating Setpoint Temperature"
+                && output.class == VariableClass::ZoneState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE IDEAL LOADS"
+                && output.variable == "Zone Ideal Loads Zone Total Heating Rate"
+                && output.class == VariableClass::HvacState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "ZONE ONE IDEAL LOADS"
+                && output.variable == "Zone Ideal Loads Zone Total Cooling Rate"
+                && output.class == VariableClass::HvacState
+        }));
+        let report = manifest.report.as_ref().ok_or_else(|| {
+            std::io::Error::other("IdealLoads thermostat smoke should declare a report path")
+        })?;
+        assert!(report.path.ends_with("compare-report.md"));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("IdealLoads thermostat smoke should declare a gate")
+        })?;
+        assert_eq!(gate.script, "scripts/dev.cmd ideal-loads-thermostat-smoke");
         assert!(gate.blocking);
 
         Ok(())

@@ -36,7 +36,11 @@ Current table:
 | OtherEquipment | yes | partial | yes | yes | partial | partial | partial | partial | internal gains used for first-zone subset, EIO nominal-gains comparison, and ESO convective-gain trace |
 | Schedule:Compact | yes | partial | yes | yes | n/a | partial | partial | partial | all-days Until segment subset |
 | Output:Variable | yes | planned | no | planned | n/a | planned | planned | planned | raw-only in compile coverage |
-| ZoneHVAC:IdealLoadsAirSystem | yes | planned | planned | planned | planned | planned | planned | planned | generic raw parse only |
+| ThermostatSetpoint:DualSetpoint | yes | partial | yes | yes | partial | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`; no thermostat numerical parity claim |
+| ZoneControl:Thermostat | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone thermostat graph edge to dual setpoint and zone |
+| ZoneHVAC:EquipmentList | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 equipment list resolves IdealLoads equipment entries |
+| ZoneHVAC:EquipmentConnections | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone equipment connection resolves zone and equipment list |
+| ZoneHVAC:IdealLoadsAirSystem | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`; not an IdealLoads load-conformance claim |
 | PlantLoop | yes | planned | planned | planned | planned | no | no | no | generic raw parse only |
 
 v0.1.0 RawModel parse support is intentionally generic: unknown object types are

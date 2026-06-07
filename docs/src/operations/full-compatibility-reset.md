@@ -246,13 +246,22 @@ Required:
 - surface temperature/rate comparisons
 - first divergence report
 
-### v0.10 IdealLoads Parity
+### v0.10 IdealLoads Typed Graph Foundation
 
 Goal:
 
 - thermostat schedules
-- IdealLoads-like load calculation following EnergyPlus semantics
-- hourly/monthly/annual heating and cooling comparison
+- thermostat, equipment-list, equipment-connection, and IdealLoads typed intake
+- graph edges from zone to thermostat, thermostat to setpoint, and zone to
+  IdealLoads equipment
+- baseline-only thermostat and IdealLoads output availability
+
+Not yet claimed:
+
+- IdealLoads load parity
+- hourly/monthly/annual heating and cooling conformance
+- HVAC node, sizing, availability, ventilation, humidity, economizer, heat
+  recovery, or fuel-use parity
 
 ### v1.0 Stable Compatibility Subset
 

@@ -44,7 +44,7 @@ separate in docs, scripts, and release language.
 | v0.7 | EnergyPlus source mapping and algorithm porting plan release | planning guard before heat-balance code |
 | v0.8 | Uncontrolled zone heat-balance port release | first tolerance-gated heat-balance subset |
 | v0.9 | Surface/fenestration/radiation expansion release | `surface_temperature_nomass_001` surface temperatures only |
-| v0.10 | IdealLoads/thermostat release | declared cases only |
+| v0.10 | IdealLoads/thermostat release | `ideal_loads_thermostat_001` typed graph and baseline-only output availability only |
 | v0.11 | Air-side node/simple HVAC component release | declared cases only |
 | v0.12 | Plant loop skeleton/node flow release | declared cases only |
 | v1.0 | Declared compatibility subset release | locked supported subset only |
@@ -172,6 +172,12 @@ surface-state case. The claim is limited to hourly `Zone Mean Air Temperature`,
 the no-mass adiabatic equilibrium case and is enforced by
 `compare-surface-temperature-conformance`. It is not a fenestration or
 solar-radiation claim.
+
+v0.10 decision: `ideal_loads_thermostat_001` is a blocking smoke gate for
+thermostat, zone equipment, and IdealLoads typed graph coverage. It proves
+baseline output availability and graph connectivity only. It is not an
+IdealLoads load-conformance claim, and it keeps `comparison_class = "smoke"`,
+`conformance_claim = false`, and `tolerance_policy: none`.
 
 ## Immediate Work Order
 

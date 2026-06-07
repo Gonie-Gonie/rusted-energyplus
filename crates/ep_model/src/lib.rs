@@ -59,6 +59,11 @@ typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(ScheduleId);
 typed_id!(RunPeriodId);
+typed_id!(ThermostatSetpointId);
+typed_id!(ZoneThermostatId);
+typed_id!(IdealLoadsAirSystemId);
+typed_id!(ZoneEquipmentListId);
+typed_id!(ZoneEquipmentConnectionId);
 typed_id!(NodeId);
 typed_id!(ComponentId);
 typed_id!(LoopId);
@@ -123,6 +128,15 @@ impl<T: Copy> NameMap<T> {
 pub enum AutoOrNumber {
     /// EnergyPlus should calculate the value from model geometry.
     AutoCalculate,
+    /// User-specified numeric value.
+    Value(f64),
+}
+
+/// Numeric field that may be set to EnergyPlus Autosize.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum AutosizeOrNumber {
+    /// EnergyPlus should autosize the value.
+    Autosize,
     /// User-specified numeric value.
     Value(f64),
 }
@@ -442,6 +456,297 @@ pub struct OtherEquipment {
     pub fraction_lost: f64,
 }
 
+/// Supported thermostat control object type for the first HVAC subset.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ThermostatControlObjectType {
+    /// `ThermostatSetpoint:DualSetpoint`.
+    DualSetpoint,
+}
+
+/// Heating and cooling setpoint schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ThermostatDualSetpoint {
+    /// Typed ID.
+    pub id: ThermostatSetpointId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Heating setpoint schedule.
+    pub heating_setpoint_schedule: ScheduleId,
+    /// Cooling setpoint schedule.
+    pub cooling_setpoint_schedule: ScheduleId,
+}
+
+/// One control entry inside `ZoneControl:Thermostat`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneThermostatControl {
+    /// Control object type.
+    pub object_type: ThermostatControlObjectType,
+    /// Referenced dual setpoint object.
+    pub dual_setpoint: ThermostatSetpointId,
+}
+
+/// Zone thermostat assignment.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneThermostat {
+    /// Typed ID.
+    pub id: ZoneThermostatId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Controlled zone.
+    pub zone: ZoneId,
+    /// Schedule containing thermostat control type integers.
+    pub control_type_schedule: ScheduleId,
+    /// Thermostat control entries in EnergyPlus order.
+    pub controls: Vec<ZoneThermostatControl>,
+    /// Temperature difference between cutout and setpoint in delta C.
+    pub temperature_difference_between_cutout_and_setpoint_delta_c: f64,
+}
+
+/// `ZoneHVAC:IdealLoadsAirSystem` limit mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IdealLoadsLimit {
+    /// No flow or capacity limit.
+    NoLimit,
+    /// Limit flow rate only.
+    LimitFlowRate,
+    /// Limit capacity only.
+    LimitCapacity,
+    /// Limit both flow rate and capacity.
+    LimitFlowRateAndCapacity,
+}
+
+/// Ideal loads dehumidification control mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DehumidificationControlType {
+    /// No dehumidification.
+    None,
+    /// Constant sensible heat ratio.
+    ConstantSensibleHeatRatio,
+    /// Constant supply humidity ratio.
+    ConstantSupplyHumidityRatio,
+    /// Humidistat-controlled.
+    Humidistat,
+}
+
+/// Ideal loads humidification control mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HumidificationControlType {
+    /// No humidification.
+    None,
+    /// Constant supply humidity ratio.
+    ConstantSupplyHumidityRatio,
+    /// Humidistat-controlled.
+    Humidistat,
+}
+
+/// Demand-controlled ventilation mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DemandControlledVentilationType {
+    /// No DCV.
+    None,
+    /// Occupancy schedule DCV.
+    OccupancySchedule,
+    /// CO2 setpoint DCV.
+    Co2Setpoint,
+}
+
+/// Outdoor-air economizer mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OutdoorAirEconomizerType {
+    /// No economizer.
+    NoEconomizer,
+    /// Differential dry-bulb economizer.
+    DifferentialDryBulb,
+    /// Differential enthalpy economizer.
+    DifferentialEnthalpy,
+}
+
+/// Heat recovery mode.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HeatRecoveryType {
+    /// No heat recovery.
+    None,
+    /// Sensible heat recovery.
+    Sensible,
+    /// Enthalpy heat recovery.
+    Enthalpy,
+}
+
+/// Ideal loads purchased energy fuel type.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IdealLoadsFuelType {
+    /// Coal.
+    Coal,
+    /// Diesel.
+    Diesel,
+    /// District cooling.
+    DistrictCooling,
+    /// District heating steam.
+    DistrictHeatingSteam,
+    /// District heating water.
+    DistrictHeatingWater,
+    /// Electricity.
+    Electricity,
+    /// Fuel oil no. 1.
+    FuelOilNo1,
+    /// Fuel oil no. 2.
+    FuelOilNo2,
+    /// Gasoline.
+    Gasoline,
+    /// Natural gas.
+    NaturalGas,
+    /// Other fuel 1.
+    OtherFuel1,
+    /// Other fuel 2.
+    OtherFuel2,
+    /// Propane.
+    Propane,
+}
+
+/// Typed IdealLoads air system inputs needed before load-solver parity.
+#[derive(Clone, Debug, PartialEq)]
+pub struct IdealLoadsAirSystem {
+    /// Typed ID.
+    pub id: IdealLoadsAirSystemId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Overall availability schedule.
+    pub availability_schedule: Option<ScheduleId>,
+    /// Zone supply air node or node list name.
+    pub zone_supply_air_node_name: NormalizedName,
+    /// Optional zone exhaust air node name.
+    pub zone_exhaust_air_node_name: Option<NormalizedName>,
+    /// Optional system inlet air node name.
+    pub system_inlet_air_node_name: Option<NormalizedName>,
+    /// Maximum heating supply air temperature in C.
+    pub maximum_heating_supply_air_temperature_c: f64,
+    /// Minimum cooling supply air temperature in C.
+    pub minimum_cooling_supply_air_temperature_c: f64,
+    /// Maximum heating supply humidity ratio.
+    pub maximum_heating_supply_air_humidity_ratio: f64,
+    /// Minimum cooling supply humidity ratio.
+    pub minimum_cooling_supply_air_humidity_ratio: f64,
+    /// Heating limit mode.
+    pub heating_limit: IdealLoadsLimit,
+    /// Maximum heating air flow rate.
+    pub maximum_heating_air_flow_rate_m3_per_s: Option<AutosizeOrNumber>,
+    /// Maximum sensible heating capacity.
+    pub maximum_sensible_heating_capacity_w: Option<AutosizeOrNumber>,
+    /// Cooling limit mode.
+    pub cooling_limit: IdealLoadsLimit,
+    /// Maximum cooling air flow rate.
+    pub maximum_cooling_air_flow_rate_m3_per_s: Option<AutosizeOrNumber>,
+    /// Maximum total cooling capacity.
+    pub maximum_total_cooling_capacity_w: Option<AutosizeOrNumber>,
+    /// Heating availability schedule.
+    pub heating_availability_schedule: Option<ScheduleId>,
+    /// Cooling availability schedule.
+    pub cooling_availability_schedule: Option<ScheduleId>,
+    /// Dehumidification control type.
+    pub dehumidification_control_type: DehumidificationControlType,
+    /// Cooling sensible heat ratio.
+    pub cooling_sensible_heat_ratio: f64,
+    /// Humidification control type.
+    pub humidification_control_type: HumidificationControlType,
+    /// Optional design specification outdoor air object name.
+    pub design_specification_outdoor_air_object_name: Option<NormalizedName>,
+    /// Optional outdoor air inlet node name.
+    pub outdoor_air_inlet_node_name: Option<NormalizedName>,
+    /// Demand-controlled ventilation type.
+    pub demand_controlled_ventilation_type: DemandControlledVentilationType,
+    /// Outdoor air economizer type.
+    pub outdoor_air_economizer_type: OutdoorAirEconomizerType,
+    /// Heat recovery type.
+    pub heat_recovery_type: HeatRecoveryType,
+    /// Sensible heat recovery effectiveness.
+    pub sensible_heat_recovery_effectiveness: f64,
+    /// Latent heat recovery effectiveness.
+    pub latent_heat_recovery_effectiveness: f64,
+    /// Optional zone HVAC sizing object name.
+    pub design_specification_zonehvac_sizing_object_name: Option<NormalizedName>,
+    /// Optional heating fuel efficiency schedule.
+    pub heating_fuel_efficiency_schedule: Option<ScheduleId>,
+    /// Heating fuel type.
+    pub heating_fuel_type: IdealLoadsFuelType,
+    /// Optional cooling fuel efficiency schedule.
+    pub cooling_fuel_efficiency_schedule: Option<ScheduleId>,
+    /// Cooling fuel type.
+    pub cooling_fuel_type: IdealLoadsFuelType,
+}
+
+/// Zone equipment load distribution scheme.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LoadDistributionScheme {
+    /// Sequential load distribution.
+    SequentialLoad,
+    /// Uniform load distribution.
+    UniformLoad,
+    /// Uniform part-load-ratio distribution.
+    UniformPlr,
+    /// Sequential uniform part-load-ratio distribution.
+    SequentialUniformPlr,
+}
+
+/// Zone equipment object types supported by the first HVAC graph subset.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ZoneEquipmentObjectType {
+    /// `ZoneHVAC:IdealLoadsAirSystem`.
+    IdealLoadsAirSystem,
+}
+
+/// One item in `ZoneHVAC:EquipmentList`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneEquipmentListEntry {
+    /// Equipment object type.
+    pub object_type: ZoneEquipmentObjectType,
+    /// Referenced IdealLoads air system.
+    pub ideal_loads_air_system: IdealLoadsAirSystemId,
+    /// Cooling sequence.
+    pub cooling_sequence: u32,
+    /// Heating or no-load sequence.
+    pub heating_or_no_load_sequence: u32,
+    /// Optional sequential cooling fraction schedule.
+    pub sequential_cooling_fraction_schedule: Option<ScheduleId>,
+    /// Optional sequential heating fraction schedule.
+    pub sequential_heating_fraction_schedule: Option<ScheduleId>,
+}
+
+/// Zone equipment list.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneEquipmentList {
+    /// Typed ID.
+    pub id: ZoneEquipmentListId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Load distribution scheme.
+    pub load_distribution_scheme: LoadDistributionScheme,
+    /// Ordered equipment entries.
+    pub equipment: Vec<ZoneEquipmentListEntry>,
+}
+
+/// Zone HVAC equipment connections.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneEquipmentConnection {
+    /// Typed ID.
+    pub id: ZoneEquipmentConnectionId,
+    /// Connected zone.
+    pub zone: ZoneId,
+    /// Conditioning equipment list.
+    pub equipment_list: ZoneEquipmentListId,
+    /// Zone air inlet node or node list name.
+    pub zone_air_inlet_node_or_nodelist_name: Option<NormalizedName>,
+    /// Zone air exhaust node or node list name.
+    pub zone_air_exhaust_node_or_nodelist_name: Option<NormalizedName>,
+    /// Zone air node name.
+    pub zone_air_node_name: NormalizedName,
+    /// Zone return air node or node list name.
+    pub zone_return_air_node_or_nodelist_name: Option<NormalizedName>,
+    /// Optional return-air fraction schedule.
+    pub zone_return_air_node_1_flow_rate_fraction_schedule: Option<ScheduleId>,
+    /// Optional return-air basis node or node list.
+    pub zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: Option<NormalizedName>,
+}
+
 /// Building surface type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SurfaceType {
@@ -558,6 +863,24 @@ pub struct TypedModel {
     pub other_equipment: Vec<OtherEquipment>,
     /// OtherEquipment names.
     pub other_equipment_names: NameMap<InternalGainId>,
+    /// Dual setpoint thermostat objects.
+    pub thermostat_dual_setpoints: Vec<ThermostatDualSetpoint>,
+    /// Dual setpoint names.
+    pub thermostat_dual_setpoint_names: NameMap<ThermostatSetpointId>,
+    /// Zone thermostat controls.
+    pub zone_thermostats: Vec<ZoneThermostat>,
+    /// Zone thermostat names.
+    pub zone_thermostat_names: NameMap<ZoneThermostatId>,
+    /// IdealLoads air systems.
+    pub ideal_loads_air_systems: Vec<IdealLoadsAirSystem>,
+    /// IdealLoads air system names.
+    pub ideal_loads_air_system_names: NameMap<IdealLoadsAirSystemId>,
+    /// Zone equipment lists.
+    pub zone_equipment_lists: Vec<ZoneEquipmentList>,
+    /// Zone equipment list names.
+    pub zone_equipment_list_names: NameMap<ZoneEquipmentListId>,
+    /// Zone equipment connections.
+    pub zone_equipment_connections: Vec<ZoneEquipmentConnection>,
     /// Zones.
     pub zones: Vec<Zone>,
     /// Zone names.
@@ -588,6 +911,15 @@ impl Default for TypedModel {
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
+            thermostat_dual_setpoints: Vec::new(),
+            thermostat_dual_setpoint_names: NameMap::default(),
+            zone_thermostats: Vec::new(),
+            zone_thermostat_names: NameMap::default(),
+            ideal_loads_air_systems: Vec::new(),
+            ideal_loads_air_system_names: NameMap::default(),
+            zone_equipment_lists: Vec::new(),
+            zone_equipment_list_names: NameMap::default(),
+            zone_equipment_connections: Vec::new(),
             zones: Vec::new(),
             zone_names: NameMap::default(),
             surfaces: Vec::new(),
@@ -610,6 +942,11 @@ impl TypedModel {
             + self.schedules.len()
             + self.compact_schedules.len()
             + self.other_equipment.len()
+            + self.thermostat_dual_setpoints.len()
+            + self.zone_thermostats.len()
+            + self.ideal_loads_air_systems.len()
+            + self.zone_equipment_lists.len()
+            + self.zone_equipment_connections.len()
             + self.zones.len()
             + self.surfaces.len()
     }
@@ -640,6 +977,12 @@ pub struct ModelGraph {
     pub zone_surfaces: Vec<ZoneSurfaceEdge>,
     /// Construction to material edges.
     pub construction_materials: Vec<ConstructionMaterialEdge>,
+    /// Zone to thermostat edges.
+    pub zone_thermostats: Vec<ZoneThermostatEdge>,
+    /// Thermostat to dual setpoint edges.
+    pub thermostat_setpoints: Vec<ThermostatSetpointEdge>,
+    /// Zone to IdealLoads equipment edges through equipment connections/lists.
+    pub zone_ideal_loads: Vec<ZoneIdealLoadsEdge>,
 }
 
 impl ModelGraph {
@@ -664,6 +1007,47 @@ impl ModelGraph {
                     layer_index: 0,
                 })
                 .collect(),
+            zone_thermostats: model
+                .zone_thermostats
+                .iter()
+                .map(|thermostat| ZoneThermostatEdge {
+                    zone: thermostat.zone,
+                    thermostat: thermostat.id,
+                })
+                .collect(),
+            thermostat_setpoints: model
+                .zone_thermostats
+                .iter()
+                .flat_map(|thermostat| {
+                    thermostat
+                        .controls
+                        .iter()
+                        .map(move |control| ThermostatSetpointEdge {
+                            thermostat: thermostat.id,
+                            setpoint: control.dual_setpoint,
+                        })
+                })
+                .collect(),
+            zone_ideal_loads: model
+                .zone_equipment_connections
+                .iter()
+                .flat_map(|connection| {
+                    model
+                        .zone_equipment_lists
+                        .iter()
+                        .find(move |list| list.id == connection.equipment_list)
+                        .into_iter()
+                        .flat_map(move |list| {
+                            list.equipment.iter().map(move |entry| ZoneIdealLoadsEdge {
+                                zone: connection.zone,
+                                equipment_list: list.id,
+                                ideal_loads_air_system: entry.ideal_loads_air_system,
+                                cooling_sequence: entry.cooling_sequence,
+                                heating_or_no_load_sequence: entry.heating_or_no_load_sequence,
+                            })
+                        })
+                })
+                .collect(),
         }
     }
 }
@@ -686,6 +1070,39 @@ pub struct ConstructionMaterialEdge {
     pub material: MaterialId,
     /// Zero-based layer index.
     pub layer_index: u32,
+}
+
+/// Zone/thermostat relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ZoneThermostatEdge {
+    /// Zone ID.
+    pub zone: ZoneId,
+    /// Thermostat ID.
+    pub thermostat: ZoneThermostatId,
+}
+
+/// Thermostat/setpoint relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ThermostatSetpointEdge {
+    /// Thermostat ID.
+    pub thermostat: ZoneThermostatId,
+    /// Dual setpoint ID.
+    pub setpoint: ThermostatSetpointId,
+}
+
+/// Zone/IdealLoads relation through equipment connections and lists.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ZoneIdealLoadsEdge {
+    /// Zone ID.
+    pub zone: ZoneId,
+    /// Equipment list ID.
+    pub equipment_list: ZoneEquipmentListId,
+    /// IdealLoads system ID.
+    pub ideal_loads_air_system: IdealLoadsAirSystemId,
+    /// Cooling sequence.
+    pub cooling_sequence: u32,
+    /// Heating or no-load sequence.
+    pub heating_or_no_load_sequence: u32,
 }
 
 #[cfg(test)]

@@ -71,7 +71,16 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.3-verify
 .\scripts\dev.cmd v0.4-verify
 .\scripts\dev.cmd v0.5-verify
+.\scripts\dev.cmd v0.6-verify
+.\scripts\dev.cmd v0.7-verify
+.\scripts\dev.cmd v0.8-verify
+.\scripts\dev.cmd v0.9-verify
+.\scripts\dev.cmd v0.10-verify
 ```
+
+Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
+their declared variables. v0.10 is a baseline-only typed-graph gate for
+thermostat and IdealLoads intake.
 
 Developer-only diagnostics:
 

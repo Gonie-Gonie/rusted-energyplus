@@ -1,9 +1,9 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
 use ep_model::{
-    AutoOrNumber, ConstructionId, MaterialId, OtherEquipment, OutputHandle,
+    AutoOrNumber, ConstructionId, IdealLoadsAirSystemId, MaterialId, OtherEquipment, OutputHandle,
     OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId,
-    SimulationModel, Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneId,
+    SimulationModel, Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneId, ZoneThermostatId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -35,8 +35,12 @@ pub enum ExecutionStep {
     UpdateWeather,
     /// Evaluate one schedule.
     EvaluateSchedule(ScheduleId),
+    /// Evaluate one zone thermostat control.
+    EvaluateZoneThermostat(ZoneThermostatId),
     /// Solve one zone.
     SolveZone(ZoneId),
+    /// Evaluate one IdealLoads air system assigned to a zone.
+    EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Write one output handle.
     WriteOutput(OutputHandle),
 }
@@ -71,12 +75,28 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     let mut setup_steps = vec![ExecutionStep::UpdateWeather];
     setup_steps.extend(schedule_ids(&model.typed).map(ExecutionStep::EvaluateSchedule));
 
-    let zone_steps = model
-        .typed
-        .zones
-        .iter()
-        .map(|zone| ExecutionStep::SolveZone(zone.id))
-        .collect();
+    let mut zone_steps = Vec::new();
+    for zone in &model.typed.zones {
+        zone_steps.extend(
+            model
+                .graph
+                .zone_thermostats
+                .iter()
+                .filter(|edge| edge.zone == zone.id)
+                .map(|edge| ExecutionStep::EvaluateZoneThermostat(edge.thermostat)),
+        );
+        zone_steps.push(ExecutionStep::SolveZone(zone.id));
+        zone_steps.extend(
+            model
+                .graph
+                .zone_ideal_loads
+                .iter()
+                .filter(|edge| edge.zone == zone.id)
+                .map(|edge| {
+                    ExecutionStep::EvaluateIdealLoadsAirSystem(edge.ideal_loads_air_system)
+                }),
+        );
+    }
 
     ExecutionPlan {
         stages: vec![
@@ -1893,11 +1913,17 @@ mod tests {
         surface_geometry_summaries, zone_geometry_summaries,
     };
     use ep_model::{
-        AutoOrNumber, Construction, ConstructionId, InternalGainId, Material, MaterialId,
-        MaterialKind, NormalizedName, OtherEquipment, OutputHandle, OutsideBoundaryCondition,
-        Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
-        ScheduleId, SimulationModel, Surface, SurfaceId, SurfaceType, TimestepConfig, TypedModel,
-        Zone, ZoneId,
+        AutoOrNumber, Construction, ConstructionId, DehumidificationControlType,
+        DemandControlledVentilationType, HeatRecoveryType, HumidificationControlType,
+        IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+        InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind, NormalizedName,
+        OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition, Point3,
+        RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
+        ScheduleId, SimulationModel, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
+        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Zone,
+        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
+        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
 
     #[test]
@@ -2058,6 +2084,139 @@ mod tests {
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
+    }
+
+    #[test]
+    fn execution_plan_includes_thermostat_and_ideal_loads_steps() {
+        let mut typed = TypedModel::default();
+        typed.schedules.push(ScheduleConstant {
+            id: ScheduleId(0),
+            name: NormalizedName::new("Control Type"),
+            schedule_type_limits: None,
+            hourly_value: 4.0,
+        });
+        typed.schedules.push(ScheduleConstant {
+            id: ScheduleId(1),
+            name: NormalizedName::new("Heating Setpoint"),
+            schedule_type_limits: None,
+            hourly_value: 21.0,
+        });
+        typed.schedules.push(ScheduleConstant {
+            id: ScheduleId(2),
+            name: NormalizedName::new("Cooling Setpoint"),
+            schedule_type_limits: None,
+            hourly_value: 24.0,
+        });
+        typed.zones.push(Zone {
+            id: ZoneId(0),
+            name: NormalizedName::new("Zone One"),
+            direction_of_relative_north_deg: 0.0,
+            origin: Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::AutoCalculate,
+        });
+        typed
+            .thermostat_dual_setpoints
+            .push(ThermostatDualSetpoint {
+                id: ThermostatSetpointId(0),
+                name: NormalizedName::new("Dual Setpoints"),
+                heating_setpoint_schedule: ScheduleId(1),
+                cooling_setpoint_schedule: ScheduleId(2),
+            });
+        typed.zone_thermostats.push(ZoneThermostat {
+            id: ZoneThermostatId(0),
+            name: NormalizedName::new("Zone Thermostat"),
+            zone: ZoneId(0),
+            control_type_schedule: ScheduleId(0),
+            controls: vec![ZoneThermostatControl {
+                object_type: ThermostatControlObjectType::DualSetpoint,
+                dual_setpoint: ThermostatSetpointId(0),
+            }],
+            temperature_difference_between_cutout_and_setpoint_delta_c: 0.0,
+        });
+        typed.ideal_loads_air_systems.push(IdealLoadsAirSystem {
+            id: IdealLoadsAirSystemId(0),
+            name: NormalizedName::new("Zone Ideal Loads"),
+            availability_schedule: None,
+            zone_supply_air_node_name: NormalizedName::new("Zone Inlet"),
+            zone_exhaust_air_node_name: None,
+            system_inlet_air_node_name: None,
+            maximum_heating_supply_air_temperature_c: 50.0,
+            minimum_cooling_supply_air_temperature_c: 13.0,
+            maximum_heating_supply_air_humidity_ratio: 0.0156,
+            minimum_cooling_supply_air_humidity_ratio: 0.0077,
+            heating_limit: IdealLoadsLimit::NoLimit,
+            maximum_heating_air_flow_rate_m3_per_s: None,
+            maximum_sensible_heating_capacity_w: None,
+            cooling_limit: IdealLoadsLimit::NoLimit,
+            maximum_cooling_air_flow_rate_m3_per_s: None,
+            maximum_total_cooling_capacity_w: None,
+            heating_availability_schedule: None,
+            cooling_availability_schedule: None,
+            dehumidification_control_type: DehumidificationControlType::ConstantSensibleHeatRatio,
+            cooling_sensible_heat_ratio: 0.7,
+            humidification_control_type: HumidificationControlType::None,
+            design_specification_outdoor_air_object_name: None,
+            outdoor_air_inlet_node_name: None,
+            demand_controlled_ventilation_type: DemandControlledVentilationType::None,
+            outdoor_air_economizer_type: OutdoorAirEconomizerType::NoEconomizer,
+            heat_recovery_type: HeatRecoveryType::None,
+            sensible_heat_recovery_effectiveness: 0.7,
+            latent_heat_recovery_effectiveness: 0.65,
+            design_specification_zonehvac_sizing_object_name: None,
+            heating_fuel_efficiency_schedule: None,
+            heating_fuel_type: IdealLoadsFuelType::DistrictHeatingWater,
+            cooling_fuel_efficiency_schedule: None,
+            cooling_fuel_type: IdealLoadsFuelType::DistrictCooling,
+        });
+        typed.zone_equipment_lists.push(ZoneEquipmentList {
+            id: ZoneEquipmentListId(0),
+            name: NormalizedName::new("Zone Equipment"),
+            load_distribution_scheme: LoadDistributionScheme::SequentialLoad,
+            equipment: vec![ZoneEquipmentListEntry {
+                object_type: ZoneEquipmentObjectType::IdealLoadsAirSystem,
+                ideal_loads_air_system: IdealLoadsAirSystemId(0),
+                cooling_sequence: 1,
+                heating_or_no_load_sequence: 1,
+                sequential_cooling_fraction_schedule: None,
+                sequential_heating_fraction_schedule: None,
+            }],
+        });
+        typed
+            .zone_equipment_connections
+            .push(ZoneEquipmentConnection {
+                id: ZoneEquipmentConnectionId(0),
+                zone: ZoneId(0),
+                equipment_list: ZoneEquipmentListId(0),
+                zone_air_inlet_node_or_nodelist_name: Some(NormalizedName::new("Zone Inlet")),
+                zone_air_exhaust_node_or_nodelist_name: None,
+                zone_air_node_name: NormalizedName::new("Zone Air Node"),
+                zone_return_air_node_or_nodelist_name: Some(NormalizedName::new("Zone Return")),
+                zone_return_air_node_1_flow_rate_fraction_schedule: None,
+                zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: None,
+            });
+        let model = SimulationModel::from_typed(typed);
+
+        let plan = build_execution_plan(&model);
+
+        assert_eq!(model.graph.zone_thermostats.len(), 1);
+        assert_eq!(model.graph.zone_ideal_loads.len(), 1);
+        assert_eq!(plan.stages[1].steps.len(), 3);
+        assert_eq!(
+            plan.stages[1].steps[0],
+            ExecutionStep::EvaluateZoneThermostat(ZoneThermostatId(0))
+        );
+        assert_eq!(plan.stages[1].steps[1], ExecutionStep::SolveZone(ZoneId(0)));
+        assert_eq!(
+            plan.stages[1].steps[2],
+            ExecutionStep::EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
+        );
     }
 
     #[test]

@@ -25,6 +25,8 @@ $required = @(
     "data\conformance_cases\internal_gains_001\internal_gains.idf",
     "data\conformance_cases\zone_temperature_diagnostic_001\case.toml",
     "data\conformance_cases\zone_temperature_diagnostic_001\zone_temperature.idf",
+    "data\conformance_cases\ideal_loads_thermostat_001\case.toml",
+    "data\conformance_cases\ideal_loads_thermostat_001\ideal_loads_thermostat.idf",
     "data\conformance_suites\foundation.toml"
 )
 

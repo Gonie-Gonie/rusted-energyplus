@@ -21,7 +21,7 @@ Milestones are organized around evidence, not demos.
 | v0.7 EnergyPlus Source Mapping | source-function maps, call order, data maps, and proof variables before algorithms | planning guard |
 | v0.8 Uncontrolled Heat Balance Port | first tolerance-gated heat-balance subset | `heat_balance_nomass_001` MAT only |
 | v0.9 Surface, Fenestration, Radiation Expansion | first surface-temperature conformance subset, with fenestration and solar still separate | `surface_temperature_nomass_001` surface temperatures only |
-| v0.10 IdealLoads and Thermostat | thermostat and IdealLoads load-calculation comparisons | declared cases only |
+| v0.10 IdealLoads and Thermostat | thermostat, zone equipment, and IdealLoads typed graph foundation | `ideal_loads_thermostat_001` baseline-only smoke, no load conformance |
 | v0.11 Air-side Node and Simple HVAC | node-level fan/coil/zone-equipment comparisons | declared cases only |
 | v0.12 Plant Loop Skeleton | plant graph, node, flow, pump/boiler/chiller subset comparisons | declared cases only |
 | v1.0 Stable Compatibility Subset | public subset with locked object matrix and CI reports | declared subset only |

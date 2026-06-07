@@ -1,23 +1,98 @@
 ---
-status: draft
-claim_level: none
+status: active
+claim_level: baseline-only
 owner: runtime
-last_reviewed: 2026-06-05
+last_reviewed: 2026-06-07
 ---
 
 # HVAC
 
-HVAC is not in the current public compatibility scope.
+HVAC numerical compatibility is not in the current public compatibility scope.
+v0.10 adds the IdealLoads typed graph foundation so later HVAC work has named
+model nodes, graph edges, and output requests to build on.
 
-Before HVAC implementation claims, this map must identify:
+## v0.10 Foundation
 
-- selected EnergyPlus source files
-- selected component subset
-- node state variables
-- thermostat/control boundaries
-- requested output variables
-- meter variables
-- tolerance policy
+`ideal_loads_thermostat_001` is the first HVAC-owned smoke case. It is a
+blocking release gate, but it is not an IdealLoads load-conformance claim.
 
-IdealLoads should be mapped before general HVAC equipment.
+Typed objects:
 
+- `ThermostatSetpoint:DualSetpoint`
+- `ZoneControl:Thermostat`
+- `ZoneHVAC:IdealLoadsAirSystem`
+- `ZoneHVAC:EquipmentList`
+- `ZoneHVAC:EquipmentConnections`
+
+Graph edges:
+
+- zone to thermostat
+- thermostat to dual setpoint
+- zone to IdealLoads equipment through equipment connections and equipment list
+
+Execution-plan placeholders:
+
+- `EvaluateZoneThermostat`
+- `EvaluateIdealLoadsAirSystem`
+
+These placeholders make ordering visible. They do not mean that EnergyPlus HVAC
+control, load, sizing, availability, humidity, ventilation, economizer, fuel,
+or heat-recovery algorithms have been ported.
+
+## Baseline Outputs
+
+The v0.10 case requests these ESO variables:
+
+| Variable | Class | Level |
+|---|---|---|
+| `Zone Thermostat Heating Setpoint Temperature` | `zone-state` | baseline-only |
+| `Zone Thermostat Cooling Setpoint Temperature` | `zone-state` | baseline-only |
+| `Zone Ideal Loads Zone Total Heating Rate` | `hvac-state` | baseline-only |
+| `Zone Ideal Loads Zone Total Cooling Rate` | `hvac-state` | baseline-only |
+
+The report must keep:
+
+```text
+comparison_class: smoke
+conformance_claim: false
+tolerance_policy: none
+status: baseline-only
+```
+
+## EnergyPlus Source Areas To Map Next
+
+Before a load-conformance claim, the source map must identify the specific
+EnergyPlus 26.1.0 functions and state transitions for:
+
+- zone thermostat control type and setpoint selection
+- IdealLoads sensible and latent load calculation
+- zone equipment availability and sequencing
+- sizing interactions with autosized flow and capacity fields
+- outdoor air, demand controlled ventilation, economizer, and heat recovery
+- humidification and dehumidification control
+- system-node temperature, humidity ratio, and mass-flow registration
+- output variable registration and meter accounting
+
+Likely source areas include `ZoneTempPredictorCorrector`,
+`ZoneEquipmentManager`, `ZoneAirLoopEquipmentManager`, `HVACManager`, and the
+IdealLoads component implementation in the EnergyPlus HVAC source tree. The
+exact source-function map must be recorded before any v0.11 or later numerical
+claim is promoted.
+
+## Promotion Requirements
+
+An IdealLoads output can move from baseline-only to conformance only when all
+of these exist:
+
+- a declared case manifest with `comparison_class = "conformance"`
+- `conformance_claim = true`
+- requested thermostat, zone, IdealLoads, and node variables
+- Rust result artifacts for the same keys, variables, and frequencies
+- timestamp and warmup handling notes
+- absolute and relative tolerances
+- compare-summary rows with first divergence information
+- markdown report artifact
+- blocking release gate
+
+Until then, IdealLoads rates and thermostat behavior remain baseline-only or
+diagnostic-only evidence.

@@ -39,7 +39,7 @@ Related policy documents:
 | output/trace/compare | selected outputs, deltas, divergence points, report index | v0.6 |
 | heat balance | no-HVAC or HVAC-disabled uncontrolled cases | v0.8 |
 | fenestration/radiation | simple window and shading cases | v0.9 |
-| IdealLoads | thermostat and IdealLoads examples | v0.10 |
+| IdealLoads | thermostat and IdealLoads typed graph, then load diagnostics | v0.10 |
 | air-side HVAC | selected fan/coil/PTAC cases | v0.11 |
 | plant | selected boiler/chiller/pump cases | v0.12 |
 

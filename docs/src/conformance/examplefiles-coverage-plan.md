@@ -36,7 +36,7 @@ Each selected case must answer:
 | v0.7 | Tier A source mapping | uncontrolled and no-HVAC heat-balance candidates | source/function and output-variable maps |
 | v0.8 | Tier A heat balance | one-zone no-mass adiabatic candidate | first tolerance-gated `Zone Mean Air Temperature` subset |
 | v0.9 | Tier A surface state | one-zone no-mass adiabatic surface candidate | first tolerance-gated surface inside/outside face temperature subset |
-| v0.10 | Tier A/B IdealLoads | selected IdealLoads and thermostat cases | setpoints, zone temperature, loads, energy |
+| v0.10 | Tier A/B IdealLoads | selected IdealLoads and thermostat cases | thermostat, equipment, and IdealLoads typed graph; baseline-only outputs |
 | v0.11 | Tier B air-side HVAC | `5ZoneAirCooled`, PTAC, selected CAV cases | node and component diagnostics |
 | v0.12 | Tier B plant | selected boiler, pump, chiller, and plant-loop cases | plant graph, node, flow, and equipment diagnostics |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
@@ -60,6 +60,10 @@ Current v0.8 heat-balance conformance case:
 Current v0.9 surface-temperature conformance case:
 
 - `surface_temperature_nomass_001`
+
+Current v0.10 IdealLoads thermostat smoke case:
+
+- `ideal_loads_thermostat_001`
 
 Planned fields:
 
@@ -95,4 +99,5 @@ baseline-only, or diagnostic-only.
 - generate a release-level conformance index
 - add Tier A candidates for one-zone uncontrolled and simple window cases
 - keep fenestration and solar outputs diagnostic-only until a separate declared case exists
+- keep IdealLoads load outputs baseline-only until a solver declares tolerances
 - keep `compare zone-temperature` diagnostic-only until v0.8

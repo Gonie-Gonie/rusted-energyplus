@@ -1,12 +1,18 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AutoOrNumber, Building, Construction, ConstructionId, InternalGainId, Material, MaterialId,
-    MaterialKind, NameMap, NormalizedName, NumericType, OtherEquipment, OutsideBoundaryCondition,
-    Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
-    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, SolarDistribution,
-    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TimestepConfig, TypedModel, Version,
-    WindExposure, Zone, ZoneId,
+    AutoOrNumber, AutosizeOrNumber, Building, Construction, ConstructionId,
+    DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
+    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
+    IdealLoadsLimit, InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind,
+    NameMap, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
+    OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
+    ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
+    SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -188,6 +194,11 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Constant",
     "Schedule:Compact",
     "OtherEquipment",
+    "ThermostatSetpoint:DualSetpoint",
+    "ZoneControl:Thermostat",
+    "ZoneHVAC:IdealLoadsAirSystem",
+    "ZoneHVAC:EquipmentList",
+    "ZoneHVAC:EquipmentConnections",
     "Zone",
     "BuildingSurface:Detailed",
 ];
@@ -223,6 +234,11 @@ impl<'a> Compiler<'a> {
         self.parse_schedules(&mut model);
         self.parse_compact_schedules(&mut model);
         self.parse_zones(&mut model);
+        self.parse_thermostat_dual_setpoints(&mut model);
+        self.parse_zone_thermostats(&mut model);
+        self.parse_ideal_loads_air_systems(&mut model);
+        self.parse_zone_equipment_lists(&mut model);
+        self.parse_zone_equipment_connections(&mut model);
         self.parse_other_equipment(&mut model);
         self.parse_surfaces(&mut model);
 
@@ -670,6 +686,549 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_thermostat_dual_setpoints(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ThermostatSetpoint:DualSetpoint") {
+            let Some(heating_setpoint_schedule) = self.required_schedule_reference(
+                model,
+                "ThermostatSetpoint:DualSetpoint",
+                &name,
+                &object,
+                "heating_setpoint_temperature_schedule_name",
+            ) else {
+                continue;
+            };
+            let Some(cooling_setpoint_schedule) = self.required_schedule_reference(
+                model,
+                "ThermostatSetpoint:DualSetpoint",
+                &name,
+                &object,
+                "cooling_setpoint_temperature_schedule_name",
+            ) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id(
+                "ThermostatSetpoint:DualSetpoint",
+                &name,
+                model.thermostat_dual_setpoints.len(),
+            ) else {
+                continue;
+            };
+            let id = ThermostatSetpointId(id_value);
+            if model
+                .thermostat_dual_setpoint_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name("ThermostatSetpoint:DualSetpoint", &name);
+                continue;
+            }
+
+            model
+                .thermostat_dual_setpoints
+                .push(ThermostatDualSetpoint {
+                    id,
+                    name: NormalizedName::new(&name),
+                    heating_setpoint_schedule,
+                    cooling_setpoint_schedule,
+                });
+        }
+    }
+
+    fn parse_zone_thermostats(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ZoneControl:Thermostat") {
+            let Some(zone_name) = self.required_string(
+                "ZoneControl:Thermostat",
+                &name,
+                &object,
+                "zone_or_zonelist_name",
+            ) else {
+                continue;
+            };
+            let Some(zone) = self.resolve_name(
+                &model.zone_names,
+                "ZoneControl:Thermostat",
+                &name,
+                "zone_or_zonelist_name",
+                &zone_name,
+                "Zone",
+            ) else {
+                continue;
+            };
+            let Some(control_type_schedule) = self.required_schedule_reference(
+                model,
+                "ZoneControl:Thermostat",
+                &name,
+                &object,
+                "control_type_schedule_name",
+            ) else {
+                continue;
+            };
+
+            let mut controls = Vec::new();
+            for index in 1..=4 {
+                let object_type_field = format!("control_{index}_object_type");
+                let name_field = format!("control_{index}_name");
+                let has_any = field_value(&object, &object_type_field).is_some()
+                    || field_value(&object, &name_field).is_some();
+                if index > 1 && !has_any {
+                    continue;
+                }
+
+                let Some(object_type) = self.required_enum(
+                    "ZoneControl:Thermostat",
+                    &name,
+                    &object,
+                    &object_type_field,
+                    parse_thermostat_control_object_type,
+                ) else {
+                    continue;
+                };
+                let Some(control_name) =
+                    self.required_string("ZoneControl:Thermostat", &name, &object, &name_field)
+                else {
+                    continue;
+                };
+                let Some(dual_setpoint) = self.resolve_name(
+                    &model.thermostat_dual_setpoint_names,
+                    "ZoneControl:Thermostat",
+                    &name,
+                    &name_field,
+                    &control_name,
+                    "ThermostatSetpoint:DualSetpoint",
+                ) else {
+                    continue;
+                };
+
+                controls.push(ZoneThermostatControl {
+                    object_type,
+                    dual_setpoint,
+                });
+            }
+            if controls.is_empty() {
+                continue;
+            }
+
+            let Some(id_value) = self.checked_id(
+                "ZoneControl:Thermostat",
+                &name,
+                model.zone_thermostats.len(),
+            ) else {
+                continue;
+            };
+            let id = ZoneThermostatId(id_value);
+            if model.zone_thermostat_names.insert(&name, id).is_some() {
+                self.duplicate_name("ZoneControl:Thermostat", &name);
+                continue;
+            }
+
+            model.zone_thermostats.push(ZoneThermostat {
+                id,
+                name: NormalizedName::new(&name),
+                zone,
+                control_type_schedule,
+                controls,
+                temperature_difference_between_cutout_and_setpoint_delta_c: self.number_default(
+                    "ZoneControl:Thermostat",
+                    &name,
+                    &object,
+                    "temperature_difference_between_cutout_and_setpoint",
+                    0.0,
+                ),
+            });
+        }
+    }
+
+    fn parse_ideal_loads_air_systems(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ZoneHVAC:IdealLoadsAirSystem") {
+            let Some(zone_supply_air_node_name) = self.required_string(
+                "ZoneHVAC:IdealLoadsAirSystem",
+                &name,
+                &object,
+                "zone_supply_air_node_name",
+            ) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id(
+                "ZoneHVAC:IdealLoadsAirSystem",
+                &name,
+                model.ideal_loads_air_systems.len(),
+            ) else {
+                continue;
+            };
+            let id = IdealLoadsAirSystemId(id_value);
+            if model
+                .ideal_loads_air_system_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name("ZoneHVAC:IdealLoadsAirSystem", &name);
+                continue;
+            }
+
+            model.ideal_loads_air_systems.push(IdealLoadsAirSystem {
+                id,
+                name: NormalizedName::new(&name),
+                availability_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "availability_schedule_name",
+                ),
+                zone_supply_air_node_name: NormalizedName::new(&zone_supply_air_node_name),
+                zone_exhaust_air_node_name: self
+                    .optional_string(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "zone_exhaust_air_node_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                system_inlet_air_node_name: self
+                    .optional_string(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "system_inlet_air_node_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                maximum_heating_supply_air_temperature_c: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_heating_supply_air_temperature",
+                    50.0,
+                ),
+                minimum_cooling_supply_air_temperature_c: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "minimum_cooling_supply_air_temperature",
+                    13.0,
+                ),
+                maximum_heating_supply_air_humidity_ratio: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_heating_supply_air_humidity_ratio",
+                    0.0156,
+                ),
+                minimum_cooling_supply_air_humidity_ratio: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "minimum_cooling_supply_air_humidity_ratio",
+                    0.0077,
+                ),
+                heating_limit: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "heating_limit"),
+                    IdealLoadsLimit::NoLimit,
+                    "NoLimit",
+                    parse_ideal_loads_limit,
+                ),
+                maximum_heating_air_flow_rate_m3_per_s: self.optional_autosize_or_number(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_heating_air_flow_rate",
+                ),
+                maximum_sensible_heating_capacity_w: self.optional_autosize_or_number(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_sensible_heating_capacity",
+                ),
+                cooling_limit: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "cooling_limit"),
+                    IdealLoadsLimit::NoLimit,
+                    "NoLimit",
+                    parse_ideal_loads_limit,
+                ),
+                maximum_cooling_air_flow_rate_m3_per_s: self.optional_autosize_or_number(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_cooling_air_flow_rate",
+                ),
+                maximum_total_cooling_capacity_w: self.optional_autosize_or_number(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "maximum_total_cooling_capacity",
+                ),
+                heating_availability_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "heating_availability_schedule_name",
+                ),
+                cooling_availability_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "cooling_availability_schedule_name",
+                ),
+                dehumidification_control_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "dehumidification_control_type"),
+                    DehumidificationControlType::ConstantSensibleHeatRatio,
+                    "ConstantSensibleHeatRatio",
+                    parse_dehumidification_control_type,
+                ),
+                cooling_sensible_heat_ratio: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "cooling_sensible_heat_ratio",
+                    0.7,
+                ),
+                humidification_control_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "humidification_control_type"),
+                    HumidificationControlType::None,
+                    "None",
+                    parse_humidification_control_type,
+                ),
+                design_specification_outdoor_air_object_name: self
+                    .optional_string(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "design_specification_outdoor_air_object_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                outdoor_air_inlet_node_name: self
+                    .optional_string(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "outdoor_air_inlet_node_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                demand_controlled_ventilation_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "demand_controlled_ventilation_type"),
+                    DemandControlledVentilationType::None,
+                    "None",
+                    parse_demand_controlled_ventilation_type,
+                ),
+                outdoor_air_economizer_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "outdoor_air_economizer_type"),
+                    OutdoorAirEconomizerType::NoEconomizer,
+                    "NoEconomizer",
+                    parse_outdoor_air_economizer_type,
+                ),
+                heat_recovery_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "heat_recovery_type"),
+                    HeatRecoveryType::None,
+                    "None",
+                    parse_heat_recovery_type,
+                ),
+                sensible_heat_recovery_effectiveness: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "sensible_heat_recovery_effectiveness",
+                    0.7,
+                ),
+                latent_heat_recovery_effectiveness: self.number_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "latent_heat_recovery_effectiveness",
+                    0.65,
+                ),
+                design_specification_zonehvac_sizing_object_name: self
+                    .optional_string(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "design_specification_zonehvac_sizing_object_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                heating_fuel_efficiency_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "heating_fuel_efficiency_schedule_name",
+                ),
+                heating_fuel_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "heating_fuel_type"),
+                    IdealLoadsFuelType::DistrictHeatingWater,
+                    "DistrictHeatingWater",
+                    parse_ideal_loads_fuel_type,
+                ),
+                cooling_fuel_efficiency_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    &object,
+                    "cooling_fuel_efficiency_schedule_name",
+                ),
+                cooling_fuel_type: self.enum_default(
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    &name,
+                    (&object, "cooling_fuel_type"),
+                    IdealLoadsFuelType::DistrictCooling,
+                    "DistrictCooling",
+                    parse_ideal_loads_fuel_type,
+                ),
+            });
+        }
+    }
+
+    fn parse_zone_equipment_lists(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ZoneHVAC:EquipmentList") {
+            let Some(id_value) = self.checked_id(
+                "ZoneHVAC:EquipmentList",
+                &name,
+                model.zone_equipment_lists.len(),
+            ) else {
+                continue;
+            };
+            let id = ZoneEquipmentListId(id_value);
+            if model.zone_equipment_list_names.insert(&name, id).is_some() {
+                self.duplicate_name("ZoneHVAC:EquipmentList", &name);
+                continue;
+            }
+            let Some(equipment) = self.zone_equipment_entries(model, &name, &object) else {
+                continue;
+            };
+
+            model.zone_equipment_lists.push(ZoneEquipmentList {
+                id,
+                name: NormalizedName::new(&name),
+                load_distribution_scheme: self.enum_default(
+                    "ZoneHVAC:EquipmentList",
+                    &name,
+                    (&object, "load_distribution_scheme"),
+                    LoadDistributionScheme::SequentialLoad,
+                    "SequentialLoad",
+                    parse_load_distribution_scheme,
+                ),
+                equipment,
+            });
+        }
+    }
+
+    fn parse_zone_equipment_connections(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ZoneHVAC:EquipmentConnections") {
+            let Some(zone_name) =
+                self.required_string("ZoneHVAC:EquipmentConnections", &name, &object, "zone_name")
+            else {
+                continue;
+            };
+            let Some(zone) = self.resolve_name(
+                &model.zone_names,
+                "ZoneHVAC:EquipmentConnections",
+                &name,
+                "zone_name",
+                &zone_name,
+                "Zone",
+            ) else {
+                continue;
+            };
+            let Some(equipment_list_name) = self.required_string(
+                "ZoneHVAC:EquipmentConnections",
+                &name,
+                &object,
+                "zone_conditioning_equipment_list_name",
+            ) else {
+                continue;
+            };
+            let Some(equipment_list) = self.resolve_name(
+                &model.zone_equipment_list_names,
+                "ZoneHVAC:EquipmentConnections",
+                &name,
+                "zone_conditioning_equipment_list_name",
+                &equipment_list_name,
+                "ZoneHVAC:EquipmentList",
+            ) else {
+                continue;
+            };
+            let Some(zone_air_node_name) = self.required_string(
+                "ZoneHVAC:EquipmentConnections",
+                &name,
+                &object,
+                "zone_air_node_name",
+            ) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id(
+                "ZoneHVAC:EquipmentConnections",
+                &name,
+                model.zone_equipment_connections.len(),
+            ) else {
+                continue;
+            };
+
+            model
+                .zone_equipment_connections
+                .push(ZoneEquipmentConnection {
+                    id: ZoneEquipmentConnectionId(id_value),
+                    zone,
+                    equipment_list,
+                    zone_air_inlet_node_or_nodelist_name: self
+                        .optional_string(
+                            "ZoneHVAC:EquipmentConnections",
+                            &name,
+                            &object,
+                            "zone_air_inlet_node_or_nodelist_name",
+                        )
+                        .map(|value| NormalizedName::new(&value)),
+                    zone_air_exhaust_node_or_nodelist_name: self
+                        .optional_string(
+                            "ZoneHVAC:EquipmentConnections",
+                            &name,
+                            &object,
+                            "zone_air_exhaust_node_or_nodelist_name",
+                        )
+                        .map(|value| NormalizedName::new(&value)),
+                    zone_air_node_name: NormalizedName::new(&zone_air_node_name),
+                    zone_return_air_node_or_nodelist_name: self
+                        .optional_string(
+                            "ZoneHVAC:EquipmentConnections",
+                            &name,
+                            &object,
+                            "zone_return_air_node_or_nodelist_name",
+                        )
+                        .map(|value| NormalizedName::new(&value)),
+                    zone_return_air_node_1_flow_rate_fraction_schedule: self
+                        .optional_schedule_reference(
+                            model,
+                            "ZoneHVAC:EquipmentConnections",
+                            &name,
+                            &object,
+                            "zone_return_air_node_1_flow_rate_fraction_schedule_name",
+                        ),
+                    zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: self
+                        .optional_string(
+                            "ZoneHVAC:EquipmentConnections",
+                            &name,
+                            &object,
+                            "zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name",
+                        )
+                        .map(|value| NormalizedName::new(&value)),
+                });
+        }
+    }
+
     fn parse_other_equipment(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("OtherEquipment") {
             let Some(zone_name) = self.required_string(
@@ -863,6 +1422,133 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn zone_equipment_entries(
+        &mut self,
+        model: &TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<ZoneEquipmentListEntry>> {
+        let Some(value) = field_value(object, "equipment") else {
+            self.error(
+                "MissingRequiredField",
+                "ZoneHVAC:EquipmentList",
+                Some(object_name),
+                Some("equipment"),
+                format!("ZoneHVAC:EquipmentList/{object_name} requires field equipment"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("ZoneHVAC:EquipmentList", object_name, "equipment", "array");
+            return None;
+        };
+
+        let mut entries = Vec::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    "ZoneHVAC:EquipmentList",
+                    Some(object_name),
+                    Some("equipment"),
+                    format!(
+                        "ZoneHVAC:EquipmentList/{object_name} equipment entry {index} must be an object"
+                    ),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(object_type) = self.required_enum(
+                "ZoneHVAC:EquipmentList",
+                &entry_name,
+                &entry_object,
+                "zone_equipment_object_type",
+                parse_zone_equipment_object_type,
+            ) else {
+                continue;
+            };
+            let Some(equipment_name) = self.required_string(
+                "ZoneHVAC:EquipmentList",
+                &entry_name,
+                &entry_object,
+                "zone_equipment_name",
+            ) else {
+                continue;
+            };
+            let Some(ideal_loads_air_system) = self.resolve_name(
+                &model.ideal_loads_air_system_names,
+                "ZoneHVAC:EquipmentList",
+                &entry_name,
+                "zone_equipment_name",
+                &equipment_name,
+                "ZoneHVAC:IdealLoadsAirSystem",
+            ) else {
+                continue;
+            };
+            let Some(cooling_sequence) = self.optional_u32(
+                "ZoneHVAC:EquipmentList",
+                &entry_name,
+                &entry_object,
+                "zone_equipment_cooling_sequence",
+            ) else {
+                self.error(
+                    "MissingRequiredField",
+                    "ZoneHVAC:EquipmentList",
+                    Some(&entry_name),
+                    Some("zone_equipment_cooling_sequence"),
+                    format!(
+                        "ZoneHVAC:EquipmentList/{entry_name} requires field zone_equipment_cooling_sequence"
+                    ),
+                );
+                continue;
+            };
+            let Some(heating_or_no_load_sequence) = self.optional_u32(
+                "ZoneHVAC:EquipmentList",
+                &entry_name,
+                &entry_object,
+                "zone_equipment_heating_or_no_load_sequence",
+            ) else {
+                self.error(
+                    "MissingRequiredField",
+                    "ZoneHVAC:EquipmentList",
+                    Some(&entry_name),
+                    Some("zone_equipment_heating_or_no_load_sequence"),
+                    format!(
+                        "ZoneHVAC:EquipmentList/{entry_name} requires field zone_equipment_heating_or_no_load_sequence"
+                    ),
+                );
+                continue;
+            };
+
+            entries.push(ZoneEquipmentListEntry {
+                object_type,
+                ideal_loads_air_system,
+                cooling_sequence,
+                heating_or_no_load_sequence,
+                sequential_cooling_fraction_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:EquipmentList",
+                    &entry_name,
+                    &entry_object,
+                    "zone_equipment_sequential_cooling_fraction_schedule_name",
+                ),
+                sequential_heating_fraction_schedule: self.optional_schedule_reference(
+                    model,
+                    "ZoneHVAC:EquipmentList",
+                    &entry_name,
+                    &entry_object,
+                    "zone_equipment_sequential_heating_fraction_schedule_name",
+                ),
+            });
+        }
+
+        Some(entries)
+    }
+
     fn objects(&self, object_type: &str) -> Vec<(String, RawObject)> {
         self.raw_model
             .objects
@@ -931,6 +1617,44 @@ impl<'a> Compiler<'a> {
         None
     }
 
+    fn required_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<ScheduleId> {
+        let schedule_name = self.required_string(object_type, object_name, object, field)?;
+        self.resolve_name(
+            &model.schedule_names,
+            object_type,
+            object_name,
+            field,
+            &schedule_name,
+            "Schedule",
+        )
+    }
+
+    fn optional_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<ScheduleId> {
+        let schedule_name = self.optional_string(object_type, object_name, object, field)?;
+        self.resolve_name(
+            &model.schedule_names,
+            object_type,
+            object_name,
+            field,
+            &schedule_name,
+            "Schedule",
+        )
+    }
+
     fn required_string(
         &mut self,
         object_type: &str,
@@ -993,6 +1717,30 @@ impl<'a> Compiler<'a> {
     ) -> Option<f64> {
         match field_value(object, field) {
             Some(value) => self.number_value(object_type, object_name, field, value),
+            None => None,
+        }
+    }
+
+    fn optional_autosize_or_number(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<AutosizeOrNumber> {
+        match field_value(object, field) {
+            Some(RawValue::String(value))
+                if value.trim().is_empty() || value.eq_ignore_ascii_case("Autosize") =>
+            {
+                if value.eq_ignore_ascii_case("Autosize") {
+                    Some(AutosizeOrNumber::Autosize)
+                } else {
+                    None
+                }
+            }
+            Some(value) => self
+                .number_value(object_type, object_name, field, value)
+                .map(AutosizeOrNumber::Value),
             None => None,
         }
     }
@@ -1587,6 +2335,151 @@ fn parse_numeric_type(value: &str) -> Option<NumericType> {
     }
 }
 
+fn parse_thermostat_control_object_type(value: &str) -> Option<ThermostatControlObjectType> {
+    match value {
+        value if value.eq_ignore_ascii_case("ThermostatSetpoint:DualSetpoint") => {
+            Some(ThermostatControlObjectType::DualSetpoint)
+        }
+        _ => None,
+    }
+}
+
+fn parse_ideal_loads_limit(value: &str) -> Option<IdealLoadsLimit> {
+    match value {
+        value if value.eq_ignore_ascii_case("NoLimit") => Some(IdealLoadsLimit::NoLimit),
+        value if value.eq_ignore_ascii_case("LimitFlowRate") => {
+            Some(IdealLoadsLimit::LimitFlowRate)
+        }
+        value if value.eq_ignore_ascii_case("LimitCapacity") => {
+            Some(IdealLoadsLimit::LimitCapacity)
+        }
+        value if value.eq_ignore_ascii_case("LimitFlowRateAndCapacity") => {
+            Some(IdealLoadsLimit::LimitFlowRateAndCapacity)
+        }
+        _ => None,
+    }
+}
+
+fn parse_dehumidification_control_type(value: &str) -> Option<DehumidificationControlType> {
+    match value {
+        value if value.eq_ignore_ascii_case("None") => Some(DehumidificationControlType::None),
+        value if value.eq_ignore_ascii_case("ConstantSensibleHeatRatio") => {
+            Some(DehumidificationControlType::ConstantSensibleHeatRatio)
+        }
+        value if value.eq_ignore_ascii_case("ConstantSupplyHumidityRatio") => {
+            Some(DehumidificationControlType::ConstantSupplyHumidityRatio)
+        }
+        value if value.eq_ignore_ascii_case("Humidistat") => {
+            Some(DehumidificationControlType::Humidistat)
+        }
+        _ => None,
+    }
+}
+
+fn parse_humidification_control_type(value: &str) -> Option<HumidificationControlType> {
+    match value {
+        value if value.eq_ignore_ascii_case("None") => Some(HumidificationControlType::None),
+        value if value.eq_ignore_ascii_case("ConstantSupplyHumidityRatio") => {
+            Some(HumidificationControlType::ConstantSupplyHumidityRatio)
+        }
+        value if value.eq_ignore_ascii_case("Humidistat") => {
+            Some(HumidificationControlType::Humidistat)
+        }
+        _ => None,
+    }
+}
+
+fn parse_demand_controlled_ventilation_type(
+    value: &str,
+) -> Option<DemandControlledVentilationType> {
+    match value {
+        value if value.eq_ignore_ascii_case("None") => Some(DemandControlledVentilationType::None),
+        value if value.eq_ignore_ascii_case("OccupancySchedule") => {
+            Some(DemandControlledVentilationType::OccupancySchedule)
+        }
+        value if value.eq_ignore_ascii_case("CO2Setpoint") => {
+            Some(DemandControlledVentilationType::Co2Setpoint)
+        }
+        _ => None,
+    }
+}
+
+fn parse_outdoor_air_economizer_type(value: &str) -> Option<OutdoorAirEconomizerType> {
+    match value {
+        value if value.eq_ignore_ascii_case("NoEconomizer") => {
+            Some(OutdoorAirEconomizerType::NoEconomizer)
+        }
+        value if value.eq_ignore_ascii_case("DifferentialDryBulb") => {
+            Some(OutdoorAirEconomizerType::DifferentialDryBulb)
+        }
+        value if value.eq_ignore_ascii_case("DifferentialEnthalpy") => {
+            Some(OutdoorAirEconomizerType::DifferentialEnthalpy)
+        }
+        _ => None,
+    }
+}
+
+fn parse_heat_recovery_type(value: &str) -> Option<HeatRecoveryType> {
+    match value {
+        value if value.eq_ignore_ascii_case("None") => Some(HeatRecoveryType::None),
+        value if value.eq_ignore_ascii_case("Sensible") => Some(HeatRecoveryType::Sensible),
+        value if value.eq_ignore_ascii_case("Enthalpy") => Some(HeatRecoveryType::Enthalpy),
+        _ => None,
+    }
+}
+
+fn parse_ideal_loads_fuel_type(value: &str) -> Option<IdealLoadsFuelType> {
+    match value {
+        value if value.eq_ignore_ascii_case("Coal") => Some(IdealLoadsFuelType::Coal),
+        value if value.eq_ignore_ascii_case("Diesel") => Some(IdealLoadsFuelType::Diesel),
+        value if value.eq_ignore_ascii_case("DistrictCooling") => {
+            Some(IdealLoadsFuelType::DistrictCooling)
+        }
+        value if value.eq_ignore_ascii_case("DistrictHeatingSteam") => {
+            Some(IdealLoadsFuelType::DistrictHeatingSteam)
+        }
+        value if value.eq_ignore_ascii_case("DistrictHeatingWater") => {
+            Some(IdealLoadsFuelType::DistrictHeatingWater)
+        }
+        value if value.eq_ignore_ascii_case("Electricity") => Some(IdealLoadsFuelType::Electricity),
+        value if value.eq_ignore_ascii_case("FuelOilNo1") => Some(IdealLoadsFuelType::FuelOilNo1),
+        value if value.eq_ignore_ascii_case("FuelOilNo2") => Some(IdealLoadsFuelType::FuelOilNo2),
+        value if value.eq_ignore_ascii_case("Gasoline") => Some(IdealLoadsFuelType::Gasoline),
+        value if value.eq_ignore_ascii_case("NaturalGas") => Some(IdealLoadsFuelType::NaturalGas),
+        value if value.eq_ignore_ascii_case("OtherFuel1") => Some(IdealLoadsFuelType::OtherFuel1),
+        value if value.eq_ignore_ascii_case("OtherFuel2") => Some(IdealLoadsFuelType::OtherFuel2),
+        value if value.eq_ignore_ascii_case("Propane") => Some(IdealLoadsFuelType::Propane),
+        _ => None,
+    }
+}
+
+fn parse_load_distribution_scheme(value: &str) -> Option<LoadDistributionScheme> {
+    match value {
+        value if value.eq_ignore_ascii_case("SequentialLoad") => {
+            Some(LoadDistributionScheme::SequentialLoad)
+        }
+        value if value.eq_ignore_ascii_case("UniformLoad") => {
+            Some(LoadDistributionScheme::UniformLoad)
+        }
+        value if value.eq_ignore_ascii_case("UniformPLR") => {
+            Some(LoadDistributionScheme::UniformPlr)
+        }
+        value if value.eq_ignore_ascii_case("SequentialUniformPLR") => {
+            Some(LoadDistributionScheme::SequentialUniformPlr)
+        }
+        _ => None,
+    }
+}
+
+fn parse_zone_equipment_object_type(value: &str) -> Option<ZoneEquipmentObjectType> {
+    match value {
+        value if value.eq_ignore_ascii_case("ZoneHVAC:IdealLoadsAirSystem") => {
+            Some(ZoneEquipmentObjectType::IdealLoadsAirSystem)
+        }
+        _ => None,
+    }
+}
+
 fn parse_day_of_week(value: &str) -> Option<ep_model::DayOfWeek> {
     match value {
         value if value.eq_ignore_ascii_case("Monday") => Some(ep_model::DayOfWeek::Monday),
@@ -1660,7 +2553,10 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
-    use ep_model::DayOfWeek;
+    use ep_model::{
+        AutosizeOrNumber, DayOfWeek, DehumidificationControlType, HumidificationControlType,
+        IdealLoadsLimit, LoadDistributionScheme, ModelGraph, OutdoorAirEconomizerType,
+    };
     use ep_raw_model::parse_epjson_str;
 
     #[test]
@@ -1893,6 +2789,129 @@ mod tests {
             8 * 60
         );
         assert_eq!(model.compact_schedules[0].segments[1].value, 1.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_thermostat_and_ideal_loads_graph() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Constant": {
+                    "Control Type": {"hourly_value": 4},
+                    "Heating Setpoint": {"hourly_value": 21},
+                    "Cooling Setpoint": {"hourly_value": 24}
+                },
+                "Zone": {"Zone One": {}},
+                "ThermostatSetpoint:DualSetpoint": {
+                    "Dual Setpoints": {
+                        "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+                        "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+                    }
+                },
+                "ZoneControl:Thermostat": {
+                    "Zone Thermostat": {
+                        "zone_or_zonelist_name": "Zone One",
+                        "control_type_schedule_name": "Control Type",
+                        "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+                        "control_1_name": "Dual Setpoints",
+                        "temperature_difference_between_cutout_and_setpoint": 0.5
+                    }
+                },
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads": {
+                        "zone_supply_air_node_name": "Zone One Inlet",
+                        "maximum_heating_supply_air_temperature": 50,
+                        "minimum_cooling_supply_air_temperature": 13,
+                        "maximum_heating_supply_air_humidity_ratio": 0.015,
+                        "minimum_cooling_supply_air_humidity_ratio": 0.009,
+                        "heating_limit": "LimitFlowRate",
+                        "maximum_heating_air_flow_rate": "Autosize",
+                        "cooling_limit": "LimitFlowRateAndCapacity",
+                        "maximum_cooling_air_flow_rate": 0.25,
+                        "maximum_total_cooling_capacity": "Autosize",
+                        "dehumidification_control_type": "ConstantSupplyHumidityRatio",
+                        "humidification_control_type": "ConstantSupplyHumidityRatio",
+                        "outdoor_air_economizer_type": "NoEconomizer"
+                    }
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "load_distribution_scheme": "SequentialLoad",
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone One": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_inlet_node_or_nodelist_name": "Zone One Inlet",
+                        "zone_air_node_name": "Zone One Air Node",
+                        "zone_return_air_node_or_nodelist_name": "Zone One Return"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.thermostat_dual_setpoints.len(), 1);
+        assert_eq!(model.zone_thermostats.len(), 1);
+        assert_eq!(model.ideal_loads_air_systems.len(), 1);
+        assert_eq!(model.zone_equipment_lists.len(), 1);
+        assert_eq!(model.zone_equipment_connections.len(), 1);
+        assert_eq!(model.zone_thermostats[0].zone.0, 0);
+        assert_eq!(model.zone_thermostats[0].controls[0].dual_setpoint.0, 0);
+        assert_eq!(
+            model.zone_thermostats[0].temperature_difference_between_cutout_and_setpoint_delta_c,
+            0.5
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].heating_limit,
+            IdealLoadsLimit::LimitFlowRate
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].maximum_heating_air_flow_rate_m3_per_s,
+            Some(AutosizeOrNumber::Autosize)
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].maximum_cooling_air_flow_rate_m3_per_s,
+            Some(AutosizeOrNumber::Value(0.25))
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].dehumidification_control_type,
+            DehumidificationControlType::ConstantSupplyHumidityRatio
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].humidification_control_type,
+            HumidificationControlType::ConstantSupplyHumidityRatio
+        );
+        assert_eq!(
+            model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+            OutdoorAirEconomizerType::NoEconomizer
+        );
+        assert_eq!(
+            model.zone_equipment_lists[0].load_distribution_scheme,
+            LoadDistributionScheme::SequentialLoad
+        );
+
+        let graph = ModelGraph::from_typed(&model);
+        assert_eq!(graph.zone_thermostats.len(), 1);
+        assert_eq!(graph.thermostat_setpoints.len(), 1);
+        assert_eq!(graph.zone_ideal_loads.len(), 1);
+        assert_eq!(graph.zone_ideal_loads[0].cooling_sequence, 1);
+        assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
 
         Ok(())
     }
