@@ -125,6 +125,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the v0.8 tolerance-gated heat-balance conformance case."
     }
+    "compare-surface-temperature-conformance" = @{
+        Path = "compare\compare-surface-temperature-conformance.ps1"
+        Group = "compare"
+        Help = "Run the v0.9 tolerance-gated surface-temperature conformance case."
+    }
     "compare-regression" = @{
         Path = "compare\compare-regression.ps1"
         Group = "compare"
@@ -200,6 +205,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.8 heat-balance conformance gate."
     }
+    "v0.9-verify" = @{
+        Path = "release\v0.9-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.9 surface-temperature conformance gate."
+    }
 }
 
 $Aliases = @{
@@ -213,6 +223,7 @@ $Aliases = @{
     "verify-v0.6" = "v0.6-verify"
     "verify-v0.7" = "v0.7-verify"
     "verify-v0.8" = "v0.8-verify"
+    "verify-v0.9" = "v0.9-verify"
 }
 
 function Show-Commands {

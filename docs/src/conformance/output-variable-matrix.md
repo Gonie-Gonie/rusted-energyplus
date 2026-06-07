@@ -22,8 +22,8 @@ conformance claim.
 | construction/material | Construction CTF layer count and thermal conductance; Material CTF Summary thickness, conductivity, density, specific heat, thermal resistance | EIO | smoke |
 | internal gains | OtherEquipment Internal Gains Nominal zone floor area, equipment level, equipment per floor area, latent/radiant/lost/convected fractions; Zone Total Internal Convective Heating Rate | EIO, ESO | smoke |
 | zone heat balance | Zone Mean Air Temperature; Zone Air Heat Balance Surface Convection Rate; Zone Air Heat Balance Air Energy Storage Rate | ESO | conformance for `heat_balance_nomass_001` `Zone Mean Air Temperature`; otherwise diagnostic |
-| surface heat balance | Surface Inside Face Temperature; Surface Outside Face Temperature; Surface Inside Face Conduction Heat Transfer Rate; Surface Outside Face Conduction Heat Transfer Rate | ESO | diagnostic until v0.8 |
-| fenestration/solar | Surface Window Transmitted Solar Radiation Rate; Surface Inside Face Solar Radiation Heat Gain Rate; Surface Outside Face Incident Solar Radiation Rate per Area | ESO | diagnostic until v0.9 |
+| surface heat balance | Surface Inside Face Temperature; Surface Outside Face Temperature; Surface Inside Face Conduction Heat Transfer Rate; Surface Outside Face Conduction Heat Transfer Rate | ESO | conformance for `surface_temperature_nomass_001` inside/outside face temperatures; conduction rates otherwise diagnostic |
+| fenestration/solar | Surface Window Transmitted Solar Radiation Rate; Surface Inside Face Solar Radiation Heat Gain Rate; Surface Outside Face Incident Solar Radiation Rate per Area | ESO | diagnostic until a separate declared case exists |
 | node | System Node Temperature; System Node Humidity Ratio; System Node Mass Flow Rate; System Node Setpoint Temperature | ESO | diagnostic until v0.11 |
 | component | Fan Electricity Rate; Cooling Coil Total Cooling Rate; Heating Coil Heating Rate | ESO | diagnostic until component port |
 | facility meter | Electricity:Facility; Gas:Facility; Heating:EnergyTransfer; Cooling:EnergyTransfer | MTR, SQL, CSV | diagnostic until meter contract |

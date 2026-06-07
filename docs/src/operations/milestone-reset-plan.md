@@ -43,7 +43,7 @@ separate in docs, scripts, and release language.
 | v0.6 | Output/trace/compare infrastructure release | no heat-balance claim |
 | v0.7 | EnergyPlus source mapping and algorithm porting plan release | planning guard before heat-balance code |
 | v0.8 | Uncontrolled zone heat-balance port release | first tolerance-gated heat-balance subset |
-| v0.9 | Surface/fenestration/radiation expansion release | declared cases only |
+| v0.9 | Surface/fenestration/radiation expansion release | `surface_temperature_nomass_001` surface temperatures only |
 | v0.10 | IdealLoads/thermostat release | declared cases only |
 | v0.11 | Air-side node/simple HVAC component release | declared cases only |
 | v0.12 | Plant loop skeleton/node flow release | declared cases only |
@@ -165,6 +165,13 @@ v0.8 decision: `heat_balance_nomass_001` is the first promoted heat-balance
 case. The claim is limited to hourly `Zone Mean Air Temperature` for the
 no-mass adiabatic equilibrium case and is enforced by
 `compare-heat-balance-conformance`.
+
+v0.9 decision: `surface_temperature_nomass_001` is the first promoted
+surface-state case. The claim is limited to hourly `Zone Mean Air Temperature`,
+`Surface Inside Face Temperature`, and `Surface Outside Face Temperature` for
+the no-mass adiabatic equilibrium case and is enforced by
+`compare-surface-temperature-conformance`. It is not a fenestration or
+solar-radiation claim.
 
 ## Immediate Work Order
 

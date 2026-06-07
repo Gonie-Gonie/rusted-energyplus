@@ -1008,6 +1008,18 @@ pub fn simulate_heat_balance_zone_air_temperatures(
             )
         })
         .collect::<Vec<_>>();
+    let mut surface_temperatures = state
+        .surfaces
+        .iter()
+        .map(|surface| {
+            (
+                surface.surface_id,
+                surface.surface_name.clone(),
+                Vec::with_capacity(options.sample_count),
+                Vec::with_capacity(options.sample_count),
+            )
+        })
+        .collect::<Vec<_>>();
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
@@ -1034,6 +1046,17 @@ pub fn simulate_heat_balance_zone_air_temperatures(
                 values.push(zone_state.mean_air_temperature_c);
             }
         }
+        for (surface_id, _surface_name, inside_values, outside_values) in &mut surface_temperatures
+        {
+            if let Some(surface_state) = state
+                .surfaces
+                .iter()
+                .find(|surface| surface.surface_id == *surface_id)
+            {
+                inside_values.push(surface_state.inside_face_temperature_c);
+                outside_values.push(surface_state.outside_face_temperature_c);
+            }
+        }
         outdoor_temperatures.push(outdoor_dry_bulb_c);
     }
 
@@ -1046,6 +1069,24 @@ pub fn simulate_heat_balance_zone_air_temperatures(
             variable_name: "Zone Mean Air Temperature".to_string(),
             units: "C".to_string(),
             values,
+        });
+        handle_index += 1;
+    }
+    for (_surface_id, surface_name, inside_values, outside_values) in surface_temperatures {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface_name.clone(),
+            variable_name: "Surface Inside Face Temperature".to_string(),
+            units: "C".to_string(),
+            values: inside_values,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface_name,
+            variable_name: "Surface Outside Face Temperature".to_string(),
+            units: "C".to_string(),
+            values: outside_values,
         });
         handle_index += 1;
     }
@@ -2237,7 +2278,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 2);
+        assert_eq!(simulation.results.series.len(), 14);
 
         let Some(zone_series) = simulation
             .results
@@ -2256,6 +2297,23 @@ DATA PERIODS
             return Err(std::io::Error::other("missing weather series").into());
         };
         assert_eq!(weather_series.values, vec![10.0, 12.0]);
+
+        let Some(inside_surface_series) = simulation
+            .results
+            .find_series("FLOOR", "Surface Inside Face Temperature")
+        else {
+            return Err(std::io::Error::other("missing inside surface series").into());
+        };
+        assert_eq!(inside_surface_series.values.len(), 2);
+        assert_eq!(inside_surface_series.values[0], zone_series.values[0]);
+
+        let Some(outside_surface_series) = simulation
+            .results
+            .find_series("FLOOR", "Surface Outside Face Temperature")
+        else {
+            return Err(std::io::Error::other("missing outside surface series").into());
+        };
+        assert_eq!(outside_surface_series.values, vec![10.0, 12.0]);
 
         Ok(())
     }

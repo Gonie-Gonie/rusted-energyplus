@@ -1,0 +1,54 @@
+id = "surface_temperature_nomass_001"
+title = "No-mass adiabatic surface temperature equilibrium"
+milestone = "v0.9-surface-temperature"
+purpose = "Tolerance-gate the first surface heat-balance temperature outputs for an uncontrolled no-mass adiabatic zone."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This v0.9 case extends the v0.8 no-mass adiabatic equilibrium gate to surface inside/outside face temperatures.",
+  "It does not claim fenestration, solar, radiation exchange, outdoor convection, or dynamic surface heat-balance parity.",
+]
+
+[input]
+idf = "data/conformance_cases/surface_temperature_nomass_001/surface_temperature_nomass.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[[tolerances]]
+variable_class = "surface-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[report]
+format = "markdown"
+path = ".runtime/surface-temperature-conformance/26.1.0/surface_temperature_nomass_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-surface-temperature-conformance"
+blocking = true

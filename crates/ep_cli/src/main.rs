@@ -819,7 +819,7 @@ fn generate_conformance_heat_balance_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<HeatBalanceReportSummary, String> {
-    let report_context = zone_temperature_conformance_context_from_manifest(manifest)?;
+    let report_context = heat_balance_conformance_context_from_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
     let oracle_output_dir = case_output_dir.join("oracle");
@@ -831,9 +831,14 @@ fn generate_conformance_heat_balance_report(
         .weather
         .as_ref()
         .ok_or_else(|| "heat-balance conformance requires input.weather".to_string())?;
-    let diagnostic = build_zone_temperature_diagnostic(&baseline.epjson, weather, &baseline.eso)?;
-    let conformance = evaluate_zone_temperature_conformance(&diagnostic, &report_context);
-    write_zone_temperature_conformance_report(&compare_dir, &diagnostic, &conformance)?;
+    let diagnostic = build_heat_balance_conformance_diagnostic(
+        &baseline.epjson,
+        weather,
+        &baseline.eso,
+        &report_context,
+    )?;
+    let conformance = evaluate_heat_balance_conformance(&diagnostic, &report_context);
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance)?;
 
     Ok(HeatBalanceReportSummary {
         baseline,
@@ -841,7 +846,7 @@ fn generate_conformance_heat_balance_report(
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
         samples: diagnostic.samples,
-        tolerance_policy: report_context.tolerance.label(),
+        tolerance_policy: report_context.tolerance_label(),
         status: conformance.status,
     })
 }
@@ -915,9 +920,7 @@ fn validate_zone_temperature_diagnostic_manifest(manifest: &ConformanceCase) -> 
     Ok(())
 }
 
-fn validate_zone_temperature_conformance_manifest(
-    manifest: &ConformanceCase,
-) -> Result<(), String> {
+fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     if manifest.comparison_class != ComparisonClass::Conformance {
         return Err(format!(
             "heat-balance conformance requires comparison_class conformance, got {}",
@@ -927,40 +930,41 @@ fn validate_zone_temperature_conformance_manifest(
     if !manifest.conformance_claim {
         return Err("heat-balance conformance requires conformance_claim=true".to_string());
     }
-    if manifest.outputs.len() != 1 {
-        return Err(format!(
-            "heat-balance conformance requires exactly one output request, got {}",
-            manifest.outputs.len()
-        ));
+    if manifest.outputs.is_empty() {
+        return Err("heat-balance conformance requires at least one output request".to_string());
     }
 
-    let output = &manifest.outputs[0];
-    if !output
-        .variable
-        .eq_ignore_ascii_case("Zone Mean Air Temperature")
-    {
-        return Err(format!(
-            "heat-balance conformance requires Zone Mean Air Temperature, got {}",
-            output.variable
-        ));
-    }
-    if output.frequency != OutputFrequency::Hourly {
-        return Err(format!(
-            "heat-balance conformance requires hourly output, got {}",
-            output_frequency_label(output.frequency)
-        ));
-    }
-    if output.class != VariableClass::ZoneState {
-        return Err(format!(
-            "heat-balance conformance requires zone-state class, got {}",
-            variable_class_label(output.class)
-        ));
-    }
-    if output.source != SourceArtifact::Eso {
-        return Err(format!(
-            "heat-balance conformance requires eso source, got {}",
-            source_artifact_label(output.source)
-        ));
+    for output in &manifest.outputs {
+        if output.frequency != OutputFrequency::Hourly {
+            return Err(format!(
+                "heat-balance conformance requires hourly output, got {} for {}",
+                output_frequency_label(output.frequency),
+                output.variable
+            ));
+        }
+        if output.source != SourceArtifact::Eso {
+            return Err(format!(
+                "heat-balance conformance requires eso source, got {} for {}",
+                source_artifact_label(output.source),
+                output.variable
+            ));
+        }
+        if !matches!(
+            output.class,
+            VariableClass::ZoneState | VariableClass::SurfaceState
+        ) {
+            return Err(format!(
+                "heat-balance conformance requires zone-state or surface-state class, got {} for {}",
+                variable_class_label(output.class),
+                output.variable
+            ));
+        }
+        if !is_supported_heat_balance_output_variable(&output.variable) {
+            return Err(format!(
+                "unsupported heat-balance conformance output variable: {}",
+                output.variable
+            ));
+        }
     }
 
     let Some(report) = manifest.report.as_ref() else {
@@ -980,7 +984,9 @@ fn validate_zone_temperature_conformance_manifest(
         return Err("heat-balance conformance gate must be blocking".to_string());
     }
 
-    zone_temperature_tolerance_from_manifest(manifest)?;
+    for variable_class in heat_balance_variable_classes(manifest) {
+        heat_balance_tolerance_from_manifest(manifest, variable_class)?;
+    }
 
     Ok(())
 }
@@ -2213,43 +2219,6 @@ struct ZoneTemperatureGateContract {
     blocking: bool,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-struct ZoneTemperatureToleranceReport {
-    variable_class: &'static str,
-    max_abs_c: Option<f64>,
-    max_rmse_c: Option<f64>,
-    max_rel: Option<f64>,
-}
-
-impl ZoneTemperatureToleranceReport {
-    fn label(self) -> String {
-        let max_abs = optional_tolerance_label(self.max_abs_c);
-        let max_rmse = optional_tolerance_label(self.max_rmse_c);
-        let max_rel = optional_tolerance_label(self.max_rel);
-        format!(
-            "{} max_abs={} max_rmse={} max_rel={}",
-            self.variable_class, max_abs, max_rmse, max_rel
-        )
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-struct ZoneTemperatureConformanceContext {
-    case_id: String,
-    oracle_version: String,
-    output: ZoneTemperatureReportOutput,
-    tolerance: ZoneTemperatureToleranceReport,
-    report: Option<ZoneTemperatureReportContract>,
-    gate: Option<ZoneTemperatureGateContract>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-struct ZoneTemperatureConformance<'a> {
-    context: &'a ZoneTemperatureConformanceContext,
-    status: &'static str,
-    failure_reasons: Vec<String>,
-}
-
 fn zone_temperature_report_context_from_manifest(
     manifest: &ConformanceCase,
 ) -> Result<ZoneTemperatureReportContext, String> {
@@ -2286,27 +2255,107 @@ fn zone_temperature_report_context_from_manifest(
     })
 }
 
-fn zone_temperature_conformance_context_from_manifest(
-    manifest: &ConformanceCase,
-) -> Result<ZoneTemperatureConformanceContext, String> {
-    validate_zone_temperature_conformance_manifest(manifest)?;
-    let output = manifest
-        .outputs
-        .first()
-        .ok_or_else(|| "heat-balance conformance requires one output request".to_string())?;
-    let tolerance = zone_temperature_tolerance_from_manifest(manifest)?;
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct HeatBalanceToleranceReport {
+    variable_class_label: &'static str,
+    max_abs_c: Option<f64>,
+    max_rmse_c: Option<f64>,
+    max_rel: Option<f64>,
+}
 
-    Ok(ZoneTemperatureConformanceContext {
-        case_id: manifest.id.clone(),
-        oracle_version: manifest.oracle_version.clone(),
-        output: ZoneTemperatureReportOutput {
+impl HeatBalanceToleranceReport {
+    fn label(self) -> String {
+        let max_abs = optional_tolerance_label(self.max_abs_c);
+        let max_rmse = optional_tolerance_label(self.max_rmse_c);
+        let max_rel = optional_tolerance_label(self.max_rel);
+        format!(
+            "{} max_abs={} max_rmse={} max_rel={}",
+            self.variable_class_label, max_abs, max_rmse, max_rel
+        )
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceConformanceContext {
+    case_id: String,
+    oracle_version: String,
+    outputs: Vec<ZoneTemperatureReportOutput>,
+    tolerances: Vec<HeatBalanceToleranceReport>,
+    report: Option<ZoneTemperatureReportContract>,
+    gate: Option<ZoneTemperatureGateContract>,
+}
+
+impl HeatBalanceConformanceContext {
+    fn tolerance_label(&self) -> String {
+        self.tolerances
+            .iter()
+            .map(|tolerance| tolerance.label())
+            .collect::<Vec<_>>()
+            .join("; ")
+    }
+
+    fn tolerance_for_class(&self, variable_class: &str) -> Option<HeatBalanceToleranceReport> {
+        self.tolerances
+            .iter()
+            .copied()
+            .find(|tolerance| tolerance.variable_class_label == variable_class)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceSeriesDiagnostic {
+    output: ZoneTemperatureReportOutput,
+    samples: usize,
+    oracle_first_c: f64,
+    rust_first_c: f64,
+    oracle_last_c: f64,
+    rust_last_c: f64,
+    delta: DeltaSummary,
+    status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceConformanceDiagnostic {
+    samples: usize,
+    heat_balance_timesteps: usize,
+    zone_count: usize,
+    surface_count: usize,
+    series: Vec<HeatBalanceSeriesDiagnostic>,
+    status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceConformance<'a> {
+    context: &'a HeatBalanceConformanceContext,
+    status: &'static str,
+    failure_reasons: Vec<String>,
+}
+
+fn heat_balance_conformance_context_from_manifest(
+    manifest: &ConformanceCase,
+) -> Result<HeatBalanceConformanceContext, String> {
+    validate_heat_balance_conformance_manifest(manifest)?;
+    let outputs = manifest
+        .outputs
+        .iter()
+        .map(|output| ZoneTemperatureReportOutput {
             key: output.key.clone(),
             variable: output.variable.clone(),
             frequency: output_frequency_label(output.frequency),
             class: variable_class_label(output.class),
             source: source_artifact_label(output.source),
-        },
-        tolerance,
+        })
+        .collect::<Vec<_>>();
+    let tolerances = heat_balance_variable_classes(manifest)
+        .into_iter()
+        .map(|variable_class| heat_balance_tolerance_from_manifest(manifest, variable_class))
+        .collect::<Result<Vec<_>, String>>()?;
+
+    Ok(HeatBalanceConformanceContext {
+        case_id: manifest.id.clone(),
+        oracle_version: manifest.oracle_version.clone(),
+        outputs,
+        tolerances,
         report: manifest
             .report
             .as_ref()
@@ -2324,31 +2373,53 @@ fn zone_temperature_conformance_context_from_manifest(
     })
 }
 
-fn zone_temperature_tolerance_from_manifest(
+fn heat_balance_tolerance_from_manifest(
     manifest: &ConformanceCase,
-) -> Result<ZoneTemperatureToleranceReport, String> {
+    variable_class: VariableClass,
+) -> Result<HeatBalanceToleranceReport, String> {
     let tolerance = manifest
         .tolerances
         .iter()
-        .find(|tolerance| tolerance.variable_class == VariableClass::ZoneState)
-        .ok_or_else(|| "heat-balance conformance requires a zone-state tolerance".to_string())?;
+        .find(|tolerance| tolerance.variable_class == variable_class)
+        .ok_or_else(|| {
+            format!(
+                "heat-balance conformance requires a {} tolerance",
+                variable_class_label(variable_class)
+            )
+        })?;
 
-    Ok(zone_temperature_tolerance_report(*tolerance))
+    Ok(heat_balance_tolerance_report(*tolerance))
 }
 
-fn zone_temperature_tolerance_report(tolerance: ToleranceRule) -> ZoneTemperatureToleranceReport {
-    ZoneTemperatureToleranceReport {
-        variable_class: variable_class_label(tolerance.variable_class),
+fn heat_balance_tolerance_report(tolerance: ToleranceRule) -> HeatBalanceToleranceReport {
+    HeatBalanceToleranceReport {
+        variable_class_label: variable_class_label(tolerance.variable_class),
         max_abs_c: tolerance.max_abs,
         max_rmse_c: tolerance.max_rmse,
         max_rel: tolerance.max_rel,
     }
 }
 
-fn evaluate_zone_temperature_conformance<'a>(
-    diagnostic: &ZoneTemperatureDiagnostic,
-    context: &'a ZoneTemperatureConformanceContext,
-) -> ZoneTemperatureConformance<'a> {
+fn heat_balance_variable_classes(manifest: &ConformanceCase) -> Vec<VariableClass> {
+    let mut classes = Vec::new();
+    for output in &manifest.outputs {
+        if !classes.contains(&output.class) {
+            classes.push(output.class);
+        }
+    }
+    classes
+}
+
+fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
+    variable.eq_ignore_ascii_case("Zone Mean Air Temperature")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
+}
+
+fn evaluate_heat_balance_conformance<'a>(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    context: &'a HeatBalanceConformanceContext,
+) -> HeatBalanceConformance<'a> {
     let mut failure_reasons = Vec::new();
     if diagnostic.status != "extracted" {
         failure_reasons.push(format!(
@@ -2356,35 +2427,45 @@ fn evaluate_zone_temperature_conformance<'a>(
             diagnostic.status
         ));
     }
-    if !diagnostic.delta.length_match {
-        failure_reasons.push("series length mismatch".to_string());
-    }
-    if let Some(max_abs_c) = context.tolerance.max_abs_c
-        && diagnostic.delta.max_abs_delta_c > max_abs_c
-    {
-        failure_reasons.push(format!(
-            "max_abs_delta_c {:.12} exceeds {:.12}",
-            diagnostic.delta.max_abs_delta_c, max_abs_c
-        ));
-    }
-    if let Some(max_rmse_c) = context.tolerance.max_rmse_c
-        && diagnostic.delta.rmse_delta_c > max_rmse_c
-    {
-        failure_reasons.push(format!(
-            "rmse_delta_c {:.12} exceeds {:.12}",
-            diagnostic.delta.rmse_delta_c, max_rmse_c
-        ));
-    }
-    if let Some(max_rel) = context.tolerance.max_rel
-        && diagnostic.delta.max_rel_delta > max_rel
-    {
-        failure_reasons.push(format!(
-            "max_rel_delta {:.12} exceeds {:.12}",
-            diagnostic.delta.max_rel_delta, max_rel
-        ));
+    for series in &diagnostic.series {
+        let label = format!("{}/{}", series.output.key, series.output.variable);
+        if series.status != "extracted" {
+            failure_reasons.push(format!("{label} extraction status was {}", series.status));
+        }
+        if !series.delta.length_match {
+            failure_reasons.push(format!("{label} series length mismatch"));
+        }
+        let Some(tolerance) = context.tolerance_for_class(series.output.class) else {
+            failure_reasons.push(format!("{label} missing {} tolerance", series.output.class));
+            continue;
+        };
+        if let Some(max_abs_c) = tolerance.max_abs_c
+            && series.delta.max_abs_delta_c > max_abs_c
+        {
+            failure_reasons.push(format!(
+                "{label} max_abs_delta_c {:.12} exceeds {:.12}",
+                series.delta.max_abs_delta_c, max_abs_c
+            ));
+        }
+        if let Some(max_rmse_c) = tolerance.max_rmse_c
+            && series.delta.rmse_delta_c > max_rmse_c
+        {
+            failure_reasons.push(format!(
+                "{label} rmse_delta_c {:.12} exceeds {:.12}",
+                series.delta.rmse_delta_c, max_rmse_c
+            ));
+        }
+        if let Some(max_rel) = tolerance.max_rel
+            && series.delta.max_rel_delta > max_rel
+        {
+            failure_reasons.push(format!(
+                "{label} max_rel_delta {:.12} exceeds {:.12}",
+                series.delta.max_rel_delta, max_rel
+            ));
+        }
     }
 
-    ZoneTemperatureConformance {
+    HeatBalanceConformance {
         context,
         status: if failure_reasons.is_empty() {
             "pass"
@@ -2393,6 +2474,119 @@ fn evaluate_zone_temperature_conformance<'a>(
         },
         failure_reasons,
     }
+}
+
+fn build_heat_balance_conformance_diagnostic(
+    input_path: &Path,
+    weather_path: &Path,
+    eso_path: &Path,
+    context: &HeatBalanceConformanceContext,
+) -> Result<HeatBalanceConformanceDiagnostic, String> {
+    let raw_model = load_epjson_file(input_path).map_err(|error| error.to_string())?;
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        return Err(format_compile_diagnostics(&result.report));
+    };
+
+    let mut oracle_series = Vec::with_capacity(context.outputs.len());
+    for output in &context.outputs {
+        let values = load_eso_series(eso_path, &output.key, &output.variable)
+            .map_err(|error| error.to_string())?;
+        if values.is_empty() {
+            return Err(format!(
+                "EnergyPlus series is empty: {}/{}",
+                output.key, output.variable
+            ));
+        }
+        oracle_series.push((output.clone(), values));
+    }
+    let sample_count = oracle_series
+        .iter()
+        .map(|(_output, values)| values.len())
+        .max()
+        .unwrap_or(0);
+
+    let weather_values =
+        load_epw_dry_bulb_series(weather_path).map_err(|error| error.to_string())?;
+    if weather_values.len() < sample_count {
+        return Err(format!(
+            "EPW dry-bulb series has {} samples but ESO requires {}",
+            weather_values.len(),
+            sample_count
+        ));
+    }
+
+    let simulation_model = SimulationModel::from_typed(model);
+    let simulation = simulate_heat_balance_zone_air_temperatures(
+        &simulation_model,
+        &weather_values,
+        HeatBalanceSimulationOptions::hourly_samples(sample_count),
+    )
+    .map_err(|error| error.to_string())?;
+
+    let mut series = Vec::with_capacity(oracle_series.len());
+    for (output, oracle_values) in oracle_series {
+        let Some(rust_series) = simulation
+            .results
+            .find_series(&output.key, &output.variable)
+        else {
+            return Err(format!(
+                "heat-balance simulation did not write output: {}/{}",
+                output.key, output.variable
+            ));
+        };
+
+        let delta = delta_summary(&oracle_values, &rust_series.values);
+        let finite = oracle_values
+            .iter()
+            .chain(rust_series.values.iter())
+            .all(|value| value.is_finite());
+        let extracted = finite && delta.length_match;
+        series.push(HeatBalanceSeriesDiagnostic {
+            output,
+            samples: delta.samples,
+            oracle_first_c: oracle_values[0],
+            rust_first_c: rust_series.values.first().copied().unwrap_or(f64::NAN),
+            oracle_last_c: oracle_values[oracle_values.len() - 1],
+            rust_last_c: rust_series.values.last().copied().unwrap_or(f64::NAN),
+            delta,
+            status: if extracted { "extracted" } else { "failed" },
+        });
+    }
+
+    let extracted = series.iter().all(|series| series.status == "extracted");
+    Ok(HeatBalanceConformanceDiagnostic {
+        samples: sample_count,
+        heat_balance_timesteps: simulation.summary.timestep_count,
+        zone_count: simulation.summary.zone_count,
+        surface_count: simulation.summary.surface_count,
+        series,
+        status: if extracted { "extracted" } else { "failed" },
+    })
+}
+
+fn heat_balance_max_abs_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .map(|series| series.delta.max_abs_delta_c)
+        .fold(0.0, f64::max)
+}
+
+fn heat_balance_max_rmse_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .map(|series| series.delta.rmse_delta_c)
+        .fold(0.0, f64::max)
+}
+
+fn heat_balance_max_rel_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .map(|series| series.delta.max_rel_delta)
+        .fold(0.0, f64::max)
 }
 
 fn build_zone_temperature_diagnostic(
@@ -3512,10 +3706,10 @@ fn render_zone_temperature_report(
     report
 }
 
-fn write_zone_temperature_conformance_report(
+fn write_heat_balance_conformance_report(
     report_dir: &Path,
-    diagnostic: &ZoneTemperatureDiagnostic,
-    conformance: &ZoneTemperatureConformance<'_>,
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
 ) -> Result<(), String> {
     std::fs::create_dir_all(report_dir)
         .map_err(|error| format!("failed to create report directory: {error}"))?;
@@ -3525,21 +3719,21 @@ fn write_zone_temperature_conformance_report(
 
     std::fs::write(
         &summary_path,
-        render_zone_temperature_conformance_summary_json(diagnostic, conformance),
+        render_heat_balance_conformance_summary_json(diagnostic, conformance),
     )
     .map_err(|error| format!("failed to write heat-balance summary: {error}"))?;
     std::fs::write(
         &report_path,
-        render_zone_temperature_conformance_report(diagnostic, conformance),
+        render_heat_balance_conformance_report(diagnostic, conformance),
     )
     .map_err(|error| format!("failed to write heat-balance report: {error}"))?;
 
     Ok(())
 }
 
-fn render_zone_temperature_conformance_summary_json(
-    diagnostic: &ZoneTemperatureDiagnostic,
-    conformance: &ZoneTemperatureConformance<'_>,
+fn render_heat_balance_conformance_summary_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
 ) -> String {
     let context = conformance.context;
     let mut json = String::new();
@@ -3555,7 +3749,14 @@ fn render_zone_temperature_conformance_summary_json(
     ));
     json.push_str(&format!(
         "  \"output\": {},\n",
-        zone_temperature_output_json(&context.output)
+        context
+            .outputs
+            .first()
+            .map_or_else(|| "null".to_string(), zone_temperature_output_json)
+    ));
+    json.push_str(&format!(
+        "  \"outputs\": {},\n",
+        heat_balance_outputs_json(&context.outputs)
     ));
     json.push_str(&format!(
         "  \"report_contract\": {},\n",
@@ -3569,7 +3770,11 @@ fn render_zone_temperature_conformance_summary_json(
     json.push_str("  \"conformance_claim\": true,\n");
     json.push_str(&format!(
         "  \"tolerance_policy\": {},\n",
-        zone_temperature_tolerance_json(context.tolerance)
+        heat_balance_tolerances_json(&context.tolerances)
+    ));
+    json.push_str(&format!(
+        "  \"tolerance_policy_label\": {},\n",
+        json_string(&context.tolerance_label())
     ));
     json.push_str("  \"runtime_class\": \"heat-balance-state-shell\",\n");
     json.push_str(&format!(
@@ -3579,10 +3784,6 @@ fn render_zone_temperature_conformance_summary_json(
     json.push_str(&format!(
         "  \"failure_reasons\": {},\n",
         string_array_json(&conformance.failure_reasons)
-    ));
-    json.push_str(&format!(
-        "  \"zone\": {},\n",
-        json_string(&diagnostic.zone_name)
     ));
     json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
     json.push_str(&format!(
@@ -3595,48 +3796,24 @@ fn render_zone_temperature_conformance_summary_json(
         diagnostic.surface_count
     ));
     json.push_str(&format!(
-        "  \"length_match\": {},\n",
-        diagnostic.delta.length_match
+        "  \"series_count\": {},\n",
+        diagnostic.series.len()
     ));
     json.push_str(&format!(
         "  \"max_abs_delta_c\": {},\n",
-        json_number(diagnostic.delta.max_abs_delta_c)
-    ));
-    json.push_str(&format!(
-        "  \"mean_abs_delta_c\": {},\n",
-        json_number(diagnostic.delta.mean_abs_delta_c)
+        json_number(heat_balance_max_abs_delta(diagnostic))
     ));
     json.push_str(&format!(
         "  \"rmse_delta_c\": {},\n",
-        json_number(diagnostic.delta.rmse_delta_c)
+        json_number(heat_balance_max_rmse_delta(diagnostic))
     ));
     json.push_str(&format!(
         "  \"max_rel_delta\": {},\n",
-        json_number(diagnostic.delta.max_rel_delta)
+        json_number(heat_balance_max_rel_delta(diagnostic))
     ));
     json.push_str(&format!(
-        "  \"first_delta_sample\": {},\n",
-        delta_point_json(diagnostic.delta.first_delta_sample)
-    ));
-    json.push_str(&format!(
-        "  \"max_delta_sample\": {},\n",
-        delta_point_json(diagnostic.delta.max_delta_sample)
-    ));
-    json.push_str(&format!(
-        "  \"oracle_first_c\": {},\n",
-        json_number(diagnostic.oracle_first_c)
-    ));
-    json.push_str(&format!(
-        "  \"rust_first_c\": {},\n",
-        json_number(diagnostic.rust_first_c)
-    ));
-    json.push_str(&format!(
-        "  \"oracle_last_c\": {},\n",
-        json_number(diagnostic.oracle_last_c)
-    ));
-    json.push_str(&format!(
-        "  \"rust_last_c\": {},\n",
-        json_number(diagnostic.rust_last_c)
+        "  \"series\": {},\n",
+        heat_balance_series_json(&diagnostic.series)
     ));
     json.push_str("  \"artifacts\": {\n");
     json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
@@ -3646,9 +3823,9 @@ fn render_zone_temperature_conformance_summary_json(
     json
 }
 
-fn render_zone_temperature_conformance_report(
-    diagnostic: &ZoneTemperatureDiagnostic,
-    conformance: &ZoneTemperatureConformance<'_>,
+fn render_heat_balance_conformance_report(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
 ) -> String {
     let context = conformance.context;
     let mut report = String::new();
@@ -3656,14 +3833,16 @@ fn render_zone_temperature_conformance_report(
     report.push_str("## Manifest\n\n");
     report.push_str(&format!("case_id: {}\n", context.case_id));
     report.push_str(&format!("oracle_version: {}\n", context.oracle_version));
-    report.push_str(&format!("output_key: {}\n", context.output.key));
-    report.push_str(&format!("output_variable: {}\n", context.output.variable));
-    report.push_str(&format!("output_frequency: {}\n", context.output.frequency));
-    report.push_str(&format!("output_class: {}\n", context.output.class));
-    report.push_str(&format!("output_source: {}\n", context.output.source));
+    report.push_str(&format!("outputs: {}\n", context.outputs.len()));
+    for output in &context.outputs {
+        report.push_str(&format!(
+            "output: {} / {} / {} / {} / {}\n",
+            output.key, output.variable, output.frequency, output.class, output.source
+        ));
+    }
     report.push_str(&format!(
         "tolerance_policy: {}\n",
-        context.tolerance.label()
+        context.tolerance_label()
     ));
     if let Some(report_contract) = &context.report {
         report.push_str(&format!("report_format: {}\n", report_contract.format));
@@ -3688,7 +3867,6 @@ fn render_zone_temperature_conformance_report(
             report.push_str(&format!("- {}\n", reason));
         }
     }
-    report.push_str(&format!("zone: {}\n", diagnostic.zone_name));
     report.push_str(&format!("samples: {}\n", diagnostic.samples));
     report.push_str(&format!(
         "heat_balance_timesteps: {}\n",
@@ -3697,39 +3875,24 @@ fn render_zone_temperature_conformance_report(
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
     report.push_str(&format!(
-        "length_match: {}\n",
-        diagnostic.delta.length_match
-    ));
-    report.push_str(&format!(
         "max_abs_delta_c: {:.12}\n",
-        diagnostic.delta.max_abs_delta_c
-    ));
-    report.push_str(&format!(
-        "mean_abs_delta_c: {:.12}\n",
-        diagnostic.delta.mean_abs_delta_c
+        heat_balance_max_abs_delta(diagnostic)
     ));
     report.push_str(&format!(
         "rmse_delta_c: {:.12}\n",
-        diagnostic.delta.rmse_delta_c
+        heat_balance_max_rmse_delta(diagnostic)
     ));
     report.push_str(&format!(
         "max_rel_delta: {:.12}\n\n",
-        diagnostic.delta.max_rel_delta
+        heat_balance_max_rel_delta(diagnostic)
     ));
 
+    report.push_str("## Series\n\n");
+    heat_balance_report_series_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
     report.push_str("## Delta Samples\n\n");
-    report.push_str("| sample | index | oracle_c | rust_c | abs_delta_c |\n");
-    report.push_str("|---|---:|---:|---:|---:|\n");
-    report_delta_row(
-        &mut report,
-        "first_delta_sample",
-        diagnostic.delta.first_delta_sample,
-    );
-    report_delta_row(
-        &mut report,
-        "max_delta_sample",
-        diagnostic.delta.max_delta_sample,
-    );
+    heat_balance_report_delta_rows(&mut report, &diagnostic.series);
     report
 }
 
@@ -3780,14 +3943,163 @@ fn zone_temperature_gate_json(gate: Option<&ZoneTemperatureGateContract>) -> Str
     }
 }
 
-fn zone_temperature_tolerance_json(tolerance: ZoneTemperatureToleranceReport) -> String {
+fn heat_balance_tolerance_json(tolerance: HeatBalanceToleranceReport) -> String {
     format!(
         "{{ \"variable_class\": {}, \"max_abs_c\": {}, \"max_rmse_c\": {}, \"max_rel\": {} }}",
-        json_string(tolerance.variable_class),
+        json_string(tolerance.variable_class_label),
         json_optional_number(tolerance.max_abs_c),
         json_optional_number(tolerance.max_rmse_c),
         json_optional_number(tolerance.max_rel)
     )
+}
+
+fn heat_balance_tolerances_json(tolerances: &[HeatBalanceToleranceReport]) -> String {
+    let mut json = String::from("[");
+    for (index, tolerance) in tolerances.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&heat_balance_tolerance_json(*tolerance));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_outputs_json(outputs: &[ZoneTemperatureReportOutput]) -> String {
+    let mut json = String::from("[");
+    for (index, output) in outputs.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&zone_temperature_output_json(output));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    let mut json = String::from("[\n");
+    for (index, row) in series.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"output\": {},\n",
+            zone_temperature_output_json(&row.output)
+        ));
+        json.push_str(&format!("      \"status\": {},\n", json_string(row.status)));
+        json.push_str(&format!("      \"samples\": {},\n", row.samples));
+        json.push_str(&format!(
+            "      \"length_match\": {},\n",
+            row.delta.length_match
+        ));
+        json.push_str(&format!(
+            "      \"max_abs_delta_c\": {},\n",
+            json_number(row.delta.max_abs_delta_c)
+        ));
+        json.push_str(&format!(
+            "      \"mean_abs_delta_c\": {},\n",
+            json_number(row.delta.mean_abs_delta_c)
+        ));
+        json.push_str(&format!(
+            "      \"rmse_delta_c\": {},\n",
+            json_number(row.delta.rmse_delta_c)
+        ));
+        json.push_str(&format!(
+            "      \"max_rel_delta\": {},\n",
+            json_number(row.delta.max_rel_delta)
+        ));
+        json.push_str(&format!(
+            "      \"first_delta_sample\": {},\n",
+            delta_point_json(row.delta.first_delta_sample)
+        ));
+        json.push_str(&format!(
+            "      \"max_delta_sample\": {},\n",
+            delta_point_json(row.delta.max_delta_sample)
+        ));
+        json.push_str(&format!(
+            "      \"oracle_first_c\": {},\n",
+            json_number(row.oracle_first_c)
+        ));
+        json.push_str(&format!(
+            "      \"rust_first_c\": {},\n",
+            json_number(row.rust_first_c)
+        ));
+        json.push_str(&format!(
+            "      \"oracle_last_c\": {},\n",
+            json_number(row.oracle_last_c)
+        ));
+        json.push_str(&format!(
+            "      \"rust_last_c\": {}\n",
+            json_number(row.rust_last_c)
+        ));
+        if index + 1 == series.len() {
+            json.push_str("    }\n");
+        } else {
+            json.push_str("    },\n");
+        }
+    }
+    json.push_str("  ]");
+    json
+}
+
+fn heat_balance_report_series_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
+    report.push_str(
+        "| key | variable | class | samples | max_abs_delta_c | rmse_delta_c | status |\n",
+    );
+    report.push_str("|---|---|---|---:|---:|---:|---|\n");
+    for row in series {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {} |\n",
+            markdown_cell(&row.output.key),
+            markdown_cell(&row.output.variable),
+            row.output.class,
+            row.samples,
+            row.delta.max_abs_delta_c,
+            row.delta.rmse_delta_c,
+            row.status
+        ));
+    }
+}
+
+fn heat_balance_report_delta_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
+    report.push_str("| output | sample | index | oracle_c | rust_c | abs_delta_c |\n");
+    report.push_str("|---|---|---:|---:|---:|---:|\n");
+    for row in series {
+        let output = format!("{}/{}", row.output.key, row.output.variable);
+        report_named_delta_row(
+            report,
+            &output,
+            "first_delta_sample",
+            row.delta.first_delta_sample,
+        );
+        report_named_delta_row(
+            report,
+            &output,
+            "max_delta_sample",
+            row.delta.max_delta_sample,
+        );
+    }
+}
+
+fn report_named_delta_row(
+    report: &mut String,
+    output: &str,
+    label: &str,
+    point: Option<DeltaPoint>,
+) {
+    match point {
+        Some(point) => report.push_str(&format!(
+            "| {} | {label} | {} | {:.6} | {:.6} | {:.6} |\n",
+            markdown_cell(output),
+            point.index,
+            point.oracle_c,
+            point.rust_c,
+            point.abs_delta_c
+        )),
+        None => report.push_str(&format!(
+            "| {} | {label} | n/a | n/a | n/a | n/a |\n",
+            markdown_cell(output)
+        )),
+    }
 }
 
 fn delta_point_json(point: Option<DeltaPoint>) -> String {
@@ -4252,36 +4564,70 @@ mod tests {
     }
 
     #[test]
-    fn zone_temperature_conformance_report_records_pass_and_tolerance() {
-        let diagnostic = super::ZoneTemperatureDiagnostic {
-            zone_name: "ZONE ONE".to_string(),
+    fn heat_balance_conformance_report_records_pass_and_tolerances() {
+        let diagnostic = super::HeatBalanceConformanceDiagnostic {
             samples: 2,
             heat_balance_timesteps: 8,
             zone_count: 1,
             surface_count: 6,
-            oracle_first_c: 23.0,
-            rust_first_c: 23.0,
-            oracle_last_c: 23.0,
-            rust_last_c: 23.0,
-            delta: super::delta_summary(&[23.0, 23.0], &[23.0, 23.0]),
+            series: vec![
+                super::HeatBalanceSeriesDiagnostic {
+                    output: super::ZoneTemperatureReportOutput {
+                        key: "ZONE ONE".to_string(),
+                        variable: "Zone Mean Air Temperature".to_string(),
+                        frequency: "hourly",
+                        class: "zone-state",
+                        source: "eso",
+                    },
+                    samples: 2,
+                    oracle_first_c: 23.0,
+                    rust_first_c: 23.0,
+                    oracle_last_c: 23.0,
+                    rust_last_c: 23.0,
+                    delta: super::delta_summary(&[23.0, 23.0], &[23.0, 23.0]),
+                    status: "extracted",
+                },
+                super::HeatBalanceSeriesDiagnostic {
+                    output: super::ZoneTemperatureReportOutput {
+                        key: "FLOOR".to_string(),
+                        variable: "Surface Inside Face Temperature".to_string(),
+                        frequency: "hourly",
+                        class: "surface-state",
+                        source: "eso",
+                    },
+                    samples: 2,
+                    oracle_first_c: 23.0,
+                    rust_first_c: 23.0,
+                    oracle_last_c: 23.0,
+                    rust_last_c: 23.0,
+                    delta: super::delta_summary(&[23.0, 23.0], &[23.0, 23.0]),
+                    status: "extracted",
+                },
+            ],
             status: "extracted",
         };
-        let context = super::ZoneTemperatureConformanceContext {
+        let context = super::HeatBalanceConformanceContext {
             case_id: "heat_balance_nomass_001".to_string(),
             oracle_version: "26.1.0".to_string(),
-            output: super::ZoneTemperatureReportOutput {
-                key: "ZONE ONE".to_string(),
-                variable: "Zone Mean Air Temperature".to_string(),
-                frequency: "hourly",
-                class: "zone-state",
-                source: "eso",
-            },
-            tolerance: super::ZoneTemperatureToleranceReport {
-                variable_class: "zone-state",
-                max_abs_c: Some(0.000001),
-                max_rmse_c: Some(0.000001),
-                max_rel: None,
-            },
+            outputs: diagnostic
+                .series
+                .iter()
+                .map(|series| series.output.clone())
+                .collect(),
+            tolerances: vec![
+                super::HeatBalanceToleranceReport {
+                    variable_class_label: "zone-state",
+                    max_abs_c: Some(0.000001),
+                    max_rmse_c: Some(0.000001),
+                    max_rel: None,
+                },
+                super::HeatBalanceToleranceReport {
+                    variable_class_label: "surface-state",
+                    max_abs_c: Some(0.000001),
+                    max_rmse_c: Some(0.000001),
+                    max_rel: None,
+                },
+            ],
             report: Some(super::ZoneTemperatureReportContract {
                 format: "markdown",
                 path: ".runtime/heat-balance-conformance/report.md".to_string(),
@@ -4291,11 +4637,10 @@ mod tests {
                 blocking: true,
             }),
         };
-        let conformance = super::evaluate_zone_temperature_conformance(&diagnostic, &context);
+        let conformance = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
-        let json =
-            super::render_zone_temperature_conformance_summary_json(&diagnostic, &conformance);
-        let report = super::render_zone_temperature_conformance_report(&diagnostic, &conformance);
+        let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &conformance);
+        let report = super::render_heat_balance_conformance_report(&diagnostic, &conformance);
 
         assert_eq!(conformance.status, "pass");
         assert!(json.contains("\"case_id\": \"heat_balance_nomass_001\""));
@@ -4303,6 +4648,8 @@ mod tests {
         assert!(json.contains("\"conformance_claim\": true"));
         assert!(json.contains("\"status\": \"pass\""));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
+        assert!(json.contains("\"series_count\": 2"));
+        assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(json.contains("\"blocking\": true"));
         assert!(report.contains("Heat Balance Conformance Report"));
         assert!(report.contains("comparison_class: conformance"));
@@ -4310,6 +4657,7 @@ mod tests {
         assert!(report.contains("status: pass"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("gate_blocking: true"));
+        assert!(report.contains("Surface Inside Face Temperature"));
     }
 
     #[test]

@@ -35,7 +35,7 @@ Each selected case must answer:
 | v0.6 | Tier A/B report infrastructure | one-zone, window variants, simple shading, `5ZoneAirCooled` | automatic compare reports and summary JSON |
 | v0.7 | Tier A source mapping | uncontrolled and no-HVAC heat-balance candidates | source/function and output-variable maps |
 | v0.8 | Tier A heat balance | one-zone no-mass adiabatic candidate | first tolerance-gated `Zone Mean Air Temperature` subset |
-| v0.9 | Tier A/B fenestration | simple window and shading cases | window, solar, and shading diagnostics or conformance |
+| v0.9 | Tier A surface state | one-zone no-mass adiabatic surface candidate | first tolerance-gated surface inside/outside face temperature subset |
 | v0.10 | Tier A/B IdealLoads | selected IdealLoads and thermostat cases | setpoints, zone temperature, loads, energy |
 | v0.11 | Tier B air-side HVAC | `5ZoneAirCooled`, PTAC, selected CAV cases | node and component diagnostics |
 | v0.12 | Tier B plant | selected boiler, pump, chiller, and plant-loop cases | plant graph, node, flow, and equipment diagnostics |
@@ -56,6 +56,10 @@ Current v0.5 static-input evidence cases:
 Current v0.8 heat-balance conformance case:
 
 - `heat_balance_nomass_001`
+
+Current v0.9 surface-temperature conformance case:
+
+- `surface_temperature_nomass_001`
 
 Planned fields:
 
@@ -90,4 +94,5 @@ baseline-only, or diagnostic-only.
 - generate selected output CSV files from oracle artifacts
 - generate a release-level conformance index
 - add Tier A candidates for one-zone uncontrolled and simple window cases
+- keep fenestration and solar outputs diagnostic-only until a separate declared case exists
 - keep `compare zone-temperature` diagnostic-only until v0.8

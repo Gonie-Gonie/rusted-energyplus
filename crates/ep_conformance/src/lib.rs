@@ -725,6 +725,47 @@ mod tests {
     }
 
     #[test]
+    fn loads_surface_temperature_nomass_conformance_case_fixture()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/surface_temperature_nomass_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "surface_temperature_nomass_001");
+        assert_eq!(manifest.milestone, "v0.9-surface-temperature");
+        assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+        assert!(manifest.conformance_claim);
+        assert_eq!(manifest.outputs.len(), 3);
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "FLOOR"
+                && output.variable == "Surface Inside Face Temperature"
+                && output.class == VariableClass::SurfaceState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "FLOOR"
+                && output.variable == "Surface Outside Face Temperature"
+                && output.class == VariableClass::SurfaceState
+        }));
+        assert_eq!(manifest.tolerances.len(), 2);
+        assert!(manifest.tolerances.iter().any(|tolerance| {
+            tolerance.variable_class == VariableClass::ZoneState
+                && tolerance.max_abs == Some(0.000001)
+                && tolerance.max_rmse == Some(0.000001)
+        }));
+        assert!(manifest.tolerances.iter().any(|tolerance| {
+            tolerance.variable_class == VariableClass::SurfaceState
+                && tolerance.max_abs == Some(0.000001)
+                && tolerance.max_rmse == Some(0.000001)
+        }));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("surface-temperature conformance should declare a gate")
+        })?;
+        assert!(gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
     fn loads_weather_fields_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
         let manifest = load_case_file(
             repo_root().join("data/conformance_cases/weather_fields_001/case.toml"),

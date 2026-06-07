@@ -1,6 +1,7 @@
 # Heat Balance Porting Map
 
-Status: v0.8 first narrow conformance gate plus ongoing porting map.
+Status: v0.9 first narrow surface-temperature conformance gate plus ongoing
+porting map.
 
 EnergyPlus reference version:
 
@@ -52,6 +53,13 @@ v0.8 promoted case: `heat_balance_nomass_001`.
 This case claims only hourly `Zone Mean Air Temperature` for one no-mass
 adiabatic zone with no internal gains, windows, solar, infiltration, HVAC,
 plant, or dynamic exterior heat-balance claim.
+
+v0.9 promoted case: `surface_temperature_nomass_001`.
+
+This case claims only hourly `Zone Mean Air Temperature`, `Surface Inside Face
+Temperature`, and `Surface Outside Face Temperature` for the same no-mass
+adiabatic surface equilibrium subset. It does not claim fenestration, solar
+radiation, conduction-rate, or dynamic exterior heat-balance parity.
 
 ## EnergyPlus Source Map
 
@@ -161,6 +169,10 @@ source-reference comments.
 8. Only after a tolerance-gated report exists, promote any case from
    diagnostic-only to conformance. Implemented first narrow promotion:
    `heat_balance_nomass_001` hourly `Zone Mean Air Temperature`.
+9. Promote the first surface-state output only after the same case, variable,
+   tolerance, report, and blocking-gate evidence exists. Implemented first
+   narrow surface promotion: `surface_temperature_nomass_001` hourly `Surface
+   Inside Face Temperature` and `Surface Outside Face Temperature`.
 
 ## First Declared Runtime Subset
 
@@ -204,6 +216,8 @@ A heat-balance claim needs all of these:
 Minimum first variables:
 
 - `Zone Mean Air Temperature`: conformance only for `heat_balance_nomass_001`
+- `Surface Inside Face Temperature`: conformance only for `surface_temperature_nomass_001`
+- `Surface Outside Face Temperature`: conformance only for `surface_temperature_nomass_001`
 - `Zone Total Internal Convective Heating Rate`
 - `Site Outdoor Air Drybulb Temperature`
 

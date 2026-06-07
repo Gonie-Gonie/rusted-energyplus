@@ -10,8 +10,9 @@ last_reviewed: 2026-06-07
 Reference version: EnergyPlus 26.1.0
 
 Purpose: map the first heat-balance candidate output variables to EnergyPlus
-source files and Rust result locations before v0.8 conformance work begins.
-Only `heat_balance_nomass_001` promotes a mapped variable in v0.8.
+source files and Rust result locations before promoting conformance claims.
+`heat_balance_nomass_001` promotes the first zone variable in v0.8, and
+`surface_temperature_nomass_001` promotes the first surface variables in v0.9.
 
 ## Candidate Variables
 
@@ -22,8 +23,8 @@ Only `heat_balance_nomass_001` promotes a mapped variable in v0.8.
 | `Zone Air Heat Balance Internal Convective Heat Gain Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/InternalHeatGains.cc` | future `ep_runtime::zone_air` report state | mapped-not-ported |
 | `Zone Air Heat Balance Surface Convection Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future surface convection sum | mapped-not-ported |
 | `Zone Air Heat Balance Air Energy Storage Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | future zone air storage term | mapped-not-ported |
-| `Surface Inside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future `SurfaceHeatBalanceState` | mapped-not-ported |
-| `Surface Outside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future `SurfaceHeatBalanceState` | mapped-not-ported |
+| `Surface Inside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
+| `Surface Outside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
 | `Surface Inside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future opaque conduction result | mapped-not-ported |
 | `Surface Outside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future opaque conduction result | mapped-not-ported |
 | `Site Outdoor Air Drybulb Temperature` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW weather trace | smoke |
@@ -59,3 +60,9 @@ deltas, but it is not a zone heat-balance conformance result.
 The v0.8 `heat_balance_nomass_001` report is a separate conformance result for
 hourly `Zone Mean Air Temperature` only. It requires a case manifest,
 zone-state tolerance, markdown/JSON report artifacts, and a blocking gate.
+
+The v0.9 `surface_temperature_nomass_001` report is a separate conformance
+result for hourly `Zone Mean Air Temperature`, `Surface Inside Face
+Temperature`, and `Surface Outside Face Temperature` only. It requires
+zone-state and surface-state tolerances, markdown/JSON report artifacts, and a
+blocking gate.
