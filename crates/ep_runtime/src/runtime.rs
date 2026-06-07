@@ -580,6 +580,21 @@ pub struct HeatBalanceSimulation {
     pub summary: HeatBalanceSimulationSummary,
 }
 
+struct SurfaceHeatBalanceTrace {
+    surface_id: SurfaceId,
+    surface_name: String,
+    inside_face_temperature_c: Vec<f64>,
+    outside_face_temperature_c: Vec<f64>,
+    inside_conduction_rate_w: Vec<f64>,
+    inside_conduction_gain_rate_w: Vec<f64>,
+    inside_conduction_loss_rate_w: Vec<f64>,
+    inside_conduction_rate_per_area_w_per_m2: Vec<f64>,
+    outside_conduction_rate_w: Vec<f64>,
+    outside_conduction_gain_rate_w: Vec<f64>,
+    outside_conduction_loss_rate_w: Vec<f64>,
+    outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
+}
+
 /// Diagnostic role assigned to one plant equipment projection row.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PlantEquipmentRole {
@@ -2052,16 +2067,35 @@ pub fn simulate_heat_balance_zone_air_temperatures(
             )
         })
         .collect::<Vec<_>>();
-    let mut surface_temperatures = state
-        .surfaces
+    let mut zone_conduction_rates = state
+        .zones
         .iter()
-        .map(|surface| {
+        .map(|zone| {
             (
-                surface.surface_id,
-                surface.surface_name.clone(),
+                zone.zone_id,
+                zone.zone_name.clone(),
+                Vec::with_capacity(options.sample_count),
                 Vec::with_capacity(options.sample_count),
                 Vec::with_capacity(options.sample_count),
             )
+        })
+        .collect::<Vec<_>>();
+    let mut surface_temperatures = state
+        .surfaces
+        .iter()
+        .map(|surface| SurfaceHeatBalanceTrace {
+            surface_id: surface.surface_id,
+            surface_name: surface.surface_name.clone(),
+            inside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
+            inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
+            inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
+            inside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
+            outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
         })
         .collect::<Vec<_>>();
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
@@ -2090,15 +2124,55 @@ pub fn simulate_heat_balance_zone_air_temperatures(
                 values.push(zone_state.mean_air_temperature_c);
             }
         }
-        for (surface_id, _surface_name, inside_values, outside_values) in &mut surface_temperatures
+        for (
+            zone_id,
+            _zone_name,
+            conduction_values,
+            conduction_gain_values,
+            conduction_loss_values,
+        ) in &mut zone_conduction_rates
         {
+            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                let rate = zone_state.opaque_surface_heat_gain_w;
+                conduction_values.push(rate);
+                conduction_gain_values.push(heat_gain_rate_w(rate));
+                conduction_loss_values.push(heat_loss_rate_w(rate));
+            }
+        }
+        for trace in &mut surface_temperatures {
             if let Some(surface_state) = state
                 .surfaces
                 .iter()
-                .find(|surface| surface.surface_id == *surface_id)
+                .find(|surface| surface.surface_id == trace.surface_id)
             {
-                inside_values.push(surface_state.inside_face_temperature_c);
-                outside_values.push(surface_state.outside_face_temperature_c);
+                let inside_rate = surface_inside_conduction_rate_w(surface_state);
+                let outside_rate = surface_outside_conduction_rate_w(surface_state);
+                trace
+                    .inside_face_temperature_c
+                    .push(surface_state.inside_face_temperature_c);
+                trace
+                    .outside_face_temperature_c
+                    .push(surface_state.outside_face_temperature_c);
+                trace.inside_conduction_rate_w.push(inside_rate);
+                trace
+                    .inside_conduction_gain_rate_w
+                    .push(heat_gain_rate_w(inside_rate));
+                trace
+                    .inside_conduction_loss_rate_w
+                    .push(heat_loss_rate_w(inside_rate));
+                trace.inside_conduction_rate_per_area_w_per_m2.push(
+                    surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2),
+                );
+                trace.outside_conduction_rate_w.push(outside_rate);
+                trace
+                    .outside_conduction_gain_rate_w
+                    .push(heat_gain_rate_w(outside_rate));
+                trace
+                    .outside_conduction_loss_rate_w
+                    .push(heat_loss_rate_w(outside_rate));
+                trace.outside_conduction_rate_per_area_w_per_m2.push(
+                    surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2),
+                );
             }
         }
         outdoor_temperatures.push(outdoor_dry_bulb_c);
@@ -2116,21 +2190,114 @@ pub fn simulate_heat_balance_zone_air_temperatures(
         });
         handle_index += 1;
     }
-    for (_surface_id, surface_name, inside_values, outside_values) in surface_temperatures {
+    for (_zone_id, zone_name, conduction_values, conduction_gain_values, conduction_loss_values) in
+        zone_conduction_rates
+    {
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: surface_name.clone(),
-            variable_name: "Surface Inside Face Temperature".to_string(),
-            units: "C".to_string(),
-            values: inside_values,
+            key: zone_name.clone(),
+            variable_name: "Zone Opaque Surface Inside Faces Conduction Rate".to_string(),
+            units: "W".to_string(),
+            values: conduction_values,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: surface_name,
+            key: zone_name.clone(),
+            variable_name: "Zone Opaque Surface Inside Faces Conduction Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: conduction_gain_values,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name,
+            variable_name: "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate".to_string(),
+            units: "W".to_string(),
+            values: conduction_loss_values,
+        });
+        handle_index += 1;
+    }
+    for trace in surface_temperatures {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Temperature".to_string(),
+            units: "C".to_string(),
+            values: trace.inside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
             variable_name: "Surface Outside Face Temperature".to_string(),
             units: "C".to_string(),
-            values: outside_values,
+            values: trace.outside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Conduction Heat Transfer Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.inside_conduction_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Conduction Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.inside_conduction_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Conduction Heat Loss Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.inside_conduction_loss_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Conduction Heat Transfer Rate per Area".to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_conduction_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Conduction Heat Transfer Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Conduction Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Conduction Heat Loss Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_loss_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name,
+            variable_name: "Surface Outside Face Conduction Heat Transfer Rate per Area"
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_conduction_rate_per_area_w_per_m2,
         });
         handle_index += 1;
     }
@@ -2282,6 +2449,26 @@ fn surface_boundary_temperature_c(
         | OutsideBoundaryCondition::Ground
         | OutsideBoundaryCondition::Other => surface.outside_face_temperature_c,
     }
+}
+
+fn surface_inside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    surface.heat_gain_to_zone_w
+}
+
+fn surface_outside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    -surface.heat_gain_to_zone_w
+}
+
+fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
+    if area_m2 > 0.0 { rate_w / area_m2 } else { 0.0 }
+}
+
+fn heat_gain_rate_w(rate_w: f64) -> f64 {
+    rate_w.max(0.0)
+}
+
+fn heat_loss_rate_w(rate_w: f64) -> f64 {
+    (-rate_w).max(0.0)
 }
 
 fn convective_internal_gain_w(model: &TypedModel, zone_id: ZoneId, hour_ending: u32) -> f64 {
@@ -3198,14 +3385,14 @@ mod tests {
         let plan = build_execution_plan(&model);
 
         assert_eq!(plan.stages.len(), 3);
-        assert_eq!(plan.step_count(), 6);
+        assert_eq!(plan.step_count(), 9);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
             plan.stages[0].steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].steps.len(), 3);
+        assert_eq!(plan.stages[2].steps.len(), 6);
         assert_eq!(
             plan.stages[2].steps[0],
             ExecutionStep::WriteOutput(OutputHandle(0))
@@ -3217,6 +3404,10 @@ mod tests {
         assert_eq!(
             plan.stages[2].steps[2],
             ExecutionStep::WriteOutput(OutputHandle(2))
+        );
+        assert_eq!(
+            plan.stages[2].steps[5],
+            ExecutionStep::WriteOutput(OutputHandle(5))
         );
     }
 
@@ -4035,7 +4226,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 14);
+        assert_eq!(simulation.results.series.len(), 65);
 
         let Some(zone_series) = simulation
             .results
@@ -4072,6 +4263,34 @@ DATA PERIODS
         };
         assert_eq!(outside_surface_series.values, vec![10.0, 12.0]);
 
+        let Some(inside_conduction_series) = simulation
+            .results
+            .find_series("FLOOR", "Surface Inside Face Conduction Heat Transfer Rate")
+        else {
+            return Err(std::io::Error::other("missing inside conduction series").into());
+        };
+        assert_eq!(inside_conduction_series.values.len(), 2);
+        assert!(inside_conduction_series.values[0] < 0.0);
+
+        let Some(outside_conduction_series) = simulation.results.find_series(
+            "FLOOR",
+            "Surface Outside Face Conduction Heat Transfer Rate",
+        ) else {
+            return Err(std::io::Error::other("missing outside conduction series").into());
+        };
+        assert_eq!(
+            outside_conduction_series.values[0],
+            -inside_conduction_series.values[0]
+        );
+
+        let Some(zone_conduction_series) = simulation.results.find_series(
+            "ZONE ONE",
+            "Zone Opaque Surface Inside Faces Conduction Rate",
+        ) else {
+            return Err(std::io::Error::other("missing zone conduction series").into());
+        };
+        assert!(zone_conduction_series.values[0] < 0.0);
+
         Ok(())
     }
 
@@ -4099,17 +4318,25 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 15);
+        assert_eq!(registry.len(), 66);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
             RuntimeOutputRequest::hourly("zone one", "Zone Mean Air Temperature"),
             RuntimeOutputRequest::hourly("floor", "Surface Inside Face Temperature"),
+            RuntimeOutputRequest::hourly(
+                "floor",
+                "Surface Inside Face Conduction Heat Transfer Rate",
+            ),
+            RuntimeOutputRequest::hourly(
+                "zone one",
+                "Zone Opaque Surface Inside Faces Conduction Rate",
+            ),
             RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Drybulb Temperature"),
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 3);
+        assert_eq!(resolution.resolved.len(), 5);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

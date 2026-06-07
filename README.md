@@ -22,6 +22,9 @@ tolerance, and code organization.
 - release conformance index and coverage matrix report generation
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
+- `specs/variable_coverage.toml` as the canonical current output-variable
+  scope: 50 tracked variables, 30 conformance variables, 9 diagnostic
+  variables, and 11 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
 - official ExampleFile static model EIO conformance report gate
@@ -30,6 +33,14 @@ tolerance, and code organization.
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
+- 12 passed numerical time series separated from broader declared conformance
+  output requests in the user coverage handbook
+- no-mass adiabatic surface conduction rate/per-area conformance for the
+  declared `surface_temperature_nomass_001` hourly series
+- official `1ZoneUncontrolled` dynamic heat-balance baseline candidate output
+  requests for zone temperature, weather, internal gain, and surface
+  conduction series; this remains baseline-only until a Rust hourly comparison
+  gate passes
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
@@ -44,6 +55,9 @@ tolerance, and code organization.
   cases and variables
 - v0.26 internal convective gain conformance only for `internal_gains_001` /
   `Zone Total Internal Convective Heating Rate`
+- current surface conduction conformance only for the no-mass adiabatic
+  `surface_temperature_nomass_001` series; official ExampleFile dynamic
+  conduction is not yet promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation

@@ -8,6 +8,7 @@ oracle_version = "26.1.0"
 notes = [
   "The source IDF is an official EnergyPlus ExampleFiles input staged from the repo-local oracle installation.",
   "The staged IDF is generated under .runtime and receives manifest-owned Output:Variable requests.",
+  "This case is the first official dynamic heat-balance conformance candidate, but it remains conformance_claim=false until Rust hourly zone/surface/conduction values match EnergyPlus under a blocking tolerance gate.",
   "This case is baseline-only. It does not compare Rust results or promote a new numerical conformance claim.",
 ]
 
@@ -18,7 +19,7 @@ source_file = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
 tier = "B"
 
 [scope]
-domains = ["weather", "zone", "internal-gain"]
+domains = ["weather", "zone", "surface", "internal-gain"]
 has_zone = true
 has_surface = true
 has_fenestration = false
@@ -34,6 +35,15 @@ weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3
 
 [[outputs]]
 key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "baseline"
+
+[[outputs]]
+key = "Environment"
 variable = "Site Wind Speed"
 frequency = "hourly"
 class = "weather"
@@ -43,11 +53,65 @@ level = "baseline"
 
 [[outputs]]
 key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "baseline"
+
+[[outputs]]
+key = "ZONE ONE"
 variable = "Zone Total Internal Convective Heating Rate"
 frequency = "hourly"
 class = "internal-gain"
 source = "eso"
 domain = "internal-gain"
+level = "baseline"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "baseline"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "baseline"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "baseline"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "baseline"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Inside Faces Conduction Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
 level = "baseline"
 
 [report]

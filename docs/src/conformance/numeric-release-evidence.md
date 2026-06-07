@@ -38,8 +38,9 @@ numeric-conformance-evidence.json
 
 Only promoted, tolerance-gated numerical conformance cases enter the release
 PDF. v0.22.0 added declared time/weather/schedule variables to the earlier
-v0.8/v0.9 no-mass cases. v0.26.0 adds the declared internal convective gain
-hourly series. v0.23.0 added static EIO evidence, v0.24.0 added runtime
+v0.8/v0.9 no-mass cases. The current v0.9 gate also includes no-mass
+adiabatic surface conduction rate/per-area series. v0.26.0 adds the declared
+internal convective gain hourly series. v0.23.0 added static EIO evidence, v0.24.0 added runtime
 registry infrastructure, v0.25.0 generalized no-mass opaque boundary
 handling, v0.27.0 added user support coverage reporting, v0.28.0 enriched
 input object coverage metadata, and v0.29.0 enriched output variable coverage
@@ -56,7 +57,7 @@ v0.8/v0.9 cases only.
 | Milestone | Case | Variables |
 |---|---|---|
 | v0.8 | `heat_balance_nomass_001` | `Zone Mean Air Temperature` |
-| v0.9 | `surface_temperature_nomass_001` | zone MAT plus surface inside/outside face temperature |
+| v0.9 | `surface_temperature_nomass_001` | zone MAT, surface inside/outside face temperature, and no-mass adiabatic surface conduction series |
 | v0.22 | `schedule_constant_001` | `Schedule Value` |
 | v0.22 | `weather_fields_001` | `Site Outdoor Air Drybulb Temperature` only |
 | v0.26 | `internal_gains_001` | `Zone Total Internal Convective Heating Rate` only |

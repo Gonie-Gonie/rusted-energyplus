@@ -45,6 +45,12 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_optional_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def evidence_root(repo_root: Path, version: str) -> Path:
     return repo_root / ".runtime" / "release-evidence" / f"v{version}"
 
@@ -65,13 +71,55 @@ def boundary_text(row: dict[str, Any]) -> str:
     return str(row.get("support_boundary") or row.get("notes") or "")
 
 
+def conformance_manifest_outputs(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted_rows(take_rows(rows, "conformance"), "case_id", "key", "variable")
+
+
+def declared_numerical_series(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted_rows(
+        [
+            row
+            for row in rows
+            if status_bucket(row) == "conformance"
+            and str(row.get("source", "")).lower() == "eso"
+            and str(row.get("frequency", "")).lower() in {"hourly", "timestep", "daily", "monthly"}
+        ],
+        "case_id",
+        "key",
+        "variable",
+    )
+
+
+def passed_numerical_series(numeric: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for case in numeric.get("cases", []):
+        case_id = str(case.get("case_id", ""))
+        for series in case.get("series", []):
+            rows.append(
+                {
+                    "case_id": case_id,
+                    "key": series.get("key", ""),
+                    "variable": series.get("variable", ""),
+                    "frequency": series.get("frequency", ""),
+                    "samples": series.get("samples", 0),
+                    "max_abs_delta_c": series.get("max_abs_delta_c", 0.0),
+                    "mean_abs_delta_c": series.get("mean_abs_delta_c", 0.0),
+                    "rmse_delta_c": series.get("rmse_delta_c", 0.0),
+                    "status": series.get("status", ""),
+                }
+            )
+    return sorted_rows(rows, "case_id", "key", "variable")
+
+
 def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
     root = evidence_root(repo_root, version)
     support = load_json(root / "support-coverage-report.json")
     index = load_json(root / "conformance-index-report.json")
+    numeric = load_optional_json(root / "numeric-conformance-evidence.json")
 
     input_rows = list(support.get("input_objects", []))
     output_rows = list(support.get("output_variables", []))
+    manifest_output_rows = list(support.get("manifest_outputs", []))
     algorithm_rows = list(support.get("algorithms", []))
     case_rows = list(support.get("cases", []))
 
@@ -82,6 +130,9 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
     baseline_outputs = sorted_rows(take_rows(output_rows, "baseline"), "domain", "name")
     conformance_algorithms = sorted_rows(take_rows(algorithm_rows, "conformance"), "domain", "id")
     diagnostic_algorithms = sorted_rows(take_rows(algorithm_rows, "diagnostic_only"), "domain", "id")
+    declared_conformance_outputs = conformance_manifest_outputs(manifest_output_rows)
+    declared_numeric = declared_numerical_series(manifest_output_rows)
+    passed_numeric = passed_numerical_series(numeric)
     promoted_cases = sorted_rows(
         [row for row in case_rows if bool(row.get("conformance_claim", False))],
         "case_id",
@@ -89,6 +140,7 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
 
     support_aggregate = support.get("aggregate") or {}
     index_aggregate = index.get("aggregate") or {}
+    numeric_aggregate = numeric.get("aggregate") or {}
     return {
         "schema_version": 1,
         "version": version,
@@ -97,6 +149,7 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
         "source_artifacts": {
             "support_coverage_json": f".runtime/release-evidence/v{version}/support-coverage-report.json",
             "conformance_index_json": f".runtime/release-evidence/v{version}/conformance-index-report.json",
+            "numeric_conformance_json": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.json",
         },
         "aggregate": {
             "input_object_count": support_aggregate.get("input_object_count", len(input_rows)),
@@ -124,6 +177,15 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
             "case_count": support_aggregate.get("case_count", len(case_rows)),
             "conformance_case_count": support_aggregate.get("conformance_case_count", len(promoted_cases)),
             "index_output_request_count": index_aggregate.get("output_count", 0),
+            "declared_conformance_output_request_count": support_aggregate.get(
+                "conformance_output_request_count",
+                len(declared_conformance_outputs),
+            ),
+            "declared_numerical_series_count": len(declared_numeric),
+            "passed_numerical_case_count": numeric_aggregate.get("case_count", 0),
+            "passed_numerical_series_count": numeric_aggregate.get("series_count", len(passed_numeric)),
+            "passed_numerical_max_abs_delta_c": numeric_aggregate.get("max_abs_delta_c", 0.0),
+            "passed_numerical_rmse_delta_c": numeric_aggregate.get("rmse_delta_c", 0.0),
             "status": "pass",
         },
         "user_decision_rules": [
@@ -137,6 +199,9 @@ def build_handbook(repo_root: Path, version: str) -> dict[str, Any]:
         "conformance_outputs": conformance_outputs,
         "diagnostic_outputs": diagnostic_outputs,
         "baseline_outputs": baseline_outputs,
+        "declared_conformance_outputs": declared_conformance_outputs,
+        "declared_numerical_series": declared_numeric,
+        "passed_numerical_series": passed_numeric,
         "conformance_algorithms": conformance_algorithms,
         "diagnostic_algorithms": diagnostic_algorithms,
         "promoted_cases": promoted_cases,
@@ -169,6 +234,9 @@ def build_metric_table(handbook: dict[str, Any]) -> Table:
         ["Typed input objects", aggregate["typed_input_count"]],
         ["Structural input objects", aggregate["structural_input_count"]],
         ["Conformance output variables", aggregate["conformance_output_variable_count"]],
+        ["Declared conformance output requests", aggregate["declared_conformance_output_request_count"]],
+        ["Declared numerical series", aggregate["declared_numerical_series_count"]],
+        ["Passed numerical series", aggregate["passed_numerical_series_count"]],
         ["Diagnostic output variables", aggregate["diagnostic_output_variable_count"]],
         ["Baseline output variables", aggregate["baseline_output_variable_count"]],
         ["Conformance algorithms", aggregate["conformance_algorithm_count"]],
@@ -206,6 +274,44 @@ def output_table(rows: list[dict[str, Any]], caption: str) -> Table:
                 row.get("first_evidence", ""),
                 ", ".join(row.get("observed_frequencies", [])),
                 boundary_text(row),
+            ]
+            for row in rows
+        ],
+        caption,
+    )
+
+
+def declared_conformance_output_table(rows: list[dict[str, Any]], caption: str) -> Table:
+    return doc_table(
+        ["Case", "Key", "Output variable", "Frequency", "Source", "Domain"],
+        [
+            [
+                row.get("case_id", ""),
+                row.get("key", ""),
+                row.get("variable", ""),
+                row.get("frequency", ""),
+                row.get("source", ""),
+                row.get("domain", ""),
+            ]
+            for row in rows
+        ],
+        caption,
+    )
+
+
+def passed_numerical_series_table(rows: list[dict[str, Any]], caption: str) -> Table:
+    return doc_table(
+        ["Case", "Key", "Output variable", "Samples", "Max abs", "Mean abs", "RMSE", "Status"],
+        [
+            [
+                row.get("case_id", ""),
+                row.get("key", ""),
+                row.get("variable", ""),
+                row.get("samples", ""),
+                row.get("max_abs_delta_c", ""),
+                row.get("mean_abs_delta_c", ""),
+                row.get("rmse_delta_c", ""),
+                row.get("status", ""),
             ]
             for row in rows
         ],
@@ -253,6 +359,7 @@ def create_scope_chart(handbook: dict[str, Any]) -> Any:
         "Inputs\ntyped",
         "Inputs\nstructural",
         "Outputs\nconformance",
+        "Series\npassed",
         "Outputs\ndiagnostic",
         "Outputs\nbaseline",
         "Algorithms\nconformance",
@@ -262,12 +369,13 @@ def create_scope_chart(handbook: dict[str, Any]) -> Any:
         aggregate["typed_input_count"],
         aggregate["structural_input_count"],
         aggregate["conformance_output_variable_count"],
+        aggregate["passed_numerical_series_count"],
         aggregate["diagnostic_output_variable_count"],
         aggregate["baseline_output_variable_count"],
         aggregate["conformance_algorithm_count"],
         aggregate["diagnostic_algorithm_count"],
     ]
-    colors = ["#2f6f9f", "#7a8c9f", "#2d7d46", "#b17921", "#697789", "#2d7d46", "#b17921"]
+    colors = ["#2f6f9f", "#7a8c9f", "#2d7d46", "#2f6f9f", "#b17921", "#697789", "#2d7d46", "#b17921"]
     fig, ax = plt.subplots(figsize=(7.2, 3.4))
     ax.bar(labels, values, color=colors)
     ax.set_title("Current User Coverage Counts", loc="left", fontsize=13, fontweight="bold")
@@ -352,6 +460,21 @@ def build_document(handbook: dict[str, Any], chart: Any) -> Document:
             output_table(handbook["conformance_outputs"], "Output variables with promoted tolerance-gated evidence."),
         ),
         Chapter(
+            "Declared vs Passed Numerical Series",
+            declared_conformance_output_table(
+                handbook["declared_conformance_outputs"],
+                "All manifest-declared conformance output requests, including static EIO rows.",
+            ),
+            declared_conformance_output_table(
+                handbook["declared_numerical_series"],
+                "Manifest-declared ESO numerical series expected to have tolerance-gated evidence.",
+            ),
+            passed_numerical_series_table(
+                handbook["passed_numerical_series"],
+                "Numerical time series that passed release evidence gates.",
+            ),
+        ),
+        Chapter(
             "Diagnostic and Baseline Outputs",
             output_table(handbook["diagnostic_outputs"], "Diagnostic output variables."),
             output_table(handbook["baseline_outputs"], "Baseline-only output variables."),
@@ -405,6 +528,27 @@ def render_markdown(handbook: dict[str, Any]) -> str:
         [row["name"], row["domain"], row["first_evidence"], boundary_text(row)]
         for row in handbook["conformance_outputs"]
     ]
+    declared_output_rows = [
+        [row["case_id"], row["key"], row["variable"], row["frequency"], row["source"]]
+        for row in handbook["declared_conformance_outputs"]
+    ]
+    declared_numerical_rows = [
+        [row["case_id"], row["key"], row["variable"], row["frequency"], row["source"]]
+        for row in handbook["declared_numerical_series"]
+    ]
+    passed_numerical_rows = [
+        [
+            row["case_id"],
+            row["key"],
+            row["variable"],
+            row["samples"],
+            row["max_abs_delta_c"],
+            row["mean_abs_delta_c"],
+            row["rmse_delta_c"],
+            row["status"],
+        ]
+        for row in handbook["passed_numerical_series"]
+    ]
     algorithm_rows = [
         [row["id"], row["domain"], row["first_evidence"], boundary_text(row)]
         for row in handbook["conformance_algorithms"]
@@ -417,6 +561,9 @@ def render_markdown(handbook: dict[str, Any]) -> str:
         f"- typed_inputs: {aggregate['typed_input_count']}\n"
         f"- structural_inputs: {aggregate['structural_input_count']}\n"
         f"- conformance_outputs: {aggregate['conformance_output_variable_count']}\n"
+        f"- declared_conformance_output_requests: {aggregate['declared_conformance_output_request_count']}\n"
+        f"- declared_numerical_series: {aggregate['declared_numerical_series_count']}\n"
+        f"- passed_numerical_series: {aggregate['passed_numerical_series_count']}\n"
         f"- diagnostic_outputs: {aggregate['diagnostic_output_variable_count']}\n"
         f"- baseline_outputs: {aggregate['baseline_output_variable_count']}\n"
         f"- conformance_algorithms: {aggregate['conformance_algorithm_count']}\n"
@@ -427,6 +574,16 @@ def render_markdown(handbook: dict[str, Any]) -> str:
         + markdown_table(["Input", "Family", "First evidence", "Boundary"], input_rows)
         + "\n## Conformance Outputs\n\n"
         + markdown_table(["Output", "Domain", "First evidence", "Boundary"], output_rows)
+        + "\n## Declared vs Passed Numerical Series\n\n"
+        + "### Declared Conformance Output Requests\n\n"
+        + markdown_table(["Case", "Key", "Output", "Frequency", "Source"], declared_output_rows)
+        + "\n### Declared Numerical Series\n\n"
+        + markdown_table(["Case", "Key", "Output", "Frequency", "Source"], declared_numerical_rows)
+        + "\n### Passed Numerical Series\n\n"
+        + markdown_table(
+            ["Case", "Key", "Output", "Samples", "Max abs", "Mean abs", "RMSE", "Status"],
+            passed_numerical_rows,
+        )
         + "\n## Conformance Algorithms\n\n"
         + markdown_table(["Algorithm", "Domain", "First evidence", "Boundary"], algorithm_rows)
         + "\n## Known Gaps\n\n"
@@ -472,6 +629,8 @@ def main() -> int:
     print(f"  status: {aggregate['status']}")
     print(f"  typed_inputs: {aggregate['typed_input_count']}")
     print(f"  conformance_outputs: {aggregate['conformance_output_variable_count']}")
+    print(f"  declared_numerical_series: {aggregate['declared_numerical_series_count']}")
+    print(f"  passed_numerical_series: {aggregate['passed_numerical_series_count']}")
     print(f"  conformance_algorithms: {aggregate['conformance_algorithm_count']}")
     print(f"  markdown: {outputs['markdown']}")
     print(f"  html: {outputs['html']}")

@@ -103,7 +103,7 @@ fn loads_surface_temperature_nomass_conformance_case_fixture()
     assert_eq!(manifest.milestone, "v0.9-surface-temperature");
     assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
     assert!(manifest.conformance_claim);
-    assert_eq!(manifest.outputs.len(), 3);
+    assert_eq!(manifest.outputs.len(), 8);
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "FLOOR"
             && output.variable == "Surface Inside Face Temperature"
@@ -112,6 +112,16 @@ fn loads_surface_temperature_nomass_conformance_case_fixture()
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "FLOOR"
             && output.variable == "Surface Outside Face Temperature"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "FLOOR"
+            && output.variable == "Surface Inside Face Conduction Heat Transfer Rate"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZONE ONE"
+            && output.variable == "Zone Opaque Surface Inside Faces Conduction Rate"
             && output.class == VariableClass::SurfaceState
     }));
     assert_eq!(manifest.tolerances.len(), 2);

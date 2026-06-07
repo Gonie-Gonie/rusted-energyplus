@@ -1154,6 +1154,13 @@ fn max_value_label(values: &[f64]) -> String {
         .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
 }
 
+fn mean_value_label(values: &[f64]) -> String {
+    if values.is_empty() {
+        return "missing".to_string();
+    }
+    format!("{:.6}", values.iter().sum::<f64>() / values.len() as f64)
+}
+
 fn nonzero_count(values: &[f64]) -> usize {
     values.iter().filter(|value| value.abs() > 1.0e-9).count()
 }
@@ -2914,6 +2921,7 @@ struct HeatBalanceSeriesDiagnostic {
     oracle_last_c: f64,
     rust_last_c: f64,
     delta: DeltaSummary,
+    sample_rows: Vec<DeltaPoint>,
     status: &'static str,
 }
 
@@ -3017,6 +3025,21 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
     variable.eq_ignore_ascii_case("Zone Mean Air Temperature")
         || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Transfer Rate")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Gain Rate")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Loss Rate")
+        || variable
+            .eq_ignore_ascii_case("Surface Inside Face Conduction Heat Transfer Rate per Area")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Conduction Heat Transfer Rate")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Conduction Heat Gain Rate")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Conduction Heat Loss Rate")
+        || variable
+            .eq_ignore_ascii_case("Surface Outside Face Conduction Heat Transfer Rate per Area")
+        || variable.eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Rate")
+        || variable
+            .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Gain Rate")
+        || variable
+            .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Loss Rate")
 }
 
 fn evaluate_heat_balance_conformance<'a>(
@@ -3140,6 +3163,7 @@ fn build_heat_balance_conformance_diagnostic(
         };
 
         let delta = delta_summary(&oracle_values, &rust_series.values);
+        let sample_rows = delta_points(&oracle_values, &rust_series.values);
         let finite = oracle_values
             .iter()
             .chain(rust_series.values.iter())
@@ -3153,6 +3177,7 @@ fn build_heat_balance_conformance_diagnostic(
             oracle_last_c: oracle_values[oracle_values.len() - 1],
             rust_last_c: rust_series.values.last().copied().unwrap_or(f64::NAN),
             delta,
+            sample_rows,
             status: if extracted { "extracted" } else { "failed" },
         });
     }
@@ -4085,6 +4110,20 @@ fn delta_summary(expected: &[f64], observed: &[f64]) -> DeltaSummary {
     }
 }
 
+fn delta_points(expected: &[f64], observed: &[f64]) -> Vec<DeltaPoint> {
+    expected
+        .iter()
+        .zip(observed)
+        .enumerate()
+        .map(|(index, (expected, observed))| DeltaPoint {
+            index,
+            oracle_c: *expected,
+            rust_c: *observed,
+            abs_delta_c: (expected - observed).abs(),
+        })
+        .collect()
+}
+
 fn print_delta_sample(label: &str, point: Option<DeltaPoint>) {
     let Some(point) = point else {
         println!("{label}: none");
@@ -4496,6 +4535,10 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## Delta Samples\n\n");
     heat_balance_report_delta_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Hourly Samples\n\n");
+    heat_balance_report_sample_rows(&mut report, &diagnostic.series);
     report
 }
 
@@ -4619,6 +4662,10 @@ fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
             delta_point_json(row.delta.max_delta_sample)
         ));
         json.push_str(&format!(
+            "      \"sample_rows\": {},\n",
+            delta_points_json(&row.sample_rows)
+        ));
+        json.push_str(&format!(
             "      \"oracle_first_c\": {},\n",
             json_number(row.oracle_first_c)
         ));
@@ -4646,17 +4693,18 @@ fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
 
 fn heat_balance_report_series_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
     report.push_str(
-        "| key | variable | class | samples | max_abs_delta_c | rmse_delta_c | status |\n",
+        "| key | variable | class | samples | max_abs_delta_c | mean_abs_delta_c | rmse_delta_c | status |\n",
     );
-    report.push_str("|---|---|---|---:|---:|---:|---|\n");
+    report.push_str("|---|---|---|---:|---:|---:|---:|---|\n");
     for row in series {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {:.12} | {:.12} | {} |\n",
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {} |\n",
             markdown_cell(&row.output.key),
             markdown_cell(&row.output.variable),
             row.output.class,
             row.samples,
             row.delta.max_abs_delta_c,
+            row.delta.mean_abs_delta_c,
             row.delta.rmse_delta_c,
             row.status
         ));
@@ -4680,6 +4728,31 @@ fn heat_balance_report_delta_rows(report: &mut String, series: &[HeatBalanceSeri
             "max_delta_sample",
             row.delta.max_delta_sample,
         );
+    }
+}
+
+fn heat_balance_report_sample_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
+    report.push_str("| output | index | oracle | rust | abs_delta |\n");
+    report.push_str("|---|---:|---:|---:|---:|\n");
+    for row in series {
+        let output = format!("{}/{}", row.output.key, row.output.variable);
+        if row.sample_rows.is_empty() {
+            report.push_str(&format!(
+                "| {} | n/a | n/a | n/a | n/a |\n",
+                markdown_cell(&output)
+            ));
+            continue;
+        }
+        for point in &row.sample_rows {
+            report.push_str(&format!(
+                "| {} | {} | {:.12} | {:.12} | {:.12} |\n",
+                markdown_cell(&output),
+                point.index,
+                point.oracle_c,
+                point.rust_c,
+                point.abs_delta_c
+            ));
+        }
     }
 }
 
@@ -4716,6 +4789,18 @@ fn delta_point_json(point: Option<DeltaPoint>) -> String {
         ),
         None => "null".to_string(),
     }
+}
+
+fn delta_points_json(points: &[DeltaPoint]) -> String {
+    let mut json = String::from("[");
+    for (index, point) in points.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&delta_point_json(Some(*point)));
+    }
+    json.push(']');
+    json
 }
 
 fn json_optional_number(value: Option<f64>) -> String {
@@ -5229,6 +5314,7 @@ mod tests {
                     oracle_last_c: 23.0,
                     rust_last_c: 23.0,
                     delta: super::delta_summary(&[23.0, 23.0], &[23.0, 23.0]),
+                    sample_rows: super::delta_points(&[23.0, 23.0], &[23.0, 23.0]),
                     status: "extracted",
                 },
                 super::HeatBalanceSeriesDiagnostic {
@@ -5245,6 +5331,7 @@ mod tests {
                     oracle_last_c: 23.0,
                     rust_last_c: 23.0,
                     delta: super::delta_summary(&[23.0, 23.0], &[23.0, 23.0]),
+                    sample_rows: super::delta_points(&[23.0, 23.0], &[23.0, 23.0]),
                     status: "extracted",
                 },
             ],
@@ -5294,6 +5381,7 @@ mod tests {
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
+        assert!(json.contains("\"sample_rows\""));
         assert!(json.contains("\"blocking\": true"));
         assert!(report.contains("Heat Balance Conformance Report"));
         assert!(report.contains("comparison_class: conformance"));
@@ -5302,6 +5390,8 @@ mod tests {
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
+        assert!(report.contains("## Hourly Samples"));
+        assert!(report.contains("| ZONE ONE/Zone Mean Air Temperature | 0 | 23.000000000000 | 23.000000000000 | 0.000000000000 |"));
     }
 
     #[test]

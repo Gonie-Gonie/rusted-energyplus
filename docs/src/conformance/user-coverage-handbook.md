@@ -17,6 +17,8 @@ Use it to answer:
 - which output variables are promoted conformance, diagnostic, or baseline only
 - which algorithm families have limited conformance evidence versus diagnostic projection evidence
 - which conformance cases define the current public numerical claim
+- which conformance output requests are declared versus which numerical
+  time-series actually passed release evidence
 - which gaps must not be inferred from neighboring support rows
 
 Generate it after the support and index reports:
@@ -24,6 +26,7 @@ Generate it after the support and index reports:
 ```powershell
 .\scripts\dev.cmd support-coverage-report -Version 0.32.0
 .\scripts\dev.cmd conformance-index-report -Version 0.32.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
 .\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
 ```
 
@@ -39,8 +42,9 @@ Artifacts are written to:
 ## Difference From Support Coverage
 
 The support coverage report is the detailed matrix. The handbook is the user decision guide over that matrix.
-It keeps detailed rows, but organizes them around decision rules, promoted
-outputs, diagnostic/baseline outputs, algorithm scope, and known gaps.
+It keeps detailed rows, but organizes them
+around decision rules, promoted outputs, diagnostic/baseline outputs, declared
+versus passed numerical series, algorithm scope, and known gaps.
 
 ## Boundary
 

@@ -7,6 +7,7 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "This v0.9 case extends the v0.8 no-mass adiabatic equilibrium gate to surface inside/outside face temperatures.",
+  "The gated output surface now includes zero-conduction hourly series for the same no-mass adiabatic boundary so conduction reporting is not just registry-only.",
   "It does not claim fenestration, solar, radiation exchange, outdoor convection, or dynamic surface heat-balance parity.",
 ]
 
@@ -56,6 +57,61 @@ rmse_tol = 0.000001
 [[outputs]]
 key = "FLOOR"
 variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "FLOOR"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Inside Faces Conduction Rate"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"

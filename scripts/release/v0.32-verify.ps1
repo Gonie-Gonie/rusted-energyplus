@@ -109,8 +109,8 @@ if ($handbook.aggregate.typed_input_count -ne 14) {
 if ($handbook.aggregate.structural_input_count -ne 6) {
     throw "Expected 6 structural inputs, found $($handbook.aggregate.structural_input_count)"
 }
-if ($handbook.aggregate.conformance_output_variable_count -ne 25) {
-    throw "Expected 25 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
+if ($handbook.aggregate.conformance_output_variable_count -ne 30) {
+    throw "Expected 30 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
 }
 if ($handbook.aggregate.diagnostic_output_variable_count -ne 9) {
     throw "Expected 9 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
@@ -126,6 +126,12 @@ if ($handbook.aggregate.diagnostic_algorithm_count -ne 2) {
 }
 if ($handbook.aggregate.conformance_case_count -ne 6) {
     throw "Expected 6 promoted conformance cases, found $($handbook.aggregate.conformance_case_count)"
+}
+if ($handbook.aggregate.declared_numerical_series_count -ne 12) {
+    throw "Expected 12 declared numerical series, found $($handbook.aggregate.declared_numerical_series_count)"
+}
+if ($handbook.aggregate.passed_numerical_series_count -ne 12) {
+    throw "Expected 12 passed numerical series, found $($handbook.aggregate.passed_numerical_series_count)"
 }
 if (@($handbook.user_decision_rules).Count -lt 4) {
     throw "Expected at least 4 user decision rules"

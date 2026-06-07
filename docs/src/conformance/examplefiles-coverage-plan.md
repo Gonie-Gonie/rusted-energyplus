@@ -105,6 +105,10 @@ Current v0.18 official baseline evidence:
 
 - `data/conformance_cases/official_1zone_uncontrolled_baseline_001/case.toml`
 - manifest-owned staged IDF output request injection
+- official dynamic conformance candidate output requests for zone temperature,
+  weather, internal gain, and surface conduction hourly baselines
+- remains `conformance_claim=false` until Rust produces matching hourly
+  values under a blocking gate
 - `official-baseline-smoke`
 - `v0.18-verify`
 

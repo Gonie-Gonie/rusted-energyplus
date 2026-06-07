@@ -22,6 +22,14 @@
 - [User Coverage Handbook](conformance/user-coverage-handbook.md)
 - [Release Evidence Manifest](conformance/release-evidence-manifest.md)
 
+# Porting Maps
+
+- [Output Variable Source Map](porting-map/output-variable-source-map.md)
+- [Zone Air Update Map](porting-map/zone-air-update-map.md)
+- [Surface Balance Map](porting-map/surface-balance-map.md)
+- [Conduction Map](porting-map/conduction-map.md)
+- [Warmup Semantics Map](porting-map/warmup-semantics-map.md)
+
 # Generated References
 
 - [Milestone Map](generated/milestone-map.md)

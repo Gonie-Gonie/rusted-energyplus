@@ -1,10 +1,146 @@
 [[variable]]
-name = "Zone Mean Air Temperature"
-domain = "heat_balance"
+name = "Zone Ideal Loads Zone Total Cooling Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Ideal Loads Zone Total Heating Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "System Node Humidity Ratio"
+domain = "node"
+status = "baseline"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "District Heating Water Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Plant Load Profile Heat Transfer Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Plant Supply Side Cooling Demand Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Plant Supply Side Heating Demand Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Plant Supply Side Inlet Mass Flow Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Pump Electricity Rate"
+domain = "plant"
+status = "baseline"
+first_case = "plant_loop_diagnostic_001"
+first_evidence = "plant_loop_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Thermostat Cooling Setpoint Temperature"
+domain = "zone"
+status = "baseline"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Thermostat Heating Setpoint Temperature"
+domain = "zone"
+status = "baseline"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Construction CTF Layer Count"
+domain = "construction"
 status = "conformance"
-first_case = "heat_balance_nomass_001"
-first_evidence = "heat_balance_nomass_001"
-support_boundary = "Tolerance-gated only for declared no-mass heat-balance cases; no general heat-balance or HVAC claim."
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Construction CTF Thermal Conductance"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Material CTF Summary Conductivity"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Material CTF Summary Density"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Material CTF Summary Specific Heat"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Material CTF Summary Thermal Resistance"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Material CTF Summary Thickness"
+domain = "construction"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
 
 [[variable]]
 name = "Surface Inside Face Temperature"
@@ -23,12 +159,172 @@ first_evidence = "surface_temperature_nomass_001"
 support_boundary = "Tolerance-gated only for declared opaque no-mass surface cases; no solar, fenestration, or general exterior boundary claim."
 
 [[variable]]
-name = "System Node Temperature"
-domain = "hvac"
-status = "diagnostic"
-first_case = "air_side_node_diagnostic_001"
-first_evidence = "air_side_node_diagnostic_001"
-support_boundary = "Diagnostic node-state evidence only; no HVAC or node numerical conformance."
+name = "Zone Mean Air Temperature"
+domain = "heat_balance"
+status = "conformance"
+first_case = "heat_balance_nomass_001"
+first_evidence = "heat_balance_nomass_001"
+support_boundary = "Tolerance-gated only for declared no-mass heat-balance cases; no general heat-balance or HVAC claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Equipment Level"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Equipment per Floor Area"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Fraction Convected"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Fraction Latent"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Fraction Lost"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Fraction Radiant"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "OtherEquipment Internal Gains Nominal Zone Floor Area"
+domain = "internal-gain"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Zone Total Internal Convective Heating Rate"
+domain = "internal-gain"
+status = "conformance"
+first_case = "internal_gains_001"
+first_evidence = "internal_gains_001"
+support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
+
+[[variable]]
+name = "Schedule Value"
+domain = "schedule"
+status = "conformance"
+first_case = "schedule_constant_001"
+first_evidence = "schedule_constant_001"
+support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
+
+[[variable]]
+name = "HeatTransfer Surface Area (Gross)"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "HeatTransfer Surface Area (Net)"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "HeatTransfer Surface Azimuth"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "HeatTransfer Surface Class"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "HeatTransfer Surface Tilt"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_static_model_001"
+first_evidence = "official_1zone_static_model_001"
+support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+
+[[variable]]
+name = "Surface Inside Face Conduction Heat Transfer Rate"
+domain = "surface"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+
+[[variable]]
+name = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+
+[[variable]]
+name = "Surface Outside Face Conduction Heat Transfer Rate"
+domain = "surface"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+
+[[variable]]
+name = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+
+[[variable]]
+name = "Zone Opaque Surface Inside Faces Conduction Rate"
+domain = "surface"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+first_evidence = "surface_temperature_nomass_001"
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+
+[[variable]]
+name = "Site Outdoor Air Drybulb Temperature"
+domain = "weather"
+status = "conformance"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
 
 [[variable]]
 name = "System Node Mass Flow Rate"
@@ -37,6 +333,14 @@ status = "diagnostic"
 first_case = "air_side_node_diagnostic_001"
 first_evidence = "air_side_node_diagnostic_001"
 support_boundary = "Diagnostic node-state evidence only; no HVAC flow balancing or node numerical conformance."
+
+[[variable]]
+name = "System Node Temperature"
+domain = "hvac"
+status = "diagnostic"
+first_case = "air_side_node_diagnostic_001"
+first_evidence = "air_side_node_diagnostic_001"
+support_boundary = "Diagnostic node-state evidence only; no HVAC or node numerical conformance."
 
 [[variable]]
 name = "Plant Supply Side Inlet Temperature"
@@ -53,3 +357,43 @@ status = "diagnostic"
 first_case = "plant_loop_diagnostic_001"
 first_evidence = "plant_loop_diagnostic_001"
 support_boundary = "Diagnostic plant-state projection only; no plant loop simulation conformance."
+
+[[variable]]
+name = "Site Outdoor Air Barometric Pressure"
+domain = "weather"
+status = "diagnostic"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Diagnostic comparison or extraction only; not release conformance."
+
+[[variable]]
+name = "Site Outdoor Air Dewpoint Temperature"
+domain = "weather"
+status = "diagnostic"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Diagnostic comparison or extraction only; not release conformance."
+
+[[variable]]
+name = "Site Outdoor Air Relative Humidity"
+domain = "weather"
+status = "diagnostic"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Diagnostic comparison or extraction only; not release conformance."
+
+[[variable]]
+name = "Site Wind Direction"
+domain = "weather"
+status = "diagnostic"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Diagnostic comparison or extraction only; not release conformance."
+
+[[variable]]
+name = "Site Wind Speed"
+domain = "weather"
+status = "diagnostic"
+first_case = "weather_fields_001"
+first_evidence = "weather_fields_001"
+support_boundary = "Diagnostic comparison or extraction only; not release conformance."

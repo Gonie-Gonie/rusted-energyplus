@@ -33,8 +33,9 @@ from matplotlib.ticker import FuncFormatter
 
 ORACLE_VERSION = "26.1.0"
 CLAIM_BOUNDARY = (
-    "Only declared v0.8/v0.9 no-mass heat-balance, v0.22 time/weather/schedule, "
-    "and v0.26 internal convective gain numerical conformance variables are promoted."
+    "Only declared v0.8/v0.9 no-mass heat-balance including no-mass adiabatic "
+    "surface conduction, v0.22 time/weather/schedule, and v0.26 internal "
+    "convective gain numerical conformance variables are promoted."
 )
 
 

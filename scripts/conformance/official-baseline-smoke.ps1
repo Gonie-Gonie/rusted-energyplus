@@ -103,6 +103,7 @@ $stagedText = Get-Content -Raw -LiteralPath $stagedIdf
 Assert-Contains -Text $stagedText -Pattern "eplus-rs output request injection begin" -Description "output injection marker"
 Assert-Contains -Text $stagedText -Pattern "Site Wind Speed" -Description "weather output injection"
 Assert-Contains -Text $stagedText -Pattern "Zone Total Internal Convective Heating Rate" -Description "internal-gain output injection"
+Assert-Contains -Text $stagedText -Pattern "Surface Inside Face Conduction Heat Transfer Rate" -Description "existing official conduction output"
 
 $expanded = Get-Content -Raw -LiteralPath $expandedManifest
 Assert-Contains -Text $expanded -Pattern 'schema = "rusted-energyplus.baseline-expanded.v1"' -Description "expanded manifest schema"
@@ -120,7 +121,7 @@ if ($LASTEXITCODE -ne 0) {
 
 $reportText = ($reportOutput -join "`n")
 Assert-Contains -Text $reportText -Pattern "Conformance Report Skeleton" -Description "report header"
-Assert-Contains -Text $reportText -Pattern "series: 2" -Description "baseline series count"
+Assert-Contains -Text $reportText -Pattern "series: 9" -Description "baseline series count"
 Assert-Contains -Text $reportText -Pattern "status: baseline-only" -Description "report status"
 
 $reportPath = Join-Path $ReportRoot "official_1zone_uncontrolled_baseline_001\compare-report.md"
@@ -129,6 +130,9 @@ Assert-FileExists -Path $reportPath -Description "official baseline report"
 Assert-FileExists -Path $summaryPath -Description "official baseline summary"
 $report = Get-Content -Raw -LiteralPath $reportPath
 Assert-Contains -Text $report -Pattern "Site Wind Speed" -Description "report weather row"
+Assert-Contains -Text $report -Pattern "Zone Mean Air Temperature" -Description "report zone row"
+Assert-Contains -Text $report -Pattern "Surface Inside Face Conduction Heat Transfer Rate" -Description "report surface conduction row"
+Assert-Contains -Text $report -Pattern "baseline_mean" -Description "report baseline mean column"
 Assert-Contains -Text $report -Pattern "Zone Total Internal Convective Heating Rate" -Description "report internal-gain row"
 Assert-Contains -Text $report -Pattern "baseline-only" -Description "report baseline boundary"
 

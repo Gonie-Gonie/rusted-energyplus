@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 
 use crate::{
     comparison_class_label, first_value_label, json_string, last_value_label, markdown_cell,
-    max_value_label, min_value_label, nonzero_count, output_frequency_idf_label,
+    max_value_label, mean_value_label, min_value_label, nonzero_count, output_frequency_idf_label,
     output_frequency_label, report_format_label, resolve_manifest_path, source_artifact_label,
     variable_class_label,
 };
@@ -503,6 +503,7 @@ pub(crate) fn generate_conformance_report_skeleton(
             first: first_value_label(&values),
             last: last_value_label(&values),
             min: min_value_label(&values),
+            mean: mean_value_label(&values),
             max: max_value_label(&values),
             nonzero_count: nonzero_count(&values),
         });
@@ -543,6 +544,7 @@ struct ReportSeriesRow {
     first: String,
     last: String,
     min: String,
+    mean: String,
     max: String,
     nonzero_count: usize,
 }
@@ -589,12 +591,12 @@ fn render_report_skeleton(
     }
     report.push_str("## Series\n\n");
     report.push_str(
-        "| key | variable | frequency | class | source | baseline_samples | first | last | baseline_min | baseline_max | baseline_nonzero_count | status |\n",
+        "| key | variable | frequency | class | source | baseline_samples | first | last | baseline_min | baseline_mean | baseline_max | baseline_nonzero_count | status |\n",
     );
-    report.push_str("|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---|\n");
+    report.push_str("|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|\n");
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | baseline-only |\n",
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | baseline-only |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.variable),
             row.frequency,
@@ -604,6 +606,7 @@ fn render_report_skeleton(
             row.first,
             row.last,
             row.min,
+            row.mean,
             row.max,
             row.nonzero_count
         ));
@@ -683,6 +686,10 @@ fn render_report_skeleton_summary_json(
         json.push_str(&format!(
             "      \"baseline_min\": {},\n",
             json_string(&row.min)
+        ));
+        json.push_str(&format!(
+            "      \"baseline_mean\": {},\n",
+            json_string(&row.mean)
         ));
         json.push_str(&format!(
             "      \"baseline_max\": {},\n",

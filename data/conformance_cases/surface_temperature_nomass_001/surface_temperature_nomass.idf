@@ -120,6 +120,9 @@ BuildingSurface:Detailed,
   1,1,1,
   0,1,1;
 
+Output:Diagnostics,
+  DisplayAdvancedReportVariables;
+
 Output:Variable,ZONE ONE,Zone Mean Air Temperature,Hourly;
 Output:Variable,FLOOR,Surface Inside Face Temperature,Hourly;
 Output:Variable,FLOOR,Surface Outside Face Temperature,Hourly;

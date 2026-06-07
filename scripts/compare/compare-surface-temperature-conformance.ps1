@@ -115,7 +115,7 @@ if ($summary.samples -ne 24) {
 if ($summary.heat_balance_timesteps -ne 96) {
     throw "Unexpected heat-balance timestep count: $($summary.heat_balance_timesteps)"
 }
-if ($summary.series_count -ne 3) {
+if ($summary.series_count -ne 8) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -gt 0.000001) {
@@ -130,11 +130,24 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Insid
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Outside Face Temperature series"
 }
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Surface Inside Face Conduction Heat Transfer Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Surface Outside Face Conduction Heat Transfer Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque Surface Inside Faces Conduction Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Zone Opaque Surface Inside Faces Conduction Rate series"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Conformance Report" -Description "markdown report header"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside surface variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside surface variable"
+Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
+Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Conduction Heat Transfer Rate" -Description "markdown inside conduction variable"
+Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
 Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Description "markdown comparison class"
 Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Description "markdown conformance claim"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"

@@ -421,6 +421,30 @@ impl RuntimeOutputRegistry {
                 RuntimeOutputFrequency::Hourly,
                 RuntimeOutputSource::RuntimeState,
             );
+            for (variable_name, units) in [
+                ("Surface Inside Face Conduction Heat Transfer Rate", "W"),
+                ("Surface Inside Face Conduction Heat Gain Rate", "W"),
+                ("Surface Inside Face Conduction Heat Loss Rate", "W"),
+                (
+                    "Surface Inside Face Conduction Heat Transfer Rate per Area",
+                    "W/m2",
+                ),
+                ("Surface Outside Face Conduction Heat Transfer Rate", "W"),
+                ("Surface Outside Face Conduction Heat Gain Rate", "W"),
+                ("Surface Outside Face Conduction Heat Loss Rate", "W"),
+                (
+                    "Surface Outside Face Conduction Heat Transfer Rate per Area",
+                    "W/m2",
+                ),
+            ] {
+                self.push_output(
+                    &surface.name.0,
+                    variable_name,
+                    units,
+                    RuntimeOutputFrequency::Hourly,
+                    RuntimeOutputSource::RuntimeState,
+                );
+            }
         }
 
         self.push_output(
@@ -430,6 +454,22 @@ impl RuntimeOutputRegistry {
             RuntimeOutputFrequency::Hourly,
             RuntimeOutputSource::WeatherInput,
         );
+
+        for zone in &model.zones {
+            for variable_name in [
+                "Zone Opaque Surface Inside Faces Conduction Rate",
+                "Zone Opaque Surface Inside Faces Conduction Heat Gain Rate",
+                "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate",
+            ] {
+                self.push_output(
+                    &zone.name.0,
+                    variable_name,
+                    "W",
+                    RuntimeOutputFrequency::Hourly,
+                    RuntimeOutputSource::RuntimeState,
+                );
+            }
+        }
 
         for schedule_id in schedule_ids(model) {
             if let Some(schedule_name) = schedule_name_for_id(model, schedule_id) {
