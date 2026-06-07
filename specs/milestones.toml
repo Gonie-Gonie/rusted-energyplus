@@ -370,6 +370,27 @@ not_claimed = [
   "plant compatibility",
 ]
 
+[[milestone]]
+version = "0.26"
+title = "Internal Convective Gains Conformance"
+status = "complete"
+claim_level = "declared-variables-only"
+required_cases = [
+  "internal_gains_001",
+]
+required_variables = [
+  "Zone Total Internal Convective Heating Rate",
+]
+not_claimed = [
+  "zone air temperature response to internal gains",
+  "radiant internal-gain coupling",
+  "latent or moisture coupling",
+  "HVAC compatibility",
+  "plant compatibility",
+  "meter conformance",
+  "general heat-balance compatibility",
+]
+
 [[target]]
 version = "1.0"
 title = "Substantial Compatibility Draft"

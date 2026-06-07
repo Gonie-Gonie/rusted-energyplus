@@ -68,6 +68,7 @@ matplotlib for document layout and charts.
 | `compare-construction-materials-smoke` | compare | compare construction/material thermal inputs with EIO | no | console output |
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-gains` |
+| `compare-internal-convective-gain-conformance` | compare | run the v0.26 tolerance-gated internal convective gain conformance case | yes | `.runtime/internal-gains-conformance` |
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
@@ -107,5 +108,6 @@ matplotlib for document layout and charts.
 | `v0.23-verify` | release | verify v0.23 official ExampleFile static model evidence gate | yes | static model reports, `.runtime/release-evidence` |
 | `v0.24-verify` | release | verify v0.24 runtime state and output registry hardening gate | yes | runtime registry smoke, `.runtime/release-evidence` |
 | `v0.25-verify` | release | verify v0.25 opaque no-mass heat-balance generalization gate | yes | heat-balance generalization smoke, `.runtime/release-evidence` |
+| `v0.26-verify` | release | verify v0.26 internal convective gains conformance gate | yes | internal-gains conformance report, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

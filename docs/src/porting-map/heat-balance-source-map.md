@@ -49,7 +49,7 @@ claim.
 | inside surface balance | `CalcHeatBalanceInsideSurf` | mapped-not-ported |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
 | zone air correction | `correctZoneAirTemps` | mapped-not-ported |
-| internal convective gains | `zoneSumAllInternalConvectionGains` | smoke trace exists |
+| internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
 ## Call Order Boundary
@@ -74,7 +74,7 @@ unless the deviation is documented in a case-specific waiver:
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only |
 | construction/material CTF data | `ep_model::Construction`, `ep_model::Material` | first-layer smoke evidence only |
 | zone predictor histories such as `MAT`, `XMAT`, and `DSXMAT` | future `ep_runtime::zone_air` histories | diagnostic shell only |
-| internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace smoke only |
+| internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
 ## Required Cases Before Porting
 

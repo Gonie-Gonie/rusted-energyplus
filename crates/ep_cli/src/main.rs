@@ -1,6 +1,7 @@
 //! Command line entry point for eplus-rs.
 
 mod conformance_artifacts;
+mod internal_gains;
 mod static_model;
 mod time_weather_schedule;
 
@@ -31,9 +32,9 @@ use ep_runtime::{
     build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
     simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
-    simulate_plant_state_projection, simulate_zone_internal_convective_gains,
-    surface_geometry_summaries, zone_geometry_summaries,
+    simulate_plant_state_projection, surface_geometry_summaries, zone_geometry_summaries,
 };
+use internal_gains::{generate_internal_gains_report, run_compare_internal_convective_gain};
 use static_model::generate_static_model_report;
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -47,6 +48,8 @@ const CONFORMANCE_HEAT_BALANCE_REPORT_USAGE: &str =
 const CONFORMANCE_STATIC_MODEL_REPORT_USAGE: &str =
     "usage: eplus-rs conformance static-model-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE: &str = "usage: eplus-rs conformance time-weather-schedule-report <case.toml> <oracle-root> <output-root>";
+const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
+    "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -402,6 +405,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
         Some("time-weather-schedule-report") => {
             run_conformance_time_weather_schedule_report(&args[1..])
         }
+        Some("internal-gains-report") => run_conformance_internal_gains_report(&args[1..]),
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
@@ -416,6 +420,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
             2
         }
         None => {
@@ -432,6 +437,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
             2
         }
     }
@@ -756,6 +762,64 @@ fn run_conformance_time_weather_schedule_report(args: &[String]) -> i32 {
     ) {
         Ok(summary) => {
             println!("Time, Weather, and Schedule Conformance Report");
+            print_conformance_case_summary(&manifest);
+            println!("  baseline_dir: {}", summary.baseline.output_dir.display());
+            println!("  report_dir: {}", summary.report_dir.display());
+            println!("  compare_report: {}", summary.compare_report.display());
+            println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  series: {}", summary.series_count);
+            println!("  conformance_series: {}", summary.conformance_series_count);
+            println!("  status: {}", summary.status);
+            if summary.status == "pass" { 0 } else { 1 }
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
+fn run_conformance_internal_gains_report(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_internal_gains_report(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("Internal Gains Conformance Report");
             print_conformance_case_summary(&manifest);
             println!("  baseline_dir: {}", summary.baseline.output_dir.display());
             println!("  report_dir: {}", summary.report_dir.display());
@@ -2640,91 +2704,6 @@ fn run_compare_internal_gains(args: &[String]) -> i32 {
         "  first_divergence: {}",
         first_divergence.unwrap_or_else(|| "none".to_string())
     );
-    println!("  status: {}", if passed { "pass" } else { "fail" });
-
-    if passed { 0 } else { 1 }
-}
-
-fn run_compare_internal_convective_gain(args: &[String]) -> i32 {
-    let Some(input_path) = args.first() else {
-        eprintln!("missing input path");
-        eprintln!("usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>");
-        return 2;
-    };
-    let Some(eso_path) = args.get(1) else {
-        eprintln!("missing eplusout.eso path");
-        eprintln!("usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>");
-        return 2;
-    };
-
-    let raw_model = match load_epjson_file(input_path) {
-        Ok(model) => model,
-        Err(error) => {
-            eprintln!("{error}");
-            return 1;
-        }
-    };
-    let result = compile_raw_model(&raw_model);
-    let Some(model) = result.model.as_ref() else {
-        print_compile_diagnostics(&result.report);
-        return 1;
-    };
-    if model.zones.is_empty() {
-        eprintln!("no Zone objects are available for internal-convective-gain comparison");
-        return 1;
-    }
-
-    let mut oracle_series = Vec::new();
-    for zone in &model.zones {
-        let values = match load_eso_series(
-            eso_path,
-            &zone.name.0,
-            "Zone Total Internal Convective Heating Rate",
-        ) {
-            Ok(values) => values,
-            Err(error) => {
-                eprintln!("{error}");
-                return 1;
-            }
-        };
-        oracle_series.push((zone.id, zone.name.0.clone(), values));
-    }
-
-    let sample_count = oracle_series
-        .iter()
-        .map(|(_id, _name, values)| values.len())
-        .max()
-        .unwrap_or(0);
-    let traces = simulate_zone_internal_convective_gains(model, sample_count);
-    let mut passed = true;
-
-    println!("Internal Convective Gain Comparison");
-    println!("  comparison_class: smoke");
-    println!("  conformance_claim: false");
-    println!("  tolerance_policy: default");
-    println!("  zones: {}", oracle_series.len());
-    for (zone_id, zone_name, expected_values) in oracle_series {
-        let Some(trace) = traces.iter().find(|trace| trace.zone_id == zone_id) else {
-            eprintln!("missing Rust internal convective gain trace: {zone_name}");
-            return 1;
-        };
-        let comparison = compare_series(
-            &expected_values,
-            &trace.values_w[..expected_values.len()],
-            Tolerance::default(),
-        );
-        if !comparison.passed {
-            passed = false;
-        }
-        println!(
-            "  zone: {} samples: {} max_abs_delta: {} status: {}",
-            zone_name,
-            comparison.samples,
-            comparison.max_abs_delta,
-            if comparison.passed { "pass" } else { "fail" }
-        );
-        print_first_divergence("  ", comparison.first_divergence);
-    }
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
     if passed { 0 } else { 1 }

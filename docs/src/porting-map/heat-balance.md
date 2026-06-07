@@ -1,7 +1,6 @@
 # Heat Balance Porting Map
 
-Status: v0.25 opaque no-mass heat-balance boundary generalization plus ongoing
-porting map.
+Status: v0.26 internal convective gain conformance plus ongoing porting map.
 
 EnergyPlus reference version:
 
@@ -39,6 +38,9 @@ Already implemented gates:
   comparison for schedule binding, zone binding, design level, W/m2, and gain fractions
 - `compare internal-convective-gain`: ESO `Zone Total Internal Convective
   Heating Rate` smoke comparison for the typed `OtherEquipment` convective-gain trace
+- `compare-internal-convective-gain-conformance`: tolerance-gated
+  `internal_gains_001` conformance report for `Zone Total Internal Convective
+  Heating Rate`
 
 Still diagnostic-only:
 
@@ -71,6 +73,13 @@ runtime state for opaque no-mass boundaries:
 - missing adjacent boundary targets fail explicitly during heat-balance state
   initialization
 
+v0.26 promotes case: `internal_gains_001`.
+
+This case claims only hourly `Zone Total Internal Convective Heating Rate` for
+the declared `OtherEquipment` fixture. It does not claim zone air temperature
+response to internal gains, radiant or latent internal-gain coupling, HVAC,
+plant, meter, or broad heat-balance compatibility.
+
 ## Porting Status Table
 
 | Area | EnergyPlus source routines | Rust target | Current evidence | Status |
@@ -78,7 +87,7 @@ runtime state for opaque no-mass boundaries:
 | Heat-balance orchestration | `ManageHeatBalance`, `InitHeatBalance` | heat-balance timestep driver and state init | source map plus v0.8/v0.9 narrow gates | partial, no general claim |
 | Zone air update | `ManageZoneAirUpdates`, `correctZoneAirTemps` | zone MAT state advance | `heat_balance_nomass_001` MAT tolerance gate | conformance only for declared no-mass case |
 | Surface inside/outside balance | `CalcHeatBalanceInsideSurf`, `CalcHeatBalanceOutsideSurf` | surface temperature trace plus adiabatic/interzone boundary target state | `surface_temperature_nomass_001` tolerance gate plus v0.25 boundary smoke | conformance only for declared surface variables |
-| Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | ESO smoke comparison | diagnostic support, not zone air parity alone |
+| Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | `internal_gains_001` tolerance gate | conformance only for declared convective trace; not zone air parity alone |
 | Weather and schedules | weather/schedule managers, source map pending expansion | typed weather and schedule traces | smoke comparisons | input evidence only |
 | Dynamic envelope behavior | multiple surface and material managers | not fully ported | none | no claim |
 | Solar, fenestration, infiltration, HVAC coupling | multiple domain managers | not ported for heat-balance conformance | none | no claim |
@@ -173,7 +182,8 @@ or source-reference comments.
 4. Port internal convective gains as a separate runtime trace. Implemented:
    `ep_runtime::simulate_zone_internal_convective_gains`.
 5. Add an EnergyPlus comparison for `Zone Total Internal Convective Heating
-   Rate` before using it to claim zone air parity.
+   Rate` before using it to claim zone air parity. Implemented v0.26
+   conformance gate: `internal_gains_001` hourly convective trace only.
 6. Add opaque surface heat-balance state for the first no-window one-zone case.
    Implemented state inputs: surface boundary condition, construction,
    outside-layer material, thermal resistance, optional area heat capacity, and
@@ -241,7 +251,8 @@ Minimum first variables:
 - `Zone Mean Air Temperature`: conformance only for `heat_balance_nomass_001`
 - `Surface Inside Face Temperature`: conformance only for `surface_temperature_nomass_001`
 - `Surface Outside Face Temperature`: conformance only for `surface_temperature_nomass_001`
-- `Zone Total Internal Convective Heating Rate`
+- `Zone Total Internal Convective Heating Rate`: conformance only for
+  `internal_gains_001`
 - `Site Outdoor Air Drybulb Temperature`
 
 Recommended supporting EIO rows:

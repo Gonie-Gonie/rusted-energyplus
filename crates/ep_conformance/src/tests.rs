@@ -378,9 +378,9 @@ fn loads_internal_gains_case_fixture() -> Result<(), Box<dyn std::error::Error>>
         load_case_file(repo_root().join("data/conformance_cases/internal_gains_001/case.toml"))?;
 
     assert_eq!(manifest.id, "internal_gains_001");
-    assert_eq!(manifest.milestone, "v0.5-geometry-internal-variables");
-    assert_eq!(manifest.comparison_class, ComparisonClass::Smoke);
-    assert!(!manifest.conformance_claim);
+    assert_eq!(manifest.milestone, "v0.26-internal-convective-gains");
+    assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+    assert!(manifest.conformance_claim);
     assert_eq!(manifest.outputs.len(), 8);
     assert!(manifest.outputs.iter().all(|output| {
         output.class == VariableClass::InternalGain
@@ -390,7 +390,22 @@ fn loads_internal_gains_case_fixture() -> Result<(), Box<dyn std::error::Error>>
         output.variable == "Zone Total Internal Convective Heating Rate"
             && output.frequency == OutputFrequency::Hourly
             && output.source == SourceArtifact::Eso
+            && output.level == Some(OutputLevel::Conformance)
     }));
+    assert_eq!(manifest.tolerances.len(), 1);
+    assert_eq!(
+        manifest.tolerances[0].variable_class,
+        VariableClass::InternalGain
+    );
+    let gate = manifest
+        .gate
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("internal-gains conformance should declare a gate"))?;
+    assert_eq!(
+        gate.script,
+        "scripts/dev.cmd compare-internal-convective-gain-conformance"
+    );
+    assert!(gate.blocking);
 
     Ok(())
 }

@@ -26,10 +26,13 @@ tolerance, and code organization.
 - runtime output registry, meter registry diagnostics, ResultStore duplicate
   checks, and profile scaffolding
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
+- internal convective gain conformance report gate for the declared
+  `Zone Total Internal Convective Heating Rate` hourly series
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
-  declared v0.22 `Schedule Value` / dry-bulb hourly variables
+  declared v0.22 `Schedule Value` / dry-bulb hourly variables plus the v0.26
+  internal convective gain hourly variable
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
@@ -37,6 +40,8 @@ tolerance, and code organization.
   conformance
 - v0.25 opaque no-mass heat-balance generalization only for declared existing
   cases and variables
+- v0.26 internal convective gain conformance only for `internal_gains_001` /
+  `Zone Total Internal Convective Heating Rate`
 
 Not claimed:
 
@@ -65,10 +70,11 @@ Useful focused checks:
 .\scripts\dev.cmd compare-schedule-conformance
 .\scripts\dev.cmd compare-weather-conformance
 .\scripts\dev.cmd compare-static-model-conformance
+.\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
-.\scripts\dev.cmd conformance-index-report -Version 0.25.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.25.0
+.\scripts\dev.cmd conformance-index-report -Version 0.26.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.26.0
 ```
 
 ## Documentation

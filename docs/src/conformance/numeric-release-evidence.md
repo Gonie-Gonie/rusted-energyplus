@@ -15,15 +15,15 @@ Release assets beside the binary zip.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.25.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.26.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.25.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.25.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.25.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.26.0/numeric-conformance-evidence.json
 ```
 
 Current GitHub Release asset names:
@@ -38,11 +38,12 @@ numeric-conformance-evidence.json
 
 Only promoted, tolerance-gated numerical conformance cases enter the release
 PDF. v0.22.0 added declared time/weather/schedule variables to the earlier
-v0.8/v0.9 no-mass cases. v0.23.0 added static EIO evidence, v0.24.0 added
-runtime registry infrastructure, and v0.25.0 generalized no-mass opaque
-boundary handling; those infrastructure/static changes do not add series to
-this numerical PDF and are represented instead by their gates plus the
-conformance index:
+v0.8/v0.9 no-mass cases. v0.26.0 adds the declared internal convective gain
+hourly series. v0.23.0 added static EIO evidence, v0.24.0 added runtime
+registry infrastructure, and v0.25.0 generalized no-mass opaque boundary
+handling; those infrastructure/static changes do not add series to this
+numerical PDF and are represented instead by their gates plus the conformance
+index:
 
 Historical note: v0.12 through v0.21 release evidence kept the earlier
 v0.8/v0.9 cases only.
@@ -53,6 +54,7 @@ v0.8/v0.9 cases only.
 | v0.9 | `surface_temperature_nomass_001` | zone MAT plus surface inside/outside face temperature |
 | v0.22 | `schedule_constant_001` | `Schedule Value` |
 | v0.22 | `weather_fields_001` | `Site Outdoor Air Drybulb Temperature` only |
+| v0.26 | `internal_gains_001` | `Zone Total Internal Convective Heating Rate` only |
 
 The PDF includes:
 

@@ -17,8 +17,8 @@ Implemented evidence:
 - `surface_geometry_001` case manifest with static surface output requests
 - `construction_materials_001` case manifest for EIO construction/material
   static summaries
-- `internal_gains_001` case manifest for nominal internal gains and the first
-  internal convective gain trace
+- `internal_gains_001` case manifest for nominal internal gains and the v0.26
+  internal convective gain conformance trace
 - `official_1zone_static_model_001` conformance case for declared official
   ExampleFile static EIO surface, construction/material, and OtherEquipment
   nominal fields
@@ -41,8 +41,7 @@ Locked v0.5 geometry/static fields:
   conductance, material thickness, conductivity, density, specific heat, and
   thermal resistance
 - OtherEquipment zone floor area, equipment level, equipment per floor area,
-  latent/radiant/lost/convected fractions, and first hourly convective gain
-  trace
+  latent/radiant/lost/convected fractions, and hourly convective gain trace
 
 Locked v0.23 static evidence fields:
 

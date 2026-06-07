@@ -7,10 +7,11 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.25.0. It generalizes opaque no-mass
-heat-balance boundary handling on top of the v0.24 runtime registry
-infrastructure, v0.23 official ExampleFile static model evidence, and v0.22
-declared time, weather, and schedule numerical conformance.
+The current public release line is v0.26.0. It promotes the declared internal
+convective gain hourly trace on top of v0.25 opaque no-mass heat-balance
+boundary handling, v0.24 runtime registry infrastructure, v0.23 official
+ExampleFile static model evidence, and v0.22 declared time, weather, and
+schedule numerical conformance.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:
@@ -19,6 +20,7 @@ variables:
 - `surface_temperature_nomass_001`
 - `schedule_constant_001`
 - `weather_fields_001` dry-bulb only
+- `internal_gains_001` `Zone Total Internal Convective Heating Rate` only
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
 model intake, additional weather variables, local fixture geometry/internal
@@ -61,6 +63,8 @@ The current public scope includes:
   scaffolding
 - opaque no-mass adiabatic and interzone surface boundary target handling in
   heat-balance state
+- timestamp-aligned internal convective gain conformance for the declared
+  `internal_gains_001` hourly ESO series
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
@@ -73,6 +77,7 @@ Not claimed:
 - node, IdealLoads, meter, or broad weather conformance
 - dynamic compatibility for the v0.23 static model case
 - new numerical conformance from the v0.24 runtime-infrastructure milestone
-- new numerical conformance beyond the declared v0.8/v0.9/v0.22 promoted
-  variables from the v0.25 generalization milestone
+- zone air temperature response to internal gains, radiant/latent internal
+  gain coupling, or broader heat-balance compatibility from the v0.26
+  internal-gain milestone
 - broad ExampleFiles compatibility

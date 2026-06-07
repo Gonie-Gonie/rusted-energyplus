@@ -180,6 +180,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Compare internal convective gain trace with EnergyPlus ESO."
     }
+    "compare-internal-convective-gain-conformance" = @{
+        Path = "compare\compare-internal-convective-gain-conformance.ps1"
+        Group = "compare"
+        Help = "Run the v0.26 tolerance-gated internal convective gain conformance case."
+    }
     "compare-zone-smoke" = @{
         Path = "compare\compare-zone-smoke.ps1"
         Group = "compare"
@@ -385,6 +390,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.25 opaque no-mass heat-balance generalization gate."
     }
+    "v0.26-verify" = @{
+        Path = "release\v0.26-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.26 internal convective gains conformance gate."
+    }
 }
 
 $Aliases = @{
@@ -415,6 +425,7 @@ $Aliases = @{
     "verify-v0.23" = "v0.23-verify"
     "verify-v0.24" = "v0.24-verify"
     "verify-v0.25" = "v0.25-verify"
+    "verify-v0.26" = "v0.26-verify"
 }
 
 function Show-Commands {

@@ -30,8 +30,10 @@ Current direction:
   conformance.
 - v0.25 generalized opaque no-mass heat-balance boundary handling for declared
   variables only.
-- v0.26 should continue building-physics expansion only where source-map,
-  case, variable, tolerance, report, and gate evidence are ready.
+- v0.26 promoted the declared `Zone Total Internal Convective Heating Rate`
+  hourly series for `internal_gains_001`, without claiming zone temperature
+  response, radiant/latent coupling, HVAC, plant, meter, or broad heat-balance
+  compatibility.
 
 The long-term targets remain:
 

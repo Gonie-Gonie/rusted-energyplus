@@ -103,7 +103,7 @@ but that report is still baseline-only evidence.
 | EIO construction/material comparison | implemented smoke gate | `eplus-rs compare construction-materials` compares first-layer construction/material thermal inputs with EnergyPlus `Construction CTF` and `Material CTF Summary` |
 | EIO internal gains comparison | implemented smoke gate | `eplus-rs compare internal-gains` compares typed `OtherEquipment` nominal gains with EnergyPlus EIO |
 | heat-balance state shell | implemented foundation | `ep_runtime::initialize_heat_balance_state` initializes zone and surface heat-balance state without advancing a solver |
-| internal convective gain trace | implemented smoke gate | `eplus-rs compare internal-convective-gain` compares Rust hourly trace with EnergyPlus ESO |
+| internal convective gain trace | implemented declared conformance gate | `eplus-rs conformance internal-gains-report` writes the v0.26 Rust hourly trace comparison against EnergyPlus ESO |
 
 ## Revised Milestone Intent
 

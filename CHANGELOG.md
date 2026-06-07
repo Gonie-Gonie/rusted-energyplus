@@ -4,6 +4,34 @@
 
 No unreleased changes.
 
+## v0.26.0 - 2026-06-07
+
+Internal convective gains conformance.
+
+### Added
+
+- v0.26 internal convective gains conformance milestone.
+- `compare-internal-convective-gain-conformance` gate and
+  `conformance internal-gains-report` CLI path.
+- Timestamp-aligned `compare-report.md` and `compare-summary.json` artifacts
+  for `internal_gains_001`.
+- v0.26 release verification script.
+
+### Changed
+
+- Promoted only `Zone Total Internal Convective Heating Rate` in
+  `internal_gains_001` to conformance level.
+- Split the internal convective gain CLI comparison into
+  `crates/ep_cli/src/internal_gains.rs` to reduce `main.rs` growth.
+- Release evidence report defaults now target v0.26.0 and include 5 promoted
+  numerical cases / 7 promoted series.
+
+### Scope
+
+- v0.26.0 does not claim zone air temperature response to internal gains,
+  radiant/latent internal-gain coupling, HVAC compatibility, plant
+  compatibility, meter conformance, or general heat-balance compatibility.
+
 ## v0.25.0 - 2026-06-07
 
 Opaque no-mass heat-balance generalization.

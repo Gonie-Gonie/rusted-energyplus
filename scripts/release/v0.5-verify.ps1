@@ -35,8 +35,8 @@ Assert-FileExists -Path "scripts\compare\compare-internal-gains-smoke.ps1" -Desc
 Assert-FileExists -Path "scripts\compare\compare-internal-convective-gain-smoke.ps1" -Description "internal convective gain compare smoke"
 
 Write-Host "milestone: v0.5.0"
-Write-Host "scope: static geometry, construction/material, and internal-gain smoke evidence"
-Write-Host "claim: conformance_claim false; no heat-balance or HVAC conformance"
+Write-Host "scope: static geometry, construction/material, and historical internal-gain smoke evidence"
+Write-Host "claim: no heat-balance or HVAC conformance; internal_gains_001 has later v0.26 declared-variable promotion"
 
 Invoke-DevCommand -Command "compare-geometry-smoke"
 Invoke-DevCommand -Command "compare-surface-geometry-smoke"

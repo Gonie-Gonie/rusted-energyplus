@@ -33,8 +33,8 @@ from matplotlib.ticker import FuncFormatter
 
 ORACLE_VERSION = "26.1.0"
 CLAIM_BOUNDARY = (
-    "Only declared v0.8/v0.9 no-mass heat-balance and v0.22 time/weather/schedule "
-    "numerical conformance variables are promoted."
+    "Only declared v0.8/v0.9 no-mass heat-balance, v0.22 time/weather/schedule, "
+    "and v0.26 internal convective gain numerical conformance variables are promoted."
 )
 
 
@@ -76,13 +76,20 @@ CASE_SPECS = (
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_fields_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_fields_001\oracle\eplusout.err",
     ),
+    CaseSpec(
+        milestone="v0.26",
+        command="compare-internal-convective-gain-conformance",
+        summary_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\oracle\eplusout.err",
+    ),
 )
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build release numerical conformance evidence.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.25.0")
+    parser.add_argument("--version", default="0.26.0")
     parser.add_argument("--skip-gate-run", action="store_true")
     return parser.parse_args()
 

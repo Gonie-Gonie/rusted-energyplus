@@ -19,7 +19,7 @@ source files and Rust result locations before promoting conformance claims.
 | Variable | Frequency | EnergyPlus source | Rust source or target | Current level |
 |---|---|---|---|---|
 | `Zone Mean Air Temperature` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ResultStore` series from heat-balance trace | conformance for `heat_balance_nomass_001`; diagnostic otherwise |
-| `Zone Total Internal Convective Heating Rate` | hourly | `src/EnergyPlus/InternalHeatGains.cc` | `simulate_zone_internal_convective_gains` | smoke |
+| `Zone Total Internal Convective Heating Rate` | hourly | `src/EnergyPlus/InternalHeatGains.cc` | `simulate_zone_internal_convective_gains` | conformance for `internal_gains_001` only |
 | `Zone Air Heat Balance Internal Convective Heat Gain Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/InternalHeatGains.cc` | future `ep_runtime::zone_air` report state | mapped-not-ported |
 | `Zone Air Heat Balance Surface Convection Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future surface convection sum | mapped-not-ported |
 | `Zone Air Heat Balance Air Energy Storage Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | future zone air storage term | mapped-not-ported |
