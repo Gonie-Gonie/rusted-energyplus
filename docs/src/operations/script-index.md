@@ -44,6 +44,7 @@ matplotlib for document layout and charts.
 | `file-size-check` | quality | warn/fail on oversized source files with explicit legacy waivers | yes | console output |
 | `perf` | quality | run local performance checks | no | console output |
 | `strict-no-false-conformance` | quality | scan for forbidden compatibility wording | yes | failure on wording |
+| `algorithm-ledger-check` | quality | validate source-map, EnergyPlus source, Rust target, first-case, and gate links | yes | console output |
 | `raw-model-smoke` | smoke | inspect RawModel fixtures | no | console output |
 | `typed-model-smoke` | smoke | compile TypedModel fixtures | no | console output |
 | `model-plan-smoke` | smoke | verify graph and execution-plan summaries | no | console output |
@@ -96,5 +97,6 @@ matplotlib for document layout and charts.
 | `v0.18-verify` | release | verify v0.18 output request injection and official baseline gate | yes | official baseline, `.runtime/release-evidence` |
 | `v0.19-verify` | release | verify v0.19 series reader and compare engine v2 gate | yes | compare-series-v2 smoke, `.runtime/release-evidence` |
 | `v0.20-verify` | release | verify v0.20 conformance report generator and coverage matrix gate | yes | conformance index report, `.runtime/release-evidence` |
+| `v0.21-verify` | release | verify v0.21 source-map and algorithm ledger validation gate | yes | algorithm ledger, generated docs, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

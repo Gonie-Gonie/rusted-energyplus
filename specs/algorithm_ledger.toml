@@ -1,30 +1,34 @@
 [[algorithm]]
 id = "zone_air_heat_balance"
 domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
 energyplus_source = [
+  "src/EnergyPlus/HeatBalanceManager.cc",
   "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/heat_balance/zone_air.rs",
+  "crates/ep_runtime/src/runtime.rs::ZoneHeatBalanceState",
+  "crates/ep_runtime/src/runtime.rs::simulate_heat_balance",
 ]
-status = "source_mapped"
+status = "conformance"
 first_case = "heat_balance_nomass_001"
 proof_variables = [
   "Zone Mean Air Temperature",
-  "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 claim_level = "limited-conformance"
 
 [[algorithm]]
 id = "surface_inside_temperature"
 domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/heat_balance/surface_inside.rs",
+  "crates/ep_runtime/src/runtime.rs::SurfaceHeatBalanceState",
+  "crates/ep_runtime/src/runtime.rs::simulate_heat_balance",
 ]
-status = "source_mapped"
+status = "conformance"
 first_case = "surface_temperature_nomass_001"
 proof_variables = [
   "Surface Inside Face Temperature",
@@ -34,12 +38,14 @@ claim_level = "limited-conformance"
 [[algorithm]]
 id = "air_side_node_state"
 domain = "hvac"
+source_map = "docs/src/porting-map/node-state-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/DataLoopNode.hh",
   "src/EnergyPlus/OutputProcessor.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/hvac/node_state.rs",
+  "crates/ep_runtime/src/runtime.rs::NodeStateStore",
+  "crates/ep_runtime/src/runtime.rs::simulate_ideal_loads_node_state_projection",
 ]
 status = "diagnostic_only"
 first_case = "air_side_node_diagnostic_001"
@@ -52,11 +58,15 @@ claim_level = "none"
 [[algorithm]]
 id = "plant_loop_state_projection"
 domain = "plant"
+source_map = "docs/src/porting-map/plant-source-map.md"
 energyplus_source = [
-  "src/EnergyPlus/Plant/PlantLoopSolver.cc",
+  "src/EnergyPlus/Plant/PlantManager.cc",
+  "src/EnergyPlus/Plant/Loop.cc",
+  "src/EnergyPlus/PlantUtilities.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/plant/plant_loop.rs",
+  "crates/ep_runtime/src/runtime.rs::PlantStateStore",
+  "crates/ep_runtime/src/runtime.rs::simulate_plant_state_projection",
 ]
 status = "diagnostic_only"
 first_case = "plant_loop_diagnostic_001"

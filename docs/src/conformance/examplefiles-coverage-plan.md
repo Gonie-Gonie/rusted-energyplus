@@ -47,6 +47,7 @@ Each selected case must answer:
 | v0.18 | output injection and oracle baseline | official IDF output request patching and selected oracle artifacts | complete; baseline-only |
 | v0.19 | series reader and compare engine v2 | selected ESO series and future meter series | comparison infrastructure only |
 | v0.20 | conformance report generator | all tracked case manifests and requested evidence surfaces | release coverage matrices only |
+| v0.21 | source-map and algorithm ledger | mapped algorithm entries and promoted/diagnostic first cases | planning guard only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -122,6 +123,13 @@ Current v0.20 reporting infrastructure evidence:
 - `.runtime/release-evidence/v0.20.0/conformance-index-report.html`
 - `.runtime/release-evidence/v0.20.0/conformance-index-report.json`
 - `v0.20-verify`
+
+Current v0.21 source-map ledger evidence:
+
+- `specs/algorithm_ledger.toml`
+- `docs/src/generated/algorithm-ledger.md`
+- `algorithm-ledger-check`
+- `v0.21-verify`
 
 Post-v0.15 plant diagnostic addendum evidence:
 

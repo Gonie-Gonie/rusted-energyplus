@@ -4,6 +4,29 @@
 
 No unreleased changes.
 
+## v0.21.0 - 2026-06-07
+
+Source map and algorithm ledger release.
+
+### Added
+
+- `source_map` links in `specs/algorithm_ledger.toml`.
+- generated algorithm ledger source-map column.
+- `algorithm-ledger-check` gate for EnergyPlus source files, source-map docs,
+  Rust target anchors, first-case manifests, proof variables, and
+  claim-appropriate blocking gates.
+- `v0.21-verify` release gate.
+- `specs/` packaging in the release zip.
+
+### Notes
+
+- v0.21.0 is a planning-guard release, not a new numerical conformance
+  release.
+- Algorithm entries with non-`none` claim levels must be backed by conformance
+  cases and blocking gates.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.20.0 - 2026-06-07
 
 Conformance report generator release.

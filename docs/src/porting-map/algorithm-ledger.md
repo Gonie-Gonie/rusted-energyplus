@@ -28,6 +28,16 @@ An algorithm entry can support a compatibility claim only when it has:
 
 No source map, no algorithm port.
 
+v0.21 makes this rule executable through `algorithm-ledger-check`. The gate
+loads `specs/algorithm_ledger.toml`, checks each `source_map`, verifies
+EnergyPlus source files against `.reference/energyplus-src/26.1.0`, verifies
+Rust target files, and checks first-case manifests, proof variables, and
+blocking gates for conformance-status entries.
+
+The generated ledger at `docs/src/generated/algorithm-ledger.md` is the
+machine-readable spec rendered for review. Keep this narrative page for policy
+and maintenance notes; keep row-level algorithm state in the spec.
+
 ## Current Ledger
 
 | Domain | EnergyPlus source anchor | Rust target | Evidence state | Claim boundary |

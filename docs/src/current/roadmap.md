@@ -19,7 +19,9 @@ Current direction:
   baseline pipeline.
 - v0.19 hardened selected series readers and comparison metrics.
 - v0.20 promoted release conformance index generation and coverage matrices.
-- v0.21 should make the algorithm ledger a stronger source-map gate.
+- v0.21 made the algorithm ledger a source-map validation gate.
+- v0.22 should expand time, weather, and schedule conformance only where
+  declared variables and gates exist.
 
 The long-term targets remain:
 

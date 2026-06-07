@@ -47,6 +47,7 @@ Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "file-size-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "source-smoke"
+Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "python-smoke"
 Invoke-DevCommand -Command "conformance-index-report"
 

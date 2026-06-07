@@ -7,8 +7,8 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.20.0. It gates the release conformance
-index report generator and coverage matrices.
+The current public release line is v0.21.0. It gates source-map and algorithm
+ledger validation.
 
 Current numerical conformance is limited to the promoted v0.8 and v0.9 no-mass
 cases and their declared variables:
@@ -36,6 +36,9 @@ The current public scope includes:
   divergence reporting
 - release conformance index reports with case, output, meter, domain, report,
   and gate coverage matrices
+- source-map and algorithm ledger checks that validate EnergyPlus source
+  anchors, Rust target anchors, first cases, proof variables, and blocking
+  gates
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 

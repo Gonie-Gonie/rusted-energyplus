@@ -65,6 +65,11 @@ $Commands = [ordered]@{
         Group = "quality"
         Help = "Guard against unsupported compatibility wording."
     }
+    "algorithm-ledger-check" = @{
+        Path = "quality\algorithm-ledger-check.ps1"
+        Group = "quality"
+        Help = "Validate source-map, EnergyPlus source, Rust target, and case evidence links."
+    }
     "raw-model-smoke" = @{
         Path = "smoke\raw-model-smoke.ps1"
         Group = "smoke"
@@ -330,6 +335,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.20 conformance report generator gate."
     }
+    "v0.21-verify" = @{
+        Path = "release\v0.21-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.21 source map and algorithm ledger gate."
+    }
 }
 
 $Aliases = @{
@@ -355,6 +365,7 @@ $Aliases = @{
     "verify-v0.18" = "v0.18-verify"
     "verify-v0.19" = "v0.19-verify"
     "verify-v0.20" = "v0.20-verify"
+    "verify-v0.21" = "v0.21-verify"
 }
 
 function Show-Commands {
