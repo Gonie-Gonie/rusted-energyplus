@@ -2,6 +2,7 @@
 param(
     [switch]$InstallRust,
     [switch]$InstallDocsTools,
+    [switch]$SkipPythonSetup,
     [switch]$SkipOracleDownload,
     [switch]$SkipSourceDownload,
     [switch]$SkipOracleSmoke
@@ -11,6 +12,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+. (Join-Path $ScriptsRoot "lib\python.ps1")
 Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
@@ -142,6 +144,90 @@ function Ensure-DocsTools {
     Invoke-External -FilePath $cargo.Source -Arguments @("install", "mdbook", "--version", $MdBookVersion, "--locked")
 }
 
+function Assert-ExpectedPython {
+    param(
+        [Parameter(Mandatory = $true)][string]$PythonExe,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if (-not (Test-Path -LiteralPath $PythonExe -PathType Leaf)) {
+        throw "Missing $Description`: $PythonExe"
+    }
+    $version = & $PythonExe --version
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Description failed to report a version."
+    }
+    if ($version -notmatch [regex]::Escape($ProjectPythonVersion)) {
+        throw "$Description version mismatch. Expected $ProjectPythonVersion, got $version"
+    }
+    Write-Host "$Description`: $version"
+}
+
+function Ensure-PortablePython {
+    if ($SkipPythonSetup) {
+        Write-Host "Skipping portable Python setup."
+        return
+    }
+
+    $pythonExe = Get-PortablePythonExe
+    if (Test-Path -LiteralPath $pythonExe -PathType Leaf) {
+        Assert-ExpectedPython -PythonExe $pythonExe -Description "portable Python"
+        return
+    }
+
+    $archivePath = Join-RepoPath ".runtime\downloads\$ProjectPythonArchiveName"
+    Download-File -Url $ProjectPythonArchiveUrl -OutFile $archivePath
+    $actualSha = Get-Sha256 -Path $archivePath
+    if ($actualSha -ne $ProjectPythonArchiveSha256) {
+        throw "Portable Python archive SHA256 mismatch. Expected $ProjectPythonArchiveSha256, got $actualSha"
+    }
+    Write-Host "Verified portable Python archive SHA256: $actualSha"
+
+    $targetPath = Get-PortablePythonRoot
+    Expand-ArchiveToSingleRoot -ArchivePath $archivePath -TargetPath $targetPath -MarkerFile "python.exe"
+    Assert-ExpectedPython -PythonExe $pythonExe -Description "portable Python"
+}
+
+function Test-ReportPythonVenv {
+    $reportPython = Get-ReportPythonExe
+    if (-not (Test-Path -LiteralPath $reportPython -PathType Leaf)) {
+        return $false
+    }
+    $check = "import oodocs, matplotlib; raise SystemExit(0 if oodocs.__version__ == '$ProjectOodocsVersion' and matplotlib.__version__ == '$ProjectMatplotlibVersion' else 1)"
+    & $reportPython -c $check *> $null
+    return ($LASTEXITCODE -eq 0)
+}
+
+function Ensure-ReportPythonVenv {
+    if ($SkipPythonSetup) {
+        Write-Host "Skipping report Python venv setup."
+        return
+    }
+
+    $reportPython = Get-ReportPythonExe
+    if (Test-ReportPythonVenv) {
+        Assert-ExpectedPython -PythonExe $reportPython -Description "report Python"
+        Write-Host "Report Python venv is ready: $(Get-ReportVenvRoot)"
+        return
+    }
+
+    $venvRoot = Get-ReportVenvRoot
+    Remove-RepoDirectory -Path $venvRoot
+    $portablePython = Get-PortablePythonExe
+    Assert-ExpectedPython -PythonExe $portablePython -Description "portable Python"
+
+    Write-Host "Creating report Python venv: $venvRoot"
+    Invoke-External -FilePath $portablePython -Arguments @("-m", "venv", $venvRoot)
+    Assert-ExpectedPython -PythonExe $reportPython -Description "report Python"
+
+    Write-Host "Installing report Python requirements"
+    Invoke-External -FilePath $reportPython -Arguments @("-m", "pip", "install", "--disable-pip-version-check", "--upgrade", "pip")
+    Invoke-External -FilePath $reportPython -Arguments @("-m", "pip", "install", "--disable-pip-version-check", "-r", (Get-ReportRequirementsPath))
+
+    if (-not (Test-ReportPythonVenv)) {
+        throw "Report Python venv did not import oodocs $ProjectOodocsVersion and matplotlib $ProjectMatplotlibVersion."
+    }
+}
+
 function Expand-ArchiveToSingleRoot {
     param(
         [Parameter(Mandatory = $true)][string]$ArchivePath,
@@ -263,6 +349,8 @@ New-Directory -Path (Join-RepoPath "config")
 Install-RustIfRequested
 Ensure-RustComponents
 Ensure-DocsTools
+Ensure-PortablePython
+Ensure-ReportPythonVenv
 Ensure-OracleBinary
 Ensure-ReferenceSource
 Write-LocalConfig

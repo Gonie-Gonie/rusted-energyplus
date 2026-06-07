@@ -21,6 +21,7 @@ EnergyPlus 26.1.0 oracle:
 - pinned Rust toolchain
 - repo-local EnergyPlus 26.1.0 oracle setup
 - repo-local EnergyPlus 26.1.0 reference source setup
+- repo-local portable Python and pinned report-generation virtual environment
 - epJSON RawModel inspection
 - TypedModel compile preview for declared seed object families
 - missing-reference diagnostics preview
@@ -71,8 +72,12 @@ The setup script keeps external oracle assets inside repo-local directories:
 
 - `.runtime/energyplus/26.1.0`
 - `.reference/energyplus-src/26.1.0`
+- `.runtime/python/3.11.9`
+- `.runtime/python-venvs/report`
 
-It does not use a globally installed EnergyPlus as the oracle.
+It does not use a globally installed EnergyPlus as the oracle, and the release
+evidence generator uses the repo-local Python environment rather than ambient
+Python packages.
 
 Current development evidence checks:
 

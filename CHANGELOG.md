@@ -12,6 +12,8 @@ PlantLoop typed graph skeleton release.
 - `plant-loop-skeleton.epJSON` fixture and `plant-loop-skeleton-smoke` gate.
 - v0.13 release verification gate and release notes.
 - v0.13 packaging of the promoted v0.8/v0.9 numerical conformance PDF/HTML/JSON evidence pack.
+- portable Python `3.11.9` setup plus pinned `oodocs`/`matplotlib` report venv for reproducible evidence generation.
+- Python `oodocs` numerical evidence generator with table of contents, direct matplotlib figure insertion, and separate values tables for chart backing data.
 
 ### Notes
 

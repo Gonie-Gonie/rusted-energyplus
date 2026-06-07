@@ -13,7 +13,7 @@ $Commands = [ordered]@{
     "setup" = @{
         Path = "setup\setup.ps1"
         Group = "setup"
-        Help = "Prepare Rust, docs tools, oracle runtime, and reference source."
+        Help = "Prepare Rust, docs tools, oracle/source assets, and report Python."
     }
     "oracle-smoke" = @{
         Path = "setup\oracle-smoke.ps1"
@@ -24,6 +24,11 @@ $Commands = [ordered]@{
         Path = "setup\source-smoke.ps1"
         Group = "setup"
         Help = "Verify the pinned EnergyPlus reference source checkout."
+    }
+    "python-smoke" = @{
+        Path = "setup\python-smoke.ps1"
+        Group = "setup"
+        Help = "Verify portable Python and the report-generation venv."
     }
     "check" = @{
         Path = "quality\check.ps1"
@@ -178,7 +183,7 @@ $Commands = [ordered]@{
     "conformance-evidence-report" = @{
         Path = "release\conformance-evidence-report.ps1"
         Group = "release"
-        Help = "Generate release PDF/HTML/JSON numerical conformance evidence."
+        Help = "Generate oodocs PDF/HTML/JSON numerical conformance evidence."
     }
     "github-release" = @{
         Path = "release\github-release.ps1"

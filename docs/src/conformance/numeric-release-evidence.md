@@ -47,12 +47,31 @@ PDF. For v0.13.0, that still means the earlier v0.8/v0.9 cases only:
 The PDF includes:
 
 - claim boundary and explicit non-claims
+- table of contents and release summary sections
 - case matrix
-- accuracy graph against declared tolerances
-- execution-time graph using release gate wall-clock and EnergyPlus oracle
+- matplotlib accuracy graph against declared tolerances
+- matplotlib execution-time graph using release gate wall-clock and EnergyPlus oracle
   elapsed time
 - per-series max absolute delta, RMSE, tolerance, sample count, and status
 - artifact paths for the HTML, PDF, and JSON evidence
+
+## Generator Architecture
+
+The release command is intentionally split into a thin PowerShell wrapper and a
+Python document generator:
+
+| Layer | Path | Responsibility |
+|---|---|---|
+| wrapper | `scripts/release/conformance-evidence-report.ps1` | locate the repo-local report Python and invoke the generator |
+| runtime setup | `scripts/lib/python.ps1`, `scripts/setup/setup.ps1` | provision portable Python `3.11.9` and the report virtual environment |
+| dependencies | `tools/python/requirements-report.txt` | pin `oodocs` and `matplotlib` for stable PDF generation |
+| generator | `tools/reporting/conformance_evidence_report.py` | collect summaries, build JSON evidence, render HTML/PDF |
+
+The generator uses `oodocs` for document structure and PDF/HTML serialization.
+Charts are built as matplotlib figure objects and inserted directly into
+`oodocs.Figure`, so the report does not depend on a one-off HTML chart renderer
+or a LaTeX toolchain. Numeric labels stay in tables below the figures instead
+of being drawn densely on top of the charts.
 
 ## Excluded Evidence
 

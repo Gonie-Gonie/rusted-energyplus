@@ -5,11 +5,14 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+. (Join-Path $ScriptsRoot "lib\python.ps1")
 Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $SourceRoot = Join-Path $RepoRoot ".reference\energyplus-src\26.1.0"
 $RuntimeRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
+$PortablePython = Get-PortablePythonExe
+$ReportPython = Get-ReportPythonExe
 
 function Assert-FileExists {
     param(
@@ -66,6 +69,9 @@ foreach ($entry in $expectedRuntimeFiles) {
     Assert-FileExists -Path (Join-Path $RuntimeRoot $entry[0]) -Description $entry[1]
 }
 
+Assert-FileExists -Path $PortablePython -Description "portable Python"
+Assert-FileExists -Path $ReportPython -Description "report Python venv"
+
 $testfileCount = (Get-ChildItem -LiteralPath (Join-Path $SourceRoot "testfiles") -File -Filter "*.idf").Count
 if ($testfileCount -lt 1) {
     throw "Expected at least one source IDF testfile."
@@ -76,6 +82,16 @@ $schemaPath = Join-Path $RuntimeRoot "Energy+.schema.epJSON"
 $schemaFirstLine = Get-Content -LiteralPath $schemaPath -TotalCount 1
 if ($schemaFirstLine -notmatch "^\s*\{") {
     throw "Packaged schema does not look like JSON: $schemaPath"
+}
+
+$pythonVersion = & $PortablePython --version
+if ($LASTEXITCODE -ne 0 -or $pythonVersion -notmatch [regex]::Escape($ProjectPythonVersion)) {
+    throw "Portable Python version mismatch: $pythonVersion"
+}
+
+$reportDependencyCheck = & $ReportPython -c "import oodocs, matplotlib; print(f'{oodocs.__version__}/{matplotlib.__version__}')"
+if ($LASTEXITCODE -ne 0 -or $reportDependencyCheck.Trim() -ne "$ProjectOodocsVersion/$ProjectMatplotlibVersion") {
+    throw "Report Python dependency version mismatch: $reportDependencyCheck"
 }
 
 Write-Host "Source smoke passed."

@@ -41,5 +41,6 @@ Invoke-DevCommand -Command "plant-loop-skeleton-smoke"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "source-smoke"
+Invoke-DevCommand -Command "python-smoke"
 
 Write-Host "Check complete."

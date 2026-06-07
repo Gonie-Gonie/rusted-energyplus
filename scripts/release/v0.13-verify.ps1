@@ -69,6 +69,10 @@ Assert-FileExists -Path "docs\src\porting-map\plant.md" -Description "plant port
 Assert-FileExists -Path "data\testcases\minimal\plant-loop-skeleton.epJSON" -Description "v0.13 plant-loop skeleton fixture"
 Assert-FileExists -Path "scripts\smoke\plant-loop-skeleton-smoke.ps1" -Description "v0.13 plant-loop skeleton smoke"
 Assert-FileExists -Path "scripts\release\conformance-evidence-report.ps1" -Description "numeric conformance evidence release script"
+Assert-FileExists -Path "scripts\lib\python.ps1" -Description "portable Python setup library"
+Assert-FileExists -Path "scripts\setup\python-smoke.ps1" -Description "report Python smoke"
+Assert-FileExists -Path "tools\python\requirements-report.txt" -Description "report Python requirements"
+Assert-FileExists -Path "tools\reporting\conformance_evidence_report.py" -Description "oodocs numerical evidence generator"
 
 foreach ($relative in @(
     "src\EnergyPlus\Plant\PlantManager.cc",
@@ -98,6 +102,8 @@ Assert-Contains -Path "docs\src\operations\v0.13.0-readiness.md" -Pattern "not a
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "v0.13 Plant Loop Skeleton" -Description "plant porting map v0.13 section"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "typed graph smoke" -Description "plant porting map smoke boundary"
 Assert-Contains -Path "docs\src\operations\supported-object-coverage.md" -Pattern "PlantLoop | yes | partial | yes | yes | yes | partial | no | no" -Description "PlantLoop object coverage boundary"
+Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "oodocs" -Description "numeric evidence oodocs documentation"
+Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "matplotlib" -Description "numeric evidence matplotlib documentation"
 
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "PlantLoopBranchListEdge" -Description "PlantLoop graph edge model"
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "PlantBranchComponentEdge" -Description "Plant branch component edge model"
@@ -106,11 +112,18 @@ Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern "parse_pumps
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "plant_loop_branch_list_edges" -Description "PlantLoop CLI graph count"
 Assert-Contains -Path "scripts\smoke\plant-loop-skeleton-smoke.ps1" -Pattern "Plant-loop skeleton smoke passed." -Description "v0.13 smoke success marker"
 Assert-Contains -Path "data\testcases\minimal\plant-loop-skeleton.epJSON" -Pattern '"PlantLoop"' -Description "v0.13 plant fixture loop object"
+Assert-Contains -Path "tools\python\requirements-report.txt" -Pattern "oodocs==1.0.1" -Description "oodocs dependency pin"
+Assert-Contains -Path "tools\python\requirements-report.txt" -Pattern "matplotlib==3.10.9" -Description "matplotlib dependency pin"
+Assert-Contains -Path "tools\reporting\conformance_evidence_report.py" -Pattern "TableOfContents" -Description "evidence report table of contents"
+Assert-Contains -Path "tools\reporting\conformance_evidence_report.py" -Pattern 'matplotlib.use("Agg")' -Description "matplotlib headless backend"
+Assert-Contains -Path "tools\reporting\conformance_evidence_report.py" -Pattern 'Figure(charts["accuracy"]' -Description "direct matplotlib figure insertion"
+Assert-Contains -Path "scripts\release\conformance-evidence-report.ps1" -Pattern "Get-ReportPythonExe" -Description "Python report wrapper"
 
 Write-Host "milestone: v0.13.0"
 Write-Host "scope: PlantLoop typed graph skeleton"
 Write-Host "claim: smoke only; no plant numerical conformance"
 
+Invoke-DevCommand -Command "python-smoke"
 Invoke-DevCommand -Command "plant-loop-skeleton-smoke"
 Invoke-DevCommand -Command "test"
 Invoke-DevCommand -Command "docs-check"
@@ -120,6 +133,8 @@ Invoke-DevCommand -Command "conformance-evidence-report" -Arguments @("-Version"
 Assert-FileExists -Path ".runtime\release-evidence\v0.13.0\numeric-conformance-evidence.html" -Description "numeric conformance evidence HTML"
 Assert-FileExists -Path ".runtime\release-evidence\v0.13.0\numeric-conformance-evidence.pdf" -Description "numeric conformance evidence PDF"
 Assert-FileExists -Path ".runtime\release-evidence\v0.13.0\numeric-conformance-evidence.json" -Description "numeric conformance evidence JSON"
+Assert-Contains -Path ".runtime\release-evidence\v0.13.0\numeric-conformance-evidence.html" -Pattern "Table of Contents" -Description "numeric evidence table of contents"
+Assert-Contains -Path ".runtime\release-evidence\v0.13.0\numeric-conformance-evidence.html" -Pattern "Accuracy Evidence" -Description "numeric evidence accuracy section"
 
 Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.13.0")
 
@@ -131,6 +146,10 @@ Assert-ZipEntry -ZipPath $package -Entry "docs/src/operations/v0.13.0-readiness.
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant.md" -Description "v0.13 packaged plant map"
 Assert-ZipEntry -ZipPath $package -Entry "data/testcases/minimal/plant-loop-skeleton.epJSON" -Description "v0.13 packaged plant fixture"
 Assert-ZipEntry -ZipPath $package -Entry "scripts/smoke/plant-loop-skeleton-smoke.ps1" -Description "v0.13 packaged plant smoke"
+Assert-ZipEntry -ZipPath $package -Entry "scripts/lib/python.ps1" -Description "v0.13 packaged portable Python library"
+Assert-ZipEntry -ZipPath $package -Entry "scripts/setup/python-smoke.ps1" -Description "v0.13 packaged Python smoke"
+Assert-ZipEntry -ZipPath $package -Entry "tools/python/requirements-report.txt" -Description "v0.13 packaged report requirements"
+Assert-ZipEntry -ZipPath $package -Entry "tools/reporting/conformance_evidence_report.py" -Description "v0.13 packaged oodocs evidence generator"
 Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.html" -Description "v0.13 packaged numeric conformance evidence HTML"
 Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.pdf" -Description "v0.13 packaged numeric conformance evidence PDF"
 Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.json" -Description "v0.13 packaged numeric conformance evidence JSON"

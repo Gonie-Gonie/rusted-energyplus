@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-05
+last_reviewed: 2026-06-07
 ---
 
 # Script Index
@@ -28,9 +28,10 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 
 | Command | Area | Purpose | Blocking release? | Main artifacts |
 |---|---|---|---:|---|
-| `setup` | setup | prepare toolchain, oracle, reference source, and docs tools | yes | `.runtime`, `.reference` |
+| `setup` | setup | prepare toolchain, oracle, reference source, docs tools, portable Python, and report venv | yes | `.runtime`, `.reference` |
 | `oracle-smoke` | setup | run EnergyPlus oracle example and conversion | no | `.runtime/oracle-smoke` |
 | `source-smoke` | setup | verify reference source checkout | yes | console output |
+| `python-smoke` | setup | verify portable Python and the pinned report-generation venv | yes | console output |
 | `check` | quality | run fmt, clippy, tests, smoke gates, docs, and guards | yes | console output |
 | `test` | quality | run Rust workspace tests | yes | console output |
 | `docs-check` | quality | build mdBook | yes | `docs/book` |
@@ -61,7 +62,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
 | `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
 | `package` | release | build local package artifact | yes for package release | package zip |
-| `conformance-evidence-report` | release | generate PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
+| `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 | `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
