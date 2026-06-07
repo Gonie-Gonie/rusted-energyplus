@@ -11,6 +11,23 @@ notes = [
   "The case captures plant supply-side demand/state, pump electricity, district heating source rate, and load-profile demand signal."
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf"
+tier = "B"
+
+[scope]
+domains = ["plant"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = true
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
@@ -21,6 +38,8 @@ variable = "Plant Supply Side Cooling Demand Rate"
 frequency = "hourly"
 class = "plant-state"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "MAIN LOOP"
@@ -28,6 +47,8 @@ variable = "Plant Supply Side Heating Demand Rate"
 frequency = "hourly"
 class = "plant-state"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "MAIN LOOP"
@@ -35,6 +56,8 @@ variable = "Plant Supply Side Inlet Mass Flow Rate"
 frequency = "hourly"
 class = "plant-state"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "MAIN LOOP"
@@ -42,6 +65,8 @@ variable = "Plant Supply Side Inlet Temperature"
 frequency = "hourly"
 class = "plant-state"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "MAIN LOOP"
@@ -49,6 +74,8 @@ variable = "Plant Supply Side Outlet Temperature"
 frequency = "hourly"
 class = "plant-state"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "PUMP"
@@ -56,6 +83,8 @@ variable = "Pump Electricity Rate"
 frequency = "hourly"
 class = "plant-equipment"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "PURCHASED HEATING"
@@ -63,6 +92,8 @@ variable = "District Heating Water Rate"
 frequency = "hourly"
 class = "plant-equipment"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [[outputs]]
 key = "LOAD PROFILE 1"
@@ -70,6 +101,8 @@ variable = "Plant Load Profile Heat Transfer Rate"
 frequency = "hourly"
 class = "plant-equipment"
 source = "eso"
+domain = "plant"
+level = "baseline"
 
 [report]
 format = "markdown"

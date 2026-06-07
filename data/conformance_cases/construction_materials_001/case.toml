@@ -12,6 +12,23 @@ notes = [
   "This remains non-blocking evidence until report artifacts, declared tolerances, and blocking gates are promoted.",
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/construction_materials_001/construction_materials.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/construction_materials_001/construction_materials.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -23,6 +40,8 @@ variable = "Construction CTF Layer Count"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -30,6 +49,8 @@ variable = "Construction CTF Thermal Conductance"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -37,6 +58,8 @@ variable = "Material CTF Summary Thickness"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -44,6 +67,8 @@ variable = "Material CTF Summary Conductivity"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -51,6 +76,8 @@ variable = "Material CTF Summary Density"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -58,6 +85,8 @@ variable = "Material CTF Summary Specific Heat"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -65,6 +94,8 @@ variable = "Material CTF Summary Thermal Resistance"
 frequency = "static"
 class = "construction-material"
 source = "eio"
+domain = "construction"
+level = "diagnostic"
 
 [report]
 format = "markdown"

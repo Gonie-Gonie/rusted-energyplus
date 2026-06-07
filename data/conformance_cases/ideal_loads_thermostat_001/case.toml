@@ -11,6 +11,23 @@ notes = [
   "The fixture includes a deterministic envelope and internal gain schedule so the baseline IdealLoads heating and cooling rates both contain nonzero samples."
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_thermostat_001/ideal_loads_thermostat.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "hvac"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/ideal_loads_thermostat_001/ideal_loads_thermostat.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -21,6 +38,8 @@ variable = "Zone Thermostat Heating Setpoint Temperature"
 frequency = "hourly"
 class = "zone-state"
 source = "eso"
+domain = "zone"
+level = "baseline"
 
 [[outputs]]
 key = "ZONE ONE"
@@ -28,6 +47,8 @@ variable = "Zone Thermostat Cooling Setpoint Temperature"
 frequency = "hourly"
 class = "zone-state"
 source = "eso"
+domain = "zone"
+level = "baseline"
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -35,6 +56,8 @@ variable = "Zone Ideal Loads Zone Total Heating Rate"
 frequency = "hourly"
 class = "hvac-state"
 source = "eso"
+domain = "hvac"
+level = "baseline"
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -42,6 +65,8 @@ variable = "Zone Ideal Loads Zone Total Cooling Rate"
 frequency = "hourly"
 class = "hvac-state"
 source = "eso"
+domain = "hvac"
+level = "baseline"
 
 [report]
 format = "markdown"

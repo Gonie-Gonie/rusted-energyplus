@@ -15,29 +15,29 @@ release artifact.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.16.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.17.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.16.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.16.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.16.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.17.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.17.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.17.0/numeric-conformance-evidence.json
 ```
 
 Current packaged release paths:
 
 ```text
-evidence/v0.16.0/numeric-conformance-evidence.html
-evidence/v0.16.0/numeric-conformance-evidence.pdf
-evidence/v0.16.0/numeric-conformance-evidence.json
+evidence/v0.17.0/numeric-conformance-evidence.html
+evidence/v0.17.0/numeric-conformance-evidence.pdf
+evidence/v0.17.0/numeric-conformance-evidence.json
 ```
 
 ## Included Cases
 
 Only promoted, tolerance-gated numerical conformance cases enter the release
-PDF. v0.16.0 is a versioning/evidence cleanup release. For v0.16.0, that still means the earlier v0.8/v0.9 cases only:
+PDF. v0.17.0 is a schema/infrastructure release. For v0.17.0, that still means the earlier v0.8/v0.9 cases only:
 
 | Milestone | Case | Variables |
 |---|---|---|

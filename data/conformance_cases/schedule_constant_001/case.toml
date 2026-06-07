@@ -10,6 +10,23 @@ notes = [
   "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/schedule_constant_001/schedule_constant.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/schedule_constant_001/schedule_constant.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -20,6 +37,8 @@ variable = "Schedule Value"
 frequency = "hourly"
 class = "schedule"
 source = "eso"
+domain = "schedule"
+level = "diagnostic"
 
 [report]
 format = "markdown"

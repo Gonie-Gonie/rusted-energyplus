@@ -170,6 +170,11 @@ $Commands = [ordered]@{
         Group = "conformance"
         Help = "Validate conformance case and suite schema fixtures."
     }
+    "manifest-validate-all" = @{
+        Path = "conformance\manifest-validate-all.ps1"
+        Group = "conformance"
+        Help = "Validate all case manifests against the v0.17 schema v2 gate."
+    }
     "conformance-baseline-smoke" = @{
         Path = "conformance\conformance-baseline-smoke.ps1"
         Group = "conformance"
@@ -280,6 +285,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify v0.16 versioning/evidence cleanup and diagnostic addendum gates."
     }
+    "v0.17-verify" = @{
+        Path = "release\v0.17-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.17 manifest and output request schema v2 gate."
+    }
 }
 
 $Aliases = @{
@@ -301,6 +311,7 @@ $Aliases = @{
     "verify-v0.14" = "v0.14-verify"
     "verify-v0.15" = "v0.15-verify"
     "verify-v0.16" = "v0.16-verify"
+    "verify-v0.17" = "v0.17-verify"
 }
 
 function Show-Commands {

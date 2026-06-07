@@ -65,6 +65,7 @@ matplotlib for document layout and charts.
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
+| `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
 | `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
 | `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
@@ -87,5 +88,6 @@ matplotlib for document layout and charts.
 | `v0.14-verify` | release | verify v0.14 plant source mapping and numeric evidence packaging | yes | plant source-map docs, `.runtime/release-evidence` |
 | `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and numeric evidence packaging | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
 | `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and numeric evidence packaging | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
+| `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

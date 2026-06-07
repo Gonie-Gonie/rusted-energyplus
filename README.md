@@ -28,6 +28,7 @@ EnergyPlus 26.1.0 oracle:
 - package and local release scripts
 - conformance harness, baseline generation, and report skeletons
 - release PDF/HTML/JSON evidence pack for promoted numerical conformance cases
+- Case Manifest and Output Request Schema v2 validation for tracked cases
 - static geometry, construction/material, and internal-gain smoke evidence
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
 - baseline-only thermostat and IdealLoads evidence, plus diagnostic-only
@@ -102,7 +103,8 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.14-verify
 .\scripts\dev.cmd v0.15-verify
 .\scripts\dev.cmd v0.16-verify
-.\scripts\dev.cmd conformance-evidence-report -Version 0.16.0
+.\scripts\dev.cmd v0.17-verify
+.\scripts\dev.cmd conformance-evidence-report -Version 0.17.0
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
@@ -116,6 +118,11 @@ after v0.15 are retained as additional diagnostic plumbing with
 v0.16 is the Versioning and Evidence Cleanup milestone. It reclassifies the
 historical evidence series, records the Road to v1.0, and packages the promoted
 v0.8/v0.9 numerical evidence set under `evidence/v0.16.0`.
+
+v0.17 adds Case Manifest and Output Request Schema v2 validation for all
+tracked case manifests. It packages the same promoted v0.8/v0.9 numerical
+evidence set under `evidence/v0.17.0` and does not add a new numerical
+conformance case.
 
 Developer-only diagnostics:
 

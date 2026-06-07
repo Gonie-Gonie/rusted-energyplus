@@ -10,6 +10,23 @@ notes = [
   "The runtime uses EnergyPlus DataHeatBalance ZoneInitialTemp and SurfInitialTemp defaults for this first equilibrium gate.",
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/heat_balance_nomass_001/heat_balance_nomass.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/heat_balance_nomass_001/heat_balance_nomass.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -20,6 +37,10 @@ variable = "Zone Mean Air Temperature"
 frequency = "hourly"
 class = "zone-state"
 source = "eso"
+domain = "zone"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
 
 [[tolerances]]
 variable_class = "zone-state"

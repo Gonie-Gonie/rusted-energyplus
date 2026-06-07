@@ -12,6 +12,23 @@ notes = [
   "This case remains non-blocking smoke evidence until a full conformance report includes Rust artifacts and blocking gates.",
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/weather_fields_001/weather_fields.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/weather_fields_001/weather_fields.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -22,6 +39,8 @@ variable = "Site Outdoor Air Drybulb Temperature"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
@@ -29,6 +48,8 @@ variable = "Site Outdoor Air Dewpoint Temperature"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
@@ -36,6 +57,8 @@ variable = "Site Outdoor Air Relative Humidity"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
@@ -43,6 +66,8 @@ variable = "Site Outdoor Air Barometric Pressure"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
@@ -50,6 +75,8 @@ variable = "Site Wind Speed"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
@@ -57,6 +84,8 @@ variable = "Site Wind Direction"
 frequency = "hourly"
 class = "weather"
 source = "eso"
+domain = "weather"
+level = "diagnostic"
 
 [report]
 format = "markdown"

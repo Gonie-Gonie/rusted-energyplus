@@ -10,6 +10,23 @@ notes = [
   "The case remains non-blocking evidence until broader coordinate-system and geometry-rule coverage is added.",
 ]
 
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/surface_geometry_001/surface_geometry.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
 [input]
 idf = "data/conformance_cases/surface_geometry_001/surface_geometry.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
@@ -20,6 +37,8 @@ variable = "HeatTransfer Surface Class"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+domain = "surface"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -27,6 +46,8 @@ variable = "HeatTransfer Surface Area (Net)"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+domain = "surface"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -34,6 +55,8 @@ variable = "HeatTransfer Surface Area (Gross)"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+domain = "surface"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -41,6 +64,8 @@ variable = "HeatTransfer Surface Azimuth"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+domain = "surface"
+level = "diagnostic"
 
 [[outputs]]
 key = "*"
@@ -48,6 +73,8 @@ variable = "HeatTransfer Surface Tilt"
 frequency = "static"
 class = "surface-state"
 source = "eio"
+domain = "surface"
+level = "diagnostic"
 
 [report]
 format = "markdown"

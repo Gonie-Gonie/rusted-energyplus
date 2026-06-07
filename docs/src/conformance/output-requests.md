@@ -10,9 +10,8 @@ last_reviewed: 2026-06-07
 Output requests are part of the evidence contract. A report cannot silently
 compare whichever variables happen to be present.
 
-v0.17 will formalize Output Request Schema v2. That schema must support both
-variables and meters, domain labels, evidence levels, tolerance rules, and
-waivers.
+v0.17 formalizes Output Request Schema v2. The schema supports variables,
+meters, domain labels, evidence levels, tolerance rules, and waivers.
 
 Example:
 
@@ -63,7 +62,7 @@ Supported source values are `eso`, `eio`, `mtr`, `sql`, and `csv`.
 Use `static` for EIO/static report rows that do not have a timestep axis, such
 as surface geometry fields.
 
-## Planned Output Request v2
+## Output Request v2
 
 ```toml
 [[variables]]
@@ -84,6 +83,6 @@ abs_tol = 0.001
 rel_tol = 0.000001
 ```
 
-Output levels are planned as `required`, `optional`, `baseline`,
-`diagnostic`, and `conformance`. Only `conformance` outputs can support a
-compatibility claim, and only when the case itself has a blocking gate.
+Output levels are `required`, `optional`, `baseline`, `diagnostic`, and
+`conformance`. Only `conformance` outputs can support a compatibility claim,
+and only when the case itself has a blocking gate.

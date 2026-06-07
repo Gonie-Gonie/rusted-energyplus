@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.17.0 - 2026-06-07
+
+Case Manifest and Output Request Schema v2 release.
+
+### Added
+
+- `manifest_v2` metadata and `[scope]` feature/domain metadata for tracked
+  case manifests.
+- output request v2 fields: `domain`, `level`, and optional per-output
+  tolerances.
+- meter request and waiver schema support in `ep_conformance`.
+- `eplus-rs conformance validate-case-v2 <case.toml>`.
+- `manifest-validate-all` dev gate for every tracked case manifest.
+- v0.17 plan, readiness, release notes, verification gate, and package checks.
+
+### Notes
+
+- v0.17.0 is schema/infrastructure work, not a new numerical conformance
+  release.
+- `level = "conformance"` remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+- Baseline-only and diagnostic-only cases continue to force
+  `conformance_claim = false`.
+
 ## v0.16.0 - 2026-06-07
 
 Versioning and evidence cleanup release.

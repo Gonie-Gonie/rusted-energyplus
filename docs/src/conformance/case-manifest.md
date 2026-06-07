@@ -10,10 +10,9 @@ last_reviewed: 2026-06-07
 Every conformance case needs a manifest. Diagnostic-only cases also need to say
 that they do not make a claim.
 
-v0.17 will replace this minimal manifest contract with Case Manifest v2. The
-v2 schema must make case tier, source kind, output requests, tolerance policy,
-waivers, and release/CI gate policy explicit before more ExampleFiles are
-promoted.
+v0.17 adds Case Manifest v2 validation. The v2 schema makes case tier, source
+kind, output requests, tolerance policy, waivers, and release/CI gate policy
+explicit before more ExampleFiles are promoted.
 
 Example:
 
@@ -46,9 +45,9 @@ comparison_class = "diagnostic-only"
 conformance_claim = false
 ```
 
-## Planned Manifest v2 Fields
+## Manifest v2 Fields
 
-The planned v2 contract is:
+The v2 contract is:
 
 ```toml
 [case]
@@ -77,5 +76,5 @@ release_gate = true
 manual_review_required = false
 ```
 
-The v2 validator must reject `conformance_claim = true` unless variables or
-meters, tolerances, report artifacts, and a blocking gate are all present.
+The v2 validator rejects `conformance_claim = true` unless variables or meters,
+tolerances, report artifacts, and a blocking gate are all present.

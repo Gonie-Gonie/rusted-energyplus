@@ -7,8 +7,9 @@ use ep_compare::{
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
-    ComparisonClass, ConformanceCase, OutputFrequency, OutputRegistry, ReportFormat,
-    SourceArtifact, ToleranceRule, VariableClass, load_case_file,
+    CaseSourceKind, CaseTier, ComparisonClass, ConformanceCase, EvidenceDomain, OutputFrequency,
+    OutputLevel, OutputRegistry, ReportFormat, SourceArtifact, ToleranceRule, VariableClass,
+    load_case_file, load_case_v2_file,
 };
 use ep_model::{
     Construction, Material, OtherEquipment, ScheduleId, SimulationModel, SurfaceType, TypedModel,
@@ -215,6 +216,7 @@ fn print_help() {
     println!("  compare weather-drybulb <weather.epw> <eplusout.eso>");
     println!("{ZONE_TEMPERATURE_COMPARE_USAGE}");
     println!("  conformance validate-case <case.toml>");
+    println!("  conformance validate-case-v2 <case.toml>");
     println!("  conformance baseline <case.toml> <oracle-root> <output-root>");
     println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
     println!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
@@ -377,6 +379,7 @@ fn print_geometry_summary(summaries: &[ZoneGeometrySummary]) {
 fn run_conformance_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("validate-case") => run_conformance_validate_case(&args[1..]),
+        Some("validate-case-v2") => run_conformance_validate_case_v2(&args[1..]),
         Some("baseline") => run_conformance_baseline(&args[1..]),
         Some("report-skeleton") => run_conformance_report_skeleton(&args[1..]),
         Some("diagnostic-report") => run_conformance_diagnostic_report(&args[1..]),
@@ -384,6 +387,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
+            eprintln!("usage: eplus-rs conformance validate-case-v2 <case.toml>");
             eprintln!(
                 "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
             );
@@ -397,6 +401,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
         None => {
             eprintln!("missing conformance command");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
+            eprintln!("usage: eplus-rs conformance validate-case-v2 <case.toml>");
             eprintln!(
                 "usage: eplus-rs conformance baseline <case.toml> <oracle-root> <output-root>"
             );
@@ -408,6 +413,27 @@ fn run_conformance_command(args: &[String]) -> i32 {
             2
         }
     }
+}
+
+fn run_conformance_validate_case_v2(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("usage: eplus-rs conformance validate-case-v2 <case.toml>");
+        return 2;
+    };
+
+    let manifest = match load_case_v2_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    println!("Conformance Case v2");
+    print_conformance_case_summary(&manifest);
+    println!("  status: valid");
+    0
 }
 
 fn run_conformance_validate_case(args: &[String]) -> i32 {
@@ -1866,6 +1892,28 @@ fn resolve_manifest_path(case_path: &Path, value: &str) -> Result<PathBuf, std::
 
 fn print_conformance_case_summary(manifest: &ConformanceCase) {
     println!("  id: {}", manifest.id);
+    if let Some(metadata) = manifest.manifest_v2.as_ref() {
+        println!("  schema_v2: {}", metadata.schema);
+        println!(
+            "  source_kind: {}",
+            case_source_kind_label(metadata.source_kind)
+        );
+        println!("  source_file: {}", metadata.source_file);
+        println!("  tier: {}", case_tier_label(metadata.tier));
+    }
+    if let Some(scope) = manifest.scope.as_ref() {
+        let domains = scope
+            .domains
+            .iter()
+            .map(|domain| evidence_domain_label(*domain))
+            .collect::<Vec<_>>()
+            .join(",");
+        println!("  domains: {domains}");
+        println!("  has_zone: {}", scope.has_zone);
+        println!("  has_surface: {}", scope.has_surface);
+        println!("  has_air_loop: {}", scope.has_air_loop);
+        println!("  has_plant_loop: {}", scope.has_plant_loop);
+    }
     println!(
         "  comparison_class: {}",
         comparison_class_label(manifest.comparison_class)
@@ -1882,6 +1930,67 @@ fn print_conformance_case_summary(manifest: &ConformanceCase) {
             variable_class_label(output.class),
             source_artifact_label(output.source)
         );
+        if let (Some(domain), Some(level)) = (output.domain, output.level) {
+            println!(
+                "      v2: domain={} level={}",
+                evidence_domain_label(domain),
+                output_level_label(level)
+            );
+        }
+    }
+    println!("  meters: {}", manifest.meters.len());
+    for meter in &manifest.meters {
+        println!(
+            "    {} / {} / {} / {} / {}",
+            meter.name,
+            output_frequency_label(meter.frequency),
+            source_artifact_label(meter.source),
+            evidence_domain_label(meter.domain),
+            output_level_label(meter.level)
+        );
+    }
+}
+
+fn case_source_kind_label(kind: CaseSourceKind) -> &'static str {
+    match kind {
+        CaseSourceKind::LocalFixture => "local-fixture",
+        CaseSourceKind::EnergyPlusExamplefile => "energyplus-examplefile",
+        CaseSourceKind::EnergyPlusTestfile => "energyplus-testfile",
+        CaseSourceKind::MinimalEpjson => "minimal-epjson",
+    }
+}
+
+fn case_tier_label(tier: CaseTier) -> &'static str {
+    match tier {
+        CaseTier::A => "A",
+        CaseTier::B => "B",
+        CaseTier::C => "C",
+    }
+}
+
+fn evidence_domain_label(domain: EvidenceDomain) -> &'static str {
+    match domain {
+        EvidenceDomain::Weather => "weather",
+        EvidenceDomain::Schedule => "schedule",
+        EvidenceDomain::Zone => "zone",
+        EvidenceDomain::Surface => "surface",
+        EvidenceDomain::Construction => "construction",
+        EvidenceDomain::InternalGain => "internal-gain",
+        EvidenceDomain::Node => "node",
+        EvidenceDomain::Hvac => "hvac",
+        EvidenceDomain::Plant => "plant",
+        EvidenceDomain::Meter => "meter",
+        EvidenceDomain::Diagnostic => "diagnostic",
+    }
+}
+
+fn output_level_label(level: OutputLevel) -> &'static str {
+    match level {
+        OutputLevel::Required => "required",
+        OutputLevel::Optional => "optional",
+        OutputLevel::Baseline => "baseline",
+        OutputLevel::Diagnostic => "diagnostic",
+        OutputLevel::Conformance => "conformance",
     }
 }
 
