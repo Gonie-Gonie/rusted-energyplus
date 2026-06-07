@@ -16,11 +16,12 @@ use ep_model::{
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, FirstZoneSimulationOptions, HeatBalanceSimulationOptions, SimulationMode,
-    SurfaceGeometrySummary, ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis,
-    load_epw_dry_bulb_series, load_epw_records, simulate_constant_schedules,
-    simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
-    simulate_zone_internal_convective_gains, surface_geometry_summaries, zone_geometry_summaries,
+    ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+    SimulationMode, SurfaceGeometrySummary, ZoneGeometrySummary, build_execution_plan,
+    build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
+    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
+    surface_geometry_summaries, zone_geometry_summaries,
 };
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -275,6 +276,24 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  steps: {}", plan.step_count());
     for stage in &plan.stages {
         println!("    {}: {}", stage.name, stage.steps.len());
+        for (index, step) in stage.steps.iter().enumerate() {
+            println!("      {index}: {}", execution_step_label(step));
+        }
+    }
+}
+
+fn execution_step_label(step: &ExecutionStep) -> String {
+    match step {
+        ExecutionStep::UpdateWeather => "UpdateWeather".to_string(),
+        ExecutionStep::EvaluateSchedule(id) => format!("EvaluateSchedule({})", id.0),
+        ExecutionStep::EvaluateZoneThermostat(id) => {
+            format!("EvaluateZoneThermostat({})", id.0)
+        }
+        ExecutionStep::SolveZone(id) => format!("SolveZone({})", id.0),
+        ExecutionStep::EvaluateIdealLoadsAirSystem(id) => {
+            format!("EvaluateIdealLoadsAirSystem({})", id.0)
+        }
+        ExecutionStep::WriteOutput(id) => format!("WriteOutput({})", id.0),
     }
 }
 
@@ -459,6 +478,9 @@ fn run_conformance_report_skeleton(args: &[String]) -> i32 {
             print_conformance_case_summary(&manifest);
             println!("  report: {}", summary.report_path.display());
             println!("  series: {}", summary.series);
+            println!("  energyplus_warnings: {}", summary.warning_count);
+            println!("  energyplus_severes: {}", summary.severe_count);
+            println!("  energyplus_fatals: {}", summary.fatal_count);
             println!("  tolerance_policy: none");
             println!("  status: baseline-only");
             0
@@ -598,6 +620,9 @@ struct BaselineSummary {
 struct ReportSkeletonSummary {
     report_path: PathBuf,
     series: usize,
+    warning_count: usize,
+    severe_count: usize,
+    fatal_count: usize,
 }
 
 struct DiagnosticReportSummary {
@@ -1029,6 +1054,11 @@ fn generate_conformance_report_skeleton(
     if !eso.is_file() {
         return Err(format!("missing baseline ESO: {}", eso.display()));
     }
+    let err = baseline_case_dir.join("eplusout.err");
+    if !err.is_file() {
+        return Err(format!("missing baseline ERR: {}", err.display()));
+    }
+    let warning_summary = read_energyplus_err_summary(&err)?;
 
     let report_dir = report_root.join(&manifest.id);
     std::fs::create_dir_all(&report_dir)
@@ -1058,22 +1088,35 @@ fn generate_conformance_report_skeleton(
             samples: values.len(),
             first: first_value_label(&values),
             last: last_value_label(&values),
+            min: min_value_label(&values),
+            max: max_value_label(&values),
+            nonzero_count: nonzero_count(&values),
         });
     }
 
-    let report = render_report_skeleton(manifest, &rows);
+    let report = render_report_skeleton(manifest, &rows, &warning_summary);
     std::fs::write(&report_path, report)
         .map_err(|error| format!("failed to write report skeleton: {error}"))?;
     std::fs::write(
         &summary_path,
-        render_report_skeleton_summary_json(manifest, &rows),
+        render_report_skeleton_summary_json(manifest, &rows, &warning_summary),
     )
     .map_err(|error| format!("failed to write report summary: {error}"))?;
 
     Ok(ReportSkeletonSummary {
         report_path,
         series: rows.len(),
+        warning_count: warning_summary.warning_count,
+        severe_count: warning_summary.severe_count,
+        fatal_count: warning_summary.fatal_count,
     })
+}
+
+struct EnergyPlusErrSummary {
+    warning_count: usize,
+    severe_count: usize,
+    fatal_count: usize,
+    warnings: Vec<String>,
 }
 
 struct ReportSeriesRow {
@@ -1085,9 +1128,16 @@ struct ReportSeriesRow {
     samples: usize,
     first: String,
     last: String,
+    min: String,
+    max: String,
+    nonzero_count: usize,
 }
 
-fn render_report_skeleton(manifest: &ConformanceCase, rows: &[ReportSeriesRow]) -> String {
+fn render_report_skeleton(
+    manifest: &ConformanceCase,
+    rows: &[ReportSeriesRow],
+    warning_summary: &EnergyPlusErrSummary,
+) -> String {
     let mut report = String::new();
     report.push_str("# Conformance Report Skeleton\n\n");
     report.push_str(&format!("case_id: {}\n", manifest.id));
@@ -1102,14 +1152,35 @@ fn render_report_skeleton(manifest: &ConformanceCase, rows: &[ReportSeriesRow]) 
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str("tolerance_policy: none\n");
     report.push_str("status: baseline-only\n\n");
+    report.push_str("## EnergyPlus ERR\n\n");
+    report.push_str(&format!(
+        "energyplus_warnings: {}\n",
+        warning_summary.warning_count
+    ));
+    report.push_str(&format!(
+        "energyplus_severes: {}\n",
+        warning_summary.severe_count
+    ));
+    report.push_str(&format!(
+        "energyplus_fatals: {}\n\n",
+        warning_summary.fatal_count
+    ));
+    if !warning_summary.warnings.is_empty() {
+        report.push_str("| index | warning |\n");
+        report.push_str("|---:|---|\n");
+        for (index, warning) in warning_summary.warnings.iter().enumerate() {
+            report.push_str(&format!("| {} | {} |\n", index + 1, markdown_cell(warning)));
+        }
+        report.push('\n');
+    }
     report.push_str("## Series\n\n");
     report.push_str(
-        "| key | variable | frequency | class | source | baseline_samples | first | last | status |\n",
+        "| key | variable | frequency | class | source | baseline_samples | first | last | baseline_min | baseline_max | baseline_nonzero_count | status |\n",
     );
-    report.push_str("|---|---|---|---|---|---:|---:|---:|---|\n");
+    report.push_str("|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---|\n");
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {} | {} | {} | {} | baseline-only |\n",
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | baseline-only |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.variable),
             row.frequency,
@@ -1117,7 +1188,10 @@ fn render_report_skeleton(manifest: &ConformanceCase, rows: &[ReportSeriesRow]) 
             row.source,
             row.samples,
             row.first,
-            row.last
+            row.last,
+            row.min,
+            row.max,
+            row.nonzero_count
         ));
     }
     report
@@ -1126,6 +1200,7 @@ fn render_report_skeleton(manifest: &ConformanceCase, rows: &[ReportSeriesRow]) 
 fn render_report_skeleton_summary_json(
     manifest: &ConformanceCase,
     rows: &[ReportSeriesRow],
+    warning_summary: &EnergyPlusErrSummary,
 ) -> String {
     let mut json = String::new();
     json.push_str("{\n");
@@ -1149,6 +1224,28 @@ fn render_report_skeleton_summary_json(
     json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
     json.push_str("    \"compare_summary_json\": \"compare-summary.json\"\n");
     json.push_str("  },\n");
+    json.push_str("  \"energyplus_err\": {\n");
+    json.push_str(&format!(
+        "    \"warnings\": {},\n",
+        warning_summary.warning_count
+    ));
+    json.push_str(&format!(
+        "    \"severes\": {},\n",
+        warning_summary.severe_count
+    ));
+    json.push_str(&format!(
+        "    \"fatals\": {},\n",
+        warning_summary.fatal_count
+    ));
+    json.push_str("    \"warning_messages\": [");
+    for (index, warning) in warning_summary.warnings.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&json_string(warning));
+    }
+    json.push_str("]\n");
+    json.push_str("  },\n");
     json.push_str("  \"requested_outputs\": [\n");
     for (index, row) in rows.iter().enumerate() {
         json.push_str("    {\n");
@@ -1169,6 +1266,18 @@ fn render_report_skeleton_summary_json(
         json.push_str(&format!("      \"baseline_samples\": {},\n", row.samples));
         json.push_str(&format!("      \"first\": {},\n", json_string(&row.first)));
         json.push_str(&format!("      \"last\": {},\n", json_string(&row.last)));
+        json.push_str(&format!(
+            "      \"baseline_min\": {},\n",
+            json_string(&row.min)
+        ));
+        json.push_str(&format!(
+            "      \"baseline_max\": {},\n",
+            json_string(&row.max)
+        ));
+        json.push_str(&format!(
+            "      \"baseline_nonzero_count\": {},\n",
+            row.nonzero_count
+        ));
         json.push_str("      \"status\": \"baseline-only\"\n");
         if index + 1 == rows.len() {
             json.push_str("    }\n");
@@ -1181,6 +1290,39 @@ fn render_report_skeleton_summary_json(
     json
 }
 
+fn read_energyplus_err_summary(path: &Path) -> Result<EnergyPlusErrSummary, String> {
+    let contents = std::fs::read_to_string(path)
+        .map_err(|error| format!("failed to read EnergyPlus ERR: {error}"))?;
+    Ok(energyplus_err_summary(&contents))
+}
+
+fn energyplus_err_summary(contents: &str) -> EnergyPlusErrSummary {
+    let mut warnings = Vec::new();
+    let mut severe_count = 0;
+    let mut fatal_count = 0;
+
+    for line in contents.lines() {
+        if line.contains("** Warning **") {
+            warnings.push(clean_energyplus_message(line));
+        } else if line.contains("** Severe  **") || line.contains("** Severe **") {
+            severe_count += 1;
+        } else if line.contains("** Fatal  **") || line.contains("** Fatal **") {
+            fatal_count += 1;
+        }
+    }
+
+    EnergyPlusErrSummary {
+        warning_count: warnings.len(),
+        severe_count,
+        fatal_count,
+        warnings,
+    }
+}
+
+fn clean_energyplus_message(line: &str) -> String {
+    line.replace("** Warning **", "").trim().to_string()
+}
+
 fn first_value_label(values: &[f64]) -> String {
     values
         .first()
@@ -1191,6 +1333,26 @@ fn last_value_label(values: &[f64]) -> String {
     values
         .last()
         .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
+}
+
+fn min_value_label(values: &[f64]) -> String {
+    values
+        .iter()
+        .copied()
+        .reduce(f64::min)
+        .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
+}
+
+fn max_value_label(values: &[f64]) -> String {
+    values
+        .iter()
+        .copied()
+        .reduce(f64::max)
+        .map_or_else(|| "missing".to_string(), |value| format!("{value:.6}"))
+}
+
+fn nonzero_count(values: &[f64]) -> usize {
+    values.iter().filter(|value| value.abs() > 1.0e-9).count()
 }
 
 fn markdown_cell(value: &str) -> String {

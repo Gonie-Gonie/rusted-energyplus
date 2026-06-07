@@ -1277,7 +1277,7 @@ pub fn surface_geometry_summaries(model: &TypedModel) -> Vec<SurfaceGeometrySumm
                 surface_type: surface.surface_type,
                 area_m2: surface_area_m2(&surface.vertices),
                 azimuth_deg: surface_azimuth_deg(&surface.vertices),
-                tilt_deg: surface_tilt_deg(&surface.vertices),
+                tilt_deg: surface_tilt_deg(surface.surface_type, &surface.vertices),
             }
         })
         .collect()
@@ -1399,13 +1399,20 @@ fn surface_azimuth_deg(vertices: &[Point3]) -> f64 {
         .unwrap_or(0.0)
 }
 
-fn surface_tilt_deg(vertices: &[Point3]) -> f64 {
+fn surface_tilt_deg(surface_type: SurfaceType, vertices: &[Point3]) -> f64 {
     let Some(normal) = polygon_normal(vertices) else {
         return 0.0;
     };
     let magnitude = normal.magnitude();
     if magnitude <= 1.0e-12 {
         return 0.0;
+    }
+    if (normal.z.abs() / magnitude) > 1.0 - 1.0e-12 {
+        return match surface_type {
+            SurfaceType::Floor => 180.0,
+            SurfaceType::Roof | SurfaceType::Ceiling => 0.0,
+            SurfaceType::Wall => 90.0,
+        };
     }
 
     (-normal.z / magnitude).clamp(-1.0, 1.0).acos().to_degrees()

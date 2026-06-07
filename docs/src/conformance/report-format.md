@@ -73,8 +73,9 @@ present.
 - status
 - input and weather paths
 - requested variable and meter coverage
-- per-variable samples, tolerance, max absolute delta, RMSE, first divergence,
-  and status
+- per-variable samples, baseline min, baseline max, nonzero sample count,
+  tolerance, max absolute delta, RMSE, first divergence, and status
+- EnergyPlus ERR warning counts and warning excerpts for baseline-only reports
 - unsupported or skipped outputs
 
 ## Markdown Report

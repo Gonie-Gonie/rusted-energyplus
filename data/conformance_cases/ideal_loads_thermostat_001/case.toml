@@ -7,7 +7,8 @@ conformance_claim = false
 oracle_version = "26.1.0"
 notes = [
   "This v0.10 case is blocking typed-graph evidence, not IdealLoads numerical conformance.",
-  "Thermostat setpoint and IdealLoads output availability is baseline/report evidence only until a load solver declares tolerances."
+  "Thermostat setpoint and IdealLoads output availability is baseline/report evidence only until a load solver declares tolerances.",
+  "The fixture includes a deterministic envelope and internal gain schedule so the baseline IdealLoads heating and cooling rates both contain nonzero samples."
 ]
 
 [input]

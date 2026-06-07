@@ -82,6 +82,7 @@ function Invoke-ReportSkeletonCase {
     Assert-Contains -Text $text -Pattern "Conformance Report Skeleton" -Description "$CaseId report header"
     Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "$CaseId case id"
     Assert-Contains -Text $text -Pattern "series: $ExpectedSeries" -Description "$CaseId series count"
+    Assert-Contains -Text $text -Pattern "energyplus_warnings:" -Description "$CaseId warning summary"
     Assert-Contains -Text $text -Pattern "tolerance_policy: none" -Description "$CaseId tolerance boundary"
     Assert-Contains -Text $text -Pattern "status: baseline-only" -Description "$CaseId report status"
 
@@ -93,11 +94,14 @@ function Invoke-ReportSkeletonCase {
     Assert-Contains -Text $report -Pattern "comparison_class: smoke" -Description "$CaseId report class"
     Assert-Contains -Text $report -Pattern "conformance_claim: false" -Description "$CaseId report claim"
     Assert-Contains -Text $report -Pattern $ExpectedVariable -Description "$CaseId report variable"
-    Assert-Contains -Text $report -Pattern "| key | variable | frequency | class | source | baseline_samples | first | last | status |" -Description "$CaseId report source column"
+    Assert-Contains -Text $report -Pattern "energyplus_warnings:" -Description "$CaseId report warning summary"
+    Assert-Contains -Text $report -Pattern "| key | variable | frequency | class | source | baseline_samples | first | last | baseline_min | baseline_max | baseline_nonzero_count | status |" -Description "$CaseId report source column"
     Assert-Contains -Text $report -Pattern "baseline-only" -Description "$CaseId report baseline status"
     $summary = Get-Content -Raw -LiteralPath $summaryPath
     Assert-Contains -Text $summary -Pattern '"status": "baseline-only"' -Description "$CaseId summary status"
     Assert-Contains -Text $summary -Pattern '"compare_summary_json": "compare-summary.json"' -Description "$CaseId summary artifact"
+    Assert-Contains -Text $summary -Pattern '"energyplus_err"' -Description "$CaseId summary warning block"
+    Assert-Contains -Text $summary -Pattern '"baseline_nonzero_count"' -Description "$CaseId summary nonzero count"
     Assert-Contains -Text $summary -Pattern '"source": "eso"' -Description "$CaseId summary source"
     Assert-Contains -Text $summary -Pattern $ExpectedVariable -Description "$CaseId summary variable"
 }

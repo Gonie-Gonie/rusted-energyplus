@@ -57,6 +57,37 @@ function Assert-FileExists {
     Write-Host "OK $Description`: $Path"
 }
 
+function Assert-TextOrder {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string[]]$Patterns,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    $offset = -1
+    foreach ($pattern in $Patterns) {
+        $index = $Text.IndexOf($pattern, $offset + 1, [System.StringComparison]::Ordinal)
+        if ($index -lt 0) {
+            Write-Host $Text
+            throw "Missing ordered $Description step: $pattern"
+        }
+        $offset = $index
+    }
+    Write-Host "OK ordered $Description`: $($Patterns -join ' -> ')"
+}
+
+function Assert-CleanEnergyPlusErr {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    $errText = Get-Content -LiteralPath $Path -Raw
+    $warningLines = @($errText -split "`r?`n" | Where-Object { $_.Contains("** Warning **") })
+    $severeLines = @($errText -split "`r?`n" | Where-Object { $_.Contains("** Severe") })
+    $fatalLines = @($errText -split "`r?`n" | Where-Object { $_.Contains("** Fatal") })
+    if ($warningLines.Count -gt 0 -or $severeLines.Count -gt 0 -or $fatalLines.Count -gt 0) {
+        Write-Host $errText
+        throw "v0.10 IdealLoads thermostat baseline must not rely on EnergyPlus warning/severe/fatal auto-fixes."
+    }
+    Write-Host "OK clean EnergyPlus ERR: warnings=0 severes=0 fatals=0"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -100,7 +131,9 @@ Assert-Contains -Text $baselineText -Pattern "conformance_claim: false" -Descrip
 Assert-Contains -Text $baselineText -Pattern "status: generated" -Description "baseline status"
 Assert-FileExists -Path $EpJsonPath -Description "converted v0.10 epJSON"
 Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.eso") -Description "v0.10 EnergyPlus ESO"
+Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.err") -Description "v0.10 EnergyPlus ERR"
 Assert-FileExists -Path (Join-Path $CaseOutputRoot "case-expanded.toml") -Description "v0.10 expanded manifest"
+Assert-CleanEnergyPlusErr -Path (Join-Path $CaseOutputRoot "eplusout.err")
 
 Write-Host "Compiling v0.10 IdealLoads thermostat typed model."
 $compileOutput = & $cargo.Source run -p ep_cli --quiet -- compile $EpJsonPath 2>&1
@@ -115,6 +148,8 @@ Assert-Contains -Text $compileText -Pattern "zone_thermostats: 1" -Description "
 Assert-Contains -Text $compileText -Pattern "ideal_loads_air_systems: 1" -Description "IdealLoads typed count"
 Assert-Contains -Text $compileText -Pattern "zone_equipment_lists: 1" -Description "equipment list typed count"
 Assert-Contains -Text $compileText -Pattern "zone_equipment_connections: 1" -Description "equipment connection typed count"
+Assert-Contains -Text $compileText -Pattern "compact_schedules: 1" -Description "internal gain schedule typed count"
+Assert-Contains -Text $compileText -Pattern "other_equipment: 1" -Description "internal gain typed count"
 Assert-Contains -Text $compileText -Pattern "ThermostatSetpoint:DualSetpoint: 1 [typed]" -Description "dual setpoint coverage"
 Assert-Contains -Text $compileText -Pattern "ZoneControl:Thermostat: 1 [typed]" -Description "thermostat coverage"
 Assert-Contains -Text $compileText -Pattern "ZoneHVAC:IdealLoadsAirSystem: 1 [typed]" -Description "IdealLoads coverage"
@@ -132,8 +167,14 @@ Assert-Contains -Text $planText -Pattern "ExecutionPlan" -Description "plan head
 Assert-Contains -Text $planText -Pattern "zone_thermostat_edges: 1" -Description "zone thermostat graph edge"
 Assert-Contains -Text $planText -Pattern "thermostat_setpoint_edges: 1" -Description "thermostat setpoint graph edge"
 Assert-Contains -Text $planText -Pattern "zone_ideal_loads_edges: 1" -Description "zone IdealLoads graph edge"
-Assert-Contains -Text $planText -Pattern "steps: 8" -Description "plan step count"
-Assert-Contains -Text $planText -Pattern "zone: 3" -Description "zone stage step count"
+Assert-Contains -Text $planText -Pattern "EvaluateZoneThermostat(0)" -Description "thermostat execution step"
+Assert-Contains -Text $planText -Pattern "SolveZone(0)" -Description "zone solve execution step"
+Assert-Contains -Text $planText -Pattern "EvaluateIdealLoadsAirSystem(0)" -Description "IdealLoads execution step"
+Assert-TextOrder -Text $planText -Patterns @(
+    "EvaluateZoneThermostat(0)",
+    "SolveZone(0)",
+    "EvaluateIdealLoadsAirSystem(0)"
+) -Description "zone thermostat/solve/IdealLoads execution"
 
 Write-Host "Writing v0.10 IdealLoads thermostat baseline-only report skeleton."
 $reportOutput = & $cargo.Source run -p ep_cli --quiet -- conformance report-skeleton $CasePath $CaseOutputRoot $ReportRoot 2>&1
@@ -145,6 +186,9 @@ $reportText = ($reportOutput -join "`n")
 Assert-Contains -Text $reportText -Pattern "Conformance Report Skeleton" -Description "report header"
 Assert-Contains -Text $reportText -Pattern "id: $CaseId" -Description "report case id"
 Assert-Contains -Text $reportText -Pattern "series: 4" -Description "report series count"
+Assert-Contains -Text $reportText -Pattern "energyplus_warnings: 0" -Description "report warning count"
+Assert-Contains -Text $reportText -Pattern "energyplus_severes: 0" -Description "report severe count"
+Assert-Contains -Text $reportText -Pattern "energyplus_fatals: 0" -Description "report fatal count"
 Assert-Contains -Text $reportText -Pattern "tolerance_policy: none" -Description "report tolerance boundary"
 Assert-Contains -Text $reportText -Pattern "status: baseline-only" -Description "report status"
 
@@ -159,6 +203,10 @@ Assert-Contains -Text $markdown -Pattern "comparison_class: smoke" -Description 
 Assert-Contains -Text $markdown -Pattern "conformance_claim: false" -Description "markdown claim boundary"
 Assert-Contains -Text $markdown -Pattern "tolerance_policy: none" -Description "markdown tolerance boundary"
 Assert-Contains -Text $markdown -Pattern "status: baseline-only" -Description "markdown baseline-only status"
+Assert-Contains -Text $markdown -Pattern "energyplus_warnings: 0" -Description "markdown warning count"
+Assert-Contains -Text $markdown -Pattern "baseline_min" -Description "markdown baseline min"
+Assert-Contains -Text $markdown -Pattern "baseline_max" -Description "markdown baseline max"
+Assert-Contains -Text $markdown -Pattern "baseline_nonzero_count" -Description "markdown nonzero count"
 Assert-Contains -Text $markdown -Pattern "Zone Thermostat Heating Setpoint Temperature" -Description "markdown thermostat heating setpoint"
 Assert-Contains -Text $markdown -Pattern "Zone Thermostat Cooling Setpoint Temperature" -Description "markdown thermostat cooling setpoint"
 Assert-Contains -Text $markdown -Pattern "Zone Ideal Loads Zone Total Heating Rate" -Description "markdown IdealLoads heating rate"
@@ -181,14 +229,34 @@ if ($summary.tolerance_policy -ne "none") {
 if ($summary.status -ne "baseline-only") {
     throw "Unexpected v0.10 summary status: $($summary.status)"
 }
+if ($summary.energyplus_err.warnings -ne 0) {
+    throw "v0.10 smoke summary must have zero EnergyPlus warnings"
+}
+if ($summary.energyplus_err.severes -ne 0) {
+    throw "v0.10 smoke summary must have zero EnergyPlus severes"
+}
+if ($summary.energyplus_err.fatals -ne 0) {
+    throw "v0.10 smoke summary must have zero EnergyPlus fatals"
+}
 if ($summary.requested_outputs.Count -ne 4) {
     throw "Unexpected v0.10 summary requested output count: $($summary.requested_outputs.Count)"
 }
-if (-not ($summary.requested_outputs | Where-Object { $_.class -eq "hvac-state" -and $_.variable -eq "Zone Ideal Loads Zone Total Heating Rate" })) {
+$heatingRate = $summary.requested_outputs | Where-Object { $_.class -eq "hvac-state" -and $_.variable -eq "Zone Ideal Loads Zone Total Heating Rate" }
+if (-not $heatingRate) {
     throw "Missing v0.10 hvac-state heating-rate summary series"
+}
+$coolingRate = $summary.requested_outputs | Where-Object { $_.class -eq "hvac-state" -and $_.variable -eq "Zone Ideal Loads Zone Total Cooling Rate" }
+if (-not $coolingRate) {
+    throw "Missing v0.10 hvac-state cooling-rate summary series"
 }
 if (-not ($summary.requested_outputs | Where-Object { $_.class -eq "zone-state" -and $_.variable -eq "Zone Thermostat Cooling Setpoint Temperature" })) {
     throw "Missing v0.10 thermostat cooling setpoint summary series"
+}
+if ([int]$heatingRate.baseline_nonzero_count -le 0) {
+    throw "v0.10 heating-rate baseline must include nonzero samples"
+}
+if ([int]$coolingRate.baseline_nonzero_count -le 0) {
+    throw "v0.10 cooling-rate baseline must include nonzero samples"
 }
 
 Write-Host "IdealLoads thermostat smoke passed."

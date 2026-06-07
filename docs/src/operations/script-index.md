@@ -42,7 +42,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `schedule-compact-smoke` | smoke | verify `Schedule:Compact` intake | no | console output |
 | `geometry-smoke` | smoke | summarize Rust geometry interpretation | no | console output |
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
-| `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, and IdealLoads typed graph | yes | `.runtime/ideal-loads-thermostat` |
+| `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, IdealLoads typed graph, warning policy, and nonzero baseline signal | yes | `.runtime/ideal-loads-thermostat` |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |

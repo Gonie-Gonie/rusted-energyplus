@@ -69,6 +69,7 @@ Assert-Contains -Path "docs\src\operations\v0.9.0-readiness.md" -Pattern "confor
 Assert-Contains -Path "docs\src\operations\v0.9.0-readiness.md" -Pattern "not a fenestration or solar-radiation claim" -Description "v0.9 claim boundary"
 Assert-Contains -Path "docs\src\operations\v0.10.0-readiness.md" -Pattern "typed-graph-ready" -Description "v0.10 active readiness boundary"
 Assert-Contains -Path "docs\src\operations\v0.10.0-readiness.md" -Pattern "not an IdealLoads load-conformance claim" -Description "v0.10 claim boundary"
+Assert-Contains -Path "docs\src\operations\v0.10.0-readiness.md" -Pattern "v0.11 may begin only after v0.10 hardening has landed" -Description "v0.11 hardening boundary"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "v0.8 case class"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "conformance_claim = true" -Description "v0.8 manifest claim"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "max_abs = 0.000001" -Description "v0.8 tolerance"
@@ -81,6 +82,7 @@ Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.to
 Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Pattern "conformance_claim = false" -Description "v0.10 manifest claim boundary"
 Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Pattern 'class = "hvac-state"' -Description "v0.10 HVAC output class"
 Assert-Contains -Path "scripts\smoke\ideal-loads-thermostat-smoke.ps1" -Pattern "status: baseline-only" -Description "v0.10 smoke gate baseline-only status"
+Assert-Contains -Path "scripts\smoke\ideal-loads-thermostat-smoke.ps1" -Pattern "baseline_nonzero_count" -Description "v0.10 nonzero baseline gate"
 
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "comparison_class: diagnostic-only" -Description "zone diagnostic CLI"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "conformance_claim: false" -Description "diagnostic CLI"

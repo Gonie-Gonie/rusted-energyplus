@@ -30,10 +30,10 @@ BuildingSurface:Detailed,
   NoWind,
   1.0,
   4,
-  0,0,0,
-  1,0,0,
+  0,1,0,
   1,1,0,
-  0,1,0;
+  1,0,0,
+  0,0,0;
 
 BuildingSurface:Detailed,
   Roof,
@@ -47,10 +47,10 @@ BuildingSurface:Detailed,
   NoWind,
   0.0,
   4,
-  0,0,1,
-  0,1,1,
+  1,0,1,
   1,1,1,
-  1,0,1;
+  0,1,1,
+  0,0,1;
 
 BuildingSurface:Detailed,
   Wall X0,

@@ -892,33 +892,37 @@ impl<'a> Compiler<'a> {
                         "system_inlet_air_node_name",
                     )
                     .map(|value| NormalizedName::new(&value)),
-                maximum_heating_supply_air_temperature_c: self.number_default(
+                maximum_heating_supply_air_temperature_c: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "maximum_heating_supply_air_temperature",
                     50.0,
+                    -100.0..=200.0,
                 ),
-                minimum_cooling_supply_air_temperature_c: self.number_default(
+                minimum_cooling_supply_air_temperature_c: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "minimum_cooling_supply_air_temperature",
                     13.0,
+                    -100.0..=200.0,
                 ),
-                maximum_heating_supply_air_humidity_ratio: self.number_default(
+                maximum_heating_supply_air_humidity_ratio: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "maximum_heating_supply_air_humidity_ratio",
                     0.0156,
+                    0.0..=1.0,
                 ),
-                minimum_cooling_supply_air_humidity_ratio: self.number_default(
+                minimum_cooling_supply_air_humidity_ratio: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "minimum_cooling_supply_air_humidity_ratio",
                     0.0077,
+                    0.0..=1.0,
                 ),
                 heating_limit: self.enum_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
@@ -928,13 +932,14 @@ impl<'a> Compiler<'a> {
                     "NoLimit",
                     parse_ideal_loads_limit,
                 ),
-                maximum_heating_air_flow_rate_m3_per_s: self.optional_autosize_or_number(
-                    "ZoneHVAC:IdealLoadsAirSystem",
-                    &name,
-                    &object,
-                    "maximum_heating_air_flow_rate",
-                ),
-                maximum_sensible_heating_capacity_w: self.optional_autosize_or_number(
+                maximum_heating_air_flow_rate_m3_per_s: self
+                    .optional_autosize_or_nonnegative_number(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "maximum_heating_air_flow_rate",
+                    ),
+                maximum_sensible_heating_capacity_w: self.optional_autosize_or_nonnegative_number(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
@@ -948,13 +953,14 @@ impl<'a> Compiler<'a> {
                     "NoLimit",
                     parse_ideal_loads_limit,
                 ),
-                maximum_cooling_air_flow_rate_m3_per_s: self.optional_autosize_or_number(
-                    "ZoneHVAC:IdealLoadsAirSystem",
-                    &name,
-                    &object,
-                    "maximum_cooling_air_flow_rate",
-                ),
-                maximum_total_cooling_capacity_w: self.optional_autosize_or_number(
+                maximum_cooling_air_flow_rate_m3_per_s: self
+                    .optional_autosize_or_nonnegative_number(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "maximum_cooling_air_flow_rate",
+                    ),
+                maximum_total_cooling_capacity_w: self.optional_autosize_or_nonnegative_number(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
@@ -982,12 +988,13 @@ impl<'a> Compiler<'a> {
                     "ConstantSensibleHeatRatio",
                     parse_dehumidification_control_type,
                 ),
-                cooling_sensible_heat_ratio: self.number_default(
+                cooling_sensible_heat_ratio: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "cooling_sensible_heat_ratio",
                     0.7,
+                    0.0..=1.0,
                 ),
                 humidification_control_type: self.enum_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
@@ -1037,19 +1044,21 @@ impl<'a> Compiler<'a> {
                     "None",
                     parse_heat_recovery_type,
                 ),
-                sensible_heat_recovery_effectiveness: self.number_default(
+                sensible_heat_recovery_effectiveness: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "sensible_heat_recovery_effectiveness",
                     0.7,
+                    0.0..=1.0,
                 ),
-                latent_heat_recovery_effectiveness: self.number_default(
+                latent_heat_recovery_effectiveness: self.number_range_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
                     "latent_heat_recovery_effectiveness",
                     0.65,
+                    0.0..=1.0,
                 ),
                 design_specification_zonehvac_sizing_object_name: self
                     .optional_string(
@@ -1095,6 +1104,9 @@ impl<'a> Compiler<'a> {
 
     fn parse_zone_equipment_lists(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("ZoneHVAC:EquipmentList") {
+            let Some(equipment) = self.zone_equipment_entries(model, &name, &object) else {
+                continue;
+            };
             let Some(id_value) = self.checked_id(
                 "ZoneHVAC:EquipmentList",
                 &name,
@@ -1107,9 +1119,6 @@ impl<'a> Compiler<'a> {
                 self.duplicate_name("ZoneHVAC:EquipmentList", &name);
                 continue;
             }
-            let Some(equipment) = self.zone_equipment_entries(model, &name, &object) else {
-                continue;
-            };
 
             model.zone_equipment_lists.push(ZoneEquipmentList {
                 id,
@@ -1177,6 +1186,22 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            if model
+                .zone_equipment_connections
+                .iter()
+                .any(|connection| connection.zone == zone)
+            {
+                self.error(
+                    "DuplicateZoneEquipmentConnection",
+                    "ZoneHVAC:EquipmentConnections",
+                    Some(&name),
+                    Some("zone_name"),
+                    format!(
+                        "ZoneHVAC:EquipmentConnections/{name} duplicates zone equipment connection for zone '{zone_name}'"
+                    ),
+                );
+                continue;
+            }
 
             model
                 .zone_equipment_connections
@@ -1489,38 +1514,20 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(cooling_sequence) = self.optional_u32(
+            let Some(cooling_sequence) = self.required_positive_u32(
                 "ZoneHVAC:EquipmentList",
                 &entry_name,
                 &entry_object,
                 "zone_equipment_cooling_sequence",
             ) else {
-                self.error(
-                    "MissingRequiredField",
-                    "ZoneHVAC:EquipmentList",
-                    Some(&entry_name),
-                    Some("zone_equipment_cooling_sequence"),
-                    format!(
-                        "ZoneHVAC:EquipmentList/{entry_name} requires field zone_equipment_cooling_sequence"
-                    ),
-                );
                 continue;
             };
-            let Some(heating_or_no_load_sequence) = self.optional_u32(
+            let Some(heating_or_no_load_sequence) = self.required_positive_u32(
                 "ZoneHVAC:EquipmentList",
                 &entry_name,
                 &entry_object,
                 "zone_equipment_heating_or_no_load_sequence",
             ) else {
-                self.error(
-                    "MissingRequiredField",
-                    "ZoneHVAC:EquipmentList",
-                    Some(&entry_name),
-                    Some("zone_equipment_heating_or_no_load_sequence"),
-                    format!(
-                        "ZoneHVAC:EquipmentList/{entry_name} requires field zone_equipment_heating_or_no_load_sequence"
-                    ),
-                );
                 continue;
             };
 
@@ -1544,6 +1551,46 @@ impl<'a> Compiler<'a> {
                     "zone_equipment_sequential_heating_fraction_schedule_name",
                 ),
             });
+        }
+
+        if entries.is_empty() {
+            self.error(
+                "MissingZoneEquipmentEntry",
+                "ZoneHVAC:EquipmentList",
+                Some(object_name),
+                Some("equipment"),
+                format!("ZoneHVAC:EquipmentList/{object_name} has no valid equipment entries"),
+            );
+            return None;
+        }
+
+        let mut cooling_sequences = std::collections::BTreeSet::new();
+        let mut heating_sequences = std::collections::BTreeSet::new();
+        for entry in &entries {
+            if !cooling_sequences.insert(entry.cooling_sequence) {
+                self.error(
+                    "DuplicateZoneEquipmentSequence",
+                    "ZoneHVAC:EquipmentList",
+                    Some(object_name),
+                    Some("zone_equipment_cooling_sequence"),
+                    format!(
+                        "ZoneHVAC:EquipmentList/{object_name} has duplicate cooling sequence {}",
+                        entry.cooling_sequence
+                    ),
+                );
+            }
+            if !heating_sequences.insert(entry.heating_or_no_load_sequence) {
+                self.error(
+                    "DuplicateZoneEquipmentSequence",
+                    "ZoneHVAC:EquipmentList",
+                    Some(object_name),
+                    Some("zone_equipment_heating_or_no_load_sequence"),
+                    format!(
+                        "ZoneHVAC:EquipmentList/{object_name} has duplicate heating/no-load sequence {}",
+                        entry.heating_or_no_load_sequence
+                    ),
+                );
+            }
         }
 
         Some(entries)
@@ -1745,6 +1792,34 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn optional_autosize_or_nonnegative_number(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<AutosizeOrNumber> {
+        let value = self.optional_autosize_or_number(object_type, object_name, object, field)?;
+        match value {
+            AutosizeOrNumber::Autosize => Some(AutosizeOrNumber::Autosize),
+            AutosizeOrNumber::Value(number) if number >= 0.0 => {
+                Some(AutosizeOrNumber::Value(number))
+            }
+            AutosizeOrNumber::Value(number) => {
+                self.error(
+                    "InvalidNumericRange",
+                    object_type,
+                    Some(object_name),
+                    Some(field),
+                    format!(
+                        "{object_type}/{object_name} field {field} must be greater than or equal to 0, got {number}"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
     fn number_default(
         &mut self,
         object_type: &str,
@@ -1760,6 +1835,34 @@ impl<'a> Compiler<'a> {
                 default
             }
         }
+    }
+
+    fn number_range_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+        range: std::ops::RangeInclusive<f64>,
+    ) -> f64 {
+        let value = self.number_default(object_type, object_name, object, field, default);
+        if range.contains(&value) {
+            return value;
+        }
+
+        let min = *range.start();
+        let max = *range.end();
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be between {min} and {max}, got {value}"
+            ),
+        );
+        default
     }
 
     fn u32_default(
@@ -1792,6 +1895,37 @@ impl<'a> Compiler<'a> {
             Some(value) => self.u32_value(object_type, object_name, field, value),
             None => None,
         }
+    }
+
+    fn required_positive_u32(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<u32> {
+        let Some(value) = self.optional_u32(object_type, object_name, object, field) else {
+            self.error(
+                "MissingRequiredField",
+                object_type,
+                Some(object_name),
+                Some(field),
+                format!("{object_type}/{object_name} requires field {field}"),
+            );
+            return None;
+        };
+        if value > 0 {
+            return Some(value);
+        }
+
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!("{object_type}/{object_name} field {field} must be greater than 0"),
+        );
+        None
     }
 
     fn auto_default(
@@ -2912,6 +3046,246 @@ mod tests {
         assert_eq!(graph.zone_ideal_loads.len(), 1);
         assert_eq!(graph.zone_ideal_loads[0].cooling_sequence, 1);
         assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_missing_thermostat_setpoint_schedule() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Constant": {
+                    "Cooling Setpoint": {"hourly_value": 24}
+                },
+                "ThermostatSetpoint:DualSetpoint": {
+                    "Dual Setpoints": {
+                        "heating_setpoint_temperature_schedule_name": "Missing Heating",
+                        "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "MissingReference"
+                && diagnostic.object_type == "ThermostatSetpoint:DualSetpoint"
+                && diagnostic.field.as_deref() == Some("heating_setpoint_temperature_schedule_name")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_unsupported_thermostat_control_type() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Constant": {
+                    "Control Type": {"hourly_value": 4},
+                    "Heating Setpoint": {"hourly_value": 21},
+                    "Cooling Setpoint": {"hourly_value": 24}
+                },
+                "Zone": {"Zone One": {}},
+                "ThermostatSetpoint:DualSetpoint": {
+                    "Dual Setpoints": {
+                        "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+                        "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+                    }
+                },
+                "ZoneControl:Thermostat": {
+                    "Zone Thermostat": {
+                        "zone_or_zonelist_name": "Zone One",
+                        "control_type_schedule_name": "Control Type",
+                        "control_1_object_type": "ThermostatSetpoint:SingleHeating",
+                        "control_1_name": "Dual Setpoints"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "InvalidEnumValue"
+                && diagnostic.object_type == "ZoneControl:Thermostat"
+                && diagnostic.field.as_deref() == Some("control_1_object_type")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_missing_ideal_loads_equipment_reference() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Missing Ideal Loads",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "MissingReference"
+                && diagnostic.object_type == "ZoneHVAC:EquipmentList"
+                && diagnostic.field.as_deref() == Some("zone_equipment_name")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_unsupported_zone_equipment_type() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "Fan:ConstantVolume",
+                                "zone_equipment_name": "Supply Fan",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "InvalidEnumValue"
+                && diagnostic.object_type == "ZoneHVAC:EquipmentList"
+                && diagnostic.field.as_deref() == Some("zone_equipment_object_type")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_ideal_loads_invalid_numeric_ranges() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads": {
+                        "zone_supply_air_node_name": "Zone One Inlet",
+                        "maximum_heating_supply_air_humidity_ratio": -0.001,
+                        "minimum_cooling_supply_air_humidity_ratio": 1.2,
+                        "maximum_cooling_air_flow_rate": -0.25,
+                        "cooling_sensible_heat_ratio": 1.5,
+                        "sensible_heat_recovery_effectiveness": -0.1,
+                        "latent_heat_recovery_effectiveness": 1.1
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        let invalid_range_count = result
+            .report
+            .diagnostics
+            .iter()
+            .filter(|diagnostic| {
+                diagnostic.severity == DiagnosticSeverity::Error
+                    && diagnostic.code == "InvalidNumericRange"
+                    && diagnostic.object_type == "ZoneHVAC:IdealLoadsAirSystem"
+            })
+            .count();
+        assert_eq!(invalid_range_count, 6);
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_equipment_sequence_and_connection_duplicates()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Zone": {"Zone One": {}},
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads One": {"zone_supply_air_node_name": "Zone One Inlet"},
+                    "Zone Ideal Loads Two": {"zone_supply_air_node_name": "Zone One Inlet 2"}
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads One",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            },
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads Two",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone Connection One": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_node_name": "Zone One Air Node"
+                    },
+                    "Zone Connection Two": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_node_name": "Zone One Air Node"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert_eq!(result.model, None);
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "DuplicateZoneEquipmentSequence"
+                && diagnostic.field.as_deref() == Some("zone_equipment_cooling_sequence")
+        }));
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "DuplicateZoneEquipmentSequence"
+                && diagnostic.field.as_deref() == Some("zone_equipment_heating_or_no_load_sequence")
+        }));
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "DuplicateZoneEquipmentConnection"
+                && diagnostic.object_type == "ZoneHVAC:EquipmentConnections"
+        }));
 
         Ok(())
     }

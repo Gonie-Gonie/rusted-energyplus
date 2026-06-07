@@ -2452,6 +2452,44 @@ foundation checkpoint:
   public semver tag 없음
 ```
 
+### 현재 진행 기준 보정 — 2026-06-07
+
+v0.8부터 v0.10까지의 실제 진행은 초기 milestone 초안보다 더
+보수적인 증거 계층으로 재정렬되었다. 현재 repo의 active 기준은 개별
+`docs/src/operations/v0.*.0-plan.md` 및 readiness 문서이며, 이 v2
+계획서는 다음 보정 원칙을 따른다.
+
+```text
+v0.8:
+  heat_balance_nomass_001의 Zone Mean Air Temperature conformance gate.
+  IdealLoads 호환성 claim이 아니다.
+
+v0.9:
+  surface_temperature_nomass_001의 zone/surface temperature conformance gate.
+  fenestration, solar, dynamic exterior heat-balance claim이 아니다.
+
+v0.10:
+  thermostat, zone equipment, IdealLoads typed graph 및 baseline-only output
+  evidence gate.
+  IdealLoads load-conformance claim이 아니다.
+
+v0.11 진입 전 hardening:
+  - v0.10 fixture의 EnergyPlus warning을 허용 목록 기반으로 관리한다.
+  - IdealLoads heating/cooling rate가 전부 0인 baseline만으로는 통과하지 않는다.
+  - report skeleton은 first/last뿐 아니라 min/max/nonzero count와
+    EnergyPlus warning summary를 기록한다.
+  - compiler는 HVAC numeric range, equipment sequence, duplicate
+    connection, missing reference, unsupported object type negative test를 갖는다.
+  - NodeList와 node registry는 v0.11의 선행 조건으로 남기고,
+    v0.10 claim에는 포함하지 않는다.
+```
+
+이 보정은 false conformance를 막기 위한 release 운영 기준이다.
+버전명보다 중요한 것은 해당 버전이 실제로 어떤 증거를 blocking gate로
+잠갔는지이며, 다음 버전으로 넘어가기 전에는 직전 버전의 fixture,
+report, negative test, smoke gate가 모두 그 증거 수준에 맞게 정리되어야
+한다.
+
 ### F0 — Reproducible Setup / Oracle Foundation
 
 목표:
