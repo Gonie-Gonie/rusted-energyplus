@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$Version = "0.31.0",
-    [switch]$SkipGateRun
+    [string]$Target = "windows-x64"
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,17 +18,14 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
     throw "Report Python environment is missing. Run .\scripts\dev.cmd setup first."
 }
 
-$script = Join-Path $RepoRoot "tools\reporting\conformance_evidence_report.py"
+$script = Join-Path $RepoRoot "tools\reporting\release_evidence_manifest.py"
 if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
-    throw "Missing report generator: $script"
+    throw "Missing release evidence manifest generator: $script"
 }
 
-$arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version)
-if ($SkipGateRun) {
-    $arguments += "--skip-gate-run"
-}
+$arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version, "--target", $Target)
 
 & $python @arguments
 if ($LASTEXITCODE -ne 0) {
-    throw "Conformance evidence report generation failed with exit code $LASTEXITCODE"
+    throw "Release evidence manifest generation failed with exit code $LASTEXITCODE"
 }

@@ -38,6 +38,7 @@ Verify the current public release gate:
 .\scripts\dev.cmd v0.28-verify
 .\scripts\dev.cmd v0.29-verify
 .\scripts\dev.cmd v0.30-verify
+.\scripts\dev.cmd v0.31-verify
 ```
 
 v0.16 is the versioning/evidence cleanup gate for Road to v1.0. It keeps the
@@ -98,6 +99,10 @@ misread as the same level of support.
 v0.30 enriches algorithm coverage with first evidence and support boundaries
 so limited-conformance algorithms and diagnostic projections are separated in
 the user-facing report.
+
+v0.31 adds the release evidence asset manifest. It records the binary package,
+coverage reports, numerical evidence, file hashes, content types, and user
+purposes that should be published as GitHub Release assets.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not

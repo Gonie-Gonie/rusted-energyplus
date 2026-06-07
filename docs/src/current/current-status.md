@@ -7,9 +7,9 @@ last_reviewed: 2026-06-08
 
 # Current Status
 
-The current public release line is v0.30.0. It enriches algorithm coverage
-with first evidence and support-boundary metadata on top of v0.29 output
-variable coverage metadata, v0.28 input object coverage metadata, the v0.27
+The current public release line is v0.31.0. It adds a release evidence asset
+manifest on top of v0.30 algorithm coverage metadata, v0.29 output variable
+coverage metadata, v0.28 input object coverage metadata, the v0.27
 user-facing support coverage report, v0.26 internal convective gain
 conformance, v0.25 opaque no-mass heat-balance boundary handling, v0.24
 runtime registry infrastructure, v0.23 official ExampleFile static model
@@ -55,6 +55,8 @@ The current public scope includes:
   and gate coverage matrices
 - user-facing support coverage reports with input object, output variable, and
   algorithm support matrices
+- release evidence asset manifests with package/report paths, SHA-256 hashes,
+  content types, user-facing purposes, and JSON evidence summaries
 - source-map and algorithm ledger checks that validate EnergyPlus source
   anchors, Rust target anchors, first cases, proof variables, and blocking
   gates
@@ -86,4 +88,5 @@ Not claimed:
   gain coupling, or broader heat-balance compatibility from the v0.26
   internal-gain milestone
 - new numerical conformance from the v0.27 support coverage report
+- new numerical conformance from the v0.31 release evidence asset manifest
 - broad ExampleFiles compatibility

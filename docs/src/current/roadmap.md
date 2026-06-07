@@ -42,6 +42,9 @@ Current direction:
   references and support-boundary metadata.
 - v0.30 enriched algorithm coverage with first evidence and support-boundary
   metadata for the user-facing report.
+- v0.31 added a release evidence asset manifest so package, numerical
+  evidence, conformance index, and support coverage assets are checked and
+  documented together.
 
 The long-term targets remain:
 

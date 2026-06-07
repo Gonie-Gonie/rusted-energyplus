@@ -15,15 +15,15 @@ Release assets beside the binary zip.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.30.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.31.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.30.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.30.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.30.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.31.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.31.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.31.0/numeric-conformance-evidence.json
 ```
 
 Current GitHub Release asset names:
@@ -43,7 +43,8 @@ hourly series. v0.23.0 added static EIO evidence, v0.24.0 added runtime
 registry infrastructure, v0.25.0 generalized no-mass opaque boundary
 handling, v0.27.0 added user support coverage reporting, v0.28.0 enriched
 input object coverage metadata, and v0.29.0 enriched output variable coverage
-metadata, and v0.30.0 enriched algorithm coverage metadata; those
+metadata, v0.30.0 enriched algorithm coverage metadata, and v0.31.0 added the
+release evidence asset manifest; those
 infrastructure/static/reporting changes do not add series to this numerical
 PDF and are represented instead by their gates plus the conformance index and
 support coverage report:

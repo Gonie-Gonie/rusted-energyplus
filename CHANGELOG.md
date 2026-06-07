@@ -4,6 +4,28 @@
 
 No unreleased changes.
 
+## v0.31.0 - 2026-06-08
+
+Release evidence asset manifest.
+
+### Added
+
+- v0.31 release evidence asset manifest milestone.
+- `release-evidence-manifest` dev command and PowerShell wrapper.
+- `release_evidence_manifest.py` oodocs PDF/HTML/JSON/Markdown generator.
+- release asset manifest docs and release note.
+- v0.31 release verification script.
+
+### Changed
+
+- Release evidence report defaults now target v0.31.0.
+
+### Scope
+
+- v0.31.0 is reporting infrastructure and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.30.0 - 2026-06-08
 
 Algorithm coverage metadata.

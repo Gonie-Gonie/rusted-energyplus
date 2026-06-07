@@ -16,16 +16,16 @@ The support coverage report is the user-facing answer to three questions:
 Generate it through the standard release wrapper:
 
 ```powershell
-.\scripts\dev.cmd support-coverage-report -Version 0.30.0
+.\scripts\dev.cmd support-coverage-report -Version 0.31.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.30.0/support-coverage.md
-.runtime/release-evidence/v0.30.0/support-coverage-report.html
-.runtime/release-evidence/v0.30.0/support-coverage-report.pdf
-.runtime/release-evidence/v0.30.0/support-coverage-report.json
+.runtime/release-evidence/v0.31.0/support-coverage.md
+.runtime/release-evidence/v0.31.0/support-coverage-report.html
+.runtime/release-evidence/v0.31.0/support-coverage-report.pdf
+.runtime/release-evidence/v0.31.0/support-coverage-report.json
 ```
 
 The PDF and HTML are generated with `oodocs` and matplotlib from repository

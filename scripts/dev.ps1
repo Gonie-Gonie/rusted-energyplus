@@ -265,6 +265,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Generate oodocs PDF/HTML/JSON/Markdown user-facing support coverage."
     }
+    "release-evidence-manifest" = @{
+        Path = "release\release-evidence-manifest.ps1"
+        Group = "release"
+        Help = "Generate oodocs PDF/HTML/JSON/Markdown release asset manifest."
+    }
     "github-release" = @{
         Path = "release\github-release.ps1"
         Group = "release"
@@ -420,6 +425,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.30 algorithm coverage metadata gate."
     }
+    "v0.31-verify" = @{
+        Path = "release\v0.31-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.31 release evidence asset manifest gate."
+    }
 }
 
 $Aliases = @{
@@ -455,6 +465,7 @@ $Aliases = @{
     "verify-v0.28" = "v0.28-verify"
     "verify-v0.29" = "v0.29-verify"
     "verify-v0.30" = "v0.30-verify"
+    "verify-v0.31" = "v0.31-verify"
 }
 
 function Show-Commands {

@@ -1,10 +1,10 @@
 [CmdletBinding()]
 param(
-    [string]$Tag = "v0.11.0",
-    [string]$Version = "0.11.0",
+    [string]$Tag = "v0.31.0",
+    [string]$Version = "0.31.0",
     [string]$Repo = "Gonie-Gonie/rusted-energyplus",
-    [string]$Artifact = "dist/eplus-rs-v0.11.0-windows-x64.zip",
-    [string]$NotesFile = "docs/src/releases/v0.11.0.md",
+    [string]$Artifact = "dist/eplus-rs-v0.31.0-windows-x64.zip",
+    [string]$NotesFile = "docs/src/releases/v0.31.0.md",
     [string]$EvidenceRoot = ""
 )
 

@@ -55,7 +55,7 @@ ALGORITHM_STATUS_LABELS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the user support coverage report.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.30.0")
+    parser.add_argument("--version", default="0.31.0")
     return parser.parse_args()
 
 
