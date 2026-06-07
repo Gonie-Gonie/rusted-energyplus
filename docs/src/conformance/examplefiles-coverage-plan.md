@@ -39,7 +39,7 @@ Each selected case must answer:
 | v0.10 | Tier A/B IdealLoads | selected IdealLoads and thermostat cases | thermostat, equipment, and IdealLoads typed graph; baseline-only outputs |
 | v0.11 | Tier B air-side HVAC | `air_side_node_diagnostic_001` first; `5ZoneAirCooled`, PTAC, selected CAV cases later | node and component diagnostics |
 | v0.12 | Tier B air-side HVAC source mapping | v0.11 node fixture and EnergyPlus node source paths | node registration, update, and output source-function map |
-| v0.13 | Tier B plant | selected boiler, pump, chiller, and plant-loop cases | plant graph, node, flow, and equipment diagnostics |
+| v0.13 | Tier B plant foundation | `plant-loop-skeleton.epJSON` typed graph smoke first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant graph intake only; no plant numerical conformance |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -73,6 +73,11 @@ Current v0.11 air-side node diagnostic case:
 Current v0.12 source-mapping evidence:
 
 - `node-state-source-map.md`
+
+Current v0.13 plant foundation evidence:
+
+- `data/testcases/minimal/plant-loop-skeleton.epJSON`
+- `plant-loop-skeleton-smoke`
 
 Planned fields:
 

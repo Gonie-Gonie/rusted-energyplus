@@ -257,6 +257,29 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     );
     println!("  nodes: {}", model.typed.nodes.len());
     println!("  node_lists: {}", model.typed.node_lists.len());
+    println!("  plant_loops: {}", model.typed.plant_loops.len());
+    println!("  plant_branches: {}", model.typed.plant_branches.len());
+    println!(
+        "  plant_branch_lists: {}",
+        model.typed.plant_branch_lists.len()
+    );
+    println!("  plant_connectors: {}", model.typed.plant_connectors.len());
+    println!(
+        "  plant_connector_lists: {}",
+        model.typed.plant_connector_lists.len()
+    );
+    println!(
+        "  pumps_constant_speed: {}",
+        model.typed.pumps_constant_speed.len()
+    );
+    println!(
+        "  boilers_hot_water: {}",
+        model.typed.boilers_hot_water.len()
+    );
+    println!(
+        "  chillers_electric_eir: {}",
+        model.typed.chillers_electric_eir.len()
+    );
     println!("  run_periods: {}", model.typed.run_periods.len());
     println!("  zone_surface_edges: {}", model.graph.zone_surfaces.len());
     println!(
@@ -286,6 +309,22 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!(
         "  zone_air_node_edges: {}",
         model.graph.zone_air_nodes.len()
+    );
+    println!(
+        "  plant_loop_branch_list_edges: {}",
+        model.graph.plant_loop_branch_lists.len()
+    );
+    println!(
+        "  plant_branch_list_member_edges: {}",
+        model.graph.plant_branch_list_members.len()
+    );
+    println!(
+        "  plant_connector_list_member_edges: {}",
+        model.graph.plant_connector_list_members.len()
+    );
+    println!(
+        "  plant_branch_component_edges: {}",
+        model.graph.plant_branch_components.len()
     );
     println!("  stages: {}", plan.stages.len());
     println!("  steps: {}", plan.step_count());
@@ -4743,6 +4782,23 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     );
     println!("  nodes: {}", model.nodes.len());
     println!("  node_lists: {}", model.node_lists.len());
+    println!("  plant_loops: {}", model.plant_loops.len());
+    println!("  plant_branches: {}", model.plant_branches.len());
+    println!("  plant_branch_lists: {}", model.plant_branch_lists.len());
+    println!("  plant_connectors: {}", model.plant_connectors.len());
+    println!(
+        "  plant_connector_lists: {}",
+        model.plant_connector_lists.len()
+    );
+    println!(
+        "  pumps_constant_speed: {}",
+        model.pumps_constant_speed.len()
+    );
+    println!("  boilers_hot_water: {}", model.boilers_hot_water.len());
+    println!(
+        "  chillers_electric_eir: {}",
+        model.chillers_electric_eir.len()
+    );
     println!("  zones: {}", model.zones.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());

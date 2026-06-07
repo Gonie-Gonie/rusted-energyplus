@@ -31,6 +31,7 @@ EnergyPlus 26.1.0 oracle:
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
 - baseline-only thermostat and IdealLoads evidence, plus diagnostic-only
   air-side node baseline/projection evidence
+- smoke-level PlantLoop typed graph skeleton evidence
 
 This public scope does not claim:
 
@@ -38,6 +39,7 @@ This public scope does not claim:
 - HVAC or plant simulation compatibility
 - general zone-temperature conformance
 - node or IdealLoads numerical conformance
+- plant numerical conformance
 - meter conformance
 - full runtime simulation compatibility
 
@@ -86,7 +88,8 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.10-verify
 .\scripts\dev.cmd v0.11-verify
 .\scripts\dev.cmd v0.12-verify
-.\scripts\dev.cmd conformance-evidence-report -Version 0.12.0
+.\scripts\dev.cmd v0.13-verify
+.\scripts\dev.cmd conformance-evidence-report -Version 0.13.0
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
@@ -95,7 +98,10 @@ thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
 baseline evidence plus `NodeStateStore`-backed Rust projection plumbing, with
 no node numerical conformance claim. v0.12 is a node source-mapping and
 evidence-policy release; it also packages the promoted v0.8/v0.9 numerical
-evidence as PDF/HTML/JSON under `evidence/v0.12.0`.
+evidence as PDF/HTML/JSON under `evidence/v0.12.0`. v0.13 is a PlantLoop
+typed graph skeleton smoke gate and still makes no plant numerical conformance
+claim; it packages the same promoted numerical evidence set under
+`evidence/v0.13.0`.
 
 Developer-only diagnostics:
 

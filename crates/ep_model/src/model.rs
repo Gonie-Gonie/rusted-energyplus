@@ -68,6 +68,10 @@ typed_id!(NodeId);
 typed_id!(NodeListId);
 typed_id!(ComponentId);
 typed_id!(LoopId);
+typed_id!(BranchId);
+typed_id!(BranchListId);
+typed_id!(ConnectorId);
+typed_id!(ConnectorListId);
 typed_id!(OutputHandle);
 
 /// Compile-time name map from EnergyPlus names to typed IDs.
@@ -768,6 +772,173 @@ pub struct ZoneEquipmentConnection {
     pub zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: Option<NormalizedName>,
 }
 
+/// One central plant loop shell.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantLoop {
+    /// Typed ID.
+    pub id: LoopId,
+    /// Plant loop name.
+    pub name: NormalizedName,
+    /// Fluid type as declared by EnergyPlus input.
+    pub fluid_type: NormalizedName,
+    /// Plant side inlet node.
+    pub plant_side_inlet_node: NodeId,
+    /// Plant side outlet node.
+    pub plant_side_outlet_node: NodeId,
+    /// Plant side branch list.
+    pub plant_side_branch_list: BranchListId,
+    /// Optional plant side connector list.
+    pub plant_side_connector_list: Option<ConnectorListId>,
+    /// Demand side inlet node.
+    pub demand_side_inlet_node: NodeId,
+    /// Demand side outlet node.
+    pub demand_side_outlet_node: NodeId,
+    /// Demand side branch list.
+    pub demand_side_branch_list: BranchListId,
+    /// Optional demand side connector list.
+    pub demand_side_connector_list: Option<ConnectorListId>,
+    /// Load distribution scheme as declared by EnergyPlus input.
+    pub load_distribution_scheme: Option<NormalizedName>,
+}
+
+/// Component reference inside one plant branch.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantBranchComponent {
+    /// Component object type.
+    pub object_type: NormalizedName,
+    /// Component object name.
+    pub name: NormalizedName,
+    /// Component inlet node.
+    pub inlet_node: NodeId,
+    /// Component outlet node.
+    pub outlet_node: NodeId,
+}
+
+/// Plant branch with ordered components.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantBranch {
+    /// Typed ID.
+    pub id: BranchId,
+    /// Branch name.
+    pub name: NormalizedName,
+    /// Ordered branch components.
+    pub components: Vec<PlantBranchComponent>,
+}
+
+/// Ordered branch list.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantBranchList {
+    /// Typed ID.
+    pub id: BranchListId,
+    /// Branch list name.
+    pub name: NormalizedName,
+    /// Branches in EnergyPlus flow order.
+    pub branches: Vec<BranchId>,
+}
+
+/// Connector type supported by the plant skeleton.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PlantConnectorKind {
+    /// `Connector:Splitter`.
+    Splitter,
+    /// `Connector:Mixer`.
+    Mixer,
+}
+
+/// Plant connector with resolved branch references.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantConnector {
+    /// Typed ID.
+    pub id: ConnectorId,
+    /// Connector name.
+    pub name: NormalizedName,
+    /// Connector kind.
+    pub kind: PlantConnectorKind,
+    /// Inlet branches for the connector.
+    pub inlet_branches: Vec<BranchId>,
+    /// Outlet branches for the connector.
+    pub outlet_branches: Vec<BranchId>,
+}
+
+/// Connector reference inside a connector list.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PlantConnectorListEntry {
+    /// Connector kind.
+    pub kind: PlantConnectorKind,
+    /// Connector ID.
+    pub connector: ConnectorId,
+}
+
+/// Ordered plant connector list.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantConnectorList {
+    /// Typed ID.
+    pub id: ConnectorListId,
+    /// Connector list name.
+    pub name: NormalizedName,
+    /// Connector entries in EnergyPlus order.
+    pub connectors: Vec<PlantConnectorListEntry>,
+}
+
+/// Typed `Pump:ConstantSpeed` identity and node endpoints.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PumpConstantSpeed {
+    /// Typed ID within the constant-speed pump subset.
+    pub id: ComponentId,
+    /// Pump name.
+    pub name: NormalizedName,
+    /// Inlet node.
+    pub inlet_node: NodeId,
+    /// Outlet node.
+    pub outlet_node: NodeId,
+    /// Optional design flow rate in m3/s.
+    pub design_flow_rate_m3_per_s: Option<AutosizeOrNumber>,
+    /// Optional design pump head in Pa.
+    pub design_pump_head_pa: Option<f64>,
+    /// Pump control type string.
+    pub pump_control_type: Option<NormalizedName>,
+}
+
+/// Typed `Boiler:HotWater` identity and node endpoints.
+#[derive(Clone, Debug, PartialEq)]
+pub struct BoilerHotWater {
+    /// Typed ID within the hot-water boiler subset.
+    pub id: ComponentId,
+    /// Boiler name.
+    pub name: NormalizedName,
+    /// Fuel type string.
+    pub fuel_type: Option<NormalizedName>,
+    /// Inlet node.
+    pub inlet_node: NodeId,
+    /// Outlet node.
+    pub outlet_node: NodeId,
+    /// Optional nominal capacity in W.
+    pub nominal_capacity_w: Option<AutosizeOrNumber>,
+    /// Optional design water flow rate in m3/s.
+    pub design_water_flow_rate_m3_per_s: Option<AutosizeOrNumber>,
+}
+
+/// Typed `Chiller:Electric:EIR` identity and node endpoints.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ChillerElectricEir {
+    /// Typed ID within the electric EIR chiller subset.
+    pub id: ComponentId,
+    /// Chiller name.
+    pub name: NormalizedName,
+    /// Chilled water inlet node.
+    pub chilled_water_inlet_node: NodeId,
+    /// Chilled water outlet node.
+    pub chilled_water_outlet_node: NodeId,
+    /// Condenser inlet node, when declared.
+    pub condenser_inlet_node: Option<NodeId>,
+    /// Condenser outlet node, when declared.
+    pub condenser_outlet_node: Option<NodeId>,
+    /// Optional reference capacity in W.
+    pub reference_capacity_w: Option<AutosizeOrNumber>,
+    /// Optional reference COP.
+    pub reference_cop: Option<f64>,
+}
+
 /// Building surface type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SurfaceType {
@@ -910,6 +1081,38 @@ pub struct TypedModel {
     pub node_lists: Vec<NodeList>,
     /// NodeList names.
     pub node_list_names: NameMap<NodeListId>,
+    /// Plant loops.
+    pub plant_loops: Vec<PlantLoop>,
+    /// Plant loop names.
+    pub plant_loop_names: NameMap<LoopId>,
+    /// Plant branches.
+    pub plant_branches: Vec<PlantBranch>,
+    /// Plant branch names.
+    pub plant_branch_names: NameMap<BranchId>,
+    /// Plant branch lists.
+    pub plant_branch_lists: Vec<PlantBranchList>,
+    /// Plant branch list names.
+    pub plant_branch_list_names: NameMap<BranchListId>,
+    /// Plant connectors.
+    pub plant_connectors: Vec<PlantConnector>,
+    /// Plant connector names.
+    pub plant_connector_names: NameMap<ConnectorId>,
+    /// Plant connector lists.
+    pub plant_connector_lists: Vec<PlantConnectorList>,
+    /// Plant connector list names.
+    pub plant_connector_list_names: NameMap<ConnectorListId>,
+    /// Constant-speed pumps.
+    pub pumps_constant_speed: Vec<PumpConstantSpeed>,
+    /// Constant-speed pump names.
+    pub pump_constant_speed_names: NameMap<ComponentId>,
+    /// Hot-water boilers.
+    pub boilers_hot_water: Vec<BoilerHotWater>,
+    /// Hot-water boiler names.
+    pub boiler_hot_water_names: NameMap<ComponentId>,
+    /// Electric EIR chillers.
+    pub chillers_electric_eir: Vec<ChillerElectricEir>,
+    /// Electric EIR chiller names.
+    pub chiller_electric_eir_names: NameMap<ComponentId>,
     /// Zones.
     pub zones: Vec<Zone>,
     /// Zone names.
@@ -953,6 +1156,22 @@ impl Default for TypedModel {
             node_names: NameMap::default(),
             node_lists: Vec::new(),
             node_list_names: NameMap::default(),
+            plant_loops: Vec::new(),
+            plant_loop_names: NameMap::default(),
+            plant_branches: Vec::new(),
+            plant_branch_names: NameMap::default(),
+            plant_branch_lists: Vec::new(),
+            plant_branch_list_names: NameMap::default(),
+            plant_connectors: Vec::new(),
+            plant_connector_names: NameMap::default(),
+            plant_connector_lists: Vec::new(),
+            plant_connector_list_names: NameMap::default(),
+            pumps_constant_speed: Vec::new(),
+            pump_constant_speed_names: NameMap::default(),
+            boilers_hot_water: Vec::new(),
+            boiler_hot_water_names: NameMap::default(),
+            chillers_electric_eir: Vec::new(),
+            chiller_electric_eir_names: NameMap::default(),
             zones: Vec::new(),
             zone_names: NameMap::default(),
             surfaces: Vec::new(),
@@ -981,6 +1200,14 @@ impl TypedModel {
             + self.zone_equipment_lists.len()
             + self.zone_equipment_connections.len()
             + self.node_lists.len()
+            + self.plant_loops.len()
+            + self.plant_branches.len()
+            + self.plant_branch_lists.len()
+            + self.plant_connectors.len()
+            + self.plant_connector_lists.len()
+            + self.pumps_constant_speed.len()
+            + self.boilers_hot_water.len()
+            + self.chillers_electric_eir.len()
             + self.zones.len()
             + self.surfaces.len()
     }
@@ -1023,6 +1250,14 @@ pub struct ModelGraph {
     pub ideal_loads_supply_nodes: Vec<IdealLoadsSupplyNodeEdge>,
     /// Zone air-node edges.
     pub zone_air_nodes: Vec<ZoneAirNodeEdge>,
+    /// Plant loop to branch-list edges.
+    pub plant_loop_branch_lists: Vec<PlantLoopBranchListEdge>,
+    /// Branch-list membership edges.
+    pub plant_branch_list_members: Vec<PlantBranchListMemberEdge>,
+    /// Connector-list membership edges.
+    pub plant_connector_list_members: Vec<PlantConnectorListMemberEdge>,
+    /// Branch to component edges.
+    pub plant_branch_components: Vec<PlantBranchComponentEdge>,
 }
 
 impl ModelGraph {
@@ -1109,8 +1344,77 @@ impl ModelGraph {
                         })
                 })
                 .collect(),
+            plant_loop_branch_lists: plant_loop_branch_lists(model),
+            plant_branch_list_members: model
+                .plant_branch_lists
+                .iter()
+                .flat_map(|list| {
+                    list.branches
+                        .iter()
+                        .enumerate()
+                        .map(move |(index, branch)| PlantBranchListMemberEdge {
+                            branch_list: list.id,
+                            branch: *branch,
+                            index: index as u32,
+                        })
+                })
+                .collect(),
+            plant_connector_list_members: model
+                .plant_connector_lists
+                .iter()
+                .flat_map(|list| {
+                    list.connectors
+                        .iter()
+                        .enumerate()
+                        .map(move |(index, entry)| PlantConnectorListMemberEdge {
+                            connector_list: list.id,
+                            connector: entry.connector,
+                            kind: entry.kind,
+                            index: index as u32,
+                        })
+                })
+                .collect(),
+            plant_branch_components: model
+                .plant_branches
+                .iter()
+                .flat_map(|branch| {
+                    branch
+                        .components
+                        .iter()
+                        .enumerate()
+                        .map(move |(index, component)| PlantBranchComponentEdge {
+                            branch: branch.id,
+                            component_type: component.object_type.clone(),
+                            component_name: component.name.clone(),
+                            inlet_node: component.inlet_node,
+                            outlet_node: component.outlet_node,
+                            index: index as u32,
+                        })
+                })
+                .collect(),
         }
     }
+}
+
+fn plant_loop_branch_lists(model: &TypedModel) -> Vec<PlantLoopBranchListEdge> {
+    model
+        .plant_loops
+        .iter()
+        .flat_map(|plant_loop| {
+            [
+                PlantLoopBranchListEdge {
+                    plant_loop: plant_loop.id,
+                    side: PlantLoopSide::Plant,
+                    branch_list: plant_loop.plant_side_branch_list,
+                },
+                PlantLoopBranchListEdge {
+                    plant_loop: plant_loop.id,
+                    side: PlantLoopSide::Demand,
+                    branch_list: plant_loop.demand_side_branch_list,
+                },
+            ]
+        })
+        .collect()
 }
 
 fn sorted_zone_ideal_loads(model: &TypedModel) -> Vec<ZoneIdealLoadsEdge> {
@@ -1237,6 +1541,67 @@ pub struct ZoneIdealLoadsEdge {
     pub cooling_sequence: u32,
     /// Heating or no-load sequence.
     pub heating_or_no_load_sequence: u32,
+}
+
+/// Side of a plant loop.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PlantLoopSide {
+    /// Supply/plant side.
+    Plant,
+    /// Demand side.
+    Demand,
+}
+
+/// Plant loop to branch-list relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PlantLoopBranchListEdge {
+    /// Plant loop ID.
+    pub plant_loop: LoopId,
+    /// Loop side.
+    pub side: PlantLoopSide,
+    /// Branch list ID.
+    pub branch_list: BranchListId,
+}
+
+/// Branch-list membership relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PlantBranchListMemberEdge {
+    /// Branch list ID.
+    pub branch_list: BranchListId,
+    /// Branch ID.
+    pub branch: BranchId,
+    /// Zero-based member index.
+    pub index: u32,
+}
+
+/// Connector-list membership relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PlantConnectorListMemberEdge {
+    /// Connector list ID.
+    pub connector_list: ConnectorListId,
+    /// Connector ID.
+    pub connector: ConnectorId,
+    /// Connector kind.
+    pub kind: PlantConnectorKind,
+    /// Zero-based member index.
+    pub index: u32,
+}
+
+/// Branch to component relation.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PlantBranchComponentEdge {
+    /// Branch ID.
+    pub branch: BranchId,
+    /// Component object type.
+    pub component_type: NormalizedName,
+    /// Component name.
+    pub component_name: NormalizedName,
+    /// Component inlet node.
+    pub inlet_node: NodeId,
+    /// Component outlet node.
+    pub outlet_node: NodeId,
+    /// Zero-based component index.
+    pub index: u32,
 }
 
 #[cfg(test)]

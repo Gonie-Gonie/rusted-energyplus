@@ -45,8 +45,9 @@ separate in docs, scripts, and release language.
 | v0.8 | Uncontrolled zone heat-balance port release | first tolerance-gated heat-balance subset |
 | v0.9 | Surface/fenestration/radiation expansion release | `surface_temperature_nomass_001` surface temperatures only |
 | v0.10 | IdealLoads/thermostat release | `ideal_loads_thermostat_001` typed graph and baseline-only output availability only |
-| v0.11 | Air-side node/simple HVAC component release | declared cases only |
-| v0.12 | Plant loop skeleton/node flow release | declared cases only |
+| v0.11 | Air-side node diagnostic release | baseline-only node evidence and diagnostic Rust projection only |
+| v0.12 | Node source mapping release | planning guard before node or IdealLoads numerical conformance |
+| v0.13 | Plant loop skeleton release | typed graph smoke only; no plant numerical conformance |
 | v1.0 | Declared compatibility subset release | locked supported subset only |
 
 ## Retroactive Audit Rules
@@ -178,6 +179,20 @@ thermostat, zone equipment, and IdealLoads typed graph coverage. It proves
 baseline output availability and graph connectivity only. It is not an
 IdealLoads load-conformance claim, and it keeps `comparison_class = "smoke"`,
 `conformance_claim = false`, and `tolerance_policy: none`.
+
+v0.11 decision: `air_side_node_diagnostic_001` is a diagnostic-only node gate.
+It records EnergyPlus baseline node-state outputs and a `NodeStateStore`-backed
+Rust projection with `algorithm_parity: false`, but it is not a node, HVAC, or
+IdealLoads numerical conformance claim.
+
+v0.12 decision: node source mapping is a planning guard. It locks EnergyPlus
+26.1.0 node registration, storage, update, and output paths before any future
+node-state numerical claim may be promoted.
+
+v0.13 decision: `plant-loop-skeleton.epJSON` is a typed graph smoke fixture for
+PlantLoop, branch, connector, and first pump/boiler/chiller identity records.
+It is not an EnergyPlus baseline case and is not a plant numerical conformance
+claim.
 
 ## Immediate Work Order
 

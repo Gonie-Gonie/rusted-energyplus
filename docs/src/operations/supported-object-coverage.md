@@ -42,7 +42,15 @@ Current table:
 | ZoneHVAC:EquipmentList | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 equipment list resolves IdealLoads equipment entries and validates sequence integrity before v0.11 |
 | ZoneHVAC:EquipmentConnections | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 zone equipment connection resolves zone and equipment list; duplicate zone connections are rejected; v0.11 records zone air-node diagnostic outputs and NodeStateStore projection |
 | ZoneHVAC:IdealLoadsAirSystem | yes | partial | yes | yes | yes | partial | planned | baseline-only | v0.10 typed graph coverage in `ideal_loads_thermostat_001`, with nonzero baseline signal and range diagnostics; not an IdealLoads load-conformance claim |
-| PlantLoop | yes | planned | planned | planned | planned | no | no | no | generic raw parse only |
+| PlantLoop | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; loop-side branch-list and connector-list references resolve |
+| Branch | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; component nodes register and first supported component identities are linked |
+| BranchList | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; branch members resolve |
+| Connector:Splitter | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; inlet/outlet branch references resolve |
+| Connector:Mixer | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; inlet/outlet branch references resolve |
+| ConnectorList | yes | partial | yes | yes | yes | partial | no | no | v0.13 typed graph smoke only; connector entries resolve |
+| Pump:ConstantSpeed | yes | partial | yes | yes | partial | partial | no | no | v0.13 typed identity only; no pump head, power, or flow parity |
+| Boiler:HotWater | yes | partial | yes | yes | partial | partial | no | no | v0.13 typed identity only; no boiler load or fuel parity |
+| Chiller:Electric:EIR | yes | partial | yes | yes | partial | partial | no | no | v0.13 typed identity only; no chiller load, COP, or condenser-loop parity |
 
 v0.1.0 RawModel parse support is intentionally generic: unknown object types are
 preserved in RawModel and reported as untracked by the CLI. Typed support is a

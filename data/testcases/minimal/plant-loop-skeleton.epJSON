@@ -1,0 +1,144 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "Pump:ConstantSpeed": {
+    "HW Pump": {
+      "inlet_node_name": "HW Supply Inlet",
+      "outlet_node_name": "HW Pump Outlet",
+      "design_flow_rate": 0.001,
+      "design_pump_head": 179352,
+      "pump_control_type": "Intermittent"
+    }
+  },
+  "Boiler:HotWater": {
+    "HW Boiler": {
+      "fuel_type": "NaturalGas",
+      "nominal_capacity": 10000,
+      "design_water_flow_rate": 0.001,
+      "boiler_water_inlet_node_name": "HW Pump Outlet",
+      "boiler_water_outlet_node_name": "HW Supply Outlet"
+    }
+  },
+  "Chiller:Electric:EIR": {
+    "CW Chiller": {
+      "reference_capacity": 12000,
+      "reference_cop": 3.2,
+      "chilled_water_inlet_node_name": "CW Supply Inlet",
+      "chilled_water_outlet_node_name": "CW Supply Outlet",
+      "condenser_inlet_node_name": "Cond Inlet",
+      "condenser_outlet_node_name": "Cond Outlet"
+    }
+  },
+  "Branch": {
+    "HW Supply Inlet Branch": {
+      "components": [
+        {
+          "component_object_type": "Pump:ConstantSpeed",
+          "component_name": "HW Pump",
+          "component_inlet_node_name": "HW Supply Inlet",
+          "component_outlet_node_name": "HW Pump Outlet"
+        }
+      ]
+    },
+    "HW Boiler Branch": {
+      "components": [
+        {
+          "component_object_type": "Boiler:HotWater",
+          "component_name": "HW Boiler",
+          "component_inlet_node_name": "HW Pump Outlet",
+          "component_outlet_node_name": "HW Supply Outlet"
+        }
+      ]
+    },
+    "HW Demand Branch": {
+      "components": [
+        {
+          "component_object_type": "Pipe:Adiabatic",
+          "component_name": "HW Demand Pipe",
+          "component_inlet_node_name": "HW Demand Inlet",
+          "component_outlet_node_name": "HW Demand Outlet"
+        }
+      ]
+    },
+    "CW Chiller Branch": {
+      "components": [
+        {
+          "component_object_type": "Chiller:Electric:EIR",
+          "component_name": "CW Chiller",
+          "component_inlet_node_name": "CW Supply Inlet",
+          "component_outlet_node_name": "CW Supply Outlet"
+        }
+      ]
+    }
+  },
+  "BranchList": {
+    "HW Supply Branches": {
+      "branches": [
+        {
+          "branch_name": "HW Supply Inlet Branch"
+        },
+        {
+          "branch_name": "HW Boiler Branch"
+        }
+      ]
+    },
+    "HW Demand Branches": {
+      "branches": [
+        {
+          "branch_name": "HW Demand Branch"
+        }
+      ]
+    },
+    "CW Supply Branches": {
+      "branches": [
+        {
+          "branch_name": "CW Chiller Branch"
+        }
+      ]
+    }
+  },
+  "Connector:Splitter": {
+    "HW Supply Splitter": {
+      "inlet_branch_name": "HW Supply Inlet Branch",
+      "branches": [
+        {
+          "outlet_branch_name": "HW Boiler Branch"
+        }
+      ]
+    }
+  },
+  "Connector:Mixer": {
+    "HW Supply Mixer": {
+      "outlet_branch_name": "HW Boiler Branch",
+      "branches": [
+        {
+          "inlet_branch_name": "HW Supply Inlet Branch"
+        }
+      ]
+    }
+  },
+  "ConnectorList": {
+    "HW Supply Connectors": {
+      "connector_1_object_type": "Connector:Splitter",
+      "connector_1_name": "HW Supply Splitter",
+      "connector_2_object_type": "Connector:Mixer",
+      "connector_2_name": "HW Supply Mixer"
+    }
+  },
+  "PlantLoop": {
+    "Hot Water Loop": {
+      "fluid_type": "Water",
+      "plant_side_inlet_node_name": "HW Supply Inlet",
+      "plant_side_outlet_node_name": "HW Supply Outlet",
+      "plant_side_branch_list_name": "HW Supply Branches",
+      "plant_side_connector_list_name": "HW Supply Connectors",
+      "demand_side_inlet_node_name": "HW Demand Inlet",
+      "demand_side_outlet_node_name": "HW Demand Outlet",
+      "demand_side_branch_list_name": "HW Demand Branches",
+      "load_distribution_scheme": "SequentialLoad"
+    }
+  }
+}

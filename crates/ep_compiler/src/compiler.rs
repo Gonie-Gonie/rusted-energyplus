@@ -1,12 +1,15 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AutoOrNumber, AutosizeOrNumber, Building, Construction, ConstructionId,
+    AutoOrNumber, AutosizeOrNumber, BoilerHotWater, BranchId, BranchListId, Building,
+    ChillerElectricEir, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind,
-    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
-    OutdoorAirEconomizerType, OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId,
+    IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
+    MaterialKind, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
+    OtherEquipment, OutdoorAirEconomizerType, OutsideBoundaryCondition, PlantBranch,
+    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
     ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
     ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
     SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
@@ -201,6 +204,15 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ZoneHVAC:IdealLoadsAirSystem",
     "ZoneHVAC:EquipmentList",
     "ZoneHVAC:EquipmentConnections",
+    "PlantLoop",
+    "Branch",
+    "BranchList",
+    "Connector:Splitter",
+    "Connector:Mixer",
+    "ConnectorList",
+    "Pump:ConstantSpeed",
+    "Boiler:HotWater",
+    "Chiller:Electric:EIR",
     "Zone",
     "BuildingSurface:Detailed",
 ];
@@ -242,6 +254,14 @@ impl<'a> Compiler<'a> {
         self.parse_ideal_loads_air_systems(&mut model);
         self.parse_zone_equipment_lists(&mut model);
         self.parse_zone_equipment_connections(&mut model);
+        self.parse_pumps_constant_speed(&mut model);
+        self.parse_boilers_hot_water(&mut model);
+        self.parse_chillers_electric_eir(&mut model);
+        self.parse_plant_branches(&mut model);
+        self.parse_plant_branch_lists(&mut model);
+        self.parse_plant_connectors(&mut model);
+        self.parse_plant_connector_lists(&mut model);
+        self.parse_plant_loops(&mut model);
         self.parse_other_equipment(&mut model);
         self.parse_surfaces(&mut model);
 
@@ -1319,6 +1339,444 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_pumps_constant_speed(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Pump:ConstantSpeed") {
+            let Some(inlet_node_name) =
+                self.required_string("Pump:ConstantSpeed", &name, &object, "inlet_node_name")
+            else {
+                continue;
+            };
+            let Some(outlet_node_name) =
+                self.required_string("Pump:ConstantSpeed", &name, &object, "outlet_node_name")
+            else {
+                continue;
+            };
+            let Some(inlet_node) = self.register_node(model, &inlet_node_name) else {
+                continue;
+            };
+            let Some(outlet_node) = self.register_node(model, &outlet_node_name) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id(
+                "Pump:ConstantSpeed",
+                &name,
+                model.pumps_constant_speed.len(),
+            ) else {
+                continue;
+            };
+            let id = ComponentId(id_value);
+            if model.pump_constant_speed_names.insert(&name, id).is_some() {
+                self.duplicate_name("Pump:ConstantSpeed", &name);
+                continue;
+            }
+
+            model.pumps_constant_speed.push(PumpConstantSpeed {
+                id,
+                name: NormalizedName::new(&name),
+                inlet_node,
+                outlet_node,
+                design_flow_rate_m3_per_s: self.optional_autosize_or_nonnegative_number(
+                    "Pump:ConstantSpeed",
+                    &name,
+                    &object,
+                    "design_flow_rate",
+                ),
+                design_pump_head_pa: self.optional_number(
+                    "Pump:ConstantSpeed",
+                    &name,
+                    &object,
+                    "design_pump_head",
+                ),
+                pump_control_type: self
+                    .optional_string("Pump:ConstantSpeed", &name, &object, "pump_control_type")
+                    .map(|value| NormalizedName::new(&value)),
+            });
+        }
+    }
+
+    fn parse_boilers_hot_water(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Boiler:HotWater") {
+            let Some(inlet_node_name) = self.required_string(
+                "Boiler:HotWater",
+                &name,
+                &object,
+                "boiler_water_inlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(outlet_node_name) = self.required_string(
+                "Boiler:HotWater",
+                &name,
+                &object,
+                "boiler_water_outlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(inlet_node) = self.register_node(model, &inlet_node_name) else {
+                continue;
+            };
+            let Some(outlet_node) = self.register_node(model, &outlet_node_name) else {
+                continue;
+            };
+            let Some(id_value) =
+                self.checked_id("Boiler:HotWater", &name, model.boilers_hot_water.len())
+            else {
+                continue;
+            };
+            let id = ComponentId(id_value);
+            if model.boiler_hot_water_names.insert(&name, id).is_some() {
+                self.duplicate_name("Boiler:HotWater", &name);
+                continue;
+            }
+
+            model.boilers_hot_water.push(BoilerHotWater {
+                id,
+                name: NormalizedName::new(&name),
+                fuel_type: self
+                    .optional_string("Boiler:HotWater", &name, &object, "fuel_type")
+                    .map(|value| NormalizedName::new(&value)),
+                inlet_node,
+                outlet_node,
+                nominal_capacity_w: self.optional_autosize_or_nonnegative_number(
+                    "Boiler:HotWater",
+                    &name,
+                    &object,
+                    "nominal_capacity",
+                ),
+                design_water_flow_rate_m3_per_s: self.optional_autosize_or_nonnegative_number(
+                    "Boiler:HotWater",
+                    &name,
+                    &object,
+                    "design_water_flow_rate",
+                ),
+            });
+        }
+    }
+
+    fn parse_chillers_electric_eir(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Chiller:Electric:EIR") {
+            let Some(chilled_water_inlet_node_name) = self.required_string(
+                "Chiller:Electric:EIR",
+                &name,
+                &object,
+                "chilled_water_inlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(chilled_water_outlet_node_name) = self.required_string(
+                "Chiller:Electric:EIR",
+                &name,
+                &object,
+                "chilled_water_outlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(chilled_water_inlet_node) =
+                self.register_node(model, &chilled_water_inlet_node_name)
+            else {
+                continue;
+            };
+            let Some(chilled_water_outlet_node) =
+                self.register_node(model, &chilled_water_outlet_node_name)
+            else {
+                continue;
+            };
+            let condenser_inlet_node = self
+                .optional_string(
+                    "Chiller:Electric:EIR",
+                    &name,
+                    &object,
+                    "condenser_inlet_node_name",
+                )
+                .and_then(|value| self.register_node(model, &value));
+            let condenser_outlet_node = self
+                .optional_string(
+                    "Chiller:Electric:EIR",
+                    &name,
+                    &object,
+                    "condenser_outlet_node_name",
+                )
+                .and_then(|value| self.register_node(model, &value));
+            let Some(id_value) = self.checked_id(
+                "Chiller:Electric:EIR",
+                &name,
+                model.chillers_electric_eir.len(),
+            ) else {
+                continue;
+            };
+            let id = ComponentId(id_value);
+            if model.chiller_electric_eir_names.insert(&name, id).is_some() {
+                self.duplicate_name("Chiller:Electric:EIR", &name);
+                continue;
+            }
+
+            model.chillers_electric_eir.push(ChillerElectricEir {
+                id,
+                name: NormalizedName::new(&name),
+                chilled_water_inlet_node,
+                chilled_water_outlet_node,
+                condenser_inlet_node,
+                condenser_outlet_node,
+                reference_capacity_w: self.optional_autosize_or_nonnegative_number(
+                    "Chiller:Electric:EIR",
+                    &name,
+                    &object,
+                    "reference_capacity",
+                ),
+                reference_cop: self.optional_number(
+                    "Chiller:Electric:EIR",
+                    &name,
+                    &object,
+                    "reference_cop",
+                ),
+            });
+        }
+    }
+
+    fn parse_plant_branches(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Branch") {
+            let Some(components) = self.plant_branch_components(model, &name, &object) else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id("Branch", &name, model.plant_branches.len())
+            else {
+                continue;
+            };
+            let id = BranchId(id_value);
+            if model.plant_branch_names.insert(&name, id).is_some() {
+                self.duplicate_name("Branch", &name);
+                continue;
+            }
+
+            model.plant_branches.push(PlantBranch {
+                id,
+                name: NormalizedName::new(&name),
+                components,
+            });
+        }
+    }
+
+    fn parse_plant_branch_lists(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("BranchList") {
+            let Some(branches) = self.plant_branch_list_members(model, &name, &object) else {
+                continue;
+            };
+            let Some(id_value) =
+                self.checked_id("BranchList", &name, model.plant_branch_lists.len())
+            else {
+                continue;
+            };
+            let id = BranchListId(id_value);
+            if model.plant_branch_list_names.insert(&name, id).is_some() {
+                self.duplicate_name("BranchList", &name);
+                continue;
+            }
+
+            model.plant_branch_lists.push(PlantBranchList {
+                id,
+                name: NormalizedName::new(&name),
+                branches,
+            });
+        }
+    }
+
+    fn parse_plant_connectors(&mut self, model: &mut TypedModel) {
+        for (object_type, kind) in [
+            ("Connector:Splitter", PlantConnectorKind::Splitter),
+            ("Connector:Mixer", PlantConnectorKind::Mixer),
+        ] {
+            for (name, object) in self.objects(object_type) {
+                let Some((inlet_branches, outlet_branches)) =
+                    self.plant_connector_branches(model, object_type, &name, &object, kind)
+                else {
+                    continue;
+                };
+                let Some(id_value) =
+                    self.checked_id(object_type, &name, model.plant_connectors.len())
+                else {
+                    continue;
+                };
+                let id = ConnectorId(id_value);
+                if model.plant_connector_names.insert(&name, id).is_some() {
+                    self.duplicate_name(object_type, &name);
+                    continue;
+                }
+
+                model.plant_connectors.push(PlantConnector {
+                    id,
+                    name: NormalizedName::new(&name),
+                    kind,
+                    inlet_branches,
+                    outlet_branches,
+                });
+            }
+        }
+    }
+
+    fn parse_plant_connector_lists(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ConnectorList") {
+            let Some(connectors) = self.plant_connector_list_entries(model, &name, &object) else {
+                continue;
+            };
+            let Some(id_value) =
+                self.checked_id("ConnectorList", &name, model.plant_connector_lists.len())
+            else {
+                continue;
+            };
+            let id = ConnectorListId(id_value);
+            if model.plant_connector_list_names.insert(&name, id).is_some() {
+                self.duplicate_name("ConnectorList", &name);
+                continue;
+            }
+
+            model.plant_connector_lists.push(PlantConnectorList {
+                id,
+                name: NormalizedName::new(&name),
+                connectors,
+            });
+        }
+    }
+
+    fn parse_plant_loops(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("PlantLoop") {
+            let Some(plant_side_inlet_node_name) =
+                self.required_string("PlantLoop", &name, &object, "plant_side_inlet_node_name")
+            else {
+                continue;
+            };
+            let Some(plant_side_outlet_node_name) =
+                self.required_string("PlantLoop", &name, &object, "plant_side_outlet_node_name")
+            else {
+                continue;
+            };
+            let Some(demand_side_inlet_node_name) =
+                self.required_string("PlantLoop", &name, &object, "demand_side_inlet_node_name")
+            else {
+                continue;
+            };
+            let Some(demand_side_outlet_node_name) =
+                self.required_string("PlantLoop", &name, &object, "demand_side_outlet_node_name")
+            else {
+                continue;
+            };
+            let Some(plant_side_inlet_node) =
+                self.register_node(model, &plant_side_inlet_node_name)
+            else {
+                continue;
+            };
+            let Some(plant_side_outlet_node) =
+                self.register_node(model, &plant_side_outlet_node_name)
+            else {
+                continue;
+            };
+            let Some(demand_side_inlet_node) =
+                self.register_node(model, &demand_side_inlet_node_name)
+            else {
+                continue;
+            };
+            let Some(demand_side_outlet_node) =
+                self.register_node(model, &demand_side_outlet_node_name)
+            else {
+                continue;
+            };
+            let Some(plant_side_branch_list_name) =
+                self.required_string("PlantLoop", &name, &object, "plant_side_branch_list_name")
+            else {
+                continue;
+            };
+            let Some(plant_side_branch_list) = self.resolve_name(
+                &model.plant_branch_list_names,
+                "PlantLoop",
+                &name,
+                "plant_side_branch_list_name",
+                &plant_side_branch_list_name,
+                "BranchList",
+            ) else {
+                continue;
+            };
+            let Some(demand_side_branch_list_name) =
+                self.required_string("PlantLoop", &name, &object, "demand_side_branch_list_name")
+            else {
+                continue;
+            };
+            let Some(demand_side_branch_list) = self.resolve_name(
+                &model.plant_branch_list_names,
+                "PlantLoop",
+                &name,
+                "demand_side_branch_list_name",
+                &demand_side_branch_list_name,
+                "BranchList",
+            ) else {
+                continue;
+            };
+            let plant_side_connector_list = self
+                .optional_string(
+                    "PlantLoop",
+                    &name,
+                    &object,
+                    "plant_side_connector_list_name",
+                )
+                .and_then(|connector_list_name| {
+                    self.resolve_name(
+                        &model.plant_connector_list_names,
+                        "PlantLoop",
+                        &name,
+                        "plant_side_connector_list_name",
+                        &connector_list_name,
+                        "ConnectorList",
+                    )
+                });
+            let demand_side_connector_list = self
+                .optional_string(
+                    "PlantLoop",
+                    &name,
+                    &object,
+                    "demand_side_connector_list_name",
+                )
+                .and_then(|connector_list_name| {
+                    self.resolve_name(
+                        &model.plant_connector_list_names,
+                        "PlantLoop",
+                        &name,
+                        "demand_side_connector_list_name",
+                        &connector_list_name,
+                        "ConnectorList",
+                    )
+                });
+            let Some(id_value) = self.checked_id("PlantLoop", &name, model.plant_loops.len())
+            else {
+                continue;
+            };
+            let id = LoopId(id_value);
+            if model.plant_loop_names.insert(&name, id).is_some() {
+                self.duplicate_name("PlantLoop", &name);
+                continue;
+            }
+
+            model.plant_loops.push(PlantLoop {
+                id,
+                name: NormalizedName::new(&name),
+                fluid_type: self
+                    .optional_string("PlantLoop", &name, &object, "fluid_type")
+                    .map_or_else(
+                        || NormalizedName::new("Water"),
+                        |value| NormalizedName::new(&value),
+                    ),
+                plant_side_inlet_node,
+                plant_side_outlet_node,
+                plant_side_branch_list,
+                plant_side_connector_list,
+                demand_side_inlet_node,
+                demand_side_outlet_node,
+                demand_side_branch_list,
+                demand_side_connector_list,
+                load_distribution_scheme: self
+                    .optional_string("PlantLoop", &name, &object, "load_distribution_scheme")
+                    .map(|value| NormalizedName::new(&value)),
+            });
+        }
+    }
+
     fn parse_other_equipment(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("OtherEquipment") {
             let Some(zone_name) = self.required_string(
@@ -1659,6 +2117,443 @@ impl<'a> Compiler<'a> {
         }
 
         Some(entries)
+    }
+
+    fn plant_branch_components(
+        &mut self,
+        model: &mut TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<PlantBranchComponent>> {
+        let Some(value) = field_value(object, "components") else {
+            self.error(
+                "MissingRequiredField",
+                "Branch",
+                Some(object_name),
+                Some("components"),
+                format!("Branch/{object_name} requires field components"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("Branch", object_name, "components", "array");
+            return None;
+        };
+
+        let mut components = Vec::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    "Branch",
+                    Some(object_name),
+                    Some("components"),
+                    format!("Branch/{object_name} component entry {index} must be an object"),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(component_object_type) = self.required_string(
+                "Branch",
+                &entry_name,
+                &entry_object,
+                "component_object_type",
+            ) else {
+                continue;
+            };
+            let Some(component_name) =
+                self.required_string("Branch", &entry_name, &entry_object, "component_name")
+            else {
+                continue;
+            };
+            if !self.supported_plant_component_exists(
+                model,
+                "Branch",
+                &entry_name,
+                "component_name",
+                &component_object_type,
+                &component_name,
+            ) {
+                continue;
+            }
+            let Some(inlet_node_name) = self.required_string(
+                "Branch",
+                &entry_name,
+                &entry_object,
+                "component_inlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(outlet_node_name) = self.required_string(
+                "Branch",
+                &entry_name,
+                &entry_object,
+                "component_outlet_node_name",
+            ) else {
+                continue;
+            };
+            let Some(inlet_node) = self.register_node(model, &inlet_node_name) else {
+                continue;
+            };
+            let Some(outlet_node) = self.register_node(model, &outlet_node_name) else {
+                continue;
+            };
+            components.push(PlantBranchComponent {
+                object_type: NormalizedName::new(&component_object_type),
+                name: NormalizedName::new(&component_name),
+                inlet_node,
+                outlet_node,
+            });
+        }
+
+        if components.is_empty() {
+            self.error(
+                "MissingPlantBranchComponent",
+                "Branch",
+                Some(object_name),
+                Some("components"),
+                format!("Branch/{object_name} has no valid components"),
+            );
+            return None;
+        }
+
+        Some(components)
+    }
+
+    fn plant_branch_list_members(
+        &mut self,
+        model: &TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<BranchId>> {
+        let Some(value) = field_value(object, "branches") else {
+            self.error(
+                "MissingRequiredField",
+                "BranchList",
+                Some(object_name),
+                Some("branches"),
+                format!("BranchList/{object_name} requires field branches"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("BranchList", object_name, "branches", "array");
+            return None;
+        };
+
+        let mut branches = Vec::new();
+        let mut seen = std::collections::BTreeSet::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    "BranchList",
+                    Some(object_name),
+                    Some("branches"),
+                    format!("BranchList/{object_name} branch entry {index} must be an object"),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(branch_name) =
+                self.required_string("BranchList", &entry_name, &entry_object, "branch_name")
+            else {
+                continue;
+            };
+            let normalized = NormalizedName::new(&branch_name);
+            if !seen.insert(normalized.clone()) {
+                self.error(
+                    "DuplicatePlantBranchListMember",
+                    "BranchList",
+                    Some(object_name),
+                    Some("branch_name"),
+                    format!(
+                        "BranchList/{object_name} duplicates branch '{}'",
+                        normalized.0
+                    ),
+                );
+                continue;
+            }
+            let Some(branch) = self.resolve_name(
+                &model.plant_branch_names,
+                "BranchList",
+                &entry_name,
+                "branch_name",
+                &branch_name,
+                "Branch",
+            ) else {
+                continue;
+            };
+            branches.push(branch);
+        }
+
+        if branches.is_empty() {
+            self.error(
+                "MissingPlantBranchListMember",
+                "BranchList",
+                Some(object_name),
+                Some("branches"),
+                format!("BranchList/{object_name} has no valid branch members"),
+            );
+            return None;
+        }
+
+        Some(branches)
+    }
+
+    fn plant_connector_branches(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        kind: PlantConnectorKind,
+    ) -> Option<(Vec<BranchId>, Vec<BranchId>)> {
+        match kind {
+            PlantConnectorKind::Splitter => {
+                let inlet = self.required_branch_reference(
+                    model,
+                    object_type,
+                    object_name,
+                    object,
+                    "inlet_branch_name",
+                )?;
+                let outlets = self.branch_reference_array(
+                    model,
+                    object_type,
+                    object_name,
+                    object,
+                    "branches",
+                    "outlet_branch_name",
+                )?;
+                Some((vec![inlet], outlets))
+            }
+            PlantConnectorKind::Mixer => {
+                let outlet = self.required_branch_reference(
+                    model,
+                    object_type,
+                    object_name,
+                    object,
+                    "outlet_branch_name",
+                )?;
+                let inlets = self.branch_reference_array(
+                    model,
+                    object_type,
+                    object_name,
+                    object,
+                    "branches",
+                    "inlet_branch_name",
+                )?;
+                Some((inlets, vec![outlet]))
+            }
+        }
+    }
+
+    fn plant_connector_list_entries(
+        &mut self,
+        model: &TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<PlantConnectorListEntry>> {
+        let mut entries = Vec::new();
+        for index in 1..=2 {
+            let object_type_field = format!("connector_{index}_object_type");
+            let name_field = format!("connector_{index}_name");
+            let Some(object_type) =
+                self.optional_string("ConnectorList", object_name, object, &object_type_field)
+            else {
+                continue;
+            };
+            let Some(kind) = parse_plant_connector_kind(&object_type) else {
+                self.error(
+                    "InvalidEnumValue",
+                    "ConnectorList",
+                    Some(object_name),
+                    Some(&object_type_field),
+                    format!("ConnectorList/{object_name} has unsupported connector object type '{object_type}'"),
+                );
+                continue;
+            };
+            let Some(connector_name) =
+                self.required_string("ConnectorList", object_name, object, &name_field)
+            else {
+                continue;
+            };
+            let Some(connector) = self.resolve_name(
+                &model.plant_connector_names,
+                "ConnectorList",
+                object_name,
+                &name_field,
+                &connector_name,
+                &object_type,
+            ) else {
+                continue;
+            };
+            entries.push(PlantConnectorListEntry { kind, connector });
+        }
+
+        if entries.is_empty() {
+            self.error(
+                "MissingPlantConnectorListMember",
+                "ConnectorList",
+                Some(object_name),
+                Some("connector_1_name"),
+                format!("ConnectorList/{object_name} has no valid connector members"),
+            );
+            return None;
+        }
+
+        Some(entries)
+    }
+
+    fn required_branch_reference(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<BranchId> {
+        let branch_name = self.required_string(object_type, object_name, object, field)?;
+        self.resolve_name(
+            &model.plant_branch_names,
+            object_type,
+            object_name,
+            field,
+            &branch_name,
+            "Branch",
+        )
+    }
+
+    fn branch_reference_array(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        array_field: &str,
+        name_field: &str,
+    ) -> Option<Vec<BranchId>> {
+        let Some(value) = field_value(object, array_field) else {
+            self.error(
+                "MissingRequiredField",
+                object_type,
+                Some(object_name),
+                Some(array_field),
+                format!("{object_type}/{object_name} requires field {array_field}"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type(object_type, object_name, array_field, "array");
+            return None;
+        };
+
+        let mut branches = Vec::new();
+        let mut seen = std::collections::BTreeSet::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    object_type,
+                    Some(object_name),
+                    Some(array_field),
+                    format!("{object_type}/{object_name} branch entry {index} must be an object"),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let branch = self.required_branch_reference(
+                model,
+                object_type,
+                &entry_name,
+                &entry_object,
+                name_field,
+            )?;
+            if !seen.insert(branch) {
+                self.error(
+                    "DuplicatePlantConnectorBranch",
+                    object_type,
+                    Some(object_name),
+                    Some(name_field),
+                    format!(
+                        "{object_type}/{object_name} duplicates branch id {}",
+                        branch.0
+                    ),
+                );
+                continue;
+            }
+            branches.push(branch);
+        }
+
+        if branches.is_empty() {
+            self.error(
+                "MissingPlantConnectorBranch",
+                object_type,
+                Some(object_name),
+                Some(array_field),
+                format!("{object_type}/{object_name} has no valid branch members"),
+            );
+            return None;
+        }
+
+        Some(branches)
+    }
+
+    fn supported_plant_component_exists(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        field: &str,
+        component_object_type: &str,
+        component_name: &str,
+    ) -> bool {
+        match component_object_type.to_ascii_lowercase().as_str() {
+            "pump:constantspeed" => self
+                .resolve_name(
+                    &model.pump_constant_speed_names,
+                    object_type,
+                    object_name,
+                    field,
+                    component_name,
+                    "Pump:ConstantSpeed",
+                )
+                .is_some(),
+            "boiler:hotwater" => self
+                .resolve_name(
+                    &model.boiler_hot_water_names,
+                    object_type,
+                    object_name,
+                    field,
+                    component_name,
+                    "Boiler:HotWater",
+                )
+                .is_some(),
+            "chiller:electric:eir" => self
+                .resolve_name(
+                    &model.chiller_electric_eir_names,
+                    object_type,
+                    object_name,
+                    field,
+                    component_name,
+                    "Chiller:Electric:EIR",
+                )
+                .is_some(),
+            _ => true,
+        }
     }
 
     fn node_list_members(
@@ -2787,6 +3682,16 @@ fn parse_zone_equipment_object_type(value: &str) -> Option<ZoneEquipmentObjectTy
     }
 }
 
+fn parse_plant_connector_kind(value: &str) -> Option<PlantConnectorKind> {
+    match value {
+        value if value.eq_ignore_ascii_case("Connector:Splitter") => {
+            Some(PlantConnectorKind::Splitter)
+        }
+        value if value.eq_ignore_ascii_case("Connector:Mixer") => Some(PlantConnectorKind::Mixer),
+        _ => None,
+    }
+}
+
 fn parse_day_of_week(value: &str) -> Option<ep_model::DayOfWeek> {
     match value {
         value if value.eq_ignore_ascii_case("Monday") => Some(ep_model::DayOfWeek::Monday),
@@ -2863,6 +3768,7 @@ mod tests {
     use ep_model::{
         AutosizeOrNumber, DayOfWeek, DehumidificationControlType, HumidificationControlType,
         IdealLoadsLimit, LoadDistributionScheme, ModelGraph, OutdoorAirEconomizerType,
+        PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -3232,6 +4138,164 @@ mod tests {
         assert_eq!(graph.zone_air_nodes.len(), 1);
         assert_eq!(graph.zone_ideal_loads[0].cooling_sequence, 1);
         assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_plant_loop_skeleton_graph() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Pump:ConstantSpeed": {
+                    "HW Pump": {
+                        "inlet_node_name": "HW Supply Inlet",
+                        "outlet_node_name": "HW Pump Outlet",
+                        "design_flow_rate": 0.001,
+                        "design_pump_head": 179352,
+                        "pump_control_type": "Intermittent"
+                    }
+                },
+                "Boiler:HotWater": {
+                    "HW Boiler": {
+                        "fuel_type": "NaturalGas",
+                        "nominal_capacity": 10000,
+                        "design_water_flow_rate": 0.001,
+                        "boiler_water_inlet_node_name": "HW Pump Outlet",
+                        "boiler_water_outlet_node_name": "HW Supply Outlet"
+                    }
+                },
+                "Chiller:Electric:EIR": {
+                    "CW Chiller": {
+                        "reference_capacity": 12000,
+                        "reference_cop": 3.2,
+                        "chilled_water_inlet_node_name": "CW Supply Inlet",
+                        "chilled_water_outlet_node_name": "CW Supply Outlet",
+                        "condenser_inlet_node_name": "Cond Inlet",
+                        "condenser_outlet_node_name": "Cond Outlet"
+                    }
+                },
+                "Branch": {
+                    "HW Supply Inlet Branch": {
+                        "components": [
+                            {
+                                "component_object_type": "Pump:ConstantSpeed",
+                                "component_name": "HW Pump",
+                                "component_inlet_node_name": "HW Supply Inlet",
+                                "component_outlet_node_name": "HW Pump Outlet"
+                            }
+                        ]
+                    },
+                    "HW Boiler Branch": {
+                        "components": [
+                            {
+                                "component_object_type": "Boiler:HotWater",
+                                "component_name": "HW Boiler",
+                                "component_inlet_node_name": "HW Pump Outlet",
+                                "component_outlet_node_name": "HW Supply Outlet"
+                            }
+                        ]
+                    },
+                    "HW Demand Branch": {
+                        "components": [
+                            {
+                                "component_object_type": "Pipe:Adiabatic",
+                                "component_name": "HW Demand Pipe",
+                                "component_inlet_node_name": "HW Demand Inlet",
+                                "component_outlet_node_name": "HW Demand Outlet"
+                            }
+                        ]
+                    },
+                    "CW Chiller Branch": {
+                        "components": [
+                            {
+                                "component_object_type": "Chiller:Electric:EIR",
+                                "component_name": "CW Chiller",
+                                "component_inlet_node_name": "CW Supply Inlet",
+                                "component_outlet_node_name": "CW Supply Outlet"
+                            }
+                        ]
+                    }
+                },
+                "BranchList": {
+                    "HW Supply Branches": {
+                        "branches": [
+                            {"branch_name": "HW Supply Inlet Branch"},
+                            {"branch_name": "HW Boiler Branch"}
+                        ]
+                    },
+                    "HW Demand Branches": {
+                        "branches": [
+                            {"branch_name": "HW Demand Branch"}
+                        ]
+                    },
+                    "CW Supply Branches": {
+                        "branches": [
+                            {"branch_name": "CW Chiller Branch"}
+                        ]
+                    }
+                },
+                "Connector:Splitter": {
+                    "HW Supply Splitter": {
+                        "inlet_branch_name": "HW Supply Inlet Branch",
+                        "branches": [
+                            {"outlet_branch_name": "HW Boiler Branch"}
+                        ]
+                    }
+                },
+                "Connector:Mixer": {
+                    "HW Supply Mixer": {
+                        "outlet_branch_name": "HW Boiler Branch",
+                        "branches": [
+                            {"inlet_branch_name": "HW Supply Inlet Branch"}
+                        ]
+                    }
+                },
+                "ConnectorList": {
+                    "HW Supply Connectors": {
+                        "connector_1_object_type": "Connector:Splitter",
+                        "connector_1_name": "HW Supply Splitter",
+                        "connector_2_object_type": "Connector:Mixer",
+                        "connector_2_name": "HW Supply Mixer"
+                    }
+                },
+                "PlantLoop": {
+                    "Hot Water Loop": {
+                        "fluid_type": "Water",
+                        "plant_side_inlet_node_name": "HW Supply Inlet",
+                        "plant_side_outlet_node_name": "HW Supply Outlet",
+                        "plant_side_branch_list_name": "HW Supply Branches",
+                        "plant_side_connector_list_name": "HW Supply Connectors",
+                        "demand_side_inlet_node_name": "HW Demand Inlet",
+                        "demand_side_outlet_node_name": "HW Demand Outlet",
+                        "demand_side_branch_list_name": "HW Demand Branches",
+                        "load_distribution_scheme": "SequentialLoad"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.plant_loops.len(), 1);
+        assert_eq!(model.plant_branches.len(), 4);
+        assert_eq!(model.plant_branch_lists.len(), 3);
+        assert_eq!(model.plant_connectors.len(), 2);
+        assert_eq!(model.plant_connector_lists.len(), 1);
+        assert_eq!(model.pumps_constant_speed.len(), 1);
+        assert_eq!(model.boilers_hot_water.len(), 1);
+        assert_eq!(model.chillers_electric_eir.len(), 1);
+        assert_eq!(model.nodes.len(), 9);
+        assert_eq!(model.plant_connectors[0].kind, PlantConnectorKind::Splitter);
+
+        let graph = ModelGraph::from_typed(&model);
+        assert_eq!(graph.plant_loop_branch_lists.len(), 2);
+        assert_eq!(graph.plant_branch_list_members.len(), 4);
+        assert_eq!(graph.plant_connector_list_members.len(), 2);
+        assert_eq!(graph.plant_branch_components.len(), 4);
 
         Ok(())
     }

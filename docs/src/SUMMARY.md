@@ -97,6 +97,8 @@
 - [v0.11.0 Readiness](operations/v0.11.0-readiness.md)
 - [v0.12.0 Plan](operations/v0.12.0-plan.md)
 - [v0.12.0 Readiness](operations/v0.12.0-readiness.md)
+- [v0.13.0 Plan](operations/v0.13.0-plan.md)
+- [v0.13.0 Readiness](operations/v0.13.0-readiness.md)
 
 # Archive
 
@@ -110,3 +112,4 @@
   - [v0.1.0](releases/v0.1.0.md)
   - [v0.11.0](releases/v0.11.0.md)
   - [v0.12.0](releases/v0.12.0.md)
+  - [v0.13.0](releases/v0.13.0.md)

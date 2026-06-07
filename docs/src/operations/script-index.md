@@ -44,6 +44,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `first-zone-smoke` | diagnostic | exercise first-zone runtime plumbing | no | diagnostic output |
 | `ideal-loads-thermostat-smoke` | smoke | gate the v0.10 thermostat, equipment, IdealLoads typed graph, warning policy, and nonzero baseline signal | yes | `.runtime/ideal-loads-thermostat` |
 | `air-side-node-diagnostic-smoke` | smoke | gate the v0.11 air-side node baseline evidence and diagnostic Rust projection | yes | `.runtime/air-side-node-diagnostic` |
+| `plant-loop-skeleton-smoke` | smoke | gate the v0.13 PlantLoop typed graph skeleton fixture | yes | console output |
 | `compare-schedule-smoke` | compare | compare constant schedule ESO values | no | `.runtime/compare-schedule` |
 | `compare-weather-smoke` | compare | compare selected EPW weather fields against ESO | no | `.runtime/compare-weather` |
 | `compare-geometry-smoke` | compare | compare Rust geometry summary with EIO | no | console output |
@@ -74,5 +75,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
 | `v0.11-verify` | release | verify v0.11 air-side node diagnostic and projection evidence | yes | `.runtime/air-side-node-diagnostic` |
 | `v0.12-verify` | release | verify v0.12 node source mapping evidence and numeric evidence packaging | yes | source-map docs, `.runtime/release-evidence` |
+| `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and numeric evidence packaging | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

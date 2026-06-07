@@ -90,6 +90,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.11 air-side node baseline evidence and Rust projection."
     }
+    "plant-loop-skeleton-smoke" = @{
+        Path = "smoke\plant-loop-skeleton-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate the v0.13 PlantLoop typed graph skeleton."
+    }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
         Group = "compare"
@@ -240,6 +245,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.12 node source mapping gate."
     }
+    "v0.13-verify" = @{
+        Path = "release\v0.13-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.13 plant-loop skeleton gate."
+    }
 }
 
 $Aliases = @{
@@ -257,6 +267,7 @@ $Aliases = @{
     "verify-v0.10" = "v0.10-verify"
     "verify-v0.11" = "v0.11-verify"
     "verify-v0.12" = "v0.12-verify"
+    "verify-v0.13" = "v0.13-verify"
 }
 
 function Show-Commands {

@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.13.0 - 2026-06-07
+
+PlantLoop typed graph skeleton release.
+
+### Added
+
+- typed `PlantLoop`, `Branch`, `BranchList`, `Connector:Splitter`, `Connector:Mixer`, and `ConnectorList` records.
+- typed identity records for `Pump:ConstantSpeed`, `Boiler:HotWater`, and `Chiller:Electric:EIR`.
+- plant graph edge summaries for loop-to-branch-list, branch-list-to-branch, connector-list-to-connector, and branch-to-component links.
+- `plant-loop-skeleton.epJSON` fixture and `plant-loop-skeleton-smoke` gate.
+- v0.13 release verification gate and release notes.
+- v0.13 packaging of the promoted v0.8/v0.9 numerical conformance PDF/HTML/JSON evidence pack.
+
+### Notes
+
+- v0.13.0 is a typed graph smoke release, not a plant numerical conformance claim.
+- No plant flow balancing, equipment load, operation scheme, meter, node-state, or ExampleFiles compatibility claim is made.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9 no-mass cases.
+
 ## v0.12.0 - 2026-06-07
 
 Node source mapping and diagnostic projection evidence-policy release.

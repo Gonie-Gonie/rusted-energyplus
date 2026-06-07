@@ -41,7 +41,7 @@ Related policy documents:
 | fenestration/radiation | simple window and shading cases | v0.9 |
 | IdealLoads | thermostat and IdealLoads typed graph, then load diagnostics | v0.10 |
 | air-side HVAC | selected fan/coil/PTAC cases | v0.11 |
-| plant | selected boiler/chiller/pump cases | v0.12 |
+| plant | typed graph skeleton first; selected boiler/chiller/pump cases later | v0.13 |
 
 Each tier must declare its variables and meters before it supports a claim.
 Running an EnergyPlus example, producing finite samples, or matching sample
