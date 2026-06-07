@@ -49,6 +49,7 @@ separate in docs, scripts, and release language.
 | v0.12 | Node source mapping release | planning guard before node or IdealLoads numerical conformance |
 | v0.13 | Plant loop skeleton release | typed graph smoke only; no plant numerical conformance |
 | v0.14 | Plant source mapping release | planning guard before plant diagnostics or numerical conformance |
+| v0.15 | Plant loop diagnostic release | oracle baseline and report skeleton only; no plant numerical conformance |
 | v1.0 | Declared compatibility subset release | locked supported subset only |
 
 ## Retroactive Audit Rules
@@ -199,6 +200,12 @@ v0.14 decision: plant source mapping is a planning guard. It locks EnergyPlus
 26.1.0 plant loop input, loop-side simulation, component dispatch, plant
 utilities, and first pump/boiler/chiller output paths before any future plant
 diagnostic or numerical claim may be promoted.
+
+v0.15 decision: `plant_loop_diagnostic_001` is a diagnostic-only plant gate. It
+records EnergyPlus oracle baseline rows for plant supply-side demand/state,
+pump electricity, district heating rate, and load-profile heat transfer, but it
+does not provide Rust plant result artifacts, tolerances, or plant numerical
+conformance.
 
 ## Immediate Work Order
 

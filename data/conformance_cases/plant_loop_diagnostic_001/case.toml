@@ -1,0 +1,80 @@
+id = "plant_loop_diagnostic_001"
+title = "PlantLoadProfile plant-loop diagnostic baseline"
+milestone = "v0.15-plant-loop-diagnostic"
+purpose = "Record baseline-only plant loop and first plant equipment output evidence from a plant-only EnergyPlus fixture without claiming numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This v0.15 case is diagnostic-only plant output evidence, not plant numerical conformance.",
+  "The fixture is based on the EnergyPlus PlantLoadProfile example and runs sizing-period plant-only simulation with zero EnergyPlus warnings.",
+  "The case captures plant supply-side demand/state, pump electricity, district heating source rate, and load-profile demand signal."
+]
+
+[input]
+idf = "data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
+
+[[outputs]]
+key = "MAIN LOOP"
+variable = "Plant Supply Side Cooling Demand Rate"
+frequency = "hourly"
+class = "plant-state"
+source = "eso"
+
+[[outputs]]
+key = "MAIN LOOP"
+variable = "Plant Supply Side Heating Demand Rate"
+frequency = "hourly"
+class = "plant-state"
+source = "eso"
+
+[[outputs]]
+key = "MAIN LOOP"
+variable = "Plant Supply Side Inlet Mass Flow Rate"
+frequency = "hourly"
+class = "plant-state"
+source = "eso"
+
+[[outputs]]
+key = "MAIN LOOP"
+variable = "Plant Supply Side Inlet Temperature"
+frequency = "hourly"
+class = "plant-state"
+source = "eso"
+
+[[outputs]]
+key = "MAIN LOOP"
+variable = "Plant Supply Side Outlet Temperature"
+frequency = "hourly"
+class = "plant-state"
+source = "eso"
+
+[[outputs]]
+key = "PUMP"
+variable = "Pump Electricity Rate"
+frequency = "hourly"
+class = "plant-equipment"
+source = "eso"
+
+[[outputs]]
+key = "PURCHASED HEATING"
+variable = "District Heating Water Rate"
+frequency = "hourly"
+class = "plant-equipment"
+source = "eso"
+
+[[outputs]]
+key = "LOAD PROFILE 1"
+variable = "Plant Load Profile Heat Transfer Rate"
+frequency = "hourly"
+class = "plant-equipment"
+source = "eso"
+
+[report]
+format = "markdown"
+path = ".runtime/plant-loop-diagnostic/26.1.0/report-skeleton/plant_loop_diagnostic_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd plant-loop-diagnostic-smoke"
+blocking = true

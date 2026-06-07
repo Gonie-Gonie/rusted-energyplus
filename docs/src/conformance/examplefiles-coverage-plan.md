@@ -41,6 +41,7 @@ Each selected case must answer:
 | v0.12 | Tier B air-side HVAC source mapping | v0.11 node fixture and EnergyPlus node source paths | node registration, update, and output source-function map |
 | v0.13 | Tier B plant foundation | `plant-loop-skeleton.epJSON` typed graph smoke first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant graph intake only; no plant numerical conformance |
 | v0.14 | Tier B plant source mapping | v0.13 plant fixture and EnergyPlus plant source paths | plant source-function map only; no plant numerical conformance |
+| v0.15 | Tier B plant diagnostic | `plant_loop_diagnostic_001` PlantLoadProfile baseline first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant oracle baseline and report skeleton only; no plant numerical conformance |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -84,6 +85,13 @@ Current v0.14 plant source-mapping evidence:
 
 - `docs/src/porting-map/plant-source-map.md`
 - `v0.14-verify`
+
+Current v0.15 plant diagnostic evidence:
+
+- `data/conformance_cases/plant_loop_diagnostic_001/case.toml`
+- `data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf`
+- `plant-loop-diagnostic-smoke`
+- `v0.15-verify`
 
 Planned fields:
 

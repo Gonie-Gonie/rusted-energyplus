@@ -60,6 +60,30 @@ plant loop loads, plant node state, pump electricity, boiler load, chiller
 load, and plant meters at future diagnostic-only status until manifests,
 Rust result artifacts, reports, tolerances, and gates exist.
 
+## v0.15 Plant Loop Diagnostic Baseline
+
+The v0.15 diagnostic gate adds the first manifest-backed plant-loop oracle
+baseline:
+
+```text
+data/conformance_cases/plant_loop_diagnostic_001/case.toml
+data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf
+```
+
+The gate is:
+
+```powershell
+.\scripts\dev.cmd plant-loop-diagnostic-smoke
+```
+
+The fixture is based on EnergyPlus `PlantLoadProfile.idf` and runs a plant-only
+sizing-period simulation with zero EnergyPlus warnings. It records
+baseline-only `plant-state` and `plant-equipment` output rows for plant
+supply-side demand/state, pump electricity, district heating rate, and
+load-profile heat transfer. It does not provide Rust plant result artifacts,
+plant solver parity, pump electricity parity, equipment load parity, plant
+node-state parity, or plant meter parity.
+
 ## Reference Source Targets
 
 Future plant work must be ported against the locked EnergyPlus 26.1.0 source
@@ -95,6 +119,8 @@ Current non-claims:
 - no plant node output parity
 - no plant meter parity
 - no plant ExampleFiles compatibility
+- v0.15 plant diagnostic rows are EnergyPlus oracle baseline-only evidence,
+  not Rust plant numerical conformance
 
 ## Promotion Requirements
 

@@ -303,6 +303,10 @@ pub enum VariableClass {
     NodeState,
     /// HVAC control or component state variables.
     HvacState,
+    /// Plant loop state variables.
+    PlantState,
+    /// Plant equipment and demand-side component variables.
+    PlantEquipment,
     /// EnergyPlus meters.
     Meter,
     /// EnergyPlus internal variables.
@@ -851,6 +855,59 @@ mod tests {
             gate.script,
             "scripts/dev.cmd air-side-node-diagnostic-smoke"
         );
+        assert!(gate.blocking);
+
+        Ok(())
+    }
+
+    #[test]
+    fn loads_plant_loop_diagnostic_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = load_case_file(
+            repo_root().join("data/conformance_cases/plant_loop_diagnostic_001/case.toml"),
+        )?;
+
+        assert_eq!(manifest.id, "plant_loop_diagnostic_001");
+        assert_eq!(manifest.milestone, "v0.15-plant-loop-diagnostic");
+        assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+        assert!(!manifest.conformance_claim);
+        assert!(manifest.tolerances.is_empty());
+        assert_eq!(manifest.outputs.len(), 8);
+        assert_eq!(
+            manifest
+                .outputs
+                .iter()
+                .filter(|output| output.class == VariableClass::PlantState)
+                .count(),
+            5
+        );
+        assert_eq!(
+            manifest
+                .outputs
+                .iter()
+                .filter(|output| output.class == VariableClass::PlantEquipment)
+                .count(),
+            3
+        );
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "MAIN LOOP"
+                && output.variable == "Plant Supply Side Heating Demand Rate"
+                && output.class == VariableClass::PlantState
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "PUMP"
+                && output.variable == "Pump Electricity Rate"
+                && output.class == VariableClass::PlantEquipment
+        }));
+        assert!(manifest.outputs.iter().any(|output| {
+            output.key == "LOAD PROFILE 1"
+                && output.variable == "Plant Load Profile Heat Transfer Rate"
+                && output.class == VariableClass::PlantEquipment
+        }));
+        let gate = manifest
+            .gate
+            .as_ref()
+            .ok_or_else(|| std::io::Error::other("plant loop diagnostic should declare a gate"))?;
+        assert_eq!(gate.script, "scripts/dev.cmd plant-loop-diagnostic-smoke");
         assert!(gate.blocking);
 
         Ok(())

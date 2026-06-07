@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.15.0 - 2026-06-07
+
+Plant-loop diagnostic baseline release.
+
+### Added
+
+- `plant_loop_diagnostic_001` diagnostic-only PlantLoadProfile baseline case.
+- `plant-state` and `plant-equipment` output request classes.
+- `plant-loop-diagnostic-smoke` gate for manifest validation, zero-warning
+  EnergyPlus baseline generation, staged epJSON compile/plan checks, and
+  baseline-only report summary validation.
+- v0.15 plan, readiness, release notes, verification gate, and package checks.
+
+### Notes
+
+- v0.15.0 is a diagnostic baseline release, not a plant numerical conformance
+  claim.
+- No plant flow balancing, operation scheme, pump electricity, district
+  heating, boiler load, chiller load, plant node-state, meter, sizing, or
+  ExampleFiles compatibility claim is made.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
+
 ## v0.14.0 - 2026-06-07
 
 Plant source mapping release.

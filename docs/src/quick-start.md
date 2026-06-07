@@ -22,7 +22,7 @@ Run the local check suite:
 Verify the current public release gate:
 
 ```powershell
-.\scripts\dev.cmd v0.14-verify
+.\scripts\dev.cmd v0.15-verify
 ```
 
 Development-only diagnostic scripts are listed in

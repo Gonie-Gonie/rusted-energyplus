@@ -100,6 +100,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.13 PlantLoop typed graph skeleton."
     }
+    "plant-loop-diagnostic-smoke" = @{
+        Path = "smoke\plant-loop-diagnostic-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate the v0.15 PlantLoadProfile baseline-only plant diagnostic."
+    }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"
         Group = "compare"
@@ -260,6 +265,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.14 plant source mapping gate."
     }
+    "v0.15-verify" = @{
+        Path = "release\v0.15-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.15 plant-loop diagnostic gate."
+    }
 }
 
 $Aliases = @{
@@ -279,6 +289,7 @@ $Aliases = @{
     "verify-v0.12" = "v0.12-verify"
     "verify-v0.13" = "v0.13-verify"
     "verify-v0.14" = "v0.14-verify"
+    "verify-v0.15" = "v0.15-verify"
 }
 
 function Show-Commands {

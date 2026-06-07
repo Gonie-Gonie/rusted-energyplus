@@ -52,7 +52,8 @@ source = "eio"
 Each output request must define key, variable, frequency, variable class, and
 source artifact. Supported variable class values are `schedule`, `weather`,
 `construction-material`, `internal-gain`, `zone-state`, `surface-state`,
-`node-state`, `hvac-state`, `meter`, `internal-variable`, and `diagnostic`.
+`node-state`, `hvac-state`, `plant-state`, `plant-equipment`, `meter`,
+`internal-variable`, and `diagnostic`.
 Supported source values are `eso`, `eio`, `mtr`, `sql`, and `csv`.
 
 Use `static` for EIO/static report rows that do not have a timestep axis, such
