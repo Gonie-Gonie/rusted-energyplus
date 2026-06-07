@@ -24,8 +24,8 @@ function Assert-FileExists {
 Write-Host "milestone: v0.4"
 Write-Host "scope: time/weather/schedule smoke evidence, no tolerance-gated conformance claim"
 
-Assert-FileExists -Path "docs\src\operations\v0.4.0-plan.md" -Description "v0.4 plan"
-Assert-FileExists -Path "docs\src\operations\v0.4.0-readiness.md" -Description "v0.4 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.4.0-plan.md" -Description "v0.4 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.4.0-readiness.md" -Description "v0.4 readiness"
 Assert-FileExists -Path "docs\src\porting-map\time-weather-schedule.md" -Description "time/weather/schedule porting map"
 Assert-FileExists -Path "docs\src\conformance\output-variable-matrix.md" -Description "output variable matrix"
 Assert-FileExists -Path "data\conformance_cases\schedule_constant_001\case.toml" -Description "schedule case manifest"

@@ -39,7 +39,9 @@ matplotlib for document layout and charts.
 | `python-smoke` | setup | verify portable Python and the pinned report-generation venv | yes | console output |
 | `check` | quality | run fmt, clippy, tests, smoke gates, docs, and guards | yes | console output |
 | `test` | quality | run Rust workspace tests | yes | console output |
+| `docs-generate` | quality | regenerate mdBook generated references from `specs/` and tracked case manifests | yes for docs/spec changes | `docs/src/generated`, `tools/docs/generated-docs.manifest.json` |
 | `docs-check` | quality | build mdBook | yes | `docs/book` |
+| `file-size-check` | quality | warn/fail on oversized source files with explicit legacy waivers | yes | console output |
 | `perf` | quality | run local performance checks | no | console output |
 | `strict-no-false-conformance` | quality | scan for forbidden compatibility wording | yes | failure on wording |
 | `raw-model-smoke` | smoke | inspect RawModel fixtures | no | console output |

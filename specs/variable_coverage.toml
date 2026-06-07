@@ -1,0 +1,41 @@
+[[variable]]
+name = "Zone Mean Air Temperature"
+domain = "heat_balance"
+status = "conformance"
+first_case = "heat_balance_nomass_001"
+
+[[variable]]
+name = "Surface Inside Face Temperature"
+domain = "heat_balance"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+
+[[variable]]
+name = "Surface Outside Face Temperature"
+domain = "heat_balance"
+status = "conformance"
+first_case = "surface_temperature_nomass_001"
+
+[[variable]]
+name = "System Node Temperature"
+domain = "hvac"
+status = "diagnostic"
+first_case = "air_side_node_diagnostic_001"
+
+[[variable]]
+name = "System Node Mass Flow Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "air_side_node_diagnostic_001"
+
+[[variable]]
+name = "Plant Supply Side Inlet Temperature"
+domain = "plant"
+status = "diagnostic"
+first_case = "plant_loop_diagnostic_001"
+
+[[variable]]
+name = "Plant Supply Side Outlet Temperature"
+domain = "plant"
+status = "diagnostic"
+first_case = "plant_loop_diagnostic_001"

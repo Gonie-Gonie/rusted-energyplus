@@ -1,0 +1,35 @@
+# Historical Pre-Alpha Plans
+
+The v0.1 through v0.15 plan and readiness notes are archived here to keep the
+current navigation small. These documents remain useful for decision history,
+but current milestone planning is maintained in `specs/milestones.toml`.
+
+- [v0.1.0 Readiness](v0.1.0-readiness.md)
+- [v0.2.0 Plan](v0.2.0-plan.md)
+- [v0.2.0 Readiness](v0.2.0-readiness.md)
+- [v0.3.0 Plan](v0.3.0-plan.md)
+- [v0.3.0 Readiness](v0.3.0-readiness.md)
+- [v0.4.0 Plan](v0.4.0-plan.md)
+- [v0.4.0 Readiness](v0.4.0-readiness.md)
+- [v0.5.0 Plan](v0.5.0-plan.md)
+- [v0.5.0 Readiness](v0.5.0-readiness.md)
+- [v0.6.0 Plan](v0.6.0-plan.md)
+- [v0.6.0 Readiness](v0.6.0-readiness.md)
+- [v0.7.0 Plan](v0.7.0-plan.md)
+- [v0.7.0 Readiness](v0.7.0-readiness.md)
+- [v0.8.0 Plan](v0.8.0-plan.md)
+- [v0.8.0 Readiness](v0.8.0-readiness.md)
+- [v0.9.0 Plan](v0.9.0-plan.md)
+- [v0.9.0 Readiness](v0.9.0-readiness.md)
+- [v0.10.0 Plan](v0.10.0-plan.md)
+- [v0.10.0 Readiness](v0.10.0-readiness.md)
+- [v0.11.0 Plan](v0.11.0-plan.md)
+- [v0.11.0 Readiness](v0.11.0-readiness.md)
+- [v0.12.0 Plan](v0.12.0-plan.md)
+- [v0.12.0 Readiness](v0.12.0-readiness.md)
+- [v0.13.0 Plan](v0.13.0-plan.md)
+- [v0.13.0 Readiness](v0.13.0-readiness.md)
+- [v0.14.0 Plan](v0.14.0-plan.md)
+- [v0.14.0 Readiness](v0.14.0-readiness.md)
+- [v0.15.0 Plan](v0.15.0-plan.md)
+- [v0.15.0 Readiness](v0.15.0-readiness.md)

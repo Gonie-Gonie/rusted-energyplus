@@ -45,6 +45,16 @@ $Commands = [ordered]@{
         Group = "quality"
         Help = "Build or structurally check the mdBook docs."
     }
+    "docs-generate" = @{
+        Path = "quality\docs-generate.ps1"
+        Group = "quality"
+        Help = "Generate mdBook reference pages from specs and case manifests."
+    }
+    "file-size-check" = @{
+        Path = "quality\file-size-check.ps1"
+        Group = "quality"
+        Help = "Warn or fail on oversized source files, with explicit legacy waivers."
+    }
     "perf" = @{
         Path = "quality\perf.ps1"
         Group = "quality"

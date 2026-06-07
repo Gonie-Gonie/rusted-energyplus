@@ -3,6 +3,7 @@
 target/
 docs/book/
 dist/
+reports/latest/
 config/local.toml
 *.log
 *.tmp

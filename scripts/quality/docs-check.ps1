@@ -13,11 +13,20 @@ $DocsRoot = Join-Path $RepoRoot "docs"
 $required = @(
     "book.toml",
     "src\SUMMARY.md",
-    "src\development-plan-v2.md",
-    "src\architecture\rust-only-policy.md",
-    "src\architecture\data-architecture.md",
-    "src\operations\oracle-setup.md",
-    "src\operations\external-checkpoints.md"
+    "src\current\project-contract.md",
+    "src\current\current-status.md",
+    "src\current\roadmap.md",
+    "src\current\verification.md",
+    "src\current\architecture-overview.md",
+    "src\guides\setup.md",
+    "src\guides\developer-workflow.md",
+    "src\guides\release-process.md",
+    "src\generated\milestone-map.md",
+    "src\generated\algorithm-ledger.md",
+    "src\generated\conformance-case-index.md",
+    "src\generated\object-coverage.md",
+    "src\generated\variable-coverage.md",
+    "src\archive\index.md"
 )
 
 foreach ($relative in $required) {
@@ -26,6 +35,8 @@ foreach ($relative in $required) {
         throw "Missing documentation file: $path"
     }
 }
+
+Invoke-DevCommand -Command "docs-generate" -Arguments @("-Check")
 
 $mdbook = Get-Command mdbook -ErrorAction SilentlyContinue
 if ($null -ne $mdbook) {

@@ -1,0 +1,16 @@
+{
+  "outputs": [
+    "docs/src/generated/milestone-map.md",
+    "docs/src/generated/algorithm-ledger.md",
+    "docs/src/generated/conformance-case-index.md",
+    "docs/src/generated/object-coverage.md",
+    "docs/src/generated/variable-coverage.md"
+  ],
+  "sources": [
+    "specs/milestones.toml",
+    "specs/algorithm_ledger.toml",
+    "specs/object_coverage.toml",
+    "specs/variable_coverage.toml",
+    "data/conformance_cases/*/case.toml"
+  ]
+}

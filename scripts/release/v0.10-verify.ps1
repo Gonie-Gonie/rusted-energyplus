@@ -35,8 +35,8 @@ function Assert-Contains {
     Write-Host "OK $Description marker: $Pattern"
 }
 
-Assert-FileExists -Path "docs\src\operations\v0.10.0-plan.md" -Description "v0.10 plan"
-Assert-FileExists -Path "docs\src\operations\v0.10.0-readiness.md" -Description "v0.10 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.10.0-plan.md" -Description "v0.10 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.10.0-readiness.md" -Description "v0.10 readiness"
 Assert-FileExists -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Description "v0.10 IdealLoads thermostat case"
 Assert-FileExists -Path "data\conformance_cases\ideal_loads_thermostat_001\ideal_loads_thermostat.idf" -Description "v0.10 IdealLoads thermostat IDF"
 Assert-FileExists -Path "scripts\smoke\ideal-loads-thermostat-smoke.ps1" -Description "v0.10 typed-graph gate"
@@ -55,10 +55,10 @@ Assert-Contains -Path "crates\ep_compiler\src\compiler.rs" -Pattern '"NodeList"'
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "EvaluateZoneThermostat" -Description "v0.10 thermostat execution step"
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "EvaluateIdealLoadsAirSystem" -Description "v0.10 IdealLoads execution step"
 
-Assert-Contains -Path "docs\src\operations\v0.10.0-plan.md" -Pattern "ideal_loads_thermostat_001" -Description "v0.10 plan case"
-Assert-Contains -Path "docs\src\operations\v0.10.0-plan.md" -Pattern "not an IdealLoads load-conformance claim" -Description "v0.10 plan claim boundary"
-Assert-Contains -Path "docs\src\operations\v0.10.0-readiness.md" -Pattern "typed-graph-ready" -Description "v0.10 readiness status"
-Assert-Contains -Path "docs\src\operations\v0.10.0-readiness.md" -Pattern "not an IdealLoads load-conformance claim" -Description "v0.10 readiness claim boundary"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.10.0-plan.md" -Pattern "ideal_loads_thermostat_001" -Description "v0.10 plan case"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.10.0-plan.md" -Pattern "not an IdealLoads load-conformance claim" -Description "v0.10 plan claim boundary"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.10.0-readiness.md" -Pattern "typed-graph-ready" -Description "v0.10 readiness status"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.10.0-readiness.md" -Pattern "not an IdealLoads load-conformance claim" -Description "v0.10 readiness claim boundary"
 Assert-Contains -Path "docs\src\porting-map\hvac.md" -Pattern "IdealLoads typed graph foundation" -Description "v0.10 HVAC map"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern "Zone Ideal Loads Zone Total Heating Rate" -Description "v0.10 output matrix"
 

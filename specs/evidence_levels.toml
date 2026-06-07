@@ -1,0 +1,29 @@
+[[level]]
+id = "smoke"
+blocks_public_claim = false
+description = "Checks plumbing or a narrow behavior without tolerance-gated oracle comparison."
+
+[[level]]
+id = "baseline-only"
+blocks_public_claim = false
+description = "Produces EnergyPlus oracle artifacts without comparing Rust numerical output."
+
+[[level]]
+id = "diagnostic"
+blocks_public_claim = false
+description = "Compares or projects values for development insight only; conformance_claim must be false."
+
+[[level]]
+id = "conformance"
+blocks_public_claim = true
+description = "Uses declared case, variables or meters, tolerances, oracle baseline, Rust artifact, report, and blocking gate."
+
+[[level]]
+id = "regression"
+blocks_public_claim = false
+description = "Detects unintended changes against previously accepted development artifacts."
+
+[[level]]
+id = "performance"
+blocks_public_claim = false
+description = "Measures runtime, memory, or throughput; not numerical compatibility evidence."

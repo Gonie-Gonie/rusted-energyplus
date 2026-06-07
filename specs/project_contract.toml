@@ -1,0 +1,36 @@
+[oracle]
+energyplus_version = "26.1.0"
+compatibility_mode_required = true
+
+[language]
+core = "Rust"
+mixed_language_kernels = false
+
+[claims]
+broad_heat_balance_compatibility = false
+hvac_compatibility = false
+plant_compatibility = false
+full_runtime_compatibility = false
+
+[optimization]
+allowed = [
+  "data_structures",
+  "execution_plan",
+  "cache",
+  "diagnostics",
+  "result_store",
+  "numerical_implementation_within_tolerance",
+  "code_organization",
+]
+forbidden_without_experimental_mode = [
+  "engineering_algorithm_change",
+  "timestep_semantics_change",
+  "setpoint_manager_timing_change",
+  "plant_dispatch_semantics_change",
+]
+
+[documentation]
+markdown_role = "human_explanation"
+spec_role = "machine_readable_decision_source"
+generated_docs_role = "navigation"
+reports_role = "evidence"

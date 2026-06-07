@@ -37,8 +37,8 @@ function Assert-Contains {
 
 $SourceRoot = ".reference\energyplus-src\26.1.0"
 
-Assert-FileExists -Path "docs\src\operations\v0.7.0-plan.md" -Description "v0.7 plan"
-Assert-FileExists -Path "docs\src\operations\v0.7.0-readiness.md" -Description "v0.7 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.7.0-plan.md" -Description "v0.7 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.7.0-readiness.md" -Description "v0.7 readiness"
 Assert-FileExists -Path "docs\src\porting-map\heat-balance-source-map.md" -Description "heat-balance source map"
 Assert-FileExists -Path "docs\src\porting-map\output-variable-source-map.md" -Description "output-variable source map"
 Assert-FileExists -Path "docs\src\porting-map\algorithm-porting-readiness.md" -Description "algorithm porting readiness"

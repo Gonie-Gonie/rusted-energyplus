@@ -21,8 +21,8 @@ function Assert-FileExists {
     Write-Host "OK $Description`: $Path"
 }
 
-Assert-FileExists -Path "docs\src\operations\v0.6.0-plan.md" -Description "v0.6 plan"
-Assert-FileExists -Path "docs\src\operations\v0.6.0-readiness.md" -Description "v0.6 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.6.0-plan.md" -Description "v0.6 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.6.0-readiness.md" -Description "v0.6 readiness"
 Assert-FileExists -Path "docs\src\porting-map\output-reporting.md" -Description "output/reporting porting map"
 Assert-FileExists -Path "docs\src\architecture\result-store.md" -Description "ResultStore architecture note"
 Assert-FileExists -Path "docs\src\architecture\diagnostics-trace.md" -Description "diagnostics/trace architecture note"

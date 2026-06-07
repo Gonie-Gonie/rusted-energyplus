@@ -11,6 +11,18 @@ Author-maintained project documentation lives in the mdBook source tree under
 `docs/src`. Generated release and evidence documents are built through the
 repo-local Python reporting environment and `oodocs`.
 
+Generated mdBook reference pages are produced from `specs/` and tracked case
+manifests by:
+
+```text
+scripts/quality/docs-generate.ps1
+  -> tools/docs/generate_docs.py
+  -> docs/src/generated/*
+```
+
+These generated reference pages are navigation aids, not evidence. They carry a
+`DO NOT EDIT` marker and are checked for staleness by `docs-check`.
+
 ## Standard Shape
 
 Scripted documentation follows this shape:
@@ -32,6 +44,10 @@ They should not own document layout, chart logic, or serialization.
 Python generators own document structure and artifact writing. They should use
 `oodocs` for HTML/PDF document serialization and matplotlib figure objects for
 charts when charts are needed.
+
+Spec-to-mdBook generators may emit Markdown directly when the output is a small
+reference page. Release-facing, report-facing, or evidence-facing documents
+should continue to use `oodocs` for structured HTML/PDF output.
 
 ## Dependency Rules
 

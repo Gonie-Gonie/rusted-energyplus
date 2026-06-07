@@ -1,0 +1,147 @@
+[[milestone]]
+version = "0.16"
+title = "Versioning and Evidence Cleanup"
+status = "complete"
+claim_level = "planning-documentation"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance",
+  "plant compatibility",
+  "HVAC compatibility",
+]
+
+[[milestone]]
+version = "0.17"
+title = "Case Manifest and Output Request Schema v2"
+status = "complete"
+claim_level = "infrastructure-only"
+required_cases = [
+  "heat_balance_nomass_001",
+  "surface_temperature_nomass_001",
+]
+required_variables = []
+not_claimed = [
+  "new numerical conformance",
+  "ExampleFiles compatibility",
+  "meter conformance",
+]
+
+[[milestone]]
+version = "0.18"
+title = "Output Request Injection and Oracle Baseline Pipeline"
+status = "planned"
+claim_level = "baseline-only"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance unless promoted by report and gate",
+  "general heat-balance compatibility",
+  "HVAC compatibility",
+  "plant compatibility",
+]
+
+[[milestone]]
+version = "0.19"
+title = "Series Reader and Compare Engine v2"
+status = "planned"
+claim_level = "comparison-infrastructure"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance unless a case is explicitly promoted",
+  "meter conformance",
+]
+
+[[milestone]]
+version = "0.20"
+title = "Conformance Report Generator"
+status = "planned"
+claim_level = "reporting-infrastructure"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance unless backed by generated evidence",
+]
+
+[[milestone]]
+version = "0.21"
+title = "Source Map and Algorithm Ledger v1"
+status = "planned"
+claim_level = "planning-guard"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "algorithm completion without source map",
+]
+
+[[milestone]]
+version = "0.22"
+title = "Time, Weather, and Schedule Conformance Expansion"
+status = "planned"
+claim_level = "declared-variables-only"
+required_cases = []
+required_variables = [
+  "Site Outdoor Air Drybulb Temperature",
+  "Schedule Value",
+]
+not_claimed = [
+  "general runtime compatibility",
+]
+
+[[milestone]]
+version = "0.23"
+title = "Static Model Evidence Expansion"
+status = "planned"
+claim_level = "static-evidence"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "dynamic heat-balance compatibility",
+]
+
+[[milestone]]
+version = "0.24"
+title = "Runtime State and Output Registry Hardening"
+status = "planned"
+claim_level = "runtime-infrastructure"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "new numerical conformance",
+]
+
+[[milestone]]
+version = "0.25"
+title = "Opaque No-Mass Heat Balance Generalization"
+status = "planned"
+claim_level = "limited-conformance"
+required_cases = [
+  "heat_balance_nomass_001",
+  "surface_temperature_nomass_001",
+]
+required_variables = [
+  "Zone Mean Air Temperature",
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
+]
+not_claimed = [
+  "general heat-balance compatibility",
+  "HVAC compatibility",
+  "plant compatibility",
+]
+
+[[target]]
+version = "1.0"
+title = "Substantial Compatibility Draft"
+claim_level = "declared-subset"
+
+[[target]]
+version = "2.0"
+title = "EnergyPlus 26.1 Full Compatibility"
+claim_level = "full-compatibility-mode-with-evidence"
+
+[[target]]
+version = "3.0"
+title = "Fast Modernized Successor"
+claim_level = "mode-specific"

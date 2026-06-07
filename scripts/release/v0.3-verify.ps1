@@ -24,8 +24,8 @@ function Assert-FileExists {
 Write-Host "milestone: v0.3"
 Write-Host "scope: input interpretation contract, no runtime or numerical conformance claim"
 
-Assert-FileExists -Path "docs\src\operations\v0.3.0-plan.md" -Description "v0.3 plan"
-Assert-FileExists -Path "docs\src\operations\v0.3.0-readiness.md" -Description "v0.3 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.3.0-plan.md" -Description "v0.3 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.3.0-readiness.md" -Description "v0.3 readiness"
 Assert-FileExists -Path "data\testcases\minimal\minimal.epJSON" -Description "RawModel fixture"
 Assert-FileExists -Path "data\testcases\minimal\typed-model.epJSON" -Description "TypedModel fixture"
 Assert-FileExists -Path "data\testcases\minimal\missing-reference.epJSON" -Description "missing-reference fixture"

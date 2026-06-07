@@ -1,0 +1,99 @@
+[[object]]
+name = "Version"
+family = "project"
+status = "typed"
+
+[[object]]
+name = "Building"
+family = "building"
+status = "typed"
+
+[[object]]
+name = "Timestep"
+family = "time"
+status = "typed"
+
+[[object]]
+name = "RunPeriod"
+family = "time"
+status = "typed"
+
+[[object]]
+name = "Site:Location"
+family = "site"
+status = "typed"
+
+[[object]]
+name = "Material"
+family = "material"
+status = "typed"
+
+[[object]]
+name = "Material:NoMass"
+family = "material"
+status = "typed"
+
+[[object]]
+name = "Construction"
+family = "construction"
+status = "typed"
+
+[[object]]
+name = "ScheduleTypeLimits"
+family = "schedule"
+status = "typed"
+
+[[object]]
+name = "Schedule:Constant"
+family = "schedule"
+status = "typed"
+
+[[object]]
+name = "Schedule:Compact"
+family = "schedule"
+status = "typed"
+
+[[object]]
+name = "OtherEquipment"
+family = "internal_gains"
+status = "typed"
+
+[[object]]
+name = "ThermostatSetpoint:DualSetpoint"
+family = "thermostat"
+status = "typed"
+
+[[object]]
+name = "ZoneControl:Thermostat"
+family = "thermostat"
+status = "typed"
+
+[[object]]
+name = "ZoneHVAC:IdealLoadsAirSystem"
+family = "hvac"
+status = "typed_graph_only"
+
+[[object]]
+name = "NodeList"
+family = "hvac"
+status = "typed_graph_only"
+
+[[object]]
+name = "PlantLoop"
+family = "plant"
+status = "typed_graph_only"
+
+[[object]]
+name = "Pump:ConstantSpeed"
+family = "plant"
+status = "typed_graph_only"
+
+[[object]]
+name = "Boiler:HotWater"
+family = "plant"
+status = "typed_graph_only"
+
+[[object]]
+name = "Chiller:Electric:EIR"
+family = "plant"
+status = "typed_graph_only"

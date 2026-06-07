@@ -1,0 +1,24 @@
+[required_for_conformance]
+items = [
+  "case_manifest",
+  "declared_output_variables_or_meters",
+  "declared_tolerance_rules",
+  "energyplus_oracle_baseline",
+  "rust_result_artifact",
+  "compare_summary_json",
+  "compare_report_md",
+  "blocking_gate",
+]
+
+[forbidden_claim_sources]
+items = [
+  "markdown_wording_without_report",
+  "smoke_test_pass",
+  "diagnostic_command_output",
+  "single_sample_delta",
+  "performance_result",
+]
+
+[diagnostic_boundary]
+must_set_conformance_claim = false
+must_not_use_level = "conformance"

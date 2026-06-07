@@ -60,8 +60,8 @@ function Assert-ZipEntry {
     }
 }
 
-Assert-FileExists -Path "docs\src\operations\v0.11.0-plan.md" -Description "v0.11 plan"
-Assert-FileExists -Path "docs\src\operations\v0.11.0-readiness.md" -Description "v0.11 readiness"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.11.0-plan.md" -Description "v0.11 plan"
+Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.11.0-readiness.md" -Description "v0.11 readiness"
 Assert-FileExists -Path "docs\src\releases\v0.11.0.md" -Description "v0.11 release note"
 Assert-FileExists -Path "data\conformance_cases\air_side_node_diagnostic_001\case.toml" -Description "v0.11 air-side node diagnostic case"
 Assert-FileExists -Path "data\conformance_cases\air_side_node_diagnostic_001\air_side_node_diagnostic.idf" -Description "v0.11 air-side node diagnostic IDF"
@@ -85,10 +85,10 @@ Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Patter
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "state_nodes: 3" -Description "v0.11 node projection state count"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "status: projected" -Description "v0.11 node projection status"
 
-Assert-Contains -Path "docs\src\operations\v0.11.0-plan.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 plan case"
-Assert-Contains -Path "docs\src\operations\v0.11.0-plan.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.11 plan claim boundary"
-Assert-Contains -Path "docs\src\operations\v0.11.0-readiness.md" -Pattern "diagnostic-ready" -Description "v0.11 readiness status"
-Assert-Contains -Path "docs\src\operations\v0.11.0-readiness.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.11 readiness claim boundary"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.11.0-plan.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 plan case"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.11.0-plan.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.11 plan claim boundary"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.11.0-readiness.md" -Pattern "diagnostic-ready" -Description "v0.11 readiness status"
+Assert-Contains -Path "docs\src\archive\pre-alpha\v0.11.0-readiness.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.11 readiness claim boundary"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 output matrix"
 Assert-Contains -Path "docs\src\porting-map\hvac.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 HVAC map"
 

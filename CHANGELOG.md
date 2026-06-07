@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Restructured mdBook navigation around short `current/`, `guides/`,
+  `generated/`, and `archive/` sections.
+- Added machine-readable `specs/` for project contract, milestones, algorithm
+  ledger, evidence levels, claim rules, object coverage, and variable coverage.
+- Added `docs-generate` and stale generated-doc checks for spec-derived
+  mdBook reference pages.
+- Archived v0.1 through v0.15 plan/readiness notes under
+  `docs/src/archive/pre-alpha`.
+- Split `ep_model` into ID, name, unit, object, and aggregate model modules.
+- Split `ep_compare` into tolerance, series, ESO, and EIO modules.
+- Moved `ep_conformance` unit tests out of the main schema file.
+
+### Added
+
+- `file-size-check` guard and PR template with claim-boundary/evidence fields.
+- Short crate README files for the core Rust crates.
+
 ## v0.17.0 - 2026-06-07
 
 Case Manifest and Output Request Schema v2 release.

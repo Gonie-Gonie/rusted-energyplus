@@ -1,0 +1,67 @@
+[[algorithm]]
+id = "zone_air_heat_balance"
+domain = "heat_balance"
+energyplus_source = [
+  "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/zone_air.rs",
+]
+status = "source_mapped"
+first_case = "heat_balance_nomass_001"
+proof_variables = [
+  "Zone Mean Air Temperature",
+  "Zone Air Heat Balance Air Energy Storage Rate",
+]
+claim_level = "limited-conformance"
+
+[[algorithm]]
+id = "surface_inside_temperature"
+domain = "heat_balance"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/surface_inside.rs",
+]
+status = "source_mapped"
+first_case = "surface_temperature_nomass_001"
+proof_variables = [
+  "Surface Inside Face Temperature",
+]
+claim_level = "limited-conformance"
+
+[[algorithm]]
+id = "air_side_node_state"
+domain = "hvac"
+energyplus_source = [
+  "src/EnergyPlus/DataLoopNode.hh",
+  "src/EnergyPlus/OutputProcessor.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/hvac/node_state.rs",
+]
+status = "diagnostic_only"
+first_case = "air_side_node_diagnostic_001"
+proof_variables = [
+  "System Node Temperature",
+  "System Node Mass Flow Rate",
+]
+claim_level = "none"
+
+[[algorithm]]
+id = "plant_loop_state_projection"
+domain = "plant"
+energyplus_source = [
+  "src/EnergyPlus/Plant/PlantLoopSolver.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/plant/plant_loop.rs",
+]
+status = "diagnostic_only"
+first_case = "plant_loop_diagnostic_001"
+proof_variables = [
+  "Plant Supply Side Inlet Temperature",
+  "Plant Supply Side Outlet Temperature",
+]
+claim_level = "none"

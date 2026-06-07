@@ -3,3 +3,6 @@
 mod conformance;
 
 pub use conformance::*;
+
+#[cfg(test)]
+mod tests;
