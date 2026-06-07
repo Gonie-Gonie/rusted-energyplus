@@ -28,7 +28,8 @@ EnergyPlus 26.1.0 oracle:
 - conformance harness, baseline generation, and report skeletons
 - static geometry, construction/material, and internal-gain smoke evidence
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
-- baseline-only thermostat, IdealLoads, and air-side node diagnostic evidence
+- baseline-only thermostat and IdealLoads evidence, plus diagnostic-only
+  air-side node baseline/projection evidence
 
 This public scope does not claim:
 
@@ -88,7 +89,8 @@ Current development evidence checks:
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
 their declared variables. v0.10 is a baseline-only typed-graph gate for
 thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
-baseline evidence.
+baseline evidence plus Rust projection plumbing, with no node numerical
+conformance claim.
 
 Developer-only diagnostics:
 

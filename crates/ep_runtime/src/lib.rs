@@ -1,9 +1,10 @@
 //! Runtime state, execution-plan shells, and first trace helpers.
 
 use ep_model::{
-    AutoOrNumber, ConstructionId, IdealLoadsAirSystemId, MaterialId, OtherEquipment, OutputHandle,
-    OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId,
-    SimulationModel, Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneId, ZoneThermostatId,
+    AutoOrNumber, AutosizeOrNumber, ConstructionId, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+    MaterialId, NodeId, NormalizedName, OtherEquipment, OutputHandle, OutsideBoundaryCondition,
+    Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, Surface,
+    SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -596,11 +597,101 @@ pub struct HeatBalanceSimulation {
     pub summary: HeatBalanceSimulationSummary,
 }
 
+/// Role assigned to a node-state projection row.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NodeStateRole {
+    /// Zone inlet or IdealLoads supply node.
+    Supply,
+    /// Zone air node.
+    ZoneAir,
+    /// Zone return node.
+    ReturnAir,
+}
+
+impl NodeStateRole {
+    /// Stable diagnostic label.
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Supply => "supply",
+            Self::ZoneAir => "zone-air",
+            Self::ReturnAir => "return-air",
+        }
+    }
+}
+
+/// Options for the diagnostic IdealLoads node-state projection.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NodeStateProjectionOptions {
+    /// Number of hourly samples to write.
+    pub sample_count: usize,
+    /// Fallback zone-air temperature in C.
+    pub default_zone_air_temperature_c: f64,
+    /// Fallback zone-air humidity ratio in kgWater/kgDryAir.
+    pub default_zone_air_humidity_ratio: f64,
+    /// Fallback supply-air temperature in C when no IdealLoads value exists.
+    pub default_supply_air_temperature_c: f64,
+    /// Fallback supply-air humidity ratio in kgWater/kgDryAir.
+    pub default_supply_air_humidity_ratio: f64,
+    /// Fallback supply-air mass flow rate in kg/s when no design flow exists.
+    pub default_supply_air_mass_flow_rate_kg_per_s: f64,
+}
+
+impl NodeStateProjectionOptions {
+    /// Creates options with a fixed hourly sample count.
+    #[must_use]
+    pub const fn hourly_samples(sample_count: usize) -> Self {
+        Self {
+            sample_count,
+            default_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            default_zone_air_humidity_ratio: 0.008,
+            default_supply_air_temperature_c: 50.0,
+            default_supply_air_humidity_ratio: 0.0156,
+            default_supply_air_mass_flow_rate_kg_per_s: 0.5,
+        }
+    }
+}
+
+/// One resolved node represented by the node-state projection.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NodeStateProjectionNode {
+    /// Resolved typed node ID.
+    pub node_id: NodeId,
+    /// EnergyPlus-normalized node key.
+    pub node_name: String,
+    /// Diagnostic role for the node.
+    pub role: NodeStateRole,
+}
+
+/// Summary for the diagnostic IdealLoads node-state projection.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NodeStateProjectionSummary {
+    /// Hourly output sample count.
+    pub samples: usize,
+    /// Number of unique nodes represented.
+    pub node_count: usize,
+    /// Number of output series written.
+    pub series_count: usize,
+    /// Resolved nodes in output order.
+    pub nodes: Vec<NodeStateProjectionNode>,
+}
+
+/// Result of the diagnostic IdealLoads node-state projection.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NodeStateProjection {
+    /// Native output results.
+    pub results: ResultStore,
+    /// Projection summary.
+    pub summary: NodeStateProjectionSummary,
+}
+
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
     /// No zones were available to simulate.
     NoZones,
+    /// No air-side nodes were available for a node-state projection.
+    NoNodeStateProjectionNodes,
     /// No weather data was supplied.
     NoWeatherData,
     /// Requested more hourly samples than the weather series contains.
@@ -638,6 +729,10 @@ impl Display for RuntimeError {
             Self::NoZones => write!(
                 formatter,
                 "first-zone simulation requires at least one Zone"
+            ),
+            Self::NoNodeStateProjectionNodes => write!(
+                formatter,
+                "node-state projection requires at least one resolved air-side node"
             ),
             Self::NoWeatherData => write!(formatter, "first-zone simulation requires weather data"),
             Self::SampleCountExceedsWeather {
@@ -749,6 +844,285 @@ pub fn simulate_first_zone_uncontrolled(
         results,
         summary: characteristics,
     })
+}
+
+/// Writes a deterministic diagnostic projection of IdealLoads-related node
+/// state outputs.
+///
+/// This function intentionally does not claim EnergyPlus algorithm parity. It
+/// maps the typed air-side node graph to native `ResultStore` series so the
+/// port can exercise NodeList expansion, node output registration, and result
+/// artifact plumbing before the full HVAC manager is ported.
+pub fn simulate_ideal_loads_node_state_projection(
+    model: &SimulationModel,
+    options: NodeStateProjectionOptions,
+) -> Result<NodeStateProjection, RuntimeError> {
+    let mut projected_nodes = Vec::new();
+
+    for connection in &model.typed.zone_equipment_connections {
+        let ideal_loads = ideal_loads_for_connection(&model.typed, connection);
+        let supply_temperature_c = ideal_loads
+            .map(|system| system.maximum_heating_supply_air_temperature_c)
+            .unwrap_or(options.default_supply_air_temperature_c);
+        let supply_humidity_ratio = ideal_loads
+            .map(|system| system.maximum_heating_supply_air_humidity_ratio)
+            .unwrap_or(options.default_supply_air_humidity_ratio);
+        let supply_mass_flow_rate_kg_per_s = ideal_loads
+            .and_then(ideal_loads_design_mass_flow_rate_kg_per_s)
+            .unwrap_or(options.default_supply_air_mass_flow_rate_kg_per_s);
+
+        let supply_nodes = connection
+            .zone_air_inlet_node_or_nodelist_name
+            .as_ref()
+            .map(|name| resolve_node_or_nodelist(&model.typed, name))
+            .unwrap_or_default();
+        let supply_node_count = supply_nodes.len().max(1) as f64;
+        for node_id in supply_nodes {
+            if let Some(node_name) = node_name_for_id(&model.typed, node_id) {
+                push_or_accumulate_projected_node(
+                    &mut projected_nodes,
+                    ProjectedNodeState {
+                        node_id,
+                        node_name,
+                        role: NodeStateRole::Supply,
+                        temperature_c: supply_temperature_c,
+                        humidity_ratio: supply_humidity_ratio,
+                        mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s / supply_node_count,
+                    },
+                );
+            }
+        }
+
+        if let Some(zone_air_node_id) = model
+            .typed
+            .node_names
+            .resolve(&connection.zone_air_node_name.0)
+            && let Some(node_name) = node_name_for_id(&model.typed, zone_air_node_id)
+        {
+            push_or_accumulate_projected_node(
+                &mut projected_nodes,
+                ProjectedNodeState {
+                    node_id: zone_air_node_id,
+                    node_name,
+                    role: NodeStateRole::ZoneAir,
+                    temperature_c: options.default_zone_air_temperature_c,
+                    humidity_ratio: options.default_zone_air_humidity_ratio,
+                    mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s,
+                },
+            );
+        }
+
+        let return_nodes = connection
+            .zone_return_air_node_or_nodelist_name
+            .as_ref()
+            .map(|name| resolve_node_or_nodelist(&model.typed, name))
+            .unwrap_or_default();
+        for node_id in return_nodes {
+            if let Some(node_name) = node_name_for_id(&model.typed, node_id) {
+                push_or_accumulate_projected_node(
+                    &mut projected_nodes,
+                    ProjectedNodeState {
+                        node_id,
+                        node_name,
+                        role: NodeStateRole::ReturnAir,
+                        temperature_c: options.default_zone_air_temperature_c,
+                        humidity_ratio: options.default_zone_air_humidity_ratio,
+                        mass_flow_rate_kg_per_s: supply_mass_flow_rate_kg_per_s,
+                    },
+                );
+            }
+        }
+    }
+
+    if projected_nodes.is_empty() {
+        return Err(RuntimeError::NoNodeStateProjectionNodes);
+    }
+
+    let mut results = ResultStore::new();
+    let mut handle_index = 0_u32;
+    for node in &projected_nodes {
+        add_constant_output_series(
+            &mut results,
+            &mut handle_index,
+            &node.node_name,
+            "System Node Temperature",
+            "C",
+            node.temperature_c,
+            options.sample_count,
+        );
+        add_constant_output_series(
+            &mut results,
+            &mut handle_index,
+            &node.node_name,
+            "System Node Humidity Ratio",
+            "kgWater/kgDryAir",
+            node.humidity_ratio,
+            options.sample_count,
+        );
+        add_constant_output_series(
+            &mut results,
+            &mut handle_index,
+            &node.node_name,
+            "System Node Mass Flow Rate",
+            "kg/s",
+            node.mass_flow_rate_kg_per_s,
+            options.sample_count,
+        );
+    }
+
+    Ok(NodeStateProjection {
+        summary: NodeStateProjectionSummary {
+            samples: options.sample_count,
+            node_count: projected_nodes.len(),
+            series_count: results.series.len(),
+            nodes: projected_nodes
+                .iter()
+                .map(|node| NodeStateProjectionNode {
+                    node_id: node.node_id,
+                    node_name: node.node_name.clone(),
+                    role: node.role,
+                })
+                .collect(),
+        },
+        results,
+    })
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct ProjectedNodeState {
+    node_id: NodeId,
+    node_name: String,
+    role: NodeStateRole,
+    temperature_c: f64,
+    humidity_ratio: f64,
+    mass_flow_rate_kg_per_s: f64,
+}
+
+fn push_or_accumulate_projected_node(
+    nodes: &mut Vec<ProjectedNodeState>,
+    node: ProjectedNodeState,
+) {
+    if let Some(existing) = nodes
+        .iter_mut()
+        .find(|existing| existing.node_id == node.node_id)
+    {
+        let total_flow = existing.mass_flow_rate_kg_per_s + node.mass_flow_rate_kg_per_s;
+        if total_flow > 0.0 {
+            existing.temperature_c = weighted_value(
+                existing.temperature_c,
+                existing.mass_flow_rate_kg_per_s,
+                node.temperature_c,
+                node.mass_flow_rate_kg_per_s,
+                total_flow,
+            );
+            existing.humidity_ratio = weighted_value(
+                existing.humidity_ratio,
+                existing.mass_flow_rate_kg_per_s,
+                node.humidity_ratio,
+                node.mass_flow_rate_kg_per_s,
+                total_flow,
+            );
+        }
+        existing.mass_flow_rate_kg_per_s = total_flow;
+        return;
+    }
+
+    nodes.push(node);
+}
+
+fn weighted_value(
+    existing_value: f64,
+    existing_weight: f64,
+    new_value: f64,
+    new_weight: f64,
+    total_weight: f64,
+) -> f64 {
+    (existing_value * existing_weight + new_value * new_weight) / total_weight
+}
+
+fn add_constant_output_series(
+    results: &mut ResultStore,
+    handle_index: &mut u32,
+    key: &str,
+    variable_name: &str,
+    units: &str,
+    value: f64,
+    sample_count: usize,
+) {
+    results.add_series(OutputSeries {
+        handle: OutputHandle(*handle_index),
+        key: key.to_string(),
+        variable_name: variable_name.to_string(),
+        units: units.to_string(),
+        values: vec![value; sample_count],
+    });
+    *handle_index += 1;
+}
+
+fn resolve_node_or_nodelist(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
+    if let Some(node_id) = model.node_names.resolve(&name.0) {
+        return vec![node_id];
+    }
+
+    if let Some(node_list_id) = model.node_list_names.resolve(&name.0)
+        && let Some(node_list) = model
+            .node_lists
+            .iter()
+            .find(|node_list| node_list.id == node_list_id)
+    {
+        return node_list.nodes.clone();
+    }
+
+    Vec::new()
+}
+
+fn node_name_for_id(model: &TypedModel, node_id: NodeId) -> Option<String> {
+    model
+        .nodes
+        .iter()
+        .find(|node| node.id == node_id)
+        .map(|node| node.name.0.clone())
+}
+
+fn ideal_loads_for_connection<'a>(
+    model: &'a TypedModel,
+    connection: &ZoneEquipmentConnection,
+) -> Option<&'a IdealLoadsAirSystem> {
+    let list = model
+        .zone_equipment_lists
+        .iter()
+        .find(|list| list.id == connection.equipment_list)?;
+    let entry = list.equipment.iter().min_by_key(|entry| {
+        (
+            entry.heating_or_no_load_sequence,
+            entry.cooling_sequence,
+            entry.ideal_loads_air_system,
+        )
+    })?;
+    model
+        .ideal_loads_air_systems
+        .iter()
+        .find(|system| system.id == entry.ideal_loads_air_system)
+}
+
+fn ideal_loads_design_mass_flow_rate_kg_per_s(system: &IdealLoadsAirSystem) -> Option<f64> {
+    let heating_flow_m3_per_s =
+        autosized_or_numeric_value(system.maximum_heating_air_flow_rate_m3_per_s);
+    let cooling_flow_m3_per_s =
+        autosized_or_numeric_value(system.maximum_cooling_air_flow_rate_m3_per_s);
+    heating_flow_m3_per_s
+        .into_iter()
+        .chain(cooling_flow_m3_per_s)
+        .filter(|value| *value > 0.0)
+        .reduce(f64::max)
+        .map(|flow_m3_per_s| flow_m3_per_s * AIR_DENSITY_KG_PER_M3)
+}
+
+fn autosized_or_numeric_value(value: Option<AutosizeOrNumber>) -> Option<f64> {
+    match value {
+        Some(AutosizeOrNumber::Value(value)) => Some(value),
+        Some(AutosizeOrNumber::Autosize) | None => None,
+    }
 }
 
 fn derive_first_zone_characteristics(
@@ -1911,26 +2285,27 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, OutputSeries, ResultStore, SimulationMode, SimulationState,
-        advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
-        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        HeatBalanceStepInput, NodeStateProjectionOptions, NodeStateRole, OutputSeries, ResultStore,
+        SimulationMode, SimulationState, advance_heat_balance_state_one_timestep,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        initialize_heat_balance_state, parse_epw_dry_bulb_series, parse_epw_records,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
         surface_geometry_summaries, zone_geometry_summaries,
     };
     use ep_model::{
-        AutoOrNumber, Construction, ConstructionId, DehumidificationControlType,
+        AutoOrNumber, AutosizeOrNumber, Construction, ConstructionId, DehumidificationControlType,
         DemandControlledVentilationType, HeatRecoveryType, HumidificationControlType,
         IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
-        InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind, NormalizedName,
-        OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition, Point3,
-        RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
-        ScheduleId, SimulationModel, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
-        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Zone,
-        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
-        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+        InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind, Node, NodeId,
+        NodeList, NodeListId, NormalizedName, OtherEquipment, OutdoorAirEconomizerType,
+        OutputHandle, OutsideBoundaryCondition, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
+        ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel, Surface, SurfaceId,
+        SurfaceType, ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId,
+        TimestepConfig, TypedModel, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+        ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+        ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
 
     #[test]
@@ -2224,6 +2599,180 @@ mod tests {
             plan.stages[1].steps[2],
             ExecutionStep::EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
+    }
+
+    #[test]
+    fn ideal_loads_node_state_projection_expands_nodelist_and_writes_series()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = ideal_loads_node_state_model();
+
+        let projection = simulate_ideal_loads_node_state_projection(
+            &model,
+            NodeStateProjectionOptions::hourly_samples(4),
+        )?;
+
+        assert_eq!(projection.summary.samples, 4);
+        assert_eq!(projection.summary.node_count, 3);
+        assert_eq!(projection.summary.series_count, 9);
+        assert_eq!(
+            projection
+                .summary
+                .nodes
+                .iter()
+                .map(|node| (node.node_name.as_str(), node.role))
+                .collect::<Vec<_>>(),
+            vec![
+                ("ZONE ONE INLET", NodeStateRole::Supply),
+                ("ZONE ONE AIR NODE", NodeStateRole::ZoneAir),
+                ("ZONE ONE RETURN", NodeStateRole::ReturnAir),
+            ]
+        );
+
+        let inlet_temperature = projection
+            .results
+            .find_series("ZONE ONE INLET", "System Node Temperature")
+            .ok_or_else(|| std::io::Error::other("missing inlet temperature series"))?;
+        assert_eq!(inlet_temperature.values, vec![50.0; 4]);
+
+        let inlet_humidity = projection
+            .results
+            .find_series("ZONE ONE INLET", "System Node Humidity Ratio")
+            .ok_or_else(|| std::io::Error::other("missing inlet humidity series"))?;
+        assert_eq!(inlet_humidity.values, vec![0.0156; 4]);
+
+        let inlet_mass_flow = projection
+            .results
+            .find_series("ZONE ONE INLET", "System Node Mass Flow Rate")
+            .ok_or_else(|| std::io::Error::other("missing inlet mass flow series"))?;
+        assert!(
+            inlet_mass_flow
+                .values
+                .iter()
+                .all(|value| (*value - 0.3).abs() < 1.0e-12)
+        );
+
+        let zone_air_temperature = projection
+            .results
+            .find_series("ZONE ONE AIR NODE", "System Node Temperature")
+            .ok_or_else(|| std::io::Error::other("missing zone air temperature series"))?;
+        assert_eq!(zone_air_temperature.values, vec![23.0; 4]);
+
+        let return_mass_flow = projection
+            .results
+            .find_series("ZONE ONE RETURN", "System Node Mass Flow Rate")
+            .ok_or_else(|| std::io::Error::other("missing return mass flow series"))?;
+        assert!(
+            return_mass_flow
+                .values
+                .iter()
+                .all(|value| (*value - 0.3).abs() < 1.0e-12)
+        );
+
+        Ok(())
+    }
+
+    fn ideal_loads_node_state_model() -> SimulationModel {
+        let mut typed = TypedModel::default();
+        typed.zones.push(Zone {
+            id: ZoneId(0),
+            name: NormalizedName::new("Zone One"),
+            direction_of_relative_north_deg: 0.0,
+            origin: Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::AutoCalculate,
+        });
+        typed.nodes.push(Node {
+            id: NodeId(0),
+            name: NormalizedName::new("Zone One Inlet"),
+        });
+        typed.nodes.push(Node {
+            id: NodeId(1),
+            name: NormalizedName::new("Zone One Air Node"),
+        });
+        typed.nodes.push(Node {
+            id: NodeId(2),
+            name: NormalizedName::new("Zone One Return"),
+        });
+        typed.node_names.insert("Zone One Inlet", NodeId(0));
+        typed.node_names.insert("Zone One Air Node", NodeId(1));
+        typed.node_names.insert("Zone One Return", NodeId(2));
+        typed.node_lists.push(NodeList {
+            id: NodeListId(0),
+            name: NormalizedName::new("Zone One Inlets"),
+            nodes: vec![NodeId(0)],
+        });
+        typed
+            .node_list_names
+            .insert("Zone One Inlets", NodeListId(0));
+        typed.ideal_loads_air_systems.push(IdealLoadsAirSystem {
+            id: IdealLoadsAirSystemId(0),
+            name: NormalizedName::new("Zone One Ideal Loads"),
+            availability_schedule: None,
+            zone_supply_air_node_name: NormalizedName::new("Zone One Inlets"),
+            zone_exhaust_air_node_name: None,
+            system_inlet_air_node_name: None,
+            maximum_heating_supply_air_temperature_c: 50.0,
+            minimum_cooling_supply_air_temperature_c: 13.0,
+            maximum_heating_supply_air_humidity_ratio: 0.0156,
+            minimum_cooling_supply_air_humidity_ratio: 0.0077,
+            heating_limit: IdealLoadsLimit::NoLimit,
+            maximum_heating_air_flow_rate_m3_per_s: Some(AutosizeOrNumber::Value(0.25)),
+            maximum_sensible_heating_capacity_w: None,
+            cooling_limit: IdealLoadsLimit::NoLimit,
+            maximum_cooling_air_flow_rate_m3_per_s: None,
+            maximum_total_cooling_capacity_w: None,
+            heating_availability_schedule: None,
+            cooling_availability_schedule: None,
+            dehumidification_control_type: DehumidificationControlType::ConstantSensibleHeatRatio,
+            cooling_sensible_heat_ratio: 0.7,
+            humidification_control_type: HumidificationControlType::None,
+            design_specification_outdoor_air_object_name: None,
+            outdoor_air_inlet_node_name: None,
+            demand_controlled_ventilation_type: DemandControlledVentilationType::None,
+            outdoor_air_economizer_type: OutdoorAirEconomizerType::NoEconomizer,
+            heat_recovery_type: HeatRecoveryType::None,
+            sensible_heat_recovery_effectiveness: 0.7,
+            latent_heat_recovery_effectiveness: 0.65,
+            design_specification_zonehvac_sizing_object_name: None,
+            heating_fuel_efficiency_schedule: None,
+            heating_fuel_type: IdealLoadsFuelType::DistrictHeatingWater,
+            cooling_fuel_efficiency_schedule: None,
+            cooling_fuel_type: IdealLoadsFuelType::DistrictCooling,
+        });
+        typed.zone_equipment_lists.push(ZoneEquipmentList {
+            id: ZoneEquipmentListId(0),
+            name: NormalizedName::new("Zone One Equipment"),
+            load_distribution_scheme: LoadDistributionScheme::SequentialLoad,
+            equipment: vec![ZoneEquipmentListEntry {
+                object_type: ZoneEquipmentObjectType::IdealLoadsAirSystem,
+                ideal_loads_air_system: IdealLoadsAirSystemId(0),
+                cooling_sequence: 1,
+                heating_or_no_load_sequence: 1,
+                sequential_cooling_fraction_schedule: None,
+                sequential_heating_fraction_schedule: None,
+            }],
+        });
+        typed
+            .zone_equipment_connections
+            .push(ZoneEquipmentConnection {
+                id: ZoneEquipmentConnectionId(0),
+                zone: ZoneId(0),
+                equipment_list: ZoneEquipmentListId(0),
+                zone_air_inlet_node_or_nodelist_name: Some(NormalizedName::new("Zone One Inlets")),
+                zone_air_exhaust_node_or_nodelist_name: None,
+                zone_air_node_name: NormalizedName::new("Zone One Air Node"),
+                zone_return_air_node_or_nodelist_name: Some(NormalizedName::new("Zone One Return")),
+                zone_return_air_node_1_flow_rate_fraction_schedule: None,
+                zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: None,
+            });
+
+        SimulationModel::from_typed(typed)
     }
 
     #[test]

@@ -11,6 +11,7 @@ $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
 $OutputRoot = Join-Path $RepoRoot ".runtime\air-side-node-diagnostic\26.1.0"
 $ReportRoot = Join-Path $OutputRoot "report-skeleton"
+$ProjectionRoot = Join-Path $OutputRoot "node-state-projection"
 $CaseId = "air_side_node_diagnostic_001"
 $CasePath = Join-Path $RepoRoot "data\conformance_cases\$CaseId\case.toml"
 $CaseOutputRoot = Join-Path $OutputRoot $CaseId
@@ -245,6 +246,86 @@ foreach ($node in @("ZONE ONE INLET", "ZONE ONE AIR NODE", "ZONE ONE RETURN")) {
         }
         if ([int]$row.baseline_nonzero_count -le 0) {
             throw "Node-state baseline must include nonzero samples for $node / $variable"
+        }
+    }
+}
+
+Write-Host "Writing v0.11 Rust air-side node-state projection."
+$projectionOutput = & $cargo.Source run -p ep_cli --quiet -- run node-state-projection $EpJsonPath $ProjectionRoot 2>&1
+if ($LASTEXITCODE -ne 0) {
+    $projectionOutput | ForEach-Object { Write-Host $_ }
+    throw "Air-side node diagnostic Rust node-state projection failed."
+}
+$projectionText = ($projectionOutput -join "`n")
+Assert-Contains -Text $projectionText -Pattern "Node State Projection" -Description "projection header"
+Assert-Contains -Text $projectionText -Pattern "runtime_class: ideal-loads-node-state-projection" -Description "projection runtime class"
+Assert-Contains -Text $projectionText -Pattern "comparison_class: diagnostic-only" -Description "projection diagnostic class"
+Assert-Contains -Text $projectionText -Pattern "conformance_claim: false" -Description "projection claim boundary"
+Assert-Contains -Text $projectionText -Pattern "algorithm_parity: false" -Description "projection algorithm boundary"
+Assert-Contains -Text $projectionText -Pattern "tolerance_policy: none" -Description "projection tolerance boundary"
+Assert-Contains -Text $projectionText -Pattern "nodes: 3" -Description "projection node count"
+Assert-Contains -Text $projectionText -Pattern "samples: 24" -Description "projection sample count"
+Assert-Contains -Text $projectionText -Pattern "series: 9" -Description "projection series count"
+Assert-Contains -Text $projectionText -Pattern "status: projected" -Description "projection status"
+
+$ProjectionMarkdown = Join-Path $ProjectionRoot "node-state-summary.md"
+$ProjectionSummary = Join-Path $ProjectionRoot "node-state-summary.json"
+Assert-FileExists -Path $ProjectionMarkdown -Description "v0.11 Rust node-state markdown summary"
+Assert-FileExists -Path $ProjectionSummary -Description "v0.11 Rust node-state JSON summary"
+
+$projectionMarkdownText = Get-Content -LiteralPath $ProjectionMarkdown -Raw
+Assert-Contains -Text $projectionMarkdownText -Pattern "comparison_class: diagnostic-only" -Description "projection markdown diagnostic class"
+Assert-Contains -Text $projectionMarkdownText -Pattern "conformance_claim: false" -Description "projection markdown claim boundary"
+Assert-Contains -Text $projectionMarkdownText -Pattern "status: projected" -Description "projection markdown status"
+Assert-Contains -Text $projectionMarkdownText -Pattern "ZONE ONE INLET" -Description "projection markdown inlet node"
+Assert-Contains -Text $projectionMarkdownText -Pattern "System Node Mass Flow Rate" -Description "projection markdown mass flow"
+
+$projection = Get-Content -LiteralPath $ProjectionSummary -Raw | ConvertFrom-Json
+if ($projection.comparison_class -ne "diagnostic-only") {
+    throw "Unexpected v0.11 projection comparison_class: $($projection.comparison_class)"
+}
+if ($projection.conformance_claim -ne $false) {
+    throw "v0.11 projection must keep conformance_claim=false"
+}
+if ($projection.algorithm_parity -ne $false) {
+    throw "v0.11 projection must keep algorithm_parity=false"
+}
+if ($projection.tolerance_policy -ne "none") {
+    throw "v0.11 projection must keep tolerance_policy=none"
+}
+if ($projection.status -ne "projected") {
+    throw "Unexpected v0.11 projection status: $($projection.status)"
+}
+if ([int]$projection.nodes -ne 3) {
+    throw "Unexpected v0.11 projection node count: $($projection.nodes)"
+}
+if ([int]$projection.samples -ne 24) {
+    throw "Unexpected v0.11 projection sample count: $($projection.samples)"
+}
+if ([int]$projection.series -ne 9) {
+    throw "Unexpected v0.11 projection series count: $($projection.series)"
+}
+if ($projection.node_order.Count -ne 3) {
+    throw "Unexpected v0.11 projection node order count: $($projection.node_order.Count)"
+}
+if ($projection.result_series.Count -ne 9) {
+    throw "Unexpected v0.11 projection result series count: $($projection.result_series.Count)"
+}
+
+foreach ($node in @("ZONE ONE INLET", "ZONE ONE AIR NODE", "ZONE ONE RETURN")) {
+    foreach ($variable in @("System Node Temperature", "System Node Humidity Ratio", "System Node Mass Flow Rate")) {
+        $row = $projection.result_series | Where-Object { $_.key -eq $node -and $_.variable -eq $variable }
+        if (-not $row) {
+            throw "Missing v0.11 Rust projection row for $node / $variable"
+        }
+        if ([int]$row.samples -ne 24) {
+            throw "Unexpected Rust projection sample count for $node / $variable`: $($row.samples)"
+        }
+        if ([int]$row.nonzero_count -ne 24) {
+            throw "Rust projection must include nonzero hourly samples for $node / $variable"
+        }
+        if ($row.status -ne "projected") {
+            throw "Unexpected Rust projection status for $node / $variable`: $($row.status)"
         }
     }
 }

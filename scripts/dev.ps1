@@ -88,7 +88,7 @@ $Commands = [ordered]@{
     "air-side-node-diagnostic-smoke" = @{
         Path = "smoke\air-side-node-diagnostic-smoke.ps1"
         Group = "smoke"
-        Help = "Gate the v0.11 air-side node diagnostic baseline evidence."
+        Help = "Gate the v0.11 air-side node baseline evidence and Rust projection."
     }
     "compare-schedule-smoke" = @{
         Path = "compare\compare-schedule-smoke.ps1"

@@ -17,11 +17,11 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-    SimulationMode, SurfaceGeometrySummary, ZoneGeometrySummary, build_execution_plan,
-    build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_heat_balance_zone_air_temperatures, simulate_zone_internal_convective_gains,
-    surface_geometry_summaries, zone_geometry_summaries,
+    NodeStateProjection, NodeStateProjectionOptions, SimulationMode, SurfaceGeometrySummary,
+    ZoneGeometrySummary, build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series,
+    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
+    simulate_zone_internal_convective_gains, surface_geometry_summaries, zone_geometry_summaries,
 };
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -200,6 +200,7 @@ fn print_help() {
     println!("  model plan <input.epJSON>");
     println!("  model geometry <input.epJSON>");
     println!("  run first-zone <input.epJSON> <weather.epw> [--hours N]");
+    println!("  run node-state-projection <input.epJSON> <output-dir> [--hours N]");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
@@ -1373,6 +1374,150 @@ fn markdown_cell(value: &str) -> String {
     value.replace('|', "\\|")
 }
 
+fn write_node_state_projection_artifacts(
+    output_dir: &Path,
+    projection: &NodeStateProjection,
+) -> Result<(), String> {
+    std::fs::create_dir_all(output_dir)
+        .map_err(|error| format!("failed to create node-state output directory: {error}"))?;
+    std::fs::write(
+        output_dir.join("node-state-summary.md"),
+        render_node_state_projection_markdown(projection),
+    )
+    .map_err(|error| format!("failed to write node-state markdown summary: {error}"))?;
+    std::fs::write(
+        output_dir.join("node-state-summary.json"),
+        render_node_state_projection_summary_json(projection),
+    )
+    .map_err(|error| format!("failed to write node-state JSON summary: {error}"))?;
+    Ok(())
+}
+
+fn render_node_state_projection_markdown(projection: &NodeStateProjection) -> String {
+    let mut report = String::new();
+    report.push_str("# Node State Projection\n\n");
+    report.push_str("runtime_class: ideal-loads-node-state-projection\n");
+    report.push_str("comparison_class: diagnostic-only\n");
+    report.push_str("conformance_claim: false\n");
+    report.push_str("algorithm_parity: false\n");
+    report.push_str("tolerance_policy: none\n");
+    report.push_str("status: projected\n");
+    report.push_str(&format!("samples: {}\n", projection.summary.samples));
+    report.push_str(&format!("nodes: {}\n", projection.summary.node_count));
+    report.push_str(&format!("series: {}\n\n", projection.summary.series_count));
+    report.push_str(
+        "| key | role | variable | units | samples | first | last | nonzero_count | status |\n",
+    );
+    report.push_str("|---|---|---|---|---:|---:|---:|---:|---|\n");
+    for series in &projection.results.series {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {} | projected |\n",
+            markdown_cell(&series.key),
+            projection_role_for_key(projection, &series.key),
+            markdown_cell(&series.variable_name),
+            markdown_cell(&series.units),
+            series.values.len(),
+            first_value_label(&series.values),
+            last_value_label(&series.values),
+            nonzero_count(&series.values)
+        ));
+    }
+    report
+}
+
+fn render_node_state_projection_summary_json(projection: &NodeStateProjection) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str("  \"runtime_class\": \"ideal-loads-node-state-projection\",\n");
+    json.push_str("  \"comparison_class\": \"diagnostic-only\",\n");
+    json.push_str("  \"conformance_claim\": false,\n");
+    json.push_str("  \"algorithm_parity\": false,\n");
+    json.push_str("  \"tolerance_policy\": \"none\",\n");
+    json.push_str("  \"status\": \"projected\",\n");
+    json.push_str(&format!("  \"samples\": {},\n", projection.summary.samples));
+    json.push_str(&format!(
+        "  \"nodes\": {},\n",
+        projection.summary.node_count
+    ));
+    json.push_str(&format!(
+        "  \"series\": {},\n",
+        projection.summary.series_count
+    ));
+    json.push_str("  \"artifacts\": {\n");
+    json.push_str("    \"summary_markdown\": \"node-state-summary.md\",\n");
+    json.push_str("    \"summary_json\": \"node-state-summary.json\"\n");
+    json.push_str("  },\n");
+    json.push_str("  \"node_order\": [\n");
+    for (index, node) in projection.summary.nodes.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!("      \"node_id\": {},\n", node.node_id.0));
+        json.push_str(&format!(
+            "      \"key\": {},\n",
+            json_string(&node.node_name)
+        ));
+        json.push_str(&format!(
+            "      \"role\": {}\n",
+            json_string(node.role.label())
+        ));
+        if index + 1 == projection.summary.nodes.len() {
+            json.push_str("    }\n");
+        } else {
+            json.push_str("    },\n");
+        }
+    }
+    json.push_str("  ],\n");
+    json.push_str("  \"result_series\": [\n");
+    for (index, series) in projection.results.series.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!("      \"handle\": {},\n", series.handle.0));
+        json.push_str(&format!("      \"key\": {},\n", json_string(&series.key)));
+        json.push_str(&format!(
+            "      \"role\": {},\n",
+            json_string(projection_role_for_key(projection, &series.key))
+        ));
+        json.push_str(&format!(
+            "      \"variable\": {},\n",
+            json_string(&series.variable_name)
+        ));
+        json.push_str(&format!(
+            "      \"units\": {},\n",
+            json_string(&series.units)
+        ));
+        json.push_str(&format!("      \"samples\": {},\n", series.values.len()));
+        json.push_str(&format!(
+            "      \"first\": {},\n",
+            json_optional_number(series.values.first().copied())
+        ));
+        json.push_str(&format!(
+            "      \"last\": {},\n",
+            json_optional_number(series.values.last().copied())
+        ));
+        json.push_str(&format!(
+            "      \"nonzero_count\": {},\n",
+            nonzero_count(&series.values)
+        ));
+        json.push_str("      \"status\": \"projected\"\n");
+        if index + 1 == projection.results.series.len() {
+            json.push_str("    }\n");
+        } else {
+            json.push_str("    },\n");
+        }
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
+}
+
+fn projection_role_for_key<'a>(projection: &'a NodeStateProjection, key: &str) -> &'a str {
+    projection
+        .summary
+        .nodes
+        .iter()
+        .find(|node| node.node_name == key)
+        .map_or("unknown", |node| node.role.label())
+}
+
 fn resolve_manifest_path(case_path: &Path, value: &str) -> Result<PathBuf, std::io::Error> {
     let path = PathBuf::from(value);
     if path.is_absolute() {
@@ -1467,14 +1612,21 @@ fn report_format_label(format: ReportFormat) -> &'static str {
 fn run_run_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
         Some("first-zone") => run_first_zone_command(&args[1..]),
+        Some("node-state-projection") => run_node_state_projection_command(&args[1..]),
         Some(command) => {
             eprintln!("unsupported run command: {command}");
             eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+            eprintln!(
+                "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
+            );
             2
         }
         None => {
             eprintln!("missing run command");
             eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+            eprintln!(
+                "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
+            );
             2
         }
     }
@@ -1564,6 +1716,79 @@ fn run_first_zone_command(args: &[String]) -> i32 {
     println!("  first_zone_temp_c: {first_zone_temp_c:.6}");
     println!("  last_zone_temp_c: {last_zone_temp_c:.6}");
     println!("  status: extracted");
+
+    0
+}
+
+fn run_node_state_projection_command(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!(
+            "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
+        );
+        return 2;
+    };
+    let Some(output_dir) = args.get(1) else {
+        eprintln!("missing output directory");
+        eprintln!(
+            "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
+        );
+        return 2;
+    };
+    let hours = match parse_hours_arg(&args[2..], 24) {
+        Ok(hours) => hours,
+        Err(error) => {
+            eprintln!("{error}");
+            eprintln!(
+                "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
+            );
+            return 2;
+        }
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let simulation_model = SimulationModel::from_typed(model);
+    let projection = match simulate_ideal_loads_node_state_projection(
+        &simulation_model,
+        NodeStateProjectionOptions::hourly_samples(hours),
+    ) {
+        Ok(projection) => projection,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let output_dir = Path::new(output_dir);
+    if let Err(error) = write_node_state_projection_artifacts(output_dir, &projection) {
+        eprintln!("{error}");
+        return 1;
+    }
+
+    println!("Node State Projection");
+    println!("  runtime_class: ideal-loads-node-state-projection");
+    println!("  comparison_class: diagnostic-only");
+    println!("  conformance_claim: false");
+    println!("  algorithm_parity: false");
+    println!("  tolerance_policy: none");
+    println!("  nodes: {}", projection.summary.node_count);
+    println!("  samples: {}", projection.summary.samples);
+    println!("  series: {}", projection.summary.series_count);
+    println!(
+        "  summary_json: {}",
+        output_dir.join("node-state-summary.json").display()
+    );
+    println!("  status: projected");
 
     0
 }

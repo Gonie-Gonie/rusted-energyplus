@@ -78,6 +78,10 @@ Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct Node" -D
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct NodeList" -Description "v0.11 NodeList typed model"
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct ZoneAirNodeEdge" -Description "v0.11 zone air node graph edge"
 Assert-Contains -Path "crates\ep_model\src\lib.rs" -Pattern "pub struct IdealLoadsSupplyNodeEdge" -Description "v0.11 IdealLoads supply node graph edge"
+Assert-Contains -Path "crates\ep_runtime\src\lib.rs" -Pattern "simulate_ideal_loads_node_state_projection" -Description "v0.11 Rust node-state projection"
+Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "run node-state-projection" -Description "v0.11 node-state projection CLI"
+Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "algorithm_parity: false" -Description "v0.11 node projection boundary"
+Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "status: projected" -Description "v0.11 node projection status"
 
 Assert-Contains -Path "docs\src\operations\v0.11.0-plan.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 plan case"
 Assert-Contains -Path "docs\src\operations\v0.11.0-plan.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.11 plan claim boundary"
@@ -87,7 +91,7 @@ Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern 
 Assert-Contains -Path "docs\src\porting-map\hvac.md" -Pattern "air_side_node_diagnostic_001" -Description "v0.11 HVAC map"
 
 Write-Host "milestone: v0.11.0"
-Write-Host "scope: baseline-only air-side node output diagnostics for the typed IdealLoads node graph"
+Write-Host "scope: baseline-only air-side node output diagnostics plus Rust projection plumbing for the typed IdealLoads node graph"
 Write-Host "claim: diagnostic-only evidence for air_side_node_diagnostic_001; no node or HVAC numerical conformance"
 
 Invoke-DevCommand -Command "source-smoke"

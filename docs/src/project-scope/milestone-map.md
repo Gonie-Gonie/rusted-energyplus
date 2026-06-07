@@ -22,8 +22,8 @@ Milestones are organized around evidence, not demos.
 | v0.8 Uncontrolled Heat Balance Port | first tolerance-gated heat-balance subset | `heat_balance_nomass_001` MAT only |
 | v0.9 Surface, Fenestration, Radiation Expansion | first surface-temperature conformance subset, with fenestration and solar still separate | `surface_temperature_nomass_001` surface temperatures only |
 | v0.10 IdealLoads and Thermostat | thermostat, zone equipment, and IdealLoads typed graph foundation | `ideal_loads_thermostat_001` baseline-only smoke, no load conformance |
-| v0.11 Air-side Node Diagnostic | baseline-only node output diagnostics for the typed IdealLoads node graph | `air_side_node_diagnostic_001` diagnostic-only; no node conformance |
-| v0.12 Node Source Mapping | source-function map for node registration, update, and output sampling paths | planning guard only |
+| v0.11 Air-side Node Diagnostic | baseline-only node output diagnostics plus Rust projection plumbing for the typed IdealLoads node graph | `air_side_node_diagnostic_001` diagnostic-only; no node conformance |
+| v0.12 Node Source Mapping | source-function map for node registration, update, and output sampling paths | planning guard for future node conformance |
 | v0.13 Plant Loop Skeleton | plant graph, node, flow, pump/boiler/chiller subset comparisons | declared cases only |
 | v1.0 Stable Compatibility Subset | public subset with locked object matrix and CI reports | declared subset only |
 

@@ -67,7 +67,9 @@ status: baseline-only
 
 `air_side_node_diagnostic_001` is the first node-owned HVAC diagnostic case. It
 keeps `comparison_class = "diagnostic-only"`, `conformance_claim = false`,
-`tolerance_policy: none`, and `status: baseline-only`.
+and `tolerance_policy: none`. The EnergyPlus report skeleton remains
+`status: baseline-only`; the Rust node-state projection remains
+`status: projected` with `algorithm_parity: false`.
 
 The case records EnergyPlus baseline-only ESO evidence for:
 
@@ -102,9 +104,9 @@ maps:
 - `ZoneTempPredictorCorrector.cc` for zone node temperature, humidity, and
   setpoint writes
 
-This is a planning guard only. It does not port the node update algorithms and
-does not promote `air_side_node_diagnostic_001` beyond diagnostic-only
-evidence.
+This is a planning guard only. The Rust projection writes diagnostic samples,
+but it does not port the node update algorithms and does not promote
+`air_side_node_diagnostic_001` beyond diagnostic-only evidence.
 
 ## EnergyPlus Source Areas To Map Next
 
