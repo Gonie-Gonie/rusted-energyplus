@@ -12,7 +12,7 @@ use conformance_artifacts::{
 use ep_compare::{
     Tolerance, compare_series, load_eio_construction_ctf, load_eio_heat_transfer_surfaces,
     load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_zone_geometry,
-    load_eso_series,
+    load_eso_series, load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -45,6 +45,7 @@ const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
     "usage: eplus-rs conformance diagnostic-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_HEAT_BALANCE_REPORT_USAGE: &str =
     "usage: eplus-rs conformance heat-balance-report <case.toml> <oracle-root> <output-root>";
+const CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE: &str = "usage: eplus-rs conformance heat-balance-diagnostic-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_STATIC_MODEL_REPORT_USAGE: &str =
     "usage: eplus-rs conformance static-model-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE: &str = "usage: eplus-rs conformance time-weather-schedule-report <case.toml> <oracle-root> <output-root>";
@@ -236,6 +237,7 @@ fn print_help() {
     println!("  conformance report-skeleton <case.toml> <baseline-case-dir> <report-root>");
     println!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
     println!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+    println!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
     println!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
     println!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
     println!();
@@ -401,6 +403,9 @@ fn run_conformance_command(args: &[String]) -> i32 {
         Some("report-skeleton") => run_conformance_report_skeleton(&args[1..]),
         Some("diagnostic-report") => run_conformance_diagnostic_report(&args[1..]),
         Some("heat-balance-report") => run_conformance_heat_balance_report(&args[1..]),
+        Some("heat-balance-diagnostic-report") => {
+            run_conformance_heat_balance_diagnostic_report(&args[1..])
+        }
         Some("static-model-report") => run_conformance_static_model_report(&args[1..]),
         Some("time-weather-schedule-report") => {
             run_conformance_time_weather_schedule_report(&args[1..])
@@ -418,6 +423,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             );
             eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
@@ -435,6 +441,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             );
             eprintln!("{CONFORMANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_HEAT_BALANCE_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
@@ -721,6 +728,64 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
     }
 }
 
+fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_conformance_heat_balance_diagnostic_report(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("Diagnostic Heat Balance Report");
+            print_conformance_case_summary(&manifest);
+            println!("  baseline_dir: {}", summary.baseline.output_dir.display());
+            println!("  report_dir: {}", summary.report_dir.display());
+            println!("  compare_report: {}", summary.compare_report.display());
+            println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  samples: {}", summary.samples);
+            println!("  tolerance_policy: {}", summary.tolerance_policy);
+            println!("  status: {}", summary.status);
+            0
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
 fn run_conformance_time_weather_schedule_report(args: &[String]) -> i32 {
     let Some(case_path) = args.first() else {
         eprintln!("missing case manifest path");
@@ -986,6 +1051,44 @@ fn generate_conformance_heat_balance_report(
     })
 }
 
+fn generate_conformance_heat_balance_diagnostic_report(
+    case_path: &Path,
+    manifest: &ConformanceCase,
+    oracle_root: &Path,
+    output_root: &Path,
+) -> Result<HeatBalanceReportSummary, String> {
+    let report_context = heat_balance_diagnostic_context_from_manifest(manifest)?;
+
+    let case_output_dir = output_root.join(&manifest.id);
+    let oracle_output_dir = case_output_dir.join("oracle");
+    let compare_dir = case_output_dir.join("compare");
+
+    let baseline =
+        generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
+    let weather = baseline
+        .weather
+        .as_ref()
+        .ok_or_else(|| "heat-balance diagnostic requires input.weather".to_string())?;
+    let diagnostic = build_heat_balance_conformance_diagnostic(
+        &baseline.epjson,
+        weather,
+        &baseline.eso,
+        &report_context,
+    )?;
+    let conformance = evaluate_heat_balance_conformance(&diagnostic, &report_context);
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance)?;
+
+    Ok(HeatBalanceReportSummary {
+        baseline,
+        report_dir: compare_dir.clone(),
+        compare_report: compare_dir.join("compare-report.md"),
+        compare_summary: compare_dir.join("compare-summary.json"),
+        samples: diagnostic.samples,
+        tolerance_policy: report_context.tolerance_label(),
+        status: conformance.status,
+    })
+}
+
 fn validate_zone_temperature_diagnostic_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
         return Err(format!(
@@ -1117,6 +1220,83 @@ fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Res
     }
     if !gate.blocking {
         return Err("heat-balance conformance gate must be blocking".to_string());
+    }
+
+    for variable_class in heat_balance_variable_classes(manifest) {
+        heat_balance_tolerance_from_manifest(manifest, variable_class)?;
+    }
+
+    Ok(())
+}
+
+fn validate_heat_balance_diagnostic_manifest(manifest: &ConformanceCase) -> Result<(), String> {
+    if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
+        return Err(format!(
+            "heat-balance diagnostic requires comparison_class diagnostic-only, got {}",
+            comparison_class_label(manifest.comparison_class)
+        ));
+    }
+    if manifest.conformance_claim {
+        return Err("heat-balance diagnostic cannot claim conformance".to_string());
+    }
+    if manifest.outputs.is_empty() {
+        return Err("heat-balance diagnostic requires at least one output request".to_string());
+    }
+
+    for output in &manifest.outputs {
+        if output.frequency != OutputFrequency::Hourly {
+            return Err(format!(
+                "heat-balance diagnostic requires hourly output, got {} for {}",
+                output_frequency_label(output.frequency),
+                output.variable
+            ));
+        }
+        if output.source != SourceArtifact::Eso {
+            return Err(format!(
+                "heat-balance diagnostic requires eso source, got {} for {}",
+                source_artifact_label(output.source),
+                output.variable
+            ));
+        }
+        if !matches!(
+            output.class,
+            VariableClass::ZoneState | VariableClass::SurfaceState
+        ) {
+            return Err(format!(
+                "heat-balance diagnostic requires zone-state or surface-state class, got {} for {}",
+                variable_class_label(output.class),
+                output.variable
+            ));
+        }
+        if !is_supported_heat_balance_output_variable(&output.variable) {
+            return Err(format!(
+                "unsupported heat-balance diagnostic output variable: {}",
+                output.variable
+            ));
+        }
+        if output.level == Some(OutputLevel::Conformance) {
+            return Err(format!(
+                "heat-balance diagnostic output cannot use conformance level: {}",
+                output.variable
+            ));
+        }
+    }
+
+    let Some(report) = manifest.report.as_ref() else {
+        return Err("heat-balance diagnostic requires a report contract".to_string());
+    };
+    if report.path.trim().is_empty() {
+        return Err("heat-balance diagnostic report contract has an empty path".to_string());
+    }
+
+    let Some(gate) = manifest.gate.as_ref() else {
+        return Err("heat-balance diagnostic requires a non-blocking gate contract".to_string());
+    };
+    if gate.script.trim().is_empty() {
+        return Err("heat-balance diagnostic gate contract has an empty script".to_string());
+    }
+    if gate.blocking {
+        return Err("heat-balance diagnostic gate must be non-blocking".to_string());
     }
 
     for variable_class in heat_balance_variable_classes(manifest) {
@@ -2893,6 +3073,8 @@ struct HeatBalanceConformanceContext {
     tolerances: Vec<HeatBalanceToleranceReport>,
     report: Option<ZoneTemperatureReportContract>,
     gate: Option<ZoneTemperatureGateContract>,
+    comparison_class: &'static str,
+    conformance_claim: bool,
 }
 
 impl HeatBalanceConformanceContext {
@@ -2946,6 +3128,19 @@ fn heat_balance_conformance_context_from_manifest(
     manifest: &ConformanceCase,
 ) -> Result<HeatBalanceConformanceContext, String> {
     validate_heat_balance_conformance_manifest(manifest)?;
+    heat_balance_context_from_manifest(manifest)
+}
+
+fn heat_balance_diagnostic_context_from_manifest(
+    manifest: &ConformanceCase,
+) -> Result<HeatBalanceConformanceContext, String> {
+    validate_heat_balance_diagnostic_manifest(manifest)?;
+    heat_balance_context_from_manifest(manifest)
+}
+
+fn heat_balance_context_from_manifest(
+    manifest: &ConformanceCase,
+) -> Result<HeatBalanceConformanceContext, String> {
     let outputs = manifest
         .outputs
         .iter()
@@ -2981,6 +3176,8 @@ fn heat_balance_conformance_context_from_manifest(
                 script: gate.script.clone(),
                 blocking: gate.blocking,
             }),
+        comparison_class: comparison_class_label(manifest.comparison_class),
+        conformance_claim: manifest.conformance_claim,
     })
 }
 
@@ -3116,8 +3313,9 @@ fn build_heat_balance_conformance_diagnostic(
 
     let mut oracle_series = Vec::with_capacity(context.outputs.len());
     for output in &context.outputs {
-        let values = load_eso_series(eso_path, &output.key, &output.variable)
+        let time_series = load_eso_time_series(eso_path, &output.key, &output.variable)
             .map_err(|error| error.to_string())?;
+        let values = run_period_eso_values(&time_series);
         if values.is_empty() {
             return Err(format!(
                 "EnergyPlus series is empty: {}/{}",
@@ -3191,6 +3389,37 @@ fn build_heat_balance_conformance_diagnostic(
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
+}
+
+fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
+    let run_period_values = series
+        .samples
+        .iter()
+        .filter(|sample| {
+            sample
+                .timestamp
+                .as_deref()
+                .and_then(eso_timestamp_environment)
+                .is_some_and(|environment| {
+                    environment.to_ascii_uppercase().starts_with("RUN PERIOD")
+                })
+        })
+        .map(|sample| sample.value)
+        .collect::<Vec<_>>();
+
+    if run_period_values.is_empty() {
+        series.samples.iter().map(|sample| sample.value).collect()
+    } else {
+        run_period_values
+    }
+}
+
+fn eso_timestamp_environment(timestamp: &str) -> Option<&str> {
+    timestamp
+        .strip_prefix("env=")?
+        .split(';')
+        .next()
+        .filter(|environment| !environment.is_empty())
 }
 
 fn heat_balance_max_abs_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
@@ -4408,8 +4637,14 @@ fn render_heat_balance_conformance_summary_json(
         "  \"gate\": {},\n",
         zone_temperature_gate_json(context.gate.as_ref())
     ));
-    json.push_str("  \"comparison_class\": \"conformance\",\n");
-    json.push_str("  \"conformance_claim\": true,\n");
+    json.push_str(&format!(
+        "  \"comparison_class\": {},\n",
+        json_string(context.comparison_class)
+    ));
+    json.push_str(&format!(
+        "  \"conformance_claim\": {},\n",
+        context.conformance_claim
+    ));
     json.push_str(&format!(
         "  \"tolerance_policy\": {},\n",
         heat_balance_tolerances_json(&context.tolerances)
@@ -4471,7 +4706,11 @@ fn render_heat_balance_conformance_report(
 ) -> String {
     let context = conformance.context;
     let mut report = String::new();
-    report.push_str("# Heat Balance Conformance Report\n\n");
+    if context.conformance_claim {
+        report.push_str("# Heat Balance Conformance Report\n\n");
+    } else {
+        report.push_str("# Heat Balance Diagnostic Report\n\n");
+    }
     report.push_str("## Manifest\n\n");
     report.push_str(&format!("case_id: {}\n", context.case_id));
     report.push_str(&format!("oracle_version: {}\n", context.oracle_version));
@@ -4497,8 +4736,11 @@ fn render_heat_balance_conformance_report(
     report.push('\n');
 
     report.push_str("## Result\n\n");
-    report.push_str("comparison_class: conformance\n");
-    report.push_str("conformance_claim: true\n");
+    report.push_str(&format!("comparison_class: {}\n", context.comparison_class));
+    report.push_str(&format!(
+        "conformance_claim: {}\n",
+        context.conformance_claim
+    ));
     report.push_str("runtime_class: heat-balance-state-shell\n");
     report.push_str(&format!("status: {}\n", conformance.status));
     if conformance.failure_reasons.is_empty() {
@@ -5367,6 +5609,8 @@ mod tests {
                 script: "scripts/dev.cmd compare-heat-balance-conformance".to_string(),
                 blocking: true,
             }),
+            comparison_class: "conformance",
+            conformance_claim: true,
         };
         let conformance = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
@@ -5392,6 +5636,97 @@ mod tests {
         assert!(report.contains("Surface Inside Face Temperature"));
         assert!(report.contains("## Hourly Samples"));
         assert!(report.contains("| ZONE ONE/Zone Mean Air Temperature | 0 | 23.000000000000 | 23.000000000000 | 0.000000000000 |"));
+    }
+
+    #[test]
+    fn heat_balance_report_can_render_diagnostic_non_claim_boundary() {
+        let diagnostic = super::HeatBalanceConformanceDiagnostic {
+            samples: 1,
+            heat_balance_timesteps: 4,
+            zone_count: 1,
+            surface_count: 6,
+            series: vec![super::HeatBalanceSeriesDiagnostic {
+                output: super::ZoneTemperatureReportOutput {
+                    key: "ZONE ONE".to_string(),
+                    variable: "Zone Mean Air Temperature".to_string(),
+                    frequency: "hourly",
+                    class: "zone-state",
+                    source: "eso",
+                },
+                samples: 1,
+                oracle_first_c: 1.0,
+                rust_first_c: 2.0,
+                oracle_last_c: 1.0,
+                rust_last_c: 2.0,
+                delta: super::delta_summary(&[1.0], &[2.0]),
+                sample_rows: super::delta_points(&[1.0], &[2.0]),
+                status: "extracted",
+            }],
+            status: "extracted",
+        };
+        let context = super::HeatBalanceConformanceContext {
+            case_id: "official_1zone_uncontrolled_dynamic_diagnostic_001".to_string(),
+            oracle_version: "26.1.0".to_string(),
+            outputs: diagnostic
+                .series
+                .iter()
+                .map(|series| series.output.clone())
+                .collect(),
+            tolerances: vec![super::HeatBalanceToleranceReport {
+                variable_class_label: "zone-state",
+                max_abs_c: Some(0.000001),
+                max_rmse_c: Some(0.000001),
+                max_rel: None,
+            }],
+            report: None,
+            gate: None,
+            comparison_class: "diagnostic-only",
+            conformance_claim: false,
+        };
+        let comparison = super::evaluate_heat_balance_conformance(&diagnostic, &context);
+
+        let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &comparison);
+        let report = super::render_heat_balance_conformance_report(&diagnostic, &comparison);
+
+        assert_eq!(comparison.status, "fail");
+        assert!(json.contains("\"comparison_class\": \"diagnostic-only\""));
+        assert!(json.contains("\"conformance_claim\": false"));
+        assert!(report.contains("Heat Balance Diagnostic Report"));
+        assert!(report.contains("comparison_class: diagnostic-only"));
+        assert!(report.contains("conformance_claim: false"));
+        assert!(report.contains("status: fail"));
+    }
+
+    #[test]
+    fn heat_balance_uses_run_period_eso_samples_when_design_days_exist() {
+        let series = ep_compare::EsoTimeSeries {
+            metadata: ep_compare::EsoSeriesMetadata {
+                id: "7".to_string(),
+                key: "ZONE ONE".to_string(),
+                variable: "Zone Mean Air Temperature".to_string(),
+                units: Some("C".to_string()),
+                frequency: Some("Hourly".to_string()),
+            },
+            samples: vec![
+                ep_compare::SeriesSample::timestamped(
+                    0,
+                    "env=CHICAGO ANN HTG 99.6% CONDNS DB;day=1;month=1;date=21;dst=0;hour=1;start=0.00;end=60.00;day_type=WinterDesignDay",
+                    -17.0,
+                ),
+                ep_compare::SeriesSample::timestamped(
+                    1,
+                    "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday",
+                    23.0,
+                ),
+                ep_compare::SeriesSample::timestamped(
+                    2,
+                    "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=2;start=0.00;end=60.00;day_type=Tuesday",
+                    24.0,
+                ),
+            ],
+        };
+
+        assert_eq!(super::run_period_eso_values(&series), vec![23.0, 24.0]);
     }
 
     #[test]

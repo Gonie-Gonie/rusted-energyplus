@@ -1,0 +1,105 @@
+id = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+title = "Official 1ZoneUncontrolled dynamic heat-balance diagnostic"
+milestone = "v0.33-official-dynamic-diagnostic"
+purpose = "Track Rust vs EnergyPlus hourly dynamic heat-balance deltas for the official 1ZoneUncontrolled ExampleFile without claiming conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This case is the official dynamic heat-balance diagnostic gate before any conformance_claim=true promotion.",
+  "The report filters EnergyPlus ESO samples to the reported RUN PERIOD environment so sizing/design-day samples do not hide the real hourly delta.",
+  "Current expected status is fail. Promotion requires source-map-backed warmup, surface balance, CTF/conduction, solar, and convection parity before changing the claim boundary.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "energy-plus-examplefile"
+source_file = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Inside Faces Conduction Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[[tolerances]]
+variable_class = "surface-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[report]
+format = "markdown"
+path = ".runtime/official-dynamic-diagnostic/26.1.0/official_1zone_uncontrolled_dynamic_diagnostic_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd official-dynamic-heat-balance-diagnostic"
+blocking = false

@@ -421,6 +421,54 @@ fn loads_internal_gains_case_fixture() -> Result<(), Box<dyn std::error::Error>>
 }
 
 #[test]
+fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
+-> Result<(), Box<dyn std::error::Error>> {
+    let manifest = load_case_file(repo_root().join(
+        "data/conformance_cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml",
+    ))?;
+
+    assert_eq!(
+        manifest.id,
+        "official_1zone_uncontrolled_dynamic_diagnostic_001"
+    );
+    assert_eq!(manifest.milestone, "v0.33-official-dynamic-diagnostic");
+    assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+    assert!(!manifest.conformance_claim);
+    assert_eq!(manifest.outputs.len(), 6);
+    assert!(manifest.outputs.iter().all(|output| {
+        output.frequency == OutputFrequency::Hourly
+            && output.source == SourceArtifact::Eso
+            && output.level == Some(OutputLevel::Diagnostic)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZONE ONE"
+            && output.variable == "Zone Mean Air Temperature"
+            && output.class == VariableClass::ZoneState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Inside Face Conduction Heat Transfer Rate"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZONE ONE"
+            && output.variable == "Zone Opaque Surface Inside Faces Conduction Rate"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert_eq!(manifest.tolerances.len(), 2);
+    let gate = manifest.gate.as_ref().ok_or_else(|| {
+        std::io::Error::other("official dynamic diagnostic should declare a gate")
+    })?;
+    assert_eq!(
+        gate.script,
+        "scripts/dev.cmd official-dynamic-heat-balance-diagnostic"
+    );
+    assert!(!gate.blocking);
+
+    Ok(())
+}
+
+#[test]
 fn loads_official_static_model_conformance_case_fixture() -> Result<(), Box<dyn std::error::Error>>
 {
     let manifest = load_case_file(

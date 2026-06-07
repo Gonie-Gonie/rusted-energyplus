@@ -200,6 +200,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the v0.9 tolerance-gated surface-temperature conformance case."
     }
+    "official-dynamic-heat-balance-diagnostic" = @{
+        Path = "compare\official-dynamic-heat-balance-diagnostic.ps1"
+        Group = "compare"
+        Help = "Run the official 1ZoneUncontrolled dynamic heat-balance diagnostic case."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

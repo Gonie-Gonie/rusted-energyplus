@@ -16,11 +16,11 @@ future official ExampleFile transient conduction work.
 
 | Variable | Current Rust source | Current claim | Official ExampleFile status |
 |---|---|---|---|
-| `Surface Inside Face Conduction Heat Transfer Rate` | `SurfaceHeatBalanceState::heat_gain_to_zone_w` | no-mass adiabatic conformance only | baseline candidate |
+| `Surface Inside Face Conduction Heat Transfer Rate` | `SurfaceHeatBalanceState::heat_gain_to_zone_w` | no-mass adiabatic conformance only | baseline + diagnostic candidate |
 | `Surface Inside Face Conduction Heat Transfer Rate per Area` | rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate` | opposite sign of inside rate in the scalar shell | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
-| `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline candidate |
+| `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |
 
 ## Source Anchors
 
@@ -36,3 +36,5 @@ future official ExampleFile transient conduction work.
 Official ExampleFile conduction cannot be promoted until the Rust side carries
 the same transient conduction history semantics as the selected EnergyPlus
 case. A zero no-mass adiabatic pass is useful but does not prove CTF parity.
+`official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
+diagnostic gate for that promotion path.

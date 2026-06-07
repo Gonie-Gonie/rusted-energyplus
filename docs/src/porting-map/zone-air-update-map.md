@@ -37,5 +37,6 @@ An official ExampleFile zone-air series may become conformance only after:
 ## Current Boundary
 
 `Zone Mean Air Temperature` is conformance only for the declared no-mass local
-cases. Official `1ZoneUncontrolled` zone temperature is a baseline candidate
-until this map is implemented beyond the scalar conductance shell.
+cases. Official `1ZoneUncontrolled` zone temperature is a baseline and failing
+diagnostic candidate until this map is implemented beyond the scalar
+conductance shell.

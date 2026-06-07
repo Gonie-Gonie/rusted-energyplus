@@ -31,6 +31,8 @@ gain cases.
 
 ## Current Boundary
 
-Official `1ZoneUncontrolled` dynamic outputs are baseline candidates. Large
-first-hour or warmup-sensitive deltas must keep the case diagnostic until this
-map is implemented.
+Official `1ZoneUncontrolled` dynamic outputs are baseline and diagnostic
+candidates. `official_1zone_uncontrolled_dynamic_diagnostic_001` currently
+keeps the case `conformance_claim=false` while reporting first-hour and
+run-period-filtered deltas. Large first-hour or warmup-sensitive deltas must
+keep the case diagnostic until this map is implemented.

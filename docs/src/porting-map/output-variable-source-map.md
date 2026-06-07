@@ -25,11 +25,11 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Air Heat Balance Air Energy Storage Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | future zone air storage term | mapped-not-ported |
 | `Surface Inside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
 | `Surface Outside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
-| `Surface Inside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `SurfaceHeatBalanceState::heat_gain_to_zone_w` | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile baseline candidate |
-| `Surface Inside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | surface conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile baseline candidate |
-| `Surface Outside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | opposite sign of scalar inside conduction shell | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile baseline candidate |
-| `Surface Outside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | outside conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile baseline candidate |
-| `Zone Opaque Surface Inside Faces Conduction Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` advanced report variables | sum of Rust opaque surface heat gain to zone | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile baseline candidate |
+| `Surface Inside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `SurfaceHeatBalanceState::heat_gain_to_zone_w` | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
+| `Surface Inside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | surface conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
+| `Surface Outside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | opposite sign of scalar inside conduction shell | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
+| `Surface Outside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | outside conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
+| `Zone Opaque Surface Inside Faces Conduction Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` advanced report variables | sum of Rust opaque surface heat gain to zone | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
 | `Zone Thermostat Heating Setpoint Temperature` | hourly | thermostat setup/output registration in EnergyPlus HVAC/zone predictor code | future thermostat result state | baseline-only for `ideal_loads_thermostat_001` |
 | `Zone Thermostat Cooling Setpoint Temperature` | hourly | thermostat setup/output registration in EnergyPlus HVAC/zone predictor code | future thermostat result state | baseline-only for `ideal_loads_thermostat_001` |
 | `Zone Ideal Loads Zone Total Heating Rate` | hourly | IdealLoads HVAC component implementation and zone equipment managers | future IdealLoads result state | baseline-only for `ideal_loads_thermostat_001`; mapped-not-ported |
@@ -80,10 +80,10 @@ tolerances, markdown/JSON report artifacts, mean/max/RMSE delta rows, and a
 blocking gate.
 
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
-weather, internal gain, and surface conduction hourly oracle series. It is a
-dynamic conformance candidate, but it remains `comparison_class=smoke` and
-`conformance_claim=false` until Rust produces matching hourly series under a
-blocking gate.
+weather, internal gain, and surface conduction hourly oracle series. The
+dynamic diagnostic case compares run-period-filtered zone/surface/conduction
+deltas. These are conformance candidates, but they remain non-claiming until
+Rust produces matching hourly series under a blocking gate.
 
 The v0.10 `ideal_loads_thermostat_001` report is baseline-only smoke evidence
 for thermostat and IdealLoads output availability plus typed graph coverage.

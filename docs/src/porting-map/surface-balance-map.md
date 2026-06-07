@@ -34,4 +34,5 @@ before official ExampleFile surface temperatures can be promoted.
 ## Current Boundary
 
 No-mass adiabatic surface temperatures and zero-conduction series are promoted.
-Official ExampleFile surface balances remain baseline candidates.
+Official ExampleFile surface balances remain baseline and failing diagnostic
+candidates until their hourly deltas are below tolerance.

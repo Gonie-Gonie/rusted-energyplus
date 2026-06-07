@@ -41,6 +41,9 @@ tolerance, and code organization.
   requests for zone temperature, weather, internal gain, and surface
   conduction series; this remains baseline-only until a Rust hourly comparison
   gate passes
+- official `1ZoneUncontrolled` dynamic heat-balance diagnostic report for
+  run-period-filtered zone temperature and surface conduction deltas; this is
+  explicitly `conformance_claim=false`
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases and
@@ -57,7 +60,7 @@ tolerance, and code organization.
   `Zone Total Internal Convective Heating Rate`
 - current surface conduction conformance only for the no-mass adiabatic
   `surface_temperature_nomass_001` series; official ExampleFile dynamic
-  conduction is not yet promoted
+  conduction is diagnostic/baseline only and is not yet promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation

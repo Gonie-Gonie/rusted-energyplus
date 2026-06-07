@@ -30,9 +30,9 @@ variables:
 
 | Area | Current conformance | Diagnostic or baseline evidence | Not claimed |
 |---|---|---|---|
-| Numerical time series | 5 promoted cases, 12 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` is an official ExampleFile dynamic conformance candidate with oracle series only | broad ExampleFiles dynamic conformance |
+| Numerical time series | 5 promoted cases, 12 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` keeps oracle series and `official_1zone_uncontrolled_dynamic_diagnostic_001` reports run-period-filtered Rust deltas | broad ExampleFiles dynamic conformance |
 | Static model | official `1ZoneUncontrolled` EIO surface geometry, Construction CTF, Material CTF Summary, and OtherEquipment nominal fields | generated support/index/release evidence PDFs | dynamic behavior from the static EIO case |
-| Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, and no-mass adiabatic conduction series | official `1ZoneUncontrolled` zone/surface/conduction hourly oracle baselines | CTF transient conduction, warmup parity, solar, radiation exchange, fenestration, infiltration, or general heat-balance compatibility |
+| Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, and no-mass adiabatic conduction series | official `1ZoneUncontrolled` zone/surface/conduction hourly oracle baselines plus failing diagnostic deltas | CTF transient conduction, warmup parity, solar, radiation exchange, fenestration, infiltration, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
 | Internal gains | `Zone Total Internal Convective Heating Rate` for `internal_gains_001` | static OtherEquipment nominal fields | zone air temperature response to gains, radiant/latent coupling, or broad internal-gain compatibility |
 | HVAC, node, plant | none | node, IdealLoads, and plant-loop baseline/diagnostic reports | HVAC, node, IdealLoads, meter, and plant numerical conformance |
