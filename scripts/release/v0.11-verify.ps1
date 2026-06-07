@@ -35,8 +35,34 @@ function Assert-Contains {
     Write-Host "OK $Description marker: $Pattern"
 }
 
+function Assert-ZipEntry {
+    param(
+        [Parameter(Mandatory = $true)][string]$ZipPath,
+        [Parameter(Mandatory = $true)][string]$Entry,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    Assert-FileExists -Path $ZipPath -Description $Description
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $ZipPath).Path)
+    try {
+        $expected = $Entry.Replace("/", "\")
+        $match = $archive.Entries | Where-Object {
+            $_.FullName.Replace("/", "\") -eq $expected
+        }
+        if ($null -eq $match) {
+            throw "Missing $Description zip entry in $ZipPath`: $Entry"
+        }
+        Write-Host "OK $Description zip entry: $Entry"
+    }
+    finally {
+        $archive.Dispose()
+    }
+}
+
 Assert-FileExists -Path "docs\src\operations\v0.11.0-plan.md" -Description "v0.11 plan"
 Assert-FileExists -Path "docs\src\operations\v0.11.0-readiness.md" -Description "v0.11 readiness"
+Assert-FileExists -Path "docs\src\releases\v0.11.0.md" -Description "v0.11 release note"
 Assert-FileExists -Path "data\conformance_cases\air_side_node_diagnostic_001\case.toml" -Description "v0.11 air-side node diagnostic case"
 Assert-FileExists -Path "data\conformance_cases\air_side_node_diagnostic_001\air_side_node_diagnostic.idf" -Description "v0.11 air-side node diagnostic IDF"
 Assert-FileExists -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Description "v0.11 node diagnostic gate"
@@ -69,6 +95,13 @@ Invoke-DevCommand -Command "air-side-node-diagnostic-smoke"
 Invoke-DevCommand -Command "test"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
+Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.11.0")
+
+$package = Join-Path $RepoRoot "dist\eplus-rs-v0.11.0-windows-x64.zip"
+Assert-FileExists -Path $package -Description "v0.11 release package"
+Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/air_side_node_diagnostic_001/case.toml" -Description "v0.11 packaged node case manifest"
+Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/air_side_node_diagnostic_001/air_side_node_diagnostic.idf" -Description "v0.11 packaged node case IDF"
+Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.11.0.md" -Description "v0.11 packaged release note"
 
 Write-Host "result: pass"
 Write-Host "v0.11.0 air-side node diagnostic verification passed."

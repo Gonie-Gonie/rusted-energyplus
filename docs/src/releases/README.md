@@ -26,3 +26,4 @@ when a token is present.
 Release notes:
 
 - [v0.1.0](v0.1.0.md)
+- [v0.11.0](v0.11.0.md)

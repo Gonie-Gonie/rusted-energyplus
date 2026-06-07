@@ -104,3 +104,4 @@
 - [Compare Diagnostic Note](archive/old-readiness-notes/v0.7.0-compare-diagnostic-note.md)
 - [Releases](releases/README.md)
   - [v0.1.0](releases/v0.1.0.md)
+  - [v0.11.0](releases/v0.11.0.md)

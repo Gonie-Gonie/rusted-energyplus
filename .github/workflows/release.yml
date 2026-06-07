@@ -66,6 +66,15 @@ jobs:
       - name: Verify release
         run: .\scripts\dev.cmd $env:VERIFY_COMMAND
 
+      - name: Build release package
+        run: |
+          if (Test-Path -LiteralPath $env:RELEASE_ARTIFACT -PathType Leaf) {
+              Write-Host "Release artifact already exists: $env:RELEASE_ARTIFACT"
+          }
+          else {
+              .\scripts\dev.cmd package -Version $env:RELEASE_VERSION
+          }
+
       - name: Check packaged binary
         run: |
           if (-not (Test-Path -LiteralPath $env:RELEASE_ARTIFACT -PathType Leaf)) {

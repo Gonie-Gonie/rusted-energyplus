@@ -79,6 +79,8 @@ Copy-RepoItem -Source (Join-Path $RepoRoot "config\default.toml") -Destination (
 Copy-RepoItem -Source (Join-Path $RepoRoot "config\local.toml.example") -Destination (Join-Path $stageRoot "config\local.toml.example")
 Copy-RepoItem -Source (Join-Path $RepoRoot "tools") -Destination (Join-Path $stageRoot "tools")
 Copy-RepoItem -Source (Join-Path $RepoRoot "data\testcases") -Destination (Join-Path $stageRoot "data\testcases")
+Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_cases") -Destination (Join-Path $stageRoot "data\conformance_cases")
+Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_suites") -Destination (Join-Path $stageRoot "data\conformance_suites")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\src") -Destination (Join-Path $stageRoot "docs\src")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\book.toml") -Destination (Join-Path $stageRoot "docs\book.toml")
 

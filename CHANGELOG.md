@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.11.0 - 2026-06-07
+
+Air-side node diagnostic release for the typed IdealLoads node graph.
+
+### Added
+
+- `node-state` output request class.
+- `air_side_node_diagnostic_001` conformance case and IDF.
+- v0.11 air-side node diagnostic smoke gate.
+- v0.11 release verification gate.
+- baseline-only node report evidence for system node temperature, humidity ratio, and mass flow rate.
+- v0.11 release notes and release package coverage for conformance cases and suites.
+
+### Notes
+
+- v0.11.0 does not claim node, IdealLoads, HVAC, plant, meter, or general ExampleFiles numerical conformance.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9 no-mass cases.
+
 ## v0.1.0 - 2026-06-04
 
 First runnable RawModel / epJSON inspection release with a typed compile preview.

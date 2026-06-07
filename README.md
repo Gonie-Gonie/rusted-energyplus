@@ -15,7 +15,8 @@ blocking gate before it can support a compatibility claim.
 
 ## Current Public Scope
 
-The public scope is foundation and model intake:
+The public scope is evidence-gated compatibility work for the locked
+EnergyPlus 26.1.0 oracle:
 
 - pinned Rust toolchain
 - repo-local EnergyPlus 26.1.0 oracle setup
@@ -24,12 +25,17 @@ The public scope is foundation and model intake:
 - TypedModel compile preview for declared seed object families
 - missing-reference diagnostics preview
 - package and local release scripts
+- conformance harness, baseline generation, and report skeletons
+- static geometry, construction/material, and internal-gain smoke evidence
+- tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
+- baseline-only thermostat, IdealLoads, and air-side node diagnostic evidence
 
 This public scope does not claim:
 
-- EnergyPlus heat-balance compatibility
+- general EnergyPlus heat-balance compatibility
 - HVAC or plant simulation compatibility
-- zone-temperature conformance
+- general zone-temperature conformance
+- node or IdealLoads numerical conformance
 - meter conformance
 - full runtime simulation compatibility
 
@@ -76,11 +82,13 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.8-verify
 .\scripts\dev.cmd v0.9-verify
 .\scripts\dev.cmd v0.10-verify
+.\scripts\dev.cmd v0.11-verify
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
 their declared variables. v0.10 is a baseline-only typed-graph gate for
-thermostat and IdealLoads intake.
+thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
+baseline evidence.
 
 Developer-only diagnostics:
 
