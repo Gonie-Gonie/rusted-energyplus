@@ -170,6 +170,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Build the local release zip."
     }
+    "conformance-evidence-report" = @{
+        Path = "release\conformance-evidence-report.ps1"
+        Group = "release"
+        Help = "Generate release PDF/HTML/JSON numerical conformance evidence."
+    }
     "github-release" = @{
         Path = "release\github-release.ps1"
         Group = "release"

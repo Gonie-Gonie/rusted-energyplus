@@ -84,6 +84,11 @@ Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_suites") -Destinati
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\src") -Destination (Join-Path $stageRoot "docs\src")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\book.toml") -Destination (Join-Path $stageRoot "docs\book.toml")
 
+$evidenceRoot = Join-Path $RepoRoot ".runtime\release-evidence\v$Version"
+if (Test-Path -LiteralPath $evidenceRoot -PathType Container) {
+    Copy-RepoItem -Source $evidenceRoot -Destination (Join-Path $stageRoot "evidence\v$Version")
+}
+
 $packageItems = Get-ChildItem -LiteralPath $stageRoot
 Compress-Archive -LiteralPath $packageItems.FullName -DestinationPath $zipPath -Force
 Write-Host "Package created: $zipPath"

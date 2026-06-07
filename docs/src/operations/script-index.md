@@ -60,6 +60,7 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
 | `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
 | `package` | release | build local package artifact | yes for package release | package zip |
+| `conformance-evidence-report` | release | generate PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
 | `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
@@ -72,6 +73,6 @@ Run `.\scripts\dev.cmd list` for the command catalog.
 | `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
 | `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
 | `v0.11-verify` | release | verify v0.11 air-side node diagnostic and projection evidence | yes | `.runtime/air-side-node-diagnostic` |
-| `v0.12-verify` | release | verify v0.12 node source mapping evidence | yes | source-map docs |
+| `v0.12-verify` | release | verify v0.12 node source mapping evidence and numeric evidence packaging | yes | source-map docs, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

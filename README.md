@@ -26,6 +26,7 @@ EnergyPlus 26.1.0 oracle:
 - missing-reference diagnostics preview
 - package and local release scripts
 - conformance harness, baseline generation, and report skeletons
+- release PDF/HTML/JSON evidence pack for promoted numerical conformance cases
 - static geometry, construction/material, and internal-gain smoke evidence
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases
 - baseline-only thermostat and IdealLoads evidence, plus diagnostic-only
@@ -84,13 +85,17 @@ Current development evidence checks:
 .\scripts\dev.cmd v0.9-verify
 .\scripts\dev.cmd v0.10-verify
 .\scripts\dev.cmd v0.11-verify
+.\scripts\dev.cmd v0.12-verify
+.\scripts\dev.cmd conformance-evidence-report -Version 0.12.0
 ```
 
 Only v0.8 and v0.9 contain tolerance-gated conformance claims, and only for
 their declared variables. v0.10 is a baseline-only typed-graph gate for
 thermostat and IdealLoads intake. v0.11 is diagnostic-only air-side node
 baseline evidence plus `NodeStateStore`-backed Rust projection plumbing, with
-no node numerical conformance claim.
+no node numerical conformance claim. v0.12 is a node source-mapping and
+evidence-policy release; it also packages the promoted v0.8/v0.9 numerical
+evidence as PDF/HTML/JSON under `evidence/v0.12.0`.
 
 Developer-only diagnostics:
 

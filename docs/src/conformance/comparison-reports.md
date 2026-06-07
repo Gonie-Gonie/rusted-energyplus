@@ -26,8 +26,10 @@ A human-reviewable report should include:
 - status per variable
 - unsupported diagnostics
 
-`compare-report.md` and `compare-summary.json` are the release-facing evidence
-artifacts once a case becomes conformance-level.
+`compare-report.md` and `compare-summary.json` are the per-case release-facing
+evidence artifacts once a case becomes conformance-level. Promoted numerical
+cases are also summarized in the generated release PDF/HTML/JSON evidence pack
+described in `numeric-release-evidence.md`.
 
 ExampleFiles-based reports should also summarize stage status, requested output
 coverage, meter coverage, surface-level details, node-level details,

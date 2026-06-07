@@ -35,6 +35,7 @@
 - [Output Variable Matrix](conformance/output-variable-matrix.md)
 - [Report Format](conformance/report-format.md)
 - [Release Gates](conformance/release-gates.md)
+- [Numeric Release Evidence](conformance/numeric-release-evidence.md)
 
 # Architecture
 

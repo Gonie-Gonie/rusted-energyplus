@@ -13,6 +13,7 @@ Before any release:
 - state the evidence level
 - list supported evidence
 - list non-claims
+- generate the release PDF/HTML/JSON evidence pack for promoted numerical cases
 - include docs in the release artifact
 - run `scripts/dev.cmd check`
 - run `scripts/dev.cmd strict-no-false-conformance`

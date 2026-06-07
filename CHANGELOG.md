@@ -11,6 +11,7 @@ Node source mapping and diagnostic projection evidence-policy release.
 - source-map, timestamp, warmup, sentinel, and excluded-variable fields in node-state projection markdown/JSON artifacts.
 - EnergyPlus `SensedNodeFlagValue` handling boundary for future `System Node Setpoint Temperature` sampling.
 - strengthened v0.12 verification gate that runs the air-side node diagnostic smoke and checks projection policy markers.
+- release PDF/HTML/JSON numerical conformance evidence pack with accuracy and execution-time graphs for promoted v0.8/v0.9 cases.
 - v0.12 release notes and package metadata.
 
 ### Notes
