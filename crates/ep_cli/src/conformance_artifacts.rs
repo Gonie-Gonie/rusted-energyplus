@@ -1,5 +1,5 @@
 use ep_compare::load_eso_series;
-use ep_conformance::{ConformanceCase, OutputRegistry, SourceArtifact};
+use ep_conformance::{ConformanceCase, OutputFrequency, OutputRegistry, SourceArtifact};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
@@ -236,7 +236,12 @@ fn render_output_request_injection(
         if output.source != SourceArtifact::Eso {
             continue;
         }
-        if has_existing_output_variable(&existing_outputs, &output.key, &output.variable) {
+        if has_existing_output_variable(
+            &existing_outputs,
+            &output.key,
+            &output.variable,
+            output.frequency,
+        ) {
             continue;
         }
         if output_count == 0 {
@@ -255,7 +260,7 @@ fn render_output_request_injection(
         output_count += 1;
     }
     for meter in &manifest.meters {
-        if has_existing_output_meter(&existing_meters, &meter.name) {
+        if has_existing_output_meter(&existing_meters, &meter.name, meter.frequency) {
             continue;
         }
         text.push_str("Output:Meter,\n");
@@ -279,12 +284,12 @@ fn render_output_request_injection(
     }
 }
 
-fn existing_output_variables(idf: &str) -> Vec<(String, String)> {
+fn existing_output_variables(idf: &str) -> Vec<(String, String, String)> {
     idf_objects(idf, "Output:Variable")
         .into_iter()
         .filter_map(|fields| {
-            if fields.len() >= 3 {
-                Some((fields[1].clone(), fields[2].clone()))
+            if fields.len() >= 4 {
+                Some((fields[1].clone(), fields[2].clone(), fields[3].clone()))
             } else {
                 None
             }
@@ -292,12 +297,12 @@ fn existing_output_variables(idf: &str) -> Vec<(String, String)> {
         .collect()
 }
 
-fn existing_output_meters(idf: &str) -> Vec<String> {
+fn existing_output_meters(idf: &str) -> Vec<(String, String)> {
     idf_objects(idf, "Output:Meter")
         .into_iter()
         .filter_map(|fields| {
-            if fields.len() >= 2 {
-                Some(fields[1].clone())
+            if fields.len() >= 3 {
+                Some((fields[1].clone(), fields[2].clone()))
             } else {
                 None
             }
@@ -347,17 +352,34 @@ fn idf_objects(idf: &str, object_type: &str) -> Vec<Vec<String>> {
     objects
 }
 
-fn has_existing_output_variable(existing: &[(String, String)], key: &str, variable: &str) -> bool {
+fn has_existing_output_variable(
+    existing: &[(String, String, String)],
+    key: &str,
+    variable: &str,
+    frequency: OutputFrequency,
+) -> bool {
     let key = normalize_idf_request_field(key);
     let variable = normalize_idf_request_field(variable);
-    existing.iter().any(|(existing_key, existing_variable)| {
-        (existing_key == "*" || existing_key == &key) && existing_variable == &variable
-    })
+    let frequency = normalize_idf_request_field(output_frequency_idf_label(frequency));
+    existing
+        .iter()
+        .any(|(existing_key, existing_variable, existing_frequency)| {
+            (existing_key == "*" || existing_key == &key)
+                && existing_variable == &variable
+                && existing_frequency == &frequency
+        })
 }
 
-fn has_existing_output_meter(existing: &[String], name: &str) -> bool {
+fn has_existing_output_meter(
+    existing: &[(String, String)],
+    name: &str,
+    frequency: OutputFrequency,
+) -> bool {
     let name = normalize_idf_request_field(name);
-    existing.iter().any(|existing_name| existing_name == &name)
+    let frequency = normalize_idf_request_field(output_frequency_idf_label(frequency));
+    existing.iter().any(|(existing_name, existing_frequency)| {
+        existing_name == &name && existing_frequency == &frequency
+    })
 }
 
 fn normalize_idf_request_field(value: &str) -> String {
@@ -742,4 +764,111 @@ fn energyplus_err_summary(contents: &str) -> EnergyPlusErrSummary {
 
 fn clean_energyplus_message(line: &str) -> String {
     line.replace("** Warning **", "").trim().to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ep_conformance::parse_case_str;
+
+    #[test]
+    fn output_injection_distinguishes_existing_variable_frequency()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = parse_case_str(
+            r#"
+id = "frequency_sensitive_output_001"
+title = "frequency sensitive output"
+milestone = "test"
+purpose = "test output request injection"
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+"#,
+        )?;
+        let idf = "Output:Variable,*,Surface Inside Face Temperature,daily;\n";
+
+        let injection = render_output_request_injection(&manifest, idf);
+
+        assert_eq!(injection.outputs, 1);
+        assert!(injection.text.contains("Surface Inside Face Temperature"));
+        assert!(injection.text.contains("Hourly"));
+        Ok(())
+    }
+
+    #[test]
+    fn output_injection_reuses_existing_variable_with_same_frequency()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = parse_case_str(
+            r#"
+id = "frequency_sensitive_output_002"
+title = "frequency sensitive output"
+milestone = "test"
+purpose = "test output request injection"
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+"#,
+        )?;
+        let idf = "Output:Variable,*,Surface Inside Face Temperature,hourly;\n";
+
+        let injection = render_output_request_injection(&manifest, idf);
+
+        assert_eq!(injection.outputs, 0);
+        assert!(injection.text.contains("no new output requests"));
+        Ok(())
+    }
+
+    #[test]
+    fn output_injection_distinguishes_existing_meter_frequency()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = parse_case_str(
+            r#"
+id = "frequency_sensitive_meter_001"
+title = "frequency sensitive meter"
+milestone = "test"
+purpose = "test meter request injection"
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+
+[[meters]]
+name = "Electricity:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+"#,
+        )?;
+        let idf = "Output:Meter,Electricity:Facility,annual;\n";
+
+        let injection = render_output_request_injection(&manifest, idf);
+
+        assert_eq!(injection.meters, 1);
+        assert!(injection.text.contains("Electricity:Facility"));
+        assert!(injection.text.contains("Hourly"));
+        Ok(())
+    }
 }

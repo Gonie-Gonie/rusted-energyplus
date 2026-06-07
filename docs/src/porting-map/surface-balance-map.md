@@ -20,7 +20,7 @@ before official ExampleFile surface temperatures can be promoted.
 | inside face temperature | `CalcHeatBalanceInsideSurf` in `HeatBalanceSurfaceManager.cc` | inside face state with zone air, convection, radiant exchange, and internal gains | zone-temperature mirror only |
 | adiabatic boundary | surface boundary condition handling | inside/outside equality for adiabatic no-mass cases | conformance for declared local case |
 | interzone boundary | adjacent surface/zone lookup | resolved target surface and zone IDs | smoke-tested |
-| reporting | `SetupOutputVariable` registration | `ResultStore` series per key/variable/frequency | temperature and conduction series registered |
+| reporting | `SetupOutputVariable` registration | `ResultStore` series per key/variable/frequency | official diagnostic now compares selected roof inside/outside temperatures and conduction series |
 
 ## Promotion Requirements
 
@@ -34,5 +34,7 @@ before official ExampleFile surface temperatures can be promoted.
 ## Current Boundary
 
 No-mass adiabatic surface temperatures and zero-conduction series are promoted.
-Official ExampleFile surface balances remain baseline and failing diagnostic
-candidates until their hourly deltas are below tolerance.
+Official ExampleFile surface balances now have selected roof inside/outside
+face-temperature and conduction deltas in the warmup-aware diagnostic report,
+but they remain failing diagnostic candidates until every declared hourly
+surface delta is below tolerance.

@@ -8,12 +8,17 @@
   warmup loop before reporting samples.
 - EnergyPlus EIO `Environment:WarmupDays` parsing and report fields for
   oracle run-period warmup day counts.
+- Official dynamic heat-balance diagnostic now compares the selected roof
+  inside/outside face temperatures in addition to conduction rates.
 
 ### Changed
 
 - `official_1zone_uncontrolled_dynamic_diagnostic_001` remains
-  `conformance_claim=false`, but now reports Rust/oracle warmup metadata in
-  stdout, JSON, and Markdown evidence.
+  `conformance_claim=false`, but now reports Rust/oracle warmup metadata and
+  explicit surface temperature deltas in stdout, JSON, and Markdown evidence.
+- Manifest-owned IDF output injection now treats reporting frequency as part
+  of the existing-request identity, so an existing daily variable or meter does
+  not suppress a required hourly request.
 
 ## v0.32.0 - 2026-06-08
 

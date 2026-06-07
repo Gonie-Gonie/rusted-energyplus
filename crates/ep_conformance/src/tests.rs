@@ -434,7 +434,7 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
     assert_eq!(manifest.milestone, "v0.33-official-dynamic-diagnostic");
     assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
     assert!(!manifest.conformance_claim);
-    assert_eq!(manifest.outputs.len(), 6);
+    assert_eq!(manifest.outputs.len(), 8);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly
             && output.source == SourceArtifact::Eso
@@ -444,6 +444,16 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
         output.key == "ZONE ONE"
             && output.variable == "Zone Mean Air Temperature"
             && output.class == VariableClass::ZoneState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Inside Face Temperature"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Outside Face Temperature"
+            && output.class == VariableClass::SurfaceState
     }));
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:ROOF001"
