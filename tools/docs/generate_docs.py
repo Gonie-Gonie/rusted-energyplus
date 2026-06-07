@@ -211,7 +211,8 @@ def variable_coverage(repo_root: Path) -> str:
             str(item.get("name", "")),
             str(item.get("domain", "")),
             str(item.get("status", "")),
-            str(item.get("first_case", "")),
+            str(item.get("first_evidence", item.get("first_case", ""))),
+            str(item.get("support_boundary", "")),
         ]
         for item in spec.get("variable", [])
     ]
@@ -219,7 +220,7 @@ def variable_coverage(repo_root: Path) -> str:
         GENERATED_NOTICE
         + "# Variable Coverage\n\n"
         + "Variable coverage is maintained in `specs/variable_coverage.toml`.\n\n"
-        + table(["Variable", "Domain", "Status", "First case"], rows)
+        + table(["Variable", "Domain", "Status", "First evidence", "Boundary"], rows)
     )
 
 

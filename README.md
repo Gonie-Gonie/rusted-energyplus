@@ -48,6 +48,8 @@ tolerance, and code organization.
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation
   infrastructure; it does not promote new numerical conformance
+- v0.29 output variable coverage metadata only as user documentation
+  infrastructure; it does not promote new numerical conformance
 
 Not claimed:
 
@@ -79,9 +81,9 @@ Useful focused checks:
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
-.\scripts\dev.cmd conformance-index-report -Version 0.28.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.28.0
-.\scripts\dev.cmd support-coverage-report -Version 0.28.0
+.\scripts\dev.cmd conformance-index-report -Version 0.29.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.29.0
+.\scripts\dev.cmd support-coverage-report -Version 0.29.0
 ```
 
 ## Documentation

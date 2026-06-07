@@ -4,6 +4,34 @@
 
 No unreleased changes.
 
+## v0.29.0 - 2026-06-08
+
+Output variable coverage metadata.
+
+### Added
+
+- v0.29 output coverage metadata milestone.
+- `support_boundary` metadata for tracked variable coverage rows.
+- generated mdBook variable coverage columns for first evidence and support
+  boundary.
+- support coverage report output tables with observed levels, best evidence
+  cases, and support boundaries.
+- support coverage JSON aggregates for output first-evidence and boundary
+  completeness.
+- v0.29 release verification script.
+
+### Changed
+
+- Output variable first evidence now resolves from the strongest available
+  evidence level instead of the earliest manifest appearance.
+- Release evidence report defaults now target v0.29.0.
+
+### Scope
+
+- v0.29.0 is reporting metadata work and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.28.0 - 2026-06-08
 
 Input object coverage metadata.

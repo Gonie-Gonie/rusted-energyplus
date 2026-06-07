@@ -16,16 +16,16 @@ The support coverage report is the user-facing answer to three questions:
 Generate it through the standard release wrapper:
 
 ```powershell
-.\scripts\dev.cmd support-coverage-report -Version 0.28.0
+.\scripts\dev.cmd support-coverage-report -Version 0.29.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.28.0/support-coverage.md
-.runtime/release-evidence/v0.28.0/support-coverage-report.html
-.runtime/release-evidence/v0.28.0/support-coverage-report.pdf
-.runtime/release-evidence/v0.28.0/support-coverage-report.json
+.runtime/release-evidence/v0.29.0/support-coverage.md
+.runtime/release-evidence/v0.29.0/support-coverage-report.html
+.runtime/release-evidence/v0.29.0/support-coverage-report.pdf
+.runtime/release-evidence/v0.29.0/support-coverage-report.json
 ```
 
 The PDF and HTML are generated with `oodocs` and matplotlib from repository
@@ -39,7 +39,7 @@ The generator reads:
 | Source | Purpose |
 |---|---|
 | `specs/object_coverage.toml` | input object support, first evidence, and support boundary |
-| `specs/variable_coverage.toml` | named output variable support |
+| `specs/variable_coverage.toml` | named output variable support, first evidence, and support boundary |
 | `specs/algorithm_ledger.toml` | algorithm status, source maps, proof variables |
 | `data/conformance_cases/*/case.toml` | case tiers, domains, requested outputs, gates, and claim boundaries |
 
@@ -61,6 +61,10 @@ supported row is only as strong as its status, first case, tolerance, and gate.
 
 As of v0.28.0, every tracked input object includes a first evidence reference
 and a support boundary in `specs/object_coverage.toml`.
+
+As of v0.29.0, output variable first evidence is resolved from the strongest available evidence level for that variable. For example, a variable that
+appears first in a diagnostic fixture but is later promoted in a conformance
+fixture reports the promoted conformance case as its first evidence.
 
 The report explicitly does not claim full EnergyPlus
 compatibility, broad ExampleFiles numerical compatibility, HVAC numerical

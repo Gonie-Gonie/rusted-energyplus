@@ -7,8 +7,9 @@ last_reviewed: 2026-06-08
 
 # Current Status
 
-The current public release line is v0.28.0. It enriches input object coverage
-with first evidence and support-boundary metadata on top of the v0.27
+The current public release line is v0.29.0. It enriches output variable
+coverage with strongest-evidence first references and support-boundary
+metadata on top of v0.28 input object coverage metadata, the v0.27
 user-facing support coverage report, v0.26 internal convective gain
 conformance, v0.25 opaque no-mass heat-balance boundary handling, v0.24
 runtime registry infrastructure, v0.23 official ExampleFile static model

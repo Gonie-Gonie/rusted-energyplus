@@ -55,7 +55,7 @@ ALGORITHM_STATUS_LABELS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the user support coverage report.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.28.0")
+    parser.add_argument("--version", default="0.29.0")
     return parser.parse_args()
 
 
@@ -114,6 +114,18 @@ def support_rank(status: str) -> int:
         "diagnostic_only": 5,
     }
     return ranks.get(status, 99)
+
+
+def variable_support_boundary(status: str, sources: list[str]) -> str:
+    if status == "conformance":
+        if sources == ["eio"] or ("eio" in sources and "eso" not in sources):
+            return "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
+        return "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
+    if status == "diagnostic":
+        return "Diagnostic comparison or extraction only; not release conformance."
+    if status == "baseline":
+        return "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+    return "Tracked output request only; support boundary is not promoted."
 
 
 def collect_case_rows(repo_root: Path) -> list[dict[str, Any]]:
@@ -203,7 +215,11 @@ def collect_variable_rows(repo_root: Path, output_rows: list[dict[str, Any]]) ->
             "status": status,
             "user_status": status_label(status, VARIABLE_STATUS_LABELS),
             "first_case": str(item.get("first_case", "")),
+            "first_evidence": str(item.get("first_evidence", item.get("first_case", ""))),
+            "support_boundary": str(item.get("support_boundary", "")),
             "observed_cases": [],
+            "best_evidence_cases": [],
+            "observed_levels": [],
             "observed_sources": [],
             "observed_frequencies": [],
         }
@@ -213,8 +229,10 @@ def collect_variable_rows(repo_root: Path, output_rows: list[dict[str, Any]]) ->
         observed[output["variable"]].append(output)
 
     for name, outputs in observed.items():
+        best_status = sorted((output["status"] for output in outputs), key=support_rank)[0]
+        best_outputs = [output for output in outputs if output["status"] == best_status]
+        observed_sources = unique_sorted([output["source"] for output in outputs])
         if name not in by_name:
-            best_status = sorted((output["status"] for output in outputs), key=support_rank)[0]
             by_name[name] = {
                 "name": name,
                 "domain": sorted({output["domain"] for output in outputs if output["domain"]})[0]
@@ -222,14 +240,27 @@ def collect_variable_rows(repo_root: Path, output_rows: list[dict[str, Any]]) ->
                 else "",
                 "status": best_status,
                 "user_status": status_label(best_status, VARIABLE_STATUS_LABELS),
-                "first_case": outputs[0]["case_id"],
+                "first_case": best_outputs[0]["case_id"],
+                "first_evidence": best_outputs[0]["case_id"],
+                "support_boundary": variable_support_boundary(best_status, observed_sources),
                 "observed_cases": [],
+                "best_evidence_cases": [],
+                "observed_levels": [],
                 "observed_sources": [],
                 "observed_frequencies": [],
             }
         row = by_name[name]
+        if support_rank(best_status) < support_rank(row["status"]):
+            row["status"] = best_status
+            row["user_status"] = status_label(best_status, VARIABLE_STATUS_LABELS)
+        if not row["first_evidence"]:
+            row["first_evidence"] = best_outputs[0]["case_id"]
+        if not row["support_boundary"]:
+            row["support_boundary"] = variable_support_boundary(row["status"], observed_sources)
         row["observed_cases"] = unique_sorted([output["case_id"] for output in outputs])
-        row["observed_sources"] = unique_sorted([output["source"] for output in outputs])
+        row["best_evidence_cases"] = unique_sorted([output["case_id"] for output in best_outputs])
+        row["observed_levels"] = unique_sorted([output["status"] for output in outputs])
+        row["observed_sources"] = observed_sources
         row["observed_frequencies"] = unique_sorted([output["frequency"] for output in outputs])
 
     return sorted(by_name.values(), key=lambda row: (support_rank(row["status"]), row["domain"], row["name"]))
@@ -286,6 +317,12 @@ def build_support_coverage(repo_root: Path, version: str) -> dict[str, Any]:
                 1 for row in object_rows if row["first_evidence"]
             ),
             "tracked_output_variable_count": len(variable_rows),
+            "output_variables_with_first_evidence_count": sum(
+                1 for row in variable_rows if row["first_evidence"]
+            ),
+            "output_variables_with_boundary_count": sum(
+                1 for row in variable_rows if row["support_boundary"]
+            ),
             "manifest_output_request_count": len(output_rows),
             "conformance_output_variable_count": variable_counts.get("conformance", 0),
             "diagnostic_output_variable_count": variable_counts.get("diagnostic", 0),
@@ -382,15 +419,27 @@ def build_output_table(report: dict[str, Any]) -> Table:
             row["name"],
             row["domain"],
             row["user_status"],
-            row["first_case"],
+            row["first_evidence"],
             ", ".join(row["observed_frequencies"]),
             ", ".join(row["observed_sources"]),
-            ", ".join(row["observed_cases"][:3]),
+            ", ".join(row["observed_levels"]),
+            ", ".join(row["best_evidence_cases"][:3]),
+            row["support_boundary"],
         ]
         for row in report["output_variables"]
     ]
     return doc_table(
-        ["Output", "Domain", "Support", "First case", "Freq", "Source", "Observed cases"],
+        [
+            "Output",
+            "Domain",
+            "Support",
+            "First evidence",
+            "Freq",
+            "Source",
+            "Levels",
+            "Best cases",
+            "Boundary",
+        ],
         rows,
         "Supported output variable coverage.",
     )
@@ -579,9 +628,11 @@ def render_markdown(report: dict[str, Any]) -> str:
             row["name"],
             row["domain"],
             row["user_status"],
-            row["first_case"],
+            row["first_evidence"],
             ", ".join(row["observed_frequencies"]),
             ", ".join(row["observed_sources"]),
+            ", ".join(row["observed_levels"]),
+            row["support_boundary"],
         ]
         for row in report["output_variables"]
     ]
@@ -610,7 +661,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         "## Supported Inputs\n\n"
         + markdown_table(["Input", "Family", "Support", "First evidence", "Boundary"], input_rows)
         + "\n## Supported Outputs\n\n"
-        + markdown_table(["Output", "Domain", "Support", "First case", "Freq", "Source"], output_rows)
+        + markdown_table(
+            ["Output", "Domain", "Support", "First evidence", "Freq", "Source", "Levels", "Boundary"],
+            output_rows,
+        )
         + "\n## Supported Algorithms\n\n"
         + markdown_table(["Algorithm", "Domain", "Support", "Claim level", "First case", "Proof outputs"], algorithm_rows)
         + "\n## Explicit Gaps\n\n"

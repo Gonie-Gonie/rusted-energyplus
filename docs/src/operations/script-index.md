@@ -112,5 +112,6 @@ matplotlib for document layout and charts.
 | `v0.26-verify` | release | verify v0.26 internal convective gains conformance gate | yes | internal-gains conformance report, `.runtime/release-evidence` |
 | `v0.27-verify` | release | verify v0.27 user support coverage report gate | yes | support coverage PDF/HTML/JSON/Markdown, `.runtime/release-evidence` |
 | `v0.28-verify` | release | verify v0.28 input object coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated object coverage |
+| `v0.29-verify` | release | verify v0.29 output variable coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated variable coverage |
 
 No diagnostic command should be listed as conformance evidence.
