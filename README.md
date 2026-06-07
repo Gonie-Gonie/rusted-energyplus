@@ -55,6 +55,10 @@ Start with the current docs:
 - `docs/src/current/verification.md`
 - `docs/src/current/architecture-overview.md`
 
+Old planning docs are not retained in the mdBook tree. Use Git history,
+release notes, and GitHub Release assets for historical planning and frozen
+evidence.
+
 Build the book with:
 
 ```powershell

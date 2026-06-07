@@ -29,3 +29,6 @@ The long-term targets remain:
 
 Plans after v0.16 should be added to `specs/milestones.toml` first. Markdown
 planning pages are allowed only when a human explanation is needed.
+
+Old milestone planning pages are not retained in the docs tree. Use
+`specs/milestones.toml`, release notes, and Git history for historical context.

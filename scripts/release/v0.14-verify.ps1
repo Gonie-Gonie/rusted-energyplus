@@ -62,8 +62,6 @@ function Assert-ZipEntry {
 
 $SourceRoot = ".reference\energyplus-src\26.1.0"
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.14.0-plan.md" -Description "v0.14 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.14.0-readiness.md" -Description "v0.14 readiness"
 Assert-FileExists -Path "docs\src\releases\v0.14.0.md" -Description "v0.14 release notes"
 Assert-FileExists -Path "docs\src\porting-map\plant-source-map.md" -Description "plant source map"
 Assert-FileExists -Path "docs\src\porting-map\plant.md" -Description "plant porting map"
@@ -159,9 +157,6 @@ Assert-Contains -Path "docs\src\porting-map\plant-source-map.md" -Pattern "Stop 
 Assert-Contains -Path "docs\src\porting-map\plant-source-map.md" -Pattern "diagnostic-only evidence" -Description "plant map non-claim boundary"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "v0.14 Plant Source Map" -Description "plant porting map v0.14 section"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern "plant loop and equipment" -Description "plant output-variable matrix row"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.14.0-readiness.md" -Pattern "planning-ready" -Description "v0.14 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.14.0-readiness.md" -Pattern "not a plant numerical conformance claim" -Description "v0.14 claim boundary"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.14.0-plan.md" -Pattern "This is not a plant, HVAC, node, meter, sizing, or ExampleFiles numerical" -Description "v0.14 plan boundary"
 
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "PlantLoopBranchListEdge" -Description "PlantLoop graph edge model"
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "PlantBranchComponentEdge" -Description "Plant branch component edge model"
@@ -193,15 +188,10 @@ Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.14.0")
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.14.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.14 release package"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.14.0.md" -Description "v0.14 packaged release note"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.14.0-plan.md" -Description "v0.14 packaged plan"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.14.0-readiness.md" -Description "v0.14 packaged readiness"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant-source-map.md" -Description "v0.14 packaged plant source map"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant.md" -Description "v0.14 packaged plant map"
 Assert-ZipEntry -ZipPath $package -Entry "data/testcases/minimal/plant-loop-skeleton.epJSON" -Description "v0.14 packaged plant fixture"
 Assert-ZipEntry -ZipPath $package -Entry "scripts/smoke/plant-loop-skeleton-smoke.ps1" -Description "v0.14 packaged plant smoke"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.14.0/numeric-conformance-evidence.html" -Description "v0.14 packaged numeric conformance evidence HTML"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.14.0/numeric-conformance-evidence.pdf" -Description "v0.14 packaged numeric conformance evidence PDF"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.14.0/numeric-conformance-evidence.json" -Description "v0.14 packaged numeric conformance evidence JSON"
 
 Write-Host "result: pass"
 Write-Host "v0.14.0 plant source mapping verification passed."

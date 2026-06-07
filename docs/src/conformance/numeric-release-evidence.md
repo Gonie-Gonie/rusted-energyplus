@@ -9,8 +9,8 @@ last_reviewed: 2026-06-07
 
 Release-stage numerical conformance evidence is distributed as a PDF evidence
 pack, not only as markdown reports. The release PDF/HTML/JSON evidence pack is
-generated from the promoted conformance summaries and is packaged with the
-release artifact.
+generated from the promoted conformance summaries and uploaded as GitHub
+Release assets beside the binary zip.
 
 Current command:
 
@@ -26,12 +26,12 @@ Current generated files:
 .runtime/release-evidence/v0.17.0/numeric-conformance-evidence.json
 ```
 
-Current packaged release paths:
+Current GitHub Release asset names:
 
 ```text
-evidence/v0.17.0/numeric-conformance-evidence.html
-evidence/v0.17.0/numeric-conformance-evidence.pdf
-evidence/v0.17.0/numeric-conformance-evidence.json
+numeric-conformance-evidence.html
+numeric-conformance-evidence.pdf
+numeric-conformance-evidence.json
 ```
 
 ## Included Cases

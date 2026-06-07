@@ -35,8 +35,6 @@ function Assert-Contains {
     Write-Host "OK $Description marker: $Pattern"
 }
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.8.0-plan.md" -Description "v0.8 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.8.0-readiness.md" -Description "v0.8 readiness"
 Assert-FileExists -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Description "v0.8 heat-balance case"
 Assert-FileExists -Path "data\conformance_cases\heat_balance_nomass_001\heat_balance_nomass.idf" -Description "v0.8 heat-balance IDF"
 Assert-FileExists -Path "scripts\compare\compare-heat-balance-conformance.ps1" -Description "v0.8 conformance gate"
@@ -47,10 +45,6 @@ Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "max_rmse = 0.000001" -Description "v0.8 rmse tolerance"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern "blocking = true" -Description "v0.8 blocking gate"
 
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.8.0-plan.md" -Pattern "heat_balance_nomass_001" -Description "v0.8 plan case"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.8.0-plan.md" -Pattern "DataHeatBalance::ZoneInitialTemp" -Description "v0.8 source reference"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.8.0-readiness.md" -Pattern "conformance-ready" -Description "v0.8 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.8.0-readiness.md" -Pattern "not a dynamic exterior heat-balance claim" -Description "v0.8 claim boundary"
 Assert-Contains -Path "docs\src\porting-map\heat-balance.md" -Pattern 'v0.8 promoted case: `heat_balance_nomass_001`' -Description "heat-balance map v0.8 promotion"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern 'conformance for `heat_balance_nomass_001`' -Description "output matrix v0.8 promotion"
 

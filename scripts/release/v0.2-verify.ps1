@@ -24,8 +24,6 @@ function Assert-FileExists {
 Write-Host "milestone: v0.2"
 Write-Host "scope: conformance harness, baseline-only reports, no Rust-vs-EnergyPlus numerical claim"
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.2.0-plan.md" -Description "v0.2 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.2.0-readiness.md" -Description "v0.2 readiness"
 Assert-FileExists -Path "docs\src\conformance\baseline-generation.md" -Description "baseline artifact contract"
 Assert-FileExists -Path "docs\src\conformance\output-requests.md" -Description "output request source contract"
 Assert-FileExists -Path "docs\src\conformance\report-format.md" -Description "report artifact contract"

@@ -39,6 +39,7 @@ jobs:
           $verifyScript = "scripts\release\$verifyCommand.ps1"
           $notesFile = "docs\src\releases\$tag.md"
           $artifact = "dist\eplus-rs-$tag-windows-x64.zip"
+          $evidenceDir = ".runtime\release-evidence\$tag"
 
           if (-not (Test-Path -LiteralPath $verifyScript -PathType Leaf)) {
               throw "Missing release verification script: $verifyScript"
@@ -53,6 +54,7 @@ jobs:
           "VERIFY_SCRIPT=$verifyScript" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_NOTES=$notesFile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_ARTIFACT=$artifact" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_EVIDENCE_DIR=$evidenceDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Set up Rust and docs tools
         run: .\scripts\dev.cmd setup -InstallRust -InstallDocsTools -SkipOracleDownload -SkipSourceDownload -SkipOracleSmoke
@@ -95,18 +97,25 @@ jobs:
           gh --version
 
           $releaseTitle = "eplus-rs $env:RELEASE_VERSION"
+          $assets = @((Resolve-Path -LiteralPath $env:RELEASE_ARTIFACT).Path)
+          if (Test-Path -LiteralPath $env:RELEASE_EVIDENCE_DIR -PathType Container) {
+              Get-ChildItem -LiteralPath $env:RELEASE_EVIDENCE_DIR -File |
+                  Sort-Object Name |
+                  ForEach-Object { $assets += $_.FullName }
+          }
+
           if (gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY *> $null) {
               gh release edit $env:RELEASE_TAG `
                   --repo $env:GITHUB_REPOSITORY `
                   --title $releaseTitle `
                   --notes-file $env:RELEASE_NOTES `
                   --prerelease
-              gh release upload $env:RELEASE_TAG $env:RELEASE_ARTIFACT `
+              gh release upload $env:RELEASE_TAG @assets `
                   --repo $env:GITHUB_REPOSITORY `
                   --clobber
           }
           else {
-              gh release create $env:RELEASE_TAG $env:RELEASE_ARTIFACT `
+              gh release create $env:RELEASE_TAG @assets `
                   --repo $env:GITHUB_REPOSITORY `
                   --verify-tag `
                   --title $releaseTitle `

@@ -24,6 +24,6 @@
 - [Object Coverage](generated/object-coverage.md)
 - [Variable Coverage](generated/variable-coverage.md)
 
-# Archive
+# ADR
 
-- [Archive Index](archive/index.md)
+- [Docs, Specs, and Evidence Retention](adr/0001-docs-specs-and-evidence-retention.md)

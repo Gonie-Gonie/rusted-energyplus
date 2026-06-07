@@ -20,6 +20,9 @@ The repository also contains smoke, baseline-only, and diagnostic evidence for
 model intake, schedules, geometry, internal gains, node projection, IdealLoads
 typed graph work, and plant-loop diagnostic plumbing. Those artifacts are
 useful development evidence, but they are not general compatibility claims.
+The historical v0.1 through v0.15 boundaries are summarized in
+`specs/milestones.toml`; their old planning pages are intentionally not
+retained in the docs tree.
 
 The current public scope includes:
 

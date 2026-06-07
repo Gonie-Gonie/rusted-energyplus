@@ -62,8 +62,6 @@ function Assert-ZipEntry {
 
 $SourceRoot = ".reference\energyplus-src\26.1.0"
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.12.0-plan.md" -Description "v0.12 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.12.0-readiness.md" -Description "v0.12 readiness"
 Assert-FileExists -Path "docs\src\conformance\numeric-release-evidence.md" -Description "numeric release evidence docs"
 Assert-FileExists -Path "docs\src\porting-map\node-state-source-map.md" -Description "node-state source map"
 Assert-FileExists -Path "docs\src\porting-map\output-variable-source-map.md" -Description "output-variable source map"
@@ -127,8 +125,6 @@ Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "NodeStateStore" -Description "node map Rust state store"
 Assert-Contains -Path "docs\src\porting-map\node-state-source-map.md" -Pattern "Stop Rule" -Description "node map stop rule"
 
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.12.0-readiness.md" -Pattern "planning-ready" -Description "v0.12 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.12.0-readiness.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.12 claim boundary"
 Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "release PDF/HTML/JSON evidence pack" -Description "numeric evidence release policy"
 Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "v0.8/v0.9 cases only" -Description "numeric evidence claim boundary"
 Assert-Contains -Path "docs\src\porting-map\output-variable-source-map.md" -Pattern "node-state-source-map.md" -Description "output variable node source map"
@@ -161,9 +157,6 @@ Assert-FileExists -Path $package -Description "v0.12 release package"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.12.0.md" -Description "v0.12 packaged release note"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/node-state-source-map.md" -Description "v0.12 packaged node source map"
 Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/air_side_node_diagnostic_001/case.toml" -Description "v0.12 packaged node case manifest"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.12.0/numeric-conformance-evidence.html" -Description "v0.12 packaged numeric conformance evidence HTML"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.12.0/numeric-conformance-evidence.pdf" -Description "v0.12 packaged numeric conformance evidence PDF"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.12.0/numeric-conformance-evidence.json" -Description "v0.12 packaged numeric conformance evidence JSON"
 
 Write-Host "result: pass"
 Write-Host "v0.12.0 node source mapping verification passed."

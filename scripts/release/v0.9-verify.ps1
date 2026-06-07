@@ -35,8 +35,6 @@ function Assert-Contains {
     Write-Host "OK $Description marker: $Pattern"
 }
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.9.0-plan.md" -Description "v0.9 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.9.0-readiness.md" -Description "v0.9 readiness"
 Assert-FileExists -Path "data\conformance_cases\surface_temperature_nomass_001\case.toml" -Description "v0.9 surface-temperature case"
 Assert-FileExists -Path "data\conformance_cases\surface_temperature_nomass_001\surface_temperature_nomass.idf" -Description "v0.9 surface-temperature IDF"
 Assert-FileExists -Path "scripts\compare\compare-surface-temperature-conformance.ps1" -Description "v0.9 conformance gate"
@@ -48,10 +46,6 @@ Assert-Contains -Path "data\conformance_cases\surface_temperature_nomass_001\cas
 Assert-Contains -Path "data\conformance_cases\surface_temperature_nomass_001\case.toml" -Pattern 'variable_class = "surface-state"' -Description "v0.9 surface tolerance class"
 Assert-Contains -Path "data\conformance_cases\surface_temperature_nomass_001\case.toml" -Pattern "blocking = true" -Description "v0.9 blocking gate"
 
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.9.0-plan.md" -Pattern "surface_temperature_nomass_001" -Description "v0.9 plan case"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.9.0-plan.md" -Pattern "not a fenestration or solar-radiation claim" -Description "v0.9 claim boundary"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.9.0-readiness.md" -Pattern "conformance-ready" -Description "v0.9 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.9.0-readiness.md" -Pattern "Surface Inside Face Temperature" -Description "v0.9 readiness inside variable"
 Assert-Contains -Path "docs\src\porting-map\output-variable-source-map.md" -Pattern 'conformance for `surface_temperature_nomass_001`' -Description "output map v0.9 promotion"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern 'conformance for `surface_temperature_nomass_001`' -Description "output matrix v0.9 promotion"
 

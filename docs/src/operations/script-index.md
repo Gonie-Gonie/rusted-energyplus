@@ -85,11 +85,11 @@ matplotlib for document layout and charts.
 | `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
 | `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
 | `v0.11-verify` | release | verify v0.11 air-side node diagnostic and projection evidence | yes | `.runtime/air-side-node-diagnostic` |
-| `v0.12-verify` | release | verify v0.12 node source mapping evidence and numeric evidence packaging | yes | source-map docs, `.runtime/release-evidence` |
-| `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and numeric evidence packaging | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
-| `v0.14-verify` | release | verify v0.14 plant source mapping and numeric evidence packaging | yes | plant source-map docs, `.runtime/release-evidence` |
-| `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and numeric evidence packaging | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
-| `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and numeric evidence packaging | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
+| `v0.12-verify` | release | verify v0.12 node source mapping evidence and release evidence assets | yes | source-map docs, `.runtime/release-evidence` |
+| `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and release evidence assets | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
+| `v0.14-verify` | release | verify v0.14 plant source mapping and release evidence assets | yes | plant source-map docs, `.runtime/release-evidence` |
+| `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and release evidence assets | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
+| `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and release evidence assets | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
 | `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

@@ -61,8 +61,6 @@ function Assert-ZipEntry {
 }
 
 Assert-Contains -Path "Cargo.toml" -Pattern 'version = "0.17.0"' -Description "workspace version"
-Assert-FileExists -Path "docs\src\operations\v0.17.0-plan.md" -Description "v0.17 plan"
-Assert-FileExists -Path "docs\src\operations\v0.17.0-readiness.md" -Description "v0.17 readiness"
 Assert-FileExists -Path "docs\src\releases\v0.17.0.md" -Description "v0.17 release notes"
 Assert-FileExists -Path "scripts\conformance\manifest-validate-all.ps1" -Description "manifest v2 all-case gate"
 
@@ -74,8 +72,6 @@ Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "validate-case-v2" -D
 Assert-Contains -Path "scripts\conformance\manifest-validate-all.ps1" -Pattern "schema_v2: rusted-energyplus.case-manifest.v2" -Description "manifest v2 schema gate marker"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern 'level = "conformance"' -Description "v0.8 conformance-level output"
 Assert-Contains -Path "data\conformance_cases\plant_loop_diagnostic_001\case.toml" -Pattern 'level = "baseline"' -Description "plant diagnostic baseline level"
-Assert-Contains -Path "docs\src\operations\v0.17.0-readiness.md" -Pattern "schema-v2-ready" -Description "v0.17 readiness status"
-Assert-Contains -Path "docs\src\operations\v0.17.0-readiness.md" -Pattern "does not add a new numerical conformance claim" -Description "v0.17 claim boundary"
 Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "For v0.17.0, that still means the earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
 
 Write-Host "milestone: v0.17.0"
@@ -99,14 +95,9 @@ Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.17.0")
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.17.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.17 release package"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.17.0.md" -Description "v0.17 packaged release note"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/operations/v0.17.0-plan.md" -Description "v0.17 packaged plan"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/operations/v0.17.0-readiness.md" -Description "v0.17 packaged readiness"
 Assert-ZipEntry -ZipPath $package -Entry "scripts/conformance/manifest-validate-all.ps1" -Description "v0.17 packaged manifest gate"
 Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/heat_balance_nomass_001/case.toml" -Description "v0.17 packaged v2 conformance case"
 Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/plant_loop_diagnostic_001/case.toml" -Description "v0.17 packaged v2 diagnostic case"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.17.0/numeric-conformance-evidence.html" -Description "v0.17 packaged numeric conformance evidence HTML"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.17.0/numeric-conformance-evidence.pdf" -Description "v0.17 packaged numeric conformance evidence PDF"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.17.0/numeric-conformance-evidence.json" -Description "v0.17 packaged numeric conformance evidence JSON"
 
 Write-Host "result: pass"
 Write-Host "v0.17.0 manifest and output request schema v2 verification passed."

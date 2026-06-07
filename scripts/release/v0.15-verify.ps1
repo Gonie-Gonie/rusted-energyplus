@@ -60,8 +60,6 @@ function Assert-ZipEntry {
     }
 }
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.15.0-plan.md" -Description "v0.15 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.15.0-readiness.md" -Description "v0.15 readiness"
 Assert-FileExists -Path "docs\src\releases\v0.15.0.md" -Description "v0.15 release notes"
 Assert-FileExists -Path "docs\src\porting-map\plant.md" -Description "plant porting map"
 Assert-FileExists -Path "docs\src\porting-map\plant-source-map.md" -Description "plant source map"
@@ -96,9 +94,6 @@ Assert-Contains -Path "scripts\smoke\plant-loop-diagnostic-smoke.ps1" -Pattern "
 Assert-Contains -Path "scripts\smoke\plant-loop-diagnostic-smoke.ps1" -Pattern "baseline_nonzero_count" -Description "v0.15 nonzero baseline gate"
 Assert-Contains -Path "scripts\smoke\plant-loop-diagnostic-smoke.ps1" -Pattern "status: baseline-only" -Description "v0.15 baseline-only status"
 
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.15.0-readiness.md" -Pattern "diagnostic-ready" -Description "v0.15 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.15.0-readiness.md" -Pattern "not a plant numerical conformance claim" -Description "v0.15 claim boundary"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.15.0-plan.md" -Pattern "This is not a plant, HVAC, node, meter, sizing, or ExampleFiles numerical" -Description "v0.15 plan boundary"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "v0.15 Plant Loop Diagnostic Baseline" -Description "plant map v0.15 section"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern "plant_loop_diagnostic_001" -Description "output variable matrix v0.15 row"
 Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "For v0.15.0, that still means the earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
@@ -126,16 +121,11 @@ Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.15.0")
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.15.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.15 release package"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.15.0.md" -Description "v0.15 packaged release note"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.15.0-plan.md" -Description "v0.15 packaged plan"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.15.0-readiness.md" -Description "v0.15 packaged readiness"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant.md" -Description "v0.15 packaged plant map"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant-source-map.md" -Description "v0.15 packaged plant source map"
 Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/plant_loop_diagnostic_001/case.toml" -Description "v0.15 packaged plant diagnostic case"
 Assert-ZipEntry -ZipPath $package -Entry "data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf" -Description "v0.15 packaged plant diagnostic IDF"
 Assert-ZipEntry -ZipPath $package -Entry "scripts/smoke/plant-loop-diagnostic-smoke.ps1" -Description "v0.15 packaged plant diagnostic smoke"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.15.0/numeric-conformance-evidence.html" -Description "v0.15 packaged numeric conformance evidence HTML"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.15.0/numeric-conformance-evidence.pdf" -Description "v0.15 packaged numeric conformance evidence PDF"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.15.0/numeric-conformance-evidence.json" -Description "v0.15 packaged numeric conformance evidence JSON"
 
 Write-Host "result: pass"
 Write-Host "v0.15.0 plant-loop diagnostic verification passed."

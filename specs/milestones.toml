@@ -1,4 +1,207 @@
 [[milestone]]
+version = "0.1"
+title = "Model Intake"
+status = "historical"
+claim_level = "model-intake-only"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "runtime conformance",
+  "heat-balance compatibility",
+]
+
+[[milestone]]
+version = "0.2"
+title = "Conformance Harness"
+status = "historical"
+claim_level = "harness-only"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "numerical conformance",
+]
+
+[[milestone]]
+version = "0.3"
+title = "Input Interpretation Parity"
+status = "historical"
+claim_level = "input-interpretation-only"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "runtime conformance",
+]
+
+[[milestone]]
+version = "0.4"
+title = "Time, Weather, and Schedule Evidence"
+status = "historical"
+claim_level = "smoke-or-baseline"
+required_cases = [
+  "schedule_constant_001",
+  "weather_fields_001",
+]
+required_variables = []
+not_claimed = [
+  "general runtime compatibility",
+]
+
+[[milestone]]
+version = "0.5"
+title = "Static Geometry, Construction, and Internal Gains"
+status = "historical"
+claim_level = "static-smoke"
+required_cases = [
+  "surface_geometry_001",
+  "construction_materials_001",
+  "internal_gains_001",
+]
+required_variables = []
+not_claimed = [
+  "dynamic heat-balance compatibility",
+]
+
+[[milestone]]
+version = "0.6"
+title = "Output, Trace, and Compare Infrastructure"
+status = "historical"
+claim_level = "diagnostic-only"
+required_cases = [
+  "zone_temperature_diagnostic_001",
+]
+required_variables = []
+not_claimed = [
+  "first executable building simulation subset",
+  "heat-balance conformance",
+]
+
+[[milestone]]
+version = "0.7"
+title = "EnergyPlus Source Mapping"
+status = "historical"
+claim_level = "planning-guard"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "zone-temperature pass wording",
+  "numerical conformance",
+]
+
+[[milestone]]
+version = "0.8"
+title = "Uncontrolled Heat Balance Port"
+status = "historical"
+claim_level = "limited-conformance"
+required_cases = [
+  "heat_balance_nomass_001",
+]
+required_variables = [
+  "Zone Mean Air Temperature",
+]
+not_claimed = [
+  "dynamic exterior heat-balance claim",
+  "general heat-balance compatibility",
+]
+
+[[milestone]]
+version = "0.9"
+title = "Surface State Expansion"
+status = "historical"
+claim_level = "limited-conformance"
+required_cases = [
+  "surface_temperature_nomass_001",
+]
+required_variables = [
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
+]
+not_claimed = [
+  "fenestration compatibility",
+  "solar-radiation compatibility",
+]
+
+[[milestone]]
+version = "0.10"
+title = "IdealLoads and Thermostat Typed Graph"
+status = "historical"
+claim_level = "typed-graph-only"
+required_cases = [
+  "ideal_loads_thermostat_001",
+]
+required_variables = []
+not_claimed = [
+  "IdealLoads load conformance",
+  "HVAC numerical conformance",
+]
+
+[[milestone]]
+version = "0.11"
+title = "Air-side Node Diagnostic"
+status = "historical"
+claim_level = "diagnostic-only"
+required_cases = [
+  "air_side_node_diagnostic_001",
+]
+required_variables = []
+not_claimed = [
+  "node numerical conformance",
+  "HVAC numerical conformance",
+]
+
+[[milestone]]
+version = "0.12"
+title = "Node Source Mapping"
+status = "historical"
+claim_level = "planning-guard"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "node numerical conformance",
+  "HVAC numerical conformance",
+]
+
+[[milestone]]
+version = "0.13"
+title = "Plant Loop Skeleton"
+status = "historical"
+claim_level = "typed-graph-smoke"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "plant numerical conformance",
+  "plant loop simulation",
+]
+
+[[milestone]]
+version = "0.14"
+title = "Plant Source Mapping"
+status = "historical"
+claim_level = "planning-guard"
+required_cases = []
+required_variables = []
+not_claimed = [
+  "plant numerical conformance",
+]
+
+[[milestone]]
+version = "0.15"
+title = "Plant Loop Diagnostic Baseline"
+status = "historical"
+claim_level = "diagnostic-only"
+required_cases = [
+  "plant_loop_diagnostic_001",
+]
+required_variables = []
+not_claimed = [
+  "plant numerical conformance",
+  "HVAC numerical conformance",
+  "node numerical conformance",
+  "meter conformance",
+  "sizing conformance",
+  "ExampleFiles numerical conformance",
+]
+
+[[milestone]]
 version = "0.16"
 title = "Versioning and Evidence Cleanup"
 status = "complete"

@@ -62,8 +62,6 @@ function Assert-ZipEntry {
 
 $SourceRoot = ".reference\energyplus-src\26.1.0"
 
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.13.0-plan.md" -Description "v0.13 plan"
-Assert-FileExists -Path "docs\src\archive\pre-alpha\v0.13.0-readiness.md" -Description "v0.13 readiness"
 Assert-FileExists -Path "docs\src\releases\v0.13.0.md" -Description "v0.13 release notes"
 Assert-FileExists -Path "docs\src\porting-map\plant.md" -Description "plant porting map"
 Assert-FileExists -Path "data\testcases\minimal\plant-loop-skeleton.epJSON" -Description "v0.13 plant-loop skeleton fixture"
@@ -97,8 +95,6 @@ Assert-Contains -Path "$SourceRoot\src\EnergyPlus\Pumps.cc" -Pattern "Pump:Const
 Assert-Contains -Path "$SourceRoot\src\EnergyPlus\Boilers.cc" -Pattern "Boiler:HotWater" -Description "EnergyPlus boiler object marker"
 Assert-Contains -Path "$SourceRoot\src\EnergyPlus\ChillerElectricEIR.cc" -Pattern "Chiller:Electric:EIR" -Description "EnergyPlus chiller object marker"
 
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.13.0-readiness.md" -Pattern "plant-graph-ready" -Description "v0.13 readiness status"
-Assert-Contains -Path "docs\src\archive\pre-alpha\v0.13.0-readiness.md" -Pattern "not a plant numerical conformance claim" -Description "v0.13 claim boundary"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "v0.13 Plant Loop Skeleton" -Description "plant porting map v0.13 section"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "typed graph smoke" -Description "plant porting map smoke boundary"
 Assert-Contains -Path "docs\src\operations\supported-object-coverage.md" -Pattern "PlantLoop | yes | partial | yes | yes | yes | partial | no | no" -Description "PlantLoop object coverage boundary"
@@ -141,8 +137,6 @@ Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.13.0")
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.13.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.13 release package"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/releases/v0.13.0.md" -Description "v0.13 packaged release note"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.13.0-plan.md" -Description "v0.13 packaged plan"
-Assert-ZipEntry -ZipPath $package -Entry "docs/src/archive/pre-alpha/v0.13.0-readiness.md" -Description "v0.13 packaged readiness"
 Assert-ZipEntry -ZipPath $package -Entry "docs/src/porting-map/plant.md" -Description "v0.13 packaged plant map"
 Assert-ZipEntry -ZipPath $package -Entry "data/testcases/minimal/plant-loop-skeleton.epJSON" -Description "v0.13 packaged plant fixture"
 Assert-ZipEntry -ZipPath $package -Entry "scripts/smoke/plant-loop-skeleton-smoke.ps1" -Description "v0.13 packaged plant smoke"
@@ -150,9 +144,6 @@ Assert-ZipEntry -ZipPath $package -Entry "scripts/lib/python.ps1" -Description "
 Assert-ZipEntry -ZipPath $package -Entry "scripts/setup/python-smoke.ps1" -Description "v0.13 packaged Python smoke"
 Assert-ZipEntry -ZipPath $package -Entry "tools/python/requirements-report.txt" -Description "v0.13 packaged report requirements"
 Assert-ZipEntry -ZipPath $package -Entry "tools/reporting/conformance_evidence_report.py" -Description "v0.13 packaged oodocs evidence generator"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.html" -Description "v0.13 packaged numeric conformance evidence HTML"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.pdf" -Description "v0.13 packaged numeric conformance evidence PDF"
-Assert-ZipEntry -ZipPath $package -Entry "evidence/v0.13.0/numeric-conformance-evidence.json" -Description "v0.13 packaged numeric conformance evidence JSON"
 
 Write-Host "result: pass"
 Write-Host "v0.13.0 PlantLoop typed graph skeleton verification passed."

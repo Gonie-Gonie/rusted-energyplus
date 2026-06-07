@@ -41,3 +41,7 @@ Release evidence documents use the repo-local Python environment and oodocs:
 Numerical conformance requires a generated report plus a blocking gate. Smoke
 or diagnostic commands can support development, but they cannot support a
 compatibility claim.
+
+Frozen release evidence is published as GitHub Release assets. The local
+`.runtime/release-evidence` directory is a staging area, not the long-term
+evidence store.
