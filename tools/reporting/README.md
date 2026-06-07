@@ -19,6 +19,8 @@ Current generators:
   coverage matrices for all tracked manifests.
 - `support_coverage_report.py` builds the user-facing input, output, and
   algorithm support coverage report from specs plus case manifests.
+- `user_coverage_handbook.py` builds the user-facing support scope handbook
+  from support coverage and conformance index JSON.
 - `release_evidence_manifest.py` builds the release asset manifest from the
   binary package plus generated evidence JSON/PDF/HTML/Markdown artifacts.
 

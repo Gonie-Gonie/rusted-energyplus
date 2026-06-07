@@ -54,6 +54,8 @@ tolerance, and code organization.
   infrastructure; it does not promote new numerical conformance
 - v0.31 release evidence asset manifest only as release documentation
   infrastructure; it does not promote new numerical conformance
+- v0.32 user coverage handbook only as user documentation infrastructure; it
+  does not promote new numerical conformance
 
 Not claimed:
 
@@ -85,10 +87,11 @@ Useful focused checks:
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
-.\scripts\dev.cmd conformance-index-report -Version 0.31.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.31.0
-.\scripts\dev.cmd support-coverage-report -Version 0.31.0
-.\scripts\dev.cmd release-evidence-manifest -Version 0.31.0
+.\scripts\dev.cmd conformance-index-report -Version 0.32.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
+.\scripts\dev.cmd support-coverage-report -Version 0.32.0
+.\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
+.\scripts\dev.cmd release-evidence-manifest -Version 0.32.0
 ```
 
 ## Documentation

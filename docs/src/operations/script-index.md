@@ -83,6 +83,7 @@ matplotlib for document layout and charts.
 | `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |
 | `conformance-index-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown conformance index coverage matrices | yes for release coverage | `.runtime/release-evidence` |
 | `support-coverage-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user-facing support coverage for inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
+| `user-coverage-handbook` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user decision guide for supported inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `release-evidence-manifest` | release | generate oodocs PDF/HTML/JSON/Markdown release package and evidence asset manifest | yes for release coverage | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
@@ -116,5 +117,6 @@ matplotlib for document layout and charts.
 | `v0.29-verify` | release | verify v0.29 output variable coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated variable coverage |
 | `v0.30-verify` | release | verify v0.30 algorithm coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated algorithm ledger |
 | `v0.31-verify` | release | verify v0.31 release evidence asset manifest gate | yes | release package, evidence manifest PDF/HTML/JSON/Markdown, `.runtime/release-evidence` |
+| `v0.32-verify` | release | verify v0.32 user coverage handbook gate | yes | user coverage handbook PDF/HTML/JSON/Markdown, release manifest |
 
 No diagnostic command should be listed as conformance evidence.

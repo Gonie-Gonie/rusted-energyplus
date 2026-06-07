@@ -4,6 +4,30 @@
 
 No unreleased changes.
 
+## v0.32.0 - 2026-06-08
+
+User coverage handbook.
+
+### Added
+
+- v0.32 user coverage handbook milestone.
+- `user-coverage-handbook` dev command and PowerShell wrapper.
+- `user_coverage_handbook.py` oodocs/matplotlib PDF/HTML/JSON/Markdown
+  generator.
+- mdBook user coverage handbook page.
+- user coverage handbook release assets in the release evidence manifest.
+- v0.32 release verification script.
+
+### Changed
+
+- Release evidence report defaults now target v0.32.0.
+
+### Scope
+
+- v0.32.0 is reporting infrastructure and does not add new numerical
+  conformance, full EnergyPlus compatibility, HVAC numerical conformance,
+  plant numerical conformance, or meter conformance.
+
 ## v0.31.0 - 2026-06-08
 
 Release evidence asset manifest.

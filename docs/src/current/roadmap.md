@@ -45,6 +45,9 @@ Current direction:
 - v0.31 added a release evidence asset manifest so package, numerical
   evidence, conformance index, and support coverage assets are checked and
   documented together.
+- v0.32 added a user coverage handbook generated from support coverage and
+  conformance index JSON, keeping current input, output, algorithm, promoted
+  case, and gap boundaries user-readable.
 
 The long-term targets remain:
 

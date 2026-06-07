@@ -36,7 +36,8 @@ and algorithm families. v0.28 enriches input object coverage metadata with
 first evidence and support boundaries. v0.29 enriches output variable coverage
 metadata with strongest-evidence first references and support boundaries.
 v0.30 enriches algorithm coverage metadata with first evidence and support
-boundaries. v0.31 adds the release evidence asset manifest. These reporting
-updates do not promote new numerical conformance.
+boundaries. v0.31 adds the release evidence asset manifest. v0.32 adds the
+user coverage handbook. These reporting updates do not promote new numerical
+conformance.
 
 For the formal non-goals list, see `project-scope/non-goals.md`.

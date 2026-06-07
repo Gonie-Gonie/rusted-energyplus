@@ -19,6 +19,7 @@
 # User Coverage
 
 - [Support Coverage Report](conformance/support-coverage-report.md)
+- [User Coverage Handbook](conformance/user-coverage-handbook.md)
 - [Release Evidence Manifest](conformance/release-evidence-manifest.md)
 
 # Generated References

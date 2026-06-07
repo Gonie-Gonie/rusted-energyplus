@@ -34,7 +34,7 @@ GITHUB_RELEASE_POLICY = (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the release evidence asset manifest.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.31.0")
+    parser.add_argument("--version", default="0.32.0")
     parser.add_argument("--target", default="windows-x64")
     return parser.parse_args()
 
@@ -75,6 +75,16 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def evidence_path(repo_root: Path, version: str, name: str) -> Path:
     return repo_root / ".runtime" / "release-evidence" / f"v{version}" / name
+
+
+def minor_version(version: str) -> int:
+    parts = version.split(".")
+    if len(parts) < 2:
+        return 0
+    try:
+        return int(parts[1])
+    except ValueError:
+        return 0
 
 
 def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dict[str, Any]]:
@@ -153,6 +163,35 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "Lightweight text copy of the user support coverage report.",
         },
     ]
+    if minor_version(version) >= 32:
+        specs.extend(
+            [
+                {
+                    "role": "user-coverage-handbook-pdf",
+                    "path": evidence_path(repo_root, version, "user-coverage-handbook.pdf"),
+                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                    "user_purpose": "Readable user guide to currently supported inputs, outputs, and algorithms.",
+                },
+                {
+                    "role": "user-coverage-handbook-html",
+                    "path": evidence_path(repo_root, version, "user-coverage-handbook.html"),
+                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                    "user_purpose": "Browser-readable user coverage handbook.",
+                },
+                {
+                    "role": "user-coverage-handbook-json",
+                    "path": evidence_path(repo_root, version, "user-coverage-handbook.json"),
+                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                    "user_purpose": "Machine-readable user coverage decision rules and scope slices.",
+                },
+                {
+                    "role": "user-coverage-handbook-markdown",
+                    "path": evidence_path(repo_root, version, "user-coverage-handbook.md"),
+                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                    "user_purpose": "Lightweight text copy of the user coverage handbook.",
+                },
+            ]
+        )
     return specs
 
 
@@ -177,10 +216,12 @@ def build_report_summaries(repo_root: Path, version: str) -> dict[str, Any]:
     numeric = load_json(evidence_path(repo_root, version, "numeric-conformance-evidence.json"))
     index = load_json(evidence_path(repo_root, version, "conformance-index-report.json"))
     support = load_json(evidence_path(repo_root, version, "support-coverage-report.json"))
+    handbook = load_json(evidence_path(repo_root, version, "user-coverage-handbook.json"))
 
     numeric_aggregate = numeric.get("aggregate") or {}
     index_aggregate = index.get("aggregate") or {}
     support_aggregate = support.get("aggregate") or {}
+    handbook_aggregate = handbook.get("aggregate") or {}
     return {
         "numeric_conformance": {
             "status": numeric_aggregate.get("status", "missing"),
@@ -202,6 +243,12 @@ def build_report_summaries(repo_root: Path, version: str) -> dict[str, Any]:
             "output_variables": support_aggregate.get("tracked_output_variable_count", 0),
             "output_requests": support_aggregate.get("manifest_output_request_count", 0),
             "algorithms": support_aggregate.get("algorithm_count", 0),
+        },
+        "user_coverage_handbook": {
+            "status": handbook_aggregate.get("status", "missing"),
+            "typed_inputs": handbook_aggregate.get("typed_input_count", 0),
+            "conformance_outputs": handbook_aggregate.get("conformance_output_variable_count", 0),
+            "conformance_algorithms": handbook_aggregate.get("conformance_algorithm_count", 0),
         },
     }
 
@@ -310,6 +357,17 @@ def build_summary_table(manifest: dict[str, Any]) -> Table:
             f"{summaries['support_coverage']['algorithms']} algorithms",
         ],
     ]
+    handbook_summary = summaries.get("user_coverage_handbook") or {}
+    if handbook_summary.get("status") != "missing":
+        rows.append(
+            [
+                "User coverage handbook",
+                handbook_summary["status"],
+                f"{handbook_summary['typed_inputs']} typed inputs, "
+                f"{handbook_summary['conformance_outputs']} conformance outputs, "
+                f"{handbook_summary['conformance_algorithms']} conformance algorithms",
+            ]
+        )
     return doc_table(["Report", "Status", "Scope summary"], rows, "Summaries read from generated JSON evidence.")
 
 
@@ -373,6 +431,7 @@ def build_document(manifest: dict[str, Any]) -> Document:
                     ["Numeric evidence", "Which promoted outputs match the oracle under declared tolerances?"],
                     ["Conformance index", "Which cases, outputs, domains, and gates are tracked?"],
                     ["Support coverage", "Which inputs, outputs, and algorithm families are supported, diagnostic, or graph-only?"],
+                    ["User coverage handbook", "How should users decide whether their IDF, requested outputs, and algorithms are in scope?"],
                 ],
                 "User-facing purpose of each release asset family.",
             ),

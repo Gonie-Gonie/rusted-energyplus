@@ -16,16 +16,16 @@ The support coverage report is the user-facing answer to three questions:
 Generate it through the standard release wrapper:
 
 ```powershell
-.\scripts\dev.cmd support-coverage-report -Version 0.31.0
+.\scripts\dev.cmd support-coverage-report -Version 0.32.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.31.0/support-coverage.md
-.runtime/release-evidence/v0.31.0/support-coverage-report.html
-.runtime/release-evidence/v0.31.0/support-coverage-report.pdf
-.runtime/release-evidence/v0.31.0/support-coverage-report.json
+.runtime/release-evidence/v0.32.0/support-coverage.md
+.runtime/release-evidence/v0.32.0/support-coverage-report.html
+.runtime/release-evidence/v0.32.0/support-coverage-report.pdf
+.runtime/release-evidence/v0.32.0/support-coverage-report.json
 ```
 
 The PDF and HTML are generated with `oodocs` and matplotlib from repository
@@ -69,6 +69,10 @@ fixture reports the promoted conformance case as its first evidence.
 As of v0.30.0, each tracked algorithm entry includes first evidence and a
 support boundary, so limited-conformance algorithms and diagnostic projections
 are visible without reading the developer source maps first.
+
+As of v0.32.0, the user coverage handbook reads this generated JSON and
+reorganizes it into user decision rules for supported inputs, outputs,
+algorithms, promoted cases, and known gaps.
 
 The report explicitly does not claim full EnergyPlus
 compatibility, broad ExampleFiles numerical compatibility, HVAC numerical

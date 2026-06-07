@@ -7,10 +7,10 @@ last_reviewed: 2026-06-08
 
 # Current Status
 
-The current public release line is v0.31.0. It adds a release evidence asset
-manifest on top of v0.30 algorithm coverage metadata, v0.29 output variable
-coverage metadata, v0.28 input object coverage metadata, the v0.27
-user-facing support coverage report, v0.26 internal convective gain
+The current public release line is v0.32.0. It adds a user coverage handbook on
+top of the v0.31 release evidence asset manifest, v0.30 algorithm coverage
+metadata, v0.29 output variable coverage metadata, v0.28 input object coverage
+metadata, the v0.27 user-facing support coverage report, v0.26 internal convective gain
 conformance, v0.25 opaque no-mass heat-balance boundary handling, v0.24
 runtime registry infrastructure, v0.23 official ExampleFile static model
 evidence, and v0.22 declared time, weather, and schedule numerical
@@ -55,6 +55,8 @@ The current public scope includes:
   and gate coverage matrices
 - user-facing support coverage reports with input object, output variable, and
   algorithm support matrices
+- user coverage handbooks that reorganize supported inputs, outputs,
+  algorithms, promoted cases, and known gaps around user decision rules
 - release evidence asset manifests with package/report paths, SHA-256 hashes,
   content types, user-facing purposes, and JSON evidence summaries
 - source-map and algorithm ledger checks that validate EnergyPlus source
@@ -89,4 +91,5 @@ Not claimed:
   internal-gain milestone
 - new numerical conformance from the v0.27 support coverage report
 - new numerical conformance from the v0.31 release evidence asset manifest
+- new numerical conformance from the v0.32 user coverage handbook
 - broad ExampleFiles compatibility
