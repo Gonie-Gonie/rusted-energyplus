@@ -84,7 +84,7 @@ Assert-Contains -Path "docs\src\project-scope\legacy-milestones.md" -Pattern "Hi
 Assert-Contains -Path "docs\src\project-scope\v1-scope.md" -Pattern "substantial compatibility draft" -Description "v1 scope boundary"
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "Plant State Projection Addendum" -Description "plant map projection addendum section"
 Assert-Contains -Path "docs\src\porting-map\algorithm-ledger.md" -Pattern "PlantLoadProfile projection" -Description "algorithm ledger v0.16 row"
-Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "For v0.16.0, that still means the earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
+Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
 
 Write-Host "milestone: v0.16.0"
 Write-Host "scope: versioning and evidence cleanup; plant-state projection addendum"

@@ -15,8 +15,8 @@ Current direction:
 
 - v0.16 reset the evidence and versioning contract for Road to v1.0.
 - v0.17 made manifest schema v2 a blocking validation gate.
-- v0.18 should connect output-request injection to the oracle baseline
-  pipeline.
+- v0.18 connected manifest-owned output-request injection to the oracle
+  baseline pipeline.
 - v0.19 should harden selected series readers and comparison metrics.
 - v0.20 should promote release report generation and coverage matrices.
 - v0.21 should make the algorithm ledger a stronger source-map gate.

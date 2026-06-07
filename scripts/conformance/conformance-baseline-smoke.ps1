@@ -83,6 +83,8 @@ Assert-Contains -Text $text -Pattern "id: schedule_constant_001" -Description "c
 Assert-Contains -Text $text -Pattern "comparison_class: smoke" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
 Assert-Contains -Text $text -Pattern "expanded_manifest:" -Description "expanded manifest path"
+Assert-Contains -Text $text -Pattern "injected_outputs: 0" -Description "idempotent injected output count"
+Assert-Contains -Text $text -Pattern "injected_meters: 0" -Description "injected meter count"
 Assert-Contains -Text $text -Pattern "status: generated" -Description "baseline status"
 
 $CaseOutput = Join-Path $OutputRoot "schedule_constant_001"
@@ -95,7 +97,14 @@ Assert-FileExists -Path (Join-Path $CaseOutput "case-expanded.toml") -Descriptio
 
 $expanded = Get-Content -Raw -LiteralPath (Join-Path $CaseOutput "case-expanded.toml")
 Assert-Contains -Text $expanded -Pattern 'schema = "rusted-energyplus.baseline-expanded.v1"' -Description "expanded manifest schema"
+Assert-Contains -Text $expanded -Pattern 'schema = "rusted-energyplus.output-injection.v1"' -Description "output injection schema"
+Assert-Contains -Text $expanded -Pattern "staged_idf_contains_manifest_requests = true" -Description "staged output request policy"
+Assert-Contains -Text $expanded -Pattern "outputs = 0" -Description "expanded output injection count"
 Assert-Contains -Text $expanded -Pattern 'source = "eso"' -Description "expanded output source"
 Assert-Contains -Text $expanded -Pattern 'eso = "eplusout.eso"' -Description "expanded ESO artifact"
+
+$staged = Get-Content -Raw -LiteralPath (Join-Path $CaseOutput "input.idf")
+Assert-Contains -Text $staged -Pattern "eplus-rs output request injection begin" -Description "staged output injection marker"
+Assert-Contains -Text $staged -Pattern "Schedule Value" -Description "staged schedule output request"
 
 Write-Host "Conformance baseline smoke passed."

@@ -96,7 +96,7 @@ Assert-Contains -Path "scripts\smoke\plant-loop-diagnostic-smoke.ps1" -Pattern "
 
 Assert-Contains -Path "docs\src\porting-map\plant.md" -Pattern "v0.15 Plant Loop Diagnostic Baseline" -Description "plant map v0.15 section"
 Assert-Contains -Path "docs\src\conformance\output-variable-matrix.md" -Pattern "plant_loop_diagnostic_001" -Description "output variable matrix v0.15 row"
-Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "For v0.15.0, that still means the earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
+Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
 
 Write-Host "milestone: v0.15.0"
 Write-Host "scope: plant-loop diagnostic baseline evidence"

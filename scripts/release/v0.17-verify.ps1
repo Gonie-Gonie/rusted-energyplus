@@ -72,7 +72,7 @@ Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "validate-case-v2" -D
 Assert-Contains -Path "scripts\conformance\manifest-validate-all.ps1" -Pattern "schema_v2: rusted-energyplus.case-manifest.v2" -Description "manifest v2 schema gate marker"
 Assert-Contains -Path "data\conformance_cases\heat_balance_nomass_001\case.toml" -Pattern 'level = "conformance"' -Description "v0.8 conformance-level output"
 Assert-Contains -Path "data\conformance_cases\plant_loop_diagnostic_001\case.toml" -Pattern 'level = "baseline"' -Description "plant diagnostic baseline level"
-Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "For v0.17.0, that still means the earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
+Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "earlier v0.8/v0.9 cases only" -Description "numeric evidence exclusion boundary"
 
 Write-Host "milestone: v0.17.0"
 Write-Host "scope: Case Manifest and Output Request Schema v2"

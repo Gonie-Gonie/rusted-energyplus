@@ -7,8 +7,8 @@ last_reviewed: 2026-06-07
 
 # Current Status
 
-The current public release line is v0.17.0. It gates Case Manifest and Output
-Request Schema v2 for tracked conformance cases.
+The current public release line is v0.18.0. It gates manifest-owned output
+request injection and official EnergyPlus ExampleFiles oracle baseline staging.
 
 Current numerical conformance is limited to the promoted v0.8 and v0.9 no-mass
 cases and their declared variables:
@@ -31,6 +31,7 @@ The current public scope includes:
 - repo-local portable Python for reporting
 - RawModel and TypedModel intake for declared seed objects
 - conformance manifests, output requests, tolerance rules, gates, and reports
+- output request injection for staged oracle baselines
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 

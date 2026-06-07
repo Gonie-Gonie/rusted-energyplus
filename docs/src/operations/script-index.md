@@ -91,5 +91,6 @@ matplotlib for document layout and charts.
 | `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and release evidence assets | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
 | `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and release evidence assets | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
 | `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
+| `v0.18-verify` | release | verify v0.18 output request injection and official baseline gate | yes | official baseline, `.runtime/release-evidence` |
 
 No diagnostic command should be listed as conformance evidence.

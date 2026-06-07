@@ -2,24 +2,32 @@
 
 ## Unreleased
 
-### Changed
+No unreleased changes.
 
-- Restructured mdBook navigation around short `current/`, `guides/`,
-  `generated/`, and `archive/` sections.
-- Added machine-readable `specs/` for project contract, milestones, algorithm
-  ledger, evidence levels, claim rules, object coverage, and variable coverage.
-- Added `docs-generate` and stale generated-doc checks for spec-derived
-  mdBook reference pages.
-- Archived v0.1 through v0.15 plan/readiness notes under
-  `docs/src/archive/pre-alpha`.
-- Split `ep_model` into ID, name, unit, object, and aggregate model modules.
-- Split `ep_compare` into tolerance, series, ESO, and EIO modules.
-- Moved `ep_conformance` unit tests out of the main schema file.
+## v0.18.0 - 2026-06-07
+
+Output request injection and official oracle baseline pipeline release.
 
 ### Added
 
-- `file-size-check` guard and PR template with claim-boundary/evidence fields.
-- Short crate README files for the core Rust crates.
+- manifest-owned `Output:Variable` and `Output:Meter` injection when staging
+  IDFs for oracle baselines.
+- idempotent output-request staging that skips requests already present in the
+  source IDF.
+- expanded baseline manifests with `rusted-energyplus.output-injection.v1`
+  metadata and injected output/meter counts.
+- official `1ZoneUncontrolled.idf` baseline-only case seeded from the
+  repo-local EnergyPlus 26.1.0 ExampleFiles tree.
+- `official-baseline-smoke` and `v0.18-verify` gates.
+
+### Notes
+
+- v0.18.0 is baseline infrastructure work, not a new numerical conformance
+  release.
+- Official ExampleFiles execution is baseline-only until Rust artifacts,
+  tolerances, compare reports, and blocking gates promote a specific case.
+- Tolerance-gated conformance remains limited to the declared v0.8 and v0.9
+  no-mass cases.
 
 ## v0.17.0 - 2026-06-07
 

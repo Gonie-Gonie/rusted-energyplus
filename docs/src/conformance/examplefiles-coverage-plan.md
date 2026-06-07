@@ -44,7 +44,7 @@ Each selected case must answer:
 | v0.15 | Tier B plant diagnostic | `plant_loop_diagnostic_001` PlantLoadProfile baseline first; selected boiler, pump, chiller, and plant-loop ExampleFiles later | plant oracle baseline and report skeleton only; no plant numerical conformance |
 | v0.16 | roadmap cleanup | legacy evidence reclassification and Road to v1.0 plan reset; plant projection remains an addendum | planning/documentation gate; no new numerical conformance |
 | v0.17 | manifest schema | Case Manifest and Output Request Schema v2 | infrastructure only |
-| v0.18 | output injection and oracle baseline | official IDF output request patching and selected oracle artifacts | baseline-only |
+| v0.18 | output injection and oracle baseline | official IDF output request patching and selected oracle artifacts | complete; baseline-only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -96,6 +96,13 @@ Current v0.15 plant diagnostic evidence:
 - `plant-loop-diagnostic-smoke`
 - `v0.15-verify`
 
+Current v0.18 official baseline evidence:
+
+- `data/conformance_cases/official_1zone_uncontrolled_baseline_001/case.toml`
+- manifest-owned staged IDF output request injection
+- `official-baseline-smoke`
+- `v0.18-verify`
+
 Post-v0.15 plant diagnostic addendum evidence:
 
 - `run plant-state-projection`
@@ -131,8 +138,6 @@ baseline-only, or diagnostic-only.
 
 ## Immediate Backlog
 
-- define Case Manifest and Output Request Schema v2
-- design `conformance patch-outputs`
 - generate selected output CSV files from oracle artifacts
 - generate a release-level conformance index
 - add Tier A candidates for one-zone uncontrolled and simple window cases

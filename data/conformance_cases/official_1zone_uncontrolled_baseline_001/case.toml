@@ -1,0 +1,59 @@
+id = "official_1zone_uncontrolled_baseline_001"
+title = "Official 1ZoneUncontrolled output-injection baseline"
+milestone = "v0.18-output-injection-baseline"
+purpose = "Exercise output request injection and EnergyPlus oracle baseline generation on an official ExampleFiles IDF without claiming numerical conformance."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The source IDF is an official EnergyPlus ExampleFiles input staged from the repo-local oracle installation.",
+  "The staged IDF is generated under .runtime and receives manifest-owned Output:Variable requests.",
+  "This case is baseline-only. It does not compare Rust results or promote a new numerical conformance claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "energy-plus-examplefile"
+source_file = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+tier = "B"
+
+[scope]
+domains = ["weather", "zone", "internal-gain"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Wind Speed"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "baseline"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Total Internal Convective Heating Rate"
+frequency = "hourly"
+class = "internal-gain"
+source = "eso"
+domain = "internal-gain"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = ".runtime/official-baseline/26.1.0/official_1zone_uncontrolled_baseline_001/report/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd official-baseline-smoke"
+blocking = false

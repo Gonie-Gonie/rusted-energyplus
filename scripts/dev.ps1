@@ -195,6 +195,11 @@ $Commands = [ordered]@{
         Group = "conformance"
         Help = "Write baseline-only conformance report skeleton."
     }
+    "official-baseline-smoke" = @{
+        Path = "conformance\official-baseline-smoke.ps1"
+        Group = "conformance"
+        Help = "Gate v0.18 output injection and official ExampleFiles oracle baselines."
+    }
     "conformance-diagnostic-report-smoke" = @{
         Path = "conformance\conformance-diagnostic-report-smoke.ps1"
         Group = "conformance"
@@ -300,6 +305,11 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.17 manifest and output request schema v2 gate."
     }
+    "v0.18-verify" = @{
+        Path = "release\v0.18-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.18 output injection and official baseline gate."
+    }
 }
 
 $Aliases = @{
@@ -322,6 +332,7 @@ $Aliases = @{
     "verify-v0.15" = "v0.15-verify"
     "verify-v0.16" = "v0.16-verify"
     "verify-v0.17" = "v0.17-verify"
+    "verify-v0.18" = "v0.18-verify"
 }
 
 function Show-Commands {

@@ -233,12 +233,18 @@ not_claimed = [
 [[milestone]]
 version = "0.18"
 title = "Output Request Injection and Oracle Baseline Pipeline"
-status = "planned"
+status = "complete"
 claim_level = "baseline-only"
-required_cases = []
-required_variables = []
+required_cases = [
+  "official_1zone_uncontrolled_baseline_001",
+]
+required_variables = [
+  "Site Wind Speed",
+  "Zone Total Internal Convective Heating Rate",
+]
 not_claimed = [
   "new numerical conformance unless promoted by report and gate",
+  "ExampleFiles numerical conformance",
   "general heat-balance compatibility",
   "HVAC compatibility",
   "plant compatibility",
