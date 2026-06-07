@@ -104,12 +104,18 @@ Assert-Contains -Path "docs\src\operations\v0.12.0-readiness.md" -Pattern "plann
 Assert-Contains -Path "docs\src\operations\v0.12.0-readiness.md" -Pattern "not a node or HVAC numerical conformance claim" -Description "v0.12 claim boundary"
 Assert-Contains -Path "docs\src\porting-map\output-variable-source-map.md" -Pattern "node-state-source-map.md" -Description "output variable node source map"
 Assert-Contains -Path "docs\src\porting-map\hvac.md" -Pattern "v0.12 Node Source Map" -Description "HVAC node source map section"
+Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "NodeStateProjectionEvidencePolicy" -Description "Rust node projection evidence policy"
+Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "NODE_TEMPERATURE_SETPOINT_SENTINEL_C" -Description "Rust node setpoint sentinel"
+Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "evidence_policy" -Description "node projection JSON evidence policy"
+Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "timestamp_rule" -Description "node projection timestamp gate"
+Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "sentinel_rule" -Description "node projection sentinel gate"
 
 Write-Host "milestone: v0.12.0"
 Write-Host "scope: source-function map for system-node output registration and update paths"
 Write-Host "claim: planning guard only; no node, IdealLoads, or HVAC numerical conformance"
 
 Invoke-DevCommand -Command "source-smoke"
+Invoke-DevCommand -Command "air-side-node-diagnostic-smoke"
 Invoke-DevCommand -Command "test"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"

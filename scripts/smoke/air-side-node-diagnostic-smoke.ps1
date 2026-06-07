@@ -278,6 +278,11 @@ $projectionMarkdownText = Get-Content -LiteralPath $ProjectionMarkdown -Raw
 Assert-Contains -Text $projectionMarkdownText -Pattern "comparison_class: diagnostic-only" -Description "projection markdown diagnostic class"
 Assert-Contains -Text $projectionMarkdownText -Pattern "conformance_claim: false" -Description "projection markdown claim boundary"
 Assert-Contains -Text $projectionMarkdownText -Pattern "status: projected" -Description "projection markdown status"
+Assert-Contains -Text $projectionMarkdownText -Pattern "source_map: docs/src/porting-map/node-state-source-map.md" -Description "projection markdown source map"
+Assert-Contains -Text $projectionMarkdownText -Pattern "timestamp_rule: hour-ending hourly samples aligned to the run-period time axis" -Description "projection markdown timestamp rule"
+Assert-Contains -Text $projectionMarkdownText -Pattern "warmup_rule: EnergyPlus warmup samples are not represented in this diagnostic projection" -Description "projection markdown warmup rule"
+Assert-Contains -Text $projectionMarkdownText -Pattern "sentinel_rule: System Node Setpoint Temperature remains excluded" -Description "projection markdown sentinel rule"
+Assert-Contains -Text $projectionMarkdownText -Pattern "excluded_variable: System Node Setpoint Temperature" -Description "projection markdown excluded variable"
 Assert-Contains -Text $projectionMarkdownText -Pattern "ZONE ONE INLET" -Description "projection markdown inlet node"
 Assert-Contains -Text $projectionMarkdownText -Pattern "System Node Mass Flow Rate" -Description "projection markdown mass flow"
 
@@ -308,6 +313,21 @@ if ([int]$projection.samples -ne 24) {
 }
 if ([int]$projection.series -ne 9) {
     throw "Unexpected v0.11 projection series count: $($projection.series)"
+}
+if ($projection.evidence_policy.source_map -ne "docs/src/porting-map/node-state-source-map.md") {
+    throw "Unexpected node projection source map: $($projection.evidence_policy.source_map)"
+}
+if ($projection.evidence_policy.timestamp_rule -ne "hour-ending hourly samples aligned to the run-period time axis") {
+    throw "Unexpected node projection timestamp rule: $($projection.evidence_policy.timestamp_rule)"
+}
+if ($projection.evidence_policy.warmup_rule -ne "EnergyPlus warmup samples are not represented in this diagnostic projection") {
+    throw "Unexpected node projection warmup rule: $($projection.evidence_policy.warmup_rule)"
+}
+if (-not $projection.evidence_policy.sentinel_rule.StartsWith("System Node Setpoint Temperature remains excluded")) {
+    throw "Unexpected node projection sentinel rule: $($projection.evidence_policy.sentinel_rule)"
+}
+if ($projection.evidence_policy.excluded_variable -ne "System Node Setpoint Temperature") {
+    throw "Unexpected node projection excluded variable: $($projection.evidence_policy.excluded_variable)"
 }
 if ($projection.node_order.Count -ne 3) {
     throw "Unexpected v0.11 projection node order count: $($projection.node_order.Count)"

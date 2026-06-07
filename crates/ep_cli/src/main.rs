@@ -1409,6 +1409,26 @@ fn render_node_state_projection_markdown(projection: &NodeStateProjection) -> St
         projection.summary.state_node_count
     ));
     report.push_str(&format!("series: {}\n\n", projection.summary.series_count));
+    report.push_str(&format!(
+        "source_map: {}\n",
+        projection.summary.evidence_policy.source_map_path
+    ));
+    report.push_str(&format!(
+        "timestamp_rule: {}\n",
+        projection.summary.evidence_policy.timestamp_rule
+    ));
+    report.push_str(&format!(
+        "warmup_rule: {}\n",
+        projection.summary.evidence_policy.warmup_rule
+    ));
+    report.push_str(&format!(
+        "sentinel_rule: {}\n",
+        projection.summary.evidence_policy.sentinel_rule
+    ));
+    report.push_str(&format!(
+        "excluded_variable: {}\n\n",
+        projection.summary.evidence_policy.excluded_variable
+    ));
     report.push_str(
         "| key | role | variable | units | samples | first | last | nonzero_count | status |\n",
     );
@@ -1452,6 +1472,28 @@ fn render_node_state_projection_summary_json(projection: &NodeStateProjection) -
         "  \"series\": {},\n",
         projection.summary.series_count
     ));
+    json.push_str("  \"evidence_policy\": {\n");
+    json.push_str(&format!(
+        "    \"source_map\": {},\n",
+        json_string(projection.summary.evidence_policy.source_map_path)
+    ));
+    json.push_str(&format!(
+        "    \"timestamp_rule\": {},\n",
+        json_string(projection.summary.evidence_policy.timestamp_rule)
+    ));
+    json.push_str(&format!(
+        "    \"warmup_rule\": {},\n",
+        json_string(projection.summary.evidence_policy.warmup_rule)
+    ));
+    json.push_str(&format!(
+        "    \"sentinel_rule\": {},\n",
+        json_string(projection.summary.evidence_policy.sentinel_rule)
+    ));
+    json.push_str(&format!(
+        "    \"excluded_variable\": {}\n",
+        json_string(projection.summary.evidence_policy.excluded_variable)
+    ));
+    json.push_str("  },\n");
     json.push_str("  \"artifacts\": {\n");
     json.push_str("    \"summary_markdown\": \"node-state-summary.md\",\n");
     json.push_str("    \"summary_json\": \"node-state-summary.json\"\n");

@@ -69,6 +69,15 @@ in `air_side_node_diagnostic_001` has a meaningful setpoint value. A future
 setpoint claim must identify which node owns the setpoint, which thermostat or
 manager writes it, and how `SensedNodeFlagValue` sentinel values are filtered.
 
+The diagnostic Rust projection records this boundary in both
+`node-state-summary.md` and `node-state-summary.json` with:
+
+- `source_map: docs/src/porting-map/node-state-source-map.md`
+- `timestamp_rule: hour-ending hourly samples aligned to the run-period time axis`
+- `warmup_rule: EnergyPlus warmup samples are not represented in this diagnostic projection`
+- `sentinel_rule: System Node Setpoint Temperature remains excluded`
+- `excluded_variable: System Node Setpoint Temperature`
+
 ## v0.11 Fixture Node Map
 
 | Fixture key | EnergyPlus source path | Current Rust evidence |

@@ -15,6 +15,21 @@ const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 
+/// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
+pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
+/// Source map that owns node-state output registration and update paths.
+pub const NODE_STATE_SOURCE_MAP_PATH: &str = "docs/src/porting-map/node-state-source-map.md";
+/// Timestamp rule for the diagnostic node-state projection.
+pub const NODE_STATE_TIMESTAMP_RULE: &str =
+    "hour-ending hourly samples aligned to the run-period time axis";
+/// Warmup handling rule for the diagnostic node-state projection.
+pub const NODE_STATE_WARMUP_RULE: &str =
+    "EnergyPlus warmup samples are not represented in this diagnostic projection";
+/// Sentinel handling rule for excluded node setpoint output.
+pub const NODE_STATE_SENTINEL_RULE: &str = "System Node Setpoint Temperature remains excluded; EnergyPlus SensedNodeFlagValue (-999) is represented as None";
+/// Node output variable excluded until setpoint ownership and sentinel filtering are ported.
+pub const NODE_STATE_EXCLUDED_SETPOINT_VARIABLE: &str = "System Node Setpoint Temperature";
+
 /// Runtime execution mode.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum SimulationMode {
@@ -652,6 +667,35 @@ impl NodeStateProjectionOptions {
     }
 }
 
+/// Evidence policy attached to diagnostic node-state projection artifacts.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NodeStateProjectionEvidencePolicy {
+    /// Source map that owns the EnergyPlus routine and field mapping.
+    pub source_map_path: &'static str,
+    /// Timestamp alignment rule for samples written by the projection.
+    pub timestamp_rule: &'static str,
+    /// Warmup handling rule for samples written by the projection.
+    pub warmup_rule: &'static str,
+    /// Sentinel filtering rule for future setpoint sampling.
+    pub sentinel_rule: &'static str,
+    /// Output variable intentionally excluded by the sentinel rule.
+    pub excluded_variable: &'static str,
+}
+
+impl NodeStateProjectionEvidencePolicy {
+    /// Returns the diagnostic-only v0.12 node-state evidence policy.
+    #[must_use]
+    pub const fn diagnostic() -> Self {
+        Self {
+            source_map_path: NODE_STATE_SOURCE_MAP_PATH,
+            timestamp_rule: NODE_STATE_TIMESTAMP_RULE,
+            warmup_rule: NODE_STATE_WARMUP_RULE,
+            sentinel_rule: NODE_STATE_SENTINEL_RULE,
+            excluded_variable: NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        }
+    }
+}
+
 /// Runtime scalar state for one air-side node.
 #[derive(Clone, Debug, PartialEq)]
 pub struct AirNodeState {
@@ -734,6 +778,16 @@ impl NodeStateStore {
     }
 }
 
+/// Converts an EnergyPlus node temperature setpoint scalar into diagnostic state.
+#[must_use]
+pub fn node_temperature_setpoint_from_energyplus(value_c: f64) -> Option<f64> {
+    if (value_c - NODE_TEMPERATURE_SETPOINT_SENTINEL_C).abs() < 1.0e-9 {
+        None
+    } else {
+        Some(value_c)
+    }
+}
+
 /// One resolved node represented by the node-state projection.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NodeStateProjectionNode {
@@ -756,6 +810,8 @@ pub struct NodeStateProjectionSummary {
     pub series_count: usize,
     /// Number of air nodes initialized in the runtime state store.
     pub state_node_count: usize,
+    /// Diagnostic evidence policy attached to output artifacts.
+    pub evidence_policy: NodeStateProjectionEvidencePolicy,
     /// Resolved nodes in output order.
     pub nodes: Vec<NodeStateProjectionNode>,
 }
@@ -1082,6 +1138,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             node_count: projected_nodes.len(),
             series_count: results.series.len(),
             state_node_count: state.len(),
+            evidence_policy: NodeStateProjectionEvidencePolicy::diagnostic(),
             nodes: projected_nodes
                 .iter()
                 .map(|node| NodeStateProjectionNode {
@@ -2421,10 +2478,12 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, NodeStateProjectionOptions, NodeStateRole, OutputSeries, ResultStore,
-        SimulationMode, SimulationState, advance_heat_balance_state_one_timestep,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        initialize_heat_balance_state, parse_epw_dry_bulb_series, parse_epw_records,
+        HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
+        OutputSeries, ResultStore, SimulationMode, SimulationState,
+        advance_heat_balance_state_one_timestep, build_execution_plan, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, initialize_heat_balance_state,
+        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
@@ -2751,6 +2810,19 @@ mod tests {
         assert_eq!(projection.summary.node_count, 3);
         assert_eq!(projection.summary.series_count, 9);
         assert_eq!(projection.summary.state_node_count, 3);
+        assert_eq!(
+            projection.summary.evidence_policy.source_map_path,
+            NODE_STATE_SOURCE_MAP_PATH
+        );
+        assert_eq!(
+            projection.summary.evidence_policy.excluded_variable,
+            NODE_STATE_EXCLUDED_SETPOINT_VARIABLE
+        );
+        assert_eq!(
+            node_temperature_setpoint_from_energyplus(NODE_TEMPERATURE_SETPOINT_SENTINEL_C),
+            None
+        );
+        assert_eq!(node_temperature_setpoint_from_energyplus(21.0), Some(21.0));
         assert_eq!(projection.state.len(), 3);
         assert_eq!(
             projection
