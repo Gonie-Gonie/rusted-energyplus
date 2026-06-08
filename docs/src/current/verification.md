@@ -87,6 +87,7 @@ quick outside-conduction boundary solves without creating a conformance claim:
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter5-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-iter5-probe

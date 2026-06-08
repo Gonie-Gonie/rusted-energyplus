@@ -2,6 +2,8 @@
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
+    [ValidateSet("boundary-u-value", "energyplus-surf-initial")]
+    [string]$CtfInitialHistoryPolicy = "boundary-u-value",
     [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
@@ -37,6 +39,12 @@ $WarmupOutputSuffix = if ($WarmupMinimumDays -gt 0) {
 else {
     ""
 }
+$InitialHistoryOutputSuffix = if ($CtfInitialHistoryPolicy -eq "energyplus-surf-initial") {
+    "-epseed"
+}
+else {
+    ""
+}
 $SurfaceIterationOutputSuffix = if ($SurfaceIterations -gt 1) {
     "-surface-iter$SurfaceIterations"
 }
@@ -44,10 +52,10 @@ else {
     ""
 }
 $OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
-    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix\26.1.0"
+    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix\26.1.0"
 }
 else {
-    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix\26.1.0"
+    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix\26.1.0"
 }
 $OutputRoot = Join-Path $RepoRoot $OutputRootRelative
 $CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
@@ -146,17 +154,20 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy, zone-air algorithm $ZoneAirAlgorithm, warmup minimum days $WarmupMinimumDays, and surface iterations $SurfaceIterations."
+Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy, CTF initial history policy $CtfInitialHistoryPolicy, zone-air algorithm $ZoneAirAlgorithm, warmup minimum days $WarmupMinimumDays, and surface iterations $SurfaceIterations."
 $policyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY"
+$initialHistoryPolicyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY"
 $algorithmEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM"
 $warmupEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS"
 $surfaceIterationsEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS"
 $previousPolicy = [Environment]::GetEnvironmentVariable($policyEnvName, "Process")
+$previousInitialHistoryPolicy = [Environment]::GetEnvironmentVariable($initialHistoryPolicyEnvName, "Process")
 $previousAlgorithm = [Environment]::GetEnvironmentVariable($algorithmEnvName, "Process")
 $previousWarmup = [Environment]::GetEnvironmentVariable($warmupEnvName, "Process")
 $previousSurfaceIterations = [Environment]::GetEnvironmentVariable($surfaceIterationsEnvName, "Process")
 try {
     [Environment]::SetEnvironmentVariable($policyEnvName, $CtfSeedPolicy, "Process")
+    [Environment]::SetEnvironmentVariable($initialHistoryPolicyEnvName, $CtfInitialHistoryPolicy, "Process")
     [Environment]::SetEnvironmentVariable($algorithmEnvName, $ZoneAirAlgorithm, "Process")
     if ($WarmupMinimumDays -gt 0) {
         [Environment]::SetEnvironmentVariable($warmupEnvName, [string]$WarmupMinimumDays, "Process")
@@ -169,6 +180,7 @@ try {
 }
 finally {
     [Environment]::SetEnvironmentVariable($policyEnvName, $previousPolicy, "Process")
+    [Environment]::SetEnvironmentVariable($initialHistoryPolicyEnvName, $previousInitialHistoryPolicy, "Process")
     [Environment]::SetEnvironmentVariable($algorithmEnvName, $previousAlgorithm, "Process")
     [Environment]::SetEnvironmentVariable($warmupEnvName, $previousWarmup, "Process")
     [Environment]::SetEnvironmentVariable($surfaceIterationsEnvName, $previousSurfaceIterations, "Process")
@@ -187,6 +199,7 @@ Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup
 Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
 Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: $SurfaceIterations" -Description "surface iteration metadata"
+Assert-Contains -Text $text -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "CTF initial history policy metadata"
 Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagnostic status"
 
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
@@ -239,6 +252,9 @@ if ($summary.zone_air_algorithm -ne $ZoneAirAlgorithm) {
 }
 if ($summary.surface_iteration_count -ne $SurfaceIterations) {
     throw "Expected surface_iteration_count $SurfaceIterations, got $($summary.surface_iteration_count)"
+}
+if ($summary.ctf_initial_history_policy -ne $CtfInitialHistoryPolicy) {
+    throw "Expected ctf_initial_history_policy $CtfInitialHistoryPolicy, got $($summary.ctf_initial_history_policy)"
 }
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     if (-not ($summary.ctf_seed.skipped_constructions | Where-Object { $_.construction_name -eq "FLOOR" -and $_.ctf_count -eq 5 })) {
@@ -364,6 +380,7 @@ Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -
 Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: $CtfSeedPolicy" -Description "markdown CTF seed policy"
 Assert-Contains -Text $reportText -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "markdown zone-air algorithm"
 Assert-Contains -Text $reportText -Pattern "surface_iteration_count: $SurfaceIterations" -Description "markdown surface iteration metadata"
+Assert-Contains -Text $reportText -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "markdown CTF initial history policy metadata"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
 }

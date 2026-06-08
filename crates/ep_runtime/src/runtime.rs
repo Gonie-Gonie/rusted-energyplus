@@ -739,6 +739,15 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusThirdOrderProbe,
 }
 
+/// Initial CTF temperature/flux history seeding used by diagnostic heat-balance traces.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceCtfInitialHistoryPolicy {
+    /// Existing Rust diagnostic seed: current boundary temperature and steady U-value flux.
+    BoundaryTemperatureAndUValue,
+    /// EnergyPlus 26.1 style seed: SurfInitialTemp histories and zero flux histories.
+    EnergyPlusSurfInitial,
+}
+
 /// Options for the heat-balance zone-air diagnostic trace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceSimulationOptions {
@@ -752,6 +761,8 @@ pub struct HeatBalanceSimulationOptions {
     pub zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     /// Number of inside/outside surface-balance passes per zone timestep.
     pub surface_iteration_count: u32,
+    /// Initial CTF temperature/flux history seeding policy.
+    pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -822,6 +833,8 @@ impl HeatBalanceSimulationOptions {
             warmup: HeatBalanceWarmupOptions::disabled(),
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             surface_iteration_count: 1,
+            ctf_initial_history_policy:
+                HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
         }
     }
 
@@ -845,6 +858,8 @@ impl HeatBalanceSimulationOptions {
             },
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             surface_iteration_count: 1,
+            ctf_initial_history_policy:
+                HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
         }
     }
 
@@ -878,6 +893,16 @@ impl HeatBalanceSimulationOptions {
         };
         self
     }
+
+    /// Returns options with an explicit initial CTF history seed policy.
+    #[must_use]
+    pub const fn with_ctf_initial_history_policy(
+        mut self,
+        ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
+    ) -> Self {
+        self.ctf_initial_history_policy = ctf_initial_history_policy;
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -897,6 +922,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_count: usize,
     /// Number of surface-balance passes used per zone timestep.
     pub surface_iteration_count: u32,
+    /// Initial CTF temperature/flux history seeding policy.
+    pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -2937,7 +2964,17 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.initial_zone_air_temperature_c,
         ctf_coefficients,
     )?;
-    seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+    match options.ctf_initial_history_policy {
+        HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
+            seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+        }
+        HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
+            seed_energyplus_initial_surface_ctf_histories(
+                &mut state,
+                options.initial_zone_air_temperature_c,
+            );
+        }
+    }
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,
         &mut state,
@@ -3306,6 +3343,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_count: state.zones.len(),
         surface_count: state.surfaces.len(),
         surface_iteration_count: options.surface_iteration_count,
+        ctf_initial_history_policy: options.ctf_initial_history_policy,
     };
 
     Ok(HeatBalanceSimulation {
@@ -3637,6 +3675,26 @@ fn seed_initial_surface_ctf_boundary_histories(
             .ctf
             .outside_flux_history_w_per_m2
             .fill(initial_flux_w_per_m2);
+    }
+}
+
+fn seed_energyplus_initial_surface_ctf_histories(
+    state: &mut HeatBalanceState,
+    initial_surface_temperature_c: f64,
+) {
+    for surface in &mut state.surfaces {
+        surface.inside_face_temperature_c = initial_surface_temperature_c;
+        surface.outside_face_temperature_c = initial_surface_temperature_c;
+        surface
+            .ctf
+            .inside_temperature_history_c
+            .fill(initial_surface_temperature_c);
+        surface
+            .ctf
+            .outside_temperature_history_c
+            .fill(initial_surface_temperature_c);
+        surface.ctf.inside_flux_history_w_per_m2.fill(0.0);
+        surface.ctf.outside_flux_history_w_per_m2.fill(0.0);
     }
 }
 
@@ -5650,14 +5708,14 @@ mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
         CtfOutsideQuickConductionBalanceInput, Date, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, HeatBalanceWarmupOptions, HeatBalanceWarmupSummary,
-        HeatBalanceZoneAirAlgorithm, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
-        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
-        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
-        PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
-        RuntimeOutputRegistry, SECONDS_PER_HOUR, SimulationMode, SimulationState,
-        advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
+        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
+        HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
+        HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
+        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR, SimulationMode,
+        SimulationState, advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
@@ -5673,9 +5731,9 @@ mod tests {
         energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        run_heat_balance_run_period_warmup, seed_initial_surface_ctf_boundary_histories,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures,
+        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
+        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -6984,6 +7042,72 @@ DATA PERIODS
         assert!((surface.ctf.inside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
 
         Ok(())
+    }
+
+    #[test]
+    fn energyplus_initial_ctf_history_seeding_uses_surf_initial_temp_and_zero_flux()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state_with_ctf_coefficients(
+            &model,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 2.0,
+                    cross_w_per_m2_k: 0.5,
+                    inside_w_per_m2_k: 3.0,
+                    flux: None,
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: 0.4,
+                    cross_w_per_m2_k: 0.1,
+                    inside_w_per_m2_k: 0.3,
+                    flux: Some(0.5),
+                },
+            ],
+        )?;
+        seed_initial_surface_ctf_boundary_histories(&mut state, 5.0);
+
+        seed_energyplus_initial_surface_ctf_histories(&mut state, ENERGYPLUS_ZONE_INITIAL_TEMP_C);
+
+        let surface = &state.surfaces[0];
+        assert_eq!(
+            surface.ctf.outside_temperature_history_c,
+            vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
+        );
+        assert_eq!(
+            surface.ctf.inside_temperature_history_c,
+            vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
+        );
+        assert_eq!(surface.ctf.outside_flux_history_w_per_m2, vec![0.0]);
+        assert_eq!(surface.ctf.inside_flux_history_w_per_m2, vec![0.0]);
+        assert_eq!(
+            surface.inside_face_temperature_c,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C
+        );
+        assert_eq!(
+            surface.outside_face_temperature_c,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_options_track_initial_ctf_history_policy() {
+        let options = HeatBalanceSimulationOptions::hourly_samples(24)
+            .with_ctf_initial_history_policy(
+                HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial,
+            );
+
+        assert_eq!(
+            options.ctf_initial_history_policy,
+            HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial
+        );
     }
 
     #[test]

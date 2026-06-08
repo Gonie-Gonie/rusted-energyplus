@@ -250,6 +250,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows, analytical coupled rebalance, previous-inside outdoor boundary solves, EnergyPlus quick outside solves, and five surface passes."
     }
+    "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows, EnergyPlus initial CTF histories, analytical coupled rebalance, previous-inside outdoor boundary solves, EnergyPlus quick outside solves, and five surface passes."
+    }
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5-probe.ps1"
         Group = "compare"

@@ -116,6 +116,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-surface-iter5"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-surface-iter5"
@@ -224,6 +233,7 @@ REFERENCE_LANES = {
     "all-ctf-analytical-coupled-previous-inside-iter3": "all-ctf-analytical-coupled-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3",
+    "all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5",
@@ -498,6 +508,9 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "artifact_status": artifact_status(summary.get("series_count")),
         "zone_air_algorithm": summary.get("zone_air_algorithm", "unknown"),
         "ctf_seed_policy": summary.get("ctf_seed", {}).get("policy", "unknown"),
+        "ctf_initial_history_policy": summary.get(
+            "ctf_initial_history_policy", "boundary-u-value"
+        ),
         "surface_iteration_count": summary.get("surface_iteration_count", 1),
         "samples": summary.get("samples"),
         "series_count": summary.get("series_count"),
@@ -516,7 +529,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_focus_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v5",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v6",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -563,16 +576,17 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"oracle_version: {summary['oracle_version']}",
         f"expected_series_count: {summary['expected_series_count']}",
         "",
-        "| lane | algorithm | CTF seed | surface passes | series | artifact | top output | top RMSE | top max abs | status |",
-        "|---|---|---|---:|---:|---|---|---:|---:|---|",
+        "| lane | algorithm | CTF seed | CTF init | surface passes | series | artifact | top output | top RMSE | top max abs | status |",
+        "|---|---|---|---|---:|---:|---|---|---:|---:|---|",
     ]
     for lane in summary["lanes"]:
         top_output = f"{lane['top_key']} / {lane['top_variable']}"
         lines.append(
-            "| {lane} | {algorithm} | {ctf} | {surface_passes} | {series_count} | {artifact_status} | {top} | {rmse} | {max_abs} | {status} |".format(
+            "| {lane} | {algorithm} | {ctf} | {ctf_init} | {surface_passes} | {series_count} | {artifact_status} | {top} | {rmse} | {max_abs} | {status} |".format(
                 lane=lane["lane"],
                 algorithm=lane["zone_air_algorithm"],
                 ctf=lane["ctf_seed_policy"],
+                ctf_init=lane["ctf_initial_history_policy"],
                 surface_passes=lane["surface_iteration_count"],
                 series_count=lane.get("series_count") or "none",
                 artifact_status=lane.get("artifact_status", "unknown"),
