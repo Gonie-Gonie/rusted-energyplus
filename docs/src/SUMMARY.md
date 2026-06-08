@@ -14,6 +14,7 @@
 
 - [Setup](guides/setup.md)
 - [Developer Workflow](guides/developer-workflow.md)
+- [Script Index](operations/script-index.md)
 - [Release Process](guides/release-process.md)
 
 # User Coverage

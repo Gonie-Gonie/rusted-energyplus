@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Script Index
@@ -25,6 +25,16 @@ directly. The implementation scripts live in field-specific folders:
 - `scripts/lib`
 
 Run `.\scripts\dev.cmd list` for the command catalog.
+
+Read the table by evidence lane, not just by folder:
+
+- `*-conformance` compare commands are promoted only when the matching case
+  manifest has `comparison_class = "conformance"`, `conformance_claim = true`,
+  declared variables, tolerances, reports, and a blocking gate.
+- diagnostic and smoke commands may run in `check`, but they do not support a
+  compatibility claim by themselves.
+- release report commands generate evidence packages; they do not promote new
+  variables unless the promoted compare gates already exist.
 
 Scripted release and evidence documents follow the
 [Documentation Framework](documentation-framework.md): PowerShell entry points
@@ -72,12 +82,14 @@ matplotlib for document layout and charts.
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
+| `official-dynamic-heat-balance-diagnostic` | diagnostic | run the official `1ZoneUncontrolled` dynamic heat-balance diagnostic with warmup metadata and no conformance claim | no | `.runtime/official-dynamic-diagnostic` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
 | `conformance-report-smoke` | conformance | write baseline-only report skeleton | no | `.runtime/conformance-report` |
+| `official-baseline-smoke` | conformance | gate v0.18 output injection and official ExampleFiles oracle baselines | yes | `.runtime/official-baseline` |
 | `conformance-diagnostic-report-smoke` | conformance | generate diagnostic-only compare artifacts from a case manifest | no | `.runtime/conformance-diagnostic` |
 | `package` | release | build local package artifact | yes for package release | package zip |
 | `conformance-evidence-report` | release | generate oodocs/matplotlib PDF/HTML/JSON release evidence for promoted numerical conformance cases | yes for conformance release | `.runtime/release-evidence` |

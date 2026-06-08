@@ -45,13 +45,26 @@ Release evidence documents use the repo-local Python environment and oodocs:
 The current declared conformance gates are:
 
 ```powershell
+.\scripts\dev.cmd compare-heat-balance-conformance
+.\scripts\dev.cmd compare-surface-temperature-conformance
 .\scripts\dev.cmd compare-schedule-conformance
 .\scripts\dev.cmd compare-weather-conformance
 .\scripts\dev.cmd compare-static-model-conformance
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
+```
+
+Current supporting release and infrastructure gates include:
+
+```powershell
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
 .\scripts\dev.cmd v0.32-verify
+```
+
+The current official dynamic 1Zone tracker is diagnostic-only:
+
+```powershell
+.\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
 ```
 
 The source-map and algorithm-ledger gate remains:
