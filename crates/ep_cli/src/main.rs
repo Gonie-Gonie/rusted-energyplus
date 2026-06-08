@@ -3675,11 +3675,14 @@ fn parse_heat_balance_zone_air_algorithm(
     match value.trim().to_ascii_lowercase().as_str() {
         "" | "simplified-analytical" => Ok(HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical),
         "energyplus-analytical-probe" => Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe),
+        "energyplus-analytical-surface-first-probe" => {
+            Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe)
+        }
         "energyplus-third-order-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
         }
         other => Err(format!(
-            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, or energyplus-third-order-probe"
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, or energyplus-third-order-probe"
         )),
     }
 }
@@ -3752,6 +3755,9 @@ fn heat_balance_zone_air_algorithm_label(
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => "simplified-analytical",
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => "energyplus-analytical-probe",
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
+            "energyplus-analytical-surface-first-probe"
+        }
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => "energyplus-third-order-probe",
     }
 }
@@ -6298,6 +6304,13 @@ mod tests {
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("energyplus-analytical-probe").unwrap(),
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm(
+                "energyplus-analytical-surface-first-probe"
+            )
+            .unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
         );
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("energyplus-third-order-probe").unwrap(),

@@ -2,7 +2,7 @@
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
-    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-third-order-probe")]
+    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
@@ -20,6 +20,7 @@ $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
 $AlgorithmOutputSuffix = switch ($ZoneAirAlgorithm) {
     "energyplus-analytical-probe" { "-analytical" }
+    "energyplus-analytical-surface-first-probe" { "-analytical-surface-first" }
     "energyplus-third-order-probe" { "-third-order" }
     Default { "" }
 }

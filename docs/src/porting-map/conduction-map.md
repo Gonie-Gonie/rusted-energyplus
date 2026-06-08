@@ -63,6 +63,10 @@ peak errors but raised the top RMSE relative to iter3, so iter3 is the current
 tracked probe count rather than a promotion setting. A steady/no-mass default
 surface-iter3 trial regressed the analytical zone-air storage guard, so surface
 iteration is kept as an all-CTF diagnostic probe instead of a default setting.
+The analytical surface-first zone-air probe improves MAT and inside-face
+temperature RMSE, but leaves the top floor conduction bottleneck unchanged and
+raises the aggregate conduction RMSE, so call-order progress still needs to be
+paired with mass-floor CTF/history parity before promotion.
 Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes

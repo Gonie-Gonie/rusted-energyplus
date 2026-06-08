@@ -697,6 +697,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     SimplifiedAnalytical,
     /// Experimental EnergyPlus analytical predictor path for diagnostics.
     EnergyPlusAnalyticalProbe,
+    /// Experimental EnergyPlus analytical correction after the surface pass.
+    EnergyPlusAnalyticalSurfaceFirstProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
     EnergyPlusThirdOrderProbe,
 }
@@ -2379,6 +2381,10 @@ fn advance_heat_balance_state_one_timestep_internal(
         .iter()
         .map(|surface| (surface.surface_id, surface.inside_face_temperature_c))
         .collect::<BTreeMap<_, _>>();
+    let correct_zone_air_after_surface_pass = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
+    );
 
     for surface in &mut state.surfaces {
         let zone_temperature_c = previous_zone_temperatures
@@ -2435,6 +2441,9 @@ fn advance_heat_balance_state_one_timestep_internal(
                 zone.air_heat_capacity_j_per_k,
                 input.timestep_seconds,
             ),
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
                     zone_surface_convection_sums(&state.surfaces, zone.zone_id);
@@ -2549,7 +2558,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
-        zone.zone_air_temperature_coefficients = energyplus_zone_air_temperature_coefficients(
+        let coefficients = energyplus_zone_air_temperature_coefficients(
             zone.sum_ha_w_per_k,
             zone.sum_hat_surf_w,
             zone.sum_hat_ref_w,
@@ -2560,6 +2569,16 @@ fn advance_heat_balance_state_one_timestep_internal(
             input.timestep_seconds,
             zone.previous_mean_air_temperatures_c,
         );
+        if correct_zone_air_after_surface_pass {
+            zone.mean_air_temperature_c = energyplus_analytical_zone_air_temperature_c(
+                zone.previous_mean_air_temperatures_c[0],
+                coefficients.temp_independent_coefficient_w,
+                coefficients.temp_dependent_coefficient_w_per_k,
+                zone.air_heat_capacity_j_per_k,
+                input.timestep_seconds,
+            );
+        }
+        zone.zone_air_temperature_coefficients = coefficients;
     }
 
     state.timestep_index += 1;
@@ -2594,7 +2613,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
 ) -> f64 {
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
             zone_state
                 .zone_air_temperature_coefficients
                 .temp_independent_coefficient_w
@@ -6895,6 +6915,14 @@ DATA PERIODS
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe)
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe,
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
         );
         assert_eq!(
             options

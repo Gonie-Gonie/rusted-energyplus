@@ -92,8 +92,8 @@ The current public scope includes:
   decomposition, and zone air heat-balance series, rank bottleneck series by
   RMSE, and record EnergyPlus EIO run-period warmup day counts, the current
   CTF seed policy, surface iteration count, and explicit all-CTF, warmup,
-  surface-iteration, analytical zone-air, and third-order probe metadata
-  without claiming parity
+  surface-iteration, analytical zone-air, analytical surface-first, and
+  third-order probe metadata without claiming parity
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 

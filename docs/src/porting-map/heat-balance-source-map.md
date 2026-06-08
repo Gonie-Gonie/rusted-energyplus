@@ -138,9 +138,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
   and third-order zone-air temperature helpers. `HeatBalanceZoneAirAlgorithm`
   keeps the default trace on the existing simplified analytical shell while
-  allowing explicit analytical and third-order diagnostic probes. The default
-  predictor equation itself remains the simplified diagnostic shell until all
-  coefficient inputs are wired from source-mapped runtime state.
+  allowing explicit analytical, analytical surface-first, and third-order
+  diagnostic probes. The default predictor equation itself remains the
+  simplified diagnostic shell until all coefficient inputs are wired from
+  source-mapped runtime state.
 - `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
   Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
   Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
@@ -167,8 +168,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   order is ported as one coherent path. The tracked
   `official-dynamic-heat-balance-analytical-probe` currently regresses MAT and
   zone-air heat-balance terms in the same surface-state direction as the
-  third-order probe, confirming that the coefficient equation should not be
-  promoted ahead of call-order parity.
+  third-order probe. The analytical surface-first probe isolates the next
+  call-order step by delaying zone-air correction until after the current
+  surface pass. It lowers MAT and inside-face temperature RMSE relative to the
+  default lane, but still regresses zone-air heat-balance rates and aggregate
+  conduction, so it remains diagnostic-only until the full inside-surface,
+  HVAC/air-correction, and history-update order is ported.
 
 Current Rust boundary:
 

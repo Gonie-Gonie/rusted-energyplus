@@ -36,9 +36,9 @@ Current generators:
   so all-CTF warmup and surface-iteration probes can be reviewed separately
   from the larger default-to-all-CTF seed movement. Probe lanes include all-CTF
   seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
-  surface-iteration probe, EnergyPlus analytical and third-order zone-air
-  updates, and an oracle-day-count warmup minimum. It is development evidence
-  only and does not create a release conformance artifact.
+  surface-iteration probe, EnergyPlus analytical, analytical surface-first, and
+  third-order zone-air updates, and an oracle-day-count warmup minimum. It is
+  development evidence only and does not create a release conformance artifact.
 
 Conformance-facing scripts should keep this split:
 
