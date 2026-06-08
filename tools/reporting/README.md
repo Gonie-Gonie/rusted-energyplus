@@ -43,8 +43,11 @@ Current generators:
   so all-CTF warmup and surface-iteration probes can be reviewed separately
   from the larger default-to-all-CTF seed movement. The best-focus table picks
   the lowest-RMSE lane per tracked metric so structural optimizations can be
-  aimed at the probe that actually improves that state. The lane table marks
-  stale artifacts when older `.runtime` summaries still have the previous
+  aimed at the probe that actually improves that state. The surface conduction
+  driver tables split each lane's inside-face conduction deltas by wall, floor,
+  and roof surface, and record the best lane for each surface so zone aggregate
+  improvements or regressions can be traced back to source rows. The lane table
+  marks stale artifacts when older `.runtime` summaries still have the previous
   series count, so missing focus rows are not mistaken for runtime support
   gaps. Probe lanes include
   all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
