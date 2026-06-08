@@ -183,7 +183,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   sunrise/sunset shadowing-period edges, Rust preserves the diffuse and
   ground-reflected solar terms when the current-day EnergyPlus sun-up test is
   true but the averaged shadowing-period beam position is still below the
-  horizon.
+  horizon. `WeatherManager.cc` derives weather day-of-year from the run-period
+  calendar and the EPW leap-year allowance rather than from the source year
+  printed on each TMY record, so Rust uses the deterministic non-leap
+  run-period ordinal for solar position and shadowing-period coefficients.
   Surface temperatures, surface/zone conduction/source report rows, and
   latent zone-air heat-balance rate rows are averaged over the zone timesteps
   before being written as hourly diagnostics.

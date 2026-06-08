@@ -6701,7 +6701,7 @@ fn solar_position_rad_at_local_hour(
     record: &EpwRecord,
     local_hour: f64,
 ) -> Option<(f64, f64)> {
-    let day = day_of_year(record.year, record.month, record.day)?;
+    let day = energyplus_weather_record_day_of_year(record)?;
     let (sin_declination, cos_declination, equation_of_time_hours) =
         energyplus_daily_solar_coefficients(day);
     solar_position_rad_from_coefficients(
@@ -6766,11 +6766,7 @@ fn energyplus_shadowing_period_solar_coefficients(
         .min(total_days.saturating_sub(period_start_day_zero))
         .max(1);
     let period_start_record = weather_records.get(period_start_day_zero * 24)?;
-    let period_start_day_of_year = day_of_year(
-        period_start_record.year,
-        period_start_record.month,
-        period_start_record.day,
-    )?;
+    let period_start_day_of_year = energyplus_weather_record_day_of_year(period_start_record)?;
 
     Some(energyplus_average_solar_coefficients(
         period_start_day_of_year,
@@ -6797,6 +6793,10 @@ fn energyplus_average_solar_coefficients(
     let equation_of_time_hours = equation_of_time_sum / day_count as f64;
 
     (sin_declination, cos_declination, equation_of_time_hours)
+}
+
+fn energyplus_weather_record_day_of_year(record: &EpwRecord) -> Option<u32> {
+    day_of_year(DEFAULT_RUN_PERIOD_YEAR, record.month, record.day)
 }
 
 fn energyplus_daily_solar_coefficients(day_of_year: u32) -> (f64, f64, f64) {
@@ -7829,7 +7829,7 @@ mod tests {
         energyplus_third_order_zone_air_temperature_c,
         energyplus_weather_atmospheric_pressure_at_timestep,
         energyplus_weather_dry_bulb_at_timestep,
-        energyplus_weather_horizontal_infrared_at_timestep,
+        energyplus_weather_horizontal_infrared_at_timestep, energyplus_weather_record_day_of_year,
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_weather_relative_humidity_at_timestep,
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
@@ -7898,6 +7898,37 @@ mod tests {
 
         assert!((sin_declination - -0.392204631085).abs() < 1.0e-12);
         assert!((equation_of_time_hours - -0.055895327979).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn energyplus_weather_record_day_of_year_ignores_tmy_source_leap_year() {
+        let mut record = EpwRecord {
+            year: 2004,
+            month: 3,
+            day: 1,
+            hour: 1,
+            minute: 60,
+            dry_bulb_c: 0.0,
+            dew_point_c: 0.0,
+            relative_humidity_percent: 0.0,
+            atmospheric_pressure_pa: 101_325.0,
+            horizontal_infrared_radiation_wh_per_m2: 0.0,
+            global_horizontal_radiation_wh_per_m2: 0.0,
+            direct_normal_radiation_wh_per_m2: 0.0,
+            diffuse_horizontal_radiation_wh_per_m2: 0.0,
+            wind_direction_deg: 0.0,
+            wind_speed_m_per_s: 0.0,
+            liquid_precipitation_depth_mm: 0.0,
+        };
+
+        assert_eq!(energyplus_weather_record_day_of_year(&record), Some(60));
+
+        record.month = 4;
+        record.day = 6;
+        assert_eq!(energyplus_weather_record_day_of_year(&record), Some(96));
+
+        record.year = 2013;
+        assert_eq!(energyplus_weather_record_day_of_year(&record), Some(96));
     }
 
     #[test]

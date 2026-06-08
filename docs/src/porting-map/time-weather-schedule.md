@@ -32,8 +32,9 @@ Weather field status:
 
 - comparison smoke: dry-bulb, dew point, relative humidity, barometric
   pressure, wind speed, wind direction
-- parser-only radiation fields: horizontal infrared, global horizontal, direct
-  normal, diffuse horizontal radiation
+- diagnostic heat-balance inputs: horizontal infrared, global horizontal,
+  direct normal, and diffuse horizontal radiation, with non-leap weather
+  ordinals for TMY solar position alignment
 - future ESO solar diagnostics: direct solar radiation rate per area, diffuse
   solar radiation rate per area, solar altitude angle, solar azimuth angle
 
