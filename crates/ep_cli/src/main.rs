@@ -28,12 +28,12 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
-    HeatBalanceSimulationOptions, HeatBalanceWarmupSummary, NodeStateProjection,
-    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, SimulationMode,
-    SurfaceGeometrySummary, ZoneGeometrySummary, append_surface_incident_solar_radiation_series,
-    build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_heat_balance_zone_air_temperatures,
+    HeatBalanceSimulationOptions, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+    NodeStateProjection, NodeStateProjectionOptions, PlantStateProjection,
+    PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary, ZoneGeometrySummary,
+    append_surface_incident_solar_radiation_series, build_execution_plan, build_hourly_time_axis,
+    load_epw_dry_bulb_series, load_epw_records, simulate_constant_schedules,
+    simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
     simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
     surface_geometry_summaries, zone_geometry_summaries,
@@ -46,6 +46,8 @@ use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
+const HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM";
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -734,6 +736,7 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             );
             print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
+            println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
@@ -801,6 +804,7 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             );
             print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
+            println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
             println!("  status: {}", summary.status);
             0
         }
@@ -1007,6 +1011,7 @@ struct HeatBalanceReportSummary {
     heat_balance_run_period_timesteps: usize,
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     tolerance_policy: String,
+    zone_air_algorithm: &'static str,
     status: &'static str,
 }
 
@@ -1079,6 +1084,7 @@ fn generate_conformance_heat_balance_report(
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
+        zone_air_algorithm: diagnostic.zone_air_algorithm,
         status: conformance.status,
     })
 }
@@ -1121,6 +1127,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
+        zone_air_algorithm: diagnostic.zone_air_algorithm,
         status: conformance.status,
     })
 }
@@ -3148,6 +3155,7 @@ struct HeatBalanceConformanceDiagnostic {
     heat_balance_run_period_timesteps: usize,
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     ctf_seed: HeatBalanceCtfSeedDiagnostic,
+    zone_air_algorithm: &'static str,
     zone_count: usize,
     surface_count: usize,
     series: Vec<HeatBalanceSeriesDiagnostic>,
@@ -3439,6 +3447,11 @@ fn build_heat_balance_conformance_diagnostic(
     }
 
     let simulation_model = SimulationModel::from_typed(model);
+    let zone_air_algorithm = if context.conformance_claim {
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+    } else {
+        heat_balance_zone_air_algorithm_from_env()?
+    };
     let simulation_options = if context.conformance_claim {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
     } else {
@@ -3446,7 +3459,8 @@ fn build_heat_balance_conformance_diagnostic(
             &simulation_model,
             sample_count,
         )
-    };
+    }
+    .with_zone_air_algorithm(zone_air_algorithm);
     let (ctf_coefficients, ctf_seed) = if context.conformance_claim {
         (Vec::new(), disabled_heat_balance_ctf_seed_diagnostic())
     } else {
@@ -3509,6 +3523,7 @@ fn build_heat_balance_conformance_diagnostic(
         heat_balance_run_period_timesteps: simulation.summary.run_period_timestep_count,
         heat_balance_warmup,
         ctf_seed,
+        zone_air_algorithm: heat_balance_zone_air_algorithm_label(zone_air_algorithm),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         series,
@@ -3615,6 +3630,41 @@ fn parse_heat_balance_ctf_seed_policy(value: &str) -> Result<HeatBalanceCtfSeedP
         other => Err(format!(
             "unsupported {HEAT_BALANCE_CTF_SEED_POLICY_ENV}: {other}; expected steady-no-mass-only or all-eio"
         )),
+    }
+}
+
+fn heat_balance_zone_air_algorithm_from_env() -> Result<HeatBalanceZoneAirAlgorithm, String> {
+    match std::env::var(HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV) {
+        Ok(value) => parse_heat_balance_zone_air_algorithm(&value),
+        Err(std::env::VarError::NotPresent) => {
+            Ok(HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical)
+        }
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_zone_air_algorithm(
+    value: &str,
+) -> Result<HeatBalanceZoneAirAlgorithm, String> {
+    match value.trim().to_ascii_lowercase().as_str() {
+        "" | "simplified-analytical" => Ok(HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical),
+        "energyplus-third-order-probe" => {
+            Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
+        }
+        other => Err(format!(
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical or energyplus-third-order-probe"
+        )),
+    }
+}
+
+fn heat_balance_zone_air_algorithm_label(
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> &'static str {
+    match zone_air_algorithm {
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => "simplified-analytical",
+        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => "energyplus-third-order-probe",
     }
 }
 
@@ -5051,6 +5101,10 @@ fn render_heat_balance_conformance_summary_json(
         "  \"ctf_seed\": {},\n",
         heat_balance_ctf_seed_json(&diagnostic.ctf_seed)
     ));
+    json.push_str(&format!(
+        "  \"zone_air_algorithm\": {},\n",
+        json_string(diagnostic.zone_air_algorithm)
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -5207,6 +5261,10 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "ctf_seed_skipped_coefficients: {}\n",
         diagnostic.ctf_seed.skipped_coefficients
+    ));
+    report.push_str(&format!(
+        "zone_air_algorithm: {}\n",
+        diagnostic.zone_air_algorithm
     ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
@@ -6132,6 +6190,23 @@ mod tests {
     }
 
     #[test]
+    fn heat_balance_zone_air_algorithm_parser_accepts_probe_algorithm() {
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm("").unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm("simplified-analytical").unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm("energyplus-third-order-probe").unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
+        );
+        assert!(super::parse_heat_balance_zone_air_algorithm("third-order").is_err());
+    }
+
+    #[test]
     fn zone_temperature_delta_summary_tracks_diagnostic_samples() {
         let summary = super::delta_summary(&[1.0, 3.0, 8.0], &[1.0, 4.5, 4.0]);
 
@@ -6249,6 +6324,7 @@ mod tests {
             heat_balance_run_period_timesteps: 8,
             heat_balance_warmup: disabled_heat_balance_warmup(),
             ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
+            zone_air_algorithm: "simplified-analytical",
             zone_count: 1,
             surface_count: 6,
             series: vec![
@@ -6334,6 +6410,7 @@ mod tests {
         assert!(json.contains("\"status\": \"pass\""));
         assert!(json.contains("\"ctf_seed\""));
         assert!(json.contains("\"policy\": \"disabled\""));
+        assert!(json.contains("\"zone_air_algorithm\": \"simplified-analytical\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
@@ -6347,6 +6424,7 @@ mod tests {
         assert!(report.contains("status: pass"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("ctf_seed_policy: disabled"));
+        assert!(report.contains("zone_air_algorithm: simplified-analytical"));
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
@@ -6379,6 +6457,7 @@ mod tests {
                 included_coefficients: 4,
                 skipped_coefficients: 6,
             },
+            zone_air_algorithm: "energyplus-third-order-probe",
             zone_count: 1,
             surface_count: 6,
             series: vec![super::HeatBalanceSeriesDiagnostic {
@@ -6430,6 +6509,7 @@ mod tests {
         assert!(json.contains("\"oracle_run_period_day_count\": 20"));
         assert!(json.contains("\"day_count_delta\": -14"));
         assert!(json.contains("\"policy\": \"steady-no-mass-only\""));
+        assert!(json.contains("\"zone_air_algorithm\": \"energyplus-third-order-probe\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
@@ -6438,6 +6518,7 @@ mod tests {
         assert!(report.contains("oracle_run_period_warmup_days: 20"));
         assert!(report.contains("warmup_day_count_delta: -14"));
         assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
+        assert!(report.contains("zone_air_algorithm: energyplus-third-order-probe"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(report.contains("## Bottlenecks"));

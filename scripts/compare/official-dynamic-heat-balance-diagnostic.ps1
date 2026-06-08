@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
-    [string]$CtfSeedPolicy = "steady-no-mass-only"
+    [string]$CtfSeedPolicy = "steady-no-mass-only",
+    [ValidateSet("simplified-analytical", "energyplus-third-order-probe")]
+    [string]$ZoneAirAlgorithm = "simplified-analytical"
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,11 +14,17 @@ Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
-$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
-    ".runtime\official-dynamic-diagnostic-all-ctf\26.1.0"
+$AlgorithmOutputSuffix = if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe") {
+    "-third-order"
 }
 else {
-    ".runtime\official-dynamic-diagnostic\26.1.0"
+    ""
+}
+$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
+    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix\26.1.0"
+}
+else {
+    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix\26.1.0"
 }
 $OutputRoot = Join-Path $RepoRoot $OutputRootRelative
 $CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
@@ -84,15 +92,19 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy."
+Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy and zone-air algorithm $ZoneAirAlgorithm."
 $policyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY"
+$algorithmEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM"
 $previousPolicy = [Environment]::GetEnvironmentVariable($policyEnvName, "Process")
+$previousAlgorithm = [Environment]::GetEnvironmentVariable($algorithmEnvName, "Process")
 try {
     [Environment]::SetEnvironmentVariable($policyEnvName, $CtfSeedPolicy, "Process")
+    [Environment]::SetEnvironmentVariable($algorithmEnvName, $ZoneAirAlgorithm, "Process")
     $output = & $cargo.Source run -p ep_cli --quiet -- conformance heat-balance-diagnostic-report $CasePath $OracleRoot $OutputRoot 2>&1
 }
 finally {
     [Environment]::SetEnvironmentVariable($policyEnvName, $previousPolicy, "Process")
+    [Environment]::SetEnvironmentVariable($algorithmEnvName, $previousAlgorithm, "Process")
 }
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
@@ -106,6 +118,7 @@ Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Descri
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
 Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup enabled"
 Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
+Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
 Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagnostic status"
 
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
@@ -149,6 +162,9 @@ if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
 }
 if ($summary.ctf_seed.policy -ne $CtfSeedPolicy) {
     throw "Expected CTF seed policy $CtfSeedPolicy, got $($summary.ctf_seed.policy)"
+}
+if ($summary.zone_air_algorithm -ne $ZoneAirAlgorithm) {
+    throw "Expected zone-air algorithm $ZoneAirAlgorithm, got $($summary.zone_air_algorithm)"
 }
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     if (-not ($summary.ctf_seed.skipped_constructions | Where-Object { $_.construction_name -eq "FLOOR" -and $_.ctf_count -eq 5 })) {
@@ -221,6 +237,7 @@ Assert-Contains -Text $reportText -Pattern "conformance_claim: false" -Descripti
 Assert-Contains -Text $reportText -Pattern "warmup_enabled: true" -Description "markdown warmup enabled"
 Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -Description "markdown oracle warmup days"
 Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: $CtfSeedPolicy" -Description "markdown CTF seed policy"
+Assert-Contains -Text $reportText -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "markdown zone-air algorithm"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
 }
