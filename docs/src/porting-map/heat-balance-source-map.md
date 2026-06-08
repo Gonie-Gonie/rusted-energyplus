@@ -151,6 +151,20 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   timestep finite-difference expression for the third-order probe. Official
   dynamic reports can compare these latent air-balance terms before a
   conformance claim is attempted.
+- `SimulationManager.cc` documents the high-level order for the relevant
+  timestep path as `ManageSurfaceHeatBalance` ->
+  `CalcHeatBalanceOutsideSurf` -> `CalcHeatBalanceInsideSurf` ->
+  `ManageAirHeatBalance` -> `CalcHeatBalanceAir` -> `ManageHVAC` ->
+  `ManageZoneAirUpdates(PREDICT)`. `HeatBalanceAirManager.cc` confirms that
+  `CalcHeatBalanceAir` delegates to `HVACManager::ManageHVAC`, and
+  `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctAirTemp`
+  applies the `ThirdOrder`, `AnalyticalSolution`, or `EulerMethod` branch from
+  freshly calculated `SumHA/SumHATsurf/SumHATref` terms. Rust still updates the
+  default MAT through the simplified zone-air shell before the current surface
+  CTF pass, then records the EnergyPlus-shaped coefficients afterward. Any
+  future analytical/coefficient probe should therefore be isolated from the
+  default lane until the inside-surface, zone-air correction, and history-update
+  order is ported as one coherent path.
 
 Current Rust boundary:
 
