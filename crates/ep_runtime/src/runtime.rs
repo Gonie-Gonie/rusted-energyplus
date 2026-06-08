@@ -6992,6 +6992,53 @@ DATA PERIODS
     }
 
     #[test]
+    fn heat_balance_surface_first_probe_uses_distinct_zone_air_order()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let analytical = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[10.0, 12.0],
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe),
+        )?;
+        let surface_first = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[10.0, 12.0],
+            HeatBalanceSimulationOptions::hourly_samples(2).with_zone_air_algorithm(
+                HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe,
+            ),
+        )?;
+
+        let Some(analytical_zone_series) = analytical
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing analytical zone series").into());
+        };
+        let Some(surface_first_zone_series) = surface_first
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing surface-first zone series").into());
+        };
+
+        assert_eq!(analytical_zone_series.values.len(), 2);
+        assert_eq!(surface_first_zone_series.values.len(), 2);
+        assert!(
+            analytical_zone_series
+                .values
+                .iter()
+                .chain(surface_first_zone_series.values.iter())
+                .all(|value| value.is_finite())
+        );
+        assert!(
+            (analytical_zone_series.values[0] - surface_first_zone_series.values[0]).abs() > 1.0e-6
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn surface_incident_solar_diagnostic_appends_roof_series()
     -> Result<(), Box<dyn std::error::Error>> {
         let mut typed = cube_model();
