@@ -97,9 +97,14 @@ EnergyPlus quick-conduction outside-face solve (`CTFCross[0] > 0.01`) and
 precomputed CTF history constants moves the active best lane again: floor
 inside conduction drops to RMSE `812.566220`, floor outside conduction to
 `397.351373`, floor heat storage to `1198.781640`, and zone aggregate
-conduction to `84.217233`. The floor storage row remains the top diagnostic
-bottleneck once it is visible, so promotion still needs the remaining
-EnergyPlus exterior radiation/coefficient updates, source coupling,
+conduction to `84.217233`. Raising that same lane to five surface passes
+lowers the active floor/aggregate bottlenecks further (`800.087434` floor
+inside conduction RMSE, `386.128809` floor outside conduction RMSE,
+`1174.412273` floor heat-storage RMSE, and `78.393234` zone aggregate
+conduction RMSE), while an ad hoc eight-pass run lowers storage a little more
+but gives back zone aggregate conduction and MAT. The floor storage row remains
+the top diagnostic bottleneck once it is visible, so promotion still needs the
+remaining EnergyPlus exterior radiation/coefficient updates, source coupling,
 predictor/corrector order, and CTF history commit parity rather than simply
 enabling the floor-conduction-best lane. Extending the previous-inside solve
 to adiabatic boundaries nudges floor inside temperature and inside conduction

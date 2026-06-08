@@ -107,6 +107,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-surface-iter5"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-analytical-coupled-previous-boundary-iter3",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-boundary-surface-iter3"
@@ -187,6 +196,7 @@ REFERENCE_LANES = {
     "all-ctf-analytical-coupled-iter3": "all-ctf-analytical-coupled",
     "all-ctf-analytical-coupled-previous-inside-iter3": "all-ctf-analytical-coupled-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
+    "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3",
     "all-ctf-analytical-coupled-previous-boundary-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
     "all-ctf-analytical-surface-first-iter3": "all-ctf-analytical-surface-first",
     "analytical": "default",

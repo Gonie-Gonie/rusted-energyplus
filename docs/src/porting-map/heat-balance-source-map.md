@@ -196,15 +196,19 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `812.566220`, floor outside conduction to `397.351373`, floor heat storage
   to `1198.781640`, zone aggregate conduction to `84.217233`, and MAT to
   `2.573470`, becoming the current best focus lane for those rows plus the
-  latent zone-air heat-balance rates. The previous-inside outdoor/adiabatic
+  latent zone-air heat-balance rates. The five-pass quick-outside probe lowers
+  the active floor/aggregate bottlenecks again (`800.087434` floor inside
+  conduction RMSE, `386.128809` floor outside conduction RMSE, `1174.412273`
+  floor heat-storage RMSE, and `78.393234` zone aggregate conduction RMSE) at
+  the cost of a small MAT regression, so it is tracked as iteration-sensitivity
+  evidence rather than a default promotion. The previous-inside outdoor/adiabatic
   boundary probe slightly lowers floor inside conduction again to RMSE
   `923.728787`, but does not improve floor heat storage (`1422.231349` versus
   `1422.193225`) or zone aggregate conduction. This narrows the next
-  source-mapped target to the
-  remaining EnergyPlus exterior radiation/coefficient updates, quick/slow
-  boundary branches, source coupling, surface iteration, zone-air correction,
-  and CTF history commit order rather than a single post-correction surface
-  feedback pass.
+  source-mapped target to the remaining EnergyPlus exterior
+  radiation/coefficient updates, quick/slow boundary branches, source
+  coupling, surface iteration, zone-air correction, and CTF history commit
+  order rather than a single post-correction surface feedback pass.
 
 Current Rust boundary:
 
