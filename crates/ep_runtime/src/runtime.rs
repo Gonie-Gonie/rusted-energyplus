@@ -32,6 +32,7 @@ const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
+const ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K: f64 = 0.01;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -614,6 +615,26 @@ pub struct CtfOutsideFaceBalanceInput {
     pub absorbed_outside_source_w_per_m2: f64,
 }
 
+/// Inputs for the EnergyPlus quick-conduction outside-face balance subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfOutsideQuickConductionBalanceInput {
+    /// Outside environmental/source balance inputs.
+    pub environmental: CtfOutsideFaceBalanceInput,
+    /// Reference zone air temperature used by inside convection in C.
+    pub reference_air_temperature_c: f64,
+    /// Inside convection coefficient in W/m2-K.
+    pub inside_convection_coefficient_w_per_m2_k: f64,
+    /// Net inside radiant/source term in W/m2 from EnergyPlus `SurfTempTerm` inputs.
+    pub net_inside_source_w_per_m2: f64,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct QuickOutsideConductionContext {
+    reference_air_temperature_c: f64,
+    inside_convection_coefficient_w_per_m2_k: f64,
+    net_inside_source_w_per_m2: f64,
+}
+
 /// Per-surface heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SurfaceHeatBalanceState {
@@ -703,6 +724,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor CTF boundary solves.
     EnergyPlusAnalyticalCoupledPreviousInsideProbe,
+    /// Experimental previous-inside coupled path using EnergyPlus quick-conduction outside face solves.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor and adiabatic boundary solves.
     EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
@@ -2393,22 +2416,29 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let rebalance_surfaces_after_zone_air_correction = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_outdoor_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_adiabatic_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
+    );
+    let use_quick_outside_conduction = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
     );
 
     for surface in &mut state.surfaces {
@@ -2425,6 +2455,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             input.outdoor_dry_bulb_c,
             zone_temperature_c,
             weather_context,
+            None,
         );
     }
 
@@ -2471,6 +2502,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe => previous_temperature_c,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe => {
+                previous_temperature_c
+            }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe => {
                 previous_temperature_c
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
@@ -2536,6 +2570,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         surface_iteration_count,
         use_previous_inside_for_outdoor_boundary,
         use_previous_inside_for_adiabatic_boundary,
+        use_quick_outside_conduction,
     );
 
     if rebalance_surfaces_after_zone_air_correction {
@@ -2560,6 +2595,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             surface_iteration_count,
             use_previous_inside_for_outdoor_boundary,
             use_previous_inside_for_adiabatic_boundary,
+            use_quick_outside_conduction,
         );
     }
 
@@ -2587,6 +2623,7 @@ fn run_surface_balance_passes(
     surface_iteration_count: u32,
     use_previous_inside_for_outdoor_boundary: bool,
     use_previous_inside_for_adiabatic_boundary: bool,
+    use_quick_outside_conduction: bool,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         for surface in surfaces.iter_mut() {
@@ -2610,6 +2647,7 @@ fn run_surface_balance_passes(
             surface.inside_convection_coefficient_w_per_m2_k =
                 inside_convection_coefficient_w_per_m2_k;
 
+            update_surface_ctf_history_constants(surface);
             let use_previous_inside_for_boundary = (use_previous_inside_for_outdoor_boundary
                 && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors)
                 || (use_previous_inside_for_adiabatic_boundary
@@ -2620,6 +2658,19 @@ fn run_surface_balance_passes(
                 zone_temperature_c
             };
             surface.inside_face_temperature_c = outside_balance_inside_temperature_c;
+            let net_inside_source_w_per_m2 = surface_inside_ctf_source_terms_w_per_m2(surface);
+            let quick_outside_conduction = if use_quick_outside_conduction
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors
+            {
+                Some(QuickOutsideConductionContext {
+                    reference_air_temperature_c: zone_temperature_c,
+                    inside_convection_coefficient_w_per_m2_k:
+                        inside_convection_coefficient_w_per_m2_k,
+                    net_inside_source_w_per_m2,
+                })
+            } else {
+                None
+            };
             surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
                 model,
                 surface,
@@ -2627,15 +2678,15 @@ fn run_surface_balance_passes(
                 input.outdoor_dry_bulb_c,
                 outside_balance_inside_temperature_c,
                 weather_context,
+                quick_outside_conduction,
             );
-            update_surface_ctf_history_constants(surface);
             surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
                 surface,
                 CtfInsideFaceBalanceInput {
                     reference_air_temperature_c: zone_temperature_c,
                     inside_convection_coefficient_w_per_m2_k,
                     previous_inside_face_temperature_c,
-                    net_inside_source_w_per_m2: surface_inside_ctf_source_terms_w_per_m2(surface),
+                    net_inside_source_w_per_m2,
                 },
             );
             if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
@@ -2722,6 +2773,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
             zone_state
                 .zone_air_temperature_coefficients
@@ -2829,6 +2881,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.initial_zone_air_temperature_c,
         ctf_coefficients,
     )?;
+    seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,
         &mut state,
@@ -2983,6 +3036,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     outdoor_dry_bulb_c,
                     surface_state.inside_face_temperature_c,
                     weather_context,
+                    options.zone_air_algorithm,
                 );
                 trace
                     .inside_face_temperature_c
@@ -3485,6 +3539,77 @@ fn surface_ctf_state_from_coefficients(
     })
 }
 
+fn seed_initial_surface_ctf_boundary_histories(
+    state: &mut HeatBalanceState,
+    initial_outdoor_dry_bulb_c: f64,
+) {
+    let zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+        .collect::<BTreeMap<_, _>>();
+
+    for surface in &mut state.surfaces {
+        let inside_temperature_c = zone_temperatures
+            .get(&surface.zone_id)
+            .copied()
+            .unwrap_or(surface.inside_face_temperature_c);
+        let outside_temperature_c = initial_surface_ctf_boundary_temperature_c(
+            surface,
+            &zone_temperatures,
+            initial_outdoor_dry_bulb_c,
+            inside_temperature_c,
+        );
+        let initial_flux_w_per_m2 = surface_steady_u_value_w_per_m2_k(surface)
+            * (outside_temperature_c - inside_temperature_c);
+
+        surface.inside_face_temperature_c = inside_temperature_c;
+        surface.outside_face_temperature_c = outside_temperature_c;
+        surface
+            .ctf
+            .inside_temperature_history_c
+            .fill(inside_temperature_c);
+        surface
+            .ctf
+            .outside_temperature_history_c
+            .fill(outside_temperature_c);
+        surface
+            .ctf
+            .inside_flux_history_w_per_m2
+            .fill(initial_flux_w_per_m2);
+        surface
+            .ctf
+            .outside_flux_history_w_per_m2
+            .fill(initial_flux_w_per_m2);
+    }
+}
+
+fn initial_surface_ctf_boundary_temperature_c(
+    surface: &SurfaceHeatBalanceState,
+    zone_temperatures: &BTreeMap<ZoneId, f64>,
+    initial_outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+) -> f64 {
+    match surface.outside_boundary_condition {
+        OutsideBoundaryCondition::Outdoors => initial_outdoor_dry_bulb_c,
+        OutsideBoundaryCondition::Adiabatic => owning_zone_temperature_c,
+        _ => surface_boundary_temperature_c(
+            surface,
+            zone_temperatures,
+            initial_outdoor_dry_bulb_c,
+            owning_zone_temperature_c,
+        ),
+    }
+}
+
+fn surface_steady_u_value_w_per_m2_k(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.thermal_resistance_m2_k_per_w > 0.0 {
+        1.0 / surface.thermal_resistance_m2_k_per_w
+    } else {
+        0.0
+    }
+}
+
 fn resolve_surface_boundary_target(
     model: &TypedModel,
     surface: &Surface,
@@ -3564,6 +3689,7 @@ fn heat_balance_surface_boundary_temperature_c(
     outdoor_dry_bulb_c: f64,
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    quick_outside_conduction: Option<QuickOutsideConductionContext>,
 ) -> f64 {
     if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
         return exterior_surface_boundary_temperature_c(
@@ -3572,6 +3698,7 @@ fn heat_balance_surface_boundary_temperature_c(
             outdoor_dry_bulb_c,
             owning_zone_temperature_c,
             weather_context,
+            quick_outside_conduction,
         );
     }
 
@@ -3589,6 +3716,7 @@ fn exterior_surface_boundary_temperature_c(
     outdoor_dry_bulb_c: f64,
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    quick_outside_conduction: Option<QuickOutsideConductionContext>,
 ) -> f64 {
     let Some(context) = weather_context else {
         return outdoor_dry_bulb_c;
@@ -3619,6 +3747,7 @@ fn exterior_surface_boundary_temperature_c(
                 outdoor_dry_bulb_c,
                 owning_zone_temperature_c,
                 0.0,
+                quick_outside_conduction,
             );
         };
         surface_incident_solar_radiation_hourly_average_w_per_m2(
@@ -3638,6 +3767,7 @@ fn exterior_surface_boundary_temperature_c(
         outdoor_dry_bulb_c,
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
+        quick_outside_conduction,
     )
 }
 
@@ -3647,8 +3777,15 @@ fn reported_surface_outside_face_temperature_c(
     outdoor_dry_bulb_c: f64,
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> f64 {
     if surface_state.outside_boundary_condition != OutsideBoundaryCondition::Outdoors {
+        return surface_state.outside_face_temperature_c;
+    }
+    if matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+    ) {
         return surface_state.outside_face_temperature_c;
     }
 
@@ -3658,6 +3795,7 @@ fn reported_surface_outside_face_temperature_c(
         outdoor_dry_bulb_c,
         owning_zone_temperature_c,
         weather_context,
+        None,
     )
 }
 
@@ -3794,6 +3932,46 @@ pub fn energyplus_ctf_outside_face_temperature_c(
         / denominator
 }
 
+/// EnergyPlus-shaped quick-conduction outside-face balance for the opaque subset.
+#[must_use]
+pub fn energyplus_ctf_outside_face_temperature_quick_conduction_c(
+    surface: &SurfaceHeatBalanceState,
+    input: CtfOutsideQuickConductionBalanceInput,
+) -> f64 {
+    let inside_denominator =
+        surface.ctf.inside_0_w_per_m2_k + input.inside_convection_coefficient_w_per_m2_k;
+    if surface.ctf.cross_0_w_per_m2_k <= ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K
+        || inside_denominator.abs() <= f64::EPSILON
+    {
+        return energyplus_ctf_outside_face_temperature_c(surface, input.environmental);
+    }
+
+    let f1 = surface.ctf.cross_0_w_per_m2_k / inside_denominator;
+    let denominator = surface.ctf.outside_0_w_per_m2_k
+        + input
+            .environmental
+            .outside_convection_coefficient_w_per_m2_k
+        + input.environmental.outside_radiation_coefficient_w_per_m2_k
+        - f1 * surface.ctf.cross_0_w_per_m2_k;
+    if denominator.abs() <= f64::EPSILON {
+        return energyplus_ctf_outside_face_temperature_c(surface, input.environmental);
+    }
+
+    let inside_balance_term = surface.ctf.const_in_part_w_per_m2
+        + input.net_inside_source_w_per_m2
+        + input.inside_convection_coefficient_w_per_m2_k * input.reference_air_temperature_c;
+    (-surface.ctf.const_out_part_w_per_m2
+        + input.environmental.absorbed_outside_source_w_per_m2
+        + input
+            .environmental
+            .outside_convection_coefficient_w_per_m2_k
+            * input.environmental.outdoor_air_temperature_c
+        + input.environmental.outside_radiation_coefficient_w_per_m2_k
+            * input.environmental.radiant_temperature_c
+        + f1 * inside_balance_term)
+        / denominator
+}
+
 fn exterior_surface_energy_balance_temperature_c(
     surface_state: &SurfaceHeatBalanceState,
     typed_surface: &Surface,
@@ -3801,9 +3979,11 @@ fn exterior_surface_energy_balance_temperature_c(
     outdoor_dry_bulb_c: f64,
     _owning_zone_temperature_c: f64,
     incident_solar_w_per_m2: f64,
+    quick_outside_conduction: Option<QuickOutsideConductionContext>,
 ) -> f64 {
-    if record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
-        || incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2
+    if quick_outside_conduction.is_none()
+        && (record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
+            || incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2)
     {
         return outdoor_dry_bulb_c;
     }
@@ -3825,16 +4005,27 @@ fn exterior_surface_energy_balance_temperature_c(
         + ground_view_factor * outdoor_dry_bulb_c
         + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
 
-    energyplus_ctf_outside_face_temperature_c(
-        surface_state,
-        CtfOutsideFaceBalanceInput {
-            outdoor_air_temperature_c: outdoor_dry_bulb_c,
-            radiant_temperature_c: longwave_radiant_temperature_c,
-            outside_convection_coefficient_w_per_m2_k: convection_coefficient,
-            outside_radiation_coefficient_w_per_m2_k: longwave_coefficient,
-            absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
-        },
-    )
+    let environmental = CtfOutsideFaceBalanceInput {
+        outdoor_air_temperature_c: outdoor_dry_bulb_c,
+        radiant_temperature_c: longwave_radiant_temperature_c,
+        outside_convection_coefficient_w_per_m2_k: convection_coefficient,
+        outside_radiation_coefficient_w_per_m2_k: longwave_coefficient,
+        absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
+    };
+    if let Some(context) = quick_outside_conduction {
+        energyplus_ctf_outside_face_temperature_quick_conduction_c(
+            surface_state,
+            CtfOutsideQuickConductionBalanceInput {
+                environmental,
+                reference_air_temperature_c: context.reference_air_temperature_c,
+                inside_convection_coefficient_w_per_m2_k: context
+                    .inside_convection_coefficient_w_per_m2_k,
+                net_inside_source_w_per_m2: context.net_inside_source_w_per_m2,
+            },
+        )
+    } else {
+        energyplus_ctf_outside_face_temperature_c(surface_state, environmental)
+    }
 }
 
 fn exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
@@ -5304,7 +5495,8 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
-        Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+        CtfOutsideQuickConductionBalanceInput, Date, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
+        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
         HeatBalanceStepInput, HeatBalanceWarmupOptions, HeatBalanceWarmupSummary,
         HeatBalanceZoneAirAlgorithm, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
         NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
@@ -5317,7 +5509,9 @@ mod tests {
         energyplus_analytical_zone_air_temperature_c,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
-        energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
+        energyplus_ctf_outside_face_temperature_c,
+        energyplus_ctf_outside_face_temperature_quick_conduction_c,
+        energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
@@ -5325,8 +5519,9 @@ mod tests {
         energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        run_heat_balance_run_period_warmup, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        run_heat_balance_run_period_warmup, seed_initial_surface_ctf_boundary_histories,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -6595,6 +6790,49 @@ DATA PERIODS
     }
 
     #[test]
+    fn initial_ctf_history_seeding_uses_boundary_temperature_and_u_value()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state_with_ctf_coefficients(
+            &model,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 2.0,
+                    cross_w_per_m2_k: 0.5,
+                    inside_w_per_m2_k: 3.0,
+                    flux: None,
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: 0.4,
+                    cross_w_per_m2_k: 0.1,
+                    inside_w_per_m2_k: 0.3,
+                    flux: Some(0.5),
+                },
+            ],
+        )?;
+
+        seed_initial_surface_ctf_boundary_histories(&mut state, 5.0);
+
+        let surface = &state.surfaces[0];
+        let expected_u_value = 1.0 / surface.thermal_resistance_m2_k_per_w;
+        let expected_flux = expected_u_value * (5.0 - ENERGYPLUS_ZONE_INITIAL_TEMP_C);
+        assert_eq!(surface.ctf.outside_temperature_history_c, vec![5.0]);
+        assert_eq!(
+            surface.ctf.inside_temperature_history_c,
+            vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
+        );
+        assert!((surface.ctf.outside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
+        assert!((surface.ctf.inside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
     fn energyplus_ctf_inside_face_balance_handles_standard_and_adiabatic()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
@@ -6689,6 +6927,39 @@ DATA PERIODS
         );
 
         assert!((temperature - (67.0 / 6.0)).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn energyplus_ctf_quick_outside_face_balance_uses_inside_balance_term()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.ctf.outside_0_w_per_m2_k = 3.0;
+        surface.ctf.cross_0_w_per_m2_k = 2.0;
+        surface.ctf.inside_0_w_per_m2_k = 4.0;
+        surface.ctf.const_out_part_w_per_m2 = 11.0;
+        surface.ctf.const_in_part_w_per_m2 = 13.0;
+
+        let temperature = energyplus_ctf_outside_face_temperature_quick_conduction_c(
+            surface,
+            CtfOutsideQuickConductionBalanceInput {
+                environmental: CtfOutsideFaceBalanceInput {
+                    outdoor_air_temperature_c: 10.0,
+                    radiant_temperature_c: 5.0,
+                    outside_convection_coefficient_w_per_m2_k: 3.0,
+                    outside_radiation_coefficient_w_per_m2_k: 2.0,
+                    absorbed_outside_source_w_per_m2: 7.0,
+                },
+                reference_air_temperature_c: 20.0,
+                inside_convection_coefficient_w_per_m2_k: 6.0,
+                net_inside_source_w_per_m2: 17.0,
+            },
+        );
+
+        assert!((temperature - (66.0 / 7.6)).abs() < 1.0e-12);
 
         Ok(())
     }
@@ -7084,6 +7355,14 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
         );
         assert_eq!(
             options

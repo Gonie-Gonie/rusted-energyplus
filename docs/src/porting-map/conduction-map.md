@@ -92,17 +92,21 @@ probe slightly improves floor inside/outside temperatures and conduction
 (`923.733908` inside conduction RMSE and `507.588138` outside conduction RMSE),
 and lowers the newly tracked floor heat-storage RMSE from `2725.712393` in the
 default lane to `1422.193225`, but it does not beat the coupled iter3 lane for
-zone aggregate conduction or air-balance rates. The floor storage row becomes
-the top diagnostic bottleneck once it is visible. MAT still stays best in the
-one-pass all-CTF analytical surface-first lane, so promotion still needs the
-EnergyPlus outside-surface quick-conduction/source coupling, history commit,
-and predictor/corrector order rather than simply enabling the
-floor-conduction-best lane. Extending the previous-inside solve to adiabatic
-boundaries nudges floor inside temperature and inside conduction slightly lower
-(`923.728787` inside conduction RMSE), but it does not improve floor storage
-(`1422.231349` RMSE versus `1422.193225`) or zone aggregate conduction, so the
-adiabatic boundary probe remains a diagnostic fork rather than the active best
-lane.
+zone aggregate conduction or air-balance rates. Extending that lane with the
+EnergyPlus quick-conduction outside-face solve (`CTFCross[0] > 0.01`) and
+precomputed CTF history constants moves the active best lane again: floor
+inside conduction drops to RMSE `812.566220`, floor outside conduction to
+`397.351373`, floor heat storage to `1198.781640`, and zone aggregate
+conduction to `84.217233`. The floor storage row remains the top diagnostic
+bottleneck once it is visible, so promotion still needs the remaining
+EnergyPlus exterior radiation/coefficient updates, source coupling,
+predictor/corrector order, and CTF history commit parity rather than simply
+enabling the floor-conduction-best lane. Extending the previous-inside solve
+to adiabatic boundaries nudges floor inside temperature and inside conduction
+slightly lower (`923.728787` inside conduction RMSE), but it does not improve
+floor storage (`1422.231349` RMSE versus `1422.193225`) or zone aggregate
+conduction, so the adiabatic boundary probe remains a diagnostic fork rather
+than the active best lane.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

@@ -51,6 +51,8 @@ Current generators:
   coupled surface rebalance, combined all-CTF analytical coupled surface
   rebalance with three surface passes, combined all-CTF analytical coupled
   previous-inside outdoor boundary solves with three surface passes, combined
+  all-CTF analytical coupled previous-inside quick outside-conduction solves
+  with three surface passes, combined
   all-CTF analytical coupled previous-inside outdoor/adiabatic boundary solves
   with three surface passes, combined
   all-CTF analytical surface-first with three surface passes, third-order

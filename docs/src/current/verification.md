@@ -71,8 +71,8 @@ The current official dynamic 1Zone tracker is diagnostic-only. The default
 lane compares 31 hourly series, including zone air heat-balance latent terms
 and the floor surface heat-storage diagnostic, and the probe lanes isolate
 mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
-correction order, and same-timestep coupled surface/zone-air rebalance without
-creating a conformance claim:
+correction order, same-timestep coupled surface/zone-air rebalance, and
+quick outside-conduction boundary solves without creating a conformance claim:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
@@ -85,6 +85,7 @@ creating a conformance claim:
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-iter3-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-boundary-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
