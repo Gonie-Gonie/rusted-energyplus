@@ -197,6 +197,11 @@ if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or $CtfSeedPolicy -eq 
     $expectedTopVariable = "Zone Air Heat Balance Surface Convection Rate"
     $expectedTopDescription = "zone air heat-balance surface convection"
 }
+if ($CtfSeedPolicy -eq "all-eio" -and $ZoneAirAlgorithm -eq "simplified-analytical") {
+    $expectedTopKey = "ZONE ONE"
+    $expectedTopVariable = "Zone Air Heat Balance Air Energy Storage Rate"
+    $expectedTopDescription = "zone air heat-balance air energy storage"
+}
 if (
     $topBottleneck.output.key -ne $expectedTopKey -or
     $topBottleneck.output.variable -ne $expectedTopVariable

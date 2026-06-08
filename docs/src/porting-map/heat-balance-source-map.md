@@ -133,8 +133,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
   Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
   now emits diagnostic zone series with those EnergyPlus names from the current
-  internal gain, `SumHA/SumHATsurf/SumHATref`, MAT, and air-capacity state so
-  official dynamic reports can compare these latent air-balance terms before a
+  internal gain, `SumHA/SumHATsurf/SumHATref`, MAT, and air-capacity state. The
+  air energy storage output follows EnergyPlus reporting semantics by using
+  `TempIndCoef - TempDepCoef * MAT` for the analytical diagnostic lane and the
+  timestep finite-difference expression for the third-order probe. Official
+  dynamic reports can compare these latent air-balance terms before a
   conformance claim is attempted.
 
 Current Rust boundary:

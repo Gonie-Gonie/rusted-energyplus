@@ -2510,6 +2510,34 @@ fn zone_surface_convection_sums(
     (sum_ha_w_per_k, sum_hat_surf_w, 0.0)
 }
 
+fn zone_air_heat_balance_air_storage_rate_w(
+    zone_state: &ZoneHeatBalanceState,
+    timestep_seconds: f64,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> f64 {
+    match zone_air_algorithm {
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => {
+            zone_state
+                .zone_air_temperature_coefficients
+                .temp_independent_coefficient_w
+                - zone_state
+                    .zone_air_temperature_coefficients
+                    .temp_dependent_coefficient_w_per_k
+                    * zone_state.mean_air_temperature_c
+        }
+        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => {
+            if timestep_seconds > 0.0 {
+                zone_state.air_heat_capacity_j_per_k
+                    * (zone_state.mean_air_temperature_c
+                        - zone_state.previous_mean_air_temperatures_c[0])
+                    / timestep_seconds
+            } else {
+                0.0
+            }
+        }
+    }
+}
+
 /// Simulates hourly zone mean air temperatures through the heat-balance state
 /// shell without making a conformance claim.
 ///
@@ -2723,15 +2751,11 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         - zone_state.sum_hat_ref_w
                         - zone_state.sum_ha_w_per_k * zone_state.mean_air_temperature_c,
                 );
-                let previous_temperature_c = zone_state.previous_mean_air_temperatures_c[0];
-                let air_storage_rate_w = if seconds_per_timestep > 0.0 {
-                    zone_state.air_heat_capacity_j_per_k
-                        * (zone_state.mean_air_temperature_c - previous_temperature_c)
-                        / seconds_per_timestep
-                } else {
-                    0.0
-                };
-                air_storage_values.push(air_storage_rate_w);
+                air_storage_values.push(zone_air_heat_balance_air_storage_rate_w(
+                    zone_state,
+                    seconds_per_timestep,
+                    options.zone_air_algorithm,
+                ));
             }
         }
         for trace in &mut surface_temperatures {
@@ -5066,7 +5090,7 @@ mod tests {
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
         surface_outside_conduction_flux_w_per_m2, update_surface_ctf_history_constants,
-        zone_geometry_summaries,
+        zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -6450,6 +6474,44 @@ DATA PERIODS
         assert!((coefficients.air_power_cap_w_per_k - (1207.2 / 600.0)).abs() < 1.0e-12);
         let expected_history = (1207.2 / 600.0) * (3.0 * 20.0 - 1.5 * 20.0 + 20.0 / 3.0);
         assert!((coefficients.third_order_history_term_w - expected_history).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn zone_air_heat_balance_storage_rate_uses_source_algorithm_branch()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let zone = &mut state.zones[0];
+        zone.mean_air_temperature_c = 21.0;
+        zone.previous_mean_air_temperatures_c = [20.0, 19.0, 18.0];
+        zone.air_heat_capacity_j_per_k = 1200.0;
+        zone.zone_air_temperature_coefficients
+            .temp_dependent_coefficient_w_per_k = 5.0;
+        zone.zone_air_temperature_coefficients
+            .temp_independent_coefficient_w = 200.0;
+
+        let analytical = zone_air_heat_balance_air_storage_rate_w(
+            zone,
+            60.0,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+        );
+        assert!((analytical - 95.0).abs() < 1.0e-12);
+
+        let third_order = zone_air_heat_balance_air_storage_rate_w(
+            zone,
+            60.0,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe,
+        );
+        assert!((third_order - 20.0).abs() < 1.0e-12);
+
+        let invalid_timestep = zone_air_heat_balance_air_storage_rate_w(
+            zone,
+            0.0,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe,
+        );
+        assert_eq!(invalid_timestep, 0.0);
 
         Ok(())
     }
