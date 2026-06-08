@@ -68,10 +68,11 @@ Current supporting release and infrastructure gates include:
 ```
 
 The current official dynamic 1Zone tracker is diagnostic-only. The default
-lane compares 30 hourly series, including zone air heat-balance latent terms,
-and the probe lanes isolate mass-CTF seeding, EnergyPlus analytical zone-air
-updates, surface-first correction order, and same-timestep coupled
-surface/zone-air rebalance without creating a conformance claim:
+lane compares 31 hourly series, including zone air heat-balance latent terms
+and the floor surface heat-storage diagnostic, and the probe lanes isolate
+mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
+correction order, and same-timestep coupled surface/zone-air rebalance without
+creating a conformance claim:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic

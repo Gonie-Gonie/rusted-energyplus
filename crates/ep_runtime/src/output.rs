@@ -447,6 +447,7 @@ impl RuntimeOutputRegistry {
                     "Surface Outside Face Conduction Heat Transfer Rate per Area",
                     "W/m2",
                 ),
+                ("Surface Heat Storage Rate", "W"),
             ] {
                 self.push_output(
                     &surface.name.0,

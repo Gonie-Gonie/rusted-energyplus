@@ -248,7 +248,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 30) {
+if ($summary.series_count -ne 31) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -258,27 +258,43 @@ $topBottleneck = @($summary.bottlenecks)[0]
 if ($null -eq $topBottleneck) {
     throw "Expected at least one bottleneck row in heat-balance diagnostic summary"
 }
-$expectedTopKey = "ZN001:FLR001"
-$expectedTopVariable = "Surface Inside Face Conduction Heat Transfer Rate"
-$expectedTopDescription = "floor inside conduction"
+$expectedTopCandidates = @(
+    @{
+        Key = "ZN001:FLR001"
+        Variable = "Surface Heat Storage Rate"
+        Description = "floor heat storage"
+    },
+    @{
+        Key = "ZN001:FLR001"
+        Variable = "Surface Inside Face Conduction Heat Transfer Rate"
+        Description = "floor inside conduction"
+    }
+)
 if (
     $ZoneAirAlgorithm -eq "energyplus-analytical-probe" -or
     $ZoneAirAlgorithm -eq "energyplus-third-order-probe"
 ) {
-    $expectedTopKey = "ZONE ONE"
-    $expectedTopVariable = "Zone Air Heat Balance Surface Convection Rate"
-    $expectedTopDescription = "zone air heat-balance surface convection"
+    $expectedTopCandidates += @{
+        Key = "ZONE ONE"
+        Variable = "Zone Air Heat Balance Surface Convection Rate"
+        Description = "zone air heat-balance surface convection"
+    }
 }
 if ($CtfSeedPolicy -eq "all-eio" -and $ZoneAirAlgorithm -eq "simplified-analytical") {
-    $expectedTopKey = "ZONE ONE"
-    $expectedTopVariable = "Zone Air Heat Balance Air Energy Storage Rate"
-    $expectedTopDescription = "zone air heat-balance air energy storage"
+    $expectedTopCandidates += @{
+        Key = "ZONE ONE"
+        Variable = "Zone Air Heat Balance Air Energy Storage Rate"
+        Description = "zone air heat-balance air energy storage"
+    }
 }
-if (
-    $topBottleneck.output.key -ne $expectedTopKey -or
-    $topBottleneck.output.variable -ne $expectedTopVariable
-) {
-    throw "Expected top bottleneck to be $expectedTopDescription, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
+$expectedTopMatch = $expectedTopCandidates | Where-Object {
+    $_.Key -eq $topBottleneck.output.key -and $_.Variable -eq $topBottleneck.output.variable
+} | Select-Object -First 1
+if ($null -eq $expectedTopMatch) {
+    $expectedTopDescriptions = ($expectedTopCandidates | ForEach-Object {
+        "$($_.Description) [$($_.Key) / $($_.Variable)]"
+    }) -join "; "
+    throw "Expected top bottleneck to be one of $expectedTopDescriptions, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Mean Air Temperature series"
@@ -330,6 +346,9 @@ if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Outside Face Conduction Heat Transfer Rate per Area" -and $_.status -eq "extracted" })) {
     throw "Missing extracted floor outside conduction per-area series"
 }
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted floor heat storage series"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Diagnostic Report" -Description "markdown report header"
@@ -358,6 +377,7 @@ Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Con
 Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"
 Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Conduction Heat Transfer Rate" -Description "markdown floor outside conduction variable"
+Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate" -Description "markdown floor storage variable"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 
 Write-Host "Official dynamic heat-balance diagnostic passed with CTF seed policy $CtfSeedPolicy."

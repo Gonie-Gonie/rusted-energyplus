@@ -9,7 +9,7 @@ from typing import Any
 
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-EXPECTED_SERIES_COUNT = 30
+EXPECTED_SERIES_COUNT = 31
 
 
 @dataclass(frozen=True)
@@ -153,6 +153,7 @@ FOCUS_METRICS = (
     FocusMetric("ZN001:FLR001", "Surface Outside Face Temperature"),
     FocusMetric("ZN001:FLR001", "Surface Inside Face Conduction Heat Transfer Rate"),
     FocusMetric("ZN001:FLR001", "Surface Outside Face Conduction Heat Transfer Rate"),
+    FocusMetric("ZN001:FLR001", "Surface Heat Storage Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Inside Face Temperature"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Temperature"),
     FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),

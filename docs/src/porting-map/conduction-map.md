@@ -20,6 +20,7 @@ future official ExampleFile transient conduction work.
 | `Surface Inside Face Conduction Heat Transfer Rate per Area` | rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
+| `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |
 
 ## Source Anchors
@@ -29,6 +30,7 @@ future official ExampleFile transient conduction work.
 | CTF setup | construction/material CTF routines and `DataHeatBalance` histories | `SurfaceCtfState` coefficients and histories |
 | inside conduction reporting | `HeatBalanceSurfaceManager.cc` output registration and update | `ResultStore` surface conduction series |
 | outside conduction reporting | `HeatBalanceSurfaceManager.cc` output registration and update | outside face conduction series |
+| surface storage reporting | `HeatBalanceSurfaceManager.cc` `SurfOpaqStorageCond = -(SurfOpaqInsFaceCond + SurfOpaqOutFaceCond)` | derived surface heat storage series |
 | zone opaque aggregate | advanced report variables for opaque surface sums | zone aggregate conduction series |
 
 ## Promotion Requirements
@@ -88,16 +90,19 @@ the current best lane for zone aggregate conduction and the latent zone-air
 surface-convection/storage rows. A follow-on previous-inside outdoor boundary
 probe slightly improves floor inside/outside temperatures and conduction
 (`923.733908` inside conduction RMSE and `507.588138` outside conduction RMSE),
-but it does not beat the coupled iter3 lane for zone aggregate conduction or
-air-balance rates. MAT still stays best in the one-pass all-CTF analytical
-surface-first lane, so promotion still needs the EnergyPlus outside-surface
-quick-conduction/source coupling, history commit, and predictor/corrector order
-rather than simply enabling the floor-conduction-best lane.
+and lowers the newly tracked floor heat-storage RMSE from `2725.712393` in the
+default lane to `1422.193225`, but it does not beat the coupled iter3 lane for
+zone aggregate conduction or air-balance rates. The floor storage row becomes
+the top diagnostic bottleneck once it is visible. MAT still stays best in the
+one-pass all-CTF analytical surface-first lane, so promotion still needs the
+EnergyPlus outside-surface quick-conduction/source coupling, history commit,
+and predictor/corrector order rather than simply enabling the
+floor-conduction-best lane.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor
-outside-face conduction and per-area floor conduction diagnostics, so aggregate
-cancellation does not hide the next bottleneck.
+outside-face conduction, per-area floor conduction, and floor heat-storage
+diagnostics, so aggregate cancellation does not hide the next bottleneck.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside

@@ -60,6 +60,7 @@ VARIABLE_LABELS = {
     "Surface Inside Face Conduction Heat Transfer Rate per Area": "Surface IF cond/area",
     "Surface Outside Face Conduction Heat Transfer Rate": "Surface OF cond",
     "Surface Outside Face Conduction Heat Transfer Rate per Area": "Surface OF cond/area",
+    "Surface Heat Storage Rate": "Surface storage",
     "Zone Opaque Surface Inside Faces Conduction Rate": "Zone opaque cond",
     "Schedule Value": "Schedule value",
     "Site Outdoor Air Drybulb Temperature": "Outdoor drybulb",
