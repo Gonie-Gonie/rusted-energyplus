@@ -265,10 +265,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   weather/solar/wind output alignment and EnergyPlus surface-local wind-speed
   profiling, the default lane has `1926.324353` RMSE, and quick-outside iter3
   lowers it to `584.195603`, matching the explicit quick-outside plus DOE-2
-  iter3 lane. The active tracker now carries 45 rows by
-  adding roof outside convection, net thermal radiation, absorbed solar,
-  and wall outside-conduction diagnostics so the remaining outside aggregate
-  movement can be tied to exterior source rows before runtime promotion. The same source alignment
+  iter3 lane. The active tracker now carries 65 rows by
+  adding wall/roof outside convection, net thermal radiation, absorbed solar,
+  incident solar, and wall outside-conduction diagnostics so the remaining
+  outside aggregate movement can be tied to exterior source rows before runtime
+  promotion. The same source alignment
   lowered the active rain-onset max spike and default roof outside source
   bottleneck. Adding EnergyPlus timestep interpolation for horizontal infrared
   radiation/sky temperature then lowers quick-outside iter3 roof net thermal

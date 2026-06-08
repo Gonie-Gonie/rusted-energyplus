@@ -89,6 +89,51 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Convection Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Convection Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -125,6 +170,51 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Convection Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Convection Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -161,6 +251,51 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Convection Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Convection Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -189,6 +324,51 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Convection Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Convection Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"

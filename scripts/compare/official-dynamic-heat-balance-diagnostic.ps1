@@ -274,7 +274,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 45) {
+if ($summary.series_count -ne 65) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -337,6 +337,25 @@ if ($CtfSeedPolicy -eq "all-eio" -and $ZoneAirAlgorithm -eq "simplified-analytic
         Variable = "Zone Air Heat Balance Air Energy Storage Rate"
         Description = "zone air heat-balance air energy storage"
     }
+}
+foreach ($wallKey in @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004")) {
+    $expectedTopCandidates += @(
+        @{
+            Key = $wallKey
+            Variable = "Surface Outside Face Convection Heat Gain Rate"
+            Description = "wall outside convection heat gain"
+        },
+        @{
+            Key = $wallKey
+            Variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+            Description = "wall outside net thermal radiation heat gain"
+        },
+        @{
+            Key = $wallKey
+            Variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+            Description = "wall outside solar heat gain"
+        }
+    )
 }
 $expectedTopMatch = $expectedTopCandidates | Where-Object {
     $_.Key -eq $topBottleneck.output.key -and $_.Variable -eq $topBottleneck.output.variable
@@ -409,6 +428,17 @@ foreach ($wallKey in @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001
     }
     if (-not ($summary.series | Where-Object { $_.output.key -eq $wallKey -and $_.output.variable -eq "Surface Outside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
         throw "Missing extracted wall outside conduction series for $wallKey"
+    }
+    foreach ($sourceVariable in @(
+            "Surface Outside Face Incident Solar Radiation Rate per Area",
+            "Surface Outside Face Convection Heat Gain Rate",
+            "Surface Outside Face Convection Heat Transfer Coefficient",
+            "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
+            "Surface Outside Face Solar Radiation Heat Gain Rate"
+        )) {
+        if (-not ($summary.series | Where-Object { $_.output.key -eq $wallKey -and $_.output.variable -eq $sourceVariable -and $_.status -eq "extracted" })) {
+            throw "Missing extracted wall exterior source series for ${wallKey}: $sourceVariable"
+        }
     }
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {

@@ -141,9 +141,9 @@ Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor
 outside-face conduction, per-area floor conduction, and floor heat-storage
-diagnostics, plus roof outside convection/radiation/solar source rows, raising
-the tracked official dynamic series count to 45 so aggregate cancellation does
-not hide the next bottleneck. The
+diagnostics, plus wall/roof outside convection/radiation/solar source rows,
+raising the tracked official dynamic series count to 65 so aggregate
+cancellation does not hide the next bottleneck. The
 dynamic probe summary now ranks each lane's top inside-face and outside-face
 conduction driver surfaces and records the best lane per surface, keeping
 aggregate conduction regressions tied to wall/floor/roof source rows before a
