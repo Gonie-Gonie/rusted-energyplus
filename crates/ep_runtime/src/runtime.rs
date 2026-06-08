@@ -7,7 +7,7 @@ use ep_model::{
     OtherEquipment, OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
     PlantBranchComponent, PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment,
     ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
-    TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -23,7 +23,7 @@ const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
 const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
 const EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K: f64 = 4.0;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
-const EXTERIOR_RAIN_FALLBACK_DEPTH_MM: f64 = 2.0;
+const ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM: f64 = 0.8;
 const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.6697e-8;
 const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
@@ -3696,6 +3696,12 @@ struct HeatBalanceWeatherContext<'a> {
     zone_steps_per_hour: u32,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct ExteriorConvectionTerms {
+    coefficient_w_per_m2_k: f64,
+    reference_temperature_c: f64,
+}
+
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 struct SurfaceBoundaryTarget {
     surface_id: Option<SurfaceId>,
@@ -4090,6 +4096,12 @@ fn exterior_surface_boundary_temperature_c(
     ) {
         return outdoor_dry_bulb_c;
     }
+    let wet_timestep_fraction = energyplus_exterior_wet_timestep_fraction(
+        context.records,
+        context.record_index,
+        context.zone_steps_per_hour,
+        typed_surface,
+    );
 
     let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
         let Some(site) = model.site.as_ref() else {
@@ -4102,6 +4114,7 @@ fn exterior_surface_boundary_temperature_c(
                 0.0,
                 quick_outside_conduction,
                 use_doe2_outside_convection,
+                wet_timestep_fraction,
             );
         };
         surface_incident_solar_radiation_hourly_average_w_per_m2(
@@ -4123,6 +4136,7 @@ fn exterior_surface_boundary_temperature_c(
         incident_solar_w_per_m2,
         quick_outside_conduction,
         use_doe2_outside_convection,
+        wet_timestep_fraction,
     )
 }
 
@@ -4209,22 +4223,26 @@ fn surface_exterior_report_terms(
 
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
-    let convection_coefficient_w_per_m2_k =
-        if heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm) {
-            energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
-                reported_outside_face_temperature_c,
-                outdoor_dry_bulb_c,
-                tilt_rad.cos(),
-                surface_azimuth_deg(&typed_surface.vertices),
-                record.wind_direction_deg,
-                record.wind_speed_m_per_s,
-                surface_state.outside_layer_roughness,
-            )
-        } else {
-            exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
-        };
-    let convection_gain_per_area_w_per_m2 = -convection_coefficient_w_per_m2_k
-        * (reported_outside_face_temperature_c - outdoor_dry_bulb_c);
+    let use_doe2_outside_convection =
+        heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm);
+    let wet_timestep_fraction = energyplus_exterior_wet_timestep_fraction(
+        context.records,
+        context.record_index,
+        context.zone_steps_per_hour,
+        typed_surface,
+    );
+    let convection_terms = energyplus_exterior_convection_terms(
+        surface_state,
+        typed_surface,
+        record,
+        reported_outside_face_temperature_c,
+        outdoor_dry_bulb_c,
+        tilt_rad,
+        use_doe2_outside_convection,
+        wet_timestep_fraction,
+    );
+    let convection_gain_per_area_w_per_m2 = -convection_terms.coefficient_w_per_m2_k
+        * (reported_outside_face_temperature_c - convection_terms.reference_temperature_c);
 
     let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
     let longwave_coefficient_w_per_m2_k =
@@ -4244,7 +4262,7 @@ fn surface_exterior_report_terms(
     SurfaceExteriorReportTerms {
         convection_heat_gain_rate_w: convection_gain_per_area_w_per_m2 * surface_state.area_m2,
         convection_heat_gain_rate_per_area_w_per_m2: convection_gain_per_area_w_per_m2,
-        convection_coefficient_w_per_m2_k,
+        convection_coefficient_w_per_m2_k: convection_terms.coefficient_w_per_m2_k,
         net_thermal_radiation_heat_gain_rate_w: net_radiation_gain_per_area_w_per_m2
             * surface_state.area_m2,
         net_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
@@ -4252,6 +4270,143 @@ fn surface_exterior_report_terms(
         solar_radiation_heat_gain_rate_w: solar_gain_per_area_w_per_m2 * surface_state.area_m2,
         solar_radiation_heat_gain_rate_per_area_w_per_m2: solar_gain_per_area_w_per_m2,
     }
+}
+
+fn energyplus_exterior_convection_terms(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: &Surface,
+    record: &EpwRecord,
+    surface_temperature_c: f64,
+    outdoor_dry_bulb_c: f64,
+    tilt_rad: f64,
+    use_doe2_outside_convection: bool,
+    wet_timestep_fraction: f64,
+) -> ExteriorConvectionTerms {
+    let dry_coefficient_w_per_m2_k = energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
+        surface_state,
+        typed_surface,
+        record,
+        surface_temperature_c,
+        outdoor_dry_bulb_c,
+        tilt_rad,
+        use_doe2_outside_convection,
+    );
+    let wet_timestep_fraction = wet_timestep_fraction.clamp(0.0, 1.0);
+    if wet_timestep_fraction <= f64::EPSILON {
+        return ExteriorConvectionTerms {
+            coefficient_w_per_m2_k: dry_coefficient_w_per_m2_k,
+            reference_temperature_c: outdoor_dry_bulb_c,
+        };
+    }
+
+    let wet_reference_temperature_c =
+        approximate_outdoor_wet_bulb_c(record).unwrap_or(outdoor_dry_bulb_c);
+    let coefficient_w_per_m2_k = wet_timestep_fraction
+        * ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
+        + (1.0 - wet_timestep_fraction) * dry_coefficient_w_per_m2_k;
+    let reference_temperature_c = if coefficient_w_per_m2_k.abs() <= f64::EPSILON {
+        outdoor_dry_bulb_c
+    } else {
+        (wet_timestep_fraction
+            * ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
+            * wet_reference_temperature_c
+            + (1.0 - wet_timestep_fraction) * dry_coefficient_w_per_m2_k * outdoor_dry_bulb_c)
+            / coefficient_w_per_m2_k
+    };
+
+    ExteriorConvectionTerms {
+        coefficient_w_per_m2_k,
+        reference_temperature_c,
+    }
+}
+
+fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: &Surface,
+    record: &EpwRecord,
+    surface_temperature_c: f64,
+    outdoor_dry_bulb_c: f64,
+    tilt_rad: f64,
+    use_doe2_outside_convection: bool,
+) -> f64 {
+    if use_doe2_outside_convection {
+        energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            surface_temperature_c,
+            outdoor_dry_bulb_c,
+            tilt_rad.cos(),
+            surface_azimuth_deg(&typed_surface.vertices),
+            record.wind_direction_deg,
+            record.wind_speed_m_per_s,
+            surface_state.outside_layer_roughness,
+        )
+    } else {
+        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
+    }
+}
+
+fn energyplus_exterior_wet_timestep_fraction(
+    records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    typed_surface: &Surface,
+) -> f64 {
+    if typed_surface.wind_exposure != WindExposure::WindExposed {
+        return 0.0;
+    }
+
+    let steps = zone_steps_per_hour.max(1);
+    let wet_steps = (1..=steps)
+        .filter(|timestep| {
+            energyplus_weather_record_is_rain_at_timestep(records, record_index, *timestep, steps)
+        })
+        .count();
+    wet_steps as f64 / f64::from(steps)
+}
+
+fn energyplus_weather_record_is_rain_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    timestep: u32,
+    zone_steps_per_hour: u32,
+) -> bool {
+    let Some(record) = records.get(record_index) else {
+        return false;
+    };
+    let previous = previous_weather_record(records, record_index);
+    let steps = zone_steps_per_hour.max(1);
+    let interpolation_weight = if steps == 1 {
+        1.0
+    } else {
+        (f64::from(timestep) / f64::from(steps)).min(1.0)
+    };
+    let interpolated_precipitation_depth_mm = previous.liquid_precipitation_depth_mm
+        * (1.0 - interpolation_weight)
+        + record.liquid_precipitation_depth_mm * interpolation_weight;
+
+    interpolated_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM
+}
+
+fn approximate_outdoor_wet_bulb_c(record: &EpwRecord) -> Option<f64> {
+    let dry_bulb_c = record.dry_bulb_c;
+    let relative_humidity_percent = record.relative_humidity_percent.clamp(0.0, 100.0);
+    if !dry_bulb_c.is_finite() || !relative_humidity_percent.is_finite() {
+        return None;
+    }
+
+    let wet_bulb_c = dry_bulb_c
+        * (0.151_977 * (relative_humidity_percent + 8.313_659).sqrt()).atan()
+        + (dry_bulb_c + relative_humidity_percent).atan()
+        - (relative_humidity_percent - 1.676_331).atan()
+        + 0.003_918_38
+            * relative_humidity_percent.powf(1.5)
+            * (0.023_101 * relative_humidity_percent).atan()
+        - 4.686_035;
+    if !wet_bulb_c.is_finite() {
+        return None;
+    }
+
+    let lower_bound_c = record.dew_point_c.min(dry_bulb_c);
+    Some(wet_bulb_c.clamp(lower_bound_c, dry_bulb_c))
 }
 
 fn heat_balance_uses_doe2_outside_convection(
@@ -4936,12 +5091,14 @@ fn exterior_surface_energy_balance_temperature_c(
     incident_solar_w_per_m2: f64,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
     use_doe2_outside_convection: bool,
+    wet_timestep_fraction: f64,
 ) -> f64 {
-    if quick_outside_conduction.is_none()
-        && (record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
-            || incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2)
-    {
-        return outdoor_dry_bulb_c;
+    if quick_outside_conduction.is_none() {
+        if wet_timestep_fraction <= f64::EPSILON
+            && incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2
+        {
+            return outdoor_dry_bulb_c;
+        }
     }
 
     let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
@@ -4952,19 +5109,16 @@ fn exterior_surface_energy_balance_temperature_c(
         || quick_outside_conduction
             .map(|context| context.use_doe2_outside_convection)
             .unwrap_or(false);
-    let convection_coefficient = if use_doe2_outside_convection {
-        energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
-            surface_state.outside_face_temperature_c,
-            outdoor_dry_bulb_c,
-            tilt_rad.cos(),
-            surface_azimuth_deg(&typed_surface.vertices),
-            record.wind_direction_deg,
-            record.wind_speed_m_per_s,
-            surface_state.outside_layer_roughness,
-        )
-    } else {
-        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
-    };
+    let convection_terms = energyplus_exterior_convection_terms(
+        surface_state,
+        typed_surface,
+        record,
+        surface_state.outside_face_temperature_c,
+        outdoor_dry_bulb_c,
+        tilt_rad,
+        use_doe2_outside_convection,
+        wet_timestep_fraction,
+    );
     let longwave_coefficient = EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
     let sky_temperature_c = horizontal_infrared_sky_temperature_c(
         record.horizontal_infrared_radiation_wh_per_m2,
@@ -4977,9 +5131,9 @@ fn exterior_surface_energy_balance_temperature_c(
         + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
 
     let environmental = CtfOutsideFaceBalanceInput {
-        outdoor_air_temperature_c: outdoor_dry_bulb_c,
+        outdoor_air_temperature_c: convection_terms.reference_temperature_c,
         radiant_temperature_c: longwave_radiant_temperature_c,
-        outside_convection_coefficient_w_per_m2_k: convection_coefficient,
+        outside_convection_coefficient_w_per_m2_k: convection_terms.coefficient_w_per_m2_k,
         outside_radiation_coefficient_w_per_m2_k: longwave_coefficient,
         absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
     };
@@ -6526,18 +6680,18 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
-        CtfOutsideQuickConductionBalanceInput, Date, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
-        HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
-        HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
-        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
-        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
-        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
-        advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
-        append_surface_incident_solar_radiation_series, build_execution_plan,
-        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        CtfOutsideQuickConductionBalanceInput, Date, ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
+        ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord, ExecutionStep, FirstZoneSimulationOptions,
+        HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceStepInput,
+        HeatBalanceWarmupOptions, HeatBalanceWarmupSummary, HeatBalanceWeatherContext,
+        HeatBalanceZoneAirAlgorithm, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
+        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
+        PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
+        RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
+        SimulationState, advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
+        append_surface_incident_solar_radiation_series, approximate_outdoor_wet_bulb_c,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
@@ -6545,9 +6699,11 @@ mod tests {
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
-        energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
+        energyplus_exterior_wet_timestep_fraction, energyplus_scriptf_from_view_factors,
+        energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
+        energyplus_weather_record_is_rain_at_timestep,
         energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
         initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
         next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
@@ -6559,10 +6715,10 @@ mod tests {
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
-        surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
-        surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
-        surface_outside_conduction_rate_w, update_surface_ctf_history_constants,
-        update_surface_inside_longwave_exchange_probe,
+        surface_exterior_report_terms, surface_geometry_summaries,
+        surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
+        surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
+        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
         zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
@@ -8800,6 +8956,91 @@ DATA PERIODS
     }
 
     #[test]
+    fn energyplus_weather_record_is_rain_uses_hourly_threshold() {
+        let mut record = weather_record_with_precipitation(0.799);
+        assert!(!energyplus_weather_record_is_rain_at_timestep(
+            &[record],
+            0,
+            1,
+            1
+        ));
+
+        record.liquid_precipitation_depth_mm = 0.8;
+        assert!(energyplus_weather_record_is_rain_at_timestep(
+            &[record],
+            0,
+            1,
+            1
+        ));
+    }
+
+    #[test]
+    fn energyplus_wet_timestep_fraction_uses_weather_interpolation() {
+        let typed = cube_model();
+        let typed_surface = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .expect("roof test surface");
+        let records = [
+            weather_record_with_precipitation(21.0),
+            weather_record_with_precipitation(0.0),
+        ];
+
+        assert_eq!(
+            energyplus_exterior_wet_timestep_fraction(&records, 1, 4, typed_surface),
+            0.75
+        );
+    }
+
+    #[test]
+    fn exterior_report_terms_use_energyplus_wet_surface_rain_override()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface_state = state
+            .surfaces
+            .iter_mut()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing roof test surface"))?;
+        surface_state.outside_face_temperature_c = 10.0;
+
+        let records = [weather_record_with_precipitation(1.0)];
+        let reference_temperature_c = approximate_outdoor_wet_bulb_c(&records[0]).unwrap_or(8.0);
+
+        let terms = surface_exterior_report_terms(
+            &typed,
+            surface_state,
+            8.0,
+            10.0,
+            Some(HeatBalanceWeatherContext {
+                records: &records,
+                record_index: 0,
+                zone_steps_per_hour: 4,
+            }),
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+        );
+
+        assert_eq!(
+            terms.convection_coefficient_w_per_m2_k,
+            ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
+        );
+        assert!(
+            reference_temperature_c < 8.0,
+            "rain path should use wet-bulb reference below dry-bulb"
+        );
+        assert!(
+            (terms.convection_heat_gain_rate_per_area_w_per_m2
+                - -ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K * (10.0 - reference_temperature_c))
+                .abs()
+                < 1.0e-9
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn heat_balance_warmup_minimum_override_preserves_disabled_boundary() {
         let disabled = HeatBalanceSimulationOptions::hourly_samples(3).with_warmup_minimum_days(20);
         assert!(!disabled.warmup.enabled);
@@ -9647,6 +9888,27 @@ DATA PERIODS
                 ],
             ),
         ]
+    }
+
+    fn weather_record_with_precipitation(liquid_precipitation_depth_mm: f64) -> EpwRecord {
+        EpwRecord {
+            year: 2013,
+            month: 9,
+            day: 18,
+            hour: 19,
+            minute: 60,
+            dry_bulb_c: 8.0,
+            dew_point_c: 7.0,
+            relative_humidity_percent: 93.0,
+            atmospheric_pressure_pa: 81_800.0,
+            horizontal_infrared_radiation_wh_per_m2: 330.0,
+            global_horizontal_radiation_wh_per_m2: 0.0,
+            direct_normal_radiation_wh_per_m2: 0.0,
+            diffuse_horizontal_radiation_wh_per_m2: 0.0,
+            wind_direction_deg: 0.0,
+            wind_speed_m_per_s: 0.0,
+            liquid_precipitation_depth_mm,
+        }
     }
 
     fn surface(id: u32, name: &str, surface_type: SurfaceType, vertices: [Point3; 4]) -> Surface {

@@ -130,6 +130,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `SurfaceConvectionAlgorithm:Outside` objects in the typed model and uses the
   DOE-2 helper in the default exterior coefficient path when that setting is
   `DOE-2`; full exterior radiation and iteration parity remain diagnostic work.
+- `WeatherManager.cc` sets timestep rain from interpolated liquid
+  precipitation using `IsRainThreshold = 0.8 / TimeStepsInHour`, while
+  `HeatBalanceSurfaceManager.cc::CalcHeatBalanceOutsideSurf` resets exposed wet
+  exterior surfaces to `SurfHConvExt = 1000.0` and uses
+  `SurfOutWetBulbTemp` as the convection reference. Rust now approximates this
+  exposed wet-surface branch for the diagnostic exterior balance and hourly
+  exterior report rows by applying the EnergyPlus hourly interpolation weights
+  to liquid precipitation, mixing the dry and wet convection terms, and using a
+  bounded outdoor wet-bulb approximation until the full Psychrometrics wet-bulb
+  routine is ported.
 - `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
   builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
   `SumHATref`, internal gains, air-exchange terms, and third-order history

@@ -47,20 +47,25 @@ or advance EnergyPlus CTF coefficient histories for mass-material constructions.
 The diagnostic timestep path now feeds the existing roof/wall exterior
 weather/solar balance into the CTF boundary driver, which improves wall, roof,
 and MAT series while exposing that the zone opaque aggregate still depends on
-unported floor mass CTF and full surface iteration parity. Inside-surface
-radiant/source terms now have explicit runtime slots matching EnergyPlus
-`SurfTempTerm` inputs, and the OtherEquipment radiant fraction is distributed to
-inside surfaces with EnergyPlus inside-layer area-absorptance normalization;
-outside-layer absorptance remains the exterior solar/longwave input. Shortwave,
-additional source, HVAC radiant, and full radiation coupling remain future
-wiring rather than promoted parity. A source-anchored ScriptF interior-longwave
-probe matches the `1ZoneUncontrolled` EIO factor orientation, but remains
-diagnostic-only because exact longwave feedback without the rest of the
-EnergyPlus surface/zone coupling regresses the active storage and aggregate
-rows. A diagnostic surface-iter3 lane can repeat the inside/outside face balance
-within one zone timestep while advancing CTF histories only once, so iteration
-sensitivity can be measured before changing the default path. The compiler now
-preserves explicit `SurfaceConvectionAlgorithm:Outside,DOE-2`, and the
-heat-balance shell uses that setting for the default exterior coefficient path;
-the DOE-2 probe lanes remain useful for isolating coefficient changes from the
-quick-conduction outside-face branch.
+unported floor mass CTF and full surface iteration parity. Exposed wet exterior
+surfaces now follow the EnergyPlus rain branch in diagnostic form: liquid
+precipitation uses the hourly interpolation threshold from `WeatherManager.cc`,
+wet timesteps mix `SurfHConvExt = 1000.0` into the hourly report coefficient,
+and the exterior convection reference temperature uses a bounded outdoor
+wet-bulb approximation. Inside-surface radiant/source terms now have explicit
+runtime slots matching EnergyPlus `SurfTempTerm` inputs, and the OtherEquipment
+radiant fraction is distributed to inside surfaces with EnergyPlus inside-layer
+area-absorptance normalization; outside-layer absorptance remains the exterior
+solar/longwave input. Shortwave, additional source, HVAC radiant, and full
+radiation coupling remain future wiring rather than promoted parity. A
+source-anchored ScriptF interior-longwave probe matches the
+`1ZoneUncontrolled` EIO factor orientation, but remains diagnostic-only because
+exact longwave feedback without the rest of the EnergyPlus surface/zone coupling
+regresses the active storage and aggregate rows. A diagnostic surface-iter3 lane
+can repeat the inside/outside face balance within one zone timestep while
+advancing CTF histories only once, so iteration sensitivity can be measured
+before changing the default path. The compiler now preserves explicit
+`SurfaceConvectionAlgorithm:Outside,DOE-2`, and the heat-balance shell uses that
+setting for the default exterior coefficient path; the DOE-2 probe lanes remain
+useful for isolating coefficient changes from the quick-conduction outside-face
+branch.
