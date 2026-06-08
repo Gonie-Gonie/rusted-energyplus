@@ -737,6 +737,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe,
     /// Experimental previous-inside coupled path using EnergyPlus quick-conduction outside face solves.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
+    /// Experimental quick-outside path that interleaves zone-air correction between surface passes.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe,
     /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe,
     /// Experimental quick-outside path with a grey interior longwave exchange probe.
@@ -2522,6 +2524,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -2542,11 +2545,16 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
+    let interleave_zone_air_surface_passes = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
+    );
     let use_previous_inside_for_outdoor_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -2561,6 +2569,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     let use_quick_outside_conduction = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -2651,6 +2660,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe => {
                 previous_temperature_c
             }
@@ -2714,44 +2726,12 @@ fn advance_heat_balance_state_one_timestep_internal(
     }
     update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
 
-    let current_zone_temperatures = state
-        .zones
-        .iter()
-        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-        .collect::<BTreeMap<_, _>>();
-
-    run_surface_balance_passes(
-        model,
-        &mut state.surfaces,
-        Some(&previous_surface_inside_temperatures),
-        &current_zone_temperatures,
-        input,
-        weather_context,
-        surface_iteration_count,
-        use_previous_inside_for_outdoor_boundary,
-        use_previous_inside_for_adiabatic_boundary,
-        use_quick_outside_conduction,
-        use_doe2_outside_convection,
-        interior_longwave_exchange_probe,
-    );
-
-    if rebalance_surfaces_after_zone_air_correction {
-        correct_zone_air_temperatures_from_current_surfaces(
-            &state.surfaces,
-            &mut state.zones,
-            input.timestep_seconds,
-            true,
-        );
-        let corrected_zone_temperatures = state
-            .zones
-            .iter()
-            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-            .collect::<BTreeMap<_, _>>();
-        run_surface_balance_passes(
+    if interleave_zone_air_surface_passes {
+        run_interleaved_surface_zone_balance(
             model,
             &mut state.surfaces,
-            None,
-            &corrected_zone_temperatures,
+            &mut state.zones,
+            Some(&previous_surface_inside_temperatures),
             input,
             weather_context,
             surface_iteration_count,
@@ -2761,6 +2741,54 @@ fn advance_heat_balance_state_one_timestep_internal(
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
         );
+    } else {
+        let current_zone_temperatures = state
+            .zones
+            .iter()
+            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+            .collect::<BTreeMap<_, _>>();
+        run_surface_balance_passes(
+            model,
+            &mut state.surfaces,
+            Some(&previous_surface_inside_temperatures),
+            &current_zone_temperatures,
+            input,
+            weather_context,
+            surface_iteration_count,
+            use_previous_inside_for_outdoor_boundary,
+            use_previous_inside_for_adiabatic_boundary,
+            use_quick_outside_conduction,
+            use_doe2_outside_convection,
+            interior_longwave_exchange_probe,
+        );
+
+        if rebalance_surfaces_after_zone_air_correction {
+            correct_zone_air_temperatures_from_current_surfaces(
+                &state.surfaces,
+                &mut state.zones,
+                input.timestep_seconds,
+                true,
+            );
+            let corrected_zone_temperatures = state
+                .zones
+                .iter()
+                .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+                .collect::<BTreeMap<_, _>>();
+            run_surface_balance_passes(
+                model,
+                &mut state.surfaces,
+                None,
+                &corrected_zone_temperatures,
+                input,
+                weather_context,
+                surface_iteration_count,
+                use_previous_inside_for_outdoor_boundary,
+                use_previous_inside_for_adiabatic_boundary,
+                use_quick_outside_conduction,
+                use_doe2_outside_convection,
+                interior_longwave_exchange_probe,
+            );
+        }
     }
 
     for surface in &mut state.surfaces {
@@ -2771,10 +2799,57 @@ fn advance_heat_balance_state_one_timestep_internal(
         &state.surfaces,
         &mut state.zones,
         input.timestep_seconds,
-        correct_zone_air_after_surface_pass,
+        correct_zone_air_after_surface_pass && !interleave_zone_air_surface_passes,
     );
 
     state.timestep_index += 1;
+}
+
+fn run_interleaved_surface_zone_balance(
+    model: &TypedModel,
+    surfaces: &mut [SurfaceHeatBalanceState],
+    zones: &mut [ZoneHeatBalanceState],
+    first_pass_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    surface_iteration_count: u32,
+    use_previous_inside_for_outdoor_boundary: bool,
+    use_previous_inside_for_adiabatic_boundary: bool,
+    use_quick_outside_conduction: bool,
+    use_doe2_outside_convection: bool,
+    interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
+) {
+    for surface_iteration_index in 0..surface_iteration_count.max(1) {
+        let zone_temperatures = zones
+            .iter()
+            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+            .collect::<BTreeMap<_, _>>();
+        let first_pass_temperatures = if surface_iteration_index == 0 {
+            first_pass_inside_temperatures
+        } else {
+            None
+        };
+        run_surface_balance_passes(
+            model,
+            surfaces,
+            first_pass_temperatures,
+            &zone_temperatures,
+            input,
+            weather_context,
+            1,
+            use_previous_inside_for_outdoor_boundary,
+            use_previous_inside_for_adiabatic_boundary,
+            use_quick_outside_conduction,
+            use_doe2_outside_convection,
+            interior_longwave_exchange_probe,
+        );
+        correct_zone_air_temperatures_from_current_surfaces(
+            surfaces,
+            zones,
+            input.timestep_seconds,
+            true,
+        );
+    }
 }
 
 fn run_surface_balance_passes(
@@ -2965,6 +3040,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -4292,6 +4368,7 @@ fn reported_surface_outside_face_temperature_c(
     if matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -9412,6 +9489,14 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
         );
         assert_eq!(
             options

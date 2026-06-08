@@ -278,7 +278,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   surface-iteration sensitivity further: floor heat storage falls to
   `618.692718` RMSE and floor outside conduction to `136.513781`, while MAT
   (`2.125244`) and air storage (`203.462113`) continue to regress, so this lane
-  is tracked as a convergence/ordering diagnostic rather than a default.
+  is tracked as a convergence/ordering diagnostic rather than a default. An
+  eight-pass interleaved surface/zone-air correction fork then lowers floor
+  heat storage further to `607.029837`, floor inside conduction to
+  `515.487716`, floor outside conduction to `134.641347`, and zone outside
+  aggregate conduction to `573.076953`, while MAT remains slightly worse
+  (`2.128169`). This confirms the next source-order target is the coupled
+  inside-surface/zone-air correction loop, not only the number of surface
+  passes.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
