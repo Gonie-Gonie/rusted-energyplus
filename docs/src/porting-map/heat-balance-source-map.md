@@ -424,9 +424,12 @@ Current Rust boundary:
   sky/air/ground exterior longwave coefficients in the diagnostic outside
   balance/report path, with timestep-interpolated weather/solar/horizontal-IR
   context, EnergyPlus Perez anisotropic sky diffuse for exterior incident
-  solar, and hourly-averaged surface diagnostics. Full inside iteration order,
-  zone predictor/corrector equations, detailed shadowing/reflection, and
-  coupled radiation coefficient update order are not yet wired.
+  solar, and hourly-averaged surface diagnostics. Ground boundary surfaces use
+  the EnergyPlus default `Site:GroundTemperature:BuildingSurface` value of
+  `18.0 C` until explicit `Site:GroundTemperature:*` parsing/model selection
+  is ported. Full inside iteration order, zone predictor/corrector equations,
+  detailed shadowing/reflection, and coupled radiation coefficient update order
+  are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

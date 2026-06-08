@@ -17,6 +17,7 @@ const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
+const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
@@ -4380,9 +4381,12 @@ fn surface_boundary_temperature_c(
             .outside_boundary_target_zone_id
             .and_then(|target_zone_id| previous_zone_temperatures.get(&target_zone_id).copied())
             .unwrap_or(owning_zone_temperature_c),
-        OutsideBoundaryCondition::Foundation
-        | OutsideBoundaryCondition::Ground
-        | OutsideBoundaryCondition::Other => surface.outside_face_temperature_c,
+        OutsideBoundaryCondition::Ground => {
+            ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C
+        }
+        OutsideBoundaryCondition::Foundation | OutsideBoundaryCondition::Other => {
+            surface.outside_face_temperature_c
+        }
     }
 }
 
@@ -7883,19 +7887,21 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
-        CtfOutsideQuickConductionBalanceInput, Date, ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
-        ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord, ExecutionStep, FirstZoneSimulationOptions,
-        HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceStepInput,
-        HeatBalanceWarmupOptions, HeatBalanceWarmupSummary, HeatBalanceWeatherContext,
-        HeatBalanceZoneAirAlgorithm, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
-        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
-        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
-        PlantEquipmentRole, PlantStateProjectionOptions, QuickOutsideConductionContext,
-        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
-        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState, SurfaceExteriorReportTerms,
-        advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
-        advance_surface_ctf_histories, append_surface_incident_solar_radiation_series,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        CtfOutsideQuickConductionBalanceInput, Date,
+        ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
+        ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
+        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
+        HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
+        HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
+        KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
+        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
+        QuickOutsideConductionContext, ResultStore, RuntimeError, RuntimeOutputRegistry,
+        SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        SurfaceExteriorReportTerms, advance_heat_balance_state_one_timestep,
+        advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
+        append_surface_incident_solar_radiation_series, build_execution_plan,
+        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
@@ -7932,7 +7938,7 @@ mod tests {
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
         surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
-        surface_tilt_deg, update_surface_ctf_history_constants,
+        surface_steady_u_value_w_per_m2_k, surface_tilt_deg, update_surface_ctf_history_constants,
         update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
@@ -9434,6 +9440,54 @@ DATA PERIODS
         assert_eq!(
             surface.ctf.inside_temperature_history_c,
             vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
+        );
+        assert!((surface.ctf.outside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
+        assert!((surface.ctf.inside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn ground_ctf_history_seeding_uses_energyplus_building_surface_default()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state_with_ctf_coefficients(
+            &model,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 2.0,
+                    cross_w_per_m2_k: 0.5,
+                    inside_w_per_m2_k: 3.0,
+                    flux: None,
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: 0.4,
+                    cross_w_per_m2_k: 0.1,
+                    inside_w_per_m2_k: 0.3,
+                    flux: Some(0.5),
+                },
+            ],
+        )?;
+        state.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
+
+        seed_initial_surface_ctf_boundary_histories(&mut state, 5.0);
+
+        let surface = &state.surfaces[0];
+        let expected_flux = surface_steady_u_value_w_per_m2_k(surface)
+            * (ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C
+                - ENERGYPLUS_ZONE_INITIAL_TEMP_C);
+        assert_eq!(
+            surface.outside_face_temperature_c,
+            ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C
+        );
+        assert_eq!(
+            surface.ctf.outside_temperature_history_c,
+            vec![ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C]
         );
         assert!((surface.ctf.outside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
         assert!((surface.ctf.inside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
