@@ -317,6 +317,59 @@ def annotate_reference_focus_movements(lanes: list[dict[str, Any]]) -> None:
         lane["focus_movement_rollup"] = rollup
 
 
+def best_focus_metric_rows(lanes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    default_metrics = {
+        metric_identity(metric): metric
+        for lane in lanes
+        if lane.get("lane") == "default"
+        for metric in lane.get("focus_metrics", [])
+        if isinstance(metric, dict)
+    }
+    rows = []
+    for metric in FOCUS_METRICS:
+        identity = (metric.key, metric.variable)
+        candidates = []
+        for lane in lanes:
+            for focus_metric in lane.get("focus_metrics", []):
+                if not isinstance(focus_metric, dict):
+                    continue
+                if metric_identity(focus_metric) != identity:
+                    continue
+                rmse = numeric(focus_metric.get("rmse_delta_c"))
+                if rmse is not None:
+                    candidates.append((rmse, lane, focus_metric))
+        if not candidates:
+            rows.append(
+                {
+                    "key": metric.key,
+                    "variable": metric.variable,
+                    "label": f"{metric.key} / {metric.variable}",
+                    "best_lane": None,
+                    "best_rmse_delta_c": None,
+                    "default_rmse_delta_c": None,
+                    "rmse_vs_default": None,
+                }
+            )
+            continue
+
+        best_rmse, best_lane, best_metric = min(candidates, key=lambda item: item[0])
+        default_rmse = numeric(default_metrics.get(identity, {}).get("rmse_delta_c"))
+        rows.append(
+            {
+                "key": metric.key,
+                "variable": metric.variable,
+                "label": best_metric.get("label", f"{metric.key} / {metric.variable}"),
+                "best_lane": best_lane.get("lane"),
+                "best_rmse_delta_c": best_rmse,
+                "default_rmse_delta_c": default_rmse,
+                "rmse_vs_default": (
+                    best_rmse - default_rmse if default_rmse is not None else None
+                ),
+            }
+        )
+    return rows
+
+
 def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
     summary_path = repo_root / lane.summary_path
     if not summary_path.exists():
@@ -348,11 +401,12 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_focus_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v3",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v4",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "lane_count": len(lanes),
         "lanes": lanes,
+        "best_focus_metrics": best_focus_metric_rows(lanes),
     }
 
 
@@ -429,6 +483,27 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 largest_regression=fmt_movement(
                     rollup.get("largest_rmse_regression")
                 ),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Best Focus Metrics",
+            "",
+            "| output | best lane | best RMSE | RMSE vs default | default RMSE |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    for metric in summary.get("best_focus_metrics", []):
+        if not isinstance(metric, dict):
+            continue
+        lines.append(
+            "| {output} | {lane} | {best_rmse} | {vs_default} | {default_rmse} |".format(
+                output=metric.get("label", "none"),
+                lane=metric.get("best_lane") or "none",
+                best_rmse=fmt_number(metric.get("best_rmse_delta_c")),
+                vs_default=fmt_signed_number(metric.get("rmse_vs_default")),
+                default_rmse=fmt_number(metric.get("default_rmse_delta_c")),
             )
         )
     lines.extend(

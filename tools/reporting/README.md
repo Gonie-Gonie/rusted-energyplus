@@ -34,8 +34,10 @@ Current generators:
   destabilize the whole zone balance are visible in one scan. The probe
   interpretation table compares each lane against its nearest reference lane,
   so all-CTF warmup and surface-iteration probes can be reviewed separately
-  from the larger default-to-all-CTF seed movement. Probe lanes include all-CTF
-  seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
+  from the larger default-to-all-CTF seed movement. The best-focus table picks
+  the lowest-RMSE lane per tracked metric so structural optimizations can be
+  aimed at the probe that actually improves that state. Probe lanes include
+  all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
   surface-iteration probe, EnergyPlus analytical, analytical surface-first, and
   third-order zone-air updates, and an oracle-day-count warmup minimum. It is
   development evidence only and does not create a release conformance artifact.
