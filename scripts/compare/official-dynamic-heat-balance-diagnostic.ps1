@@ -189,21 +189,19 @@ $topBottleneck = @($summary.bottlenecks)[0]
 if ($null -eq $topBottleneck) {
     throw "Expected at least one bottleneck row in heat-balance diagnostic summary"
 }
-if ($CtfSeedPolicy -eq "steady-no-mass-only") {
-    if (
-        $topBottleneck.output.key -ne "ZN001:FLR001" -or
-        $topBottleneck.output.variable -ne "Surface Inside Face Conduction Heat Transfer Rate"
-    ) {
-        throw "Expected steady/no-mass top bottleneck to be floor inside conduction, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
-    }
+$expectedTopKey = "ZN001:FLR001"
+$expectedTopVariable = "Surface Inside Face Conduction Heat Transfer Rate"
+$expectedTopDescription = "floor inside conduction"
+if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or $CtfSeedPolicy -eq "all-eio") {
+    $expectedTopKey = "ZONE ONE"
+    $expectedTopVariable = "Zone Opaque Surface Inside Faces Conduction Rate"
+    $expectedTopDescription = "zone aggregate conduction"
 }
-else {
-    if (
-        $topBottleneck.output.key -ne "ZONE ONE" -or
-        $topBottleneck.output.variable -ne "Zone Opaque Surface Inside Faces Conduction Rate"
-    ) {
-        throw "Expected all-eio top bottleneck to be zone aggregate conduction, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
-    }
+if (
+    $topBottleneck.output.key -ne $expectedTopKey -or
+    $topBottleneck.output.variable -ne $expectedTopVariable
+) {
+    throw "Expected top bottleneck to be $expectedTopDescription, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Mean Air Temperature series"

@@ -210,6 +210,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows enabled as a non-claim probe."
     }
+    "official-dynamic-heat-balance-third-order-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with the EnergyPlus third-order zone-air probe enabled."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"
