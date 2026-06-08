@@ -73,6 +73,37 @@ function Assert-FileExists {
     Write-Host "OK $Description`: $Path"
 }
 
+function Get-SeriesDiagnostic {
+    param(
+        [Parameter(Mandatory = $true)][object]$Summary,
+        [Parameter(Mandatory = $true)][string]$Key,
+        [Parameter(Mandatory = $true)][string]$Variable
+    )
+
+    return @($Summary.series | Where-Object {
+            $_.output.key -eq $Key -and $_.output.variable -eq $Variable
+        })[0]
+}
+
+function Assert-SeriesRmseBelow {
+    param(
+        [Parameter(Mandatory = $true)][object]$Summary,
+        [Parameter(Mandatory = $true)][string]$Key,
+        [Parameter(Mandatory = $true)][string]$Variable,
+        [Parameter(Mandatory = $true)][double]$MaxRmse,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $series = Get-SeriesDiagnostic -Summary $Summary -Key $Key -Variable $Variable
+    if ($null -eq $series) {
+        throw "Missing series for ${Description}: ${Key} / ${Variable}"
+    }
+    if ([double]$series.rmse_delta_c -gt $MaxRmse) {
+        throw "Expected ${Description} RMSE <= $MaxRmse, got $($series.rmse_delta_c)"
+    }
+    Write-Host "OK ${Description} RMSE: $($series.rmse_delta_c)"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -234,6 +265,14 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Air Energy Storage Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Air Heat Balance Air Energy Storage Rate series"
+}
+if ($CtfSeedPolicy -eq "steady-no-mass-only" -and $ZoneAirAlgorithm -eq "simplified-analytical") {
+    Assert-SeriesRmseBelow `
+        -Summary $summary `
+        -Key "ZONE ONE" `
+        -Variable "Zone Air Heat Balance Air Energy Storage Rate" `
+        -MaxRmse 100.0 `
+        -Description "analytical zone air heat-balance storage"
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:WALL001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted wall decomposition conduction series"
