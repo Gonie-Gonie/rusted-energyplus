@@ -298,10 +298,18 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   conduction, and `115.570807` outside conduction) and lowers MAT to
   `2.147988` with air storage at `172.470431`; roof outside convection and net
   thermal radiation stay near `214.357183` and `178.357290`, so the top
-  bottleneck is again floor heat storage. This confirms the next source-order
-  target is the coupled inside-surface/zone-air correction loop and floor CTF
-  source/history ordering, not only exterior radiation/coefficient alignment or
-  the number of surface passes.
+  bottleneck is again floor heat storage. Adding a grey interior-longwave
+  exchange update to the same twenty-pass interleaved fork moves the active
+  lane again: MAT falls to `0.484295`, surface-convection and air-storage RMSE
+  to `21.126984` and `27.010902`, floor inside conduction to `90.441963`,
+  floor heat storage to `369.424200`, and zone outside aggregate conduction to
+  `328.987074`. The trade-off is explicit: floor outside conduction regresses
+  to `399.588084` and becomes the top bottleneck, while roof outside
+  convection and net thermal radiation improve to `190.479825` and
+  `170.807621`. This confirms the next source-order target is the coupled
+  inside-surface/zone-air/interior-longwave correction loop and floor CTF
+  outside-face reporting/order, not only exterior radiation/coefficient
+  alignment or the number of surface passes.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
