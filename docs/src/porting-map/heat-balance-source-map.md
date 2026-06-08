@@ -318,7 +318,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   convection and net thermal radiation become the new top source rows at
   `189.364767` and `171.066926`, so the next source-order target is exterior
   radiation/convection source coupling after the adiabatic floor CTF reporting
-  order is no longer the top bottleneck.
+  order is no longer the top bottleneck. A follow-up exterior report-order
+  probe that recomputed roof convection/radiation coefficients from the prior
+  CTF outside-temperature history instead of the reported current outside
+  temperature was a strict no-op: roof outside convection stayed `189.364767`,
+  roof net thermal radiation stayed `171.066926`, and the active bottleneck
+  ordering did not move. Keep the next exterior investigation on the outside
+  face temperature balance inputs, local wind/HConv source state, and
+  radiation/source coupling rather than on the final report coefficient
+  sampling point alone.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
