@@ -46,10 +46,10 @@ they are not general compatibility claims.
 The active dynamic expansion target is tracked by
 `scripts\dev.cmd v0.26-dynamic-idf-inventory`. As of the current inventory,
 12 IDF-backed case manifests through v0.26 are in scope, 5 have dynamic
-conformance-gated evidence. The remaining 7 gaps are now target-role grouped:
-2 are static input fixtures, 1 is static-model-only official ExampleFile
-evidence, 3 are HVAC/node/plant system diagnostics, and 1 is the official
-ExampleFile heat-balance baseline blocked by the active dynamic 1Zone tracker.
+conformance-gated evidence, and 4 are active dynamic gaps after static fixtures
+and static-only evidence are separated out. There is 1 EnergyPlus ExampleFile
+dynamic candidate through v0.26, `1ZoneUncontrolled.idf`, and it is not gated
+yet; the blocking path remains the official dynamic 1Zone heat-balance tracker.
 
 Current static model conformance is limited to:
 

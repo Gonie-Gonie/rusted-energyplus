@@ -26,10 +26,10 @@ Current generators:
 - `v026_dynamic_idf_inventory.py` inventories IDF-backed case manifests through
   v0.26 and flags which ones currently have dynamic conformance-gated evidence
   versus static, baseline, smoke, or diagnostic-only gaps. It also assigns each
-  case a target domain and role so official ExampleFile heat-balance work stays
-  separated from HVAC, plant, and static intake gaps. It is a planning aid for
-  the v0.26-example dynamic-conformance expansion target, not a release claim
-  artifact.
+  case a target domain, role, source kind, and IDF path so official ExampleFile
+  heat-balance work stays separated from HVAC, plant, local fixtures, and
+  static intake gaps. It is a planning aid for the v0.26-example
+  dynamic-conformance expansion target, not a release claim artifact.
 - `dynamic_heat_balance_probe_summary.py` summarizes the official dynamic
   heat-balance diagnostic probe lanes from existing `.runtime` compare
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and

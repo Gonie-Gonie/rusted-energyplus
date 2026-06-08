@@ -12,6 +12,12 @@ from typing import Any
 CUTOFF_VERSION = (0, 26)
 CASE_ROOT = Path("data/conformance_cases")
 DYNAMIC_FREQUENCIES = {"detailed", "timestep", "hourly", "daily", "monthly", "runperiod"}
+EXAMPLEFILE_SOURCE_KIND = "energy-plus-examplefile"
+NON_ACTIVE_TARGET_ROLES = {
+    "already-gated",
+    "not-a-dynamic-physics-target",
+    "static-model-only",
+}
 
 
 CASE_TARGETS = {
@@ -260,6 +266,7 @@ def build_inventory(repo_root: Path) -> dict[str, Any]:
     status_counts: dict[str, int] = {}
     target_role_counts: dict[str, int] = {}
     target_domain_counts: dict[str, int] = {}
+    source_kind_counts: dict[str, int] = {}
     for row in rows:
         status_counts[row.status] = status_counts.get(row.status, 0) + 1
         target_role_counts[row.target_role] = (
@@ -268,9 +275,25 @@ def build_inventory(repo_root: Path) -> dict[str, Any]:
         target_domain_counts[row.target_domain] = (
             target_domain_counts.get(row.target_domain, 0) + 1
         )
+        source_kind = row.source_kind or "unspecified"
+        source_kind_counts[source_kind] = source_kind_counts.get(source_kind, 0) + 1
+
+    active_dynamic_gap_rows = [
+        row
+        for row in rows
+        if row.dynamic_output_count > 0
+        and row.status != "dynamic-conformance-gated"
+        and row.target_role not in NON_ACTIVE_TARGET_ROLES
+    ]
+    examplefile_rows = [
+        row for row in rows if row.source_kind == EXAMPLEFILE_SOURCE_KIND
+    ]
+    examplefile_dynamic_rows = [
+        row for row in examplefile_rows if row.dynamic_output_count > 0
+    ]
 
     return {
-        "schema": "rusted-energyplus.v026-dynamic-idf-inventory.v2",
+        "schema": "rusted-energyplus.v026-dynamic-idf-inventory.v3",
         "cutoff_version": f"v{CUTOFF_VERSION[0]}.{CUTOFF_VERSION[1]}",
         "case_count": len(rows),
         "dynamic_conformance_gated_count": status_counts.get(
@@ -278,9 +301,22 @@ def build_inventory(repo_root: Path) -> dict[str, Any]:
         ),
         "gap_count": len(rows)
         - status_counts.get("dynamic-conformance-gated", 0),
+        "active_dynamic_gap_count": len(active_dynamic_gap_rows),
+        "energyplus_examplefile_case_count": len(examplefile_rows),
+        "energyplus_examplefile_dynamic_candidate_count": len(
+            examplefile_dynamic_rows
+        ),
+        "energyplus_examplefile_dynamic_gated_count": len(
+            [
+                row
+                for row in examplefile_dynamic_rows
+                if row.status == "dynamic-conformance-gated"
+            ]
+        ),
         "status_counts": status_counts,
         "target_role_counts": target_role_counts,
         "target_domain_counts": target_domain_counts,
+        "source_kind_counts": source_kind_counts,
         "cases": [row.__dict__ for row in rows],
     }
 
@@ -293,6 +329,9 @@ def render_markdown(inventory: dict[str, Any]) -> str:
         f"case_count: {inventory['case_count']}",
         f"dynamic_conformance_gated_count: {inventory['dynamic_conformance_gated_count']}",
         f"gap_count: {inventory['gap_count']}",
+        f"active_dynamic_gap_count: {inventory['active_dynamic_gap_count']}",
+        f"energyplus_examplefile_dynamic_candidate_count: {inventory['energyplus_examplefile_dynamic_candidate_count']}",
+        f"energyplus_examplefile_dynamic_gated_count: {inventory['energyplus_examplefile_dynamic_gated_count']}",
         "",
         "## Target Roles",
         "",
@@ -304,17 +343,30 @@ def render_markdown(inventory: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
+            "## Source Kinds",
+            "",
+            "| source kind | count |",
+            "|---|---:|",
+        ]
+    )
+    for source_kind, count in sorted(inventory["source_kind_counts"].items()):
+        lines.append(f"| {source_kind} | {count} |")
+    lines.extend(
+        [
+            "",
             "## Cases",
             "",
-            "| case | milestone | domain | role | dynamic outputs | dynamic conformance | status | next action |",
-            "|---|---|---|---|---:|---:|---|---|",
+            "| case | milestone | source | IDF | domain | role | dynamic outputs | dynamic conformance | status | next action |",
+            "|---|---|---|---|---|---|---:|---:|---|---|",
         ]
     )
     for row in inventory["cases"]:
         lines.append(
-            "| {case_id} | {milestone} | {target_domain} | {target_role} | {dynamic_output_count} | {dynamic_conformance_output_count} | {status} | {next_action} |".format(
+            "| {case_id} | {milestone} | {source_kind} | {idf} | {target_domain} | {target_role} | {dynamic_output_count} | {dynamic_conformance_output_count} | {status} | {next_action} |".format(
                 case_id=row["case_id"],
                 milestone=row["milestone"],
+                source_kind=row["source_kind"] or "unspecified",
+                idf=row["idf"],
                 target_domain=row["target_domain"],
                 target_role=row["target_role"],
                 dynamic_output_count=row["dynamic_output_count"],

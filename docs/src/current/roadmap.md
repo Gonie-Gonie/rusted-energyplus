@@ -58,6 +58,10 @@ parity; broader v0.26-example dynamic promotion should wait until that tracker
 has a passing generated report and blocking gate. The planning inventory command
 `scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the IDF-backed case list and
 current dynamic gaps explicit while that runtime work proceeds.
+The inventory now reports active dynamic gaps separately from static fixtures
+and static-only evidence; through v0.26 there is 1 EnergyPlus ExampleFile
+dynamic candidate, `1ZoneUncontrolled.idf`, and it remains ungated until the
+official dynamic tracker passes.
 
 The long-term targets remain:
 
