@@ -47,7 +47,9 @@ lists skipped mass constructions such as `FLOOR (#CTFs=5)`. Developers can
 temporarily set `RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY=all-eio` to
 reproduce mass CTF over-amplification without changing the official diagnostic
 default or making a conformance claim. The default diagnostic keeps floor inside
-conduction as the top bottleneck, while the all-CTF probe moves the top
+conduction as the top bottleneck because the adiabatic mass-material floor is
+not seeded into the simplified CTF shell and therefore reports zero inside
+conduction in the Rust lane, while the all-CTF probe moves the top
 bottleneck to zone air heat-balance storage/convection and worsens the zone
 aggregate conduction row, confirming the current blocker is the mass CTF
 face/history coupling rather than EIO coefficient availability. Roof/wall exterior

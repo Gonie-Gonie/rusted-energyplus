@@ -123,6 +123,39 @@ def focus_metric_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def metric_identity(metric: dict[str, Any]) -> tuple[str, str]:
+    return (str(metric.get("key", "")), str(metric.get("variable", "")))
+
+
+def numeric(value: Any) -> float | None:
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
+
+
+def annotate_default_focus_deltas(lanes: list[dict[str, Any]]) -> None:
+    default_lane = next((lane for lane in lanes if lane.get("lane") == "default"), None)
+    if default_lane is None:
+        return
+
+    baselines: dict[tuple[str, str], float] = {}
+    for metric in default_lane.get("focus_metrics", []):
+        rmse = numeric(metric.get("rmse_delta_c"))
+        if rmse is not None:
+            baselines[metric_identity(metric)] = rmse
+
+    for lane in lanes:
+        for metric in lane.get("focus_metrics", []):
+            rmse = numeric(metric.get("rmse_delta_c"))
+            baseline = baselines.get(metric_identity(metric))
+            if lane.get("lane") == "default" or rmse is None or baseline is None:
+                metric["rmse_vs_default"] = None
+                metric["rmse_ratio_vs_default"] = None
+                continue
+            metric["rmse_vs_default"] = rmse - baseline
+            metric["rmse_ratio_vs_default"] = rmse / baseline if baseline != 0 else None
+
+
 def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
     summary_path = repo_root / lane.summary_path
     if not summary_path.exists():
@@ -150,8 +183,9 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
 
 def build_summary(repo_root: Path) -> dict[str, Any]:
     lanes = [row for lane in LANES if (row := lane_row(repo_root, lane)) is not None]
+    annotate_default_focus_deltas(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v1",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v2",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "lane_count": len(lanes),
@@ -193,17 +227,19 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "",
             "## Focus Metrics",
             "",
-            "| lane | output | RMSE | max abs | mean abs | status |",
-            "|---|---|---:|---:|---:|---|",
+            "| lane | output | RMSE | RMSE vs default | ratio | max abs | mean abs | status |",
+            "|---|---|---:|---:|---:|---:|---:|---|",
         ]
     )
     for lane in summary["lanes"]:
         for metric in lane.get("focus_metrics", []):
             lines.append(
-                "| {lane} | {output} | {rmse} | {max_abs} | {mean_abs} | {status} |".format(
+                "| {lane} | {output} | {rmse} | {vs_default} | {ratio} | {max_abs} | {mean_abs} | {status} |".format(
                     lane=lane["lane"],
                     output=metric["label"],
                     rmse=fmt_number(metric["rmse_delta_c"]),
+                    vs_default=fmt_number(metric.get("rmse_vs_default")),
+                    ratio=fmt_number(metric.get("rmse_ratio_vs_default")),
                     max_abs=fmt_number(metric["max_abs_delta_c"]),
                     mean_abs=fmt_number(metric["mean_abs_delta_c"]),
                     status=metric["status"],

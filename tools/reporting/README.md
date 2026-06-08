@@ -26,8 +26,10 @@ Current generators:
 - `dynamic_heat_balance_probe_summary.py` summarizes the official dynamic
   heat-balance diagnostic probe lanes from existing `.runtime` compare
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
-  aggregate conduction focus metrics across lanes. It is development evidence
-  only and does not create a release conformance artifact.
+  aggregate conduction focus metrics across lanes. The focus table also records
+  RMSE movement relative to the default lane so partial isolation improvements
+  that destabilize the whole zone balance are visible in one scan. It is
+  development evidence only and does not create a release conformance artifact.
 
 Conformance-facing scripts should keep this split:
 
