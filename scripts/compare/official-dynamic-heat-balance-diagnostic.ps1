@@ -261,8 +261,7 @@ $expectedTopVariable = "Surface Inside Face Conduction Heat Transfer Rate"
 $expectedTopDescription = "floor inside conduction"
 if (
     $ZoneAirAlgorithm -eq "energyplus-analytical-probe" -or
-    $ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or
-    $CtfSeedPolicy -eq "all-eio"
+    $ZoneAirAlgorithm -eq "energyplus-third-order-probe"
 ) {
     $expectedTopKey = "ZONE ONE"
     $expectedTopVariable = "Zone Air Heat Balance Surface Convection Rate"

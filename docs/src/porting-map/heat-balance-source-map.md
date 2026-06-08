@@ -173,7 +173,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   surface pass. It lowers MAT and inside-face temperature RMSE relative to the
   default lane, but still regresses zone-air heat-balance rates and aggregate
   conduction, so it remains diagnostic-only until the full inside-surface,
-  HVAC/air-correction, and history-update order is ported.
+  HVAC/air-correction, and history-update order is ported. The combined
+  all-CTF analytical surface-first probe lowers the same air and surface
+  focus metrics further while leaving floor inside conduction as the top
+  bottleneck, which keeps mass-floor CTF face/history parity as the next
+  source-mapped target.
 
 Current Rust boundary:
 

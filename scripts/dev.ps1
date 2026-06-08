@@ -220,6 +220,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with the EnergyPlus analytical surface-first zone-air probe enabled."
     }
+    "official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows and surface-first analytical zone-air correction."
+    }
     "official-dynamic-heat-balance-third-order-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-probe.ps1"
         Group = "compare"

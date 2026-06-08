@@ -74,6 +74,7 @@ claim:
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-surface-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-analytical-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-analytical-surface-first-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-probe-summary

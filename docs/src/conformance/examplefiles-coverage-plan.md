@@ -121,15 +121,16 @@ Current v0.33 official dynamic diagnostic evidence:
   heat-balance hourly Rust-vs-oracle deltas
 - Rust first-run-period-day warmup metadata and EnergyPlus EIO run-period
   warmup day counts in the compare summary/report
-- explicit all-CTF, analytical zone-air, analytical surface-first, and
-  third-order zone-air diagnostic probe lanes for structural bottleneck
-  isolation
+- explicit all-CTF, analytical zone-air, analytical surface-first, combined
+  all-CTF analytical surface-first, and third-order zone-air diagnostic probe
+  lanes for structural bottleneck isolation
 - remains `comparison_class=diagnostic-only` and `conformance_claim=false`
   until the dynamic heat-balance deltas pass under a blocking gate
 - `official-dynamic-heat-balance-diagnostic`
 - `official-dynamic-heat-balance-all-ctf-probe`
 - `official-dynamic-heat-balance-analytical-probe`
 - `official-dynamic-heat-balance-analytical-surface-first-probe`
+- `official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe`
 - `official-dynamic-heat-balance-third-order-probe`
 - `official-dynamic-heat-balance-probe-summary` for development summaries from
   existing `.runtime` compare outputs

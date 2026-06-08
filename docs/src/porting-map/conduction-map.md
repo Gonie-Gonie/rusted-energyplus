@@ -66,10 +66,15 @@ iteration is kept as an all-CTF diagnostic probe instead of a default setting.
 The analytical surface-first zone-air probe improves MAT and inside-face
 temperature RMSE, but leaves the top floor conduction bottleneck unchanged and
 raises the aggregate conduction RMSE, so call-order progress still needs to be
-paired with mass-floor CTF/history parity before promotion.
-Roof/wall exterior
-weather/solar forcing now feeds the diagnostic CTF boundary driver for
-run-period timesteps, and the official diagnostic manifest now includes
+paired with mass-floor CTF/history parity before promotion. Combining all-CTF
+seeding with analytical surface-first correction lowers MAT, floor inside
+conduction, and zone aggregate conduction RMSE compared with either isolated
+probe, while keeping floor inside conduction as the top bottleneck. That
+combined lane confirms the next promotion blocker is not coefficient
+availability alone or zone-air call order alone, but the mass-floor
+face/history coupling that remains after those two probes are joined.
+Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
+boundary driver for run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface
 decomposition rows so aggregate cancellation does not hide the next bottleneck.
 The aggregate zone conduction series remains blocked by unported mass-material
