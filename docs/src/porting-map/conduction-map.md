@@ -150,17 +150,21 @@ aggregate conduction regressions tied to wall/floor/roof source rows before a
 runtime change is promoted.
 Porting the EnergyPlus Perez anisotropic sky diffuse multiplier for exterior
 incident solar then moves the active quick-boundary lane away from thousand-Watt
-wall solar source errors: wall incident solar per-area RMSE is now single-digit
-W/m2. Aligning solar position and shadowing-period coefficients to
-EnergyPlus' non-leap weather ordinal for TMY records removes the source-year
-leap-day drift visible in late-year roof/wall solar samples. The leading
-residuals are now wall absorbed solar, outside-face aggregate conduction, and
-the remaining mass floor/history coupling path. The official dynamic manifest
-now also compares beam, sky diffuse, and ground diffuse exterior incident
-solar component rows so future solar fixes can isolate which source term moved.
-The current 80-series active lane shows beam incident RMSE near zero on
-walls/roof, with the remaining wall incident-solar residual dominated by the
-sky diffuse component.
+wall solar source errors. Aligning solar position and shadowing-period
+coefficients to EnergyPlus' non-leap weather ordinal for TMY records removes
+the source-year leap-day drift visible in late-year roof/wall solar samples,
+and splitting the exterior solar calculation so beam uses the
+shadowing-period table while Perez sky diffuse and ground reflection use the
+current timestep `SOLCOS` lowers the wall incident solar per-area RMSE to
+`0.126385`, `0.567803`, `0.242010`, and `0.369024` W/m2 for WALL001 through
+WALL004. Beam incident RMSE remains near zero and ground diffuse is now
+zero-delta in the active lane; the remaining sub-W/m2 incident residual is in
+the sky diffuse component. The leading residuals have moved to outside-face
+aggregate conduction (`84.810714` RMSE), inside-face aggregate conduction
+(`65.975683` RMSE), and the mass floor/history coupling path (`56.528269`
+RMSE floor storage). The official dynamic manifest now also compares beam,
+sky diffuse, and ground diffuse exterior incident solar component rows so
+future solar fixes can isolate which source term moved.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, full

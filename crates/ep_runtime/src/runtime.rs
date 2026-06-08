@@ -6278,14 +6278,14 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     );
     let local_hour =
         f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
-    let actual_sun_is_up = solar_position_rad_at_local_hour(site, record, local_hour).is_some();
+    let actual_solar_position_rad = solar_position_rad_at_local_hour(site, record, local_hour);
 
     surface_incident_solar_components_at_local_hour_w_per_m2(
         surface,
         site,
         SurfaceSolarTimestepInput {
             local_hour,
-            actual_sun_is_up,
+            actual_solar_position_rad,
             sin_declination,
             cos_declination,
             equation_of_time_hours,
@@ -6298,7 +6298,7 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
 #[derive(Clone, Copy)]
 struct SurfaceSolarTimestepInput {
     local_hour: f64,
-    actual_sun_is_up: bool,
+    actual_solar_position_rad: Option<(f64, f64)>,
     sin_declination: f64,
     cos_declination: f64,
     equation_of_time_hours: f64,
@@ -6311,46 +6311,54 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
     site: &SiteLocation,
     input: SurfaceSolarTimestepInput,
 ) -> SurfaceIncidentSolarComponents {
-    if !input.actual_sun_is_up {
+    let Some((actual_solar_altitude_rad, actual_solar_azimuth_rad)) =
+        input.actual_solar_position_rad
+    else {
         return SurfaceIncidentSolarComponents::default();
-    }
+    };
 
     let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
     let direct_normal = input.direct_normal_radiation_w_per_m2.max(0.0);
     let diffuse_horizontal = input.diffuse_horizontal_radiation_w_per_m2.max(0.0);
 
-    let Some((solar_altitude_rad, solar_azimuth_rad)) = solar_position_rad_from_coefficients(
+    // EnergyPlus reports beam with the shadowing-period SurfCosIncAng table,
+    // while Perez sky diffuse and ground-reflected solar use current SOLCOS.
+    let shadowing_period_solar_position_rad = solar_position_rad_from_coefficients(
         site,
         input.local_hour,
         input.sin_declination,
         input.cos_declination,
         input.equation_of_time_hours,
-    ) else {
-        return diffuse_solar_components_w_per_m2(surface, tilt_rad, diffuse_horizontal);
-    };
-    if solar_altitude_rad <= 0.0 {
-        return diffuse_solar_components_w_per_m2(surface, tilt_rad, diffuse_horizontal);
-    }
+    );
 
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
 
-    let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
-        + solar_altitude_rad.cos()
+    let beam = shadowing_period_solar_position_rad
+        .filter(|(solar_altitude_rad, _solar_azimuth_rad)| *solar_altitude_rad > 0.0)
+        .map(|(solar_altitude_rad, solar_azimuth_rad)| {
+            let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
+                + solar_altitude_rad.cos()
+                    * tilt_rad.sin()
+                    * (solar_azimuth_rad - surface_azimuth_rad).cos();
+            direct_normal * cos_incidence.max(0.0)
+        })
+        .unwrap_or(0.0);
+    let actual_cos_incidence = actual_solar_altitude_rad.sin() * tilt_rad.cos()
+        + actual_solar_altitude_rad.cos()
             * tilt_rad.sin()
-            * (solar_azimuth_rad - surface_azimuth_rad).cos();
-    let beam = direct_normal * cos_incidence.max(0.0);
+            * (actual_solar_azimuth_rad - surface_azimuth_rad).cos();
     let sky_diffuse = diffuse_horizontal
         * energyplus_anisotropic_sky_multiplier(
             surface,
             site,
             tilt_rad,
-            solar_altitude_rad,
+            actual_solar_altitude_rad,
             direct_normal,
             diffuse_horizontal,
-            cos_incidence,
+            actual_cos_incidence,
         );
     let ground_horizontal =
-        (direct_normal * solar_altitude_rad.sin() + diffuse_horizontal).max(0.0);
+        (direct_normal * actual_solar_altitude_rad.sin() + diffuse_horizontal).max(0.0);
     let ground_reflected = ground_horizontal
         * DEFAULT_SOLAR_GROUND_REFLECTANCE
         * surface_ground_view_factor(surface, tilt_rad);
@@ -6432,24 +6440,6 @@ fn energyplus_anisotropic_sky_multiplier(
     let view_factor_sky = surface_sky_view_factor(surface, tilt_rad);
     let multiplier = view_factor_sky * (1.0 - f1) + f1 * circumsolar_factor + f2 * tilt_rad.sin();
     multiplier.max(0.0)
-}
-
-fn diffuse_solar_components_w_per_m2(
-    surface: &Surface,
-    tilt_rad: f64,
-    diffuse_horizontal_w_per_m2: f64,
-) -> SurfaceIncidentSolarComponents {
-    let diffuse_horizontal = diffuse_horizontal_w_per_m2.max(0.0);
-    let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
-    let ground_reflected = diffuse_horizontal
-        * DEFAULT_SOLAR_GROUND_REFLECTANCE
-        * surface_ground_view_factor(surface, tilt_rad);
-
-    SurfaceIncidentSolarComponents {
-        beam_w_per_m2: 0.0,
-        sky_diffuse_w_per_m2: sky_diffuse,
-        ground_diffuse_w_per_m2: ground_reflected,
-    }
 }
 
 fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
