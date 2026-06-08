@@ -116,6 +116,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter3",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-surface-iter3"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-surface-iter5"
@@ -260,6 +269,7 @@ REFERENCE_LANES = {
     "all-ctf-analytical-coupled-previous-inside-iter3": "all-ctf-analytical-coupled-iter3",
     "all-ctf-analytical-coupled-previous-inside-doe2-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
+    "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter3": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter3",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",

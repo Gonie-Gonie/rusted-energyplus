@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Heat Balance Source Map
@@ -202,9 +202,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `766.667596`, floor outside conduction to `373.650657`, and MAT to
   `2.186220`, while regressing zone aggregate conduction to `124.010025` RMSE.
   This keeps DOE-2 exterior convection as a measured source term rather than a
-  default promotion. Extending the previous-inside path with the source-mapped
-  EnergyPlus
-  quick-conduction outside-face branch lowers floor inside conduction to RMSE
+  default promotion. A direct quick-outside plus DOE-2 three-pass sibling lowers
+  the quick-only iter3 floor storage row to RMSE `771.500589`, floor inside
+  conduction to `587.797421`, and floor outside conduction to `227.407205`, but
+  raises zone aggregate conduction to `128.396815` and the latent air-balance
+  rows (`90.988382` surface convection, `95.018026` air storage). This narrows
+  the next target to coupled surface/zone source ordering rather than only the
+  exterior coefficient expression. Extending the previous-inside path with the
+  source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
+  inside conduction to RMSE
   `812.566220`, floor outside conduction to `397.351373`, floor heat storage
   to `1198.781640`, zone aggregate conduction to `84.217233`, and MAT to
   `2.573470`, becoming the current best focus lane for those rows plus the
