@@ -4269,13 +4269,43 @@ fn step_zone_air_temperature(
     if heat_capacity_j_per_k <= 0.0 || timestep_seconds <= 0.0 {
         return current_temperature_c;
     }
-    if conductance_w_per_k <= 0.0 {
-        return current_temperature_c + internal_gain_w * timestep_seconds / heat_capacity_j_per_k;
+
+    energyplus_analytical_zone_air_temperature_c(
+        current_temperature_c,
+        internal_gain_w + conductance_w_per_k * outdoor_temperature_c,
+        conductance_w_per_k,
+        heat_capacity_j_per_k,
+        timestep_seconds,
+    )
+}
+
+/// EnergyPlus analytical zone-air temperature solution for one timestep.
+///
+/// This mirrors the `AnalyticalSolution` branch in
+/// `ZoneTempPredictorCorrector.cc`, using `TempIndCoef`, `TempDepCoef`, and
+/// `AirPowerCap = C_air / dt`.
+#[must_use]
+pub fn energyplus_analytical_zone_air_temperature_c(
+    previous_temperature_c: f64,
+    temp_independent_coefficient_w: f64,
+    temp_dependent_coefficient_w_per_k: f64,
+    air_heat_capacity_j_per_k: f64,
+    timestep_seconds: f64,
+) -> f64 {
+    if air_heat_capacity_j_per_k <= 0.0 || timestep_seconds <= 0.0 {
+        return previous_temperature_c;
     }
 
-    let equilibrium_temperature_c = outdoor_temperature_c + internal_gain_w / conductance_w_per_k;
-    let decay = (-conductance_w_per_k * timestep_seconds / heat_capacity_j_per_k).exp();
-    equilibrium_temperature_c + (current_temperature_c - equilibrium_temperature_c) * decay
+    let air_power_cap_w_per_k = air_heat_capacity_j_per_k / timestep_seconds;
+    if temp_dependent_coefficient_w_per_k.abs() <= f64::EPSILON {
+        return previous_temperature_c + temp_independent_coefficient_w / air_power_cap_w_per_k;
+    }
+
+    let equilibrium_temperature_c =
+        temp_independent_coefficient_w / temp_dependent_coefficient_w_per_k;
+    let exponent = (-temp_dependent_coefficient_w_per_k / air_power_cap_w_per_k).min(700.0);
+    (previous_temperature_c - equilibrium_temperature_c) * exponent.exp()
+        + equilibrium_temperature_c
 }
 
 #[derive(Clone, Copy)]
@@ -4734,6 +4764,7 @@ mod tests {
         advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        energyplus_analytical_zone_air_temperature_c,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
@@ -5738,6 +5769,18 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
 
         Ok(())
+    }
+
+    #[test]
+    fn energyplus_analytical_zone_air_temperature_matches_predictor_branch() {
+        let zero_dependency =
+            energyplus_analytical_zone_air_temperature_c(20.0, 12.0, 0.0, 1207.2, 600.0);
+        assert!((zero_dependency - (20.0 + 12.0 * 600.0 / 1207.2)).abs() < 1.0e-12);
+
+        let temperature =
+            energyplus_analytical_zone_air_temperature_c(20.0, 72.0, 6.0, 1207.2, 600.0);
+        let expected = 12.0 + (20.0 - 12.0) * (-6.0 * 600.0 / 1207.2_f64).exp();
+        assert!((temperature - expected).abs() < 1.0e-12);
     }
 
     #[test]

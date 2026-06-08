@@ -121,8 +121,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   terms. `calcZoneOrSpaceSums`/`calcSumHAT` are the source anchors for the
   surface convection sums. Rust now stores the zone-level `SumHA`,
   `SumHATsurf`, and `SumHATref` diagnostic state from current inside
-  convection coefficients and surface temperatures; the predictor equation
-  itself remains the simplified diagnostic shell.
+  convection coefficients and surface temperatures, and exposes an
+  EnergyPlus-shaped analytical zone-air temperature helper. The predictor
+  equation itself remains the simplified diagnostic shell until all coefficient
+  inputs are wired from source-mapped runtime state.
 
 Current Rust boundary:
 
