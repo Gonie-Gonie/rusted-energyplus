@@ -269,7 +269,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   instead of syncing it to the current inside face was tested and rejected for
   now: using the current zone boundary value made floor outside conduction the
   top bottleneck, while using the previous inside face left floor heat-storage
-  RMSE essentially unchanged (`684.141484`). The EnergyPlus
+  RMSE essentially unchanged (`684.141484`). Re-testing the same idea after
+  timestep-interpolated exterior longwave alignment on the interleaved
+  twenty-pass lane also rejects it: freezing the adiabatic outside face at the
+  timestep-start inside temperature lowers neither the active bottleneck nor
+  the zone aggregate, raising floor heat-storage RMSE to `854.900255` and zone
+  outside aggregate conduction RMSE to `871.940554`. The EnergyPlus
   `SurfInitialTemp`/zero-flux CTF initial-history lane is a better isolated
   target: with five surface passes it lowers floor heat storage to
   `637.691788` RMSE, floor inside conduction to `530.085504`, floor outside
