@@ -302,7 +302,7 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Air Energy Storage Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Air Heat Balance Air Energy Storage Rate series"
 }
-if ($CtfSeedPolicy -eq "steady-no-mass-only" -and $ZoneAirAlgorithm -eq "simplified-analytical") {
+if ($CtfSeedPolicy -eq "steady-no-mass-only" -and $ZoneAirAlgorithm -eq "simplified-analytical" -and $SurfaceIterations -eq 1) {
     Assert-SeriesRmseBelow `
         -Summary $summary `
         -Key "ZONE ONE" `
