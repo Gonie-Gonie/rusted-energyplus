@@ -255,6 +255,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Summarize existing official dynamic heat-balance probe lanes with the report Python."
     }
+    "official-dynamic-heat-balance-probe-suite" = @{
+        Path = "compare\official-dynamic-heat-balance-probe-suite.ps1"
+        Group = "compare"
+        Help = "Refresh all official dynamic heat-balance probe lanes and regenerate the probe summary."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

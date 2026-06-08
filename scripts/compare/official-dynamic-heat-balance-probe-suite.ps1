@@ -1,0 +1,30 @@
+[CmdletBinding()]
+param(
+    [switch]$SkipSummary
+)
+
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+$lanes = @(
+    "official-dynamic-heat-balance-diagnostic.ps1",
+    "official-dynamic-heat-balance-all-ctf-probe.ps1",
+    "official-dynamic-heat-balance-all-ctf-warmup-20-probe.ps1",
+    "official-dynamic-heat-balance-all-ctf-surface-iter3-probe.ps1",
+    "official-dynamic-heat-balance-analytical-probe.ps1",
+    "official-dynamic-heat-balance-analytical-surface-first-probe.ps1",
+    "official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe.ps1",
+    "official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe.ps1",
+    "official-dynamic-heat-balance-third-order-probe.ps1",
+    "official-dynamic-heat-balance-warmup-20-probe.ps1"
+)
+
+foreach ($lane in $lanes) {
+    Write-Host "Running $lane"
+    & (Join-Path $PSScriptRoot $lane)
+}
+
+if (-not $SkipSummary) {
+    Write-Host "Running official-dynamic-heat-balance-probe-summary.ps1"
+    & (Join-Path $PSScriptRoot "official-dynamic-heat-balance-probe-summary.ps1")
+}

@@ -47,7 +47,9 @@ Current generators:
   oracle-day-count warmup minimum. It is
   development evidence only and does not create a release conformance artifact.
   `scripts\dev.cmd official-dynamic-heat-balance-probe-summary` invokes this
-  generator through the repo-local report Python environment.
+  generator through the repo-local report Python environment. Use
+  `scripts\dev.cmd official-dynamic-heat-balance-probe-suite` to refresh every
+  tracked probe lane before regenerating the summary.
 
 Conformance-facing scripts should keep this split:
 
