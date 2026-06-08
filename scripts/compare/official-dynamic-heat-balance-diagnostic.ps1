@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet("steady-no-mass-only", "all-eio")]
+    [string]$CtfSeedPolicy = "steady-no-mass-only"
+)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -9,7 +12,13 @@ Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
-$OutputRoot = Join-Path $RepoRoot ".runtime\official-dynamic-diagnostic\26.1.0"
+$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
+    ".runtime\official-dynamic-diagnostic-all-ctf\26.1.0"
+}
+else {
+    ".runtime\official-dynamic-diagnostic\26.1.0"
+}
+$OutputRoot = Join-Path $RepoRoot $OutputRootRelative
 $CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 $CasePath = Join-Path $RepoRoot "data\conformance_cases\$CaseId\case.toml"
 $CaseOutputRoot = Join-Path $OutputRoot $CaseId
@@ -75,8 +84,16 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running official dynamic heat-balance diagnostic gate."
-$output = & $cargo.Source run -p ep_cli --quiet -- conformance heat-balance-diagnostic-report $CasePath $OracleRoot $OutputRoot 2>&1
+Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy."
+$policyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY"
+$previousPolicy = [Environment]::GetEnvironmentVariable($policyEnvName, "Process")
+try {
+    [Environment]::SetEnvironmentVariable($policyEnvName, $CtfSeedPolicy, "Process")
+    $output = & $cargo.Source run -p ep_cli --quiet -- conformance heat-balance-diagnostic-report $CasePath $OracleRoot $OutputRoot 2>&1
+}
+finally {
+    [Environment]::SetEnvironmentVariable($policyEnvName, $previousPolicy, "Process")
+}
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
     throw "Official dynamic heat-balance diagnostic failed to generate."
@@ -130,6 +147,22 @@ if ($summary.heat_balance_warmup.timestep_count -le 0) {
 if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
     throw "Expected oracle run-period warmup days 20, got $($summary.heat_balance_warmup.oracle_run_period_day_count)"
 }
+if ($summary.ctf_seed.policy -ne $CtfSeedPolicy) {
+    throw "Expected CTF seed policy $CtfSeedPolicy, got $($summary.ctf_seed.policy)"
+}
+if ($CtfSeedPolicy -eq "steady-no-mass-only") {
+    if (-not ($summary.ctf_seed.skipped_constructions | Where-Object { $_.construction_name -eq "FLOOR" -and $_.ctf_count -eq 5 })) {
+        throw "Expected steady/no-mass policy to skip FLOOR #CTFs=5"
+    }
+}
+else {
+    if (-not ($summary.ctf_seed.included_constructions -contains "FLOOR")) {
+        throw "Expected all-eio policy to include FLOOR"
+    }
+    if ($summary.ctf_seed.skipped_constructions.Count -ne 0) {
+        throw "Expected all-eio policy to skip no constructions"
+    }
+}
 if ($summary.series_count -ne 24) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
@@ -167,8 +200,14 @@ Assert-Contains -Text $reportText -Pattern "comparison_class: diagnostic-only" -
 Assert-Contains -Text $reportText -Pattern "conformance_claim: false" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "warmup_enabled: true" -Description "markdown warmup enabled"
 Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -Description "markdown oracle warmup days"
-Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: steady-no-mass-only" -Description "markdown CTF seed policy"
-Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
+Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: $CtfSeedPolicy" -Description "markdown CTF seed policy"
+if ($CtfSeedPolicy -eq "steady-no-mass-only") {
+    Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
+}
+else {
+    Assert-Contains -Text $reportText -Pattern "ctf_seed_included_constructions: FLOOR, R13WALL, ROOF31" -Description "markdown all-eio included mass CTF construction"
+    Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: none" -Description "markdown all-eio skipped construction list"
+}
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
@@ -180,4 +219,4 @@ Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Con
 Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 
-Write-Host "Official dynamic heat-balance diagnostic passed."
+Write-Host "Official dynamic heat-balance diagnostic passed with CTF seed policy $CtfSeedPolicy."

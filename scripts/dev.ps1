@@ -205,6 +205,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official 1ZoneUncontrolled dynamic heat-balance diagnostic case."
     }
+    "official-dynamic-heat-balance-all-ctf-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows enabled as a non-claim probe."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

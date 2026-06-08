@@ -83,6 +83,7 @@ matplotlib for document layout and charts.
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
 | `official-dynamic-heat-balance-diagnostic` | diagnostic | run the official `1ZoneUncontrolled` dynamic heat-balance diagnostic with warmup metadata and no conformance claim | no | `.runtime/official-dynamic-diagnostic` |
+| `official-dynamic-heat-balance-all-ctf-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows enabled for mass-CTF isolation and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
