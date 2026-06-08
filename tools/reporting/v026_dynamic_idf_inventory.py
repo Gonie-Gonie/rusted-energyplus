@@ -14,6 +14,70 @@ CASE_ROOT = Path("data/conformance_cases")
 DYNAMIC_FREQUENCIES = {"detailed", "timestep", "hourly", "daily", "monthly", "runperiod"}
 
 
+CASE_TARGETS = {
+    "construction_materials_001": (
+        "static-input-fixture",
+        "not-a-dynamic-physics-target",
+        "keep as smoke/static intake evidence unless a runtime material-state output is added",
+    ),
+    "surface_geometry_001": (
+        "static-input-fixture",
+        "not-a-dynamic-physics-target",
+        "keep as smoke/static geometry evidence unless a runtime geometry-derived output is added",
+    ),
+    "heat_balance_nomass_001": (
+        "heat-balance",
+        "already-gated",
+        "maintain declared no-mass MAT conformance while the transient CTF tracker advances",
+    ),
+    "surface_temperature_nomass_001": (
+        "heat-balance",
+        "already-gated",
+        "maintain declared no-mass surface-state conformance while transient CTF parity advances",
+    ),
+    "ideal_loads_thermostat_001": (
+        "hvac-ideal-loads",
+        "system-scope-diagnostic",
+        "promote only after IdealLoads thermal response and node flow values have source-mapped parity",
+    ),
+    "air_side_node_diagnostic_001": (
+        "hvac-node",
+        "system-scope-diagnostic",
+        "promote only after node projection values have source-mapped runtime parity",
+    ),
+    "plant_loop_diagnostic_001": (
+        "plant-loop",
+        "system-scope-diagnostic",
+        "promote only after plant loop mass-flow, temperature, and equipment rates are simulated",
+    ),
+    "official_1zone_uncontrolled_baseline_001": (
+        "official-examplefile-heat-balance",
+        "blocked-by-official-dynamic-tracker",
+        "use the official dynamic 1Zone diagnostic before promoting ExampleFile hourly variables",
+    ),
+    "schedule_constant_001": (
+        "time-schedule",
+        "already-gated",
+        "maintain declared Schedule Value conformance",
+    ),
+    "weather_fields_001": (
+        "weather",
+        "already-gated",
+        "maintain dry-bulb conformance; promote additional weather fields only with tolerances",
+    ),
+    "official_1zone_static_model_001": (
+        "official-examplefile-static",
+        "static-model-only",
+        "keep static EIO conformance separate from the dynamic ExampleFile target",
+    ),
+    "internal_gains_001": (
+        "internal-gain",
+        "already-gated",
+        "maintain convective-gain trace conformance; radiant/latent response remains future work",
+    ),
+}
+
+
 @dataclass(frozen=True)
 class CaseRow:
     case_id: str
@@ -27,6 +91,9 @@ class CaseRow:
     dynamic_output_count: int
     dynamic_conformance_output_count: int
     dynamic_diagnostic_output_count: int
+    target_domain: str
+    target_role: str
+    next_action: str
     gate_script: str
     gate_blocking: bool
     status: str
@@ -104,6 +171,17 @@ def classify_case(
     )
 
 
+def target_metadata(case_id: str, status: str, gap: str) -> tuple[str, str, str]:
+    target = CASE_TARGETS.get(case_id)
+    if target is not None:
+        return target
+    if status == "dynamic-conformance-gated":
+        return ("runtime", "already-gated", "maintain existing blocking gate")
+    if status == "dynamic-diagnostic-only":
+        return ("runtime", "promotion-candidate", gap)
+    return ("runtime", "unclassified-gap", gap)
+
+
 def case_row(case_path: Path) -> CaseRow | None:
     payload = load_toml(case_path)
     milestone = str(payload.get("milestone", ""))
@@ -150,9 +228,11 @@ def case_row(case_path: Path) -> CaseRow | None:
         dynamic_diagnostic_output_count=len(dynamic_diagnostic_outputs),
         gate_blocking=gate_blocking,
     )
+    case_id = str(payload.get("id", case_path.parent.name))
+    target_domain, target_role, next_action = target_metadata(case_id, status, gap)
 
     return CaseRow(
-        case_id=str(payload.get("id", case_path.parent.name)),
+        case_id=case_id,
         milestone=milestone,
         milestone_version=version,
         comparison_class=comparison_class,
@@ -163,6 +243,9 @@ def case_row(case_path: Path) -> CaseRow | None:
         dynamic_output_count=len(dynamic_outputs),
         dynamic_conformance_output_count=len(dynamic_conformance_outputs),
         dynamic_diagnostic_output_count=len(dynamic_diagnostic_outputs),
+        target_domain=target_domain,
+        target_role=target_role,
+        next_action=next_action,
         gate_script=str(gate.get("script", "")),
         gate_blocking=gate_blocking,
         status=status,
@@ -175,11 +258,19 @@ def build_inventory(repo_root: Path) -> dict[str, Any]:
     rows = [row for path in case_paths if (row := case_row(path)) is not None]
     rows.sort(key=lambda row: (row.milestone_version or (999, 999), row.case_id))
     status_counts: dict[str, int] = {}
+    target_role_counts: dict[str, int] = {}
+    target_domain_counts: dict[str, int] = {}
     for row in rows:
         status_counts[row.status] = status_counts.get(row.status, 0) + 1
+        target_role_counts[row.target_role] = (
+            target_role_counts.get(row.target_role, 0) + 1
+        )
+        target_domain_counts[row.target_domain] = (
+            target_domain_counts.get(row.target_domain, 0) + 1
+        )
 
     return {
-        "schema": "rusted-energyplus.v026-dynamic-idf-inventory.v1",
+        "schema": "rusted-energyplus.v026-dynamic-idf-inventory.v2",
         "cutoff_version": f"v{CUTOFF_VERSION[0]}.{CUTOFF_VERSION[1]}",
         "case_count": len(rows),
         "dynamic_conformance_gated_count": status_counts.get(
@@ -188,6 +279,8 @@ def build_inventory(repo_root: Path) -> dict[str, Any]:
         "gap_count": len(rows)
         - status_counts.get("dynamic-conformance-gated", 0),
         "status_counts": status_counts,
+        "target_role_counts": target_role_counts,
+        "target_domain_counts": target_domain_counts,
         "cases": [row.__dict__ for row in rows],
     }
 
@@ -201,23 +294,35 @@ def render_markdown(inventory: dict[str, Any]) -> str:
         f"dynamic_conformance_gated_count: {inventory['dynamic_conformance_gated_count']}",
         f"gap_count: {inventory['gap_count']}",
         "",
-        "| case | milestone | comparison | claim | dynamic outputs | dynamic conformance | gate | status | gap |",
-        "|---|---|---|---:|---:|---:|---|---|---|",
+        "## Target Roles",
+        "",
+        "| role | count |",
+        "|---|---:|",
     ]
+    for role, count in sorted(inventory["target_role_counts"].items()):
+        lines.append(f"| {role} | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Cases",
+            "",
+            "| case | milestone | domain | role | dynamic outputs | dynamic conformance | status | next action |",
+            "|---|---|---|---|---:|---:|---|---|",
+        ]
+    )
     for row in inventory["cases"]:
         lines.append(
-            "| {case_id} | {milestone} | {comparison_class} | {claim} | {dynamic_output_count} | {dynamic_conformance_output_count} | {gate} | {status} | {gap} |".format(
+            "| {case_id} | {milestone} | {target_domain} | {target_role} | {dynamic_output_count} | {dynamic_conformance_output_count} | {status} | {next_action} |".format(
                 case_id=row["case_id"],
                 milestone=row["milestone"],
-                comparison_class=row["comparison_class"],
-                claim=str(row["conformance_claim"]).lower(),
+                target_domain=row["target_domain"],
+                target_role=row["target_role"],
                 dynamic_output_count=row["dynamic_output_count"],
                 dynamic_conformance_output_count=row[
                     "dynamic_conformance_output_count"
                 ],
-                gate=row["gate_script"] or "none",
                 status=row["status"],
-                gap=row["gap"],
+                next_action=row["next_action"],
             )
         )
     lines.append("")
