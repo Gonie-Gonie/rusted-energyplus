@@ -51,3 +51,7 @@ to raise the Rust diagnostic warmup minimum to the EnergyPlus run-period warmup
 day count for the official 1Zone case. That lane is diagnostic-only and exists
 to isolate whether current first-hour and floor-history deltas are driven by
 early Rust warmup convergence or by deeper CTF/iteration differences.
+`scripts\dev.cmd official-dynamic-heat-balance-all-ctf-warmup-20-probe` applies
+the same warmup minimum while enabling all EIO CTF rows. Current probe evidence
+shows only negligible movement from the all-CTF lane, so warmup day count alone
+is not the mass-floor fix.

@@ -52,7 +52,10 @@ not seeded into the simplified CTF shell and therefore reports zero inside
 conduction in the Rust lane, while the all-CTF probe moves the top
 bottleneck to zone air heat-balance storage/convection and worsens the zone
 aggregate conduction row, confirming the current blocker is the mass CTF
-face/history coupling rather than EIO coefficient availability. Roof/wall exterior
+face/history coupling rather than EIO coefficient availability. The
+all-CTF-plus-20-day-warmup probe shows only negligible movement from the
+all-CTF lane, so the remaining floor delta is not explained by Rust's early
+warmup convergence alone. Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface

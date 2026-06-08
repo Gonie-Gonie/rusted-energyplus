@@ -220,6 +220,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with Rust warmup minimum days raised to the EnergyPlus run-period count."
     }
+    "official-dynamic-heat-balance-all-ctf-warmup-20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-warmup-20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows and the EnergyPlus run-period warmup count."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

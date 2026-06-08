@@ -43,6 +43,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-warmup-min20",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-warmup-min20"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="third-order",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-third-order"
