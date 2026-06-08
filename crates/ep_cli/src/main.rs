@@ -44,6 +44,8 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use time_weather_schedule::generate_time_weather_schedule_report;
 
+const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
+
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
     "usage: eplus-rs conformance diagnostic-report <case.toml> <oracle-root> <output-root>";
@@ -5014,6 +5016,10 @@ fn render_heat_balance_conformance_summary_json(
         json_number(heat_balance_max_rel_delta(diagnostic))
     ));
     json.push_str(&format!(
+        "  \"bottlenecks\": {},\n",
+        heat_balance_bottlenecks_json(&diagnostic.series)
+    ));
+    json.push_str(&format!(
         "  \"series\": {},\n",
         heat_balance_series_json(&diagnostic.series)
     ));
@@ -5159,6 +5165,10 @@ fn render_heat_balance_conformance_report(
         "max_rel_delta: {:.12}\n\n",
         heat_balance_max_rel_delta(diagnostic)
     ));
+
+    report.push_str("## Bottlenecks\n\n");
+    heat_balance_report_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
 
     report.push_str("## Series\n\n");
     heat_balance_report_series_rows(&mut report, &diagnostic.series);
@@ -5332,6 +5342,53 @@ fn heat_balance_outputs_json(outputs: &[ZoneTemperatureReportOutput]) -> String 
     json
 }
 
+fn heat_balance_bottleneck_rows(
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<&HeatBalanceSeriesDiagnostic> {
+    let mut rows = series.iter().collect::<Vec<_>>();
+    rows.sort_by(|left, right| {
+        right
+            .delta
+            .rmse_delta_c
+            .total_cmp(&left.delta.rmse_delta_c)
+            .then_with(|| {
+                right
+                    .delta
+                    .max_abs_delta_c
+                    .total_cmp(&left.delta.max_abs_delta_c)
+            })
+            .then_with(|| left.output.key.cmp(&right.output.key))
+            .then_with(|| left.output.variable.cmp(&right.output.variable))
+    });
+    rows.truncate(HEAT_BALANCE_BOTTLENECK_LIMIT);
+    rows
+}
+
+fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    let rows = heat_balance_bottleneck_rows(series);
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"rank\": {}, \"output\": {}, \"status\": {}, ",
+                "\"max_abs_delta_c\": {}, \"mean_abs_delta_c\": {}, ",
+                "\"rmse_delta_c\": {} }}"
+            ),
+            index + 1,
+            zone_temperature_output_json(&row.output),
+            json_string(row.status),
+            json_number(row.delta.max_abs_delta_c),
+            json_number(row.delta.mean_abs_delta_c),
+            json_number(row.delta.rmse_delta_c)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
     let mut json = String::from("[\n");
     for (index, row) in series.iter().enumerate() {
@@ -5398,6 +5455,29 @@ fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
     }
     json.push_str("  ]");
     json
+}
+
+fn heat_balance_report_bottleneck_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| rank | key | variable | class | max_abs_delta_c | mean_abs_delta_c | rmse_delta_c | status |\n",
+    );
+    report.push_str("|---:|---|---|---|---:|---:|---:|---|\n");
+    for (index, row) in heat_balance_bottleneck_rows(series).iter().enumerate() {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {} |\n",
+            index + 1,
+            markdown_cell(&row.output.key),
+            markdown_cell(&row.output.variable),
+            row.output.class,
+            row.delta.max_abs_delta_c,
+            row.delta.mean_abs_delta_c,
+            row.delta.rmse_delta_c,
+            row.status
+        ));
+    }
 }
 
 fn heat_balance_report_series_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
@@ -6163,6 +6243,8 @@ mod tests {
         assert!(json.contains("\"status\": \"pass\""));
         assert!(json.contains("\"ctf_seed\""));
         assert!(json.contains("\"policy\": \"disabled\""));
+        assert!(json.contains("\"bottlenecks\""));
+        assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
@@ -6174,6 +6256,7 @@ mod tests {
         assert!(report.contains("status: pass"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("ctf_seed_policy: disabled"));
+        assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
         assert!(report.contains("## Hourly Samples"));
@@ -6257,6 +6340,7 @@ mod tests {
         assert!(json.contains("\"day_count_delta\": -14"));
         assert!(json.contains("\"policy\": \"steady-no-mass-only\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
+        assert!(json.contains("\"bottlenecks\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));
@@ -6265,6 +6349,7 @@ mod tests {
         assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
+        assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("status: fail"));
     }
 

@@ -89,8 +89,9 @@ The current public scope includes:
 - official dynamic heat-balance diagnostic reports that run a Rust
   first-run-period-day warmup loop, filter oracle ESO values to run-period
   samples, compare roof/wall/floor face-temperature and conduction
-  decomposition series, and record EnergyPlus EIO run-period warmup day counts
-  without claiming parity
+  decomposition series, rank bottleneck series by RMSE, and record EnergyPlus
+  EIO run-period warmup day counts and the current CTF seed policy without
+  claiming parity
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
