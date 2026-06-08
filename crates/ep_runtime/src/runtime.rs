@@ -4357,6 +4357,22 @@ pub fn energyplus_zone_air_temperature_coefficients(
     let temp_dependent_coefficient_w_per_k = sum_ha_w_per_k + sum_mcp_w_per_k;
     let temp_independent_coefficient_w =
         sum_internal_gain_w + sum_hat_surf_w - sum_hat_ref_w + sum_mcp_t_w;
+    energyplus_zone_air_temperature_coefficients_from_terms(
+        temp_dependent_coefficient_w_per_k,
+        temp_independent_coefficient_w,
+        air_heat_capacity_j_per_k,
+        timestep_seconds,
+        previous_mean_air_temperatures_c,
+    )
+}
+
+fn energyplus_zone_air_temperature_coefficients_from_terms(
+    temp_dependent_coefficient_w_per_k: f64,
+    temp_independent_coefficient_w: f64,
+    air_heat_capacity_j_per_k: f64,
+    timestep_seconds: f64,
+    previous_mean_air_temperatures_c: [f64; 3],
+) -> ZoneAirTemperatureCoefficients {
     let air_power_cap_w_per_k = if air_heat_capacity_j_per_k > 0.0 && timestep_seconds > 0.0 {
         air_heat_capacity_j_per_k / timestep_seconds
     } else {
@@ -4376,6 +4392,35 @@ pub fn energyplus_zone_air_temperature_coefficients(
             + temp_dependent_coefficient_w_per_k,
         third_order_temp_independent_load_w: third_order_history_term_w
             + temp_independent_coefficient_w,
+    }
+}
+
+/// EnergyPlus third-order zone-air temperature solution for one timestep.
+///
+/// This mirrors the `ThirdOrder` branch in `correctZoneAirTemps`:
+/// `ZT = (TempIndCoef + TempHistoryTerm) /
+///       ((11/6) * AirPowerCap + TempDepCoef)`.
+#[must_use]
+pub fn energyplus_third_order_zone_air_temperature_c(
+    previous_temperature_c: f64,
+    temp_independent_coefficient_w: f64,
+    temp_dependent_coefficient_w_per_k: f64,
+    air_heat_capacity_j_per_k: f64,
+    timestep_seconds: f64,
+    previous_mean_air_temperatures_c: [f64; 3],
+) -> f64 {
+    let coefficients = energyplus_zone_air_temperature_coefficients_from_terms(
+        temp_dependent_coefficient_w_per_k,
+        temp_independent_coefficient_w,
+        air_heat_capacity_j_per_k,
+        timestep_seconds,
+        previous_mean_air_temperatures_c,
+    );
+    let denominator = coefficients.third_order_temp_dependent_load_w_per_k;
+    if denominator.abs() <= f64::EPSILON {
+        previous_temperature_c
+    } else {
+        coefficients.third_order_temp_independent_load_w / denominator
     }
 }
 
@@ -4871,6 +4916,7 @@ mod tests {
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
+        energyplus_third_order_zone_air_temperature_c,
         energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
@@ -5923,6 +5969,26 @@ DATA PERIODS
             (coefficients.third_order_temp_independent_load_w - (expected_history + 424.12)).abs()
                 < 1.0e-12
         );
+    }
+
+    #[test]
+    fn energyplus_third_order_zone_air_temperature_matches_predictor_branch() {
+        let temperature = energyplus_third_order_zone_air_temperature_c(
+            20.0,
+            424.12,
+            21.456,
+            1207.2,
+            600.0,
+            [20.0, 19.0, 18.0],
+        );
+        let air_power_cap = 1207.2 / 600.0;
+        let history_term = air_power_cap * (3.0 * 20.0 - 1.5 * 19.0 + (1.0 / 3.0) * 18.0);
+        let expected = (424.12 + history_term) / ((11.0 / 6.0) * air_power_cap + 21.456);
+        assert!((temperature - expected).abs() < 1.0e-12);
+
+        let fallback =
+            energyplus_third_order_zone_air_temperature_c(20.0, 1.0, 0.0, 0.0, 600.0, [20.0; 3]);
+        assert_eq!(fallback, 20.0);
     }
 
     #[test]

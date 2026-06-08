@@ -123,8 +123,8 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `SumHATsurf`, and `SumHATref` diagnostic state from current inside
   convection coefficients and surface temperatures, snapshots
   `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` in
-  `ZoneAirTemperatureCoefficients`, and exposes an EnergyPlus-shaped
-  analytical zone-air temperature helper. The predictor equation itself
+  `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
+  and third-order zone-air temperature helpers. The predictor equation itself
   remains the simplified diagnostic shell until all coefficient inputs are
   wired from source-mapped runtime state.
 
