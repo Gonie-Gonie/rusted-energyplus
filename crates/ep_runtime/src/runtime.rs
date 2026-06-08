@@ -2629,6 +2629,19 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             )
         })
         .collect::<Vec<_>>();
+    let mut zone_air_heat_balance_rates = state
+        .zones
+        .iter()
+        .map(|zone| {
+            (
+                zone.zone_id,
+                zone.zone_name.clone(),
+                Vec::with_capacity(options.sample_count),
+                Vec::with_capacity(options.sample_count),
+                Vec::with_capacity(options.sample_count),
+            )
+        })
+        .collect::<Vec<_>>();
     let mut surface_temperatures = state
         .surfaces
         .iter()
@@ -2693,6 +2706,32 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 conduction_values.push(rate);
                 conduction_gain_values.push(heat_gain_rate_w(rate));
                 conduction_loss_values.push(heat_loss_rate_w(rate));
+            }
+        }
+        for (
+            zone_id,
+            _zone_name,
+            internal_gain_values,
+            surface_convection_values,
+            air_storage_values,
+        ) in &mut zone_air_heat_balance_rates
+        {
+            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                internal_gain_values.push(zone_state.convective_internal_gain_w);
+                surface_convection_values.push(
+                    zone_state.sum_hat_surf_w
+                        - zone_state.sum_hat_ref_w
+                        - zone_state.sum_ha_w_per_k * zone_state.mean_air_temperature_c,
+                );
+                let previous_temperature_c = zone_state.previous_mean_air_temperatures_c[0];
+                let air_storage_rate_w = if seconds_per_timestep > 0.0 {
+                    zone_state.air_heat_capacity_j_per_k
+                        * (zone_state.mean_air_temperature_c - previous_temperature_c)
+                        / seconds_per_timestep
+                } else {
+                    0.0
+                };
+                air_storage_values.push(air_storage_rate_w);
             }
         }
         for trace in &mut surface_temperatures {
@@ -2778,6 +2817,39 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate".to_string(),
             units: "W".to_string(),
             values: conduction_loss_values,
+        });
+        handle_index += 1;
+    }
+    for (
+        _zone_id,
+        zone_name,
+        internal_gain_values,
+        surface_convection_values,
+        air_storage_values,
+    ) in zone_air_heat_balance_rates
+    {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name.clone(),
+            variable_name: "Zone Air Heat Balance Internal Convective Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: internal_gain_values,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name.clone(),
+            variable_name: "Zone Air Heat Balance Surface Convection Rate".to_string(),
+            units: "W".to_string(),
+            values: surface_convection_values,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name,
+            variable_name: "Zone Air Heat Balance Air Energy Storage Rate".to_string(),
+            units: "W".to_string(),
+            values: air_storage_values,
         });
         handle_index += 1;
     }
@@ -6541,7 +6613,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 65);
+        assert_eq!(simulation.results.series.len(), 68);
 
         let Some(zone_series) = simulation
             .results
@@ -6606,6 +6678,15 @@ DATA PERIODS
             return Err(std::io::Error::other("missing zone conduction series").into());
         };
         assert!(zone_conduction_series.values[0] < 0.0);
+
+        let Some(surface_convection_series) = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate")
+        else {
+            return Err(std::io::Error::other("missing zone air surface convection series").into());
+        };
+        assert_eq!(surface_convection_series.values.len(), 2);
+        assert!(surface_convection_series.values[0].is_finite());
 
         Ok(())
     }

@@ -179,7 +179,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 24) {
+if ($summary.series_count -ne 27) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -194,8 +194,8 @@ $expectedTopVariable = "Surface Inside Face Conduction Heat Transfer Rate"
 $expectedTopDescription = "floor inside conduction"
 if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or $CtfSeedPolicy -eq "all-eio") {
     $expectedTopKey = "ZONE ONE"
-    $expectedTopVariable = "Zone Opaque Surface Inside Faces Conduction Rate"
-    $expectedTopDescription = "zone aggregate conduction"
+    $expectedTopVariable = "Zone Air Heat Balance Surface Convection Rate"
+    $expectedTopDescription = "zone air heat-balance surface convection"
 }
 if (
     $topBottleneck.output.key -ne $expectedTopKey -or
@@ -220,6 +220,15 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Insid
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque Surface Inside Faces Conduction Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Opaque Surface Inside Faces Conduction Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Internal Convective Heat Gain Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Zone Air Heat Balance Internal Convective Heat Gain Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Surface Convection Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Zone Air Heat Balance Surface Convection Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Air Energy Storage Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Zone Air Heat Balance Air Energy Storage Rate series"
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:WALL001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted wall decomposition conduction series"
@@ -251,6 +260,7 @@ Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -De
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
+Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"
 Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 

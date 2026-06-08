@@ -43,6 +43,33 @@ domain = "zone"
 level = "diagnostic"
 
 [[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Internal Convective Heat Gain Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Surface Convection Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Air Energy Storage Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZN001:WALL001"
 variable = "Surface Inside Face Temperature"
 frequency = "hourly"

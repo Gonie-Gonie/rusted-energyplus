@@ -129,6 +129,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   allowing an explicit third-order diagnostic probe. The default predictor
   equation itself remains the simplified diagnostic shell until all coefficient
   inputs are wired from source-mapped runtime state.
+- `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
+  Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
+  Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
+  now emits diagnostic zone series with those EnergyPlus names from the current
+  internal gain, `SumHA/SumHATsurf/SumHATref`, MAT, and air-capacity state so
+  official dynamic reports can compare these latent air-balance terms before a
+  conformance claim is attempted.
 
 Current Rust boundary:
 

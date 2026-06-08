@@ -3339,6 +3339,9 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
             .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Gain Rate")
         || variable
             .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Loss Rate")
+        || variable.eq_ignore_ascii_case("Zone Air Heat Balance Internal Convective Heat Gain Rate")
+        || variable.eq_ignore_ascii_case("Zone Air Heat Balance Surface Convection Rate")
+        || variable.eq_ignore_ascii_case("Zone Air Heat Balance Air Energy Storage Rate")
 }
 
 fn evaluate_heat_balance_conformance<'a>(
