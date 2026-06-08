@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-09
 ---
 
 # Heat Balance Source Map
@@ -262,7 +262,19 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   quick-outside bottleneck has moved to `ZN001:FLR001` surface heat storage
   (`683.997518` RMSE), keeping floor mass CTF history/order parity and zone
   aggregate conduction as the next source-mapped target rather than exterior
-  wind/convection alignment.
+  wind/convection alignment. A direct runtime candidate that preserved a
+  separate adiabatic mass-CTF outside face/history instead of syncing it to the
+  current inside face was tested and rejected for now: using the current zone
+  boundary value made floor outside conduction the top bottleneck, while using
+  the previous inside face left floor heat-storage RMSE essentially unchanged
+  (`684.141484`). The EnergyPlus `SurfInitialTemp`/zero-flux CTF initial-history
+  lane is a better isolated target: with five surface passes it lowers floor
+  heat storage to `637.691788` RMSE, floor inside conduction to `530.085504`,
+  floor outside conduction to `148.148684`, and zone outside aggregate
+  conduction to `579.984742`, but it slightly regresses MAT (`2.107293`) and
+  the latent air-storage row (`197.510852`). Keep it as a source-aligned probe
+  lane until the zone-air/source-term ordering work can absorb those air-side
+  regressions.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
