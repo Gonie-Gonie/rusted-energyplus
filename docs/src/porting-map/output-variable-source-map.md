@@ -29,6 +29,10 @@ source files and Rust result locations before promoting conformance claims.
 | `Surface Inside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | surface conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | opposite sign of scalar inside conduction shell | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | outside conduction rate divided by area | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
+| `Surface Outside Face Convection Heat Gain Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc::GetQdotConvOutPerArea` | diagnostic `ResultStore` series from current outside face temperature, exterior dry-bulb, and exterior convection coefficient | diagnostic-only for official dynamic heat-balance case |
+| `Surface Outside Face Convection Heat Transfer Coefficient` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc`; `src/EnergyPlus/ConvectionCoefficients.cc` | diagnostic exterior coefficient helper, with DOE-2 available only in explicit probe lanes | diagnostic-only for official dynamic heat-balance case |
+| `Surface Outside Face Net Thermal Radiation Heat Gain Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` outside radiation report variables | diagnostic exterior longwave source report from current outside face temperature and weather-derived radiant temperature | diagnostic-only for official dynamic heat-balance case |
+| `Surface Outside Face Solar Radiation Heat Gain Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` outside absorbed shortwave report variables | diagnostic exterior solar source report from incident solar and outside-layer solar absorptance | diagnostic-only for official dynamic heat-balance case |
 | `Surface Heat Storage Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | diagnostic `ResultStore` series derived as `-(inside + outside)` from surface conduction rates | diagnostic-only for official dynamic heat-balance case |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` advanced report variables | sum of Rust opaque surface heat gain to zone | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
 | `Zone Opaque Surface Outside Faces Conduction Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` advanced report variables | sum of Rust outside-face opaque surface conduction rates | diagnostic-only for official dynamic heat-balance case |
@@ -84,10 +88,10 @@ blocking gate.
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
 zone air heat-balance, weather, internal gain, and surface conduction hourly
 oracle series. The dynamic diagnostic case compares run-period-filtered zone,
-roof/wall/floor face-temperature decomposition, surface/zone conduction, and
-zone air heat-balance deltas and records Rust/oracle warmup day metadata. These
-are conformance candidates, but they remain non-claiming until Rust produces
-matching hourly series under a blocking gate.
+roof/wall/floor face-temperature decomposition, surface/zone conduction, roof
+exterior source rows, and zone air heat-balance deltas and records Rust/oracle
+warmup day metadata. These are conformance candidates, but they remain
+non-claiming until Rust produces matching hourly series under a blocking gate.
 
 The v0.10 `ideal_loads_thermostat_001` report is baseline-only smoke evidence
 for thermostat and IdealLoads output availability plus typed graph coverage.

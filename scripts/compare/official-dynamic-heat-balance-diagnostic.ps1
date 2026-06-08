@@ -272,7 +272,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 34) {
+if ($summary.series_count -ne 41) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -297,6 +297,21 @@ $expectedTopCandidates = @(
         Key = "ZONE ONE"
         Variable = "Zone Opaque Surface Outside Faces Conduction Rate"
         Description = "zone outside opaque conduction aggregate"
+    },
+    @{
+        Key = "ZN001:ROOF001"
+        Variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+        Description = "roof outside solar heat gain"
+    },
+    @{
+        Key = "ZN001:ROOF001"
+        Variable = "Surface Outside Face Convection Heat Gain Rate"
+        Description = "roof outside convection heat gain"
+    },
+    @{
+        Key = "ZN001:ROOF001"
+        Variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+        Description = "roof outside net thermal radiation heat gain"
     }
 )
 if (
@@ -336,6 +351,18 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outsi
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Incident Solar Radiation Rate per Area" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Outside Face Incident Solar Radiation Rate per Area series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Convection Heat Gain Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted roof outside convection heat gain series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Convection Heat Transfer Coefficient" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted roof outside convection coefficient series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Net Thermal Radiation Heat Gain Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted roof outside net thermal radiation heat gain series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Solar Radiation Heat Gain Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted roof outside solar radiation heat gain series"
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Conduction Heat Transfer Rate series"
@@ -412,6 +439,9 @@ Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "mar
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate" -Description "markdown outside convection source variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate" -Description "markdown outside radiation source variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate" -Description "markdown outside solar source variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate" -Description "markdown zone outside conduction variable"
 Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"

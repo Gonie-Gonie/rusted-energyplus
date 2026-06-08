@@ -432,6 +432,40 @@ impl RuntimeOutputRegistry {
                     RuntimeOutputSource::WeatherInput,
                 );
             }
+            if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
+                for (variable_name, units) in [
+                    ("Surface Outside Face Convection Heat Gain Rate", "W"),
+                    (
+                        "Surface Outside Face Convection Heat Gain Rate per Area",
+                        "W/m2",
+                    ),
+                    (
+                        "Surface Outside Face Convection Heat Transfer Coefficient",
+                        "W/m2-K",
+                    ),
+                    (
+                        "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
+                        "W",
+                    ),
+                    (
+                        "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
+                        "W/m2",
+                    ),
+                    ("Surface Outside Face Solar Radiation Heat Gain Rate", "W"),
+                    (
+                        "Surface Outside Face Solar Radiation Heat Gain Rate per Area",
+                        "W/m2",
+                    ),
+                ] {
+                    self.push_output(
+                        &surface.name.0,
+                        variable_name,
+                        units,
+                        RuntimeOutputFrequency::Hourly,
+                        RuntimeOutputSource::RuntimeState,
+                    );
+                }
+            }
             for (variable_name, units) in [
                 ("Surface Inside Face Conduction Heat Transfer Rate", "W"),
                 ("Surface Inside Face Conduction Heat Gain Rate", "W"),

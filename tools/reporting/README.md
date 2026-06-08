@@ -34,9 +34,10 @@ Current generators:
   heat-balance diagnostic probe lanes from existing `.runtime` compare
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
   inside/outside aggregate conduction focus metrics across lanes. The focus set also includes
-  latent diagnostic state such as internal convective gain and floor/roof
-  inside/outside face temperatures, so rate regressions can be reviewed against
-  their surface-state drivers. The focus table also records RMSE movement
+  latent diagnostic state such as internal convective gain, floor/roof
+  inside/outside face temperatures, and roof outside convection/radiation/solar
+  source rows, so rate regressions can be reviewed against their surface-state
+  drivers. The focus table also records RMSE movement
   relative to the default lane so partial isolation improvements that
   destabilize the whole zone balance are visible in one scan. The probe
   interpretation table compares each lane against its nearest reference lane,

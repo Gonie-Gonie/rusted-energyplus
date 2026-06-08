@@ -213,6 +213,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   same bottleneck: the default lane has `2119.175942` RMSE, quick-outside iter3
   lowers it to `1216.135113`, and quick-outside plus DOE-2 iter3 lowers it to
   `799.673332` while still making it the top row in those 34-series probes.
+  The active tracker now carries 41 rows by adding roof outside convection,
+  net thermal radiation, and absorbed solar source diagnostics so the remaining
+  outside aggregate movement can be tied to exterior source rows before runtime
+  promotion.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE

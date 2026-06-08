@@ -954,6 +954,13 @@ struct SurfaceHeatBalanceTrace {
     surface_name: String,
     inside_face_temperature_c: Vec<f64>,
     outside_face_temperature_c: Vec<f64>,
+    outside_convection_heat_gain_rate_w: Vec<f64>,
+    outside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
+    outside_convection_coefficient_w_per_m2_k: Vec<f64>,
+    outside_net_thermal_radiation_heat_gain_rate_w: Vec<f64>,
+    outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
+    outside_solar_radiation_heat_gain_rate_w: Vec<f64>,
+    outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     inside_conduction_rate_w: Vec<f64>,
     inside_conduction_gain_rate_w: Vec<f64>,
     inside_conduction_loss_rate_w: Vec<f64>,
@@ -974,6 +981,17 @@ struct ZoneConductionTrace {
     outside_conduction_rate_w: Vec<f64>,
     outside_conduction_gain_rate_w: Vec<f64>,
     outside_conduction_loss_rate_w: Vec<f64>,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct SurfaceExteriorReportTerms {
+    convection_heat_gain_rate_w: f64,
+    convection_heat_gain_rate_per_area_w_per_m2: f64,
+    convection_coefficient_w_per_m2_k: f64,
+    net_thermal_radiation_heat_gain_rate_w: f64,
+    net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: f64,
+    solar_radiation_heat_gain_rate_w: f64,
+    solar_radiation_heat_gain_rate_per_area_w_per_m2: f64,
 }
 
 /// Appends diagnostic surface incident solar radiation series for sun-exposed
@@ -3109,6 +3127,21 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             surface_name: surface.surface_name.clone(),
             inside_face_temperature_c: Vec::with_capacity(options.sample_count),
             outside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
+            outside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_convection_coefficient_w_per_m2_k: Vec::with_capacity(options.sample_count),
+            outside_net_thermal_radiation_heat_gain_rate_w: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_solar_radiation_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
+            outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
             inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
@@ -3218,12 +3251,41 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     weather_context,
                     options.zone_air_algorithm,
                 );
+                let exterior_terms = surface_exterior_report_terms(
+                    &model.typed,
+                    surface_state,
+                    outdoor_dry_bulb_c,
+                    outside_face_temperature_c,
+                    weather_context,
+                    options.zone_air_algorithm,
+                );
                 trace
                     .inside_face_temperature_c
                     .push(surface_state.inside_face_temperature_c);
                 trace
                     .outside_face_temperature_c
                     .push(outside_face_temperature_c);
+                trace
+                    .outside_convection_heat_gain_rate_w
+                    .push(exterior_terms.convection_heat_gain_rate_w);
+                trace
+                    .outside_convection_heat_gain_rate_per_area_w_per_m2
+                    .push(exterior_terms.convection_heat_gain_rate_per_area_w_per_m2);
+                trace
+                    .outside_convection_coefficient_w_per_m2_k
+                    .push(exterior_terms.convection_coefficient_w_per_m2_k);
+                trace
+                    .outside_net_thermal_radiation_heat_gain_rate_w
+                    .push(exterior_terms.net_thermal_radiation_heat_gain_rate_w);
+                trace
+                    .outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2
+                    .push(exterior_terms.net_thermal_radiation_heat_gain_rate_per_area_w_per_m2);
+                trace
+                    .outside_solar_radiation_heat_gain_rate_w
+                    .push(exterior_terms.solar_radiation_heat_gain_rate_w);
+                trace
+                    .outside_solar_radiation_heat_gain_rate_per_area_w_per_m2
+                    .push(exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2);
                 trace.inside_conduction_rate_w.push(inside_rate);
                 trace
                     .inside_conduction_gain_rate_w
@@ -3362,6 +3424,64 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Surface Outside Face Temperature".to_string(),
             units: "C".to_string(),
             values: trace.outside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Convection Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_convection_heat_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Convection Heat Gain Rate per Area".to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_convection_heat_gain_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Convection Heat Transfer Coefficient".to_string(),
+            units: "W/m2-K".to_string(),
+            values: trace.outside_convection_coefficient_w_per_m2_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Net Thermal Radiation Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_net_thermal_radiation_heat_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Solar Radiation Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_solar_radiation_heat_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Solar Radiation Heat Gain Rate per Area"
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -4045,6 +4165,112 @@ fn reported_surface_outside_face_temperature_c(
             zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
         ),
+    )
+}
+
+fn surface_exterior_report_terms(
+    model: &TypedModel,
+    surface_state: &SurfaceHeatBalanceState,
+    outdoor_dry_bulb_c: f64,
+    reported_outside_face_temperature_c: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> SurfaceExteriorReportTerms {
+    if surface_state.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
+        || surface_state.area_m2 <= 0.0
+    {
+        return SurfaceExteriorReportTerms::default();
+    }
+    let Some(context) = weather_context else {
+        return SurfaceExteriorReportTerms::default();
+    };
+    let Some(record) = context.records.get(context.record_index) else {
+        return SurfaceExteriorReportTerms::default();
+    };
+    let Some(typed_surface) = model
+        .surfaces
+        .iter()
+        .find(|surface| surface.id == surface_state.surface_id)
+    else {
+        return SurfaceExteriorReportTerms::default();
+    };
+
+    let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
+        model
+            .site
+            .as_ref()
+            .map(|site| {
+                surface_incident_solar_radiation_hourly_average_w_per_m2(
+                    typed_surface,
+                    site,
+                    context.records,
+                    context.record_index,
+                    context.zone_steps_per_hour,
+                )
+            })
+            .unwrap_or(0.0)
+    } else {
+        0.0
+    };
+    let solar_gain_per_area_w_per_m2 =
+        surface_state.solar_absorptance.clamp(0.0, 1.0) * incident_solar_w_per_m2.max(0.0);
+
+    let tilt_rad =
+        surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+    let convection_coefficient_w_per_m2_k =
+        if zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm) {
+            energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+                reported_outside_face_temperature_c,
+                outdoor_dry_bulb_c,
+                tilt_rad.cos(),
+                surface_azimuth_deg(&typed_surface.vertices),
+                record.wind_direction_deg,
+                record.wind_speed_m_per_s,
+                surface_state.outside_layer_roughness,
+            )
+        } else {
+            exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
+        };
+    let convection_gain_per_area_w_per_m2 = -convection_coefficient_w_per_m2_k
+        * (reported_outside_face_temperature_c - outdoor_dry_bulb_c);
+
+    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
+    let longwave_coefficient_w_per_m2_k =
+        EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
+    let sky_temperature_c = horizontal_infrared_sky_temperature_c(
+        record.horizontal_infrared_radiation_wh_per_m2,
+        outdoor_dry_bulb_c,
+    );
+    let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
+    let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
+    let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
+        + ground_view_factor * outdoor_dry_bulb_c
+        + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
+    let net_radiation_gain_per_area_w_per_m2 = -longwave_coefficient_w_per_m2_k
+        * (reported_outside_face_temperature_c - longwave_radiant_temperature_c);
+
+    SurfaceExteriorReportTerms {
+        convection_heat_gain_rate_w: convection_gain_per_area_w_per_m2 * surface_state.area_m2,
+        convection_heat_gain_rate_per_area_w_per_m2: convection_gain_per_area_w_per_m2,
+        convection_coefficient_w_per_m2_k,
+        net_thermal_radiation_heat_gain_rate_w: net_radiation_gain_per_area_w_per_m2
+            * surface_state.area_m2,
+        net_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
+            net_radiation_gain_per_area_w_per_m2,
+        solar_radiation_heat_gain_rate_w: solar_gain_per_area_w_per_m2 * surface_state.area_m2,
+        solar_radiation_heat_gain_rate_per_area_w_per_m2: solar_gain_per_area_w_per_m2,
+    }
+}
+
+fn zone_air_algorithm_uses_doe2_outside_convection(
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> bool {
+    matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     )
 }
 
@@ -8318,7 +8544,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 77);
+        assert_eq!(simulation.results.series.len(), 119);
 
         let Some(zone_series) = simulation
             .results
@@ -9036,7 +9262,7 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 81);
+        assert_eq!(registry.len(), 123);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
@@ -9059,11 +9285,15 @@ DATA PERIODS
                 "floor",
                 "Surface Outside Face Incident Solar Radiation Rate per Area",
             ),
+            RuntimeOutputRequest::hourly(
+                "floor",
+                "Surface Outside Face Convection Heat Transfer Coefficient",
+            ),
             RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Drybulb Temperature"),
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 8);
+        assert_eq!(resolution.resolved.len(), 9);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

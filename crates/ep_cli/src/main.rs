@@ -3366,6 +3366,18 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case("Surface Heat Storage Rate")
         || variable
             .eq_ignore_ascii_case("Surface Outside Face Incident Solar Radiation Rate per Area")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Convection Heat Gain Rate")
+        || variable.eq_ignore_ascii_case("Surface Outside Face Convection Heat Gain Rate per Area")
+        || variable
+            .eq_ignore_ascii_case("Surface Outside Face Convection Heat Transfer Coefficient")
+        || variable
+            .eq_ignore_ascii_case("Surface Outside Face Net Thermal Radiation Heat Gain Rate")
+        || variable.eq_ignore_ascii_case(
+            "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
+        )
+        || variable.eq_ignore_ascii_case("Surface Outside Face Solar Radiation Heat Gain Rate")
+        || variable
+            .eq_ignore_ascii_case("Surface Outside Face Solar Radiation Heat Gain Rate per Area")
         || variable.eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Rate")
         || variable
             .eq_ignore_ascii_case("Zone Opaque Surface Inside Faces Conduction Heat Gain Rate")
