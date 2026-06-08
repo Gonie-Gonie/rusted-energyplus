@@ -55,7 +55,8 @@ Current generators:
   previous-inside outdoor boundary solves with three surface passes, combined
   all-CTF analytical coupled previous-inside quick outside-conduction solves
   with three and five surface passes plus DOE-2 exterior-convection and grey
-  interior-longwave forks, combined
+  interior-longwave forks plus the combined DOE-2/interior-longwave fork,
+  combined
   all-CTF analytical coupled previous-inside outdoor/adiabatic boundary solves
   with three surface passes, combined
   all-CTF analytical surface-first with three surface passes, third-order

@@ -206,11 +206,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `576.102819`, and floor outside conduction to `225.936049`, but regresses the
   zone aggregate row to `100.797367` and the latent air-balance rates. The grey
   interior-longwave fork lowers floor storage further to RMSE `579.551277`, but
-  also gives back zone aggregate conduction (`122.199401` RMSE). These forks
-  narrow the next source-mapped target to coherent exterior radiation,
-  interior longwave, quick/slow boundary branches, source coupling, surface
-  iteration, zone-air correction, and CTF history commit order rather than a
-  single post-correction surface feedback pass. The previous-inside
+  also gives back zone aggregate conduction (`122.199401` RMSE). Combining
+  DOE-2 exterior convection and grey interior longwave improves MAT
+  (`0.972533` RMSE), zone surface convection (`52.581726` RMSE), floor inside
+  conduction (`293.417817` RMSE), and floor storage (`575.885599` RMSE), but
+  raises floor outside conduction to `423.487145` RMSE and storage max-abs to
+  `8287.121494`. These forks narrow the next source-mapped target to coherent
+  exterior radiation, interior longwave, quick/slow boundary branches, source
+  coupling, surface iteration, zone-air correction, and CTF history commit
+  order rather than a single post-correction surface feedback pass. The
+  previous-inside
   outdoor/adiabatic boundary probe slightly lowers floor inside conduction
   again to RMSE `923.728787`, but does not improve floor heat storage
   (`1422.231349` versus `1422.193225`) or zone aggregate conduction.
