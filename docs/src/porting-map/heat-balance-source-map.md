@@ -92,6 +92,9 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `CalcHeatBalanceInsideSurf2CTFOnly` uses `IterDampConst = 5.0`, subtracts
   `CTFCross[0]` from the inside denominator for adiabatic surfaces, and uses
   `CTFCross[0] * SurfTempOutHist(1)` for standard opaque surfaces.
+- `DataHeatBalance::SurfInitialConvCoeff = 3.076 W/m2-K` initializes inside
+  convection coefficients before the selected inside convection algorithm is
+  evaluated.
 - `CalcHeatBalanceOutsideSurf` solves the no-movable-insulation exterior face
   temperature with `-SurfCTFConstOutPart`, current `CTFCross[0] * SurfTempIn`,
   absorbed outside source terms, and exterior convection/radiation coefficients.
@@ -108,9 +111,10 @@ Current Rust boundary:
   during diagnostic-only heat-balance runs. The default CLI diagnostic seed is
   limited to steady/no-mass `#CTFs <= 1` constructions until CTF face-temperature
   solving is ported. Runtime helpers now encode the EnergyPlus-shaped CTF
-  inside and outside face-temperature equations, but the full EnergyPlus
-  iteration order and convection/radiation coefficient updates are not yet wired
-  into the timestep shell.
+  inside and outside face-temperature equations. The timestep shell uses the
+  EnergyPlus initial inside convection coefficient as an interim bridge; the
+  selected TARP/DOE-2 convection algorithms, full inside iteration order, and
+  radiation coefficient updates are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

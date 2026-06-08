@@ -31,6 +31,7 @@ const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
+const ENERGYPLUS_INITIAL_INSIDE_CONVECTION_W_PER_M2_K: f64 = 3.076;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -2288,6 +2289,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         .collect::<Vec<_>>();
 
     for surface in &mut state.surfaces {
+        let previous_inside_face_temperature_c = surface.inside_face_temperature_c;
         let zone_temperature_c = state
             .zones
             .iter()
@@ -2303,6 +2305,19 @@ fn advance_heat_balance_state_one_timestep_internal(
             zone_temperature_c,
         );
         update_surface_ctf_history_constants(surface);
+        surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
+            surface,
+            CtfInsideFaceBalanceInput {
+                reference_air_temperature_c: zone_temperature_c,
+                inside_convection_coefficient_w_per_m2_k:
+                    ENERGYPLUS_INITIAL_INSIDE_CONVECTION_W_PER_M2_K,
+                previous_inside_face_temperature_c,
+                net_inside_source_w_per_m2: 0.0,
+            },
+        );
+        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+            surface.outside_face_temperature_c = surface.inside_face_temperature_c;
+        }
         surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
         advance_surface_ctf_histories(surface);
     }
@@ -5642,10 +5657,10 @@ DATA PERIODS
         assert!(state.zones[0].mean_air_temperature_c < 20.0);
         assert!(state.zones[0].opaque_surface_heat_gain_w < 0.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 10.0);
-        assert_eq!(
-            state.surfaces[0].inside_face_temperature_c,
-            state.zones[0].mean_air_temperature_c
+        assert!(
+            state.surfaces[0].inside_face_temperature_c > state.zones[0].mean_air_temperature_c
         );
+        assert!(state.surfaces[0].inside_face_temperature_c < 20.0);
         assert!(state.surfaces[0].heat_gain_to_zone_w < 0.0);
 
         Ok(())
@@ -5811,7 +5826,8 @@ DATA PERIODS
             return Err(std::io::Error::other("missing inside surface series").into());
         };
         assert_eq!(inside_surface_series.values.len(), 2);
-        assert_eq!(inside_surface_series.values[0], zone_series.values[0]);
+        assert!(inside_surface_series.values[0].is_finite());
+        assert_ne!(inside_surface_series.values[0], zone_series.values[0]);
 
         let Some(outside_surface_series) = simulation
             .results
