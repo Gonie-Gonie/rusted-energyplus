@@ -637,6 +637,7 @@ struct QuickOutsideConductionContext {
     reference_air_temperature_c: f64,
     inside_convection_coefficient_w_per_m2_k: f64,
     net_inside_source_w_per_m2: f64,
+    exterior_coefficient_surface_temperature_c: Option<f64>,
     use_doe2_outside_convection: bool,
 }
 
@@ -2528,6 +2529,11 @@ fn advance_heat_balance_state_one_timestep_internal(
         .iter()
         .map(|surface| (surface.surface_id, surface.inside_face_temperature_c))
         .collect::<BTreeMap<_, _>>();
+    let previous_surface_outside_temperatures = state
+        .surfaces
+        .iter()
+        .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
+        .collect::<BTreeMap<_, _>>();
     let correct_zone_air_after_surface_pass = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
@@ -2760,6 +2766,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             use_previous_inside_for_outdoor_boundary,
             use_previous_inside_for_adiabatic_boundary,
             use_quick_outside_conduction,
+            Some(&previous_surface_outside_temperatures),
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
         );
@@ -2781,6 +2788,11 @@ fn advance_heat_balance_state_one_timestep_internal(
             use_previous_inside_for_outdoor_boundary,
             use_previous_inside_for_adiabatic_boundary,
             use_quick_outside_conduction,
+            if use_quick_outside_conduction {
+                Some(&previous_surface_outside_temperatures)
+            } else {
+                None
+            },
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
         );
@@ -2809,6 +2821,11 @@ fn advance_heat_balance_state_one_timestep_internal(
                 use_previous_inside_for_outdoor_boundary,
                 use_previous_inside_for_adiabatic_boundary,
                 use_quick_outside_conduction,
+                if use_quick_outside_conduction {
+                    Some(&previous_surface_outside_temperatures)
+                } else {
+                    None
+                },
                 use_doe2_outside_convection,
                 interior_longwave_exchange_probe,
             );
@@ -2840,6 +2857,7 @@ fn run_interleaved_surface_zone_balance(
     use_previous_inside_for_outdoor_boundary: bool,
     use_previous_inside_for_adiabatic_boundary: bool,
     use_quick_outside_conduction: bool,
+    exterior_coefficient_surface_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     use_doe2_outside_convection: bool,
     interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
 ) {
@@ -2872,6 +2890,7 @@ fn run_interleaved_surface_zone_balance(
             use_previous_inside_for_outdoor_boundary,
             use_previous_inside_for_adiabatic_boundary,
             use_quick_outside_conduction,
+            exterior_coefficient_surface_temperatures,
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
         );
@@ -2896,6 +2915,7 @@ fn run_surface_balance_passes(
     use_previous_inside_for_outdoor_boundary: bool,
     use_previous_inside_for_adiabatic_boundary: bool,
     use_quick_outside_conduction: bool,
+    exterior_coefficient_surface_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     use_doe2_outside_convection: bool,
     interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
 ) {
@@ -2964,6 +2984,10 @@ fn run_surface_balance_passes(
                     inside_convection_coefficient_w_per_m2_k:
                         inside_convection_coefficient_w_per_m2_k,
                     net_inside_source_w_per_m2,
+                    exterior_coefficient_surface_temperature_c:
+                        exterior_coefficient_surface_temperatures
+                            .and_then(|temperatures| temperatures.get(&surface.surface_id))
+                            .copied(),
                     use_doe2_outside_convection,
                 })
             } else {
@@ -4427,6 +4451,8 @@ fn exterior_surface_boundary_balance(
                 use_doe2_outside_convection,
                 wet_reference_temperature_c,
                 wet_timestep_fraction,
+                quick_outside_conduction
+                    .and_then(|context| context.exterior_coefficient_surface_temperature_c),
             );
         };
         surface_incident_solar_radiation_for_weather_context_w_per_m2(
@@ -4455,6 +4481,8 @@ fn exterior_surface_boundary_balance(
         use_doe2_outside_convection,
         wet_reference_temperature_c,
         wet_timestep_fraction,
+        quick_outside_conduction
+            .and_then(|context| context.exterior_coefficient_surface_temperature_c),
     )
 }
 
@@ -5758,6 +5786,7 @@ fn exterior_surface_energy_balance(
     use_doe2_outside_convection: bool,
     wet_reference_temperature_c: f64,
     wet_timestep_fraction: f64,
+    exterior_coefficient_surface_temperature_c: Option<f64>,
 ) -> SurfaceBoundaryBalanceResult {
     if quick_outside_conduction.is_none() {
         if wet_timestep_fraction <= f64::EPSILON
@@ -5774,6 +5803,8 @@ fn exterior_surface_energy_balance(
     let solar_gain_per_area_w_per_m2 = solar_absorptance * incident_solar_w_per_m2.max(0.0);
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+    let coefficient_surface_temperature_c = exterior_coefficient_surface_temperature_c
+        .unwrap_or(surface_state.outside_face_temperature_c);
     let use_doe2_outside_convection = use_doe2_outside_convection
         || quick_outside_conduction
             .map(|context| context.use_doe2_outside_convection)
@@ -5781,7 +5812,7 @@ fn exterior_surface_energy_balance(
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,
         typed_surface,
-        surface_state.outside_face_temperature_c,
+        coefficient_surface_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
         terrain,
@@ -5795,7 +5826,7 @@ fn exterior_surface_energy_balance(
         surface_state,
         typed_surface,
         horizontal_infrared_radiation_w_per_m2,
-        surface_state.outside_face_temperature_c,
+        coefficient_surface_temperature_c,
         convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
@@ -7695,12 +7726,12 @@ mod tests {
         HeatBalanceZoneAirAlgorithm, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
         NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
         NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
-        PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
-        RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
-        SimulationState, SurfaceExteriorReportTerms, advance_heat_balance_state_one_timestep,
-        advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
-        append_surface_incident_solar_radiation_series, build_execution_plan,
-        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        PlantEquipmentRole, PlantStateProjectionOptions, QuickOutsideConductionContext,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState, SurfaceExteriorReportTerms,
+        advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
+        advance_surface_ctf_histories, append_surface_incident_solar_radiation_series,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
@@ -7721,18 +7752,19 @@ mod tests {
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_weather_relative_humidity_at_timestep,
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
-        energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
-        horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
-        initialize_heat_balance_state_with_ctf_coefficients, next_day,
-        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
-        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        energyplus_zone_air_temperature_coefficients, exterior_surface_energy_balance,
+        heat_balance_uses_doe2_outside_convection, horizontal_infrared_sky_temperature_c,
+        initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+        next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
+        parse_epw_records, run_heat_balance_run_period_warmup,
+        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
-        surface_exterior_report_terms, surface_geometry_summaries,
+        surface_azimuth_deg, surface_exterior_report_terms, surface_geometry_summaries,
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
         surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
@@ -10182,6 +10214,102 @@ DATA PERIODS
 
         assert_eq!(cached_terms, surface.outside_report_terms);
         assert_eq!(fallback_terms, SurfaceExteriorReportTerms::default());
+
+        Ok(())
+    }
+
+    #[test]
+    fn quick_outside_balance_freezes_exterior_coefficient_temperature()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface_state = state
+            .surfaces
+            .iter_mut()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing roof test surface"))?;
+        surface_state.outside_face_temperature_c = 60.0;
+        let typed_surface = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing typed roof test surface"))?;
+        let record = weather_record_with_precipitation(0.0);
+
+        let quick_context = QuickOutsideConductionContext {
+            reference_air_temperature_c: 20.0,
+            inside_convection_coefficient_w_per_m2_k: 3.0,
+            net_inside_source_w_per_m2: 0.0,
+            exterior_coefficient_surface_temperature_c: Some(20.0),
+            use_doe2_outside_convection: true,
+        };
+        let frozen = exterior_surface_energy_balance(
+            surface_state,
+            typed_surface,
+            &record,
+            10.0,
+            20.0,
+            0.0,
+            Terrain::Suburbs,
+            0.0,
+            0.0,
+            300.0,
+            Some(quick_context),
+            true,
+            10.0,
+            0.0,
+            quick_context.exterior_coefficient_surface_temperature_c,
+        );
+        let unfrozen = exterior_surface_energy_balance(
+            surface_state,
+            typed_surface,
+            &record,
+            10.0,
+            20.0,
+            0.0,
+            Terrain::Suburbs,
+            0.0,
+            0.0,
+            300.0,
+            Some(QuickOutsideConductionContext {
+                exterior_coefficient_surface_temperature_c: None,
+                ..quick_context
+            }),
+            true,
+            10.0,
+            0.0,
+            None,
+        );
+        let expected_coefficient = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            20.0,
+            10.0,
+            surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices)
+                .to_radians()
+                .cos(),
+            surface_azimuth_deg(&typed_surface.vertices),
+            0.0,
+            0.0,
+            surface_state.outside_layer_roughness,
+        );
+
+        assert!(
+            (frozen
+                .exterior_report_terms
+                .convection_coefficient_w_per_m2_k
+                - expected_coefficient)
+                .abs()
+                < 1.0e-12
+        );
+        assert!(
+            unfrozen
+                .exterior_report_terms
+                .convection_coefficient_w_per_m2_k
+                > frozen
+                    .exterior_report_terms
+                    .convection_coefficient_w_per_m2_k
+                    + 1.0
+        );
 
         Ok(())
     }

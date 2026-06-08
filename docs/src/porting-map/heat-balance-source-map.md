@@ -150,12 +150,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   The EnergyPlus-shaped quick-outside probes now cache the exterior report
   terms from the outside balance itself so `SurfHConvExt`-like convection and
   `SurfH*Ext`-like radiation state are reused for reporting instead of being
-  recomputed from the solved face temperature. A 2026-06-09 active probe rerun
-  showed this as a structural no-op for the current roof bottleneck
-  (`ZN001:ROOF001` outside convection RMSE stayed at about `189.364764` W),
-  so the remaining roof source delta should be investigated through the CTF
-  outside-face temperature/history path rather than through report helper
-  recomputation.
+  recomputed from the solved face temperature. EnergyPlus evaluates those
+  exterior coefficients through `InitExtConvCoeff` before the same-timestep
+  outside-face temperature solve, so the quick-outside diagnostic path now also
+  freezes the coefficient evaluation temperature at the timestep-start
+  `SurfOutsideTempHist(1)` analogue while still reporting heat gains from the
+  solved outside face temperature.
 - `WeatherManager.cc` sets timestep rain from interpolated liquid
   precipitation using `IsRainThreshold = 0.8 / TimeStepsInHour`, while
   `HeatBalanceSurfaceManager.cc::CalcHeatBalanceOutsideSurf` resets exposed wet
@@ -332,15 +332,18 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   convection and net thermal radiation become the new top source rows at
   `189.364767` and `171.066926`, so the next source-order target is exterior
   radiation/convection source coupling after the adiabatic floor CTF reporting
-  order is no longer the top bottleneck. A follow-up exterior report-order
-  probe that recomputed roof convection/radiation coefficients from the prior
-  CTF outside-temperature history instead of the reported current outside
-  temperature was a strict no-op: roof outside convection stayed `189.364767`,
-  roof net thermal radiation stayed `171.066926`, and the active bottleneck
-  ordering did not move. Keep the next exterior investigation on the outside
-  face temperature balance inputs, local wind/HConv source state, and
-  radiation/source coupling rather than on the final report coefficient
-  sampling point alone.
+  order is no longer the top bottleneck. Freezing the quick-outside exterior
+  convection/radiation coefficient evaluation temperature at the timestep-start
+  outside face, matching the `InitExtConvCoeff` call before the TH11 solve,
+  resolves the sharp post-rain roof spike: the active lane drops roof outside
+  convection RMSE from `177.495366` to `57.796045`, max-abs from
+  `6379.490036` to `609.232339`, and roof net thermal radiation RMSE from
+  `161.732738` to `34.308908`. At the November 11 11:00 focus hour, roof
+  outside face temperature moves from a `7.576803 C` delta to `0.000329 C`,
+  and `SurfHConvExt` analogue moves from a `0.768933` delta to `0.000757`.
+  The next active bottleneck is back on zone aggregate outside conduction,
+  floor storage, and inside-face coupling rather than exterior HConv/source
+  sampling.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
