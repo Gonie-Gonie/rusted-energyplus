@@ -309,7 +309,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `170.807621`. This confirms the next source-order target is the coupled
   inside-surface/zone-air/interior-longwave correction loop and floor CTF
   outside-face reporting/order, not only exterior radiation/coefficient
-  alignment or the number of surface passes.
+  alignment or the number of surface passes. Re-applying the rejected
+  adiabatic outside-face freeze to this grey longwave interleaved lane is also
+  a no-op at the current diagnostic precision: MAT remains `0.484293`, floor
+  outside conduction remains the top bottleneck at `399.585932`, floor storage
+  stays `369.422094`, and zone outside aggregate conduction stays
+  `328.985192`. Keep that fork rejected and focus the next probe on EnergyPlus
+  CTF outside-face flux/history reporting order rather than on another
+  adiabatic boundary-temperature sync toggle.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE

@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-09
 ---
 
 # Conduction Map
@@ -118,7 +118,12 @@ to adiabatic boundaries nudges floor inside temperature and inside conduction
 slightly lower (`923.728787` inside conduction RMSE), but it does not improve
 floor storage (`1422.231349` RMSE versus `1422.193225`) or zone aggregate
 conduction, so the adiabatic boundary probe remains a diagnostic fork rather
-than the active best lane.
+than the active best lane. Re-testing the same boundary freeze after the
+interleaved grey interior-longwave lane also stays below the diagnostic
+movement threshold: floor outside conduction remains `399.585932` RMSE and
+floor storage remains `369.422094`, so the next conduction target is outside
+flux/history reporting order rather than another adiabatic temperature-sync
+toggle.
 Adding the EnergyPlus advanced outside-face zone aggregate as a latent
 diagnostic row exposed outside aggregate conduction as a second default bottleneck
 (`2024.075950` RMSE) and the top current quick-boundary bottleneck:
