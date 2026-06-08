@@ -58,7 +58,9 @@ all-CTF lane, so the remaining floor delta is not explained by Rust's early
 warmup convergence alone. The all-CTF surface-iter3 probe lowers the
 zone-air storage/convection bottleneck relative to all-CTF, but it does not
 improve the floor conduction row, so iteration sensitivity and mass-floor CTF
-history parity remain separate work items. Roof/wall exterior
+history parity remain separate work items. Ad hoc iter5/iter8 runs lowered some
+peak errors but raised the top RMSE relative to iter3, so iter3 is the current
+tracked probe count rather than a promotion setting. Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface

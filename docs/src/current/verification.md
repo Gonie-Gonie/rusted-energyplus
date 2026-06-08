@@ -69,7 +69,10 @@ zone-air update without creating a conformance claim:
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-warmup-20-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-surface-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe
 python tools\reporting\dynamic_heat_balance_probe_summary.py --repo-root .
 ```
 

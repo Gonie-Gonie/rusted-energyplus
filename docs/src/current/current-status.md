@@ -91,8 +91,8 @@ The current public scope includes:
   samples, compare 27 roof/wall/floor face-temperature, conduction
   decomposition, and zone air heat-balance series, rank bottleneck series by
   RMSE, and record EnergyPlus EIO run-period warmup day counts, the current
-  CTF seed policy, and explicit all-CTF/third-order probe metadata without
-  claiming parity
+  CTF seed policy, surface iteration count, and explicit all-CTF, warmup,
+  surface-iteration, and third-order probe metadata without claiming parity
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
