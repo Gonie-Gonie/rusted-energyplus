@@ -3,11 +3,11 @@
 use crate::{OutputSeries, ResultStore, RuntimeOutputRegistry};
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
-    IdealLoadsAirSystemId, LoopId, MaterialId, NodeId, NormalizedName, OtherEquipment,
-    OutputHandle, OutsideBoundaryCondition, PlantBranchComponent, PlantLoop, Point3, RunPeriod,
-    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, SunExposure,
-    Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId,
-    ZoneThermostatId,
+    IdealLoadsAirSystemId, LoopId, MaterialId, MaterialSurfaceRoughness, NodeId, NormalizedName,
+    OtherEquipment, OutputHandle, OutsideBoundaryCondition, PlantBranchComponent, PlantLoop,
+    Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel,
+    SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, Zone,
+    ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
@@ -602,6 +602,8 @@ pub struct SurfaceHeatBalanceState {
     pub outside_layer_material_id: MaterialId,
     /// EnergyPlus-normalized outside layer material name.
     pub outside_layer_material_name: String,
+    /// Outside layer surface roughness used by EnergyPlus exterior convection.
+    pub outside_layer_roughness: MaterialSurfaceRoughness,
     /// Surface area in square meters.
     pub area_m2: f64,
     /// Surface tilt in degrees using EnergyPlus orientation conventions.
@@ -2176,6 +2178,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 construction_name: thermal.construction_name,
                 outside_layer_material_id: thermal.outside_layer_material_id,
                 outside_layer_material_name: thermal.outside_layer_material_name,
+                outside_layer_roughness: thermal.outside_layer_roughness,
                 area_m2,
                 tilt_deg,
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
@@ -2810,6 +2813,7 @@ struct SurfaceThermalProperties {
     construction_name: String,
     outside_layer_material_id: MaterialId,
     outside_layer_material_name: String,
+    outside_layer_roughness: MaterialSurfaceRoughness,
     thermal_resistance_m2_k_per_w: f64,
     heat_capacity_j_per_m2_k: Option<f64>,
     thermal_absorptance: f64,
@@ -2884,6 +2888,9 @@ fn surface_thermal_properties(
         construction_name: construction.name.0.clone(),
         outside_layer_material_id: material.id,
         outside_layer_material_name: material.name.0.clone(),
+        outside_layer_roughness: material
+            .roughness
+            .unwrap_or(MaterialSurfaceRoughness::MediumRough),
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k,
         thermal_absorptance: material
@@ -4606,13 +4613,13 @@ mod tests {
         DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
         HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
         IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
-        MaterialKind, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment,
-        OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition, PlantBranch,
-        PlantBranchComponent, PlantBranchList, PlantLoop, Point3, RunPeriod, RunPeriodId,
-        ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel,
-        SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
-        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Zone,
-        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+        MaterialKind, MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
+        OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition,
+        PlantBranch, PlantBranchComponent, PlantBranchList, PlantLoop, Point3, RunPeriod,
+        RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId,
+        SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
+        ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+        TypedModel, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
         ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
         ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
@@ -5557,6 +5564,10 @@ DATA PERIODS
         );
         assert_eq!(state.surfaces[0].construction_name, "WALL");
         assert_eq!(state.surfaces[0].outside_layer_material_name, "R1");
+        assert_eq!(
+            state.surfaces[0].outside_layer_roughness,
+            MaterialSurfaceRoughness::Rough
+        );
         assert_eq!(state.surfaces[0].area_m2, 1.0);
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
@@ -6270,6 +6281,7 @@ DATA PERIODS
             id: MaterialId(0),
             name: NormalizedName::new("R1"),
             kind: MaterialKind::NoMass,
+            roughness: Some(MaterialSurfaceRoughness::Rough),
             conductivity_w_per_m_k: None,
             density_kg_per_m3: None,
             specific_heat_j_per_kg_k: None,
@@ -6330,6 +6342,7 @@ DATA PERIODS
             id: MaterialId(0),
             name: NormalizedName::new("R1"),
             kind: MaterialKind::NoMass,
+            roughness: Some(MaterialSurfaceRoughness::Rough),
             conductivity_w_per_m_k: None,
             density_kg_per_m3: None,
             specific_heat_j_per_kg_k: None,

@@ -190,6 +190,39 @@ pub enum MaterialKind {
     NoMass,
 }
 
+/// EnergyPlus material surface roughness.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MaterialSurfaceRoughness {
+    /// `VeryRough`.
+    VeryRough,
+    /// `Rough`.
+    Rough,
+    /// `MediumRough`.
+    MediumRough,
+    /// `MediumSmooth`.
+    MediumSmooth,
+    /// `Smooth`.
+    Smooth,
+    /// `VerySmooth`.
+    VerySmooth,
+}
+
+impl MaterialSurfaceRoughness {
+    /// Parses an EnergyPlus roughness token.
+    #[must_use]
+    pub fn from_energyplus_name(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_uppercase().as_str() {
+            "VERYROUGH" => Some(Self::VeryRough),
+            "ROUGH" => Some(Self::Rough),
+            "MEDIUMROUGH" => Some(Self::MediumRough),
+            "MEDIUMSMOOTH" => Some(Self::MediumSmooth),
+            "SMOOTH" => Some(Self::Smooth),
+            "VERYSMOOTH" => Some(Self::VerySmooth),
+            _ => None,
+        }
+    }
+}
+
 /// Minimal material identity and thermal properties.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Material {
@@ -199,6 +232,8 @@ pub struct Material {
     pub name: NormalizedName,
     /// Material object kind.
     pub kind: MaterialKind,
+    /// Surface roughness used by exterior convection algorithms.
+    pub roughness: Option<MaterialSurfaceRoughness>,
     /// Conductivity for Material objects in W/m-K.
     pub conductivity_w_per_m_k: Option<f64>,
     /// Density for Material objects in kg/m3.

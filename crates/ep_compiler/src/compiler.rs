@@ -6,17 +6,17 @@ use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
-    MaterialKind, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
-    OtherEquipment, OutdoorAirEconomizerType, OutsideBoundaryCondition, PlantBranch,
-    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
-    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId,
+    MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList, NodeListId,
+    NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
+    OutsideBoundaryCondition, PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnector,
+    PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop, Point3,
+    PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
+    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -479,6 +479,7 @@ impl<'a> Compiler<'a> {
                     id,
                     name: NormalizedName::new(&name),
                     kind,
+                    roughness: self.optional_material_roughness(object_type, &name, &object),
                     conductivity_w_per_m_k: self.optional_number(
                         object_type,
                         &name,
@@ -2868,6 +2869,28 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn optional_material_roughness(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<MaterialSurfaceRoughness> {
+        let roughness = self.optional_string(object_type, object_name, object, "roughness")?;
+        match MaterialSurfaceRoughness::from_energyplus_name(&roughness) {
+            Some(value) => Some(value),
+            None => {
+                self.error(
+                    "InvalidEnumValue",
+                    object_type,
+                    Some(object_name),
+                    Some("roughness"),
+                    format!("{object_type}/{object_name} has unsupported roughness '{roughness}'"),
+                );
+                None
+            }
+        }
+    }
+
     fn optional_number(
         &mut self,
         object_type: &str,
@@ -3812,8 +3835,8 @@ mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_model::{
         AutosizeOrNumber, DayOfWeek, DehumidificationControlType, HumidificationControlType,
-        IdealLoadsLimit, LoadDistributionScheme, ModelGraph, OutdoorAirEconomizerType,
-        PlantConnectorKind,
+        IdealLoadsLimit, LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
+        OutdoorAirEconomizerType, PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -3927,6 +3950,7 @@ mod tests {
             r#"{
                 "Material": {
                     "Concrete": {
+                        "roughness": "MediumRough",
                         "conductivity": 2.0,
                         "density": 2000.0,
                         "specific_heat": 800.0,
@@ -3935,6 +3959,7 @@ mod tests {
                 },
                 "Material:NoMass": {
                     "R13": {
+                        "roughness": "Rough",
                         "thermal_resistance": 2.29
                     }
                 },
@@ -3964,8 +3989,16 @@ mod tests {
             return Err(std::io::Error::other("expected typed model").into());
         };
         assert_eq!(model.materials.len(), 2);
+        assert_eq!(
+            model.materials[0].roughness,
+            Some(MaterialSurfaceRoughness::MediumRough)
+        );
         assert_eq!(model.materials[0].thermal_resistance(), Some(0.05));
         assert_eq!(model.materials[0].heat_capacity_per_area(), Some(160_000.0));
+        assert_eq!(
+            model.materials[1].roughness,
+            Some(MaterialSurfaceRoughness::Rough)
+        );
         assert_eq!(model.materials[1].thermal_resistance(), Some(2.29));
         assert_eq!(model.other_equipment.len(), 1);
         assert_eq!(model.other_equipment[0].zone.0, 0);

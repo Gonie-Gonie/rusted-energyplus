@@ -607,9 +607,9 @@ pub struct PlantBranchComponentEdge {
 #[cfg(test)]
 mod tests {
     use crate::{
-        AutoOrNumber, Construction, ConstructionId, Material, MaterialId, MaterialKind, ModelGraph,
-        NameMap, NormalizedName, OutsideBoundaryCondition, SunExposure, Surface, SurfaceId,
-        SurfaceType, TypedModel, Version, WindExposure, ZoneId,
+        AutoOrNumber, Construction, ConstructionId, Material, MaterialId, MaterialKind,
+        MaterialSurfaceRoughness, ModelGraph, NameMap, NormalizedName, OutsideBoundaryCondition,
+        SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, Version, WindExposure, ZoneId,
     };
 
     #[test]
@@ -642,6 +642,7 @@ mod tests {
             id: MaterialId(0),
             name: NormalizedName::new("Concrete"),
             kind: MaterialKind::Mass,
+            roughness: None,
             conductivity_w_per_m_k: Some(2.0),
             density_kg_per_m3: Some(2_000.0),
             specific_heat_j_per_kg_k: Some(800.0),
@@ -654,6 +655,10 @@ mod tests {
 
         assert_eq!(material.thermal_resistance(), Some(0.05));
         assert_eq!(material.heat_capacity_per_area(), Some(160_000.0));
+        assert_eq!(
+            MaterialSurfaceRoughness::from_energyplus_name("mediumrough"),
+            Some(MaterialSurfaceRoughness::MediumRough)
+        );
     }
 
     #[test]
