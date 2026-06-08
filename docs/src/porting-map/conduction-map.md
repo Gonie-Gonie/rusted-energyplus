@@ -41,9 +41,10 @@ history constants, and can seed CTF rows from EnergyPlus EIO output for
 diagnostic isolation. The default official diagnostic path only seeds
 steady/no-mass `#CTFs <= 1` rows while mass-material CTF rows are isolated from
 the current simplified face-temperature/history shell; enabling mass CTF rows at
-this stage over-amplifies latent floor history. Roof exterior weather/solar
-forcing now feeds the diagnostic CTF boundary driver for run-period timesteps,
-and the official diagnostic manifest now includes wall/floor surface
+this stage over-amplifies latent floor history. Roof/wall exterior
+weather/solar forcing now feeds the diagnostic CTF boundary driver for
+run-period timesteps, and the official diagnostic manifest now includes
+wall/floor surface
 decomposition rows so aggregate cancellation does not hide the next bottleneck.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native

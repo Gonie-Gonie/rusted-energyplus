@@ -3121,7 +3121,10 @@ fn exterior_surface_boundary_temperature_c(
     else {
         return outdoor_dry_bulb_c;
     };
-    if typed_surface.surface_type != SurfaceType::Roof {
+    if !matches!(
+        typed_surface.surface_type,
+        SurfaceType::Roof | SurfaceType::Wall
+    ) {
         return outdoor_dry_bulb_c;
     }
 
@@ -6140,7 +6143,7 @@ DATA PERIODS
     }
 
     #[test]
-    fn weather_record_exterior_balance_forces_roof_conduction()
+    fn weather_record_exterior_balance_forces_exterior_conduction()
     -> Result<(), Box<dyn std::error::Error>> {
         let mut typed = cube_model();
         typed.site = Some(SiteLocation {
@@ -6191,10 +6194,25 @@ DATA PERIODS
         else {
             return Err(std::io::Error::other("missing forced roof conduction series").into());
         };
+        let Some(dry_wall_conduction) = dry_bulb_only.results.find_series(
+            "WALL Y0",
+            "Surface Inside Face Conduction Heat Transfer Rate",
+        ) else {
+            return Err(std::io::Error::other("missing dry wall conduction series").into());
+        };
+        let Some(forced_wall_conduction) = weather_forced.results.find_series(
+            "WALL Y0",
+            "Surface Inside Face Conduction Heat Transfer Rate",
+        ) else {
+            return Err(std::io::Error::other("missing forced wall conduction series").into());
+        };
 
         assert_eq!(dry_roof_conduction.values.len(), 2);
         assert_eq!(forced_roof_conduction.values.len(), 2);
+        assert_eq!(dry_wall_conduction.values.len(), 2);
+        assert_eq!(forced_wall_conduction.values.len(), 2);
         assert!((dry_roof_conduction.values[0] - forced_roof_conduction.values[0]).abs() > 1.0e-3);
+        assert!((dry_wall_conduction.values[0] - forced_wall_conduction.values[0]).abs() > 1.0e-3);
 
         Ok(())
     }
