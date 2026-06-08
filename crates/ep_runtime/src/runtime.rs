@@ -502,6 +502,40 @@ pub struct ZoneHeatBalanceState {
     pub sum_hat_surf_w: f64,
     /// EnergyPlus `SumHATref`: reference-air convection temperature sum in W.
     pub sum_hat_ref_w: f64,
+    /// EnergyPlus zone-air temperature coefficient snapshot for diagnostics.
+    pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
+}
+
+/// EnergyPlus zone-air temperature coefficient snapshot.
+///
+/// These fields mirror the predictor/corrector coefficient names in
+/// `ZoneTempPredictorCorrector.cc`. They are diagnostic state until the full
+/// zone-air predictor is wired into the heat-balance timestep.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ZoneAirTemperatureCoefficients {
+    /// EnergyPlus `TempDepCoef` in W/K.
+    pub temp_dependent_coefficient_w_per_k: f64,
+    /// EnergyPlus `TempIndCoef` in W.
+    pub temp_independent_coefficient_w: f64,
+    /// EnergyPlus `AirPowerCap = C_air / dt` in W/K.
+    pub air_power_cap_w_per_k: f64,
+    /// EnergyPlus third-order `TempHistoryTerm` in W.
+    pub third_order_history_term_w: f64,
+    /// EnergyPlus third-order `tempDepLoad` in W/K.
+    pub third_order_temp_dependent_load_w_per_k: f64,
+    /// EnergyPlus third-order `tempIndLoad` in W.
+    pub third_order_temp_independent_load_w: f64,
+}
+
+impl ZoneAirTemperatureCoefficients {
+    const ZERO: Self = Self {
+        temp_dependent_coefficient_w_per_k: 0.0,
+        temp_independent_coefficient_w: 0.0,
+        air_power_cap_w_per_k: 0.0,
+        third_order_history_term_w: 0.0,
+        third_order_temp_dependent_load_w_per_k: 0.0,
+        third_order_temp_independent_load_w: 0.0,
+    };
 }
 
 /// Surface CTF coefficients and history constants.
@@ -2145,6 +2179,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             sum_ha_w_per_k: 0.0,
             sum_hat_surf_w: 0.0,
             sum_hat_ref_w: 0.0,
+            zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients::ZERO,
         });
     }
 
@@ -2217,6 +2252,17 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
+        zone.zone_air_temperature_coefficients = energyplus_zone_air_temperature_coefficients(
+            zone.sum_ha_w_per_k,
+            zone.sum_hat_surf_w,
+            zone.sum_hat_ref_w,
+            zone.convective_internal_gain_w,
+            0.0,
+            0.0,
+            zone.air_heat_capacity_j_per_k,
+            0.0,
+            zone.previous_mean_air_temperatures_c,
+        );
     }
 
     Ok(HeatBalanceState {
@@ -2375,6 +2421,17 @@ fn advance_heat_balance_state_one_timestep_internal(
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
+        zone.zone_air_temperature_coefficients = energyplus_zone_air_temperature_coefficients(
+            zone.sum_ha_w_per_k,
+            zone.sum_hat_surf_w,
+            zone.sum_hat_ref_w,
+            zone.convective_internal_gain_w,
+            0.0,
+            0.0,
+            zone.air_heat_capacity_j_per_k,
+            input.timestep_seconds,
+            zone.previous_mean_air_temperatures_c,
+        );
     }
 
     state.timestep_index += 1;
@@ -4279,6 +4336,49 @@ fn step_zone_air_temperature(
     )
 }
 
+/// Builds EnergyPlus zone-air temperature coefficients for an uncontrolled zone.
+///
+/// This mirrors the coefficient assembly in `correctZoneAirTemps` for the
+/// current diagnostic subset:
+/// `TempDepCoef = SumHA + SumMCp` and
+/// `TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT`.
+#[must_use]
+pub fn energyplus_zone_air_temperature_coefficients(
+    sum_ha_w_per_k: f64,
+    sum_hat_surf_w: f64,
+    sum_hat_ref_w: f64,
+    sum_internal_gain_w: f64,
+    sum_mcp_w_per_k: f64,
+    sum_mcp_t_w: f64,
+    air_heat_capacity_j_per_k: f64,
+    timestep_seconds: f64,
+    previous_mean_air_temperatures_c: [f64; 3],
+) -> ZoneAirTemperatureCoefficients {
+    let temp_dependent_coefficient_w_per_k = sum_ha_w_per_k + sum_mcp_w_per_k;
+    let temp_independent_coefficient_w =
+        sum_internal_gain_w + sum_hat_surf_w - sum_hat_ref_w + sum_mcp_t_w;
+    let air_power_cap_w_per_k = if air_heat_capacity_j_per_k > 0.0 && timestep_seconds > 0.0 {
+        air_heat_capacity_j_per_k / timestep_seconds
+    } else {
+        0.0
+    };
+    let third_order_history_term_w = air_power_cap_w_per_k
+        * (3.0 * previous_mean_air_temperatures_c[0]
+            - (3.0 / 2.0) * previous_mean_air_temperatures_c[1]
+            + (1.0 / 3.0) * previous_mean_air_temperatures_c[2]);
+
+    ZoneAirTemperatureCoefficients {
+        temp_dependent_coefficient_w_per_k,
+        temp_independent_coefficient_w,
+        air_power_cap_w_per_k,
+        third_order_history_term_w,
+        third_order_temp_dependent_load_w_per_k: (11.0 / 6.0) * air_power_cap_w_per_k
+            + temp_dependent_coefficient_w_per_k,
+        third_order_temp_independent_load_w: third_order_history_term_w
+            + temp_independent_coefficient_w,
+    }
+}
+
 /// EnergyPlus analytical zone-air temperature solution for one timestep.
 ///
 /// This mirrors the `AnalyticalSolution` branch in
@@ -4770,7 +4870,8 @@ mod tests {
         energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_shadowing_period_solar_coefficients,
-        energyplus_tarp_inside_convection_coefficient_w_per_m2_k, initialize_heat_balance_state,
+        energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
+        energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
@@ -5718,6 +5819,28 @@ DATA PERIODS
         assert!((state.zones[0].sum_ha_w_per_k - 18.456).abs() < 1.0e-12);
         assert!((state.zones[0].sum_hat_surf_w - 369.12).abs() < 1.0e-12);
         assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
+        assert!(
+            (state.zones[0]
+                .zone_air_temperature_coefficients
+                .temp_dependent_coefficient_w_per_k
+                - 18.456)
+                .abs()
+                < 1.0e-12
+        );
+        assert!(
+            (state.zones[0]
+                .zone_air_temperature_coefficients
+                .temp_independent_coefficient_w
+                - 381.12)
+                .abs()
+                < 1.0e-12
+        );
+        assert_eq!(
+            state.zones[0]
+                .zone_air_temperature_coefficients
+                .air_power_cap_w_per_k,
+            0.0
+        );
         assert_eq!(state.surfaces.len(), 6);
         let floor = state
             .surfaces
@@ -5769,6 +5892,37 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
 
         Ok(())
+    }
+
+    #[test]
+    fn energyplus_zone_air_temperature_coefficients_match_predictor_terms() {
+        let coefficients = energyplus_zone_air_temperature_coefficients(
+            18.456,
+            369.12,
+            2.0,
+            12.0,
+            3.0,
+            45.0,
+            1207.2,
+            600.0,
+            [20.0, 19.0, 18.0],
+        );
+
+        assert!((coefficients.temp_dependent_coefficient_w_per_k - 21.456).abs() < 1.0e-12);
+        assert!((coefficients.temp_independent_coefficient_w - 424.12).abs() < 1.0e-12);
+        assert!((coefficients.air_power_cap_w_per_k - 2.012).abs() < 1.0e-12);
+        let expected_history = 2.012 * (3.0 * 20.0 - 1.5 * 19.0 + (1.0 / 3.0) * 18.0);
+        assert!((coefficients.third_order_history_term_w - expected_history).abs() < 1.0e-12);
+        assert!(
+            (coefficients.third_order_temp_dependent_load_w_per_k
+                - ((11.0 / 6.0) * 2.012 + 21.456))
+                .abs()
+                < 1.0e-12
+        );
+        assert!(
+            (coefficients.third_order_temp_independent_load_w - (expected_history + 424.12)).abs()
+                < 1.0e-12
+        );
     }
 
     #[test]
@@ -6079,6 +6233,19 @@ DATA PERIODS
         assert!((state.zones[0].sum_ha_w_per_k - expected_sum_ha).abs() < 1.0e-12);
         assert!((state.zones[0].sum_hat_surf_w - expected_sum_hat_surf).abs() < 1.0e-12);
         assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
+        let coefficients = state.zones[0].zone_air_temperature_coefficients;
+        assert!(
+            (coefficients.temp_dependent_coefficient_w_per_k - expected_sum_ha).abs() < 1.0e-12
+        );
+        assert!(
+            (coefficients.temp_independent_coefficient_w
+                - (state.zones[0].convective_internal_gain_w + expected_sum_hat_surf))
+                .abs()
+                < 1.0e-12
+        );
+        assert!((coefficients.air_power_cap_w_per_k - (1207.2 / 600.0)).abs() < 1.0e-12);
+        let expected_history = (1207.2 / 600.0) * (3.0 * 20.0 - 1.5 * 20.0 + 20.0 / 3.0);
+        assert!((coefficients.third_order_history_term_w - expected_history).abs() < 1.0e-12);
 
         Ok(())
     }

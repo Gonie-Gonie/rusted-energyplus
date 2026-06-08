@@ -73,7 +73,7 @@ unless the deviation is documented in a case-specific waiver:
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | construction/material CTF data | `ep_model::Construction`, `ep_model::Material`, `ep_runtime::SurfaceCtfState` | ordered opaque layer stack, diagnostic EIO coefficient seeding for steady/no-mass rows, and CTF history advancement exist; mass-material coefficient generation and face-temperature CTF solving are not ported |
-| zone predictor histories and sums such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, and `SumHATref` | `ep_runtime::ZoneHeatBalanceState` and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history and stores surface convection sums for future predictor wiring; full predictor/corrector equations are not ported |
+| zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
 ## CTF Porting Notes
@@ -121,10 +121,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   terms. `calcZoneOrSpaceSums`/`calcSumHAT` are the source anchors for the
   surface convection sums. Rust now stores the zone-level `SumHA`,
   `SumHATsurf`, and `SumHATref` diagnostic state from current inside
-  convection coefficients and surface temperatures, and exposes an
-  EnergyPlus-shaped analytical zone-air temperature helper. The predictor
-  equation itself remains the simplified diagnostic shell until all coefficient
-  inputs are wired from source-mapped runtime state.
+  convection coefficients and surface temperatures, snapshots
+  `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` in
+  `ZoneAirTemperatureCoefficients`, and exposes an EnergyPlus-shaped
+  analytical zone-air temperature helper. The predictor equation itself
+  remains the simplified diagnostic shell until all coefficient inputs are
+  wired from source-mapped runtime state.
 
 Current Rust boundary:
 
