@@ -181,9 +181,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   same-timestep surface rebalance after the analytical MAT correction; it
   lowers floor and aggregate conduction relative to the combined surface-first
   lane, but remains behind the three-pass surface iteration lane and slightly
-  worsens MAT/air-storage. This narrows the next source-mapped target to the
-  coherent EnergyPlus surface iteration, zone-air correction, and CTF history
-  commit order rather than a single post-correction surface feedback pass.
+  worsens MAT/air-storage. Pairing the coupled rebalance with three surface
+  passes moves the conduction and latent air-balance best-focus rows again:
+  floor inside conduction drops to RMSE `924.427599`, floor outside conduction
+  to `508.231496`, and zone aggregate conduction to `93.616120`, while MAT
+  remains best in the one-pass all-CTF analytical surface-first lane. This
+  narrows the next source-mapped target to the coherent EnergyPlus surface
+  iteration, zone-air correction, and CTF history commit order rather than a
+  single post-correction surface feedback pass.
 
 Current Rust boundary:
 

@@ -82,6 +82,7 @@ surface/zone-air rebalance without creating a conformance claim:
 .\scripts\dev.cmd official-dynamic-heat-balance-analytical-surface-first-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe

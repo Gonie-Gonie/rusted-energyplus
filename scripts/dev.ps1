@@ -230,6 +230,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows and a same-timestep analytical surface rebalance."
     }
+    "official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows, analytical coupled rebalance, and three surface passes."
+    }
     "official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe.ps1"
         Group = "compare"
