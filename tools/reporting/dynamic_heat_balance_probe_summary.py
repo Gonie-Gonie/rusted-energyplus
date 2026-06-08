@@ -12,6 +12,7 @@ CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 EXPECTED_SERIES_COUNT = 41
 SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
+SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"
 SURFACE_DRIVER_LIMIT = 3
 
 
@@ -422,6 +423,76 @@ def surface_conduction_metric_rows(
     return rows
 
 
+def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    by_surface: dict[str, dict[str, dict[str, Any]]] = {}
+    for variable in (
+        SURFACE_HEAT_STORAGE_VARIABLE,
+        SURFACE_INSIDE_CONDUCTION_VARIABLE,
+        SURFACE_OUTSIDE_CONDUCTION_VARIABLE,
+    ):
+        for metric in surface_conduction_metric_rows(summary, variable):
+            key = str(metric.get("key", "none"))
+            by_surface.setdefault(key, {})[variable] = metric
+
+    rows: list[dict[str, Any]] = []
+    for surface_key, metrics in by_surface.items():
+        storage_metric = metrics.get(SURFACE_HEAT_STORAGE_VARIABLE)
+        inside_metric = metrics.get(SURFACE_INSIDE_CONDUCTION_VARIABLE)
+        outside_metric = metrics.get(SURFACE_OUTSIDE_CONDUCTION_VARIABLE)
+        leg_rmses = {
+            "storage": numeric(storage_metric.get("rmse_delta_c"))
+            if isinstance(storage_metric, dict)
+            else None,
+            "inside": numeric(inside_metric.get("rmse_delta_c"))
+            if isinstance(inside_metric, dict)
+            else None,
+            "outside": numeric(outside_metric.get("rmse_delta_c"))
+            if isinstance(outside_metric, dict)
+            else None,
+        }
+        available_rmses = {
+            name: rmse for name, rmse in leg_rmses.items() if rmse is not None
+        }
+        dominant_leg = (
+            max(available_rmses.items(), key=lambda item: item[1])[0]
+            if available_rmses
+            else "none"
+        )
+        rows.append(
+            {
+                "key": surface_key,
+                "label": surface_key,
+                "status": (
+                    storage_metric or inside_metric or outside_metric or {}
+                ).get("status"),
+                "dominant_leg": dominant_leg,
+                "storage_rmse_delta_c": leg_rmses["storage"],
+                "inside_rmse_delta_c": leg_rmses["inside"],
+                "outside_rmse_delta_c": leg_rmses["outside"],
+                "storage_max_abs_delta_c": storage_metric.get("max_abs_delta_c")
+                if isinstance(storage_metric, dict)
+                else None,
+                "inside_max_abs_delta_c": inside_metric.get("max_abs_delta_c")
+                if isinstance(inside_metric, dict)
+                else None,
+                "outside_max_abs_delta_c": outside_metric.get("max_abs_delta_c")
+                if isinstance(outside_metric, dict)
+                else None,
+            }
+        )
+
+    rows.sort(
+        key=lambda row: (
+            numeric(row.get("storage_rmse_delta_c"))
+            or numeric(row.get("inside_rmse_delta_c"))
+            or numeric(row.get("outside_rmse_delta_c"))
+            or -1.0
+        ),
+        reverse=True,
+    )
+    return rows
+
+
 def metric_identity(metric: dict[str, Any]) -> tuple[str, str]:
     return (str(metric.get("key", "")), str(metric.get("variable", "")))
 
@@ -479,6 +550,38 @@ def annotate_default_surface_conduction_deltas(
                 continue
             metric["rmse_vs_default"] = rmse - baseline
             metric["rmse_ratio_vs_default"] = rmse / baseline if baseline != 0 else None
+
+
+def annotate_default_surface_balance_deltas(lanes: list[dict[str, Any]]) -> None:
+    default_lane = next((lane for lane in lanes if lane.get("lane") == "default"), None)
+    if default_lane is None:
+        return
+
+    baseline_rows = {
+        str(metric.get("key")): metric
+        for metric in default_lane.get("surface_balance_drivers", [])
+        if isinstance(metric, dict)
+    }
+    for lane in lanes:
+        for metric in lane.get("surface_balance_drivers", []):
+            if not isinstance(metric, dict):
+                continue
+            baseline = baseline_rows.get(str(metric.get("key")))
+            for field in ("storage", "inside", "outside"):
+                rmse = numeric(metric.get(f"{field}_rmse_delta_c"))
+                baseline_rmse = (
+                    numeric(baseline.get(f"{field}_rmse_delta_c"))
+                    if isinstance(baseline, dict)
+                    else None
+                )
+                if lane.get("lane") == "default" or rmse is None or baseline_rmse is None:
+                    metric[f"{field}_rmse_vs_default"] = None
+                    metric[f"{field}_rmse_ratio_vs_default"] = None
+                    continue
+                metric[f"{field}_rmse_vs_default"] = rmse - baseline_rmse
+                metric[f"{field}_rmse_ratio_vs_default"] = (
+                    rmse / baseline_rmse if baseline_rmse != 0 else None
+                )
 
 
 def empty_focus_movement_rollup(reference_lane: str | None) -> dict[str, Any]:
@@ -719,6 +822,11 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
             summary,
             SURFACE_OUTSIDE_CONDUCTION_VARIABLE,
         ),
+        "surface_heat_storage_metrics": surface_conduction_metric_rows(
+            summary,
+            SURFACE_HEAT_STORAGE_VARIABLE,
+        ),
+        "surface_balance_drivers": surface_balance_driver_rows(summary),
     }
 
 
@@ -727,9 +835,11 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_focus_deltas(lanes)
     annotate_default_surface_conduction_deltas(lanes, "surface_conduction_metrics")
     annotate_default_surface_conduction_deltas(lanes, "surface_outside_conduction_metrics")
+    annotate_default_surface_conduction_deltas(lanes, "surface_heat_storage_metrics")
+    annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v11",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v12",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -743,6 +853,10 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
         "best_surface_outside_conduction_metrics": best_surface_conduction_metric_rows(
             lanes,
             "surface_outside_conduction_metrics",
+        ),
+        "best_surface_heat_storage_metrics": best_surface_conduction_metric_rows(
+            lanes,
+            "surface_heat_storage_metrics",
         ),
     }
 
@@ -897,6 +1011,58 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 default_rmse=fmt_number(metric.get("default_rmse_delta_c")),
             )
         )
+    lines.extend(
+        [
+            "",
+            "## Best Surface Heat Storage Metrics",
+            "",
+            "| surface output | best lane | best RMSE | RMSE vs default | default RMSE |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    for metric in summary.get("best_surface_heat_storage_metrics", []):
+        if not isinstance(metric, dict):
+            continue
+        lines.append(
+            "| {output} | {lane} | {best_rmse} | {vs_default} | {default_rmse} |".format(
+                output=metric.get("label", "none"),
+                lane=metric.get("best_lane") or "none",
+                best_rmse=fmt_number(metric.get("best_rmse_delta_c")),
+                vs_default=fmt_signed_number(metric.get("rmse_vs_default")),
+                default_rmse=fmt_number(metric.get("default_rmse_delta_c")),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Surface Conduction Balance Drivers",
+            "",
+            "Top per-surface storage rows paired with their inside- and outside-face conduction RMSE. This shows whether the storage bottleneck is moving with the inside face, outside face, or their combined report balance.",
+            "",
+            "| lane | rank | surface | storage RMSE | storage vs default | inside RMSE | outside RMSE | dominant leg | status |",
+            "|---|---:|---|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        for rank, metric in enumerate(
+            lane.get("surface_balance_drivers", [])[:SURFACE_DRIVER_LIMIT],
+            start=1,
+        ):
+            lines.append(
+                "| {lane} | {rank} | {surface} | {storage_rmse} | {storage_vs_default} | {inside_rmse} | {outside_rmse} | {dominant_leg} | {status} |".format(
+                    lane=lane["lane"],
+                    rank=rank,
+                    surface=metric["label"],
+                    storage_rmse=fmt_number(metric.get("storage_rmse_delta_c")),
+                    storage_vs_default=fmt_signed_number(
+                        metric.get("storage_rmse_vs_default")
+                    ),
+                    inside_rmse=fmt_number(metric.get("inside_rmse_delta_c")),
+                    outside_rmse=fmt_number(metric.get("outside_rmse_delta_c")),
+                    dominant_leg=metric.get("dominant_leg", "none"),
+                    status=metric.get("status", "none"),
+                )
+            )
     lines.extend(
         [
             "",
