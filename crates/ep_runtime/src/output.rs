@@ -1,8 +1,8 @@
 //! Runtime output, meter, diagnostic, and result-store primitives.
 
 use ep_model::{
-    BranchListId, NormalizedName, OutputHandle, PlantBranchComponent, ScheduleId, SimulationModel,
-    TypedModel,
+    BranchListId, NormalizedName, OutputHandle, OutsideBoundaryCondition, PlantBranchComponent,
+    ScheduleId, SimulationModel, SunExposure, TypedModel,
 };
 use std::collections::BTreeSet;
 
@@ -421,13 +421,17 @@ impl RuntimeOutputRegistry {
                 RuntimeOutputFrequency::Hourly,
                 RuntimeOutputSource::RuntimeState,
             );
-            self.push_output(
-                &surface.name.0,
-                "Surface Outside Face Incident Solar Radiation Rate per Area",
-                "W/m2",
-                RuntimeOutputFrequency::Hourly,
-                RuntimeOutputSource::WeatherInput,
-            );
+            if surface.sun_exposure == SunExposure::SunExposed
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors
+            {
+                self.push_output(
+                    &surface.name.0,
+                    "Surface Outside Face Incident Solar Radiation Rate per Area",
+                    "W/m2",
+                    RuntimeOutputFrequency::Hourly,
+                    RuntimeOutputSource::WeatherInput,
+                );
+            }
             for (variable_name, units) in [
                 ("Surface Inside Face Conduction Heat Transfer Rate", "W"),
                 ("Surface Inside Face Conduction Heat Gain Rate", "W"),

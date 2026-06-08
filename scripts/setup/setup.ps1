@@ -3,6 +3,7 @@ param(
     [switch]$InstallRust,
     [switch]$InstallDocsTools,
     [switch]$SkipPythonSetup,
+    [switch]$SkipPythonSmoke,
     [switch]$SkipOracleDownload,
     [switch]$SkipSourceDownload,
     [switch]$SkipOracleSmoke
@@ -354,6 +355,10 @@ Ensure-ReportPythonVenv
 Ensure-OracleBinary
 Ensure-ReferenceSource
 Write-LocalConfig
+
+if (-not $SkipPythonSetup -and -not $SkipPythonSmoke) {
+    Invoke-DevCommand -Command "python-smoke"
+}
 
 if (-not $SkipOracleSmoke) {
     Invoke-DevCommand -Command "oracle-smoke"

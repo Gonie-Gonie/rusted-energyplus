@@ -5,8 +5,9 @@ use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
     IdealLoadsAirSystemId, LoopId, MaterialId, NodeId, NormalizedName, OtherEquipment,
     OutputHandle, OutsideBoundaryCondition, PlantBranchComponent, PlantLoop, Point3, RunPeriod,
-    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, Surface,
-    SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, SunExposure,
+    Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId,
+    ZoneThermostatId,
 };
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -682,13 +683,14 @@ struct SurfaceHeatBalanceTrace {
     outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
 }
 
-/// Appends diagnostic surface incident solar radiation series for all opaque
+/// Appends diagnostic surface incident solar radiation series for sun-exposed
 /// surfaces with a declared site location.
 ///
 /// The calculation is intentionally a forcing diagnostic: direct normal
-/// radiation is projected with a compact solar-position model, diffuse sky is
-/// isotropic, and ground reflection uses a fixed default reflectance. It is not
-/// a full EnergyPlus solar distribution or shadowing claim.
+/// radiation is projected with a compact solar-position model and
+/// EnergyPlus-style weather timestep interpolation, diffuse sky is isotropic,
+/// and ground reflection uses a fixed default reflectance. It is not a full
+/// EnergyPlus solar distribution or shadowing claim.
 pub fn append_surface_incident_solar_radiation_series(
     results: &mut ResultStore,
     model: &SimulationModel,
@@ -710,11 +712,26 @@ pub fn append_surface_incident_solar_radiation_series(
         .max()
         .map_or(0, |handle| handle + 1);
 
+    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     for surface in &model.typed.surfaces {
+        if surface.sun_exposure != SunExposure::SunExposed
+            || surface.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
+        {
+            continue;
+        }
         let values = weather_records
             .iter()
+            .enumerate()
             .take(sample_count)
-            .map(|record| surface_incident_solar_radiation_w_per_m2(surface, site, record))
+            .map(|(record_index, _record)| {
+                surface_incident_solar_radiation_hourly_average_w_per_m2(
+                    surface,
+                    site,
+                    weather_records,
+                    record_index,
+                    zone_steps_per_hour,
+                )
+            })
             .collect::<Vec<_>>();
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
@@ -2695,12 +2712,65 @@ fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
     if area_m2 > 0.0 { rate_w / area_m2 } else { 0.0 }
 }
 
-fn surface_incident_solar_radiation_w_per_m2(
+fn surface_incident_solar_radiation_hourly_average_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+) -> f64 {
+    let Some(record) = weather_records.get(record_index) else {
+        return 0.0;
+    };
+    let steps = zone_steps_per_hour.max(1);
+    let mut total = 0.0;
+    for timestep in 1..=steps {
+        let (previous_weight, current_weight, next_weight) =
+            solar_weather_interpolation_weights(steps, timestep);
+        let previous = previous_weather_record(weather_records, record_index);
+        let next = next_weather_record(weather_records, record_index);
+        let direct_normal = weighted_solar_value(
+            previous.direct_normal_radiation_wh_per_m2,
+            record.direct_normal_radiation_wh_per_m2,
+            next.direct_normal_radiation_wh_per_m2,
+            previous_weight,
+            current_weight,
+            next_weight,
+        );
+        let diffuse_horizontal = weighted_solar_value(
+            previous.diffuse_horizontal_radiation_wh_per_m2,
+            record.diffuse_horizontal_radiation_wh_per_m2,
+            next.diffuse_horizontal_radiation_wh_per_m2,
+            previous_weight,
+            current_weight,
+            next_weight,
+        );
+        let local_hour =
+            f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
+        total += surface_incident_solar_radiation_at_local_hour_w_per_m2(
+            surface,
+            site,
+            record,
+            local_hour,
+            direct_normal,
+            diffuse_horizontal,
+        );
+    }
+
+    total / f64::from(steps)
+}
+
+fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
     surface: &Surface,
     site: &SiteLocation,
     record: &EpwRecord,
+    local_hour: f64,
+    direct_normal_radiation_w_per_m2: f64,
+    diffuse_horizontal_radiation_w_per_m2: f64,
 ) -> f64 {
-    let Some((solar_altitude_rad, solar_azimuth_rad)) = solar_position_rad(site, record) else {
+    let Some((solar_altitude_rad, solar_azimuth_rad)) =
+        solar_position_rad_at_local_hour(site, record, local_hour)
+    else {
         return 0.0;
     };
     if solar_altitude_rad <= 0.0 {
@@ -2709,9 +2779,8 @@ fn surface_incident_solar_radiation_w_per_m2(
 
     let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
-    let direct_normal = record.direct_normal_radiation_wh_per_m2.max(0.0);
-    let diffuse_horizontal = record.diffuse_horizontal_radiation_wh_per_m2.max(0.0);
-    let global_horizontal = record.global_horizontal_radiation_wh_per_m2.max(0.0);
+    let direct_normal = direct_normal_radiation_w_per_m2.max(0.0);
+    let diffuse_horizontal = diffuse_horizontal_radiation_w_per_m2.max(0.0);
 
     let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
         + solar_altitude_rad.cos()
@@ -2719,13 +2788,104 @@ fn surface_incident_solar_radiation_w_per_m2(
             * (solar_azimuth_rad - surface_azimuth_rad).cos();
     let beam = direct_normal * cos_incidence.max(0.0);
     let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
-    let ground_reflected =
-        global_horizontal * DEFAULT_SOLAR_GROUND_REFLECTANCE * (1.0 - tilt_rad.cos()) * 0.5;
+    let ground_horizontal =
+        (direct_normal * solar_altitude_rad.sin() + diffuse_horizontal).max(0.0);
+    let ground_reflected = ground_horizontal
+        * DEFAULT_SOLAR_GROUND_REFLECTANCE
+        * surface_ground_view_factor(surface, tilt_rad);
 
     beam + sky_diffuse + ground_reflected
 }
 
-fn solar_position_rad(site: &SiteLocation, record: &EpwRecord) -> Option<(f64, f64)> {
+fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
+    if record_index == 0 {
+        &records[records.len() - 1]
+    } else {
+        &records[record_index - 1]
+    }
+}
+
+fn next_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
+    let next_index = if record_index + 1 >= records.len() {
+        0
+    } else {
+        record_index + 1
+    };
+    &records[next_index]
+}
+
+fn weighted_solar_value(
+    previous: f64,
+    current: f64,
+    next: f64,
+    previous_weight: f64,
+    current_weight: f64,
+    next_weight: f64,
+) -> f64 {
+    previous.max(0.0) * previous_weight
+        + current.max(0.0) * current_weight
+        + next.max(0.0) * next_weight
+}
+
+fn solar_weather_interpolation_weights(zone_steps_per_hour: u32, timestep: u32) -> (f64, f64, f64) {
+    let steps = zone_steps_per_hour.max(1);
+    let timestep = timestep.clamp(1, steps);
+    let current_weight = solar_interpolation_weight(steps, timestep);
+    if steps == 1 {
+        return (0.0, current_weight, 0.0);
+    }
+    let timestep_fraction = 1.0 / f64::from(steps);
+    if (current_weight - 1.0).abs() <= f64::EPSILON {
+        (0.0, current_weight, 0.0)
+    } else if f64::from(timestep) * timestep_fraction < 0.5 {
+        (1.0 - current_weight, current_weight, 0.0)
+    } else {
+        (0.0, current_weight, 1.0 - current_weight)
+    }
+}
+
+fn solar_interpolation_weight(zone_steps_per_hour: u32, timestep: u32) -> f64 {
+    let steps = zone_steps_per_hour.max(1);
+    let timestep = timestep.clamp(1, steps);
+    if steps.is_multiple_of(2) {
+        let halfpoint = steps / 2;
+        let distance = timestep.abs_diff(halfpoint);
+        return 1.0 - f64::from(distance) / f64::from(steps);
+    }
+
+    if steps == 1 {
+        0.5
+    } else if steps == 3 {
+        match timestep {
+            1 | 2 => 5.0 / 6.0,
+            _ => 0.5,
+        }
+    } else {
+        let timestep_weight = 1.0 / f64::from(steps);
+        let halfpoint = steps / 2;
+        let peak_weight = 1.0 - timestep_weight / 2.0;
+        if timestep == halfpoint || timestep == halfpoint + 1 {
+            peak_weight
+        } else if timestep > halfpoint + 1 {
+            peak_weight - f64::from(timestep - (halfpoint + 1)) * timestep_weight
+        } else {
+            peak_weight - f64::from(halfpoint - timestep) * timestep_weight
+        }
+    }
+}
+
+fn surface_ground_view_factor(surface: &Surface, tilt_rad: f64) -> f64 {
+    match surface.view_factor_to_ground {
+        AutoOrNumber::Value(value) => value.clamp(0.0, 1.0),
+        AutoOrNumber::AutoCalculate => ((1.0 - tilt_rad.cos()) * 0.5).clamp(0.0, 1.0),
+    }
+}
+
+fn solar_position_rad_at_local_hour(
+    site: &SiteLocation,
+    record: &EpwRecord,
+    local_hour: f64,
+) -> Option<(f64, f64)> {
     let day = day_of_year(record.year, record.month, record.day)?;
     let day_angle_rad = (360.0 * (f64::from(day) - 81.0) / 364.0).to_radians();
     let equation_of_time_min =
@@ -2733,8 +2893,7 @@ fn solar_position_rad(site: &SiteLocation, record: &EpwRecord) -> Option<(f64, f
     let local_standard_meridian_deg = 15.0 * site.time_zone_hours;
     let time_correction_min =
         4.0 * (site.longitude_deg - local_standard_meridian_deg) + equation_of_time_min;
-    let local_mid_hour = f64::from(record.hour.clamp(1, 24)) - 0.5;
-    let solar_time_hours = local_mid_hour + time_correction_min / 60.0;
+    let solar_time_hours = local_hour + time_correction_min / 60.0;
     let hour_angle_rad = (15.0 * (solar_time_hours - 12.0)).to_radians();
     let declination_rad = (23.45
         * (360.0 * (284.0 + f64::from(day)) / 365.0)
@@ -3506,8 +3665,9 @@ mod tests {
         parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
         simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
-        simulate_schedule_values, simulate_zone_internal_convective_gains, surface_area_m2,
-        surface_geometry_summaries, zone_geometry_summaries,
+        simulate_schedule_values, simulate_zone_internal_convective_gains,
+        solar_weather_interpolation_weights, surface_area_m2, surface_geometry_summaries,
+        zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -3519,7 +3679,7 @@ mod tests {
         OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition, PlantBranch,
         PlantBranchComponent, PlantBranchList, PlantLoop, Point3, RunPeriod, RunPeriodId,
         ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel,
-        SiteLocation, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
+        SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, ThermostatControlObjectType,
         ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Zone,
         ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
         ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
@@ -3533,6 +3693,14 @@ mod tests {
         assert_eq!(state.timestep_index, 0);
         assert_eq!(state.mode, SimulationMode::Compatibility);
         assert!(state.zones.is_empty());
+    }
+
+    #[test]
+    fn solar_weather_interpolation_matches_energyplus_even_timestep_weights() {
+        assert_eq!(solar_weather_interpolation_weights(4, 1), (0.25, 0.75, 0.0));
+        assert_eq!(solar_weather_interpolation_weights(4, 2), (0.0, 1.0, 0.0));
+        assert_eq!(solar_weather_interpolation_weights(4, 3), (0.0, 0.75, 0.25));
+        assert_eq!(solar_weather_interpolation_weights(4, 4), (0.0, 0.5, 0.5));
     }
 
     #[test]
@@ -4590,6 +4758,7 @@ DATA PERIODS
     fn surface_incident_solar_diagnostic_appends_roof_series()
     -> Result<(), Box<dyn std::error::Error>> {
         let mut typed = cube_model();
+        typed.surfaces[0].sun_exposure = SunExposure::NoSun;
         typed.site = Some(SiteLocation {
             name: NormalizedName::new("Solar Test Site"),
             latitude_deg: 39.75,
@@ -4628,7 +4797,16 @@ DATA PERIODS
             2,
         );
 
-        assert_eq!(added, 6);
+        assert_eq!(added, 5);
+        assert!(
+            simulation
+                .results
+                .find_series(
+                    "FLOOR",
+                    "Surface Outside Face Incident Solar Radiation Rate per Area"
+                )
+                .is_none()
+        );
         let Some(roof_solar) = simulation.results.find_series(
             "ROOF",
             "Surface Outside Face Incident Solar Radiation Rate per Area",
@@ -4692,6 +4870,26 @@ DATA PERIODS
         assert_eq!(resolution.resolved.len(), 6);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
+    }
+
+    #[test]
+    fn runtime_output_registry_skips_no_sun_surface_solar_output() {
+        let mut typed = cube_model();
+        typed.surfaces[0].sun_exposure = SunExposure::NoSun;
+        let model = SimulationModel::from_typed(typed);
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        let resolution = registry.resolve_output_requests(&[RuntimeOutputRequest::hourly(
+            "floor",
+            "Surface Outside Face Incident Solar Radiation Rate per Area",
+        )]);
+
+        assert!(resolution.resolved.is_empty());
+        assert!(resolution.diagnostics.has_errors());
+        assert_eq!(
+            resolution.diagnostics.diagnostics[0].code,
+            RuntimeDiagnosticCode::OutputVariableUnavailable
+        );
     }
 
     #[test]
