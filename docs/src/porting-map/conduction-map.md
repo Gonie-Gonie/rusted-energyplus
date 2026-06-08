@@ -77,6 +77,12 @@ Adding three surface-balance passes on top of that combined lane lowers the
 floor inside/outside conduction and zone aggregate conduction RMSE further,
 while slightly worsening MAT, so surface iteration is a real conduction lever
 but still has to be paired with the zone-air correction order before promotion.
+The all-CTF analytical coupled probe applies one same-timestep surface rebalance
+after the analytical MAT correction. It lowers aggregate and floor conduction
+relative to the combined surface-first lane, but not as far as the tracked
+iter3 lane, and it slightly worsens MAT/air-storage relative to surface-first.
+That keeps the active blocker on coherent surface iteration plus zone-air
+correction/history semantics rather than a one-pass feedback loop alone.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

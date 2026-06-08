@@ -699,6 +699,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalProbe,
     /// Experimental EnergyPlus analytical correction after the surface pass.
     EnergyPlusAnalyticalSurfaceFirstProbe,
+    /// Experimental analytical correction with a same-timestep surface rebalance.
+    EnergyPlusAnalyticalCoupledProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
     EnergyPlusThirdOrderProbe,
 }
@@ -2384,6 +2386,11 @@ fn advance_heat_balance_state_one_timestep_internal(
     let correct_zone_air_after_surface_pass = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
+    );
+    let rebalance_surfaces_after_zone_air_correction = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
     );
 
     for surface in &mut state.surfaces {
@@ -2444,6 +2451,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe => previous_temperature_c,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
                     zone_surface_convection_sums(&state.surfaces, zone.zone_id);
@@ -2494,17 +2502,72 @@ fn advance_heat_balance_state_one_timestep_internal(
         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
         .collect::<BTreeMap<_, _>>();
 
+    run_surface_balance_passes(
+        model,
+        &mut state.surfaces,
+        Some(&previous_surface_inside_temperatures),
+        &current_zone_temperatures,
+        input,
+        weather_context,
+        surface_iteration_count,
+    );
+
+    if rebalance_surfaces_after_zone_air_correction {
+        correct_zone_air_temperatures_from_current_surfaces(
+            &state.surfaces,
+            &mut state.zones,
+            input.timestep_seconds,
+            true,
+        );
+        let corrected_zone_temperatures = state
+            .zones
+            .iter()
+            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+            .collect::<BTreeMap<_, _>>();
+        run_surface_balance_passes(
+            model,
+            &mut state.surfaces,
+            None,
+            &corrected_zone_temperatures,
+            input,
+            weather_context,
+            surface_iteration_count,
+        );
+    }
+
+    for surface in &mut state.surfaces {
+        advance_surface_ctf_histories(surface);
+    }
+
+    correct_zone_air_temperatures_from_current_surfaces(
+        &state.surfaces,
+        &mut state.zones,
+        input.timestep_seconds,
+        correct_zone_air_after_surface_pass,
+    );
+
+    state.timestep_index += 1;
+}
+
+fn run_surface_balance_passes(
+    model: &TypedModel,
+    surfaces: &mut [SurfaceHeatBalanceState],
+    first_pass_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
+    zone_temperatures: &BTreeMap<ZoneId, f64>,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    surface_iteration_count: u32,
+) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
-        for surface in &mut state.surfaces {
+        for surface in surfaces.iter_mut() {
             let previous_inside_face_temperature_c = if surface_iteration_index == 0 {
-                previous_surface_inside_temperatures
-                    .get(&surface.surface_id)
-                    .copied()
+                first_pass_inside_temperatures
+                    .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
                     .unwrap_or(surface.inside_face_temperature_c)
             } else {
                 surface.inside_face_temperature_c
             };
-            let zone_temperature_c = current_zone_temperatures
+            let zone_temperature_c = zone_temperatures
                 .get(&surface.zone_id)
                 .copied()
                 .unwrap_or(surface.inside_face_temperature_c);
@@ -2521,7 +2584,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
                 model,
                 surface,
-                &current_zone_temperatures,
+                zone_temperatures,
                 input.outdoor_dry_bulb_c,
                 zone_temperature_c,
                 weather_context,
@@ -2542,19 +2605,22 @@ fn advance_heat_balance_state_one_timestep_internal(
             surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
         }
     }
-    for surface in &mut state.surfaces {
-        advance_surface_ctf_histories(surface);
-    }
+}
 
-    for zone in &mut state.zones {
-        zone.opaque_surface_heat_gain_w = state
-            .surfaces
+fn correct_zone_air_temperatures_from_current_surfaces(
+    surfaces: &[SurfaceHeatBalanceState],
+    zones: &mut [ZoneHeatBalanceState],
+    timestep_seconds: f64,
+    update_mean_air_temperature: bool,
+) {
+    for zone in zones {
+        zone.opaque_surface_heat_gain_w = surfaces
             .iter()
             .filter(|surface| surface.zone_id == zone.zone_id)
             .map(|surface| surface.heat_gain_to_zone_w)
             .sum();
         let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-            zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+            zone_surface_convection_sums(surfaces, zone.zone_id);
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
@@ -2566,22 +2632,20 @@ fn advance_heat_balance_state_one_timestep_internal(
             0.0,
             0.0,
             zone.air_heat_capacity_j_per_k,
-            input.timestep_seconds,
+            timestep_seconds,
             zone.previous_mean_air_temperatures_c,
         );
-        if correct_zone_air_after_surface_pass {
+        if update_mean_air_temperature {
             zone.mean_air_temperature_c = energyplus_analytical_zone_air_temperature_c(
                 zone.previous_mean_air_temperatures_c[0],
                 coefficients.temp_independent_coefficient_w,
                 coefficients.temp_dependent_coefficient_w_per_k,
                 zone.air_heat_capacity_j_per_k,
-                input.timestep_seconds,
+                timestep_seconds,
             );
         }
         zone.zone_air_temperature_coefficients = coefficients;
     }
-
-    state.timestep_index += 1;
 }
 
 fn zone_surface_convection_sums(
@@ -2614,7 +2678,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe => {
             zone_state
                 .zone_air_temperature_coefficients
                 .temp_independent_coefficient_w
@@ -6933,6 +6998,14 @@ DATA PERIODS
         );
         assert_eq!(
             options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
+        );
+        assert_eq!(
+            options
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
@@ -7100,6 +7173,13 @@ DATA PERIODS
                 HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe,
             ),
         )?;
+        let coupled = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[10.0, 12.0],
+            HeatBalanceSimulationOptions::hourly_samples(2).with_zone_air_algorithm(
+                HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe,
+            ),
+        )?;
 
         let Some(analytical_zone_series) = analytical
             .results
@@ -7113,18 +7193,29 @@ DATA PERIODS
         else {
             return Err(std::io::Error::other("missing surface-first zone series").into());
         };
+        let Some(coupled_zone_series) = coupled
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing coupled zone series").into());
+        };
 
         assert_eq!(analytical_zone_series.values.len(), 2);
         assert_eq!(surface_first_zone_series.values.len(), 2);
+        assert_eq!(coupled_zone_series.values.len(), 2);
         assert!(
             analytical_zone_series
                 .values
                 .iter()
                 .chain(surface_first_zone_series.values.iter())
+                .chain(coupled_zone_series.values.iter())
                 .all(|value| value.is_finite())
         );
         assert!(
             (analytical_zone_series.values[0] - surface_first_zone_series.values[0]).abs() > 1.0e-6
+        );
+        assert!(
+            (surface_first_zone_series.values[0] - coupled_zone_series.values[0]).abs() > 1.0e-6
         );
 
         Ok(())

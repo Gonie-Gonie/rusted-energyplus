@@ -43,7 +43,8 @@ Current generators:
   all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
   surface-iteration probe, EnergyPlus analytical, analytical surface-first,
   combined all-CTF analytical surface-first, combined all-CTF analytical
-  surface-first with three surface passes, third-order zone-air updates, and an
+  coupled surface rebalance, combined all-CTF analytical surface-first with
+  three surface passes, third-order zone-air updates, and an
   oracle-day-count warmup minimum. It is
   development evidence only and does not create a release conformance artifact.
   `scripts\dev.cmd official-dynamic-heat-balance-probe-summary` invokes this

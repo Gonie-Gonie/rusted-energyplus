@@ -177,7 +177,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   all-CTF analytical surface-first probe lowers the same air and surface
   focus metrics further while leaving floor inside conduction as the top
   bottleneck, which keeps mass-floor CTF face/history parity as the next
-  source-mapped target.
+  source-mapped target. The analytical coupled probe adds a diagnostic
+  same-timestep surface rebalance after the analytical MAT correction; it
+  lowers floor and aggregate conduction relative to the combined surface-first
+  lane, but remains behind the three-pass surface iteration lane and slightly
+  worsens MAT/air-storage. This narrows the next source-mapped target to the
+  coherent EnergyPlus surface iteration, zone-air correction, and CTF history
+  commit order rather than a single post-correction surface feedback pass.
 
 Current Rust boundary:
 

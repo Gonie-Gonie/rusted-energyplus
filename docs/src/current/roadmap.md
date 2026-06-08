@@ -49,6 +49,14 @@ Current direction:
   conformance index JSON, keeping current input, output, algorithm, promoted
   case, and gap boundaries user-readable.
 
+Current post-v0.32 development is focused on dynamic heat-balance conformance
+for the IDFs used through v0.26 evidence: `heat_balance_nomass_001`,
+`surface_temperature_nomass_001`, `internal_gains_001`, and the official
+`1ZoneUncontrolled` ExampleFile tracker. The first active blocker remains
+official `1ZoneUncontrolled` mass-floor CTF/history and zone-air correction
+parity; broader v0.26-example dynamic promotion should wait until that tracker
+has a passing generated report and blocking gate.
+
 The long-term targets remain:
 
 - v1.0: substantial declared compatibility draft

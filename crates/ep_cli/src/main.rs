@@ -3678,11 +3678,14 @@ fn parse_heat_balance_zone_air_algorithm(
         "energyplus-analytical-surface-first-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe)
         }
+        "energyplus-analytical-coupled-probe" => {
+            Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe)
+        }
         "energyplus-third-order-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
         }
         other => Err(format!(
-            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, or energyplus-third-order-probe"
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, energyplus-analytical-coupled-probe, or energyplus-third-order-probe"
         )),
     }
 }
@@ -3757,6 +3760,9 @@ fn heat_balance_zone_air_algorithm_label(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => "energyplus-analytical-probe",
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
             "energyplus-analytical-surface-first-probe"
+        }
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe => {
+            "energyplus-analytical-coupled-probe"
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => "energyplus-third-order-probe",
     }
@@ -6311,6 +6317,11 @@ mod tests {
             )
             .unwrap(),
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm("energyplus-analytical-coupled-probe")
+                .unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
         );
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("energyplus-third-order-probe").unwrap(),

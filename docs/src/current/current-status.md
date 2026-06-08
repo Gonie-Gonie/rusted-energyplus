@@ -88,12 +88,13 @@ The current public scope includes:
   `internal_gains_001` hourly ESO series
 - official dynamic heat-balance diagnostic reports that run a Rust
   first-run-period-day warmup loop, filter oracle ESO values to run-period
-  samples, compare 27 roof/wall/floor face-temperature, conduction
+  samples, compare 30 roof/wall/floor face-temperature, conduction
   decomposition, and zone air heat-balance series, rank bottleneck series by
   RMSE, and record EnergyPlus EIO run-period warmup day counts, the current
   CTF seed policy, surface iteration count, and explicit all-CTF, warmup,
-  surface-iteration, analytical zone-air, analytical surface-first, and
-  third-order probe metadata without claiming parity
+  surface-iteration, analytical zone-air, analytical surface-first, analytical
+  coupled surface rebalance, and third-order probe metadata without claiming
+  parity
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
