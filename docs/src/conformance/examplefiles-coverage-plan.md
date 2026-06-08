@@ -131,7 +131,7 @@ Current v0.33 official dynamic diagnostic evidence:
 - `official-dynamic-heat-balance-analytical-probe`
 - `official-dynamic-heat-balance-analytical-surface-first-probe`
 - `official-dynamic-heat-balance-third-order-probe`
-- `dynamic_heat_balance_probe_summary.py` for development summaries from
+- `official-dynamic-heat-balance-probe-summary` for development summaries from
   existing `.runtime` compare outputs
 
 Current v0.19 comparison infrastructure evidence:

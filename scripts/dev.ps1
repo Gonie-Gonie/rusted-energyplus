@@ -240,6 +240,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows and three surface-balance passes per timestep."
     }
+    "official-dynamic-heat-balance-probe-summary" = @{
+        Path = "compare\official-dynamic-heat-balance-probe-summary.ps1"
+        Group = "compare"
+        Help = "Summarize existing official dynamic heat-balance probe lanes with the report Python."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

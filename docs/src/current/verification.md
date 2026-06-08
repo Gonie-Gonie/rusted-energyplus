@@ -76,7 +76,7 @@ claim:
 .\scripts\dev.cmd official-dynamic-heat-balance-analytical-surface-first-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe
-python tools\reporting\dynamic_heat_balance_probe_summary.py --repo-root .
+.\scripts\dev.cmd official-dynamic-heat-balance-probe-summary
 ```
 
 The source-map and algorithm-ledger gate remains:
