@@ -40,9 +40,9 @@ The current runtime has per-surface CTF coefficient/history slots, advances CTF
 history constants, and can seed CTF rows from EnergyPlus EIO output for
 diagnostic isolation. The default official diagnostic path only seeds
 steady/no-mass `#CTFs <= 1` rows until the inside/outside face-temperature CTF
-solver is ported; enabling mass CTF rows against the current simplified face
-temperature shell over-amplifies latent floor history. Native
-EnergyPlus-equivalent mass-material CTF coefficient generation is still
-unported.
+solver helpers are wired into the timestep shell; enabling mass CTF rows against
+the current simplified face temperature shell over-amplifies latent floor
+history. Native EnergyPlus-equivalent mass-material CTF coefficient generation
+is still unported.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

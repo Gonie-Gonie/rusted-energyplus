@@ -30,6 +30,7 @@ const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.6697e-8;
 const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
+const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -542,6 +543,34 @@ pub struct ConstructionCtfCoefficientOverride {
     pub inside_w_per_m2_k: f64,
     /// CTF flux coefficient for history rows.
     pub flux: Option<f64>,
+}
+
+/// Inputs for the EnergyPlus CTF inside-face temperature balance subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfInsideFaceBalanceInput {
+    /// Reference zone air temperature used by inside convection in C.
+    pub reference_air_temperature_c: f64,
+    /// Inside convection coefficient in W/m2-K.
+    pub inside_convection_coefficient_w_per_m2_k: f64,
+    /// Previous inside-face temperature from the current inside-surface iteration in C.
+    pub previous_inside_face_temperature_c: f64,
+    /// Net inside radiant/source term in W/m2. Zero for the current diagnostic subset.
+    pub net_inside_source_w_per_m2: f64,
+}
+
+/// Inputs for the EnergyPlus CTF outside-face environmental balance subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfOutsideFaceBalanceInput {
+    /// Outdoor air temperature used by exterior convection in C.
+    pub outdoor_air_temperature_c: f64,
+    /// Linearized outside radiant temperature in C.
+    pub radiant_temperature_c: f64,
+    /// Outside convection coefficient in W/m2-K.
+    pub outside_convection_coefficient_w_per_m2_k: f64,
+    /// Linearized outside radiation coefficient in W/m2-K.
+    pub outside_radiation_coefficient_w_per_m2_k: f64,
+    /// Shortwave/source term absorbed at the outside face in W/m2.
+    pub absorbed_outside_source_w_per_m2: f64,
 }
 
 /// Per-surface heat-balance state shell.
@@ -3082,12 +3111,70 @@ fn reported_surface_outside_face_temperature_c(
     )
 }
 
+/// EnergyPlus-shaped CTF inside-face temperature balance for the opaque subset.
+///
+/// This covers the no-source/no-pool/no-movable-insulation branch documented in
+/// `CalcHeatBalanceInsideSurf2CTFOnly`. It is kept separate from the current
+/// zone-air diagnostic shell so the CTF face solver can be wired incrementally.
+#[must_use]
+pub fn energyplus_ctf_inside_face_temperature_c(
+    surface: &SurfaceHeatBalanceState,
+    input: CtfInsideFaceBalanceInput,
+) -> f64 {
+    let adiabatic_cross =
+        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+            surface.ctf.cross_0_w_per_m2_k
+        } else {
+            0.0
+        };
+    let outside_temperature_term =
+        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+            0.0
+        } else {
+            surface.ctf.cross_0_w_per_m2_k * surface.outside_face_temperature_c
+        };
+    let denominator = surface.ctf.inside_0_w_per_m2_k - adiabatic_cross
+        + input.inside_convection_coefficient_w_per_m2_k
+        + ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K;
+    if denominator.abs() <= f64::EPSILON {
+        return surface.inside_face_temperature_c;
+    }
+
+    (surface.ctf.const_in_part_w_per_m2
+        + input.net_inside_source_w_per_m2
+        + input.inside_convection_coefficient_w_per_m2_k * input.reference_air_temperature_c
+        + ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K * input.previous_inside_face_temperature_c
+        + outside_temperature_term)
+        / denominator
+}
+
+/// EnergyPlus-shaped CTF outside-face environmental balance for the opaque subset.
+#[must_use]
+pub fn energyplus_ctf_outside_face_temperature_c(
+    surface: &SurfaceHeatBalanceState,
+    input: CtfOutsideFaceBalanceInput,
+) -> f64 {
+    let denominator = surface.ctf.outside_0_w_per_m2_k
+        + input.outside_convection_coefficient_w_per_m2_k
+        + input.outside_radiation_coefficient_w_per_m2_k;
+    if denominator.abs() <= f64::EPSILON {
+        return input.outdoor_air_temperature_c;
+    }
+
+    (-surface.ctf.const_out_part_w_per_m2
+        + input.absorbed_outside_source_w_per_m2
+        + input.outside_convection_coefficient_w_per_m2_k * input.outdoor_air_temperature_c
+        + input.outside_radiation_coefficient_w_per_m2_k * input.radiant_temperature_c
+        + surface.ctf.cross_0_w_per_m2_k * surface.inside_face_temperature_c)
+        / denominator
+}
+
 fn exterior_surface_energy_balance_temperature_c(
     surface_state: &SurfaceHeatBalanceState,
     typed_surface: &Surface,
     record: &EpwRecord,
     outdoor_dry_bulb_c: f64,
-    owning_zone_temperature_c: f64,
+    _owning_zone_temperature_c: f64,
     incident_solar_w_per_m2: f64,
 ) -> f64 {
     if record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
@@ -3096,11 +3183,6 @@ fn exterior_surface_energy_balance_temperature_c(
         return outdoor_dry_bulb_c;
     }
 
-    let conductance_w_per_m2_k = if surface_state.area_m2 > 0.0 {
-        surface_state.conductance_w_per_k / surface_state.area_m2
-    } else {
-        0.0
-    };
     let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
     let convection_coefficient =
@@ -3117,16 +3199,17 @@ fn exterior_surface_energy_balance_temperature_c(
     let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
         + ground_view_factor * outdoor_dry_bulb_c
         + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
-    let denominator = convection_coefficient + longwave_coefficient + conductance_w_per_m2_k;
-    if denominator <= 0.0 {
-        return outdoor_dry_bulb_c;
-    }
 
-    (convection_coefficient * outdoor_dry_bulb_c
-        + longwave_coefficient * longwave_radiant_temperature_c
-        + solar_absorptance * incident_solar_w_per_m2.max(0.0)
-        + conductance_w_per_m2_k * owning_zone_temperature_c)
-        / denominator
+    energyplus_ctf_outside_face_temperature_c(
+        surface_state,
+        CtfOutsideFaceBalanceInput {
+            outdoor_air_temperature_c: outdoor_dry_bulb_c,
+            radiant_temperature_c: longwave_radiant_temperature_c,
+            outside_convection_coefficient_w_per_m2_k: convection_coefficient,
+            outside_radiation_coefficient_w_per_m2_k: longwave_coefficient,
+            absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
+        },
+    )
 }
 
 fn exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
@@ -4402,16 +4485,17 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        ConstructionCtfCoefficientOverride, Date, EpwRecord, ExecutionStep,
-        FirstZoneSimulationOptions, HeatBalanceSimulationOptions, HeatBalanceStepInput,
-        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
+        Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+        HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_average_solar_coefficients, energyplus_daily_solar_coefficients,
+        energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
+        energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
         energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
@@ -5465,6 +5549,71 @@ DATA PERIODS
         assert_eq!(ctf.inside_temperature_history_c, vec![20.0, 20.0]);
         assert_eq!(ctf.outside_flux_history_w_per_m2, vec![0.0, 0.0]);
         assert_eq!(ctf.inside_flux_history_w_per_m2, vec![0.0, 0.0]);
+
+        Ok(())
+    }
+
+    #[test]
+    fn energyplus_ctf_inside_face_balance_handles_standard_and_adiabatic()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.outside_face_temperature_c = 10.0;
+        surface.inside_face_temperature_c = 19.0;
+        surface.ctf.inside_0_w_per_m2_k = 3.0;
+        surface.ctf.cross_0_w_per_m2_k = 0.5;
+        surface.ctf.const_in_part_w_per_m2 = 1.0;
+
+        let standard = energyplus_ctf_inside_face_temperature_c(
+            surface,
+            CtfInsideFaceBalanceInput {
+                reference_air_temperature_c: 20.0,
+                inside_convection_coefficient_w_per_m2_k: 2.0,
+                previous_inside_face_temperature_c: 18.0,
+                net_inside_source_w_per_m2: 4.0,
+            },
+        );
+        assert!((standard - 14.0).abs() < 1.0e-12);
+
+        surface.outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
+        let adiabatic = energyplus_ctf_inside_face_temperature_c(
+            surface,
+            CtfInsideFaceBalanceInput {
+                reference_air_temperature_c: 20.0,
+                inside_convection_coefficient_w_per_m2_k: 2.0,
+                previous_inside_face_temperature_c: 18.0,
+                net_inside_source_w_per_m2: 4.0,
+            },
+        );
+        assert!((adiabatic - (135.0 / 9.5)).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn energyplus_ctf_outside_face_balance_uses_ctf_zero_terms()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.inside_face_temperature_c = 20.0;
+        surface.ctf.outside_0_w_per_m2_k = 1.0;
+        surface.ctf.cross_0_w_per_m2_k = 1.0;
+        surface.ctf.const_out_part_w_per_m2 = 0.0;
+
+        let temperature = energyplus_ctf_outside_face_temperature_c(
+            surface,
+            CtfOutsideFaceBalanceInput {
+                outdoor_air_temperature_c: 10.0,
+                radiant_temperature_c: 5.0,
+                outside_convection_coefficient_w_per_m2_k: 3.0,
+                outside_radiation_coefficient_w_per_m2_k: 2.0,
+                absorbed_outside_source_w_per_m2: 7.0,
+            },
+        );
+
+        assert!((temperature - (67.0 / 6.0)).abs() < 1.0e-12);
 
         Ok(())
     }

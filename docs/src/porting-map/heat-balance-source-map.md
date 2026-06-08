@@ -45,8 +45,8 @@ claim.
 | construction input | `GetConstructData` | typed opaque layer stack exists; CTF coefficients not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
-| outside surface balance | `CalcHeatBalanceOutsideSurf` | mapped-not-ported |
-| inside surface balance | `CalcHeatBalanceInsideSurf` | mapped-not-ported |
+| outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
+| inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
 | zone air correction | `correctZoneAirTemps` | mapped-not-ported |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
@@ -89,6 +89,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `HeatBalanceSurfaceManager.cc` builds `SurfCTFConstInPart` and
   `SurfCTFConstOutPart` from temperature and flux histories before calculating
   current inside/outside conduction fluxes and face temperatures.
+- `CalcHeatBalanceInsideSurf2CTFOnly` uses `IterDampConst = 5.0`, subtracts
+  `CTFCross[0]` from the inside denominator for adiabatic surfaces, and uses
+  `CTFCross[0] * SurfTempOutHist(1)` for standard opaque surfaces.
+- `CalcHeatBalanceOutsideSurf` solves the no-movable-insulation exterior face
+  temperature with `-SurfCTFConstOutPart`, current `CTFCross[0] * SurfTempIn`,
+  absorbed outside source terms, and exterior convection/radiation coefficients.
 
 Current Rust boundary:
 
@@ -101,7 +107,10 @@ Current Rust boundary:
   coefficient/history slots per surface, and can seed those slots from EIO rows
   during diagnostic-only heat-balance runs. The default CLI diagnostic seed is
   limited to steady/no-mass `#CTFs <= 1` constructions until CTF face-temperature
-  solving is ported.
+  solving is ported. Runtime helpers now encode the EnergyPlus-shaped CTF
+  inside and outside face-temperature equations, but the full EnergyPlus
+  iteration order and convection/radiation coefficient updates are not yet wired
+  into the timestep shell.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
