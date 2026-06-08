@@ -149,7 +149,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   exterior report rows by applying the EnergyPlus hourly interpolation weights
   to liquid precipitation, mixing the dry and wet convection terms, and using a
   bounded outdoor wet-bulb approximation until the full Psychrometrics wet-bulb
-  routine is ported.
+  routine is ported. The run-period and warmup timestep shells now pass a
+  timestep-aware weather context for exterior forcing: dry-bulb follows
+  EnergyPlus hourly interpolation, rain uses the current timestep flag, and
+  exterior solar balance/report terms use the same timestep solar interpolation
+  helper that backs the hourly incident-solar diagnostic. Surface temperatures
+  and surface/zone conduction/source report rows are averaged over the zone
+  timesteps before being written as hourly diagnostics; the latent zone-air
+  heat-balance rows intentionally remain hour-end diagnostics until the full
+  zone predictor/corrector source path is ported.
 - `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
   builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
   `SumHATref`, internal gains, air-exchange terms, and third-order history
@@ -230,19 +238,20 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   the next target to coupled surface/zone source ordering rather than only the
   exterior coefficient expression. Adding the EnergyPlus advanced outside-face
   zone aggregate as a latent diagnostic row exposes the exterior side of that
-  same bottleneck: after the explicit exterior longwave split, the default lane
-  has `2057.629368` RMSE, and quick-outside iter3 lowers it to `917.272947`,
-  matching the explicit quick-outside plus DOE-2 iter3 lane. The active tracker
-  now carries 41 rows by adding roof outside convection, net thermal radiation,
-  and absorbed solar source diagnostics so the remaining outside aggregate
-  movement can be tied to exterior source rows before runtime promotion. The
-  same longwave split lowered the active roof outside source bottlenecks:
-  quick-outside iter3 roof net thermal radiation RMSE is `4750.633902`, roof
-  outside convection heat-gain RMSE is `4946.299339`, and the default roof
-  outside net thermal radiation RMSE is `6291.820739`. The current max-error
-  sample has moved to a rain-onset hour, so the next source-mapped exterior
-  target is timestep rain/output alignment rather than another fixed longwave
-  coefficient adjustment.
+  same bottleneck: after the explicit exterior longwave split plus timestep
+  weather/solar output averaging, the default lane has `2007.221448` RMSE, and
+  quick-outside iter3 lowers it to `945.671209`, matching the explicit
+  quick-outside plus DOE-2 iter3 lane. The active tracker now carries 41 rows by
+  adding roof outside convection, net thermal radiation, and absorbed solar
+  source diagnostics so the remaining outside aggregate movement can be tied to
+  exterior source rows before runtime promotion. The same source alignment
+  lowered the active rain-onset max spike and default roof outside source
+  bottleneck: quick-outside iter3 roof net thermal radiation RMSE is
+  `4868.506550`, roof outside convection heat-gain RMSE is `5065.433053`, and
+  the default roof outside convection heat-gain RMSE is `9182.351467`. The
+  remaining top sample has moved back to the dry high-solar roof hour, keeping
+  exterior source coupling and outside-face temperature iteration as the next
+  source-mapped target rather than rain-onset output alignment.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
@@ -304,9 +313,9 @@ Current Rust boundary:
   shell now honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for the
   exterior convection coefficient and uses EnergyPlus-shaped sky/air/ground
   exterior longwave coefficients in the diagnostic outside balance/report path,
-  but full inside iteration order, rain timestep/output alignment, zone
-  predictor/corrector equations, and coupled radiation coefficient update order
-  are not yet wired.
+  with timestep-interpolated weather/solar context and hourly-averaged surface
+  diagnostics, but full inside iteration order, zone predictor/corrector
+  equations, and coupled radiation coefficient update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

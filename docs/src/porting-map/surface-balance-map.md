@@ -52,16 +52,19 @@ surfaces now follow the EnergyPlus rain branch in diagnostic form: liquid
 precipitation uses the hourly interpolation threshold from `WeatherManager.cc`,
 wet timesteps mix `SurfHConvExt = 1000.0` into the hourly report coefficient,
 and the exterior convection reference temperature uses a bounded outdoor
-wet-bulb approximation. Exterior longwave now follows the EnergyPlus diagnostic
-split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`, including
-`SurfAirSkyRadSplit`, and both the outside-face balance equivalent radiation
-term and the net thermal radiation report row share that helper. Inside-surface
-radiant/source terms now have explicit runtime slots matching EnergyPlus
-`SurfTempTerm` inputs, and the OtherEquipment radiant fraction is distributed
-to inside surfaces with EnergyPlus inside-layer area-absorptance normalization;
-outside-layer absorptance remains the exterior solar/longwave input. Shortwave,
-additional source, HVAC radiant, rain timestep/output alignment, and full
-radiation coupling remain future wiring rather than promoted parity. A
+wet-bulb approximation. The run-period and warmup shells now pass timestep
+weather context for dry-bulb, rain, and exterior solar forcing, then average
+surface temperatures plus surface/zone conduction/source rows over the zone
+timesteps for hourly diagnostics. Exterior longwave follows the EnergyPlus
+diagnostic split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`,
+including `SurfAirSkyRadSplit`, and both the outside-face balance equivalent
+radiation term and the net thermal radiation report row share that helper.
+Inside-surface radiant/source terms now have explicit runtime slots matching
+EnergyPlus `SurfTempTerm` inputs, and the OtherEquipment radiant fraction is
+distributed to inside surfaces with EnergyPlus inside-layer area-absorptance
+normalization; outside-layer absorptance remains the exterior solar/longwave
+input. Shortwave, additional source, HVAC radiant, and full radiation coupling
+remain future wiring rather than promoted parity. A
 source-anchored ScriptF interior-longwave probe matches the
 `1ZoneUncontrolled` EIO factor orientation, but remains diagnostic-only because
 exact longwave feedback without the rest of the EnergyPlus surface/zone coupling

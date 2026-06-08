@@ -971,6 +971,28 @@ struct SurfaceHeatBalanceTrace {
     heat_storage_rate_w: Vec<f64>,
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+struct SurfaceHeatBalanceTraceSums {
+    inside_face_temperature_c: f64,
+    outside_face_temperature_c: f64,
+    outside_convection_heat_gain_rate_w: f64,
+    outside_convection_heat_gain_rate_per_area_w_per_m2: f64,
+    outside_convection_coefficient_w_per_m2_k: f64,
+    outside_net_thermal_radiation_heat_gain_rate_w: f64,
+    outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: f64,
+    outside_solar_radiation_heat_gain_rate_w: f64,
+    outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: f64,
+    inside_conduction_rate_w: f64,
+    inside_conduction_gain_rate_w: f64,
+    inside_conduction_loss_rate_w: f64,
+    inside_conduction_rate_per_area_w_per_m2: f64,
+    outside_conduction_rate_w: f64,
+    outside_conduction_gain_rate_w: f64,
+    outside_conduction_loss_rate_w: f64,
+    outside_conduction_rate_per_area_w_per_m2: f64,
+    heat_storage_rate_w: f64,
+}
+
 struct ZoneConductionTrace {
     zone_id: ZoneId,
     zone_name: String,
@@ -3156,17 +3178,33 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         .enumerate()
     {
         let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
-        let weather_context = weather_records.map(|records| HeatBalanceWeatherContext {
-            records,
-            record_index: hour_index,
-            zone_steps_per_hour,
-        });
-        for _substep in 0..zone_steps_per_hour {
+        let steps = zone_steps_per_hour.max(1);
+        let mut zone_temperature_sums = vec![0.0; zone_temperatures.len()];
+        let mut zone_conduction_sums =
+            vec![(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); zone_conduction_rates.len()];
+        let mut surface_sums =
+            vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
+        let mut outdoor_temperature_sum = 0.0;
+
+        for substep in 1..=steps {
+            let timestep_outdoor_dry_bulb_c = energyplus_weather_dry_bulb_at_timestep(
+                weather_records,
+                hour_index,
+                outdoor_dry_bulb_c,
+                steps,
+                substep,
+            );
+            let weather_context = heat_balance_weather_context_for_timestep(
+                weather_records,
+                hour_index,
+                steps,
+                substep,
+            );
             advance_heat_balance_state_one_timestep_internal(
                 &model.typed,
                 &mut state,
                 HeatBalanceStepInput {
-                    outdoor_dry_bulb_c,
+                    outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
                     hour_ending,
                     timestep_seconds: seconds_per_timestep,
                 },
@@ -3174,37 +3212,98 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
             );
-        }
 
-        for (zone_id, _zone_name, values) in &mut zone_temperatures {
-            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                values.push(zone_state.mean_air_temperature_c);
+            outdoor_temperature_sum += timestep_outdoor_dry_bulb_c;
+            for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
+                if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                    zone_temperature_sums[index] += zone_state.mean_air_temperature_c;
+                }
+            }
+            for (index, trace) in zone_conduction_rates.iter().enumerate() {
+                if let Some(zone_state) = state
+                    .zones
+                    .iter()
+                    .find(|zone| zone.zone_id == trace.zone_id)
+                {
+                    let inside_rate = zone_state.opaque_surface_heat_gain_w;
+                    let outside_rate = zone_state.opaque_surface_outside_conduction_w;
+                    zone_conduction_sums[index].0 += inside_rate;
+                    zone_conduction_sums[index].1 += heat_gain_rate_w(inside_rate);
+                    zone_conduction_sums[index].2 += heat_loss_rate_w(inside_rate);
+                    zone_conduction_sums[index].3 += outside_rate;
+                    zone_conduction_sums[index].4 += heat_gain_rate_w(outside_rate);
+                    zone_conduction_sums[index].5 += heat_loss_rate_w(outside_rate);
+                }
+            }
+            for (index, trace) in surface_temperatures.iter().enumerate() {
+                if let Some(surface_state) = state
+                    .surfaces
+                    .iter()
+                    .find(|surface| surface.surface_id == trace.surface_id)
+                {
+                    let inside_rate = surface_inside_conduction_rate_w(surface_state);
+                    let outside_rate = surface_outside_conduction_rate_w(surface_state);
+                    let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
+                    let outside_face_temperature_c = reported_surface_outside_face_temperature_c(
+                        &model.typed,
+                        surface_state,
+                        timestep_outdoor_dry_bulb_c,
+                        surface_state.inside_face_temperature_c,
+                        weather_context,
+                        options.zone_air_algorithm,
+                    );
+                    let exterior_terms = surface_exterior_report_terms(
+                        &model.typed,
+                        surface_state,
+                        timestep_outdoor_dry_bulb_c,
+                        outside_face_temperature_c,
+                        weather_context,
+                        options.zone_air_algorithm,
+                    );
+                    let sums = &mut surface_sums[index];
+                    sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
+                    sums.outside_face_temperature_c += outside_face_temperature_c;
+                    sums.outside_convection_heat_gain_rate_w +=
+                        exterior_terms.convection_heat_gain_rate_w;
+                    sums.outside_convection_heat_gain_rate_per_area_w_per_m2 +=
+                        exterior_terms.convection_heat_gain_rate_per_area_w_per_m2;
+                    sums.outside_convection_coefficient_w_per_m2_k +=
+                        exterior_terms.convection_coefficient_w_per_m2_k;
+                    sums.outside_net_thermal_radiation_heat_gain_rate_w +=
+                        exterior_terms.net_thermal_radiation_heat_gain_rate_w;
+                    sums.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                        exterior_terms.net_thermal_radiation_heat_gain_rate_per_area_w_per_m2;
+                    sums.outside_solar_radiation_heat_gain_rate_w +=
+                        exterior_terms.solar_radiation_heat_gain_rate_w;
+                    sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                        exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2;
+                    sums.inside_conduction_rate_w += inside_rate;
+                    sums.inside_conduction_gain_rate_w += heat_gain_rate_w(inside_rate);
+                    sums.inside_conduction_loss_rate_w += heat_loss_rate_w(inside_rate);
+                    sums.inside_conduction_rate_per_area_w_per_m2 +=
+                        surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2);
+                    sums.outside_conduction_rate_w += outside_rate;
+                    sums.outside_conduction_gain_rate_w += heat_gain_rate_w(outside_rate);
+                    sums.outside_conduction_loss_rate_w += heat_loss_rate_w(outside_rate);
+                    sums.outside_conduction_rate_per_area_w_per_m2 +=
+                        surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2);
+                    sums.heat_storage_rate_w += storage_rate;
+                }
             }
         }
-        for trace in &mut zone_conduction_rates {
-            if let Some(zone_state) = state
-                .zones
-                .iter()
-                .find(|zone| zone.zone_id == trace.zone_id)
-            {
-                let inside_rate = zone_state.opaque_surface_heat_gain_w;
-                trace.inside_conduction_rate_w.push(inside_rate);
-                trace
-                    .inside_conduction_gain_rate_w
-                    .push(heat_gain_rate_w(inside_rate));
-                trace
-                    .inside_conduction_loss_rate_w
-                    .push(heat_loss_rate_w(inside_rate));
 
-                let outside_rate = zone_state.opaque_surface_outside_conduction_w;
-                trace.outside_conduction_rate_w.push(outside_rate);
-                trace
-                    .outside_conduction_gain_rate_w
-                    .push(heat_gain_rate_w(outside_rate));
-                trace
-                    .outside_conduction_loss_rate_w
-                    .push(heat_loss_rate_w(outside_rate));
-            }
+        let divisor = f64::from(steps);
+        for (index, (_zone_id, _zone_name, values)) in zone_temperatures.iter_mut().enumerate() {
+            values.push(zone_temperature_sums[index] / divisor);
+        }
+        for (index, trace) in zone_conduction_rates.iter_mut().enumerate() {
+            let sums = zone_conduction_sums[index];
+            trace.inside_conduction_rate_w.push(sums.0 / divisor);
+            trace.inside_conduction_gain_rate_w.push(sums.1 / divisor);
+            trace.inside_conduction_loss_rate_w.push(sums.2 / divisor);
+            trace.outside_conduction_rate_w.push(sums.3 / divisor);
+            trace.outside_conduction_gain_rate_w.push(sums.4 / divisor);
+            trace.outside_conduction_loss_rate_w.push(sums.5 / divisor);
         }
         for (
             zone_id,
@@ -3228,82 +3327,66 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 ));
             }
         }
-        for trace in &mut surface_temperatures {
-            if let Some(surface_state) = state
-                .surfaces
-                .iter()
-                .find(|surface| surface.surface_id == trace.surface_id)
-            {
-                let inside_rate = surface_inside_conduction_rate_w(surface_state);
-                let outside_rate = surface_outside_conduction_rate_w(surface_state);
-                let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
-                let outside_face_temperature_c = reported_surface_outside_face_temperature_c(
-                    &model.typed,
-                    surface_state,
-                    outdoor_dry_bulb_c,
-                    surface_state.inside_face_temperature_c,
-                    weather_context,
-                    options.zone_air_algorithm,
+        for (index, trace) in surface_temperatures.iter_mut().enumerate() {
+            let sums = surface_sums[index];
+            trace
+                .inside_face_temperature_c
+                .push(sums.inside_face_temperature_c / divisor);
+            trace
+                .outside_face_temperature_c
+                .push(sums.outside_face_temperature_c / divisor);
+            trace
+                .outside_convection_heat_gain_rate_w
+                .push(sums.outside_convection_heat_gain_rate_w / divisor);
+            trace
+                .outside_convection_heat_gain_rate_per_area_w_per_m2
+                .push(sums.outside_convection_heat_gain_rate_per_area_w_per_m2 / divisor);
+            trace
+                .outside_convection_coefficient_w_per_m2_k
+                .push(sums.outside_convection_coefficient_w_per_m2_k / divisor);
+            trace
+                .outside_net_thermal_radiation_heat_gain_rate_w
+                .push(sums.outside_net_thermal_radiation_heat_gain_rate_w / divisor);
+            trace
+                .outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2
+                .push(
+                    sums.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2 / divisor,
                 );
-                let exterior_terms = surface_exterior_report_terms(
-                    &model.typed,
-                    surface_state,
-                    outdoor_dry_bulb_c,
-                    outside_face_temperature_c,
-                    weather_context,
-                    options.zone_air_algorithm,
-                );
-                trace
-                    .inside_face_temperature_c
-                    .push(surface_state.inside_face_temperature_c);
-                trace
-                    .outside_face_temperature_c
-                    .push(outside_face_temperature_c);
-                trace
-                    .outside_convection_heat_gain_rate_w
-                    .push(exterior_terms.convection_heat_gain_rate_w);
-                trace
-                    .outside_convection_heat_gain_rate_per_area_w_per_m2
-                    .push(exterior_terms.convection_heat_gain_rate_per_area_w_per_m2);
-                trace
-                    .outside_convection_coefficient_w_per_m2_k
-                    .push(exterior_terms.convection_coefficient_w_per_m2_k);
-                trace
-                    .outside_net_thermal_radiation_heat_gain_rate_w
-                    .push(exterior_terms.net_thermal_radiation_heat_gain_rate_w);
-                trace
-                    .outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2
-                    .push(exterior_terms.net_thermal_radiation_heat_gain_rate_per_area_w_per_m2);
-                trace
-                    .outside_solar_radiation_heat_gain_rate_w
-                    .push(exterior_terms.solar_radiation_heat_gain_rate_w);
-                trace
-                    .outside_solar_radiation_heat_gain_rate_per_area_w_per_m2
-                    .push(exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2);
-                trace.inside_conduction_rate_w.push(inside_rate);
-                trace
-                    .inside_conduction_gain_rate_w
-                    .push(heat_gain_rate_w(inside_rate));
-                trace
-                    .inside_conduction_loss_rate_w
-                    .push(heat_loss_rate_w(inside_rate));
-                trace.inside_conduction_rate_per_area_w_per_m2.push(
-                    surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2),
-                );
-                trace.outside_conduction_rate_w.push(outside_rate);
-                trace
-                    .outside_conduction_gain_rate_w
-                    .push(heat_gain_rate_w(outside_rate));
-                trace
-                    .outside_conduction_loss_rate_w
-                    .push(heat_loss_rate_w(outside_rate));
-                trace.outside_conduction_rate_per_area_w_per_m2.push(
-                    surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2),
-                );
-                trace.heat_storage_rate_w.push(storage_rate);
-            }
+            trace
+                .outside_solar_radiation_heat_gain_rate_w
+                .push(sums.outside_solar_radiation_heat_gain_rate_w / divisor);
+            trace
+                .outside_solar_radiation_heat_gain_rate_per_area_w_per_m2
+                .push(sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 / divisor);
+            trace
+                .inside_conduction_rate_w
+                .push(sums.inside_conduction_rate_w / divisor);
+            trace
+                .inside_conduction_gain_rate_w
+                .push(sums.inside_conduction_gain_rate_w / divisor);
+            trace
+                .inside_conduction_loss_rate_w
+                .push(sums.inside_conduction_loss_rate_w / divisor);
+            trace
+                .inside_conduction_rate_per_area_w_per_m2
+                .push(sums.inside_conduction_rate_per_area_w_per_m2 / divisor);
+            trace
+                .outside_conduction_rate_w
+                .push(sums.outside_conduction_rate_w / divisor);
+            trace
+                .outside_conduction_gain_rate_w
+                .push(sums.outside_conduction_gain_rate_w / divisor);
+            trace
+                .outside_conduction_loss_rate_w
+                .push(sums.outside_conduction_loss_rate_w / divisor);
+            trace
+                .outside_conduction_rate_per_area_w_per_m2
+                .push(sums.outside_conduction_rate_per_area_w_per_m2 / divisor);
+            trace
+                .heat_storage_rate_w
+                .push(sums.heat_storage_rate_w / divisor);
         }
-        outdoor_temperatures.push(outdoor_dry_bulb_c);
+        outdoor_temperatures.push(outdoor_temperature_sum / divisor);
     }
 
     let mut results = ResultStore::new();
@@ -3608,17 +3691,26 @@ fn run_heat_balance_run_period_warmup(
             .enumerate()
         {
             let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
-            let weather_context = weather_records.map(|records| HeatBalanceWeatherContext {
-                records,
-                record_index: hour_index,
-                zone_steps_per_hour,
-            });
-            for _substep in 0..zone_steps_per_hour {
+            let steps = zone_steps_per_hour.max(1);
+            for substep in 1..=steps {
+                let timestep_outdoor_dry_bulb_c = energyplus_weather_dry_bulb_at_timestep(
+                    weather_records,
+                    hour_index,
+                    outdoor_dry_bulb_c,
+                    steps,
+                    substep,
+                );
+                let weather_context = heat_balance_weather_context_for_timestep(
+                    weather_records,
+                    hour_index,
+                    steps,
+                    substep,
+                );
                 advance_heat_balance_state_one_timestep_internal(
                     model,
                     state,
                     HeatBalanceStepInput {
-                        outdoor_dry_bulb_c,
+                        outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
                         hour_ending,
                         timestep_seconds: seconds_per_timestep,
                     },
@@ -3693,6 +3785,7 @@ struct HeatBalanceWeatherContext<'a> {
     records: &'a [EpwRecord],
     record_index: usize,
     zone_steps_per_hour: u32,
+    zone_timestep: Option<u32>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -4132,12 +4225,7 @@ fn exterior_surface_boundary_temperature_c(
     ) {
         return outdoor_dry_bulb_c;
     }
-    let wet_timestep_fraction = energyplus_exterior_wet_timestep_fraction(
-        context.records,
-        context.record_index,
-        context.zone_steps_per_hour,
-        typed_surface,
-    );
+    let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
 
     let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
         let Some(site) = model.site.as_ref() else {
@@ -4153,12 +4241,13 @@ fn exterior_surface_boundary_temperature_c(
                 wet_timestep_fraction,
             );
         };
-        surface_incident_solar_radiation_hourly_average_w_per_m2(
+        surface_incident_solar_radiation_for_weather_context_w_per_m2(
             typed_surface,
             site,
             context.records,
             context.record_index,
             context.zone_steps_per_hour,
+            context.zone_timestep,
         )
     } else {
         0.0
@@ -4242,12 +4331,13 @@ fn surface_exterior_report_terms(
             .site
             .as_ref()
             .map(|site| {
-                surface_incident_solar_radiation_hourly_average_w_per_m2(
+                surface_incident_solar_radiation_for_weather_context_w_per_m2(
                     typed_surface,
                     site,
                     context.records,
                     context.record_index,
                     context.zone_steps_per_hour,
+                    context.zone_timestep,
                 )
             })
             .unwrap_or(0.0)
@@ -4261,12 +4351,7 @@ fn surface_exterior_report_terms(
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
     let use_doe2_outside_convection =
         heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm);
-    let wet_timestep_fraction = energyplus_exterior_wet_timestep_fraction(
-        context.records,
-        context.record_index,
-        context.zone_steps_per_hour,
-        typed_surface,
-    );
+    let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,
         typed_surface,
@@ -4462,6 +4547,36 @@ fn energyplus_exterior_wet_timestep_fraction(
     wet_steps as f64 / f64::from(steps)
 }
 
+fn energyplus_exterior_wet_context_fraction(
+    context: HeatBalanceWeatherContext<'_>,
+    typed_surface: &Surface,
+) -> f64 {
+    if typed_surface.wind_exposure != WindExposure::WindExposed {
+        return 0.0;
+    }
+
+    let steps = context.zone_steps_per_hour.max(1);
+    if let Some(timestep) = context.zone_timestep {
+        return if energyplus_weather_record_is_rain_at_timestep(
+            context.records,
+            context.record_index,
+            timestep,
+            steps,
+        ) {
+            1.0
+        } else {
+            0.0
+        };
+    }
+
+    energyplus_exterior_wet_timestep_fraction(
+        context.records,
+        context.record_index,
+        steps,
+        typed_surface,
+    )
+}
+
 fn energyplus_weather_record_is_rain_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -4473,11 +4588,7 @@ fn energyplus_weather_record_is_rain_at_timestep(
     };
     let previous = previous_weather_record(records, record_index);
     let steps = zone_steps_per_hour.max(1);
-    let interpolation_weight = if steps == 1 {
-        1.0
-    } else {
-        (f64::from(timestep) / f64::from(steps)).min(1.0)
-    };
+    let interpolation_weight = energyplus_weather_interpolation_weight(steps, timestep);
     let interpolated_precipitation_depth_mm = previous.liquid_precipitation_depth_mm
         * (1.0 - interpolation_weight)
         + record.liquid_precipitation_depth_mm * interpolation_weight;
@@ -5479,56 +5590,118 @@ fn surface_incident_solar_radiation_hourly_average_w_per_m2(
     record_index: usize,
     zone_steps_per_hour: u32,
 ) -> f64 {
-    let Some(record) = weather_records.get(record_index) else {
+    surface_incident_solar_radiation_for_weather_context_w_per_m2(
+        surface,
+        site,
+        weather_records,
+        record_index,
+        zone_steps_per_hour,
+        None,
+    )
+}
+
+fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: Option<u32>,
+) -> f64 {
+    if weather_records.get(record_index).is_none() {
         return 0.0;
-    };
+    }
     let Some((sin_declination, cos_declination, equation_of_time_hours)) =
         energyplus_shadowing_period_solar_coefficients(weather_records, record_index)
     else {
         return 0.0;
     };
     let steps = zone_steps_per_hour.max(1);
-    let mut total = 0.0;
-    for timestep in 1..=steps {
-        let (previous_weight, current_weight, next_weight) =
-            solar_weather_interpolation_weights(steps, timestep);
-        let previous = previous_weather_record(weather_records, record_index);
-        let next = next_weather_record(weather_records, record_index);
-        let direct_normal = weighted_solar_value(
-            previous.direct_normal_radiation_wh_per_m2,
-            record.direct_normal_radiation_wh_per_m2,
-            next.direct_normal_radiation_wh_per_m2,
-            previous_weight,
-            current_weight,
-            next_weight,
-        );
-        let diffuse_horizontal = weighted_solar_value(
-            previous.diffuse_horizontal_radiation_wh_per_m2,
-            record.diffuse_horizontal_radiation_wh_per_m2,
-            next.diffuse_horizontal_radiation_wh_per_m2,
-            previous_weight,
-            current_weight,
-            next_weight,
-        );
-        let local_hour =
-            f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
-        let actual_sun_is_up = solar_position_rad_at_local_hour(site, record, local_hour).is_some();
-        total += surface_incident_solar_radiation_at_local_hour_w_per_m2(
+    if let Some(timestep) = zone_timestep {
+        return surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
             surface,
             site,
-            SurfaceSolarTimestepInput {
-                local_hour,
-                actual_sun_is_up,
-                sin_declination,
-                cos_declination,
-                equation_of_time_hours,
-                direct_normal_radiation_w_per_m2: direct_normal,
-                diffuse_horizontal_radiation_w_per_m2: diffuse_horizontal,
-            },
+            weather_records,
+            record_index,
+            steps,
+            timestep,
+            sin_declination,
+            cos_declination,
+            equation_of_time_hours,
+        );
+    }
+
+    let mut total = 0.0;
+    for timestep in 1..=steps {
+        total += surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
+            surface,
+            site,
+            weather_records,
+            record_index,
+            steps,
+            timestep,
+            sin_declination,
+            cos_declination,
+            equation_of_time_hours,
         );
     }
 
     total / f64::from(steps)
+}
+
+fn surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    sin_declination: f64,
+    cos_declination: f64,
+    equation_of_time_hours: f64,
+) -> f64 {
+    let Some(record) = weather_records.get(record_index) else {
+        return 0.0;
+    };
+    let steps = zone_steps_per_hour.max(1);
+    let timestep = zone_timestep.clamp(1, steps);
+    let (previous_weight, current_weight, next_weight) =
+        solar_weather_interpolation_weights(steps, timestep);
+    let previous = previous_weather_record(weather_records, record_index);
+    let next = next_weather_record(weather_records, record_index);
+    let direct_normal = weighted_solar_value(
+        previous.direct_normal_radiation_wh_per_m2,
+        record.direct_normal_radiation_wh_per_m2,
+        next.direct_normal_radiation_wh_per_m2,
+        previous_weight,
+        current_weight,
+        next_weight,
+    );
+    let diffuse_horizontal = weighted_solar_value(
+        previous.diffuse_horizontal_radiation_wh_per_m2,
+        record.diffuse_horizontal_radiation_wh_per_m2,
+        next.diffuse_horizontal_radiation_wh_per_m2,
+        previous_weight,
+        current_weight,
+        next_weight,
+    );
+    let local_hour =
+        f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
+    let actual_sun_is_up = solar_position_rad_at_local_hour(site, record, local_hour).is_some();
+
+    surface_incident_solar_radiation_at_local_hour_w_per_m2(
+        surface,
+        site,
+        SurfaceSolarTimestepInput {
+            local_hour,
+            actual_sun_is_up,
+            sin_declination,
+            cos_declination,
+            equation_of_time_hours,
+            direct_normal_radiation_w_per_m2: direct_normal,
+            diffuse_horizontal_radiation_w_per_m2: diffuse_horizontal,
+        },
+    )
 }
 
 #[derive(Clone, Copy)]
@@ -5599,6 +5772,49 @@ fn next_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord
         record_index + 1
     };
     &records[next_index]
+}
+
+fn heat_balance_weather_context_for_timestep(
+    weather_records: Option<&[EpwRecord]>,
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> Option<HeatBalanceWeatherContext<'_>> {
+    weather_records.map(|records| HeatBalanceWeatherContext {
+        records,
+        record_index,
+        zone_steps_per_hour,
+        zone_timestep: Some(zone_timestep),
+    })
+}
+
+fn energyplus_weather_dry_bulb_at_timestep(
+    weather_records: Option<&[EpwRecord]>,
+    record_index: usize,
+    fallback_hourly_dry_bulb_c: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    let Some(records) = weather_records else {
+        return fallback_hourly_dry_bulb_c;
+    };
+    let Some(record) = records.get(record_index) else {
+        return fallback_hourly_dry_bulb_c;
+    };
+    let previous = previous_weather_record(records, record_index);
+    let interpolation_weight =
+        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+
+    previous.dry_bulb_c * (1.0 - interpolation_weight) + record.dry_bulb_c * interpolation_weight
+}
+
+fn energyplus_weather_interpolation_weight(zone_steps_per_hour: u32, zone_timestep: u32) -> f64 {
+    let steps = zone_steps_per_hour.max(1);
+    if steps == 1 {
+        return 1.0;
+    }
+
+    (f64::from(zone_timestep.clamp(1, steps)) / f64::from(steps)).min(1.0)
 }
 
 fn weighted_solar_value(
@@ -6805,11 +7021,12 @@ mod tests {
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
-        energyplus_exterior_longwave_terms, energyplus_exterior_wet_timestep_fraction,
+        energyplus_exterior_longwave_terms, energyplus_exterior_wet_context_fraction,
+        energyplus_exterior_wet_timestep_fraction,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
-        energyplus_third_order_zone_air_temperature_c,
+        energyplus_third_order_zone_air_temperature_c, energyplus_weather_dry_bulb_at_timestep,
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
@@ -9102,6 +9319,62 @@ DATA PERIODS
     }
 
     #[test]
+    fn energyplus_weather_context_uses_timestep_rain_and_dry_bulb_interpolation() {
+        let typed = cube_model();
+        let typed_surface = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .expect("roof test surface");
+        let mut previous = weather_record_with_precipitation(0.0);
+        previous.dry_bulb_c = 10.0;
+        let mut current = weather_record_with_precipitation(1.0);
+        current.dry_bulb_c = 22.0;
+        let records = [previous, current];
+
+        assert!(
+            (energyplus_weather_dry_bulb_at_timestep(Some(&records), 1, 22.0, 4, 2) - 16.0).abs()
+                < 1.0e-12
+        );
+        assert_eq!(
+            energyplus_exterior_wet_context_fraction(
+                HeatBalanceWeatherContext {
+                    records: &records,
+                    record_index: 1,
+                    zone_steps_per_hour: 4,
+                    zone_timestep: Some(3),
+                },
+                typed_surface,
+            ),
+            0.0
+        );
+        assert_eq!(
+            energyplus_exterior_wet_context_fraction(
+                HeatBalanceWeatherContext {
+                    records: &records,
+                    record_index: 1,
+                    zone_steps_per_hour: 4,
+                    zone_timestep: Some(4),
+                },
+                typed_surface,
+            ),
+            1.0
+        );
+        assert_eq!(
+            energyplus_exterior_wet_context_fraction(
+                HeatBalanceWeatherContext {
+                    records: &records,
+                    record_index: 1,
+                    zone_steps_per_hour: 4,
+                    zone_timestep: None,
+                },
+                typed_surface,
+            ),
+            0.25
+        );
+    }
+
+    #[test]
     fn exterior_report_terms_use_energyplus_wet_surface_rain_override()
     -> Result<(), Box<dyn std::error::Error>> {
         let typed = cube_model();
@@ -9126,6 +9399,7 @@ DATA PERIODS
                 records: &records,
                 record_index: 0,
                 zone_steps_per_hour: 4,
+                zone_timestep: None,
             }),
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         );
