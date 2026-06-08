@@ -3353,6 +3353,15 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
     variable.eq_ignore_ascii_case("Zone Mean Air Temperature")
         || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Transfer Coefficient")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Gain Rate")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Gain Rate per Area")
+        || variable.eq_ignore_ascii_case(
+            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
+        )
+        || variable.eq_ignore_ascii_case(
+            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area",
+        )
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Transfer Rate")
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Gain Rate")
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Loss Rate")

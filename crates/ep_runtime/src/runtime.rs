@@ -994,6 +994,11 @@ struct SurfaceHeatBalanceTrace {
     surface_name: String,
     inside_face_temperature_c: Vec<f64>,
     outside_face_temperature_c: Vec<f64>,
+    inside_convection_heat_gain_rate_w: Vec<f64>,
+    inside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
+    inside_convection_coefficient_w_per_m2_k: Vec<f64>,
+    inside_net_surface_thermal_radiation_heat_gain_rate_w: Vec<f64>,
+    inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     outside_convection_heat_gain_rate_w: Vec<f64>,
     outside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     outside_convection_coefficient_w_per_m2_k: Vec<f64>,
@@ -1016,6 +1021,11 @@ struct SurfaceHeatBalanceTrace {
 struct SurfaceHeatBalanceTraceSums {
     inside_face_temperature_c: f64,
     outside_face_temperature_c: f64,
+    inside_convection_heat_gain_rate_w: f64,
+    inside_convection_heat_gain_rate_per_area_w_per_m2: f64,
+    inside_convection_coefficient_w_per_m2_k: f64,
+    inside_net_surface_thermal_radiation_heat_gain_rate_w: f64,
+    inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: f64,
     outside_convection_heat_gain_rate_w: f64,
     outside_convection_heat_gain_rate_per_area_w_per_m2: f64,
     outside_convection_coefficient_w_per_m2_k: f64,
@@ -3151,6 +3161,19 @@ fn zone_surface_convection_sums(
     (sum_ha_w_per_k, sum_hat_surf_w, 0.0)
 }
 
+fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
+    surface: &SurfaceHeatBalanceState,
+    zones: &[ZoneHeatBalanceState],
+) -> f64 {
+    let reference_air_temperature_c = zones
+        .iter()
+        .find(|zone| zone.zone_id == surface.zone_id)
+        .map(|zone| zone.mean_air_temperature_c)
+        .unwrap_or(surface.inside_face_temperature_c);
+    surface.inside_convection_coefficient_w_per_m2_k
+        * (reference_air_temperature_c - surface.inside_face_temperature_c)
+}
+
 fn zone_air_heat_balance_air_storage_rate_w(
     zone_state: &ZoneHeatBalanceState,
     timestep_seconds: f64,
@@ -3353,6 +3376,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             surface_name: surface.surface_name.clone(),
             inside_face_temperature_c: Vec::with_capacity(options.sample_count),
             outside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            inside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
+            inside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
+            inside_convection_coefficient_w_per_m2_k: Vec::with_capacity(options.sample_count),
+            inside_net_surface_thermal_radiation_heat_gain_rate_w: Vec::with_capacity(
+                options.sample_count,
+            ),
+            inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
+                Vec::with_capacity(options.sample_count),
             outside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
             outside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
                 options.sample_count,
@@ -3467,6 +3500,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     .iter()
                     .find(|surface| surface.surface_id == trace.surface_id)
                 {
+                    let inside_convection_heat_gain_rate_per_area =
+                        surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
+                            surface_state,
+                            &state.zones,
+                        );
+                    let inside_convection_heat_gain_rate =
+                        surface_state.area_m2 * inside_convection_heat_gain_rate_per_area;
+                    let inside_net_surface_thermal_radiation_heat_gain_rate =
+                        surface_state.area_m2 * surface_state.inside_net_longwave_w_per_m2;
                     let inside_rate = surface_inside_conduction_rate_w(surface_state);
                     let outside_rate = surface_outside_conduction_rate_w(surface_state);
                     let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
@@ -3489,6 +3531,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     let sums = &mut surface_sums[index];
                     sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
                     sums.outside_face_temperature_c += outside_face_temperature_c;
+                    sums.inside_convection_heat_gain_rate_w += inside_convection_heat_gain_rate;
+                    sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
+                        inside_convection_heat_gain_rate_per_area;
+                    sums.inside_convection_coefficient_w_per_m2_k +=
+                        surface_state.inside_convection_coefficient_w_per_m2_k;
+                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_w +=
+                        inside_net_surface_thermal_radiation_heat_gain_rate;
+                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                        surface_state.inside_net_longwave_w_per_m2;
                     sums.outside_convection_heat_gain_rate_w +=
                         exterior_terms.convection_heat_gain_rate_w;
                     sums.outside_convection_heat_gain_rate_per_area_w_per_m2 +=
@@ -3555,6 +3606,24 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .outside_face_temperature_c
                 .push(sums.outside_face_temperature_c / divisor);
+            trace
+                .inside_convection_heat_gain_rate_w
+                .push(sums.inside_convection_heat_gain_rate_w / divisor);
+            trace
+                .inside_convection_heat_gain_rate_per_area_w_per_m2
+                .push(sums.inside_convection_heat_gain_rate_per_area_w_per_m2 / divisor);
+            trace
+                .inside_convection_coefficient_w_per_m2_k
+                .push(sums.inside_convection_coefficient_w_per_m2_k / divisor);
+            trace
+                .inside_net_surface_thermal_radiation_heat_gain_rate_w
+                .push(sums.inside_net_surface_thermal_radiation_heat_gain_rate_w / divisor);
+            trace
+                .inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2
+                .push(
+                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2
+                        / divisor,
+                );
             trace
                 .outside_convection_heat_gain_rate_w
                 .push(sums.outside_convection_heat_gain_rate_w / divisor);
@@ -3721,6 +3790,49 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Surface Outside Face Temperature".to_string(),
             units: "C".to_string(),
             values: trace.outside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Convection Heat Transfer Coefficient".to_string(),
+            units: "W/m2-K".to_string(),
+            values: trace.inside_convection_coefficient_w_per_m2_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Convection Heat Gain Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.inside_convection_heat_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Convection Heat Gain Rate per Area".to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_convection_heat_gain_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+                .to_string(),
+            units: "W".to_string(),
+            values: trace.inside_net_surface_thermal_radiation_heat_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name:
+                "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area"
+                    .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -10185,7 +10297,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 119);
+        assert_eq!(simulation.results.series.len(), 149);
 
         let Some(zone_series) = simulation
             .results
@@ -10196,6 +10308,14 @@ DATA PERIODS
         assert!(zone_series.values[0] > 11.9);
         assert!(zone_series.values[0] < 20.0);
         assert!(zone_series.values[1] > zone_series.values[0]);
+
+        let Some(inside_convection_series) = simulation.results.find_series(
+            "FLOOR",
+            "Surface Inside Face Convection Heat Transfer Coefficient",
+        ) else {
+            return Err(std::io::Error::other("missing inside convection series").into());
+        };
+        assert_eq!(inside_convection_series.values.len(), 2);
 
         let Some(weather_series) = simulation
             .results

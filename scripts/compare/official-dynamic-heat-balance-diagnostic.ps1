@@ -274,7 +274,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 80) {
+if ($summary.series_count -ne 98) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -285,6 +285,16 @@ if ($null -eq $topBottleneck) {
     throw "Expected at least one bottleneck row in heat-balance diagnostic summary"
 }
 $expectedTopCandidates = @(
+    @{
+        Key = "ZN001:FLR001"
+        Variable = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+        Description = "floor inside net surface thermal radiation heat gain"
+    },
+    @{
+        Key = "ZN001:FLR001"
+        Variable = "Surface Inside Face Convection Heat Gain Rate"
+        Description = "floor inside convection heat gain"
+    },
     @{
         Key = "ZN001:FLR001"
         Variable = "Surface Heat Storage Rate"
@@ -304,6 +314,16 @@ $expectedTopCandidates = @(
         Key = "ZONE ONE"
         Variable = "Zone Opaque Surface Outside Faces Conduction Rate"
         Description = "zone outside opaque conduction aggregate"
+    },
+    @{
+        Key = "ZN001:ROOF001"
+        Variable = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+        Description = "roof inside net surface thermal radiation heat gain"
+    },
+    @{
+        Key = "ZN001:ROOF001"
+        Variable = "Surface Inside Face Convection Heat Gain Rate"
+        Description = "roof inside convection heat gain"
     },
     @{
         Key = "ZN001:ROOF001"
@@ -342,6 +362,16 @@ foreach ($wallKey in @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001
     $expectedTopCandidates += @(
         @{
             Key = $wallKey
+            Variable = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+            Description = "wall inside net surface thermal radiation heat gain"
+        },
+        @{
+            Key = $wallKey
+            Variable = "Surface Inside Face Convection Heat Gain Rate"
+            Description = "wall inside convection heat gain"
+        },
+        @{
+            Key = $wallKey
             Variable = "Surface Outside Face Convection Heat Gain Rate"
             Description = "wall outside convection heat gain"
         },
@@ -371,6 +401,15 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Temperature series"
+}
+foreach ($insideVariable in @(
+        "Surface Inside Face Convection Heat Transfer Coefficient",
+        "Surface Inside Face Convection Heat Gain Rate",
+        "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+    )) {
+    if (-not ($summary.series | Where-Object { $_.output.variable -eq $insideVariable -and $_.status -eq "extracted" })) {
+        throw "Missing extracted $insideVariable series"
+    }
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Outside Face Temperature series"
@@ -500,6 +539,9 @@ Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "mark
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate" -Description "markdown inside convection source variable"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate" -Description "markdown inside radiation source variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Beam Solar Radiation Rate per Area" -Description "markdown outside incident beam solar variable"
