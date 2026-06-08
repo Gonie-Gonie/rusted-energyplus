@@ -169,6 +169,26 @@ if ($summary.series_count -ne 24) {
 if ($summary.max_abs_delta_c -le 1.0) {
     throw "Expected current official dynamic diagnostic delta to remain visible, got $($summary.max_abs_delta_c)"
 }
+$topBottleneck = @($summary.bottlenecks)[0]
+if ($null -eq $topBottleneck) {
+    throw "Expected at least one bottleneck row in heat-balance diagnostic summary"
+}
+if ($CtfSeedPolicy -eq "steady-no-mass-only") {
+    if (
+        $topBottleneck.output.key -ne "ZN001:FLR001" -or
+        $topBottleneck.output.variable -ne "Surface Inside Face Conduction Heat Transfer Rate"
+    ) {
+        throw "Expected steady/no-mass top bottleneck to be floor inside conduction, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
+    }
+}
+else {
+    if (
+        $topBottleneck.output.key -ne "ZONE ONE" -or
+        $topBottleneck.output.variable -ne "Zone Opaque Surface Inside Faces Conduction Rate"
+    ) {
+        throw "Expected all-eio top bottleneck to be zone aggregate conduction, got $($topBottleneck.output.key) / $($topBottleneck.output.variable)"
+    }
+}
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Mean Air Temperature series"
 }

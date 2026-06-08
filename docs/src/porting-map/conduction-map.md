@@ -46,7 +46,11 @@ JSON/markdown report records this as `ctf_seed_policy: steady-no-mass-only` and
 lists skipped mass constructions such as `FLOOR (#CTFs=5)`. Developers can
 temporarily set `RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY=all-eio` to
 reproduce mass CTF over-amplification without changing the official diagnostic
-default or making a conformance claim. Roof/wall exterior
+default or making a conformance claim. The default diagnostic keeps floor inside
+conduction as the top bottleneck, while the all-CTF probe moves the top
+bottleneck to zone aggregate conduction, confirming the current blocker is the
+mass CTF face/history coupling rather than EIO coefficient availability.
+Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface
