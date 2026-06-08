@@ -50,7 +50,8 @@ and MAT series while exposing that the zone opaque aggregate still depends on
 unported floor mass CTF and full surface iteration parity. Inside-surface
 radiant/source terms now have explicit runtime slots matching EnergyPlus
 `SurfTempTerm` inputs, and the OtherEquipment radiant fraction is distributed to
-inside surfaces with EnergyPlus area-absorptance normalization. Shortwave,
+inside surfaces with EnergyPlus inside-layer area-absorptance normalization;
+outside-layer absorptance remains the exterior solar/longwave input. Shortwave,
 additional source, HVAC radiant, and full radiation coupling remain future
 wiring rather than promoted parity. A source-anchored ScriptF interior-longwave
 probe matches the `1ZoneUncontrolled` EIO factor orientation, but remains

@@ -677,6 +677,8 @@ pub struct SurfaceHeatBalanceState {
     pub heat_capacity_j_per_m2_k: Option<f64>,
     /// Outside layer thermal absorptance used by exterior diagnostic forcing.
     pub thermal_absorptance: f64,
+    /// Inside layer thermal absorptance used by interior radiant exchange/source terms.
+    pub inside_thermal_absorptance: f64,
     /// Outside layer solar absorptance used by exterior diagnostic forcing.
     pub solar_absorptance: f64,
     /// Surface conductance in W/K.
@@ -2365,6 +2367,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,
+                inside_thermal_absorptance: thermal.inside_thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
                 conductance_w_per_k,
                 inside_convection_coefficient_w_per_m2_k:
@@ -3501,6 +3504,7 @@ struct SurfaceThermalProperties {
     thermal_resistance_m2_k_per_w: f64,
     heat_capacity_j_per_m2_k: Option<f64>,
     thermal_absorptance: f64,
+    inside_thermal_absorptance: f64,
     solar_absorptance: f64,
 }
 
@@ -3544,8 +3548,14 @@ fn surface_thermal_properties(
             })?;
         layer_materials.push(material);
     }
-    let material = layer_materials
-        .first()
+    let outside_material =
+        layer_materials
+            .first()
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
+    let inside_material = layer_materials
+        .last()
         .ok_or_else(|| RuntimeError::MissingMaterial {
             construction_name: construction.name.0.clone(),
         })?;
@@ -3570,17 +3580,20 @@ fn surface_thermal_properties(
     Ok(SurfaceThermalProperties {
         construction_id: construction.id,
         construction_name: construction.name.0.clone(),
-        outside_layer_material_id: material.id,
-        outside_layer_material_name: material.name.0.clone(),
-        outside_layer_roughness: material
+        outside_layer_material_id: outside_material.id,
+        outside_layer_material_name: outside_material.name.0.clone(),
+        outside_layer_roughness: outside_material
             .roughness
             .unwrap_or(MaterialSurfaceRoughness::MediumRough),
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k,
-        thermal_absorptance: material
+        thermal_absorptance: outside_material
             .thermal_absorptance
             .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
-        solar_absorptance: material
+        inside_thermal_absorptance: inside_material
+            .thermal_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
+        solar_absorptance: outside_material
             .solar_absorptance
             .unwrap_or(DEFAULT_MATERIAL_SOLAR_ABSORPTANCE),
     })
@@ -4070,7 +4083,7 @@ fn update_surface_inside_longwave_exchange_probe(
                 azimuth_deg: surface.azimuth_deg,
                 tilt_deg: surface.tilt_deg,
                 temperature_k4: temperature_k.powi(4),
-                thermal_absorptance: surface.thermal_absorptance.clamp(0.0, 1.0),
+                thermal_absorptance: surface.inside_thermal_absorptance.clamp(0.0, 1.0),
             }
         })
         .collect::<Vec<_>>();
@@ -4137,7 +4150,7 @@ fn update_surface_inside_scriptf_longwave_exchange_probe(
                 azimuth_deg: surface.azimuth_deg,
                 tilt_deg: surface.tilt_deg,
                 temperature_k4: temperature_k.powi(4),
-                thermal_absorptance: surface.thermal_absorptance.clamp(0.0, 1.0),
+                thermal_absorptance: surface.inside_thermal_absorptance.clamp(0.0, 1.0),
             }
         })
         .collect::<Vec<_>>();
@@ -5331,7 +5344,7 @@ fn update_surface_radiant_internal_gain_source_terms(
         let area_absorptance_sum_m2 = surfaces
             .iter()
             .filter(|surface| surface.zone_id == zone_id)
-            .map(|surface| surface.area_m2 * surface.thermal_absorptance.max(0.0))
+            .map(|surface| surface.area_m2 * surface.inside_thermal_absorptance.max(0.0))
             .sum::<f64>();
         if area_absorptance_sum_m2 <= 0.0 {
             continue;
@@ -5342,7 +5355,7 @@ fn update_surface_radiant_internal_gain_source_terms(
             .filter(|surface| surface.zone_id == zone_id)
         {
             surface.inside_radiant_internal_gain_w_per_m2 =
-                thermal_absorptance_multiplier * surface.thermal_absorptance.max(0.0);
+                thermal_absorptance_multiplier * surface.inside_thermal_absorptance.max(0.0);
         }
     }
 }
@@ -7231,6 +7244,8 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].area_m2, 1.0);
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
+        assert_eq!(state.surfaces[0].thermal_absorptance, 0.9);
+        assert_eq!(state.surfaces[0].inside_thermal_absorptance, 0.9);
         assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
         assert_eq!(
             state.surfaces[0].inside_convection_coefficient_w_per_m2_k,
@@ -7248,6 +7263,73 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_state_uses_inside_layer_absorptance_for_interior_sources()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.materials.push(Material {
+            id: MaterialId(1),
+            name: NormalizedName::new("Inside Low Absorptance"),
+            kind: MaterialKind::NoMass,
+            roughness: Some(MaterialSurfaceRoughness::Smooth),
+            conductivity_w_per_m_k: None,
+            density_kg_per_m3: None,
+            specific_heat_j_per_kg_k: None,
+            thickness_m: None,
+            thermal_resistance_m2_k_per_w: Some(1.0),
+            thermal_absorptance: Some(0.2),
+            solar_absorptance: Some(0.2),
+            visible_absorptance: Some(0.2),
+        });
+        typed.materials.push(Material {
+            id: MaterialId(2),
+            name: NormalizedName::new("Inside High Absorptance"),
+            kind: MaterialKind::NoMass,
+            roughness: Some(MaterialSurfaceRoughness::Smooth),
+            conductivity_w_per_m_k: None,
+            density_kg_per_m3: None,
+            specific_heat_j_per_kg_k: None,
+            thickness_m: None,
+            thermal_resistance_m2_k_per_w: Some(1.0),
+            thermal_absorptance: Some(0.8),
+            solar_absorptance: Some(0.8),
+            visible_absorptance: Some(0.8),
+        });
+        typed.constructions[0].layers = vec![MaterialId(0), MaterialId(1)];
+        typed.constructions.push(Construction {
+            id: ConstructionId(1),
+            name: NormalizedName::new("High Inside Wall"),
+            outside_layer: MaterialId(0),
+            layers: vec![MaterialId(0), MaterialId(2)],
+        });
+        typed.surfaces[0].construction = ConstructionId(1);
+        typed.other_equipment[0].fraction_radiant = 0.25;
+        let model = SimulationModel::from_typed(typed);
+        let state = initialize_heat_balance_state(&model, 20.0)?;
+
+        let high_inside = &state.surfaces[0];
+        assert_eq!(high_inside.thermal_absorptance, 0.9);
+        assert_eq!(high_inside.inside_thermal_absorptance, 0.8);
+        let low_inside = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_id != high_inside.surface_id)
+            .ok_or_else(|| std::io::Error::other("missing low-inside surface"))?;
+        assert_eq!(low_inside.thermal_absorptance, 0.9);
+        assert_eq!(low_inside.inside_thermal_absorptance, 0.2);
+
+        let denominator = 0.8 + 5.0 * 0.2;
+        let multiplier = 3.0 / denominator;
+        assert!(
+            (high_inside.inside_radiant_internal_gain_w_per_m2 - multiplier * 0.8).abs() < 1.0e-12
+        );
+        assert!(
+            (low_inside.inside_radiant_internal_gain_w_per_m2 - multiplier * 0.2).abs() < 1.0e-12
+        );
 
         Ok(())
     }

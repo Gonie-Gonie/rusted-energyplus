@@ -98,10 +98,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `SurfQdotRadHVACInPerArea`, then adds `SurfQdotRadNetLWInPerArea` in the
   standard no-pool branch. Rust now feeds the `SurfQdotRadIntGainsInPerArea`
   slot from `OtherEquipment` radiant fractions using the EnergyPlus
-  area-absorptance normalization. The other inside shortwave, additional heat
-  source, HVAC radiant, and net longwave slots remain explicit per-surface
-  source-map fields so future solar/radiation wiring can be isolated without
-  changing the CTF face solver API again.
+  inside-layer area-absorptance normalization while retaining outside-layer
+  absorptance for exterior solar and longwave forcing. The other inside
+  shortwave, additional heat source, HVAC radiant, and net longwave slots
+  remain explicit per-surface source-map fields so future solar/radiation
+  wiring can be isolated without changing the CTF face solver API again.
 - `CalcHeatBalanceInsideSurf2CTFOnly` keeps the previous inside surface
   temperature in `SurfTempInsOld` for the iterative damping term; Rust now
   preserves the previous per-surface inside-face temperature before its
