@@ -9,7 +9,7 @@ from typing import Any
 
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-EXPECTED_SERIES_COUNT = 31
+EXPECTED_SERIES_COUNT = 34
 SURFACE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_DRIVER_LIMIT = 3
 
@@ -258,6 +258,7 @@ FOCUS_METRICS = (
     FocusMetric("ZN001:ROOF001", "Surface Inside Face Temperature"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Temperature"),
     FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),
+    FocusMetric("ZONE ONE", "Zone Opaque Surface Outside Faces Conduction Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Solar Radiation Rate per Area"),
 )
 
@@ -676,7 +677,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_conduction_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v8",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v9",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,

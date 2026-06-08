@@ -497,6 +497,8 @@ pub struct ZoneHeatBalanceState {
     pub opaque_surface_conductance_w_per_k: f64,
     /// Current opaque surface heat gain to the zone in W.
     pub opaque_surface_heat_gain_w: f64,
+    /// Current opaque outside-face surface conduction aggregate in W.
+    pub opaque_surface_outside_conduction_w: f64,
     /// EnergyPlus `SumHA`: inside convection conductance sum in W/K.
     pub sum_ha_w_per_k: f64,
     /// EnergyPlus `SumHATsurf`: inside convection temperature sum in W.
@@ -961,6 +963,17 @@ struct SurfaceHeatBalanceTrace {
     outside_conduction_loss_rate_w: Vec<f64>,
     outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
     heat_storage_rate_w: Vec<f64>,
+}
+
+struct ZoneConductionTrace {
+    zone_id: ZoneId,
+    zone_name: String,
+    inside_conduction_rate_w: Vec<f64>,
+    inside_conduction_gain_rate_w: Vec<f64>,
+    inside_conduction_loss_rate_w: Vec<f64>,
+    outside_conduction_rate_w: Vec<f64>,
+    outside_conduction_gain_rate_w: Vec<f64>,
+    outside_conduction_loss_rate_w: Vec<f64>,
 }
 
 /// Appends diagnostic surface incident solar radiation series for sun-exposed
@@ -2314,6 +2327,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
+            opaque_surface_outside_conduction_w: 0.0,
             sum_ha_w_per_k: 0.0,
             sum_hat_surf_w: 0.0,
             sum_hat_ref_w: 0.0,
@@ -2845,6 +2859,11 @@ fn correct_zone_air_temperatures_from_current_surfaces(
             .filter(|surface| surface.zone_id == zone.zone_id)
             .map(|surface| surface.heat_gain_to_zone_w)
             .sum();
+        zone.opaque_surface_outside_conduction_w = surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone.zone_id)
+            .map(surface_outside_conduction_rate_w)
+            .sum();
         let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
             zone_surface_convection_sums(surfaces, zone.zone_id);
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
@@ -3058,14 +3077,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut zone_conduction_rates = state
         .zones
         .iter()
-        .map(|zone| {
-            (
-                zone.zone_id,
-                zone.zone_name.clone(),
-                Vec::with_capacity(options.sample_count),
-                Vec::with_capacity(options.sample_count),
-                Vec::with_capacity(options.sample_count),
-            )
+        .map(|zone| ZoneConductionTrace {
+            zone_id: zone.zone_id,
+            zone_name: zone.zone_name.clone(),
+            inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
+            inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
+            inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
+            outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
         })
         .collect::<Vec<_>>();
     let mut zone_air_heat_balance_rates = state
@@ -3134,19 +3154,29 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 values.push(zone_state.mean_air_temperature_c);
             }
         }
-        for (
-            zone_id,
-            _zone_name,
-            conduction_values,
-            conduction_gain_values,
-            conduction_loss_values,
-        ) in &mut zone_conduction_rates
-        {
-            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                let rate = zone_state.opaque_surface_heat_gain_w;
-                conduction_values.push(rate);
-                conduction_gain_values.push(heat_gain_rate_w(rate));
-                conduction_loss_values.push(heat_loss_rate_w(rate));
+        for trace in &mut zone_conduction_rates {
+            if let Some(zone_state) = state
+                .zones
+                .iter()
+                .find(|zone| zone.zone_id == trace.zone_id)
+            {
+                let inside_rate = zone_state.opaque_surface_heat_gain_w;
+                trace.inside_conduction_rate_w.push(inside_rate);
+                trace
+                    .inside_conduction_gain_rate_w
+                    .push(heat_gain_rate_w(inside_rate));
+                trace
+                    .inside_conduction_loss_rate_w
+                    .push(heat_loss_rate_w(inside_rate));
+
+                let outside_rate = zone_state.opaque_surface_outside_conduction_w;
+                trace.outside_conduction_rate_w.push(outside_rate);
+                trace
+                    .outside_conduction_gain_rate_w
+                    .push(heat_gain_rate_w(outside_rate));
+                trace
+                    .outside_conduction_loss_rate_w
+                    .push(heat_loss_rate_w(outside_rate));
             }
         }
         for (
@@ -3232,31 +3262,55 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         });
         handle_index += 1;
     }
-    for (_zone_id, zone_name, conduction_values, conduction_gain_values, conduction_loss_values) in
-        zone_conduction_rates
-    {
+    for trace in zone_conduction_rates {
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: zone_name.clone(),
+            key: trace.zone_name.clone(),
             variable_name: "Zone Opaque Surface Inside Faces Conduction Rate".to_string(),
             units: "W".to_string(),
-            values: conduction_values,
+            values: trace.inside_conduction_rate_w,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: zone_name.clone(),
+            key: trace.zone_name.clone(),
             variable_name: "Zone Opaque Surface Inside Faces Conduction Heat Gain Rate".to_string(),
             units: "W".to_string(),
-            values: conduction_gain_values,
+            values: trace.inside_conduction_gain_rate_w,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: zone_name,
+            key: trace.zone_name.clone(),
             variable_name: "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate".to_string(),
             units: "W".to_string(),
-            values: conduction_loss_values,
+            values: trace.inside_conduction_loss_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: "Zone Opaque Surface Outside Faces Conduction Rate".to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate"
+                .to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_gain_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name,
+            variable_name: "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate"
+                .to_string(),
+            units: "W".to_string(),
+            values: trace.outside_conduction_loss_rate_w,
         });
         handle_index += 1;
     }
@@ -6273,7 +6327,8 @@ mod tests {
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
-        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
+        surface_outside_conduction_rate_w, update_surface_ctf_history_constants,
+        update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
         zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
@@ -6551,14 +6606,14 @@ mod tests {
         let plan = build_execution_plan(&model);
 
         assert_eq!(plan.stages.len(), 3);
-        assert_eq!(plan.step_count(), 9);
+        assert_eq!(plan.step_count(), 12);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
             plan.stages[0].steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].steps.len(), 6);
+        assert_eq!(plan.stages[2].steps.len(), 9);
         assert_eq!(
             plan.stages[2].steps[0],
             ExecutionStep::WriteOutput(OutputHandle(0))
@@ -6572,8 +6627,8 @@ mod tests {
             ExecutionStep::WriteOutput(OutputHandle(2))
         );
         assert_eq!(
-            plan.stages[2].steps[5],
-            ExecutionStep::WriteOutput(OutputHandle(5))
+            plan.stages[2].steps[8],
+            ExecutionStep::WriteOutput(OutputHandle(8))
         );
     }
 
@@ -8015,6 +8070,16 @@ DATA PERIODS
         assert!(state.zones[0].mean_air_temperature_c > 12.0);
         assert!(state.zones[0].mean_air_temperature_c < 20.0);
         assert!(state.zones[0].opaque_surface_heat_gain_w < 0.0);
+        let expected_outside_conduction = state
+            .surfaces
+            .iter()
+            .map(surface_outside_conduction_rate_w)
+            .sum::<f64>();
+        assert!(
+            (state.zones[0].opaque_surface_outside_conduction_w - expected_outside_conduction)
+                .abs()
+                < 1.0e-12
+        );
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 10.0);
         assert!(
             state.surfaces[0].inside_face_temperature_c > state.zones[0].mean_air_temperature_c
@@ -8142,6 +8207,7 @@ DATA PERIODS
 
         assert!(state.zones[0].mean_air_temperature_c > 20.0);
         assert!((state.zones[0].opaque_surface_heat_gain_w).abs() < 1.0e-9);
+        assert!((state.zones[0].opaque_surface_outside_conduction_w).abs() < 1.0e-9);
         for surface in &state.surfaces {
             assert_eq!(
                 surface.outside_boundary_condition,
@@ -8252,7 +8318,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 74);
+        assert_eq!(simulation.results.series.len(), 77);
 
         let Some(zone_series) = simulation
             .results
@@ -8332,6 +8398,15 @@ DATA PERIODS
             return Err(std::io::Error::other("missing zone conduction series").into());
         };
         assert!(zone_conduction_series.values[0] < 0.0);
+
+        let Some(zone_outside_conduction_series) = simulation.results.find_series(
+            "ZONE ONE",
+            "Zone Opaque Surface Outside Faces Conduction Rate",
+        ) else {
+            return Err(std::io::Error::other("missing zone outside conduction series").into());
+        };
+        assert_eq!(zone_outside_conduction_series.values.len(), 2);
+        assert!(zone_outside_conduction_series.values[0].is_finite());
 
         let Some(surface_convection_series) = simulation
             .results
@@ -8961,7 +9036,7 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 78);
+        assert_eq!(registry.len(), 81);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
@@ -8975,6 +9050,10 @@ DATA PERIODS
                 "zone one",
                 "Zone Opaque Surface Inside Faces Conduction Rate",
             ),
+            RuntimeOutputRequest::hourly(
+                "zone one",
+                "Zone Opaque Surface Outside Faces Conduction Rate",
+            ),
             RuntimeOutputRequest::hourly("floor", "Surface Heat Storage Rate"),
             RuntimeOutputRequest::hourly(
                 "floor",
@@ -8984,7 +9063,7 @@ DATA PERIODS
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 7);
+        assert_eq!(resolution.resolved.len(), 8);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

@@ -22,6 +22,7 @@ future official ExampleFile transient conduction work.
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |
+| `Zone Opaque Surface Outside Faces Conduction Rate` | sum of surface outside-face conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 
 ## Source Anchors
 
@@ -118,6 +119,14 @@ slightly lower (`923.728787` inside conduction RMSE), but it does not improve
 floor storage (`1422.231349` RMSE versus `1422.193225`) or zone aggregate
 conduction, so the adiabatic boundary probe remains a diagnostic fork rather
 than the active best lane.
+Adding the EnergyPlus advanced outside-face zone aggregate as a latent
+diagnostic row raises the tracked official dynamic series count to 34. It
+exposes outside aggregate conduction as a second default bottleneck
+(`2119.175942` RMSE) and the top current quick-boundary bottleneck:
+quick-outside iter3 lowers it to `1216.135113`, while quick-outside plus DOE-2
+iter3 lowers it to `799.673332`. This ties the remaining floor storage and
+outside-face aggregate errors to the exterior face/source/history path rather
+than only the inside aggregate cancellation row.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

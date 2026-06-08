@@ -257,6 +257,8 @@ Minimum first variables:
   for no-mass adiabatic `surface_temperature_nomass_001`
 - `Zone Opaque Surface Inside Faces Conduction Rate`: conformance only for
   no-mass adiabatic `surface_temperature_nomass_001`
+- `Zone Opaque Surface Outside Faces Conduction Rate`: diagnostic-only for
+  official dynamic heat-balance work
 - `Zone Total Internal Convective Heating Rate`: conformance only for
   `internal_gains_001`
 - `Site Outdoor Air Drybulb Temperature`

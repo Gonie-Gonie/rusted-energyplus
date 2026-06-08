@@ -208,7 +208,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   raises zone aggregate conduction to `128.396815` and the latent air-balance
   rows (`90.988382` surface convection, `95.018026` air storage). This narrows
   the next target to coupled surface/zone source ordering rather than only the
-  exterior coefficient expression. Extending the previous-inside path with the
+  exterior coefficient expression. Adding the EnergyPlus advanced outside-face
+  zone aggregate as a latent diagnostic row exposes the exterior side of that
+  same bottleneck: the default lane has `2119.175942` RMSE, quick-outside iter3
+  lowers it to `1216.135113`, and quick-outside plus DOE-2 iter3 lowers it to
+  `799.673332` while still making it the top row in those 34-series probes.
+  Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
   `812.566220`, floor outside conduction to `397.351373`, floor heat storage

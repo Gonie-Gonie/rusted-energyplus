@@ -472,6 +472,9 @@ impl RuntimeOutputRegistry {
                 "Zone Opaque Surface Inside Faces Conduction Rate",
                 "Zone Opaque Surface Inside Faces Conduction Heat Gain Rate",
                 "Zone Opaque Surface Inside Faces Conduction Heat Loss Rate",
+                "Zone Opaque Surface Outside Faces Conduction Rate",
+                "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate",
+                "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate",
             ] {
                 self.push_output(
                     &zone.name.0,
