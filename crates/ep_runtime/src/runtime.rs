@@ -2220,13 +2220,14 @@ pub fn advance_heat_balance_state_one_timestep(
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
 ) {
-    advance_heat_balance_state_one_timestep_internal(model, state, input);
+    advance_heat_balance_state_one_timestep_internal(model, state, input, None);
 }
 
 fn advance_heat_balance_state_one_timestep_internal(
     model: &TypedModel,
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
 ) {
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
@@ -2243,11 +2244,13 @@ fn advance_heat_balance_state_one_timestep_internal(
             .unwrap_or(surface.inside_face_temperature_c);
 
         surface.inside_face_temperature_c = zone_temperature_c;
-        surface.outside_face_temperature_c = surface_boundary_temperature_c(
+        surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
+            model,
             surface,
             &previous_zone_temperatures,
             input.outdoor_dry_bulb_c,
             zone_temperature_c,
+            weather_context,
         );
     }
 
@@ -2312,11 +2315,13 @@ fn advance_heat_balance_state_one_timestep_internal(
             );
 
         surface.inside_face_temperature_c = zone_temperature_c;
-        surface.outside_face_temperature_c = surface_boundary_temperature_c(
+        surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
+            model,
             surface,
             &current_zone_temperatures,
             input.outdoor_dry_bulb_c,
             zone_temperature_c,
+            weather_context,
         );
         update_surface_ctf_history_constants(surface);
         surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
@@ -2506,6 +2511,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     hour_ending,
                     timestep_seconds: seconds_per_timestep,
                 },
+                weather_context,
             );
         }
 
@@ -2758,6 +2764,7 @@ fn run_heat_balance_run_period_warmup(
                         hour_ending,
                         timestep_seconds: seconds_per_timestep,
                     },
+                    None,
                 );
             }
         }
@@ -3066,6 +3073,32 @@ fn surface_boundary_temperature_c(
         | OutsideBoundaryCondition::Ground
         | OutsideBoundaryCondition::Other => surface.outside_face_temperature_c,
     }
+}
+
+fn heat_balance_surface_boundary_temperature_c(
+    model: &TypedModel,
+    surface: &SurfaceHeatBalanceState,
+    previous_zone_temperatures: &[(ZoneId, f64)],
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+) -> f64 {
+    if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
+        return exterior_surface_boundary_temperature_c(
+            model,
+            surface,
+            outdoor_dry_bulb_c,
+            owning_zone_temperature_c,
+            weather_context,
+        );
+    }
+
+    surface_boundary_temperature_c(
+        surface,
+        previous_zone_temperatures,
+        outdoor_dry_bulb_c,
+        owning_zone_temperature_c,
+    )
 }
 
 fn exterior_surface_boundary_temperature_c(
@@ -4600,12 +4633,14 @@ mod tests {
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
-        simulate_plant_state_projection, simulate_schedule_values,
-        simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
-        solar_weather_interpolation_weights, surface_area_m2, surface_geometry_summaries,
-        surface_inside_conduction_flux_w_per_m2, surface_outside_conduction_flux_w_per_m2,
-        update_surface_ctf_history_constants, zone_geometry_summaries,
+        simulate_heat_balance_zone_air_temperatures,
+        simulate_heat_balance_zone_air_temperatures_with_weather_records,
+        simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
+        simulate_schedule_values, simulate_zone_internal_convective_gains,
+        solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
+        surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
+        surface_outside_conduction_flux_w_per_m2, update_surface_ctf_history_constants,
+        zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -6100,6 +6135,66 @@ DATA PERIODS
         assert_eq!(roof_solar.values.len(), 2);
         assert!(roof_solar.values[0].is_finite());
         assert!(roof_solar.values[0] > 600.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn weather_record_exterior_balance_forces_roof_conduction()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.site = Some(SiteLocation {
+            name: NormalizedName::new("Solar Test Site"),
+            latitude_deg: 39.75,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        });
+        let model = SimulationModel::from_typed(typed);
+        let records = parse_epw_records(
+            r#"LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+2013,6,21,12,0,Source,25.0,5.0,30,82000,0,0,300,900,800,100,0,0,0,0,180,2.5
+2013,6,21,13,0,Source,26.0,5.0,30,82000,0,0,300,920,820,100,0,0,0,0,180,2.5
+"#,
+        )?;
+        let weather_values = records
+            .iter()
+            .map(|record| record.dry_bulb_c)
+            .collect::<Vec<_>>();
+        let dry_bulb_only = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &weather_values,
+            HeatBalanceSimulationOptions::hourly_samples(2),
+        )?;
+        let weather_forced = simulate_heat_balance_zone_air_temperatures_with_weather_records(
+            &model,
+            &records,
+            HeatBalanceSimulationOptions::hourly_samples(2),
+        )?;
+
+        let Some(dry_roof_conduction) = dry_bulb_only
+            .results
+            .find_series("ROOF", "Surface Inside Face Conduction Heat Transfer Rate")
+        else {
+            return Err(std::io::Error::other("missing dry roof conduction series").into());
+        };
+        let Some(forced_roof_conduction) = weather_forced
+            .results
+            .find_series("ROOF", "Surface Inside Face Conduction Heat Transfer Rate")
+        else {
+            return Err(std::io::Error::other("missing forced roof conduction series").into());
+        };
+
+        assert_eq!(dry_roof_conduction.values.len(), 2);
+        assert_eq!(forced_roof_conduction.values.len(), 2);
+        assert!((dry_roof_conduction.values[0] - forced_roof_conduction.values[0]).abs() > 1.0e-3);
 
         Ok(())
     }

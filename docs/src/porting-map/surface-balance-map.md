@@ -16,7 +16,7 @@ before official ExampleFile surface temperatures can be promoted.
 
 | Balance side | EnergyPlus source | Required Rust target | Current status |
 |---|---|---|---|
-| outside face temperature | `CalcHeatBalanceOutsideSurf` in `HeatBalanceSurfaceManager.cc` | outside face state with weather, solar, exterior convection, and boundary conditions | dry-bulb/boundary shell only |
+| outside face temperature | `CalcHeatBalanceOutsideSurf` in `HeatBalanceSurfaceManager.cc` | outside face state with weather, solar, exterior convection, and boundary conditions | roof diagnostic uses weather/solar exterior forcing; non-roof and full DOE-2/radiation iteration remain partial |
 | inside face temperature | `CalcHeatBalanceInsideSurf` in `HeatBalanceSurfaceManager.cc` | inside face state with zone air, convection, radiant exchange, and internal gains | zone-temperature mirror only |
 | opaque conduction histories | `SurfCTFConstInPart`, `SurfCTFConstOutPart`, `SurfInsideFluxHist`, and `SurfOutsideFluxHist` in `HeatBalanceSurfaceManager.cc` | CTF coefficient and history state per opaque surface | layer-stack input exists; CTF histories not ported |
 | adiabatic boundary | surface boundary condition handling | inside/outside equality for adiabatic no-mass cases | conformance for declared local case |
@@ -42,4 +42,8 @@ face-temperature and conduction deltas in the warmup-aware diagnostic report,
 but they remain failing diagnostic candidates until every declared hourly
 surface delta is below tolerance. Construction layer stacks are preserved for
 future CTF work, but the runtime does not yet generate or advance EnergyPlus CTF
-coefficient histories.
+coefficient histories for mass-material constructions. The diagnostic timestep
+path now feeds the existing roof exterior weather/solar balance into the CTF
+boundary driver, which improves selected roof and MAT series while exposing that
+the zone opaque aggregate still depends on unported floor mass CTF and full
+surface iteration parity.
