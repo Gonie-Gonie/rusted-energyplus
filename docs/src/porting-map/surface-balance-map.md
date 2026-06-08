@@ -16,7 +16,7 @@ before official ExampleFile surface temperatures can be promoted.
 
 | Balance side | EnergyPlus source | Required Rust target | Current status |
 |---|---|---|---|
-| outside face temperature | `CalcHeatBalanceOutsideSurf` in `HeatBalanceSurfaceManager.cc` | outside face state with weather, solar, exterior convection, and boundary conditions | roof/wall diagnostic uses weather/solar exterior forcing plus DOE-2 and sky/air/ground exterior longwave helpers; floor/other, rain alignment, and full iteration remain partial |
+| outside face temperature | `CalcHeatBalanceOutsideSurf` in `HeatBalanceSurfaceManager.cc` | outside face state with weather, solar, exterior convection, and boundary conditions | roof/wall diagnostic uses weather/solar exterior forcing plus DOE-2, terrain-adjusted surface wind speed, and sky/air/ground exterior longwave helpers; floor/other and full iteration remain partial |
 | inside face temperature | `CalcHeatBalanceInsideSurf` in `HeatBalanceSurfaceManager.cc` | inside face state with zone air, convection, radiant exchange, and internal gains | CTF subset solver uses zone air, TARP convection, damping, and OtherEquipment radiant source slots; full radiation/internal source wiring remains partial |
 | opaque conduction histories | `SurfCTFConstInPart`, `SurfCTFConstOutPart`, `SurfInsideFluxHist`, and `SurfOutsideFluxHist` in `HeatBalanceSurfaceManager.cc` | CTF coefficient and history state per opaque surface | EIO-seeded diagnostic histories exist; native mass-material coefficient generation and full iteration parity remain unported |
 | adiabatic boundary | surface boundary condition handling | inside/outside equality for adiabatic no-mass cases | conformance for declared local case |
@@ -59,6 +59,10 @@ timesteps for hourly diagnostics. Exterior longwave follows the EnergyPlus
 diagnostic split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`,
 including `SurfAirSkyRadSplit`, and both the outside-face balance equivalent
 radiation term and the net thermal radiation report row share that helper.
+Exterior convection now uses the EnergyPlus `SetSurfaceWindSpeedAt` terrain and
+surface-centroid profile before DOE-2/MoWITT forced-convection terms, so
+diagnostic coefficients use `SurfOutWindSpeed`-shaped local wind instead of raw
+EPW wind speed.
 Inside-surface radiant/source terms now have explicit runtime slots matching
 EnergyPlus `SurfTempTerm` inputs, and the OtherEquipment radiant fraction is
 distributed to inside surfaces with EnergyPlus inside-layer area-absorptance

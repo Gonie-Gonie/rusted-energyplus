@@ -7,7 +7,7 @@ use ep_model::{
     OtherEquipment, OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
     PlantBranchComponent, PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment,
     ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
-    TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    Terrain, TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -28,6 +28,9 @@ const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
+const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M: f64 = 10.0;
+const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;
+const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
@@ -4236,6 +4239,7 @@ fn exterior_surface_boundary_temperature_c(
                 outdoor_dry_bulb_c,
                 owning_zone_temperature_c,
                 0.0,
+                energyplus_building_terrain(model),
                 quick_outside_conduction,
                 use_doe2_outside_convection,
                 wet_timestep_fraction,
@@ -4259,6 +4263,7 @@ fn exterior_surface_boundary_temperature_c(
         outdoor_dry_bulb_c,
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
+        energyplus_building_terrain(model),
         quick_outside_conduction,
         use_doe2_outside_convection,
         wet_timestep_fraction,
@@ -4359,6 +4364,7 @@ fn surface_exterior_report_terms(
         reported_outside_face_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
+        energyplus_building_terrain(model),
         use_doe2_outside_convection,
         wet_timestep_fraction,
     );
@@ -4463,6 +4469,7 @@ fn energyplus_exterior_convection_terms(
     surface_temperature_c: f64,
     outdoor_dry_bulb_c: f64,
     tilt_rad: f64,
+    terrain: Terrain,
     use_doe2_outside_convection: bool,
     wet_timestep_fraction: f64,
 ) -> ExteriorConvectionTerms {
@@ -4473,6 +4480,7 @@ fn energyplus_exterior_convection_terms(
         surface_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
+        terrain,
         use_doe2_outside_convection,
     );
     let wet_timestep_fraction = wet_timestep_fraction.clamp(0.0, 1.0);
@@ -4511,8 +4519,14 @@ fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
     surface_temperature_c: f64,
     outdoor_dry_bulb_c: f64,
     tilt_rad: f64,
+    terrain: Terrain,
     use_doe2_outside_convection: bool,
 ) -> f64 {
+    let wind_speed_m_per_s = energyplus_surface_outside_wind_speed_m_per_s(
+        typed_surface,
+        terrain,
+        record.wind_speed_m_per_s,
+    );
     if use_doe2_outside_convection {
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
             surface_temperature_c,
@@ -4520,12 +4534,75 @@ fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
             tilt_rad.cos(),
             surface_azimuth_deg(&typed_surface.vertices),
             record.wind_direction_deg,
-            record.wind_speed_m_per_s,
+            wind_speed_m_per_s,
             surface_state.outside_layer_roughness,
         )
     } else {
-        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
+        exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s)
     }
+}
+
+fn energyplus_building_terrain(model: &TypedModel) -> Terrain {
+    model
+        .building
+        .as_ref()
+        .map(|building| building.terrain)
+        .unwrap_or(Terrain::Suburbs)
+}
+
+fn energyplus_surface_outside_wind_speed_m_per_s(
+    surface: &Surface,
+    terrain: Terrain,
+    weather_file_wind_speed_m_per_s: f64,
+) -> f64 {
+    if surface.wind_exposure != WindExposure::WindExposed {
+        return 0.0;
+    }
+
+    energyplus_wind_speed_at_height_m_per_s(
+        terrain,
+        weather_file_wind_speed_m_per_s,
+        surface_centroid_z_m(&surface.vertices),
+    )
+}
+
+fn energyplus_wind_speed_at_height_m_per_s(
+    terrain: Terrain,
+    weather_file_wind_speed_m_per_s: f64,
+    height_m: f64,
+) -> f64 {
+    if height_m <= 0.0 || weather_file_wind_speed_m_per_s <= 0.0 {
+        return 0.0;
+    }
+
+    let (site_wind_exp, site_wind_boundary_layer_height_m) = energyplus_site_wind_profile(terrain);
+    if site_wind_exp == 0.0 {
+        return weather_file_wind_speed_m_per_s;
+    }
+
+    let weather_file_wind_mod_coeff = (ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M
+        / ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M)
+        .powf(ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT);
+    weather_file_wind_speed_m_per_s
+        * weather_file_wind_mod_coeff
+        * (height_m / site_wind_boundary_layer_height_m).powf(site_wind_exp)
+}
+
+fn energyplus_site_wind_profile(terrain: Terrain) -> (f64, f64) {
+    match terrain {
+        Terrain::Country => (0.14, 270.0),
+        Terrain::Suburbs | Terrain::Urban => (0.22, 370.0),
+        Terrain::City => (0.33, 460.0),
+        Terrain::Ocean => (0.10, 210.0),
+    }
+}
+
+fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
+    if vertices.is_empty() {
+        return 0.0;
+    }
+
+    vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / vertices.len() as f64
 }
 
 fn energyplus_exterior_wet_timestep_fraction(
@@ -5299,6 +5376,7 @@ fn exterior_surface_energy_balance_temperature_c(
     outdoor_dry_bulb_c: f64,
     _owning_zone_temperature_c: f64,
     incident_solar_w_per_m2: f64,
+    terrain: Terrain,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
     use_doe2_outside_convection: bool,
     wet_timestep_fraction: f64,
@@ -5325,6 +5403,7 @@ fn exterior_surface_energy_balance_temperature_c(
         surface_state.outside_face_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
+        terrain,
         use_doe2_outside_convection,
         wet_timestep_fraction,
     );
@@ -7025,6 +7104,7 @@ mod tests {
         energyplus_exterior_wet_timestep_fraction,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
+        energyplus_surface_outside_wind_speed_m_per_s,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c, energyplus_weather_dry_bulb_at_timestep,
         energyplus_weather_record_is_rain_at_timestep,
@@ -7059,7 +7139,7 @@ mod tests {
         OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent, PlantBranchList,
         PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
         ScheduleConstant, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface,
-        SurfaceId, SurfaceType, ThermostatControlObjectType, ThermostatDualSetpoint,
+        SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
         ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
         ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
         ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
@@ -8287,6 +8367,34 @@ DATA PERIODS
         assert!((leeward - 11.929263692153699).abs() < 1.0e-12);
         assert!(windward > leeward);
         assert!(smoother < windward);
+    }
+
+    #[test]
+    fn energyplus_surface_wind_speed_uses_terrain_and_centroid_height() {
+        let typed = cube_model();
+        let roof = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .expect("roof test surface");
+        let expected_weather_mod = (270.0_f64 / 10.0).powf(0.14);
+        let roof_height_m =
+            roof.vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / roof.vertices.len() as f64;
+        let expected_roof_wind = 4.0 * expected_weather_mod * (roof_height_m / 370.0).powf(0.22);
+
+        assert!(
+            (energyplus_surface_outside_wind_speed_m_per_s(roof, Terrain::Suburbs, 4.0)
+                - expected_roof_wind)
+                .abs()
+                < 1.0e-12
+        );
+
+        let mut no_wind_roof = roof.clone();
+        no_wind_roof.wind_exposure = WindExposure::NoWind;
+        assert_eq!(
+            energyplus_surface_outside_wind_speed_m_per_s(&no_wind_roof, Terrain::Suburbs, 4.0),
+            0.0
+        );
     }
 
     #[test]
