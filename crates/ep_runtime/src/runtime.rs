@@ -4229,6 +4229,10 @@ fn exterior_surface_boundary_temperature_c(
         return outdoor_dry_bulb_c;
     }
     let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
+    let weather_file_wind_speed_m_per_s =
+        energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
+    let wind_direction_deg =
+        energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
 
     let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
         let Some(site) = model.site.as_ref() else {
@@ -4240,6 +4244,8 @@ fn exterior_surface_boundary_temperature_c(
                 owning_zone_temperature_c,
                 0.0,
                 energyplus_building_terrain(model),
+                weather_file_wind_speed_m_per_s,
+                wind_direction_deg,
                 quick_outside_conduction,
                 use_doe2_outside_convection,
                 wet_timestep_fraction,
@@ -4264,6 +4270,8 @@ fn exterior_surface_boundary_temperature_c(
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
         energyplus_building_terrain(model),
+        weather_file_wind_speed_m_per_s,
+        wind_direction_deg,
         quick_outside_conduction,
         use_doe2_outside_convection,
         wet_timestep_fraction,
@@ -4357,6 +4365,10 @@ fn surface_exterior_report_terms(
     let use_doe2_outside_convection =
         heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm);
     let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
+    let weather_file_wind_speed_m_per_s =
+        energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
+    let wind_direction_deg =
+        energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,
         typed_surface,
@@ -4365,6 +4377,8 @@ fn surface_exterior_report_terms(
         outdoor_dry_bulb_c,
         tilt_rad,
         energyplus_building_terrain(model),
+        weather_file_wind_speed_m_per_s,
+        wind_direction_deg,
         use_doe2_outside_convection,
         wet_timestep_fraction,
     );
@@ -4470,17 +4484,20 @@ fn energyplus_exterior_convection_terms(
     outdoor_dry_bulb_c: f64,
     tilt_rad: f64,
     terrain: Terrain,
+    weather_file_wind_speed_m_per_s: f64,
+    wind_direction_deg: f64,
     use_doe2_outside_convection: bool,
     wet_timestep_fraction: f64,
 ) -> ExteriorConvectionTerms {
     let dry_coefficient_w_per_m2_k = energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
         surface_state,
         typed_surface,
-        record,
         surface_temperature_c,
         outdoor_dry_bulb_c,
         tilt_rad,
         terrain,
+        weather_file_wind_speed_m_per_s,
+        wind_direction_deg,
         use_doe2_outside_convection,
     );
     let wet_timestep_fraction = wet_timestep_fraction.clamp(0.0, 1.0);
@@ -4515,17 +4532,18 @@ fn energyplus_exterior_convection_terms(
 fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
     surface_state: &SurfaceHeatBalanceState,
     typed_surface: &Surface,
-    record: &EpwRecord,
     surface_temperature_c: f64,
     outdoor_dry_bulb_c: f64,
     tilt_rad: f64,
     terrain: Terrain,
+    weather_file_wind_speed_m_per_s: f64,
+    wind_direction_deg: f64,
     use_doe2_outside_convection: bool,
 ) -> f64 {
     let wind_speed_m_per_s = energyplus_surface_outside_wind_speed_m_per_s(
         typed_surface,
         terrain,
-        record.wind_speed_m_per_s,
+        weather_file_wind_speed_m_per_s,
     );
     if use_doe2_outside_convection {
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
@@ -4533,7 +4551,7 @@ fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
             outdoor_dry_bulb_c,
             tilt_rad.cos(),
             surface_azimuth_deg(&typed_surface.vertices),
-            record.wind_direction_deg,
+            wind_direction_deg,
             wind_speed_m_per_s,
             surface_state.outside_layer_roughness,
         )
@@ -5377,6 +5395,8 @@ fn exterior_surface_energy_balance_temperature_c(
     _owning_zone_temperature_c: f64,
     incident_solar_w_per_m2: f64,
     terrain: Terrain,
+    weather_file_wind_speed_m_per_s: f64,
+    wind_direction_deg: f64,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
     use_doe2_outside_convection: bool,
     wet_timestep_fraction: f64,
@@ -5404,6 +5424,8 @@ fn exterior_surface_energy_balance_temperature_c(
         outdoor_dry_bulb_c,
         tilt_rad,
         terrain,
+        weather_file_wind_speed_m_per_s,
+        wind_direction_deg,
         use_doe2_outside_convection,
         wet_timestep_fraction,
     );
@@ -5885,6 +5907,97 @@ fn energyplus_weather_dry_bulb_at_timestep(
         energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
 
     previous.dry_bulb_c * (1.0 - interpolation_weight) + record.dry_bulb_c * interpolation_weight
+}
+
+fn energyplus_weather_wind_speed_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_wind_speed_m_per_s: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_wind_speed_m_per_s;
+    };
+
+    energyplus_weather_wind_speed_at_timestep(
+        context.records,
+        context.record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        context.zone_steps_per_hour,
+        timestep,
+    )
+}
+
+fn energyplus_weather_wind_speed_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_speed_m_per_s: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    let Some(record) = records.get(record_index) else {
+        return fallback_hourly_wind_speed_m_per_s;
+    };
+    let previous = previous_weather_record(records, record_index);
+    let interpolation_weight =
+        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+
+    previous.wind_speed_m_per_s * (1.0 - interpolation_weight)
+        + record.wind_speed_m_per_s * interpolation_weight
+}
+
+fn energyplus_weather_wind_direction_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_wind_direction_deg: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_wind_direction_deg;
+    };
+
+    energyplus_weather_wind_direction_at_timestep(
+        context.records,
+        context.record_index,
+        fallback_hourly_wind_direction_deg,
+        context.zone_steps_per_hour,
+        timestep,
+    )
+}
+
+fn energyplus_weather_wind_direction_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_direction_deg: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    let Some(record) = records.get(record_index) else {
+        return fallback_hourly_wind_direction_deg;
+    };
+    let previous = previous_weather_record(records, record_index);
+    let interpolation_weight =
+        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+
+    energyplus_interpolate_wind_direction_deg(
+        previous.wind_direction_deg,
+        record.wind_direction_deg,
+        interpolation_weight,
+    )
+}
+
+fn energyplus_interpolate_wind_direction_deg(
+    previous_wind_direction_deg: f64,
+    current_wind_direction_deg: f64,
+    current_hour_weight: f64,
+) -> f64 {
+    let mut current = current_wind_direction_deg;
+    let mut previous = previous_wind_direction_deg;
+    if (current - previous).abs() > 180.0 {
+        if current > previous {
+            previous += 360.0;
+        } else {
+            current += 360.0;
+        }
+    }
+
+    (previous + (current - previous) * current_hour_weight).rem_euclid(360.0)
 }
 
 fn energyplus_weather_interpolation_weight(zone_steps_per_hour: u32, zone_timestep: u32) -> f64 {
@@ -7108,6 +7221,7 @@ mod tests {
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c, energyplus_weather_dry_bulb_at_timestep,
         energyplus_weather_record_is_rain_at_timestep,
+        energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
         energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
@@ -9436,12 +9550,24 @@ DATA PERIODS
             .expect("roof test surface");
         let mut previous = weather_record_with_precipitation(0.0);
         previous.dry_bulb_c = 10.0;
+        previous.wind_speed_m_per_s = 2.0;
+        previous.wind_direction_deg = 350.0;
         let mut current = weather_record_with_precipitation(1.0);
         current.dry_bulb_c = 22.0;
+        current.wind_speed_m_per_s = 10.0;
+        current.wind_direction_deg = 10.0;
         let records = [previous, current];
 
         assert!(
             (energyplus_weather_dry_bulb_at_timestep(Some(&records), 1, 22.0, 4, 2) - 16.0).abs()
+                < 1.0e-12
+        );
+        assert!(
+            (energyplus_weather_wind_speed_at_timestep(&records, 1, 10.0, 4, 2) - 6.0).abs()
+                < 1.0e-12
+        );
+        assert!(
+            (energyplus_weather_wind_direction_at_timestep(&records, 1, 10.0, 4, 2) - 0.0).abs()
                 < 1.0e-12
         );
         assert_eq!(

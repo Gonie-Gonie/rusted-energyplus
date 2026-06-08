@@ -133,8 +133,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `DataSurfaces.cc::SetSurfaceWindSpeedAt` derives per-surface
   `SurfOutWindSpeed` from EPW wind speed, weather-station wind profile
   defaults, building terrain, and each surface centroid height. Rust now applies
-  the same terrain profile for diagnostic exterior convection instead of using
-  raw EPW wind speed directly, and keeps `NoWind` surfaces at zero local wind.
+  the same terrain profile and `WeatherManager.cc::interpolateWindDirection`
+  timestep wind speed/direction values for diagnostic exterior convection
+  instead of using raw hourly EPW wind directly, and keeps `NoWind` surfaces at
+  zero local wind.
 - `ConvectionCoefficients.cc::InitExtConvCoeff` also linearizes exterior
   longwave exchange into `SurfHSkyExt`, `SurfHGrdExt`, and `SurfHAirExt` using
   outside thermal absorptance, `ViewFactorSkyIR`, `ViewFactorGroundIR`, and
@@ -156,10 +158,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   bounded outdoor wet-bulb approximation until the full Psychrometrics wet-bulb
   routine is ported. The run-period and warmup timestep shells now pass a
   timestep-aware weather context for exterior forcing: dry-bulb follows
-  EnergyPlus hourly interpolation, rain uses the current timestep flag, and
-  exterior solar balance/report terms use the same timestep solar interpolation
-  helper that backs the hourly incident-solar diagnostic. Surface temperatures
-  and surface/zone conduction/source report rows are averaged over the zone
+  EnergyPlus hourly interpolation, rain uses the current timestep flag,
+  exterior convection uses timestep wind speed/direction, and exterior solar
+  balance/report terms use the same timestep solar interpolation helper that
+  backs the hourly incident-solar diagnostic. Surface temperatures and
+  surface/zone conduction/source report rows are averaged over the zone
   timesteps before being written as hourly diagnostics; the latent zone-air
   heat-balance rows intentionally remain hour-end diagnostics until the full
   zone predictor/corrector source path is ported.
@@ -244,21 +247,22 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   exterior coefficient expression. Adding the EnergyPlus advanced outside-face
   zone aggregate as a latent diagnostic row exposes the exterior side of that
   same bottleneck: after the explicit exterior longwave split plus timestep
-  weather/solar output averaging and EnergyPlus surface-local wind-speed
-  profiling, the default lane has `1932.173123` RMSE, and quick-outside iter3
-  lowers it to `599.726379`, matching the explicit quick-outside plus DOE-2
+  weather/solar/wind output alignment and EnergyPlus surface-local wind-speed
+  profiling, the default lane has `1926.324353` RMSE, and quick-outside iter3
+  lowers it to `584.195603`, matching the explicit quick-outside plus DOE-2
   iter3 lane. The active tracker now carries 41 rows by
   adding roof outside convection, net thermal radiation, and absorbed solar
   source diagnostics so the remaining outside aggregate movement can be tied to
   exterior source rows before runtime promotion. The same source alignment
   lowered the active rain-onset max spike and default roof outside source
   bottleneck: quick-outside iter3 roof net thermal radiation RMSE is
-  `1696.518958`, roof outside convection heat-gain RMSE is `1753.504379`,
-  roof outside convection coefficient RMSE is `1.640921`, and the default roof
-  outside convection heat-gain RMSE is `8136.065408`. The remaining top sample
-  stays on dry high-solar roof hours, keeping exterior source coupling,
-  outside-face temperature iteration, and CTF history/order parity as the next
-  source-mapped target rather than rain-onset output alignment.
+  `566.230481`, roof outside convection heat-gain RMSE is `602.238829`,
+  roof outside convection coefficient RMSE is `0.079698`, and the default roof
+  outside convection heat-gain RMSE is `7997.333666`. The active top
+  quick-outside bottleneck has moved to `ZN001:FLR001` surface heat storage
+  (`683.997518` RMSE), keeping floor mass CTF history/order parity and zone
+  aggregate conduction as the next source-mapped target rather than exterior
+  wind/convection alignment.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
@@ -319,12 +323,13 @@ Current Rust boundary:
   histories no longer use a dry-bulb-only warmup path. The compiler/runtime
   shell now honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for the
   exterior convection coefficient, applies EnergyPlus terrain/centroid
-  wind-speed profiling before DOE-2/MoWITT forced-convection terms, and uses
-  EnergyPlus-shaped sky/air/ground exterior longwave coefficients in the
-  diagnostic outside balance/report path, with timestep-interpolated
-  weather/solar context and hourly-averaged surface diagnostics. Full inside
-  iteration order, zone predictor/corrector equations, and coupled radiation
-  coefficient update order are not yet wired.
+  wind-speed profiling plus timestep wind speed/direction interpolation before
+  DOE-2/MoWITT forced-convection terms, and uses EnergyPlus-shaped
+  sky/air/ground exterior longwave coefficients in the diagnostic outside
+  balance/report path, with timestep-interpolated weather/solar context and
+  hourly-averaged surface diagnostics. Full inside iteration order, zone
+  predictor/corrector equations, and coupled radiation coefficient update order
+  are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

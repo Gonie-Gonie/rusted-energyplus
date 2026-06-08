@@ -53,16 +53,17 @@ precipitation uses the hourly interpolation threshold from `WeatherManager.cc`,
 wet timesteps mix `SurfHConvExt = 1000.0` into the hourly report coefficient,
 and the exterior convection reference temperature uses a bounded outdoor
 wet-bulb approximation. The run-period and warmup shells now pass timestep
-weather context for dry-bulb, rain, and exterior solar forcing, then average
-surface temperatures plus surface/zone conduction/source rows over the zone
-timesteps for hourly diagnostics. Exterior longwave follows the EnergyPlus
+weather context for dry-bulb, rain, exterior wind speed/direction, and exterior
+solar forcing, then average surface temperatures plus surface/zone
+conduction/source rows over the zone timesteps for hourly diagnostics.
+Exterior longwave follows the EnergyPlus
 diagnostic split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`,
 including `SurfAirSkyRadSplit`, and both the outside-face balance equivalent
 radiation term and the net thermal radiation report row share that helper.
 Exterior convection now uses the EnergyPlus `SetSurfaceWindSpeedAt` terrain and
 surface-centroid profile before DOE-2/MoWITT forced-convection terms, so
-diagnostic coefficients use `SurfOutWindSpeed`-shaped local wind instead of raw
-EPW wind speed.
+diagnostic coefficients use timestep `SurfOutWindSpeed`-shaped local wind
+instead of raw hourly EPW wind speed.
 Inside-surface radiant/source terms now have explicit runtime slots matching
 EnergyPlus `SurfTempTerm` inputs, and the OtherEquipment radiant fraction is
 distributed to inside surfaces with EnergyPlus inside-layer area-absorptance
