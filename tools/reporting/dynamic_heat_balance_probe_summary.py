@@ -82,9 +82,14 @@ LANES = (
 
 FOCUS_METRICS = (
     FocusMetric("ZONE ONE", "Zone Mean Air Temperature"),
+    FocusMetric("ZONE ONE", "Zone Air Heat Balance Internal Convective Heat Gain Rate"),
     FocusMetric("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate"),
     FocusMetric("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate"),
+    FocusMetric("ZN001:FLR001", "Surface Inside Face Temperature"),
+    FocusMetric("ZN001:FLR001", "Surface Outside Face Temperature"),
     FocusMetric("ZN001:FLR001", "Surface Inside Face Conduction Heat Transfer Rate"),
+    FocusMetric("ZN001:ROOF001", "Surface Inside Face Temperature"),
+    FocusMetric("ZN001:ROOF001", "Surface Outside Face Temperature"),
     FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Solar Radiation Rate per Area"),
 )

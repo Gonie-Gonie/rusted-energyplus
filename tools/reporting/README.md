@@ -26,9 +26,12 @@ Current generators:
 - `dynamic_heat_balance_probe_summary.py` summarizes the official dynamic
   heat-balance diagnostic probe lanes from existing `.runtime` compare
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
-  aggregate conduction focus metrics across lanes. The focus table also records
-  RMSE movement relative to the default lane so partial isolation improvements
-  that destabilize the whole zone balance are visible in one scan. The probe
+  aggregate conduction focus metrics across lanes. The focus set also includes
+  latent diagnostic state such as internal convective gain and floor/roof
+  inside/outside face temperatures, so rate regressions can be reviewed against
+  their surface-state drivers. The focus table also records RMSE movement
+  relative to the default lane so partial isolation improvements that
+  destabilize the whole zone balance are visible in one scan. The probe
   interpretation table compares each lane against its nearest reference lane,
   so all-CTF warmup and surface-iteration probes can be reviewed separately
   from the larger default-to-all-CTF seed movement. Probe lanes include all-CTF
