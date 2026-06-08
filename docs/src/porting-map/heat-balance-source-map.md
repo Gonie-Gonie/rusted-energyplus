@@ -178,8 +178,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   direct beam, Perez anisotropic sky diffuse (`SurfAnisoSkyMult *
   DifSolarRad`), and ground-reflected beam/diffuse terms. Rust now mirrors
   that anisotropic sky multiplier and the default ground-reflectance term for
-  unobstructed exterior opaque surfaces; detailed shadowing and obstruction
-  reflection factors remain outside the diagnostic claim boundary. At
+  unobstructed exterior opaque surfaces, and writes diagnostic beam, sky
+  diffuse, and ground diffuse incident component rows next to the total
+  incident solar row; detailed shadowing and obstruction reflection factors
+  remain outside the diagnostic claim boundary. At
   sunrise/sunset shadowing-period edges, Rust preserves the diffuse and
   ground-reflected solar terms when the current-day EnergyPlus sun-up test is
   true but the averaged shadowing-period beam position is still below the

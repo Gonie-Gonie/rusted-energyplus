@@ -98,6 +98,33 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
 variable = "Surface Outside Face Convection Heat Gain Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -179,6 +206,33 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
 variable = "Surface Outside Face Convection Heat Gain Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -260,6 +314,33 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
 variable = "Surface Outside Face Convection Heat Gain Rate"
 frequency = "hourly"
 class = "surface-state"
@@ -333,6 +414,33 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -477,6 +585,33 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"

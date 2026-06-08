@@ -274,7 +274,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 65) {
+if ($summary.series_count -ne 80) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -378,6 +378,15 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outsi
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Outside Face Incident Solar Radiation Rate per Area" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Outside Face Incident Solar Radiation Rate per Area series"
 }
+foreach ($solarComponentVariable in @(
+        "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
+        "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
+        "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+    )) {
+    if (-not ($summary.series | Where-Object { $_.output.variable -eq $solarComponentVariable -and $_.status -eq "extracted" })) {
+        throw "Missing extracted $solarComponentVariable series"
+    }
+}
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Convection Heat Gain Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted roof outside convection heat gain series"
 }
@@ -389,6 +398,15 @@ if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -an
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq "Surface Outside Face Solar Radiation Heat Gain Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted roof outside solar radiation heat gain series"
+}
+foreach ($solarComponentVariable in @(
+        "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
+        "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
+        "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+    )) {
+    if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq $solarComponentVariable -and $_.status -eq "extracted" })) {
+        throw "Missing extracted roof solar decomposition series: $solarComponentVariable"
+    }
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Conduction Heat Transfer Rate series"
@@ -431,6 +449,9 @@ foreach ($wallKey in @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001
     }
     foreach ($sourceVariable in @(
             "Surface Outside Face Incident Solar Radiation Rate per Area",
+            "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
+            "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
+            "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
             "Surface Outside Face Convection Heat Gain Rate",
             "Surface Outside Face Convection Heat Transfer Coefficient",
             "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
@@ -481,6 +502,9 @@ Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "mar
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Beam Solar Radiation Rate per Area" -Description "markdown outside incident beam solar variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area" -Description "markdown outside incident sky diffuse solar variable"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area" -Description "markdown outside incident ground diffuse solar variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate" -Description "markdown outside convection source variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate" -Description "markdown outside radiation source variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate" -Description "markdown outside solar source variable"

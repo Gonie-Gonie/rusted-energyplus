@@ -36,8 +36,9 @@ Current generators:
   inside/outside aggregate conduction focus metrics across lanes. The focus set also includes
   latent diagnostic state such as internal convective gain, floor/roof
   inside/outside face temperatures, and roof outside convection/radiation/solar
-  source rows, so rate regressions can be reviewed against their surface-state
-  drivers. The focus table also records RMSE movement
+  source rows, including incident solar beam/sky/ground decomposition, so rate
+  regressions can be reviewed against their surface-state drivers. The focus
+  table also records RMSE movement
   relative to the default lane so partial isolation improvements that
   destabilize the whole zone balance are visible in one scan. The probe
   interpretation table compares each lane against its nearest reference lane,

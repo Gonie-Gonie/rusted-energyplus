@@ -9,7 +9,7 @@ from typing import Any
 
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-EXPECTED_SERIES_COUNT = 65
+EXPECTED_SERIES_COUNT = 80
 SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
 SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"
@@ -298,6 +298,9 @@ FOCUS_METRICS = (
     FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),
     FocusMetric("ZONE ONE", "Zone Opaque Surface Outside Faces Conduction Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Solar Radiation Rate per Area"),
+    FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Beam Solar Radiation Rate per Area"),
+    FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"),
+    FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Convection Heat Gain Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Convection Heat Transfer Coefficient"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Net Thermal Radiation Heat Gain Rate"),

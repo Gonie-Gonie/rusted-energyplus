@@ -653,6 +653,19 @@ struct SurfaceExteriorReportTerms {
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct SurfaceIncidentSolarComponents {
+    beam_w_per_m2: f64,
+    sky_diffuse_w_per_m2: f64,
+    ground_diffuse_w_per_m2: f64,
+}
+
+impl SurfaceIncidentSolarComponents {
+    fn total_w_per_m2(self) -> f64 {
+        self.beam_w_per_m2 + self.sky_diffuse_w_per_m2 + self.ground_diffuse_w_per_m2
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 struct SurfaceBoundaryBalanceResult {
     temperature_c: f64,
     exterior_report_terms: SurfaceExteriorReportTerms,
@@ -1036,9 +1049,10 @@ struct ZoneConductionTrace {
 ///
 /// The calculation is intentionally a forcing diagnostic: direct normal
 /// radiation is projected with EnergyPlus-style weather timestep interpolation
-/// and shadowing-period solar position coefficients. Diffuse sky remains
-/// isotropic, and ground reflection uses a fixed default reflectance. It is not
-/// a full EnergyPlus solar distribution or shadowing claim.
+/// and shadowing-period solar position coefficients. Diffuse sky uses the
+/// EnergyPlus Perez anisotropic multiplier, and ground reflection uses a fixed
+/// default reflectance. It is not a full EnergyPlus solar distribution or
+/// shadowing claim.
 pub fn append_surface_incident_solar_radiation_series(
     results: &mut ResultStore,
     model: &SimulationModel,
@@ -1067,12 +1081,12 @@ pub fn append_surface_incident_solar_radiation_series(
         {
             continue;
         }
-        let values = weather_records
+        let components = weather_records
             .iter()
             .enumerate()
             .take(sample_count)
             .map(|(record_index, _record)| {
-                surface_incident_solar_radiation_hourly_average_w_per_m2(
+                surface_incident_solar_components_hourly_average_w_per_m2(
                     surface,
                     site,
                     weather_records,
@@ -1087,7 +1101,51 @@ pub fn append_surface_incident_solar_radiation_series(
             variable_name: "Surface Outside Face Incident Solar Radiation Rate per Area"
                 .to_string(),
             units: "W/m2".to_string(),
-            values,
+            values: components
+                .iter()
+                .map(|component| component.total_w_per_m2())
+                .collect(),
+        });
+        handle_index += 1;
+        added += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface.name.0.clone(),
+            variable_name: "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: components
+                .iter()
+                .map(|component| component.beam_w_per_m2)
+                .collect(),
+        });
+        handle_index += 1;
+        added += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface.name.0.clone(),
+            variable_name:
+                "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+                    .to_string(),
+            units: "W/m2".to_string(),
+            values: components
+                .iter()
+                .map(|component| component.sky_diffuse_w_per_m2)
+                .collect(),
+        });
+        handle_index += 1;
+        added += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: surface.name.0.clone(),
+            variable_name:
+                "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+                    .to_string(),
+            units: "W/m2".to_string(),
+            values: components
+                .iter()
+                .map(|component| component.ground_diffuse_w_per_m2)
+                .collect(),
         });
         handle_index += 1;
         added += 1;
@@ -6089,14 +6147,14 @@ fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
     if area_m2 > 0.0 { rate_w / area_m2 } else { 0.0 }
 }
 
-fn surface_incident_solar_radiation_hourly_average_w_per_m2(
+fn surface_incident_solar_components_hourly_average_w_per_m2(
     surface: &Surface,
     site: &SiteLocation,
     weather_records: &[EpwRecord],
     record_index: usize,
     zone_steps_per_hour: u32,
-) -> f64 {
-    surface_incident_solar_radiation_for_weather_context_w_per_m2(
+) -> SurfaceIncidentSolarComponents {
+    surface_incident_solar_components_for_weather_context_w_per_m2(
         surface,
         site,
         weather_records,
@@ -6114,17 +6172,36 @@ fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
     zone_steps_per_hour: u32,
     zone_timestep: Option<u32>,
 ) -> f64 {
+    surface_incident_solar_components_for_weather_context_w_per_m2(
+        surface,
+        site,
+        weather_records,
+        record_index,
+        zone_steps_per_hour,
+        zone_timestep,
+    )
+    .total_w_per_m2()
+}
+
+fn surface_incident_solar_components_for_weather_context_w_per_m2(
+    surface: &Surface,
+    site: &SiteLocation,
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
+    zone_timestep: Option<u32>,
+) -> SurfaceIncidentSolarComponents {
     if weather_records.get(record_index).is_none() {
-        return 0.0;
+        return SurfaceIncidentSolarComponents::default();
     }
     let Some((sin_declination, cos_declination, equation_of_time_hours)) =
         energyplus_shadowing_period_solar_coefficients(weather_records, record_index)
     else {
-        return 0.0;
+        return SurfaceIncidentSolarComponents::default();
     };
     let steps = zone_steps_per_hour.max(1);
     if let Some(timestep) = zone_timestep {
-        return surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
+        return surface_incident_solar_components_at_weather_timestep_w_per_m2(
             surface,
             site,
             weather_records,
@@ -6137,9 +6214,9 @@ fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
         );
     }
 
-    let mut total = 0.0;
+    let mut components = SurfaceIncidentSolarComponents::default();
     for timestep in 1..=steps {
-        total += surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
+        let timestep_components = surface_incident_solar_components_at_weather_timestep_w_per_m2(
             surface,
             site,
             weather_records,
@@ -6150,12 +6227,20 @@ fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
             cos_declination,
             equation_of_time_hours,
         );
+        components.beam_w_per_m2 += timestep_components.beam_w_per_m2;
+        components.sky_diffuse_w_per_m2 += timestep_components.sky_diffuse_w_per_m2;
+        components.ground_diffuse_w_per_m2 += timestep_components.ground_diffuse_w_per_m2;
     }
 
-    total / f64::from(steps)
+    let divisor = f64::from(steps);
+    SurfaceIncidentSolarComponents {
+        beam_w_per_m2: components.beam_w_per_m2 / divisor,
+        sky_diffuse_w_per_m2: components.sky_diffuse_w_per_m2 / divisor,
+        ground_diffuse_w_per_m2: components.ground_diffuse_w_per_m2 / divisor,
+    }
 }
 
-fn surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
+fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     surface: &Surface,
     site: &SiteLocation,
     weather_records: &[EpwRecord],
@@ -6165,9 +6250,9 @@ fn surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
     sin_declination: f64,
     cos_declination: f64,
     equation_of_time_hours: f64,
-) -> f64 {
+) -> SurfaceIncidentSolarComponents {
     let Some(record) = weather_records.get(record_index) else {
-        return 0.0;
+        return SurfaceIncidentSolarComponents::default();
     };
     let steps = zone_steps_per_hour.max(1);
     let timestep = zone_timestep.clamp(1, steps);
@@ -6195,7 +6280,7 @@ fn surface_incident_solar_radiation_at_weather_timestep_w_per_m2(
         f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
     let actual_sun_is_up = solar_position_rad_at_local_hour(site, record, local_hour).is_some();
 
-    surface_incident_solar_radiation_at_local_hour_w_per_m2(
+    surface_incident_solar_components_at_local_hour_w_per_m2(
         surface,
         site,
         SurfaceSolarTimestepInput {
@@ -6221,13 +6306,13 @@ struct SurfaceSolarTimestepInput {
     diffuse_horizontal_radiation_w_per_m2: f64,
 }
 
-fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
+fn surface_incident_solar_components_at_local_hour_w_per_m2(
     surface: &Surface,
     site: &SiteLocation,
     input: SurfaceSolarTimestepInput,
-) -> f64 {
+) -> SurfaceIncidentSolarComponents {
     if !input.actual_sun_is_up {
-        return 0.0;
+        return SurfaceIncidentSolarComponents::default();
     }
 
     let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
@@ -6241,10 +6326,10 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         input.cos_declination,
         input.equation_of_time_hours,
     ) else {
-        return diffuse_solar_radiation_w_per_m2(surface, tilt_rad, diffuse_horizontal);
+        return diffuse_solar_components_w_per_m2(surface, tilt_rad, diffuse_horizontal);
     };
     if solar_altitude_rad <= 0.0 {
-        return diffuse_solar_radiation_w_per_m2(surface, tilt_rad, diffuse_horizontal);
+        return diffuse_solar_components_w_per_m2(surface, tilt_rad, diffuse_horizontal);
     }
 
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
@@ -6270,7 +6355,11 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         * DEFAULT_SOLAR_GROUND_REFLECTANCE
         * surface_ground_view_factor(surface, tilt_rad);
 
-    beam + sky_diffuse + ground_reflected
+    SurfaceIncidentSolarComponents {
+        beam_w_per_m2: beam,
+        sky_diffuse_w_per_m2: sky_diffuse,
+        ground_diffuse_w_per_m2: ground_reflected,
+    }
 }
 
 fn energyplus_anisotropic_sky_multiplier(
@@ -6345,18 +6434,22 @@ fn energyplus_anisotropic_sky_multiplier(
     multiplier.max(0.0)
 }
 
-fn diffuse_solar_radiation_w_per_m2(
+fn diffuse_solar_components_w_per_m2(
     surface: &Surface,
     tilt_rad: f64,
     diffuse_horizontal_w_per_m2: f64,
-) -> f64 {
+) -> SurfaceIncidentSolarComponents {
     let diffuse_horizontal = diffuse_horizontal_w_per_m2.max(0.0);
     let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
     let ground_reflected = diffuse_horizontal
         * DEFAULT_SOLAR_GROUND_REFLECTANCE
         * surface_ground_view_factor(surface, tilt_rad);
 
-    sky_diffuse + ground_reflected
+    SurfaceIncidentSolarComponents {
+        beam_w_per_m2: 0.0,
+        sky_diffuse_w_per_m2: sky_diffuse,
+        ground_diffuse_w_per_m2: ground_reflected,
+    }
 }
 
 fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
@@ -10913,7 +11006,7 @@ DATA PERIODS
             2,
         );
 
-        assert_eq!(added, 5);
+        assert_eq!(added, 20);
         assert!(
             simulation
                 .results
@@ -10933,6 +11026,20 @@ DATA PERIODS
         assert_eq!(roof_solar.values.len(), 2);
         assert!(roof_solar.values[0].is_finite());
         assert!(roof_solar.values[0] > 600.0);
+        for variable in [
+            "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
+            "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
+            "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
+        ] {
+            let Some(series) = simulation.results.find_series("ROOF", variable) else {
+                return Err(
+                    std::io::Error::other(format!("missing roof {variable} series")).into(),
+                );
+            };
+            assert_eq!(series.units, "W/m2");
+            assert_eq!(series.values.len(), 2);
+            assert!(series.values[0].is_finite());
+        }
 
         Ok(())
     }

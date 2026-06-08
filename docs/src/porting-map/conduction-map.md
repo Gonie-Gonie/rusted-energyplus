@@ -142,7 +142,7 @@ boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor
 outside-face conduction, per-area floor conduction, and floor heat-storage
 diagnostics, plus wall/roof outside convection/radiation/solar source rows,
-raising the tracked official dynamic series count to 65 so aggregate
+raising the tracked official dynamic series count to 80 so aggregate
 cancellation does not hide the next bottleneck. The
 dynamic probe summary now ranks each lane's top inside-face and outside-face
 conduction driver surfaces and records the best lane per surface, keeping
@@ -155,7 +155,12 @@ W/m2. Aligning solar position and shadowing-period coefficients to
 EnergyPlus' non-leap weather ordinal for TMY records removes the source-year
 leap-day drift visible in late-year roof/wall solar samples. The leading
 residuals are now wall absorbed solar, outside-face aggregate conduction, and
-the remaining mass floor/history coupling path.
+the remaining mass floor/history coupling path. The official dynamic manifest
+now also compares beam, sky diffuse, and ground diffuse exterior incident
+solar component rows so future solar fixes can isolate which source term moved.
+The current 80-series active lane shows beam incident RMSE near zero on
+walls/roof, with the remaining wall incident-solar residual dominated by the
+sky diffuse component.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, full
