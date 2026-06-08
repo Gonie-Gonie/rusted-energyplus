@@ -107,6 +107,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `CalcHeatBalanceOutsideSurf` solves the no-movable-insulation exterior face
   temperature with `-SurfCTFConstOutPart`, current `CTFCross[0] * SurfTempIn`,
   absorbed outside source terms, and exterior convection/radiation coefficients.
+- `ConvectionCoefficients.cc::InitExtConvCoeff` dispatches
+  `SurfaceConvectionAlgorithm:Outside,DOE-2` through the DOE-2 branch:
+  windward/leeward MoWITT forced terms, ASHRAE TARP natural convection, and
+  EnergyPlus roughness multipliers. Rust has a source-anchored DOE-2 helper for
+  this expression, but the official dynamic diagnostic keeps the existing
+  exterior balance coefficient until DOE-2 wiring can be paired with the full
+  exterior radiation and iteration path; the isolated helper probe improved some
+  wall/roof rows but regressed MAT and zone aggregate conduction.
 
 Current Rust boundary:
 
@@ -126,9 +134,10 @@ Current Rust boundary:
   temperature histories are isolated from the simplified timestep shell. Runtime
   helpers now encode the EnergyPlus-shaped CTF inside and outside
   face-temperature equations, and the timestep shell uses the EnergyPlus TARP
-  inside natural convection coefficient in the inside CTF balance. DOE-2 outside
-  convection, full inside iteration order, and radiation coefficient updates are
-  not yet wired.
+  inside natural convection coefficient in the inside CTF balance. A DOE-2
+  outside convection helper exists for future wiring, but full inside iteration
+  order, exterior DOE-2/radiation coupling, and radiation coefficient updates
+  are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

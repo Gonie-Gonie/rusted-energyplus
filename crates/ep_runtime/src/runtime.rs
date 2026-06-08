@@ -21,8 +21,6 @@ const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
 const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
-const EXTERIOR_CONVECTION_BASE_COEFFICIENT_W_PER_M2_K: f64 = 13.0;
-const EXTERIOR_CONVECTION_WIND_COEFFICIENT_W_PER_M3_K: f64 = 2.5;
 const EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K: f64 = 4.0;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
 const EXTERIOR_RAIN_FALLBACK_DEPTH_MM: f64 = 2.0;
@@ -3319,6 +3317,8 @@ fn exterior_surface_energy_balance_temperature_c(
 
     let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
+    let tilt_rad =
+        surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
     let convection_coefficient =
         exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s);
     let longwave_coefficient = EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
@@ -3326,8 +3326,6 @@ fn exterior_surface_energy_balance_temperature_c(
         record.horizontal_infrared_radiation_wh_per_m2,
         outdoor_dry_bulb_c,
     );
-    let tilt_rad =
-        surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
     let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
     let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
     let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
@@ -3347,8 +3345,69 @@ fn exterior_surface_energy_balance_temperature_c(
 }
 
 fn exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
-    EXTERIOR_CONVECTION_BASE_COEFFICIENT_W_PER_M2_K
-        + EXTERIOR_CONVECTION_WIND_COEFFICIENT_W_PER_M3_K * wind_speed_m_per_s.max(0.0)
+    13.0 + 2.5 * wind_speed_m_per_s.max(0.0)
+}
+
+/// EnergyPlus DOE-2 outside convection coefficient for future exterior balance wiring.
+#[must_use]
+pub fn energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+    cos_tilt: f64,
+    surface_azimuth_deg: f64,
+    wind_direction_deg: f64,
+    wind_speed_m_per_s: f64,
+    roughness: MaterialSurfaceRoughness,
+) -> f64 {
+    let h_n = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(
+        surface_temperature_c,
+        air_temperature_c,
+        cos_tilt,
+    );
+    let h_f_smooth =
+        if energyplus_surface_is_windward(cos_tilt, surface_azimuth_deg, wind_direction_deg) {
+            energyplus_mowitt_forced_windward_w_per_m2_k(wind_speed_m_per_s)
+        } else {
+            energyplus_mowitt_forced_leeward_w_per_m2_k(wind_speed_m_per_s)
+        };
+    let h_c_smooth = (h_n.powi(2) + h_f_smooth.powi(2)).sqrt();
+    let h_f = energyplus_roughness_multiplier(roughness) * (h_c_smooth - h_n);
+    h_n + h_f
+}
+
+fn energyplus_surface_is_windward(
+    cos_tilt: f64,
+    surface_azimuth_deg: f64,
+    wind_direction_deg: f64,
+) -> bool {
+    if cos_tilt.abs() >= 0.98 {
+        return true;
+    }
+
+    let mut diff = (wind_direction_deg - surface_azimuth_deg).abs();
+    if diff - 180.0 > 0.001 {
+        diff -= 360.0;
+    }
+    diff.abs() - 90.0 <= 0.001
+}
+
+fn energyplus_mowitt_forced_windward_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
+    3.26 * wind_speed_m_per_s.max(0.0).powf(0.89)
+}
+
+fn energyplus_mowitt_forced_leeward_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
+    3.55 * wind_speed_m_per_s.max(0.0).powf(0.617)
+}
+
+fn energyplus_roughness_multiplier(roughness: MaterialSurfaceRoughness) -> f64 {
+    match roughness {
+        MaterialSurfaceRoughness::VeryRough => 2.17,
+        MaterialSurfaceRoughness::Rough => 1.67,
+        MaterialSurfaceRoughness::MediumRough => 1.52,
+        MaterialSurfaceRoughness::MediumSmooth => 1.13,
+        MaterialSurfaceRoughness::Smooth => 1.11,
+        MaterialSurfaceRoughness::VerySmooth => 1.0,
+    }
 }
 
 fn horizontal_infrared_sky_temperature_c(
@@ -4631,6 +4690,7 @@ mod tests {
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
+        energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
@@ -5686,6 +5746,42 @@ DATA PERIODS
         assert_eq!(zero_delta_coefficient, 0.1);
 
         Ok(())
+    }
+
+    #[test]
+    fn energyplus_doe2_outside_convection_uses_wind_side_and_roughness() {
+        let windward = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            35.0,
+            20.0,
+            0.0,
+            180.0,
+            180.0,
+            4.0,
+            MaterialSurfaceRoughness::MediumRough,
+        );
+        let leeward = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            35.0,
+            20.0,
+            0.0,
+            180.0,
+            0.0,
+            4.0,
+            MaterialSurfaceRoughness::MediumRough,
+        );
+        let smoother = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            35.0,
+            20.0,
+            0.0,
+            180.0,
+            180.0,
+            4.0,
+            MaterialSurfaceRoughness::VerySmooth,
+        );
+
+        assert!((windward - 16.031846262998357).abs() < 1.0e-12);
+        assert!((leeward - 11.929263692153699).abs() < 1.0e-12);
+        assert!(windward > leeward);
+        assert!(smoother < windward);
     }
 
     #[test]
