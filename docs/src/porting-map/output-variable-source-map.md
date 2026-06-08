@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: conformance
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Output Variable Source Map
@@ -20,9 +20,9 @@ source files and Rust result locations before promoting conformance claims.
 |---|---|---|---|---|
 | `Zone Mean Air Temperature` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ResultStore` series from heat-balance trace | conformance for `heat_balance_nomass_001`; diagnostic otherwise |
 | `Zone Total Internal Convective Heating Rate` | hourly | `src/EnergyPlus/InternalHeatGains.cc` | `simulate_zone_internal_convective_gains` | conformance for `internal_gains_001` only |
-| `Zone Air Heat Balance Internal Convective Heat Gain Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/InternalHeatGains.cc` | future `ep_runtime::zone_air` report state | mapped-not-ported |
-| `Zone Air Heat Balance Surface Convection Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | future surface convection sum | mapped-not-ported |
-| `Zone Air Heat Balance Air Energy Storage Rate` | hourly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | future zone air storage term | mapped-not-ported |
+| `Zone Air Heat Balance Internal Convective Heat Gain Rate` | hourly | `src/EnergyPlus/DataHeatBalance.cc`; `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/InternalHeatGains.cc` | diagnostic `ResultStore` series from `ZoneHeatBalanceState::convective_internal_gain_w` | diagnostic-only for official dynamic heat-balance case |
+| `Zone Air Heat Balance Surface Convection Rate` | hourly | `src/EnergyPlus/DataHeatBalance.cc`; `src/EnergyPlus/ZoneTempPredictorCorrector.cc`; `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | diagnostic `ResultStore` series from `SumHA`, `SumHATsurf`, and `SumHATref` shell state | diagnostic-only for official dynamic heat-balance case |
+| `Zone Air Heat Balance Air Energy Storage Rate` | hourly | `src/EnergyPlus/DataHeatBalance.cc`; `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | diagnostic `ResultStore` series from air heat capacity, MAT, and timestep delta | diagnostic-only for official dynamic heat-balance case |
 | `Surface Inside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
 | `Surface Outside Face Temperature` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ResultStore` series from heat-balance trace | conformance for `surface_temperature_nomass_001`; diagnostic otherwise |
 | `Surface Inside Face Conduction Heat Transfer Rate` | hourly | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | steady `SurfaceHeatBalanceState` CTF inside flux shell | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile diagnostic candidate |
@@ -80,12 +80,12 @@ tolerances, markdown/JSON report artifacts, mean/max/RMSE delta rows, and a
 blocking gate.
 
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
-weather, internal gain, and surface conduction hourly oracle series. The
-dynamic diagnostic case compares run-period-filtered zone, roof/wall/floor
-face-temperature decomposition, and surface/zone conduction deltas and records
-Rust/oracle warmup day metadata. These are conformance candidates, but they
-remain non-claiming until Rust produces matching hourly series under a blocking
-gate.
+zone air heat-balance, weather, internal gain, and surface conduction hourly
+oracle series. The dynamic diagnostic case compares run-period-filtered zone,
+roof/wall/floor face-temperature decomposition, surface/zone conduction, and
+zone air heat-balance deltas and records Rust/oracle warmup day metadata. These
+are conformance candidates, but they remain non-claiming until Rust produces
+matching hourly series under a blocking gate.
 
 The v0.10 `ideal_loads_thermostat_001` report is baseline-only smoke evidence
 for thermostat and IdealLoads output availability plus typed graph coverage.

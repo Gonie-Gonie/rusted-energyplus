@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: conformance
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # Output Variable Matrix
@@ -21,7 +21,7 @@ conformance claim.
 | static surface | HeatTransfer Surface class, net area, gross area, azimuth, tilt | EIO | conformance for `official_1zone_static_model_001`; local fixture checks remain smoke |
 | construction/material | Construction CTF layer count and thermal conductance; Material CTF Summary thickness, conductivity, density, specific heat, thermal resistance | EIO | conformance for `official_1zone_static_model_001`; local fixture checks remain smoke |
 | internal gains | OtherEquipment Internal Gains Nominal zone floor area, equipment level, equipment per floor area, latent/radiant/lost/convected fractions; Zone Total Internal Convective Heating Rate | EIO, ESO | EIO nominal fields conformance for `official_1zone_static_model_001`; ESO convective trace conformance for `internal_gains_001` only |
-| zone heat balance | Zone Mean Air Temperature; Zone Air Heat Balance Surface Convection Rate; Zone Air Heat Balance Air Energy Storage Rate | ESO | conformance for `heat_balance_nomass_001` `Zone Mean Air Temperature`; otherwise diagnostic |
+| zone heat balance | Zone Mean Air Temperature; Zone Air Heat Balance Internal Convective Heat Gain Rate; Zone Air Heat Balance Surface Convection Rate; Zone Air Heat Balance Air Energy Storage Rate | ESO | conformance for `heat_balance_nomass_001` `Zone Mean Air Temperature`; otherwise diagnostic |
 | surface heat balance | Surface Inside Face Temperature; Surface Outside Face Temperature; Surface Inside Face Conduction Heat Transfer Rate; Surface Inside/Outside Face Conduction Heat Transfer Rate per Area; Zone Opaque Surface Inside Faces Conduction Rate | ESO | conformance for no-mass adiabatic `surface_temperature_nomass_001`; official ExampleFile dynamic surface-temperature and conduction rows remain diagnostic candidates |
 | fenestration/solar | Surface Window Transmitted Solar Radiation Rate; Surface Inside Face Solar Radiation Heat Gain Rate; Surface Outside Face Incident Solar Radiation Rate per Area | ESO | diagnostic until a separate declared case exists |
 | thermostat and IdealLoads | Zone Thermostat Heating Setpoint Temperature; Zone Thermostat Cooling Setpoint Temperature; Zone Ideal Loads Zone Total Heating Rate; Zone Ideal Loads Zone Total Cooling Rate | ESO | smoke and baseline-only for `ideal_loads_thermostat_001`; not an IdealLoads load-conformance claim |
