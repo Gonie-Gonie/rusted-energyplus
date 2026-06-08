@@ -2,7 +2,7 @@
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
-    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
+    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
@@ -24,6 +24,8 @@ $AlgorithmOutputSuffix = switch ($ZoneAirAlgorithm) {
     "energyplus-analytical-coupled-probe" { "-analytical-coupled" }
     "energyplus-analytical-coupled-previous-inside-probe" { "-analytical-coupled-previous-inside" }
     "energyplus-analytical-coupled-previous-inside-quick-outside-probe" { "-analytical-coupled-previous-inside-quick-outside" }
+    "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe" { "-analytical-coupled-previous-inside-quick-outside-doe2" }
+    "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe" { "-analytical-coupled-previous-inside-quick-outside-lw" }
     "energyplus-analytical-coupled-previous-boundary-probe" { "-analytical-coupled-previous-boundary" }
     "energyplus-third-order-probe" { "-third-order" }
     Default { "" }

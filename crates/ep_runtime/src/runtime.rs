@@ -633,6 +633,7 @@ struct QuickOutsideConductionContext {
     reference_air_temperature_c: f64,
     inside_convection_coefficient_w_per_m2_k: f64,
     net_inside_source_w_per_m2: f64,
+    use_doe2_outside_convection: bool,
 }
 
 /// Per-surface heat-balance state shell.
@@ -726,6 +727,10 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledPreviousInsideProbe,
     /// Experimental previous-inside coupled path using EnergyPlus quick-conduction outside face solves.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
+    /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe,
+    /// Experimental quick-outside path with a grey interior longwave exchange probe.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor and adiabatic boundary solves.
     EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
@@ -2417,6 +2422,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let rebalance_surfaces_after_zone_air_correction = matches!(
@@ -2424,12 +2431,16 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_outdoor_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_adiabatic_boundary = matches!(
@@ -2439,6 +2450,16 @@ fn advance_heat_balance_state_one_timestep_internal(
     let use_quick_outside_conduction = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
+    );
+    let use_doe2_outside_convection = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+    );
+    let use_inside_longwave_exchange_probe = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
     );
 
     for surface in &mut state.surfaces {
@@ -2507,6 +2528,12 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe => {
+                previous_temperature_c
+            }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
                 previous_temperature_c
             }
@@ -2571,6 +2598,8 @@ fn advance_heat_balance_state_one_timestep_internal(
         use_previous_inside_for_outdoor_boundary,
         use_previous_inside_for_adiabatic_boundary,
         use_quick_outside_conduction,
+        use_doe2_outside_convection,
+        use_inside_longwave_exchange_probe,
     );
 
     if rebalance_surfaces_after_zone_air_correction {
@@ -2596,6 +2625,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             use_previous_inside_for_outdoor_boundary,
             use_previous_inside_for_adiabatic_boundary,
             use_quick_outside_conduction,
+            use_doe2_outside_convection,
+            use_inside_longwave_exchange_probe,
         );
     }
 
@@ -2624,8 +2655,18 @@ fn run_surface_balance_passes(
     use_previous_inside_for_outdoor_boundary: bool,
     use_previous_inside_for_adiabatic_boundary: bool,
     use_quick_outside_conduction: bool,
+    use_doe2_outside_convection: bool,
+    use_inside_longwave_exchange_probe: bool,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
+        if use_inside_longwave_exchange_probe {
+            let temperature_overrides = if surface_iteration_index == 0 {
+                first_pass_inside_temperatures
+            } else {
+                None
+            };
+            update_surface_inside_longwave_exchange_probe(surfaces, temperature_overrides);
+        }
         for surface in surfaces.iter_mut() {
             let previous_inside_face_temperature_c = if surface_iteration_index == 0 {
                 first_pass_inside_temperatures
@@ -2667,6 +2708,7 @@ fn run_surface_balance_passes(
                     inside_convection_coefficient_w_per_m2_k:
                         inside_convection_coefficient_w_per_m2_k,
                     net_inside_source_w_per_m2,
+                    use_doe2_outside_convection,
                 })
             } else {
                 None
@@ -2774,6 +2816,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
             zone_state
                 .zone_air_temperature_coefficients
@@ -3785,6 +3829,8 @@ fn reported_surface_outside_face_temperature_c(
     if matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
     ) {
         return surface_state.outside_face_temperature_c;
     }
@@ -3871,6 +3917,87 @@ fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -
         + surface.inside_additional_heat_source_w_per_m2
         + surface.inside_radiant_hvac_w_per_m2
         + surface.inside_net_longwave_w_per_m2
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct InteriorLongwaveSurfaceSnapshot {
+    zone_id: ZoneId,
+    area_m2: f64,
+    temperature_k4: f64,
+    thermal_absorptance: f64,
+}
+
+fn update_surface_inside_longwave_exchange_probe(
+    surfaces: &mut [SurfaceHeatBalanceState],
+    temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) {
+    let snapshots = surfaces
+        .iter()
+        .map(|surface| {
+            let temperature_c = temperature_overrides
+                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            let temperature_k = (temperature_c + KELVIN_OFFSET).max(0.0);
+            InteriorLongwaveSurfaceSnapshot {
+                zone_id: surface.zone_id,
+                area_m2: surface.area_m2.max(0.0),
+                temperature_k4: temperature_k.powi(4),
+                thermal_absorptance: surface.thermal_absorptance.clamp(0.0, 1.0),
+            }
+        })
+        .collect::<Vec<_>>();
+    let mut zone_area_m2 = BTreeMap::<ZoneId, f64>::new();
+    for snapshot in &snapshots {
+        *zone_area_m2.entry(snapshot.zone_id).or_insert(0.0) += snapshot.area_m2;
+    }
+
+    let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
+    for (receiver_index, receiver) in snapshots.iter().enumerate() {
+        let Some(zone_area_m2) = zone_area_m2.get(&receiver.zone_id).copied() else {
+            continue;
+        };
+        if zone_area_m2 <= f64::EPSILON || receiver.area_m2 <= f64::EPSILON {
+            continue;
+        }
+
+        let mut net_longwave_w_per_m2 = 0.0;
+        for (sender_index, sender) in snapshots.iter().enumerate() {
+            if sender_index == receiver_index
+                || sender.zone_id != receiver.zone_id
+                || sender.area_m2 <= f64::EPSILON
+            {
+                continue;
+            }
+            let exchange_emissivity = grey_pair_exchange_emissivity(
+                receiver.thermal_absorptance,
+                sender.thermal_absorptance,
+            );
+            if exchange_emissivity <= f64::EPSILON {
+                continue;
+            }
+            let view_factor = sender.area_m2 / zone_area_m2;
+            net_longwave_w_per_m2 += STEFAN_BOLTZMANN_W_PER_M2_K4
+                * exchange_emissivity
+                * view_factor
+                * (sender.temperature_k4 - receiver.temperature_k4);
+        }
+        longwave_terms_w_per_m2[receiver_index] = net_longwave_w_per_m2;
+    }
+
+    for (surface, net_longwave_w_per_m2) in
+        surfaces.iter_mut().zip(longwave_terms_w_per_m2.into_iter())
+    {
+        surface.inside_net_longwave_w_per_m2 = net_longwave_w_per_m2;
+    }
+}
+
+fn grey_pair_exchange_emissivity(receiver_emissivity: f64, sender_emissivity: f64) -> f64 {
+    let receiver = receiver_emissivity.clamp(0.0, 1.0);
+    let sender = sender_emissivity.clamp(0.0, 1.0);
+    if receiver <= f64::EPSILON || sender <= f64::EPSILON {
+        return 0.0;
+    }
+    1.0 / ((1.0 / receiver) + (1.0 / sender) - 1.0)
 }
 
 /// EnergyPlus-shaped CTF inside-face temperature balance for the opaque subset.
@@ -3992,8 +4119,22 @@ fn exterior_surface_energy_balance_temperature_c(
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
-    let convection_coefficient =
-        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s);
+    let use_doe2_outside_convection = quick_outside_conduction
+        .map(|context| context.use_doe2_outside_convection)
+        .unwrap_or(false);
+    let convection_coefficient = if use_doe2_outside_convection {
+        energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
+            surface_state.outside_face_temperature_c,
+            outdoor_dry_bulb_c,
+            tilt_rad.cos(),
+            surface_azimuth_deg(&typed_surface.vertices),
+            record.wind_direction_deg,
+            record.wind_speed_m_per_s,
+            surface_state.outside_layer_roughness,
+        )
+    } else {
+        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s)
+    };
     let longwave_coefficient = EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
     let sky_temperature_c = horizontal_infrared_sky_temperature_c(
         record.horizontal_infrared_radiation_wh_per_m2,
@@ -5528,8 +5669,8 @@ mod tests {
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
-        update_surface_ctf_history_constants, zone_air_heat_balance_air_storage_rate_w,
-        zone_geometry_summaries,
+        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
+        zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -6905,6 +7046,51 @@ DATA PERIODS
     }
 
     #[test]
+    fn interior_longwave_probe_is_zero_for_equal_surface_temperatures()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        for surface in &mut state.surfaces {
+            surface.inside_face_temperature_c = 21.0;
+            surface.inside_net_longwave_w_per_m2 = 12.0;
+        }
+
+        update_surface_inside_longwave_exchange_probe(&mut state.surfaces, None);
+
+        for surface in &state.surfaces {
+            assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-12);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn interior_longwave_probe_conserves_zone_exchange_signs()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        for surface in &mut state.surfaces {
+            surface.inside_face_temperature_c = 20.0;
+        }
+        state.surfaces[0].inside_face_temperature_c = 30.0;
+
+        update_surface_inside_longwave_exchange_probe(&mut state.surfaces, None);
+
+        assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
+        for surface in state.surfaces.iter().skip(1) {
+            assert!(surface.inside_net_longwave_w_per_m2 > 0.0);
+        }
+        let zone_exchange_w = state
+            .surfaces
+            .iter()
+            .map(|surface| surface.inside_net_longwave_w_per_m2 * surface.area_m2)
+            .sum::<f64>();
+        assert!(zone_exchange_w.abs() < 1.0e-9);
+
+        Ok(())
+    }
+
+    #[test]
     fn energyplus_ctf_outside_face_balance_uses_ctf_zero_terms()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
@@ -7363,6 +7549,14 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
         );
         assert_eq!(
             options

@@ -201,14 +201,19 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   conduction RMSE, `386.128809` floor outside conduction RMSE, `1174.412273`
   floor heat-storage RMSE, and `78.393234` zone aggregate conduction RMSE) at
   the cost of a small MAT regression, so it is tracked as iteration-sensitivity
-  evidence rather than a default promotion. The previous-inside outdoor/adiabatic
-  boundary probe slightly lowers floor inside conduction again to RMSE
-  `923.728787`, but does not improve floor heat storage (`1422.231349` versus
-  `1422.193225`) or zone aggregate conduction. This narrows the next
-  source-mapped target to the remaining EnergyPlus exterior
-  radiation/coefficient updates, quick/slow boundary branches, source
-  coupling, surface iteration, zone-air correction, and CTF history commit
-  order rather than a single post-correction surface feedback pass.
+  evidence rather than a default promotion. The DOE-2 exterior-convection fork
+  lowers floor storage to RMSE `752.765953`, floor inside conduction to
+  `576.102819`, and floor outside conduction to `225.936049`, but regresses the
+  zone aggregate row to `100.797367` and the latent air-balance rates. The grey
+  interior-longwave fork lowers floor storage further to RMSE `579.551277`, but
+  also gives back zone aggregate conduction (`122.199401` RMSE). These forks
+  narrow the next source-mapped target to coherent exterior radiation,
+  interior longwave, quick/slow boundary branches, source coupling, surface
+  iteration, zone-air correction, and CTF history commit order rather than a
+  single post-correction surface feedback pass. The previous-inside
+  outdoor/adiabatic boundary probe slightly lowers floor inside conduction
+  again to RMSE `923.728787`, but does not improve floor heat storage
+  (`1422.231349` versus `1422.193225`) or zone aggregate conduction.
 
 Current Rust boundary:
 

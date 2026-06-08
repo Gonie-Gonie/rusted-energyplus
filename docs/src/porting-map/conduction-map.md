@@ -103,8 +103,11 @@ inside conduction RMSE, `386.128809` floor outside conduction RMSE,
 `1174.412273` floor heat-storage RMSE, and `78.393234` zone aggregate
 conduction RMSE), while an ad hoc eight-pass run lowers storage a little more
 but gives back zone aggregate conduction and MAT. The floor storage row remains
-the top diagnostic bottleneck once it is visible, so promotion still needs the
-remaining EnergyPlus exterior radiation/coefficient updates, source coupling,
+the top balanced-lane diagnostic bottleneck once it is visible. DOE-2 exterior
+convection and grey interior-longwave forks lower the floor storage row further
+(`752.765953` and `579.551277` RMSE respectively), but both give back zone
+aggregate conduction and/or latent air-balance rows, so promotion still needs
+the remaining EnergyPlus radiation/coefficient coupling, source coupling,
 predictor/corrector order, and CTF history commit parity rather than simply
 enabling the floor-conduction-best lane. Extending the previous-inside solve
 to adiabatic boundaries nudges floor inside temperature and inside conduction
