@@ -133,6 +133,14 @@ convection latent diagnostics exposed, the active grey interior-longwave path
 now uses EnergyPlus fixed direct surface view factors; this reduces the
 previously hidden floor inside longwave/convection bottleneck but leaves floor
 storage and inside/outside floor conduction as the next conduction-facing rows.
+Follow-up probes after that change keep the blocker on source/coupling order:
+forcing Rust warmup to the EnergyPlus 20-day run-period count and switching the
+initial CTF histories to EnergyPlus `SurfInitialTemp`/zero-flux seeding move the
+top floor storage and conduction RMSE only below the fourth decimal place. A
+full ScriptF interior-longwave source is also not a promotion shortcut in the
+current shell: even a one-pass ScriptF lane diverges to multi-kW floor storage
+and roof inside-longwave errors, so ScriptF parity has to be paired with the
+full EnergyPlus inside-surface iteration/convergence and source update order.
 Adding the EnergyPlus advanced outside-face zone aggregate as a latent
 diagnostic row exposed outside aggregate conduction as a second default bottleneck
 (`2024.075950` RMSE) and the top current quick-boundary bottleneck:

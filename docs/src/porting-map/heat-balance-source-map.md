@@ -435,7 +435,10 @@ Current Rust boundary:
   the floor inside convection RMSE from `123.066168` to `41.950371`, MAT RMSE
   from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
   from `84.712495` to `38.774428`; floor storage remains the top active
-  diagnostic row at `108.672323` RMSE. Full inside iteration order, zone
+  diagnostic row at `108.672323` RMSE. Rechecking the active lane with
+  EnergyPlus initial CTF histories or a 20-day Rust warmup does not materially
+  move the floor rows, while a one-pass full ScriptF source still diverges in
+  the current simplified coupling shell. Full inside iteration order, zone
   predictor/corrector equations, detailed shadowing/reflection, and coupled
   radiation coefficient update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
