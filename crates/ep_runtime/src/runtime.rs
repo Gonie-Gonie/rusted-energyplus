@@ -21,7 +21,6 @@ const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
 const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
-const EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K: f64 = 4.0;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
 const ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM: f64 = 0.8;
 const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.6697e-8;
@@ -3702,6 +3701,43 @@ struct ExteriorConvectionTerms {
     reference_temperature_c: f64,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct ExteriorLongwaveTerms {
+    sky_coefficient_w_per_m2_k: f64,
+    air_coefficient_w_per_m2_k: f64,
+    ground_coefficient_w_per_m2_k: f64,
+    sky_temperature_c: f64,
+    air_temperature_c: f64,
+    ground_temperature_c: f64,
+}
+
+impl ExteriorLongwaveTerms {
+    fn equivalent_coefficient_w_per_m2_k(self) -> f64 {
+        self.sky_coefficient_w_per_m2_k
+            + self.air_coefficient_w_per_m2_k
+            + self.ground_coefficient_w_per_m2_k
+    }
+
+    fn equivalent_radiant_temperature_c(self, fallback_temperature_c: f64) -> f64 {
+        let coefficient = self.equivalent_coefficient_w_per_m2_k();
+        if coefficient.abs() <= f64::EPSILON {
+            return fallback_temperature_c;
+        }
+
+        (self.sky_coefficient_w_per_m2_k * self.sky_temperature_c
+            + self.air_coefficient_w_per_m2_k * self.air_temperature_c
+            + self.ground_coefficient_w_per_m2_k * self.ground_temperature_c)
+            / coefficient
+    }
+
+    fn net_heat_gain_per_area_w_per_m2(self, surface_temperature_c: f64) -> f64 {
+        -(self.sky_coefficient_w_per_m2_k * (surface_temperature_c - self.sky_temperature_c)
+            + self.air_coefficient_w_per_m2_k * (surface_temperature_c - self.air_temperature_c)
+            + self.ground_coefficient_w_per_m2_k
+                * (surface_temperature_c - self.ground_temperature_c))
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 struct SurfaceBoundaryTarget {
     surface_id: Option<SurfaceId>,
@@ -4244,20 +4280,17 @@ fn surface_exterior_report_terms(
     let convection_gain_per_area_w_per_m2 = -convection_terms.coefficient_w_per_m2_k
         * (reported_outside_face_temperature_c - convection_terms.reference_temperature_c);
 
-    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
-    let longwave_coefficient_w_per_m2_k =
-        EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
-    let sky_temperature_c = horizontal_infrared_sky_temperature_c(
-        record.horizontal_infrared_radiation_wh_per_m2,
+    let longwave_terms = energyplus_exterior_longwave_terms(
+        surface_state,
+        typed_surface,
+        record,
+        reported_outside_face_temperature_c,
+        convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,
+        tilt_rad,
     );
-    let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
-    let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
-    let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
-        + ground_view_factor * outdoor_dry_bulb_c
-        + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
-    let net_radiation_gain_per_area_w_per_m2 = -longwave_coefficient_w_per_m2_k
-        * (reported_outside_face_temperature_c - longwave_radiant_temperature_c);
+    let net_radiation_gain_per_area_w_per_m2 =
+        longwave_terms.net_heat_gain_per_area_w_per_m2(reported_outside_face_temperature_c);
 
     SurfaceExteriorReportTerms {
         convection_heat_gain_rate_w: convection_gain_per_area_w_per_m2 * surface_state.area_m2,
@@ -4270,6 +4303,72 @@ fn surface_exterior_report_terms(
         solar_radiation_heat_gain_rate_w: solar_gain_per_area_w_per_m2 * surface_state.area_m2,
         solar_radiation_heat_gain_rate_per_area_w_per_m2: solar_gain_per_area_w_per_m2,
     }
+}
+
+fn energyplus_exterior_longwave_terms(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: &Surface,
+    record: &EpwRecord,
+    surface_temperature_c: f64,
+    air_reference_temperature_c: f64,
+    ground_temperature_c: f64,
+    tilt_rad: f64,
+) -> ExteriorLongwaveTerms {
+    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
+    let surface_temperature_k = surface_temperature_c + KELVIN_OFFSET;
+    let sky_temperature_c = horizontal_infrared_sky_temperature_c(
+        record.horizontal_infrared_radiation_wh_per_m2,
+        ground_temperature_c,
+    );
+    let sky_temperature_k = sky_temperature_c + KELVIN_OFFSET;
+    let air_temperature_k = ground_temperature_c + KELVIN_OFFSET;
+    let ground_temperature_k = ground_temperature_c + KELVIN_OFFSET;
+    let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
+    let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
+    let air_sky_rad_split = surface_air_sky_radiation_split(tilt_rad);
+    let sky_coefficient_w_per_m2_k = energyplus_linearized_radiation_coefficient_w_per_m2_k(
+        thermal_absorptance * sky_view_factor * air_sky_rad_split,
+        surface_temperature_k,
+        sky_temperature_k,
+    );
+    let air_coefficient_w_per_m2_k = energyplus_linearized_radiation_coefficient_w_per_m2_k(
+        thermal_absorptance * sky_view_factor * (1.0 - air_sky_rad_split),
+        surface_temperature_k,
+        air_temperature_k,
+    );
+    let ground_coefficient_w_per_m2_k = energyplus_linearized_radiation_coefficient_w_per_m2_k(
+        thermal_absorptance * ground_view_factor,
+        surface_temperature_k,
+        ground_temperature_k,
+    );
+
+    ExteriorLongwaveTerms {
+        sky_coefficient_w_per_m2_k,
+        air_coefficient_w_per_m2_k,
+        ground_coefficient_w_per_m2_k,
+        sky_temperature_c,
+        air_temperature_c: air_reference_temperature_c,
+        ground_temperature_c,
+    }
+}
+
+fn energyplus_linearized_radiation_coefficient_w_per_m2_k(
+    exchange_factor: f64,
+    surface_temperature_k: f64,
+    reference_temperature_k: f64,
+) -> f64 {
+    if exchange_factor <= 0.0
+        || !surface_temperature_k.is_finite()
+        || !reference_temperature_k.is_finite()
+        || (surface_temperature_k - reference_temperature_k).abs() <= f64::EPSILON
+    {
+        return 0.0;
+    }
+
+    STEFAN_BOLTZMANN_W_PER_M2_K4
+        * exchange_factor
+        * (surface_temperature_k.powi(4) - reference_temperature_k.powi(4))
+        / (surface_temperature_k - reference_temperature_k)
 }
 
 fn energyplus_exterior_convection_terms(
@@ -5101,7 +5200,6 @@ fn exterior_surface_energy_balance_temperature_c(
         }
     }
 
-    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
@@ -5119,22 +5217,23 @@ fn exterior_surface_energy_balance_temperature_c(
         use_doe2_outside_convection,
         wet_timestep_fraction,
     );
-    let longwave_coefficient = EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
-    let sky_temperature_c = horizontal_infrared_sky_temperature_c(
-        record.horizontal_infrared_radiation_wh_per_m2,
+    let longwave_terms = energyplus_exterior_longwave_terms(
+        surface_state,
+        typed_surface,
+        record,
+        surface_state.outside_face_temperature_c,
+        convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,
+        tilt_rad,
     );
-    let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
-    let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
-    let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
-        + ground_view_factor * outdoor_dry_bulb_c
-        + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
 
     let environmental = CtfOutsideFaceBalanceInput {
         outdoor_air_temperature_c: convection_terms.reference_temperature_c,
-        radiant_temperature_c: longwave_radiant_temperature_c,
+        radiant_temperature_c: longwave_terms
+            .equivalent_radiant_temperature_c(convection_terms.reference_temperature_c),
         outside_convection_coefficient_w_per_m2_k: convection_terms.coefficient_w_per_m2_k,
-        outside_radiation_coefficient_w_per_m2_k: longwave_coefficient,
+        outside_radiation_coefficient_w_per_m2_k: longwave_terms
+            .equivalent_coefficient_w_per_m2_k(),
         absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
     };
     if let Some(context) = quick_outside_conduction {
@@ -5574,6 +5673,13 @@ fn surface_sky_view_factor(surface: &Surface, tilt_rad: f64) -> f64 {
         AutoOrNumber::Value(value) => (1.0 - value).clamp(0.0, 1.0),
         AutoOrNumber::AutoCalculate => ((1.0 + tilt_rad.cos()) * 0.5).clamp(0.0, 1.0),
     }
+}
+
+fn surface_air_sky_radiation_split(tilt_rad: f64) -> f64 {
+    ((1.0 + tilt_rad.cos()) * 0.5)
+        .max(0.0)
+        .sqrt()
+        .clamp(0.0, 1.0)
 }
 
 fn solar_position_rad_at_local_hour(
@@ -6684,7 +6790,7 @@ mod tests {
         ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord, ExecutionStep, FirstZoneSimulationOptions,
         HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceWarmupOptions, HeatBalanceWarmupSummary, HeatBalanceWeatherContext,
-        HeatBalanceZoneAirAlgorithm, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        HeatBalanceZoneAirAlgorithm, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
         NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
         NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
         PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
@@ -6699,18 +6805,19 @@ mod tests {
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
-        energyplus_exterior_wet_timestep_fraction, energyplus_scriptf_from_view_factors,
-        energyplus_shadowing_period_solar_coefficients,
+        energyplus_exterior_longwave_terms, energyplus_exterior_wet_timestep_fraction,
+        energyplus_linearized_radiation_coefficient_w_per_m2_k,
+        energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
-        initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
-        next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
-        parse_epw_records, run_heat_balance_run_period_warmup,
-        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures,
+        horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
+        initialize_heat_balance_state_with_ctf_coefficients, next_day,
+        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
+        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
+        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -6718,7 +6825,8 @@ mod tests {
         surface_exterior_report_terms, surface_geometry_summaries,
         surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
         surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
-        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
+        surface_tilt_deg, update_surface_ctf_history_constants,
+        update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
         zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
@@ -9036,6 +9144,61 @@ DATA PERIODS
                 .abs()
                 < 1.0e-9
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn exterior_longwave_terms_use_energyplus_sky_air_ground_split()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface_state = state
+            .surfaces
+            .iter_mut()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing roof test surface"))?;
+        surface_state.outside_face_temperature_c = 60.0;
+        let typed_surface = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing typed roof test surface"))?;
+        let record = EpwRecord {
+            dry_bulb_c: 24.0,
+            horizontal_infrared_radiation_wh_per_m2: 358.0,
+            wind_speed_m_per_s: 4.6,
+            wind_direction_deg: 310.0,
+            ..weather_record_with_precipitation(0.0)
+        };
+        let tilt_rad =
+            surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+
+        let terms = energyplus_exterior_longwave_terms(
+            surface_state,
+            typed_surface,
+            &record,
+            60.0,
+            24.0,
+            24.0,
+            tilt_rad,
+        );
+        let expected_sky_temperature_c = horizontal_infrared_sky_temperature_c(
+            record.horizontal_infrared_radiation_wh_per_m2,
+            24.0,
+        );
+        let expected_sky_coefficient = energyplus_linearized_radiation_coefficient_w_per_m2_k(
+            0.9,
+            60.0 + KELVIN_OFFSET,
+            expected_sky_temperature_c + KELVIN_OFFSET,
+        );
+        let expected_gain = -expected_sky_coefficient * (60.0 - expected_sky_temperature_c);
+
+        assert!((terms.sky_coefficient_w_per_m2_k - expected_sky_coefficient).abs() < 1.0e-12);
+        assert!(terms.air_coefficient_w_per_m2_k.abs() < 1.0e-12);
+        assert!(terms.ground_coefficient_w_per_m2_k.abs() < 1.0e-12);
+        assert!((terms.net_heat_gain_per_area_w_per_m2(60.0) - expected_gain).abs() < 1.0e-12);
 
         Ok(())
     }
