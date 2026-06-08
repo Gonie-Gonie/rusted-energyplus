@@ -45,7 +45,7 @@ field_type_diagnostic_code = "InvalidFieldType"
 [expected_oracle_smoke]
 version = "26.1.0"
 raw_object_count = 88
-typed_object_count = 22
+typed_object_count = 24
 material_count = 3
 construction_count = 3
 schedule_type_limit_count = 2

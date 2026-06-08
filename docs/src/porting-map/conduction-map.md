@@ -121,9 +121,10 @@ conduction, so the adiabatic boundary probe remains a diagnostic fork rather
 than the active best lane.
 Adding the EnergyPlus advanced outside-face zone aggregate as a latent
 diagnostic row exposed outside aggregate conduction as a second default bottleneck
-(`2119.175942` RMSE) and the top current quick-boundary bottleneck:
-quick-outside iter3 lowers it to `1216.135113`, while quick-outside plus DOE-2
-iter3 lowers it to `799.673332`. This ties the remaining floor storage and
+(`2024.075950` RMSE) and the top current quick-boundary bottleneck:
+quick-outside iter3 now honors the source-declared DOE-2 outside convection
+setting and lowers it to `799.673332`, matching the explicit quick-outside
+plus DOE-2 iter3 lane. This ties the remaining floor storage and
 outside-face aggregate errors to the exterior face/source/history path rather
 than only the inside aggregate cancellation row.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
@@ -139,11 +140,13 @@ aggregate conduction regressions tied to wall/floor/roof source rows before a
 runtime change is promoted.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
-EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside
-convection, full inside-surface iteration order, and radiation coefficient
-updates are still unported. The timestep shell now uses the EnergyPlus TARP
-inside natural convection coefficient in the inside CTF balance and preserves
-the previous inside face temperature for the EnergyPlus-style iterative damping
-term before the zone-air predictor overwrites current face estimates.
+EnergyPlus-equivalent mass-material CTF coefficient generation, full
+inside-surface iteration order, exterior radiation coupling, and radiation
+coefficient updates are still unported. The timestep shell now uses the
+EnergyPlus TARP inside natural convection coefficient in the inside CTF balance,
+preserves the previous inside face temperature for the EnergyPlus-style
+iterative damping term before the zone-air predictor overwrites current face
+estimates, and honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for
+the exterior convection coefficient.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

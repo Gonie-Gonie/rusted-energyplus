@@ -126,11 +126,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `ConvectionCoefficients.cc::InitExtConvCoeff` dispatches
   `SurfaceConvectionAlgorithm:Outside,DOE-2` through the DOE-2 branch:
   windward/leeward MoWITT forced terms, ASHRAE TARP natural convection, and
-  EnergyPlus roughness multipliers. Rust has a source-anchored DOE-2 helper for
-  this expression, but the official dynamic diagnostic keeps the existing
-  exterior balance coefficient until DOE-2 wiring can be paired with the full
-  exterior radiation and iteration path; the isolated helper probe improved some
-  wall/roof rows but regressed MAT and zone aggregate conduction.
+  EnergyPlus roughness multipliers. Rust now preserves explicit
+  `SurfaceConvectionAlgorithm:Outside` objects in the typed model and uses the
+  DOE-2 helper in the default exterior coefficient path when that setting is
+  `DOE-2`; full exterior radiation and iteration parity remain diagnostic work.
 - `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
   builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
   `SumHATref`, internal gains, air-exchange terms, and third-order history
@@ -201,8 +200,9 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   lowers floor storage RMSE to `1120.518407`, floor inside conduction to
   `766.667596`, floor outside conduction to `373.650657`, and MAT to
   `2.186220`, while regressing zone aggregate conduction to `124.010025` RMSE.
-  This keeps DOE-2 exterior convection as a measured source term rather than a
-  default promotion. A direct quick-outside plus DOE-2 three-pass sibling lowers
+  This made DOE-2 exterior convection a measured source term before it was wired
+  to the default source-declared path. A direct quick-outside plus DOE-2
+  three-pass sibling lowers
   the quick-only iter3 floor storage row to RMSE `771.500589`, floor inside
   conduction to `587.797421`, and floor outside conduction to `227.407205`, but
   raises zone aggregate conduction to `128.396815` and the latent air-balance
@@ -210,9 +210,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   the next target to coupled surface/zone source ordering rather than only the
   exterior coefficient expression. Adding the EnergyPlus advanced outside-face
   zone aggregate as a latent diagnostic row exposes the exterior side of that
-  same bottleneck: the default lane has `2119.175942` RMSE, quick-outside iter3
-  lowers it to `1216.135113`, and quick-outside plus DOE-2 iter3 lowers it to
-  `799.673332` while still making it the top row in those 34-series probes.
+  same bottleneck: the default lane has `2024.075950` RMSE, and quick-outside
+  iter3 now honors the source-declared DOE-2 outside convection setting and
+  lowers it to `799.673332`, matching the explicit quick-outside plus DOE-2
+  iter3 lane while still making it the top row in those probe artifacts.
   The active tracker now carries 41 rows by adding roof outside convection,
   net thermal radiation, and absorbed solar source diagnostics so the remaining
   outside aggregate movement can be tied to exterior source rows before runtime
@@ -274,10 +275,11 @@ Current Rust boundary:
   inside natural convection coefficient in the inside CTF balance. Rust warmup
   now forwards available EPW weather records into the same diagnostic exterior
   forcing path used by run-period timesteps, so solar/radiation boundary
-  histories no longer use a dry-bulb-only warmup path. A DOE-2 outside
-  convection helper exists for future wiring, but full inside iteration order,
-  exterior DOE-2/radiation coupling, zone predictor/corrector equations, and
-  radiation coefficient updates are not yet wired.
+  histories no longer use a dry-bulb-only warmup path. The compiler/runtime
+  shell now honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for the
+  exterior convection coefficient, but full inside iteration order, exterior
+  radiation coupling, zone predictor/corrector equations, and radiation
+  coefficient updates are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

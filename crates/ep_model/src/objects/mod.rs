@@ -67,6 +67,45 @@ pub enum SolarDistribution {
     FullInteriorAndExteriorWithReflections,
 }
 
+/// Default inside surface convection algorithm.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InsideSurfaceConvectionAlgorithm {
+    /// Constant natural convection.
+    Simple,
+    /// ASHRAE TARP natural convection.
+    Tarp,
+    /// Ceiling diffuser mixed convection.
+    CeilingDiffuser,
+    /// EnergyPlus adaptive inside convection model selection.
+    AdaptiveConvectionAlgorithm,
+    /// ASTM C1340 mixed convection correlations.
+    AstmC1340,
+}
+
+/// Default outside surface convection algorithm.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OutsideSurfaceConvectionAlgorithm {
+    /// Simple combined exterior coefficient.
+    SimpleCombined,
+    /// TARP exterior convection.
+    Tarp,
+    /// MoWiTT smooth-surface exterior convection.
+    MoWitt,
+    /// DOE-2 rough-surface exterior convection.
+    Doe2,
+    /// EnergyPlus adaptive outside convection model selection.
+    AdaptiveConvectionAlgorithm,
+}
+
+/// Global surface convection algorithm settings.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct SurfaceConvectionAlgorithms {
+    /// Parsed `SurfaceConvectionAlgorithm:Inside` setting, when present.
+    pub inside: Option<InsideSurfaceConvectionAlgorithm>,
+    /// Parsed `SurfaceConvectionAlgorithm:Outside` setting, when present.
+    pub outside: Option<OutsideSurfaceConvectionAlgorithm>,
+}
+
 /// Building-level typed settings.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Building {

@@ -5,18 +5,19 @@ use ep_model::{
     ChillerElectricEir, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
-    MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnector,
-    PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop, Point3,
-    PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
-    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme,
+    LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId,
+    NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent,
+    PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
+    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -191,6 +192,8 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Version",
     "Building",
     "Timestep",
+    "SurfaceConvectionAlgorithm:Inside",
+    "SurfaceConvectionAlgorithm:Outside",
     "RunPeriod",
     "Site:Location",
     "Material",
@@ -242,6 +245,7 @@ impl<'a> Compiler<'a> {
 
         self.parse_building(&mut model);
         self.parse_timestep(&mut model);
+        self.parse_surface_convection_algorithms(&mut model);
         self.parse_run_periods(&mut model);
         self.parse_site_location(&mut model);
         self.parse_materials(&mut model);
@@ -399,6 +403,30 @@ impl<'a> Compiler<'a> {
                 6,
             ),
         };
+    }
+
+    fn parse_surface_convection_algorithms(&mut self, model: &mut TypedModel) {
+        if let Some((name, object)) = self.single_object("SurfaceConvectionAlgorithm:Inside") {
+            model.surface_convection_algorithms.inside = Some(self.enum_default(
+                "SurfaceConvectionAlgorithm:Inside",
+                &name,
+                (&object, "algorithm"),
+                InsideSurfaceConvectionAlgorithm::Tarp,
+                "TARP",
+                parse_inside_surface_convection_algorithm,
+            ));
+        }
+
+        if let Some((name, object)) = self.single_object("SurfaceConvectionAlgorithm:Outside") {
+            model.surface_convection_algorithms.outside = Some(self.enum_default(
+                "SurfaceConvectionAlgorithm:Outside",
+                &name,
+                (&object, "algorithm"),
+                OutsideSurfaceConvectionAlgorithm::Doe2,
+                "DOE-2",
+                parse_outside_surface_convection_algorithm,
+            ));
+        }
     }
 
     fn parse_run_periods(&mut self, model: &mut TypedModel) {
@@ -3597,6 +3625,50 @@ fn parse_solar_distribution(value: &str) -> Option<SolarDistribution> {
     }
 }
 
+fn parse_inside_surface_convection_algorithm(
+    value: &str,
+) -> Option<InsideSurfaceConvectionAlgorithm> {
+    match value {
+        value if value.eq_ignore_ascii_case("Simple") => {
+            Some(InsideSurfaceConvectionAlgorithm::Simple)
+        }
+        value if value.eq_ignore_ascii_case("TARP") => Some(InsideSurfaceConvectionAlgorithm::Tarp),
+        value if value.eq_ignore_ascii_case("CeilingDiffuser") => {
+            Some(InsideSurfaceConvectionAlgorithm::CeilingDiffuser)
+        }
+        value if value.eq_ignore_ascii_case("AdaptiveConvectionAlgorithm") => {
+            Some(InsideSurfaceConvectionAlgorithm::AdaptiveConvectionAlgorithm)
+        }
+        value if value.eq_ignore_ascii_case("ASTMC1340") => {
+            Some(InsideSurfaceConvectionAlgorithm::AstmC1340)
+        }
+        _ => None,
+    }
+}
+
+fn parse_outside_surface_convection_algorithm(
+    value: &str,
+) -> Option<OutsideSurfaceConvectionAlgorithm> {
+    match value {
+        value if value.eq_ignore_ascii_case("SimpleCombined") => {
+            Some(OutsideSurfaceConvectionAlgorithm::SimpleCombined)
+        }
+        value if value.eq_ignore_ascii_case("TARP") => {
+            Some(OutsideSurfaceConvectionAlgorithm::Tarp)
+        }
+        value if value.eq_ignore_ascii_case("MoWiTT") => {
+            Some(OutsideSurfaceConvectionAlgorithm::MoWitt)
+        }
+        value if value.eq_ignore_ascii_case("DOE-2") || value.eq_ignore_ascii_case("DOE2") => {
+            Some(OutsideSurfaceConvectionAlgorithm::Doe2)
+        }
+        value if value.eq_ignore_ascii_case("AdaptiveConvectionAlgorithm") => {
+            Some(OutsideSurfaceConvectionAlgorithm::AdaptiveConvectionAlgorithm)
+        }
+        _ => None,
+    }
+}
+
 fn parse_numeric_type(value: &str) -> Option<NumericType> {
     match value {
         value if value.eq_ignore_ascii_case("Continuous") => Some(NumericType::Continuous),
@@ -3835,8 +3907,9 @@ mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_model::{
         AutosizeOrNumber, DayOfWeek, DehumidificationControlType, HumidificationControlType,
-        IdealLoadsLimit, LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
-        OutdoorAirEconomizerType, PlantConnectorKind,
+        IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, LoadDistributionScheme,
+        MaterialSurfaceRoughness, ModelGraph, OutdoorAirEconomizerType,
+        OutsideSurfaceConvectionAlgorithm, PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -3940,6 +4013,45 @@ mod tests {
         };
         assert_eq!(output_variable.object_count, 1);
         assert_eq!(output_variable.status, ObjectCoverageStatus::RawOnly);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_surface_convection_algorithm_singletons() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "SurfaceConvectionAlgorithm:Inside": {
+                    "SurfaceConvectionAlgorithm:Inside 1": {"algorithm": "TARP"}
+                },
+                "SurfaceConvectionAlgorithm:Outside": {
+                    "SurfaceConvectionAlgorithm:Outside 1": {"algorithm": "DOE-2"}
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        assert_eq!(result.report.typed_object_count, 3);
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(
+            model.surface_convection_algorithms.inside,
+            Some(InsideSurfaceConvectionAlgorithm::Tarp)
+        );
+        assert_eq!(
+            model.surface_convection_algorithms.outside,
+            Some(OutsideSurfaceConvectionAlgorithm::Doe2)
+        );
+        let outside = result
+            .report
+            .coverage
+            .iter()
+            .find(|entry| entry.object_type == "SurfaceConvectionAlgorithm:Outside")
+            .ok_or_else(|| std::io::Error::other("missing outside algorithm coverage"))?;
+        assert_eq!(outside.status, ObjectCoverageStatus::Typed);
 
         Ok(())
     }

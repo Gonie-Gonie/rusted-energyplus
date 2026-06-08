@@ -7,9 +7,9 @@ use crate::{
     NormalizedName, OtherEquipment, PlantBranch, PlantBranchList, PlantConnector,
     PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId,
     ScheduleCompact, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    SiteLocation, Surface, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, Version, Zone, ZoneEquipmentConnection,
+    ZoneEquipmentList, ZoneEquipmentListId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -21,6 +21,8 @@ pub struct TypedModel {
     pub building: Option<Building>,
     /// Zone timestep config.
     pub timestep: TimestepConfig,
+    /// Global surface convection algorithm settings.
+    pub surface_convection_algorithms: SurfaceConvectionAlgorithms,
     /// Run periods.
     pub run_periods: Vec<RunPeriod>,
     /// Run period names.
@@ -123,6 +125,7 @@ impl Default for TypedModel {
             version: Version::oracle_26_1_0(),
             building: None,
             timestep: TimestepConfig::default(),
+            surface_convection_algorithms: SurfaceConvectionAlgorithms::default(),
             run_periods: Vec::new(),
             run_period_names: NameMap::default(),
             site: None,
@@ -181,6 +184,8 @@ impl TypedModel {
         usize::from(self.building.is_some())
             + usize::from(self.site.is_some())
             + 1
+            + usize::from(self.surface_convection_algorithms.inside.is_some())
+            + usize::from(self.surface_convection_algorithms.outside.is_some())
             + self.run_periods.len()
             + self.materials.len()
             + self.constructions.len()
@@ -607,9 +612,10 @@ pub struct PlantBranchComponentEdge {
 #[cfg(test)]
 mod tests {
     use crate::{
-        AutoOrNumber, Construction, ConstructionId, Material, MaterialId, MaterialKind,
-        MaterialSurfaceRoughness, ModelGraph, NameMap, NormalizedName, OutsideBoundaryCondition,
-        SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, Version, WindExposure, ZoneId,
+        AutoOrNumber, Construction, ConstructionId, InsideSurfaceConvectionAlgorithm, Material,
+        MaterialId, MaterialKind, MaterialSurfaceRoughness, ModelGraph, NameMap, NormalizedName,
+        OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, SunExposure, Surface,
+        SurfaceId, SurfaceType, TypedModel, Version, WindExposure, ZoneId,
     };
 
     #[test]
@@ -617,6 +623,17 @@ mod tests {
         let model = TypedModel::default();
 
         assert_eq!(model.version, Version::oracle_26_1_0());
+    }
+
+    #[test]
+    fn object_count_includes_explicit_surface_convection_algorithms() {
+        let mut model = TypedModel::default();
+        assert_eq!(model.object_count(), 1);
+
+        model.surface_convection_algorithms.inside = Some(InsideSurfaceConvectionAlgorithm::Tarp);
+        model.surface_convection_algorithms.outside = Some(OutsideSurfaceConvectionAlgorithm::Doe2);
+
+        assert_eq!(model.object_count(), 3);
     }
 
     #[test]

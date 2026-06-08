@@ -4,10 +4,10 @@ use crate::{OutputSeries, ResultStore, RuntimeOutputRegistry};
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
     IdealLoadsAirSystemId, LoopId, MaterialId, MaterialSurfaceRoughness, NodeId, NormalizedName,
-    OtherEquipment, OutputHandle, OutsideBoundaryCondition, PlantBranchComponent, PlantLoop,
-    Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel,
-    SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, Zone,
-    ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    OtherEquipment, OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
+    PlantBranchComponent, PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment,
+    ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
+    TypedModel, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -2543,13 +2543,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     );
-    let use_doe2_outside_convection = matches!(
-        zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
-    );
+    let use_doe2_outside_convection =
+        heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm);
     let interior_longwave_exchange_probe = match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe => {
@@ -4161,10 +4156,7 @@ fn reported_surface_outside_face_temperature_c(
         owning_zone_temperature_c,
         weather_context,
         None,
-        matches!(
-            zone_air_algorithm,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
-        ),
+        heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm),
     )
 }
 
@@ -4218,7 +4210,7 @@ fn surface_exterior_report_terms(
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
     let convection_coefficient_w_per_m2_k =
-        if zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm) {
+        if heat_balance_uses_doe2_outside_convection(model, zone_air_algorithm) {
             energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
                 reported_outside_face_temperature_c,
                 outdoor_dry_bulb_c,
@@ -4260,6 +4252,21 @@ fn surface_exterior_report_terms(
         solar_radiation_heat_gain_rate_w: solar_gain_per_area_w_per_m2 * surface_state.area_m2,
         solar_radiation_heat_gain_rate_per_area_w_per_m2: solar_gain_per_area_w_per_m2,
     }
+}
+
+fn heat_balance_uses_doe2_outside_convection(
+    model: &TypedModel,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> bool {
+    model_uses_doe2_outside_convection(model)
+        || zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm)
+}
+
+fn model_uses_doe2_outside_convection(model: &TypedModel) -> bool {
+    matches!(
+        model.surface_convection_algorithms.outside,
+        Some(OutsideSurfaceConvectionAlgorithm::Doe2)
+    )
 }
 
 fn zone_air_algorithm_uses_doe2_outside_convection(
@@ -6541,12 +6548,13 @@ mod tests {
         energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
-        energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
-        initialize_heat_balance_state_with_ctf_coefficients, next_day,
-        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
-        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
+        initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+        next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
+        parse_epw_records, run_heat_balance_run_period_warmup,
+        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -6567,13 +6575,14 @@ mod tests {
         IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
         MaterialKind, MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
         OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition,
-        PlantBranch, PlantBranchComponent, PlantBranchList, PlantLoop, Point3, RunPeriod,
-        RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId,
-        SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
-        ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-        TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-        ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-        ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+        OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent, PlantBranchList,
+        PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
+        ScheduleConstant, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface,
+        SurfaceId, SurfaceType, ThermostatControlObjectType, ThermostatDualSetpoint,
+        ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
+        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
+        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
 
     #[test]
@@ -8767,6 +8776,27 @@ DATA PERIODS
                 .surface_iteration_count,
             3
         );
+    }
+
+    #[test]
+    fn heat_balance_uses_source_declared_doe2_outside_convection() {
+        let mut model = TypedModel::default();
+
+        assert!(!heat_balance_uses_doe2_outside_convection(
+            &model,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        ));
+        assert!(heat_balance_uses_doe2_outside_convection(
+            &model,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+        ));
+
+        model.surface_convection_algorithms.outside = Some(OutsideSurfaceConvectionAlgorithm::Doe2);
+
+        assert!(heat_balance_uses_doe2_outside_convection(
+            &model,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        ));
     }
 
     #[test]

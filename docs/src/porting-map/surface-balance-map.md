@@ -59,7 +59,8 @@ diagnostic-only because exact longwave feedback without the rest of the
 EnergyPlus surface/zone coupling regresses the active storage and aggregate
 rows. A diagnostic surface-iter3 lane can repeat the inside/outside face balance
 within one zone timestep while advancing CTF histories only once, so iteration
-sensitivity can be measured before changing the default path. A DOE-2
-exterior-only previous-inside lane also isolates the official
-`SurfaceConvectionAlgorithm:Outside,DOE-2` coefficient effect from the
+sensitivity can be measured before changing the default path. The compiler now
+preserves explicit `SurfaceConvectionAlgorithm:Outside,DOE-2`, and the
+heat-balance shell uses that setting for the default exterior coefficient path;
+the DOE-2 probe lanes remain useful for isolating coefficient changes from the
 quick-conduction outside-face branch.
