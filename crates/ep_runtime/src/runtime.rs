@@ -6337,20 +6337,45 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
 
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
 
-    let beam = shadowing_period_solar_position_rad
-        .filter(|(solar_altitude_rad, _solar_azimuth_rad)| *solar_altitude_rad > 0.0)
-        .map(|(solar_altitude_rad, solar_azimuth_rad)| {
-            let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
+    let shadowing_period_cos_incidence =
+        shadowing_period_solar_position_rad.map(|(solar_altitude_rad, solar_azimuth_rad)| {
+            solar_altitude_rad.sin() * tilt_rad.cos()
                 + solar_altitude_rad.cos()
                     * tilt_rad.sin()
-                    * (solar_azimuth_rad - surface_azimuth_rad).cos();
-            direct_normal * cos_incidence.max(0.0)
-        })
+                    * (solar_azimuth_rad - surface_azimuth_rad).cos()
+        });
+    let beam = shadowing_period_solar_position_rad
+        .zip(shadowing_period_cos_incidence)
+        .filter(
+            |((solar_altitude_rad, _solar_azimuth_rad), _cos_incidence)| *solar_altitude_rad > 0.0,
+        )
+        .map(
+            |((_solar_altitude_rad, _solar_azimuth_rad), cos_incidence)| {
+                direct_normal * cos_incidence.max(0.0)
+            },
+        )
         .unwrap_or(0.0);
     let actual_cos_incidence = actual_solar_altitude_rad.sin() * tilt_rad.cos()
         + actual_solar_altitude_rad.cos()
             * tilt_rad.sin()
             * (actual_solar_azimuth_rad - surface_azimuth_rad).cos();
+    let circumsolar_sunlit_fraction = if tilt_rad.to_degrees() < 2.0 {
+        if actual_cos_incidence > ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
+            1.0
+        } else {
+            0.0
+        }
+    } else {
+        shadowing_period_cos_incidence
+            .map(|cos_incidence| {
+                if cos_incidence > ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
+                    1.0
+                } else {
+                    0.0
+                }
+            })
+            .unwrap_or(0.0)
+    };
     let sky_diffuse = diffuse_horizontal
         * energyplus_anisotropic_sky_multiplier(
             surface,
@@ -6360,6 +6385,7 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
             direct_normal,
             diffuse_horizontal,
             actual_cos_incidence,
+            circumsolar_sunlit_fraction,
         );
     let ground_horizontal =
         (direct_normal * actual_solar_altitude_rad.sin() + diffuse_horizontal).max(0.0);
@@ -6382,6 +6408,7 @@ fn energyplus_anisotropic_sky_multiplier(
     direct_normal_w_per_m2: f64,
     diffuse_horizontal_w_per_m2: f64,
     cos_incidence: f64,
+    circumsolar_sunlit_fraction: f64,
 ) -> f64 {
     const EPSILON_LIMIT: [f64; 7] = [1.065, 1.23, 1.5, 1.95, 2.8, 4.5, 6.2];
     const F11R: [f64; 8] = [
@@ -6442,7 +6469,9 @@ fn energyplus_anisotropic_sky_multiplier(
     }
 
     let view_factor_sky = surface_sky_view_factor(surface, tilt_rad);
-    let multiplier = view_factor_sky * (1.0 - f1) + f1 * circumsolar_factor + f2 * tilt_rad.sin();
+    let multiplier = view_factor_sky * (1.0 - f1)
+        + f1 * circumsolar_factor * circumsolar_sunlit_fraction.clamp(0.0, 1.0)
+        + f2 * tilt_rad.sin();
     multiplier.max(0.0)
 }
 
@@ -7902,7 +7931,7 @@ mod tests {
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_analytical_zone_air_temperature_c,
+        energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
         energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c,
@@ -8178,6 +8207,52 @@ mod tests {
         );
 
         assert!((incident - 7.0).abs() < 1.0e-9);
+    }
+
+    #[test]
+    fn anisotropic_sky_circumsolar_uses_sunlit_fraction() {
+        let site = SiteLocation {
+            name: NormalizedName::new("Golden"),
+            latitude_deg: 39.74,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        };
+        let wall = surface(
+            101,
+            "South Wall",
+            SurfaceType::Wall,
+            [
+                point(0.0, 0.0, 0.0),
+                point(1.0, 0.0, 0.0),
+                point(1.0, 0.0, 1.0),
+                point(0.0, 0.0, 1.0),
+            ],
+        );
+
+        let shadowed = energyplus_anisotropic_sky_multiplier(
+            &wall,
+            &site,
+            90.0_f64.to_radians(),
+            20.0_f64.to_radians(),
+            500.0,
+            100.0,
+            0.6,
+            0.0,
+        );
+        let sunlit = energyplus_anisotropic_sky_multiplier(
+            &wall,
+            &site,
+            90.0_f64.to_radians(),
+            20.0_f64.to_radians(),
+            500.0,
+            100.0,
+            0.6,
+            1.0,
+        );
+
+        assert!(shadowed > 0.0);
+        assert!(sunlit > shadowed);
     }
 
     #[test]
