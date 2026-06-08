@@ -2234,18 +2234,17 @@ fn advance_heat_balance_state_one_timestep_internal(
         .zones
         .iter()
         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-        .collect::<Vec<_>>();
+        .collect::<BTreeMap<_, _>>();
     let previous_surface_inside_temperatures = state
         .surfaces
         .iter()
         .map(|surface| (surface.surface_id, surface.inside_face_temperature_c))
-        .collect::<Vec<_>>();
+        .collect::<BTreeMap<_, _>>();
 
     for surface in &mut state.surfaces {
         let zone_temperature_c = previous_zone_temperatures
-            .iter()
-            .find(|(zone_id, _temperature)| *zone_id == surface.zone_id)
-            .map(|(_zone_id, temperature)| *temperature)
+            .get(&surface.zone_id)
+            .copied()
             .unwrap_or(surface.inside_face_temperature_c);
 
         surface.inside_face_temperature_c = zone_temperature_c;
@@ -2302,19 +2301,16 @@ fn advance_heat_balance_state_one_timestep_internal(
         .zones
         .iter()
         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-        .collect::<Vec<_>>();
+        .collect::<BTreeMap<_, _>>();
 
     for surface in &mut state.surfaces {
         let previous_inside_face_temperature_c = previous_surface_inside_temperatures
-            .iter()
-            .find(|(surface_id, _temperature)| *surface_id == surface.surface_id)
-            .map(|(_surface_id, temperature)| *temperature)
+            .get(&surface.surface_id)
+            .copied()
             .unwrap_or(surface.inside_face_temperature_c);
-        let zone_temperature_c = state
-            .zones
-            .iter()
-            .find(|zone| zone.zone_id == surface.zone_id)
-            .map(|zone| zone.mean_air_temperature_c)
+        let zone_temperature_c = current_zone_temperatures
+            .get(&surface.zone_id)
+            .copied()
             .unwrap_or(surface.inside_face_temperature_c);
         let inside_convection_coefficient_w_per_m2_k =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
@@ -3060,7 +3056,7 @@ fn boundary_object_name(surface: &Surface) -> String {
 
 fn surface_boundary_temperature_c(
     surface: &SurfaceHeatBalanceState,
-    previous_zone_temperatures: &[(ZoneId, f64)],
+    previous_zone_temperatures: &BTreeMap<ZoneId, f64>,
     outdoor_dry_bulb_c: f64,
     owning_zone_temperature_c: f64,
 ) -> f64 {
@@ -3071,12 +3067,7 @@ fn surface_boundary_temperature_c(
         | OutsideBoundaryCondition::Zone
         | OutsideBoundaryCondition::Space => surface
             .outside_boundary_target_zone_id
-            .and_then(|target_zone_id| {
-                previous_zone_temperatures
-                    .iter()
-                    .find(|(zone_id, _temperature)| *zone_id == target_zone_id)
-                    .map(|(_zone_id, temperature)| *temperature)
-            })
+            .and_then(|target_zone_id| previous_zone_temperatures.get(&target_zone_id).copied())
             .unwrap_or(owning_zone_temperature_c),
         OutsideBoundaryCondition::Foundation
         | OutsideBoundaryCondition::Ground
@@ -3087,7 +3078,7 @@ fn surface_boundary_temperature_c(
 fn heat_balance_surface_boundary_temperature_c(
     model: &TypedModel,
     surface: &SurfaceHeatBalanceState,
-    previous_zone_temperatures: &[(ZoneId, f64)],
+    previous_zone_temperatures: &BTreeMap<ZoneId, f64>,
     outdoor_dry_bulb_c: f64,
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
