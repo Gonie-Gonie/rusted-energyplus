@@ -2232,7 +2232,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             input.outdoor_dry_bulb_c,
             zone_temperature_c,
         );
+        update_surface_ctf_history_constants(surface);
         surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
+        advance_surface_ctf_histories(surface);
     }
 
     for zone in &mut state.zones {
@@ -3013,17 +3015,137 @@ fn horizontal_infrared_sky_temperature_c(
 }
 
 fn surface_inside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
-    surface.area_m2
-        * (surface.outside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
-            - surface.inside_face_temperature_c * surface.ctf.inside_0_w_per_m2_k
-            + surface.ctf.const_in_part_w_per_m2)
+    surface.area_m2 * surface_inside_conduction_flux_w_per_m2(surface)
 }
 
 fn surface_outside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
-    -surface.area_m2
-        * (surface.outside_face_temperature_c * surface.ctf.outside_0_w_per_m2_k
-            - surface.inside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
-            + surface.ctf.const_out_part_w_per_m2)
+    -surface.area_m2 * surface_outside_conduction_flux_w_per_m2(surface)
+}
+
+fn surface_inside_conduction_flux_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+
+    surface.outside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+        - surface.inside_face_temperature_c * surface.ctf.inside_0_w_per_m2_k
+        + surface.ctf.const_in_part_w_per_m2
+}
+
+fn surface_outside_conduction_flux_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+
+    surface.outside_face_temperature_c * surface.ctf.outside_0_w_per_m2_k
+        - surface.inside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+        + surface.ctf.const_out_part_w_per_m2
+}
+
+fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
+    surface.ctf.const_in_part_w_per_m2 = 0.0;
+    surface.ctf.const_out_part_w_per_m2 = 0.0;
+    let terms = surface
+        .ctf
+        .outside_history_w_per_m2_k
+        .len()
+        .max(surface.ctf.cross_history_w_per_m2_k.len())
+        .max(surface.ctf.inside_history_w_per_m2_k.len())
+        .max(surface.ctf.flux_history.len());
+
+    for term in 0..terms {
+        let outside_temperature_c = surface
+            .ctf
+            .outside_temperature_history_c
+            .get(term)
+            .copied()
+            .unwrap_or(surface.outside_face_temperature_c);
+        let inside_temperature_c = surface
+            .ctf
+            .inside_temperature_history_c
+            .get(term)
+            .copied()
+            .unwrap_or(surface.inside_face_temperature_c);
+        let inside_flux_w_per_m2 = surface
+            .ctf
+            .inside_flux_history_w_per_m2
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let outside_flux_w_per_m2 = surface
+            .ctf
+            .outside_flux_history_w_per_m2
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let cross = surface
+            .ctf
+            .cross_history_w_per_m2_k
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let inside = surface
+            .ctf
+            .inside_history_w_per_m2_k
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let outside = surface
+            .ctf
+            .outside_history_w_per_m2_k
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let flux = surface.ctf.flux_history.get(term).copied().unwrap_or(0.0);
+
+        surface.ctf.const_in_part_w_per_m2 += cross * outside_temperature_c
+            - inside * inside_temperature_c
+            + flux * inside_flux_w_per_m2;
+        surface.ctf.const_out_part_w_per_m2 += outside * outside_temperature_c
+            - cross * inside_temperature_c
+            + flux * outside_flux_w_per_m2;
+    }
+}
+
+fn advance_surface_ctf_histories(surface: &mut SurfaceHeatBalanceState) {
+    let history_terms = surface
+        .ctf
+        .outside_history_w_per_m2_k
+        .len()
+        .max(surface.ctf.cross_history_w_per_m2_k.len())
+        .max(surface.ctf.inside_history_w_per_m2_k.len())
+        .max(surface.ctf.flux_history.len());
+    if history_terms == 0 {
+        return;
+    }
+
+    let inside_flux_w_per_m2 = surface_inside_conduction_flux_w_per_m2(surface);
+    let outside_flux_w_per_m2 = surface_outside_conduction_flux_w_per_m2(surface);
+    push_surface_history(
+        &mut surface.ctf.outside_temperature_history_c,
+        surface.outside_face_temperature_c,
+        history_terms,
+    );
+    push_surface_history(
+        &mut surface.ctf.inside_temperature_history_c,
+        surface.inside_face_temperature_c,
+        history_terms,
+    );
+    push_surface_history(
+        &mut surface.ctf.inside_flux_history_w_per_m2,
+        inside_flux_w_per_m2,
+        history_terms,
+    );
+    push_surface_history(
+        &mut surface.ctf.outside_flux_history_w_per_m2,
+        outside_flux_w_per_m2,
+        history_terms,
+    );
+}
+
+fn push_surface_history(history: &mut Vec<f64>, value: f64, limit: usize) {
+    history.insert(0, value);
+    history.truncate(limit);
 }
 
 fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
@@ -4153,8 +4275,9 @@ mod tests {
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
-        advance_heat_balance_state_one_timestep, append_surface_incident_solar_radiation_series,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
+        append_surface_incident_solar_radiation_series, build_execution_plan,
+        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_average_solar_coefficients, energyplus_daily_solar_coefficients,
         energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
@@ -4163,7 +4286,8 @@ mod tests {
         simulate_plant_state_projection, simulate_schedule_values,
         simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
         solar_weather_interpolation_weights, surface_area_m2, surface_geometry_summaries,
-        zone_geometry_summaries,
+        surface_inside_conduction_flux_w_per_m2, surface_outside_conduction_flux_w_per_m2,
+        update_surface_ctf_history_constants, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -5120,6 +5244,42 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn surface_ctf_history_terms_update_flux_constants() -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.inside_face_temperature_c = 20.0;
+        surface.outside_face_temperature_c = 10.0;
+        surface.ctf.cross_history_w_per_m2_k = vec![0.2];
+        surface.ctf.inside_history_w_per_m2_k = vec![0.3];
+        surface.ctf.outside_history_w_per_m2_k = vec![0.4];
+        surface.ctf.flux_history = vec![0.5];
+        surface.ctf.outside_temperature_history_c = vec![8.0];
+        surface.ctf.inside_temperature_history_c = vec![18.0];
+        surface.ctf.inside_flux_history_w_per_m2 = vec![1.2];
+        surface.ctf.outside_flux_history_w_per_m2 = vec![-0.4];
+
+        update_surface_ctf_history_constants(surface);
+
+        assert!((surface.ctf.const_in_part_w_per_m2 - (-3.2)).abs() < 1.0e-12);
+        assert!((surface.ctf.const_out_part_w_per_m2 - (-0.6)).abs() < 1.0e-12);
+
+        let inside_flux = surface_inside_conduction_flux_w_per_m2(surface);
+        let outside_flux = surface_outside_conduction_flux_w_per_m2(surface);
+        advance_surface_ctf_histories(surface);
+
+        assert_eq!(surface.ctf.outside_temperature_history_c, vec![10.0]);
+        assert_eq!(surface.ctf.inside_temperature_history_c, vec![20.0]);
+        assert_eq!(surface.ctf.inside_flux_history_w_per_m2, vec![inside_flux]);
+        assert_eq!(
+            surface.ctf.outside_flux_history_w_per_m2,
+            vec![outside_flux]
+        );
 
         Ok(())
     }
