@@ -172,7 +172,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   exterior convection uses timestep wind speed/direction, exterior longwave
   uses timestep-interpolated horizontal infrared radiation/sky temperature,
   and exterior solar balance/report terms use the same timestep solar
-  interpolation helper that backs the hourly incident-solar diagnostic.
+  interpolation helper that backs the hourly incident-solar diagnostic. At
+  sunrise/sunset shadowing-period edges, Rust preserves the diffuse and
+  ground-reflected solar terms when the current-day EnergyPlus sun-up test is
+  true but the averaged shadowing-period beam position is still below the
+  horizon.
   Surface temperatures, surface/zone conduction/source report rows, and
   latent zone-air heat-balance rate rows are averaged over the zone timesteps
   before being written as hourly diagnostics.

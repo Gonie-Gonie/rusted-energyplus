@@ -6199,6 +6199,10 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         return 0.0;
     }
 
+    let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
+    let direct_normal = input.direct_normal_radiation_w_per_m2.max(0.0);
+    let diffuse_horizontal = input.diffuse_horizontal_radiation_w_per_m2.max(0.0);
+
     let Some((solar_altitude_rad, solar_azimuth_rad)) = solar_position_rad_from_coefficients(
         site,
         input.local_hour,
@@ -6206,16 +6210,13 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         input.cos_declination,
         input.equation_of_time_hours,
     ) else {
-        return 0.0;
+        return diffuse_solar_radiation_w_per_m2(surface, tilt_rad, diffuse_horizontal);
     };
     if solar_altitude_rad <= 0.0 {
-        return 0.0;
+        return diffuse_solar_radiation_w_per_m2(surface, tilt_rad, diffuse_horizontal);
     }
 
-    let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
-    let direct_normal = input.direct_normal_radiation_w_per_m2.max(0.0);
-    let diffuse_horizontal = input.diffuse_horizontal_radiation_w_per_m2.max(0.0);
 
     let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
         + solar_altitude_rad.cos()
@@ -6230,6 +6231,20 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         * surface_ground_view_factor(surface, tilt_rad);
 
     beam + sky_diffuse + ground_reflected
+}
+
+fn diffuse_solar_radiation_w_per_m2(
+    surface: &Surface,
+    tilt_rad: f64,
+    diffuse_horizontal_w_per_m2: f64,
+) -> f64 {
+    let diffuse_horizontal = diffuse_horizontal_w_per_m2.max(0.0);
+    let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
+    let ground_reflected = diffuse_horizontal
+        * DEFAULT_SOLAR_GROUND_REFLECTANCE
+        * surface_ground_view_factor(surface, tilt_rad);
+
+    sky_diffuse + ground_reflected
 }
 
 fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
@@ -7718,6 +7733,7 @@ mod tests {
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_exterior_report_terms, surface_geometry_summaries,
+        surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
         surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
         surface_tilt_deg, update_surface_ctf_history_constants,
@@ -7857,6 +7873,78 @@ mod tests {
 
         assert!((altitude_rad.to_degrees() - 25.115079268192).abs() < 1.0e-12);
         assert!((azimuth_rad.to_degrees() - 181.434056277464).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn surface_solar_preserves_diffuse_at_shadowing_sunrise_edge() {
+        let site = SiteLocation {
+            name: NormalizedName::new("Golden"),
+            latitude_deg: 39.74,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        };
+        let mut records = Vec::new();
+        let mut record_index = None;
+        let mut date = Date {
+            year: 2004,
+            month: 1,
+            day_of_month: 1,
+        };
+        for _day in 0..340 {
+            for hour in 1..=24 {
+                if date.month == 11 && date.day_of_month == 19 && hour == 7 {
+                    record_index = Some(records.len());
+                }
+                let (direct_normal_radiation_wh_per_m2, diffuse_horizontal_radiation_wh_per_m2) =
+                    if date.month == 11 && date.day_of_month == 19 && hour == 8 {
+                        (279.0, 56.0)
+                    } else {
+                        (0.0, 0.0)
+                    };
+                records.push(EpwRecord {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day_of_month,
+                    hour,
+                    minute: 0,
+                    dry_bulb_c: 0.0,
+                    dew_point_c: 0.0,
+                    relative_humidity_percent: 50.0,
+                    atmospheric_pressure_pa: 82_000.0,
+                    horizontal_infrared_radiation_wh_per_m2: 0.0,
+                    global_horizontal_radiation_wh_per_m2: 0.0,
+                    direct_normal_radiation_wh_per_m2,
+                    diffuse_horizontal_radiation_wh_per_m2,
+                    wind_direction_deg: 0.0,
+                    wind_speed_m_per_s: 0.0,
+                    liquid_precipitation_depth_mm: 0.0,
+                });
+            }
+            date = next_day(date);
+        }
+        let roof = surface(
+            100,
+            "Sunrise Roof",
+            SurfaceType::Roof,
+            [
+                point(0.0, 0.0, 1.0),
+                point(0.0, 1.0, 1.0),
+                point(1.0, 1.0, 1.0),
+                point(1.0, 0.0, 1.0),
+            ],
+        );
+
+        let incident = surface_incident_solar_radiation_for_weather_context_w_per_m2(
+            &roof,
+            &site,
+            &records,
+            record_index.unwrap_or(0),
+            4,
+            None,
+        );
+
+        assert!((incident - 7.0).abs() < 1.0e-9);
     }
 
     #[test]
