@@ -89,6 +89,23 @@ pub struct EioConstructionCtf {
     pub roughness: String,
 }
 
+/// Construction transfer-function coefficient values read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioConstructionCtfCoefficient {
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// EIO `Time` history index.
+    pub time_index: usize,
+    /// EIO outside/X coefficient.
+    pub outside: f64,
+    /// EIO cross/Y coefficient.
+    pub cross: f64,
+    /// EIO inside/Z coefficient.
+    pub inside: f64,
+    /// EIO flux coefficient; absent for the final time-zero row.
+    pub flux: Option<f64>,
+}
+
 /// Material CTF summary values read from EnergyPlus `eplusout.eio`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioMaterialCtfSummary {
@@ -130,6 +147,8 @@ pub enum EioError {
     MissingOtherEquipmentNominal,
     /// No `Construction CTF` rows were present.
     MissingConstructionCtf,
+    /// No `CTF` coefficient rows were present.
+    MissingConstructionCtfCoefficient,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
     /// An `Environment:WarmupDays` row could not be parsed.
@@ -177,6 +196,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `CTF` coefficient row could not be parsed.
+    InvalidConstructionCtfCoefficient {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `Material CTF Summary` row could not be parsed.
     InvalidMaterialCtfSummary {
         /// One-based line number.
@@ -203,6 +231,9 @@ impl Display for EioError {
                 )
             }
             Self::MissingConstructionCtf => write!(formatter, "EIO Construction CTF not found"),
+            Self::MissingConstructionCtfCoefficient => {
+                write!(formatter, "EIO CTF coefficient rows not found")
+            }
             Self::MissingMaterialCtfSummary => {
                 write!(formatter, "EIO Material CTF Summary not found")
             }
@@ -221,6 +252,10 @@ impl Display for EioError {
             Self::InvalidConstructionCtf { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Construction CTF at line {line}: {reason}: {text}"
+            ),
+            Self::InvalidConstructionCtfCoefficient { line, text, reason } => write!(
+                formatter,
+                "invalid EIO CTF coefficient at line {line}: {reason}: {text}"
             ),
             Self::InvalidMaterialCtfSummary { line, text, reason } => write!(
                 formatter,
@@ -244,9 +279,11 @@ impl std::error::Error for EioError {
             | Self::InvalidZoneInformation { .. }
             | Self::InvalidHeatTransferSurface { .. }
             | Self::MissingConstructionCtf
+            | Self::MissingConstructionCtfCoefficient
             | Self::MissingMaterialCtfSummary
             | Self::InvalidOtherEquipmentNominal { .. }
             | Self::InvalidConstructionCtf { .. }
+            | Self::InvalidConstructionCtfCoefficient { .. }
             | Self::InvalidMaterialCtfSummary { .. }
             | Self::InvalidWarmupEnvironment { .. } => None,
         }
@@ -287,6 +324,14 @@ pub fn load_eio_construction_ctf(
 ) -> Result<Vec<EioConstructionCtf>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_construction_ctf(&contents)
+}
+
+/// Loads construction CTF coefficient rows from an EnergyPlus EIO file.
+pub fn load_eio_construction_ctf_coefficients(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioConstructionCtfCoefficient>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_construction_ctf_coefficients(&contents)
 }
 
 /// Loads material CTF summary rows from an EnergyPlus EIO file.
@@ -546,6 +591,61 @@ pub fn parse_eio_construction_ctf(contents: &str) -> Result<Vec<EioConstructionC
     Ok(constructions)
 }
 
+/// Parses `CTF` coefficient rows from EnergyPlus EIO contents.
+pub fn parse_eio_construction_ctf_coefficients(
+    contents: &str,
+) -> Result<Vec<EioConstructionCtfCoefficient>, EioError> {
+    let mut coefficients = Vec::new();
+    let mut current_construction_name: Option<String> = None;
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if trimmed.starts_with("Construction CTF,") {
+            let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+            current_construction_name = Some(required_field(&fields, 1).to_ascii_uppercase());
+            continue;
+        }
+        if !trimmed.starts_with("CTF,") {
+            continue;
+        }
+
+        let Some(construction_name) = current_construction_name.clone() else {
+            return Err(EioError::InvalidConstructionCtfCoefficient {
+                line: line_number,
+                text: line.to_string(),
+                reason: "CTF row appeared before any Construction CTF row".to_string(),
+            });
+        };
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() <= 4 {
+            return Err(EioError::InvalidConstructionCtfCoefficient {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 5 fields, found {}", fields.len()),
+            });
+        }
+
+        let flux = match fields.get(5).copied().filter(|field| !field.is_empty()) {
+            Some(_field) => Some(parse_ctf_f64_field(&fields, 5, line_number, line, "Flux")?),
+            None => None,
+        };
+        coefficients.push(EioConstructionCtfCoefficient {
+            construction_name,
+            time_index: parse_ctf_usize_field(&fields, 1, line_number, line, "Time")?,
+            outside: parse_ctf_f64_field(&fields, 2, line_number, line, "Outside")?,
+            cross: parse_ctf_f64_field(&fields, 3, line_number, line, "Cross")?,
+            inside: parse_ctf_f64_field(&fields, 4, line_number, line, "Inside")?,
+            flux,
+        });
+    }
+
+    if coefficients.is_empty() {
+        return Err(EioError::MissingConstructionCtfCoefficient);
+    }
+
+    Ok(coefficients)
+}
+
 /// Parses `Material CTF Summary` rows from EnergyPlus EIO contents.
 pub fn parse_eio_material_ctf_summary(
     contents: &str,
@@ -725,6 +825,22 @@ fn parse_construction_f64_field(
         })
 }
 
+fn parse_ctf_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidConstructionCtfCoefficient {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
 fn parse_material_f64_field(
     fields: &[&str],
     index: usize,
@@ -751,6 +867,22 @@ fn parse_construction_usize_field(
     required_field(fields, index)
         .parse::<usize>()
         .map_err(|_error| EioError::InvalidConstructionCtf {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_ctf_usize_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<usize, EioError> {
+    required_field(fields, index)
+        .parse::<usize>()
+        .map_err(|_error| EioError::InvalidConstructionCtfCoefficient {
             line,
             text: text.to_string(),
             reason: format!("invalid {field}"),

@@ -1,9 +1,10 @@
 use crate::{
     SeriesAlignment, SeriesDivergenceKind, SeriesSample, Tolerance, compare_series,
     compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
-    parse_eio_heat_transfer_surfaces, parse_eio_material_ctf_summary,
-    parse_eio_other_equipment_nominal, parse_eio_warmup_environments, parse_eio_zone_geometry,
-    parse_eso_series, parse_eso_time_series,
+    parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
+    parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
+    parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
+    parse_eso_time_series,
 };
 
 #[test]
@@ -236,6 +237,36 @@ fn parses_eio_construction_ctf_rows() -> Result<(), Box<dyn std::error::Error>> 
     assert_eq!(constructions[0].timestep_hours, 0.25);
     assert_eq!(constructions[0].thermal_conductance_w_per_m2_k, 0.4365);
     assert_eq!(constructions[0].roughness, "Rough");
+
+    Ok(())
+}
+
+#[test]
+fn parses_eio_construction_ctf_coefficient_rows() -> Result<(), Box<dyn std::error::Error>> {
+    let coefficients = parse_eio_construction_ctf_coefficients(
+        r#"! <Construction CTF>,Construction Name,...
+! <Material CTF Summary>,Material Name,...
+! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)
+ Construction CTF,FLOOR,   2,   1,   5,   0.250,          17.04,   0.900,   0.900,   0.650,   0.650,MediumRough
+ Material CTF Summary,C5 - 4 IN HW CONCRETE,  0.1015,         1.730,   2242.585,      836.800,     0.05868
+ CTF,   1,          -62.622544,           4.7096437,          -62.622544,          0.60555731
+ CTF,   0,            58.08561,          0.72354869,            58.08561
+"#,
+    )?;
+
+    assert_eq!(coefficients.len(), 2);
+    assert_eq!(coefficients[0].construction_name, "FLOOR");
+    assert_eq!(coefficients[0].time_index, 1);
+    assert_eq!(coefficients[0].outside, -62.622544);
+    assert_eq!(coefficients[0].cross, 4.7096437);
+    assert_eq!(coefficients[0].inside, -62.622544);
+    assert_eq!(coefficients[0].flux, Some(0.60555731));
+    assert_eq!(coefficients[1].construction_name, "FLOOR");
+    assert_eq!(coefficients[1].time_index, 0);
+    assert_eq!(coefficients[1].outside, 58.08561);
+    assert_eq!(coefficients[1].cross, 0.72354869);
+    assert_eq!(coefficients[1].inside, 58.08561);
+    assert_eq!(coefficients[1].flux, None);
 
     Ok(())
 }

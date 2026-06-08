@@ -94,6 +94,8 @@ Current Rust boundary:
 
 - `ep_model::Construction.layers` stores material IDs from outside to inside;
   `outside_layer` remains the outside-face compatibility field.
+- `ep_compare` reads EIO `CTF` coefficient rows and associates them with the
+  preceding `Construction CTF` row for coefficient-level oracle checks.
 - `ep_runtime` sums layer thermal resistance and available areal heat capacity
   for the current simplified opaque surface state.
 - EnergyPlus CTF coefficient generation, history terms, source/sink terms, and
