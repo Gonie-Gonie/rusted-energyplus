@@ -43,7 +43,10 @@ steady/no-mass `#CTFs <= 1` rows while mass-material CTF rows are isolated from
 the current simplified face-temperature/history shell; enabling mass CTF rows at
 this stage over-amplifies latent floor history. The official dynamic diagnostic
 JSON/markdown report records this as `ctf_seed_policy: steady-no-mass-only` and
-lists skipped mass constructions such as `FLOOR (#CTFs=5)`. Roof/wall exterior
+lists skipped mass constructions such as `FLOOR (#CTFs=5)`. Developers can
+temporarily set `RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY=all-eio` to
+reproduce mass CTF over-amplification without changing the official diagnostic
+default or making a conformance claim. Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface

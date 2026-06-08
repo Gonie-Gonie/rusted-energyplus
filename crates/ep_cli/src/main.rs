@@ -45,6 +45,7 @@ use std::path::{Path, PathBuf};
 use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
+const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -3162,6 +3163,21 @@ struct HeatBalanceCtfSeedDiagnostic {
     skipped_coefficients: usize,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum HeatBalanceCtfSeedPolicy {
+    SteadyNoMassOnly,
+    AllEio,
+}
+
+impl HeatBalanceCtfSeedPolicy {
+    fn label(self) -> &'static str {
+        match self {
+            Self::SteadyNoMassOnly => "steady-no-mass-only",
+            Self::AllEio => "all-eio",
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 struct HeatBalanceSkippedCtfConstruction {
     construction_name: String,
@@ -3509,15 +3525,36 @@ fn load_runtime_ctf_coefficients_from_eio(
     ),
     String,
 > {
+    let policy = heat_balance_ctf_seed_policy_from_env()?;
+    load_runtime_ctf_coefficients_from_eio_with_policy(eio_path, policy)
+}
+
+fn load_runtime_ctf_coefficients_from_eio_with_policy(
+    eio_path: &Path,
+    policy: HeatBalanceCtfSeedPolicy,
+) -> Result<
+    (
+        Vec<ConstructionCtfCoefficientOverride>,
+        HeatBalanceCtfSeedDiagnostic,
+    ),
+    String,
+> {
     let constructions = load_eio_construction_ctf(eio_path).map_err(|error| error.to_string())?;
     let steady_constructions = constructions
         .iter()
         .filter(|construction| construction.ctf_count <= 1)
         .map(|construction| construction.construction_name.clone())
         .collect::<BTreeSet<_>>();
+    let included_constructions = match policy {
+        HeatBalanceCtfSeedPolicy::SteadyNoMassOnly => steady_constructions.clone(),
+        HeatBalanceCtfSeedPolicy::AllEio => constructions
+            .iter()
+            .map(|construction| construction.construction_name.clone())
+            .collect::<BTreeSet<_>>(),
+    };
     let skipped_constructions = constructions
         .iter()
-        .filter(|construction| construction.ctf_count > 1)
+        .filter(|construction| !included_constructions.contains(&construction.construction_name))
         .map(|construction| HeatBalanceSkippedCtfConstruction {
             construction_name: construction.construction_name.clone(),
             ctf_count: construction.ctf_count,
@@ -3528,7 +3565,7 @@ fn load_runtime_ctf_coefficients_from_eio(
     let mut included_coefficients = Vec::new();
     let mut skipped_coefficients = 0;
     for coefficient in coefficients {
-        if steady_constructions.contains(&coefficient.construction_name) {
+        if included_constructions.contains(&coefficient.construction_name) {
             included_coefficients.push(ConstructionCtfCoefficientOverride {
                 construction_name: coefficient.construction_name,
                 time_index: coefficient.time_index,
@@ -3542,8 +3579,8 @@ fn load_runtime_ctf_coefficients_from_eio(
         }
     }
     let ctf_seed = HeatBalanceCtfSeedDiagnostic {
-        policy: "steady-no-mass-only",
-        included_constructions: steady_constructions.into_iter().collect(),
+        policy: policy.label(),
+        included_constructions: included_constructions.into_iter().collect(),
         skipped_constructions,
         included_coefficients: included_coefficients.len(),
         skipped_coefficients,
@@ -3558,6 +3595,26 @@ fn disabled_heat_balance_ctf_seed_diagnostic() -> HeatBalanceCtfSeedDiagnostic {
         skipped_constructions: Vec::new(),
         included_coefficients: 0,
         skipped_coefficients: 0,
+    }
+}
+
+fn heat_balance_ctf_seed_policy_from_env() -> Result<HeatBalanceCtfSeedPolicy, String> {
+    match std::env::var(HEAT_BALANCE_CTF_SEED_POLICY_ENV) {
+        Ok(value) => parse_heat_balance_ctf_seed_policy(&value),
+        Err(std::env::VarError::NotPresent) => Ok(HeatBalanceCtfSeedPolicy::SteadyNoMassOnly),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_CTF_SEED_POLICY_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_ctf_seed_policy(value: &str) -> Result<HeatBalanceCtfSeedPolicy, String> {
+    match value.trim().to_ascii_lowercase().as_str() {
+        "" | "steady-no-mass-only" => Ok(HeatBalanceCtfSeedPolicy::SteadyNoMassOnly),
+        "all-eio" => Ok(HeatBalanceCtfSeedPolicy::AllEio),
+        other => Err(format!(
+            "unsupported {HEAT_BALANCE_CTF_SEED_POLICY_ENV}: {other}; expected steady-no-mass-only or all-eio"
+        )),
     }
 }
 
@@ -6014,7 +6071,15 @@ mod tests {
 "#,
         )?;
 
-        let (coefficients, ctf_seed) = super::load_runtime_ctf_coefficients_from_eio(&path)?;
+        let (coefficients, ctf_seed) = super::load_runtime_ctf_coefficients_from_eio_with_policy(
+            &path,
+            super::HeatBalanceCtfSeedPolicy::SteadyNoMassOnly,
+        )?;
+        let (all_coefficients, all_ctf_seed) =
+            super::load_runtime_ctf_coefficients_from_eio_with_policy(
+                &path,
+                super::HeatBalanceCtfSeedPolicy::AllEio,
+            )?;
         std::fs::remove_file(&path)?;
 
         assert_eq!(coefficients.len(), 2);
@@ -6036,8 +6101,34 @@ mod tests {
         );
         assert_eq!(ctf_seed.included_coefficients, 2);
         assert_eq!(ctf_seed.skipped_coefficients, 2);
+        assert_eq!(all_coefficients.len(), 4);
+        assert_eq!(all_ctf_seed.policy, "all-eio");
+        assert_eq!(
+            all_ctf_seed.included_constructions,
+            vec!["FLOOR", "R13WALL"]
+        );
+        assert!(all_ctf_seed.skipped_constructions.is_empty());
+        assert_eq!(all_ctf_seed.included_coefficients, 4);
+        assert_eq!(all_ctf_seed.skipped_coefficients, 0);
 
         Ok(())
+    }
+
+    #[test]
+    fn heat_balance_ctf_seed_policy_parser_accepts_probe_policy() {
+        assert_eq!(
+            super::parse_heat_balance_ctf_seed_policy("").unwrap(),
+            super::HeatBalanceCtfSeedPolicy::SteadyNoMassOnly
+        );
+        assert_eq!(
+            super::parse_heat_balance_ctf_seed_policy("steady-no-mass-only").unwrap(),
+            super::HeatBalanceCtfSeedPolicy::SteadyNoMassOnly
+        );
+        assert_eq!(
+            super::parse_heat_balance_ctf_seed_policy("all-eio").unwrap(),
+            super::HeatBalanceCtfSeedPolicy::AllEio
+        );
+        assert!(super::parse_heat_balance_ctf_seed_policy("mass-only").is_err());
     }
 
     #[test]
