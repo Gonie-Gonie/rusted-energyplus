@@ -147,6 +147,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   carries a diagnostic equivalent radiation coefficient/reference built from
   those three terms instead of the prior fixed exterior longwave coefficient,
   and the roof outside radiation/convection report rows share that helper.
+  The EnergyPlus-shaped quick-outside probes now cache the exterior report
+  terms from the outside balance itself so `SurfHConvExt`-like convection and
+  `SurfH*Ext`-like radiation state are reused for reporting instead of being
+  recomputed from the solved face temperature. A 2026-06-09 active probe rerun
+  showed this as a structural no-op for the current roof bottleneck
+  (`ZN001:ROOF001` outside convection RMSE stayed at about `189.364764` W),
+  so the remaining roof source delta should be investigated through the CTF
+  outside-face temperature/history path rather than through report helper
+  recomputation.
 - `WeatherManager.cc` sets timestep rain from interpolated liquid
   precipitation using `IsRainThreshold = 0.8 / TimeStepsInHour`, while
   `HeatBalanceSurfaceManager.cc::CalcHeatBalanceOutsideSurf` resets exposed wet
