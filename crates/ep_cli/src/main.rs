@@ -3144,10 +3144,26 @@ struct HeatBalanceConformanceDiagnostic {
     heat_balance_timesteps: usize,
     heat_balance_run_period_timesteps: usize,
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
+    ctf_seed: HeatBalanceCtfSeedDiagnostic,
     zone_count: usize,
     surface_count: usize,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceCtfSeedDiagnostic {
+    policy: &'static str,
+    included_constructions: Vec<String>,
+    skipped_constructions: Vec<HeatBalanceSkippedCtfConstruction>,
+    included_coefficients: usize,
+    skipped_coefficients: usize,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceSkippedCtfConstruction {
+    construction_name: String,
+    ctf_count: usize,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3413,8 +3429,8 @@ fn build_heat_balance_conformance_diagnostic(
             sample_count,
         )
     };
-    let ctf_coefficients = if context.conformance_claim {
-        Vec::new()
+    let (ctf_coefficients, ctf_seed) = if context.conformance_claim {
+        (Vec::new(), disabled_heat_balance_ctf_seed_diagnostic())
     } else {
         load_runtime_ctf_coefficients_from_eio(eio_path)?
     };
@@ -3474,6 +3490,7 @@ fn build_heat_balance_conformance_diagnostic(
         heat_balance_timesteps: simulation.summary.timestep_count,
         heat_balance_run_period_timesteps: simulation.summary.run_period_timestep_count,
         heat_balance_warmup,
+        ctf_seed,
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         series,
@@ -3483,27 +3500,63 @@ fn build_heat_balance_conformance_diagnostic(
 
 fn load_runtime_ctf_coefficients_from_eio(
     eio_path: &Path,
-) -> Result<Vec<ConstructionCtfCoefficientOverride>, String> {
-    let steady_constructions = load_eio_construction_ctf(eio_path)
-        .map_err(|error| error.to_string())?
-        .into_iter()
+) -> Result<
+    (
+        Vec<ConstructionCtfCoefficientOverride>,
+        HeatBalanceCtfSeedDiagnostic,
+    ),
+    String,
+> {
+    let constructions = load_eio_construction_ctf(eio_path).map_err(|error| error.to_string())?;
+    let steady_constructions = constructions
+        .iter()
         .filter(|construction| construction.ctf_count <= 1)
-        .map(|construction| construction.construction_name)
+        .map(|construction| construction.construction_name.clone())
         .collect::<BTreeSet<_>>();
+    let skipped_constructions = constructions
+        .iter()
+        .filter(|construction| construction.ctf_count > 1)
+        .map(|construction| HeatBalanceSkippedCtfConstruction {
+            construction_name: construction.construction_name.clone(),
+            ctf_count: construction.ctf_count,
+        })
+        .collect::<Vec<_>>();
     let coefficients =
         load_eio_construction_ctf_coefficients(eio_path).map_err(|error| error.to_string())?;
-    Ok(coefficients
-        .into_iter()
-        .filter(|coefficient| steady_constructions.contains(&coefficient.construction_name))
-        .map(|coefficient| ConstructionCtfCoefficientOverride {
-            construction_name: coefficient.construction_name,
-            time_index: coefficient.time_index,
-            outside_w_per_m2_k: coefficient.outside,
-            cross_w_per_m2_k: coefficient.cross,
-            inside_w_per_m2_k: coefficient.inside,
-            flux: coefficient.flux,
-        })
-        .collect())
+    let mut included_coefficients = Vec::new();
+    let mut skipped_coefficients = 0;
+    for coefficient in coefficients {
+        if steady_constructions.contains(&coefficient.construction_name) {
+            included_coefficients.push(ConstructionCtfCoefficientOverride {
+                construction_name: coefficient.construction_name,
+                time_index: coefficient.time_index,
+                outside_w_per_m2_k: coefficient.outside,
+                cross_w_per_m2_k: coefficient.cross,
+                inside_w_per_m2_k: coefficient.inside,
+                flux: coefficient.flux,
+            });
+        } else {
+            skipped_coefficients += 1;
+        }
+    }
+    let ctf_seed = HeatBalanceCtfSeedDiagnostic {
+        policy: "steady-no-mass-only",
+        included_constructions: steady_constructions.into_iter().collect(),
+        skipped_constructions,
+        included_coefficients: included_coefficients.len(),
+        skipped_coefficients,
+    };
+    Ok((included_coefficients, ctf_seed))
+}
+
+fn disabled_heat_balance_ctf_seed_diagnostic() -> HeatBalanceCtfSeedDiagnostic {
+    HeatBalanceCtfSeedDiagnostic {
+        policy: "disabled",
+        included_constructions: Vec::new(),
+        skipped_constructions: Vec::new(),
+        included_coefficients: 0,
+        skipped_coefficients: 0,
+    }
 }
 
 fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
@@ -4935,6 +4988,10 @@ fn render_heat_balance_conformance_summary_json(
         "  \"heat_balance_warmup\": {},\n",
         heat_balance_warmup_json(&diagnostic.heat_balance_warmup)
     ));
+    json.push_str(&format!(
+        "  \"ctf_seed\": {},\n",
+        heat_balance_ctf_seed_json(&diagnostic.ctf_seed)
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -5068,6 +5125,26 @@ fn render_heat_balance_conformance_report(
             .heat_balance_warmup
             .final_max_zone_temperature_delta_c
     ));
+    report.push_str(&format!(
+        "ctf_seed_policy: {}\n",
+        diagnostic.ctf_seed.policy
+    ));
+    report.push_str(&format!(
+        "ctf_seed_included_constructions: {}\n",
+        heat_balance_ctf_seed_included_label(&diagnostic.ctf_seed)
+    ));
+    report.push_str(&format!(
+        "ctf_seed_skipped_constructions: {}\n",
+        heat_balance_ctf_seed_skipped_label(&diagnostic.ctf_seed)
+    ));
+    report.push_str(&format!(
+        "ctf_seed_included_coefficients: {}\n",
+        diagnostic.ctf_seed.included_coefficients
+    ));
+    report.push_str(&format!(
+        "ctf_seed_skipped_coefficients: {}\n",
+        diagnostic.ctf_seed.skipped_coefficients
+    ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
     report.push_str(&format!(
@@ -5160,6 +5237,65 @@ fn heat_balance_warmup_json(warmup: &HeatBalanceWarmupDiagnostic) -> String {
         json_optional_u32(warmup.oracle_run_period_day_count),
         json_optional_i64(heat_balance_warmup_day_count_delta(warmup))
     )
+}
+
+fn heat_balance_ctf_seed_json(ctf_seed: &HeatBalanceCtfSeedDiagnostic) -> String {
+    format!(
+        concat!(
+            "{{ \"policy\": {}, \"included_constructions\": {}, ",
+            "\"skipped_constructions\": {}, \"included_coefficients\": {}, ",
+            "\"skipped_coefficients\": {} }}"
+        ),
+        json_string(ctf_seed.policy),
+        string_array_json(&ctf_seed.included_constructions),
+        heat_balance_skipped_ctf_constructions_json(&ctf_seed.skipped_constructions),
+        ctf_seed.included_coefficients,
+        ctf_seed.skipped_coefficients
+    )
+}
+
+fn heat_balance_skipped_ctf_constructions_json(
+    skipped_constructions: &[HeatBalanceSkippedCtfConstruction],
+) -> String {
+    let mut json = String::from("[");
+    for (index, construction) in skipped_constructions.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            "{{ \"construction_name\": {}, \"ctf_count\": {} }}",
+            json_string(&construction.construction_name),
+            construction.ctf_count
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_ctf_seed_included_label(ctf_seed: &HeatBalanceCtfSeedDiagnostic) -> String {
+    if ctf_seed.included_constructions.is_empty() {
+        "none".to_string()
+    } else {
+        ctf_seed.included_constructions.join(", ")
+    }
+}
+
+fn heat_balance_ctf_seed_skipped_label(ctf_seed: &HeatBalanceCtfSeedDiagnostic) -> String {
+    if ctf_seed.skipped_constructions.is_empty() {
+        "none".to_string()
+    } else {
+        ctf_seed
+            .skipped_constructions
+            .iter()
+            .map(|construction| {
+                format!(
+                    "{} (#CTFs={})",
+                    construction.construction_name, construction.ctf_count
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
 }
 
 fn heat_balance_tolerance_json(tolerance: HeatBalanceToleranceReport) -> String {
@@ -5798,7 +5934,7 @@ mod tests {
 "#,
         )?;
 
-        let coefficients = super::load_runtime_ctf_coefficients_from_eio(&path)?;
+        let (coefficients, ctf_seed) = super::load_runtime_ctf_coefficients_from_eio(&path)?;
         std::fs::remove_file(&path)?;
 
         assert_eq!(coefficients.len(), 2);
@@ -5809,6 +5945,17 @@ mod tests {
         );
         assert_eq!(coefficients[0].time_index, 1);
         assert_eq!(coefficients[1].time_index, 0);
+        assert_eq!(ctf_seed.policy, "steady-no-mass-only");
+        assert_eq!(ctf_seed.included_constructions, vec!["R13WALL"]);
+        assert_eq!(
+            ctf_seed.skipped_constructions,
+            vec![super::HeatBalanceSkippedCtfConstruction {
+                construction_name: "FLOOR".to_string(),
+                ctf_count: 5,
+            }]
+        );
+        assert_eq!(ctf_seed.included_coefficients, 2);
+        assert_eq!(ctf_seed.skipped_coefficients, 2);
 
         Ok(())
     }
@@ -5930,6 +6077,7 @@ mod tests {
             heat_balance_timesteps: 8,
             heat_balance_run_period_timesteps: 8,
             heat_balance_warmup: disabled_heat_balance_warmup(),
+            ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
             zone_count: 1,
             surface_count: 6,
             series: vec![
@@ -6013,6 +6161,8 @@ mod tests {
         assert!(json.contains("\"comparison_class\": \"conformance\""));
         assert!(json.contains("\"conformance_claim\": true"));
         assert!(json.contains("\"status\": \"pass\""));
+        assert!(json.contains("\"ctf_seed\""));
+        assert!(json.contains("\"policy\": \"disabled\""));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
@@ -6023,6 +6173,7 @@ mod tests {
         assert!(report.contains("conformance_claim: true"));
         assert!(report.contains("status: pass"));
         assert!(report.contains("failure_reasons: none"));
+        assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
         assert!(report.contains("## Hourly Samples"));
@@ -6043,6 +6194,16 @@ mod tests {
                 converged: true,
                 final_max_zone_temperature_delta_c: 0.0005,
                 oracle_run_period_day_count: Some(20),
+            },
+            ctf_seed: super::HeatBalanceCtfSeedDiagnostic {
+                policy: "steady-no-mass-only",
+                included_constructions: vec!["R13WALL".to_string(), "ROOF31".to_string()],
+                skipped_constructions: vec![super::HeatBalanceSkippedCtfConstruction {
+                    construction_name: "FLOOR".to_string(),
+                    ctf_count: 5,
+                }],
+                included_coefficients: 4,
+                skipped_coefficients: 6,
             },
             zone_count: 1,
             surface_count: 6,
@@ -6094,11 +6255,16 @@ mod tests {
         assert!(json.contains("\"conformance_claim\": false"));
         assert!(json.contains("\"oracle_run_period_day_count\": 20"));
         assert!(json.contains("\"day_count_delta\": -14"));
+        assert!(json.contains("\"policy\": \"steady-no-mass-only\""));
+        assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));
         assert!(report.contains("oracle_run_period_warmup_days: 20"));
         assert!(report.contains("warmup_day_count_delta: -14"));
+        assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
+        assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
+        assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(report.contains("status: fail"));
     }
 

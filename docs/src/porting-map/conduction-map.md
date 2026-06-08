@@ -41,7 +41,9 @@ history constants, and can seed CTF rows from EnergyPlus EIO output for
 diagnostic isolation. The default official diagnostic path only seeds
 steady/no-mass `#CTFs <= 1` rows while mass-material CTF rows are isolated from
 the current simplified face-temperature/history shell; enabling mass CTF rows at
-this stage over-amplifies latent floor history. Roof/wall exterior
+this stage over-amplifies latent floor history. The official dynamic diagnostic
+JSON/markdown report records this as `ctf_seed_policy: steady-no-mass-only` and
+lists skipped mass constructions such as `FLOOR (#CTFs=5)`. Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface

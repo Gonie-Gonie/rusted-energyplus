@@ -167,6 +167,8 @@ Assert-Contains -Text $reportText -Pattern "comparison_class: diagnostic-only" -
 Assert-Contains -Text $reportText -Pattern "conformance_claim: false" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "warmup_enabled: true" -Description "markdown warmup enabled"
 Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -Description "markdown oracle warmup days"
+Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: steady-no-mass-only" -Description "markdown CTF seed policy"
+Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
