@@ -55,7 +55,10 @@ aggregate conduction row, confirming the current blocker is the mass CTF
 face/history coupling rather than EIO coefficient availability. The
 all-CTF-plus-20-day-warmup probe shows only negligible movement from the
 all-CTF lane, so the remaining floor delta is not explained by Rust's early
-warmup convergence alone. Roof/wall exterior
+warmup convergence alone. The all-CTF surface-iter3 probe lowers the
+zone-air storage/convection bottleneck relative to all-CTF, but it does not
+improve the floor conduction row, so iteration sensitivity and mass-floor CTF
+history parity remain separate work items. Roof/wall exterior
 weather/solar forcing now feeds the diagnostic CTF boundary driver for
 run-period timesteps, and the official diagnostic manifest now includes
 wall/floor surface

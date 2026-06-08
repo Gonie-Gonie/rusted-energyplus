@@ -103,6 +103,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   temperature in `SurfTempInsOld` for the iterative damping term; Rust now
   preserves the previous per-surface inside-face temperature before its
   zone-air predictor pass overwrites the current face estimate.
+- EnergyPlus iterates inside/outside surface balances before committing CTF
+  histories for the timestep. Rust default diagnostics still use one pass, but
+  `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
+  surface-iter3 probe can repeat the face-balance pass while advancing histories
+  once at timestep end.
 - `DataHeatBalance::SurfInitialConvCoeff = 3.076 W/m2-K` initializes inside
   convection coefficients before the selected inside convection algorithm is
   evaluated. `DataHeatBalance::LowHConvLimit = 0.1 W/m2-K` and

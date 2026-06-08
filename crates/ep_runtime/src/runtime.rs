@@ -710,6 +710,8 @@ pub struct HeatBalanceSimulationOptions {
     pub warmup: HeatBalanceWarmupOptions,
     /// Zone-air temperature algorithm for diagnostic probes.
     pub zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    /// Number of inside/outside surface-balance passes per zone timestep.
+    pub surface_iteration_count: u32,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -779,6 +781,7 @@ impl HeatBalanceSimulationOptions {
             initial_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
             warmup: HeatBalanceWarmupOptions::disabled(),
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            surface_iteration_count: 1,
         }
     }
 
@@ -801,6 +804,7 @@ impl HeatBalanceSimulationOptions {
                     .temperature_convergence_tolerance_delta_c,
             },
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            surface_iteration_count: 1,
         }
     }
 
@@ -823,6 +827,17 @@ impl HeatBalanceSimulationOptions {
         }
         self
     }
+
+    /// Returns options with an explicit surface-balance iteration count.
+    #[must_use]
+    pub const fn with_surface_iteration_count(mut self, surface_iteration_count: u32) -> Self {
+        self.surface_iteration_count = if surface_iteration_count == 0 {
+            1
+        } else {
+            surface_iteration_count
+        };
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -840,6 +855,8 @@ pub struct HeatBalanceSimulationSummary {
     pub zone_count: usize,
     /// Number of surfaces represented in the state.
     pub surface_count: usize,
+    /// Number of surface-balance passes used per zone timestep.
+    pub surface_iteration_count: u32,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -2337,6 +2354,7 @@ pub fn advance_heat_balance_state_one_timestep(
         input,
         None,
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+        1,
     );
 }
 
@@ -2346,6 +2364,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     input: HeatBalanceStepInput,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    surface_iteration_count: u32,
 ) {
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
@@ -2442,46 +2461,55 @@ fn advance_heat_balance_state_one_timestep_internal(
         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
         .collect::<BTreeMap<_, _>>();
 
-    for surface in &mut state.surfaces {
-        let previous_inside_face_temperature_c = previous_surface_inside_temperatures
-            .get(&surface.surface_id)
-            .copied()
-            .unwrap_or(surface.inside_face_temperature_c);
-        let zone_temperature_c = current_zone_temperatures
-            .get(&surface.zone_id)
-            .copied()
-            .unwrap_or(surface.inside_face_temperature_c);
-        let inside_convection_coefficient_w_per_m2_k =
-            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
-                surface,
-                previous_inside_face_temperature_c,
-                zone_temperature_c,
-            );
-        surface.inside_convection_coefficient_w_per_m2_k = inside_convection_coefficient_w_per_m2_k;
+    for surface_iteration_index in 0..surface_iteration_count.max(1) {
+        for surface in &mut state.surfaces {
+            let previous_inside_face_temperature_c = if surface_iteration_index == 0 {
+                previous_surface_inside_temperatures
+                    .get(&surface.surface_id)
+                    .copied()
+                    .unwrap_or(surface.inside_face_temperature_c)
+            } else {
+                surface.inside_face_temperature_c
+            };
+            let zone_temperature_c = current_zone_temperatures
+                .get(&surface.zone_id)
+                .copied()
+                .unwrap_or(surface.inside_face_temperature_c);
+            let inside_convection_coefficient_w_per_m2_k =
+                energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                    surface,
+                    previous_inside_face_temperature_c,
+                    zone_temperature_c,
+                );
+            surface.inside_convection_coefficient_w_per_m2_k =
+                inside_convection_coefficient_w_per_m2_k;
 
-        surface.inside_face_temperature_c = zone_temperature_c;
-        surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
-            model,
-            surface,
-            &current_zone_temperatures,
-            input.outdoor_dry_bulb_c,
-            zone_temperature_c,
-            weather_context,
-        );
-        update_surface_ctf_history_constants(surface);
-        surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
-            surface,
-            CtfInsideFaceBalanceInput {
-                reference_air_temperature_c: zone_temperature_c,
-                inside_convection_coefficient_w_per_m2_k,
-                previous_inside_face_temperature_c,
-                net_inside_source_w_per_m2: surface_inside_ctf_source_terms_w_per_m2(surface),
-            },
-        );
-        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
-            surface.outside_face_temperature_c = surface.inside_face_temperature_c;
+            surface.inside_face_temperature_c = zone_temperature_c;
+            surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
+                model,
+                surface,
+                &current_zone_temperatures,
+                input.outdoor_dry_bulb_c,
+                zone_temperature_c,
+                weather_context,
+            );
+            update_surface_ctf_history_constants(surface);
+            surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
+                surface,
+                CtfInsideFaceBalanceInput {
+                    reference_air_temperature_c: zone_temperature_c,
+                    inside_convection_coefficient_w_per_m2_k,
+                    previous_inside_face_temperature_c,
+                    net_inside_source_w_per_m2: surface_inside_ctf_source_terms_w_per_m2(surface),
+                },
+            );
+            if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+                surface.outside_face_temperature_c = surface.inside_face_temperature_c;
+            }
+            surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
         }
-        surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
+    }
+    for surface in &mut state.surfaces {
         advance_surface_ctf_histories(surface);
     }
 
@@ -2656,6 +2684,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         seconds_per_timestep,
         options.warmup,
         options.zone_air_algorithm,
+        options.surface_iteration_count,
     );
     let run_period_timestep_start = state.timestep_index;
     let mut zone_temperatures = state
@@ -2738,6 +2767,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 },
                 weather_context,
                 options.zone_air_algorithm,
+                options.surface_iteration_count,
             );
         }
 
@@ -3000,6 +3030,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         warmup,
         zone_count: state.zones.len(),
         surface_count: state.surfaces.len(),
+        surface_iteration_count: options.surface_iteration_count,
     };
 
     Ok(HeatBalanceSimulation {
@@ -3017,6 +3048,7 @@ fn run_heat_balance_run_period_warmup(
     seconds_per_timestep: f64,
     options: HeatBalanceWarmupOptions,
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    surface_iteration_count: u32,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
         return HeatBalanceWarmupSummary::disabled();
@@ -3048,6 +3080,7 @@ fn run_heat_balance_run_period_warmup(
                     },
                     None,
                     zone_air_algorithm,
+                    surface_iteration_count,
                 );
             }
         }
@@ -6831,11 +6864,24 @@ DATA PERIODS
             options.zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
         );
+        assert_eq!(options.surface_iteration_count, 1);
         assert_eq!(
             options
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
+        );
+        assert_eq!(
+            options
+                .with_surface_iteration_count(0)
+                .surface_iteration_count,
+            1
+        );
+        assert_eq!(
+            options
+                .with_surface_iteration_count(3)
+                .surface_iteration_count,
+            3
         );
     }
 

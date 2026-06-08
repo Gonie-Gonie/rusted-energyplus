@@ -52,6 +52,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-surface-iter3",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-surface-iter3"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="third-order",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-third-order"
@@ -188,6 +197,7 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "status": summary.get("status"),
         "zone_air_algorithm": summary.get("zone_air_algorithm", "unknown"),
         "ctf_seed_policy": summary.get("ctf_seed", {}).get("policy", "unknown"),
+        "surface_iteration_count": summary.get("surface_iteration_count", 1),
         "samples": summary.get("samples"),
         "top_key": output.get("key", "none"),
         "top_variable": output.get("variable", "none"),
@@ -224,16 +234,17 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"case_id: {summary['case_id']}",
         f"oracle_version: {summary['oracle_version']}",
         "",
-        "| lane | algorithm | CTF seed | top output | top RMSE | top max abs | status |",
-        "|---|---|---|---|---:|---:|---|",
+        "| lane | algorithm | CTF seed | surface passes | top output | top RMSE | top max abs | status |",
+        "|---|---|---|---:|---|---:|---:|---|",
     ]
     for lane in summary["lanes"]:
         top_output = f"{lane['top_key']} / {lane['top_variable']}"
         lines.append(
-            "| {lane} | {algorithm} | {ctf} | {top} | {rmse} | {max_abs} | {status} |".format(
+            "| {lane} | {algorithm} | {ctf} | {surface_passes} | {top} | {rmse} | {max_abs} | {status} |".format(
                 lane=lane["lane"],
                 algorithm=lane["zone_air_algorithm"],
                 ctf=lane["ctf_seed_policy"],
+                surface_passes=lane["surface_iteration_count"],
                 top=top_output,
                 rmse=fmt_number(lane["top_rmse_delta_c"]),
                 max_abs=fmt_number(lane["top_max_abs_delta_c"]),

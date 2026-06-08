@@ -22,6 +22,7 @@ before official ExampleFile surface temperatures can be promoted.
 | adiabatic boundary | surface boundary condition handling | inside/outside equality for adiabatic no-mass cases | conformance for declared local case |
 | interzone boundary | adjacent surface/zone lookup | resolved target surface and zone IDs | smoke-tested |
 | reporting | `SetupOutputVariable` registration | `ResultStore` series per key/variable/frequency | official diagnostic now compares roof plus wall/floor decomposition series |
+| inside/outside iteration | inside surface heat-balance iteration manager | repeat inside/outside face balance passes without advancing timestep histories more than once | default remains one pass; all-CTF surface-iter3 probe is diagnostic-only |
 
 ## Promotion Requirements
 
@@ -49,4 +50,7 @@ and MAT series while exposing that the zone opaque aggregate still depends on
 unported floor mass CTF and full surface iteration parity. Inside-surface
 radiant/source terms now have explicit zero-initialized runtime slots matching
 EnergyPlus `SurfTempTerm` inputs, but the official diagnostic still treats those
-terms as future wiring rather than promoted parity.
+terms as future wiring rather than promoted parity. A diagnostic surface-iter3
+lane can repeat the inside/outside face balance within one zone timestep while
+advancing CTF histories only once, so iteration sensitivity can be measured
+before changing the default path.

@@ -87,6 +87,7 @@ matplotlib for document layout and charts.
 | `official-dynamic-heat-balance-third-order-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus third-order zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-third-order` |
 | `official-dynamic-heat-balance-warmup-20-probe` | diagnostic | run the official dynamic diagnostic with Rust warmup minimum days raised to the EnergyPlus run-period count and no conformance claim | no | `.runtime/official-dynamic-diagnostic-warmup-min20` |
 | `official-dynamic-heat-balance-all-ctf-warmup-20-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus the EnergyPlus run-period warmup count and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf-warmup-min20` |
+| `official-dynamic-heat-balance-all-ctf-surface-iter3-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows plus three surface-balance passes per timestep and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf-surface-iter3` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |

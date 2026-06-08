@@ -225,6 +225,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows and the EnergyPlus run-period warmup count."
     }
+    "official-dynamic-heat-balance-all-ctf-surface-iter3-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-surface-iter3-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows and three surface-balance passes per timestep."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

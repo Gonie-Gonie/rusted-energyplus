@@ -29,9 +29,10 @@ Current generators:
   aggregate conduction focus metrics across lanes. The focus table also records
   RMSE movement relative to the default lane so partial isolation improvements
   that destabilize the whole zone balance are visible in one scan. Probe lanes
-  include all-CTF seeding, all-CTF plus oracle-day-count warmup, third-order
-  zone-air update, and an oracle-day-count warmup minimum. It is development
-  evidence only and does not create a release conformance artifact.
+  include all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
+  surface-iteration probe, third-order zone-air update, and an oracle-day-count
+  warmup minimum. It is development evidence only and does not create a release
+  conformance artifact.
 
 Conformance-facing scripts should keep this split:
 

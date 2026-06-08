@@ -50,6 +50,8 @@ const HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM";
 const HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS";
+const HEAT_BALANCE_SURFACE_ITERATIONS_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS";
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -739,6 +741,10 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
+            println!(
+                "  surface_iteration_count: {}",
+                summary.surface_iteration_count
+            );
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
@@ -807,6 +813,10 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
+            println!(
+                "  surface_iteration_count: {}",
+                summary.surface_iteration_count
+            );
             println!("  status: {}", summary.status);
             0
         }
@@ -1014,6 +1024,7 @@ struct HeatBalanceReportSummary {
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     tolerance_policy: String,
     zone_air_algorithm: &'static str,
+    surface_iteration_count: u32,
     status: &'static str,
 }
 
@@ -1087,6 +1098,7 @@ fn generate_conformance_heat_balance_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
+        surface_iteration_count: diagnostic.surface_iteration_count,
         status: conformance.status,
     })
 }
@@ -1130,6 +1142,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
+        surface_iteration_count: diagnostic.surface_iteration_count,
         status: conformance.status,
     })
 }
@@ -3158,6 +3171,7 @@ struct HeatBalanceConformanceDiagnostic {
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     ctf_seed: HeatBalanceCtfSeedDiagnostic,
     zone_air_algorithm: &'static str,
+    surface_iteration_count: u32,
     zone_count: usize,
     surface_count: usize,
     series: Vec<HeatBalanceSeriesDiagnostic>,
@@ -3460,11 +3474,13 @@ fn build_heat_balance_conformance_diagnostic(
     let simulation_options = if context.conformance_claim {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
     } else {
-        apply_heat_balance_warmup_minimum_days_from_env(
-            HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
-                &simulation_model,
-                sample_count,
-            ),
+        apply_heat_balance_surface_iterations_from_env(
+            apply_heat_balance_warmup_minimum_days_from_env(
+                HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+                    &simulation_model,
+                    sample_count,
+                ),
+            )?,
         )?
     }
     .with_zone_air_algorithm(zone_air_algorithm);
@@ -3531,6 +3547,7 @@ fn build_heat_balance_conformance_diagnostic(
         heat_balance_warmup,
         ctf_seed,
         zone_air_algorithm: heat_balance_zone_air_algorithm_label(zone_air_algorithm),
+        surface_iteration_count: simulation.summary.surface_iteration_count,
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         series,
@@ -3695,6 +3712,37 @@ fn parse_heat_balance_warmup_minimum_days(value: &str) -> Result<Option<u32>, St
         return Ok(None);
     }
     Ok(Some(days))
+}
+
+fn apply_heat_balance_surface_iterations_from_env(
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulationOptions, String> {
+    match std::env::var(HEAT_BALANCE_SURFACE_ITERATIONS_ENV) {
+        Ok(value) => parse_heat_balance_surface_iterations(&value).map(|iteration_count| {
+            match iteration_count {
+                Some(iteration_count) => options.with_surface_iteration_count(iteration_count),
+                None => options,
+            }
+        }),
+        Err(std::env::VarError::NotPresent) => Ok(options),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_SURFACE_ITERATIONS_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_surface_iterations(value: &str) -> Result<Option<u32>, String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return Ok(None);
+    }
+    let iteration_count = trimmed.parse::<u32>().map_err(|error| {
+        format!("unsupported {HEAT_BALANCE_SURFACE_ITERATIONS_ENV}: {trimmed}; expected positive integer iteration count ({error})")
+    })?;
+    if iteration_count == 0 {
+        return Ok(None);
+    }
+    Ok(Some(iteration_count))
 }
 
 fn heat_balance_zone_air_algorithm_label(
@@ -5143,6 +5191,10 @@ fn render_heat_balance_conformance_summary_json(
         "  \"zone_air_algorithm\": {},\n",
         json_string(diagnostic.zone_air_algorithm)
     ));
+    json.push_str(&format!(
+        "  \"surface_iteration_count\": {},\n",
+        diagnostic.surface_iteration_count
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -5303,6 +5355,10 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "zone_air_algorithm: {}\n",
         diagnostic.zone_air_algorithm
+    ));
+    report.push_str(&format!(
+        "surface_iteration_count: {}\n",
+        diagnostic.surface_iteration_count
     ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
@@ -6263,6 +6319,24 @@ mod tests {
     }
 
     #[test]
+    fn heat_balance_surface_iterations_parser_accepts_empty_or_positive_count() {
+        assert_eq!(
+            super::parse_heat_balance_surface_iterations("").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_surface_iterations("0").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_surface_iterations("3").unwrap(),
+            Some(3)
+        );
+        assert!(super::parse_heat_balance_surface_iterations("-1").is_err());
+        assert!(super::parse_heat_balance_surface_iterations("many").is_err());
+    }
+
+    #[test]
     fn zone_temperature_delta_summary_tracks_diagnostic_samples() {
         let summary = super::delta_summary(&[1.0, 3.0, 8.0], &[1.0, 4.5, 4.0]);
 
@@ -6381,6 +6455,7 @@ mod tests {
             heat_balance_warmup: disabled_heat_balance_warmup(),
             ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
             zone_air_algorithm: "simplified-analytical",
+            surface_iteration_count: 1,
             zone_count: 1,
             surface_count: 6,
             series: vec![
@@ -6467,6 +6542,7 @@ mod tests {
         assert!(json.contains("\"ctf_seed\""));
         assert!(json.contains("\"policy\": \"disabled\""));
         assert!(json.contains("\"zone_air_algorithm\": \"simplified-analytical\""));
+        assert!(json.contains("\"surface_iteration_count\": 1"));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
@@ -6478,6 +6554,7 @@ mod tests {
         assert!(report.contains("comparison_class: conformance"));
         assert!(report.contains("conformance_claim: true"));
         assert!(report.contains("status: pass"));
+        assert!(report.contains("surface_iteration_count: 1"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
@@ -6514,6 +6591,7 @@ mod tests {
                 skipped_coefficients: 6,
             },
             zone_air_algorithm: "energyplus-third-order-probe",
+            surface_iteration_count: 3,
             zone_count: 1,
             surface_count: 6,
             series: vec![super::HeatBalanceSeriesDiagnostic {
@@ -6566,6 +6644,7 @@ mod tests {
         assert!(json.contains("\"day_count_delta\": -14"));
         assert!(json.contains("\"policy\": \"steady-no-mass-only\""));
         assert!(json.contains("\"zone_air_algorithm\": \"energyplus-third-order-probe\""));
+        assert!(json.contains("\"surface_iteration_count\": 3"));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
@@ -6575,6 +6654,7 @@ mod tests {
         assert!(report.contains("warmup_day_count_delta: -14"));
         assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
         assert!(report.contains("zone_air_algorithm: energyplus-third-order-probe"));
+        assert!(report.contains("surface_iteration_count: 3"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(report.contains("## Bottlenecks"));
