@@ -9,7 +9,7 @@ use ep_model::{
     SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, Zone,
     ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
@@ -2317,7 +2317,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         });
     }
 
-    let surfaces = model
+    let mut surfaces = model
         .typed
         .surfaces
         .iter()
@@ -2381,6 +2381,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
+    update_surface_radiant_internal_gain_source_terms(&model.typed, &mut surfaces, 1);
 
     for zone in &mut zones {
         zone.opaque_surface_conductance_w_per_k = surfaces
@@ -2647,6 +2648,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             }
         };
     }
+    update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
 
     let current_zone_temperatures = state
         .zones
@@ -5285,6 +5287,66 @@ fn convective_internal_gain_for_equipment_w(
     equipment.design_level_w * schedule_multiplier * convective_fraction
 }
 
+fn radiant_internal_gain_w(model: &TypedModel, zone_id: ZoneId, hour_ending: u32) -> f64 {
+    model
+        .other_equipment
+        .iter()
+        .filter(|equipment| equipment.zone == zone_id)
+        .map(|equipment| radiant_internal_gain_for_equipment_w(model, equipment, hour_ending))
+        .sum()
+}
+
+fn radiant_internal_gain_for_equipment_w(
+    model: &TypedModel,
+    equipment: &OtherEquipment,
+    hour_ending: u32,
+) -> f64 {
+    let schedule_multiplier = equipment
+        .schedule
+        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
+        .unwrap_or(1.0);
+    let radiant_fraction = equipment.fraction_radiant.max(0.0);
+
+    equipment.design_level_w * schedule_multiplier * radiant_fraction
+}
+
+fn update_surface_radiant_internal_gain_source_terms(
+    model: &TypedModel,
+    surfaces: &mut [SurfaceHeatBalanceState],
+    hour_ending: u32,
+) {
+    for surface in surfaces.iter_mut() {
+        surface.inside_radiant_internal_gain_w_per_m2 = 0.0;
+    }
+
+    let zone_ids = surfaces
+        .iter()
+        .map(|surface| surface.zone_id)
+        .collect::<BTreeSet<_>>();
+    for zone_id in zone_ids {
+        let radiant_gain_w = radiant_internal_gain_w(model, zone_id, hour_ending);
+        if radiant_gain_w <= 0.0 {
+            continue;
+        }
+        let area_absorptance_sum_m2 = surfaces
+            .iter()
+            .filter(|surface| surface.zone_id == zone_id)
+            .map(|surface| surface.area_m2 * surface.thermal_absorptance.max(0.0))
+            .sum::<f64>();
+        if area_absorptance_sum_m2 <= 0.0 {
+            continue;
+        }
+        let thermal_absorptance_multiplier = radiant_gain_w / area_absorptance_sum_m2;
+        for surface in surfaces
+            .iter_mut()
+            .filter(|surface| surface.zone_id == zone_id)
+        {
+            surface.inside_radiant_internal_gain_w_per_m2 =
+                thermal_absorptance_multiplier * surface.thermal_absorptance.max(0.0);
+        }
+    }
+}
+
 fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
     model
         .schedules
@@ -6177,6 +6239,7 @@ mod tests {
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
         update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
+        update_surface_radiant_internal_gain_source_terms,
         zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
@@ -7614,6 +7677,31 @@ DATA PERIODS
             },
         );
         assert!((temperature - 15.1).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn radiant_internal_gains_follow_energyplus_area_absorptance_distribution()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.other_equipment[0].fraction_radiant = 0.25;
+        let model = SimulationModel::from_typed(typed);
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+
+        let absorbed_radiant_gain_w = state
+            .surfaces
+            .iter()
+            .map(|surface| surface.inside_radiant_internal_gain_w_per_m2 * surface.area_m2)
+            .sum::<f64>();
+        assert!((absorbed_radiant_gain_w - 3.0).abs() < 1.0e-12);
+        for surface in &state.surfaces {
+            assert!((surface.inside_radiant_internal_gain_w_per_m2 - 0.5).abs() < 1.0e-12);
+        }
+
+        state.surfaces[0].inside_radiant_internal_gain_w_per_m2 = 10.0;
+        update_surface_radiant_internal_gain_source_terms(&model.typed, &mut state.surfaces, 1);
+        assert!((state.surfaces[0].inside_radiant_internal_gain_w_per_m2 - 0.5).abs() < 1.0e-12);
 
         Ok(())
     }
