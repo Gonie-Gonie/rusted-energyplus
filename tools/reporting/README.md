@@ -23,6 +23,10 @@ Current generators:
   from support coverage and conformance index JSON.
 - `release_evidence_manifest.py` builds the release asset manifest from the
   binary package plus generated evidence JSON/PDF/HTML/Markdown artifacts.
+- `dynamic_heat_balance_probe_summary.py` summarizes the official dynamic
+  heat-balance diagnostic probe lanes from existing `.runtime` compare
+  summaries. It is development evidence only and does not create a release
+  conformance artifact.
 
 Conformance-facing scripts should keep this split:
 
