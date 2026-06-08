@@ -22,9 +22,10 @@ gain cases.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` now runs a diagnostic
 Rust warmup loop before recording run-period samples. The loop repeats the
 first run-period weather day, records Rust warmup days/timesteps/convergence,
-and stores the EnergyPlus EIO run-period `Environment:WarmupDays` value in the
-compare summary. This is instrumentation for diagnosis only; it is not
-EnergyPlus warmup parity.
+passes available EPW records through the same exterior surface forcing context
+used by reported run-period timesteps, and stores the EnergyPlus EIO run-period
+`Environment:WarmupDays` value in the compare summary. This is instrumentation
+for diagnosis only; it is not EnergyPlus warmup parity.
 
 ## Required Official ExampleFile Work
 
@@ -54,4 +55,7 @@ early Rust warmup convergence or by deeper CTF/iteration differences.
 `scripts\dev.cmd official-dynamic-heat-balance-all-ctf-warmup-20-probe` applies
 the same warmup minimum while enabling all EIO CTF rows. Current probe evidence
 shows only negligible movement from the all-CTF lane, so warmup day count alone
-is not the mass-floor fix.
+is not the mass-floor fix. EPW exterior forcing is now used during Rust warmup
+when full weather records are available; this source-match refinement only
+nudges current official dynamic metrics and does not change the mass-floor
+CTF/history promotion blocker.

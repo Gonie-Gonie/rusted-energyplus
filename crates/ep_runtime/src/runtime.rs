@@ -2725,6 +2725,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &model.typed,
         &mut state,
         weather_dry_bulb_c,
+        weather_records,
         zone_steps_per_hour,
         seconds_per_timestep,
         options.warmup,
@@ -3089,6 +3090,7 @@ fn run_heat_balance_run_period_warmup(
     model: &TypedModel,
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
+    weather_records: Option<&[EpwRecord]>,
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     options: HeatBalanceWarmupOptions,
@@ -3114,6 +3116,11 @@ fn run_heat_balance_run_period_warmup(
             .enumerate()
         {
             let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
+            let weather_context = weather_records.map(|records| HeatBalanceWeatherContext {
+                records,
+                record_index: hour_index,
+                zone_steps_per_hour,
+            });
             for _substep in 0..zone_steps_per_hour {
                 advance_heat_balance_state_one_timestep_internal(
                     model,
@@ -3123,7 +3130,7 @@ fn run_heat_balance_run_period_warmup(
                         hour_ending,
                         timestep_seconds: seconds_per_timestep,
                     },
-                    None,
+                    weather_context,
                     zone_air_algorithm,
                     surface_iteration_count,
                 );
@@ -5180,7 +5187,7 @@ mod tests {
         NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
         NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
         PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
-        RuntimeOutputRegistry, SimulationMode, SimulationState,
+        RuntimeOutputRegistry, SECONDS_PER_HOUR, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
@@ -5195,8 +5202,8 @@ mod tests {
         energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures,
+        run_heat_balance_run_period_warmup, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -6960,6 +6967,91 @@ DATA PERIODS
         let overridden = enabled.with_warmup_minimum_days(20);
         assert_eq!(overridden.warmup.minimum_days, 20);
         assert_eq!(overridden.warmup.maximum_days, 20);
+    }
+
+    #[test]
+    fn heat_balance_warmup_uses_weather_context_for_exterior_forcing()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.timestep = TimestepConfig {
+            number_of_timesteps_per_hour: 1,
+        };
+        typed.site = Some(SiteLocation {
+            name: NormalizedName::new("Golden"),
+            latitude_deg: 39.75,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        });
+        let model = SimulationModel::from_typed(typed.clone());
+        let records = parse_epw_records(
+            r#"LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+2013,6,21,12,0,Source,25.0,5.0,30,82000,0,0,300,900,800,100,0,0,0,0,180,2.5
+2013,6,21,13,0,Source,26.0,5.0,30,82000,0,0,300,920,820,100,0,0,0,0,180,2.5
+"#,
+        )?;
+        let weather_dry_bulb_c = records
+            .iter()
+            .map(|record| record.dry_bulb_c)
+            .collect::<Vec<_>>();
+        let options = HeatBalanceWarmupOptions {
+            enabled: true,
+            minimum_days: 1,
+            maximum_days: 1,
+            temperature_convergence_tolerance_delta_c: 0.0,
+        };
+        let mut dry_only_state = initialize_heat_balance_state(&model, 20.0)?;
+        let mut weather_context_state = initialize_heat_balance_state(&model, 20.0)?;
+
+        let dry_only_summary = run_heat_balance_run_period_warmup(
+            &typed,
+            &mut dry_only_state,
+            &weather_dry_bulb_c,
+            None,
+            1,
+            SECONDS_PER_HOUR,
+            options,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            1,
+        );
+        let weather_context_summary = run_heat_balance_run_period_warmup(
+            &typed,
+            &mut weather_context_state,
+            &weather_dry_bulb_c,
+            Some(&records),
+            1,
+            SECONDS_PER_HOUR,
+            options,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            1,
+        );
+
+        assert_eq!(dry_only_summary.day_count, 1);
+        assert_eq!(weather_context_summary.day_count, 1);
+        let dry_only_roof = dry_only_state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing dry-only roof"))?;
+        let weather_context_roof = weather_context_state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing weather-context roof"))?;
+
+        assert!(
+            weather_context_roof.outside_face_temperature_c
+                > dry_only_roof.outside_face_temperature_c + 1.0
+        );
+
+        Ok(())
     }
 
     #[test]

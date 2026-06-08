@@ -197,10 +197,13 @@ Current Rust boundary:
   temperature histories are isolated from the simplified timestep shell. Runtime
   helpers now encode the EnergyPlus-shaped CTF inside and outside
   face-temperature equations, and the timestep shell uses the EnergyPlus TARP
-  inside natural convection coefficient in the inside CTF balance. A DOE-2
-  outside convection helper exists for future wiring, but full inside iteration
-  order, exterior DOE-2/radiation coupling, zone predictor/corrector
-  equations, and radiation coefficient updates are not yet wired.
+  inside natural convection coefficient in the inside CTF balance. Rust warmup
+  now forwards available EPW weather records into the same diagnostic exterior
+  forcing path used by run-period timesteps, so solar/radiation boundary
+  histories no longer use a dry-bulb-only warmup path. A DOE-2 outside
+  convection helper exists for future wiring, but full inside iteration order,
+  exterior DOE-2/radiation coupling, zone predictor/corrector equations, and
+  radiation coefficient updates are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
