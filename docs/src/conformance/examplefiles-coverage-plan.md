@@ -116,8 +116,9 @@ Current v0.18 official baseline evidence:
 Current v0.33 official dynamic diagnostic evidence:
 
 - `data/conformance_cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml`
-- run-period-filtered `Zone Mean Air Temperature`, selected roof inside/outside
-  face temperatures, and surface conduction hourly Rust-vs-oracle deltas
+- run-period-filtered `Zone Mean Air Temperature`, roof/wall/floor
+  inside/outside face temperatures, and surface conduction hourly
+  Rust-vs-oracle deltas
 - Rust first-run-period-day warmup metadata and EnergyPlus EIO run-period
   warmup day counts in the compare summary/report
 - remains `comparison_class=diagnostic-only` and `conformance_claim=false`

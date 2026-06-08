@@ -43,8 +43,10 @@ steady/no-mass `#CTFs <= 1` rows while mass-material CTF rows are isolated from
 the current simplified face-temperature/history shell; enabling mass CTF rows at
 this stage over-amplifies latent floor history. Roof exterior weather/solar
 forcing now feeds the diagnostic CTF boundary driver for run-period timesteps,
-but the aggregate zone conduction series remains blocked by unported
-mass-material floor CTF histories and the full surface iteration order. Native
+and the official diagnostic manifest now includes wall/floor surface
+decomposition rows so aggregate cancellation does not hide the next bottleneck.
+The aggregate zone conduction series remains blocked by unported mass-material
+floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside
 convection, full inside-surface iteration order, and radiation coefficient
 updates are still unported. The timestep shell now uses the EnergyPlus TARP

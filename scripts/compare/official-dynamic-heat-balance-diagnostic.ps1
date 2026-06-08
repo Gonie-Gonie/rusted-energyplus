@@ -130,7 +130,7 @@ if ($summary.heat_balance_warmup.timestep_count -le 0) {
 if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
     throw "Expected oracle run-period warmup days 20, got $($summary.heat_balance_warmup.oracle_run_period_day_count)"
 }
-if ($summary.series_count -ne 9) {
+if ($summary.series_count -ne 24) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -154,6 +154,12 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Insid
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque Surface Inside Faces Conduction Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Opaque Surface Inside Faces Conduction Rate series"
 }
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:WALL001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted wall decomposition conduction series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted floor decomposition conduction series"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Diagnostic Report" -Description "markdown report header"
@@ -168,6 +174,7 @@ Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -De
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
+Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 
 Write-Host "Official dynamic heat-balance diagnostic passed."
