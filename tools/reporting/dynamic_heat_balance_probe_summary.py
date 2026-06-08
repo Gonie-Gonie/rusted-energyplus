@@ -9,7 +9,7 @@ from typing import Any
 
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-EXPECTED_SERIES_COUNT = 41
+EXPECTED_SERIES_COUNT = 45
 SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
 SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"

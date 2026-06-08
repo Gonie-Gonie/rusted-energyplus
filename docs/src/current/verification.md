@@ -68,9 +68,10 @@ Current supporting release and infrastructure gates include:
 ```
 
 The current official dynamic 1Zone tracker is diagnostic-only. The default
-lane compares 41 hourly series, including zone air heat-balance latent terms,
-inside/outside zone opaque conduction aggregates, roof exterior source rows,
-and the floor surface heat-storage diagnostic, and the probe lanes isolate
+lane compares 45 hourly series, including zone air heat-balance latent terms,
+inside/outside zone opaque conduction aggregates, wall/floor conduction
+decomposition rows, roof exterior source rows, and the floor surface
+heat-storage diagnostic, and the probe lanes isolate
 mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
 correction order, same-timestep coupled surface/zone-air rebalance, and
 quick outside-conduction boundary solves without creating a conformance claim:

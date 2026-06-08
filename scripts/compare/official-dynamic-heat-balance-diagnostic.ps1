@@ -274,7 +274,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 41) {
+if ($summary.series_count -ne 45) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -403,8 +403,13 @@ if ($CtfSeedPolicy -eq "steady-no-mass-only" -and $ZoneAirAlgorithm -eq "simplif
         -MaxRmse 100.0 `
         -Description "analytical zone air heat-balance storage"
 }
-if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:WALL001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
-    throw "Missing extracted wall decomposition conduction series"
+foreach ($wallKey in @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004")) {
+    if (-not ($summary.series | Where-Object { $_.output.key -eq $wallKey -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+        throw "Missing extracted wall decomposition conduction series for $wallKey"
+    }
+    if (-not ($summary.series | Where-Object { $_.output.key -eq $wallKey -and $_.output.variable -eq "Surface Outside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
+        throw "Missing extracted wall outside conduction series for $wallKey"
+    }
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Inside Face Conduction Heat Transfer Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted floor decomposition conduction series"
@@ -453,6 +458,7 @@ Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Con
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate" -Description "markdown zone outside conduction variable"
 Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"
 Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
+Assert-Contains -Text $reportText -Pattern "ZN001:WALL001" -Description "markdown wall decomposition key"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Conduction Heat Transfer Rate" -Description "markdown floor outside conduction variable"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate" -Description "markdown floor storage variable"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"

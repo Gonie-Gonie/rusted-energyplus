@@ -97,6 +97,15 @@ domain = "surface"
 level = "diagnostic"
 
 [[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZN001:WALL002"
 variable = "Surface Inside Face Temperature"
 frequency = "hourly"
@@ -117,6 +126,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL002"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -151,6 +169,15 @@ domain = "surface"
 level = "diagnostic"
 
 [[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Inside Face Temperature"
 frequency = "hourly"
@@ -171,6 +198,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
