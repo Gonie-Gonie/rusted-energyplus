@@ -159,13 +159,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   routine is ported. The run-period and warmup timestep shells now pass a
   timestep-aware weather context for exterior forcing: dry-bulb follows
   EnergyPlus hourly interpolation, rain uses the current timestep flag,
-  exterior convection uses timestep wind speed/direction, and exterior solar
-  balance/report terms use the same timestep solar interpolation helper that
-  backs the hourly incident-solar diagnostic. Surface temperatures and
-  surface/zone conduction/source report rows are averaged over the zone
-  timesteps before being written as hourly diagnostics; the latent zone-air
-  heat-balance rows intentionally remain hour-end diagnostics until the full
-  zone predictor/corrector source path is ported.
+  exterior convection uses timestep wind speed/direction, exterior longwave
+  uses timestep-interpolated horizontal infrared radiation/sky temperature,
+  and exterior solar balance/report terms use the same timestep solar
+  interpolation helper that backs the hourly incident-solar diagnostic.
+  Surface temperatures, surface/zone conduction/source report rows, and
+  latent zone-air heat-balance rate rows are averaged over the zone timesteps
+  before being written as hourly diagnostics.
 - `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
   builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
   `SumHATref`, internal gains, air-exchange terms, and third-order history
@@ -256,42 +256,47 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   source diagnostics so the remaining outside aggregate movement can be tied to
   exterior source rows before runtime promotion. The same source alignment
   lowered the active rain-onset max spike and default roof outside source
-  bottleneck: quick-outside iter3 roof net thermal radiation RMSE is
-  `566.230481`, roof outside convection heat-gain RMSE is `602.238829`,
-  roof outside convection coefficient RMSE is `0.079698`, and the default roof
-  outside convection heat-gain RMSE is `7997.333666`. The active top
-  quick-outside bottleneck has moved to `ZN001:FLR001` surface heat storage
-  (`683.997518` RMSE), keeping floor mass CTF history/order parity and zone
-  aggregate conduction as the next source-mapped target rather than exterior
-  wind/convection alignment. A direct runtime candidate that preserved a
-  separate adiabatic mass-CTF outside face/history instead of syncing it to the
-  current inside face was tested and rejected for now: using the current zone
-  boundary value made floor outside conduction the top bottleneck, while using
-  the previous inside face left floor heat-storage RMSE essentially unchanged
-  (`684.141484`). The EnergyPlus `SurfInitialTemp`/zero-flux CTF initial-history
-  lane is a better isolated target: with five surface passes it lowers floor
-  heat storage to `637.691788` RMSE, floor inside conduction to `530.085504`,
-  floor outside conduction to `148.148684`, and zone outside aggregate
-  conduction to `579.984742`, but it slightly regresses MAT (`2.107293`) and
-  the latent air-storage row (`197.510852`). Keep it as a source-aligned probe
+  bottleneck. Adding EnergyPlus timestep interpolation for horizontal infrared
+  radiation/sky temperature then lowers quick-outside iter3 roof net thermal
+  radiation RMSE to `177.367681`, roof outside convection heat-gain RMSE to
+  `214.438811`, and roof outside convection coefficient RMSE to `0.071865`;
+  the default roof outside convection heat-gain RMSE remains `7997.333666`.
+  The active top quick-outside bottleneck has moved back to `ZN001:FLR001`
+  surface heat storage (`695.637088` RMSE), keeping floor mass CTF
+  history/order parity and zone aggregate conduction as the next source-mapped
+  target rather than exterior wind/convection alignment. A direct runtime
+  candidate that preserved a separate adiabatic mass-CTF outside face/history
+  instead of syncing it to the current inside face was tested and rejected for
+  now: using the current zone boundary value made floor outside conduction the
+  top bottleneck, while using the previous inside face left floor heat-storage
+  RMSE essentially unchanged (`684.141484`). The EnergyPlus
+  `SurfInitialTemp`/zero-flux CTF initial-history lane is a better isolated
+  target: with five surface passes it lowers floor heat storage to
+  `637.691788` RMSE, floor inside conduction to `530.085504`, floor outside
+  conduction to `148.148684`, and zone outside aggregate conduction to
+  `579.984742`, but it slightly regresses MAT (`2.107293`) and the latent
+  air-storage row (`197.510852`). Keep it as a source-aligned probe
   lane until the zone-air/source-term ordering work can absorb those air-side
   regressions. The same quick-outside path with eight surface passes isolates
   surface-iteration sensitivity further: floor heat storage falls to
-  `618.692718` RMSE and floor outside conduction to `136.513781`, while MAT
-  (`2.125244`) and air storage (`167.709331`) continue to regress, so this lane
-  is tracked as a convergence/ordering diagnostic rather than a default. An
+  `629.603383` RMSE and floor outside conduction to `140.971525`, while MAT
+  (`2.112893`) and air storage (`166.324263`) continue to regress relative to
+  the simpler paths; roof outside convection and net thermal radiation are now
+  down to `214.451575` and `177.821078`. This lane is tracked as a
+  convergence/ordering diagnostic rather than a default. An
   eight-pass interleaved surface/zone-air correction fork then lowers floor
-  heat storage further to `607.029837`, floor inside conduction to
-  `515.487716`, floor outside conduction to `134.641347`, and zone outside
-  aggregate conduction to `573.076953`, while MAT remains slightly worse
-  (`2.128169`). Raising the same interleaved fork to twenty passes pushes the
-  floor rows further (`568.173742` heat storage, `498.436050` inside
-  conduction, and `112.184982` outside conduction) and lowers zone outside
-  aggregate conduction to `568.807080`, but MAT (`2.160647`) and latent
-  air-storage (`173.901593`) regress and the top bottleneck shifts to roof
-  outside convection (`604.267805`). This confirms the next source-order
-  target is the coupled inside-surface/zone-air correction loop, not only the
-  number of surface passes.
+  heat storage further to `618.031709`, floor inside conduction to
+  `520.860751`, floor outside conduction to `138.920627`, and zone outside
+  aggregate conduction to `581.252181`, while MAT remains slightly worse
+  (`2.115718`). Raising the same interleaved fork to twenty passes pushes the
+  floor rows further (`578.427201` heat storage, `503.533184` inside
+  conduction, and `115.570807` outside conduction) and lowers MAT to
+  `2.147988` with air storage at `172.470431`; roof outside convection and net
+  thermal radiation stay near `214.357183` and `178.357290`, so the top
+  bottleneck is again floor heat storage. This confirms the next source-order
+  target is the coupled inside-surface/zone-air correction loop and floor CTF
+  source/history ordering, not only exterior radiation/coefficient alignment or
+  the number of surface passes.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
@@ -355,10 +360,10 @@ Current Rust boundary:
   wind-speed profiling plus timestep wind speed/direction interpolation before
   DOE-2/MoWITT forced-convection terms, and uses EnergyPlus-shaped
   sky/air/ground exterior longwave coefficients in the diagnostic outside
-  balance/report path, with timestep-interpolated weather/solar context and
-  hourly-averaged surface diagnostics. Full inside iteration order, zone
-  predictor/corrector equations, and coupled radiation coefficient update order
-  are not yet wired.
+  balance/report path, with timestep-interpolated weather/solar/horizontal-IR
+  context and hourly-averaged surface diagnostics. Full inside iteration order,
+  zone predictor/corrector equations, and coupled radiation coefficient update
+  order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

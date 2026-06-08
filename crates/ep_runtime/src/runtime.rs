@@ -4325,6 +4325,10 @@ fn exterior_surface_boundary_temperature_c(
         energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
     let wind_direction_deg =
         energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
+    let horizontal_infrared_radiation_w_per_m2 = energyplus_weather_horizontal_infrared_for_context(
+        context,
+        record.horizontal_infrared_radiation_wh_per_m2,
+    );
 
     let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
         let Some(site) = model.site.as_ref() else {
@@ -4338,6 +4342,7 @@ fn exterior_surface_boundary_temperature_c(
                 energyplus_building_terrain(model),
                 weather_file_wind_speed_m_per_s,
                 wind_direction_deg,
+                horizontal_infrared_radiation_w_per_m2,
                 quick_outside_conduction,
                 use_doe2_outside_convection,
                 wet_timestep_fraction,
@@ -4364,6 +4369,7 @@ fn exterior_surface_boundary_temperature_c(
         energyplus_building_terrain(model),
         weather_file_wind_speed_m_per_s,
         wind_direction_deg,
+        horizontal_infrared_radiation_w_per_m2,
         quick_outside_conduction,
         use_doe2_outside_convection,
         wet_timestep_fraction,
@@ -4462,6 +4468,10 @@ fn surface_exterior_report_terms(
         energyplus_weather_wind_speed_for_context(context, record.wind_speed_m_per_s);
     let wind_direction_deg =
         energyplus_weather_wind_direction_for_context(context, record.wind_direction_deg);
+    let horizontal_infrared_radiation_w_per_m2 = energyplus_weather_horizontal_infrared_for_context(
+        context,
+        record.horizontal_infrared_radiation_wh_per_m2,
+    );
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,
         typed_surface,
@@ -4481,7 +4491,7 @@ fn surface_exterior_report_terms(
     let longwave_terms = energyplus_exterior_longwave_terms(
         surface_state,
         typed_surface,
-        record,
+        horizontal_infrared_radiation_w_per_m2,
         reported_outside_face_temperature_c,
         convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,
@@ -4506,7 +4516,7 @@ fn surface_exterior_report_terms(
 fn energyplus_exterior_longwave_terms(
     surface_state: &SurfaceHeatBalanceState,
     typed_surface: &Surface,
-    record: &EpwRecord,
+    horizontal_infrared_radiation_w_per_m2: f64,
     surface_temperature_c: f64,
     air_reference_temperature_c: f64,
     ground_temperature_c: f64,
@@ -4515,7 +4525,7 @@ fn energyplus_exterior_longwave_terms(
     let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
     let surface_temperature_k = surface_temperature_c + KELVIN_OFFSET;
     let sky_temperature_c = horizontal_infrared_sky_temperature_c(
-        record.horizontal_infrared_radiation_wh_per_m2,
+        horizontal_infrared_radiation_w_per_m2,
         ground_temperature_c,
     );
     let sky_temperature_k = sky_temperature_c + KELVIN_OFFSET;
@@ -5490,6 +5500,7 @@ fn exterior_surface_energy_balance_temperature_c(
     terrain: Terrain,
     weather_file_wind_speed_m_per_s: f64,
     wind_direction_deg: f64,
+    horizontal_infrared_radiation_w_per_m2: f64,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
     use_doe2_outside_convection: bool,
     wet_timestep_fraction: f64,
@@ -5525,7 +5536,7 @@ fn exterior_surface_energy_balance_temperature_c(
     let longwave_terms = energyplus_exterior_longwave_terms(
         surface_state,
         typed_surface,
-        record,
+        horizontal_infrared_radiation_w_per_m2,
         surface_state.outside_face_temperature_c,
         convection_terms.reference_temperature_c,
         outdoor_dry_bulb_c,
@@ -6000,6 +6011,41 @@ fn energyplus_weather_dry_bulb_at_timestep(
         energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
 
     previous.dry_bulb_c * (1.0 - interpolation_weight) + record.dry_bulb_c * interpolation_weight
+}
+
+fn energyplus_weather_horizontal_infrared_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_horizontal_infrared_w_per_m2;
+    };
+
+    energyplus_weather_horizontal_infrared_at_timestep(
+        context.records,
+        context.record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        context.zone_steps_per_hour,
+        timestep,
+    )
+}
+
+fn energyplus_weather_horizontal_infrared_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    let Some(record) = records.get(record_index) else {
+        return fallback_hourly_horizontal_infrared_w_per_m2;
+    };
+    let previous = previous_weather_record(records, record_index);
+    let interpolation_weight =
+        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+
+    previous.horizontal_infrared_radiation_wh_per_m2 * (1.0 - interpolation_weight)
+        + record.horizontal_infrared_radiation_wh_per_m2 * interpolation_weight
 }
 
 fn energyplus_weather_wind_speed_for_context(
@@ -7314,6 +7360,7 @@ mod tests {
         energyplus_surface_outside_wind_speed_m_per_s,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c, energyplus_weather_dry_bulb_at_timestep,
+        energyplus_weather_horizontal_infrared_at_timestep,
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
         energyplus_zone_air_temperature_coefficients, heat_balance_uses_doe2_outside_convection,
@@ -9711,6 +9758,8 @@ DATA PERIODS
         current.dry_bulb_c = 22.0;
         current.wind_speed_m_per_s = 10.0;
         current.wind_direction_deg = 10.0;
+        previous.horizontal_infrared_radiation_wh_per_m2 = 200.0;
+        current.horizontal_infrared_radiation_wh_per_m2 = 600.0;
         let records = [previous, current];
 
         assert!(
@@ -9723,6 +9772,11 @@ DATA PERIODS
         );
         assert!(
             (energyplus_weather_wind_direction_at_timestep(&records, 1, 10.0, 4, 2) - 0.0).abs()
+                < 1.0e-12
+        );
+        assert!(
+            (energyplus_weather_horizontal_infrared_at_timestep(&records, 1, 600.0, 4, 2) - 400.0)
+                .abs()
                 < 1.0e-12
         );
         assert_eq!(
@@ -9841,7 +9895,7 @@ DATA PERIODS
         let terms = energyplus_exterior_longwave_terms(
             surface_state,
             typed_surface,
-            &record,
+            record.horizontal_infrared_radiation_wh_per_m2,
             60.0,
             24.0,
             24.0,
