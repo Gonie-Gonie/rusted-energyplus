@@ -534,6 +534,16 @@ pub struct SurfaceHeatBalanceState {
     pub solar_absorptance: f64,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
+    /// CTF outside/X coefficient at time zero in W/m2-K.
+    pub ctf_outside_0_w_per_m2_k: f64,
+    /// CTF cross/Y coefficient at time zero in W/m2-K.
+    pub ctf_cross_0_w_per_m2_k: f64,
+    /// CTF inside/Z coefficient at time zero in W/m2-K.
+    pub ctf_inside_0_w_per_m2_k: f64,
+    /// Inside CTF history constant part in W/m2.
+    pub ctf_const_in_part_w_per_m2: f64,
+    /// Outside CTF history constant part in W/m2.
+    pub ctf_const_out_part_w_per_m2: f64,
     /// Current opaque heat transfer to the owning zone in W.
     pub heat_gain_to_zone_w: f64,
     /// Current inside face temperature in C.
@@ -2045,6 +2055,9 @@ pub fn initialize_heat_balance_state(
             let area_m2 = surface_area_m2(&surface.vertices);
             let thermal = surface_thermal_properties(&model.typed, surface)?;
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
+            let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
+            let steady_ctf_w_per_m2_k =
+                steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
 
             Ok(SurfaceHeatBalanceState {
                 surface_id: surface.id,
@@ -2067,7 +2080,12 @@ pub fn initialize_heat_balance_state(
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
-                conductance_w_per_k: area_m2 / thermal.thermal_resistance_m2_k_per_w,
+                conductance_w_per_k,
+                ctf_outside_0_w_per_m2_k: steady_ctf_w_per_m2_k,
+                ctf_cross_0_w_per_m2_k: steady_ctf_w_per_m2_k,
+                ctf_inside_0_w_per_m2_k: steady_ctf_w_per_m2_k,
+                ctf_const_in_part_w_per_m2: 0.0,
+                ctf_const_out_part_w_per_m2: 0.0,
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
                 outside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2192,8 +2210,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             input.outdoor_dry_bulb_c,
             zone_temperature_c,
         );
-        surface.heat_gain_to_zone_w =
-            surface.conductance_w_per_k * (surface.outside_face_temperature_c - zone_temperature_c);
+        surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
     }
 
     for zone in &mut state.zones {
@@ -2728,6 +2745,14 @@ fn surface_thermal_properties(
     })
 }
 
+fn steady_ctf_coefficient_w_per_m2_k(area_m2: f64, thermal_resistance_m2_k_per_w: f64) -> f64 {
+    if area_m2 > 0.0 && thermal_resistance_m2_k_per_w > 0.0 {
+        1.0 / thermal_resistance_m2_k_per_w
+    } else {
+        0.0
+    }
+}
+
 fn resolve_surface_boundary_target(
     model: &TypedModel,
     surface: &Surface,
@@ -2945,11 +2970,17 @@ fn horizontal_infrared_sky_temperature_c(
 }
 
 fn surface_inside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
-    surface.heat_gain_to_zone_w
+    surface.area_m2
+        * (surface.outside_face_temperature_c * surface.ctf_cross_0_w_per_m2_k
+            - surface.inside_face_temperature_c * surface.ctf_inside_0_w_per_m2_k
+            + surface.ctf_const_in_part_w_per_m2)
 }
 
 fn surface_outside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
-    -surface.heat_gain_to_zone_w
+    -surface.area_m2
+        * (surface.outside_face_temperature_c * surface.ctf_outside_0_w_per_m2_k
+            - surface.inside_face_temperature_c * surface.ctf_cross_0_w_per_m2_k
+            + surface.ctf_const_out_part_w_per_m2)
 }
 
 fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
@@ -5034,6 +5065,11 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
         assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf_outside_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf_cross_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf_inside_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf_const_in_part_w_per_m2, 0.0);
+        assert_eq!(state.surfaces[0].ctf_const_out_part_w_per_m2, 0.0);
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
