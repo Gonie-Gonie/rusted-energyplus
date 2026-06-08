@@ -89,6 +89,19 @@ FOCUS_METRICS = (
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Solar Radiation Rate per Area"),
 )
 
+REFERENCE_LANES = {
+    "all-ctf": "default",
+    "all-ctf-warmup-min20": "all-ctf",
+    "all-ctf-surface-iter3": "all-ctf",
+    "third-order": "default",
+    "warmup-min20": "default",
+}
+
+# The rollup is an interpretation aid, not a tolerance gate. Treat tiny probe
+# movements as unchanged so warmup/no-op probes do not look more decisive than
+# they are.
+MOVEMENT_EPSILON = 1.0
+
 
 def load_json(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
@@ -183,6 +196,102 @@ def annotate_default_focus_deltas(lanes: list[dict[str, Any]]) -> None:
             metric["rmse_ratio_vs_default"] = rmse / baseline if baseline != 0 else None
 
 
+def empty_focus_movement_rollup(reference_lane: str | None) -> dict[str, Any]:
+    return {
+        "reference_lane": reference_lane,
+        "improved_focus_count": 0,
+        "worsened_focus_count": 0,
+        "unchanged_focus_count": 0,
+        "missing_focus_count": 0,
+        "largest_rmse_improvement": None,
+        "largest_rmse_regression": None,
+    }
+
+
+def annotate_reference_focus_movements(lanes: list[dict[str, Any]]) -> None:
+    lane_by_name = {str(lane.get("lane")): lane for lane in lanes}
+    metrics_by_lane: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
+    for lane in lanes:
+        lane_name = str(lane.get("lane"))
+        metrics_by_lane[lane_name] = {
+            metric_identity(metric): metric
+            for metric in lane.get("focus_metrics", [])
+            if isinstance(metric, dict)
+        }
+
+    for lane in lanes:
+        lane_name = str(lane.get("lane"))
+        reference_lane = REFERENCE_LANES.get(lane_name)
+        lane["reference_lane"] = reference_lane
+        lane["focus_movement_vs_reference"] = []
+        lane["focus_movement_rollup"] = empty_focus_movement_rollup(reference_lane)
+
+        if reference_lane is None or reference_lane not in lane_by_name:
+            continue
+
+        reference_metrics = metrics_by_lane.get(reference_lane, {})
+        movements: list[dict[str, Any]] = []
+        rollup = empty_focus_movement_rollup(reference_lane)
+        largest_improvement: dict[str, Any] | None = None
+        largest_regression: dict[str, Any] | None = None
+
+        for metric in lane.get("focus_metrics", []):
+            if not isinstance(metric, dict):
+                continue
+            reference_metric = reference_metrics.get(metric_identity(metric))
+            rmse = numeric(metric.get("rmse_delta_c"))
+            reference_rmse = (
+                numeric(reference_metric.get("rmse_delta_c"))
+                if isinstance(reference_metric, dict)
+                else None
+            )
+            movement = {
+                "key": metric.get("key"),
+                "variable": metric.get("variable"),
+                "label": metric.get("label"),
+                "rmse_delta_c": rmse,
+                "reference_rmse_delta_c": reference_rmse,
+                "rmse_vs_reference": None,
+                "rmse_ratio_vs_reference": None,
+                "direction": "missing",
+            }
+            if rmse is None or reference_rmse is None:
+                rollup["missing_focus_count"] += 1
+                movements.append(movement)
+                continue
+
+            delta = rmse - reference_rmse
+            movement["rmse_vs_reference"] = delta
+            movement["rmse_ratio_vs_reference"] = (
+                rmse / reference_rmse if reference_rmse != 0 else None
+            )
+            if delta < -MOVEMENT_EPSILON:
+                movement["direction"] = "improved"
+                rollup["improved_focus_count"] += 1
+                if (
+                    largest_improvement is None
+                    or delta < numeric(largest_improvement.get("rmse_vs_reference"))
+                ):
+                    largest_improvement = movement
+            elif delta > MOVEMENT_EPSILON:
+                movement["direction"] = "worsened"
+                rollup["worsened_focus_count"] += 1
+                if (
+                    largest_regression is None
+                    or delta > numeric(largest_regression.get("rmse_vs_reference"))
+                ):
+                    largest_regression = movement
+            else:
+                movement["direction"] = "unchanged"
+                rollup["unchanged_focus_count"] += 1
+            movements.append(movement)
+
+        rollup["largest_rmse_improvement"] = largest_improvement
+        rollup["largest_rmse_regression"] = largest_regression
+        lane["focus_movement_vs_reference"] = movements
+        lane["focus_movement_rollup"] = rollup
+
+
 def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
     summary_path = repo_root / lane.summary_path
     if not summary_path.exists():
@@ -212,8 +321,9 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
 def build_summary(repo_root: Path) -> dict[str, Any]:
     lanes = [row for lane in LANES if (row := lane_row(repo_root, lane)) is not None]
     annotate_default_focus_deltas(lanes)
+    annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v2",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v3",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "lane_count": len(lanes),
@@ -225,6 +335,21 @@ def fmt_number(value: Any) -> str:
     if isinstance(value, (int, float)):
         return f"{value:.6f}"
     return "none"
+
+
+def fmt_signed_number(value: Any) -> str:
+    if isinstance(value, (int, float)):
+        return f"{value:+.6f}"
+    return "none"
+
+
+def fmt_movement(metric: Any) -> str:
+    if not isinstance(metric, dict):
+        return "none"
+    return "{label} ({delta})".format(
+        label=metric.get("label", "none"),
+        delta=fmt_signed_number(metric.get("rmse_vs_reference")),
+    )
 
 
 def render_markdown(summary: dict[str, Any]) -> str:
@@ -249,6 +374,36 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 rmse=fmt_number(lane["top_rmse_delta_c"]),
                 max_abs=fmt_number(lane["top_max_abs_delta_c"]),
                 status=lane["status"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Probe Interpretation",
+            "",
+            "RMSE movement is measured against each probe lane's nearest reference lane.",
+            "",
+            "| lane | reference | improved | worsened | unchanged | largest improvement | largest regression |",
+            "|---|---|---:|---:|---:|---|---|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        rollup = lane.get("focus_movement_rollup", {})
+        if not isinstance(rollup, dict):
+            rollup = {}
+        lines.append(
+            "| {lane} | {reference} | {improved} | {worsened} | {unchanged} | {largest_improvement} | {largest_regression} |".format(
+                lane=lane["lane"],
+                reference=rollup.get("reference_lane") or "none",
+                improved=rollup.get("improved_focus_count", 0),
+                worsened=rollup.get("worsened_focus_count", 0),
+                unchanged=rollup.get("unchanged_focus_count", 0),
+                largest_improvement=fmt_movement(
+                    rollup.get("largest_rmse_improvement")
+                ),
+                largest_regression=fmt_movement(
+                    rollup.get("largest_rmse_regression")
+                ),
             )
         )
     lines.extend(

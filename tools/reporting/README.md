@@ -28,8 +28,11 @@ Current generators:
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
   aggregate conduction focus metrics across lanes. The focus table also records
   RMSE movement relative to the default lane so partial isolation improvements
-  that destabilize the whole zone balance are visible in one scan. Probe lanes
-  include all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
+  that destabilize the whole zone balance are visible in one scan. The probe
+  interpretation table compares each lane against its nearest reference lane,
+  so all-CTF warmup and surface-iteration probes can be reviewed separately
+  from the larger default-to-all-CTF seed movement. Probe lanes include all-CTF
+  seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
   surface-iteration probe, third-order zone-air update, and an oracle-day-count
   warmup minimum. It is development evidence only and does not create a release
   conformance artifact.
