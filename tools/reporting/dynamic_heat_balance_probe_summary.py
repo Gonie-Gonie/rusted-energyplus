@@ -152,6 +152,24 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-iter5",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-scriptf-lw-surface-iter5"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
+        lane="all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-iter5",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-lw-surface-iter5"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-analytical-coupled-previous-boundary-iter3",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-boundary-surface-iter3"
@@ -237,6 +255,8 @@ REFERENCE_LANES = {
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5",
+    "all-ctf-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5",
+    "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-iter5",
     "all-ctf-analytical-coupled-previous-boundary-iter3": "all-ctf-analytical-coupled-previous-inside-iter3",
     "all-ctf-analytical-surface-first-iter3": "all-ctf-analytical-surface-first",
     "analytical": "default",
@@ -529,7 +549,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_focus_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v6",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v7",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,

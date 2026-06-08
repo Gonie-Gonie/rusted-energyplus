@@ -211,10 +211,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   (`0.972533` RMSE), zone surface convection (`52.581726` RMSE), floor inside
   conduction (`293.417817` RMSE), and floor storage (`575.885599` RMSE), but
   raises floor outside conduction to `423.487145` RMSE and storage max-abs to
-  `8287.121494`. These forks narrow the next source-mapped target to coherent
-  exterior radiation, interior longwave, quick/slow boundary branches, source
-  coupling, surface iteration, zone-air correction, and CTF history commit
-  order rather than a single post-correction surface feedback pass. The
+  `8287.121494`. The EnergyPlus `ViewFactorInfo` EIO probe for
+  `1ZoneUncontrolled` now anchors the Script F factor orientation used by the
+  Rust diagnostic. That source-aligned ScriptF interior-longwave lane is not a
+  promotion candidate yet: it regresses floor storage and zone aggregate rows
+  relative to the grey longwave forks, which indicates the remaining bottleneck
+  is the broader coupled surface/zone/source-term path rather than only the
+  ScriptF factor math. These forks narrow the next source-mapped target to
+  coherent exterior radiation, interior longwave, quick/slow boundary branches,
+  source coupling, surface iteration, zone-air correction, and CTF history
+  commit order rather than a single post-correction surface feedback pass. The
   previous-inside
   outdoor/adiabatic boundary probe slightly lowers floor inside conduction
   again to RMSE `923.728787`, but does not improve floor heat storage

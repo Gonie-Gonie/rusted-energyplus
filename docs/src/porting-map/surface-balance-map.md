@@ -50,7 +50,10 @@ and MAT series while exposing that the zone opaque aggregate still depends on
 unported floor mass CTF and full surface iteration parity. Inside-surface
 radiant/source terms now have explicit zero-initialized runtime slots matching
 EnergyPlus `SurfTempTerm` inputs, but the official diagnostic still treats those
-terms as future wiring rather than promoted parity. A diagnostic surface-iter3
-lane can repeat the inside/outside face balance within one zone timestep while
-advancing CTF histories only once, so iteration sensitivity can be measured
-before changing the default path.
+terms as future wiring rather than promoted parity. A source-anchored ScriptF
+interior-longwave probe matches the `1ZoneUncontrolled` EIO factor orientation,
+but remains diagnostic-only because exact longwave feedback without the rest of
+the EnergyPlus surface/zone coupling regresses the active storage and aggregate
+rows. A diagnostic surface-iter3 lane can repeat the inside/outside face balance
+within one zone timestep while advancing CTF histories only once, so iteration
+sensitivity can be measured before changing the default path.

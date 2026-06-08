@@ -667,6 +667,8 @@ pub struct SurfaceHeatBalanceState {
     pub outside_layer_roughness: MaterialSurfaceRoughness,
     /// Surface area in square meters.
     pub area_m2: f64,
+    /// Surface azimuth in degrees clockwise from north.
+    pub azimuth_deg: f64,
     /// Surface tilt in degrees using EnergyPlus orientation conventions.
     pub tilt_deg: f64,
     /// Area-normalized thermal resistance in m2-K/W.
@@ -733,6 +735,10 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe,
     /// Experimental quick-outside path combining DOE-2 exterior convection and grey interior longwave exchange.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe,
+    /// Experimental quick-outside path with EnergyPlus ScriptF interior longwave exchange.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe,
+    /// Experimental quick-outside path combining DOE-2 exterior convection and ScriptF interior longwave exchange.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor and adiabatic boundary solves.
     EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
@@ -2317,6 +2323,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         .iter()
         .map(|surface| {
             let area_m2 = surface_area_m2(&surface.vertices);
+            let azimuth_deg = surface_azimuth_deg(&surface.vertices);
             let tilt_deg = surface_tilt_deg(surface.surface_type, &surface.vertices);
             let thermal = surface_thermal_properties(&model.typed, surface)?;
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
@@ -2353,6 +2360,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 outside_layer_material_name: thermal.outside_layer_material_name,
                 outside_layer_roughness: thermal.outside_layer_roughness,
                 area_m2,
+                azimuth_deg,
                 tilt_deg,
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
@@ -2454,6 +2462,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let rebalance_surfaces_after_zone_air_correction = matches!(
@@ -2464,6 +2474,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_outdoor_boundary = matches!(
@@ -2473,6 +2485,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_adiabatic_boundary = matches!(
@@ -2485,17 +2499,26 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     );
     let use_doe2_outside_convection = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     );
-    let use_inside_longwave_exchange_probe = matches!(
-        zone_air_algorithm,
+    let interior_longwave_exchange_probe = match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
-    );
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe => {
+            InteriorLongwaveExchangeProbe::GreyAreaWeighted
+        }
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe => {
+            InteriorLongwaveExchangeProbe::EnergyPlusScriptF
+        }
+        _ => InteriorLongwaveExchangeProbe::None,
+    };
 
     for surface in &mut state.surfaces {
         let zone_temperature_c = previous_zone_temperatures
@@ -2572,6 +2595,12 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe => {
+                previous_temperature_c
+            }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
                 previous_temperature_c
             }
@@ -2637,7 +2666,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         use_previous_inside_for_adiabatic_boundary,
         use_quick_outside_conduction,
         use_doe2_outside_convection,
-        use_inside_longwave_exchange_probe,
+        interior_longwave_exchange_probe,
     );
 
     if rebalance_surfaces_after_zone_air_correction {
@@ -2664,7 +2693,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             use_previous_inside_for_adiabatic_boundary,
             use_quick_outside_conduction,
             use_doe2_outside_convection,
-            use_inside_longwave_exchange_probe,
+            interior_longwave_exchange_probe,
         );
     }
 
@@ -2694,16 +2723,25 @@ fn run_surface_balance_passes(
     use_previous_inside_for_adiabatic_boundary: bool,
     use_quick_outside_conduction: bool,
     use_doe2_outside_convection: bool,
-    use_inside_longwave_exchange_probe: bool,
+    interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
-        if use_inside_longwave_exchange_probe {
-            let temperature_overrides = if surface_iteration_index == 0 {
-                first_pass_inside_temperatures
-            } else {
-                None
-            };
-            update_surface_inside_longwave_exchange_probe(surfaces, temperature_overrides);
+        let temperature_overrides = if surface_iteration_index == 0 {
+            first_pass_inside_temperatures
+        } else {
+            None
+        };
+        match interior_longwave_exchange_probe {
+            InteriorLongwaveExchangeProbe::None => {}
+            InteriorLongwaveExchangeProbe::GreyAreaWeighted => {
+                update_surface_inside_longwave_exchange_probe(surfaces, temperature_overrides);
+            }
+            InteriorLongwaveExchangeProbe::EnergyPlusScriptF => {
+                update_surface_inside_scriptf_longwave_exchange_probe(
+                    surfaces,
+                    temperature_overrides,
+                );
+            }
         }
         for surface in surfaces.iter_mut() {
             let previous_inside_face_temperature_c = if surface_iteration_index == 0 {
@@ -2857,6 +2895,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
             zone_state
                 .zone_air_temperature_coefficients
@@ -3902,6 +3942,8 @@ fn reported_surface_outside_face_temperature_c(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     ) {
         return surface_state.outside_face_temperature_c;
     }
@@ -3990,10 +4032,20 @@ fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -
         + surface.inside_net_longwave_w_per_m2
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum InteriorLongwaveExchangeProbe {
+    None,
+    GreyAreaWeighted,
+    EnergyPlusScriptF,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct InteriorLongwaveSurfaceSnapshot {
     zone_id: ZoneId,
+    surface_type: SurfaceType,
     area_m2: f64,
+    azimuth_deg: f64,
+    tilt_deg: f64,
     temperature_k4: f64,
     thermal_absorptance: f64,
 }
@@ -4011,7 +4063,10 @@ fn update_surface_inside_longwave_exchange_probe(
             let temperature_k = (temperature_c + KELVIN_OFFSET).max(0.0);
             InteriorLongwaveSurfaceSnapshot {
                 zone_id: surface.zone_id,
+                surface_type: surface.surface_type,
                 area_m2: surface.area_m2.max(0.0),
+                azimuth_deg: surface.azimuth_deg,
+                tilt_deg: surface.tilt_deg,
                 temperature_k4: temperature_k.powi(4),
                 thermal_absorptance: surface.thermal_absorptance.clamp(0.0, 1.0),
             }
@@ -4060,6 +4115,385 @@ fn update_surface_inside_longwave_exchange_probe(
     {
         surface.inside_net_longwave_w_per_m2 = net_longwave_w_per_m2;
     }
+}
+
+fn update_surface_inside_scriptf_longwave_exchange_probe(
+    surfaces: &mut [SurfaceHeatBalanceState],
+    temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) {
+    let snapshots = surfaces
+        .iter()
+        .map(|surface| {
+            let temperature_c = temperature_overrides
+                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            let temperature_k = (temperature_c + KELVIN_OFFSET).max(0.0);
+            InteriorLongwaveSurfaceSnapshot {
+                zone_id: surface.zone_id,
+                surface_type: surface.surface_type,
+                area_m2: surface.area_m2.max(0.0),
+                azimuth_deg: surface.azimuth_deg,
+                tilt_deg: surface.tilt_deg,
+                temperature_k4: temperature_k.powi(4),
+                thermal_absorptance: surface.thermal_absorptance.clamp(0.0, 1.0),
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let mut surfaces_by_zone = BTreeMap::<ZoneId, Vec<usize>>::new();
+    for (surface_index, snapshot) in snapshots.iter().enumerate() {
+        surfaces_by_zone
+            .entry(snapshot.zone_id)
+            .or_default()
+            .push(surface_index);
+    }
+
+    let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
+    for surface_indices in surfaces_by_zone.values() {
+        if surface_indices.len() <= 1 {
+            continue;
+        }
+        let zone_snapshots = surface_indices
+            .iter()
+            .map(|surface_index| snapshots[*surface_index])
+            .collect::<Vec<_>>();
+        let Some(script_f) = energyplus_scriptf_longwave_matrix_w_per_m2_k4(&zone_snapshots) else {
+            continue;
+        };
+        let surface_count = zone_snapshots.len();
+        for (receiver_zone_index, receiver) in zone_snapshots.iter().enumerate() {
+            let mut net_longwave_w_per_m2 = 0.0;
+            for (sender_zone_index, sender) in zone_snapshots.iter().enumerate() {
+                if sender_zone_index == receiver_zone_index {
+                    continue;
+                }
+                net_longwave_w_per_m2 += script_f
+                    [sender_zone_index * surface_count + receiver_zone_index]
+                    * (sender.temperature_k4 - receiver.temperature_k4);
+            }
+            longwave_terms_w_per_m2[surface_indices[receiver_zone_index]] = net_longwave_w_per_m2;
+        }
+    }
+
+    for (surface, net_longwave_w_per_m2) in
+        surfaces.iter_mut().zip(longwave_terms_w_per_m2.into_iter())
+    {
+        surface.inside_net_longwave_w_per_m2 = net_longwave_w_per_m2;
+    }
+}
+
+fn energyplus_scriptf_longwave_matrix_w_per_m2_k4(
+    surfaces: &[InteriorLongwaveSurfaceSnapshot],
+) -> Option<Vec<f64>> {
+    let surface_count = surfaces.len();
+    if surface_count <= 1
+        || surfaces
+            .iter()
+            .any(|surface| surface.area_m2 <= f64::EPSILON)
+    {
+        return None;
+    }
+
+    let areas = surfaces
+        .iter()
+        .map(|surface| surface.area_m2)
+        .collect::<Vec<_>>();
+    let direct_view_factors = fix_energyplus_approximate_view_factors(
+        &areas,
+        &energyplus_approximate_view_factors(surfaces),
+    );
+    let mut emissivities = surfaces
+        .iter()
+        .map(|surface| surface.thermal_absorptance.clamp(0.0, 0.99999))
+        .collect::<Vec<_>>();
+    energyplus_scriptf_from_view_factors(&areas, &direct_view_factors, &mut emissivities)
+}
+
+fn energyplus_approximate_view_factors(surfaces: &[InteriorLongwaveSurfaceSnapshot]) -> Vec<f64> {
+    let surface_count = surfaces.len();
+    let mut zone_area_seen_m2 = vec![0.0; surface_count];
+    for (from_index, from_surface) in surfaces.iter().enumerate() {
+        for (to_index, to_surface) in surfaces.iter().enumerate() {
+            if energyplus_surface_sees_surface(from_surface, to_surface, from_index, to_index) {
+                zone_area_seen_m2[from_index] += to_surface.area_m2;
+            }
+        }
+    }
+
+    let mut view_factors = vec![0.0; surface_count * surface_count];
+    for (from_index, from_surface) in surfaces.iter().enumerate() {
+        if zone_area_seen_m2[from_index] <= f64::EPSILON {
+            continue;
+        }
+        for (to_index, to_surface) in surfaces.iter().enumerate() {
+            if energyplus_surface_sees_surface(from_surface, to_surface, from_index, to_index) {
+                view_factors[to_index * surface_count + from_index] =
+                    to_surface.area_m2 / zone_area_seen_m2[from_index];
+            }
+        }
+    }
+    view_factors
+}
+
+fn energyplus_surface_sees_surface(
+    from_surface: &InteriorLongwaveSurfaceSnapshot,
+    to_surface: &InteriorLongwaveSurfaceSnapshot,
+    from_index: usize,
+    to_index: usize,
+) -> bool {
+    if from_index == to_index
+        || (from_surface.surface_type == SurfaceType::Floor
+            && to_surface.surface_type == SurfaceType::Floor)
+    {
+        return false;
+    }
+
+    let azimuth_difference_deg = (from_surface.azimuth_deg - to_surface.azimuth_deg).abs();
+    let tilt_difference_deg = (from_surface.tilt_deg - to_surface.tilt_deg).abs();
+    to_surface.surface_type == SurfaceType::Floor
+        || from_surface.surface_type == SurfaceType::Floor
+        || (azimuth_difference_deg > 10.0 && azimuth_difference_deg < 350.0)
+        || tilt_difference_deg > 10.0
+}
+
+fn fix_energyplus_approximate_view_factors(areas: &[f64], view_factors: &[f64]) -> Vec<f64> {
+    let surface_count = areas.len();
+    if surface_count == 0 || view_factors.len() != surface_count * surface_count {
+        return view_factors.to_vec();
+    }
+
+    let original_check = (view_factors.iter().sum::<f64>() - surface_count as f64).abs();
+    let mut fixed_area_factors = view_factors.to_vec();
+    let total_area = areas.iter().sum::<f64>();
+    if surface_count > 3 && total_area > f64::EPSILON {
+        if let Some((largest_index, largest_area)) = areas
+            .iter()
+            .copied()
+            .enumerate()
+            .max_by(|left, right| left.1.total_cmp(&right.1))
+        {
+            if largest_area > 0.99 * (total_area - largest_area) {
+                fixed_area_factors[largest_index * surface_count + largest_index] =
+                    (1.2 * largest_area / total_area).min(0.9);
+            }
+        }
+    }
+
+    let mut area_factor_matrix = vec![0.0; surface_count * surface_count];
+    for from_index in 0..surface_count {
+        for to_index in 0..surface_count {
+            area_factor_matrix[to_index * surface_count + from_index] =
+                fixed_area_factors[to_index * surface_count + from_index] * areas[from_index];
+        }
+    }
+    fixed_area_factors = average_with_transpose(&area_factor_matrix, surface_count);
+
+    if surface_count <= 3 {
+        let mut fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
+        let row_sum = fixed_factors.iter().sum::<f64>();
+        if row_sum > surface_count as f64 + 0.01 {
+            let max_surface_sum = max_surface_view_factor_sum(&fixed_factors, surface_count);
+            if max_surface_sum > 1.0 {
+                for factor in &mut fixed_factors {
+                    *factor /= max_surface_sum;
+                }
+            }
+        }
+        return fixed_factors;
+    }
+
+    let mut convergence_old = 10.0;
+    let mut fixed_factors = view_factors.to_vec();
+    for _ in 0..400 {
+        for from_index in 0..surface_count {
+            let column_sum = (0..surface_count)
+                .map(|to_index| fixed_area_factors[to_index * surface_count + from_index])
+                .sum::<f64>();
+            let coefficient = if column_sum.abs() > 1.0e-10 {
+                areas[from_index] / column_sum
+            } else {
+                1.0
+            };
+            for to_index in 0..surface_count {
+                fixed_area_factors[to_index * surface_count + from_index] *= coefficient;
+            }
+        }
+
+        fixed_area_factors = average_with_transpose(&fixed_area_factors, surface_count);
+        fixed_factors = area_factors_to_view_factors(&fixed_area_factors, areas);
+        for (view_factor, area_factor) in
+            fixed_factors.iter_mut().zip(fixed_area_factors.iter_mut())
+        {
+            if view_factor.abs() < 1.0e-10 {
+                *view_factor = 0.0;
+                *area_factor = 0.0;
+            }
+        }
+
+        let convergence_new = (fixed_factors.iter().sum::<f64>() - surface_count as f64).abs();
+        if (convergence_old - convergence_new).abs() < 1.0e-5 || convergence_new <= 0.001 {
+            let row_sum = fixed_factors.iter().sum::<f64>();
+            if convergence_new < original_check || (row_sum - surface_count as f64).abs() < 0.001 {
+                return fixed_factors;
+            }
+            return view_factors.to_vec();
+        }
+        convergence_old = convergence_new;
+    }
+
+    fixed_factors
+}
+
+fn average_with_transpose(matrix: &[f64], surface_count: usize) -> Vec<f64> {
+    let mut averaged = vec![0.0; matrix.len()];
+    for row in 0..surface_count {
+        for col in 0..surface_count {
+            averaged[row * surface_count + col] =
+                0.5 * (matrix[row * surface_count + col] + matrix[col * surface_count + row]);
+        }
+    }
+    averaged
+}
+
+fn area_factors_to_view_factors(area_factors: &[f64], areas: &[f64]) -> Vec<f64> {
+    let surface_count = areas.len();
+    let mut view_factors = vec![0.0; area_factors.len()];
+    for from_index in 0..surface_count {
+        if areas[from_index] <= f64::EPSILON {
+            continue;
+        }
+        for to_index in 0..surface_count {
+            view_factors[to_index * surface_count + from_index] =
+                area_factors[to_index * surface_count + from_index] / areas[from_index];
+        }
+    }
+    view_factors
+}
+
+fn max_surface_view_factor_sum(view_factors: &[f64], surface_count: usize) -> f64 {
+    (0..surface_count)
+        .map(|from_index| {
+            (0..surface_count)
+                .map(|to_index| view_factors[to_index * surface_count + from_index])
+                .sum::<f64>()
+        })
+        .fold(0.0, f64::max)
+}
+
+fn energyplus_scriptf_from_view_factors(
+    areas: &[f64],
+    view_factors: &[f64],
+    emissivities: &mut [f64],
+) -> Option<Vec<f64>> {
+    let surface_count = areas.len();
+    if surface_count == 0
+        || view_factors.len() != surface_count * surface_count
+        || emissivities.len() != surface_count
+    {
+        return None;
+    }
+
+    let mut coefficient_matrix = vec![0.0; surface_count * surface_count];
+    for row in 0..surface_count {
+        for col in 0..surface_count {
+            coefficient_matrix[row * surface_count + col] =
+                areas[row] * view_factors[row * surface_count + col];
+        }
+    }
+
+    let mut excitation = vec![0.0; surface_count];
+    for index in 0..surface_count {
+        emissivities[index] = emissivities[index].clamp(0.0, 0.99999);
+        let emissivity = emissivities[index];
+        let emissivity_area_factor = areas[index] / (1.0 - emissivity);
+        excitation[index] = -emissivity * emissivity_area_factor;
+        coefficient_matrix[index * surface_count + index] -= emissivity_area_factor;
+    }
+
+    let mut inverse = invert_square_matrix(&coefficient_matrix, surface_count)?;
+    for col in 0..surface_count {
+        for row in 0..surface_count {
+            inverse[row * surface_count + col] *= excitation[col];
+        }
+    }
+
+    let mut script_f = vec![0.0; surface_count * surface_count];
+    for receiver_index in 0..surface_count {
+        let emissivity = emissivities[receiver_index];
+        let emissivity_factor = emissivity / (1.0 - emissivity);
+        for sender_index in 0..surface_count {
+            let inverse_value = inverse[receiver_index * surface_count + sender_index];
+            let script_f_value = if receiver_index == sender_index {
+                emissivity_factor * (inverse_value - emissivity)
+            } else {
+                emissivity_factor * inverse_value
+            };
+            script_f[sender_index * surface_count + receiver_index] =
+                script_f_value * STEFAN_BOLTZMANN_W_PER_M2_K4;
+        }
+    }
+    Some(script_f)
+}
+
+fn invert_square_matrix(matrix: &[f64], dimension: usize) -> Option<Vec<f64>> {
+    if dimension == 0 || matrix.len() != dimension * dimension {
+        return None;
+    }
+
+    let augmented_width = dimension * 2;
+    let mut augmented = vec![0.0; dimension * augmented_width];
+    for row in 0..dimension {
+        for col in 0..dimension {
+            augmented[row * augmented_width + col] = matrix[row * dimension + col];
+        }
+        augmented[row * augmented_width + dimension + row] = 1.0;
+    }
+
+    for pivot_col in 0..dimension {
+        let pivot_row = (pivot_col..dimension).max_by(|left, right| {
+            augmented[*left * augmented_width + pivot_col]
+                .abs()
+                .total_cmp(&augmented[*right * augmented_width + pivot_col].abs())
+        })?;
+        let pivot = augmented[pivot_row * augmented_width + pivot_col];
+        if pivot.abs() <= 1.0e-12 {
+            return None;
+        }
+        if pivot_row != pivot_col {
+            for col in 0..augmented_width {
+                augmented.swap(
+                    pivot_col * augmented_width + col,
+                    pivot_row * augmented_width + col,
+                );
+            }
+        }
+
+        let pivot = augmented[pivot_col * augmented_width + pivot_col];
+        for col in 0..augmented_width {
+            augmented[pivot_col * augmented_width + col] /= pivot;
+        }
+        for row in 0..dimension {
+            if row == pivot_col {
+                continue;
+            }
+            let factor = augmented[row * augmented_width + pivot_col];
+            if factor.abs() <= 1.0e-15 {
+                continue;
+            }
+            for col in 0..augmented_width {
+                augmented[row * augmented_width + col] -=
+                    factor * augmented[pivot_col * augmented_width + col];
+            }
+        }
+    }
+
+    let mut inverse = vec![0.0; dimension * dimension];
+    for row in 0..dimension {
+        for col in 0..dimension {
+            inverse[row * dimension + col] = augmented[row * augmented_width + dimension + col];
+        }
+    }
+    Some(inverse)
 }
 
 fn grey_pair_exchange_emissivity(receiver_emissivity: f64, sender_emissivity: f64) -> f64 {
@@ -5714,8 +6148,9 @@ mod tests {
         NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR, SimulationMode,
-        SimulationState, advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
@@ -5725,7 +6160,7 @@ mod tests {
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
-        energyplus_shadowing_period_solar_coefficients,
+        energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
         energyplus_zone_air_temperature_coefficients, initialize_heat_balance_state,
@@ -5741,6 +6176,7 @@ mod tests {
         surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
         update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
+        update_surface_inside_scriptf_longwave_exchange_probe,
         zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
@@ -7228,6 +7664,82 @@ DATA PERIODS
     }
 
     #[test]
+    fn scriptf_interior_longwave_probe_is_zero_for_equal_surface_temperatures()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        for surface in &mut state.surfaces {
+            surface.inside_face_temperature_c = 21.0;
+            surface.inside_net_longwave_w_per_m2 = 12.0;
+        }
+
+        update_surface_inside_scriptf_longwave_exchange_probe(&mut state.surfaces, None);
+
+        for surface in &state.surfaces {
+            assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-9);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn scriptf_interior_longwave_probe_conserves_zone_exchange_signs()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        for surface in &mut state.surfaces {
+            surface.inside_face_temperature_c = 20.0;
+        }
+        state.surfaces[0].inside_face_temperature_c = 30.0;
+
+        update_surface_inside_scriptf_longwave_exchange_probe(&mut state.surfaces, None);
+
+        assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
+        let zone_exchange_w = state
+            .surfaces
+            .iter()
+            .map(|surface| surface.inside_net_longwave_w_per_m2 * surface.area_m2)
+            .sum::<f64>();
+        assert!(zone_exchange_w.abs() < 1.0e-8);
+
+        Ok(())
+    }
+
+    #[test]
+    fn scriptf_from_view_factors_matches_energyplus_1zone_eio_orientation() {
+        let areas = [69.6773, 69.6773, 69.6773, 69.6773, 232.2576, 232.2576];
+        let printed_final_view_factors = [
+            [0.0000, 0.078565, 0.078565, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.0000, 0.078565, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.078565, 0.0000, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.078565, 0.078565, 0.0000, 0.3823, 0.3823],
+            [0.1147, 0.1147, 0.1147, 0.1147, 0.0000, 0.5410],
+            [0.1147, 0.1147, 0.1147, 0.1147, 0.5410, 0.0000],
+        ];
+        let surface_count = areas.len();
+        let mut internal_view_factors = vec![0.0; surface_count * surface_count];
+        for from_index in 0..surface_count {
+            for to_index in 0..surface_count {
+                internal_view_factors[to_index * surface_count + from_index] =
+                    printed_final_view_factors[from_index][to_index];
+            }
+        }
+        let mut emissivities = vec![0.9; surface_count];
+
+        let script_f =
+            energyplus_scriptf_from_view_factors(&areas, &internal_view_factors, &mut emissivities)
+                .expect("script F matrix");
+        let dimensionless = |sender_index: usize, receiver_index: usize| {
+            script_f[sender_index * surface_count + receiver_index] / STEFAN_BOLTZMANN_W_PER_M2_K4
+        };
+
+        assert!((dimensionless(0, 4) - 0.3366).abs() < 5.0e-4);
+        assert!((dimensionless(4, 0) - 0.1010).abs() < 5.0e-4);
+        assert!((dimensionless(4, 5) - 0.4559).abs() < 5.0e-4);
+        assert!((dimensionless(0, 0) - 0.0094307).abs() < 5.0e-5);
+    }
+
+    #[test]
     fn energyplus_ctf_outside_face_balance_uses_ctf_zero_terms()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
@@ -7710,6 +8222,22 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
         );
         assert_eq!(
             options
