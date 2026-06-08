@@ -19,6 +19,7 @@ const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
+const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -688,10 +689,10 @@ struct SurfaceHeatBalanceTrace {
 /// surfaces with a declared site location.
 ///
 /// The calculation is intentionally a forcing diagnostic: direct normal
-/// radiation is projected with a compact solar-position model and
-/// EnergyPlus-style weather timestep interpolation, diffuse sky is isotropic,
-/// and ground reflection uses a fixed default reflectance. It is not a full
-/// EnergyPlus solar distribution or shadowing claim.
+/// radiation is projected with EnergyPlus-style weather timestep interpolation
+/// and shadowing-period solar position coefficients. Diffuse sky remains
+/// isotropic, and ground reflection uses a fixed default reflectance. It is not
+/// a full EnergyPlus solar distribution or shadowing claim.
 pub fn append_surface_incident_solar_radiation_series(
     results: &mut ResultStore,
     model: &SimulationModel,
@@ -2723,6 +2724,11 @@ fn surface_incident_solar_radiation_hourly_average_w_per_m2(
     let Some(record) = weather_records.get(record_index) else {
         return 0.0;
     };
+    let Some((sin_declination, cos_declination, equation_of_time_hours)) =
+        energyplus_shadowing_period_solar_coefficients(weather_records, record_index)
+    else {
+        return 0.0;
+    };
     let steps = zone_steps_per_hour.max(1);
     let mut total = 0.0;
     for timestep in 1..=steps {
@@ -2748,30 +2754,52 @@ fn surface_incident_solar_radiation_hourly_average_w_per_m2(
         );
         let local_hour =
             f64::from(record.hour.saturating_sub(1)) + f64::from(timestep) / f64::from(steps);
+        let actual_sun_is_up = solar_position_rad_at_local_hour(site, record, local_hour).is_some();
         total += surface_incident_solar_radiation_at_local_hour_w_per_m2(
             surface,
             site,
-            record,
-            local_hour,
-            direct_normal,
-            diffuse_horizontal,
+            SurfaceSolarTimestepInput {
+                local_hour,
+                actual_sun_is_up,
+                sin_declination,
+                cos_declination,
+                equation_of_time_hours,
+                direct_normal_radiation_w_per_m2: direct_normal,
+                diffuse_horizontal_radiation_w_per_m2: diffuse_horizontal,
+            },
         );
     }
 
     total / f64::from(steps)
 }
 
+#[derive(Clone, Copy)]
+struct SurfaceSolarTimestepInput {
+    local_hour: f64,
+    actual_sun_is_up: bool,
+    sin_declination: f64,
+    cos_declination: f64,
+    equation_of_time_hours: f64,
+    direct_normal_radiation_w_per_m2: f64,
+    diffuse_horizontal_radiation_w_per_m2: f64,
+}
+
 fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
     surface: &Surface,
     site: &SiteLocation,
-    record: &EpwRecord,
-    local_hour: f64,
-    direct_normal_radiation_w_per_m2: f64,
-    diffuse_horizontal_radiation_w_per_m2: f64,
+    input: SurfaceSolarTimestepInput,
 ) -> f64 {
-    let Some((solar_altitude_rad, solar_azimuth_rad)) =
-        solar_position_rad_at_local_hour(site, record, local_hour)
-    else {
+    if !input.actual_sun_is_up {
+        return 0.0;
+    }
+
+    let Some((solar_altitude_rad, solar_azimuth_rad)) = solar_position_rad_from_coefficients(
+        site,
+        input.local_hour,
+        input.sin_declination,
+        input.cos_declination,
+        input.equation_of_time_hours,
+    ) else {
         return 0.0;
     };
     if solar_altitude_rad <= 0.0 {
@@ -2780,8 +2808,8 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
 
     let tilt_rad = surface_tilt_deg(surface.surface_type, &surface.vertices).to_radians();
     let surface_azimuth_rad = surface_azimuth_deg(&surface.vertices).to_radians();
-    let direct_normal = direct_normal_radiation_w_per_m2.max(0.0);
-    let diffuse_horizontal = diffuse_horizontal_radiation_w_per_m2.max(0.0);
+    let direct_normal = input.direct_normal_radiation_w_per_m2.max(0.0);
+    let diffuse_horizontal = input.diffuse_horizontal_radiation_w_per_m2.max(0.0);
 
     let cos_incidence = solar_altitude_rad.sin() * tilt_rad.cos()
         + solar_altitude_rad.cos()
@@ -2888,11 +2916,27 @@ fn solar_position_rad_at_local_hour(
     local_hour: f64,
 ) -> Option<(f64, f64)> {
     let day = day_of_year(record.year, record.month, record.day)?;
+    let (sin_declination, cos_declination, equation_of_time_hours) =
+        energyplus_daily_solar_coefficients(day);
+    solar_position_rad_from_coefficients(
+        site,
+        local_hour,
+        sin_declination,
+        cos_declination,
+        equation_of_time_hours,
+    )
+}
+
+fn solar_position_rad_from_coefficients(
+    site: &SiteLocation,
+    local_hour: f64,
+    sin_declination: f64,
+    cos_declination: f64,
+    equation_of_time_hours: f64,
+) -> Option<(f64, f64)> {
     let latitude_rad = site.latitude_deg.to_radians();
     let sin_latitude = latitude_rad.sin();
     let cos_latitude = latitude_rad.cos();
-    let (sin_declination, cos_declination, equation_of_time_hours) =
-        energyplus_daily_solar_coefficients(day);
     let time_zone_meridian_deg = 15.0 * site.time_zone_hours;
     let hour_angle_deg = 15.0 * (12.0 - (local_hour + equation_of_time_hours))
         + (time_zone_meridian_deg - site.longitude_deg);
@@ -2918,6 +2962,55 @@ fn solar_position_rad_at_local_hour(
     }
 
     Some((altitude_rad, azimuth_rad))
+}
+
+fn energyplus_shadowing_period_solar_coefficients(
+    weather_records: &[EpwRecord],
+    record_index: usize,
+) -> Option<(f64, f64, f64)> {
+    if weather_records.is_empty() {
+        return None;
+    }
+
+    let total_days = weather_records.len().div_ceil(24);
+    let day_of_sim_zero = record_index / 24;
+    let period_start_day_zero = (day_of_sim_zero / ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS)
+        * ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS;
+    let period_length = ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS
+        .min(total_days.saturating_sub(period_start_day_zero))
+        .max(1);
+    let period_start_record = weather_records.get(period_start_day_zero * 24)?;
+    let period_start_day_of_year = day_of_year(
+        period_start_record.year,
+        period_start_record.month,
+        period_start_record.day,
+    )?;
+
+    Some(energyplus_average_solar_coefficients(
+        period_start_day_of_year,
+        period_length,
+    ))
+}
+
+fn energyplus_average_solar_coefficients(
+    start_day_of_year: u32,
+    day_count: usize,
+) -> (f64, f64, f64) {
+    let day_count = day_count.max(1);
+    let mut sin_declination_sum = 0.0;
+    let mut equation_of_time_sum = 0.0;
+    for offset in 0..day_count {
+        let (sin_declination, _cos_declination, equation_of_time_hours) =
+            energyplus_daily_solar_coefficients(start_day_of_year + offset as u32);
+        sin_declination_sum += sin_declination;
+        equation_of_time_sum += equation_of_time_hours;
+    }
+
+    let sin_declination = sin_declination_sum / day_count as f64;
+    let cos_declination = (1.0 - sin_declination.powi(2)).sqrt();
+    let equation_of_time_hours = equation_of_time_sum / day_count as f64;
+
+    (sin_declination, cos_declination, equation_of_time_hours)
 }
 
 fn energyplus_daily_solar_coefficients(day_of_year: u32) -> (f64, f64, f64) {
@@ -3713,14 +3806,15 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+        Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
         HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, append_surface_incident_solar_radiation_series,
         build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_daily_solar_coefficients, initialize_heat_balance_state,
+        energyplus_average_solar_coefficients, energyplus_daily_solar_coefficients,
+        energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
@@ -3770,6 +3864,57 @@ mod tests {
 
         assert!((sin_declination - -0.392204631085).abs() < 1.0e-12);
         assert!((equation_of_time_hours - -0.055895327979).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn energyplus_average_solar_coefficients_match_shadowing_period() {
+        let (sin_declination, cos_declination, equation_of_time_hours) =
+            energyplus_average_solar_coefficients(61, 20);
+
+        assert!((sin_declination - -0.065802703719632).abs() < 1.0e-12);
+        assert!((cos_declination - 0.997832653395942).abs() < 1.0e-12);
+        assert!((equation_of_time_hours - -0.168373861452452).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn shadowing_period_solar_coefficients_use_energyplus_update_frequency() {
+        let mut records = Vec::new();
+        let mut date = Date {
+            year: 2013,
+            month: 1,
+            day_of_month: 1,
+        };
+        for _day in 0..80 {
+            for hour in 1..=24 {
+                records.push(EpwRecord {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day_of_month,
+                    hour,
+                    minute: 60,
+                    dry_bulb_c: 0.0,
+                    dew_point_c: 0.0,
+                    relative_humidity_percent: 0.0,
+                    atmospheric_pressure_pa: 101_325.0,
+                    horizontal_infrared_radiation_wh_per_m2: 0.0,
+                    global_horizontal_radiation_wh_per_m2: 0.0,
+                    direct_normal_radiation_wh_per_m2: 0.0,
+                    diffuse_horizontal_radiation_wh_per_m2: 0.0,
+                    wind_direction_deg: 0.0,
+                    wind_speed_m_per_s: 0.0,
+                });
+            }
+            date = next_day(date);
+        }
+
+        let coefficients = energyplus_shadowing_period_solar_coefficients(&records, 1450);
+        assert!(coefficients.is_some());
+        let (sin_declination, cos_declination, equation_of_time_hours) =
+            coefficients.unwrap_or((0.0, 0.0, 0.0));
+
+        assert!((sin_declination - -0.065802703719632).abs() < 1.0e-12);
+        assert!((cos_declination - 0.997832653395942).abs() < 1.0e-12);
+        assert!((equation_of_time_hours - -0.168373861452452).abs() < 1.0e-12);
     }
 
     #[test]
