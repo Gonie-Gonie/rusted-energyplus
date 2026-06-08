@@ -3674,11 +3674,12 @@ fn parse_heat_balance_zone_air_algorithm(
 ) -> Result<HeatBalanceZoneAirAlgorithm, String> {
     match value.trim().to_ascii_lowercase().as_str() {
         "" | "simplified-analytical" => Ok(HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical),
+        "energyplus-analytical-probe" => Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe),
         "energyplus-third-order-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
         }
         other => Err(format!(
-            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical or energyplus-third-order-probe"
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, or energyplus-third-order-probe"
         )),
     }
 }
@@ -3750,6 +3751,7 @@ fn heat_balance_zone_air_algorithm_label(
 ) -> &'static str {
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => "simplified-analytical",
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => "energyplus-analytical-probe",
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => "energyplus-third-order-probe",
     }
 }
@@ -6292,6 +6294,10 @@ mod tests {
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("simplified-analytical").unwrap(),
             ep_runtime::HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm("energyplus-analytical-probe").unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
         );
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("energyplus-third-order-probe").unwrap(),

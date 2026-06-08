@@ -695,6 +695,8 @@ pub struct HeatBalanceStepInput {
 pub enum HeatBalanceZoneAirAlgorithm {
     /// Existing simplified analytical diagnostic shell.
     SimplifiedAnalytical,
+    /// Experimental EnergyPlus analytical predictor path for diagnostics.
+    EnergyPlusAnalyticalProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
     EnergyPlusThirdOrderProbe,
 }
@@ -2433,6 +2435,28 @@ fn advance_heat_balance_state_one_timestep_internal(
                 zone.air_heat_capacity_j_per_k,
                 input.timestep_seconds,
             ),
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
+                let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
+                    zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+                let coefficients = energyplus_zone_air_temperature_coefficients(
+                    sum_ha_w_per_k,
+                    sum_hat_surf_w,
+                    sum_hat_ref_w,
+                    zone.convective_internal_gain_w,
+                    0.0,
+                    0.0,
+                    zone.air_heat_capacity_j_per_k,
+                    input.timestep_seconds,
+                    zone.previous_mean_air_temperatures_c,
+                );
+                energyplus_analytical_zone_air_temperature_c(
+                    previous_temperature_c,
+                    coefficients.temp_independent_coefficient_w,
+                    coefficients.temp_dependent_coefficient_w_per_k,
+                    zone.air_heat_capacity_j_per_k,
+                    input.timestep_seconds,
+                )
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
                     zone_surface_convection_sums(&state.surfaces, zone.zone_id);
@@ -2569,7 +2593,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> f64 {
     match zone_air_algorithm {
-        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => {
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
             zone_state
                 .zone_air_temperature_coefficients
                 .temp_independent_coefficient_w
@@ -6865,6 +6890,12 @@ DATA PERIODS
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
         );
         assert_eq!(options.surface_iteration_count, 1);
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe)
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
+        );
         assert_eq!(
             options
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)

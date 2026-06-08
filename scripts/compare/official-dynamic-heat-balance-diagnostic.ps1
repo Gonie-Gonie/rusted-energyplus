@@ -2,7 +2,7 @@
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
-    [ValidateSet("simplified-analytical", "energyplus-third-order-probe")]
+    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
@@ -18,11 +18,10 @@ Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
-$AlgorithmOutputSuffix = if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe") {
-    "-third-order"
-}
-else {
-    ""
+$AlgorithmOutputSuffix = switch ($ZoneAirAlgorithm) {
+    "energyplus-analytical-probe" { "-analytical" }
+    "energyplus-third-order-probe" { "-third-order" }
+    Default { "" }
 }
 $WarmupOutputSuffix = if ($WarmupMinimumDays -gt 0) {
     "-warmup-min$WarmupMinimumDays"
@@ -259,7 +258,11 @@ if ($null -eq $topBottleneck) {
 $expectedTopKey = "ZN001:FLR001"
 $expectedTopVariable = "Surface Inside Face Conduction Heat Transfer Rate"
 $expectedTopDescription = "floor inside conduction"
-if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or $CtfSeedPolicy -eq "all-eio") {
+if (
+    $ZoneAirAlgorithm -eq "energyplus-analytical-probe" -or
+    $ZoneAirAlgorithm -eq "energyplus-third-order-probe" -or
+    $CtfSeedPolicy -eq "all-eio"
+) {
     $expectedTopKey = "ZONE ONE"
     $expectedTopVariable = "Zone Air Heat Balance Surface Convection Rate"
     $expectedTopDescription = "zone air heat-balance surface convection"
