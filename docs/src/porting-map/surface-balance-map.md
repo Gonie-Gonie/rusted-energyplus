@@ -17,8 +17,8 @@ before official ExampleFile surface temperatures can be promoted.
 | Balance side | EnergyPlus source | Required Rust target | Current status |
 |---|---|---|---|
 | outside face temperature | `CalcHeatBalanceOutsideSurf` in `HeatBalanceSurfaceManager.cc` | outside face state with weather, solar, exterior convection, and boundary conditions | roof/wall diagnostic uses weather/solar exterior forcing; floor/other and full DOE-2/radiation iteration remain partial |
-| inside face temperature | `CalcHeatBalanceInsideSurf` in `HeatBalanceSurfaceManager.cc` | inside face state with zone air, convection, radiant exchange, and internal gains | zone-temperature mirror only |
-| opaque conduction histories | `SurfCTFConstInPart`, `SurfCTFConstOutPart`, `SurfInsideFluxHist`, and `SurfOutsideFluxHist` in `HeatBalanceSurfaceManager.cc` | CTF coefficient and history state per opaque surface | layer-stack input exists; CTF histories not ported |
+| inside face temperature | `CalcHeatBalanceInsideSurf` in `HeatBalanceSurfaceManager.cc` | inside face state with zone air, convection, radiant exchange, and internal gains | CTF subset solver uses zone air, TARP convection, damping, and zero-initialized radiant/source slots; full radiation/internal source wiring remains partial |
+| opaque conduction histories | `SurfCTFConstInPart`, `SurfCTFConstOutPart`, `SurfInsideFluxHist`, and `SurfOutsideFluxHist` in `HeatBalanceSurfaceManager.cc` | CTF coefficient and history state per opaque surface | EIO-seeded diagnostic histories exist; native mass-material coefficient generation and full iteration parity remain unported |
 | adiabatic boundary | surface boundary condition handling | inside/outside equality for adiabatic no-mass cases | conformance for declared local case |
 | interzone boundary | adjacent surface/zone lookup | resolved target surface and zone IDs | smoke-tested |
 | reporting | `SetupOutputVariable` registration | `ResultStore` series per key/variable/frequency | official diagnostic now compares roof plus wall/floor decomposition series |
@@ -46,4 +46,7 @@ or advance EnergyPlus CTF coefficient histories for mass-material constructions.
 The diagnostic timestep path now feeds the existing roof/wall exterior
 weather/solar balance into the CTF boundary driver, which improves wall, roof,
 and MAT series while exposing that the zone opaque aggregate still depends on
-unported floor mass CTF and full surface iteration parity.
+unported floor mass CTF and full surface iteration parity. Inside-surface
+radiant/source terms now have explicit zero-initialized runtime slots matching
+EnergyPlus `SurfTempTerm` inputs, but the official diagnostic still treats those
+terms as future wiring rather than promoted parity.

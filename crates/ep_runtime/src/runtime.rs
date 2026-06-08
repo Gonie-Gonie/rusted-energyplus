@@ -595,7 +595,7 @@ pub struct CtfInsideFaceBalanceInput {
     pub inside_convection_coefficient_w_per_m2_k: f64,
     /// Previous inside-face temperature from the current inside-surface iteration in C.
     pub previous_inside_face_temperature_c: f64,
-    /// Net inside radiant/source term in W/m2. Zero for the current diagnostic subset.
+    /// Net inside radiant/source term in W/m2 from EnergyPlus `SurfTempTerm` inputs.
     pub net_inside_source_w_per_m2: f64,
 }
 
@@ -659,6 +659,16 @@ pub struct SurfaceHeatBalanceState {
     pub conductance_w_per_k: f64,
     /// Current inside convection coefficient in W/m2-K.
     pub inside_convection_coefficient_w_per_m2_k: f64,
+    /// EnergyPlus `SurfQdotRadIntGainsInPerArea` source term in W/m2.
+    pub inside_radiant_internal_gain_w_per_m2: f64,
+    /// EnergyPlus `SurfOpaqQRadSWInAbs` absorbed inside shortwave term in W/m2.
+    pub inside_shortwave_absorbed_w_per_m2: f64,
+    /// EnergyPlus `SurfQAdditionalHeatSourceInside` term in W/m2.
+    pub inside_additional_heat_source_w_per_m2: f64,
+    /// EnergyPlus `SurfQdotRadHVACInPerArea` source term in W/m2.
+    pub inside_radiant_hvac_w_per_m2: f64,
+    /// EnergyPlus `SurfQdotRadNetLWInPerArea` source term in W/m2.
+    pub inside_net_longwave_w_per_m2: f64,
     /// Surface CTF coefficients and history constants.
     pub ctf: SurfaceCtfState,
     /// Current opaque heat transfer to the owning zone in W.
@@ -2256,6 +2266,11 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 conductance_w_per_k,
                 inside_convection_coefficient_w_per_m2_k:
                     ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K,
+                inside_radiant_internal_gain_w_per_m2: 0.0,
+                inside_shortwave_absorbed_w_per_m2: 0.0,
+                inside_additional_heat_source_w_per_m2: 0.0,
+                inside_radiant_hvac_w_per_m2: 0.0,
+                inside_net_longwave_w_per_m2: 0.0,
                 ctf,
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2450,7 +2465,7 @@ fn advance_heat_balance_state_one_timestep_internal(
                 reference_air_temperature_c: zone_temperature_c,
                 inside_convection_coefficient_w_per_m2_k,
                 previous_inside_face_temperature_c,
-                net_inside_source_w_per_m2: 0.0,
+                net_inside_source_w_per_m2: surface_inside_ctf_source_terms_w_per_m2(surface),
             },
         );
         if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
@@ -3498,11 +3513,20 @@ fn energyplus_walton_stable_horizontal_or_tilt_convection_w_per_m2_k(
     1.810 * delta_temperature_c.abs().powf(1.0 / 3.0) / (1.382 + cos_tilt.abs())
 }
 
+fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+    surface.inside_radiant_internal_gain_w_per_m2
+        + surface.inside_shortwave_absorbed_w_per_m2
+        + surface.inside_additional_heat_source_w_per_m2
+        + surface.inside_radiant_hvac_w_per_m2
+        + surface.inside_net_longwave_w_per_m2
+}
+
 /// EnergyPlus-shaped CTF inside-face temperature balance for the opaque subset.
 ///
-/// This covers the no-source/no-pool/no-movable-insulation branch documented in
-/// `CalcHeatBalanceInsideSurf2CTFOnly`. It is kept separate from the current
-/// zone-air diagnostic shell so the CTF face solver can be wired incrementally.
+/// This covers the no-pool/no-movable-insulation branch documented in
+/// `CalcHeatBalanceInsideSurf2CTFOnly`. Inside shortwave, radiant, additional
+/// heat-source, HVAC radiant, and net longwave terms are passed through the
+/// source-map slots on `SurfaceHeatBalanceState`.
 #[must_use]
 pub fn energyplus_ctf_inside_face_temperature_c(
     surface: &SurfaceHeatBalanceState,
@@ -5089,8 +5113,9 @@ mod tests {
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_geometry_summaries, surface_inside_conduction_flux_w_per_m2,
-        surface_outside_conduction_flux_w_per_m2, update_surface_ctf_history_constants,
-        zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
+        surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
+        update_surface_ctf_history_constants, zone_air_heat_balance_air_storage_rate_w,
+        zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -6384,6 +6409,40 @@ DATA PERIODS
             },
         );
         assert!((adiabatic - (135.0 / 9.5)).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn surface_inside_ctf_source_terms_follow_energyplus_temp_term_slots()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.outside_face_temperature_c = 10.0;
+        surface.inside_face_temperature_c = 19.0;
+        surface.ctf.inside_0_w_per_m2_k = 3.0;
+        surface.ctf.cross_0_w_per_m2_k = 0.5;
+        surface.ctf.const_in_part_w_per_m2 = 1.0;
+        surface.inside_radiant_internal_gain_w_per_m2 = 1.0;
+        surface.inside_shortwave_absorbed_w_per_m2 = 2.0;
+        surface.inside_additional_heat_source_w_per_m2 = 3.0;
+        surface.inside_radiant_hvac_w_per_m2 = 4.0;
+        surface.inside_net_longwave_w_per_m2 = 5.0;
+
+        let source_terms = surface_inside_ctf_source_terms_w_per_m2(surface);
+        assert!((source_terms - 15.0).abs() < 1.0e-12);
+
+        let temperature = energyplus_ctf_inside_face_temperature_c(
+            surface,
+            CtfInsideFaceBalanceInput {
+                reference_air_temperature_c: 20.0,
+                inside_convection_coefficient_w_per_m2_k: 2.0,
+                previous_inside_face_temperature_c: 18.0,
+                net_inside_source_w_per_m2: source_terms,
+            },
+        );
+        assert!((temperature - 15.1).abs() < 1.0e-12);
 
         Ok(())
     }

@@ -92,6 +92,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `CalcHeatBalanceInsideSurf2CTFOnly` uses `IterDampConst = 5.0`, subtracts
   `CTFCross[0]` from the inside denominator for adiabatic surfaces, and uses
   `CTFCross[0] * SurfTempOutHist(1)` for standard opaque surfaces.
+- `CalcHeatBalanceInsideSurf2CTFOnly` builds `SurfTempTerm` from
+  `SurfCTFConstInPart`, `SurfQdotRadIntGainsInPerArea`, `SurfOpaqQRadSWInAbs`,
+  `SurfQAdditionalHeatSourceInside`, `HConvInt * RefAirTemp`, and
+  `SurfQdotRadHVACInPerArea`, then adds `SurfQdotRadNetLWInPerArea` in the
+  standard no-pool branch. Rust now exposes zero-initialized per-surface slots
+  for those inside radiant/source terms so future solar/radiation wiring can be
+  isolated without changing the CTF face solver API again.
 - `CalcHeatBalanceInsideSurf2CTFOnly` keeps the previous inside surface
   temperature in `SurfTempInsOld` for the iterative damping term; Rust now
   preserves the previous per-surface inside-face temperature before its
