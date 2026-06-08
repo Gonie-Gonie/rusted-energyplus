@@ -124,9 +124,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   convection coefficients and surface temperatures, snapshots
   `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` in
   `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
-  and third-order zone-air temperature helpers. The predictor equation itself
-  remains the simplified diagnostic shell until all coefficient inputs are
-  wired from source-mapped runtime state.
+  and third-order zone-air temperature helpers. `HeatBalanceZoneAirAlgorithm`
+  keeps the default trace on the existing simplified analytical shell while
+  allowing an explicit third-order diagnostic probe. The default predictor
+  equation itself remains the simplified diagnostic shell until all coefficient
+  inputs are wired from source-mapped runtime state.
 
 Current Rust boundary:
 

@@ -680,6 +680,15 @@ pub struct HeatBalanceStepInput {
     pub timestep_seconds: f64,
 }
 
+/// Zone-air temperature algorithm used by diagnostic heat-balance traces.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceZoneAirAlgorithm {
+    /// Existing simplified analytical diagnostic shell.
+    SimplifiedAnalytical,
+    /// Experimental EnergyPlus third-order predictor path for diagnostics.
+    EnergyPlusThirdOrderProbe,
+}
+
 /// Options for the heat-balance zone-air diagnostic trace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceSimulationOptions {
@@ -689,6 +698,8 @@ pub struct HeatBalanceSimulationOptions {
     pub initial_zone_air_temperature_c: f64,
     /// Optional run-period warmup loop.
     pub warmup: HeatBalanceWarmupOptions,
+    /// Zone-air temperature algorithm for diagnostic probes.
+    pub zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -757,6 +768,7 @@ impl HeatBalanceSimulationOptions {
             sample_count,
             initial_zone_air_temperature_c: ENERGYPLUS_ZONE_INITIAL_TEMP_C,
             warmup: HeatBalanceWarmupOptions::disabled(),
+            zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         }
     }
 
@@ -778,7 +790,18 @@ impl HeatBalanceSimulationOptions {
                 temperature_convergence_tolerance_delta_c: building
                     .temperature_convergence_tolerance_delta_c,
             },
+            zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         }
+    }
+
+    /// Returns options with an explicit zone-air diagnostic algorithm.
+    #[must_use]
+    pub const fn with_zone_air_algorithm(
+        mut self,
+        zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    ) -> Self {
+        self.zone_air_algorithm = zone_air_algorithm;
+        self
     }
 }
 
@@ -2283,7 +2306,13 @@ pub fn advance_heat_balance_state_one_timestep(
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
 ) {
-    advance_heat_balance_state_one_timestep_internal(model, state, input, None);
+    advance_heat_balance_state_one_timestep_internal(
+        model,
+        state,
+        input,
+        None,
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+    );
 }
 
 fn advance_heat_balance_state_one_timestep_internal(
@@ -2291,6 +2320,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) {
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
@@ -2350,14 +2380,35 @@ fn advance_heat_balance_state_one_timestep_internal(
         };
 
         zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
-        zone.mean_air_temperature_c = step_zone_air_temperature(
-            previous_temperature_c,
-            equivalent_outside_temperature_c,
-            zone.convective_internal_gain_w,
-            conductance_w_per_k,
-            zone.air_heat_capacity_j_per_k,
-            input.timestep_seconds,
-        );
+        zone.mean_air_temperature_c = match zone_air_algorithm {
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => step_zone_air_temperature(
+                previous_temperature_c,
+                equivalent_outside_temperature_c,
+                zone.convective_internal_gain_w,
+                conductance_w_per_k,
+                zone.air_heat_capacity_j_per_k,
+                input.timestep_seconds,
+            ),
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => {
+                let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
+                    zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+                let coefficients = energyplus_zone_air_temperature_coefficients(
+                    sum_ha_w_per_k,
+                    sum_hat_surf_w,
+                    sum_hat_ref_w,
+                    zone.convective_internal_gain_w,
+                    0.0,
+                    0.0,
+                    zone.air_heat_capacity_j_per_k,
+                    input.timestep_seconds,
+                    zone.previous_mean_air_temperatures_c,
+                );
+                energyplus_third_order_zone_air_temperature_from_coefficients(
+                    previous_temperature_c,
+                    coefficients,
+                )
+            }
+        };
     }
 
     let current_zone_temperatures = state
@@ -2551,6 +2602,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_steps_per_hour,
         seconds_per_timestep,
         options.warmup,
+        options.zone_air_algorithm,
     );
     let run_period_timestep_start = state.timestep_index;
     let mut zone_temperatures = state
@@ -2619,6 +2671,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     timestep_seconds: seconds_per_timestep,
                 },
                 weather_context,
+                options.zone_air_algorithm,
             );
         }
 
@@ -2842,6 +2895,7 @@ fn run_heat_balance_run_period_warmup(
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     options: HeatBalanceWarmupOptions,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
         return HeatBalanceWarmupSummary::disabled();
@@ -2872,6 +2926,7 @@ fn run_heat_balance_run_period_warmup(
                         timestep_seconds: seconds_per_timestep,
                     },
                     None,
+                    zone_air_algorithm,
                 );
             }
         }
@@ -4416,6 +4471,16 @@ pub fn energyplus_third_order_zone_air_temperature_c(
         timestep_seconds,
         previous_mean_air_temperatures_c,
     );
+    energyplus_third_order_zone_air_temperature_from_coefficients(
+        previous_temperature_c,
+        coefficients,
+    )
+}
+
+fn energyplus_third_order_zone_air_temperature_from_coefficients(
+    previous_temperature_c: f64,
+    coefficients: ZoneAirTemperatureCoefficients,
+) -> f64 {
     let denominator = coefficients.third_order_temp_dependent_load_w_per_k;
     if denominator.abs() <= f64::EPSILON {
         previous_temperature_c
@@ -4902,7 +4967,8 @@ mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
         Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        HeatBalanceStepInput, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
@@ -6540,6 +6606,51 @@ DATA PERIODS
             return Err(std::io::Error::other("missing zone conduction series").into());
         };
         assert!(zone_conduction_series.values[0] < 0.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_zone_air_algorithm_option_defaults_to_simplified() {
+        let options = HeatBalanceSimulationOptions::hourly_samples(2);
+
+        assert_eq!(
+            options.zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
+        );
+    }
+
+    #[test]
+    fn heat_balance_third_order_probe_runs_as_diagnostic_option()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let simulation = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[10.0, 12.0],
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe),
+        )?;
+
+        assert_eq!(simulation.summary.samples, 2);
+        assert_eq!(simulation.summary.timestep_count, 12);
+        let Some(zone_series) = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing zone series").into());
+        };
+        assert_eq!(zone_series.values.len(), 2);
+        assert!(zone_series.values.iter().all(|value| value.is_finite()));
+        assert_eq!(
+            simulation.summary.warmup,
+            HeatBalanceWarmupSummary::disabled()
+        );
 
         Ok(())
     }
