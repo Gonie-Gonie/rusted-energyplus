@@ -26,7 +26,7 @@ future official ExampleFile transient conduction work.
 
 | EnergyPlus area | Source anchor | Rust target |
 |---|---|---|
-| CTF setup | construction/material CTF routines and `DataHeatBalance` histories | future construction transfer function state |
+| CTF setup | construction/material CTF routines and `DataHeatBalance` histories | `SurfaceCtfState` coefficients and histories |
 | inside conduction reporting | `HeatBalanceSurfaceManager.cc` output registration and update | `ResultStore` surface conduction series |
 | outside conduction reporting | `HeatBalanceSurfaceManager.cc` output registration and update | outside face conduction series |
 | zone opaque aggregate | advanced report variables for opaque surface sums | zone aggregate conduction series |

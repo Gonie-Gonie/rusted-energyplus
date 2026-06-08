@@ -72,7 +72,7 @@ unless the deviation is documented in a case-specific waiver:
 |---|---|---|
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only |
-| construction/material CTF data | `ep_model::Construction`, `ep_model::Material` | ordered opaque layer stack is preserved; CTF coefficient arrays and histories are not ported |
+| construction/material CTF data | `ep_model::Construction`, `ep_model::Material`, `ep_runtime::SurfaceCtfState` | ordered opaque layer stack and steady CTF slots exist; mass-material coefficient generation and history advancement are not ported |
 | zone predictor histories such as `MAT`, `XMAT`, and `DSXMAT` | future `ep_runtime::zone_air` histories | diagnostic shell only |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
@@ -97,8 +97,9 @@ Current Rust boundary:
 - `ep_compare` reads EIO `CTF` coefficient rows and associates them with the
   preceding `Construction CTF` row for coefficient-level oracle checks.
 - `ep_runtime` sums layer thermal resistance and available areal heat capacity
-  for the current simplified opaque surface state.
-- EnergyPlus CTF coefficient generation, history terms, source/sink terms, and
+  for the current simplified opaque surface state, and stores steady CTF
+  coefficient/history slots per surface.
+- EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
 

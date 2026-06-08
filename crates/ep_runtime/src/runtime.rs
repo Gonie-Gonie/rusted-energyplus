@@ -495,6 +495,37 @@ pub struct ZoneHeatBalanceState {
     pub opaque_surface_heat_gain_w: f64,
 }
 
+/// Surface CTF coefficients and history constants.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceCtfState {
+    /// CTF outside/X coefficient at time zero in W/m2-K.
+    pub outside_0_w_per_m2_k: f64,
+    /// CTF cross/Y coefficient at time zero in W/m2-K.
+    pub cross_0_w_per_m2_k: f64,
+    /// CTF inside/Z coefficient at time zero in W/m2-K.
+    pub inside_0_w_per_m2_k: f64,
+    /// Inside CTF history constant part in W/m2.
+    pub const_in_part_w_per_m2: f64,
+    /// Outside CTF history constant part in W/m2.
+    pub const_out_part_w_per_m2: f64,
+    /// CTF outside/X history coefficients in W/m2-K.
+    pub outside_history_w_per_m2_k: Vec<f64>,
+    /// CTF cross/Y history coefficients in W/m2-K.
+    pub cross_history_w_per_m2_k: Vec<f64>,
+    /// CTF inside/Z history coefficients in W/m2-K.
+    pub inside_history_w_per_m2_k: Vec<f64>,
+    /// CTF flux history coefficients.
+    pub flux_history: Vec<f64>,
+    /// Previous outside face temperature history in C.
+    pub outside_temperature_history_c: Vec<f64>,
+    /// Previous inside face temperature history in C.
+    pub inside_temperature_history_c: Vec<f64>,
+    /// Previous outside conduction flux history in W/m2.
+    pub outside_flux_history_w_per_m2: Vec<f64>,
+    /// Previous inside conduction flux history in W/m2.
+    pub inside_flux_history_w_per_m2: Vec<f64>,
+}
+
 /// Per-surface heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SurfaceHeatBalanceState {
@@ -534,16 +565,8 @@ pub struct SurfaceHeatBalanceState {
     pub solar_absorptance: f64,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
-    /// CTF outside/X coefficient at time zero in W/m2-K.
-    pub ctf_outside_0_w_per_m2_k: f64,
-    /// CTF cross/Y coefficient at time zero in W/m2-K.
-    pub ctf_cross_0_w_per_m2_k: f64,
-    /// CTF inside/Z coefficient at time zero in W/m2-K.
-    pub ctf_inside_0_w_per_m2_k: f64,
-    /// Inside CTF history constant part in W/m2.
-    pub ctf_const_in_part_w_per_m2: f64,
-    /// Outside CTF history constant part in W/m2.
-    pub ctf_const_out_part_w_per_m2: f64,
+    /// Surface CTF coefficients and history constants.
+    pub ctf: SurfaceCtfState,
     /// Current opaque heat transfer to the owning zone in W.
     pub heat_gain_to_zone_w: f64,
     /// Current inside face temperature in C.
@@ -2081,11 +2104,10 @@ pub fn initialize_heat_balance_state(
                 thermal_absorptance: thermal.thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
                 conductance_w_per_k,
-                ctf_outside_0_w_per_m2_k: steady_ctf_w_per_m2_k,
-                ctf_cross_0_w_per_m2_k: steady_ctf_w_per_m2_k,
-                ctf_inside_0_w_per_m2_k: steady_ctf_w_per_m2_k,
-                ctf_const_in_part_w_per_m2: 0.0,
-                ctf_const_out_part_w_per_m2: 0.0,
+                ctf: steady_surface_ctf_state(
+                    steady_ctf_w_per_m2_k,
+                    initial_zone_air_temperature_c,
+                ),
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
                 outside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2753,6 +2775,27 @@ fn steady_ctf_coefficient_w_per_m2_k(area_m2: f64, thermal_resistance_m2_k_per_w
     }
 }
 
+fn steady_surface_ctf_state(
+    coefficient_w_per_m2_k: f64,
+    initial_temperature_c: f64,
+) -> SurfaceCtfState {
+    SurfaceCtfState {
+        outside_0_w_per_m2_k: coefficient_w_per_m2_k,
+        cross_0_w_per_m2_k: coefficient_w_per_m2_k,
+        inside_0_w_per_m2_k: coefficient_w_per_m2_k,
+        const_in_part_w_per_m2: 0.0,
+        const_out_part_w_per_m2: 0.0,
+        outside_history_w_per_m2_k: Vec::new(),
+        cross_history_w_per_m2_k: Vec::new(),
+        inside_history_w_per_m2_k: Vec::new(),
+        flux_history: Vec::new(),
+        outside_temperature_history_c: vec![initial_temperature_c],
+        inside_temperature_history_c: vec![initial_temperature_c],
+        outside_flux_history_w_per_m2: vec![0.0],
+        inside_flux_history_w_per_m2: vec![0.0],
+    }
+}
+
 fn resolve_surface_boundary_target(
     model: &TypedModel,
     surface: &Surface,
@@ -2971,16 +3014,16 @@ fn horizontal_infrared_sky_temperature_c(
 
 fn surface_inside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
     surface.area_m2
-        * (surface.outside_face_temperature_c * surface.ctf_cross_0_w_per_m2_k
-            - surface.inside_face_temperature_c * surface.ctf_inside_0_w_per_m2_k
-            + surface.ctf_const_in_part_w_per_m2)
+        * (surface.outside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+            - surface.inside_face_temperature_c * surface.ctf.inside_0_w_per_m2_k
+            + surface.ctf.const_in_part_w_per_m2)
 }
 
 fn surface_outside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
     -surface.area_m2
-        * (surface.outside_face_temperature_c * surface.ctf_outside_0_w_per_m2_k
-            - surface.inside_face_temperature_c * surface.ctf_cross_0_w_per_m2_k
-            + surface.ctf_const_out_part_w_per_m2)
+        * (surface.outside_face_temperature_c * surface.ctf.outside_0_w_per_m2_k
+            - surface.inside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+            + surface.ctf.const_out_part_w_per_m2)
 }
 
 fn surface_rate_per_area_w_per_m2(rate_w: f64, area_m2: f64) -> f64 {
@@ -5065,11 +5108,15 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
         assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
-        assert_eq!(state.surfaces[0].ctf_outside_0_w_per_m2_k, 1.0);
-        assert_eq!(state.surfaces[0].ctf_cross_0_w_per_m2_k, 1.0);
-        assert_eq!(state.surfaces[0].ctf_inside_0_w_per_m2_k, 1.0);
-        assert_eq!(state.surfaces[0].ctf_const_in_part_w_per_m2, 0.0);
-        assert_eq!(state.surfaces[0].ctf_const_out_part_w_per_m2, 0.0);
+        assert_eq!(state.surfaces[0].ctf.outside_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf.cross_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf.inside_0_w_per_m2_k, 1.0);
+        assert_eq!(state.surfaces[0].ctf.const_in_part_w_per_m2, 0.0);
+        assert_eq!(state.surfaces[0].ctf.const_out_part_w_per_m2, 0.0);
+        assert_eq!(
+            state.surfaces[0].ctf.outside_temperature_history_c,
+            vec![20.0]
+        );
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
