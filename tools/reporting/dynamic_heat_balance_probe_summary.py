@@ -70,6 +70,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-analytical-surface-first-iter3",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-analytical-surface-first-surface-iter3"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="analytical",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-analytical"
@@ -127,6 +136,7 @@ REFERENCE_LANES = {
     "all-ctf-warmup-min20": "all-ctf",
     "all-ctf-surface-iter3": "all-ctf",
     "all-ctf-analytical-surface-first": "all-ctf",
+    "all-ctf-analytical-surface-first-iter3": "all-ctf-analytical-surface-first",
     "analytical": "default",
     "analytical-surface-first": "default",
     "third-order": "default",

@@ -73,6 +73,10 @@ probe, while keeping floor inside conduction as the top bottleneck. That
 combined lane confirms the next promotion blocker is not coefficient
 availability alone or zone-air call order alone, but the mass-floor
 face/history coupling that remains after those two probes are joined.
+Adding three surface-balance passes on top of that combined lane lowers the
+floor inside/outside conduction and zone aggregate conduction RMSE further,
+while slightly worsening MAT, so surface iteration is a real conduction lever
+but still has to be paired with the zone-air correction order before promotion.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

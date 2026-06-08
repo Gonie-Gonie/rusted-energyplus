@@ -39,8 +39,9 @@ Current generators:
   aimed at the probe that actually improves that state. Probe lanes include
   all-CTF seeding, all-CTF plus oracle-day-count warmup, all-CTF plus a
   surface-iteration probe, EnergyPlus analytical, analytical surface-first,
-  combined all-CTF analytical surface-first, third-order zone-air updates, and
-  an oracle-day-count warmup minimum. It is
+  combined all-CTF analytical surface-first, combined all-CTF analytical
+  surface-first with three surface passes, third-order zone-air updates, and an
+  oracle-day-count warmup minimum. It is
   development evidence only and does not create a release conformance artifact.
   `scripts\dev.cmd official-dynamic-heat-balance-probe-summary` invokes this
   generator through the repo-local report Python environment.

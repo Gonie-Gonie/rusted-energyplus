@@ -131,6 +131,7 @@ Current v0.33 official dynamic diagnostic evidence:
 - `official-dynamic-heat-balance-analytical-probe`
 - `official-dynamic-heat-balance-analytical-surface-first-probe`
 - `official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe`
+- `official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe`
 - `official-dynamic-heat-balance-third-order-probe`
 - `official-dynamic-heat-balance-probe-summary` for development summaries from
   existing `.runtime` compare outputs
