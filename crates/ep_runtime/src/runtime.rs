@@ -31,7 +31,8 @@ const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
-const ENERGYPLUS_INITIAL_INSIDE_CONVECTION_W_PER_M2_K: f64 = 3.076;
+const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
+const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -603,6 +604,8 @@ pub struct SurfaceHeatBalanceState {
     pub outside_layer_material_name: String,
     /// Surface area in square meters.
     pub area_m2: f64,
+    /// Surface tilt in degrees using EnergyPlus orientation conventions.
+    pub tilt_deg: f64,
     /// Area-normalized thermal resistance in m2-K/W.
     pub thermal_resistance_m2_k_per_w: f64,
     /// Area-normalized heat capacity in J/m2-K when available.
@@ -2139,6 +2142,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         .iter()
         .map(|surface| {
             let area_m2 = surface_area_m2(&surface.vertices);
+            let tilt_deg = surface_tilt_deg(surface.surface_type, &surface.vertices);
             let thermal = surface_thermal_properties(&model.typed, surface)?;
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
@@ -2173,6 +2177,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 outside_layer_material_id: thermal.outside_layer_material_id,
                 outside_layer_material_name: thermal.outside_layer_material_name,
                 area_m2,
+                tilt_deg,
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
                 thermal_absorptance: thermal.thermal_absorptance,
@@ -2296,6 +2301,12 @@ fn advance_heat_balance_state_one_timestep_internal(
             .find(|zone| zone.zone_id == surface.zone_id)
             .map(|zone| zone.mean_air_temperature_c)
             .unwrap_or(surface.inside_face_temperature_c);
+        let inside_convection_coefficient_w_per_m2_k =
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                surface,
+                previous_inside_face_temperature_c,
+                zone_temperature_c,
+            );
 
         surface.inside_face_temperature_c = zone_temperature_c;
         surface.outside_face_temperature_c = surface_boundary_temperature_c(
@@ -2309,8 +2320,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             surface,
             CtfInsideFaceBalanceInput {
                 reference_air_temperature_c: zone_temperature_c,
-                inside_convection_coefficient_w_per_m2_k:
-                    ENERGYPLUS_INITIAL_INSIDE_CONVECTION_W_PER_M2_K,
+                inside_convection_coefficient_w_per_m2_k,
                 previous_inside_face_temperature_c,
                 net_inside_source_w_per_m2: 0.0,
             },
@@ -3124,6 +3134,72 @@ fn reported_surface_outside_face_temperature_c(
         owning_zone_temperature_c,
         weather_context,
     )
+}
+
+/// EnergyPlus ASHRAE TARP inside natural convection coefficient for one surface.
+#[must_use]
+pub fn energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+    surface: &SurfaceHeatBalanceState,
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+) -> f64 {
+    let inside_cos_tilt = -surface.tilt_deg.to_radians().cos();
+    let coefficient = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(
+        surface_temperature_c,
+        air_temperature_c,
+        inside_cos_tilt,
+    );
+    if !coefficient.is_finite() {
+        return ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K;
+    }
+
+    coefficient.clamp(
+        ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K,
+        ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
+    )
+}
+
+fn energyplus_ashrae_tarp_natural_convection_w_per_m2_k(
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+    cos_tilt: f64,
+) -> f64 {
+    let delta_temperature_c = surface_temperature_c - air_temperature_c;
+    if delta_temperature_c.abs() <= f64::EPSILON || cos_tilt.abs() <= 1.0e-12 {
+        return energyplus_ashrae_vertical_wall_convection_w_per_m2_k(delta_temperature_c);
+    }
+
+    if (delta_temperature_c < 0.0 && cos_tilt < 0.0)
+        || (delta_temperature_c > 0.0 && cos_tilt > 0.0)
+    {
+        energyplus_walton_unstable_horizontal_or_tilt_convection_w_per_m2_k(
+            delta_temperature_c,
+            cos_tilt,
+        )
+    } else {
+        energyplus_walton_stable_horizontal_or_tilt_convection_w_per_m2_k(
+            delta_temperature_c,
+            cos_tilt,
+        )
+    }
+}
+
+fn energyplus_ashrae_vertical_wall_convection_w_per_m2_k(delta_temperature_c: f64) -> f64 {
+    1.31 * delta_temperature_c.abs().powf(1.0 / 3.0)
+}
+
+fn energyplus_walton_unstable_horizontal_or_tilt_convection_w_per_m2_k(
+    delta_temperature_c: f64,
+    cos_tilt: f64,
+) -> f64 {
+    9.482 * delta_temperature_c.abs().powf(1.0 / 3.0) / (7.238 - cos_tilt.abs())
+}
+
+fn energyplus_walton_stable_horizontal_or_tilt_convection_w_per_m2_k(
+    delta_temperature_c: f64,
+    cos_tilt: f64,
+) -> f64 {
+    1.810 * delta_temperature_c.abs().powf(1.0 / 3.0) / (1.382 + cos_tilt.abs())
 }
 
 /// EnergyPlus-shaped CTF inside-face temperature balance for the opaque subset.
@@ -4509,9 +4585,11 @@ mod tests {
         advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c, energyplus_daily_solar_coefficients,
-        energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state,
+        energyplus_shadowing_period_solar_coefficients,
+        energyplus_tarp_inside_convection_coefficient_w_per_m2_k, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
@@ -5455,6 +5533,24 @@ DATA PERIODS
         assert_eq!(state.zones[0].opaque_surface_conductance_w_per_k, 6.0);
         assert_eq!(state.zones[0].opaque_surface_heat_gain_w, 0.0);
         assert_eq!(state.surfaces.len(), 6);
+        let floor = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "FLOOR")
+            .ok_or_else(|| std::io::Error::other("missing floor surface"))?;
+        assert!((floor.tilt_deg - 180.0).abs() < 1.0e-9);
+        let roof = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing roof surface"))?;
+        assert!((roof.tilt_deg - 0.0).abs() < 1.0e-9);
+        let wall = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing wall surface"))?;
+        assert!((wall.tilt_deg - 90.0).abs() < 1.0e-9);
         assert_eq!(
             state.surfaces[0].outside_boundary_condition,
             OutsideBoundaryCondition::Outdoors
@@ -5477,6 +5573,68 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn energyplus_tarp_natural_convection_matches_ashrae_branches() {
+        let vertical = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(28.0, 20.0, 0.0);
+        assert!((vertical - 2.62).abs() < 1.0e-12);
+
+        let unstable_delta = 2.0_f64.powf(1.0 / 3.0);
+        let unstable = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(22.0, 20.0, 1.0);
+        let expected_unstable = 9.482 * unstable_delta / (7.238 - 1.0);
+        assert!((unstable - expected_unstable).abs() < 1.0e-12);
+
+        let stable = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(22.0, 20.0, -1.0);
+        let expected_stable = 1.810 * unstable_delta / (1.382 + 1.0);
+        assert!((stable - expected_stable).abs() < 1.0e-12);
+
+        let zero_delta = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(20.0, 20.0, 1.0);
+        assert_eq!(zero_delta, 0.0);
+    }
+
+    #[test]
+    fn energyplus_tarp_inside_convection_uses_surface_orientation_and_limits()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let state = initialize_heat_balance_state(&model, 20.0)?;
+        let floor = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "FLOOR")
+            .ok_or_else(|| std::io::Error::other("missing floor surface"))?;
+        let roof = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing roof surface"))?;
+        let wall = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing wall surface"))?;
+
+        let delta_term = 2.0_f64.powf(1.0 / 3.0);
+        let floor_coefficient =
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 22.0, 20.0);
+        let expected_floor = 9.482 * delta_term / (7.238 - 1.0);
+        assert!((floor_coefficient - expected_floor).abs() < 1.0e-12);
+
+        let roof_coefficient =
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(roof, 22.0, 20.0);
+        let expected_roof = 1.810 * delta_term / (1.382 + 1.0);
+        assert!((roof_coefficient - expected_roof).abs() < 1.0e-12);
+
+        let wall_coefficient =
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(wall, 22.0, 20.0);
+        let expected_wall = 1.31 * delta_term;
+        assert!((wall_coefficient - expected_wall).abs() < 1.0e-12);
+
+        let zero_delta_coefficient =
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 20.0, 20.0);
+        assert_eq!(zero_delta_coefficient, 0.1);
 
         Ok(())
     }

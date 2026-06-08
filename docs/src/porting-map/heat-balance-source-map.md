@@ -94,7 +94,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `CTFCross[0] * SurfTempOutHist(1)` for standard opaque surfaces.
 - `DataHeatBalance::SurfInitialConvCoeff = 3.076 W/m2-K` initializes inside
   convection coefficients before the selected inside convection algorithm is
-  evaluated.
+  evaluated. `DataHeatBalance::LowHConvLimit = 0.1 W/m2-K` and
+  `HighHConvLimit = 1000 W/m2-K` bound calculated convection coefficients.
+- `ConvectionCoefficients.cc::CalcASHRAEDetailedIntConvCoeff` dispatches
+  inside `SurfaceConvectionAlgorithm:Inside,TARP` surfaces through
+  `CalcASHRAETARPNatural(SurfTempIn, RefAirTemp, -CosTilt)`, using ASHRAE
+  vertical-wall and Walton stable/unstable horizontal-or-tilt correlations.
 - `CalcHeatBalanceOutsideSurf` solves the no-movable-insulation exterior face
   temperature with `-SurfCTFConstOutPart`, current `CTFCross[0] * SurfTempIn`,
   absorbed outside source terms, and exterior convection/radiation coefficients.
@@ -109,12 +114,13 @@ Current Rust boundary:
   for the current simplified opaque surface state, stores CTF
   coefficient/history slots per surface, and can seed those slots from EIO rows
   during diagnostic-only heat-balance runs. The default CLI diagnostic seed is
-  limited to steady/no-mass `#CTFs <= 1` constructions until CTF face-temperature
-  solving is ported. Runtime helpers now encode the EnergyPlus-shaped CTF
-  inside and outside face-temperature equations. The timestep shell uses the
-  EnergyPlus initial inside convection coefficient as an interim bridge; the
-  selected TARP/DOE-2 convection algorithms, full inside iteration order, and
-  radiation coefficient updates are not yet wired.
+  limited to steady/no-mass `#CTFs <= 1` constructions while mass-material CTF
+  temperature histories are isolated from the simplified timestep shell. Runtime
+  helpers now encode the EnergyPlus-shaped CTF inside and outside
+  face-temperature equations, and the timestep shell uses the EnergyPlus TARP
+  inside natural convection coefficient in the inside CTF balance. DOE-2 outside
+  convection, full inside iteration order, and radiation coefficient updates are
+  not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
