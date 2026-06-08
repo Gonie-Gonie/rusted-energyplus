@@ -132,10 +132,10 @@ boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor
 outside-face conduction, per-area floor conduction, and floor heat-storage
 diagnostics, so aggregate cancellation does not hide the next bottleneck. The
-dynamic probe summary now ranks each lane's top inside-face conduction driver
-surfaces and records the best lane per surface, keeping aggregate conduction
-regressions tied to wall/floor/roof source rows before a runtime change is
-promoted.
+dynamic probe summary now ranks each lane's top inside-face and outside-face
+conduction driver surfaces and records the best lane per surface, keeping
+aggregate conduction regressions tied to wall/floor/roof source rows before a
+runtime change is promoted.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside

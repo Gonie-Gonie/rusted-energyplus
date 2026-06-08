@@ -10,7 +10,8 @@ from typing import Any
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 EXPECTED_SERIES_COUNT = 34
-SURFACE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
+SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
+SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
 SURFACE_DRIVER_LIMIT = 3
 
 
@@ -354,7 +355,10 @@ def focus_metric_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
-def surface_conduction_metric_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
+def surface_conduction_metric_rows(
+    summary: dict[str, Any],
+    variable: str,
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for series in summary.get("series", []):
         if not isinstance(series, dict):
@@ -362,12 +366,12 @@ def surface_conduction_metric_rows(summary: dict[str, Any]) -> list[dict[str, An
         output = series.get("output", {})
         if not isinstance(output, dict):
             continue
-        if output.get("variable") != SURFACE_CONDUCTION_VARIABLE:
+        if output.get("variable") != variable:
             continue
         rows.append(
             {
                 "key": output.get("key", "none"),
-                "variable": output.get("variable", SURFACE_CONDUCTION_VARIABLE),
+                "variable": output.get("variable", variable),
                 "label": series_output_label(series),
                 "status": series.get("status"),
                 "samples": series.get("samples"),
@@ -417,19 +421,22 @@ def annotate_default_focus_deltas(lanes: list[dict[str, Any]]) -> None:
             metric["rmse_ratio_vs_default"] = rmse / baseline if baseline != 0 else None
 
 
-def annotate_default_surface_conduction_deltas(lanes: list[dict[str, Any]]) -> None:
+def annotate_default_surface_conduction_deltas(
+    lanes: list[dict[str, Any]],
+    metric_field: str,
+) -> None:
     default_lane = next((lane for lane in lanes if lane.get("lane") == "default"), None)
     if default_lane is None:
         return
 
     baselines: dict[tuple[str, str], float] = {}
-    for metric in default_lane.get("surface_conduction_metrics", []):
+    for metric in default_lane.get(metric_field, []):
         rmse = numeric(metric.get("rmse_delta_c"))
         if rmse is not None:
             baselines[metric_identity(metric)] = rmse
 
     for lane in lanes:
-        for metric in lane.get("surface_conduction_metrics", []):
+        for metric in lane.get(metric_field, []):
             rmse = numeric(metric.get("rmse_delta_c"))
             baseline = baselines.get(metric_identity(metric))
             if lane.get("lane") == "default" or rmse is None or baseline is None:
@@ -589,19 +596,22 @@ def best_focus_metric_rows(lanes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
-def best_surface_conduction_metric_rows(lanes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def best_surface_conduction_metric_rows(
+    lanes: list[dict[str, Any]],
+    metric_field: str,
+) -> list[dict[str, Any]]:
     default_metrics = {
         metric_identity(metric): metric
         for lane in lanes
         if lane.get("lane") == "default"
-        for metric in lane.get("surface_conduction_metrics", [])
+        for metric in lane.get(metric_field, [])
         if isinstance(metric, dict)
     }
     identities = sorted(
         {
             metric_identity(metric)
             for lane in lanes
-            for metric in lane.get("surface_conduction_metrics", [])
+            for metric in lane.get(metric_field, [])
             if isinstance(metric, dict)
         }
     )
@@ -610,7 +620,7 @@ def best_surface_conduction_metric_rows(lanes: list[dict[str, Any]]) -> list[dic
     for identity in identities:
         candidates = []
         for lane in lanes:
-            for metric in lane.get("surface_conduction_metrics", []):
+            for metric in lane.get(metric_field, []):
                 if not isinstance(metric, dict):
                     continue
                 if metric_identity(metric) != identity:
@@ -667,24 +677,39 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "max_abs_delta_c": summary.get("max_abs_delta_c"),
         "rmse_delta_c": summary.get("rmse_delta_c"),
         "focus_metrics": focus_metric_rows(summary),
-        "surface_conduction_metrics": surface_conduction_metric_rows(summary),
+        "surface_conduction_metrics": surface_conduction_metric_rows(
+            summary,
+            SURFACE_INSIDE_CONDUCTION_VARIABLE,
+        ),
+        "surface_outside_conduction_metrics": surface_conduction_metric_rows(
+            summary,
+            SURFACE_OUTSIDE_CONDUCTION_VARIABLE,
+        ),
     }
 
 
 def build_summary(repo_root: Path) -> dict[str, Any]:
     lanes = [row for lane in LANES if (row := lane_row(repo_root, lane)) is not None]
     annotate_default_focus_deltas(lanes)
-    annotate_default_surface_conduction_deltas(lanes)
+    annotate_default_surface_conduction_deltas(lanes, "surface_conduction_metrics")
+    annotate_default_surface_conduction_deltas(lanes, "surface_outside_conduction_metrics")
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v9",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v10",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
         "lane_count": len(lanes),
         "lanes": lanes,
         "best_focus_metrics": best_focus_metric_rows(lanes),
-        "best_surface_conduction_metrics": best_surface_conduction_metric_rows(lanes),
+        "best_surface_conduction_metrics": best_surface_conduction_metric_rows(
+            lanes,
+            "surface_conduction_metrics",
+        ),
+        "best_surface_outside_conduction_metrics": best_surface_conduction_metric_rows(
+            lanes,
+            "surface_outside_conduction_metrics",
+        ),
     }
 
 
@@ -820,7 +845,28 @@ def render_markdown(summary: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Surface Conduction Drivers",
+            "## Best Surface Outside Conduction Metrics",
+            "",
+            "| surface output | best lane | best RMSE | RMSE vs default | default RMSE |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    for metric in summary.get("best_surface_outside_conduction_metrics", []):
+        if not isinstance(metric, dict):
+            continue
+        lines.append(
+            "| {output} | {lane} | {best_rmse} | {vs_default} | {default_rmse} |".format(
+                output=metric.get("label", "none"),
+                lane=metric.get("best_lane") or "none",
+                best_rmse=fmt_number(metric.get("best_rmse_delta_c")),
+                vs_default=fmt_signed_number(metric.get("rmse_vs_default")),
+                default_rmse=fmt_number(metric.get("default_rmse_delta_c")),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Surface Inside Conduction Drivers",
             "",
             "Top inside-face conduction RMSE rows per lane. These rows decompose the zone aggregate conduction signal so aggregate cancellation or regression can be traced back to surfaces.",
             "",
@@ -831,6 +877,35 @@ def render_markdown(summary: dict[str, Any]) -> str:
     for lane in summary["lanes"]:
         for rank, metric in enumerate(
             lane.get("surface_conduction_metrics", [])[:SURFACE_DRIVER_LIMIT],
+            start=1,
+        ):
+            lines.append(
+                "| {lane} | {rank} | {output} | {rmse} | {vs_default} | {ratio} | {max_abs} | {mean_abs} | {status} |".format(
+                    lane=lane["lane"],
+                    rank=rank,
+                    output=metric["label"],
+                    rmse=fmt_number(metric["rmse_delta_c"]),
+                    vs_default=fmt_signed_number(metric.get("rmse_vs_default")),
+                    ratio=fmt_number(metric.get("rmse_ratio_vs_default")),
+                    max_abs=fmt_number(metric["max_abs_delta_c"]),
+                    mean_abs=fmt_number(metric["mean_abs_delta_c"]),
+                    status=metric["status"],
+                )
+            )
+    lines.extend(
+        [
+            "",
+            "## Surface Outside Conduction Drivers",
+            "",
+            "Top outside-face conduction RMSE rows per lane. These rows decompose the outside aggregate conduction signal so exterior boundary/source/history regressions can be traced back to surfaces.",
+            "",
+            "| lane | rank | surface output | RMSE | RMSE vs default | ratio | max abs | mean abs | status |",
+            "|---|---:|---|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        for rank, metric in enumerate(
+            lane.get("surface_outside_conduction_metrics", [])[:SURFACE_DRIVER_LIMIT],
             start=1,
         ):
             lines.append(
