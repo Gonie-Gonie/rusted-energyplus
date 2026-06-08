@@ -739,7 +739,7 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
     /// Experimental quick-outside path that interleaves zone-air correction between surface passes.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe,
-    /// Experimental interleaved quick-outside path with a grey interior longwave exchange probe.
+    /// Experimental interleaved quick-outside path with grey interior longwave exchange and EnergyPlus-style adiabatic CTF outside reporting order.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
     /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe,
@@ -2569,7 +2569,8 @@ fn advance_heat_balance_state_one_timestep_internal(
     );
     let use_previous_inside_for_adiabatic_boundary = matches!(
         zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_quick_outside_conduction = matches!(
         zone_air_algorithm,
@@ -2761,6 +2762,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             model,
             &mut state.surfaces,
             Some(&previous_surface_inside_temperatures),
+            None,
             &current_zone_temperatures,
             input,
             weather_context,
@@ -2787,6 +2789,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             run_surface_balance_passes(
                 model,
                 &mut state.surfaces,
+                None,
                 None,
                 &corrected_zone_temperatures,
                 input,
@@ -2843,6 +2846,14 @@ fn run_interleaved_surface_zone_balance(
             model,
             surfaces,
             first_pass_temperatures,
+            // EnergyPlus sets regular adiabatic/partition outside-face CTF state
+            // during the outside balance before the inside surface loop, then
+            // reports outside flux from that frozen state in UpdateThermalHistories.
+            if use_previous_inside_for_adiabatic_boundary {
+                first_pass_inside_temperatures
+            } else {
+                None
+            },
             &zone_temperatures,
             input,
             weather_context,
@@ -2866,6 +2877,7 @@ fn run_surface_balance_passes(
     model: &TypedModel,
     surfaces: &mut [SurfaceHeatBalanceState],
     first_pass_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
+    adiabatic_boundary_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     zone_temperatures: &BTreeMap<ZoneId, f64>,
     input: HeatBalanceStepInput,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
@@ -2920,7 +2932,13 @@ fn run_surface_balance_passes(
                 && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors)
                 || (use_previous_inside_for_adiabatic_boundary
                     && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic);
-            let outside_balance_inside_temperature_c = if use_previous_inside_for_boundary {
+            let outside_balance_inside_temperature_c = if use_previous_inside_for_adiabatic_boundary
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+            {
+                adiabatic_boundary_inside_temperatures
+                    .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                    .unwrap_or(previous_inside_face_temperature_c)
+            } else if use_previous_inside_for_boundary {
                 previous_inside_face_temperature_c
             } else {
                 zone_temperature_c
@@ -10404,6 +10422,61 @@ DATA PERIODS
                 - previous_boundary_floor_outside_temperature.values[0])
                 .abs()
                 > 1.0e-6
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn interleaved_longwave_probe_freezes_adiabatic_outside_ctf_report_state()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
+        typed.surfaces[0].sun_exposure = SunExposure::NoSun;
+        typed.surfaces[0].wind_exposure = WindExposure::NoWind;
+        let model = SimulationModel::from_typed(typed);
+        let weather_values = vec![10.0, 12.0];
+
+        let simulation = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &weather_values,
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
+                )
+                .with_surface_iteration_count(3),
+        )?;
+
+        let Some(floor_inside_conduction) = simulation
+            .results
+            .find_series("FLOOR", "Surface Inside Face Conduction Heat Transfer Rate")
+        else {
+            return Err(std::io::Error::other("missing floor inside conduction").into());
+        };
+        let Some(floor_outside_conduction) = simulation.results.find_series(
+            "FLOOR",
+            "Surface Outside Face Conduction Heat Transfer Rate",
+        ) else {
+            return Err(std::io::Error::other("missing floor outside conduction").into());
+        };
+        let Some(floor_storage) = simulation
+            .results
+            .find_series("FLOOR", "Surface Heat Storage Rate")
+        else {
+            return Err(std::io::Error::other("missing floor heat storage").into());
+        };
+
+        assert_eq!(floor_inside_conduction.values.len(), 2);
+        assert_eq!(floor_outside_conduction.values.len(), 2);
+        assert!(
+            (floor_inside_conduction.values[0] - floor_outside_conduction.values[0]).abs() > 1.0e-6
+        );
+        assert!(
+            (floor_storage.values[0]
+                + floor_inside_conduction.values[0]
+                + floor_outside_conduction.values[0])
+                .abs()
+                < 1.0e-9
         );
 
         Ok(())

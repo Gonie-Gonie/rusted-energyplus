@@ -118,12 +118,17 @@ to adiabatic boundaries nudges floor inside temperature and inside conduction
 slightly lower (`923.728787` inside conduction RMSE), but it does not improve
 floor storage (`1422.231349` RMSE versus `1422.193225`) or zone aggregate
 conduction, so the adiabatic boundary probe remains a diagnostic fork rather
-than the active best lane. Re-testing the same boundary freeze after the
-interleaved grey interior-longwave lane also stays below the diagnostic
-movement threshold: floor outside conduction remains `399.585932` RMSE and
-floor storage remains `369.422094`, so the next conduction target is outside
-flux/history reporting order rather than another adiabatic temperature-sync
-toggle.
+than the active best lane. The interleaved grey interior-longwave lane later
+made the floor outside flux/reporting order explicit: a per-pass adiabatic
+previous-inside toggle stayed below the diagnostic movement threshold, but
+freezing the adiabatic outside-face CTF balance at the timestep-start inside
+temperature across interleaved passes matches EnergyPlus'
+outside-balance-before-inside-loop reporting order and lowers floor outside
+conduction from `399.588084` to `50.562260` RMSE, floor storage from
+`369.424200` to `119.606076`, and zone outside aggregate conduction from
+`328.987074` to `155.538581`. The remaining conduction target is now the
+exterior source coupling behind roof convection/radiation and the zone outside
+aggregate, not adiabatic floor flux parity alone.
 Adding the EnergyPlus advanced outside-face zone aggregate as a latent
 diagnostic row exposed outside aggregate conduction as a second default bottleneck
 (`2024.075950` RMSE) and the top current quick-boundary bottleneck:

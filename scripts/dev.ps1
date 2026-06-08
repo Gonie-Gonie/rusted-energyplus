@@ -278,7 +278,7 @@ $Commands = [ordered]@{
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe.ps1"
         Group = "compare"
-        Help = "Run the official dynamic diagnostic with all EIO CTF rows, previous-inside quick outside solves, grey interior longwave exchange, and twenty interleaved surface/zone-air passes."
+        Help = "Run the official dynamic diagnostic with all EIO CTF rows, previous-inside quick outside solves, grey interior longwave exchange, timestep-start adiabatic outside CTF reporting order, and twenty interleaved surface/zone-air passes."
     }
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe.ps1"

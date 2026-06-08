@@ -299,24 +299,26 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `2.147988` with air storage at `172.470431`; roof outside convection and net
   thermal radiation stay near `214.357183` and `178.357290`, so the top
   bottleneck is again floor heat storage. Adding a grey interior-longwave
-  exchange update to the same twenty-pass interleaved fork moves the active
-  lane again: MAT falls to `0.484295`, surface-convection and air-storage RMSE
-  to `21.126984` and `27.010902`, floor inside conduction to `90.441963`,
-  floor heat storage to `369.424200`, and zone outside aggregate conduction to
-  `328.987074`. The trade-off is explicit: floor outside conduction regresses
-  to `399.588084` and becomes the top bottleneck, while roof outside
-  convection and net thermal radiation improve to `190.479825` and
-  `170.807621`. This confirms the next source-order target is the coupled
-  inside-surface/zone-air/interior-longwave correction loop and floor CTF
-  outside-face reporting/order, not only exterior radiation/coefficient
-  alignment or the number of surface passes. Re-applying the rejected
-  adiabatic outside-face freeze to this grey longwave interleaved lane is also
-  a no-op at the current diagnostic precision: MAT remains `0.484293`, floor
-  outside conduction remains the top bottleneck at `399.585932`, floor storage
-  stays `369.422094`, and zone outside aggregate conduction stays
-  `328.985192`. Keep that fork rejected and focus the next probe on EnergyPlus
-  CTF outside-face flux/history reporting order rather than on another
-  adiabatic boundary-temperature sync toggle.
+  exchange update to the same twenty-pass interleaved fork first exposed a
+  floor outside-face reporting/order trade-off: MAT fell to `0.484295`,
+  surface-convection and air-storage RMSE to `21.126984` and `27.010902`,
+  floor inside conduction to `90.441963`, floor heat storage to `369.424200`,
+  and zone outside aggregate conduction to `328.987074`, but floor outside
+  conduction regressed to `399.588084` and became the top bottleneck. A weaker
+  per-pass previous-inside adiabatic boundary toggle was a no-op at that
+  precision. Freezing only the adiabatic outside-face CTF balance at the
+  timestep-start inside temperature across the interleaved passes matches the
+  EnergyPlus `CalcHeatBalanceOutsideSurf` before `CalcHeatBalanceInsideSurf`
+  and `UpdateThermalHistories` reporting order for regular adiabatic/partition
+  surfaces. That accepted source-order probe moves the active lane again: MAT
+  is `0.385438`, floor inside and outside face temperature RMSE are
+  `0.267604` and `0.267603`, floor inside conduction is `69.374470`, floor
+  outside conduction falls to `50.562260`, floor heat storage to `119.606076`,
+  and zone outside aggregate conduction to `155.538581`. Roof outside
+  convection and net thermal radiation become the new top source rows at
+  `189.364767` and `171.066926`, so the next source-order target is exterior
+  radiation/convection source coupling after the adiabatic floor CTF reporting
+  order is no longer the top bottleneck.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
