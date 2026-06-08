@@ -9,6 +9,7 @@ from typing import Any
 
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+EXPECTED_SERIES_COUNT = 30
 
 
 @dataclass(frozen=True)
@@ -403,10 +404,12 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "lane": lane.lane,
         "path": str(lane.summary_path).replace("\\", "/"),
         "status": summary.get("status"),
+        "artifact_status": artifact_status(summary.get("series_count")),
         "zone_air_algorithm": summary.get("zone_air_algorithm", "unknown"),
         "ctf_seed_policy": summary.get("ctf_seed", {}).get("policy", "unknown"),
         "surface_iteration_count": summary.get("surface_iteration_count", 1),
         "samples": summary.get("samples"),
+        "series_count": summary.get("series_count"),
         "top_key": output.get("key", "none"),
         "top_variable": output.get("variable", "none"),
         "top_rmse_delta_c": top.get("rmse_delta_c"),
@@ -422,13 +425,22 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_focus_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v4",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v5",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
+        "expected_series_count": EXPECTED_SERIES_COUNT,
         "lane_count": len(lanes),
         "lanes": lanes,
         "best_focus_metrics": best_focus_metric_rows(lanes),
     }
+
+
+def artifact_status(series_count: Any) -> str:
+    if not isinstance(series_count, int):
+        return "missing-series-count"
+    if series_count != EXPECTED_SERIES_COUNT:
+        return f"stale-series-count-{series_count}"
+    return "current"
 
 
 def fmt_number(value: Any) -> str:
@@ -458,18 +470,21 @@ def render_markdown(summary: dict[str, Any]) -> str:
         "",
         f"case_id: {summary['case_id']}",
         f"oracle_version: {summary['oracle_version']}",
+        f"expected_series_count: {summary['expected_series_count']}",
         "",
-        "| lane | algorithm | CTF seed | surface passes | top output | top RMSE | top max abs | status |",
-        "|---|---|---|---:|---|---:|---:|---|",
+        "| lane | algorithm | CTF seed | surface passes | series | artifact | top output | top RMSE | top max abs | status |",
+        "|---|---|---|---:|---:|---|---|---:|---:|---|",
     ]
     for lane in summary["lanes"]:
         top_output = f"{lane['top_key']} / {lane['top_variable']}"
         lines.append(
-            "| {lane} | {algorithm} | {ctf} | {surface_passes} | {top} | {rmse} | {max_abs} | {status} |".format(
+            "| {lane} | {algorithm} | {ctf} | {surface_passes} | {series_count} | {artifact_status} | {top} | {rmse} | {max_abs} | {status} |".format(
                 lane=lane["lane"],
                 algorithm=lane["zone_air_algorithm"],
                 ctf=lane["ctf_seed_policy"],
                 surface_passes=lane["surface_iteration_count"],
+                series_count=lane.get("series_count") or "none",
+                artifact_status=lane.get("artifact_status", "unknown"),
                 top=top_output,
                 rmse=fmt_number(lane["top_rmse_delta_c"]),
                 max_abs=fmt_number(lane["top_max_abs_delta_c"]),
