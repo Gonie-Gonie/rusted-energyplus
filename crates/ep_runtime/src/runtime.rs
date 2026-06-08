@@ -6254,7 +6254,16 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
             * tilt_rad.sin()
             * (solar_azimuth_rad - surface_azimuth_rad).cos();
     let beam = direct_normal * cos_incidence.max(0.0);
-    let sky_diffuse = diffuse_horizontal * (1.0 + tilt_rad.cos()) * 0.5;
+    let sky_diffuse = diffuse_horizontal
+        * energyplus_anisotropic_sky_multiplier(
+            surface,
+            site,
+            tilt_rad,
+            solar_altitude_rad,
+            direct_normal,
+            diffuse_horizontal,
+            cos_incidence,
+        );
     let ground_horizontal =
         (direct_normal * solar_altitude_rad.sin() + diffuse_horizontal).max(0.0);
     let ground_reflected = ground_horizontal
@@ -6262,6 +6271,78 @@ fn surface_incident_solar_radiation_at_local_hour_w_per_m2(
         * surface_ground_view_factor(surface, tilt_rad);
 
     beam + sky_diffuse + ground_reflected
+}
+
+fn energyplus_anisotropic_sky_multiplier(
+    surface: &Surface,
+    site: &SiteLocation,
+    tilt_rad: f64,
+    solar_altitude_rad: f64,
+    direct_normal_w_per_m2: f64,
+    diffuse_horizontal_w_per_m2: f64,
+    cos_incidence: f64,
+) -> f64 {
+    const EPSILON_LIMIT: [f64; 7] = [1.065, 1.23, 1.5, 1.95, 2.8, 4.5, 6.2];
+    const F11R: [f64; 8] = [
+        -0.0083117, 0.1299457, 0.3296958, 0.5682053, 0.8730280, 1.1326077, 1.0601591, 0.6777470,
+    ];
+    const F12R: [f64; 8] = [
+        0.5877285, 0.6825954, 0.4868735, 0.1874525, -0.3920403, -1.2367284, -1.5999137, -0.3272588,
+    ];
+    const F13R: [f64; 8] = [
+        -0.0620636, -0.1513752, -0.2210958, -0.2951290, -0.3616149, -0.4118494, -0.3589221,
+        -0.2504286,
+    ];
+    const F21R: [f64; 8] = [
+        -0.0596012, -0.0189325, 0.0554140, 0.1088631, 0.2255647, 0.2877813, 0.2642124, 0.1561313,
+    ];
+    const F22R: [f64; 8] = [
+        0.0721249, 0.0659650, -0.0639588, -0.1519229, -0.4620442, -0.8230357, -1.1272340,
+        -1.3765031,
+    ];
+    const F23R: [f64; 8] = [
+        -0.0220216, -0.0288748, -0.0260542, -0.0139754, 0.0012448, 0.0558651, 0.1310694, 0.2506212,
+    ];
+
+    let diffuse_horizontal = diffuse_horizontal_w_per_m2.max(0.0);
+    if diffuse_horizontal <= f64::EPSILON {
+        return surface_sky_view_factor(surface, tilt_rad);
+    }
+
+    let direct_normal = direct_normal_w_per_m2.max(0.0);
+    let cos_zenith = solar_altitude_rad.sin().clamp(0.0, 1.0);
+    if cos_zenith < ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
+        return surface_sky_view_factor(surface, tilt_rad);
+    }
+
+    let zenith_rad = cos_zenith.acos();
+    let zenith_deg = zenith_rad.to_degrees();
+    let air_mass_height = 1.0 - 0.1 * site.elevation_m / 1000.0;
+    let air_mass = if zenith_deg <= 75.0 {
+        air_mass_height / cos_zenith
+    } else {
+        air_mass_height / (cos_zenith + 0.15 * (93.9 - zenith_deg).powf(-1.253))
+    };
+    let kappa_z3 = 1.041 * zenith_rad.powi(3);
+    let epsilon =
+        ((direct_normal + diffuse_horizontal) / diffuse_horizontal + kappa_z3) / (1.0 + kappa_z3);
+    let delta = diffuse_horizontal * air_mass / 1353.0;
+    let epsilon_bin = EPSILON_LIMIT
+        .iter()
+        .position(|limit| epsilon < *limit)
+        .unwrap_or(F11R.len() - 1);
+    let f1 =
+        (F11R[epsilon_bin] + F12R[epsilon_bin] * delta + F13R[epsilon_bin] * zenith_rad).max(0.0);
+    let f2 = F21R[epsilon_bin] + F22R[epsilon_bin] * delta + F23R[epsilon_bin] * zenith_rad;
+
+    let mut circumsolar_factor = cos_incidence.max(0.0) / cos_zenith.max(0.0871557);
+    if circumsolar_factor > 0.0 && cos_zenith < 0.0871557 && tilt_rad.to_degrees() < 2.0 {
+        circumsolar_factor = 1.0;
+    }
+
+    let view_factor_sky = surface_sky_view_factor(surface, tilt_rad);
+    let multiplier = view_factor_sky * (1.0 - f1) + f1 * circumsolar_factor + f2 * tilt_rad.sin();
+    multiplier.max(0.0)
 }
 
 fn diffuse_solar_radiation_w_per_m2(

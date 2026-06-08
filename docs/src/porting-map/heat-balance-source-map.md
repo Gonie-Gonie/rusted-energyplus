@@ -172,7 +172,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   exterior convection uses timestep wind speed/direction, exterior longwave
   uses timestep-interpolated horizontal infrared radiation/sky temperature,
   and exterior solar balance/report terms use the same timestep solar
-  interpolation helper that backs the hourly incident-solar diagnostic. At
+  interpolation helper that backs the hourly incident-solar diagnostic.
+  `SolarShading.cc::AnisoSkyViewFactors` and
+  `HeatBalanceSurfaceManager.cc` show that `SurfQRadSWOutIncident` uses
+  direct beam, Perez anisotropic sky diffuse (`SurfAnisoSkyMult *
+  DifSolarRad`), and ground-reflected beam/diffuse terms. Rust now mirrors
+  that anisotropic sky multiplier and the default ground-reflectance term for
+  unobstructed exterior opaque surfaces; detailed shadowing and obstruction
+  reflection factors remain outside the diagnostic claim boundary. At
   sunrise/sunset shadowing-period edges, Rust preserves the diffuse and
   ground-reflected solar terms when the current-day EnergyPlus sun-up test is
   true but the averaged shadowing-period beam position is still below the
@@ -409,9 +416,10 @@ Current Rust boundary:
   DOE-2/MoWITT forced-convection terms, and uses EnergyPlus-shaped
   sky/air/ground exterior longwave coefficients in the diagnostic outside
   balance/report path, with timestep-interpolated weather/solar/horizontal-IR
-  context and hourly-averaged surface diagnostics. Full inside iteration order,
-  zone predictor/corrector equations, and coupled radiation coefficient update
-  order are not yet wired.
+  context, EnergyPlus Perez anisotropic sky diffuse for exterior incident
+  solar, and hourly-averaged surface diagnostics. Full inside iteration order,
+  zone predictor/corrector equations, detailed shadowing/reflection, and
+  coupled radiation coefficient update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

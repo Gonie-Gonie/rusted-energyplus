@@ -148,6 +148,11 @@ dynamic probe summary now ranks each lane's top inside-face and outside-face
 conduction driver surfaces and records the best lane per surface, keeping
 aggregate conduction regressions tied to wall/floor/roof source rows before a
 runtime change is promoted.
+Porting the EnergyPlus Perez anisotropic sky diffuse multiplier for exterior
+incident solar then moves the active quick-boundary lane away from thousand-Watt
+wall solar source errors: wall incident solar per-area RMSE is now single-digit
+W/m2, and the leading residuals are wall/roof absorbed solar, outside-face
+aggregate conduction, and the remaining mass floor/history coupling path.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, full
