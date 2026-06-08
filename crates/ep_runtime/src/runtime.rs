@@ -29,6 +29,7 @@ const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 const ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
+const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 
@@ -495,6 +496,12 @@ pub struct ZoneHeatBalanceState {
     pub opaque_surface_conductance_w_per_k: f64,
     /// Current opaque surface heat gain to the zone in W.
     pub opaque_surface_heat_gain_w: f64,
+    /// EnergyPlus `SumHA`: inside convection conductance sum in W/K.
+    pub sum_ha_w_per_k: f64,
+    /// EnergyPlus `SumHATsurf`: inside convection temperature sum in W.
+    pub sum_hat_surf_w: f64,
+    /// EnergyPlus `SumHATref`: reference-air convection temperature sum in W.
+    pub sum_hat_ref_w: f64,
 }
 
 /// Surface CTF coefficients and history constants.
@@ -616,6 +623,8 @@ pub struct SurfaceHeatBalanceState {
     pub solar_absorptance: f64,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
+    /// Current inside convection coefficient in W/m2-K.
+    pub inside_convection_coefficient_w_per_m2_k: f64,
     /// Surface CTF coefficients and history constants.
     pub ctf: SurfaceCtfState,
     /// Current opaque heat transfer to the owning zone in W.
@@ -2133,6 +2142,9 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
+            sum_ha_w_per_k: 0.0,
+            sum_hat_surf_w: 0.0,
+            sum_hat_ref_w: 0.0,
         });
     }
 
@@ -2184,6 +2196,8 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 thermal_absorptance: thermal.thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
                 conductance_w_per_k,
+                inside_convection_coefficient_w_per_m2_k:
+                    ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K,
                 ctf,
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2198,6 +2212,11 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             .filter(|surface| surface.zone_id == zone.zone_id)
             .map(|surface| surface.conductance_w_per_k)
             .sum();
+        let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
+            zone_surface_convection_sums(&surfaces, zone.zone_id);
+        zone.sum_ha_w_per_k = sum_ha_w_per_k;
+        zone.sum_hat_surf_w = sum_hat_surf_w;
+        zone.sum_hat_ref_w = sum_hat_ref_w;
     }
 
     Ok(HeatBalanceState {
@@ -2316,6 +2335,7 @@ fn advance_heat_balance_state_one_timestep_internal(
                 previous_inside_face_temperature_c,
                 zone_temperature_c,
             );
+        surface.inside_convection_coefficient_w_per_m2_k = inside_convection_coefficient_w_per_m2_k;
 
         surface.inside_face_temperature_c = zone_temperature_c;
         surface.outside_face_temperature_c = heat_balance_surface_boundary_temperature_c(
@@ -2350,9 +2370,36 @@ fn advance_heat_balance_state_one_timestep_internal(
             .filter(|surface| surface.zone_id == zone.zone_id)
             .map(|surface| surface.heat_gain_to_zone_w)
             .sum();
+        let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
+            zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+        zone.sum_ha_w_per_k = sum_ha_w_per_k;
+        zone.sum_hat_surf_w = sum_hat_surf_w;
+        zone.sum_hat_ref_w = sum_hat_ref_w;
     }
 
     state.timestep_index += 1;
+}
+
+fn zone_surface_convection_sums(
+    surfaces: &[SurfaceHeatBalanceState],
+    zone_id: ZoneId,
+) -> (f64, f64, f64) {
+    let (sum_ha_w_per_k, sum_hat_surf_w) = surfaces
+        .iter()
+        .filter(|surface| surface.zone_id == zone_id)
+        .map(|surface| {
+            let surface_ha_w_per_k =
+                surface.inside_convection_coefficient_w_per_m2_k * surface.area_m2;
+            (
+                surface_ha_w_per_k,
+                surface_ha_w_per_k * surface.inside_face_temperature_c,
+            )
+        })
+        .fold((0.0, 0.0), |(sum_ha, sum_hat), (ha, hat)| {
+            (sum_ha + ha, sum_hat + hat)
+        });
+
+    (sum_ha_w_per_k, sum_hat_surf_w, 0.0)
 }
 
 /// Simulates hourly zone mean air temperatures through the heat-balance state
@@ -5637,6 +5684,9 @@ DATA PERIODS
         assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
         assert_eq!(state.zones[0].opaque_surface_conductance_w_per_k, 6.0);
         assert_eq!(state.zones[0].opaque_surface_heat_gain_w, 0.0);
+        assert!((state.zones[0].sum_ha_w_per_k - 18.456).abs() < 1.0e-12);
+        assert!((state.zones[0].sum_hat_surf_w - 369.12).abs() < 1.0e-12);
+        assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
         assert_eq!(state.surfaces.len(), 6);
         let floor = state
             .surfaces
@@ -5670,6 +5720,10 @@ DATA PERIODS
         assert_eq!(state.surfaces[0].thermal_resistance_m2_k_per_w, 1.0);
         assert_eq!(state.surfaces[0].heat_capacity_j_per_m2_k, None);
         assert_eq!(state.surfaces[0].conductance_w_per_k, 1.0);
+        assert_eq!(
+            state.surfaces[0].inside_convection_coefficient_w_per_m2_k,
+            3.076
+        );
         assert_eq!(state.surfaces[0].ctf.outside_0_w_per_m2_k, 1.0);
         assert_eq!(state.surfaces[0].ctf.cross_0_w_per_m2_k, 1.0);
         assert_eq!(state.surfaces[0].ctf.inside_0_w_per_m2_k, 1.0);
@@ -5965,6 +6019,23 @@ DATA PERIODS
         );
         assert!(state.surfaces[0].inside_face_temperature_c < 20.0);
         assert!(state.surfaces[0].heat_gain_to_zone_w < 0.0);
+        let expected_sum_ha = state
+            .surfaces
+            .iter()
+            .map(|surface| surface.inside_convection_coefficient_w_per_m2_k * surface.area_m2)
+            .sum::<f64>();
+        let expected_sum_hat_surf = state
+            .surfaces
+            .iter()
+            .map(|surface| {
+                surface.inside_convection_coefficient_w_per_m2_k
+                    * surface.area_m2
+                    * surface.inside_face_temperature_c
+            })
+            .sum::<f64>();
+        assert!((state.zones[0].sum_ha_w_per_k - expected_sum_ha).abs() < 1.0e-12);
+        assert!((state.zones[0].sum_hat_surf_w - expected_sum_hat_surf).abs() < 1.0e-12);
+        assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
 
         Ok(())
     }

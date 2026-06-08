@@ -73,7 +73,7 @@ unless the deviation is documented in a case-specific waiver:
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | construction/material CTF data | `ep_model::Construction`, `ep_model::Material`, `ep_runtime::SurfaceCtfState` | ordered opaque layer stack, diagnostic EIO coefficient seeding for steady/no-mass rows, and CTF history advancement exist; mass-material coefficient generation and face-temperature CTF solving are not ported |
-| zone predictor histories such as `MAT`, `XMAT`, and `DSXMAT` | future `ep_runtime::zone_air` histories | diagnostic shell only |
+| zone predictor histories and sums such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, and `SumHATref` | `ep_runtime::ZoneHeatBalanceState` and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history and stores surface convection sums for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
 ## CTF Porting Notes
@@ -115,6 +115,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   exterior balance coefficient until DOE-2 wiring can be paired with the full
   exterior radiation and iteration path; the isolated helper probe improved some
   wall/roof rows but regressed MAT and zone aggregate conduction.
+- `ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad`
+  builds `TempDepCoef` and `TempIndCoef` from `SumHA`, `SumHATsurf`,
+  `SumHATref`, internal gains, air-exchange terms, and third-order history
+  terms. `calcZoneOrSpaceSums`/`calcSumHAT` are the source anchors for the
+  surface convection sums. Rust now stores the zone-level `SumHA`,
+  `SumHATsurf`, and `SumHATref` diagnostic state from current inside
+  convection coefficients and surface temperatures; the predictor equation
+  itself remains the simplified diagnostic shell.
 
 Current Rust boundary:
 
@@ -136,8 +144,8 @@ Current Rust boundary:
   face-temperature equations, and the timestep shell uses the EnergyPlus TARP
   inside natural convection coefficient in the inside CTF balance. A DOE-2
   outside convection helper exists for future wiring, but full inside iteration
-  order, exterior DOE-2/radiation coupling, and radiation coefficient updates
-  are not yet wired.
+  order, exterior DOE-2/radiation coupling, zone predictor/corrector
+  equations, and radiation coefficient updates are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
