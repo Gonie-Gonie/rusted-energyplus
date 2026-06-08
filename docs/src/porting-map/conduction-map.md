@@ -84,11 +84,15 @@ iter3 lane, and it slightly worsens MAT/air-storage relative to surface-first.
 That keeps the active blocker on coherent surface iteration plus zone-air
 correction/history semantics rather than a one-pass feedback loop alone. When
 that coupled rebalance is paired with three surface passes, the probe becomes
-the current best lane for floor inside/outside conduction, zone aggregate
-conduction, and the latent zone-air surface-convection/storage rows. MAT still
-stays best in the one-pass all-CTF analytical surface-first lane, so promotion
-still needs the EnergyPlus history commit and predictor/corrector order rather
-than simply enabling the conduction-best lane.
+the current best lane for zone aggregate conduction and the latent zone-air
+surface-convection/storage rows. A follow-on previous-inside outdoor boundary
+probe slightly improves floor inside/outside temperatures and conduction
+(`923.733908` inside conduction RMSE and `507.588138` outside conduction RMSE),
+but it does not beat the coupled iter3 lane for zone aggregate conduction or
+air-balance rates. MAT still stays best in the one-pass all-CTF analytical
+surface-first lane, so promotion still needs the EnergyPlus outside-surface
+quick-conduction/source coupling, history commit, and predictor/corrector order
+rather than simply enabling the floor-conduction-best lane.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

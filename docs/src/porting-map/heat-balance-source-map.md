@@ -138,10 +138,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
   and third-order zone-air temperature helpers. `HeatBalanceZoneAirAlgorithm`
   keeps the default trace on the existing simplified analytical shell while
-  allowing explicit analytical, analytical surface-first, and third-order
-  diagnostic probes. The default predictor equation itself remains the
-  simplified diagnostic shell until all coefficient inputs are wired from
-  source-mapped runtime state.
+  allowing explicit analytical, analytical surface-first, coupled rebalance,
+  previous-inside outdoor boundary, and third-order diagnostic probes. The
+  default predictor equation itself remains the simplified diagnostic shell
+  until all coefficient inputs are wired from source-mapped runtime state.
 - `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
   Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
   Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
@@ -185,8 +185,12 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   passes moves the conduction and latent air-balance best-focus rows again:
   floor inside conduction drops to RMSE `924.427599`, floor outside conduction
   to `508.231496`, and zone aggregate conduction to `93.616120`, while MAT
-  remains best in the one-pass all-CTF analytical surface-first lane. This
-  narrows the next source-mapped target to the coherent EnergyPlus surface
+  remains best in the one-pass all-CTF analytical surface-first lane. The
+  previous-inside outdoor boundary probe then nudges floor inside conduction to
+  RMSE `923.733908` and floor outside conduction to `507.588138`, but leaves
+  zone aggregate conduction and the latent zone-air balance best rows with the
+  coupled iter3 lane. This narrows the next source-mapped target to the
+  coherent EnergyPlus outside-surface quick-conduction/source coupling, surface
   iteration, zone-air correction, and CTF history commit order rather than a
   single post-correction surface feedback pass.
 
