@@ -100,7 +100,7 @@ but that report is still baseline-only evidence.
 | `Schedule:Compact` subset | implemented foundation | typed all-days `Until` segments and runtime hourly evaluation |
 | zone geometry summary | implemented foundation | `eplus-rs model geometry` prints zone surface count, floor area, volume, and exterior wall area |
 | EIO geometry comparison | implemented smoke gate | `eplus-rs compare geometry` compares Rust geometry summary with EnergyPlus `Zone Information` |
-| EIO construction/material comparison | implemented smoke gate | `eplus-rs compare construction-materials` compares first-layer construction/material thermal inputs with EnergyPlus `Construction CTF` and `Material CTF Summary` |
+| EIO construction/material comparison | implemented smoke gate | `eplus-rs compare construction-materials` compares construction layer-stack conductance and outside-layer material inputs with EnergyPlus `Construction CTF` and `Material CTF Summary` |
 | EIO internal gains comparison | implemented smoke gate | `eplus-rs compare internal-gains` compares typed `OtherEquipment` nominal gains with EnergyPlus EIO |
 | heat-balance state shell | implemented foundation | `ep_runtime::initialize_heat_balance_state` initializes zone and surface heat-balance state without advancing a solver |
 | internal convective gain trace | implemented declared conformance gate | `eplus-rs conformance internal-gains-report` writes the v0.26 Rust hourly trace comparison against EnergyPlus ESO |

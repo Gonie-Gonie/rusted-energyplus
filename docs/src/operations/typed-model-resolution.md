@@ -32,6 +32,7 @@ structures use typed IDs rather than string lookup.
 Current resolved references:
 
 - `Construction.outside_layer` -> `MaterialId`
+- `Construction.layers[layer_index]` -> `MaterialId`
 - `Schedule:Constant.schedule_type_limits_name` -> `ScheduleTypeLimitId`
 - `OtherEquipment.zone_or_zonelist_or_space_or_spacelist_name` -> `ZoneId`
 - `OtherEquipment.schedule_name` -> `ScheduleId`

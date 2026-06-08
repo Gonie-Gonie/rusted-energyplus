@@ -20,6 +20,8 @@ use ep_model::{
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
+const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
+
 /// Ordered model compiler stages.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CompileStage {
@@ -537,6 +539,30 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            let mut layers = vec![outside_layer];
+            let mut layers_valid = true;
+            for layer_number in 2..=MAX_OPAQUE_CONSTRUCTION_LAYERS {
+                let field = format!("layer_{layer_number}");
+                let Some(layer_name) = self.optional_string("Construction", &name, &object, &field)
+                else {
+                    continue;
+                };
+                let Some(layer) = self.resolve_name(
+                    &model.material_names,
+                    "Construction",
+                    &name,
+                    &field,
+                    &layer_name,
+                    "Material",
+                ) else {
+                    layers_valid = false;
+                    continue;
+                };
+                layers.push(layer);
+            }
+            if !layers_valid {
+                continue;
+            }
             let Some(id_value) = self.checked_id("Construction", &name, model.constructions.len())
             else {
                 continue;
@@ -551,6 +577,7 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 outside_layer,
+                layers,
             });
         }
     }
@@ -3797,8 +3824,8 @@ mod tests {
             r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
                 "Timestep": {"Timestep 1": {}},
-                "Material:NoMass": {"R13": {}},
-                "Construction": {"Wall Construction": {"outside_layer": "R13"}},
+                "Material:NoMass": {"R13": {}, "Finish": {}},
+                "Construction": {"Wall Construction": {"outside_layer": "R13", "layer_2": "Finish"}},
                 "Zone": {"Zone One": {}},
                 "BuildingSurface:Detailed": {
                     "Wall One": {
@@ -3835,6 +3862,23 @@ mod tests {
         assert_eq!(model.zones.len(), 1);
         assert_eq!(model.surfaces.len(), 1);
         assert_eq!(model.surfaces[0].zone.0, 0);
+        assert_eq!(model.constructions[0].layers.len(), 2);
+        let layer_names = model.constructions[0]
+            .layers
+            .iter()
+            .map(|layer_id| {
+                model
+                    .materials
+                    .iter()
+                    .find(|material| material.id == *layer_id)
+                    .map(|material| material.name.0.as_str())
+                    .unwrap_or("")
+            })
+            .collect::<Vec<_>>();
+        assert!(layer_names[0].eq_ignore_ascii_case("R13"));
+        assert!(layer_names[1].eq_ignore_ascii_case("Finish"));
+        let graph = ModelGraph::from_typed(&model);
+        assert_eq!(graph.construction_materials.len(), 2);
         assert!(!result.report.defaults_applied.is_empty());
 
         Ok(())

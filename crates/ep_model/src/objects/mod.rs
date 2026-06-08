@@ -256,7 +256,7 @@ impl Material {
     }
 }
 
-/// Construction resolved to an outside layer material.
+/// Construction resolved to an ordered material layer stack.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Construction {
     /// Typed ID.
@@ -265,6 +265,8 @@ pub struct Construction {
     pub name: NormalizedName,
     /// Outside layer material.
     pub outside_layer: MaterialId,
+    /// Ordered material layers from outside to inside.
+    pub layers: Vec<MaterialId>,
 }
 
 /// Schedule numeric type.

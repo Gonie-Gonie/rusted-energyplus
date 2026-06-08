@@ -42,7 +42,7 @@ claim.
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
 | material input | `Material::GetMaterialData` | typed subset exists; source map required before expansion |
-| construction input | `GetConstructData` | typed first-layer subset exists; source map required before expansion |
+| construction input | `GetConstructData` | typed opaque layer stack exists; CTF coefficients not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | mapped-not-ported |
@@ -72,9 +72,33 @@ unless the deviation is documented in a case-specific waiver:
 |---|---|---|
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only |
-| construction/material CTF data | `ep_model::Construction`, `ep_model::Material` | first-layer smoke evidence only |
+| construction/material CTF data | `ep_model::Construction`, `ep_model::Material` | ordered opaque layer stack is preserved; CTF coefficient arrays and histories are not ported |
 | zone predictor histories such as `MAT`, `XMAT`, and `DSXMAT` | future `ep_runtime::zone_air` histories | diagnostic shell only |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
+
+## CTF Porting Notes
+
+EnergyPlus 26.1.0 anchors for opaque conduction:
+
+- `Construction.hh` defines `MaxLayersInConstruct`, `ConstructionProps::TotLayers`,
+  `LayerPoint`, and CTF arrays `CTFOutside`, `CTFCross`, `CTFInside`, and
+  `CTFFlux`.
+- `Construction.cc::ConstructionProps::calculateTransferFunction` consumes the
+  material layer physical properties, handles all-resistive, reversed, and
+  state-space paths, and emits the EIO `Construction CTF` rows.
+- `HeatBalanceSurfaceManager.cc` builds `SurfCTFConstInPart` and
+  `SurfCTFConstOutPart` from temperature and flux histories before calculating
+  current inside/outside conduction fluxes and face temperatures.
+
+Current Rust boundary:
+
+- `ep_model::Construction.layers` stores material IDs from outside to inside;
+  `outside_layer` remains the outside-face compatibility field.
+- `ep_runtime` sums layer thermal resistance and available areal heat capacity
+  for the current simplified opaque surface state.
+- EnergyPlus CTF coefficient generation, history terms, source/sink terms, and
+  timestep-dependent transfer-function validation are still unmapped runtime
+  work.
 
 ## Required Cases Before Porting
 

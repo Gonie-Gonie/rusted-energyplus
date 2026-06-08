@@ -2705,11 +2705,7 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
         }
     };
 
-    let rust_material_count = rust_rows
-        .iter()
-        .map(|row| row.outside_layer_material_name.as_str())
-        .collect::<BTreeSet<_>>()
-        .len();
+    let rust_material_count = construction_layer_material_count(&model);
     let tolerance = Tolerance {
         absolute: 0.001,
         relative: 1.0e-6,
@@ -3814,11 +3810,33 @@ fn construction_material_rows(model: &TypedModel) -> Result<Vec<ConstructionMate
         .collect()
 }
 
+fn construction_layer_material_count(model: &TypedModel) -> usize {
+    model
+        .constructions
+        .iter()
+        .flat_map(|construction| {
+            let layer_ids = if construction.layers.is_empty() {
+                std::slice::from_ref(&construction.outside_layer)
+            } else {
+                construction.layers.as_slice()
+            };
+            layer_ids.iter().copied()
+        })
+        .collect::<BTreeSet<_>>()
+        .len()
+}
+
 fn construction_material_row(
     model: &TypedModel,
     construction: &Construction,
 ) -> Result<ConstructionMaterialRow, String> {
-    let material = material_for_construction(model, construction)?;
+    let layer_materials = materials_for_construction(model, construction)?;
+    let material = layer_materials.first().ok_or_else(|| {
+        format!(
+            "construction {} references no material layers",
+            construction.name.0
+        )
+    })?;
     let material_thermal_resistance_m2_k_per_w =
         material.thermal_resistance().ok_or_else(|| {
             format!(
@@ -3826,11 +3844,21 @@ fn construction_material_row(
                 construction.name.0, material.name.0
             )
         })?;
+    let mut construction_thermal_resistance_m2_k_per_w = 0.0;
+    for material in &layer_materials {
+        construction_thermal_resistance_m2_k_per_w +=
+            material.thermal_resistance().ok_or_else(|| {
+                format!(
+                    "construction {} layer {} has no positive thermal resistance",
+                    construction.name.0, material.name.0
+                )
+            })?;
+    }
     Ok(ConstructionMaterialRow {
         construction_name: construction.name.0.clone(),
-        layer_count: 1,
+        layer_count: layer_materials.len(),
         outside_layer_material_name: material.name.0.clone(),
-        thermal_conductance_w_per_m2_k: 1.0 / material_thermal_resistance_m2_k_per_w,
+        thermal_conductance_w_per_m2_k: 1.0 / construction_thermal_resistance_m2_k_per_w,
         material_thickness_m: material.thickness_m,
         material_conductivity_w_per_m_k: material.conductivity_w_per_m_k,
         material_density_kg_per_m3: material.density_kg_per_m3,
@@ -3839,20 +3867,30 @@ fn construction_material_row(
     })
 }
 
-fn material_for_construction<'a>(
+fn materials_for_construction<'a>(
     model: &'a TypedModel,
     construction: &Construction,
-) -> Result<&'a Material, String> {
-    model
-        .materials
+) -> Result<Vec<&'a Material>, String> {
+    let layer_ids = if construction.layers.is_empty() {
+        std::slice::from_ref(&construction.outside_layer)
+    } else {
+        construction.layers.as_slice()
+    };
+    layer_ids
         .iter()
-        .find(|material| material.id == construction.outside_layer)
-        .ok_or_else(|| {
-            format!(
-                "construction {} references missing outside layer material",
-                construction.name.0
-            )
+        .map(|layer_id| {
+            model
+                .materials
+                .iter()
+                .find(|material| material.id == *layer_id)
+                .ok_or_else(|| {
+                    format!(
+                        "construction {} references missing material layer",
+                        construction.name.0
+                    )
+                })
         })
+        .collect()
 }
 
 struct OtherEquipmentNominalRow {

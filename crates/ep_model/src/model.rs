@@ -270,10 +270,16 @@ impl ModelGraph {
             construction_materials: model
                 .constructions
                 .iter()
-                .map(|construction| ConstructionMaterialEdge {
-                    construction: construction.id,
-                    material: construction.outside_layer,
-                    layer_index: 0,
+                .flat_map(|construction| {
+                    construction
+                        .layers
+                        .iter()
+                        .enumerate()
+                        .map(|(index, material)| ConstructionMaterialEdge {
+                            construction: construction.id,
+                            material: *material,
+                            layer_index: index as u32,
+                        })
                 })
                 .collect(),
             zone_thermostats: model
@@ -657,6 +663,7 @@ mod tests {
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             outside_layer: MaterialId(0),
+            layers: vec![MaterialId(0), MaterialId(1)],
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),
@@ -676,6 +683,10 @@ mod tests {
 
         assert_eq!(graph.zone_surfaces[0].zone, ZoneId(0));
         assert_eq!(graph.zone_surfaces[0].surface, SurfaceId(0));
+        assert_eq!(graph.construction_materials.len(), 2);
         assert_eq!(graph.construction_materials[0].material, MaterialId(0));
+        assert_eq!(graph.construction_materials[0].layer_index, 0);
+        assert_eq!(graph.construction_materials[1].material, MaterialId(1));
+        assert_eq!(graph.construction_materials[1].layer_index, 1);
     }
 }

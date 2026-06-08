@@ -32,8 +32,8 @@ Already implemented gates:
 - `compare geometry`: EIO `Zone Information` smoke comparison for zone count,
   surface count, floor area, volume, and exterior gross wall area
 - `compare construction-materials`: EIO `Construction CTF` and
-  `Material CTF Summary` smoke comparison for first-layer thermal conductance and
-  material resistance/properties
+  `Material CTF Summary` smoke comparison for construction layer-stack thermal
+  conductance and outside-layer material resistance/properties
 - `compare internal-gains`: EIO `OtherEquipment Internal Gains Nominal` smoke
   comparison for schedule binding, zone binding, design level, W/m2, and gain fractions
 - `compare internal-convective-gain`: ESO `Zone Total Internal Convective
@@ -216,7 +216,7 @@ Allowed:
 - one or more `Zone` objects
 - `BuildingSurface:Detailed` opaque floors, roofs, ceilings, and walls
 - adiabatic opaque surfaces for the first v0.8 equilibrium gate
-- `Construction` with first-layer material resistance
+- `Construction` with ordered opaque material layers and summed layer resistance
 - `Material` and `Material:NoMass`
 - `Schedule:Constant`
 - `Schedule:Compact` all-days `Until` subset

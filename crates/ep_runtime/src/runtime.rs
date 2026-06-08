@@ -2673,19 +2673,44 @@ fn surface_thermal_properties(
         .ok_or_else(|| RuntimeError::MissingConstruction {
             surface_name: surface.name.0.clone(),
         })?;
-    let material = model
-        .materials
-        .iter()
-        .find(|material| material.id == construction.outside_layer)
+    let layer_ids = if construction.layers.is_empty() {
+        std::slice::from_ref(&construction.outside_layer)
+    } else {
+        construction.layers.as_slice()
+    };
+    let mut layer_materials = Vec::with_capacity(layer_ids.len());
+    for layer_id in layer_ids {
+        let material = model
+            .materials
+            .iter()
+            .find(|material| material.id == *layer_id)
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
+        layer_materials.push(material);
+    }
+    let material = layer_materials
+        .first()
         .ok_or_else(|| RuntimeError::MissingMaterial {
             construction_name: construction.name.0.clone(),
         })?;
-    let thermal_resistance_m2_k_per_w =
-        material
-            .thermal_resistance()
-            .ok_or_else(|| RuntimeError::MissingThermalResistance {
+    let mut thermal_resistance_m2_k_per_w = 0.0;
+    for material in &layer_materials {
+        thermal_resistance_m2_k_per_w += material.thermal_resistance().ok_or_else(|| {
+            RuntimeError::MissingThermalResistance {
                 material_name: material.name.0.clone(),
-            })?;
+            }
+        })?;
+    }
+    let heat_capacity_j_per_m2_k = layer_materials
+        .iter()
+        .filter_map(|material| material.heat_capacity_per_area())
+        .sum::<f64>();
+    let heat_capacity_j_per_m2_k = if heat_capacity_j_per_m2_k > 0.0 {
+        Some(heat_capacity_j_per_m2_k)
+    } else {
+        None
+    };
 
     Ok(SurfaceThermalProperties {
         construction_id: construction.id,
@@ -2693,7 +2718,7 @@ fn surface_thermal_properties(
         outside_layer_material_id: material.id,
         outside_layer_material_name: material.name.0.clone(),
         thermal_resistance_m2_k_per_w,
-        heat_capacity_j_per_m2_k: material.heat_capacity_per_area(),
+        heat_capacity_j_per_m2_k,
         thermal_absorptance: material
             .thermal_absorptance
             .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
@@ -5507,6 +5532,7 @@ DATA PERIODS
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             outside_layer: MaterialId(0),
+            layers: vec![MaterialId(0)],
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -5566,6 +5592,7 @@ DATA PERIODS
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             outside_layer: MaterialId(0),
+            layers: vec![MaterialId(0)],
         });
         model.zones.push(Zone {
             id: ZoneId(0),

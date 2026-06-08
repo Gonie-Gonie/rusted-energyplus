@@ -14,9 +14,10 @@ use std::path::{Path, PathBuf};
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
 use crate::{
-    angle_abs_delta_deg, comparison_class_label, construction_material_rows, json_number,
-    json_string, markdown_cell, other_equipment_nominal_rows, output_frequency_label,
-    output_level_label, source_artifact_label, surface_type_label, variable_class_label,
+    angle_abs_delta_deg, comparison_class_label, construction_layer_material_count,
+    construction_material_rows, json_number, json_string, markdown_cell,
+    other_equipment_nominal_rows, output_frequency_label, output_level_label,
+    source_artifact_label, surface_type_label, variable_class_label,
 };
 
 const CLAIM_BOUNDARY: &str = "static EIO model evidence only; no dynamic heat-balance, HVAC, plant, solar, fenestration, warmup, sizing, or meter conformance";
@@ -312,11 +313,7 @@ fn build_static_model_report(
     {
         let construction_rows = construction_material_rows(&model)?;
         object_counts.constructions = construction_rows.len();
-        object_counts.materials = construction_rows
-            .iter()
-            .map(|row| row.outside_layer_material_name.as_str())
-            .collect::<std::collections::BTreeSet<_>>()
-            .len();
+        object_counts.materials = construction_layer_material_count(&model);
         object_counts.oracle_constructions = load_eio_construction_ctf(&baseline.eio)
             .map_err(|error| format!("failed to load construction EIO rows: {error}"))?
             .len();
