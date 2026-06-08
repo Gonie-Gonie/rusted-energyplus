@@ -274,7 +274,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   conduction to `579.984742`, but it slightly regresses MAT (`2.107293`) and
   the latent air-storage row (`197.510852`). Keep it as a source-aligned probe
   lane until the zone-air/source-term ordering work can absorb those air-side
-  regressions.
+  regressions. The same quick-outside path with eight surface passes isolates
+  surface-iteration sensitivity further: floor heat storage falls to
+  `618.692718` RMSE and floor outside conduction to `136.513781`, while MAT
+  (`2.125244`) and air storage (`203.462113`) continue to regress, so this lane
+  is tracked as a convergence/ordering diagnostic rather than a default.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
