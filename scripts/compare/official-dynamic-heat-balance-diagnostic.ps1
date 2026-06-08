@@ -2,7 +2,7 @@
 param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
-    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-third-order-probe")]
+    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
@@ -23,6 +23,7 @@ $AlgorithmOutputSuffix = switch ($ZoneAirAlgorithm) {
     "energyplus-analytical-surface-first-probe" { "-analytical-surface-first" }
     "energyplus-analytical-coupled-probe" { "-analytical-coupled" }
     "energyplus-analytical-coupled-previous-inside-probe" { "-analytical-coupled-previous-inside" }
+    "energyplus-analytical-coupled-previous-boundary-probe" { "-analytical-coupled-previous-boundary" }
     "energyplus-third-order-probe" { "-third-order" }
     Default { "" }
 }

@@ -97,7 +97,12 @@ the top diagnostic bottleneck once it is visible. MAT still stays best in the
 one-pass all-CTF analytical surface-first lane, so promotion still needs the
 EnergyPlus outside-surface quick-conduction/source coupling, history commit,
 and predictor/corrector order rather than simply enabling the
-floor-conduction-best lane.
+floor-conduction-best lane. Extending the previous-inside solve to adiabatic
+boundaries nudges floor inside temperature and inside conduction slightly lower
+(`923.728787` inside conduction RMSE), but it does not improve floor storage
+(`1422.231349` RMSE versus `1422.193225`) or zone aggregate conduction, so the
+adiabatic boundary probe remains a diagnostic fork rather than the active best
+lane.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
 boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor

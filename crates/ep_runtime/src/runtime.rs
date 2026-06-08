@@ -703,6 +703,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor CTF boundary solves.
     EnergyPlusAnalyticalCoupledPreviousInsideProbe,
+    /// Experimental coupled analytical path using previous inside surface temperature for outdoor and adiabatic boundary solves.
+    EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
     /// Experimental EnergyPlus third-order predictor path for diagnostics.
     EnergyPlusThirdOrderProbe,
 }
@@ -2391,15 +2393,22 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let rebalance_surfaces_after_zone_air_correction = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
     let use_previous_inside_for_outdoor_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
+    );
+    let use_previous_inside_for_adiabatic_boundary = matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
 
     for surface in &mut state.surfaces {
@@ -2464,6 +2473,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
                     zone_surface_convection_sums(&state.surfaces, zone.zone_id);
@@ -2523,6 +2535,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         weather_context,
         surface_iteration_count,
         use_previous_inside_for_outdoor_boundary,
+        use_previous_inside_for_adiabatic_boundary,
     );
 
     if rebalance_surfaces_after_zone_air_correction {
@@ -2546,6 +2559,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             weather_context,
             surface_iteration_count,
             use_previous_inside_for_outdoor_boundary,
+            use_previous_inside_for_adiabatic_boundary,
         );
     }
 
@@ -2572,6 +2586,7 @@ fn run_surface_balance_passes(
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     surface_iteration_count: u32,
     use_previous_inside_for_outdoor_boundary: bool,
+    use_previous_inside_for_adiabatic_boundary: bool,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         for surface in surfaces.iter_mut() {
@@ -2595,9 +2610,11 @@ fn run_surface_balance_passes(
             surface.inside_convection_coefficient_w_per_m2_k =
                 inside_convection_coefficient_w_per_m2_k;
 
-            let outside_balance_inside_temperature_c = if use_previous_inside_for_outdoor_boundary
-                && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors
-            {
+            let use_previous_inside_for_boundary = (use_previous_inside_for_outdoor_boundary
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors)
+                || (use_previous_inside_for_adiabatic_boundary
+                    && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic);
+            let outside_balance_inside_temperature_c = if use_previous_inside_for_boundary {
                 previous_inside_face_temperature_c
             } else {
                 zone_temperature_c
@@ -2608,7 +2625,7 @@ fn run_surface_balance_passes(
                 surface,
                 zone_temperatures,
                 input.outdoor_dry_bulb_c,
-                zone_temperature_c,
+                outside_balance_inside_temperature_c,
                 weather_context,
             );
             update_surface_ctf_history_constants(surface);
@@ -2621,7 +2638,9 @@ fn run_surface_balance_passes(
                     net_inside_source_w_per_m2: surface_inside_ctf_source_terms_w_per_m2(surface),
                 },
             );
-            if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+            if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+                && !use_previous_inside_for_adiabatic_boundary
+            {
                 surface.outside_face_temperature_c = surface.inside_face_temperature_c;
             }
             surface.heat_gain_to_zone_w = surface_inside_conduction_rate_w(surface);
@@ -2702,7 +2721,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe => {
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe => {
             zone_state
                 .zone_air_temperature_coefficients
                 .temp_independent_coefficient_w
@@ -5328,9 +5348,9 @@ mod tests {
         RunPeriodId, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId,
         SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
         ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-        TypedModel, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
-        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+        TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+        ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+        ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
     };
 
     #[test]
@@ -7067,6 +7087,14 @@ DATA PERIODS
         );
         assert_eq!(
             options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
+        );
+        assert_eq!(
+            options
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
@@ -7456,6 +7484,73 @@ DATA PERIODS
         assert!((dry_wall_conduction.values[0] - forced_wall_conduction.values[0]).abs() > 1.0e-3);
         assert!(
             (coupled_roof_temperature.values[0] - previous_inside_roof_temperature.values[0]).abs()
+                > 1.0e-6
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn previous_boundary_probe_keeps_adiabatic_outside_face_history()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
+        typed.surfaces[0].sun_exposure = SunExposure::NoSun;
+        typed.surfaces[0].wind_exposure = WindExposure::NoWind;
+        let model = SimulationModel::from_typed(typed);
+        let weather_values = vec![10.0, 12.0];
+
+        let coupled = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &weather_values,
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe,
+                )
+                .with_surface_iteration_count(3),
+        )?;
+        let previous_boundary = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &weather_values,
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
+                )
+                .with_surface_iteration_count(3),
+        )?;
+
+        let Some(coupled_floor_outside_temperature) = coupled
+            .results
+            .find_series("FLOOR", "Surface Outside Face Temperature")
+        else {
+            return Err(std::io::Error::other("missing coupled floor outside temperature").into());
+        };
+        let Some(coupled_floor_inside_temperature) = coupled
+            .results
+            .find_series("FLOOR", "Surface Inside Face Temperature")
+        else {
+            return Err(std::io::Error::other("missing coupled floor inside temperature").into());
+        };
+        let Some(previous_boundary_floor_outside_temperature) = previous_boundary
+            .results
+            .find_series("FLOOR", "Surface Outside Face Temperature")
+        else {
+            return Err(std::io::Error::other(
+                "missing previous-boundary floor outside temperature",
+            )
+            .into());
+        };
+
+        assert_eq!(coupled_floor_outside_temperature.values.len(), 2);
+        assert_eq!(previous_boundary_floor_outside_temperature.values.len(), 2);
+        assert_eq!(
+            coupled_floor_outside_temperature.values[0],
+            coupled_floor_inside_temperature.values[0]
+        );
+        assert!(
+            (coupled_floor_outside_temperature.values[0]
+                - previous_boundary_floor_outside_temperature.values[0])
+                .abs()
                 > 1.0e-6
         );
 

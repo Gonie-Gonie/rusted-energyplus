@@ -139,7 +139,8 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   and third-order zone-air temperature helpers. `HeatBalanceZoneAirAlgorithm`
   keeps the default trace on the existing simplified analytical shell while
   allowing explicit analytical, analytical surface-first, coupled rebalance,
-  previous-inside outdoor boundary, and third-order diagnostic probes. The
+  previous-inside outdoor boundary, previous-inside outdoor/adiabatic boundary,
+  and third-order diagnostic probes. The
   default predictor equation itself remains the simplified diagnostic shell
   until all coefficient inputs are wired from source-mapped runtime state.
 - `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
@@ -189,7 +190,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   previous-inside outdoor boundary probe then nudges floor inside conduction to
   RMSE `923.733908` and floor outside conduction to `507.588138`, but leaves
   zone aggregate conduction and the latent zone-air balance best rows with the
-  coupled iter3 lane. This narrows the next source-mapped target to the
+  coupled iter3 lane. The previous-inside outdoor/adiabatic boundary probe
+  slightly lowers floor inside conduction again to RMSE `923.728787`, but does
+  not improve floor heat storage (`1422.231349` versus `1422.193225`) or zone
+  aggregate conduction. This narrows the next source-mapped target to the
   coherent EnergyPlus outside-surface quick-conduction/source coupling, surface
   iteration, zone-air correction, and CTF history commit order rather than a
   single post-correction surface feedback pass.
