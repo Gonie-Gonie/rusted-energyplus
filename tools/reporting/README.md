@@ -59,9 +59,9 @@ Current generators:
   rebalance with three surface passes, combined all-CTF analytical coupled
   previous-inside outdoor boundary solves with three surface passes, combined
   all-CTF analytical coupled previous-inside quick outside-conduction solves
-  with three, five, and eight surface passes, an eight-pass interleaved
-  surface/zone-air correction fork, plus an EnergyPlus initial CTF-history
-  seed fork, DOE-2 exterior-convection, grey interior-longwave, ScriptF
+  with three, five, and eight surface passes, eight- and twenty-pass
+  interleaved surface/zone-air correction forks, plus an EnergyPlus initial
+  CTF-history seed fork, DOE-2 exterior-convection, grey interior-longwave, ScriptF
   interior-longwave, and combined DOE-2/longwave forks,
   combined
   all-CTF analytical coupled previous-inside outdoor/adiabatic boundary solves

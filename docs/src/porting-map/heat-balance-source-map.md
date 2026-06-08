@@ -283,9 +283,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   heat storage further to `607.029837`, floor inside conduction to
   `515.487716`, floor outside conduction to `134.641347`, and zone outside
   aggregate conduction to `573.076953`, while MAT remains slightly worse
-  (`2.128169`). This confirms the next source-order target is the coupled
-  inside-surface/zone-air correction loop, not only the number of surface
-  passes.
+  (`2.128169`). Raising the same interleaved fork to twenty passes pushes the
+  floor rows further (`568.173742` heat storage, `498.436050` inside
+  conduction, and `112.184982` outside conduction) and lowers zone outside
+  aggregate conduction to `568.807080`, but MAT (`2.160647`) and latent
+  air-storage (`213.617863`) regress and the top bottleneck shifts to roof
+  outside convection (`604.267805`). This confirms the next source-order
+  target is the coupled inside-surface/zone-air correction loop, not only the
+  number of surface passes.
   Extending the previous-inside path with the
   source-mapped EnergyPlus quick-conduction outside-face branch lowers floor
   inside conduction to RMSE
