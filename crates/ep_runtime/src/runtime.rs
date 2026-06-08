@@ -3068,6 +3068,12 @@ fn zone_air_heat_balance_air_storage_rate_w(
     }
 }
 
+fn zone_air_heat_balance_surface_convection_rate_w(zone_state: &ZoneHeatBalanceState) -> f64 {
+    zone_state.sum_hat_surf_w
+        - zone_state.sum_hat_ref_w
+        - zone_state.sum_ha_w_per_k * zone_state.mean_air_temperature_c
+}
+
 /// Simulates hourly zone mean air temperatures through the heat-balance state
 /// shell without making a conformance claim.
 ///
@@ -3261,6 +3267,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut zone_temperature_sums = vec![0.0; zone_temperatures.len()];
         let mut zone_conduction_sums =
             vec![(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); zone_conduction_rates.len()];
+        let mut zone_air_heat_balance_sums =
+            vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
         let mut surface_sums =
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
@@ -3312,6 +3320,20 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     zone_conduction_sums[index].3 += outside_rate;
                     zone_conduction_sums[index].4 += heat_gain_rate_w(outside_rate);
                     zone_conduction_sums[index].5 += heat_loss_rate_w(outside_rate);
+                }
+            }
+            for (index, (zone_id, _zone_name, _internal, _surface, _storage)) in
+                zone_air_heat_balance_rates.iter().enumerate()
+            {
+                if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                    zone_air_heat_balance_sums[index].0 += zone_state.convective_internal_gain_w;
+                    zone_air_heat_balance_sums[index].1 +=
+                        zone_air_heat_balance_surface_convection_rate_w(zone_state);
+                    zone_air_heat_balance_sums[index].2 += zone_air_heat_balance_air_storage_rate_w(
+                        zone_state,
+                        seconds_per_timestep,
+                        options.zone_air_algorithm,
+                    );
                 }
             }
             for (index, trace) in surface_temperatures.iter().enumerate() {
@@ -3385,26 +3407,20 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace.outside_conduction_loss_rate_w.push(sums.5 / divisor);
         }
         for (
-            zone_id,
-            _zone_name,
-            internal_gain_values,
-            surface_convection_values,
-            air_storage_values,
-        ) in &mut zone_air_heat_balance_rates
+            index,
+            (
+                _zone_id,
+                _zone_name,
+                internal_gain_values,
+                surface_convection_values,
+                air_storage_values,
+            ),
+        ) in zone_air_heat_balance_rates.iter_mut().enumerate()
         {
-            if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                internal_gain_values.push(zone_state.convective_internal_gain_w);
-                surface_convection_values.push(
-                    zone_state.sum_hat_surf_w
-                        - zone_state.sum_hat_ref_w
-                        - zone_state.sum_ha_w_per_k * zone_state.mean_air_temperature_c,
-                );
-                air_storage_values.push(zone_air_heat_balance_air_storage_rate_w(
-                    zone_state,
-                    seconds_per_timestep,
-                    options.zone_air_algorithm,
-                ));
-            }
+            let sums = zone_air_heat_balance_sums[index];
+            internal_gain_values.push(sums.0 / divisor);
+            surface_convection_values.push(sums.1 / divisor);
+            air_storage_values.push(sums.2 / divisor);
         }
         for (index, trace) in surface_temperatures.iter_mut().enumerate() {
             let sums = surface_sums[index];
@@ -7280,7 +7296,8 @@ mod tests {
         NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
         PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
         RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
-        SimulationState, advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
+        SimulationState, advance_heat_balance_state_one_timestep,
+        advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, approximate_outdoor_wet_bulb_c,
         build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c,
@@ -7317,7 +7334,8 @@ mod tests {
         update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
-        zone_air_heat_balance_air_storage_rate_w, zone_geometry_summaries,
+        zone_air_heat_balance_air_storage_rate_w, zone_air_heat_balance_surface_convection_rate_w,
+        zone_geometry_summaries,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -9431,6 +9449,58 @@ DATA PERIODS
         };
         assert_eq!(surface_convection_series.values.len(), 2);
         assert!(surface_convection_series.values[0].is_finite());
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_zone_air_rate_outputs_are_hourly_averages()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let options = HeatBalanceSimulationOptions::hourly_samples(1);
+        let simulation = simulate_heat_balance_zone_air_temperatures(&model, &[10.0], options)?;
+        let steps = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+        let timestep_seconds = SECONDS_PER_HOUR / f64::from(steps);
+        let mut state =
+            initialize_heat_balance_state(&model, options.initial_zone_air_temperature_c)?;
+        let mut surface_convection_sum = 0.0;
+        let mut air_storage_sum = 0.0;
+
+        for _substep in 1..=steps {
+            advance_heat_balance_state_one_timestep_internal(
+                &model.typed,
+                &mut state,
+                HeatBalanceStepInput {
+                    outdoor_dry_bulb_c: 10.0,
+                    hour_ending: 1,
+                    timestep_seconds,
+                },
+                None,
+                options.zone_air_algorithm,
+                options.surface_iteration_count,
+            );
+            let zone = &state.zones[0];
+            surface_convection_sum += zone_air_heat_balance_surface_convection_rate_w(zone);
+            air_storage_sum += zone_air_heat_balance_air_storage_rate_w(
+                zone,
+                timestep_seconds,
+                options.zone_air_algorithm,
+            );
+        }
+
+        let divisor = f64::from(steps);
+        let surface_convection_series = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate")
+            .ok_or_else(|| std::io::Error::other("missing surface convection series"))?;
+        assert!(
+            (surface_convection_series.values[0] - surface_convection_sum / divisor).abs() < 1.0e-9
+        );
+        let air_storage_series = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate")
+            .ok_or_else(|| std::io::Error::other("missing air storage series"))?;
+        assert!((air_storage_series.values[0] - air_storage_sum / divisor).abs() < 1.0e-9);
 
         Ok(())
     }

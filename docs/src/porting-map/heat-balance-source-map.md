@@ -190,8 +190,9 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   internal gain, `SumHA/SumHATsurf/SumHATref`, MAT, and air-capacity state. The
   air energy storage output follows EnergyPlus reporting semantics by using
   `TempIndCoef - TempDepCoef * MAT` for the analytical diagnostic lane and the
-  timestep finite-difference expression for the third-order probe. Official
-  dynamic reports can compare these latent air-balance terms before a
+  timestep finite-difference expression for the third-order probe, then
+  averaging the zone-timestep rate terms into the hourly diagnostic sample.
+  Official dynamic reports can compare these latent air-balance terms before a
   conformance claim is attempted.
 - `SimulationManager.cc` documents the high-level order for the relevant
   timestep path as `ManageSurfaceHeatBalance` ->
@@ -277,7 +278,7 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   regressions. The same quick-outside path with eight surface passes isolates
   surface-iteration sensitivity further: floor heat storage falls to
   `618.692718` RMSE and floor outside conduction to `136.513781`, while MAT
-  (`2.125244`) and air storage (`203.462113`) continue to regress, so this lane
+  (`2.125244`) and air storage (`167.709331`) continue to regress, so this lane
   is tracked as a convergence/ordering diagnostic rather than a default. An
   eight-pass interleaved surface/zone-air correction fork then lowers floor
   heat storage further to `607.029837`, floor inside conduction to
@@ -287,7 +288,7 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   floor rows further (`568.173742` heat storage, `498.436050` inside
   conduction, and `112.184982` outside conduction) and lowers zone outside
   aggregate conduction to `568.807080`, but MAT (`2.160647`) and latent
-  air-storage (`213.617863`) regress and the top bottleneck shifts to roof
+  air-storage (`173.901593`) regress and the top bottleneck shifts to roof
   outside convection (`604.267805`). This confirms the next source-order
   target is the coupled inside-surface/zone-air correction loop, not only the
   number of surface passes.
