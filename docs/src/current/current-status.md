@@ -43,6 +43,13 @@ gain checks, node projection, IdealLoads typed graph work, and plant-loop
 diagnostic plumbing. Those artifacts are useful development evidence, but
 they are not general compatibility claims.
 
+The active dynamic expansion target is tracked by
+`scripts\dev.cmd v0.26-dynamic-idf-inventory`. As of the current inventory,
+12 IDF-backed case manifests through v0.26 are in scope, 5 have dynamic
+conformance-gated evidence, and 7 remain static, smoke, baseline, or
+diagnostic-only gaps before the broader v0.26-example dynamic target can be
+promoted.
+
 Current static model conformance is limited to:
 
 - `official_1zone_static_model_001`

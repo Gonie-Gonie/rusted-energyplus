@@ -55,7 +55,9 @@ for the IDFs used through v0.26 evidence: `heat_balance_nomass_001`,
 `1ZoneUncontrolled` ExampleFile tracker. The first active blocker remains
 official `1ZoneUncontrolled` mass-floor CTF/history and zone-air correction
 parity; broader v0.26-example dynamic promotion should wait until that tracker
-has a passing generated report and blocking gate.
+has a passing generated report and blocking gate. The planning inventory command
+`scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the IDF-backed case list and
+current dynamic gaps explicit while that runtime work proceeds.
 
 The long-term targets remain:
 

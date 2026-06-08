@@ -290,6 +290,11 @@ $Commands = [ordered]@{
         Group = "conformance"
         Help = "Validate all case manifests against the v0.17 schema v2 gate."
     }
+    "v0.26-dynamic-idf-inventory" = @{
+        Path = "conformance\v0.26-dynamic-idf-inventory.ps1"
+        Group = "conformance"
+        Help = "Inventory IDF-backed dynamic conformance status through the v0.26 evidence set."
+    }
     "conformance-baseline-smoke" = @{
         Path = "conformance\conformance-baseline-smoke.ps1"
         Group = "conformance"

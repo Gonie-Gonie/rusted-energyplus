@@ -26,6 +26,12 @@ Case manifest schema v2 is checked with:
 .\scripts\dev.cmd manifest-validate-all
 ```
 
+The v0.26 IDF-backed dynamic evidence inventory is:
+
+```powershell
+.\scripts\dev.cmd v0.26-dynamic-idf-inventory
+```
+
 The false-claim guard is:
 
 ```powershell
