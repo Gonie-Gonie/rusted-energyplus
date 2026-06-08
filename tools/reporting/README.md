@@ -24,4 +24,17 @@ Current generators:
 - `release_evidence_manifest.py` builds the release asset manifest from the
   binary package plus generated evidence JSON/PDF/HTML/Markdown artifacts.
 
+Conformance-facing scripts should keep this split:
+
+- `scripts/dev.ps1` exposes stable user commands and groups them by purpose.
+- `scripts/release/*.ps1` wrappers locate/provision the report Python and pass
+  arguments through to the generator.
+- `tools/reporting/*.py` owns data shaping, chart readability, document layout,
+  and durable artifact serialization.
+
+When a Python report includes charts, review the rendered PDF/HTML output as
+part of the change. Temporary screenshots or page images are useful for QA, but
+the release artifact set should stay limited to promoted evidence files unless
+a new artifact is intentionally added to the release contract.
+
 Pinned dependencies live in `tools/python/requirements-report.txt`.

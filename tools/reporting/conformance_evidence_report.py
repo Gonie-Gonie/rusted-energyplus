@@ -38,6 +38,42 @@ CLAIM_BOUNDARY = (
     "convective gain numerical conformance variables are promoted."
 )
 
+CASE_LABELS = {
+    "heat_balance_nomass_001": "HB no-mass",
+    "surface_temperature_nomass_001": "Surface no-mass",
+    "schedule_constant_001": "Schedule const",
+    "weather_fields_001": "Weather fields",
+    "internal_gains_001": "Internal gains",
+}
+
+KEY_LABELS = {
+    "ZONE ONE": "Zone One",
+    "ALWAYSON": "AlwaysOn",
+    "Environment": "Env",
+}
+
+VARIABLE_LABELS = {
+    "Zone Mean Air Temperature": "Zone MAT",
+    "Surface Inside Face Temperature": "Surface IFT",
+    "Surface Outside Face Temperature": "Surface OFT",
+    "Surface Inside Face Conduction Heat Transfer Rate": "Surface IF cond",
+    "Surface Inside Face Conduction Heat Transfer Rate per Area": "Surface IF cond/area",
+    "Surface Outside Face Conduction Heat Transfer Rate": "Surface OF cond",
+    "Surface Outside Face Conduction Heat Transfer Rate per Area": "Surface OF cond/area",
+    "Zone Opaque Surface Inside Faces Conduction Rate": "Zone opaque cond",
+    "Schedule Value": "Schedule value",
+    "Site Outdoor Air Drybulb Temperature": "Outdoor drybulb",
+    "Zone Total Internal Convective Heating Rate": "Internal convective",
+}
+
+CLASS_LABELS = {
+    "zone-state": "zone",
+    "surface-state": "surface",
+    "schedule": "sched",
+    "weather": "weather",
+    "internal-gain": "gain",
+}
+
 
 @dataclass(frozen=True)
 class CaseSpec:
@@ -105,6 +141,49 @@ def percent_label(numerator: float | None, denominator: float | None, digits: in
     if numerator is None or denominator in (None, 0):
         return "n/a"
     return f"{(float(numerator) / float(denominator)) * 100.0:.{digits}f}%"
+
+
+def compact_number_label(value: float | int | None) -> str:
+    if value is None:
+        return "n/a"
+    number = float(value)
+    if number == 0.0:
+        return "0"
+    if abs(number) < 0.001:
+        mantissa, exponent = f"{number:.3e}".split("e")
+        mantissa = mantissa.rstrip("0").rstrip(".")
+        return f"{mantissa}e{int(exponent)}"
+    if abs(number) < 10.0:
+        return f"{number:.3f}".rstrip("0").rstrip(".")
+    return f"{number:.1f}"
+
+
+def case_label(case_id: str) -> str:
+    return CASE_LABELS.get(case_id, case_id)
+
+
+def key_label(key: str | None) -> str:
+    if key is None:
+        return ""
+    return KEY_LABELS.get(key, str(key))
+
+
+def variable_label(variable: str | None) -> str:
+    if variable is None:
+        return ""
+    return VARIABLE_LABELS.get(variable, str(variable))
+
+
+def class_label(output_class: str | None) -> str:
+    if output_class is None:
+        return ""
+    return CLASS_LABELS.get(output_class, str(output_class))
+
+
+def status_label(status: str | None) -> str:
+    if status in ("pass", "expected", "extracted"):
+        return "ok"
+    return "" if status is None else str(status)
 
 
 def repo_path(repo_root: Path, relative: str) -> Path:
@@ -287,6 +366,16 @@ def axis_label(value: float, _position: int) -> str:
     return f"{value:.3f}".rstrip("0").rstrip(".")
 
 
+def chart_value_label(value: float) -> str:
+    if value == 0.0:
+        return "0"
+    if abs(value) < 0.001:
+        return f"{value:.6f}".rstrip("0").rstrip(".")
+    if abs(value) < 10.0:
+        return f"{value:.3f}".rstrip("0").rstrip(".")
+    return f"{value:.1f}"
+
+
 def style_axis(ax: Any) -> None:
     ax.grid(axis="x", color="#e3e7ed", linewidth=0.8)
     ax.set_axisbelow(True)
@@ -339,13 +428,40 @@ def build_dual_bar_figure(
         edgecolor="none",
         label=secondary_label,
     )
+    label_offset = max_value * 0.012
+    for y, value in zip((y - 0.16 for y in y_values), primary):
+        ax.text(
+            value + label_offset,
+            y,
+            chart_value_label(value),
+            va="center",
+            ha="left",
+            fontsize=6.6,
+            color="#4b5563",
+        )
+    for y, value, visible in zip((y + 0.16 for y in y_values), secondary, secondary_visible):
+        ax.text(
+            visible + label_offset,
+            y,
+            chart_value_label(value),
+            va="center",
+            ha="left",
+            fontsize=6.6,
+            color=secondary_color,
+        )
     ax.set_yticks(y_values, labels)
     ax.invert_yaxis()
-    ax.set_xlim(0, max_value * 1.04)
+    ax.set_xlim(0, max_value * 1.18)
     ax.set_xlabel(x_label, fontsize=9, color="#5b6775")
     ax.set_title(title, loc="left", fontsize=13, fontweight="bold", color="#17212b", pad=10)
     style_axis(ax)
-    ax.legend(loc="lower right", fontsize=8, frameon=False)
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.14),
+        ncol=2,
+        fontsize=8,
+        frameon=False,
+    )
     fig.tight_layout(pad=1.0)
     return fig
 
@@ -357,7 +473,7 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         for series in case["series"]:
             accuracy_rows.append(
                 {
-                    "id": f"S{series_index}",
+                    "id": f"S{series_index:02d}",
                     "primary": series["tolerance_max_abs_c"],
                     "secondary": series["max_abs_delta_c"],
                 }
@@ -366,7 +482,7 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
 
     timing_rows = [
         {
-            "id": f"C{index + 1}",
+            "id": f"C{index + 1:02d}",
             "primary": case["gate_elapsed_seconds"],
             "secondary": case["energyplus_elapsed_seconds"] or 0.0,
         }
@@ -394,15 +510,24 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     return {"accuracy": accuracy, "timing": timing}
 
 
-def table(headers: list[str], rows: list[list[Any]], caption: str) -> Table:
+def table(
+    headers: list[str],
+    rows: list[list[Any]],
+    caption: str,
+    column_widths: list[float] | None = None,
+) -> Table:
     string_rows = [["" if value is None else str(value) for value in row] for row in rows]
     return Table(
         headers,
         string_rows,
         caption=caption,
+        column_widths=column_widths,
+        unit="in",
         header_background_color="#eef3f7",
         border_color="#d7dde5",
         alternate_row_background_color="#f8fafc",
+        cell_padding=3.2,
+        border_width=0.4,
         repeat_header_rows=True,
         split=True,
     )
@@ -413,15 +538,15 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
     for index, case in enumerate(evidence["cases"], start=1):
         rows.append(
             [
-                f"C{index}",
+                f"C{index:02d}",
                 case["milestone"],
-                case["case_id"],
-                case["status"],
+                case_label(case["case_id"]),
+                status_label(case["status"]),
                 case["series_count"],
                 case["samples"],
                 case["heat_balance_timesteps"],
-                number_label(case["max_abs_delta_c"], 12),
-                number_label(case["rmse_delta_c"], 12),
+                compact_number_label(case["max_abs_delta_c"]),
+                compact_number_label(case["rmse_delta_c"]),
                 number_label(case["gate_elapsed_seconds"], 3, "s"),
                 "n/a"
                 if case["energyplus_elapsed_seconds"] is None
@@ -431,19 +556,20 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
     return table(
         [
             "ID",
-            "Milestone",
+            "MS",
             "Case",
-            "Status",
+            "OK",
             "Series",
             "Samples",
-            "Rust timesteps",
+            "HB ts",
             "Max abs",
             "RMSE",
-            "Gate wall",
+            "Gate",
             "E+ elapsed",
         ],
         rows,
         "Promoted numerical conformance case matrix.",
+        [0.42, 0.5, 1.45, 0.45, 0.55, 0.6, 0.55, 0.75, 0.75, 0.62, 0.62],
     )
 
 
@@ -454,21 +580,22 @@ def build_accuracy_values(evidence: dict[str, Any]) -> Table:
         for series in case["series"]:
             rows.append(
                 [
-                    f"S{series_index}",
+                    f"S{series_index:02d}",
                     case["milestone"],
-                    case["case_id"],
-                    series["key"],
-                    series["variable"],
-                    number_label(series["max_abs_delta_c"], 12),
-                    number_label(series["tolerance_max_abs_c"], 12),
+                    case_label(case["case_id"]),
+                    key_label(series["key"]),
+                    variable_label(series["variable"]),
+                    compact_number_label(series["max_abs_delta_c"]),
+                    compact_number_label(series["tolerance_max_abs_c"]),
                     percent_label(series["max_abs_delta_c"], series["tolerance_max_abs_c"]),
                 ]
             )
             series_index += 1
     return table(
-        ["ID", "Milestone", "Case", "Key", "Variable", "Observed max abs", "Tolerance", "Utilization"],
+        ["ID", "MS", "Case", "Key", "Output", "Max", "Tol", "Use"],
         rows,
         "Accuracy values backing the chart.",
+        [0.42, 0.5, 1.45, 0.85, 1.55, 0.8, 0.8, 0.6],
     )
 
 
@@ -477,9 +604,9 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
     for index, case in enumerate(evidence["cases"], start=1):
         rows.append(
             [
-                f"C{index}",
+                f"C{index:02d}",
                 case["milestone"],
-                case["case_id"],
+                case_label(case["case_id"]),
                 number_label(case["gate_elapsed_seconds"], 3, "s"),
                 "n/a"
                 if case["energyplus_elapsed_seconds"] is None
@@ -492,6 +619,7 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
         ["ID", "Milestone", "Case", "Gate wall", "E+ elapsed", "E+ warnings", "E+ severes"],
         rows,
         "Execution time and EnergyPlus error summary values.",
+        [0.55, 0.75, 1.8, 0.85, 0.85, 0.8, 0.8],
     )
 
 
@@ -502,16 +630,16 @@ def build_series_detail(evidence: dict[str, Any]) -> Table:
         for series in case["series"]:
             rows.append(
                 [
-                    f"S{series_index}",
-                    case["case_id"],
-                    series["key"],
-                    series["variable"],
-                    series["class"],
+                    f"S{series_index:02d}",
+                    case_label(case["case_id"]),
+                    key_label(series["key"]),
+                    variable_label(series["variable"]),
+                    class_label(series["class"]),
                     series["samples"],
-                    number_label(series["max_abs_delta_c"], 12),
-                    number_label(series["rmse_delta_c"], 12),
-                    number_label(series["tolerance_max_abs_c"], 12),
-                    series["status"],
+                    compact_number_label(series["max_abs_delta_c"]),
+                    compact_number_label(series["rmse_delta_c"]),
+                    compact_number_label(series["tolerance_max_abs_c"]),
+                    status_label(series["status"]),
                 ]
             )
             series_index += 1
@@ -520,16 +648,17 @@ def build_series_detail(evidence: dict[str, Any]) -> Table:
             "ID",
             "Case",
             "Key",
-            "Variable",
+            "Output",
             "Class",
-            "Samples",
+            "N",
             "Max abs",
             "RMSE",
-            "Max abs tolerance",
-            "Status",
+            "Tol",
+            "OK",
         ],
         rows,
         "Per-series numerical evidence.",
+        [0.38, 1.2, 0.75, 1.45, 0.6, 0.35, 0.65, 0.65, 0.65, 0.35],
     )
 
 
@@ -542,7 +671,17 @@ def build_metric_table(evidence: dict[str, Any]) -> Table:
         ["Max RMSE", number_label(aggregate["rmse_delta_c"], 12)],
         ["Gate status", aggregate["status"]],
     ]
-    return table(["Metric", "Value"], rows, "Release evidence summary metrics.")
+    return table(["Metric", "Value"], rows, "Release evidence summary metrics.", [2.4, 2.2])
+
+
+def build_artifact_paths(evidence: dict[str, Any]) -> Table:
+    labels = {
+        "html": "HTML evidence",
+        "pdf": "PDF evidence",
+        "json": "JSON evidence",
+    }
+    rows = [[labels.get(key, key), path] for key, path in evidence["artifacts"].items()]
+    return table(["Artifact", "Path"], rows, "Generated release evidence artifacts.", [1.5, 5.6])
 
 
 def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document:
@@ -598,13 +737,14 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             build_metric_table(evidence),
         ),
         Chapter("Case Matrix", build_case_matrix(evidence)),
+        PageBreak(),
         Chapter(
             "Accuracy Evidence",
             Paragraph(
-                "The figure uses compact row IDs. Numeric values are reported in the table below the figure so "
-                "labels remain stable in PDF output as this report grows."
+                "The figure uses compact row IDs. Full case, key, and variable names remain in JSON evidence; "
+                "the PDF table uses short labels to keep the release view readable."
             ),
-            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8),
+            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
             build_accuracy_values(evidence),
         ),
         Chapter(
@@ -613,7 +753,12 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 "Release gate wall-clock covers oracle generation, Rust comparison, and artifact writing. "
                 "EnergyPlus elapsed time is read from eplusout.end and is not a portable performance benchmark."
             ),
-            Figure(charts["timing"], caption="Release gate wall-clock and EnergyPlus elapsed time.", width=6.8),
+            Figure(
+                charts["timing"],
+                caption="Release gate wall-clock and EnergyPlus elapsed time.",
+                width=6.8,
+                placement="H",
+            ),
             build_timing_values(evidence),
         ),
         PageBreak(),
@@ -633,19 +778,12 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                     ["Preserve explicit non-claims", "HVAC, node, plant, fenestration, solar, warmup, sizing, and meters need their own gates."],
                 ],
                 "Rules for adding future release evidence.",
+                [2.3, 4.8],
             ),
         ),
         Chapter(
             "Artifact Paths",
-            table(
-                ["Artifact", "Path"],
-                [
-                    ["HTML evidence", evidence["artifacts"]["html"]],
-                    ["PDF evidence", evidence["artifacts"]["pdf"]],
-                    ["JSON evidence", evidence["artifacts"]["json"]],
-                ],
-                "Generated release evidence artifacts.",
-            ),
+            build_artifact_paths(evidence),
         ),
         settings=settings,
     )
@@ -656,11 +794,10 @@ def write_outputs(repo_root: Path, version: str, evidence: dict[str, Any]) -> di
     evidence_root.mkdir(parents=True, exist_ok=True)
     charts = create_charts(evidence)
     try:
-        document = build_document(evidence, charts)
-
         json_path = evidence_root / "numeric-conformance-evidence.json"
         html_path = evidence_root / "numeric-conformance-evidence.html"
         pdf_path = evidence_root / "numeric-conformance-evidence.pdf"
+        document = build_document(evidence, charts)
 
         json_path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
         document.save_html(html_path)

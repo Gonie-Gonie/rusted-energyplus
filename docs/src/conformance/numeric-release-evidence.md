@@ -88,8 +88,8 @@ Python document generator:
 The generator uses `oodocs` for document structure and PDF/HTML serialization.
 Charts are built as matplotlib figure objects and inserted directly into
 `oodocs.Figure`, so the report does not depend on a one-off HTML chart renderer
-or a LaTeX toolchain. Numeric labels stay in tables below the figures instead
-of being drawn densely on top of the charts.
+or a LaTeX toolchain. Compact chart labels expose the visual scale, while full
+precision values remain in the tables below the figures.
 
 This is now the standard framework for scripted documentation. PowerShell entry
 points remain stable user-facing commands, while Python generators under
