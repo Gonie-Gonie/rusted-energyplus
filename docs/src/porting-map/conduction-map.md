@@ -60,6 +60,8 @@ floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside
 convection, full inside-surface iteration order, and radiation coefficient
 updates are still unported. The timestep shell now uses the EnergyPlus TARP
-inside natural convection coefficient in the inside CTF balance.
+inside natural convection coefficient in the inside CTF balance and preserves
+the previous inside face temperature for the EnergyPlus-style iterative damping
+term before the zone-air predictor overwrites current face estimates.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

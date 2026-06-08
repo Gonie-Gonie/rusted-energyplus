@@ -2235,6 +2235,11 @@ fn advance_heat_balance_state_one_timestep_internal(
         .iter()
         .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
         .collect::<Vec<_>>();
+    let previous_surface_inside_temperatures = state
+        .surfaces
+        .iter()
+        .map(|surface| (surface.surface_id, surface.inside_face_temperature_c))
+        .collect::<Vec<_>>();
 
     for surface in &mut state.surfaces {
         let zone_temperature_c = previous_zone_temperatures
@@ -2300,7 +2305,11 @@ fn advance_heat_balance_state_one_timestep_internal(
         .collect::<Vec<_>>();
 
     for surface in &mut state.surfaces {
-        let previous_inside_face_temperature_c = surface.inside_face_temperature_c;
+        let previous_inside_face_temperature_c = previous_surface_inside_temperatures
+            .iter()
+            .find(|(surface_id, _temperature)| *surface_id == surface.surface_id)
+            .map(|(_surface_id, temperature)| *temperature)
+            .unwrap_or(surface.inside_face_temperature_c);
         let zone_temperature_c = state
             .zones
             .iter()
@@ -5869,6 +5878,32 @@ DATA PERIODS
         );
         assert!(state.surfaces[0].inside_face_temperature_c < 20.0);
         assert!(state.surfaces[0].heat_gain_to_zone_w < 0.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_timestep_uses_previous_surface_temperature_for_ctf_damping()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        state.surfaces[0].inside_face_temperature_c = 40.0;
+
+        advance_heat_balance_state_one_timestep(
+            &typed,
+            &mut state,
+            HeatBalanceStepInput {
+                outdoor_dry_bulb_c: 20.0,
+                hour_ending: 1,
+                timestep_seconds: 60.0,
+            },
+        );
+
+        assert!(
+            state.surfaces[0].inside_face_temperature_c > 25.0,
+            "CTF damping should use the previous surface temperature, not the overwritten zone temperature"
+        );
 
         Ok(())
     }

@@ -92,6 +92,10 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `CalcHeatBalanceInsideSurf2CTFOnly` uses `IterDampConst = 5.0`, subtracts
   `CTFCross[0]` from the inside denominator for adiabatic surfaces, and uses
   `CTFCross[0] * SurfTempOutHist(1)` for standard opaque surfaces.
+- `CalcHeatBalanceInsideSurf2CTFOnly` keeps the previous inside surface
+  temperature in `SurfTempInsOld` for the iterative damping term; Rust now
+  preserves the previous per-surface inside-face temperature before its
+  zone-air predictor pass overwrites the current face estimate.
 - `DataHeatBalance::SurfInitialConvCoeff = 3.076 W/m2-K` initializes inside
   convection coefficients before the selected inside convection algorithm is
   evaluated. `DataHeatBalance::LowHConvLimit = 0.1 W/m2-K` and
