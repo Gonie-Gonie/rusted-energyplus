@@ -18,6 +18,7 @@ const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
+const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -2887,30 +2888,88 @@ fn solar_position_rad_at_local_hour(
     local_hour: f64,
 ) -> Option<(f64, f64)> {
     let day = day_of_year(record.year, record.month, record.day)?;
-    let day_angle_rad = (360.0 * (f64::from(day) - 81.0) / 364.0).to_radians();
-    let equation_of_time_min =
-        9.87 * (2.0 * day_angle_rad).sin() - 7.53 * day_angle_rad.cos() - 1.5 * day_angle_rad.sin();
-    let local_standard_meridian_deg = 15.0 * site.time_zone_hours;
-    let time_correction_min =
-        4.0 * (site.longitude_deg - local_standard_meridian_deg) + equation_of_time_min;
-    let solar_time_hours = local_hour + time_correction_min / 60.0;
-    let hour_angle_rad = (15.0 * (solar_time_hours - 12.0)).to_radians();
-    let declination_rad = (23.45
-        * (360.0 * (284.0 + f64::from(day)) / 365.0)
-            .to_radians()
-            .sin())
-    .to_radians();
     let latitude_rad = site.latitude_deg.to_radians();
+    let sin_latitude = latitude_rad.sin();
+    let cos_latitude = latitude_rad.cos();
+    let (sin_declination, cos_declination, equation_of_time_hours) =
+        energyplus_daily_solar_coefficients(day);
+    let time_zone_meridian_deg = 15.0 * site.time_zone_hours;
+    let hour_angle_deg = 15.0 * (12.0 - (local_hour + equation_of_time_hours))
+        + (time_zone_meridian_deg - site.longitude_deg);
+    let hour_angle_rad = hour_angle_deg.to_radians();
 
-    let sin_altitude = latitude_rad.sin() * declination_rad.sin()
-        + latitude_rad.cos() * declination_rad.cos() * hour_angle_rad.cos();
-    let altitude_rad = sin_altitude.clamp(-1.0, 1.0).asin();
-    let mut azimuth_rad = hour_angle_rad.sin().atan2(
-        hour_angle_rad.cos() * latitude_rad.sin() - declination_rad.tan() * latitude_rad.cos(),
-    ) + std::f64::consts::PI;
-    azimuth_rad = azimuth_rad.rem_euclid(2.0 * std::f64::consts::PI);
+    let cos_zenith =
+        sin_declination * sin_latitude + cos_declination * cos_latitude * hour_angle_rad.cos();
+    if cos_zenith < ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
+        return None;
+    }
+
+    let altitude_rad = cos_zenith.clamp(-1.0, 1.0).asin();
+    let solar_zenith_rad = cos_zenith.clamp(-1.0, 1.0).acos();
+    let azimuth_denominator = cos_latitude * solar_zenith_rad.sin();
+    let mut azimuth_rad = if azimuth_denominator.abs() > 1.0e-12 {
+        let cos_azimuth = -((sin_latitude * cos_zenith - sin_declination) / azimuth_denominator);
+        cos_azimuth.clamp(-1.0, 1.0).acos()
+    } else {
+        0.0
+    };
+    if hour_angle_deg < 0.0 {
+        azimuth_rad = 2.0 * std::f64::consts::PI - azimuth_rad;
+    }
 
     Some((altitude_rad, azimuth_rad))
+}
+
+fn energyplus_daily_solar_coefficients(day_of_year: u32) -> (f64, f64, f64) {
+    const SINE_SOLAR_DECLINATION_COEFFICIENTS: [f64; 9] = [
+        0.00561800,
+        0.0657911,
+        -0.392779,
+        0.00064440,
+        -0.00618495,
+        -0.00010101,
+        -0.00007951,
+        -0.00011691,
+        0.00002096,
+    ];
+    const EQUATION_OF_TIME_COEFFICIENTS: [f64; 9] = [
+        0.00021971,
+        -0.122649,
+        0.00762856,
+        -0.156308,
+        -0.0530028,
+        -0.00388702,
+        -0.00123978,
+        -0.00270502,
+        -0.00167992,
+    ];
+
+    let angle = 2.0 * std::f64::consts::PI * f64::from(day_of_year) / 366.0;
+    let sin_x = angle.sin();
+    let cos_x = angle.cos();
+    let sin_2x = sin_x * cos_x * 2.0;
+    let cos_2x = cos_x.powi(2) - sin_x.powi(2);
+    let sin_3x = sin_x * cos_2x + cos_x * sin_2x;
+    let cos_3x = cos_x * cos_2x - sin_x * sin_2x;
+    let sin_4x = 2.0 * sin_2x * cos_2x;
+    let cos_4x = cos_2x.powi(2) - sin_2x.powi(2);
+    let basis = [
+        1.0, sin_x, cos_x, sin_2x, cos_2x, sin_3x, cos_3x, sin_4x, cos_4x,
+    ];
+
+    let sin_declination = SINE_SOLAR_DECLINATION_COEFFICIENTS
+        .iter()
+        .zip(basis)
+        .map(|(coefficient, term)| coefficient * term)
+        .sum::<f64>();
+    let cos_declination = (1.0 - sin_declination.powi(2)).sqrt();
+    let equation_of_time_hours = EQUATION_OF_TIME_COEFFICIENTS
+        .iter()
+        .zip(basis)
+        .map(|(coefficient, term)| coefficient * term)
+        .sum::<f64>();
+
+    (sin_declination, cos_declination, equation_of_time_hours)
 }
 
 fn heat_gain_rate_w(rate_w: f64) -> f64 {
@@ -3654,18 +3713,19 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
+        EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
         HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, append_surface_incident_solar_radiation_series,
         build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        initialize_heat_balance_state, node_temperature_setpoint_from_energyplus,
-        parse_epw_dry_bulb_series, parse_epw_records, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
-        simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
-        simulate_schedule_values, simulate_zone_internal_convective_gains,
+        energyplus_daily_solar_coefficients, initialize_heat_balance_state,
+        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
+        simulate_plant_state_projection, simulate_schedule_values,
+        simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
         solar_weather_interpolation_weights, surface_area_m2, surface_geometry_summaries,
         zone_geometry_summaries,
     };
@@ -3701,6 +3761,50 @@ mod tests {
         assert_eq!(solar_weather_interpolation_weights(4, 2), (0.0, 1.0, 0.0));
         assert_eq!(solar_weather_interpolation_weights(4, 3), (0.0, 0.75, 0.25));
         assert_eq!(solar_weather_interpolation_weights(4, 4), (0.0, 0.5, 0.5));
+    }
+
+    #[test]
+    fn energyplus_daily_solar_coefficients_match_reference_day() {
+        let (sin_declination, _cos_declination, equation_of_time_hours) =
+            energyplus_daily_solar_coefficients(1);
+
+        assert!((sin_declination - -0.392204631085).abs() < 1.0e-12);
+        assert!((equation_of_time_hours - -0.055895327979).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn solar_position_uses_energyplus_hour_angle_convention() {
+        let site = SiteLocation {
+            name: NormalizedName::new("Chicago"),
+            latitude_deg: 41.78,
+            longitude_deg: -87.75,
+            time_zone_hours: -6.0,
+            elevation_m: 190.0,
+        };
+        let record = EpwRecord {
+            year: 2013,
+            month: 1,
+            day: 1,
+            hour: 12,
+            minute: 60,
+            dry_bulb_c: 0.0,
+            dew_point_c: 0.0,
+            relative_humidity_percent: 0.0,
+            atmospheric_pressure_pa: 101_325.0,
+            horizontal_infrared_radiation_wh_per_m2: 0.0,
+            global_horizontal_radiation_wh_per_m2: 0.0,
+            direct_normal_radiation_wh_per_m2: 0.0,
+            diffuse_horizontal_radiation_wh_per_m2: 0.0,
+            wind_direction_deg: 0.0,
+            wind_speed_m_per_s: 0.0,
+        };
+
+        let position = solar_position_rad_at_local_hour(&site, &record, 12.0);
+        assert!(position.is_some());
+        let (altitude_rad, azimuth_rad) = position.unwrap_or((0.0, 0.0));
+
+        assert!((altitude_rad.to_degrees() - 25.115079268192).abs() < 1.0e-12);
+        assert!((azimuth_rad.to_degrees() - 181.434056277464).abs() < 1.0e-12);
     }
 
     #[test]
