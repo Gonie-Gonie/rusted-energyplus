@@ -209,6 +209,12 @@ pub struct Material {
     pub thickness_m: Option<f64>,
     /// Thermal resistance for Material:NoMass objects in m2-K/W.
     pub thermal_resistance_m2_k_per_w: Option<f64>,
+    /// Thermal absorptance for exterior longwave heat-balance diagnostics.
+    pub thermal_absorptance: Option<f64>,
+    /// Solar absorptance for exterior solar heat-balance diagnostics.
+    pub solar_absorptance: Option<f64>,
+    /// Visible absorptance.
+    pub visible_absorptance: Option<f64>,
 }
 
 impl Material {

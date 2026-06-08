@@ -32,8 +32,10 @@ use ep_runtime::{
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
     build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
     simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
-    simulate_plant_state_projection, surface_geometry_summaries, zone_geometry_summaries,
+    simulate_heat_balance_zone_air_temperatures,
+    simulate_heat_balance_zone_air_temperatures_with_weather_records,
+    simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
+    surface_geometry_summaries, zone_geometry_summaries,
 };
 use internal_gains::{generate_internal_gains_report, run_compare_internal_convective_gain};
 use static_model::generate_static_model_report;
@@ -3414,9 +3416,9 @@ fn build_heat_balance_conformance_diagnostic(
             sample_count,
         )
     };
-    let mut simulation = simulate_heat_balance_zone_air_temperatures(
+    let mut simulation = simulate_heat_balance_zone_air_temperatures_with_weather_records(
         &simulation_model,
-        &weather_values,
+        &weather_records,
         simulation_options,
     )
     .map_err(|error| error.to_string())?;

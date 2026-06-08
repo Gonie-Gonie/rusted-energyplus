@@ -18,6 +18,15 @@ const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
+const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
+const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
+const EXTERIOR_CONVECTION_BASE_COEFFICIENT_W_PER_M2_K: f64 = 13.0;
+const EXTERIOR_CONVECTION_WIND_COEFFICIENT_W_PER_M3_K: f64 = 2.5;
+const EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K: f64 = 4.0;
+const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
+const EXTERIOR_RAIN_FALLBACK_DEPTH_MM: f64 = 2.0;
+const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.6697e-8;
+const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_SUN_IS_UP_COS_ZENITH: f64 = 0.00001;
 const ENERGYPLUS_SHADOWING_CALC_FREQUENCY_DAYS: usize = 20;
 
@@ -519,6 +528,10 @@ pub struct SurfaceHeatBalanceState {
     pub thermal_resistance_m2_k_per_w: f64,
     /// Area-normalized heat capacity in J/m2-K when available.
     pub heat_capacity_j_per_m2_k: Option<f64>,
+    /// Outside layer thermal absorptance used by exterior diagnostic forcing.
+    pub thermal_absorptance: f64,
+    /// Outside layer solar absorptance used by exterior diagnostic forcing.
+    pub solar_absorptance: f64,
     /// Surface conductance in W/K.
     pub conductance_w_per_k: f64,
     /// Current opaque heat transfer to the owning zone in W.
@@ -2052,6 +2065,8 @@ pub fn initialize_heat_balance_state(
                 area_m2,
                 thermal_resistance_m2_k_per_w: thermal.thermal_resistance_m2_k_per_w,
                 heat_capacity_j_per_m2_k: thermal.heat_capacity_j_per_m2_k,
+                thermal_absorptance: thermal.thermal_absorptance,
+                solar_absorptance: thermal.solar_absorptance,
                 conductance_w_per_k: area_m2 / thermal.thermal_resistance_m2_k_per_w,
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2082,6 +2097,14 @@ pub fn initialize_heat_balance_state(
 /// the currently supported opaque surface conductance and internal convective
 /// gains while keeping the public zone-temperature comparison diagnostic-only.
 pub fn advance_heat_balance_state_one_timestep(
+    model: &TypedModel,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+) {
+    advance_heat_balance_state_one_timestep_internal(model, state, input);
+}
+
+fn advance_heat_balance_state_one_timestep_internal(
     model: &TypedModel,
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
@@ -2195,6 +2218,34 @@ pub fn simulate_heat_balance_zone_air_temperatures(
     weather_dry_bulb_c: &[f64],
     options: HeatBalanceSimulationOptions,
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_internal(model, weather_dry_bulb_c, None, options)
+}
+
+/// Simulates hourly zone mean air temperatures with full EPW records available
+/// for diagnostic exterior surface forcing.
+pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records(
+    model: &SimulationModel,
+    weather_records: &[EpwRecord],
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    let weather_dry_bulb_c = weather_records
+        .iter()
+        .map(|record| record.dry_bulb_c)
+        .collect::<Vec<_>>();
+    simulate_heat_balance_zone_air_temperatures_internal(
+        model,
+        &weather_dry_bulb_c,
+        Some(weather_records),
+        options,
+    )
+}
+
+fn simulate_heat_balance_zone_air_temperatures_internal(
+    model: &SimulationModel,
+    weather_dry_bulb_c: &[f64],
+    weather_records: Option<&[EpwRecord]>,
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
     if weather_dry_bulb_c.is_empty() {
         return Err(RuntimeError::NoWeatherData);
     }
@@ -2271,8 +2322,13 @@ pub fn simulate_heat_balance_zone_air_temperatures(
         .enumerate()
     {
         let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
+        let weather_context = weather_records.map(|records| HeatBalanceWeatherContext {
+            records,
+            record_index: hour_index,
+            zone_steps_per_hour,
+        });
         for _substep in 0..zone_steps_per_hour {
-            advance_heat_balance_state_one_timestep(
+            advance_heat_balance_state_one_timestep_internal(
                 &model.typed,
                 &mut state,
                 HeatBalanceStepInput {
@@ -2311,12 +2367,19 @@ pub fn simulate_heat_balance_zone_air_temperatures(
             {
                 let inside_rate = surface_inside_conduction_rate_w(surface_state);
                 let outside_rate = surface_outside_conduction_rate_w(surface_state);
+                let outside_face_temperature_c = reported_surface_outside_face_temperature_c(
+                    &model.typed,
+                    surface_state,
+                    outdoor_dry_bulb_c,
+                    surface_state.inside_face_temperature_c,
+                    weather_context,
+                );
                 trace
                     .inside_face_temperature_c
                     .push(surface_state.inside_face_temperature_c);
                 trace
                     .outside_face_temperature_c
-                    .push(surface_state.outside_face_temperature_c);
+                    .push(outside_face_temperature_c);
                 trace.inside_conduction_rate_w.push(inside_rate);
                 trace
                     .inside_conduction_gain_rate_w
@@ -2517,7 +2580,7 @@ fn run_heat_balance_run_period_warmup(
         {
             let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
             for _substep in 0..zone_steps_per_hour {
-                advance_heat_balance_state_one_timestep(
+                advance_heat_balance_state_one_timestep_internal(
                     model,
                     state,
                     HeatBalanceStepInput {
@@ -2582,6 +2645,15 @@ struct SurfaceThermalProperties {
     outside_layer_material_name: String,
     thermal_resistance_m2_k_per_w: f64,
     heat_capacity_j_per_m2_k: Option<f64>,
+    thermal_absorptance: f64,
+    solar_absorptance: f64,
+}
+
+#[derive(Clone, Copy)]
+struct HeatBalanceWeatherContext<'a> {
+    records: &'a [EpwRecord],
+    record_index: usize,
+    zone_steps_per_hour: u32,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -2622,6 +2694,12 @@ fn surface_thermal_properties(
         outside_layer_material_name: material.name.0.clone(),
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k: material.heat_capacity_per_area(),
+        thermal_absorptance: material
+            .thermal_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
+        solar_absorptance: material
+            .solar_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_SOLAR_ABSORPTANCE),
     })
 }
 
@@ -2700,6 +2778,145 @@ fn surface_boundary_temperature_c(
         | OutsideBoundaryCondition::Ground
         | OutsideBoundaryCondition::Other => surface.outside_face_temperature_c,
     }
+}
+
+fn exterior_surface_boundary_temperature_c(
+    model: &TypedModel,
+    surface_state: &SurfaceHeatBalanceState,
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+) -> f64 {
+    let Some(context) = weather_context else {
+        return outdoor_dry_bulb_c;
+    };
+    let Some(record) = context.records.get(context.record_index) else {
+        return outdoor_dry_bulb_c;
+    };
+    let Some(typed_surface) = model
+        .surfaces
+        .iter()
+        .find(|surface| surface.id == surface_state.surface_id)
+    else {
+        return outdoor_dry_bulb_c;
+    };
+    if typed_surface.surface_type != SurfaceType::Roof {
+        return outdoor_dry_bulb_c;
+    }
+
+    let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
+        let Some(site) = model.site.as_ref() else {
+            return exterior_surface_energy_balance_temperature_c(
+                surface_state,
+                typed_surface,
+                record,
+                outdoor_dry_bulb_c,
+                owning_zone_temperature_c,
+                0.0,
+            );
+        };
+        surface_incident_solar_radiation_hourly_average_w_per_m2(
+            typed_surface,
+            site,
+            context.records,
+            context.record_index,
+            context.zone_steps_per_hour,
+        )
+    } else {
+        0.0
+    };
+    exterior_surface_energy_balance_temperature_c(
+        surface_state,
+        typed_surface,
+        record,
+        outdoor_dry_bulb_c,
+        owning_zone_temperature_c,
+        incident_solar_w_per_m2,
+    )
+}
+
+fn reported_surface_outside_face_temperature_c(
+    model: &TypedModel,
+    surface_state: &SurfaceHeatBalanceState,
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+) -> f64 {
+    if surface_state.outside_boundary_condition != OutsideBoundaryCondition::Outdoors {
+        return surface_state.outside_face_temperature_c;
+    }
+
+    exterior_surface_boundary_temperature_c(
+        model,
+        surface_state,
+        outdoor_dry_bulb_c,
+        owning_zone_temperature_c,
+        weather_context,
+    )
+}
+
+fn exterior_surface_energy_balance_temperature_c(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: &Surface,
+    record: &EpwRecord,
+    outdoor_dry_bulb_c: f64,
+    owning_zone_temperature_c: f64,
+    incident_solar_w_per_m2: f64,
+) -> f64 {
+    if record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
+        || incident_solar_w_per_m2 < EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2
+    {
+        return outdoor_dry_bulb_c;
+    }
+
+    let conductance_w_per_m2_k = if surface_state.area_m2 > 0.0 {
+        surface_state.conductance_w_per_k / surface_state.area_m2
+    } else {
+        0.0
+    };
+    let thermal_absorptance = surface_state.thermal_absorptance.clamp(0.0, 1.0);
+    let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
+    let convection_coefficient =
+        exterior_convection_coefficient_w_per_m2_k(record.wind_speed_m_per_s);
+    let longwave_coefficient = EXTERIOR_LONGWAVE_COEFFICIENT_W_PER_M2_K * thermal_absorptance;
+    let sky_temperature_c = horizontal_infrared_sky_temperature_c(
+        record.horizontal_infrared_radiation_wh_per_m2,
+        outdoor_dry_bulb_c,
+    );
+    let tilt_rad =
+        surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+    let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
+    let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
+    let longwave_radiant_temperature_c = sky_view_factor * sky_temperature_c
+        + ground_view_factor * outdoor_dry_bulb_c
+        + (1.0 - sky_view_factor - ground_view_factor).max(0.0) * outdoor_dry_bulb_c;
+    let denominator = convection_coefficient + longwave_coefficient + conductance_w_per_m2_k;
+    if denominator <= 0.0 {
+        return outdoor_dry_bulb_c;
+    }
+
+    (convection_coefficient * outdoor_dry_bulb_c
+        + longwave_coefficient * longwave_radiant_temperature_c
+        + solar_absorptance * incident_solar_w_per_m2.max(0.0)
+        + conductance_w_per_m2_k * owning_zone_temperature_c)
+        / denominator
+}
+
+fn exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {
+    EXTERIOR_CONVECTION_BASE_COEFFICIENT_W_PER_M2_K
+        + EXTERIOR_CONVECTION_WIND_COEFFICIENT_W_PER_M3_K * wind_speed_m_per_s.max(0.0)
+}
+
+fn horizontal_infrared_sky_temperature_c(
+    horizontal_infrared_radiation_w_per_m2: f64,
+    fallback_air_temperature_c: f64,
+) -> f64 {
+    if horizontal_infrared_radiation_w_per_m2 <= 0.0 {
+        return fallback_air_temperature_c;
+    }
+
+    (horizontal_infrared_radiation_w_per_m2 / STEFAN_BOLTZMANN_W_PER_M2_K4).powf(0.25)
+        - KELVIN_OFFSET
 }
 
 fn surface_inside_conduction_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
@@ -2907,6 +3124,13 @@ fn surface_ground_view_factor(surface: &Surface, tilt_rad: f64) -> f64 {
     match surface.view_factor_to_ground {
         AutoOrNumber::Value(value) => value.clamp(0.0, 1.0),
         AutoOrNumber::AutoCalculate => ((1.0 - tilt_rad.cos()) * 0.5).clamp(0.0, 1.0),
+    }
+}
+
+fn surface_sky_view_factor(surface: &Surface, tilt_rad: f64) -> f64 {
+    match surface.view_factor_to_ground {
+        AutoOrNumber::Value(value) => (1.0 - value).clamp(0.0, 1.0),
+        AutoOrNumber::AutoCalculate => ((1.0 + tilt_rad.cos()) * 0.5).clamp(0.0, 1.0),
     }
 }
 
@@ -3676,6 +3900,8 @@ pub struct EpwRecord {
     pub wind_direction_deg: f64,
     /// Wind speed in m/s.
     pub wind_speed_m_per_s: f64,
+    /// Liquid precipitation depth in mm for the hour when present.
+    pub liquid_precipitation_depth_mm: f64,
 }
 
 /// Loads hourly EPW records from a weather file.
@@ -3735,6 +3961,7 @@ pub fn parse_epw_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
             )?,
             wind_direction_deg: parse_epw_f64(&fields, line_number, 20, "wind direction")?,
             wind_speed_m_per_s: parse_epw_f64(&fields, line_number, 21, "wind speed")?,
+            liquid_precipitation_depth_mm: parse_epw_liquid_precipitation_depth_mm(&fields, 33),
         });
     }
 
@@ -3789,6 +4016,22 @@ fn parse_epw_f64(
             field,
             value: value.to_string(),
         })
+}
+
+fn parse_epw_optional_f64_default(fields: &[&str], index: usize, default: f64) -> f64 {
+    let Some(value) = fields.get(index).map(|value| value.trim()) else {
+        return default;
+    };
+    if value.is_empty() {
+        default
+    } else {
+        value.parse::<f64>().unwrap_or(default)
+    }
+}
+
+fn parse_epw_liquid_precipitation_depth_mm(fields: &[&str], index: usize) -> f64 {
+    let value = parse_epw_optional_f64_default(fields, index, 0.0);
+    if value >= 99.0 { 0.0 } else { value.max(0.0) }
 }
 
 fn epw_field<'a>(
@@ -3902,6 +4145,7 @@ mod tests {
                     diffuse_horizontal_radiation_wh_per_m2: 0.0,
                     wind_direction_deg: 0.0,
                     wind_speed_m_per_s: 0.0,
+                    liquid_precipitation_depth_mm: 0.0,
                 });
             }
             date = next_day(date);
@@ -3942,6 +4186,7 @@ mod tests {
             diffuse_horizontal_radiation_wh_per_m2: 0.0,
             wind_direction_deg: 0.0,
             wind_speed_m_per_s: 0.0,
+            liquid_precipitation_depth_mm: 0.0,
         };
 
         let position = solar_position_rad_at_local_hour(&site, &record, 12.0);
@@ -4613,7 +4858,7 @@ COMMENTS 1
 COMMENTS 2
 DATA PERIODS
 1999,1,1,1,0,Source,-3.0,-4.0,50,82000,0,0,300,10,20,30,0,0,0,0,180,2.5
-1999,1,1,2,0,Source,-2.0,-3.0,51,82100,0,0,301,11,21,31,0,0,0,0,190,2.6
+1999,1,1,2,0,Source,-2.0,-3.0,51,82100,0,0,301,11,21,31,0,0,0,0,190,2.6,0,0,0,0,0,0,0,0,0,0,0,2.0,1.0
 "#,
         )?;
 
@@ -4624,6 +4869,8 @@ DATA PERIODS
         assert_eq!(records[0].atmospheric_pressure_pa, 82_000.0);
         assert_eq!(records[0].wind_direction_deg, 180.0);
         assert_eq!(records[0].wind_speed_m_per_s, 2.5);
+        assert_eq!(records[0].liquid_precipitation_depth_mm, 0.0);
+        assert_eq!(records[1].liquid_precipitation_depth_mm, 2.0);
 
         Ok(())
     }
@@ -5252,6 +5499,9 @@ DATA PERIODS
             specific_heat_j_per_kg_k: None,
             thickness_m: None,
             thermal_resistance_m2_k_per_w: Some(1.0),
+            thermal_absorptance: Some(0.9),
+            solar_absorptance: Some(0.75),
+            visible_absorptance: Some(0.75),
         });
         model.constructions.push(Construction {
             id: ConstructionId(0),
@@ -5308,6 +5558,9 @@ DATA PERIODS
             specific_heat_j_per_kg_k: None,
             thickness_m: None,
             thermal_resistance_m2_k_per_w: Some(1.0),
+            thermal_absorptance: Some(0.9),
+            solar_absorptance: Some(0.75),
+            visible_absorptance: Some(0.75),
         });
         model.constructions.push(Construction {
             id: ConstructionId(0),

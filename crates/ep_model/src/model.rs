@@ -641,6 +641,9 @@ mod tests {
             specific_heat_j_per_kg_k: Some(800.0),
             thickness_m: Some(0.1),
             thermal_resistance_m2_k_per_w: None,
+            thermal_absorptance: Some(0.9),
+            solar_absorptance: Some(0.75),
+            visible_absorptance: Some(0.75),
         };
 
         assert_eq!(material.thermal_resistance(), Some(0.05));

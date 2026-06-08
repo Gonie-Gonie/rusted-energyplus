@@ -497,6 +497,24 @@ impl<'a> Compiler<'a> {
                         &object,
                         "thermal_resistance",
                     ),
+                    thermal_absorptance: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "thermal_absorptance",
+                    ),
+                    solar_absorptance: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "solar_absorptance",
+                    ),
+                    visible_absorptance: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "visible_absorptance",
+                    ),
                 });
             }
         }
