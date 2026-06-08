@@ -25,8 +25,9 @@ Current generators:
   binary package plus generated evidence JSON/PDF/HTML/Markdown artifacts.
 - `dynamic_heat_balance_probe_summary.py` summarizes the official dynamic
   heat-balance diagnostic probe lanes from existing `.runtime` compare
-  summaries. It is development evidence only and does not create a release
-  conformance artifact.
+  summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
+  aggregate conduction focus metrics across lanes. It is development evidence
+  only and does not create a release conformance artifact.
 
 Conformance-facing scripts should keep this split:
 

@@ -17,6 +17,12 @@ class ProbeLane:
     summary_path: Path
 
 
+@dataclass(frozen=True)
+class FocusMetric:
+    key: str
+    variable: str
+
+
 LANES = (
     ProbeLane(
         lane="default",
@@ -47,6 +53,15 @@ LANES = (
     ),
 )
 
+FOCUS_METRICS = (
+    FocusMetric("ZONE ONE", "Zone Mean Air Temperature"),
+    FocusMetric("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate"),
+    FocusMetric("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate"),
+    FocusMetric("ZN001:FLR001", "Surface Inside Face Conduction Heat Transfer Rate"),
+    FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),
+    FocusMetric("ZN001:ROOF001", "Surface Outside Face Incident Solar Radiation Rate per Area"),
+)
+
 
 def load_json(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
@@ -54,6 +69,58 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"Expected object JSON at {path}")
     return payload
+
+
+def series_output_label(series: dict[str, Any]) -> str:
+    output = series.get("output", {})
+    if not isinstance(output, dict):
+        return "none"
+    return f"{output.get('key', 'none')} / {output.get('variable', 'none')}"
+
+
+def find_series(summary: dict[str, Any], metric: FocusMetric) -> dict[str, Any] | None:
+    for series in summary.get("series", []):
+        if not isinstance(series, dict):
+            continue
+        output = series.get("output", {})
+        if not isinstance(output, dict):
+            continue
+        if output.get("key") == metric.key and output.get("variable") == metric.variable:
+            return series
+    return None
+
+
+def focus_metric_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for metric in FOCUS_METRICS:
+        series = find_series(summary, metric)
+        if series is None:
+            rows.append(
+                {
+                    "key": metric.key,
+                    "variable": metric.variable,
+                    "label": f"{metric.key} / {metric.variable}",
+                    "status": "missing",
+                    "samples": None,
+                    "rmse_delta_c": None,
+                    "max_abs_delta_c": None,
+                    "mean_abs_delta_c": None,
+                }
+            )
+            continue
+        rows.append(
+            {
+                "key": metric.key,
+                "variable": metric.variable,
+                "label": series_output_label(series),
+                "status": series.get("status"),
+                "samples": series.get("samples"),
+                "rmse_delta_c": series.get("rmse_delta_c"),
+                "max_abs_delta_c": series.get("max_abs_delta_c"),
+                "mean_abs_delta_c": series.get("mean_abs_delta_c"),
+            }
+        )
+    return rows
 
 
 def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
@@ -77,6 +144,7 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "top_max_abs_delta_c": top.get("max_abs_delta_c"),
         "max_abs_delta_c": summary.get("max_abs_delta_c"),
         "rmse_delta_c": summary.get("rmse_delta_c"),
+        "focus_metrics": focus_metric_rows(summary),
     }
 
 
@@ -120,6 +188,27 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 status=lane["status"],
             )
         )
+    lines.extend(
+        [
+            "",
+            "## Focus Metrics",
+            "",
+            "| lane | output | RMSE | max abs | mean abs | status |",
+            "|---|---|---:|---:|---:|---|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        for metric in lane.get("focus_metrics", []):
+            lines.append(
+                "| {lane} | {output} | {rmse} | {max_abs} | {mean_abs} | {status} |".format(
+                    lane=lane["lane"],
+                    output=metric["label"],
+                    rmse=fmt_number(metric["rmse_delta_c"]),
+                    max_abs=fmt_number(metric["max_abs_delta_c"]),
+                    mean_abs=fmt_number(metric["mean_abs_delta_c"]),
+                    status=metric["status"],
+                )
+            )
     lines.append("")
     return "\n".join(lines)
 
