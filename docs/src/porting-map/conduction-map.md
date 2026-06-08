@@ -128,7 +128,11 @@ conduction from `399.588084` to `50.562260` RMSE, floor storage from
 `369.424200` to `119.606076`, and zone outside aggregate conduction from
 `328.987074` to `155.538581`. The remaining conduction target is now the
 exterior source coupling behind roof convection/radiation and the zone outside
-aggregate, not adiabatic floor flux parity alone.
+aggregate, not adiabatic floor flux parity alone. With inside longwave and
+convection latent diagnostics exposed, the active grey interior-longwave path
+now uses EnergyPlus fixed direct surface view factors; this reduces the
+previously hidden floor inside longwave/convection bottleneck but leaves floor
+storage and inside/outside floor conduction as the next conduction-facing rows.
 Adding the EnergyPlus advanced outside-face zone aggregate as a latent
 diagnostic row exposed outside aggregate conduction as a second default bottleneck
 (`2024.075950` RMSE) and the top current quick-boundary bottleneck:

@@ -2673,7 +2673,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe => {
-            InteriorLongwaveExchangeProbe::GreyAreaWeighted
+            InteriorLongwaveExchangeProbe::GreyEnergyPlusDirectViewFactor
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe => {
@@ -2996,7 +2996,7 @@ fn run_surface_balance_passes(
         };
         match interior_longwave_exchange_probe {
             InteriorLongwaveExchangeProbe::None => {}
-            InteriorLongwaveExchangeProbe::GreyAreaWeighted => {
+            InteriorLongwaveExchangeProbe::GreyEnergyPlusDirectViewFactor => {
                 update_surface_inside_longwave_exchange_probe(surfaces, temperature_overrides);
             }
             InteriorLongwaveExchangeProbe::EnergyPlusScriptF => {
@@ -5376,7 +5376,7 @@ fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum InteriorLongwaveExchangeProbe {
     None,
-    GreyAreaWeighted,
+    GreyEnergyPlusDirectViewFactor,
     EnergyPlusScriptF,
 }
 
@@ -5413,42 +5413,56 @@ fn update_surface_inside_longwave_exchange_probe(
             }
         })
         .collect::<Vec<_>>();
-    let mut zone_area_m2 = BTreeMap::<ZoneId, f64>::new();
-    for snapshot in &snapshots {
-        *zone_area_m2.entry(snapshot.zone_id).or_insert(0.0) += snapshot.area_m2;
+    let mut surfaces_by_zone = BTreeMap::<ZoneId, Vec<usize>>::new();
+    for (surface_index, snapshot) in snapshots.iter().enumerate() {
+        surfaces_by_zone
+            .entry(snapshot.zone_id)
+            .or_default()
+            .push(surface_index);
     }
 
     let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
-    for (receiver_index, receiver) in snapshots.iter().enumerate() {
-        let Some(zone_area_m2) = zone_area_m2.get(&receiver.zone_id).copied() else {
-            continue;
-        };
-        if zone_area_m2 <= f64::EPSILON || receiver.area_m2 <= f64::EPSILON {
+    for surface_indices in surfaces_by_zone.values() {
+        if surface_indices.len() <= 1 {
             continue;
         }
+        let zone_snapshots = surface_indices
+            .iter()
+            .map(|surface_index| snapshots[*surface_index])
+            .collect::<Vec<_>>();
+        let areas = zone_snapshots
+            .iter()
+            .map(|surface| surface.area_m2)
+            .collect::<Vec<_>>();
+        if areas.iter().any(|area| *area <= f64::EPSILON) {
+            continue;
+        }
+        let view_factors = fix_energyplus_approximate_view_factors(
+            &areas,
+            &energyplus_approximate_view_factors(&zone_snapshots),
+        );
+        let surface_count = zone_snapshots.len();
 
-        let mut net_longwave_w_per_m2 = 0.0;
-        for (sender_index, sender) in snapshots.iter().enumerate() {
-            if sender_index == receiver_index
-                || sender.zone_id != receiver.zone_id
-                || sender.area_m2 <= f64::EPSILON
-            {
-                continue;
+        for (receiver_zone_index, receiver) in zone_snapshots.iter().enumerate() {
+            let mut net_longwave_w_per_m2 = 0.0;
+            for (sender_zone_index, sender) in zone_snapshots.iter().enumerate() {
+                if sender_zone_index == receiver_zone_index {
+                    continue;
+                }
+                let exchange_emissivity = grey_pair_exchange_emissivity(
+                    receiver.thermal_absorptance,
+                    sender.thermal_absorptance,
+                );
+                if exchange_emissivity <= f64::EPSILON {
+                    continue;
+                }
+                net_longwave_w_per_m2 += STEFAN_BOLTZMANN_W_PER_M2_K4
+                    * exchange_emissivity
+                    * view_factors[sender_zone_index * surface_count + receiver_zone_index]
+                    * (sender.temperature_k4 - receiver.temperature_k4);
             }
-            let exchange_emissivity = grey_pair_exchange_emissivity(
-                receiver.thermal_absorptance,
-                sender.thermal_absorptance,
-            );
-            if exchange_emissivity <= f64::EPSILON {
-                continue;
-            }
-            let view_factor = sender.area_m2 / zone_area_m2;
-            net_longwave_w_per_m2 += STEFAN_BOLTZMANN_W_PER_M2_K4
-                * exchange_emissivity
-                * view_factor
-                * (sender.temperature_k4 - receiver.temperature_k4);
+            longwave_terms_w_per_m2[surface_indices[receiver_zone_index]] = net_longwave_w_per_m2;
         }
-        longwave_terms_w_per_m2[receiver_index] = net_longwave_w_per_m2;
     }
 
     for (surface, net_longwave_w_per_m2) in

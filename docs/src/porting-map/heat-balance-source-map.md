@@ -428,9 +428,16 @@ Current Rust boundary:
   solar, and hourly-averaged surface diagnostics. Ground boundary surfaces use
   the EnergyPlus default `Site:GroundTemperature:BuildingSurface` value of
   `18.0 C` until explicit `Site:GroundTemperature:*` parsing/model selection
-  is ported. Full inside iteration order, zone predictor/corrector equations,
-  detailed shadowing/reflection, and coupled radiation coefficient update order
-  are not yet wired.
+  is ported. The active grey interior-longwave diagnostic now uses
+  EnergyPlus-style fixed direct surface view factors, rather than zone-area
+  weighting, before applying the grey-pair exchange emissivity. This lowers the
+  newly exposed floor inside longwave RMSE from `137.147093` to `27.742006`,
+  the floor inside convection RMSE from `123.066168` to `41.950371`, MAT RMSE
+  from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
+  from `84.712495` to `38.774428`; floor storage remains the top active
+  diagnostic row at `108.672323` RMSE. Full inside iteration order, zone
+  predictor/corrector equations, detailed shadowing/reflection, and coupled
+  radiation coefficient update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

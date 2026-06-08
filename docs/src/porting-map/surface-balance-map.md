@@ -71,6 +71,10 @@ distributed to inside surfaces with EnergyPlus inside-layer area-absorptance
 normalization; outside-layer absorptance remains the exterior solar/longwave
 input. Shortwave, additional source, HVAC radiant, and full radiation coupling
 remain future wiring rather than promoted parity. A
+grey direct-exchange interior-longwave diagnostic uses EnergyPlus fixed surface
+view factors before applying the grey-pair exchange emissivity, which pulls the
+new latent floor inside longwave row much closer while leaving floor storage as
+the active top bottleneck. The
 source-anchored ScriptF interior-longwave probe matches the
 `1ZoneUncontrolled` EIO factor orientation, but remains diagnostic-only because
 exact longwave feedback without the rest of the EnergyPlus surface/zone coupling
