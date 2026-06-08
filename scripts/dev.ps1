@@ -215,6 +215,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with the EnergyPlus third-order zone-air probe enabled."
     }
+    "official-dynamic-heat-balance-warmup-20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-warmup-20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with Rust warmup minimum days raised to the EnergyPlus run-period count."
+    }
     "compare-static-model-conformance" = @{
         Path = "compare\compare-static-model-conformance.ps1"
         Group = "compare"

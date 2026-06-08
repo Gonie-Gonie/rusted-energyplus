@@ -51,6 +51,15 @@ LANES = (
         / CASE_ID
         / "compare/compare-summary.json",
     ),
+    ProbeLane(
+        lane="warmup-min20",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-warmup-min20"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
 )
 
 FOCUS_METRICS = (

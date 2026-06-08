@@ -813,6 +813,16 @@ impl HeatBalanceSimulationOptions {
         self.zone_air_algorithm = zone_air_algorithm;
         self
     }
+
+    /// Returns options with an elevated warmup minimum day count for diagnostics.
+    #[must_use]
+    pub fn with_warmup_minimum_days(mut self, minimum_days: u32) -> Self {
+        if self.warmup.enabled {
+            self.warmup.minimum_days = minimum_days;
+            self.warmup.maximum_days = self.warmup.maximum_days.max(minimum_days);
+        }
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -5087,11 +5097,12 @@ mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
         Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
-        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
-        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
+        HeatBalanceStepInput, HeatBalanceWarmupOptions, HeatBalanceWarmupSummary,
+        HeatBalanceZoneAirAlgorithm, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
+        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
+        PlantEquipmentRole, PlantStateProjectionOptions, ResultStore, RuntimeError,
+        RuntimeOutputRegistry, SimulationMode, SimulationState,
         advance_heat_balance_state_one_timestep, advance_surface_ctf_histories,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
@@ -6826,6 +6837,24 @@ DATA PERIODS
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
         );
+    }
+
+    #[test]
+    fn heat_balance_warmup_minimum_override_preserves_disabled_boundary() {
+        let disabled = HeatBalanceSimulationOptions::hourly_samples(3).with_warmup_minimum_days(20);
+        assert!(!disabled.warmup.enabled);
+        assert_eq!(disabled.warmup.minimum_days, 0);
+
+        let mut enabled = HeatBalanceSimulationOptions::hourly_samples(3);
+        enabled.warmup = HeatBalanceWarmupOptions {
+            enabled: true,
+            minimum_days: 6,
+            maximum_days: 10,
+            temperature_convergence_tolerance_delta_c: 0.1,
+        };
+        let overridden = enabled.with_warmup_minimum_days(20);
+        assert_eq!(overridden.warmup.minimum_days, 20);
+        assert_eq!(overridden.warmup.maximum_days, 20);
     }
 
     #[test]

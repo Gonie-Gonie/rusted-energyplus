@@ -48,6 +48,8 @@ const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
 const HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM";
+const HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS";
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -3458,10 +3460,12 @@ fn build_heat_balance_conformance_diagnostic(
     let simulation_options = if context.conformance_claim {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
     } else {
-        HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
-            &simulation_model,
-            sample_count,
-        )
+        apply_heat_balance_warmup_minimum_days_from_env(
+            HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+                &simulation_model,
+                sample_count,
+            ),
+        )?
     }
     .with_zone_air_algorithm(zone_air_algorithm);
     let (ctf_coefficients, ctf_seed) = if context.conformance_claim {
@@ -3660,6 +3664,37 @@ fn parse_heat_balance_zone_air_algorithm(
             "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical or energyplus-third-order-probe"
         )),
     }
+}
+
+fn apply_heat_balance_warmup_minimum_days_from_env(
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulationOptions, String> {
+    match std::env::var(HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV) {
+        Ok(value) => {
+            parse_heat_balance_warmup_minimum_days(&value).map(|minimum_days| match minimum_days {
+                Some(minimum_days) => options.with_warmup_minimum_days(minimum_days),
+                None => options,
+            })
+        }
+        Err(std::env::VarError::NotPresent) => Ok(options),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_warmup_minimum_days(value: &str) -> Result<Option<u32>, String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return Ok(None);
+    }
+    let days = trimmed.parse::<u32>().map_err(|error| {
+        format!("unsupported {HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV}: {trimmed}; expected positive integer days ({error})")
+    })?;
+    if days == 0 {
+        return Ok(None);
+    }
+    Ok(Some(days))
 }
 
 fn heat_balance_zone_air_algorithm_label(
@@ -6207,6 +6242,24 @@ mod tests {
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
         );
         assert!(super::parse_heat_balance_zone_air_algorithm("third-order").is_err());
+    }
+
+    #[test]
+    fn heat_balance_warmup_minimum_days_parser_accepts_empty_or_positive_days() {
+        assert_eq!(
+            super::parse_heat_balance_warmup_minimum_days("").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_warmup_minimum_days("0").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_warmup_minimum_days("20").unwrap(),
+            Some(20)
+        );
+        assert!(super::parse_heat_balance_warmup_minimum_days("-1").is_err());
+        assert!(super::parse_heat_balance_warmup_minimum_days("oracle").is_err());
     }
 
     #[test]

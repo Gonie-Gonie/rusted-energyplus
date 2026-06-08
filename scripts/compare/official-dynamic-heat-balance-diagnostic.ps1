@@ -3,7 +3,9 @@ param(
     [ValidateSet("steady-no-mass-only", "all-eio")]
     [string]$CtfSeedPolicy = "steady-no-mass-only",
     [ValidateSet("simplified-analytical", "energyplus-third-order-probe")]
-    [string]$ZoneAirAlgorithm = "simplified-analytical"
+    [string]$ZoneAirAlgorithm = "simplified-analytical",
+    [ValidateRange(0, 365)]
+    [int]$WarmupMinimumDays = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,11 +22,17 @@ $AlgorithmOutputSuffix = if ($ZoneAirAlgorithm -eq "energyplus-third-order-probe
 else {
     ""
 }
-$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
-    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix\26.1.0"
+$WarmupOutputSuffix = if ($WarmupMinimumDays -gt 0) {
+    "-warmup-min$WarmupMinimumDays"
 }
 else {
-    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix\26.1.0"
+    ""
+}
+$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
+    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$WarmupOutputSuffix\26.1.0"
+}
+else {
+    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$WarmupOutputSuffix\26.1.0"
 }
 $OutputRoot = Join-Path $RepoRoot $OutputRootRelative
 $CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
@@ -123,19 +131,28 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy and zone-air algorithm $ZoneAirAlgorithm."
+Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy, zone-air algorithm $ZoneAirAlgorithm, and warmup minimum days $WarmupMinimumDays."
 $policyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY"
 $algorithmEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM"
+$warmupEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS"
 $previousPolicy = [Environment]::GetEnvironmentVariable($policyEnvName, "Process")
 $previousAlgorithm = [Environment]::GetEnvironmentVariable($algorithmEnvName, "Process")
+$previousWarmup = [Environment]::GetEnvironmentVariable($warmupEnvName, "Process")
 try {
     [Environment]::SetEnvironmentVariable($policyEnvName, $CtfSeedPolicy, "Process")
     [Environment]::SetEnvironmentVariable($algorithmEnvName, $ZoneAirAlgorithm, "Process")
+    if ($WarmupMinimumDays -gt 0) {
+        [Environment]::SetEnvironmentVariable($warmupEnvName, [string]$WarmupMinimumDays, "Process")
+    }
+    else {
+        [Environment]::SetEnvironmentVariable($warmupEnvName, $null, "Process")
+    }
     $output = & $cargo.Source run -p ep_cli --quiet -- conformance heat-balance-diagnostic-report $CasePath $OracleRoot $OutputRoot 2>&1
 }
 finally {
     [Environment]::SetEnvironmentVariable($policyEnvName, $previousPolicy, "Process")
     [Environment]::SetEnvironmentVariable($algorithmEnvName, $previousAlgorithm, "Process")
+    [Environment]::SetEnvironmentVariable($warmupEnvName, $previousWarmup, "Process")
 }
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
@@ -190,6 +207,9 @@ if ($summary.heat_balance_warmup.timestep_count -le 0) {
 }
 if ($summary.heat_balance_warmup.oracle_run_period_day_count -ne 20) {
     throw "Expected oracle run-period warmup days 20, got $($summary.heat_balance_warmup.oracle_run_period_day_count)"
+}
+if ($WarmupMinimumDays -gt 0 -and $summary.heat_balance_warmup.day_count -lt $WarmupMinimumDays) {
+    throw "Expected Rust warmup days >= $WarmupMinimumDays, got $($summary.heat_balance_warmup.day_count)"
 }
 if ($summary.ctf_seed.policy -ne $CtfSeedPolicy) {
     throw "Expected CTF seed policy $CtfSeedPolicy, got $($summary.ctf_seed.policy)"

@@ -45,3 +45,9 @@ run-period-filtered deltas, Rust warmup metadata, and oracle run-period warmup
 days. If Rust warmup day count, initial histories, surface CTF history, or
 post-warmup hourly values differ from EnergyPlus, the case must remain
 diagnostic.
+
+Developers can run `scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe`
+to raise the Rust diagnostic warmup minimum to the EnergyPlus run-period warmup
+day count for the official 1Zone case. That lane is diagnostic-only and exists
+to isolate whether current first-hour and floor-history deltas are driven by
+early Rust warmup convergence or by deeper CTF/iteration differences.

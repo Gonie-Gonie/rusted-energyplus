@@ -28,8 +28,10 @@ Current generators:
   summaries, including fixed MAT, zone-air heat-balance, floor conduction, and
   aggregate conduction focus metrics across lanes. The focus table also records
   RMSE movement relative to the default lane so partial isolation improvements
-  that destabilize the whole zone balance are visible in one scan. It is
-  development evidence only and does not create a release conformance artifact.
+  that destabilize the whole zone balance are visible in one scan. Probe lanes
+  include all-CTF seeding, third-order zone-air update, and an oracle-day-count
+  warmup minimum. It is development evidence only and does not create a release
+  conformance artifact.
 
 Conformance-facing scripts should keep this split:
 
