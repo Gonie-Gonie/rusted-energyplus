@@ -36,8 +36,13 @@ future official ExampleFile transient conduction work.
 Official ExampleFile conduction cannot be promoted until the Rust side carries
 the same transient conduction history semantics as the selected EnergyPlus
 case. A zero no-mass adiabatic pass is useful but does not prove CTF parity.
-The current runtime has steady CTF zero-term slots for opaque surfaces;
-EnergyPlus mass-material CTF coefficients and history constants are not yet
-advanced.
+The current runtime has per-surface CTF coefficient/history slots, advances CTF
+history constants, and can seed CTF rows from EnergyPlus EIO output for
+diagnostic isolation. The default official diagnostic path only seeds
+steady/no-mass `#CTFs <= 1` rows until the inside/outside face-temperature CTF
+solver is ported; enabling mass CTF rows against the current simplified face
+temperature shell over-amplifies latent floor history. Native
+EnergyPlus-equivalent mass-material CTF coefficient generation is still
+unported.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

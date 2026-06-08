@@ -10,9 +10,10 @@ use conformance_artifacts::{
     generate_conformance_report_skeleton,
 };
 use ep_compare::{
-    Tolerance, compare_series, load_eio_construction_ctf, load_eio_heat_transfer_surfaces,
-    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_warmup_environments,
-    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
+    Tolerance, compare_series, load_eio_construction_ctf, load_eio_construction_ctf_coefficients,
+    load_eio_heat_transfer_surfaces, load_eio_material_ctf_summary,
+    load_eio_other_equipment_nominal, load_eio_warmup_environments, load_eio_zone_geometry,
+    load_eso_series, load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -26,14 +27,14 @@ use ep_model::{
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-    HeatBalanceWarmupSummary, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary,
-    ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
-    build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
+    ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
+    HeatBalanceSimulationOptions, HeatBalanceWarmupSummary, NodeStateProjection,
+    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, SimulationMode,
+    SurfaceGeometrySummary, ZoneGeometrySummary, append_surface_incident_solar_radiation_series,
+    build_execution_plan, build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
     simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures,
-    simulate_heat_balance_zone_air_temperatures_with_weather_records,
+    simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
     surface_geometry_summaries, zone_geometry_summaries,
 };
@@ -3412,12 +3413,19 @@ fn build_heat_balance_conformance_diagnostic(
             sample_count,
         )
     };
-    let mut simulation = simulate_heat_balance_zone_air_temperatures_with_weather_records(
-        &simulation_model,
-        &weather_records,
-        simulation_options,
-    )
-    .map_err(|error| error.to_string())?;
+    let ctf_coefficients = if context.conformance_claim {
+        Vec::new()
+    } else {
+        load_runtime_ctf_coefficients_from_eio(eio_path)?
+    };
+    let mut simulation =
+        simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients(
+            &simulation_model,
+            &weather_records,
+            simulation_options,
+            &ctf_coefficients,
+        )
+        .map_err(|error| error.to_string())?;
     append_surface_incident_solar_radiation_series(
         &mut simulation.results,
         &simulation_model,
@@ -3471,6 +3479,31 @@ fn build_heat_balance_conformance_diagnostic(
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
+}
+
+fn load_runtime_ctf_coefficients_from_eio(
+    eio_path: &Path,
+) -> Result<Vec<ConstructionCtfCoefficientOverride>, String> {
+    let steady_constructions = load_eio_construction_ctf(eio_path)
+        .map_err(|error| error.to_string())?
+        .into_iter()
+        .filter(|construction| construction.ctf_count <= 1)
+        .map(|construction| construction.construction_name)
+        .collect::<BTreeSet<_>>();
+    let coefficients =
+        load_eio_construction_ctf_coefficients(eio_path).map_err(|error| error.to_string())?;
+    Ok(coefficients
+        .into_iter()
+        .filter(|coefficient| steady_constructions.contains(&coefficient.construction_name))
+        .map(|coefficient| ConstructionCtfCoefficientOverride {
+            construction_name: coefficient.construction_name,
+            time_index: coefficient.time_index,
+            outside_w_per_m2_k: coefficient.outside,
+            cross_w_per_m2_k: coefficient.cross,
+            inside_w_per_m2_k: coefficient.inside,
+            flux: coefficient.flux,
+        })
+        .collect())
 }
 
 fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
@@ -5742,6 +5775,40 @@ mod tests {
         assert_eq!(parsed.weather_path, std::path::PathBuf::from("weather.epw"));
         assert_eq!(parsed.eso_path, std::path::PathBuf::from("eplusout.eso"));
         assert_eq!(parsed.report_dir, Some(std::path::PathBuf::from("reports")));
+
+        Ok(())
+    }
+
+    #[test]
+    fn runtime_ctf_eio_seed_filters_mass_constructions() -> Result<(), Box<dyn std::error::Error>> {
+        let path = std::env::temp_dir().join(format!(
+            "rusted-energyplus-cli-ctf-{}.eio",
+            std::process::id()
+        ));
+        std::fs::write(
+            &path,
+            r#"! <Construction CTF>,Construction Name,...
+! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)
+ Construction CTF,R13WALL,   1,   1,   1,   0.250,         0.4365,   0.900,   0.900,   0.750,   0.750,Rough
+ CTF,   1,            0.0000,            0.0000,             0.0000,          0.0000
+ CTF,   0,            0.4365,            0.4365,             0.4365
+ Construction CTF,FLOOR,   2,   1,   5,   0.250,          17.04,   0.900,   0.900,   0.650,   0.650,MediumRough
+ CTF,   1,          -62.622544,           4.7096437,          -62.622544,          0.60555731
+ CTF,   0,            58.08561,          0.72354869,            58.08561
+"#,
+        )?;
+
+        let coefficients = super::load_runtime_ctf_coefficients_from_eio(&path)?;
+        std::fs::remove_file(&path)?;
+
+        assert_eq!(coefficients.len(), 2);
+        assert!(
+            coefficients
+                .iter()
+                .all(|coefficient| coefficient.construction_name == "R13WALL")
+        );
+        assert_eq!(coefficients[0].time_index, 1);
+        assert_eq!(coefficients[1].time_index, 0);
 
         Ok(())
     }

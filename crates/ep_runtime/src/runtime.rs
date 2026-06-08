@@ -9,6 +9,7 @@ use ep_model::{
     Surface, SurfaceId, SurfaceType, TypedModel, Zone, ZoneEquipmentConnection, ZoneId,
     ZoneThermostatId,
 };
+use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
@@ -524,6 +525,23 @@ pub struct SurfaceCtfState {
     pub outside_flux_history_w_per_m2: Vec<f64>,
     /// Previous inside conduction flux history in W/m2.
     pub inside_flux_history_w_per_m2: Vec<f64>,
+}
+
+/// Per-construction CTF coefficient row used to seed diagnostic surface histories.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionCtfCoefficientOverride {
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// EnergyPlus CTF time/history index. Time zero is the current coefficient row.
+    pub time_index: usize,
+    /// CTF outside/X coefficient in W/m2-K.
+    pub outside_w_per_m2_k: f64,
+    /// CTF cross/Y coefficient in W/m2-K.
+    pub cross_w_per_m2_k: f64,
+    /// CTF inside/Z coefficient in W/m2-K.
+    pub inside_w_per_m2_k: f64,
+    /// CTF flux coefficient for history rows.
+    pub flux: Option<f64>,
 }
 
 /// Per-surface heat-balance state shell.
@@ -2049,6 +2067,21 @@ pub fn initialize_heat_balance_state(
     model: &SimulationModel,
     initial_zone_air_temperature_c: f64,
 ) -> Result<HeatBalanceState, RuntimeError> {
+    initialize_heat_balance_state_with_ctf_coefficients(model, initial_zone_air_temperature_c, &[])
+}
+
+/// Initializes the heat-balance state shell with diagnostic CTF coefficient rows.
+///
+/// This is an oracle-isolation hook for heat-balance diagnostics. It does not
+/// calculate EnergyPlus CTF coefficients; callers may provide rows already
+/// emitted by EnergyPlus so surface history behavior can be tested separately
+/// from coefficient generation.
+pub fn initialize_heat_balance_state_with_ctf_coefficients(
+    model: &SimulationModel,
+    initial_zone_air_temperature_c: f64,
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+) -> Result<HeatBalanceState, RuntimeError> {
+    let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
         let volume_m3 =
@@ -2081,6 +2114,17 @@ pub fn initialize_heat_balance_state(
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
             let steady_ctf_w_per_m2_k =
                 steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
+            let ctf = ctf_coefficients_by_construction
+                .get(&thermal.construction_name)
+                .and_then(|coefficients| {
+                    surface_ctf_state_from_coefficients(
+                        coefficients,
+                        initial_zone_air_temperature_c,
+                    )
+                })
+                .unwrap_or_else(|| {
+                    steady_surface_ctf_state(steady_ctf_w_per_m2_k, initial_zone_air_temperature_c)
+                });
 
             Ok(SurfaceHeatBalanceState {
                 surface_id: surface.id,
@@ -2104,10 +2148,7 @@ pub fn initialize_heat_balance_state(
                 thermal_absorptance: thermal.thermal_absorptance,
                 solar_absorptance: thermal.solar_absorptance,
                 conductance_w_per_k,
-                ctf: steady_surface_ctf_state(
-                    steady_ctf_w_per_m2_k,
-                    initial_zone_air_temperature_c,
-                ),
+                ctf,
                 heat_gain_to_zone_w: 0.0,
                 inside_face_temperature_c: initial_zone_air_temperature_c,
                 outside_face_temperature_c: initial_zone_air_temperature_c,
@@ -2259,7 +2300,13 @@ pub fn simulate_heat_balance_zone_air_temperatures(
     weather_dry_bulb_c: &[f64],
     options: HeatBalanceSimulationOptions,
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
-    simulate_heat_balance_zone_air_temperatures_internal(model, weather_dry_bulb_c, None, options)
+    simulate_heat_balance_zone_air_temperatures_internal(
+        model,
+        weather_dry_bulb_c,
+        None,
+        options,
+        &[],
+    )
 }
 
 /// Simulates hourly zone mean air temperatures with full EPW records available
@@ -2268,6 +2315,25 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records(
     model: &SimulationModel,
     weather_records: &[EpwRecord],
     options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients(
+        model,
+        weather_records,
+        options,
+        &[],
+    )
+}
+
+/// Simulates hourly zone mean air temperatures with diagnostic CTF coefficient rows.
+///
+/// The coefficient rows are intended for diagnostic isolation with EnergyPlus
+/// `eplusout.eio` CTF output. Conformance paths should use the default
+/// simulation entry points until native coefficient generation is ported.
+pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients(
+    model: &SimulationModel,
+    weather_records: &[EpwRecord],
+    options: HeatBalanceSimulationOptions,
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
     let weather_dry_bulb_c = weather_records
         .iter()
@@ -2278,6 +2344,7 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records(
         &weather_dry_bulb_c,
         Some(weather_records),
         options,
+        ctf_coefficients,
     )
 }
 
@@ -2286,6 +2353,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
     options: HeatBalanceSimulationOptions,
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
     if weather_dry_bulb_c.is_empty() {
         return Err(RuntimeError::NoWeatherData);
@@ -2302,7 +2370,11 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
 
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
-    let mut state = initialize_heat_balance_state(model, options.initial_zone_air_temperature_c)?;
+    let mut state = initialize_heat_balance_state_with_ctf_coefficients(
+        model,
+        options.initial_zone_air_temperature_c,
+        ctf_coefficients,
+    )?;
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,
         &mut state,
@@ -2796,6 +2868,66 @@ fn steady_surface_ctf_state(
         outside_flux_history_w_per_m2: vec![0.0],
         inside_flux_history_w_per_m2: vec![0.0],
     }
+}
+
+fn construction_ctf_coefficients_by_name(
+    coefficients: &[ConstructionCtfCoefficientOverride],
+) -> BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>> {
+    let mut by_construction = BTreeMap::new();
+    for coefficient in coefficients {
+        by_construction
+            .entry(NormalizedName::new(&coefficient.construction_name).0)
+            .or_insert_with(Vec::new)
+            .push(coefficient);
+    }
+    for coefficients in by_construction.values_mut() {
+        coefficients.sort_by_key(|coefficient| coefficient.time_index);
+    }
+    by_construction
+}
+
+fn surface_ctf_state_from_coefficients(
+    coefficients: &[&ConstructionCtfCoefficientOverride],
+    initial_temperature_c: f64,
+) -> Option<SurfaceCtfState> {
+    let zero = coefficients
+        .iter()
+        .copied()
+        .find(|coefficient| coefficient.time_index == 0)?;
+    let history = coefficients
+        .iter()
+        .copied()
+        .filter(|coefficient| coefficient.time_index > 0)
+        .collect::<Vec<_>>();
+    let history_terms = history.len();
+
+    Some(SurfaceCtfState {
+        outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
+        cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+        inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+        const_in_part_w_per_m2: 0.0,
+        const_out_part_w_per_m2: 0.0,
+        outside_history_w_per_m2_k: history
+            .iter()
+            .map(|coefficient| coefficient.outside_w_per_m2_k)
+            .collect(),
+        cross_history_w_per_m2_k: history
+            .iter()
+            .map(|coefficient| coefficient.cross_w_per_m2_k)
+            .collect(),
+        inside_history_w_per_m2_k: history
+            .iter()
+            .map(|coefficient| coefficient.inside_w_per_m2_k)
+            .collect(),
+        flux_history: history
+            .iter()
+            .map(|coefficient| coefficient.flux.unwrap_or(0.0))
+            .collect(),
+        outside_temperature_history_c: vec![initial_temperature_c; history_terms],
+        inside_temperature_history_c: vec![initial_temperature_c; history_terms],
+        outside_flux_history_w_per_m2: vec![0.0; history_terms],
+        inside_flux_history_w_per_m2: vec![0.0; history_terms],
+    })
 }
 
 fn resolve_surface_boundary_target(
@@ -4270,8 +4402,9 @@ fn epw_field<'a>(
 #[cfg(test)]
 mod tests {
     use super::{
-        Date, EpwRecord, ExecutionStep, FirstZoneSimulationOptions, HeatBalanceSimulationOptions,
-        HeatBalanceStepInput, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        ConstructionCtfCoefficientOverride, Date, EpwRecord, ExecutionStep,
+        FirstZoneSimulationOptions, HeatBalanceSimulationOptions, HeatBalanceStepInput,
+        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
         ResultStore, RuntimeError, RuntimeOutputRegistry, SimulationMode, SimulationState,
@@ -4279,7 +4412,8 @@ mod tests {
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_average_solar_coefficients, energyplus_daily_solar_coefficients,
-        energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state, next_day,
+        energyplus_shadowing_period_solar_coefficients, initialize_heat_balance_state,
+        initialize_heat_balance_state_with_ctf_coefficients, next_day,
         node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures, simulate_ideal_loads_node_state_projection,
@@ -5280,6 +5414,57 @@ DATA PERIODS
             surface.ctf.outside_flux_history_w_per_m2,
             vec![outside_flux]
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_state_applies_construction_ctf_coefficients()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let state = initialize_heat_balance_state_with_ctf_coefficients(
+            &model,
+            20.0,
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 2,
+                    outside_w_per_m2_k: -0.4,
+                    cross_w_per_m2_k: 0.2,
+                    inside_w_per_m2_k: -0.3,
+                    flux: Some(-0.5),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 2.0,
+                    cross_w_per_m2_k: 0.5,
+                    inside_w_per_m2_k: 3.0,
+                    flux: None,
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: 0.4,
+                    cross_w_per_m2_k: 0.1,
+                    inside_w_per_m2_k: 0.3,
+                    flux: Some(0.5),
+                },
+            ],
+        )?;
+
+        let ctf = &state.surfaces[0].ctf;
+        assert_eq!(ctf.outside_0_w_per_m2_k, 2.0);
+        assert_eq!(ctf.cross_0_w_per_m2_k, 0.5);
+        assert_eq!(ctf.inside_0_w_per_m2_k, 3.0);
+        assert_eq!(ctf.outside_history_w_per_m2_k, vec![0.4, -0.4]);
+        assert_eq!(ctf.cross_history_w_per_m2_k, vec![0.1, 0.2]);
+        assert_eq!(ctf.inside_history_w_per_m2_k, vec![0.3, -0.3]);
+        assert_eq!(ctf.flux_history, vec![0.5, -0.5]);
+        assert_eq!(ctf.outside_temperature_history_c, vec![20.0, 20.0]);
+        assert_eq!(ctf.inside_temperature_history_c, vec![20.0, 20.0]);
+        assert_eq!(ctf.outside_flux_history_w_per_m2, vec![0.0, 0.0]);
+        assert_eq!(ctf.inside_flux_history_w_per_m2, vec![0.0, 0.0]);
 
         Ok(())
     }
