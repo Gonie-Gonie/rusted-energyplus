@@ -160,12 +160,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   precipitation using `IsRainThreshold = 0.8 / TimeStepsInHour`, while
   `HeatBalanceSurfaceManager.cc::CalcHeatBalanceOutsideSurf` resets exposed wet
   exterior surfaces to `SurfHConvExt = 1000.0` and uses
-  `SurfOutWetBulbTemp` as the convection reference. Rust now approximates this
+  `SurfOutWetBulbTemp` as the convection reference. Rust now mirrors this
   exposed wet-surface branch for the diagnostic exterior balance and hourly
   exterior report rows by applying the EnergyPlus hourly interpolation weights
-  to liquid precipitation, mixing the dry and wet convection terms, and using a
-  bounded outdoor wet-bulb approximation until the full Psychrometrics wet-bulb
-  routine is ported. The run-period and warmup timestep shells now pass a
+  to liquid precipitation, mixing the dry and wet convection terms, and using
+  the EnergyPlus Psychrometrics wet-bulb formula with timestep-interpolated
+  dry-bulb, relative humidity, and barometric pressure. The run-period and
+  warmup timestep shells now pass a
   timestep-aware weather context for exterior forcing: dry-bulb follows
   EnergyPlus hourly interpolation, rain uses the current timestep flag,
   exterior convection uses timestep wind speed/direction, exterior longwave
