@@ -195,7 +195,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   previous-inside outdoor boundary probe then nudges floor inside conduction to
   RMSE `923.733908` and floor outside conduction to `507.588138`, but leaves
   zone aggregate conduction and the latent zone-air balance best rows with the
-  coupled iter3 lane. Extending that path with the source-mapped EnergyPlus
+  coupled iter3 lane. A DOE-2 exterior-only sibling isolates the
+  `SurfaceConvectionAlgorithm:Outside,DOE-2` coefficient impact without also
+  enabling the quick-conduction outside-face branch: at three surface passes it
+  lowers floor storage RMSE to `1120.518407`, floor inside conduction to
+  `766.667596`, floor outside conduction to `373.650657`, and MAT to
+  `2.186220`, while regressing zone aggregate conduction to `124.010025` RMSE.
+  This keeps DOE-2 exterior convection as a measured source term rather than a
+  default promotion. Extending the previous-inside path with the source-mapped
+  EnergyPlus
   quick-conduction outside-face branch lowers floor inside conduction to RMSE
   `812.566220`, floor outside conduction to `397.351373`, floor heat storage
   to `1198.781640`, zone aggregate conduction to `84.217233`, and MAT to

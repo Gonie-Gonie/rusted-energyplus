@@ -3732,6 +3732,9 @@ fn parse_heat_balance_zone_air_algorithm(
         "energyplus-analytical-coupled-previous-inside-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe)
         }
+        "energyplus-analytical-coupled-previous-inside-doe2-probe" => {
+            Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe)
+        }
         "energyplus-analytical-coupled-previous-inside-quick-outside-probe" => Ok(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
         ),
@@ -3757,7 +3760,7 @@ fn parse_heat_balance_zone_air_algorithm(
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
         }
         other => Err(format!(
-            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, energyplus-analytical-coupled-probe, energyplus-analytical-coupled-previous-inside-probe, energyplus-analytical-coupled-previous-inside-quick-outside-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-boundary-probe, or energyplus-third-order-probe"
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, energyplus-analytical-coupled-probe, energyplus-analytical-coupled-previous-inside-probe, energyplus-analytical-coupled-previous-inside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-boundary-probe, or energyplus-third-order-probe"
         )),
     }
 }
@@ -3847,6 +3850,9 @@ fn heat_balance_zone_air_algorithm_label(
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe => {
             "energyplus-analytical-coupled-previous-inside-probe"
+        }
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe => {
+            "energyplus-analytical-coupled-previous-inside-doe2-probe"
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe => {
             "energyplus-analytical-coupled-previous-inside-quick-outside-probe"
@@ -6460,6 +6466,13 @@ mod tests {
             )
             .unwrap(),
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm(
+                "energyplus-analytical-coupled-previous-inside-doe2-probe"
+            )
+            .unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
         );
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm(

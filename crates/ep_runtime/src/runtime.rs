@@ -729,6 +729,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledProbe,
     /// Experimental coupled analytical path using previous inside surface temperature for outdoor CTF boundary solves.
     EnergyPlusAnalyticalCoupledPreviousInsideProbe,
+    /// Experimental previous-inside path using EnergyPlus DOE-2 exterior convection without quick outside conduction.
+    EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe,
     /// Experimental previous-inside coupled path using EnergyPlus quick-conduction outside face solves.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
     /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
@@ -2462,6 +2464,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2474,6 +2477,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2485,6 +2489,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     let use_previous_inside_for_outdoor_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2508,7 +2513,8 @@ fn advance_heat_balance_state_one_timestep_internal(
     );
     let use_doe2_outside_convection = matches!(
         zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     );
@@ -2539,6 +2545,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             zone_temperature_c,
             weather_context,
             None,
+            use_doe2_outside_convection,
         );
     }
 
@@ -2585,6 +2592,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe => previous_temperature_c,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe => {
+                previous_temperature_c
+            }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe => {
                 previous_temperature_c
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe => {
@@ -2802,6 +2812,7 @@ fn run_surface_balance_passes(
                 outside_balance_inside_temperature_c,
                 weather_context,
                 quick_outside_conduction,
+                use_doe2_outside_convection,
             );
             surface.inside_face_temperature_c = energyplus_ctf_inside_face_temperature_c(
                 surface,
@@ -2896,6 +2907,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -3859,6 +3871,7 @@ fn heat_balance_surface_boundary_temperature_c(
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
+    use_doe2_outside_convection: bool,
 ) -> f64 {
     if surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
         return exterior_surface_boundary_temperature_c(
@@ -3868,6 +3881,7 @@ fn heat_balance_surface_boundary_temperature_c(
             owning_zone_temperature_c,
             weather_context,
             quick_outside_conduction,
+            use_doe2_outside_convection,
         );
     }
 
@@ -3886,6 +3900,7 @@ fn exterior_surface_boundary_temperature_c(
     owning_zone_temperature_c: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
+    use_doe2_outside_convection: bool,
 ) -> f64 {
     let Some(context) = weather_context else {
         return outdoor_dry_bulb_c;
@@ -3917,6 +3932,7 @@ fn exterior_surface_boundary_temperature_c(
                 owning_zone_temperature_c,
                 0.0,
                 quick_outside_conduction,
+                use_doe2_outside_convection,
             );
         };
         surface_incident_solar_radiation_hourly_average_w_per_m2(
@@ -3937,6 +3953,7 @@ fn exterior_surface_boundary_temperature_c(
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
         quick_outside_conduction,
+        use_doe2_outside_convection,
     )
 }
 
@@ -3970,6 +3987,10 @@ fn reported_surface_outside_face_temperature_c(
         owning_zone_temperature_c,
         weather_context,
         None,
+        matches!(
+            zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+        ),
     )
 }
 
@@ -4627,6 +4648,7 @@ fn exterior_surface_energy_balance_temperature_c(
     _owning_zone_temperature_c: f64,
     incident_solar_w_per_m2: f64,
     quick_outside_conduction: Option<QuickOutsideConductionContext>,
+    use_doe2_outside_convection: bool,
 ) -> f64 {
     if quick_outside_conduction.is_none()
         && (record.liquid_precipitation_depth_mm >= EXTERIOR_RAIN_FALLBACK_DEPTH_MM
@@ -4639,9 +4661,10 @@ fn exterior_surface_energy_balance_temperature_c(
     let solar_absorptance = surface_state.solar_absorptance.clamp(0.0, 1.0);
     let tilt_rad =
         surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
-    let use_doe2_outside_convection = quick_outside_conduction
-        .map(|context| context.use_doe2_outside_convection)
-        .unwrap_or(false);
+    let use_doe2_outside_convection = use_doe2_outside_convection
+        || quick_outside_conduction
+            .map(|context| context.use_doe2_outside_convection)
+            .unwrap_or(false);
     let convection_coefficient = if use_doe2_outside_convection {
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
             surface_state.outside_face_temperature_c,
@@ -8364,6 +8387,14 @@ DATA PERIODS
         assert_eq!(
             options
                 .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
                     HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
                 )
                 .zone_air_algorithm,
@@ -8758,6 +8789,15 @@ DATA PERIODS
                 )
                 .with_surface_iteration_count(3),
         )?;
+        let previous_inside_doe2 = simulate_heat_balance_zone_air_temperatures_with_weather_records(
+            &model,
+            &records,
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe,
+                )
+                .with_surface_iteration_count(3),
+        )?;
 
         let Some(dry_roof_conduction) = dry_bulb_only
             .results
@@ -8797,6 +8837,15 @@ DATA PERIODS
                 std::io::Error::other("missing previous-inside roof temperature series").into(),
             );
         };
+        let Some(previous_inside_doe2_roof_temperature) = previous_inside_doe2
+            .results
+            .find_series("ROOF", "Surface Outside Face Temperature")
+        else {
+            return Err(std::io::Error::other(
+                "missing previous-inside DOE-2 roof temperature series",
+            )
+            .into());
+        };
 
         assert_eq!(dry_roof_conduction.values.len(), 2);
         assert_eq!(forced_roof_conduction.values.len(), 2);
@@ -8804,10 +8853,17 @@ DATA PERIODS
         assert_eq!(forced_wall_conduction.values.len(), 2);
         assert_eq!(coupled_roof_temperature.values.len(), 2);
         assert_eq!(previous_inside_roof_temperature.values.len(), 2);
+        assert_eq!(previous_inside_doe2_roof_temperature.values.len(), 2);
         assert!((dry_roof_conduction.values[0] - forced_roof_conduction.values[0]).abs() > 1.0e-3);
         assert!((dry_wall_conduction.values[0] - forced_wall_conduction.values[0]).abs() > 1.0e-3);
         assert!(
             (coupled_roof_temperature.values[0] - previous_inside_roof_temperature.values[0]).abs()
+                > 1.0e-6
+        );
+        assert!(
+            (previous_inside_doe2_roof_temperature.values[0]
+                - previous_inside_roof_temperature.values[0])
+                .abs()
                 > 1.0e-6
         );
 

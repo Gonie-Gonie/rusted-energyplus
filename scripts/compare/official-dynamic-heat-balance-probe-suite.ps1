@@ -17,6 +17,7 @@ $lanes = @(
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-iter3-probe.ps1",
+    "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-doe2-iter3-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter3-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter5-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe.ps1",
