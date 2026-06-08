@@ -115,6 +115,7 @@ FOCUS_METRICS = (
     FocusMetric("ZN001:FLR001", "Surface Inside Face Temperature"),
     FocusMetric("ZN001:FLR001", "Surface Outside Face Temperature"),
     FocusMetric("ZN001:FLR001", "Surface Inside Face Conduction Heat Transfer Rate"),
+    FocusMetric("ZN001:FLR001", "Surface Outside Face Conduction Heat Transfer Rate"),
     FocusMetric("ZN001:ROOF001", "Surface Inside Face Temperature"),
     FocusMetric("ZN001:ROOF001", "Surface Outside Face Temperature"),
     FocusMetric("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate"),

@@ -74,9 +74,10 @@ combined lane confirms the next promotion blocker is not coefficient
 availability alone or zone-air call order alone, but the mass-floor
 face/history coupling that remains after those two probes are joined.
 Roof/wall exterior weather/solar forcing now feeds the diagnostic CTF
-boundary driver for run-period timesteps, and the official diagnostic manifest now includes
-wall/floor surface
-decomposition rows so aggregate cancellation does not hide the next bottleneck.
+boundary driver for run-period timesteps, and the official diagnostic manifest
+now includes wall/floor surface decomposition rows, including floor
+outside-face conduction and per-area floor conduction diagnostics, so aggregate
+cancellation does not hide the next bottleneck.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, DOE-2 outside

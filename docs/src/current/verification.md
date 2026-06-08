@@ -62,7 +62,7 @@ Current supporting release and infrastructure gates include:
 ```
 
 The current official dynamic 1Zone tracker is diagnostic-only. The default
-lane compares 27 hourly series, including zone air heat-balance latent terms,
+lane compares 30 hourly series, including zone air heat-balance latent terms,
 and the probe lanes isolate mass-CTF seeding, EnergyPlus analytical zone-air
 updates, and surface-first correction order without creating a conformance
 claim:
