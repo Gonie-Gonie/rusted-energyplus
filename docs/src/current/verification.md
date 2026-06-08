@@ -61,10 +61,16 @@ Current supporting release and infrastructure gates include:
 .\scripts\dev.cmd v0.32-verify
 ```
 
-The current official dynamic 1Zone tracker is diagnostic-only:
+The current official dynamic 1Zone tracker is diagnostic-only. The default
+lane compares 27 hourly series, including zone air heat-balance latent terms,
+and the probe lanes isolate mass-CTF seeding and the EnergyPlus third-order
+zone-air update without creating a conformance claim:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
+.\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-probe
+.\scripts\dev.cmd official-dynamic-heat-balance-third-order-probe
+python tools\reporting\dynamic_heat_balance_probe_summary.py --repo-root .
 ```
 
 The source-map and algorithm-ledger gate remains:

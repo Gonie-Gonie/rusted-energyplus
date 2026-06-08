@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: conformance
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-08
 ---
 
 # ExampleFiles Coverage Plan
@@ -50,7 +50,7 @@ Each selected case must answer:
 | v0.21 | source-map and algorithm ledger | mapped algorithm entries and promoted/diagnostic first cases | planning guard only |
 | v0.22 | time/weather/schedule conformance | `schedule_constant_001`, `weather_fields_001` | declared variables only: `Schedule Value` and dry-bulb |
 | v0.23 | static model evidence | official `1ZoneUncontrolled.idf` | static EIO fields only: surface, construction/material, OtherEquipment nominal |
-| v0.33 | dynamic heat-balance diagnostic | official `1ZoneUncontrolled.idf` | run-period-filtered zone/surface/conduction deltas plus Rust/oracle warmup metadata; diagnostic-only |
+| v0.33 | dynamic heat-balance diagnostic | official `1ZoneUncontrolled.idf` | run-period-filtered zone/surface/conduction and zone air heat-balance deltas plus Rust/oracle warmup metadata; diagnostic-only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -117,13 +117,19 @@ Current v0.33 official dynamic diagnostic evidence:
 
 - `data/conformance_cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml`
 - run-period-filtered `Zone Mean Air Temperature`, roof/wall/floor
-  inside/outside face temperatures, and surface conduction hourly
-  Rust-vs-oracle deltas
+  inside/outside face temperatures, surface conduction, and zone air
+  heat-balance hourly Rust-vs-oracle deltas
 - Rust first-run-period-day warmup metadata and EnergyPlus EIO run-period
   warmup day counts in the compare summary/report
+- explicit all-CTF and third-order zone-air diagnostic probe lanes for
+  structural bottleneck isolation
 - remains `comparison_class=diagnostic-only` and `conformance_claim=false`
   until the dynamic heat-balance deltas pass under a blocking gate
 - `official-dynamic-heat-balance-diagnostic`
+- `official-dynamic-heat-balance-all-ctf-probe`
+- `official-dynamic-heat-balance-third-order-probe`
+- `dynamic_heat_balance_probe_summary.py` for development summaries from
+  existing `.runtime` compare outputs
 
 Current v0.19 comparison infrastructure evidence:
 
