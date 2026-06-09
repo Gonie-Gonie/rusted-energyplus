@@ -690,6 +690,20 @@ Current Rust boundary:
   rejects freezing exterior report terms wholesale; the next narrower probe
   should separate the inside CTF solve's `SurfTempOutHist` snapshot from
   current outside-face report-state generation.
+  That narrower converged-lane probe is now wired as an inside-CTF
+  outside-history snapshot: the current outside-face balance/report state is
+  recalculated each surface pass, but the inside CTF solve's current outside
+  temperature term reuses the first-pass outside-face snapshot. It keeps the
+  broad frozen-outside floor benefit while avoiding the roof exterior-report
+  regression: top floor storage RMSE improves from `52.022146` to `45.539704`,
+  floor inside conduction from `30.201354` to `26.437580`, floor outside
+  conduction from `21.976058` to `19.262430`, aggregate inside conduction from
+  `26.355358` to `23.838450`, aggregate outside conduction from `27.990507` to
+  `25.267733`, zone surface convection from `21.105254` to `21.080512`, and
+  air storage from `7.547299` to `7.486249`. The roof outside convection RMSE
+  only moves from `19.325833` to `19.473624`, so the next runtime promotion
+  candidate should carry the inside-CTF-only outside snapshot and leave exterior
+  report-state generation current.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

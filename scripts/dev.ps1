@@ -335,6 +335,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with converged surface solves and frozen outside-face snapshots."
     }
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with converged surface solves and inside CTF outside-history snapshots."
+    }
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1"
         Group = "compare"
