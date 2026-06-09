@@ -492,8 +492,15 @@ Current Rust boundary:
   oracle temperatures/rates plus EIO zero CTF coefficients, yielding
   `1880.111844 W` inside and `1769.027186 W` outside history deltas. That keeps
   the next EnergyPlus source-porting target on the mass-floor
-  warmup/run-period history and coupled source handoff. Full inside iteration
-  order, zone predictor/corrector equations, detailed
+  warmup/run-period history and coupled source handoff. The digest now also
+  emits Rust run-period initial CTF history slots captured after warmup and
+  before the first reported timestep. In the same active lane, the floor
+  run-period initial slot sum is already `1393.986801 W` inside and
+  `1607.011644 W` outside before the first hour averages to `1229.296987 W`
+  inside and `1297.344600 W` outside, so the current mismatch is present at the
+  warmup/run-period handoff rather than being introduced only by first-hour
+  averaging. Full inside iteration order, zone predictor/corrector equations,
+  detailed
   shadowing/reflection, and coupled radiation coefficient update order are not
   yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and

@@ -28,10 +28,11 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
-    HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfInitialHistoryPolicy,
-    HeatBalanceSimulationOptions, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-    NodeStateProjection, NodeStateProjectionOptions, PlantStateProjection,
-    PlantStateProjectionOptions, ResultStore, SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+    HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfHistorySlotSample,
+    HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceWarmupSummary,
+    HeatBalanceZoneAirAlgorithm, NodeStateProjection, NodeStateProjectionOptions,
+    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
@@ -3202,6 +3203,7 @@ struct HeatBalanceConformanceDiagnostic {
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
     ctf_history_first_sample_deltas: Vec<HeatBalanceCtfHistoryFirstSampleDelta>,
+    ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
@@ -3667,6 +3669,9 @@ fn build_heat_balance_conformance_diagnostic(
         surface_count: simulation.summary.surface_count,
         ctf_component_first_samples,
         ctf_history_first_sample_deltas,
+        ctf_history_run_period_initial_slots: simulation
+            .summary
+            .run_period_initial_ctf_history_slots,
         ctf_history_first_sample_slots: simulation.summary.first_sample_ctf_history_slots,
         series,
         status: if extracted { "extracted" } else { "failed" },
@@ -5685,6 +5690,10 @@ fn render_heat_balance_conformance_json(
         )
     ));
     json.push_str(&format!(
+        "  \"ctf_history_run_period_initial_slots\": {},\n",
+        heat_balance_ctf_history_slots_json(&diagnostic.ctf_history_run_period_initial_slots)
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_first_sample_slots\": {},\n",
         heat_balance_ctf_history_first_sample_slots_json(
             &diagnostic.ctf_history_first_sample_slots
@@ -5875,6 +5884,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_ctf_history_first_sample_delta_rows(
         &mut report,
         &diagnostic.ctf_history_first_sample_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Rust CTF History Run-Period Initial Slots\n\n");
+    heat_balance_report_ctf_history_slot_rows(
+        &mut report,
+        &diagnostic.ctf_history_run_period_initial_slots,
     );
     report.push('\n');
 
@@ -6301,6 +6317,57 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
     json
 }
 
+fn heat_balance_ctf_history_slots_json(rows: &[HeatBalanceCtfHistorySlotSample]) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"slot_index\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"outside_history_coefficient_w_per_m2_k\": {}, ",
+                "\"cross_history_coefficient_w_per_m2_k\": {}, ",
+                "\"inside_history_coefficient_w_per_m2_k\": {}, ",
+                "\"flux_history_coefficient\": {}, ",
+                "\"outside_temperature_history_c\": {}, ",
+                "\"inside_temperature_history_c\": {}, ",
+                "\"outside_flux_history_w_per_m2\": {}, ",
+                "\"inside_flux_history_w_per_m2\": {}, ",
+                "\"inside_temperature_term_w\": {}, ",
+                "\"inside_flux_term_w\": {}, ",
+                "\"inside_total_term_w\": {}, ",
+                "\"outside_temperature_term_w\": {}, ",
+                "\"outside_flux_term_w\": {}, ",
+                "\"outside_total_term_w\": {} }}"
+            ),
+            json_string(&row.surface_name),
+            json_string(&row.construction_name),
+            row.slot_index,
+            json_number(row.area_m2),
+            json_number(row.outside_history_coefficient_w_per_m2_k),
+            json_number(row.cross_history_coefficient_w_per_m2_k),
+            json_number(row.inside_history_coefficient_w_per_m2_k),
+            json_number(row.flux_history_coefficient),
+            json_number(row.outside_temperature_history_c),
+            json_number(row.inside_temperature_history_c),
+            json_number(row.outside_flux_history_w_per_m2),
+            json_number(row.inside_flux_history_w_per_m2),
+            json_number(row.inside_temperature_term_w),
+            json_number(row.inside_flux_term_w),
+            json_number(row.inside_total_term_w),
+            json_number(row.outside_temperature_term_w),
+            json_number(row.outside_flux_term_w),
+            json_number(row.outside_total_term_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_history_first_sample_slots_json(
     rows: &[HeatBalanceCtfHistorySlotFirstSample],
 ) -> String {
@@ -6529,6 +6596,40 @@ fn heat_balance_report_ctf_history_first_sample_delta_rows(
             row.oracle_outside_history_term_w,
             row.rust_outside_history_term_w,
             row.outside_history_delta_w
+        ));
+    }
+}
+
+fn heat_balance_report_ctf_history_slot_rows(
+    report: &mut String,
+    rows: &[HeatBalanceCtfHistorySlotSample],
+) {
+    report.push_str(
+        "| key | construction | slot | x_hist | y_hist | z_hist | q_hist | out_temp_c | in_temp_c | out_flux_w_per_m2 | in_flux_w_per_m2 | in_temp_term_w | in_flux_term_w | in_total_w | out_temp_term_w | out_flux_term_w | out_total_w |\n",
+    );
+    report.push_str(
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+    );
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.surface_name),
+            markdown_cell(&row.construction_name),
+            row.slot_index,
+            row.outside_history_coefficient_w_per_m2_k,
+            row.cross_history_coefficient_w_per_m2_k,
+            row.inside_history_coefficient_w_per_m2_k,
+            row.flux_history_coefficient,
+            row.outside_temperature_history_c,
+            row.inside_temperature_history_c,
+            row.outside_flux_history_w_per_m2,
+            row.inside_flux_history_w_per_m2,
+            row.inside_temperature_term_w,
+            row.inside_flux_term_w,
+            row.inside_total_term_w,
+            row.outside_temperature_term_w,
+            row.outside_flux_term_w,
+            row.outside_total_term_w
         ));
     }
 }
@@ -7505,6 +7606,26 @@ mod tests {
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 2.0,
             }],
+            ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
+                surface_name: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                slot_index: 1,
+                area_m2: 100.0,
+                outside_history_coefficient_w_per_m2_k: 1.0,
+                cross_history_coefficient_w_per_m2_k: 2.0,
+                inside_history_coefficient_w_per_m2_k: 3.0,
+                flux_history_coefficient: 0.5,
+                outside_temperature_history_c: 9.0,
+                inside_temperature_history_c: 19.0,
+                outside_flux_history_w_per_m2: -2.0,
+                inside_flux_history_w_per_m2: 2.0,
+                inside_temperature_term_w: -3900.0,
+                inside_flux_term_w: 100.0,
+                inside_total_term_w: -3800.0,
+                outside_temperature_term_w: 2900.0,
+                outside_flux_term_w: 100.0,
+                outside_total_term_w: 3000.0,
+            }],
             ctf_history_first_sample_slots: vec![super::HeatBalanceCtfHistorySlotFirstSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -7619,6 +7740,7 @@ mod tests {
         assert!(json.contains("\"inside_current_outside_term_w\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_history_delta_w\""));
+        assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"inside_total_term_w\""));
         assert!(json.contains("\"rank\": 1"));
@@ -7638,6 +7760,7 @@ mod tests {
         assert!(digest.contains("\"inside_current_outside_term_w\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
+        assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"inside_total_term_w\""));
         assert!(digest.contains("\"first_delta_sample\""));
@@ -7662,6 +7785,7 @@ mod tests {
         );
         assert!(report.contains("## CTF History First-Sample Deltas"));
         assert!(report.contains("| FLOOR | FLOOR | 100.000000000000 | 1.000000000000 |"));
+        assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
         assert!(report.contains("gate_blocking: true"));
@@ -7743,6 +7867,26 @@ mod tests {
                 oracle_outside_history_term_w: 5.0,
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 5.0,
+            }],
+            ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
+                surface_name: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                slot_index: 1,
+                area_m2: 100.0,
+                outside_history_coefficient_w_per_m2_k: 1.0,
+                cross_history_coefficient_w_per_m2_k: 2.0,
+                inside_history_coefficient_w_per_m2_k: 3.0,
+                flux_history_coefficient: 0.5,
+                outside_temperature_history_c: 9.0,
+                inside_temperature_history_c: 19.0,
+                outside_flux_history_w_per_m2: -2.0,
+                inside_flux_history_w_per_m2: 2.0,
+                inside_temperature_term_w: -3900.0,
+                inside_flux_term_w: 100.0,
+                inside_total_term_w: -3800.0,
+                outside_temperature_term_w: 2900.0,
+                outside_flux_term_w: 100.0,
+                outside_total_term_w: 3000.0,
             }],
             ctf_history_first_sample_slots: vec![super::HeatBalanceCtfHistorySlotFirstSample {
                 surface_name: "FLOOR".to_string(),
@@ -7826,6 +7970,7 @@ mod tests {
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
         assert!(json.contains("\"max_delta_sample\""));
@@ -7836,6 +7981,7 @@ mod tests {
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
         assert!(digest.contains("\"first_delta_sample\""));
@@ -7860,6 +8006,7 @@ mod tests {
         assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(report.contains("## CTF History First-Sample Deltas"));
+        assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("status: fail"));
     }

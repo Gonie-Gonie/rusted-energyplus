@@ -370,6 +370,10 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([double]$floorHistoryDelta.outside_history_delta_w -le 100.0) {
         throw "Expected active FLOOR outside history delta to remain visible, got $($floorHistoryDelta.outside_history_delta_w)"
     }
+    $floorRunPeriodInitialSlots = @($summary.ctf_history_run_period_initial_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
+    if ($floorRunPeriodInitialSlots.Count -lt 5) {
+        throw "Expected ctf_history_run_period_initial_slots to include FLOOR #CTFs=5 rows, got $($floorRunPeriodInitialSlots.Count)"
+    }
     $floorHistorySlots = @($summary.ctf_history_first_sample_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
     if ($floorHistorySlots.Count -lt 5) {
         throw "Expected ctf_history_first_sample_slots to include FLOOR #CTFs=5 rows, got $($floorHistorySlots.Count)"
@@ -650,6 +654,8 @@ Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
 Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
 Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
+Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
+Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"

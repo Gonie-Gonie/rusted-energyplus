@@ -1082,6 +1082,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_iteration_count: u32,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
+    /// Per-slot CTF history terms after optional warmup, before the run period starts.
+    pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
     pub first_sample_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
 }
@@ -3541,6 +3543,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.zone_air_algorithm,
         options.surface_iteration_count,
     );
+    let run_period_initial_ctf_history_slots =
+        heat_balance_ctf_history_slot_samples(&state.surfaces);
     let run_period_timestep_start = state.timestep_index;
     let mut zone_temperatures = state
         .zones
@@ -4308,6 +4312,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         surface_count: state.surfaces.len(),
         surface_iteration_count: options.surface_iteration_count,
         ctf_initial_history_policy: options.ctf_initial_history_policy,
+        run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
             .map(HeatBalanceCtfHistorySlotFirstSampleAccumulator::finalize)
@@ -8655,6 +8660,7 @@ mod tests {
         seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures,
+        simulate_heat_balance_zone_air_temperatures_internal,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -10217,6 +10223,59 @@ DATA PERIODS
         assert_eq!(ctf.inside_temperature_history_c, vec![20.0, 20.0]);
         assert_eq!(ctf.outside_flux_history_w_per_m2, vec![0.0, 0.0]);
         assert_eq!(ctf.inside_flux_history_w_per_m2, vec![0.0, 0.0]);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_summary_captures_run_period_initial_ctf_history_slots()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let simulation = simulate_heat_balance_zone_air_temperatures_internal(
+            &model,
+            &[5.0],
+            None,
+            HeatBalanceSimulationOptions::hourly_samples(1),
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 2.0,
+                    cross_w_per_m2_k: 0.5,
+                    inside_w_per_m2_k: 3.0,
+                    flux: None,
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: 0.4,
+                    cross_w_per_m2_k: 0.1,
+                    inside_w_per_m2_k: 0.3,
+                    flux: Some(0.5),
+                },
+            ],
+        )?;
+
+        let floor_initial_slots = simulation
+            .summary
+            .run_period_initial_ctf_history_slots
+            .iter()
+            .filter(|sample| sample.surface_name == "FLOOR")
+            .collect::<Vec<_>>();
+        assert_eq!(floor_initial_slots.len(), 1);
+        assert_eq!(floor_initial_slots[0].slot_index, 1);
+        assert!(floor_initial_slots[0].inside_total_term_w.is_finite());
+        assert!(floor_initial_slots[0].outside_total_term_w.is_finite());
+
+        let floor_first_sample_slots = simulation
+            .summary
+            .first_sample_ctf_history_slots
+            .iter()
+            .filter(|sample| sample.surface_name == "FLOOR")
+            .collect::<Vec<_>>();
+        assert_eq!(floor_first_sample_slots.len(), 1);
+        assert_eq!(floor_first_sample_slots[0].slot_index, 1);
+        assert!(floor_first_sample_slots[0].timestep_count > 0);
 
         Ok(())
     }
