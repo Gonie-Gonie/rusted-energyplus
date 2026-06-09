@@ -129,3 +129,12 @@ Heat Balance Surface Convection Rate` from `22.062956 W` to `91.956638 W` RMSE.
 This means the surface `SurfQdotConvInRep` reference-air snapshot is useful
 source evidence, but the zone AirRpt surface-convection row still needs the
 EnergyPlus `CalcZoneComponentLoadSums` timing mapped separately.
+
+A final-hconv report sibling then tested whether EnergyPlus' reported
+`SurfHConvInt` could be approximated by recomputing TARP from the final
+`SurfTempIn` and report reference air while keeping the solver frozen. It is
+also a rejected report path: zone surface convection RMSE worsens from
+`22.062956 W` to `24.513143 W`, and floor inside convection heat gain worsens
+from `13.602803 W` to `16.742712 W`. The remaining zone-air surface convection
+gap is therefore not solved by either surface-refair reporting or final
+hconv-only reporting.

@@ -777,6 +777,17 @@ Current Rust boundary:
   Keep the stored surface reference-air snapshot as source evidence for the
   surface convection report path, and map EnergyPlus `CalcZoneComponentLoadSums`
   / `SumHADTsurfs` timing separately from `SurfQdotConvInRep`.
+  A final-hconv report sibling recomputes TARP inside convection from final
+  reported surface temperatures and report reference air while leaving the
+  frozen-hconv solver untouched. It is also rejected: floor storage stays fixed
+  at `28.786920 W`, but `Zone Air Heat Balance Surface Convection Rate`
+  regresses from `22.062956` to `24.513143 W` RMSE and max abs from
+  `212.520279` to `297.253699 W`; floor inside convection coefficient worsens
+  from `0.025744` to `0.035059 W/m2-K` RMSE and floor inside convection heat
+  gain from `13.602803` to `16.742712 W`. This rules out a simple final
+  `SurfTempIn` TARP-report recompute as the missing EnergyPlus hconv/report
+  timing; keep the frozen solver coefficient path until a source-level
+  `InitIntConvCoeff`/inside-iteration cadence probe can be isolated.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

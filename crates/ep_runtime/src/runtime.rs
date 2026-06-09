@@ -1017,6 +1017,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe,
     /// Experimental ScriptF-flat path reporting surface convection from the surface reference-air snapshot.
     EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe,
+    /// Experimental ScriptF-flat path reporting inside convection from final surface temperatures.
+    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe,
     /// Experimental converged-surface path committing adiabatic CTF history from current inside face without mutating report state.
     EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceAdiabaticHistoryCommitProbe,
     /// Experimental balance-surface-convection path syncing adiabatic outside history after the inside solve.
@@ -1048,7 +1050,8 @@ fn heat_balance_zone_air_algorithm_feature_base(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe => {
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe => {
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe
         }
         _ => zone_air_algorithm,
@@ -3169,6 +3172,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
     ) {
         InteriorLongwaveExchangeProbe::EnergyPlusScriptFFlatAccess
     } else {
@@ -3333,6 +3337,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceAdiabaticHistoryCommitProbe => {
                 previous_temperature_c
             }
@@ -3430,6 +3437,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
     );
     let commit_inside_ctf_outside_temperature_to_history = matches!(
         zone_air_algorithm,
@@ -4081,6 +4089,15 @@ fn heat_balance_uses_surface_reference_air_convection_report(
     )
 }
 
+fn heat_balance_uses_final_inside_convection_report(
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> bool {
+    matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
+    )
+}
+
 fn zone_surface_convection_sums(
     surfaces: &[SurfaceHeatBalanceState],
     zone_id: ZoneId,
@@ -4118,12 +4135,12 @@ fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
         .sum()
 }
 
-fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
+fn surface_inside_convection_reference_air_temperature_c(
     surface: &SurfaceHeatBalanceState,
     zones: &[ZoneHeatBalanceState],
     use_surface_reference_air_report: bool,
 ) -> f64 {
-    let reference_air_temperature_c = if use_surface_reference_air_report {
+    if use_surface_reference_air_report {
         surface.inside_reference_air_temperature_c
     } else {
         zones
@@ -4131,9 +4148,76 @@ fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
             .find(|zone| zone.zone_id == surface.zone_id)
             .map(|zone| zone.mean_air_temperature_c)
             .unwrap_or(surface.inside_face_temperature_c)
-    };
-    surface.inside_convection_coefficient_w_per_m2_k
-        * (reference_air_temperature_c - surface.inside_face_temperature_c)
+    }
+}
+
+fn surface_inside_convection_report_coefficient_w_per_m2_k(
+    surface: &SurfaceHeatBalanceState,
+    zones: &[ZoneHeatBalanceState],
+    use_surface_reference_air_report: bool,
+    use_final_inside_convection_report: bool,
+) -> f64 {
+    if use_final_inside_convection_report {
+        let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
+            surface,
+            zones,
+            use_surface_reference_air_report,
+        );
+        energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+            surface,
+            surface.inside_face_temperature_c,
+            reference_air_temperature_c,
+        )
+    } else {
+        surface.inside_convection_coefficient_w_per_m2_k
+    }
+}
+
+fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
+    surface: &SurfaceHeatBalanceState,
+    zones: &[ZoneHeatBalanceState],
+    use_surface_reference_air_report: bool,
+    use_final_inside_convection_report: bool,
+) -> f64 {
+    let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
+        surface,
+        zones,
+        use_surface_reference_air_report,
+    );
+    surface_inside_convection_report_coefficient_w_per_m2_k(
+        surface,
+        zones,
+        use_surface_reference_air_report,
+        use_final_inside_convection_report,
+    ) * (reference_air_temperature_c - surface.inside_face_temperature_c)
+}
+
+fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
+    surfaces: &[SurfaceHeatBalanceState],
+    zones: &[ZoneHeatBalanceState],
+    zone_id: ZoneId,
+    use_surface_reference_air_report: bool,
+) -> f64 {
+    surfaces
+        .iter()
+        .filter(|surface| surface.zone_id == zone_id)
+        .map(|surface| {
+            let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
+                surface,
+                zones,
+                use_surface_reference_air_report,
+            );
+            let coefficient_w_per_m2_k = surface_inside_convection_report_coefficient_w_per_m2_k(
+                surface,
+                zones,
+                use_surface_reference_air_report,
+                true,
+            );
+            coefficient_w_per_m2_k
+                * surface.area_m2
+                * (surface.inside_face_temperature_c - reference_air_temperature_c)
+        })
+        .sum()
 }
 
 fn zone_air_heat_balance_air_storage_rate_w(
@@ -4187,6 +4271,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceAdiabaticHistoryCommitProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionCurrentAdiabaticHistoryProbe => {
             if timestep_seconds > 0.0 {
@@ -4437,6 +4522,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut surface_first_sample_trace = Vec::new();
     let use_surface_reference_air_convection_report =
         heat_balance_uses_surface_reference_air_convection_report(options.zone_air_algorithm);
+    let use_final_inside_convection_report =
+        heat_balance_uses_final_inside_convection_report(options.zone_air_algorithm);
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
         .iter()
@@ -4551,29 +4638,35 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         third_order_report_air_heat_capacity_j_per_k,
                     );
                     zone_air_heat_balance_sums[index].0 += zone_state.convective_internal_gain_w;
-                    zone_air_heat_balance_sums[index].1 +=
-                        if use_surface_reference_air_convection_report {
-                            zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
+                    zone_air_heat_balance_sums[index].1 += if use_final_inside_convection_report {
+                        zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
                                 &state.surfaces,
+                                &state.zones,
                                 *zone_id,
+                                use_surface_reference_air_convection_report,
                             )
-                        } else if heat_balance_uses_balance_surface_convection_report(
-                            options.zone_air_algorithm,
-                        ) {
-                            zone_air_heat_balance_surface_convection_rate_from_balance_w(
-                                zone_state,
-                                air_storage_rate_w,
-                            )
-                        } else if heat_balance_uses_previous_mat_surface_convection_report(
-                            options.zone_air_algorithm,
-                        ) {
-                            zone_air_heat_balance_surface_convection_rate_at_air_temperature_w(
-                                zone_state,
-                                zone_state.previous_mean_air_temperatures_c[0],
-                            )
-                        } else {
-                            zone_air_heat_balance_surface_convection_rate_w(zone_state)
-                        };
+                    } else if use_surface_reference_air_convection_report {
+                        zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
+                            &state.surfaces,
+                            *zone_id,
+                        )
+                    } else if heat_balance_uses_balance_surface_convection_report(
+                        options.zone_air_algorithm,
+                    ) {
+                        zone_air_heat_balance_surface_convection_rate_from_balance_w(
+                            zone_state,
+                            air_storage_rate_w,
+                        )
+                    } else if heat_balance_uses_previous_mat_surface_convection_report(
+                        options.zone_air_algorithm,
+                    ) {
+                        zone_air_heat_balance_surface_convection_rate_at_air_temperature_w(
+                            zone_state,
+                            zone_state.previous_mean_air_temperatures_c[0],
+                        )
+                    } else {
+                        zone_air_heat_balance_surface_convection_rate_w(zone_state)
+                    };
                     zone_air_heat_balance_sums[index].2 += air_storage_rate_w;
                 }
             }
@@ -4588,9 +4681,17 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                             surface_state,
                             &state.zones,
                             use_surface_reference_air_convection_report,
+                            use_final_inside_convection_report,
                         );
                     let inside_convection_heat_gain_rate =
                         surface_state.area_m2 * inside_convection_heat_gain_rate_per_area;
+                    let inside_convection_coefficient_w_per_m2_k =
+                        surface_inside_convection_report_coefficient_w_per_m2_k(
+                            surface_state,
+                            &state.zones,
+                            use_surface_reference_air_convection_report,
+                            use_final_inside_convection_report,
+                        );
                     let inside_net_surface_thermal_radiation_heat_gain_rate =
                         surface_state.area_m2 * surface_state.inside_net_longwave_w_per_m2;
                     let inside_rate = surface_inside_conduction_rate_w(surface_state);
@@ -4650,7 +4751,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
                         inside_convection_heat_gain_rate_per_area;
                     sums.inside_convection_coefficient_w_per_m2_k +=
-                        surface_state.inside_convection_coefficient_w_per_m2_k;
+                        inside_convection_coefficient_w_per_m2_k;
                     sums.inside_net_surface_thermal_radiation_heat_gain_rate_w +=
                         inside_net_surface_thermal_radiation_heat_gain_rate;
                     sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
@@ -9993,6 +10094,7 @@ mod tests {
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_conduction_rate_w,
         surface_inside_convection_heat_gain_rate_per_area_w_per_m2,
+        surface_inside_convection_report_coefficient_w_per_m2_k,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
         surface_outside_conduction_rate_w, surface_steady_u_value_w_per_m2_k, surface_tilt_deg,
         update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
@@ -12548,9 +12650,26 @@ DATA PERIODS
             (surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
                 &state.surfaces[0],
                 &state.zones,
-                true
+                true,
+                false,
             ) + 4.0)
                 .abs()
+                < 1.0e-12
+        );
+        let final_coefficient = surface_inside_convection_report_coefficient_w_per_m2_k(
+            &state.surfaces[0],
+            &state.zones,
+            false,
+            true,
+        );
+        assert!(
+            (final_coefficient
+                - energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                    &state.surfaces[0],
+                    state.surfaces[0].inside_face_temperature_c,
+                    state.zones[0].mean_air_temperature_c,
+                ))
+            .abs()
                 < 1.0e-12
         );
 
@@ -13170,6 +13289,14 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
         );
         assert_eq!(
             options
