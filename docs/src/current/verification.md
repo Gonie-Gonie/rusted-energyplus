@@ -82,8 +82,9 @@ Heat-balance diagnostic and conformance report writers also emit a compact
 series-level deltas, including first/max delta samples on each bottleneck row,
 plus first reported sample bottlenecks for run-period handoff diagnosis, while
 also carrying Rust-only first-sample CTF component rows for inside/outside
-current-temperature and history-term isolation. The full summary preserves
-hourly sample rows for deeper inspection:
+current-temperature and history-term isolation plus oracle-inferred first-sample
+CTF history deltas when EIO zero coefficients and matching oracle series are
+available. The full summary preserves hourly sample rows for deeper inspection:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic

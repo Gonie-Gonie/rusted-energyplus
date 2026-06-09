@@ -165,7 +165,12 @@ outside-temperature, `10.100465 W` current inside-temperature, and
 history terms and inside/outside conduction cancellation at the first sample,
 so the remaining first-sample storage blocker is concentrated in mass-floor
 history/source handoff rather than in every surface's current-temperature
-terms. A
+terms. The new oracle-inferred history delta table makes that mismatch direct:
+using the oracle first-sample floor temperatures and conduction rates with the
+EIO zero CTF coefficients gives `-650.814857 W` inside history and
+`-471.682586 W` outside history, while Rust carries `1229.296987 W` and
+`1297.344600 W`, leaving `1880.111844 W` inside and `1769.027186 W` outside
+history-term deltas. A
 full ScriptF interior-longwave source is also not a promotion shortcut in the
 current shell: even a one-pass ScriptF lane diverges to multi-kW floor storage
 and roof inside-longwave errors, so ScriptF parity has to be paired with the

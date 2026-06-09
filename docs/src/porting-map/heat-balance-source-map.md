@@ -487,9 +487,13 @@ Current Rust boundary:
   component rows. In the active lane the mass floor's first sample is dominated
   by CTF history terms (`1229.296987 W` inside and `1297.344600 W` outside),
   while roof/wall no-mass rows have zero history terms and cancel inside/outside
-  conduction. That keeps the next EnergyPlus source-porting target on the
-  mass-floor warmup/run-period history and coupled source handoff. Full inside
-  iteration order, zone predictor/corrector equations, detailed
+  conduction. The companion oracle-inferred first-sample table derives
+  `-650.814857 W` inside and `-471.682586 W` outside floor history terms from
+  oracle temperatures/rates plus EIO zero CTF coefficients, yielding
+  `1880.111844 W` inside and `1769.027186 W` outside history deltas. That keeps
+  the next EnergyPlus source-porting target on the mass-floor
+  warmup/run-period history and coupled source handoff. Full inside iteration
+  order, zone predictor/corrector equations, detailed
   shadowing/reflection, and coupled radiation coefficient update order are not
   yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and

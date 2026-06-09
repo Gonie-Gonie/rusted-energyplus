@@ -359,6 +359,18 @@ $storageFromConduction = -([double]$floorCtfComponent.inside_conduction_rate_w +
 if ([Math]::Abs($storageFromConduction - [double]$floorCtfComponent.heat_storage_rate_w) -gt 1.0e-6) {
     throw "Expected FLOOR storage to match the negated inside/outside conduction sum"
 }
+if ($CtfSeedPolicy -eq "all-eio") {
+    $floorHistoryDelta = @($summary.ctf_history_first_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorHistoryDelta) {
+        throw "Expected ctf_history_first_sample_deltas to include ZN001:FLR001 in all-eio mode"
+    }
+    if ([double]$floorHistoryDelta.inside_history_delta_w -le 100.0) {
+        throw "Expected active FLOOR inside history delta to remain visible, got $($floorHistoryDelta.inside_history_delta_w)"
+    }
+    if ([double]$floorHistoryDelta.outside_history_delta_w -le 100.0) {
+        throw "Expected active FLOOR outside history delta to remain visible, got $($floorHistoryDelta.outside_history_delta_w)"
+    }
+}
 $expectedTopCandidates = @(
     @{
         Key = "ZN001:FLR001"
@@ -620,6 +632,8 @@ Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdo
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
+Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
+Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
