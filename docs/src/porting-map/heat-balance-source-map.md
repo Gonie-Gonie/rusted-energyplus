@@ -518,13 +518,18 @@ Current Rust boundary:
   by CTF history terms (`1229.296987 W` inside and `1297.344600 W` outside),
   while roof/wall no-mass rows have zero history terms and cancel inside/outside
   conduction. The companion oracle-inferred first-sample table derives
-  `-650.814857 W` inside and `-471.682586 W` outside floor history terms from
-  oracle temperatures/rates plus EIO zero CTF coefficients, yielding
-  `1880.111844 W` inside and `1769.027186 W` outside history deltas. That keeps
-  the next EnergyPlus source-porting target on the mass-floor
-  warmup/run-period history and coupled source handoff. The digest now also
-  emits Rust run-period initial CTF history slots captured after warmup and
-  before the first reported timestep. In the same active lane, the floor
+  `1546.858233 W` inside and `1136.823976 W` outside floor current zero-term
+  values plus `-650.814857 W` inside and `-471.682586 W` outside floor history
+  terms from oracle temperatures/rates and EIO zero CTF coefficients. Rust's
+  corresponding first-sample current terms are `-798.515769 W` inside and
+  `-980.325547 W` outside, so the current-term deltas
+  (`2345.374002`/`2117.149523 W`) are even larger than the history deltas
+  (`1880.111844`/`1769.027186 W`). That shifts the next EnergyPlus
+  source-porting target from history-vector contents alone to the combined
+  mass-floor face-temperature/current-term alignment and coupled
+  warmup/run-period source handoff. The digest now also emits Rust run-period
+  initial CTF history slots captured after warmup and before the first reported
+  timestep. In the same active lane, the floor
   run-period initial slot sum is already `1393.986801 W` inside and
   `1607.011644 W` outside before the first hour averages to `1229.296987 W`
   inside and `1297.344600 W` outside, so the current mismatch is present at the

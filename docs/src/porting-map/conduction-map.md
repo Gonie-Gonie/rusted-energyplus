@@ -144,7 +144,10 @@ longwave/convection and zone-air rows. A non-interleaved grey-longwave
 twenty-pass probe also reduces first-sample floor history deltas but regresses
 floor storage and outside conduction, so the best active direction remains
 interleaved surface/zone coupling with a narrower CTF history/source update
-fix. A
+fix. The expanded first-sample CTF delta table now shows that the active
+mass-floor current zero-term deltas are larger than the history deltas, so the
+next conduction target includes face-temperature/current-term alignment rather
+than history-vector contents alone. A
 source recheck of EnergyPlus 26.1.0 `UpdateThermalHistories` also rules out an
 outside-face report sign flip as the next correction: EnergyPlus computes
 current `Qout` into `SurfOutsideFluxHist(1)`, reports

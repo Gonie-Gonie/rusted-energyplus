@@ -660,6 +660,7 @@ Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Descri
 Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
 Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
+Assert-Contains -Text $reportText -Pattern "in_current_abs_delta_w" -Description "markdown CTF current delta column"
 Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"

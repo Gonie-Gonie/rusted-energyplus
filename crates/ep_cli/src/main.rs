@@ -3228,9 +3228,15 @@ struct HeatBalanceCtfHistoryFirstSampleDelta {
     key: String,
     construction_name: String,
     area_m2: f64,
+    oracle_inside_current_term_w: f64,
+    rust_inside_current_term_w: f64,
+    inside_current_delta_w: f64,
     oracle_inside_history_term_w: f64,
     rust_inside_history_term_w: f64,
     inside_history_delta_w: f64,
+    oracle_outside_current_term_w: f64,
+    rust_outside_current_term_w: f64,
+    outside_current_delta_w: f64,
     oracle_outside_history_term_w: f64,
     rust_outside_history_term_w: f64,
     outside_history_delta_w: f64,
@@ -3818,6 +3824,10 @@ fn heat_balance_ctf_history_first_sample_deltas(
             let oracle_outside_current_term_w = -area_m2
                 * (oracle_outside_temperature_c * zero.outside_w_per_m2_k
                     - oracle_inside_temperature_c * zero.cross_w_per_m2_k);
+            let rust_inside_current_term_w =
+                component.inside_current_outside_term_w + component.inside_current_inside_term_w;
+            let rust_outside_current_term_w =
+                component.outside_current_outside_term_w + component.outside_current_inside_term_w;
             let oracle_inside_history_term_w =
                 oracle_inside_conduction_rate_w - oracle_inside_current_term_w;
             let oracle_outside_history_term_w =
@@ -3827,10 +3837,19 @@ fn heat_balance_ctf_history_first_sample_deltas(
                 key: surface.name.0.clone(),
                 construction_name: construction.name.0.clone(),
                 area_m2,
+                oracle_inside_current_term_w,
+                rust_inside_current_term_w,
+                inside_current_delta_w: (oracle_inside_current_term_w - rust_inside_current_term_w)
+                    .abs(),
                 oracle_inside_history_term_w,
                 rust_inside_history_term_w: component.inside_history_term_w,
                 inside_history_delta_w: (oracle_inside_history_term_w
                     - component.inside_history_term_w)
+                    .abs(),
+                oracle_outside_current_term_w,
+                rust_outside_current_term_w,
+                outside_current_delta_w: (oracle_outside_current_term_w
+                    - rust_outside_current_term_w)
                     .abs(),
                 oracle_outside_history_term_w,
                 rust_outside_history_term_w: component.outside_history_term_w,
@@ -6295,9 +6314,15 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
                 "{{ \"key\": {}, ",
                 "\"construction_name\": {}, ",
                 "\"area_m2\": {}, ",
+                "\"oracle_inside_current_term_w\": {}, ",
+                "\"rust_inside_current_term_w\": {}, ",
+                "\"inside_current_delta_w\": {}, ",
                 "\"oracle_inside_history_term_w\": {}, ",
                 "\"rust_inside_history_term_w\": {}, ",
                 "\"inside_history_delta_w\": {}, ",
+                "\"oracle_outside_current_term_w\": {}, ",
+                "\"rust_outside_current_term_w\": {}, ",
+                "\"outside_current_delta_w\": {}, ",
                 "\"oracle_outside_history_term_w\": {}, ",
                 "\"rust_outside_history_term_w\": {}, ",
                 "\"outside_history_delta_w\": {} }}"
@@ -6305,9 +6330,15 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
             json_string(&row.key),
             json_string(&row.construction_name),
             json_number(row.area_m2),
+            json_number(row.oracle_inside_current_term_w),
+            json_number(row.rust_inside_current_term_w),
+            json_number(row.inside_current_delta_w),
             json_number(row.oracle_inside_history_term_w),
             json_number(row.rust_inside_history_term_w),
             json_number(row.inside_history_delta_w),
+            json_number(row.oracle_outside_current_term_w),
+            json_number(row.rust_outside_current_term_w),
+            json_number(row.outside_current_delta_w),
             json_number(row.oracle_outside_history_term_w),
             json_number(row.rust_outside_history_term_w),
             json_number(row.outside_history_delta_w)
@@ -6581,18 +6612,24 @@ fn heat_balance_report_ctf_history_first_sample_delta_rows(
     rows: &[HeatBalanceCtfHistoryFirstSampleDelta],
 ) {
     report.push_str(
-        "| key | construction | area_m2 | oracle_in_history_w | rust_in_history_w | in_history_abs_delta_w | oracle_out_history_w | rust_out_history_w | out_history_abs_delta_w |\n",
+        "| key | construction | area_m2 | oracle_in_current_w | rust_in_current_w | in_current_abs_delta_w | oracle_in_history_w | rust_in_history_w | in_history_abs_delta_w | oracle_out_current_w | rust_out_current_w | out_current_abs_delta_w | oracle_out_history_w | rust_out_history_w | out_history_abs_delta_w |\n",
     );
-    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|\n");
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             row.area_m2,
+            row.oracle_inside_current_term_w,
+            row.rust_inside_current_term_w,
+            row.inside_current_delta_w,
             row.oracle_inside_history_term_w,
             row.rust_inside_history_term_w,
             row.inside_history_delta_w,
+            row.oracle_outside_current_term_w,
+            row.rust_outside_current_term_w,
+            row.outside_current_delta_w,
             row.oracle_outside_history_term_w,
             row.rust_outside_history_term_w,
             row.outside_history_delta_w
@@ -7599,9 +7636,15 @@ mod tests {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
+                oracle_inside_current_term_w: 9.0,
+                rust_inside_current_term_w: 10.0,
+                inside_current_delta_w: 1.0,
                 oracle_inside_history_term_w: 1.0,
                 rust_inside_history_term_w: 0.0,
                 inside_history_delta_w: 1.0,
+                oracle_outside_current_term_w: -8.0,
+                rust_outside_current_term_w: -10.0,
+                outside_current_delta_w: 2.0,
                 oracle_outside_history_term_w: 2.0,
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 2.0,
@@ -7739,6 +7782,7 @@ mod tests {
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"inside_current_outside_term_w\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"inside_history_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
@@ -7759,6 +7803,7 @@ mod tests {
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"inside_current_outside_term_w\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
@@ -7784,7 +7829,9 @@ mod tests {
             report.contains("| FLOOR | -10.000000000000 | 30.000000000000 | -40.000000000000 |")
         );
         assert!(report.contains("## CTF History First-Sample Deltas"));
-        assert!(report.contains("| FLOOR | FLOOR | 100.000000000000 | 1.000000000000 |"));
+        assert!(report.contains(
+            "| FLOOR | FLOOR | 100.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
+        ));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
@@ -7861,9 +7908,15 @@ mod tests {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
+                oracle_inside_current_term_w: 6.0,
+                rust_inside_current_term_w: 7.0,
+                inside_current_delta_w: 1.0,
                 oracle_inside_history_term_w: 4.0,
                 rust_inside_history_term_w: 0.0,
                 inside_history_delta_w: 4.0,
+                oracle_outside_current_term_w: -6.0,
+                rust_outside_current_term_w: -8.0,
+                outside_current_delta_w: 2.0,
                 oracle_outside_history_term_w: 5.0,
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 5.0,
@@ -7970,6 +8023,7 @@ mod tests {
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
@@ -7981,6 +8035,7 @@ mod tests {
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
+        assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
