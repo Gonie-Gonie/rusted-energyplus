@@ -704,6 +704,13 @@ Current Rust boundary:
   only moves from `19.325833` to `19.473624`, so the next runtime promotion
   candidate should carry the inside-CTF-only outside snapshot and leave exterior
   report-state generation current.
+  Replacing that lane's grey direct-view-factor interior longwave exchange with
+  the current ScriptF implementation is rejected: floor storage RMSE jumps from
+  `45.539704` to `6293.390244`, floor inside conduction from `26.437580` to
+  `3666.401318`, floor outside conduction from `19.262430` to `2659.919883`,
+  and floor inside net longwave from `24.877762` to `3613.270767`. This keeps
+  ScriptF as a source-porting target, but not as a drop-in improvement until the
+  surrounding EnergyPlus coupled radiation coefficient/update order is mapped.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
