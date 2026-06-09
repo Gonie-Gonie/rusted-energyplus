@@ -668,6 +668,15 @@ Current Rust boundary:
   next promotion path; the remaining floor CTF error needs the broader
   EnergyPlus inside/outside/air-balance iteration cadence, not just a final
   history-slot assignment.
+  A narrower converged-lane follow-up that preserved reported outside-face
+  state but committed adiabatic CTF history temperature/flux from the current
+  inside face also regresses, so the rejection is not just a report-state side
+  effect: floor storage RMSE rises from `52.022146` to `500.413170`, floor
+  outside conduction from `21.976058` to `456.564008`, and the annual floor
+  current/history RMSEs jump from about `401 W` to roughly `3800 W` to
+  `3909 W`.
+  This rules out a history-only current-inside adiabatic commit as the next
+  floor-storage lever.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
