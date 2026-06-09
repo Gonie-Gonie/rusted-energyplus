@@ -86,6 +86,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
 - `Construction.cc::ConstructionProps::calculateTransferFunction` consumes the
   material layer physical properties, handles all-resistive, reversed, and
   state-space paths, and emits the EIO `Construction CTF` rows.
+- In those EIO rows, `#CTFs` is EnergyPlus `NumCTFTerms`, the number of
+  transfer-function coefficient terms. It is not the per-surface history
+  cadence; cadence is governed by the construction `CTFTimeStep` relative to
+  `TimeStepZone` and EnergyPlus `NumHistories`. The official 1Zone FLOOR row
+  reports `#CTFs=5` and `Time Step {hours}=0.250`, which matches the 15-minute
+  zone timestep and therefore does not by itself imply a multi-zone-timestep
+  master-history interpolation path.
 - `HeatBalanceSurfaceManager.cc` builds `SurfCTFConstInPart` and
   `SurfCTFConstOutPart` from temperature and flux histories before calculating
   current inside/outside conduction fluxes and face temperatures.
@@ -411,6 +418,10 @@ Current Rust boundary:
   `outside_layer` remains the outside-face compatibility field.
 - `ep_compare` reads EIO `CTF` coefficient rows and associates them with the
   preceding `Construction CTF` row for coefficient-level oracle checks.
+- The diagnostic CTF seed report preserves each EIO construction's `#CTFs` and
+  `Time Step {hours}` metadata so future runtime work can distinguish
+  coefficient-term depth from actual history cadence before changing surface
+  history advancement.
 - `ep_model` and `ep_compiler` preserve material surface roughness names using
   EnergyPlus roughness categories so future DOE-2/TARP exterior convection
   ports can use the selected outside layer metadata directly.

@@ -261,9 +261,22 @@ if ($summary.surface_iteration_count -ne $SurfaceIterations) {
 if ($summary.ctf_initial_history_policy -ne $CtfInitialHistoryPolicy) {
     throw "Expected ctf_initial_history_policy $CtfInitialHistoryPolicy, got $($summary.ctf_initial_history_policy)"
 }
+$floorCtfSummary = $summary.ctf_seed.construction_summaries | Where-Object { $_.construction_name -eq "FLOOR" } | Select-Object -First 1
+if ($null -eq $floorCtfSummary) {
+    throw "Expected CTF construction summaries to include FLOOR"
+}
+if ($floorCtfSummary.ctf_count -ne 5) {
+    throw "Expected FLOOR #CTFs=5 in CTF construction summaries, got $($floorCtfSummary.ctf_count)"
+}
+if ([Math]::Abs([double]$floorCtfSummary.timestep_hours - 0.25) -gt 1.0e-9) {
+    throw "Expected FLOOR CTF timestep 0.25h, got $($floorCtfSummary.timestep_hours)"
+}
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     if (-not ($summary.ctf_seed.skipped_constructions | Where-Object { $_.construction_name -eq "FLOOR" -and $_.ctf_count -eq 5 })) {
         throw "Expected steady/no-mass policy to skip FLOOR #CTFs=5"
+    }
+    if ($floorCtfSummary.included) {
+        throw "Expected steady/no-mass policy to mark FLOOR CTF summary as skipped"
     }
 }
 else {
@@ -272,6 +285,9 @@ else {
     }
     if ($summary.ctf_seed.skipped_constructions.Count -ne 0) {
         throw "Expected all-eio policy to skip no constructions"
+    }
+    if (-not $floorCtfSummary.included) {
+        throw "Expected all-eio policy to mark FLOOR CTF summary as included"
     }
 }
 if ($summary.series_count -ne 99) {
@@ -532,10 +548,12 @@ Assert-Contains -Text $reportText -Pattern "surface_iteration_count: $SurfaceIte
 Assert-Contains -Text $reportText -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "markdown CTF initial history policy metadata"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
+    Assert-Contains -Text $reportText -Pattern "FLOOR (#CTFs=5) @ dt=0.250h [skipped]" -Description "markdown skipped mass CTF summary"
 }
 else {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_included_constructions: FLOOR, R13WALL, ROOF31" -Description "markdown all-eio included mass CTF construction"
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: none" -Description "markdown all-eio skipped construction list"
+    Assert-Contains -Text $reportText -Pattern "FLOOR (#CTFs=5) @ dt=0.250h [included]" -Description "markdown all-eio mass CTF summary"
 }
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
