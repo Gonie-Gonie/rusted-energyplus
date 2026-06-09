@@ -128,6 +128,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `2345.374002 W` inside-current and `2117.149523 W` outside-current CTF term
   deltas. The next floor work should therefore target adiabatic face
   temperature/source handoff as well as the history vector itself.
+- An interleaved ScriptF longwave probe was added and rejected as an active
+  candidate. With the same all-CTF, previous-inside quick-outside, twenty-pass
+  interleaved coupling, replacing the grey direct-view-factor longwave exchange
+  with the current Rust ScriptF helper raises the top RMSE from
+  `108.672323` to `50142.610234`, led by `ZN001:ROOF001` inside net surface
+  thermal radiation; `ZN001:FLR001` heat-storage RMSE rises to `6586.821302`.
+  ScriptF therefore needs source-level EnergyPlus normalization/iteration
+  parity work before it can replace the grey longwave active lane.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
