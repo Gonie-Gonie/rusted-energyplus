@@ -53,6 +53,7 @@ use std::path::{Path, PathBuf};
 use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
+const HEAT_BALANCE_MAX_SAMPLE_CONTEXT_LIMIT: usize = 8;
 const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
 const HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY";
@@ -3190,6 +3191,23 @@ struct HeatBalanceSeriesDiagnostic {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceMaxSampleContext {
+    trigger_rank: usize,
+    trigger_output: ZoneTemperatureReportOutput,
+    sample_index: usize,
+    rows: Vec<HeatBalanceMaxSampleContextRow>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceMaxSampleContextRow {
+    output: ZoneTemperatureReportOutput,
+    oracle_c: f64,
+    rust_c: f64,
+    abs_delta_c: f64,
+    series_rmse_delta_c: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 struct HeatBalanceConformanceDiagnostic {
     samples: usize,
     heat_balance_timesteps: usize,
@@ -6053,6 +6071,10 @@ fn render_heat_balance_conformance_json(
         heat_balance_bottlenecks_json(&diagnostic.series)
     ));
     json.push_str(&format!(
+        "  \"max_sample_contexts\": {},\n",
+        heat_balance_max_sample_contexts_json(&diagnostic.series)
+    ));
+    json.push_str(&format!(
         "  \"first_sample_bottlenecks\": {},\n",
         heat_balance_first_sample_bottlenecks_json(&diagnostic.series)
     ));
@@ -6252,6 +6274,10 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## Bottlenecks\n\n");
     heat_balance_report_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Max-Sample Contexts\n\n");
+    heat_balance_report_max_sample_context_rows(&mut report, &diagnostic.series);
     report.push('\n');
 
     report.push_str("## First-Sample Bottlenecks\n\n");
@@ -6552,6 +6578,71 @@ fn heat_balance_bottleneck_rows(
     rows
 }
 
+fn heat_balance_max_sample_contexts(
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<HeatBalanceMaxSampleContext> {
+    let mut seen_sample_indices = BTreeSet::new();
+    heat_balance_bottleneck_rows(series)
+        .into_iter()
+        .enumerate()
+        .filter_map(|(rank_index, bottleneck)| {
+            let sample_index = bottleneck.delta.max_delta_sample?.index;
+            if !seen_sample_indices.insert(sample_index) {
+                return None;
+            }
+            let mut rows = series
+                .iter()
+                .filter_map(|row| {
+                    heat_balance_sample_point(row, sample_index).map(|point| {
+                        HeatBalanceMaxSampleContextRow {
+                            output: row.output.clone(),
+                            oracle_c: point.oracle_c,
+                            rust_c: point.rust_c,
+                            abs_delta_c: point.abs_delta_c,
+                            series_rmse_delta_c: row.delta.rmse_delta_c,
+                        }
+                    })
+                })
+                .collect::<Vec<_>>();
+            rows.sort_by(|left, right| {
+                right
+                    .abs_delta_c
+                    .total_cmp(&left.abs_delta_c)
+                    .then_with(|| {
+                        right
+                            .series_rmse_delta_c
+                            .total_cmp(&left.series_rmse_delta_c)
+                    })
+                    .then_with(|| left.output.key.cmp(&right.output.key))
+                    .then_with(|| left.output.variable.cmp(&right.output.variable))
+            });
+            rows.truncate(HEAT_BALANCE_MAX_SAMPLE_CONTEXT_LIMIT);
+            Some(HeatBalanceMaxSampleContext {
+                trigger_rank: rank_index + 1,
+                trigger_output: bottleneck.output.clone(),
+                sample_index,
+                rows,
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_sample_point(
+    row: &HeatBalanceSeriesDiagnostic,
+    sample_index: usize,
+) -> Option<DeltaPoint> {
+    row.sample_rows
+        .get(sample_index)
+        .copied()
+        .filter(|point| point.index == sample_index)
+        .or_else(|| {
+            row.sample_rows
+                .iter()
+                .copied()
+                .find(|point| point.index == sample_index)
+        })
+}
+
 fn heat_balance_first_sample_bottleneck_rows(
     series: &[HeatBalanceSeriesDiagnostic],
 ) -> Vec<&HeatBalanceSeriesDiagnostic> {
@@ -6611,6 +6702,55 @@ fn heat_balance_bottleneck_rows_json(rows: &[&HeatBalanceSeriesDiagnostic]) -> S
 
 fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
     heat_balance_bottleneck_rows_json(&heat_balance_bottleneck_rows(series))
+}
+
+fn heat_balance_max_sample_contexts_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    let contexts = heat_balance_max_sample_contexts(series);
+    let mut json = String::from("[");
+    for (index, context) in contexts.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"trigger_rank\": {}, ",
+                "\"trigger_output\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"rows\": {} }}"
+            ),
+            context.trigger_rank,
+            zone_temperature_output_json(&context.trigger_output),
+            context.sample_index,
+            heat_balance_max_sample_context_rows_json(&context.rows)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_max_sample_context_rows_json(rows: &[HeatBalanceMaxSampleContextRow]) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"output\": {}, ",
+                "\"oracle_c\": {}, ",
+                "\"rust_c\": {}, ",
+                "\"abs_delta_c\": {}, ",
+                "\"series_rmse_delta_c\": {} }}"
+            ),
+            zone_temperature_output_json(&row.output),
+            json_number(row.oracle_c),
+            json_number(row.rust_c),
+            json_number(row.abs_delta_c),
+            json_number(row.series_rmse_delta_c)
+        ));
+    }
+    json.push(']');
+    json
 }
 
 fn heat_balance_first_sample_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
@@ -7029,6 +7169,46 @@ fn heat_balance_report_bottleneck_rows(
             row.delta.rmse_delta_c,
             row.status
         ));
+    }
+}
+
+fn heat_balance_report_max_sample_context_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| trigger_rank | sample_index | trigger | key | variable | class | oracle_c | rust_c | abs_delta_c | series_rmse_delta_c |\n",
+    );
+    report.push_str("|---:|---:|---|---|---|---|---:|---:|---:|---:|\n");
+    for context in heat_balance_max_sample_contexts(series) {
+        let trigger = format!(
+            "{}/{}",
+            context.trigger_output.key, context.trigger_output.variable
+        );
+        if context.rows.is_empty() {
+            report.push_str(&format!(
+                "| {} | {} | {} | n/a | n/a | n/a | n/a | n/a | n/a | n/a |\n",
+                context.trigger_rank,
+                context.sample_index,
+                markdown_cell(&trigger)
+            ));
+            continue;
+        }
+        for row in context.rows {
+            report.push_str(&format!(
+                "| {} | {} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+                context.trigger_rank,
+                context.sample_index,
+                markdown_cell(&trigger),
+                markdown_cell(&row.output.key),
+                markdown_cell(&row.output.variable),
+                row.output.class,
+                row.oracle_c,
+                row.rust_c,
+                row.abs_delta_c,
+                row.series_rmse_delta_c
+            ));
+        }
     }
 }
 
@@ -8547,6 +8727,9 @@ mod tests {
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"first_delta_sample\""));
         assert!(json.contains("\"max_delta_sample\""));
+        assert!(json.contains("\"max_sample_contexts\""));
+        assert!(json.contains("\"trigger_rank\": 1"));
+        assert!(json.contains("\"sample_index\": 0"));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
@@ -8574,6 +8757,8 @@ mod tests {
         assert!(digest.contains("\"inside_total_term_w\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
+        assert!(digest.contains("\"max_sample_contexts\""));
+        assert!(digest.contains("\"trigger_output\""));
         assert!(digest.contains("\"compare_summary_json\": \"compare-summary.json\""));
         assert!(digest.contains("\"compare_digest_json\": \"compare-digest.json\""));
         assert!(!digest.contains("\"sample_rows\""));
@@ -8588,6 +8773,7 @@ mod tests {
         assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
         assert!(report.contains("## Bottlenecks"));
+        assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(
@@ -8834,10 +9020,13 @@ mod tests {
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
         assert!(json.contains("\"max_delta_sample\""));
+        assert!(json.contains("\"max_sample_contexts\""));
+        assert!(json.contains("\"trigger_output\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"max_sample_contexts\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
@@ -8868,6 +9057,7 @@ mod tests {
             report.contains("ctf_seed_construction_summaries: R13WALL (#CTFs=1) @ dt=0.250h [included], FLOOR (#CTFs=5) @ dt=0.250h [skipped]")
         );
         assert!(report.contains("## Bottlenecks"));
+        assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(report.contains("## CTF History First-Sample Deltas"));

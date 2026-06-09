@@ -355,6 +355,16 @@ if ($null -eq $topBottleneck.first_delta_sample) {
 if ($null -eq $topBottleneck.max_delta_sample) {
     throw "Expected top bottleneck to include a max_delta_sample fingerprint"
 }
+$topMaxSampleContext = @($summary.max_sample_contexts)[0]
+if ($null -eq $topMaxSampleContext) {
+    throw "Expected at least one max-sample context row in heat-balance diagnostic summary"
+}
+if ($topMaxSampleContext.sample_index -ne $topBottleneck.max_delta_sample.index) {
+    throw "Expected first max-sample context to use top bottleneck sample index $($topBottleneck.max_delta_sample.index), got $($topMaxSampleContext.sample_index)"
+}
+if (@($topMaxSampleContext.rows).Count -lt 1) {
+    throw "Expected first max-sample context to include related output rows"
+}
 $topFirstSampleBottleneck = @($summary.first_sample_bottlenecks)[0]
 if ($null -eq $topFirstSampleBottleneck) {
     throw "Expected at least one first-sample bottleneck row in heat-balance diagnostic summary"
@@ -706,6 +716,8 @@ else {
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
+Assert-Contains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "markdown max-sample context section"
+Assert-Contains -Text $reportText -Pattern "trigger_rank" -Description "markdown max-sample context trigger column"
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
 Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
