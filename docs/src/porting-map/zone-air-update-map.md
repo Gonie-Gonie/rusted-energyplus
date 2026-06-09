@@ -76,3 +76,11 @@ stays at `29.623453 W`. This points the remaining latent zone-air work at
 surface convection source-order/coefficient timing, while proper zone
 `airHumRat` ownership remains required before promoting the moist-air capacity
 formula into the active solver.
+
+A previous-MAT surface-convection report probe was added to test whether the
+remaining zone surface-convection row was using `ZTM[0]` rather than corrected
+MAT as the reference air temperature. It is a rejected path: the MAT/floor/air
+storage rows are unchanged, but `Zone Air Heat Balance Surface Convection Rate`
+RMSE rises from `29.623453 W` to `104.589141 W`. Keep the next work on
+`SurfTempInTmp`/hconv/source-order parity instead of changing the report
+reference to previous MAT.

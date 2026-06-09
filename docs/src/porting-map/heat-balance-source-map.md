@@ -217,6 +217,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   surface-convection row is unchanged at `29.623453 W`, so the air-storage
   regression is mostly report-capacity/humidity ownership while the surface
   convection regression is still source-order/coefficient timing.
+- A previous-MAT surface-convection report sibling of that weather-storage lane
+  was added as a report-order rejection probe. It keeps MAT, floor rows, and
+  weather-proxy air storage unchanged (`0.069817 C`, `54.593582 W`, and
+  `5.845285 W` RMSE for MAT/floor storage/air storage), but worsens `Zone Air
+  Heat Balance Surface Convection Rate` RMSE from `29.623453 W` to
+  `104.589141 W`. EnergyPlus `CalcZoneComponentLoadSums` reports
+  `SurfHConvInt * Area * (SurfTempInTmp - RefAirTemp)` after the corrected
+  zone-air state, so the remaining surface-convection mismatch is not solved by
+  using `ZTM[0]` as the report reference temperature.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
@@ -593,7 +602,10 @@ Current Rust boundary:
   weather-proxy moist-air storage fork keeps the frozen third-order MAT/floor
   rows unchanged while lowering air-storage RMSE to `5.845285`; the surface
   convection row stays at `29.623453`, keeping source-order/coefficient timing
-  as the next zone-air target. Rechecking the active
+  as the next zone-air target. A previous-MAT surface-convection report sibling
+  rejects the report-reference-temperature hypothesis: MAT/floor/storage rows
+  are unchanged, but the zone surface-convection RMSE rises to `104.589141`.
+  Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
   floor RMSE rows and identical first-sample floor history deltas
