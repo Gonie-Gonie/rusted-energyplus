@@ -3227,6 +3227,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_storage_max_sample_deltas: Vec<HeatBalanceCtfStorageMaxSampleDelta>,
     inside_balance_max_sample_deltas: Vec<HeatBalanceInsideBalanceMaxSampleDelta>,
     inside_solve_max_sample_deltas: Vec<HeatBalanceInsideSolveMaxSampleDelta>,
+    adiabatic_history_max_sample_deltas: Vec<HeatBalanceAdiabaticHistoryMaxSampleDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
@@ -3377,6 +3378,39 @@ struct HeatBalanceInsideSolveMaxSampleDelta {
     oracle_inside_net_longwave_w: f64,
     rust_inside_net_longwave_w: f64,
     inside_net_longwave_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceAdiabaticHistoryMaxSampleDelta {
+    key: String,
+    construction_name: String,
+    sample_index: usize,
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    ctf_cross_0_w_per_m2_k: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_delta_c: f64,
+    oracle_outside_face_temperature_c: f64,
+    rust_outside_face_temperature_c: f64,
+    outside_face_temperature_delta_c: f64,
+    oracle_outside_minus_inside_c: f64,
+    rust_outside_minus_inside_c: f64,
+    outside_minus_inside_delta_c: f64,
+    oracle_inside_current_term_w: f64,
+    rust_inside_current_term_w: f64,
+    inside_current_delta_w: f64,
+    oracle_inside_current_if_outside_synced_w: f64,
+    rust_inside_current_if_outside_synced_w: f64,
+    inside_current_if_outside_synced_delta_w: f64,
+    oracle_inside_current_sync_shift_w: f64,
+    rust_inside_current_sync_shift_w: f64,
+    oracle_inside_history_term_w: f64,
+    rust_inside_history_term_w: f64,
+    inside_history_delta_w: f64,
+    oracle_inside_history_if_outside_synced_w: f64,
+    rust_inside_history_if_outside_synced_w: f64,
+    inside_history_if_outside_synced_delta_w: f64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3817,6 +3851,12 @@ fn build_heat_balance_conformance_diagnostic(
         &ctf_coefficients,
         &simulation.results,
     );
+    let adiabatic_history_max_sample_deltas = heat_balance_adiabatic_history_max_sample_deltas(
+        &simulation_model,
+        &series,
+        &ctf_coefficients,
+        &simulation.results,
+    );
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
@@ -3836,6 +3876,7 @@ fn build_heat_balance_conformance_diagnostic(
         ctf_storage_max_sample_deltas,
         inside_balance_max_sample_deltas,
         inside_solve_max_sample_deltas,
+        adiabatic_history_max_sample_deltas,
         ctf_history_run_period_initial_slots: simulation
             .summary
             .run_period_initial_ctf_history_slots,
@@ -4599,6 +4640,143 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 oracle_inside_net_longwave_w: inside_net_longwave.oracle_c,
                 rust_inside_net_longwave_w: inside_net_longwave.rust_c,
                 inside_net_longwave_delta_w: inside_net_longwave.abs_delta_c,
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_adiabatic_history_max_sample_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    results: &ResultStore,
+) -> Vec<HeatBalanceAdiabaticHistoryMaxSampleDelta> {
+    model
+        .typed
+        .surfaces
+        .iter()
+        .filter(|surface| surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic)
+        .filter_map(|surface| {
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            let zero = ctf_coefficients.iter().find(|coefficient| {
+                coefficient.time_index == 0
+                    && coefficient
+                        .construction_name
+                        .eq_ignore_ascii_case(&construction.name.0)
+            })?;
+            let storage_series =
+                heat_balance_series(series, &surface.name.0, "Surface Heat Storage Rate")?;
+            let storage_point = storage_series.delta.max_delta_sample?;
+            let sample_index = storage_point.index;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+
+            let inside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+                sample_index,
+            )?;
+            let outside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Outside Face Temperature",
+                sample_index,
+            )?;
+            let inside_conduction = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Conduction Heat Transfer Rate",
+                sample_index,
+            )?;
+            let rust_inside_current_outside = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+            let rust_inside_current_inside = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+            let rust_inside_history = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+
+            let oracle_inside_current_term_w = area_m2
+                * (outside_temperature.oracle_c * zero.cross_w_per_m2_k
+                    - inside_temperature.oracle_c * zero.inside_w_per_m2_k);
+            let rust_inside_current_term_w =
+                rust_inside_current_outside + rust_inside_current_inside;
+            let oracle_inside_current_if_outside_synced_w = area_m2
+                * (inside_temperature.oracle_c * zero.cross_w_per_m2_k
+                    - inside_temperature.oracle_c * zero.inside_w_per_m2_k);
+            let rust_inside_current_if_outside_synced_w = area_m2
+                * (inside_temperature.rust_c * zero.cross_w_per_m2_k
+                    - inside_temperature.rust_c * zero.inside_w_per_m2_k);
+            let oracle_inside_history_term_w =
+                inside_conduction.oracle_c - oracle_inside_current_term_w;
+            let oracle_inside_history_if_outside_synced_w =
+                inside_conduction.oracle_c - oracle_inside_current_if_outside_synced_w;
+            let rust_inside_history_if_outside_synced_w =
+                inside_conduction.rust_c - rust_inside_current_if_outside_synced_w;
+            let oracle_outside_minus_inside_c =
+                outside_temperature.oracle_c - inside_temperature.oracle_c;
+            let rust_outside_minus_inside_c =
+                outside_temperature.rust_c - inside_temperature.rust_c;
+
+            Some(HeatBalanceAdiabaticHistoryMaxSampleDelta {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                sample_index,
+                area_m2,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                ctf_cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+                oracle_inside_face_temperature_c: inside_temperature.oracle_c,
+                rust_inside_face_temperature_c: inside_temperature.rust_c,
+                inside_face_temperature_delta_c: inside_temperature.abs_delta_c,
+                oracle_outside_face_temperature_c: outside_temperature.oracle_c,
+                rust_outside_face_temperature_c: outside_temperature.rust_c,
+                outside_face_temperature_delta_c: outside_temperature.abs_delta_c,
+                oracle_outside_minus_inside_c,
+                rust_outside_minus_inside_c,
+                outside_minus_inside_delta_c: (oracle_outside_minus_inside_c
+                    - rust_outside_minus_inside_c)
+                    .abs(),
+                oracle_inside_current_term_w,
+                rust_inside_current_term_w,
+                inside_current_delta_w: (oracle_inside_current_term_w - rust_inside_current_term_w)
+                    .abs(),
+                oracle_inside_current_if_outside_synced_w,
+                rust_inside_current_if_outside_synced_w,
+                inside_current_if_outside_synced_delta_w:
+                    (oracle_inside_current_if_outside_synced_w
+                        - rust_inside_current_if_outside_synced_w)
+                        .abs(),
+                oracle_inside_current_sync_shift_w: oracle_inside_current_if_outside_synced_w
+                    - oracle_inside_current_term_w,
+                rust_inside_current_sync_shift_w: rust_inside_current_if_outside_synced_w
+                    - rust_inside_current_term_w,
+                oracle_inside_history_term_w,
+                rust_inside_history_term_w: rust_inside_history,
+                inside_history_delta_w: (oracle_inside_history_term_w - rust_inside_history).abs(),
+                oracle_inside_history_if_outside_synced_w,
+                rust_inside_history_if_outside_synced_w,
+                inside_history_if_outside_synced_delta_w:
+                    (oracle_inside_history_if_outside_synced_w
+                        - rust_inside_history_if_outside_synced_w)
+                        .abs(),
             })
         })
         .collect()
@@ -6713,6 +6891,12 @@ fn render_heat_balance_conformance_json(
         )
     ));
     json.push_str(&format!(
+        "  \"adiabatic_history_max_sample_deltas\": {},\n",
+        heat_balance_adiabatic_history_max_sample_deltas_json(
+            &diagnostic.adiabatic_history_max_sample_deltas
+        )
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_run_period_initial_slots\": {},\n",
         heat_balance_ctf_history_slots_json(&diagnostic.ctf_history_run_period_initial_slots)
     ));
@@ -6946,6 +7130,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_inside_solve_max_sample_delta_rows(
         &mut report,
         &diagnostic.inside_solve_max_sample_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Adiabatic History Max-Sample Deltas\n\n");
+    heat_balance_report_adiabatic_history_max_sample_delta_rows(
+        &mut report,
+        &diagnostic.adiabatic_history_max_sample_deltas,
     );
     report.push('\n');
 
@@ -7812,6 +8003,81 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
     json
 }
 
+fn heat_balance_adiabatic_history_max_sample_deltas_json(
+    rows: &[HeatBalanceAdiabaticHistoryMaxSampleDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                "\"ctf_cross_0_w_per_m2_k\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
+                "\"oracle_outside_face_temperature_c\": {}, ",
+                "\"rust_outside_face_temperature_c\": {}, ",
+                "\"outside_face_temperature_delta_c\": {}, ",
+                "\"oracle_outside_minus_inside_c\": {}, ",
+                "\"rust_outside_minus_inside_c\": {}, ",
+                "\"outside_minus_inside_delta_c\": {}, ",
+                "\"oracle_inside_current_term_w\": {}, ",
+                "\"rust_inside_current_term_w\": {}, ",
+                "\"inside_current_delta_w\": {}, ",
+                "\"oracle_inside_current_if_outside_synced_w\": {}, ",
+                "\"rust_inside_current_if_outside_synced_w\": {}, ",
+                "\"inside_current_if_outside_synced_delta_w\": {}, ",
+                "\"oracle_inside_current_sync_shift_w\": {}, ",
+                "\"rust_inside_current_sync_shift_w\": {}, ",
+                "\"oracle_inside_history_term_w\": {}, ",
+                "\"rust_inside_history_term_w\": {}, ",
+                "\"inside_history_delta_w\": {}, ",
+                "\"oracle_inside_history_if_outside_synced_w\": {}, ",
+                "\"rust_inside_history_if_outside_synced_w\": {}, ",
+                "\"inside_history_if_outside_synced_delta_w\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.construction_name),
+            row.sample_index,
+            json_number(row.area_m2),
+            json_number(row.ctf_inside_0_w_per_m2_k),
+            json_number(row.ctf_cross_0_w_per_m2_k),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_delta_c),
+            json_number(row.oracle_outside_face_temperature_c),
+            json_number(row.rust_outside_face_temperature_c),
+            json_number(row.outside_face_temperature_delta_c),
+            json_number(row.oracle_outside_minus_inside_c),
+            json_number(row.rust_outside_minus_inside_c),
+            json_number(row.outside_minus_inside_delta_c),
+            json_number(row.oracle_inside_current_term_w),
+            json_number(row.rust_inside_current_term_w),
+            json_number(row.inside_current_delta_w),
+            json_number(row.oracle_inside_current_if_outside_synced_w),
+            json_number(row.rust_inside_current_if_outside_synced_w),
+            json_number(row.inside_current_if_outside_synced_delta_w),
+            json_number(row.oracle_inside_current_sync_shift_w),
+            json_number(row.rust_inside_current_sync_shift_w),
+            json_number(row.oracle_inside_history_term_w),
+            json_number(row.rust_inside_history_term_w),
+            json_number(row.inside_history_delta_w),
+            json_number(row.oracle_inside_history_if_outside_synced_w),
+            json_number(row.rust_inside_history_if_outside_synced_w),
+            json_number(row.inside_history_if_outside_synced_delta_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_history_slots_json(rows: &[HeatBalanceCtfHistorySlotSample]) -> String {
     let mut json = String::from("[");
     for (index, row) in rows.iter().enumerate() {
@@ -8315,6 +8581,35 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
             row.rust_solve_denominator_w_per_m2_k,
             row.oracle_inferred_reference_air_temperature_c,
             row.rust_inferred_reference_air_temperature_c
+        ));
+    }
+}
+
+fn heat_balance_report_adiabatic_history_max_sample_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceAdiabaticHistoryMaxSampleDelta],
+) {
+    report.push_str(
+        "| key | construction | sample_index | out_minus_in_delta_c | oracle_out_minus_in_c | rust_out_minus_in_c | in_current_delta_w | in_current_synced_delta_w | oracle_current_sync_shift_w | rust_current_sync_shift_w | in_history_delta_w | in_history_synced_delta_w | in_temp_delta_c | out_temp_delta_c |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            row.sample_index,
+            row.outside_minus_inside_delta_c,
+            row.oracle_outside_minus_inside_c,
+            row.rust_outside_minus_inside_c,
+            row.inside_current_delta_w,
+            row.inside_current_if_outside_synced_delta_w,
+            row.oracle_inside_current_sync_shift_w,
+            row.rust_inside_current_sync_shift_w,
+            row.inside_history_delta_w,
+            row.inside_history_if_outside_synced_delta_w,
+            row.inside_face_temperature_delta_c,
+            row.outside_face_temperature_delta_c
         ));
     }
 }
@@ -9599,6 +9894,39 @@ mod tests {
                 rust_inside_net_longwave_w: -10.0,
                 inside_net_longwave_delta_w: 2.0,
             }],
+            adiabatic_history_max_sample_deltas: vec![
+                super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
+                    key: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    sample_index: 1,
+                    area_m2: 100.0,
+                    ctf_inside_0_w_per_m2_k: 4.0,
+                    ctf_cross_0_w_per_m2_k: 1.0,
+                    oracle_inside_face_temperature_c: 16.0,
+                    rust_inside_face_temperature_c: 17.0,
+                    inside_face_temperature_delta_c: 1.0,
+                    oracle_outside_face_temperature_c: 15.0,
+                    rust_outside_face_temperature_c: 14.0,
+                    outside_face_temperature_delta_c: 1.0,
+                    oracle_outside_minus_inside_c: -1.0,
+                    rust_outside_minus_inside_c: -3.0,
+                    outside_minus_inside_delta_c: 2.0,
+                    oracle_inside_current_term_w: -4900.0,
+                    rust_inside_current_term_w: -5400.0,
+                    inside_current_delta_w: 500.0,
+                    oracle_inside_current_if_outside_synced_w: -4800.0,
+                    rust_inside_current_if_outside_synced_w: -5100.0,
+                    inside_current_if_outside_synced_delta_w: 300.0,
+                    oracle_inside_current_sync_shift_w: 100.0,
+                    rust_inside_current_sync_shift_w: 300.0,
+                    oracle_inside_history_term_w: 4920.0,
+                    rust_inside_history_term_w: 5418.0,
+                    inside_history_delta_w: 498.0,
+                    oracle_inside_history_if_outside_synced_w: 4820.0,
+                    rust_inside_history_if_outside_synced_w: 5118.0,
+                    inside_history_if_outside_synced_delta_w: 298.0,
+                },
+            ],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -9762,6 +10090,8 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
+        assert!(json.contains("\"outside_minus_inside_delta_c\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"inside_total_term_w\""));
@@ -9799,6 +10129,8 @@ mod tests {
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
         assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
         assert!(digest.contains("\"inside_face_temperature_delta_c\""));
+        assert!(digest.contains("\"adiabatic_history_max_sample_deltas\""));
+        assert!(digest.contains("\"inside_current_if_outside_synced_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"inside_total_term_w\""));
@@ -9838,6 +10170,8 @@ mod tests {
         assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Inside Solve Max-Sample Deltas"));
         assert!(report.contains("implied_numerator_delta_w"));
+        assert!(report.contains("## Adiabatic History Max-Sample Deltas"));
+        assert!(report.contains("out_minus_in_delta_c"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
@@ -10031,6 +10365,39 @@ mod tests {
                 rust_inside_net_longwave_w: -2.0,
                 inside_net_longwave_delta_w: 1.0,
             }],
+            adiabatic_history_max_sample_deltas: vec![
+                super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
+                    key: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    sample_index: 1,
+                    area_m2: 100.0,
+                    ctf_inside_0_w_per_m2_k: 4.0,
+                    ctf_cross_0_w_per_m2_k: 1.0,
+                    oracle_inside_face_temperature_c: 16.0,
+                    rust_inside_face_temperature_c: 17.0,
+                    inside_face_temperature_delta_c: 1.0,
+                    oracle_outside_face_temperature_c: 15.0,
+                    rust_outside_face_temperature_c: 14.0,
+                    outside_face_temperature_delta_c: 1.0,
+                    oracle_outside_minus_inside_c: -1.0,
+                    rust_outside_minus_inside_c: -3.0,
+                    outside_minus_inside_delta_c: 2.0,
+                    oracle_inside_current_term_w: -4900.0,
+                    rust_inside_current_term_w: -5400.0,
+                    inside_current_delta_w: 500.0,
+                    oracle_inside_current_if_outside_synced_w: -4800.0,
+                    rust_inside_current_if_outside_synced_w: -5100.0,
+                    inside_current_if_outside_synced_delta_w: 300.0,
+                    oracle_inside_current_sync_shift_w: 100.0,
+                    rust_inside_current_sync_shift_w: 300.0,
+                    oracle_inside_history_term_w: 4912.0,
+                    rust_inside_history_term_w: 5410.0,
+                    inside_history_delta_w: 498.0,
+                    oracle_inside_history_if_outside_synced_w: 4812.0,
+                    rust_inside_history_if_outside_synced_w: 5110.0,
+                    inside_history_if_outside_synced_delta_w: 298.0,
+                },
+            ],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -10160,6 +10527,8 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
+        assert!(json.contains("\"outside_minus_inside_delta_c\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
@@ -10184,6 +10553,8 @@ mod tests {
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(digest.contains("\"adiabatic_history_max_sample_deltas\""));
+        assert!(digest.contains("\"inside_current_if_outside_synced_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
@@ -10219,6 +10590,8 @@ mod tests {
         assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Inside Solve Max-Sample Deltas"));
         assert!(report.contains("implied_numerator_delta_w"));
+        assert!(report.contains("## Adiabatic History Max-Sample Deltas"));
+        assert!(report.contains("out_minus_in_delta_c"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("status: fail"));
