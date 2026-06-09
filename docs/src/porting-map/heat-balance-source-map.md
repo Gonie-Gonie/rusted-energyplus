@@ -478,12 +478,15 @@ Current Rust boundary:
   the floor inside convection RMSE from `123.066168` to `41.950371`, MAT RMSE
   from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
   from `84.712495` to `38.774428`; floor storage remains the top active
-  diagnostic row at `108.672323` RMSE. Rechecking the active lane with
-  EnergyPlus initial CTF histories does not materially move the floor rows, and
-  forcing the Rust warmup to the oracle's 20 run-period warmup days only moves
-  top RMSE from `108.672323` to `108.671673` while reducing the floor
-  first-sample inside/outside history deltas from `1880.111844`/`1769.027186 W`
-  to `1824.704274`/`1713.508910 W`. Raising the same interleaved grey-longwave
+  diagnostic row at `108.672323` RMSE. Rechecking the active lane with the
+  EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
+  floor RMSE rows and identical first-sample floor history deltas
+  (`1880.111844`/`1769.027186 W`), so the active warmup path washes out that
+  initial seed difference. Forcing the Rust warmup to the oracle's 20 run-period
+  warmup days only moves top RMSE from `108.672323` to `108.671673` while
+  reducing the floor first-sample inside/outside history deltas from
+  `1880.111844`/`1769.027186 W` to `1824.704274`/`1713.508910 W`. Raising the
+  same interleaved grey-longwave
   lane from 20 to 100 surface iterations slightly worsens the top floor storage
   RMSE (`108.672323` to `108.676973`). A trial final surface pass after the
   active interleaved zone-air correction also worsened top RMSE to `108.674004`

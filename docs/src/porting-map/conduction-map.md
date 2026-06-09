@@ -136,9 +136,11 @@ previously hidden floor inside longwave/convection bottleneck but leaves floor
 storage and inside/outside floor conduction as the next conduction-facing rows.
 Follow-up probes after that change keep the blocker on source/coupling order:
 forcing Rust warmup to the EnergyPlus 20-day run-period count barely moves the
-active top rows, while switching the initial CTF histories to an EnergyPlus
-InitHeatBalance-shaped seed improves the first-sample floor history terms but
-regresses coupled floor longwave/convection and zone-air rows. A
+active top rows, and switching the active interleaved grey-longwave lane to an
+EnergyPlus InitHeatBalance-shaped initial CTF seed is numerically identical
+after warmup. On the non-active quick-outside epseed lane, that seed improves
+first-sample floor history terms but regresses coupled floor
+longwave/convection and zone-air rows. A
 source recheck of EnergyPlus 26.1.0 `UpdateThermalHistories` also rules out an
 outside-face report sign flip as the next correction: EnergyPlus computes
 current `Qout` into `SurfOutsideFluxHist(1)`, reports
