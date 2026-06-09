@@ -4620,6 +4620,8 @@ fn construction_ctf_coefficients_by_name(
             .push(coefficient);
     }
     for coefficients in by_construction.values_mut() {
+        // EnergyPlus writes EIO CTF rows in descending array index, but the
+        // surface balance consumes history terms as Term=1..NumCTFTerms.
         coefficients.sort_by_key(|coefficient| coefficient.time_index);
     }
     by_construction
@@ -10223,6 +10225,113 @@ DATA PERIODS
         assert_eq!(ctf.inside_temperature_history_c, vec![20.0, 20.0]);
         assert_eq!(ctf.outside_flux_history_w_per_m2, vec![0.0, 0.0]);
         assert_eq!(ctf.inside_flux_history_w_per_m2, vec![0.0, 0.0]);
+
+        Ok(())
+    }
+
+    #[test]
+    fn heat_balance_state_orders_energyplus_ctf_history_indices_for_runtime_slots()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let state = initialize_heat_balance_state_with_ctf_coefficients(
+            &model,
+            20.0,
+            &[
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 5,
+                    outside_w_per_m2_k: -4.1142049e-08,
+                    cross_w_per_m2_k: 1.5543709e-08,
+                    inside_w_per_m2_k: -4.1142049e-08,
+                    flux: Some(1.2297289e-11),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 4,
+                    outside_w_per_m2_k: 0.00057884701,
+                    cross_w_per_m2_k: 0.00022976293,
+                    inside_w_per_m2_k: 0.00057884701,
+                    flux: Some(-4.0580373e-07),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 3,
+                    outside_w_per_m2_k: -0.33051123,
+                    cross_w_per_m2_k: 0.091914804,
+                    inside_w_per_m2_k: -0.33051123,
+                    flux: Some(0.0006592243),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 2,
+                    outside_w_per_m2_k: 12.566595,
+                    cross_w_per_m2_k: 2.1743923,
+                    inside_w_per_m2_k: 12.566595,
+                    flux: Some(-0.058066613),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 1,
+                    outside_w_per_m2_k: -62.622544,
+                    cross_w_per_m2_k: 4.7096437,
+                    inside_w_per_m2_k: -62.622544,
+                    flux: Some(0.60555731),
+                },
+                ConstructionCtfCoefficientOverride {
+                    construction_name: "Wall".to_string(),
+                    time_index: 0,
+                    outside_w_per_m2_k: 58.08561,
+                    cross_w_per_m2_k: 0.72354869,
+                    inside_w_per_m2_k: 58.08561,
+                    flux: None,
+                },
+            ],
+        )?;
+
+        let ctf = &state.surfaces[0].ctf;
+        assert_eq!(ctf.outside_0_w_per_m2_k, 58.08561);
+        assert_eq!(ctf.cross_0_w_per_m2_k, 0.72354869);
+        assert_eq!(ctf.inside_0_w_per_m2_k, 58.08561);
+        assert_eq!(
+            ctf.outside_history_w_per_m2_k,
+            vec![
+                -62.622544,
+                12.566595,
+                -0.33051123,
+                0.00057884701,
+                -4.1142049e-08
+            ]
+        );
+        assert_eq!(
+            ctf.cross_history_w_per_m2_k,
+            vec![
+                4.7096437,
+                2.1743923,
+                0.091914804,
+                0.00022976293,
+                1.5543709e-08
+            ]
+        );
+        assert_eq!(
+            ctf.inside_history_w_per_m2_k,
+            vec![
+                -62.622544,
+                12.566595,
+                -0.33051123,
+                0.00057884701,
+                -4.1142049e-08
+            ]
+        );
+        assert_eq!(
+            ctf.flux_history,
+            vec![
+                0.60555731,
+                -0.058066613,
+                0.0006592243,
+                -4.0580373e-07,
+                1.2297289e-11
+            ]
+        );
 
         Ok(())
     }

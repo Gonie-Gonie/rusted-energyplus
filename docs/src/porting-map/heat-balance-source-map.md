@@ -93,6 +93,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   reports `#CTFs=5` and `Time Step {hours}=0.250`, which matches the 15-minute
   zone timestep and therefore does not by itself imply a multi-zone-timestep
   master-history interpolation path.
+- `Construction.cc::ConstructionProps::printReport` emits CTF coefficient
+  rows in descending array-index order (`NumCTFTerms` down to `0`), but the row
+  index is still the EnergyPlus CTF array index. `HeatBalanceSurfaceManager.cc`
+  consumes history terms by looping `Term = 1..NumCTFTerms`, so Rust intentionally
+  sorts parsed EIO rows by `time_index` before storing runtime history vectors.
 - `HeatBalanceSurfaceManager.cc` builds `SurfCTFConstInPart` and
   `SurfCTFConstOutPart` from temperature and flux histories before calculating
   current inside/outside conduction fluxes and face temperatures.

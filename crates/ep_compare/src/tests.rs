@@ -291,12 +291,12 @@ fn preserves_energyplus_mass_ctf_emission_order() -> Result<(), Box<dyn std::err
         .map(|coefficient| coefficient.time_index)
         .collect::<Vec<_>>();
     assert_eq!(emitted_times, vec![5, 4, 3, 2, 1, 0]);
-    let runtime_history_times = coefficients
+    let emitted_history_times = coefficients
         .iter()
         .filter(|coefficient| coefficient.time_index > 0)
         .map(|coefficient| coefficient.time_index)
         .collect::<Vec<_>>();
-    assert_eq!(runtime_history_times, vec![5, 4, 3, 2, 1]);
+    assert_eq!(emitted_history_times, vec![5, 4, 3, 2, 1]);
 
     Ok(())
 }
