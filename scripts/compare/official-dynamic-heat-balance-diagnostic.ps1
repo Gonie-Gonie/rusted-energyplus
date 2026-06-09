@@ -370,6 +370,22 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([double]$floorHistoryDelta.outside_history_delta_w -le 100.0) {
         throw "Expected active FLOOR outside history delta to remain visible, got $($floorHistoryDelta.outside_history_delta_w)"
     }
+    $floorHistorySlots = @($summary.ctf_history_first_sample_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
+    if ($floorHistorySlots.Count -lt 5) {
+        throw "Expected ctf_history_first_sample_slots to include FLOOR #CTFs=5 rows, got $($floorHistorySlots.Count)"
+    }
+    $insideSlotSum = 0.0
+    $outsideSlotSum = 0.0
+    foreach ($slot in $floorHistorySlots) {
+        $insideSlotSum += [double]$slot.inside_total_term_w
+        $outsideSlotSum += [double]$slot.outside_total_term_w
+    }
+    if ([Math]::Abs($insideSlotSum - [double]$floorCtfComponent.inside_history_term_w) -gt 1.0e-6) {
+        throw "Expected FLOOR inside CTF slot sum to match aggregate history term"
+    }
+    if ([Math]::Abs($outsideSlotSum - [double]$floorCtfComponent.outside_history_term_w) -gt 1.0e-6) {
+        throw "Expected FLOOR outside CTF slot sum to match aggregate history term"
+    }
 }
 $expectedTopCandidates = @(
     @{

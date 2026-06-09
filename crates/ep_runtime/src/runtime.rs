@@ -497,6 +497,92 @@ pub struct HeatBalanceState {
     pub zones: Vec<ZoneHeatBalanceState>,
     /// Per-surface heat-balance state.
     pub surfaces: Vec<SurfaceHeatBalanceState>,
+    /// Most recent per-slot CTF history terms, captured before CTF histories advance.
+    pub last_ctf_history_slot_terms: Vec<HeatBalanceCtfHistorySlotSample>,
+}
+
+/// One per-slot CTF history contribution captured for a heat-balance timestep.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceCtfHistorySlotSample {
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// One-based CTF history slot index.
+    pub slot_index: usize,
+    /// Surface area in square meters.
+    pub area_m2: f64,
+    /// CTF outside/X history coefficient for this slot in W/m2-K.
+    pub outside_history_coefficient_w_per_m2_k: f64,
+    /// CTF cross/Y history coefficient for this slot in W/m2-K.
+    pub cross_history_coefficient_w_per_m2_k: f64,
+    /// CTF inside/Z history coefficient for this slot in W/m2-K.
+    pub inside_history_coefficient_w_per_m2_k: f64,
+    /// CTF flux history coefficient for this slot.
+    pub flux_history_coefficient: f64,
+    /// Previous outside face temperature in C for this slot.
+    pub outside_temperature_history_c: f64,
+    /// Previous inside face temperature in C for this slot.
+    pub inside_temperature_history_c: f64,
+    /// Previous outside conduction flux in W/m2 for this slot.
+    pub outside_flux_history_w_per_m2: f64,
+    /// Previous inside conduction flux in W/m2 for this slot.
+    pub inside_flux_history_w_per_m2: f64,
+    /// Inside-face temperature-history contribution in W.
+    pub inside_temperature_term_w: f64,
+    /// Inside-face flux-history contribution in W.
+    pub inside_flux_term_w: f64,
+    /// Inside-face total history contribution in W.
+    pub inside_total_term_w: f64,
+    /// Outside-face temperature-history contribution in reported W sign.
+    pub outside_temperature_term_w: f64,
+    /// Outside-face flux-history contribution in reported W sign.
+    pub outside_flux_term_w: f64,
+    /// Outside-face total history contribution in reported W sign.
+    pub outside_total_term_w: f64,
+}
+
+/// First reported hourly sample CTF history contribution averaged by slot.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceCtfHistorySlotFirstSample {
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// One-based CTF history slot index.
+    pub slot_index: usize,
+    /// Surface area in square meters.
+    pub area_m2: f64,
+    /// Number of zone timesteps averaged into the first hourly sample.
+    pub timestep_count: usize,
+    /// CTF outside/X history coefficient for this slot in W/m2-K.
+    pub outside_history_coefficient_w_per_m2_k: f64,
+    /// CTF cross/Y history coefficient for this slot in W/m2-K.
+    pub cross_history_coefficient_w_per_m2_k: f64,
+    /// CTF inside/Z history coefficient for this slot in W/m2-K.
+    pub inside_history_coefficient_w_per_m2_k: f64,
+    /// CTF flux history coefficient for this slot.
+    pub flux_history_coefficient: f64,
+    /// Average previous outside face temperature in C for this slot.
+    pub outside_temperature_history_c: f64,
+    /// Average previous inside face temperature in C for this slot.
+    pub inside_temperature_history_c: f64,
+    /// Average previous outside conduction flux in W/m2 for this slot.
+    pub outside_flux_history_w_per_m2: f64,
+    /// Average previous inside conduction flux in W/m2 for this slot.
+    pub inside_flux_history_w_per_m2: f64,
+    /// Average inside-face temperature-history contribution in W.
+    pub inside_temperature_term_w: f64,
+    /// Average inside-face flux-history contribution in W.
+    pub inside_flux_term_w: f64,
+    /// Average inside-face total history contribution in W.
+    pub inside_total_term_w: f64,
+    /// Average outside-face temperature-history contribution in reported W sign.
+    pub outside_temperature_term_w: f64,
+    /// Average outside-face flux-history contribution in reported W sign.
+    pub outside_flux_term_w: f64,
+    /// Average outside-face total history contribution in reported W sign.
+    pub outside_total_term_w: f64,
 }
 
 /// Per-zone heat-balance state shell.
@@ -996,6 +1082,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_iteration_count: u32,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
+    /// Per-slot CTF history terms averaged over the first reported hourly sample.
+    pub first_sample_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -1076,6 +1164,94 @@ struct SurfaceHeatBalanceTraceSums {
     ctf_outside_history_term_rate_w: f64,
     heat_storage_rate_w: f64,
     heat_storage_rate_per_area_w_per_m2: f64,
+}
+
+#[derive(Clone, Debug)]
+struct HeatBalanceCtfHistorySlotFirstSampleAccumulator {
+    surface_name: String,
+    construction_name: String,
+    slot_index: usize,
+    area_m2: f64,
+    timestep_count: usize,
+    outside_history_coefficient_w_per_m2_k: f64,
+    cross_history_coefficient_w_per_m2_k: f64,
+    inside_history_coefficient_w_per_m2_k: f64,
+    flux_history_coefficient: f64,
+    outside_temperature_history_c: f64,
+    inside_temperature_history_c: f64,
+    outside_flux_history_w_per_m2: f64,
+    inside_flux_history_w_per_m2: f64,
+    inside_temperature_term_w: f64,
+    inside_flux_term_w: f64,
+    inside_total_term_w: f64,
+    outside_temperature_term_w: f64,
+    outside_flux_term_w: f64,
+    outside_total_term_w: f64,
+}
+
+impl HeatBalanceCtfHistorySlotFirstSampleAccumulator {
+    fn from_sample(sample: &HeatBalanceCtfHistorySlotSample) -> Self {
+        Self {
+            surface_name: sample.surface_name.clone(),
+            construction_name: sample.construction_name.clone(),
+            slot_index: sample.slot_index,
+            area_m2: sample.area_m2,
+            timestep_count: 0,
+            outside_history_coefficient_w_per_m2_k: sample.outside_history_coefficient_w_per_m2_k,
+            cross_history_coefficient_w_per_m2_k: sample.cross_history_coefficient_w_per_m2_k,
+            inside_history_coefficient_w_per_m2_k: sample.inside_history_coefficient_w_per_m2_k,
+            flux_history_coefficient: sample.flux_history_coefficient,
+            outside_temperature_history_c: 0.0,
+            inside_temperature_history_c: 0.0,
+            outside_flux_history_w_per_m2: 0.0,
+            inside_flux_history_w_per_m2: 0.0,
+            inside_temperature_term_w: 0.0,
+            inside_flux_term_w: 0.0,
+            inside_total_term_w: 0.0,
+            outside_temperature_term_w: 0.0,
+            outside_flux_term_w: 0.0,
+            outside_total_term_w: 0.0,
+        }
+    }
+
+    fn push(&mut self, sample: &HeatBalanceCtfHistorySlotSample) {
+        self.timestep_count += 1;
+        self.outside_temperature_history_c += sample.outside_temperature_history_c;
+        self.inside_temperature_history_c += sample.inside_temperature_history_c;
+        self.outside_flux_history_w_per_m2 += sample.outside_flux_history_w_per_m2;
+        self.inside_flux_history_w_per_m2 += sample.inside_flux_history_w_per_m2;
+        self.inside_temperature_term_w += sample.inside_temperature_term_w;
+        self.inside_flux_term_w += sample.inside_flux_term_w;
+        self.inside_total_term_w += sample.inside_total_term_w;
+        self.outside_temperature_term_w += sample.outside_temperature_term_w;
+        self.outside_flux_term_w += sample.outside_flux_term_w;
+        self.outside_total_term_w += sample.outside_total_term_w;
+    }
+
+    fn finalize(self) -> HeatBalanceCtfHistorySlotFirstSample {
+        let divisor = self.timestep_count.max(1) as f64;
+        HeatBalanceCtfHistorySlotFirstSample {
+            surface_name: self.surface_name,
+            construction_name: self.construction_name,
+            slot_index: self.slot_index,
+            area_m2: self.area_m2,
+            timestep_count: self.timestep_count,
+            outside_history_coefficient_w_per_m2_k: self.outside_history_coefficient_w_per_m2_k,
+            cross_history_coefficient_w_per_m2_k: self.cross_history_coefficient_w_per_m2_k,
+            inside_history_coefficient_w_per_m2_k: self.inside_history_coefficient_w_per_m2_k,
+            flux_history_coefficient: self.flux_history_coefficient,
+            outside_temperature_history_c: self.outside_temperature_history_c / divisor,
+            inside_temperature_history_c: self.inside_temperature_history_c / divisor,
+            outside_flux_history_w_per_m2: self.outside_flux_history_w_per_m2 / divisor,
+            inside_flux_history_w_per_m2: self.inside_flux_history_w_per_m2 / divisor,
+            inside_temperature_term_w: self.inside_temperature_term_w / divisor,
+            inside_flux_term_w: self.inside_flux_term_w / divisor,
+            inside_total_term_w: self.inside_total_term_w / divisor,
+            outside_temperature_term_w: self.outside_temperature_term_w / divisor,
+            outside_flux_term_w: self.outside_flux_term_w / divisor,
+            outside_total_term_w: self.outside_total_term_w / divisor,
+        }
+    }
 }
 
 struct ZoneConductionTrace {
@@ -2589,6 +2765,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         timestep_index: 0,
         zones,
         surfaces,
+        last_ctf_history_slot_terms: Vec::new(),
     })
 }
 
@@ -2935,6 +3112,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         }
     }
 
+    state.last_ctf_history_slot_terms = heat_balance_ctf_history_slot_samples(&state.surfaces);
     for surface in &mut state.surfaces {
         advance_surface_ctf_histories(surface);
     }
@@ -3454,6 +3632,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         })
         .collect::<Vec<_>>();
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
+    let mut first_sample_ctf_history_slot_accumulators =
+        BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
         .iter()
@@ -3498,6 +3678,17 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
             );
+
+            if hour_index == 0 {
+                for sample in &state.last_ctf_history_slot_terms {
+                    first_sample_ctf_history_slot_accumulators
+                        .entry((sample.surface_name.clone(), sample.slot_index))
+                        .or_insert_with(|| {
+                            HeatBalanceCtfHistorySlotFirstSampleAccumulator::from_sample(sample)
+                        })
+                        .push(sample);
+                }
+            }
 
             outdoor_temperature_sum += timestep_outdoor_dry_bulb_c;
             for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
@@ -4117,6 +4308,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         surface_count: state.surfaces.len(),
         surface_iteration_count: options.surface_iteration_count,
         ctf_initial_history_policy: options.ctf_initial_history_policy,
+        first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
+            .into_values()
+            .map(HeatBalanceCtfHistorySlotFirstSampleAccumulator::finalize)
+            .collect(),
     };
 
     Ok(HeatBalanceSimulation {
@@ -6443,16 +6638,118 @@ fn surface_ctf_outside_history_term_rate_w(surface: &SurfaceHeatBalanceState) ->
     -surface.area_m2 * surface.ctf.const_out_part_w_per_m2
 }
 
-fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
-    surface.ctf.const_in_part_w_per_m2 = 0.0;
-    surface.ctf.const_out_part_w_per_m2 = 0.0;
-    let terms = surface
+fn surface_ctf_history_term_count(surface: &SurfaceHeatBalanceState) -> usize {
+    surface
         .ctf
         .outside_history_w_per_m2_k
         .len()
         .max(surface.ctf.cross_history_w_per_m2_k.len())
         .max(surface.ctf.inside_history_w_per_m2_k.len())
-        .max(surface.ctf.flux_history.len());
+        .max(surface.ctf.flux_history.len())
+}
+
+fn surface_ctf_history_slot_samples(
+    surface: &SurfaceHeatBalanceState,
+) -> Vec<HeatBalanceCtfHistorySlotSample> {
+    (0..surface_ctf_history_term_count(surface))
+        .map(|term| surface_ctf_history_slot_sample(surface, term))
+        .collect()
+}
+
+fn surface_ctf_history_slot_sample(
+    surface: &SurfaceHeatBalanceState,
+    term: usize,
+) -> HeatBalanceCtfHistorySlotSample {
+    let outside_temperature_history_c = surface
+        .ctf
+        .outside_temperature_history_c
+        .get(term)
+        .copied()
+        .unwrap_or(surface.outside_face_temperature_c);
+    let inside_temperature_history_c = surface
+        .ctf
+        .inside_temperature_history_c
+        .get(term)
+        .copied()
+        .unwrap_or(surface.inside_face_temperature_c);
+    let outside_flux_history_w_per_m2 = surface
+        .ctf
+        .outside_flux_history_w_per_m2
+        .get(term)
+        .copied()
+        .unwrap_or(0.0);
+    let inside_flux_history_w_per_m2 = surface
+        .ctf
+        .inside_flux_history_w_per_m2
+        .get(term)
+        .copied()
+        .unwrap_or(0.0);
+    let outside_history_coefficient_w_per_m2_k = surface
+        .ctf
+        .outside_history_w_per_m2_k
+        .get(term)
+        .copied()
+        .unwrap_or(0.0);
+    let cross_history_coefficient_w_per_m2_k = surface
+        .ctf
+        .cross_history_w_per_m2_k
+        .get(term)
+        .copied()
+        .unwrap_or(0.0);
+    let inside_history_coefficient_w_per_m2_k = surface
+        .ctf
+        .inside_history_w_per_m2_k
+        .get(term)
+        .copied()
+        .unwrap_or(0.0);
+    let flux_history_coefficient = surface.ctf.flux_history.get(term).copied().unwrap_or(0.0);
+
+    let inside_temperature_term_w = surface.area_m2
+        * (cross_history_coefficient_w_per_m2_k * outside_temperature_history_c
+            - inside_history_coefficient_w_per_m2_k * inside_temperature_history_c);
+    let inside_flux_term_w =
+        surface.area_m2 * flux_history_coefficient * inside_flux_history_w_per_m2;
+    let outside_temperature_term_w = -surface.area_m2
+        * (outside_history_coefficient_w_per_m2_k * outside_temperature_history_c
+            - cross_history_coefficient_w_per_m2_k * inside_temperature_history_c);
+    let outside_flux_term_w =
+        -surface.area_m2 * flux_history_coefficient * outside_flux_history_w_per_m2;
+
+    HeatBalanceCtfHistorySlotSample {
+        surface_name: surface.surface_name.clone(),
+        construction_name: surface.construction_name.clone(),
+        slot_index: term + 1,
+        area_m2: surface.area_m2,
+        outside_history_coefficient_w_per_m2_k,
+        cross_history_coefficient_w_per_m2_k,
+        inside_history_coefficient_w_per_m2_k,
+        flux_history_coefficient,
+        outside_temperature_history_c,
+        inside_temperature_history_c,
+        outside_flux_history_w_per_m2,
+        inside_flux_history_w_per_m2,
+        inside_temperature_term_w,
+        inside_flux_term_w,
+        inside_total_term_w: inside_temperature_term_w + inside_flux_term_w,
+        outside_temperature_term_w,
+        outside_flux_term_w,
+        outside_total_term_w: outside_temperature_term_w + outside_flux_term_w,
+    }
+}
+
+fn heat_balance_ctf_history_slot_samples(
+    surfaces: &[SurfaceHeatBalanceState],
+) -> Vec<HeatBalanceCtfHistorySlotSample> {
+    surfaces
+        .iter()
+        .flat_map(surface_ctf_history_slot_samples)
+        .collect()
+}
+
+fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
+    surface.ctf.const_in_part_w_per_m2 = 0.0;
+    surface.ctf.const_out_part_w_per_m2 = 0.0;
+    let terms = surface_ctf_history_term_count(surface);
 
     for term in 0..terms {
         let outside_temperature_c = surface
@@ -6509,13 +6806,7 @@ fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
 }
 
 fn advance_surface_ctf_histories(surface: &mut SurfaceHeatBalanceState) {
-    let history_terms = surface
-        .ctf
-        .outside_history_w_per_m2_k
-        .len()
-        .max(surface.ctf.cross_history_w_per_m2_k.len())
-        .max(surface.ctf.inside_history_w_per_m2_k.len())
-        .max(surface.ctf.flux_history.len());
+    let history_terms = surface_ctf_history_term_count(surface);
     if history_terms == 0 {
         return;
     }
@@ -8368,8 +8659,9 @@ mod tests {
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
-        surface_azimuth_deg, surface_exterior_report_terms, surface_geometry_summaries,
-        surface_heat_storage_rate_w, surface_incident_solar_radiation_for_weather_context_w_per_m2,
+        surface_azimuth_deg, surface_ctf_history_slot_samples, surface_exterior_report_terms,
+        surface_geometry_summaries, surface_heat_storage_rate_w,
+        surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_conduction_rate_w,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
         surface_outside_conduction_rate_w, surface_steady_u_value_w_per_m2_k, surface_tilt_deg,
@@ -9819,6 +10111,20 @@ DATA PERIODS
         assert!((surface.ctf.const_in_part_w_per_m2 - (-3.2)).abs() < 1.0e-12);
         assert!((surface.ctf.const_out_part_w_per_m2 - (-0.6)).abs() < 1.0e-12);
 
+        let slot_samples = surface_ctf_history_slot_samples(surface);
+        assert_eq!(slot_samples.len(), 1);
+        let slot = &slot_samples[0];
+        assert_eq!(slot.slot_index, 1);
+        assert!(
+            (slot.inside_total_term_w - surface.area_m2 * surface.ctf.const_in_part_w_per_m2).abs()
+                < 1.0e-12
+        );
+        assert!(
+            (slot.outside_total_term_w + surface.area_m2 * surface.ctf.const_out_part_w_per_m2)
+                .abs()
+                < 1.0e-12
+        );
+
         let inside_flux = surface_inside_conduction_flux_w_per_m2(surface);
         let outside_flux = surface_outside_conduction_flux_w_per_m2(surface);
         advance_surface_ctf_histories(surface);
@@ -10794,7 +11100,6 @@ DATA PERIODS
                 .abs()
                 < 1.0e-9
         );
-
         let Some(storage_series) = simulation
             .results
             .find_series("FLOOR", "Surface Heat Storage Rate")
