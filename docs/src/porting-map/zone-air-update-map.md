@@ -138,3 +138,12 @@ also a rejected report path: zone surface convection RMSE worsens from
 from `13.602803 W` to `16.742712 W`. The remaining zone-air surface convection
 gap is therefore not solved by either surface-refair reporting or final
 hconv-only reporting.
+
+An inside-CTF report sibling then tested whether the aggregate conduction rows
+should use the outside-temperature snapshot consumed by the last inside CTF
+solve. It leaves MAT, surface convection, air storage, floor storage, and
+individual floor conduction unchanged, but worsens zone opaque aggregate
+conduction from `18.143612 W` to `22.208305 W` inside and from `11.590547 W` to
+`12.785602 W` outside. The zone-air/aggregate report path therefore still needs
+EnergyPlus advanced report timing mapped separately from the surface CTF solve
+snapshot.

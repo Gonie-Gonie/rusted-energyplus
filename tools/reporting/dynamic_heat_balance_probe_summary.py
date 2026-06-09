@@ -330,6 +330,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-warmup-min20-iter20",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-warmup-min20-surface-iter20"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-surface-iter20"
@@ -514,6 +523,7 @@ REFERENCE_LANES = {
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-live-refair-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-surf-refair-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-final-hconv-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
+    "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-current-adhist-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-iter20",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",

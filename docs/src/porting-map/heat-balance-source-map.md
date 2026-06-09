@@ -788,6 +788,17 @@ Current Rust boundary:
   `SurfTempIn` TARP-report recompute as the missing EnergyPlus hconv/report
   timing; keep the frozen solver coefficient path until a source-level
   `InitIntConvCoeff`/inside-iteration cadence probe can be isolated.
+  An inside-CTF report probe then tests whether EnergyPlus report/source
+  conduction should use the outside temperature snapshot consumed by the last
+  inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
+  outside face temperature. It is rejected as a promotion path: top floor
+  storage and individual floor inside/outside conduction remain unchanged
+  (`28.786920`, `16.729618`, and `12.216935 W` RMSE), while zone opaque
+  aggregate conduction regresses from `18.143612` to `22.208305 W` inside and
+  from `11.590547` to `12.785602 W` outside. This keeps the current individual
+  surface conduction report path intact and shifts the aggregate conduction
+  question back to EnergyPlus advanced report-variable timing rather than the
+  inside-CTF outside snapshot alone.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

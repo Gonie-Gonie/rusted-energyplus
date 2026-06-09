@@ -268,5 +268,12 @@ conduction to `27.990507`. This suggests the active floor conduction path was
 slightly over-iterated by a fixed twenty-pass loop. The remaining blocker is
 still source/history parity because the first-sample floor storage max-abs is
 about `701.319969` and the zone-air latent rows regress slightly.
+On the later ScriptF-flat active lane, forcing zone aggregate conduction reports
+to reuse the last inside-CTF outside-temperature snapshot is also rejected:
+floor storage and individual floor conduction stay unchanged, but zone opaque
+inside/outside aggregate RMSE worsens from `18.143612`/`11.590547` to
+`22.208305`/`12.785602`. Keep individual surface conduction reporting on the
+current report-state path while the aggregate rows remain an EnergyPlus
+advanced-report timing target.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.
