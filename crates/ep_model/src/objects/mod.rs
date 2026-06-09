@@ -161,6 +161,16 @@ pub enum DayOfWeek {
     Sunday,
 }
 
+/// RunPeriod first-hour weather interpolation starting point.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum FirstHourInterpolationStartingValues {
+    /// Use the first hour of the first run-period weather day.
+    Hour1,
+    /// Use the 24th hour of the first run-period weather day.
+    #[default]
+    Hour24,
+}
+
 /// Run period date range.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RunPeriod {
@@ -182,6 +192,8 @@ pub struct RunPeriod {
     pub end_year: Option<u32>,
     /// Optional declared start day of week.
     pub day_of_week_for_start_day: Option<DayOfWeek>,
+    /// First-hour weather interpolation starting point.
+    pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 }
 
 /// Site location.

@@ -3,11 +3,12 @@
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
-    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme,
-    LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId,
-    NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
+    DehumidificationControlType, DemandControlledVentilationType,
+    FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
+    IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
+    MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList,
+    NodeListId, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
     OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent,
     PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
@@ -468,6 +469,14 @@ impl<'a> Compiler<'a> {
                     &object,
                     "day_of_week_for_start_day",
                     parse_day_of_week,
+                ),
+                first_hour_interpolation_starting_values: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "first_hour_interpolation_starting_values"),
+                    FirstHourInterpolationStartingValues::Hour24,
+                    "Hour24",
+                    parse_first_hour_interpolation_starting_values,
                 ),
             });
         }
@@ -3845,6 +3854,20 @@ fn parse_day_of_week(value: &str) -> Option<ep_model::DayOfWeek> {
     }
 }
 
+fn parse_first_hour_interpolation_starting_values(
+    value: &str,
+) -> Option<FirstHourInterpolationStartingValues> {
+    match value {
+        value if value.eq_ignore_ascii_case("Hour1") => {
+            Some(FirstHourInterpolationStartingValues::Hour1)
+        }
+        value if value.eq_ignore_ascii_case("Hour24") => {
+            Some(FirstHourInterpolationStartingValues::Hour24)
+        }
+        _ => None,
+    }
+}
+
 fn parse_surface_type(value: &str) -> Option<SurfaceType> {
     match value {
         value if value.eq_ignore_ascii_case("Ceiling") => Some(SurfaceType::Ceiling),
@@ -3906,10 +3929,11 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_model::{
-        AutosizeOrNumber, DayOfWeek, DehumidificationControlType, HumidificationControlType,
-        IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, LoadDistributionScheme,
-        MaterialSurfaceRoughness, ModelGraph, OutdoorAirEconomizerType,
-        OutsideSurfaceConvectionAlgorithm, PlantConnectorKind,
+        AutosizeOrNumber, DayOfWeek, DehumidificationControlType,
+        FirstHourInterpolationStartingValues, HumidificationControlType, IdealLoadsLimit,
+        InsideSurfaceConvectionAlgorithm, LoadDistributionScheme, MaterialSurfaceRoughness,
+        ModelGraph, OutdoorAirEconomizerType, OutsideSurfaceConvectionAlgorithm,
+        PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -4135,7 +4159,8 @@ mod tests {
                         "end_month": 1,
                         "end_day_of_month": 3,
                         "end_year": 2013,
-                        "day_of_week_for_start_day": "Wednesday"
+                        "day_of_week_for_start_day": "Wednesday",
+                        "first_hour_interpolation_starting_values": "Hour1"
                     }
                 }
             }"#,
@@ -4155,6 +4180,10 @@ mod tests {
         assert_eq!(
             model.run_periods[0].day_of_week_for_start_day,
             Some(DayOfWeek::Wednesday)
+        );
+        assert_eq!(
+            model.run_periods[0].first_hour_interpolation_starting_values,
+            FirstHourInterpolationStartingValues::Hour1
         );
 
         Ok(())

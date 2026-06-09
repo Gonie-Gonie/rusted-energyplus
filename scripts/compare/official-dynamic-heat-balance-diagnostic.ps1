@@ -376,6 +376,9 @@ if ($null -eq $floorSurfaceFirstTrace) {
 if ($null -eq $floorSurfaceFirstTrace.outdoor_dry_bulb_c) {
     throw "Expected surface_first_sample_trace rows to include outdoor_dry_bulb_c"
 }
+if ([Math]::Abs([double]$floorSurfaceFirstTrace.outdoor_dry_bulb_c - -6.0) -gt 1.0e-9) {
+    throw "Expected first-hour weather interpolation to seed from run-period day Hour24, got outdoor_dry_bulb_c $($floorSurfaceFirstTrace.outdoor_dry_bulb_c)"
+}
 if ($null -eq $floorSurfaceFirstTrace.outside_face_temperature_c) {
     throw "Expected surface_first_sample_trace rows to include outside_face_temperature_c"
 }

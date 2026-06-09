@@ -600,13 +600,18 @@ Current Rust boundary:
 - The compact digest and markdown report also carry a Rust-only
   `surface_first_sample_trace` table for the first reported hour. In the active
   all-CTF, ScriptF-flat, 20-iteration lane this exposes the timestep dry-bulb
-  sequence `2.25, 0.50, -1.25, -3.00 C` and the matching per-surface outside
-  balance terms before hourly averaging. EnergyPlus `WeatherManager` seeds the
-  first weather-day interpolation from either Hour 1 or Hour 24 via
-  `firstHrInterpUseHr1` in `ReadWeatherForDay`, with the RunPeriod field
+  sequence and the matching per-surface outside balance terms before hourly
+  averaging. EnergyPlus `WeatherManager` seeds the first weather-day
+  interpolation from either Hour 1 or Hour 24 of the first run-period weather
+  day via `firstHrInterpUseHr1` in `ReadWeatherForDay`, with the RunPeriod field
   `First Hour Interpolation Starting Values` parsed in `GetRunPeriodData`.
-  This makes RunPeriod first-hour weather handoff the next source-mapped target
-  for the remaining first-sample outside/no-mass and floor CTF residuals.
+  Rust now preserves this RunPeriod enum and defaults to EnergyPlus `Hour24`
+  instead of wrapping first-hour interpolation to the final EPW record. For
+  `1ZoneUncontrolled`, the active lane's first-hour dry-bulb trace moved from
+  the file-wrap sequence `2.25, 0.50, -1.25, -3.00 C` to the source-aligned
+  `-6.00, -5.00, -4.00, -3.00 C`; first-sample zone outside opaque conduction
+  delta fell from `821.886055 W` to `3.529915 W`, and floor storage max-abs
+  fell from `701.082304 W` to `242.511509 W`.
 - EnergyPlus `UpdateThermalHistories` first computes current CTF inside and
   outside fluxes into `SurfInsideFluxHist(1)` and `SurfOutsideFluxHist(1)`,
   flips the outside flux into `SurfOpaqOutFaceCondFlux` for reporting, then
@@ -779,33 +784,24 @@ Current Rust boundary:
   the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
   ScriptF gap is expected to live in the coupled surface/zone iteration timing
   rather than in the grey interchange matrix itself. The compact diagnostic
-  digest now carries first reported sample bottlenecks; in the active lane the
-  first-sample outside opaque aggregate delta is `871.308445 W`, driven by
-  floor storage/conduction plus underpredicted wall/roof outside conduction,
-  while the floor inside net longwave first-sample delta remains
-  `404.796794 W`. The digest now also emits Rust-only first-sample CTF
-  component rows. In the active lane the mass floor's first sample is dominated
-  by CTF history terms (`1229.296987 W` inside and `1297.344600 W` outside),
-  while roof/wall no-mass rows have zero history terms and cancel inside/outside
-  conduction. The companion oracle-inferred first-sample table derives
-  `1546.858233 W` inside and `1136.823976 W` outside floor current zero-term
-  values plus `-650.814857 W` inside and `-471.682586 W` outside floor history
-  terms from oracle temperatures/rates and EIO zero CTF coefficients. Rust's
-  corresponding first-sample current terms are `-798.515769 W` inside and
-  `-980.325547 W` outside, so the current-term deltas
-  (`2345.374002`/`2117.149523 W`) are even larger than the history deltas
-  (`1880.111844`/`1769.027186 W`). That shifts the next EnergyPlus
-  source-porting target from history-vector contents alone to the combined
-  mass-floor face-temperature/current-term alignment and coupled
-  warmup/run-period source handoff. The digest now also emits Rust run-period
-  initial CTF history slots captured after warmup and before the first reported
-  timestep. In the same active lane, the floor
-  run-period initial slot sum is already `1393.986801 W` inside and
-  `1607.011644 W` outside before the first hour averages to `1229.296987 W`
-  inside and `1297.344600 W` outside, so the current mismatch is present at the
-  warmup/run-period handoff rather than being introduced only by first-hour
-  averaging. Full inside iteration order, zone predictor/corrector equations,
-  detailed
+  digest now carries first reported sample bottlenecks and Rust-only
+  first-sample CTF component rows. After the RunPeriod first-hour weather seed
+  fix, the active lane's first-sample outside opaque aggregate delta is
+  `3.529915 W`, and the mass floor first sample has Rust current/history terms
+  much closer to the oracle-inferred decomposition: inside current
+  `1751.360499 W` versus oracle `1546.858233 W`, inside history
+  `-852.644209 W` versus oracle `-650.814857 W`, outside current
+  `1338.455829 W` versus oracle `1136.823976 W`, and outside history
+  `-673.309511 W` versus oracle `-471.682586 W`. The remaining first-sample
+  deltas are now roughly `200 W` per floor CTF component rather than the prior
+  multi-kW file-wrap weather artifact, so the next EnergyPlus source-porting
+  target shifts back to mass-floor face-temperature/history alignment and the
+  coupled warmup/run-period source handoff. The digest also emits Rust
+  run-period initial CTF history slots captured after warmup and before the
+  first reported timestep; in the same active lane, the floor run-period initial
+  slot sum is `-209.595019 W` inside and `-4.314343 W` outside before the first
+  hour averages to `-852.644209 W` inside and `-673.309511 W` outside. Full
+  inside iteration order, zone predictor/corrector equations, detailed
   shadowing/reflection, and coupled radiation coefficient update order are not
   yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and

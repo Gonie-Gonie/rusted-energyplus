@@ -2,12 +2,13 @@
 
 use crate::{OutputSeries, ResultStore, RuntimeOutputRegistry};
 use ep_model::{
-    AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId, IdealLoadsAirSystem,
-    IdealLoadsAirSystemId, LoopId, MaterialId, MaterialSurfaceRoughness, NodeId, NormalizedName,
-    OtherEquipment, OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
-    PlantBranchComponent, PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment,
-    ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
-    Terrain, TypedModel, WindExposure, Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ConstructionId,
+    FirstHourInterpolationStartingValues, IdealLoadsAirSystem, IdealLoadsAirSystemId, LoopId,
+    MaterialId, MaterialSurfaceRoughness, NodeId, NormalizedName, OtherEquipment, OutputHandle,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranchComponent, PlantLoop,
+    Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel,
+    SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure,
+    Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -283,6 +284,16 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
     };
 
     build_hourly_time_axis_for_run_period(run_period)
+}
+
+fn run_period_first_hour_interpolation_starting_values(
+    model: &TypedModel,
+) -> FirstHourInterpolationStartingValues {
+    model
+        .run_periods
+        .first()
+        .map(|run_period| run_period.first_hour_interpolation_starting_values)
+        .unwrap_or_default()
 }
 
 /// Builds an hourly time axis for one run period.
@@ -4157,6 +4168,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
 
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
+    let first_hour_interpolation_starting_values =
+        run_period_first_hour_interpolation_starting_values(&model.typed);
     let mut state = initialize_heat_balance_state_with_ctf_coefficients(
         model,
         options.initial_zone_air_temperature_c,
@@ -4184,6 +4197,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.warmup,
         options.zone_air_algorithm,
         options.surface_iteration_count,
+        first_hour_interpolation_starting_values,
     );
     let run_period_initial_ctf_history_slots =
         heat_balance_ctf_history_slot_samples(&state.surfaces);
@@ -4300,18 +4314,21 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut outdoor_temperature_sum = 0.0;
 
         for substep in 1..=steps {
-            let timestep_outdoor_dry_bulb_c = energyplus_weather_dry_bulb_at_timestep(
-                weather_records,
-                hour_index,
-                outdoor_dry_bulb_c,
-                steps,
-                substep,
-            );
+            let timestep_outdoor_dry_bulb_c =
+                energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                    weather_records,
+                    hour_index,
+                    outdoor_dry_bulb_c,
+                    steps,
+                    substep,
+                    first_hour_interpolation_starting_values,
+                );
             let weather_context = heat_balance_weather_context_for_timestep(
                 weather_records,
                 hour_index,
                 steps,
                 substep,
+                first_hour_interpolation_starting_values,
             );
             advance_heat_balance_state_one_timestep_internal(
                 &model.typed,
@@ -5038,6 +5055,7 @@ fn run_heat_balance_run_period_warmup(
     options: HeatBalanceWarmupOptions,
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     surface_iteration_count: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
         return HeatBalanceWarmupSummary::disabled();
@@ -5060,18 +5078,21 @@ fn run_heat_balance_run_period_warmup(
             let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
             let steps = zone_steps_per_hour.max(1);
             for substep in 1..=steps {
-                let timestep_outdoor_dry_bulb_c = energyplus_weather_dry_bulb_at_timestep(
-                    weather_records,
-                    hour_index,
-                    outdoor_dry_bulb_c,
-                    steps,
-                    substep,
-                );
+                let timestep_outdoor_dry_bulb_c =
+                    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                        weather_records,
+                        hour_index,
+                        outdoor_dry_bulb_c,
+                        steps,
+                        substep,
+                        first_hour_interpolation_starting_values,
+                    );
                 let weather_context = heat_balance_weather_context_for_timestep(
                     weather_records,
                     hour_index,
                     steps,
                     substep,
+                    first_hour_interpolation_starting_values,
                 );
                 advance_heat_balance_state_one_timestep_internal(
                     model,
@@ -5153,6 +5174,7 @@ struct HeatBalanceWeatherContext<'a> {
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: Option<u32>,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -5695,6 +5717,7 @@ fn exterior_surface_boundary_balance(
             context.record_index,
             context.zone_steps_per_hour,
             context.zone_timestep,
+            context.first_hour_interpolation_starting_values,
         )
     } else {
         0.0
@@ -5813,6 +5836,7 @@ fn surface_exterior_report_terms(
                     context.record_index,
                     context.zone_steps_per_hour,
                     context.zone_timestep,
+                    context.first_hour_interpolation_starting_values,
                 )
             })
             .unwrap_or(0.0)
@@ -6168,11 +6192,12 @@ fn energyplus_exterior_wet_context_fraction(
 
     let steps = context.zone_steps_per_hour.max(1);
     if let Some(timestep) = context.zone_timestep {
-        return if energyplus_weather_record_is_rain_at_timestep(
+        return if energyplus_weather_record_is_rain_at_timestep_with_starting_values(
             context.records,
             context.record_index,
             timestep,
             steps,
+            context.first_hour_interpolation_starting_values,
         ) {
             1.0
         } else {
@@ -6207,6 +6232,30 @@ fn energyplus_weather_record_is_rain_at_timestep(
     interpolated_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM
 }
 
+fn energyplus_weather_record_is_rain_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    timestep: u32,
+    zone_steps_per_hour: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> bool {
+    let Some(record) = records.get(record_index) else {
+        return false;
+    };
+    let previous = previous_weather_record_with_first_hour_starting_values(
+        records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    );
+    let steps = zone_steps_per_hour.max(1);
+    let interpolation_weight = energyplus_weather_interpolation_weight(steps, timestep);
+    let interpolated_precipitation_depth_mm = previous.liquid_precipitation_depth_mm
+        * (1.0 - interpolation_weight)
+        + record.liquid_precipitation_depth_mm * interpolation_weight;
+
+    interpolated_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM
+}
+
 fn energyplus_exterior_wet_reference_temperature_c(
     context: HeatBalanceWeatherContext<'_>,
     fallback_dry_bulb_c: f64,
@@ -6217,12 +6266,13 @@ fn energyplus_exterior_wet_reference_temperature_c(
     let dry_bulb_c = context
         .zone_timestep
         .map(|timestep| {
-            energyplus_weather_dry_bulb_at_timestep(
+            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
                 Some(context.records),
                 context.record_index,
                 fallback_dry_bulb_c,
                 context.zone_steps_per_hour,
                 timestep,
+                context.first_hour_interpolation_starting_values,
             )
         })
         .unwrap_or(fallback_dry_bulb_c);
@@ -6303,12 +6353,13 @@ fn update_zone_air_heat_capacities_from_weather_context(
     let dry_bulb_c = context
         .zone_timestep
         .map(|timestep| {
-            energyplus_weather_dry_bulb_at_timestep(
+            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
                 Some(context.records),
                 context.record_index,
                 fallback_dry_bulb_c,
                 context.zone_steps_per_hour,
                 timestep,
+                context.first_hour_interpolation_starting_values,
             )
         })
         .unwrap_or(fallback_dry_bulb_c);
@@ -7693,6 +7744,7 @@ fn surface_incident_solar_components_hourly_average_w_per_m2(
         record_index,
         zone_steps_per_hour,
         None,
+        FirstHourInterpolationStartingValues::Hour24,
     )
 }
 
@@ -7703,6 +7755,7 @@ fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: Option<u32>,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> f64 {
     surface_incident_solar_components_for_weather_context_w_per_m2(
         surface,
@@ -7711,6 +7764,7 @@ fn surface_incident_solar_radiation_for_weather_context_w_per_m2(
         record_index,
         zone_steps_per_hour,
         zone_timestep,
+        first_hour_interpolation_starting_values,
     )
     .total_w_per_m2()
 }
@@ -7722,6 +7776,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: Option<u32>,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> SurfaceIncidentSolarComponents {
     if weather_records.get(record_index).is_none() {
         return SurfaceIncidentSolarComponents::default();
@@ -7740,6 +7795,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
             record_index,
             steps,
             timestep,
+            first_hour_interpolation_starting_values,
             sin_declination,
             cos_declination,
             equation_of_time_hours,
@@ -7755,6 +7811,7 @@ fn surface_incident_solar_components_for_weather_context_w_per_m2(
             record_index,
             steps,
             timestep,
+            first_hour_interpolation_starting_values,
             sin_declination,
             cos_declination,
             equation_of_time_hours,
@@ -7779,6 +7836,7 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     sin_declination: f64,
     cos_declination: f64,
     equation_of_time_hours: f64,
@@ -7790,7 +7848,11 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
     let timestep = zone_timestep.clamp(1, steps);
     let (previous_weight, current_weight, next_weight) =
         solar_weather_interpolation_weights(steps, timestep);
-    let previous = previous_weather_record(weather_records, record_index);
+    let previous = previous_weather_record_with_first_hour_starting_values(
+        weather_records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    );
     let next = next_weather_record(weather_records, record_index);
     let direct_normal = weighted_solar_value(
         previous.direct_normal_radiation_wh_per_m2,
@@ -8004,8 +8066,24 @@ fn energyplus_anisotropic_sky_multiplier(
 }
 
 fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
+    previous_weather_record_with_first_hour_starting_values(
+        records,
+        record_index,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+fn previous_weather_record_with_first_hour_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> &EpwRecord {
     if record_index == 0 {
-        &records[records.len() - 1]
+        let first_day_record_index = match first_hour_interpolation_starting_values {
+            FirstHourInterpolationStartingValues::Hour1 => 0,
+            FirstHourInterpolationStartingValues::Hour24 => records.len().min(24) - 1,
+        };
+        &records[first_day_record_index]
     } else {
         &records[record_index - 1]
     }
@@ -8025,15 +8103,18 @@ fn heat_balance_weather_context_for_timestep(
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> Option<HeatBalanceWeatherContext<'_>> {
     weather_records.map(|records| HeatBalanceWeatherContext {
         records,
         record_index,
         zone_steps_per_hour,
         zone_timestep: Some(zone_timestep),
+        first_hour_interpolation_starting_values,
     })
 }
 
+#[cfg(test)]
 fn energyplus_weather_dry_bulb_at_timestep(
     weather_records: Option<&[EpwRecord]>,
     record_index: usize,
@@ -8041,17 +8122,59 @@ fn energyplus_weather_dry_bulb_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
+    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+        weather_records,
+        record_index,
+        fallback_hourly_dry_bulb_c,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+fn energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+    weather_records: Option<&[EpwRecord]>,
+    record_index: usize,
+    fallback_hourly_dry_bulb_c: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
     let Some(records) = weather_records else {
         return fallback_hourly_dry_bulb_c;
     };
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_dry_bulb_c,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.dry_bulb_c,
+    )
+}
+
+fn energyplus_weather_scalar_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_value: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    value: impl Fn(&EpwRecord) -> f64,
+) -> f64 {
     let Some(record) = records.get(record_index) else {
-        return fallback_hourly_dry_bulb_c;
+        return fallback_hourly_value;
     };
-    let previous = previous_weather_record(records, record_index);
+    let previous = previous_weather_record_with_first_hour_starting_values(
+        records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    );
     let interpolation_weight =
         energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
 
-    previous.dry_bulb_c * (1.0 - interpolation_weight) + record.dry_bulb_c * interpolation_weight
+    value(previous) * (1.0 - interpolation_weight) + value(record) * interpolation_weight
 }
 
 fn energyplus_weather_relative_humidity_for_context(
@@ -8062,15 +8185,17 @@ fn energyplus_weather_relative_humidity_for_context(
         return fallback_relative_humidity_percent;
     };
 
-    energyplus_weather_relative_humidity_at_timestep(
+    energyplus_weather_relative_humidity_at_timestep_with_starting_values(
         context.records,
         context.record_index,
         fallback_relative_humidity_percent,
         context.zone_steps_per_hour,
         timestep,
+        context.first_hour_interpolation_starting_values,
     )
 }
 
+#[cfg(test)]
 fn energyplus_weather_relative_humidity_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -8078,15 +8203,33 @@ fn energyplus_weather_relative_humidity_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
-    let Some(record) = records.get(record_index) else {
-        return fallback_relative_humidity_percent;
-    };
-    let previous = previous_weather_record(records, record_index);
-    let interpolation_weight =
-        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+    energyplus_weather_relative_humidity_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_relative_humidity_percent,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
 
-    previous.relative_humidity_percent * (1.0 - interpolation_weight)
-        + record.relative_humidity_percent * interpolation_weight
+fn energyplus_weather_relative_humidity_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_relative_humidity_percent: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_relative_humidity_percent,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.relative_humidity_percent,
+    )
 }
 
 fn energyplus_weather_atmospheric_pressure_for_context(
@@ -8097,15 +8240,17 @@ fn energyplus_weather_atmospheric_pressure_for_context(
         return fallback_atmospheric_pressure_pa;
     };
 
-    energyplus_weather_atmospheric_pressure_at_timestep(
+    energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
         context.records,
         context.record_index,
         fallback_atmospheric_pressure_pa,
         context.zone_steps_per_hour,
         timestep,
+        context.first_hour_interpolation_starting_values,
     )
 }
 
+#[cfg(test)]
 fn energyplus_weather_atmospheric_pressure_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -8113,15 +8258,33 @@ fn energyplus_weather_atmospheric_pressure_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
-    let Some(record) = records.get(record_index) else {
-        return fallback_atmospheric_pressure_pa;
-    };
-    let previous = previous_weather_record(records, record_index);
-    let interpolation_weight =
-        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+    energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_atmospheric_pressure_pa,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
 
-    previous.atmospheric_pressure_pa * (1.0 - interpolation_weight)
-        + record.atmospheric_pressure_pa * interpolation_weight
+fn energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_atmospheric_pressure_pa: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_atmospheric_pressure_pa,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.atmospheric_pressure_pa,
+    )
 }
 
 fn weather_proxy_zone_air_heat_capacity_j_per_k(
@@ -8134,12 +8297,13 @@ fn weather_proxy_zone_air_heat_capacity_j_per_k(
     let dry_bulb_c = context
         .zone_timestep
         .map(|timestep| {
-            energyplus_weather_dry_bulb_at_timestep(
+            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
                 Some(context.records),
                 context.record_index,
                 fallback_dry_bulb_c,
                 context.zone_steps_per_hour,
                 timestep,
+                context.first_hour_interpolation_starting_values,
             )
         })
         .unwrap_or(fallback_dry_bulb_c);
@@ -8171,15 +8335,17 @@ fn energyplus_weather_horizontal_infrared_for_context(
         return fallback_hourly_horizontal_infrared_w_per_m2;
     };
 
-    energyplus_weather_horizontal_infrared_at_timestep(
+    energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
         context.records,
         context.record_index,
         fallback_hourly_horizontal_infrared_w_per_m2,
         context.zone_steps_per_hour,
         timestep,
+        context.first_hour_interpolation_starting_values,
     )
 }
 
+#[cfg(test)]
 fn energyplus_weather_horizontal_infrared_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -8187,15 +8353,33 @@ fn energyplus_weather_horizontal_infrared_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
-    let Some(record) = records.get(record_index) else {
-        return fallback_hourly_horizontal_infrared_w_per_m2;
-    };
-    let previous = previous_weather_record(records, record_index);
-    let interpolation_weight =
-        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+    energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
 
-    previous.horizontal_infrared_radiation_wh_per_m2 * (1.0 - interpolation_weight)
-        + record.horizontal_infrared_radiation_wh_per_m2 * interpolation_weight
+fn energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.horizontal_infrared_radiation_wh_per_m2,
+    )
 }
 
 fn energyplus_weather_wind_speed_for_context(
@@ -8206,15 +8390,17 @@ fn energyplus_weather_wind_speed_for_context(
         return fallback_hourly_wind_speed_m_per_s;
     };
 
-    energyplus_weather_wind_speed_at_timestep(
+    energyplus_weather_wind_speed_at_timestep_with_starting_values(
         context.records,
         context.record_index,
         fallback_hourly_wind_speed_m_per_s,
         context.zone_steps_per_hour,
         timestep,
+        context.first_hour_interpolation_starting_values,
     )
 }
 
+#[cfg(test)]
 fn energyplus_weather_wind_speed_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -8222,15 +8408,33 @@ fn energyplus_weather_wind_speed_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
-    let Some(record) = records.get(record_index) else {
-        return fallback_hourly_wind_speed_m_per_s;
-    };
-    let previous = previous_weather_record(records, record_index);
-    let interpolation_weight =
-        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+    energyplus_weather_wind_speed_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
 
-    previous.wind_speed_m_per_s * (1.0 - interpolation_weight)
-        + record.wind_speed_m_per_s * interpolation_weight
+fn energyplus_weather_wind_speed_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_speed_m_per_s: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.wind_speed_m_per_s,
+    )
 }
 
 fn energyplus_weather_wind_direction_for_context(
@@ -8241,15 +8445,17 @@ fn energyplus_weather_wind_direction_for_context(
         return fallback_hourly_wind_direction_deg;
     };
 
-    energyplus_weather_wind_direction_at_timestep(
+    energyplus_weather_wind_direction_at_timestep_with_starting_values(
         context.records,
         context.record_index,
         fallback_hourly_wind_direction_deg,
         context.zone_steps_per_hour,
         timestep,
+        context.first_hour_interpolation_starting_values,
     )
 }
 
+#[cfg(test)]
 fn energyplus_weather_wind_direction_at_timestep(
     records: &[EpwRecord],
     record_index: usize,
@@ -8257,10 +8463,32 @@ fn energyplus_weather_wind_direction_at_timestep(
     zone_steps_per_hour: u32,
     zone_timestep: u32,
 ) -> f64 {
+    energyplus_weather_wind_direction_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_wind_direction_deg,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+fn energyplus_weather_wind_direction_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_direction_deg: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
     let Some(record) = records.get(record_index) else {
         return fallback_hourly_wind_direction_deg;
     };
-    let previous = previous_weather_record(records, record_index);
+    let previous = previous_weather_record_with_first_hour_starting_values(
+        records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    );
     let interpolation_weight =
         energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
 
@@ -9085,6 +9313,7 @@ fn default_run_period() -> RunPeriod {
         end_day_of_month: 1,
         end_year: Some(DEFAULT_RUN_PERIOD_YEAR),
         day_of_week_for_start_day: None,
+        first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
     }
 }
 
@@ -9519,6 +9748,7 @@ mod tests {
         energyplus_third_order_zone_air_temperature_c,
         energyplus_weather_atmospheric_pressure_at_timestep,
         energyplus_weather_dry_bulb_at_timestep,
+        energyplus_weather_dry_bulb_at_timestep_with_starting_values,
         energyplus_weather_horizontal_infrared_at_timestep, energyplus_weather_record_day_of_year,
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_weather_relative_humidity_at_timestep,
@@ -9556,10 +9786,11 @@ mod tests {
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
         AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, Construction, ConstructionId,
-        DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
-        HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-        IdealLoadsLimit, InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId,
-        MaterialKind, MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
+        DehumidificationControlType, DemandControlledVentilationType,
+        FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
+        IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+        InternalGainId, LoadDistributionScheme, LoopId, Material, MaterialId, MaterialKind,
+        MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
         OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition,
         OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent, PlantBranchList,
         PlantLoop, Point3, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
@@ -9784,6 +10015,7 @@ mod tests {
             record_index.unwrap_or(0),
             4,
             None,
+            FirstHourInterpolationStartingValues::Hour24,
         );
 
         assert!((incident - 7.0).abs() < 1.0e-9);
@@ -9919,6 +10151,7 @@ mod tests {
             end_day_of_month: 3,
             end_year: Some(2013),
             day_of_week_for_start_day: None,
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
         })?;
 
         assert_eq!(axis.sample_count(), 72);
@@ -9941,6 +10174,7 @@ mod tests {
             end_day_of_month: 1,
             end_year: Some(2020),
             day_of_week_for_start_day: None,
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
         })?;
 
         assert_eq!(axis.sample_count(), 72);
@@ -12979,6 +13213,8 @@ DATA PERIODS
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(3),
+                    first_hour_interpolation_starting_values:
+                        FirstHourInterpolationStartingValues::Hour24,
                 },
                 typed_surface,
             ),
@@ -12991,6 +13227,8 @@ DATA PERIODS
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(4),
+                    first_hour_interpolation_starting_values:
+                        FirstHourInterpolationStartingValues::Hour24,
                 },
                 typed_surface,
             ),
@@ -13003,11 +13241,35 @@ DATA PERIODS
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: None,
+                    first_hour_interpolation_starting_values:
+                        FirstHourInterpolationStartingValues::Hour24,
                 },
                 typed_surface,
             ),
             0.25
         );
+    }
+
+    #[test]
+    fn first_hour_weather_interpolation_uses_run_period_day_seed() {
+        let mut records = vec![weather_record_with_precipitation(0.0); 25];
+        records[0].dry_bulb_c = -3.0;
+        records[23].dry_bulb_c = -11.0;
+        records[24].dry_bulb_c = 4.0;
+
+        let default_hour24 =
+            energyplus_weather_dry_bulb_at_timestep(Some(&records), 0, records[0].dry_bulb_c, 4, 1);
+        let explicit_hour1 = energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+            Some(&records),
+            0,
+            records[0].dry_bulb_c,
+            4,
+            1,
+            FirstHourInterpolationStartingValues::Hour1,
+        );
+
+        assert!((default_hour24 - -9.0).abs() < 1.0e-12);
+        assert!((explicit_hour1 - -3.0).abs() < 1.0e-12);
     }
 
     #[test]
@@ -13055,6 +13317,7 @@ DATA PERIODS
             record_index: 1,
             zone_steps_per_hour: 4,
             zone_timestep: Some(2),
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
         };
 
         update_zone_air_heat_capacities_from_weather_context(
@@ -13120,6 +13383,8 @@ DATA PERIODS
                 record_index: 0,
                 zone_steps_per_hour: 4,
                 zone_timestep: None,
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
             }),
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         );
@@ -13266,6 +13531,7 @@ DATA PERIODS
             options,
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
+            FirstHourInterpolationStartingValues::Hour24,
         );
         let weather_context_summary = run_heat_balance_run_period_warmup(
             &typed,
@@ -13277,6 +13543,7 @@ DATA PERIODS
             options,
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
+            FirstHourInterpolationStartingValues::Hour24,
         );
 
         assert_eq!(dry_only_summary.day_count, 1);
