@@ -492,6 +492,12 @@ Current Rust boundary:
   active interleaved zone-air correction also worsened top RMSE to `108.674004`
   while barely changing the first-sample floor history deltas, so the active
   mismatch is not explained by a missing final post-correction surface pass. A
+  non-interleaved grey-longwave twenty-pass probe reduces the first-sample floor
+  history deltas to `1422.936503`/`1243.804233 W`, but it worsens top RMSE to
+  `505.688631`, floor outside conduction RMSE to `470.726229`, and floor storage
+  RMSE to `505.688631`; the active lane therefore still needs interleaved
+  surface/zone coupling while the remaining CTF history mismatch is isolated
+  elsewhere in the coupled update path. A
   trial that froze the grey interior-longwave source after the first interleaved
   surface pass was also rejected: top RMSE jumped to `20311.728529`, and the
   floor first-sample inside/outside history deltas jumped to

@@ -140,7 +140,11 @@ active top rows, and switching the active interleaved grey-longwave lane to an
 EnergyPlus InitHeatBalance-shaped initial CTF seed is numerically identical
 after warmup. On the non-active quick-outside epseed lane, that seed improves
 first-sample floor history terms but regresses coupled floor
-longwave/convection and zone-air rows. A
+longwave/convection and zone-air rows. A non-interleaved grey-longwave
+twenty-pass probe also reduces first-sample floor history deltas but regresses
+floor storage and outside conduction, so the best active direction remains
+interleaved surface/zone coupling with a narrower CTF history/source update
+fix. A
 source recheck of EnergyPlus 26.1.0 `UpdateThermalHistories` also rules out an
 outside-face report sign flip as the next correction: EnergyPlus computes
 current `Qout` into `SurfOutsideFluxHist(1)`, reports
