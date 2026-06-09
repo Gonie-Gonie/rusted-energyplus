@@ -172,6 +172,19 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   reported storage sum. This keeps the next solver target on mass-floor
   face/history cancellation parity rather than no-mass wall/roof history
   bookkeeping.
+- A current-longwave fork of the frozen-hconv lane was added and rejected for
+  the floor-focused active path. EnergyPlus calls interior radiation exchange
+  with the current `SurfTempIn` vector inside the inside-surface iteration
+  loop, so the probe disables Rust's first-pass previous-inside longwave
+  temperature override while preserving the frozen hconv and adiabatic CTF
+  handoff behavior. It is effectively neutral for zone air (`Surface
+  Convection Rate` RMSE `9.385594` to `9.385137`, `Air Energy Storage Rate`
+  `16.169222` to `16.168835`) but worsens the current top floor rows:
+  `ZN001:FLR001` heat-storage RMSE `105.876226` to `105.890635`, inside
+  conduction `61.293942` to `61.302300`, outside conduction `45.144665` to
+  `45.150659`, and latent floor current/history RMSEs all rise by about
+  `0.342 W`. Keep longwave source sampling as a secondary source-order detail;
+  it is not the next floor-storage lever.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
