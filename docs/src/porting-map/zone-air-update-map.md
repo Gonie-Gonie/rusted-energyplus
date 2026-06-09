@@ -120,3 +120,12 @@ surface convection rises to `21.105254 W` and weather-proxy air storage rises
 to `7.547299 W`. Keep the convergence cutoff as a source-aligned surface
 cadence candidate, while the next zone-air work remains the explicit
 `SurfTempInTmp`/hconv report path and owned humidity/capacitance.
+
+On the promoted ScriptF-flat, 20-iteration lane, a surface-reference-air report
+probe separates the surface report snapshot from the zone-air `SumHADTsurfs`
+path. Using each surface's stored inside-solve reference air improves individual
+`Surface Inside Face Convection Heat Gain Rate` rows, but it worsens `Zone Air
+Heat Balance Surface Convection Rate` from `22.062956 W` to `91.956638 W` RMSE.
+This means the surface `SurfQdotConvInRep` reference-air snapshot is useful
+source evidence, but the zone AirRpt surface-convection row still needs the
+EnergyPlus `CalcZoneComponentLoadSums` timing mapped separately.

@@ -765,6 +765,18 @@ Current Rust boundary:
   surface reference air in the current active floor solve and shifts the next
   zone-convection work toward report/coupling timing or EnergyPlus source-map
   refinement rather than thawing the surface reference-air input.
+  A surface-reference-air report follow-up keeps that active ScriptF-flat,
+  frozen-reference-air solve but reports inside convection from each surface's
+  stored inside-solve reference-air snapshot. It improves the individual
+  surface convection report rows, for example floor RMSE `13.602803` to
+  `8.144741 W`, roof `13.288790` to `6.606491 W`, and `ZN001:WALL001`
+  `6.175653` to `3.432004 W`, while leaving floor storage unchanged at
+  `28.786920 W`. It is rejected as a zone-air promotion path, however, because
+  `Zone Air Heat Balance Surface Convection Rate` regresses from `22.062956`
+  to `91.956638 W` RMSE and max abs from `212.520279` to `433.880433 W`.
+  Keep the stored surface reference-air snapshot as source evidence for the
+  surface convection report path, and map EnergyPlus `CalcZoneComponentLoadSums`
+  / `SumHADTsurfs` timing separately from `SurfQdotConvInRep`.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
