@@ -3223,6 +3223,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_first_sample_deltas: Vec<HeatBalanceCtfHistoryFirstSampleDelta>,
     ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
     ctf_storage_max_sample_deltas: Vec<HeatBalanceCtfStorageMaxSampleDelta>,
+    inside_balance_max_sample_deltas: Vec<HeatBalanceInsideBalanceMaxSampleDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
@@ -3311,6 +3312,32 @@ struct HeatBalanceCtfStorageMaxSampleDelta {
     oracle_outside_history_term_w: f64,
     rust_outside_history_term_w: f64,
     outside_history_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceInsideBalanceMaxSampleDelta {
+    key: String,
+    construction_name: String,
+    sample_index: usize,
+    area_m2: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_delta_c: f64,
+    oracle_inside_convection_coefficient_w_per_m2_k: f64,
+    rust_inside_convection_coefficient_w_per_m2_k: f64,
+    inside_convection_coefficient_delta_w_per_m2_k: f64,
+    oracle_inside_conduction_w: f64,
+    rust_inside_conduction_w: f64,
+    inside_conduction_delta_w: f64,
+    oracle_inside_convection_w: f64,
+    rust_inside_convection_w: f64,
+    inside_convection_delta_w: f64,
+    oracle_inside_net_longwave_w: f64,
+    rust_inside_net_longwave_w: f64,
+    inside_net_longwave_delta_w: f64,
+    oracle_inside_balance_residual_w: f64,
+    rust_inside_balance_residual_w: f64,
+    inside_balance_residual_delta_w: f64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3743,6 +3770,8 @@ fn build_heat_balance_conformance_diagnostic(
         &ctf_coefficients,
         &simulation.results,
     );
+    let inside_balance_max_sample_deltas =
+        heat_balance_inside_balance_max_sample_deltas(&simulation_model, &series);
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
@@ -3760,6 +3789,7 @@ fn build_heat_balance_conformance_diagnostic(
         ctf_history_first_sample_deltas,
         ctf_history_series_deltas,
         ctf_storage_max_sample_deltas,
+        inside_balance_max_sample_deltas,
         ctf_history_run_period_initial_slots: simulation
             .summary
             .run_period_initial_ctf_history_slots,
@@ -4251,6 +4281,97 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 oracle_outside_history_term_w,
                 rust_outside_history_term_w: rust_outside_history,
                 outside_history_delta_w: (oracle_outside_history_term_w - rust_outside_history)
+                    .abs(),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_inside_balance_max_sample_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<HeatBalanceInsideBalanceMaxSampleDelta> {
+    model
+        .typed
+        .surfaces
+        .iter()
+        .filter_map(|surface| {
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            let storage_series =
+                heat_balance_series(series, &surface.name.0, "Surface Heat Storage Rate")?;
+            let storage_point = storage_series.delta.max_delta_sample?;
+            let sample_index = storage_point.index;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+
+            let inside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+                sample_index,
+            )?;
+            let inside_convection_coefficient = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Convection Heat Transfer Coefficient",
+                sample_index,
+            )?;
+            let inside_conduction = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Conduction Heat Transfer Rate",
+                sample_index,
+            )?;
+            let inside_convection = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Convection Heat Gain Rate",
+                sample_index,
+            )?;
+            let inside_net_longwave = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
+                sample_index,
+            )?;
+            let oracle_inside_balance_residual_w = inside_conduction.oracle_c
+                + inside_convection.oracle_c
+                + inside_net_longwave.oracle_c;
+            let rust_inside_balance_residual_w =
+                inside_conduction.rust_c + inside_convection.rust_c + inside_net_longwave.rust_c;
+
+            Some(HeatBalanceInsideBalanceMaxSampleDelta {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                sample_index,
+                area_m2,
+                oracle_inside_face_temperature_c: inside_temperature.oracle_c,
+                rust_inside_face_temperature_c: inside_temperature.rust_c,
+                inside_face_temperature_delta_c: inside_temperature.abs_delta_c,
+                oracle_inside_convection_coefficient_w_per_m2_k: inside_convection_coefficient
+                    .oracle_c,
+                rust_inside_convection_coefficient_w_per_m2_k: inside_convection_coefficient.rust_c,
+                inside_convection_coefficient_delta_w_per_m2_k: inside_convection_coefficient
+                    .abs_delta_c,
+                oracle_inside_conduction_w: inside_conduction.oracle_c,
+                rust_inside_conduction_w: inside_conduction.rust_c,
+                inside_conduction_delta_w: inside_conduction.abs_delta_c,
+                oracle_inside_convection_w: inside_convection.oracle_c,
+                rust_inside_convection_w: inside_convection.rust_c,
+                inside_convection_delta_w: inside_convection.abs_delta_c,
+                oracle_inside_net_longwave_w: inside_net_longwave.oracle_c,
+                rust_inside_net_longwave_w: inside_net_longwave.rust_c,
+                inside_net_longwave_delta_w: inside_net_longwave.abs_delta_c,
+                oracle_inside_balance_residual_w,
+                rust_inside_balance_residual_w,
+                inside_balance_residual_delta_w: (oracle_inside_balance_residual_w
+                    - rust_inside_balance_residual_w)
                     .abs(),
             })
         })
@@ -6313,6 +6434,12 @@ fn render_heat_balance_conformance_json(
         heat_balance_ctf_storage_max_sample_deltas_json(&diagnostic.ctf_storage_max_sample_deltas)
     ));
     json.push_str(&format!(
+        "  \"inside_balance_max_sample_deltas\": {},\n",
+        heat_balance_inside_balance_max_sample_deltas_json(
+            &diagnostic.inside_balance_max_sample_deltas
+        )
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_run_period_initial_slots\": {},\n",
         heat_balance_ctf_history_slots_json(&diagnostic.ctf_history_run_period_initial_slots)
     ));
@@ -6532,6 +6659,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_ctf_storage_max_sample_delta_rows(
         &mut report,
         &diagnostic.ctf_storage_max_sample_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Inside Balance Max-Sample Deltas\n\n");
+    heat_balance_report_inside_balance_max_sample_delta_rows(
+        &mut report,
+        &diagnostic.inside_balance_max_sample_deltas,
     );
     report.push('\n');
 
@@ -7256,6 +7390,67 @@ fn heat_balance_ctf_storage_max_sample_deltas_json(
     json
 }
 
+fn heat_balance_inside_balance_max_sample_deltas_json(
+    rows: &[HeatBalanceInsideBalanceMaxSampleDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
+                "\"oracle_inside_convection_coefficient_w_per_m2_k\": {}, ",
+                "\"rust_inside_convection_coefficient_w_per_m2_k\": {}, ",
+                "\"inside_convection_coefficient_delta_w_per_m2_k\": {}, ",
+                "\"oracle_inside_conduction_w\": {}, ",
+                "\"rust_inside_conduction_w\": {}, ",
+                "\"inside_conduction_delta_w\": {}, ",
+                "\"oracle_inside_convection_w\": {}, ",
+                "\"rust_inside_convection_w\": {}, ",
+                "\"inside_convection_delta_w\": {}, ",
+                "\"oracle_inside_net_longwave_w\": {}, ",
+                "\"rust_inside_net_longwave_w\": {}, ",
+                "\"inside_net_longwave_delta_w\": {}, ",
+                "\"oracle_inside_balance_residual_w\": {}, ",
+                "\"rust_inside_balance_residual_w\": {}, ",
+                "\"inside_balance_residual_delta_w\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.construction_name),
+            row.sample_index,
+            json_number(row.area_m2),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_delta_c),
+            json_number(row.oracle_inside_convection_coefficient_w_per_m2_k),
+            json_number(row.rust_inside_convection_coefficient_w_per_m2_k),
+            json_number(row.inside_convection_coefficient_delta_w_per_m2_k),
+            json_number(row.oracle_inside_conduction_w),
+            json_number(row.rust_inside_conduction_w),
+            json_number(row.inside_conduction_delta_w),
+            json_number(row.oracle_inside_convection_w),
+            json_number(row.rust_inside_convection_w),
+            json_number(row.inside_convection_delta_w),
+            json_number(row.oracle_inside_net_longwave_w),
+            json_number(row.rust_inside_net_longwave_w),
+            json_number(row.inside_net_longwave_delta_w),
+            json_number(row.oracle_inside_balance_residual_w),
+            json_number(row.rust_inside_balance_residual_w),
+            json_number(row.inside_balance_residual_delta_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_history_slots_json(rows: &[HeatBalanceCtfHistorySlotSample]) -> String {
     let mut json = String::from("[");
     for (index, row) in rows.iter().enumerate() {
@@ -7690,6 +7885,40 @@ fn heat_balance_report_ctf_storage_max_sample_delta_rows(
             row.rust_outside_current_term_w,
             row.oracle_outside_history_term_w,
             row.rust_outside_history_term_w
+        ));
+    }
+}
+
+fn heat_balance_report_inside_balance_max_sample_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceInsideBalanceMaxSampleDelta],
+) {
+    report.push_str(
+        "| key | construction | sample_index | residual_delta_w | cond_delta_w | conv_delta_w | net_lw_delta_w | hconv_delta_w_per_m2_k | in_temp_delta_c | oracle_residual_w | rust_residual_w | oracle_cond_w | rust_cond_w | oracle_conv_w | rust_conv_w | oracle_net_lw_w | rust_net_lw_w |\n",
+    );
+    report.push_str(
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+    );
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            row.sample_index,
+            row.inside_balance_residual_delta_w,
+            row.inside_conduction_delta_w,
+            row.inside_convection_delta_w,
+            row.inside_net_longwave_delta_w,
+            row.inside_convection_coefficient_delta_w_per_m2_k,
+            row.inside_face_temperature_delta_c,
+            row.oracle_inside_balance_residual_w,
+            row.rust_inside_balance_residual_w,
+            row.oracle_inside_conduction_w,
+            row.rust_inside_conduction_w,
+            row.oracle_inside_convection_w,
+            row.rust_inside_convection_w,
+            row.oracle_inside_net_longwave_w,
+            row.rust_inside_net_longwave_w
         ));
     }
 }
@@ -8916,6 +9145,30 @@ mod tests {
                 rust_outside_history_term_w: 2.0,
                 outside_history_delta_w: 3.0,
             }],
+            inside_balance_max_sample_deltas: vec![super::HeatBalanceInsideBalanceMaxSampleDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                sample_index: 1,
+                area_m2: 100.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_inside_convection_coefficient_w_per_m2_k: 2.0,
+                rust_inside_convection_coefficient_w_per_m2_k: 3.0,
+                inside_convection_coefficient_delta_w_per_m2_k: 1.0,
+                oracle_inside_conduction_w: 20.0,
+                rust_inside_conduction_w: 18.0,
+                inside_conduction_delta_w: 2.0,
+                oracle_inside_convection_w: -4.0,
+                rust_inside_convection_w: -5.0,
+                inside_convection_delta_w: 1.0,
+                oracle_inside_net_longwave_w: -12.0,
+                rust_inside_net_longwave_w: -10.0,
+                inside_net_longwave_delta_w: 2.0,
+                oracle_inside_balance_residual_w: 4.0,
+                rust_inside_balance_residual_w: 3.0,
+                inside_balance_residual_delta_w: 1.0,
+            }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -9075,6 +9328,8 @@ mod tests {
         assert!(json.contains("\"inside_history_delta\""));
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"storage_delta_w\""));
+        assert!(json.contains("\"inside_balance_max_sample_deltas\""));
+        assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"inside_total_term_w\""));
@@ -9106,6 +9361,8 @@ mod tests {
         assert!(digest.contains("\"inside_history_delta\""));
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"storage_delta_w\""));
+        assert!(digest.contains("\"inside_balance_max_sample_deltas\""));
+        assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
         assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
@@ -9143,6 +9400,8 @@ mod tests {
         assert!(report.contains("in_history_rmse_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("storage_delta_w"));
+        assert!(report.contains("## Inside Balance Max-Sample Deltas"));
+        assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
@@ -9278,6 +9537,30 @@ mod tests {
                 rust_outside_history_term_w: 4.0,
                 outside_history_delta_w: 3.0,
             }],
+            inside_balance_max_sample_deltas: vec![super::HeatBalanceInsideBalanceMaxSampleDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                sample_index: 1,
+                area_m2: 100.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_inside_convection_coefficient_w_per_m2_k: 2.0,
+                rust_inside_convection_coefficient_w_per_m2_k: 3.5,
+                inside_convection_coefficient_delta_w_per_m2_k: 1.5,
+                oracle_inside_conduction_w: 12.0,
+                rust_inside_conduction_w: 10.0,
+                inside_conduction_delta_w: 2.0,
+                oracle_inside_convection_w: -5.0,
+                rust_inside_convection_w: -4.0,
+                inside_convection_delta_w: 1.0,
+                oracle_inside_net_longwave_w: -3.0,
+                rust_inside_net_longwave_w: -2.0,
+                inside_net_longwave_delta_w: 1.0,
+                oracle_inside_balance_residual_w: 4.0,
+                rust_inside_balance_residual_w: 4.0,
+                inside_balance_residual_delta_w: 0.0,
+            }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -9403,6 +9686,8 @@ mod tests {
         assert!(json.contains("\"outside_history_delta\""));
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"outside_history_delta_w\""));
+        assert!(json.contains("\"inside_balance_max_sample_deltas\""));
+        assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
@@ -9423,6 +9708,8 @@ mod tests {
         assert!(digest.contains("\"outside_history_delta\""));
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"outside_history_delta_w\""));
+        assert!(digest.contains("\"inside_balance_max_sample_deltas\""));
+        assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
@@ -9454,6 +9741,8 @@ mod tests {
         assert!(report.contains("out_history_rmse_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("out_history_delta_w"));
+        assert!(report.contains("## Inside Balance Max-Sample Deltas"));
+        assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("status: fail"));

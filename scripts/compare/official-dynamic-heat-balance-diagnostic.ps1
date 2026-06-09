@@ -446,6 +446,16 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([double]$floorStorageMaxSampleDelta.storage_delta_w -le 0.0) {
         throw "Expected floor storage max-sample CTF delta to retain visible storage_delta_w"
     }
+    $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorInsideBalanceMaxSampleDelta) {
+        throw "Expected inside_balance_max_sample_deltas to include ZN001:FLR001 in all-eio mode"
+    }
+    if ([int]$floorInsideBalanceMaxSampleDelta.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
+        throw "Expected FLOOR inside-balance max-sample row to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($floorInsideBalanceMaxSampleDelta.sample_index)"
+    }
+    if ($null -eq $floorInsideBalanceMaxSampleDelta.inside_balance_residual_delta_w) {
+        throw "Expected FLOOR inside-balance max-sample row to include inside_balance_residual_delta_w"
+    }
     $floorRunPeriodInitialSlots = @($summary.ctf_history_run_period_initial_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
     if ($floorRunPeriodInitialSlots.Count -lt 5) {
         throw "Expected ctf_history_run_period_initial_slots to include FLOOR #CTFs=5 rows, got $($floorRunPeriodInitialSlots.Count)"
@@ -745,6 +755,8 @@ Assert-Contains -Text $reportText -Pattern "in_history_rmse_w" -Description "mar
 Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "markdown CTF outside history series RMSE column"
 Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -Description "markdown CTF storage max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "storage_delta_w" -Description "markdown CTF storage max-sample delta column"
+Assert-Contains -Text $reportText -Pattern "## Inside Balance Max-Sample Deltas" -Description "markdown inside-balance max-sample delta section"
+Assert-Contains -Text $reportText -Pattern "residual_delta_w" -Description "markdown inside-balance residual delta column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
