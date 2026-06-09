@@ -36,6 +36,7 @@ const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 const ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K: f64 = 0.01;
+const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -5197,6 +5198,107 @@ fn energyplus_outdoor_wet_bulb_c(
     Some(wet_bulb_c.min(dry_bulb_c))
 }
 
+#[cfg(test)]
+fn update_zone_air_heat_capacities_from_weather_context(
+    zones: &mut [ZoneHeatBalanceState],
+    context: Option<HeatBalanceWeatherContext<'_>>,
+    fallback_dry_bulb_c: f64,
+) {
+    let Some(context) = context else {
+        return;
+    };
+    let Some(record) = context.records.get(context.record_index) else {
+        return;
+    };
+
+    let dry_bulb_c = context
+        .zone_timestep
+        .map(|timestep| {
+            energyplus_weather_dry_bulb_at_timestep(
+                Some(context.records),
+                context.record_index,
+                fallback_dry_bulb_c,
+                context.zone_steps_per_hour,
+                timestep,
+            )
+        })
+        .unwrap_or(fallback_dry_bulb_c);
+    let relative_humidity_percent =
+        energyplus_weather_relative_humidity_for_context(context, record.relative_humidity_percent);
+    let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
+        context,
+        record.atmospheric_pressure_pa,
+    );
+    let Some(humidity_ratio) = energyplus_psychrometric_humidity_ratio_from_rh(
+        dry_bulb_c,
+        (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
+        atmospheric_pressure_pa,
+    ) else {
+        return;
+    };
+
+    for zone in zones {
+        if let Some(air_heat_capacity_j_per_k) = energyplus_zone_air_heat_capacity_j_per_k(
+            zone.volume_m3,
+            atmospheric_pressure_pa,
+            zone.mean_air_temperature_c,
+            humidity_ratio,
+        ) {
+            zone.air_heat_capacity_j_per_k = air_heat_capacity_j_per_k;
+        }
+    }
+}
+
+/// Returns EnergyPlus-style zone air heat capacity in J/K.
+///
+/// This mirrors the moist-air density and specific-heat terms EnergyPlus uses
+/// when building zone-air `AirPowerCap`; callers must provide the owning zone
+/// humidity ratio.
+pub fn energyplus_zone_air_heat_capacity_j_per_k(
+    volume_m3: f64,
+    atmospheric_pressure_pa: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> Option<f64> {
+    if !volume_m3.is_finite() || volume_m3 <= 0.0 {
+        return None;
+    }
+    let density_kg_per_m3 = energyplus_moist_air_density_kg_per_m3(
+        atmospheric_pressure_pa,
+        dry_bulb_c,
+        humidity_ratio,
+    )?;
+    let specific_heat_j_per_kg_k = energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio);
+
+    Some(volume_m3 * density_kg_per_m3 * specific_heat_j_per_kg_k)
+}
+
+/// Returns EnergyPlus `PsyRhoAirFnPbTdbW`-style moist-air density in kg/m3.
+pub fn energyplus_moist_air_density_kg_per_m3(
+    atmospheric_pressure_pa: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> Option<f64> {
+    if !atmospheric_pressure_pa.is_finite()
+        || atmospheric_pressure_pa <= 1000.0
+        || !dry_bulb_c.is_finite()
+    {
+        return None;
+    }
+    let dry_bulb_k = dry_bulb_c + KELVIN_OFFSET;
+    if dry_bulb_k <= 0.0 {
+        return None;
+    }
+    let humidity_ratio = humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO);
+
+    Some(atmospheric_pressure_pa / (287.0 * dry_bulb_k * (1.0 + 1.607_768_7 * humidity_ratio)))
+}
+
+/// Returns EnergyPlus `PsyCpAirFnW`-style moist-air specific heat in J/kg-K.
+pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64 {
+    1.004_84e3 + humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO) * 1.858_95e3
+}
+
 fn energyplus_psychrometric_humidity_ratio_from_rh(
     dry_bulb_c: f64,
     relative_humidity: f64,
@@ -5206,7 +5308,7 @@ fn energyplus_psychrometric_humidity_ratio_from_rh(
     let dew_pressure_pa = relative_humidity * saturation_pressure_pa;
     Some(
         (dew_pressure_pa * 0.62198 / (atmospheric_pressure_pa - dew_pressure_pa).max(1000.0))
-            .max(1.0e-5),
+            .max(ENERGYPLUS_MIN_HUMIDITY_RATIO),
     )
 }
 
@@ -8066,7 +8168,9 @@ mod tests {
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_exterior_longwave_terms, energyplus_exterior_wet_context_fraction,
         energyplus_exterior_wet_timestep_fraction,
-        energyplus_linearized_radiation_coefficient_w_per_m2_k, energyplus_outdoor_wet_bulb_c,
+        energyplus_linearized_radiation_coefficient_w_per_m2_k,
+        energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
+        energyplus_outdoor_wet_bulb_c, energyplus_psychrometric_humidity_ratio_from_rh,
         energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
         energyplus_surface_outside_wind_speed_m_per_s,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
@@ -8077,14 +8181,15 @@ mod tests {
         energyplus_weather_record_is_rain_at_timestep,
         energyplus_weather_relative_humidity_at_timestep,
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
-        energyplus_zone_air_temperature_coefficients, exterior_surface_energy_balance,
-        fix_energyplus_approximate_view_factors, heat_balance_uses_doe2_outside_convection,
-        horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
-        initialize_heat_balance_state_with_ctf_coefficients, next_day,
-        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
-        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
-        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        energyplus_zone_air_heat_capacity_j_per_k, energyplus_zone_air_temperature_coefficients,
+        exterior_surface_energy_balance, fix_energyplus_approximate_view_factors,
+        heat_balance_uses_doe2_outside_convection, horizontal_infrared_sky_temperature_c,
+        initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+        next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
+        parse_epw_records, run_heat_balance_run_period_warmup,
+        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -8097,6 +8202,7 @@ mod tests {
         update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
+        update_zone_air_heat_capacities_from_weather_context,
         zone_air_heat_balance_air_storage_rate_w, zone_air_heat_balance_surface_convection_rate_w,
         zone_geometry_summaries,
     };
@@ -10954,6 +11060,74 @@ DATA PERIODS
             ),
             0.25
         );
+    }
+
+    #[test]
+    fn energyplus_zone_air_heat_capacity_uses_moist_air_psychrometrics() {
+        let humidity_ratio = 0.0075;
+        let density = energyplus_moist_air_density_kg_per_m3(82_000.0, 20.0, humidity_ratio)
+            .expect("valid moist-air density");
+        let expected_density =
+            82_000.0 / (287.0 * (20.0 + KELVIN_OFFSET) * (1.0 + 1.607_768_7 * humidity_ratio));
+        assert!((density - expected_density).abs() < 1.0e-12);
+
+        let specific_heat = energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio);
+        let expected_specific_heat = 1.004_84e3 + humidity_ratio * 1.858_95e3;
+        assert!((specific_heat - expected_specific_heat).abs() < 1.0e-12);
+
+        let volume_m3 = 10.0;
+        let heat_capacity =
+            energyplus_zone_air_heat_capacity_j_per_k(volume_m3, 82_000.0, 20.0, humidity_ratio)
+                .expect("valid zone air heat capacity");
+        assert!(
+            (heat_capacity - volume_m3 * expected_density * expected_specific_heat).abs() < 1.0e-9
+        );
+        assert!(heat_capacity < volume_m3 * 1.2 * 1006.0);
+    }
+
+    #[test]
+    fn weather_context_updates_zone_air_heat_capacity_from_pressure_and_humidity()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed);
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let initial_capacity = state.zones[0].air_heat_capacity_j_per_k;
+
+        let mut previous = weather_record_with_precipitation(0.0);
+        previous.dry_bulb_c = 10.0;
+        previous.relative_humidity_percent = 40.0;
+        previous.atmospheric_pressure_pa = 80_000.0;
+        let mut current = weather_record_with_precipitation(0.0);
+        current.dry_bulb_c = 22.0;
+        current.relative_humidity_percent = 80.0;
+        current.atmospheric_pressure_pa = 84_000.0;
+        let records = [previous, current];
+        let context = HeatBalanceWeatherContext {
+            records: &records,
+            record_index: 1,
+            zone_steps_per_hour: 4,
+            zone_timestep: Some(2),
+        };
+
+        update_zone_air_heat_capacities_from_weather_context(
+            &mut state.zones,
+            Some(context),
+            current.dry_bulb_c,
+        );
+
+        let humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(16.0, 0.60, 82_000.0)
+            .expect("valid weather humidity ratio");
+        let expected_capacity = energyplus_zone_air_heat_capacity_j_per_k(
+            state.zones[0].volume_m3,
+            82_000.0,
+            20.0,
+            humidity_ratio,
+        )
+        .expect("valid expected capacity");
+        assert!((state.zones[0].air_heat_capacity_j_per_k - expected_capacity).abs() < 1.0e-9);
+        assert!(state.zones[0].air_heat_capacity_j_per_k < initial_capacity);
+
+        Ok(())
     }
 
     #[test]

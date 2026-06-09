@@ -212,6 +212,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   diagnostic probes. The
   default predictor equation itself remains the simplified diagnostic shell
   until all coefficient inputs are wired from source-mapped runtime state.
+  Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance
+  formulas used by `AirPowerCap`
+  (`PsyRhoAirFnPbTdbW` and `PsyCpAirFnW`), but they are deliberately not wired
+  into the active dynamic diagnostic solver yet. A direct weather-context
+  experiment that used timestep-interpolated outdoor humidity as the zone
+  `airHumRat` proxy reduced the physical altitude shortcut but worsened the
+  active floor heat-storage and aggregate conduction focus rows; porting the
+  actual zone humidity ratio and predictor/corrector state ownership must come
+  first.
 - `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
   Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
   Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
