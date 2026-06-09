@@ -704,6 +704,16 @@ Current Rust boundary:
   only moves from `19.325833` to `19.473624`, so the next runtime promotion
   candidate should carry the inside-CTF-only outside snapshot and leave exterior
   report-state generation current.
+  A follow-up commit probe that also writes that same inside-CTF outside
+  snapshot into outdoor CTF history slots is a verified no-op: all 99 compared
+  series and all Rust hourly sample rows match the active inside-CTF
+  outside-history lane exactly, including floor storage RMSE `45.539704`, floor
+  inside conduction `26.437580`, floor outside conduction `19.262430`,
+  aggregate outside conduction `25.267733`, zone surface convection
+  `21.080512`, and air storage `7.486249`. This rules out a separate outdoor
+  history-commit cadence mismatch; the persistent floor storage gap is in the
+  inside CTF solve inputs/coupling itself rather than the subsequent outdoor
+  history push.
   Replacing that lane's grey direct-view-factor interior longwave exchange with
   the current ScriptF implementation is rejected: floor storage RMSE jumps from
   `45.539704` to `6293.390244`, floor inside conduction from `26.437580` to

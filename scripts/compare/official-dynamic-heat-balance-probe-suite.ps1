@@ -35,6 +35,7 @@ $lanes = @(
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe.ps1",
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-commit-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-current-adhist-iter20-probe.ps1",
