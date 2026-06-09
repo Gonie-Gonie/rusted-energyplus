@@ -119,6 +119,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   temperature in `SurfTempInsOld` for the iterative damping term; Rust now
   preserves the previous per-surface inside-face temperature before its
   zone-air predictor pass overwrites the current face estimate.
+- The diagnostic `CTF History First-Sample Deltas` table now carries the zero
+  CTF coefficients and oracle/Rust inside/outside face temperatures next to the
+  current/history term decomposition. In the active all-CTF interleaved
+  longwave lane, `ZN001:FLR001` has `Z0=X0=58.085610 W/m2-K` and
+  `Y0=0.72354869 W/m2-K`; first-sample face-temperature deltas of only
+  `0.175831697 C` inside and `0.159122817 C` outside still expand to
+  `2345.374002 W` inside-current and `2117.149523 W` outside-current CTF term
+  deltas. The next floor work should therefore target adiabatic face
+  temperature/source handoff as well as the history vector itself.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF

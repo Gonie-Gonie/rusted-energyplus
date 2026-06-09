@@ -3228,6 +3228,15 @@ struct HeatBalanceCtfHistoryFirstSampleDelta {
     key: String,
     construction_name: String,
     area_m2: f64,
+    ctf_outside_0_w_per_m2_k: f64,
+    ctf_cross_0_w_per_m2_k: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    oracle_outside_face_temperature_c: f64,
+    rust_outside_face_temperature_c: f64,
+    outside_face_temperature_delta_c: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_delta_c: f64,
     oracle_inside_current_term_w: f64,
     rust_inside_current_term_w: f64,
     inside_current_delta_w: f64,
@@ -3807,6 +3816,16 @@ fn heat_balance_ctf_history_first_sample_deltas(
                 &surface.name.0,
                 "Surface Outside Face Temperature",
             )?;
+            let rust_inside_temperature_c = heat_balance_rust_first_value(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+            )?;
+            let rust_outside_temperature_c = heat_balance_rust_first_value(
+                series,
+                &surface.name.0,
+                "Surface Outside Face Temperature",
+            )?;
             let oracle_inside_conduction_rate_w = heat_balance_oracle_first_value(
                 series,
                 &surface.name.0,
@@ -3837,6 +3856,19 @@ fn heat_balance_ctf_history_first_sample_deltas(
                 key: surface.name.0.clone(),
                 construction_name: construction.name.0.clone(),
                 area_m2,
+                ctf_outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
+                ctf_cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                oracle_outside_face_temperature_c: oracle_outside_temperature_c,
+                rust_outside_face_temperature_c: rust_outside_temperature_c,
+                outside_face_temperature_delta_c: (oracle_outside_temperature_c
+                    - rust_outside_temperature_c)
+                    .abs(),
+                oracle_inside_face_temperature_c: oracle_inside_temperature_c,
+                rust_inside_face_temperature_c: rust_inside_temperature_c,
+                inside_face_temperature_delta_c: (oracle_inside_temperature_c
+                    - rust_inside_temperature_c)
+                    .abs(),
                 oracle_inside_current_term_w,
                 rust_inside_current_term_w,
                 inside_current_delta_w: (oracle_inside_current_term_w - rust_inside_current_term_w)
@@ -3873,6 +3905,21 @@ fn heat_balance_oracle_first_value(
                 && series.output.variable.eq_ignore_ascii_case(variable_name)
         })
         .map(|series| series.oracle_first_c)
+        .filter(|value| value.is_finite())
+}
+
+fn heat_balance_rust_first_value(
+    series: &[HeatBalanceSeriesDiagnostic],
+    key: &str,
+    variable_name: &str,
+) -> Option<f64> {
+    series
+        .iter()
+        .find(|series| {
+            series.output.key.eq_ignore_ascii_case(key)
+                && series.output.variable.eq_ignore_ascii_case(variable_name)
+        })
+        .map(|series| series.rust_first_c)
         .filter(|value| value.is_finite())
 }
 
@@ -6314,6 +6361,15 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
                 "{{ \"key\": {}, ",
                 "\"construction_name\": {}, ",
                 "\"area_m2\": {}, ",
+                "\"ctf_outside_0_w_per_m2_k\": {}, ",
+                "\"ctf_cross_0_w_per_m2_k\": {}, ",
+                "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                "\"oracle_outside_face_temperature_c\": {}, ",
+                "\"rust_outside_face_temperature_c\": {}, ",
+                "\"outside_face_temperature_delta_c\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
                 "\"oracle_inside_current_term_w\": {}, ",
                 "\"rust_inside_current_term_w\": {}, ",
                 "\"inside_current_delta_w\": {}, ",
@@ -6330,6 +6386,15 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
             json_string(&row.key),
             json_string(&row.construction_name),
             json_number(row.area_m2),
+            json_number(row.ctf_outside_0_w_per_m2_k),
+            json_number(row.ctf_cross_0_w_per_m2_k),
+            json_number(row.ctf_inside_0_w_per_m2_k),
+            json_number(row.oracle_outside_face_temperature_c),
+            json_number(row.rust_outside_face_temperature_c),
+            json_number(row.outside_face_temperature_delta_c),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_delta_c),
             json_number(row.oracle_inside_current_term_w),
             json_number(row.rust_inside_current_term_w),
             json_number(row.inside_current_delta_w),
@@ -6612,15 +6677,24 @@ fn heat_balance_report_ctf_history_first_sample_delta_rows(
     rows: &[HeatBalanceCtfHistoryFirstSampleDelta],
 ) {
     report.push_str(
-        "| key | construction | area_m2 | oracle_in_current_w | rust_in_current_w | in_current_abs_delta_w | oracle_in_history_w | rust_in_history_w | in_history_abs_delta_w | oracle_out_current_w | rust_out_current_w | out_current_abs_delta_w | oracle_out_history_w | rust_out_history_w | out_history_abs_delta_w |\n",
+        "| key | construction | area_m2 | ctf_x0 | ctf_y0 | ctf_z0 | oracle_out_temp_c | rust_out_temp_c | out_temp_abs_delta_c | oracle_in_temp_c | rust_in_temp_c | in_temp_abs_delta_c | oracle_in_current_w | rust_in_current_w | in_current_abs_delta_w | oracle_in_history_w | rust_in_history_w | in_history_abs_delta_w | oracle_out_current_w | rust_out_current_w | out_current_abs_delta_w | oracle_out_history_w | rust_out_history_w | out_history_abs_delta_w |\n",
     );
-    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             row.area_m2,
+            row.ctf_outside_0_w_per_m2_k,
+            row.ctf_cross_0_w_per_m2_k,
+            row.ctf_inside_0_w_per_m2_k,
+            row.oracle_outside_face_temperature_c,
+            row.rust_outside_face_temperature_c,
+            row.outside_face_temperature_delta_c,
+            row.oracle_inside_face_temperature_c,
+            row.rust_inside_face_temperature_c,
+            row.inside_face_temperature_delta_c,
             row.oracle_inside_current_term_w,
             row.rust_inside_current_term_w,
             row.inside_current_delta_w,
@@ -7636,6 +7710,15 @@ mod tests {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
+                ctf_outside_0_w_per_m2_k: 11.0,
+                ctf_cross_0_w_per_m2_k: 12.0,
+                ctf_inside_0_w_per_m2_k: 13.0,
+                oracle_outside_face_temperature_c: 14.0,
+                rust_outside_face_temperature_c: 15.0,
+                outside_face_temperature_delta_c: 1.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
                 oracle_inside_current_term_w: 9.0,
                 rust_inside_current_term_w: 10.0,
                 inside_current_delta_w: 1.0,
@@ -7805,6 +7888,8 @@ mod tests {
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
+        assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
+        assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"inside_total_term_w\""));
@@ -7830,7 +7915,7 @@ mod tests {
         );
         assert!(report.contains("## CTF History First-Sample Deltas"));
         assert!(report.contains(
-            "| FLOOR | FLOOR | 100.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
+            "| FLOOR | FLOOR | 100.000000000000 | 11.000000000000 | 12.000000000000 | 13.000000000000 | 14.000000000000 | 15.000000000000 | 1.000000000000 | 16.000000000000 | 17.000000000000 | 1.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
         ));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
@@ -7908,6 +7993,15 @@ mod tests {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
+                ctf_outside_0_w_per_m2_k: 11.0,
+                ctf_cross_0_w_per_m2_k: 12.0,
+                ctf_inside_0_w_per_m2_k: 13.0,
+                oracle_outside_face_temperature_c: 14.0,
+                rust_outside_face_temperature_c: 15.0,
+                outside_face_temperature_delta_c: 1.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
                 oracle_inside_current_term_w: 6.0,
                 rust_inside_current_term_w: 7.0,
                 inside_current_delta_w: 1.0,
