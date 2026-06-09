@@ -99,10 +99,12 @@ Current generators:
   and recent CTF history slot 1/2 contributions so the active storage
   bottleneck can be traced to reference-air, longwave, damping/source-order, or
   history-slot timing before adding another probe lane. It also
-  reports zone surface-convection closure against the signed sum of individual
-  surface inside-convection heat-gain rows, which keeps EnergyPlus AirRpt
-  source/timing differences visible before treating surface report rows as a
-  substitute for `CalcZoneComponentLoadSums`.
+  splits reference-air source deltas into hconv-coefficient and
+  reference-air-temperature components, and reports zone surface-convection
+  closure against the signed sum of individual surface inside-convection
+  heat-gain rows. This keeps EnergyPlus AirRpt source/timing differences
+  visible before treating surface report rows as a substitute for
+  `CalcZoneComponentLoadSums`.
 
 Conformance-facing scripts should keep this split:
 

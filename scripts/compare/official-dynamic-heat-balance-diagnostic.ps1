@@ -506,6 +506,22 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorInsideSolveMaxSampleDelta.tracked_solve_source_coverage_ratio) {
         throw "Expected FLOOR inside-solve max-sample row to include tracked_solve_source_coverage_ratio"
     }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_coefficient_source_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_temperature_source_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_temperature_source_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_share) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_coefficient_source_share"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_temperature_source_share) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_temperature_source_share"
+    }
+    $referenceAirSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_delta_w
+    if ([Math]::Abs($referenceAirSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_delta_w) -gt 1.0e-6) {
+        throw "Expected FLOOR inside-solve reference-air split terms to sum to reference_air_source_delta_w"
+    }
     $rustInsideHistorySplitSum = [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_temperature_term_w + [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_flux_term_w
     if ([Math]::Abs($rustInsideHistorySplitSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
         throw "Expected FLOOR inside-solve Rust history split terms to sum to rust_inside_history_term_w"
