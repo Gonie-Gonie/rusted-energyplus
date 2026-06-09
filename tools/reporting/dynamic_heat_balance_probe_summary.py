@@ -719,12 +719,17 @@ def sum_optional(left: float | None, right: float | None) -> float | None:
 
 
 def first_matching_key(rows: Any, key: str) -> dict[str, Any] | None:
+    return next(iter(matching_key_rows(rows, key)), None)
+
+
+def matching_key_rows(rows: Any, key: str) -> list[dict[str, Any]]:
     if not isinstance(rows, list):
-        return None
-    for row in rows:
-        if isinstance(row, dict) and row.get("key") == key:
-            return row
-    return None
+        return []
+    return [
+        row
+        for row in rows
+        if isinstance(row, dict) and row.get("key") == key
+    ]
 
 
 def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | None:
@@ -807,6 +812,106 @@ def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | No
             series,
             "outside_history_delta",
             "rmse_delta_c",
+        ),
+    }
+
+
+def slot_inside_history_temperature_equivalent_delta_c(
+    slot: dict[str, Any] | None,
+    history_delta_w: float | None,
+) -> float | None:
+    if slot is None or history_delta_w is None:
+        return None
+    area = numeric(slot.get("area_m2"))
+    coefficient = numeric(slot.get("inside_history_coefficient_w_per_m2_k"))
+    if area is None or coefficient is None or area == 0.0 or coefficient == 0.0:
+        return None
+    return -history_delta_w / (area * coefficient)
+
+
+def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] | None:
+    inside_solve = first_matching_key(
+        summary.get("inside_solve_max_sample_deltas"),
+        FLOOR_CTF_DRIVER_KEY,
+    )
+    slots = sorted(
+        matching_key_rows(
+            summary.get("ctf_history_max_sample_slots"),
+            FLOOR_CTF_DRIVER_KEY,
+        ),
+        key=lambda row: numeric(row.get("slot_index")) or 0.0,
+    )
+    if inside_solve is None and not slots:
+        return None
+
+    inside_solve = inside_solve or {}
+    slot1 = slots[0] if len(slots) >= 1 else None
+    slot2 = slots[1] if len(slots) >= 2 else None
+    history_delta_w = numeric(inside_solve.get("inside_history_delta_w"))
+
+    return {
+        "key": FLOOR_CTF_DRIVER_KEY,
+        "construction_name": inside_solve.get("construction_name")
+        or (slot1 or {}).get("construction_name"),
+        "sample_index": inside_solve.get("sample_index")
+        or (slot1 or {}).get("sample_index"),
+        "area_m2": inside_solve.get("area_m2") or (slot1 or {}).get("area_m2"),
+        "slot_count": len(slots),
+        "inside_face_temperature_delta_c": inside_solve.get(
+            "inside_face_temperature_delta_c"
+        ),
+        "inferred_reference_air_temperature_delta_c": inside_solve.get(
+            "inferred_reference_air_temperature_delta_c"
+        ),
+        "implied_solve_numerator_delta_w": inside_solve.get(
+            "implied_solve_numerator_delta_w"
+        ),
+        "reference_air_source_delta_w": inside_solve.get(
+            "reference_air_source_delta_w"
+        ),
+        "inside_history_delta_w": inside_solve.get("inside_history_delta_w"),
+        "rust_inside_history_temperature_term_w": inside_solve.get(
+            "rust_inside_history_temperature_term_w"
+        ),
+        "rust_inside_history_flux_term_w": inside_solve.get(
+            "rust_inside_history_flux_term_w"
+        ),
+        "inside_net_longwave_delta_w": inside_solve.get(
+            "inside_net_longwave_delta_w"
+        ),
+        "slot1_inside_total_term_w": (slot1 or {}).get("inside_total_term_w"),
+        "slot1_inside_temperature_term_w": (slot1 or {}).get(
+            "inside_temperature_term_w"
+        ),
+        "slot1_inside_flux_term_w": (slot1 or {}).get("inside_flux_term_w"),
+        "slot1_inside_temperature_history_c": (slot1 or {}).get(
+            "inside_temperature_history_c"
+        ),
+        "slot1_outside_temperature_history_c": (slot1 or {}).get(
+            "outside_temperature_history_c"
+        ),
+        "slot1_inside_history_temperature_equivalent_delta_c": (
+            slot_inside_history_temperature_equivalent_delta_c(
+                slot1,
+                history_delta_w,
+            )
+        ),
+        "slot2_inside_total_term_w": (slot2 or {}).get("inside_total_term_w"),
+        "slot2_inside_temperature_term_w": (slot2 or {}).get(
+            "inside_temperature_term_w"
+        ),
+        "slot2_inside_flux_term_w": (slot2 or {}).get("inside_flux_term_w"),
+        "slot2_inside_temperature_history_c": (slot2 or {}).get(
+            "inside_temperature_history_c"
+        ),
+        "slot2_outside_temperature_history_c": (slot2 or {}).get(
+            "outside_temperature_history_c"
+        ),
+        "slot2_inside_history_temperature_equivalent_delta_c": (
+            slot_inside_history_temperature_equivalent_delta_c(
+                slot2,
+                history_delta_w,
+            )
         ),
     }
 
@@ -1152,6 +1257,7 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         ),
         "surface_balance_drivers": surface_balance_driver_rows(summary),
         "floor_ctf_history_driver": floor_ctf_history_driver_row(summary),
+        "floor_ctf_max_sample_driver": floor_ctf_max_sample_driver_row(summary),
     }
 
 
@@ -1164,7 +1270,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v14",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v15",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1442,6 +1548,56 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 in_history_rmse=fmt_number(driver.get("inside_history_rmse_w")),
                 out_current_rmse=fmt_number(driver.get("outside_current_rmse_w")),
                 out_history_rmse=fmt_number(driver.get("outside_history_rmse_w")),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Floor CTF Max-Sample Drivers",
+            "",
+            "Max-sample solve/source rows keep the active floor storage bottleneck visible after the first-sample history cancellation has settled. The slot equivalent columns estimate the inside-history temperature shift that would explain the full history delta if assigned to that slot's inside temperature coefficient.",
+            "",
+            "| lane | sample | Tin dC | ref air dC | numerator dW | ref air dW | history dW | history temp W | history flux W | LW dW | slots | slot1 total W | slot1 Tin C | slot1 equiv dC | slot2 total W | slot2 Tin C | slot2 equiv dC |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        driver = lane.get("floor_ctf_max_sample_driver")
+        if not isinstance(driver, dict):
+            continue
+        lines.append(
+            "| {lane} | {sample} | {in_temp} | {ref_air_temp} | {numerator} | {ref_air} | {history} | {history_temp} | {history_flux} | {lw} | {slots} | {slot1_total} | {slot1_tin} | {slot1_equiv} | {slot2_total} | {slot2_tin} | {slot2_equiv} |".format(
+                lane=lane["lane"],
+                sample=driver.get("sample_index") or "none",
+                in_temp=fmt_number(driver.get("inside_face_temperature_delta_c")),
+                ref_air_temp=fmt_number(
+                    driver.get("inferred_reference_air_temperature_delta_c")
+                ),
+                numerator=fmt_number(driver.get("implied_solve_numerator_delta_w")),
+                ref_air=fmt_number(driver.get("reference_air_source_delta_w")),
+                history=fmt_number(driver.get("inside_history_delta_w")),
+                history_temp=fmt_number(
+                    driver.get("rust_inside_history_temperature_term_w")
+                ),
+                history_flux=fmt_number(
+                    driver.get("rust_inside_history_flux_term_w")
+                ),
+                lw=fmt_number(driver.get("inside_net_longwave_delta_w")),
+                slots=driver.get("slot_count") or "none",
+                slot1_total=fmt_number(driver.get("slot1_inside_total_term_w")),
+                slot1_tin=fmt_number(
+                    driver.get("slot1_inside_temperature_history_c")
+                ),
+                slot1_equiv=fmt_signed_number(
+                    driver.get("slot1_inside_history_temperature_equivalent_delta_c")
+                ),
+                slot2_total=fmt_number(driver.get("slot2_inside_total_term_w")),
+                slot2_tin=fmt_number(
+                    driver.get("slot2_inside_temperature_history_c")
+                ),
+                slot2_equiv=fmt_signed_number(
+                    driver.get("slot2_inside_history_temperature_equivalent_delta_c")
+                ),
             )
         )
     lines.extend(

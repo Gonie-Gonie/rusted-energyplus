@@ -93,7 +93,10 @@ Current generators:
   promoted. It also prints signed `ZN001:FLR001` CTF current/history
   first-sample deltas and annual current/history RMSE so cancellation can be
   reviewed directly when a probe improves reported storage but leaves latent
-  mass-floor history mismatch behind.
+  mass-floor history mismatch behind. The same report includes the floor
+  max-sample inside-solve decomposition and recent CTF history slot 1/2
+  contributions so the active storage bottleneck can be traced to source,
+  longwave, or history-slot timing before adding another probe lane.
 
 Conformance-facing scripts should keep this split:
 
