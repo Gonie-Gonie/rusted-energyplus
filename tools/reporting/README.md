@@ -71,6 +71,7 @@ Current generators:
   frozen-reference-air cadence probe, a third-order balance-surface-convection
   frozen-reference-air current-longwave cadence probe, a third-order
   frozen-reference-air current-longwave convergence-cutoff probe, a third-order
+  converged-surface frozen-outside snapshot probe, a third-order
   converged-surface adiabatic history-only commit rejection probe, a third-order
   balance-surface-convection current-adiabatic-history rejection probe, combined
   all-CTF analytical surface-first with three surface passes, third-order

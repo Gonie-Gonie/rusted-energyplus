@@ -677,6 +677,19 @@ Current Rust boundary:
   `3909 W`.
   This rules out a history-only current-inside adiabatic commit as the next
   floor-storage lever.
+  A converged-lane frozen-outside snapshot probe then holds the outside
+  boundary-balance temperature and exterior report terms from the first
+  inside-surface pass through subsequent surface iterations. This improves the
+  floor CTF/storage cancellation rows relative to the active best
+  (`52.022146` to `45.972185` floor storage RMSE, `30.201354` to
+  `26.687843` inside conduction, `21.976058` to `19.445141` outside
+  conduction, and `27.990507` to `20.835446` aggregate outside conduction),
+  but it also regresses `ZN001:ROOF001 / Surface Outside Face Convection Heat
+  Gain Rate` from `19.325833` to `67.850650` RMSE. This points to a real
+  EnergyPlus outside-snapshot cadence lever for floor CTF cancellation, but
+  rejects freezing exterior report terms wholesale; the next narrower probe
+  should separate the inside CTF solve's `SurfTempOutHist` snapshot from
+  current outside-face report-state generation.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

@@ -330,6 +330,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with frozen reference air, current-pass longwave, and EnergyPlus inside-surface convergence cutoff."
     }
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with converged surface solves and frozen outside-face snapshots."
+    }
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1"
         Group = "compare"
