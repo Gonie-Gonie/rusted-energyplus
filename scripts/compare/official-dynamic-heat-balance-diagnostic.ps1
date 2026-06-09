@@ -456,6 +456,19 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorInsideBalanceMaxSampleDelta.inside_balance_residual_delta_w) {
         throw "Expected FLOOR inside-balance max-sample row to include inside_balance_residual_delta_w"
     }
+    $floorInsideSolveMaxSampleDelta = @($summary.inside_solve_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorInsideSolveMaxSampleDelta) {
+        throw "Expected inside_solve_max_sample_deltas to include ZN001:FLR001 in all-eio mode"
+    }
+    if ([int]$floorInsideSolveMaxSampleDelta.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
+        throw "Expected FLOOR inside-solve max-sample row to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($floorInsideSolveMaxSampleDelta.sample_index)"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.implied_solve_numerator_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include implied_solve_numerator_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.inferred_reference_air_temperature_delta_c) {
+        throw "Expected FLOOR inside-solve max-sample row to include inferred_reference_air_temperature_delta_c"
+    }
     $floorRunPeriodInitialSlots = @($summary.ctf_history_run_period_initial_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
     if ($floorRunPeriodInitialSlots.Count -lt 5) {
         throw "Expected ctf_history_run_period_initial_slots to include FLOOR #CTFs=5 rows, got $($floorRunPeriodInitialSlots.Count)"
@@ -757,6 +770,8 @@ Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -D
 Assert-Contains -Text $reportText -Pattern "storage_delta_w" -Description "markdown CTF storage max-sample delta column"
 Assert-Contains -Text $reportText -Pattern "## Inside Balance Max-Sample Deltas" -Description "markdown inside-balance max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "residual_delta_w" -Description "markdown inside-balance residual delta column"
+Assert-Contains -Text $reportText -Pattern "## Inside Solve Max-Sample Deltas" -Description "markdown inside-solve max-sample delta section"
+Assert-Contains -Text $reportText -Pattern "implied_numerator_delta_w" -Description "markdown inside-solve implied numerator delta column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"

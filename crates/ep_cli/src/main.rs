@@ -22,7 +22,8 @@ use ep_conformance::{
     load_case_v2_file,
 };
 use ep_model::{
-    Construction, Material, OtherEquipment, ScheduleId, SimulationModel, SurfaceType, TypedModel,
+    Construction, Material, OtherEquipment, OutsideBoundaryCondition, ScheduleId, SimulationModel,
+    SurfaceType, TypedModel,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
@@ -63,6 +64,7 @@ const HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS";
 const HEAT_BALANCE_SURFACE_ITERATIONS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS";
+const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -3224,6 +3226,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
     ctf_storage_max_sample_deltas: Vec<HeatBalanceCtfStorageMaxSampleDelta>,
     inside_balance_max_sample_deltas: Vec<HeatBalanceInsideBalanceMaxSampleDelta>,
+    inside_solve_max_sample_deltas: Vec<HeatBalanceInsideSolveMaxSampleDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
@@ -3338,6 +3341,42 @@ struct HeatBalanceInsideBalanceMaxSampleDelta {
     oracle_inside_balance_residual_w: f64,
     rust_inside_balance_residual_w: f64,
     inside_balance_residual_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceInsideSolveMaxSampleDelta {
+    key: String,
+    construction_name: String,
+    outside_boundary_condition: String,
+    sample_index: usize,
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    ctf_cross_0_w_per_m2_k: f64,
+    iter_damp_w_per_m2_k: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_delta_c: f64,
+    oracle_inferred_reference_air_temperature_c: f64,
+    rust_inferred_reference_air_temperature_c: f64,
+    inferred_reference_air_temperature_delta_c: f64,
+    oracle_solve_denominator_w_per_m2_k: f64,
+    rust_solve_denominator_w_per_m2_k: f64,
+    solve_denominator_delta_w_per_m2_k: f64,
+    oracle_implied_solve_numerator_w: f64,
+    rust_implied_solve_numerator_w: f64,
+    implied_solve_numerator_delta_w: f64,
+    oracle_reference_air_source_w: f64,
+    rust_reference_air_source_w: f64,
+    reference_air_source_delta_w: f64,
+    oracle_outside_temperature_source_w: f64,
+    rust_outside_temperature_source_w: f64,
+    outside_temperature_source_delta_w: f64,
+    oracle_inside_history_term_w: f64,
+    rust_inside_history_term_w: f64,
+    inside_history_delta_w: f64,
+    oracle_inside_net_longwave_w: f64,
+    rust_inside_net_longwave_w: f64,
+    inside_net_longwave_delta_w: f64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3772,6 +3811,12 @@ fn build_heat_balance_conformance_diagnostic(
     );
     let inside_balance_max_sample_deltas =
         heat_balance_inside_balance_max_sample_deltas(&simulation_model, &series);
+    let inside_solve_max_sample_deltas = heat_balance_inside_solve_max_sample_deltas(
+        &simulation_model,
+        &series,
+        &ctf_coefficients,
+        &simulation.results,
+    );
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
@@ -3790,6 +3835,7 @@ fn build_heat_balance_conformance_diagnostic(
         ctf_history_series_deltas,
         ctf_storage_max_sample_deltas,
         inside_balance_max_sample_deltas,
+        inside_solve_max_sample_deltas,
         ctf_history_run_period_initial_slots: simulation
             .summary
             .run_period_initial_ctf_history_slots,
@@ -4376,6 +4422,227 @@ fn heat_balance_inside_balance_max_sample_deltas(
             })
         })
         .collect()
+}
+
+fn heat_balance_inside_solve_max_sample_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    results: &ResultStore,
+) -> Vec<HeatBalanceInsideSolveMaxSampleDelta> {
+    model
+        .typed
+        .surfaces
+        .iter()
+        .filter_map(|surface| {
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            let zero = ctf_coefficients.iter().find(|coefficient| {
+                coefficient.time_index == 0
+                    && coefficient
+                        .construction_name
+                        .eq_ignore_ascii_case(&construction.name.0)
+            })?;
+            let storage_series =
+                heat_balance_series(series, &surface.name.0, "Surface Heat Storage Rate")?;
+            let storage_point = storage_series.delta.max_delta_sample?;
+            let sample_index = storage_point.index;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+
+            let inside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+                sample_index,
+            )?;
+            let outside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Outside Face Temperature",
+                sample_index,
+            )?;
+            let inside_convection_coefficient = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Convection Heat Transfer Coefficient",
+                sample_index,
+            )?;
+            let inside_convection = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Convection Heat Gain Rate",
+                sample_index,
+            )?;
+            let inside_conduction = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Conduction Heat Transfer Rate",
+                sample_index,
+            )?;
+            let inside_net_longwave = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
+                sample_index,
+            )?;
+            let rust_inside_history = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+
+            let adiabatic_cross =
+                if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+                    zero.cross_w_per_m2_k
+                } else {
+                    0.0
+                };
+            let oracle_solve_denominator_w_per_m2_k = zero.inside_w_per_m2_k - adiabatic_cross
+                + inside_convection_coefficient.oracle_c
+                + HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K;
+            let rust_solve_denominator_w_per_m2_k = zero.inside_w_per_m2_k - adiabatic_cross
+                + inside_convection_coefficient.rust_c
+                + HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K;
+            let oracle_inferred_reference_air_temperature_c =
+                heat_balance_inferred_reference_air_temperature_c(
+                    inside_temperature.oracle_c,
+                    inside_convection_coefficient.oracle_c,
+                    area_m2,
+                    inside_convection.oracle_c,
+                );
+            let rust_inferred_reference_air_temperature_c =
+                heat_balance_inferred_reference_air_temperature_c(
+                    inside_temperature.rust_c,
+                    inside_convection_coefficient.rust_c,
+                    area_m2,
+                    inside_convection.rust_c,
+                );
+            let oracle_reference_air_source_w = area_m2
+                * inside_convection_coefficient.oracle_c
+                * oracle_inferred_reference_air_temperature_c;
+            let rust_reference_air_source_w = area_m2
+                * inside_convection_coefficient.rust_c
+                * rust_inferred_reference_air_temperature_c;
+            let oracle_outside_temperature_source_w = area_m2
+                * heat_balance_inside_solve_outside_temperature_source_w_per_m2(
+                    surface.outside_boundary_condition,
+                    zero.cross_w_per_m2_k,
+                    outside_temperature.oracle_c,
+                );
+            let rust_outside_temperature_source_w = area_m2
+                * heat_balance_inside_solve_outside_temperature_source_w_per_m2(
+                    surface.outside_boundary_condition,
+                    zero.cross_w_per_m2_k,
+                    outside_temperature.rust_c,
+                );
+            let oracle_inside_current_term_w = area_m2
+                * (outside_temperature.oracle_c * zero.cross_w_per_m2_k
+                    - inside_temperature.oracle_c * zero.inside_w_per_m2_k);
+            let oracle_inside_history_term_w =
+                inside_conduction.oracle_c - oracle_inside_current_term_w;
+            let oracle_implied_solve_numerator_w =
+                area_m2 * oracle_solve_denominator_w_per_m2_k * inside_temperature.oracle_c;
+            let rust_implied_solve_numerator_w =
+                area_m2 * rust_solve_denominator_w_per_m2_k * inside_temperature.rust_c;
+
+            Some(HeatBalanceInsideSolveMaxSampleDelta {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                outside_boundary_condition: heat_balance_outside_boundary_condition_label(
+                    surface.outside_boundary_condition,
+                )
+                .to_string(),
+                sample_index,
+                area_m2,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                ctf_cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+                iter_damp_w_per_m2_k: HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K,
+                oracle_inside_face_temperature_c: inside_temperature.oracle_c,
+                rust_inside_face_temperature_c: inside_temperature.rust_c,
+                inside_face_temperature_delta_c: inside_temperature.abs_delta_c,
+                oracle_inferred_reference_air_temperature_c,
+                rust_inferred_reference_air_temperature_c,
+                inferred_reference_air_temperature_delta_c:
+                    (oracle_inferred_reference_air_temperature_c
+                        - rust_inferred_reference_air_temperature_c)
+                        .abs(),
+                oracle_solve_denominator_w_per_m2_k,
+                rust_solve_denominator_w_per_m2_k,
+                solve_denominator_delta_w_per_m2_k: (oracle_solve_denominator_w_per_m2_k
+                    - rust_solve_denominator_w_per_m2_k)
+                    .abs(),
+                oracle_implied_solve_numerator_w,
+                rust_implied_solve_numerator_w,
+                implied_solve_numerator_delta_w: (oracle_implied_solve_numerator_w
+                    - rust_implied_solve_numerator_w)
+                    .abs(),
+                oracle_reference_air_source_w,
+                rust_reference_air_source_w,
+                reference_air_source_delta_w: (oracle_reference_air_source_w
+                    - rust_reference_air_source_w)
+                    .abs(),
+                oracle_outside_temperature_source_w,
+                rust_outside_temperature_source_w,
+                outside_temperature_source_delta_w: (oracle_outside_temperature_source_w
+                    - rust_outside_temperature_source_w)
+                    .abs(),
+                oracle_inside_history_term_w,
+                rust_inside_history_term_w: rust_inside_history,
+                inside_history_delta_w: (oracle_inside_history_term_w - rust_inside_history).abs(),
+                oracle_inside_net_longwave_w: inside_net_longwave.oracle_c,
+                rust_inside_net_longwave_w: inside_net_longwave.rust_c,
+                inside_net_longwave_delta_w: inside_net_longwave.abs_delta_c,
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_inferred_reference_air_temperature_c(
+    inside_face_temperature_c: f64,
+    inside_convection_coefficient_w_per_m2_k: f64,
+    area_m2: f64,
+    inside_convection_heat_gain_rate_w: f64,
+) -> f64 {
+    let conductance_w_per_k = inside_convection_coefficient_w_per_m2_k * area_m2;
+    if conductance_w_per_k.abs() <= f64::EPSILON {
+        f64::NAN
+    } else {
+        inside_face_temperature_c + inside_convection_heat_gain_rate_w / conductance_w_per_k
+    }
+}
+
+fn heat_balance_inside_solve_outside_temperature_source_w_per_m2(
+    outside_boundary_condition: OutsideBoundaryCondition,
+    ctf_cross_0_w_per_m2_k: f64,
+    outside_face_temperature_c: f64,
+) -> f64 {
+    if outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+        0.0
+    } else {
+        ctf_cross_0_w_per_m2_k * outside_face_temperature_c
+    }
+}
+
+fn heat_balance_outside_boundary_condition_label(
+    outside_boundary_condition: OutsideBoundaryCondition,
+) -> &'static str {
+    match outside_boundary_condition {
+        OutsideBoundaryCondition::Adiabatic => "adiabatic",
+        OutsideBoundaryCondition::Foundation => "foundation",
+        OutsideBoundaryCondition::Ground => "ground",
+        OutsideBoundaryCondition::Outdoors => "outdoors",
+        OutsideBoundaryCondition::Space => "space",
+        OutsideBoundaryCondition::Surface => "surface",
+        OutsideBoundaryCondition::Zone => "zone",
+        OutsideBoundaryCondition::Other => "other",
+    }
 }
 
 fn heat_balance_oracle_series_values(
@@ -6440,6 +6707,12 @@ fn render_heat_balance_conformance_json(
         )
     ));
     json.push_str(&format!(
+        "  \"inside_solve_max_sample_deltas\": {},\n",
+        heat_balance_inside_solve_max_sample_deltas_json(
+            &diagnostic.inside_solve_max_sample_deltas
+        )
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_run_period_initial_slots\": {},\n",
         heat_balance_ctf_history_slots_json(&diagnostic.ctf_history_run_period_initial_slots)
     ));
@@ -6666,6 +6939,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_inside_balance_max_sample_delta_rows(
         &mut report,
         &diagnostic.inside_balance_max_sample_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Inside Solve Max-Sample Deltas\n\n");
+    heat_balance_report_inside_solve_max_sample_delta_rows(
+        &mut report,
+        &diagnostic.inside_solve_max_sample_deltas,
     );
     report.push('\n');
 
@@ -7451,6 +7731,87 @@ fn heat_balance_inside_balance_max_sample_deltas_json(
     json
 }
 
+fn heat_balance_inside_solve_max_sample_deltas_json(
+    rows: &[HeatBalanceInsideSolveMaxSampleDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"outside_boundary_condition\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                "\"ctf_cross_0_w_per_m2_k\": {}, ",
+                "\"iter_damp_w_per_m2_k\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
+                "\"oracle_inferred_reference_air_temperature_c\": {}, ",
+                "\"rust_inferred_reference_air_temperature_c\": {}, ",
+                "\"inferred_reference_air_temperature_delta_c\": {}, ",
+                "\"oracle_solve_denominator_w_per_m2_k\": {}, ",
+                "\"rust_solve_denominator_w_per_m2_k\": {}, ",
+                "\"solve_denominator_delta_w_per_m2_k\": {}, ",
+                "\"oracle_implied_solve_numerator_w\": {}, ",
+                "\"rust_implied_solve_numerator_w\": {}, ",
+                "\"implied_solve_numerator_delta_w\": {}, ",
+                "\"oracle_reference_air_source_w\": {}, ",
+                "\"rust_reference_air_source_w\": {}, ",
+                "\"reference_air_source_delta_w\": {}, ",
+                "\"oracle_outside_temperature_source_w\": {}, ",
+                "\"rust_outside_temperature_source_w\": {}, ",
+                "\"outside_temperature_source_delta_w\": {}, ",
+                "\"oracle_inside_history_term_w\": {}, ",
+                "\"rust_inside_history_term_w\": {}, ",
+                "\"inside_history_delta_w\": {}, ",
+                "\"oracle_inside_net_longwave_w\": {}, ",
+                "\"rust_inside_net_longwave_w\": {}, ",
+                "\"inside_net_longwave_delta_w\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.construction_name),
+            json_string(&row.outside_boundary_condition),
+            row.sample_index,
+            json_number(row.area_m2),
+            json_number(row.ctf_inside_0_w_per_m2_k),
+            json_number(row.ctf_cross_0_w_per_m2_k),
+            json_number(row.iter_damp_w_per_m2_k),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_delta_c),
+            json_number(row.oracle_inferred_reference_air_temperature_c),
+            json_number(row.rust_inferred_reference_air_temperature_c),
+            json_number(row.inferred_reference_air_temperature_delta_c),
+            json_number(row.oracle_solve_denominator_w_per_m2_k),
+            json_number(row.rust_solve_denominator_w_per_m2_k),
+            json_number(row.solve_denominator_delta_w_per_m2_k),
+            json_number(row.oracle_implied_solve_numerator_w),
+            json_number(row.rust_implied_solve_numerator_w),
+            json_number(row.implied_solve_numerator_delta_w),
+            json_number(row.oracle_reference_air_source_w),
+            json_number(row.rust_reference_air_source_w),
+            json_number(row.reference_air_source_delta_w),
+            json_number(row.oracle_outside_temperature_source_w),
+            json_number(row.rust_outside_temperature_source_w),
+            json_number(row.outside_temperature_source_delta_w),
+            json_number(row.oracle_inside_history_term_w),
+            json_number(row.rust_inside_history_term_w),
+            json_number(row.inside_history_delta_w),
+            json_number(row.oracle_inside_net_longwave_w),
+            json_number(row.rust_inside_net_longwave_w),
+            json_number(row.inside_net_longwave_delta_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_history_slots_json(rows: &[HeatBalanceCtfHistorySlotSample]) -> String {
     let mut json = String::from("[");
     for (index, row) in rows.iter().enumerate() {
@@ -7919,6 +8280,41 @@ fn heat_balance_report_inside_balance_max_sample_delta_rows(
             row.rust_inside_convection_w,
             row.oracle_inside_net_longwave_w,
             row.rust_inside_net_longwave_w
+        ));
+    }
+}
+
+fn heat_balance_report_inside_solve_max_sample_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceInsideSolveMaxSampleDelta],
+) {
+    report.push_str(
+        "| key | construction | boundary | sample_index | implied_numerator_delta_w | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | outside_source_delta_w | history_delta_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
+    );
+    report.push_str(
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+    );
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            markdown_cell(&row.outside_boundary_condition),
+            row.sample_index,
+            row.implied_solve_numerator_delta_w,
+            row.solve_denominator_delta_w_per_m2_k,
+            row.inferred_reference_air_temperature_delta_c,
+            row.reference_air_source_delta_w,
+            row.outside_temperature_source_delta_w,
+            row.inside_history_delta_w,
+            row.inside_net_longwave_delta_w,
+            row.inside_face_temperature_delta_c,
+            row.oracle_implied_solve_numerator_w,
+            row.rust_implied_solve_numerator_w,
+            row.oracle_solve_denominator_w_per_m2_k,
+            row.rust_solve_denominator_w_per_m2_k,
+            row.oracle_inferred_reference_air_temperature_c,
+            row.rust_inferred_reference_air_temperature_c
         ));
     }
 }
@@ -9169,6 +9565,40 @@ mod tests {
                 rust_inside_balance_residual_w: 3.0,
                 inside_balance_residual_delta_w: 1.0,
             }],
+            inside_solve_max_sample_deltas: vec![super::HeatBalanceInsideSolveMaxSampleDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                outside_boundary_condition: "adiabatic".to_string(),
+                sample_index: 1,
+                area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                ctf_cross_0_w_per_m2_k: 1.0,
+                iter_damp_w_per_m2_k: 5.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_inferred_reference_air_temperature_c: 14.0,
+                rust_inferred_reference_air_temperature_c: 15.0,
+                inferred_reference_air_temperature_delta_c: 1.0,
+                oracle_solve_denominator_w_per_m2_k: 8.0,
+                rust_solve_denominator_w_per_m2_k: 9.0,
+                solve_denominator_delta_w_per_m2_k: 1.0,
+                oracle_implied_solve_numerator_w: 12800.0,
+                rust_implied_solve_numerator_w: 15300.0,
+                implied_solve_numerator_delta_w: 2500.0,
+                oracle_reference_air_source_w: 2800.0,
+                rust_reference_air_source_w: 4500.0,
+                reference_air_source_delta_w: 1700.0,
+                oracle_outside_temperature_source_w: 0.0,
+                rust_outside_temperature_source_w: 0.0,
+                outside_temperature_source_delta_w: 0.0,
+                oracle_inside_history_term_w: 11.0,
+                rust_inside_history_term_w: 8.0,
+                inside_history_delta_w: 3.0,
+                oracle_inside_net_longwave_w: -12.0,
+                rust_inside_net_longwave_w: -10.0,
+                inside_net_longwave_delta_w: 2.0,
+            }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -9330,6 +9760,8 @@ mod tests {
         assert!(json.contains("\"storage_delta_w\""));
         assert!(json.contains("\"inside_balance_max_sample_deltas\""));
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
+        assert!(json.contains("\"inside_solve_max_sample_deltas\""));
+        assert!(json.contains("\"implied_solve_numerator_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"inside_total_term_w\""));
@@ -9363,6 +9795,8 @@ mod tests {
         assert!(digest.contains("\"storage_delta_w\""));
         assert!(digest.contains("\"inside_balance_max_sample_deltas\""));
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
+        assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
+        assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
         assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
         assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
@@ -9402,6 +9836,8 @@ mod tests {
         assert!(report.contains("storage_delta_w"));
         assert!(report.contains("## Inside Balance Max-Sample Deltas"));
         assert!(report.contains("residual_delta_w"));
+        assert!(report.contains("## Inside Solve Max-Sample Deltas"));
+        assert!(report.contains("implied_numerator_delta_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
@@ -9561,6 +9997,40 @@ mod tests {
                 rust_inside_balance_residual_w: 4.0,
                 inside_balance_residual_delta_w: 0.0,
             }],
+            inside_solve_max_sample_deltas: vec![super::HeatBalanceInsideSolveMaxSampleDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                outside_boundary_condition: "adiabatic".to_string(),
+                sample_index: 1,
+                area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                ctf_cross_0_w_per_m2_k: 1.0,
+                iter_damp_w_per_m2_k: 5.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_inferred_reference_air_temperature_c: 13.5,
+                rust_inferred_reference_air_temperature_c: 15.8,
+                inferred_reference_air_temperature_delta_c: 2.3,
+                oracle_solve_denominator_w_per_m2_k: 8.0,
+                rust_solve_denominator_w_per_m2_k: 9.5,
+                solve_denominator_delta_w_per_m2_k: 1.5,
+                oracle_implied_solve_numerator_w: 12800.0,
+                rust_implied_solve_numerator_w: 16150.0,
+                implied_solve_numerator_delta_w: 3350.0,
+                oracle_reference_air_source_w: 2700.0,
+                rust_reference_air_source_w: 5530.0,
+                reference_air_source_delta_w: 2830.0,
+                oracle_outside_temperature_source_w: 0.0,
+                rust_outside_temperature_source_w: 0.0,
+                outside_temperature_source_delta_w: 0.0,
+                oracle_inside_history_term_w: 6.0,
+                rust_inside_history_term_w: 3.0,
+                inside_history_delta_w: 3.0,
+                oracle_inside_net_longwave_w: -3.0,
+                rust_inside_net_longwave_w: -2.0,
+                inside_net_longwave_delta_w: 1.0,
+            }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -9688,6 +10158,8 @@ mod tests {
         assert!(json.contains("\"outside_history_delta_w\""));
         assert!(json.contains("\"inside_balance_max_sample_deltas\""));
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
+        assert!(json.contains("\"inside_solve_max_sample_deltas\""));
+        assert!(json.contains("\"implied_solve_numerator_delta_w\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
@@ -9710,6 +10182,8 @@ mod tests {
         assert!(digest.contains("\"outside_history_delta_w\""));
         assert!(digest.contains("\"inside_balance_max_sample_deltas\""));
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
+        assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
+        assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
@@ -9743,6 +10217,8 @@ mod tests {
         assert!(report.contains("out_history_delta_w"));
         assert!(report.contains("## Inside Balance Max-Sample Deltas"));
         assert!(report.contains("residual_delta_w"));
+        assert!(report.contains("## Inside Solve Max-Sample Deltas"));
+        assert!(report.contains("implied_numerator_delta_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("status: fail"));
