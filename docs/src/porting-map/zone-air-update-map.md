@@ -94,3 +94,13 @@ from `29.623453 W` to `19.203798 W`. Keep this as source-isolation evidence
 only: EnergyPlus reports the direct `SumHADTsurfs` surface sum, so the
 remaining work is still `SurfTempInTmp`/hconv/source-order parity plus owned
 zone humidity before any conformance promotion.
+
+A frozen-reference-air surface-solve probe improves the zone state but exposes
+the remaining coupled-source trade-off. Holding the surface pass reference air
+at the timestep-start MAT while still correcting zone air after each pass lowers
+MAT RMSE from `0.069817 C` to `0.031508 C` and the mass-floor face-temperature
+RMSEs from about `0.0534 C` to about `0.0322 C`. The latent zone-air rows
+regress, though: balance-closure surface convection rises from `19.203798 W` to
+`21.039586 W`, and weather-proxy air storage rises from `5.845285 W` to
+`7.495999 W`. This makes frozen surface reference air a useful cadence clue,
+not a standalone promotion path.

@@ -235,6 +235,20 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   row mismatch is air-balance/report closure, not as a source-parity output:
   EnergyPlus still publishes `SumHADTsurfs` from the explicit
   `SurfTempInTmp`/`SurfHConvInt` surface sum.
+- A frozen-reference-air sibling of the balance-closure lane was added to test
+  whether EnergyPlus keeps the surface-solve `RefAirTemp` fixed while the
+  inside surface loop iterates before the zone-air correction is committed. It
+  improves MAT RMSE from `0.069817 C` to `0.031508 C`, floor inside/outside
+  face-temperature RMSE from about `0.0534 C` to about `0.0322 C`, and
+  aggregate inside-face conduction from `43.069343 W` to `27.427925 W`. Floor
+  storage moves only slightly (`54.593582 W` to `54.561792 W`) and the trade-off
+  is not promotion-ready: aggregate outside-face conduction worsens from
+  `20.119228 W` to `29.132671 W`, zone surface convection from `19.203798 W` to
+  `21.039586 W`, air storage from `5.845285 W` to `7.495999 W`, and floor inside
+  longwave from `16.615214 W` to `31.074699 W`. Treat this as a strong source
+  clue for surface reference-air cadence, but the next candidate must combine it
+  with EnergyPlus inside longwave/source-order and outside aggregate reporting
+  parity instead of promoting the probe directly.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF

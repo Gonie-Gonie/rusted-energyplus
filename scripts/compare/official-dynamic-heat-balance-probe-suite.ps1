@@ -30,6 +30,7 @@ $lanes = @(
     "official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-air-storage-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-prevmat-surfconv-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-iter20-probe.ps1",
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-iter20-probe.ps1",
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-current-adhist-iter20-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe.ps1",
     "official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5-probe.ps1",

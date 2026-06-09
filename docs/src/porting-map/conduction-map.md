@@ -243,5 +243,16 @@ floor storage RMSE from `54.593582` to `453.783584` and floor outside
 conduction RMSE from `23.282797` to `446.456057`, so the floor path should next
 target full EnergyPlus surface/air iteration cadence rather than a one-point
 self-adiabatic outside history overwrite.
+A timestep-start reference-air surface-solve probe was also kept as diagnostic
+evidence. It is a better candidate than the adiabatic-history overwrite for the
+current cadence question: MAT RMSE improves from `0.069817` to `0.031508`, floor
+face-temperature RMSE drops from about `0.0534` to `0.0322`, aggregate
+inside-face conduction falls from `43.069343` to `27.427925`, and floor storage
+edges down from `54.593582` to `54.561792`. It is still not promotion-ready
+because aggregate outside-face conduction worsens from `20.119228` to
+`29.132671`, floor inside-face longwave worsens from `16.615214` to
+`31.074699`, and the zone-air latent rows regress. The next conduction step
+should therefore keep the frozen reference-air clue but pair it with full
+inside longwave/source-order and outside aggregate reporting parity work.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.
