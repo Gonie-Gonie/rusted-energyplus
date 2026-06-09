@@ -470,10 +470,13 @@ Current Rust boundary:
   from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
   from `84.712495` to `38.774428`; floor storage remains the top active
   diagnostic row at `108.672323` RMSE. Rechecking the active lane with
-  EnergyPlus initial CTF histories or a 20-day Rust warmup does not materially
-  move the floor rows, and raising the same interleaved grey-longwave lane from
-  20 to 100 surface iterations slightly worsens the top floor storage RMSE
-  (`108.672323` to `108.676973`). A one-pass full ScriptF source still diverges
+  EnergyPlus initial CTF histories does not materially move the floor rows, and
+  forcing the Rust warmup to the oracle's 20 run-period warmup days only moves
+  top RMSE from `108.672323` to `108.671673` while reducing the floor
+  first-sample inside/outside history deltas from `1880.111844`/`1769.027186 W`
+  to `1824.704274`/`1713.508910 W`. Raising the same interleaved grey-longwave
+  lane from 20 to 100 surface iterations slightly worsens the top floor storage
+  RMSE (`108.672323` to `108.676973`). A one-pass full ScriptF source still diverges
   in the current simplified coupling shell. The Rust fixed approximate
   view-factor generation and ScriptF orientation are now unit-checked against
   the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining

@@ -1,7 +1,9 @@
 use ep_compare::load_eso_series;
 use ep_conformance::{ConformanceCase, OutputFrequency, OutputRegistry, SourceArtifact};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Command, Output};
 
 use crate::{
     comparison_class_label, first_value_label, json_string, last_value_label, markdown_cell,
@@ -85,36 +87,80 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     let input_idf = output_dir.join("input.idf");
     let injection = stage_idf_with_output_requests(&source_idf, &input_idf, manifest)?;
 
+    let input_arg = process_path_argument(&input_idf);
+    let output_arg = process_path_argument(output_dir);
+    let use_short_run_dir = input_arg.len() > 180 || output_arg.len() > 180;
+    let short_run_dir = if use_short_run_dir {
+        let run_dir = short_energyplus_run_dir(output_dir)?;
+        if run_dir.exists() {
+            std::fs::remove_dir_all(&run_dir).map_err(|error| {
+                format!(
+                    "failed to remove previous EnergyPlus run directory {}: {error}",
+                    run_dir.display()
+                )
+            })?;
+        }
+        std::fs::create_dir_all(&run_dir).map_err(|error| {
+            format!(
+                "failed to create EnergyPlus run directory {}: {error}",
+                run_dir.display()
+            )
+        })?;
+        std::fs::copy(&input_idf, run_dir.join("input.idf"))
+            .map_err(|error| format!("failed to stage EnergyPlus input.idf: {error}"))?;
+        if let Some(weather) = source_weather.as_ref() {
+            std::fs::copy(weather, run_dir.join("weather.epw"))
+                .map_err(|error| format!("failed to stage EnergyPlus weather.epw: {error}"))?;
+        }
+        Some(run_dir)
+    } else {
+        None
+    };
+
     let mut energyplus_command = Command::new(&energyplus);
-    if let Some(weather) = source_weather.as_ref() {
-        energyplus_command.arg("-w").arg(weather);
+    if let Some(run_dir) = short_run_dir.as_ref() {
+        energyplus_command.current_dir(run_dir);
+        if source_weather.is_some() {
+            energyplus_command.arg("-w").arg("weather.epw");
+        }
+        energyplus_command.arg("-d").arg(".").arg("input.idf");
+    } else {
+        if let Some(weather) = source_weather.as_ref() {
+            energyplus_command.arg("-w").arg(weather);
+        }
+        energyplus_command.arg("-d").arg(output_arg).arg(input_arg);
     }
-    energyplus_command
-        .arg("-d")
-        .arg(output_dir)
-        .arg(&input_idf)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
-    let energyplus_status = energyplus_command
-        .status()
+    let energyplus_output = energyplus_command
+        .output()
         .map_err(|error| format!("failed to start EnergyPlus: {error}"))?;
-    if !energyplus_status.success() {
-        return Err(format!(
-            "EnergyPlus baseline failed with status {energyplus_status}"
+    if !energyplus_output.status.success() {
+        let err_path = short_run_dir
+            .as_ref()
+            .map(|run_dir| run_dir.join("eplusout.err"))
+            .unwrap_or_else(|| output_dir.join("eplusout.err"));
+        return Err(command_failure_message(
+            "EnergyPlus baseline",
+            &energyplus_output,
+            Some(&err_path),
         ));
     }
 
-    let converter_status = Command::new(&converter)
+    let converter_dir = short_run_dir.as_deref().unwrap_or(output_dir);
+    let converter_output = Command::new(&converter)
         .arg("input.idf")
-        .current_dir(output_dir)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
+        .current_dir(converter_dir)
+        .output()
         .map_err(|error| format!("failed to start IDF converter: {error}"))?;
-    if !converter_status.success() {
-        return Err(format!(
-            "IDF conversion failed with status {converter_status}"
+    if !converter_output.status.success() {
+        return Err(command_failure_message(
+            "IDF conversion",
+            &converter_output,
+            None,
         ));
+    }
+
+    if let Some(run_dir) = short_run_dir.as_ref() {
+        copy_regular_files(run_dir, output_dir)?;
     }
 
     let eso = output_dir.join("eplusout.eso");
@@ -739,6 +785,110 @@ fn read_energyplus_err_summary(path: &Path) -> Result<EnergyPlusErrSummary, Stri
     Ok(energyplus_err_summary(&contents))
 }
 
+fn short_process_path(path: &Path) -> PathBuf {
+    let Ok(current_dir) = std::env::current_dir() else {
+        return path.to_path_buf();
+    };
+    let Ok(relative) = path.strip_prefix(&current_dir) else {
+        return path.to_path_buf();
+    };
+    if relative.as_os_str().is_empty() {
+        path.to_path_buf()
+    } else {
+        relative.to_path_buf()
+    }
+}
+
+fn process_path_argument(path: &Path) -> String {
+    short_process_path(path)
+        .to_string_lossy()
+        .replace('\\', "/")
+}
+
+fn short_energyplus_run_dir(output_dir: &Path) -> Result<PathBuf, String> {
+    let current_dir =
+        std::env::current_dir().map_err(|error| format!("failed to read current dir: {error}"))?;
+    let mut hasher = DefaultHasher::new();
+    output_dir.to_string_lossy().hash(&mut hasher);
+    Ok(current_dir
+        .join(".runtime")
+        .join("energyplus-runs")
+        .join(format!("{:016x}", hasher.finish())))
+}
+
+fn copy_regular_files(source_dir: &Path, target_dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(target_dir).map_err(|error| {
+        format!(
+            "failed to create EnergyPlus output directory {}: {error}",
+            target_dir.display()
+        )
+    })?;
+    for entry in std::fs::read_dir(source_dir).map_err(|error| {
+        format!(
+            "failed to read EnergyPlus run directory {}: {error}",
+            source_dir.display()
+        )
+    })? {
+        let entry = entry.map_err(|error| format!("failed to read EnergyPlus output: {error}"))?;
+        let file_type = entry
+            .file_type()
+            .map_err(|error| format!("failed to inspect EnergyPlus output: {error}"))?;
+        if file_type.is_file() {
+            std::fs::copy(entry.path(), target_dir.join(entry.file_name())).map_err(|error| {
+                format!(
+                    "failed to copy EnergyPlus output {}: {error}",
+                    entry.path().display()
+                )
+            })?;
+        }
+    }
+    Ok(())
+}
+
+fn command_failure_message(label: &str, output: &Output, err_path: Option<&Path>) -> String {
+    let mut message = format!("{label} failed with status {}", output.status);
+    append_process_stream_tail(&mut message, "stdout", &output.stdout);
+    append_process_stream_tail(&mut message, "stderr", &output.stderr);
+    if let Some(path) = err_path {
+        if let Ok(contents) = std::fs::read_to_string(path) {
+            append_text_tail(&mut message, &format!("{} tail", path.display()), &contents);
+        }
+    }
+    message
+}
+
+fn append_process_stream_tail(message: &mut String, label: &str, bytes: &[u8]) {
+    if bytes.is_empty() {
+        return;
+    }
+    let text = String::from_utf8_lossy(bytes);
+    append_text_tail(message, label, &text);
+}
+
+fn append_text_tail(message: &mut String, label: &str, text: &str) {
+    let lines = text
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .collect::<Vec<_>>();
+    if lines.is_empty() {
+        return;
+    }
+    message.push_str("\n--- ");
+    message.push_str(label);
+    message.push_str(" ---");
+    for line in lines
+        .iter()
+        .rev()
+        .take(40)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+    {
+        message.push('\n');
+        message.push_str(line);
+    }
+}
+
 fn energyplus_err_summary(contents: &str) -> EnergyPlusErrSummary {
     let mut warnings = Vec::new();
     let mut severe_count = 0;
@@ -803,6 +953,37 @@ source = "eso"
         assert!(injection.text.contains("Surface Inside Face Temperature"));
         assert!(injection.text.contains("Hourly"));
         Ok(())
+    }
+
+    #[test]
+    fn process_failure_tail_omits_blank_lines_and_keeps_recent_context() {
+        let text = (1..=45)
+            .map(|index| format!("line {index}"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let mut message = String::from("failed");
+
+        append_text_tail(&mut message, "stderr", &format!("\n{text}\n\n"));
+
+        assert!(message.contains("--- stderr ---"));
+        assert!(!message.contains("line 1\n"));
+        assert!(message.contains("line 6"));
+        assert!(message.contains("line 45"));
+    }
+
+    #[test]
+    fn process_paths_are_shortened_when_they_are_under_current_directory() {
+        let current_dir = std::env::current_dir().expect("current dir");
+        let path = current_dir
+            .join("target")
+            .join("diagnostic")
+            .join("input.idf");
+
+        assert_eq!(
+            short_process_path(&path),
+            PathBuf::from("target").join("diagnostic").join("input.idf")
+        );
+        assert_eq!(process_path_argument(&path), "target/diagnostic/input.idf");
     }
 
     #[test]
