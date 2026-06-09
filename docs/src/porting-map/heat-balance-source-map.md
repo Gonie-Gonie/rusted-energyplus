@@ -492,8 +492,13 @@ Current Rust boundary:
   active interleaved zone-air correction also worsened top RMSE to `108.674004`
   while barely changing the first-sample floor history deltas, so the active
   mismatch is not explained by a missing final post-correction surface pass. A
-  one-pass full ScriptF source still diverges
-  in the current simplified coupling shell. The Rust fixed approximate
+  trial that froze the grey interior-longwave source after the first interleaved
+  surface pass was also rejected: top RMSE jumped to `20311.728529`, and the
+  floor first-sample inside/outside history deltas jumped to
+  `226264.768901`/`226437.862641 W`, so the EnergyPlus `InitSurfaceHeatBalance`
+  longwave timing cannot be approximated by simply holding the first-pass source
+  while keeping the current Rust interleaving loop. A one-pass full ScriptF
+  source still diverges in the current simplified coupling shell. The Rust fixed approximate
   view-factor generation and ScriptF orientation are now unit-checked against
   the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
   ScriptF gap is expected to live in the coupled surface/zone iteration timing
