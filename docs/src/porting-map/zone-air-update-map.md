@@ -59,3 +59,11 @@ to `0.069817 C` and floor heat-storage RMSE to `54.593582 W`, but the latent
 Energy Storage Rate` rows rise to `29.623453 W` and `29.666388 W` RMSE. Keep
 the next zone-air work on source-order parity and owned moist-air capacitance,
 not on a standalone temperature-solver swap.
+
+A non-frozen-hconv third-order sibling confirms that the latent air-balance
+regression is not solved by simply unfreezing hconv. It nudges MAT and the two
+latent zone-air RMSE rows to `0.069191 C`, `28.637227 W`, and `28.446243 W`, but
+raises the current floor heat-storage/inside-conduction/outside-conduction rows
+to `58.289839 W`, `33.704368 W`, and `24.970278 W`. That keeps the next
+zone-air target on coefficient/source ordering rather than a different hconv
+cadence.

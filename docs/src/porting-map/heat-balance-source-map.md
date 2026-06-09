@@ -199,6 +199,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   uses `RhoAir * CpAir * Volume * (MAT - ZTM[0]) / TimeStepSysSec`, so the next
   target is coupled zone-air source ordering and moist-air capacitance ownership
   rather than changing the third-order storage report formula.
+- A non-frozen-hconv sibling of the third-order interleaved grey-longwave lane
+  was added to isolate that trade-off. It slightly improves MAT
+  (`0.069817 C` to `0.069191 C`) and the latent zone-air rows (`29.623453 W` to
+  `28.637227 W` for surface convection, `29.666388 W` to `28.446243 W` for air
+  storage) relative to the frozen third-order probe, but worsens the top floor
+  rows: heat storage rises from `54.593582 W` to `58.289839 W`, inside
+  conduction from `31.581604 W` to `33.704368 W`, and outside conduction from
+  `23.282797 W` to `24.970278 W`. Keep frozen-hconv third-order as the current
+  floor/MAT candidate and treat non-frozen third-order as a rejected isolation
+  probe, not a promotion path.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
@@ -567,7 +577,11 @@ Current Rust boundary:
   (`54.593582` floor storage, `31.581604` floor inside conduction,
   `23.282797` floor outside conduction, and `0.069817` MAT RMSE), but exposes a
   latent zone-air report/source-order trade-off because surface-convection and
-  air-storage RMSE rise to `29.623453` and `29.666388`. Rechecking the active
+  air-storage RMSE rise to `29.623453` and `29.666388`. Removing the hconv
+  freeze from that third-order lane slightly improves MAT and those latent
+  air-balance rows (`0.069191`, `28.637227`, and `28.446243` RMSE), but worsens
+  the floor storage/inside/outside conduction rows to `58.289839`, `33.704368`,
+  and `24.970278`, so it is only an isolation probe. Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
   floor RMSE rows and identical first-sample floor history deltas
