@@ -146,6 +146,22 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   and `ZN001:FLR001` inside-convection-coefficient RMSE from `0.073182` to
   `0.031945`. It is a useful diagnostic candidate, but floor CTF
   face-temperature/history handoff remains the dominant bottleneck.
+- A current-adiabatic fork of the frozen-hconv lane was added and rejected as
+  an active candidate. The EnergyPlus interzone/adiabatic branch updates
+  `SurfTempOut`/`SurfOutsideTempHist(1)` from the adjacent current inside
+  temperature during `CalcHeatBalanceInsideSurf2CTFOnly`, so the probe lets the
+  adiabatic outside face follow the current inside solve instead of the
+  timestep-start previous-inside value. This lowers `ZN001:FLR001`
+  first-sample CTF current/history term deltas (`inside_current` from
+  `2332.481555 W` to `1904.486777 W`, `outside_current` from `2104.053664 W`
+  to `1494.452520 W`, `inside_history` from `1869.921937 W` to
+  `1432.798624 W`, and `outside_history` from `1760.206936 W` to
+  `1253.666354 W`), but the annual dynamic lane regresses sharply: MAT RMSE
+  rises from `0.116074` to `0.366845`, floor heat-storage RMSE rises from
+  `105.876226` to `507.532350`, and floor outside-conduction RMSE rises from
+  `45.144665` to `471.677285`. Treat the source clue as history/report-order
+  work, not a direct current-inside adiabatic outside-face replacement in this
+  coupled lane.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
