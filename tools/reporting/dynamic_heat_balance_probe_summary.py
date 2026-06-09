@@ -13,6 +13,8 @@ EXPECTED_SERIES_COUNT = 99
 SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
 SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"
+SURFACE_INSIDE_TEMPERATURE_VARIABLE = "Surface Inside Face Temperature"
+SURFACE_OUTSIDE_TEMPERATURE_VARIABLE = "Surface Outside Face Temperature"
 SURFACE_DRIVER_LIMIT = 3
 
 
@@ -502,6 +504,8 @@ def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]
         SURFACE_HEAT_STORAGE_VARIABLE,
         SURFACE_INSIDE_CONDUCTION_VARIABLE,
         SURFACE_OUTSIDE_CONDUCTION_VARIABLE,
+        SURFACE_INSIDE_TEMPERATURE_VARIABLE,
+        SURFACE_OUTSIDE_TEMPERATURE_VARIABLE,
     ):
         for metric in surface_conduction_metric_rows(summary, variable):
             key = str(metric.get("key", "none"))
@@ -512,6 +516,8 @@ def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]
         storage_metric = metrics.get(SURFACE_HEAT_STORAGE_VARIABLE)
         inside_metric = metrics.get(SURFACE_INSIDE_CONDUCTION_VARIABLE)
         outside_metric = metrics.get(SURFACE_OUTSIDE_CONDUCTION_VARIABLE)
+        inside_temperature_metric = metrics.get(SURFACE_INSIDE_TEMPERATURE_VARIABLE)
+        outside_temperature_metric = metrics.get(SURFACE_OUTSIDE_TEMPERATURE_VARIABLE)
         leg_rmses = {
             "storage": numeric(storage_metric.get("rmse_delta_c"))
             if isinstance(storage_metric, dict)
@@ -522,9 +528,17 @@ def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]
             "outside": numeric(outside_metric.get("rmse_delta_c"))
             if isinstance(outside_metric, dict)
             else None,
+            "inside_temperature": numeric(inside_temperature_metric.get("rmse_delta_c"))
+            if isinstance(inside_temperature_metric, dict)
+            else None,
+            "outside_temperature": numeric(outside_temperature_metric.get("rmse_delta_c"))
+            if isinstance(outside_temperature_metric, dict)
+            else None,
         }
         available_rmses = {
-            name: rmse for name, rmse in leg_rmses.items() if rmse is not None
+            name: rmse
+            for name, rmse in leg_rmses.items()
+            if rmse is not None and not name.endswith("_temperature")
         }
         dominant_leg = (
             max(available_rmses.items(), key=lambda item: item[1])[0]
@@ -542,6 +556,20 @@ def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]
                 "storage_rmse_delta_c": leg_rmses["storage"],
                 "inside_rmse_delta_c": leg_rmses["inside"],
                 "outside_rmse_delta_c": leg_rmses["outside"],
+                "inside_temperature_rmse_delta_c": leg_rmses["inside_temperature"],
+                "outside_temperature_rmse_delta_c": leg_rmses["outside_temperature"],
+                "storage_rmse_per_inside_temperature_rmse": ratio(
+                    leg_rmses["storage"], leg_rmses["inside_temperature"]
+                ),
+                "storage_rmse_per_outside_temperature_rmse": ratio(
+                    leg_rmses["storage"], leg_rmses["outside_temperature"]
+                ),
+                "inside_conduction_rmse_per_inside_temperature_rmse": ratio(
+                    leg_rmses["inside"], leg_rmses["inside_temperature"]
+                ),
+                "outside_conduction_rmse_per_outside_temperature_rmse": ratio(
+                    leg_rmses["outside"], leg_rmses["outside_temperature"]
+                ),
                 "storage_max_abs_delta_c": storage_metric.get("max_abs_delta_c")
                 if isinstance(storage_metric, dict)
                 else None,
@@ -574,6 +602,12 @@ def numeric(value: Any) -> float | None:
     if isinstance(value, (int, float)):
         return float(value)
     return None
+
+
+def ratio(numerator: float | None, denominator: float | None) -> float | None:
+    if numerator is None or denominator is None or denominator == 0.0:
+        return None
+    return numerator / denominator
 
 
 def annotate_default_focus_deltas(lanes: list[dict[str, Any]]) -> None:
@@ -912,7 +946,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v12",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v13",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1110,10 +1144,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "",
             "## Surface Conduction Balance Drivers",
             "",
-            "Top per-surface storage rows paired with their inside- and outside-face conduction RMSE. This shows whether the storage bottleneck is moving with the inside face, outside face, or their combined report balance.",
+            "Top per-surface storage rows paired with their inside/outside-face conduction and temperature RMSE. The amplification columns divide W-rate RMSE by face-temperature RMSE, which highlights CTF cases where a small temperature miss is being multiplied into a large storage/conduction delta.",
             "",
-            "| lane | rank | surface | storage RMSE | storage vs default | inside RMSE | outside RMSE | dominant leg | status |",
-            "|---|---:|---|---:|---:|---:|---:|---|---|",
+            "| lane | rank | surface | storage RMSE | storage vs default | inside RMSE | outside RMSE | inside temp RMSE | outside temp RMSE | storage/inside temp | storage/outside temp | dominant leg | status |",
+            "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
         ]
     )
     for lane in summary["lanes"]:
@@ -1122,7 +1156,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             start=1,
         ):
             lines.append(
-                "| {lane} | {rank} | {surface} | {storage_rmse} | {storage_vs_default} | {inside_rmse} | {outside_rmse} | {dominant_leg} | {status} |".format(
+                "| {lane} | {rank} | {surface} | {storage_rmse} | {storage_vs_default} | {inside_rmse} | {outside_rmse} | {inside_temp_rmse} | {outside_temp_rmse} | {storage_per_inside_temp} | {storage_per_outside_temp} | {dominant_leg} | {status} |".format(
                     lane=lane["lane"],
                     rank=rank,
                     surface=metric["label"],
@@ -1132,6 +1166,18 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     ),
                     inside_rmse=fmt_number(metric.get("inside_rmse_delta_c")),
                     outside_rmse=fmt_number(metric.get("outside_rmse_delta_c")),
+                    inside_temp_rmse=fmt_number(
+                        metric.get("inside_temperature_rmse_delta_c")
+                    ),
+                    outside_temp_rmse=fmt_number(
+                        metric.get("outside_temperature_rmse_delta_c")
+                    ),
+                    storage_per_inside_temp=fmt_number(
+                        metric.get("storage_rmse_per_inside_temperature_rmse")
+                    ),
+                    storage_per_outside_temp=fmt_number(
+                        metric.get("storage_rmse_per_outside_temperature_rmse")
+                    ),
                     dominant_leg=metric.get("dominant_leg", "none"),
                     status=metric.get("status", "none"),
                 )

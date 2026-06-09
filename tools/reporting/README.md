@@ -76,9 +76,11 @@ Current generators:
   generator through the repo-local report Python environment. Use
   `scripts\dev.cmd official-dynamic-heat-balance-probe-suite` to refresh every
   tracked probe lane before regenerating the summary. The summary also pairs
-  per-surface heat-storage RMSE with inside- and outside-face conduction RMSE
-  so the active floor/aggregate bottleneck can be attributed before a runtime
-  candidate is promoted.
+  per-surface heat-storage RMSE with inside- and outside-face conduction and
+  temperature RMSE, then reports storage/conduction RMSE per face-temperature
+  RMSE. This keeps CTF amplification cases, where small temperature misses
+  become large storage-rate deltas, visible before a runtime candidate is
+  promoted.
 
 Conformance-facing scripts should keep this split:
 

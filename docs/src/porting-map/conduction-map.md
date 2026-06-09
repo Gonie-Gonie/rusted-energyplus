@@ -202,9 +202,11 @@ raising the tracked official dynamic series count to 99 after the floor
 storage per-area row was added, so aggregate cancellation does not hide the
 next bottleneck. The
 dynamic probe summary now ranks each lane's top inside-face and outside-face
-conduction driver surfaces and records the best lane per surface, keeping
-aggregate conduction regressions tied to wall/floor/roof source rows before a
-runtime change is promoted.
+conduction driver surfaces and records the best lane per surface. It also pairs
+surface heat-storage/conduction RMSE with inside/outside face-temperature RMSE
+and reports the W-rate RMSE per C of face-temperature RMSE, keeping aggregate
+conduction regressions and CTF amplification tied to wall/floor/roof source rows
+before a runtime change is promoted.
 Porting the EnergyPlus Perez anisotropic sky diffuse multiplier for exterior
 incident solar then moves the active quick-boundary lane away from thousand-Watt
 wall solar source errors. Aligning solar position and shadowing-period
