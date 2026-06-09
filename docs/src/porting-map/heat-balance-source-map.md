@@ -614,6 +614,15 @@ Current Rust boundary:
   as the next zone-air target. A previous-MAT surface-convection report sibling
   rejects the report-reference-temperature hypothesis: MAT/floor/storage rows
   are unchanged, but the zone surface-convection RMSE rises to `104.589141`.
+  A balance-surface-convection sibling that syncs self-adiabatic outside faces
+  back to the current inside face immediately before CTF history/report commit
+  is also rejected in the current Rust interleaving shell: floor storage RMSE
+  worsens from `54.593582` to `453.783584`, floor outside conduction from
+  `23.282797` to `446.456057`, and MAT from `0.069817` to `0.335157`. This
+  rules out a simple post-inside-solve adiabatic outside-history sync as the
+  next promotion path; the remaining floor CTF error needs the broader
+  EnergyPlus inside/outside/air-balance iteration cadence, not just a final
+  history-slot assignment.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

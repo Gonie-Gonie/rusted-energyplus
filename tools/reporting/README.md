@@ -67,7 +67,8 @@ Current generators:
   interior-longwave, and combined DOE-2/longwave forks,
   combined
   all-CTF analytical coupled previous-inside outdoor/adiabatic boundary solves
-  with three surface passes, combined
+  with three surface passes, a third-order balance-surface-convection
+  current-adiabatic-history rejection probe, combined
   all-CTF analytical surface-first with three surface passes, third-order
   zone-air updates, and an
   oracle-day-count warmup minimum. It is

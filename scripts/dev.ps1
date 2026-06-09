@@ -315,6 +315,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with weather-storage reporting and air-balance closure surface convection reporting."
     }
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-current-adhist-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-current-adhist-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with balance surface convection reporting and current-inside adiabatic history commit."
+    }
     "official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe.ps1"
         Group = "compare"

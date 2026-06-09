@@ -236,6 +236,12 @@ EnergyPlus TARP inside natural convection coefficient in the inside CTF balance,
 preserves the previous inside face temperature for the EnergyPlus-style
 iterative damping term before the zone-air predictor overwrites current face
 estimates, and honors explicit `SurfaceConvectionAlgorithm:Outside,DOE-2` for
-the exterior convection coefficient.
+the exterior convection coefficient. A current-inside adiabatic-history commit
+probe was kept as diagnostic evidence but rejected as a promotion candidate:
+in the active third-order/weather-storage/balance-surfconv lane it worsens
+floor storage RMSE from `54.593582` to `453.783584` and floor outside
+conduction RMSE from `23.282797` to `446.456057`, so the floor path should next
+target full EnergyPlus surface/air iteration cadence rather than a one-point
+self-adiabatic outside history overwrite.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

@@ -230,6 +230,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-current-adhist-iter20",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-current-adhist-surface-iter20"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-surface-iter5"
@@ -385,6 +394,7 @@ REFERENCE_LANES = {
     "all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-storage-iter20": "all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-prevmat-surfconv-iter20": "all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-storage-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-iter20": "all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-storage-iter20",
+    "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-current-adhist-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-iter20",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
