@@ -5878,14 +5878,18 @@ fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> Stri
             concat!(
                 "{{ \"rank\": {}, \"output\": {}, \"status\": {}, ",
                 "\"max_abs_delta_c\": {}, \"mean_abs_delta_c\": {}, ",
-                "\"rmse_delta_c\": {} }}"
+                "\"rmse_delta_c\": {}, \"max_rel_delta\": {}, ",
+                "\"first_delta_sample\": {}, \"max_delta_sample\": {} }}"
             ),
             index + 1,
             zone_temperature_output_json(&row.output),
             json_string(row.status),
             json_number(row.delta.max_abs_delta_c),
             json_number(row.delta.mean_abs_delta_c),
-            json_number(row.delta.rmse_delta_c)
+            json_number(row.delta.rmse_delta_c),
+            json_number(row.delta.max_rel_delta),
+            delta_point_json(row.delta.first_delta_sample),
+            delta_point_json(row.delta.max_delta_sample)
         ));
     }
     json.push(']');
@@ -6997,6 +7001,8 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"rank\": 1"));
+        assert!(json.contains("\"first_delta_sample\""));
+        assert!(json.contains("\"max_delta_sample\""));
         assert!(json.contains("\"max_abs_c\": 0.000001000000"));
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
@@ -7006,6 +7012,8 @@ mod tests {
         assert!(digest.contains("\"case_id\": \"heat_balance_nomass_001\""));
         assert!(digest.contains("\"series_count\": 2"));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
+        assert!(digest.contains("\"first_delta_sample\""));
+        assert!(digest.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"compare_summary_json\": \"compare-summary.json\""));
         assert!(digest.contains("\"compare_digest_json\": \"compare-digest.json\""));
         assert!(!digest.contains("\"sample_rows\""));
@@ -7134,10 +7142,13 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
+        assert!(json.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"first_delta_sample\""));
+        assert!(digest.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"series\""));
         assert!(!digest.contains("\"sample_rows\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));

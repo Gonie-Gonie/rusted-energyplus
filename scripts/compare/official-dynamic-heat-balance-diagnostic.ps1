@@ -323,6 +323,12 @@ $topBottleneck = @($summary.bottlenecks)[0]
 if ($null -eq $topBottleneck) {
     throw "Expected at least one bottleneck row in heat-balance diagnostic summary"
 }
+if ($null -eq $topBottleneck.first_delta_sample) {
+    throw "Expected top bottleneck to include a first_delta_sample fingerprint"
+}
+if ($null -eq $topBottleneck.max_delta_sample) {
+    throw "Expected top bottleneck to include a max_delta_sample fingerprint"
+}
 $expectedTopCandidates = @(
     @{
         Key = "ZN001:FLR001"

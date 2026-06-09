@@ -79,7 +79,8 @@ quick outside-conduction boundary solves without creating a conformance claim.
 Heat-balance diagnostic and conformance report writers also emit a compact
 `compare-digest.json` next to the full `compare-summary.json` and
 `compare-report.md`; active gates read the digest for metadata, bottlenecks, and
-series-level deltas while preserving full sample rows for deeper inspection:
+series-level deltas, including first/max delta samples on each bottleneck row,
+while preserving full sample rows for deeper inspection:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
