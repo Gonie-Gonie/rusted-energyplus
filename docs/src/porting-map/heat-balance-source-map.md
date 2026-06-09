@@ -819,7 +819,14 @@ Current Rust boundary:
   `47.307560 W`, so EnergyPlus `CalcZoneComponentLoadSums`/`SumHADTsurfs`
   cannot be approximated as a direct negative of the individual surface report
   rows. Keep the remaining work on `SurfTempInTmp`, reference-air timing, and
-  hconv/source ownership.
+  hconv/source ownership. A ScriptF-flat adiabatic report/history split probe
+  also rejects syncing adiabatic outside faces to current inside faces for
+  report-only state: it preserves MAT (`0.037329 C` RMSE), zone surface
+  convection (`22.062956 W` RMSE), and air storage (`9.127258 W` RMSE), but
+  regresses floor outside conduction from `12.216935 W` to `747.544527 W` RMSE
+  and floor heat storage from `28.786920 W` to `732.801403 W` RMSE. This keeps
+  `CalcHeatBalanceOutsideSurf`/`UpdateThermalHistories` adiabatic parity on the
+  pre-sync outside snapshot path rather than a report-only current-inside sync.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

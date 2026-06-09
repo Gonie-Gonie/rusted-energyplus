@@ -76,6 +76,7 @@ Current generators:
   inside-CTF outside-history outdoor history-commit no-op probe, a third-order
   inside-CTF outside-history ScriptF longwave follow-up probe, a third-order
   inside-CTF outside-history ScriptF flat-access follow-up probe, a third-order
+  ScriptF-flat adiabatic report/history split rejection probe, a third-order
   converged-surface adiabatic history-only commit rejection probe, a third-order
   balance-surface-convection current-adiabatic-history rejection probe, combined
   all-CTF analytical surface-first with three surface passes, third-order

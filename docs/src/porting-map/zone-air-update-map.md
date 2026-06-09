@@ -158,6 +158,16 @@ The next zone-air work therefore stays on `CalcZoneComponentLoadSums` timing,
 `SurfTempInTmp`/hconv ownership, and upstream surface/source/history parity
 rather than on a zone aggregate accumulator source swap.
 
+An adiabatic-report sibling then tested whether EnergyPlus reports the
+adiabatic floor outside face after syncing it to the current inside face while
+still committing the pre-sync outside snapshot to CTF history. This is rejected:
+MAT, zone surface convection, and air storage stay unchanged, but floor outside
+conduction jumps from `12.216935 W` to `747.544527 W` RMSE and floor storage
+from `28.786920 W` to `732.801403 W`. The active ScriptF-flat lane should
+therefore keep the adiabatic outside report state on the pre-sync outside
+snapshot; the remaining floor storage gap is not a missing current-inside
+outside-face report sync.
+
 The dynamic probe summary now also tracks zone surface-convection report
 closure against the signed sum of individual
 `Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`). On
