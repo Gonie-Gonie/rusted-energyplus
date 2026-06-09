@@ -76,9 +76,10 @@ view factors before applying the grey-pair exchange emissivity, which pulls the
 new latent floor inside longwave row much closer while leaving floor storage as
 the active top bottleneck. The
 source-anchored ScriptF interior-longwave probe matches the
-`1ZoneUncontrolled` EIO factor orientation, but remains diagnostic-only because
-exact longwave feedback without the rest of the EnergyPlus surface/zone coupling
-regresses the active storage and aggregate rows. A diagnostic surface-iter3 lane
+`1ZoneUncontrolled` EIO final view-factor generation and factor orientation, but
+remains diagnostic-only because exact longwave feedback without the rest of the
+EnergyPlus surface/zone coupling regresses the active storage and aggregate
+rows. A diagnostic surface-iter3 lane
 can repeat the inside/outside face balance within one zone timestep while
 advancing CTF histories only once, so iteration sensitivity can be measured
 before changing the default path. The compiler now preserves explicit

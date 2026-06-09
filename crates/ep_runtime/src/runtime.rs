@@ -8048,17 +8048,17 @@ mod tests {
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
-        KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
-        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
-        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        QuickOutsideConductionContext, ResultStore, RuntimeError, RuntimeOutputRegistry,
-        SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
-        SurfaceExteriorReportTerms, advance_heat_balance_state_one_timestep,
-        advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
-        append_surface_incident_solar_radiation_series, build_execution_plan,
-        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
+        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
+        PlantEquipmentRole, PlantStateProjectionOptions, QuickOutsideConductionContext,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState, SurfaceExteriorReportTerms,
+        advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
+        advance_surface_ctf_histories, append_surface_incident_solar_radiation_series,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
-        energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
+        energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
@@ -8078,13 +8078,13 @@ mod tests {
         energyplus_weather_relative_humidity_at_timestep,
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
         energyplus_zone_air_temperature_coefficients, exterior_surface_energy_balance,
-        heat_balance_uses_doe2_outside_convection, horizontal_infrared_sky_temperature_c,
-        initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
-        next_day, node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series,
-        parse_epw_records, run_heat_balance_run_period_warmup,
-        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
-        simulate_constant_schedules, simulate_first_zone_uncontrolled,
-        simulate_heat_balance_zone_air_temperatures,
+        fix_energyplus_approximate_view_factors, heat_balance_uses_doe2_outside_convection,
+        horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
+        initialize_heat_balance_state_with_ctf_coefficients, next_day,
+        node_temperature_setpoint_from_energyplus, parse_epw_dry_bulb_series, parse_epw_records,
+        run_heat_balance_run_period_warmup, seed_energyplus_initial_surface_ctf_histories,
+        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
+        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_with_weather_records,
         simulate_ideal_loads_node_state_projection, simulate_plant_state_projection,
         simulate_schedule_values, simulate_zone_internal_convective_gains,
@@ -9978,6 +9978,62 @@ DATA PERIODS
         assert!((dimensionless(4, 0) - 0.1010).abs() < 5.0e-4);
         assert!((dimensionless(4, 5) - 0.4559).abs() < 5.0e-4);
         assert!((dimensionless(0, 0) - 0.0094307).abs() < 5.0e-5);
+    }
+
+    #[test]
+    fn approximate_view_factors_match_energyplus_1zone_eio() {
+        let areas = [69.6773, 69.6773, 69.6773, 69.6773, 232.2576, 232.2576];
+        let surface_types = [
+            SurfaceType::Wall,
+            SurfaceType::Wall,
+            SurfaceType::Wall,
+            SurfaceType::Wall,
+            SurfaceType::Floor,
+            SurfaceType::Roof,
+        ];
+        let azimuths = [180.0, 90.0, 0.0, 270.0, 0.0, 0.0];
+        let tilts = [90.0, 90.0, 90.0, 90.0, 180.0, 0.0];
+        let snapshots = areas
+            .iter()
+            .copied()
+            .zip(surface_types)
+            .zip(azimuths)
+            .zip(tilts)
+            .map(|(((area_m2, surface_type), azimuth_deg), tilt_deg)| {
+                InteriorLongwaveSurfaceSnapshot {
+                    zone_id: ZoneId(0),
+                    surface_type,
+                    area_m2,
+                    azimuth_deg,
+                    tilt_deg,
+                    temperature_k4: 293.15_f64.powi(4),
+                    thermal_absorptance: 0.9,
+                }
+            })
+            .collect::<Vec<_>>();
+        let view_factors = fix_energyplus_approximate_view_factors(
+            &areas,
+            &energyplus_approximate_view_factors(&snapshots),
+        );
+        let printed_final_view_factors = [
+            [0.0000, 0.078565, 0.078565, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.0000, 0.078565, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.078565, 0.0000, 0.078565, 0.3823, 0.3823],
+            [0.078565, 0.078565, 0.078565, 0.0000, 0.3823, 0.3823],
+            [0.1147, 0.1147, 0.1147, 0.1147, 0.0000, 0.5410],
+            [0.1147, 0.1147, 0.1147, 0.1147, 0.5410, 0.0000],
+        ];
+        let surface_count = areas.len();
+        for from_index in 0..surface_count {
+            for to_index in 0..surface_count {
+                let actual = view_factors[to_index * surface_count + from_index];
+                let expected = printed_final_view_factors[from_index][to_index];
+                assert!(
+                    (actual - expected).abs() < 5.0e-4,
+                    "view factor {from_index}->{to_index}: actual {actual}, expected {expected}"
+                );
+            }
+        }
     }
 
     #[test]

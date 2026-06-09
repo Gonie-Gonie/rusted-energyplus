@@ -438,9 +438,13 @@ Current Rust boundary:
   diagnostic row at `108.672323` RMSE. Rechecking the active lane with
   EnergyPlus initial CTF histories or a 20-day Rust warmup does not materially
   move the floor rows, while a one-pass full ScriptF source still diverges in
-  the current simplified coupling shell. Full inside iteration order, zone
-  predictor/corrector equations, detailed shadowing/reflection, and coupled
-  radiation coefficient update order are not yet wired.
+  the current simplified coupling shell. The Rust fixed approximate view-factor
+  generation and ScriptF orientation are now unit-checked against the
+  `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
+  ScriptF gap is expected to live in the coupled surface/zone iteration timing
+  rather than in the grey interchange matrix itself. Full inside iteration
+  order, zone predictor/corrector equations, detailed shadowing/reflection, and
+  coupled radiation coefficient update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.
