@@ -791,6 +791,13 @@ def sum_optional(left: float | None, right: float | None) -> float | None:
     return left + right
 
 
+def sum_present(values: list[float | None]) -> float | None:
+    present = [value for value in values if value is not None]
+    if not present:
+        return None
+    return sum(present)
+
+
 def first_matching_key(rows: Any, key: str) -> dict[str, Any] | None:
     return next(iter(matching_key_rows(rows, key)), None)
 
@@ -920,7 +927,32 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
     inside_solve = inside_solve or {}
     slot1 = slots[0] if len(slots) >= 1 else None
     slot2 = slots[1] if len(slots) >= 2 else None
+    implied_numerator_delta_w = numeric(
+        inside_solve.get("implied_solve_numerator_delta_w")
+    )
+    reference_air_source_delta_w = numeric(
+        inside_solve.get("reference_air_source_delta_w")
+    )
+    outside_temperature_source_delta_w = numeric(
+        inside_solve.get("outside_temperature_source_delta_w")
+    )
     history_delta_w = numeric(inside_solve.get("inside_history_delta_w"))
+    inside_net_longwave_delta_w = numeric(
+        inside_solve.get("inside_net_longwave_delta_w")
+    )
+    tracked_source_delta_w = sum_present(
+        [
+            reference_air_source_delta_w,
+            outside_temperature_source_delta_w,
+            history_delta_w,
+            inside_net_longwave_delta_w,
+        ]
+    )
+    untracked_source_delta_w = (
+        implied_numerator_delta_w - tracked_source_delta_w
+        if implied_numerator_delta_w is not None and tracked_source_delta_w is not None
+        else None
+    )
 
     return {
         "key": FLOOR_CTF_DRIVER_KEY,
@@ -942,6 +974,9 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         "reference_air_source_delta_w": inside_solve.get(
             "reference_air_source_delta_w"
         ),
+        "outside_temperature_source_delta_w": inside_solve.get(
+            "outside_temperature_source_delta_w"
+        ),
         "inside_history_delta_w": inside_solve.get("inside_history_delta_w"),
         "rust_inside_history_temperature_term_w": inside_solve.get(
             "rust_inside_history_temperature_term_w"
@@ -951,6 +986,32 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         ),
         "inside_net_longwave_delta_w": inside_solve.get(
             "inside_net_longwave_delta_w"
+        ),
+        "tracked_source_delta_w": tracked_source_delta_w,
+        "untracked_source_delta_w": untracked_source_delta_w,
+        "tracked_source_coverage_ratio": ratio(
+            tracked_source_delta_w,
+            implied_numerator_delta_w,
+        ),
+        "reference_air_source_share": ratio(
+            reference_air_source_delta_w,
+            implied_numerator_delta_w,
+        ),
+        "outside_temperature_source_share": ratio(
+            outside_temperature_source_delta_w,
+            implied_numerator_delta_w,
+        ),
+        "inside_history_source_share": ratio(
+            history_delta_w,
+            implied_numerator_delta_w,
+        ),
+        "inside_net_longwave_source_share": ratio(
+            inside_net_longwave_delta_w,
+            implied_numerator_delta_w,
+        ),
+        "untracked_source_share": ratio(
+            untracked_source_delta_w,
+            implied_numerator_delta_w,
         ),
         "slot1_inside_total_term_w": (slot1 or {}).get("inside_total_term_w"),
         "slot1_inside_temperature_term_w": (slot1 or {}).get(
@@ -1475,7 +1536,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v16",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v17",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1793,10 +1854,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "",
             "## Floor CTF Max-Sample Drivers",
             "",
-            "Max-sample solve/source rows keep the active floor storage bottleneck visible after the first-sample history cancellation has settled. The slot equivalent columns estimate the inside-history temperature shift that would explain the full history delta if assigned to that slot's inside temperature coefficient.",
+            "Max-sample solve/source rows keep the active floor storage bottleneck visible after the first-sample history cancellation has settled. Tracked source coverage sums the currently decomposed numerator deltas: reference air, outside-temperature source, CTF history, and inside longwave. The untracked residual mostly represents still-unsplit damping/source-order effects and is the next place to add source probes when coverage is low.",
             "",
-            "| lane | sample | Tin dC | ref air dC | numerator dW | ref air dW | history dW | history temp W | history flux W | LW dW | slots | slot1 total W | slot1 Tin C | slot1 equiv dC | slot2 total W | slot2 Tin C | slot2 equiv dC |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "| lane | sample | Tin dC | ref air dC | numerator dW | tracked dW | coverage | untracked dW | history share | ref-air share | LW share | outside share | history dW | ref air dW | LW dW | history temp W | history flux W | slots | slot1 total W | slot1 Tin C | slot1 equiv dC | slot2 total W | slot2 Tin C | slot2 equiv dC |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for lane in summary["lanes"]:
@@ -1804,7 +1865,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
         if not isinstance(driver, dict):
             continue
         lines.append(
-            "| {lane} | {sample} | {in_temp} | {ref_air_temp} | {numerator} | {ref_air} | {history} | {history_temp} | {history_flux} | {lw} | {slots} | {slot1_total} | {slot1_tin} | {slot1_equiv} | {slot2_total} | {slot2_tin} | {slot2_equiv} |".format(
+            "| {lane} | {sample} | {in_temp} | {ref_air_temp} | {numerator} | {tracked} | {coverage} | {untracked} | {history_share} | {ref_air_share} | {lw_share} | {outside_share} | {history} | {ref_air} | {lw} | {history_temp} | {history_flux} | {slots} | {slot1_total} | {slot1_tin} | {slot1_equiv} | {slot2_total} | {slot2_tin} | {slot2_equiv} |".format(
                 lane=lane["lane"],
                 sample=driver.get("sample_index") or "none",
                 in_temp=fmt_number(driver.get("inside_face_temperature_delta_c")),
@@ -1812,6 +1873,15 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     driver.get("inferred_reference_air_temperature_delta_c")
                 ),
                 numerator=fmt_number(driver.get("implied_solve_numerator_delta_w")),
+                tracked=fmt_number(driver.get("tracked_source_delta_w")),
+                coverage=fmt_number(driver.get("tracked_source_coverage_ratio")),
+                untracked=fmt_signed_number(driver.get("untracked_source_delta_w")),
+                history_share=fmt_number(driver.get("inside_history_source_share")),
+                ref_air_share=fmt_number(driver.get("reference_air_source_share")),
+                lw_share=fmt_number(driver.get("inside_net_longwave_source_share")),
+                outside_share=fmt_number(
+                    driver.get("outside_temperature_source_share")
+                ),
                 ref_air=fmt_number(driver.get("reference_air_source_delta_w")),
                 history=fmt_number(driver.get("inside_history_delta_w")),
                 history_temp=fmt_number(

@@ -95,9 +95,10 @@ Current generators:
   first-sample deltas and annual current/history RMSE so cancellation can be
   reviewed directly when a probe improves reported storage but leaves latent
   mass-floor history mismatch behind. The same report includes the floor
-  max-sample inside-solve decomposition and recent CTF history slot 1/2
-  contributions so the active storage bottleneck can be traced to source,
-  longwave, or history-slot timing before adding another probe lane. It also
+  max-sample inside-solve decomposition, tracked numerator-source coverage,
+  and recent CTF history slot 1/2 contributions so the active storage
+  bottleneck can be traced to reference-air, longwave, damping/source-order, or
+  history-slot timing before adding another probe lane. It also
   reports zone surface-convection closure against the signed sum of individual
   surface inside-convection heat-gain rows, which keeps EnergyPlus AirRpt
   source/timing differences visible before treating surface report rows as a
