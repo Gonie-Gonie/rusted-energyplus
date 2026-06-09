@@ -138,6 +138,17 @@ Follow-up probes after that change keep the blocker on source/coupling order:
 forcing Rust warmup to the EnergyPlus 20-day run-period count and switching the
 initial CTF histories to EnergyPlus `SurfInitialTemp`/zero-flux seeding move the
 top floor storage and conduction RMSE only below the fourth decimal place. A
+source recheck of EnergyPlus 26.1.0 `UpdateThermalHistories` also rules out an
+outside-face report sign flip as the next correction: EnergyPlus computes
+current `Qout` into `SurfOutsideFluxHist(1)`, reports
+`SurfOpaqOutFaceCondFlux = -SurfOutsideFluxHist(1)`, and derives storage as
+`-(SurfOpaqInsFaceCond + SurfOpaqOutFaceCond)`. Rust's report helpers now have
+a unit guard for that sign/storage convention. The active all-CTF interleaved
+grey-longwave lane still puts the maximum floor storage/conduction delta at
+run-period sample 0 (`813.384496 W` storage, `465.262159 W` inside conduction,
+and `348.122337 W` outside conduction), so the next CTF-facing blocker is the
+warmup-to-run-period history handoff plus coupled source/history update order,
+not another report-sign adjustment. A
 full ScriptF interior-longwave source is also not a promotion shortcut in the
 current shell: even a one-pass ScriptF lane diverges to multi-kW floor storage
 and roof inside-longwave errors, so ScriptF parity has to be paired with the

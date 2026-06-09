@@ -427,6 +427,15 @@ Current Rust boundary:
   warmup, CTF seed, bottleneck, and series-level delta metadata but omits full
   hourly `sample_rows`, so diagnostic gates can validate large official dynamic
   lanes without repeatedly parsing the full trace payload.
+- EnergyPlus `UpdateThermalHistories` first computes current CTF inside and
+  outside fluxes into `SurfInsideFluxHist(1)` and `SurfOutsideFluxHist(1)`,
+  flips the outside flux into `SurfOpaqOutFaceCondFlux` for reporting, then
+  shifts the current temperature/flux slots into history slot 2 for the next
+  timestep in the `SimpleCTFOnly` path. The Rust history vectors intentionally
+  represent EnergyPlus history slot 2 and later, not the current slot 1; the
+  remaining mass-floor storage work should therefore target the warmup/run-period
+  history handoff and coupled source update order rather than another outside
+  report sign flip.
 - `ep_model` and `ep_compiler` preserve material surface roughness names using
   EnergyPlus roughness categories so future DOE-2/TARP exterior convection
   ports can use the selected outside layer metadata directly.

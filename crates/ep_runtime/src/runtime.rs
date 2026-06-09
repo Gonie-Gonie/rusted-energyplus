@@ -8212,11 +8212,11 @@ mod tests {
         simulate_schedule_values, simulate_zone_internal_convective_gains,
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_azimuth_deg, surface_exterior_report_terms, surface_geometry_summaries,
-        surface_incident_solar_radiation_for_weather_context_w_per_m2,
-        surface_inside_conduction_flux_w_per_m2, surface_inside_ctf_source_terms_w_per_m2,
-        surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
-        surface_steady_u_value_w_per_m2_k, surface_tilt_deg, update_surface_ctf_history_constants,
-        update_surface_inside_longwave_exchange_probe,
+        surface_heat_storage_rate_w, surface_incident_solar_radiation_for_weather_context_w_per_m2,
+        surface_inside_conduction_flux_w_per_m2, surface_inside_conduction_rate_w,
+        surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
+        surface_outside_conduction_rate_w, surface_steady_u_value_w_per_m2_k, surface_tilt_deg,
+        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
         update_zone_air_heat_capacities_from_weather_context,
@@ -9673,6 +9673,36 @@ DATA PERIODS
             surface.ctf.outside_flux_history_w_per_m2,
             vec![outside_flux]
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn surface_ctf_conduction_report_signs_match_energyplus_storage_convention()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface = &mut state.surfaces[0];
+        surface.inside_face_temperature_c = 20.0;
+        surface.outside_face_temperature_c = 10.0;
+        surface.ctf.outside_0_w_per_m2_k = 0.7;
+        surface.ctf.cross_0_w_per_m2_k = 0.2;
+        surface.ctf.inside_0_w_per_m2_k = 0.5;
+        surface.ctf.const_in_part_w_per_m2 = 1.0;
+        surface.ctf.const_out_part_w_per_m2 = -0.3;
+
+        let inside_flux = surface_inside_conduction_flux_w_per_m2(surface);
+        let outside_ctf_flux = surface_outside_conduction_flux_w_per_m2(surface);
+        let inside_rate = surface_inside_conduction_rate_w(surface);
+        let outside_report_rate = surface_outside_conduction_rate_w(surface);
+        let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_report_rate);
+
+        assert!((inside_rate - surface.area_m2 * inside_flux).abs() < 1.0e-12);
+        assert!(
+            (outside_report_rate + surface.area_m2 * outside_ctf_flux).abs() < 1.0e-12,
+            "EnergyPlus flips Qout to SurfOpaqOutFaceCondFlux before reporting"
+        );
+        assert!((storage_rate + inside_rate + outside_report_rate).abs() < 1.0e-12);
 
         Ok(())
     }
