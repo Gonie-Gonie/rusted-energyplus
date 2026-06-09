@@ -603,6 +603,51 @@ pub struct HeatBalanceCtfHistorySlotFirstSample {
     pub outside_total_term_w: f64,
 }
 
+/// One reported hourly sample CTF history contribution averaged by slot.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceCtfHistorySlotHourlySample {
+    /// Zero-based hourly sample index.
+    pub sample_index: usize,
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// One-based CTF history slot index.
+    pub slot_index: usize,
+    /// Surface area in square meters.
+    pub area_m2: f64,
+    /// Number of zone timesteps averaged into the hourly sample.
+    pub timestep_count: usize,
+    /// CTF outside/X history coefficient for this slot in W/m2-K.
+    pub outside_history_coefficient_w_per_m2_k: f64,
+    /// CTF cross/Y history coefficient for this slot in W/m2-K.
+    pub cross_history_coefficient_w_per_m2_k: f64,
+    /// CTF inside/Z history coefficient for this slot in W/m2-K.
+    pub inside_history_coefficient_w_per_m2_k: f64,
+    /// CTF flux history coefficient for this slot.
+    pub flux_history_coefficient: f64,
+    /// Average previous outside face temperature in C for this slot.
+    pub outside_temperature_history_c: f64,
+    /// Average previous inside face temperature in C for this slot.
+    pub inside_temperature_history_c: f64,
+    /// Average previous outside conduction flux in W/m2 for this slot.
+    pub outside_flux_history_w_per_m2: f64,
+    /// Average previous inside conduction flux in W/m2 for this slot.
+    pub inside_flux_history_w_per_m2: f64,
+    /// Average inside-face temperature-history contribution in W.
+    pub inside_temperature_term_w: f64,
+    /// Average inside-face flux-history contribution in W.
+    pub inside_flux_term_w: f64,
+    /// Average inside-face total history contribution in W.
+    pub inside_total_term_w: f64,
+    /// Average outside-face temperature-history contribution in reported W sign.
+    pub outside_temperature_term_w: f64,
+    /// Average outside-face flux-history contribution in reported W sign.
+    pub outside_flux_term_w: f64,
+    /// Average outside-face total history contribution in reported W sign.
+    pub outside_total_term_w: f64,
+}
+
 /// One surface-state sample captured after a zone timestep in the first reported hour.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeatBalanceSurfaceFirstSampleTrace {
@@ -1192,6 +1237,8 @@ pub struct HeatBalanceSimulationSummary {
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
     pub first_sample_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
+    /// Per-slot CTF history terms averaged for each reported hourly sample.
+    pub hourly_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     /// Per-surface timestep states captured across the first reported hourly sample.
     pub surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
 }
@@ -1345,6 +1392,32 @@ impl HeatBalanceCtfHistorySlotFirstSampleAccumulator {
     fn finalize(self) -> HeatBalanceCtfHistorySlotFirstSample {
         let divisor = self.timestep_count.max(1) as f64;
         HeatBalanceCtfHistorySlotFirstSample {
+            surface_name: self.surface_name,
+            construction_name: self.construction_name,
+            slot_index: self.slot_index,
+            area_m2: self.area_m2,
+            timestep_count: self.timestep_count,
+            outside_history_coefficient_w_per_m2_k: self.outside_history_coefficient_w_per_m2_k,
+            cross_history_coefficient_w_per_m2_k: self.cross_history_coefficient_w_per_m2_k,
+            inside_history_coefficient_w_per_m2_k: self.inside_history_coefficient_w_per_m2_k,
+            flux_history_coefficient: self.flux_history_coefficient,
+            outside_temperature_history_c: self.outside_temperature_history_c / divisor,
+            inside_temperature_history_c: self.inside_temperature_history_c / divisor,
+            outside_flux_history_w_per_m2: self.outside_flux_history_w_per_m2 / divisor,
+            inside_flux_history_w_per_m2: self.inside_flux_history_w_per_m2 / divisor,
+            inside_temperature_term_w: self.inside_temperature_term_w / divisor,
+            inside_flux_term_w: self.inside_flux_term_w / divisor,
+            inside_total_term_w: self.inside_total_term_w / divisor,
+            outside_temperature_term_w: self.outside_temperature_term_w / divisor,
+            outside_flux_term_w: self.outside_flux_term_w / divisor,
+            outside_total_term_w: self.outside_total_term_w / divisor,
+        }
+    }
+
+    fn finalize_hourly(self, sample_index: usize) -> HeatBalanceCtfHistorySlotHourlySample {
+        let divisor = self.timestep_count.max(1) as f64;
+        HeatBalanceCtfHistorySlotHourlySample {
+            sample_index,
             surface_name: self.surface_name,
             construction_name: self.construction_name,
             slot_index: self.slot_index,
@@ -4306,6 +4379,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
     let mut first_sample_ctf_history_slot_accumulators =
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
+    let mut hourly_ctf_history_slots = Vec::new();
     let mut surface_first_sample_trace = Vec::new();
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
@@ -4324,6 +4398,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut surface_sums =
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
+        let mut hourly_ctf_history_slot_accumulators =
+            BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
         for substep in 1..=steps {
             let timestep_outdoor_dry_bulb_c =
@@ -4354,6 +4430,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
             );
+
+            for sample in &state.last_ctf_history_slot_terms {
+                hourly_ctf_history_slot_accumulators
+                    .entry((sample.surface_name.clone(), sample.slot_index))
+                    .or_insert_with(|| {
+                        HeatBalanceCtfHistorySlotFirstSampleAccumulator::from_sample(sample)
+                    })
+                    .push(sample);
+            }
 
             if hour_index == 0 {
                 for sample in &state.last_ctf_history_slot_terms {
@@ -4559,6 +4644,12 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 }
             }
         }
+
+        hourly_ctf_history_slots.extend(
+            hourly_ctf_history_slot_accumulators
+                .into_values()
+                .map(|accumulator| accumulator.finalize_hourly(hour_index)),
+        );
 
         let divisor = f64::from(steps);
         for (index, (_zone_id, _zone_name, values)) in zone_temperatures.iter_mut().enumerate() {
@@ -5079,6 +5170,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             .into_values()
             .map(HeatBalanceCtfHistorySlotFirstSampleAccumulator::finalize)
             .collect(),
+        hourly_ctf_history_slots,
         surface_first_sample_trace,
     };
 
@@ -11559,6 +11651,20 @@ DATA PERIODS
         assert_eq!(floor_first_sample_slots.len(), 1);
         assert_eq!(floor_first_sample_slots[0].slot_index, 1);
         assert!(floor_first_sample_slots[0].timestep_count > 0);
+
+        let floor_hourly_slots = simulation
+            .summary
+            .hourly_ctf_history_slots
+            .iter()
+            .filter(|sample| sample.surface_name == "FLOOR")
+            .collect::<Vec<_>>();
+        assert_eq!(floor_hourly_slots.len(), 1);
+        assert_eq!(floor_hourly_slots[0].sample_index, 0);
+        assert_eq!(floor_hourly_slots[0].slot_index, 1);
+        assert_eq!(
+            floor_hourly_slots[0].inside_total_term_w,
+            floor_first_sample_slots[0].inside_total_term_w
+        );
 
         Ok(())
     }

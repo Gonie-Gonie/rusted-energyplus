@@ -500,6 +500,22 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($floorHistorySlots.Count -lt 5) {
         throw "Expected ctf_history_first_sample_slots to include FLOOR #CTFs=5 rows, got $($floorHistorySlots.Count)"
     }
+    $floorMaxSampleHistorySlots = @($summary.ctf_history_max_sample_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
+    if ($floorMaxSampleHistorySlots.Count -lt 5) {
+        throw "Expected ctf_history_max_sample_slots to include FLOOR #CTFs=5 rows, got $($floorMaxSampleHistorySlots.Count)"
+    }
+    foreach ($slot in $floorMaxSampleHistorySlots) {
+        if ([int]$slot.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
+            throw "Expected FLOOR max-sample CTF history slot to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($slot.sample_index)"
+        }
+    }
+    $maxSampleInsideSlotSum = 0.0
+    foreach ($slot in $floorMaxSampleHistorySlots) {
+        $maxSampleInsideSlotSum += [double]$slot.inside_total_term_w
+    }
+    if ([Math]::Abs($maxSampleInsideSlotSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
+        throw "Expected FLOOR max-sample CTF slot sum to match Rust inside history term"
+    }
     $insideSlotSum = 0.0
     $outsideSlotSum = 0.0
     foreach ($slot in $floorHistorySlots) {
@@ -800,6 +816,7 @@ Assert-Contains -Text $reportText -Pattern "## Adiabatic History Max-Sample Delt
 Assert-Contains -Text $reportText -Pattern "out_minus_in_delta_c" -Description "markdown adiabatic-history outside-minus-inside delta column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
+Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots" -Description "markdown CTF max-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
