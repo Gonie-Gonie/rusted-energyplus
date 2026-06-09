@@ -272,6 +272,36 @@ fn parses_eio_construction_ctf_coefficient_rows() -> Result<(), Box<dyn std::err
 }
 
 #[test]
+fn preserves_energyplus_mass_ctf_emission_order() -> Result<(), Box<dyn std::error::Error>> {
+    let coefficients = parse_eio_construction_ctf_coefficients(
+        r#"! <Construction CTF>,Construction Name,...
+! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)
+ Construction CTF,FLOOR,   2,   1,   5,   0.250,          17.04,   0.900,   0.900,   0.650,   0.650,MediumRough
+ CTF,   5,      -4.1142049E-08,       1.5543709E-08,      -4.1142049E-08,       1.2297289E-11
+ CTF,   4,       0.00057884701,       0.00022976293,       0.00057884701,      -4.0580373E-07
+ CTF,   3,         -0.33051123,         0.091914804,         -0.33051123,        0.0006592243
+ CTF,   2,           12.566595,           2.1743923,           12.566595,        -0.058066613
+ CTF,   1,          -62.622544,           4.7096437,          -62.622544,          0.60555731
+ CTF,   0,            58.08561,          0.72354869,            58.08561
+"#,
+    )?;
+
+    let emitted_times = coefficients
+        .iter()
+        .map(|coefficient| coefficient.time_index)
+        .collect::<Vec<_>>();
+    assert_eq!(emitted_times, vec![5, 4, 3, 2, 1, 0]);
+    let runtime_history_times = coefficients
+        .iter()
+        .filter(|coefficient| coefficient.time_index > 0)
+        .map(|coefficient| coefficient.time_index)
+        .collect::<Vec<_>>();
+    assert_eq!(runtime_history_times, vec![5, 4, 3, 2, 1]);
+
+    Ok(())
+}
+
+#[test]
 fn parses_eio_material_ctf_summary_rows() -> Result<(), Box<dyn std::error::Error>> {
     let materials = parse_eio_material_ctf_summary(
         r#"! <Material CTF Summary>,Material Name,...

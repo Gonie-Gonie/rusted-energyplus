@@ -476,7 +476,11 @@ Current Rust boundary:
   first-sample inside/outside history deltas from `1880.111844`/`1769.027186 W`
   to `1824.704274`/`1713.508910 W`. Raising the same interleaved grey-longwave
   lane from 20 to 100 surface iterations slightly worsens the top floor storage
-  RMSE (`108.672323` to `108.676973`). A one-pass full ScriptF source still diverges
+  RMSE (`108.672323` to `108.676973`). A trial final surface pass after the
+  active interleaved zone-air correction also worsened top RMSE to `108.674004`
+  while barely changing the first-sample floor history deltas, so the active
+  mismatch is not explained by a missing final post-correction surface pass. A
+  one-pass full ScriptF source still diverges
   in the current simplified coupling shell. The Rust fixed approximate
   view-factor generation and ScriptF orientation are now unit-checked against
   the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
