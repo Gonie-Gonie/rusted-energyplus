@@ -940,7 +940,9 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
     inside_net_longwave_delta_w = numeric(
         inside_solve.get("inside_net_longwave_delta_w")
     )
-    tracked_source_delta_w = sum_present(
+    tracked_source_delta_w = numeric(
+        inside_solve.get("tracked_solve_source_delta_w")
+    ) or sum_present(
         [
             reference_air_source_delta_w,
             outside_temperature_source_delta_w,
@@ -948,10 +950,21 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
             inside_net_longwave_delta_w,
         ]
     )
-    untracked_source_delta_w = (
-        implied_numerator_delta_w - tracked_source_delta_w
-        if implied_numerator_delta_w is not None and tracked_source_delta_w is not None
-        else None
+    untracked_source_delta_w = numeric(
+        inside_solve.get("solve_source_residual_delta_w")
+    )
+    if untracked_source_delta_w is None:
+        untracked_source_delta_w = (
+            implied_numerator_delta_w - tracked_source_delta_w
+            if implied_numerator_delta_w is not None
+            and tracked_source_delta_w is not None
+            else None
+        )
+    tracked_source_coverage_ratio = numeric(
+        inside_solve.get("tracked_solve_source_coverage_ratio")
+    ) or ratio(
+        tracked_source_delta_w,
+        implied_numerator_delta_w,
     )
 
     return {
@@ -989,27 +1002,34 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         ),
         "tracked_source_delta_w": tracked_source_delta_w,
         "untracked_source_delta_w": untracked_source_delta_w,
-        "tracked_source_coverage_ratio": ratio(
-            tracked_source_delta_w,
-            implied_numerator_delta_w,
-        ),
-        "reference_air_source_share": ratio(
+        "tracked_source_coverage_ratio": tracked_source_coverage_ratio,
+        "reference_air_source_share": numeric(
+            inside_solve.get("reference_air_source_share")
+        ) or ratio(
             reference_air_source_delta_w,
             implied_numerator_delta_w,
         ),
-        "outside_temperature_source_share": ratio(
+        "outside_temperature_source_share": numeric(
+            inside_solve.get("outside_temperature_source_share")
+        ) or ratio(
             outside_temperature_source_delta_w,
             implied_numerator_delta_w,
         ),
-        "inside_history_source_share": ratio(
+        "inside_history_source_share": numeric(
+            inside_solve.get("inside_history_source_share")
+        ) or ratio(
             history_delta_w,
             implied_numerator_delta_w,
         ),
-        "inside_net_longwave_source_share": ratio(
+        "inside_net_longwave_source_share": numeric(
+            inside_solve.get("inside_net_longwave_source_share")
+        ) or ratio(
             inside_net_longwave_delta_w,
             implied_numerator_delta_w,
         ),
-        "untracked_source_share": ratio(
+        "untracked_source_share": numeric(
+            inside_solve.get("solve_source_residual_share")
+        ) or ratio(
             untracked_source_delta_w,
             implied_numerator_delta_w,
         ),

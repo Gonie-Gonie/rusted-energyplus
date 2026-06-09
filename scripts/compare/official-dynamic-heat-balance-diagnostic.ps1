@@ -497,6 +497,15 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorInsideSolveMaxSampleDelta.rust_inside_history_flux_term_w) {
         throw "Expected FLOOR inside-solve max-sample row to include rust_inside_history_flux_term_w"
     }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.tracked_solve_source_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include tracked_solve_source_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.solve_source_residual_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include solve_source_residual_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.tracked_solve_source_coverage_ratio) {
+        throw "Expected FLOOR inside-solve max-sample row to include tracked_solve_source_coverage_ratio"
+    }
     $rustInsideHistorySplitSum = [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_temperature_term_w + [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_flux_term_w
     if ([Math]::Abs($rustInsideHistorySplitSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
         throw "Expected FLOOR inside-solve Rust history split terms to sum to rust_inside_history_term_w"
@@ -835,6 +844,8 @@ Assert-Contains -Text $reportText -Pattern "## Inside Balance Max-Sample Deltas"
 Assert-Contains -Text $reportText -Pattern "residual_delta_w" -Description "markdown inside-balance residual delta column"
 Assert-Contains -Text $reportText -Pattern "## Inside Solve Max-Sample Deltas" -Description "markdown inside-solve max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "implied_numerator_delta_w" -Description "markdown inside-solve implied numerator delta column"
+Assert-Contains -Text $reportText -Pattern "source_coverage_ratio" -Description "markdown inside-solve source coverage column"
+Assert-Contains -Text $reportText -Pattern "source_residual_delta_w" -Description "markdown inside-solve source residual column"
 Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown inside-solve Rust history temperature split column"
 Assert-Contains -Text $reportText -Pattern "## Adiabatic History Max-Sample Deltas" -Description "markdown adiabatic-history max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "out_minus_in_delta_c" -Description "markdown adiabatic-history outside-minus-inside delta column"

@@ -3398,6 +3398,14 @@ struct HeatBalanceInsideSolveMaxSampleDelta {
     oracle_inside_net_longwave_w: f64,
     rust_inside_net_longwave_w: f64,
     inside_net_longwave_delta_w: f64,
+    tracked_solve_source_delta_w: f64,
+    solve_source_residual_delta_w: f64,
+    tracked_solve_source_coverage_ratio: f64,
+    reference_air_source_share: f64,
+    outside_temperature_source_share: f64,
+    inside_history_source_share: f64,
+    inside_net_longwave_source_share: f64,
+    solve_source_residual_share: f64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -4635,6 +4643,20 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 area_m2 * oracle_solve_denominator_w_per_m2_k * inside_temperature.oracle_c;
             let rust_implied_solve_numerator_w =
                 area_m2 * rust_solve_denominator_w_per_m2_k * inside_temperature.rust_c;
+            let implied_solve_numerator_delta_w =
+                (oracle_implied_solve_numerator_w - rust_implied_solve_numerator_w).abs();
+            let reference_air_source_delta_w =
+                (oracle_reference_air_source_w - rust_reference_air_source_w).abs();
+            let outside_temperature_source_delta_w =
+                (oracle_outside_temperature_source_w - rust_outside_temperature_source_w).abs();
+            let inside_history_delta_w = (oracle_inside_history_term_w - rust_inside_history).abs();
+            let inside_net_longwave_delta_w = inside_net_longwave.abs_delta_c;
+            let tracked_solve_source_delta_w = reference_air_source_delta_w
+                + outside_temperature_source_delta_w
+                + inside_history_delta_w
+                + inside_net_longwave_delta_w;
+            let solve_source_residual_delta_w =
+                implied_solve_numerator_delta_w - tracked_solve_source_delta_w;
 
             Some(HeatBalanceInsideSolveMaxSampleDelta {
                 key: surface.name.0.clone(),
@@ -4664,30 +4686,58 @@ fn heat_balance_inside_solve_max_sample_deltas(
                     .abs(),
                 oracle_implied_solve_numerator_w,
                 rust_implied_solve_numerator_w,
-                implied_solve_numerator_delta_w: (oracle_implied_solve_numerator_w
-                    - rust_implied_solve_numerator_w)
-                    .abs(),
+                implied_solve_numerator_delta_w,
                 oracle_reference_air_source_w,
                 rust_reference_air_source_w,
-                reference_air_source_delta_w: (oracle_reference_air_source_w
-                    - rust_reference_air_source_w)
-                    .abs(),
+                reference_air_source_delta_w,
                 oracle_outside_temperature_source_w,
                 rust_outside_temperature_source_w,
-                outside_temperature_source_delta_w: (oracle_outside_temperature_source_w
-                    - rust_outside_temperature_source_w)
-                    .abs(),
+                outside_temperature_source_delta_w,
                 oracle_inside_history_term_w,
                 rust_inside_history_term_w: rust_inside_history,
-                inside_history_delta_w: (oracle_inside_history_term_w - rust_inside_history).abs(),
+                inside_history_delta_w,
                 rust_inside_history_temperature_term_w: rust_inside_history_temperature,
                 rust_inside_history_flux_term_w: rust_inside_history_flux,
                 oracle_inside_net_longwave_w: inside_net_longwave.oracle_c,
                 rust_inside_net_longwave_w: inside_net_longwave.rust_c,
-                inside_net_longwave_delta_w: inside_net_longwave.abs_delta_c,
+                inside_net_longwave_delta_w,
+                tracked_solve_source_delta_w,
+                solve_source_residual_delta_w,
+                tracked_solve_source_coverage_ratio: heat_balance_ratio_or_zero(
+                    tracked_solve_source_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
+                reference_air_source_share: heat_balance_ratio_or_zero(
+                    reference_air_source_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
+                outside_temperature_source_share: heat_balance_ratio_or_zero(
+                    outside_temperature_source_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
+                inside_history_source_share: heat_balance_ratio_or_zero(
+                    inside_history_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
+                inside_net_longwave_source_share: heat_balance_ratio_or_zero(
+                    inside_net_longwave_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
+                solve_source_residual_share: heat_balance_ratio_or_zero(
+                    solve_source_residual_delta_w,
+                    implied_solve_numerator_delta_w,
+                ),
             })
         })
         .collect()
+}
+
+fn heat_balance_ratio_or_zero(numerator: f64, denominator: f64) -> f64 {
+    if denominator.abs() <= f64::EPSILON {
+        0.0
+    } else {
+        numerator / denominator
+    }
 }
 
 fn heat_balance_adiabatic_history_max_sample_deltas(
@@ -8127,7 +8177,15 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
                 "\"rust_inside_history_flux_term_w\": {}, ",
                 "\"oracle_inside_net_longwave_w\": {}, ",
                 "\"rust_inside_net_longwave_w\": {}, ",
-                "\"inside_net_longwave_delta_w\": {} }}"
+                "\"inside_net_longwave_delta_w\": {}, ",
+                "\"tracked_solve_source_delta_w\": {}, ",
+                "\"solve_source_residual_delta_w\": {}, ",
+                "\"tracked_solve_source_coverage_ratio\": {}, ",
+                "\"reference_air_source_share\": {}, ",
+                "\"outside_temperature_source_share\": {}, ",
+                "\"inside_history_source_share\": {}, ",
+                "\"inside_net_longwave_source_share\": {}, ",
+                "\"solve_source_residual_share\": {} }}"
             ),
             json_string(&row.key),
             json_string(&row.construction_name),
@@ -8162,7 +8220,15 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
             json_number(row.rust_inside_history_flux_term_w),
             json_number(row.oracle_inside_net_longwave_w),
             json_number(row.rust_inside_net_longwave_w),
-            json_number(row.inside_net_longwave_delta_w)
+            json_number(row.inside_net_longwave_delta_w),
+            json_number(row.tracked_solve_source_delta_w),
+            json_number(row.solve_source_residual_delta_w),
+            json_number(row.tracked_solve_source_coverage_ratio),
+            json_number(row.reference_air_source_share),
+            json_number(row.outside_temperature_source_share),
+            json_number(row.inside_history_source_share),
+            json_number(row.inside_net_longwave_source_share),
+            json_number(row.solve_source_residual_share)
         ));
     }
     json.push(']');
@@ -8778,19 +8844,27 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
     rows: &[HeatBalanceInsideSolveMaxSampleDelta],
 ) {
     report.push_str(
-        "| key | construction | boundary | sample_index | implied_numerator_delta_w | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | outside_source_delta_w | history_delta_w | rust_history_temp_w | rust_history_flux_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
+        "| key | construction | boundary | sample_index | implied_numerator_delta_w | tracked_source_delta_w | source_coverage_ratio | source_residual_delta_w | ref_air_share | outside_share | history_share | net_lw_share | residual_share | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | outside_source_delta_w | history_delta_w | rust_history_temp_w | rust_history_flux_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
     );
     report.push_str(
-        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
     );
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             markdown_cell(&row.outside_boundary_condition),
             row.sample_index,
             row.implied_solve_numerator_delta_w,
+            row.tracked_solve_source_delta_w,
+            row.tracked_solve_source_coverage_ratio,
+            row.solve_source_residual_delta_w,
+            row.reference_air_source_share,
+            row.outside_temperature_source_share,
+            row.inside_history_source_share,
+            row.inside_net_longwave_source_share,
+            row.solve_source_residual_share,
             row.solve_denominator_delta_w_per_m2_k,
             row.inferred_reference_air_temperature_delta_c,
             row.reference_air_source_delta_w,
@@ -10214,6 +10288,14 @@ mod tests {
                 oracle_inside_net_longwave_w: -12.0,
                 rust_inside_net_longwave_w: -10.0,
                 inside_net_longwave_delta_w: 2.0,
+                tracked_solve_source_delta_w: 1705.0,
+                solve_source_residual_delta_w: 795.0,
+                tracked_solve_source_coverage_ratio: 0.682,
+                reference_air_source_share: 0.68,
+                outside_temperature_source_share: 0.0,
+                inside_history_source_share: 0.0012,
+                inside_net_longwave_source_share: 0.0008,
+                solve_source_residual_share: 0.318,
             }],
             adiabatic_history_max_sample_deltas: vec![
                 super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
@@ -10434,6 +10516,9 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"tracked_solve_source_delta_w\""));
+        assert!(json.contains("\"tracked_solve_source_coverage_ratio\""));
+        assert!(json.contains("\"solve_source_residual_delta_w\""));
         assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
         assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(json.contains("\"outside_minus_inside_delta_c\""));
@@ -10471,6 +10556,8 @@ mod tests {
         assert!(digest.contains("\"storage_delta_w\""));
         assert!(digest.contains("\"inside_balance_max_sample_deltas\""));
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
+        assert!(digest.contains("\"tracked_solve_source_delta_w\""));
+        assert!(digest.contains("\"tracked_solve_source_coverage_ratio\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
         assert!(digest.contains("\"rust_inside_history_flux_term_w\""));
@@ -10718,6 +10805,14 @@ mod tests {
                 oracle_inside_net_longwave_w: -3.0,
                 rust_inside_net_longwave_w: -2.0,
                 inside_net_longwave_delta_w: 1.0,
+                tracked_solve_source_delta_w: 2834.0,
+                solve_source_residual_delta_w: 516.0,
+                tracked_solve_source_coverage_ratio: 0.8459701492537313,
+                reference_air_source_share: 0.844776119402985,
+                outside_temperature_source_share: 0.0,
+                inside_history_source_share: 0.0008955223880597015,
+                inside_net_longwave_source_share: 0.00029850746268656717,
+                solve_source_residual_share: 0.15402985074626865,
             }],
             adiabatic_history_max_sample_deltas: vec![
                 super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
@@ -10904,6 +10999,9 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"tracked_solve_source_delta_w\""));
+        assert!(json.contains("\"tracked_solve_source_coverage_ratio\""));
+        assert!(json.contains("\"solve_source_residual_delta_w\""));
         assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
         assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(json.contains("\"outside_minus_inside_delta_c\""));
@@ -10932,6 +11030,8 @@ mod tests {
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(digest.contains("\"tracked_solve_source_delta_w\""));
+        assert!(digest.contains("\"tracked_solve_source_coverage_ratio\""));
         assert!(digest.contains("\"rust_inside_history_flux_term_w\""));
         assert!(digest.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(digest.contains("\"inside_current_if_outside_synced_delta_w\""));
