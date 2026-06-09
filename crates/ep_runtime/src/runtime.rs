@@ -902,7 +902,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
 pub enum HeatBalanceCtfInitialHistoryPolicy {
     /// Existing Rust diagnostic seed: current boundary temperature and steady U-value flux.
     BoundaryTemperatureAndUValue,
-    /// EnergyPlus 26.1 style seed: SurfInitialTemp histories and zero flux histories.
+    /// EnergyPlus 26.1 style InitHeatBalance seed: SurfInitialTemp inside
+    /// histories, boundary outside histories, and steady U-value flux histories.
     EnergyPlusSurfInitial,
 }
 
@@ -3529,6 +3530,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             seed_energyplus_initial_surface_ctf_histories(
                 &mut state,
                 options.initial_zone_air_temperature_c,
+                weather_dry_bulb_c[0],
             );
         }
     }
@@ -4719,10 +4721,26 @@ fn seed_initial_surface_ctf_boundary_histories(
 fn seed_energyplus_initial_surface_ctf_histories(
     state: &mut HeatBalanceState,
     initial_surface_temperature_c: f64,
+    initial_outdoor_dry_bulb_c: f64,
 ) {
+    let zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| (zone.zone_id, initial_surface_temperature_c))
+        .collect::<BTreeMap<_, _>>();
+
     for surface in &mut state.surfaces {
+        let outside_temperature_c = initial_surface_ctf_boundary_temperature_c(
+            surface,
+            &zone_temperatures,
+            initial_outdoor_dry_bulb_c,
+            initial_surface_temperature_c,
+        );
+        let initial_flux_w_per_m2 = surface_steady_u_value_w_per_m2_k(surface)
+            * (outside_temperature_c - initial_surface_temperature_c);
+
         surface.inside_face_temperature_c = initial_surface_temperature_c;
-        surface.outside_face_temperature_c = initial_surface_temperature_c;
+        surface.outside_face_temperature_c = outside_temperature_c;
         surface
             .ctf
             .inside_temperature_history_c
@@ -4730,9 +4748,15 @@ fn seed_energyplus_initial_surface_ctf_histories(
         surface
             .ctf
             .outside_temperature_history_c
-            .fill(initial_surface_temperature_c);
-        surface.ctf.inside_flux_history_w_per_m2.fill(0.0);
-        surface.ctf.outside_flux_history_w_per_m2.fill(0.0);
+            .fill(outside_temperature_c);
+        surface
+            .ctf
+            .inside_flux_history_w_per_m2
+            .fill(initial_flux_w_per_m2);
+        surface
+            .ctf
+            .outside_flux_history_w_per_m2
+            .fill(initial_flux_w_per_m2);
     }
 }
 
@@ -10481,7 +10505,7 @@ DATA PERIODS
     }
 
     #[test]
-    fn energyplus_initial_ctf_history_seeding_uses_surf_initial_temp_and_zero_flux()
+    fn energyplus_initial_ctf_history_seeding_applies_boundary_reset_and_steady_flux()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
         let mut state = initialize_heat_balance_state_with_ctf_coefficients(
@@ -10508,27 +10532,27 @@ DATA PERIODS
         )?;
         seed_initial_surface_ctf_boundary_histories(&mut state, 5.0);
 
-        seed_energyplus_initial_surface_ctf_histories(&mut state, ENERGYPLUS_ZONE_INITIAL_TEMP_C);
+        seed_energyplus_initial_surface_ctf_histories(
+            &mut state,
+            ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+            5.0,
+        );
 
         let surface = &state.surfaces[0];
-        assert_eq!(
-            surface.ctf.outside_temperature_history_c,
-            vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
-        );
+        let expected_flux =
+            surface_steady_u_value_w_per_m2_k(surface) * (5.0 - ENERGYPLUS_ZONE_INITIAL_TEMP_C);
+        assert_eq!(surface.ctf.outside_temperature_history_c, vec![5.0]);
         assert_eq!(
             surface.ctf.inside_temperature_history_c,
             vec![ENERGYPLUS_ZONE_INITIAL_TEMP_C]
         );
-        assert_eq!(surface.ctf.outside_flux_history_w_per_m2, vec![0.0]);
-        assert_eq!(surface.ctf.inside_flux_history_w_per_m2, vec![0.0]);
+        assert!((surface.ctf.outside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
+        assert!((surface.ctf.inside_flux_history_w_per_m2[0] - expected_flux).abs() < 1.0e-12);
         assert_eq!(
             surface.inside_face_temperature_c,
             ENERGYPLUS_ZONE_INITIAL_TEMP_C
         );
-        assert_eq!(
-            surface.outside_face_temperature_c,
-            ENERGYPLUS_ZONE_INITIAL_TEMP_C
-        );
+        assert_eq!(surface.outside_face_temperature_c, 5.0);
 
         Ok(())
     }

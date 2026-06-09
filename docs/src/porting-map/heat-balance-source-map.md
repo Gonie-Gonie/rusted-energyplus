@@ -326,14 +326,18 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   timestep-start inside temperature lowers neither the active bottleneck nor
   the zone aggregate, raising floor heat-storage RMSE to `854.900255` and zone
   outside aggregate conduction RMSE to `871.940554`. The EnergyPlus
-  `SurfInitialTemp`/zero-flux CTF initial-history lane is a better isolated
-  target: with five surface passes it lowers floor heat storage to
-  `637.691788` RMSE, floor inside conduction to `530.085504`, floor outside
-  conduction to `148.148684`, and zone outside aggregate conduction to
-  `579.984742`, but it slightly regresses MAT (`2.107293`) and the latent
-  air-storage row (`197.510852`). Keep it as a source-aligned probe
-  lane until the zone-air/source-term ordering work can absorb those air-side
-  regressions. The same quick-outside path with eight surface passes isolates
+  InitHeatBalance-shaped CTF initial-history lane is a useful isolated target:
+  with five surface passes and the corrected boundary outside-history/U-value
+  flux seed, the first-sample floor history deltas drop to `462.011526 W`
+  inside and `641.143796 W` outside, while floor heat storage lands at
+  `611.120087` RMSE, floor inside conduction at `518.073223`, floor outside
+  conduction at `133.967463`, and zone outside aggregate conduction at
+  `553.316167`. The same lane badly exposes coupled source timing, however:
+  floor inside longwave and convection rise to `1390.133963` and `926.220009`
+  RMSE, MAT is `2.112462`, and the latent air-storage row is `167.005552`.
+  Keep it as a source-aligned probe lane until the zone-air/source-term ordering
+  work can absorb those air-side regressions. The same quick-outside path with
+  eight surface passes isolates
   surface-iteration sensitivity further: floor heat storage falls to
   `629.603383` RMSE and floor outside conduction to `140.971525`, while MAT
   (`2.112893`) and air storage (`166.324263`) continue to regress relative to
