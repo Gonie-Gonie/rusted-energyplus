@@ -752,6 +752,19 @@ Current Rust boundary:
   candidate, with the next probe focused on zone-air/source reporting coupling
   and first-sample floor storage max-abs alignment rather than reverting to the
   grey direct-view-factor lane.
+  A live-reference-air follow-up keeps that ScriptF flat-access path, inside-CTF
+  outside-history snapshots, current longwave, converged surface cutoff, and
+  20-day warmup, but thaws the timestep-start frozen surface reference air
+  during the interleaved surface solve. It improves the latent zone
+  surface-convection row (`22.062956` to `19.657827 W` RMSE, max `212.520279`
+  to `177.745381 W`), but it is rejected for promotion because it regresses the
+  dominant floor CTF rows: floor storage RMSE rises from `28.786920` to
+  `81.570933` and max from `242.511509` to `412.045918`, floor inside
+  conduction RMSE rises from `16.729618` to `47.254164`, and aggregate inside
+  conduction rises from `18.143612` to `54.154851`. This keeps the frozen
+  surface reference air in the current active floor solve and shifts the next
+  zone-convection work toward report/coupling timing or EnergyPlus source-map
+  refinement rather than thawing the surface reference-air input.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
