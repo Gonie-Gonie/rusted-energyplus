@@ -112,3 +112,11 @@ zone-air picture essentially unchanged: MAT nudges from `0.031508 C` to
 air storage remains `7.496023 W`. The next zone-air work is therefore still
 `SurfTempInTmp`/hconv/source-order parity plus owned zone humidity, not
 longwave sampling cadence alone.
+
+Adding the EnergyPlus inside-surface convergence cutoff to that same lane
+improves MAT slightly (`0.031507 C` to `0.030867 C`) and lowers the floor and
+aggregate conduction rows, but it does not solve the latent zone-air rows:
+surface convection rises to `21.105254 W` and weather-proxy air storage rises
+to `7.547299 W`. Keep the convergence cutoff as a source-aligned surface
+cadence candidate, while the next zone-air work remains the explicit
+`SurfTempInTmp`/hconv report path and owned humidity/capacitance.

@@ -260,6 +260,18 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   remain at about `21.0396 W` surface convection and `7.4960 W` air storage.
   Keep current-pass longwave sampling as source-aligned bookkeeping, not the
   next bottleneck lever.
+- Adding EnergyPlus' inside-surface convergence cutoff on top of the
+  frozen-reference-air/current-longwave lane is a useful fixed-iteration
+  correction. EnergyPlus uses `MaxAllowedDelTemp = 0.002 C`; with the same
+  twenty-pass cap, stopping once the inside-face delta reaches that tolerance
+  lowers floor heat-storage RMSE from `54.558577 W` to `52.022146 W`, floor
+  inside/outside conduction from `31.672094 W`/`23.036538 W` to
+  `30.201354 W`/`21.976058 W`, floor inside longwave from `31.072578 W` to
+  `29.362310 W`, and zone inside/outside aggregate conduction from
+  `27.426369 W`/`29.131216 W` to `26.355358 W`/`27.990507 W`. The latent
+  zone-air rows still move the wrong way slightly (`21.039633 W` to
+  `21.105254 W` surface convection, `7.496023 W` to `7.547299 W` air storage),
+  so this is a stronger candidate cadence but not a conformance promotion.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF

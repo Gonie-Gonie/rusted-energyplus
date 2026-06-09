@@ -261,5 +261,12 @@ inside conduction from `31.673961` to `31.672094`, and outside aggregate
 conduction from `29.132671` to `29.131216`, while the zone-air latent rows stay
 regressed. That rules out longwave sampling cadence alone as the next
 conduction promotion lever.
+Applying EnergyPlus' `MaxAllowedDelTemp = 0.002 C` inside-surface convergence
+cutoff to that lane is more useful: floor storage drops to `52.022146`, floor
+inside/outside conduction to `30.201354`/`21.976058`, and outside aggregate
+conduction to `27.990507`. This suggests the active floor conduction path was
+slightly over-iterated by a fixed twenty-pass loop. The remaining blocker is
+still source/history parity because the first-sample floor storage max-abs is
+about `701.319969` and the zone-air latent rows regress slightly.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.
