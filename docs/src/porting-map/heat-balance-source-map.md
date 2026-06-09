@@ -721,6 +721,22 @@ Current Rust boundary:
   and floor inside net longwave from `24.877762` to `3613.270767`. This keeps
   ScriptF as a source-porting target, but not as a drop-in improvement until the
   surrounding EnergyPlus coupled radiation coefficient/update order is mapped.
+  A narrower ScriptF flat-access follow-up keeps the same Hottel ScriptF
+  coefficient generation but applies the matrix with EnergyPlus'
+  `lSR = RecSurf * NumSurfaces + SendSurf` flat access order from
+  `CalcInteriorRadExchange`. This becomes the strongest current 1Zone dynamic
+  candidate: floor storage RMSE falls from `45.539704` to `29.868130`, floor
+  inside conduction from `26.437580` to `17.354885`, floor outside conduction
+  from `19.262430` to `12.667232`, aggregate inside conduction from
+  `23.838450` to `18.204288`, aggregate outside conduction from `25.267733` to
+  `14.690801`, and floor inside longwave drops out of the top eight
+  bottlenecks. The trade-off is still visible in the latent air/report rows:
+  MAT RMSE rises from `0.031384 C` to `0.038412 C`, zone surface convection
+  from `21.080512 W` to `22.090516 W`, and air storage from `7.486249 W` to
+  `9.195009 W`. Treat flat ScriptF access as the new source-aligned promotion
+  candidate, with the next probe focused on zone-air/source reporting coupling
+  and first-sample floor storage max-abs alignment rather than reverting to the
+  grey direct-view-factor lane.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
