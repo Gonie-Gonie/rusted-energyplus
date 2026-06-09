@@ -226,6 +226,15 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `SurfHConvInt * Area * (SurfTempInTmp - RefAirTemp)` after the corrected
   zone-air state, so the remaining surface-convection mismatch is not solved by
   using `ZTM[0]` as the report reference temperature.
+- A balance-closure surface-convection sibling of the weather-storage lane was
+  added as a lower-bound isolation probe. It leaves MAT, floor rows, and
+  weather-proxy air storage unchanged, but reports the zone surface-convection
+  row as `CzdTdt - SumIntGains` for this no-load/no-infiltration diagnostic and
+  lowers `Zone Air Heat Balance Surface Convection Rate` RMSE from
+  `29.623453 W` to `19.203798 W`. Keep this as evidence that part of the latent
+  row mismatch is air-balance/report closure, not as a source-parity output:
+  EnergyPlus still publishes `SumHADTsurfs` from the explicit
+  `SurfTempInTmp`/`SurfHConvInt` surface sum.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF

@@ -84,3 +84,13 @@ storage rows are unchanged, but `Zone Air Heat Balance Surface Convection Rate`
 RMSE rises from `29.623453 W` to `104.589141 W`. Keep the next work on
 `SurfTempInTmp`/hconv/source-order parity instead of changing the report
 reference to previous MAT.
+
+A balance-closure surface-convection report probe narrows the same latent row
+without changing the active solver path. In the no-load/no-infiltration
+`1ZoneUncontrolled` diagnostic, reporting surface convection as
+`CzdTdt - SumIntGains` leaves MAT, floor rows, and weather-proxy air storage
+unchanged while lowering `Zone Air Heat Balance Surface Convection Rate` RMSE
+from `29.623453 W` to `19.203798 W`. Keep this as source-isolation evidence
+only: EnergyPlus reports the direct `SumHADTsurfs` surface sum, so the
+remaining work is still `SurfTempInTmp`/hconv/source-order parity plus owned
+zone humidity before any conformance promotion.
