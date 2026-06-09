@@ -115,6 +115,10 @@ while preserving full sample rows for deeper inspection:
 .\scripts\dev.cmd official-dynamic-heat-balance-probe-suite
 ```
 
+For convergence isolation, the base diagnostic script also accepts
+`-SurfaceIterations` up to `200`; wrapper probes keep their smaller named counts
+so regular local gates remain bounded.
+
 The source-map and algorithm-ledger gate remains:
 
 ```powershell

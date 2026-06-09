@@ -8,7 +8,7 @@ param(
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
-    [ValidateRange(1, 20)]
+    [ValidateRange(1, 200)]
     [int]$SurfaceIterations = 1
 )
 
