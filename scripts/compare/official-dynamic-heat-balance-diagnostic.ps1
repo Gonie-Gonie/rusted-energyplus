@@ -98,6 +98,18 @@ function Assert-Contains {
     Write-Host "OK $Description`: $Pattern"
 }
 
+function Assert-NotContains {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if ($Text -match [regex]::Escape($Pattern)) {
+        throw "Unexpected $Description`: $Pattern"
+    }
+    Write-Host "OK no $Description`: $Pattern"
+}
+
 function Assert-FileExists {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
@@ -205,14 +217,19 @@ Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Descri
 Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: $SurfaceIterations" -Description "surface iteration metadata"
 Assert-Contains -Text $text -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "CTF initial history policy metadata"
+Assert-Contains -Text $text -Pattern "compare_digest:" -Description "compact digest artifact path"
 Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagnostic status"
 
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
+$digestPath = Join-Path $CompareRoot "compare-digest.json"
 $reportPath = Join-Path $CompareRoot "compare-report.md"
 Assert-FileExists -Path $summaryPath -Description "official dynamic diagnostic summary"
+Assert-FileExists -Path $digestPath -Description "official dynamic diagnostic digest"
 Assert-FileExists -Path $reportPath -Description "official dynamic diagnostic report"
 
-$summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
+$digestText = Get-Content -LiteralPath $digestPath -Raw
+Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "compact digest sample row payload"
+$summary = $digestText | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected case_id: $($summary.case_id)"
 }
@@ -224,6 +241,12 @@ if ($summary.conformance_claim -ne $false) {
 }
 if ($summary.gate.blocking -ne $false) {
     throw "Official dynamic diagnostic gate must be non-blocking"
+}
+if ($summary.artifacts.compare_summary_json -ne "compare-summary.json") {
+    throw "Unexpected summary artifact pointer: $($summary.artifacts.compare_summary_json)"
+}
+if ($summary.artifacts.compare_digest_json -ne "compare-digest.json") {
+    throw "Unexpected digest artifact pointer: $($summary.artifacts.compare_digest_json)"
 }
 if ($summary.status -ne "fail") {
     throw "Official dynamic diagnostic should remain fail until the case is promoted intentionally: $($summary.status)"

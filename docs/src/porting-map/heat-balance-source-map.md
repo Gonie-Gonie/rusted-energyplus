@@ -422,6 +422,11 @@ Current Rust boundary:
   `Time Step {hours}` metadata so future runtime work can distinguish
   coefficient-term depth from actual history cadence before changing surface
   history advancement.
+- Heat-balance report generation writes `compare-digest.json` alongside the
+  full `compare-summary.json` and markdown report. The digest keeps manifest,
+  warmup, CTF seed, bottleneck, and series-level delta metadata but omits full
+  hourly `sample_rows`, so diagnostic gates can validate large official dynamic
+  lanes without repeatedly parsing the full trace payload.
 - `ep_model` and `ep_compiler` preserve material surface roughness names using
   EnergyPlus roughness categories so future DOE-2/TARP exterior convection
   ports can use the selected outside layer metadata directly.

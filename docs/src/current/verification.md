@@ -75,7 +75,11 @@ solar decomposition rows, and the floor surface heat-storage diagnostics in
 whole-surface and per-area form, and the probe lanes isolate
 mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
 correction order, same-timestep coupled surface/zone-air rebalance, and
-quick outside-conduction boundary solves without creating a conformance claim:
+quick outside-conduction boundary solves without creating a conformance claim.
+Heat-balance diagnostic and conformance report writers also emit a compact
+`compare-digest.json` next to the full `compare-summary.json` and
+`compare-report.md`; active gates read the digest for metadata, bottlenecks, and
+series-level deltas while preserving full sample rows for deeper inspection:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic

@@ -732,6 +732,7 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             println!("  report_dir: {}", summary.report_dir.display());
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  compare_digest: {}", summary.compare_digest.display());
             println!("  samples: {}", summary.samples);
             println!(
                 "  heat_balance_timesteps: {}",
@@ -808,6 +809,7 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!("  report_dir: {}", summary.report_dir.display());
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  compare_digest: {}", summary.compare_digest.display());
             println!("  samples: {}", summary.samples);
             println!(
                 "  heat_balance_timesteps: {}",
@@ -1029,6 +1031,7 @@ struct HeatBalanceReportSummary {
     report_dir: PathBuf,
     compare_report: PathBuf,
     compare_summary: PathBuf,
+    compare_digest: PathBuf,
     samples: usize,
     heat_balance_timesteps: usize,
     heat_balance_run_period_timesteps: usize,
@@ -1104,6 +1107,7 @@ fn generate_conformance_heat_balance_report(
         report_dir: compare_dir.clone(),
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
+        compare_digest: compare_dir.join("compare-digest.json"),
         samples: diagnostic.samples,
         heat_balance_timesteps: diagnostic.heat_balance_timesteps,
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
@@ -1149,6 +1153,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         report_dir: compare_dir.clone(),
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
+        compare_digest: compare_dir.join("compare-digest.json"),
         samples: diagnostic.samples,
         heat_balance_timesteps: diagnostic.heat_balance_timesteps,
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
@@ -5289,6 +5294,7 @@ fn write_heat_balance_conformance_report(
         .map_err(|error| format!("failed to create report directory: {error}"))?;
 
     let summary_path = report_dir.join("compare-summary.json");
+    let digest_path = report_dir.join("compare-digest.json");
     let report_path = report_dir.join("compare-report.md");
 
     std::fs::write(
@@ -5296,6 +5302,11 @@ fn write_heat_balance_conformance_report(
         render_heat_balance_conformance_summary_json(diagnostic, conformance),
     )
     .map_err(|error| format!("failed to write heat-balance summary: {error}"))?;
+    std::fs::write(
+        &digest_path,
+        render_heat_balance_conformance_digest_json(diagnostic, conformance),
+    )
+    .map_err(|error| format!("failed to write heat-balance digest: {error}"))?;
     std::fs::write(
         &report_path,
         render_heat_balance_conformance_report(diagnostic, conformance),
@@ -5308,6 +5319,21 @@ fn write_heat_balance_conformance_report(
 fn render_heat_balance_conformance_summary_json(
     diagnostic: &HeatBalanceConformanceDiagnostic,
     conformance: &HeatBalanceConformance<'_>,
+) -> String {
+    render_heat_balance_conformance_json(diagnostic, conformance, true)
+}
+
+fn render_heat_balance_conformance_digest_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
+) -> String {
+    render_heat_balance_conformance_json(diagnostic, conformance, false)
+}
+
+fn render_heat_balance_conformance_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
+    include_sample_rows: bool,
 ) -> String {
     let context = conformance.context;
     let mut json = String::new();
@@ -5419,13 +5445,16 @@ fn render_heat_balance_conformance_summary_json(
         "  \"bottlenecks\": {},\n",
         heat_balance_bottlenecks_json(&diagnostic.series)
     ));
-    json.push_str(&format!(
-        "  \"series\": {},\n",
+    let series_json = if include_sample_rows {
         heat_balance_series_json(&diagnostic.series)
-    ));
+    } else {
+        heat_balance_series_json_with_sample_rows(&diagnostic.series, false)
+    };
+    json.push_str(&format!("  \"series\": {},\n", series_json));
     json.push_str("  \"artifacts\": {\n");
     json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
-    json.push_str("    \"compare_summary_json\": \"compare-summary.json\"\n");
+    json.push_str("    \"compare_summary_json\": \"compare-summary.json\",\n");
+    json.push_str("    \"compare_digest_json\": \"compare-digest.json\"\n");
     json.push_str("  }\n");
     json.push_str("}\n");
     json
@@ -5864,6 +5893,13 @@ fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> Stri
 }
 
 fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    heat_balance_series_json_with_sample_rows(series, true)
+}
+
+fn heat_balance_series_json_with_sample_rows(
+    series: &[HeatBalanceSeriesDiagnostic],
+    include_sample_rows: bool,
+) -> String {
     let mut json = String::from("[\n");
     for (index, row) in series.iter().enumerate() {
         json.push_str("    {\n");
@@ -5901,10 +5937,12 @@ fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
             "      \"max_delta_sample\": {},\n",
             delta_point_json(row.delta.max_delta_sample)
         ));
-        json.push_str(&format!(
-            "      \"sample_rows\": {},\n",
-            delta_points_json(&row.sample_rows)
-        ));
+        if include_sample_rows {
+            json.push_str(&format!(
+                "      \"sample_rows\": {},\n",
+                delta_points_json(&row.sample_rows)
+            ));
+        }
         json.push_str(&format!(
             "      \"oracle_first_c\": {},\n",
             json_number(row.oracle_first_c)
@@ -6944,6 +6982,7 @@ mod tests {
         let conformance = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
         let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &conformance);
+        let digest = super::render_heat_balance_conformance_digest_json(&diagnostic, &conformance);
         let report = super::render_heat_balance_conformance_report(&diagnostic, &conformance);
 
         assert_eq!(conformance.status, "pass");
@@ -6962,7 +7001,14 @@ mod tests {
         assert!(json.contains("\"series_count\": 2"));
         assert!(json.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(json.contains("\"sample_rows\""));
+        assert!(json.contains("\"compare_digest_json\": \"compare-digest.json\""));
         assert!(json.contains("\"blocking\": true"));
+        assert!(digest.contains("\"case_id\": \"heat_balance_nomass_001\""));
+        assert!(digest.contains("\"series_count\": 2"));
+        assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
+        assert!(digest.contains("\"compare_summary_json\": \"compare-summary.json\""));
+        assert!(digest.contains("\"compare_digest_json\": \"compare-digest.json\""));
+        assert!(!digest.contains("\"sample_rows\""));
         assert!(report.contains("Heat Balance Conformance Report"));
         assert!(report.contains("comparison_class: conformance"));
         assert!(report.contains("conformance_claim: true"));
@@ -7071,6 +7117,7 @@ mod tests {
         let comparison = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
         let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &comparison);
+        let digest = super::render_heat_balance_conformance_digest_json(&diagnostic, &comparison);
         let report = super::render_heat_balance_conformance_report(&diagnostic, &comparison);
 
         assert_eq!(comparison.status, "fail");
@@ -7087,6 +7134,12 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
+        assert!(digest.contains("\"construction_summaries\""));
+        assert!(digest.contains("\"construction_name\": \"FLOOR\""));
+        assert!(digest.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"series\""));
+        assert!(!digest.contains("\"sample_rows\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));

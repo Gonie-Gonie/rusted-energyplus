@@ -82,7 +82,7 @@ matplotlib for document layout and charts.
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |
-| `official-dynamic-heat-balance-diagnostic` | diagnostic | run the official `1ZoneUncontrolled` dynamic heat-balance diagnostic with warmup metadata and no conformance claim | no | `.runtime/official-dynamic-diagnostic` |
+| `official-dynamic-heat-balance-diagnostic` | diagnostic | run the official `1ZoneUncontrolled` dynamic heat-balance diagnostic with warmup metadata and no conformance claim | no | `.runtime/official-dynamic-diagnostic` with `compare-digest.json` for gate checks |
 | `official-dynamic-heat-balance-all-ctf-probe` | diagnostic | run the official dynamic diagnostic with all EIO CTF rows enabled for mass-CTF isolation and no conformance claim | no | `.runtime/official-dynamic-diagnostic-all-ctf` |
 | `official-dynamic-heat-balance-analytical-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus analytical zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-analytical` |
 | `official-dynamic-heat-balance-analytical-surface-first-probe` | diagnostic | run the official dynamic diagnostic with the EnergyPlus analytical surface-first zone-air probe enabled and no conformance claim | no | `.runtime/official-dynamic-diagnostic-analytical-surface-first` |
