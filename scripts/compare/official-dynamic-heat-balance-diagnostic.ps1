@@ -518,9 +518,32 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_temperature_source_share) {
         throw "Expected FLOOR inside-solve max-sample row to include reference_air_temperature_source_share"
     }
-    $referenceAirSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_delta_w
-    if ([Math]::Abs($referenceAirSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_delta_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside-solve reference-air split terms to sum to reference_air_source_delta_w"
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_source_signed_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_source_signed_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_source_split_abs_sum_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_source_split_abs_sum_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_source_cancellation_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_source_cancellation_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_signed_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_coefficient_source_signed_delta_w"
+    }
+    if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_temperature_source_signed_delta_w) {
+        throw "Expected FLOOR inside-solve max-sample row to include reference_air_temperature_source_signed_delta_w"
+    }
+    $referenceAirSignedSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_signed_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_signed_delta_w
+    if ([Math]::Abs($referenceAirSignedSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_signed_delta_w) -gt 1.0e-6) {
+        throw "Expected FLOOR inside-solve signed reference-air split terms to reconstruct reference_air_source_signed_delta_w"
+    }
+    $referenceAirAbsSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_delta_w
+    if ([Math]::Abs($referenceAirAbsSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_split_abs_sum_w) -gt 1.0e-6) {
+        throw "Expected FLOOR inside-solve absolute reference-air split terms to reconstruct reference_air_source_split_abs_sum_w"
+    }
+    $referenceAirCancellation = [double]$floorInsideSolveMaxSampleDelta.reference_air_source_split_abs_sum_w - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_delta_w
+    if ([Math]::Abs($referenceAirCancellation - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_cancellation_delta_w) -gt 1.0e-6) {
+        throw "Expected FLOOR inside-solve reference-air cancellation delta to match abs split sum minus absolute source delta"
     }
     $rustInsideHistorySplitSum = [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_temperature_term_w + [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_flux_term_w
     if ([Math]::Abs($rustInsideHistorySplitSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {

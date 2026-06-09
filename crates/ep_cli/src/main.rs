@@ -3392,7 +3392,12 @@ struct HeatBalanceInsideSolveMaxSampleDelta {
     oracle_reference_air_source_w: f64,
     rust_reference_air_source_w: f64,
     reference_air_source_delta_w: f64,
+    reference_air_source_signed_delta_w: f64,
+    reference_air_source_split_abs_sum_w: f64,
+    reference_air_source_cancellation_delta_w: f64,
+    reference_air_coefficient_source_signed_delta_w: f64,
     reference_air_coefficient_source_delta_w: f64,
+    reference_air_temperature_source_signed_delta_w: f64,
     reference_air_temperature_source_delta_w: f64,
     oracle_outside_temperature_source_w: f64,
     rust_outside_temperature_source_w: f64,
@@ -4666,15 +4671,23 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 .abs();
             let reference_air_source_delta_w =
                 (oracle_reference_air_source_w - rust_reference_air_source_w).abs();
-            let reference_air_coefficient_source_delta_w = (area_m2
+            let reference_air_source_signed_delta_w =
+                oracle_reference_air_source_w - rust_reference_air_source_w;
+            let reference_air_coefficient_source_signed_delta_w = area_m2
                 * (inside_convection_coefficient.oracle_c - inside_convection_coefficient.rust_c)
-                * oracle_inferred_reference_air_temperature_c)
-                .abs();
-            let reference_air_temperature_source_delta_w = (area_m2
+                * oracle_inferred_reference_air_temperature_c;
+            let reference_air_coefficient_source_delta_w =
+                reference_air_coefficient_source_signed_delta_w.abs();
+            let reference_air_temperature_source_signed_delta_w = area_m2
                 * inside_convection_coefficient.rust_c
                 * (oracle_inferred_reference_air_temperature_c
-                    - rust_inferred_reference_air_temperature_c))
-                .abs();
+                    - rust_inferred_reference_air_temperature_c);
+            let reference_air_temperature_source_delta_w =
+                reference_air_temperature_source_signed_delta_w.abs();
+            let reference_air_source_split_abs_sum_w =
+                reference_air_coefficient_source_delta_w + reference_air_temperature_source_delta_w;
+            let reference_air_source_cancellation_delta_w =
+                reference_air_source_split_abs_sum_w - reference_air_source_delta_w;
             let outside_temperature_source_delta_w =
                 (oracle_outside_temperature_source_w - rust_outside_temperature_source_w).abs();
             let inside_history_delta_w = (oracle_inside_history_term_w - rust_inside_history).abs();
@@ -4725,7 +4738,12 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 oracle_reference_air_source_w,
                 rust_reference_air_source_w,
                 reference_air_source_delta_w,
+                reference_air_source_signed_delta_w,
+                reference_air_source_split_abs_sum_w,
+                reference_air_source_cancellation_delta_w,
+                reference_air_coefficient_source_signed_delta_w,
                 reference_air_coefficient_source_delta_w,
+                reference_air_temperature_source_signed_delta_w,
                 reference_air_temperature_source_delta_w,
                 oracle_outside_temperature_source_w,
                 rust_outside_temperature_source_w,
@@ -8225,7 +8243,12 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
                 "\"oracle_reference_air_source_w\": {}, ",
                 "\"rust_reference_air_source_w\": {}, ",
                 "\"reference_air_source_delta_w\": {}, ",
+                "\"reference_air_source_signed_delta_w\": {}, ",
+                "\"reference_air_source_split_abs_sum_w\": {}, ",
+                "\"reference_air_source_cancellation_delta_w\": {}, ",
+                "\"reference_air_coefficient_source_signed_delta_w\": {}, ",
                 "\"reference_air_coefficient_source_delta_w\": {}, ",
+                "\"reference_air_temperature_source_signed_delta_w\": {}, ",
                 "\"reference_air_temperature_source_delta_w\": {}, ",
                 "\"oracle_outside_temperature_source_w\": {}, ",
                 "\"rust_outside_temperature_source_w\": {}, ",
@@ -8279,7 +8302,12 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
             json_number(row.oracle_reference_air_source_w),
             json_number(row.rust_reference_air_source_w),
             json_number(row.reference_air_source_delta_w),
+            json_number(row.reference_air_source_signed_delta_w),
+            json_number(row.reference_air_source_split_abs_sum_w),
+            json_number(row.reference_air_source_cancellation_delta_w),
+            json_number(row.reference_air_coefficient_source_signed_delta_w),
             json_number(row.reference_air_coefficient_source_delta_w),
+            json_number(row.reference_air_temperature_source_signed_delta_w),
             json_number(row.reference_air_temperature_source_delta_w),
             json_number(row.oracle_outside_temperature_source_w),
             json_number(row.rust_outside_temperature_source_w),
@@ -8919,14 +8947,14 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
     rows: &[HeatBalanceInsideSolveMaxSampleDelta],
 ) {
     report.push_str(
-        "| key | construction | boundary | sample_index | implied_numerator_delta_w | tracked_source_delta_w | source_coverage_ratio | source_residual_delta_w | temp_component_w | denominator_component_w | temp_component_share | denominator_component_share | ref_air_share | ref_air_hconv_share | ref_air_temp_share | outside_share | history_share | net_lw_share | residual_share | hconv_delta_w_per_m2_k | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | ref_air_hconv_delta_w | ref_air_temp_delta_w | outside_source_delta_w | history_delta_w | rust_history_temp_w | rust_history_flux_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_hconv_w_per_m2_k | rust_hconv_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
+        "| key | construction | boundary | sample_index | implied_numerator_delta_w | tracked_source_delta_w | source_coverage_ratio | source_residual_delta_w | temp_component_w | denominator_component_w | temp_component_share | denominator_component_share | ref_air_share | ref_air_hconv_share | ref_air_temp_share | outside_share | history_share | net_lw_share | residual_share | hconv_delta_w_per_m2_k | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | ref_air_signed_w | ref_air_abs_sum_w | ref_air_cancel_w | ref_air_hconv_signed_w | ref_air_hconv_delta_w | ref_air_temp_signed_w | ref_air_temp_delta_w | outside_source_delta_w | history_delta_w | rust_history_temp_w | rust_history_flux_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_hconv_w_per_m2_k | rust_hconv_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
     );
     report.push_str(
-        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
     );
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             markdown_cell(&row.outside_boundary_condition),
@@ -8950,7 +8978,12 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
             row.solve_denominator_delta_w_per_m2_k,
             row.inferred_reference_air_temperature_delta_c,
             row.reference_air_source_delta_w,
+            row.reference_air_source_signed_delta_w,
+            row.reference_air_source_split_abs_sum_w,
+            row.reference_air_source_cancellation_delta_w,
+            row.reference_air_coefficient_source_signed_delta_w,
             row.reference_air_coefficient_source_delta_w,
+            row.reference_air_temperature_source_signed_delta_w,
             row.reference_air_temperature_source_delta_w,
             row.outside_temperature_source_delta_w,
             row.inside_history_delta_w,
@@ -10368,7 +10401,12 @@ mod tests {
                 oracle_reference_air_source_w: 2800.0,
                 rust_reference_air_source_w: 4500.0,
                 reference_air_source_delta_w: 1700.0,
+                reference_air_source_signed_delta_w: -1700.0,
+                reference_air_source_split_abs_sum_w: 1700.0,
+                reference_air_source_cancellation_delta_w: 0.0,
+                reference_air_coefficient_source_signed_delta_w: -1400.0,
                 reference_air_coefficient_source_delta_w: 1400.0,
+                reference_air_temperature_source_signed_delta_w: -300.0,
                 reference_air_temperature_source_delta_w: 300.0,
                 oracle_outside_temperature_source_w: 0.0,
                 rust_outside_temperature_source_w: 0.0,
@@ -10618,6 +10656,11 @@ mod tests {
         assert!(json.contains("\"solve_source_residual_delta_w\""));
         assert!(json.contains("\"reference_air_coefficient_source_delta_w\""));
         assert!(json.contains("\"reference_air_temperature_source_delta_w\""));
+        assert!(json.contains("\"reference_air_source_signed_delta_w\""));
+        assert!(json.contains("\"reference_air_source_split_abs_sum_w\""));
+        assert!(json.contains("\"reference_air_source_cancellation_delta_w\""));
+        assert!(json.contains("\"reference_air_coefficient_source_signed_delta_w\""));
+        assert!(json.contains("\"reference_air_temperature_source_signed_delta_w\""));
         assert!(json.contains("\"reference_air_coefficient_source_share\""));
         assert!(json.contains("\"reference_air_temperature_source_share\""));
         assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
@@ -10661,6 +10704,11 @@ mod tests {
         assert!(digest.contains("\"tracked_solve_source_coverage_ratio\""));
         assert!(digest.contains("\"reference_air_coefficient_source_delta_w\""));
         assert!(digest.contains("\"reference_air_temperature_source_delta_w\""));
+        assert!(digest.contains("\"reference_air_source_signed_delta_w\""));
+        assert!(digest.contains("\"reference_air_source_split_abs_sum_w\""));
+        assert!(digest.contains("\"reference_air_source_cancellation_delta_w\""));
+        assert!(digest.contains("\"reference_air_coefficient_source_signed_delta_w\""));
+        assert!(digest.contains("\"reference_air_temperature_source_signed_delta_w\""));
         assert!(digest.contains("\"reference_air_coefficient_source_share\""));
         assert!(digest.contains("\"reference_air_temperature_source_share\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
@@ -10904,7 +10952,12 @@ mod tests {
                 oracle_reference_air_source_w: 2700.0,
                 rust_reference_air_source_w: 5530.0,
                 reference_air_source_delta_w: 2830.0,
+                reference_air_source_signed_delta_w: -2830.0,
+                reference_air_source_split_abs_sum_w: 2830.0,
+                reference_air_source_cancellation_delta_w: 0.0,
+                reference_air_coefficient_source_signed_delta_w: -2025.0,
                 reference_air_coefficient_source_delta_w: 2025.0,
+                reference_air_temperature_source_signed_delta_w: -805.0,
                 reference_air_temperature_source_delta_w: 805.0,
                 oracle_outside_temperature_source_w: 0.0,
                 rust_outside_temperature_source_w: 0.0,
@@ -11120,6 +11173,11 @@ mod tests {
         assert!(json.contains("\"solve_source_residual_delta_w\""));
         assert!(json.contains("\"reference_air_coefficient_source_delta_w\""));
         assert!(json.contains("\"reference_air_temperature_source_delta_w\""));
+        assert!(json.contains("\"reference_air_source_signed_delta_w\""));
+        assert!(json.contains("\"reference_air_source_split_abs_sum_w\""));
+        assert!(json.contains("\"reference_air_source_cancellation_delta_w\""));
+        assert!(json.contains("\"reference_air_coefficient_source_signed_delta_w\""));
+        assert!(json.contains("\"reference_air_temperature_source_signed_delta_w\""));
         assert!(json.contains("\"reference_air_coefficient_source_share\""));
         assert!(json.contains("\"reference_air_temperature_source_share\""));
         assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
@@ -11154,6 +11212,11 @@ mod tests {
         assert!(digest.contains("\"tracked_solve_source_coverage_ratio\""));
         assert!(digest.contains("\"reference_air_coefficient_source_delta_w\""));
         assert!(digest.contains("\"reference_air_temperature_source_delta_w\""));
+        assert!(digest.contains("\"reference_air_source_signed_delta_w\""));
+        assert!(digest.contains("\"reference_air_source_split_abs_sum_w\""));
+        assert!(digest.contains("\"reference_air_source_cancellation_delta_w\""));
+        assert!(digest.contains("\"reference_air_coefficient_source_signed_delta_w\""));
+        assert!(digest.contains("\"reference_air_temperature_source_signed_delta_w\""));
         assert!(digest.contains("\"reference_air_coefficient_source_share\""));
         assert!(digest.contains("\"reference_air_temperature_source_share\""));
         assert!(digest.contains("\"rust_inside_history_flux_term_w\""));
