@@ -136,6 +136,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   thermal radiation; `ZN001:FLR001` heat-storage RMSE rises to `6586.821302`.
   ScriptF therefore needs source-level EnergyPlus normalization/iteration
   parity work before it can replace the grey longwave active lane.
+- A frozen-inside-convection fork of the same interleaved grey longwave lane
+  was added as a source-order probe. EnergyPlus computes inside convection
+  terms before the CTF inside loop and only re-evaluates them on the
+  `ItersReevalConvCoeff` cadence, while the previous Rust interleaved lane
+  recomputed TARP coefficients on every pass. Freezing the Rust coefficient
+  map at timestep start lowers top floor storage RMSE from `108.672323` to
+  `105.876226`, zone surface-convection RMSE from `10.438503` to `9.385594`,
+  and `ZN001:FLR001` inside-convection-coefficient RMSE from `0.073182` to
+  `0.031945`. It is a useful diagnostic candidate, but floor CTF
+  face-temperature/history handoff remains the dominant bottleneck.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
@@ -495,7 +505,11 @@ Current Rust boundary:
   the floor inside convection RMSE from `123.066168` to `41.950371`, MAT RMSE
   from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
   from `84.712495` to `38.774428`; floor storage remains the top active
-  diagnostic row at `108.672323` RMSE. Rechecking the active lane with the
+  diagnostic row at `108.672323` RMSE. Freezing inside convection coefficients
+  at timestep start on the same lane modestly improves the current best
+  diagnostic candidate: floor storage RMSE falls to `105.876226`, MAT RMSE to
+  `0.116074`, zone surface-convection RMSE to `9.385594`, and floor inside
+  convection RMSE to `39.128925`. Rechecking the active lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
   floor RMSE rows and identical first-sample floor history deltas
   (`1880.111844`/`1769.027186 W`), so the active warmup path washes out that

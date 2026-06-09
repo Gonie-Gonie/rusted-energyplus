@@ -881,6 +881,8 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe,
     /// Experimental interleaved quick-outside path with grey interior longwave exchange and EnergyPlus-style adiabatic CTF outside reporting order.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
+    /// Experimental interleaved grey longwave path that freezes inside convection coefficients for the timestep.
+    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe,
     /// Experimental interleaved quick-outside path with EnergyPlus ScriptF interior longwave exchange.
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe,
     /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
@@ -2828,6 +2830,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2853,6 +2856,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
     );
     let use_previous_inside_for_outdoor_boundary = matches!(
@@ -2862,6 +2866,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2873,6 +2878,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     let use_previous_inside_for_adiabatic_boundary = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousBoundaryProbe
     );
@@ -2881,6 +2887,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -2893,7 +2900,8 @@ fn advance_heat_balance_state_one_timestep_internal(
     let interior_longwave_exchange_probe = match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe => {
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe => {
             InteriorLongwaveExchangeProbe::GreyEnergyPlusDirectViewFactor
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
@@ -2982,6 +2990,9 @@ fn advance_heat_balance_state_one_timestep_internal(
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe => {
                 previous_temperature_c
             }
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe => {
                 previous_temperature_c
             }
@@ -3063,6 +3074,10 @@ fn advance_heat_balance_state_one_timestep_internal(
             Some(&previous_surface_outside_temperatures),
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
+            matches!(
+                zone_air_algorithm,
+                HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
+            ),
         );
     } else {
         let current_zone_temperatures = state
@@ -3089,6 +3104,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             },
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
+            None,
         );
 
         if rebalance_surfaces_after_zone_air_correction {
@@ -3122,6 +3138,7 @@ fn advance_heat_balance_state_one_timestep_internal(
                 },
                 use_doe2_outside_convection,
                 interior_longwave_exchange_probe,
+                None,
             );
         }
     }
@@ -3155,7 +3172,39 @@ fn run_interleaved_surface_zone_balance(
     exterior_coefficient_surface_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     use_doe2_outside_convection: bool,
     interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
+    freeze_inside_convection_for_timestep: bool,
 ) {
+    let frozen_inside_convection_coefficients = if freeze_inside_convection_for_timestep {
+        let zone_temperatures = zones
+            .iter()
+            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+            .collect::<BTreeMap<_, _>>();
+        Some(
+            surfaces
+                .iter()
+                .map(|surface| {
+                    let previous_inside_face_temperature_c = first_pass_inside_temperatures
+                        .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                        .unwrap_or(surface.inside_face_temperature_c);
+                    let zone_temperature_c = zone_temperatures
+                        .get(&surface.zone_id)
+                        .copied()
+                        .unwrap_or(surface.inside_face_temperature_c);
+                    (
+                        surface.surface_id,
+                        energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                            surface,
+                            previous_inside_face_temperature_c,
+                            zone_temperature_c,
+                        ),
+                    )
+                })
+                .collect::<BTreeMap<_, _>>(),
+        )
+    } else {
+        None
+    };
+
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         let zone_temperatures = zones
             .iter()
@@ -3188,6 +3237,7 @@ fn run_interleaved_surface_zone_balance(
             exterior_coefficient_surface_temperatures,
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
+            frozen_inside_convection_coefficients.as_ref(),
         );
         correct_zone_air_temperatures_from_current_surfaces(
             surfaces,
@@ -3213,6 +3263,7 @@ fn run_surface_balance_passes(
     exterior_coefficient_surface_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     use_doe2_outside_convection: bool,
     interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
+    inside_convection_coefficient_overrides: Option<&BTreeMap<SurfaceId, f64>>,
 ) {
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         let temperature_overrides = if surface_iteration_index == 0 {
@@ -3244,12 +3295,15 @@ fn run_surface_balance_passes(
                 .get(&surface.zone_id)
                 .copied()
                 .unwrap_or(surface.inside_face_temperature_c);
-            let inside_convection_coefficient_w_per_m2_k =
-                energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
-                    surface,
-                    previous_inside_face_temperature_c,
-                    zone_temperature_c,
-                );
+            let inside_convection_coefficient_w_per_m2_k = inside_convection_coefficient_overrides
+                .and_then(|coefficients| coefficients.get(&surface.surface_id).copied())
+                .unwrap_or_else(|| {
+                    energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                        surface,
+                        previous_inside_face_temperature_c,
+                        zone_temperature_c,
+                    )
+                });
             surface.inside_convection_coefficient_w_per_m2_k =
                 inside_convection_coefficient_w_per_m2_k;
 
@@ -3415,6 +3469,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -5047,6 +5102,7 @@ fn reported_surface_outside_face_temperature_c(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
@@ -5202,6 +5258,7 @@ fn heat_balance_uses_cached_exterior_report_terms(
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
@@ -11483,6 +11540,14 @@ DATA PERIODS
                 )
                 .zone_air_algorithm,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+        );
+        assert_eq!(
+            options
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
+                )
+                .zone_air_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
         );
         assert_eq!(
             options
