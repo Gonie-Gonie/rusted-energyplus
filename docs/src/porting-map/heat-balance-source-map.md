@@ -811,6 +811,15 @@ Current Rust boundary:
   `12.216935`, and `28.786920`). This rules out zone-state-vs-surface-report
   accumulation as the next bottleneck; keep the remaining aggregate work on the
   upstream surface/source/history values and EnergyPlus report timing.
+  The dynamic probe summary also carries a zone surface-convection report
+  closure check against the signed sum of individual
+  `Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`).
+  On the active ScriptF-flat lane the six-surface closure has oracle RMSE
+  `67.733212 W`, Rust RMSE `30.140119 W`, and residual-delta RMSE
+  `47.307560 W`, so EnergyPlus `CalcZoneComponentLoadSums`/`SumHADTsurfs`
+  cannot be approximated as a direct negative of the individual surface report
+  rows. Keep the remaining work on `SurfTempInTmp`, reference-air timing, and
+  hconv/source ownership.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

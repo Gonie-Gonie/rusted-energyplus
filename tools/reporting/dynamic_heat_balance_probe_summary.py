@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,8 @@ from typing import Any
 ORACLE_VERSION = "26.1.0"
 CASE_ID = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 EXPECTED_SERIES_COUNT = 99
+ZONE_SURFACE_CONVECTION_VARIABLE = "Zone Air Heat Balance Surface Convection Rate"
+SURFACE_INSIDE_CONVECTION_VARIABLE = "Surface Inside Face Convection Heat Gain Rate"
 SURFACE_INSIDE_CONDUCTION_VARIABLE = "Surface Inside Face Conduction Heat Transfer Rate"
 SURFACE_OUTSIDE_CONDUCTION_VARIABLE = "Surface Outside Face Conduction Heat Transfer Rate"
 SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"
@@ -982,6 +985,132 @@ def ratio(numerator: float | None, denominator: float | None) -> float | None:
     return numerator / denominator
 
 
+def sample_rows(series: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = series.get("sample_rows")
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def sample_numeric(row: dict[str, Any], field: str) -> float | None:
+    return numeric(row.get(field))
+
+
+def residual_stats(values: list[float]) -> dict[str, float | None]:
+    if not values:
+        return {
+            "max_abs_w": None,
+            "rmse_w": None,
+            "mean_abs_w": None,
+        }
+    abs_values = [abs(value) for value in values]
+    return {
+        "max_abs_w": max(abs_values),
+        "rmse_w": math.sqrt(sum(value * value for value in values) / len(values)),
+        "mean_abs_w": sum(abs_values) / len(abs_values),
+    }
+
+
+def zone_surface_convection_closure_row(summary: dict[str, Any]) -> dict[str, Any]:
+    zone_series = find_series(
+        summary,
+        FocusMetric("ZONE ONE", ZONE_SURFACE_CONVECTION_VARIABLE),
+    )
+    surface_series = []
+    for series in summary.get("series", []):
+        if not isinstance(series, dict):
+            continue
+        output = series.get("output", {})
+        if not isinstance(output, dict):
+            continue
+        if output.get("variable") == SURFACE_INSIDE_CONVECTION_VARIABLE:
+            surface_series.append(series)
+    surface_series.sort(key=series_output_label)
+
+    if zone_series is None:
+        return {
+            "status": "missing-zone-row",
+            "surface_count": len(surface_series),
+            "samples": None,
+            "sign_convention": "zone_plus_surface_report_heat_gain",
+        }
+    if not surface_series:
+        return {
+            "status": "missing-surface-rows",
+            "surface_count": 0,
+            "samples": None,
+            "sign_convention": "zone_plus_surface_report_heat_gain",
+        }
+
+    zone_samples = sample_rows(zone_series)
+    surface_samples = [sample_rows(series) for series in surface_series]
+    if not zone_samples or any(not rows for rows in surface_samples):
+        return {
+            "status": "missing-samples",
+            "surface_count": len(surface_series),
+            "samples": 0,
+            "sign_convention": "zone_plus_surface_report_heat_gain",
+        }
+
+    sample_window = min(len(zone_samples), *(len(rows) for rows in surface_samples))
+    oracle_residuals: list[float] = []
+    rust_residuals: list[float] = []
+    delta_residuals: list[float] = []
+
+    for sample_index in range(sample_window):
+        zone_oracle = sample_numeric(zone_samples[sample_index], "oracle_c")
+        zone_rust = sample_numeric(zone_samples[sample_index], "rust_c")
+        if zone_oracle is None or zone_rust is None:
+            continue
+
+        oracle_surface_sum = 0.0
+        rust_surface_sum = 0.0
+        sample_ok = True
+        for rows in surface_samples:
+            surface_oracle = sample_numeric(rows[sample_index], "oracle_c")
+            surface_rust = sample_numeric(rows[sample_index], "rust_c")
+            if surface_oracle is None or surface_rust is None:
+                sample_ok = False
+                break
+            oracle_surface_sum += surface_oracle
+            rust_surface_sum += surface_rust
+        if not sample_ok:
+            continue
+
+        oracle_residual = zone_oracle + oracle_surface_sum
+        rust_residual = zone_rust + rust_surface_sum
+        oracle_residuals.append(oracle_residual)
+        rust_residuals.append(rust_residual)
+        delta_residuals.append(rust_residual - oracle_residual)
+
+    oracle_stats = residual_stats(oracle_residuals)
+    rust_stats = residual_stats(rust_residuals)
+    delta_stats = residual_stats(delta_residuals)
+    status = "computed" if oracle_residuals else "missing-values"
+    if oracle_residuals and len(oracle_residuals) != sample_window:
+        status = "computed-with-skipped-samples"
+
+    return {
+        "status": status,
+        "zone_key": "ZONE ONE",
+        "zone_variable": ZONE_SURFACE_CONVECTION_VARIABLE,
+        "surface_variable": SURFACE_INSIDE_CONVECTION_VARIABLE,
+        "surface_count": len(surface_series),
+        "samples": len(oracle_residuals),
+        "sample_window": sample_window,
+        "sign_convention": "zone_plus_surface_report_heat_gain",
+        "oracle_closure_max_abs_w": oracle_stats["max_abs_w"],
+        "oracle_closure_rmse_w": oracle_stats["rmse_w"],
+        "oracle_closure_mean_abs_w": oracle_stats["mean_abs_w"],
+        "rust_closure_max_abs_w": rust_stats["max_abs_w"],
+        "rust_closure_rmse_w": rust_stats["rmse_w"],
+        "rust_closure_mean_abs_w": rust_stats["mean_abs_w"],
+        "closure_delta_max_abs_w": delta_stats["max_abs_w"],
+        "closure_delta_rmse_w": delta_stats["rmse_w"],
+        "closure_delta_mean_abs_w": delta_stats["mean_abs_w"],
+    }
+
+
 def annotate_default_focus_deltas(lanes: list[dict[str, Any]]) -> None:
     default_lane = next((lane for lane in lanes if lane.get("lane") == "default"), None)
     if default_lane is None:
@@ -1309,6 +1438,9 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
             SURFACE_HEAT_STORAGE_VARIABLE,
         ),
         "surface_balance_drivers": surface_balance_driver_rows(summary),
+        "zone_surface_convection_closure": zone_surface_convection_closure_row(
+            summary
+        ),
         "floor_ctf_history_driver": floor_ctf_history_driver_row(summary),
         "floor_ctf_max_sample_driver": floor_ctf_max_sample_driver_row(summary),
     }
@@ -1323,7 +1455,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v15",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v16",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1560,6 +1692,38 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     status=metric.get("status", "none"),
                 )
             )
+    lines.extend(
+        [
+            "",
+            "## Zone Surface Convection Report Closure",
+            "",
+            "Compares `Zone Air Heat Balance Surface Convection Rate` with the signed sum of `Surface Inside Face Convection Heat Gain Rate` rows using `zone + surface_sum`. Nonzero oracle closure means EnergyPlus zone AirRpt uses a different report timing/source than the individual surface report rows.",
+            "",
+            "| lane | surfaces | samples | oracle RMSE | Rust RMSE | delta RMSE | oracle max | Rust max | delta max | oracle mean | Rust mean | delta mean | status |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        closure = lane.get("zone_surface_convection_closure")
+        if not isinstance(closure, dict):
+            continue
+        lines.append(
+            "| {lane} | {surfaces} | {samples} | {oracle_rmse} | {rust_rmse} | {delta_rmse} | {oracle_max} | {rust_max} | {delta_max} | {oracle_mean} | {rust_mean} | {delta_mean} | {status} |".format(
+                lane=lane["lane"],
+                surfaces=closure.get("surface_count", "none"),
+                samples=closure.get("samples", "none"),
+                oracle_rmse=fmt_number(closure.get("oracle_closure_rmse_w")),
+                rust_rmse=fmt_number(closure.get("rust_closure_rmse_w")),
+                delta_rmse=fmt_number(closure.get("closure_delta_rmse_w")),
+                oracle_max=fmt_number(closure.get("oracle_closure_max_abs_w")),
+                rust_max=fmt_number(closure.get("rust_closure_max_abs_w")),
+                delta_max=fmt_number(closure.get("closure_delta_max_abs_w")),
+                oracle_mean=fmt_number(closure.get("oracle_closure_mean_abs_w")),
+                rust_mean=fmt_number(closure.get("rust_closure_mean_abs_w")),
+                delta_mean=fmt_number(closure.get("closure_delta_mean_abs_w")),
+                status=closure.get("status", "none"),
+            )
+        )
     lines.extend(
         [
             "",

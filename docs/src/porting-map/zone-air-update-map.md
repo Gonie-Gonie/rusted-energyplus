@@ -157,3 +157,14 @@ storage all retain the active ScriptF-flat RMSE values (`0.037329 C`,
 The next zone-air work therefore stays on `CalcZoneComponentLoadSums` timing,
 `SurfTempInTmp`/hconv ownership, and upstream surface/source/history parity
 rather than on a zone aggregate accumulator source swap.
+
+The dynamic probe summary now also tracks zone surface-convection report
+closure against the signed sum of individual
+`Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`). On
+the active ScriptF-flat lane the six-surface closure has oracle RMSE
+`67.733212 W`, Rust RMSE `30.140119 W`, and residual-delta RMSE `47.307560 W`.
+Because EnergyPlus itself does not close this surface-report sum to zero, the
+remaining `SumHADTsurfs` work should stay on EnergyPlus
+`CalcZoneComponentLoadSums` timing, `SurfTempInTmp`, and
+`getInsideAirTemperature`/hconv ownership rather than directly summing surface
+report heat-gain rows.
