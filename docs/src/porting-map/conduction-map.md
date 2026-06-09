@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-10
 ---
 
 # Conduction Map
@@ -275,5 +275,14 @@ inside/outside aggregate RMSE worsens from `18.143612`/`11.590547` to
 `22.208305`/`12.785602`. Keep individual surface conduction reporting on the
 current report-state path while the aggregate rows remain an EnergyPlus
 advanced-report timing target.
+The next zone aggregate source probe then aligned with EnergyPlus'
+`UpdateThermalHistories` sum shape by accumulating the same per-surface report
+rates used for individual surface conduction outputs. That probe is a tracked
+no-op, not a promotion: zone opaque inside/outside aggregate RMSE remains
+`18.143612`/`11.590547`, outside gain/loss remains `7.153090`/`8.778568`, and
+floor storage/inside/outside conduction remain `28.786920`/`16.729618`/
+`12.216935`. The aggregate mismatch is therefore not caused by summing stale
+zone-state fields after the current active solver path; continue on the
+surface/source/history values feeding those report terms.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

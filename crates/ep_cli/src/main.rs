@@ -32,8 +32,8 @@ use ep_runtime::{
     HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfHistorySlotHourlySample,
     HeatBalanceCtfHistorySlotSample, HeatBalanceCtfInitialHistoryPolicy,
     HeatBalanceSimulationOptions, HeatBalanceSurfaceFirstSampleTrace, HeatBalanceWarmupSummary,
-    HeatBalanceZoneAirAlgorithm, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    HeatBalanceZoneAirAlgorithm, HeatBalanceZoneConductionReportSource, NodeStateProjection,
+    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, ResultStore,
     SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
@@ -67,6 +67,8 @@ const HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS";
 const HEAT_BALANCE_SURFACE_ITERATIONS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS";
+const HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE";
 const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
@@ -766,6 +768,10 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
                 "  ctf_initial_history_policy: {}",
                 summary.ctf_initial_history_policy
             );
+            println!(
+                "  zone_conduction_report_source: {}",
+                summary.zone_conduction_report_source
+            );
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
@@ -842,6 +848,10 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!(
                 "  ctf_initial_history_policy: {}",
                 summary.ctf_initial_history_policy
+            );
+            println!(
+                "  zone_conduction_report_source: {}",
+                summary.zone_conduction_report_source
             );
             println!("  status: {}", summary.status);
             0
@@ -1053,6 +1063,7 @@ struct HeatBalanceReportSummary {
     zone_air_algorithm: &'static str,
     surface_iteration_count: u32,
     ctf_initial_history_policy: &'static str,
+    zone_conduction_report_source: &'static str,
     status: &'static str,
 }
 
@@ -1129,6 +1140,7 @@ fn generate_conformance_heat_balance_report(
         zone_air_algorithm: diagnostic.zone_air_algorithm,
         surface_iteration_count: diagnostic.surface_iteration_count,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
+        zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         status: conformance.status,
     })
 }
@@ -1175,6 +1187,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         zone_air_algorithm: diagnostic.zone_air_algorithm,
         surface_iteration_count: diagnostic.surface_iteration_count,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
+        zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         status: conformance.status,
     })
 }
@@ -3222,6 +3235,7 @@ struct HeatBalanceConformanceDiagnostic {
     zone_air_algorithm: &'static str,
     surface_iteration_count: u32,
     ctf_initial_history_policy: &'static str,
+    zone_conduction_report_source: &'static str,
     zone_count: usize,
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
@@ -3762,13 +3776,15 @@ fn build_heat_balance_conformance_diagnostic(
     let simulation_options = if context.conformance_claim {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
     } else {
-        apply_heat_balance_ctf_initial_history_policy_from_env(
-            apply_heat_balance_surface_iterations_from_env(
-                apply_heat_balance_warmup_minimum_days_from_env(
-                    HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
-                        &simulation_model,
-                        sample_count,
-                    ),
+        apply_heat_balance_zone_conduction_report_source_from_env(
+            apply_heat_balance_ctf_initial_history_policy_from_env(
+                apply_heat_balance_surface_iterations_from_env(
+                    apply_heat_balance_warmup_minimum_days_from_env(
+                        HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+                            &simulation_model,
+                            sample_count,
+                        ),
+                    )?,
                 )?,
             )?,
         )?
@@ -3878,6 +3894,9 @@ fn build_heat_balance_conformance_diagnostic(
         surface_iteration_count: simulation.summary.surface_iteration_count,
         ctf_initial_history_policy: heat_balance_ctf_initial_history_policy_label(
             simulation.summary.ctf_initial_history_policy,
+        ),
+        zone_conduction_report_source: heat_balance_zone_conduction_report_source_label(
+            simulation.summary.zone_conduction_report_source,
         ),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
@@ -5308,12 +5327,46 @@ fn parse_heat_balance_surface_iterations(value: &str) -> Result<Option<u32>, Str
     Ok(Some(iteration_count))
 }
 
+fn apply_heat_balance_zone_conduction_report_source_from_env(
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulationOptions, String> {
+    match std::env::var(HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV) {
+        Ok(value) => parse_heat_balance_zone_conduction_report_source(&value)
+            .map(|source| options.with_zone_conduction_report_source(source)),
+        Err(std::env::VarError::NotPresent) => Ok(options),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_zone_conduction_report_source(
+    value: &str,
+) -> Result<HeatBalanceZoneConductionReportSource, String> {
+    match value.trim().to_ascii_lowercase().as_str() {
+        "" | "zone-state" => Ok(HeatBalanceZoneConductionReportSource::ZoneState),
+        "surface-report" => Ok(HeatBalanceZoneConductionReportSource::SurfaceReport),
+        other => Err(format!(
+            "unsupported {HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV}: {other}; expected zone-state or surface-report"
+        )),
+    }
+}
+
 fn heat_balance_ctf_initial_history_policy_label(
     ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
 ) -> &'static str {
     match ctf_initial_history_policy {
         HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => "boundary-u-value",
         HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => "energyplus-surf-initial",
+    }
+}
+
+fn heat_balance_zone_conduction_report_source_label(
+    zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
+) -> &'static str {
+    match zone_conduction_report_source {
+        HeatBalanceZoneConductionReportSource::ZoneState => "zone-state",
+        HeatBalanceZoneConductionReportSource::SurfaceReport => "surface-report",
     }
 }
 
@@ -6901,6 +6954,10 @@ fn render_heat_balance_conformance_json(
         "  \"ctf_initial_history_policy\": {},\n",
         json_string(diagnostic.ctf_initial_history_policy)
     ));
+    json.push_str(&format!(
+        "  \"zone_conduction_report_source\": {},\n",
+        json_string(diagnostic.zone_conduction_report_source)
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -7138,6 +7195,10 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "ctf_initial_history_policy: {}\n",
         diagnostic.ctf_initial_history_policy
+    ));
+    report.push_str(&format!(
+        "zone_conduction_report_source: {}\n",
+        diagnostic.zone_conduction_report_source
     ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
@@ -9546,6 +9607,23 @@ mod tests {
     }
 
     #[test]
+    fn heat_balance_zone_conduction_report_source_parser_accepts_probe_source() {
+        assert_eq!(
+            super::parse_heat_balance_zone_conduction_report_source("").unwrap(),
+            ep_runtime::HeatBalanceZoneConductionReportSource::ZoneState
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_conduction_report_source("zone-state").unwrap(),
+            ep_runtime::HeatBalanceZoneConductionReportSource::ZoneState
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_conduction_report_source("surface-report").unwrap(),
+            ep_runtime::HeatBalanceZoneConductionReportSource::SurfaceReport
+        );
+        assert!(super::parse_heat_balance_zone_conduction_report_source("surface-sum").is_err());
+    }
+
+    #[test]
     fn heat_balance_zone_air_algorithm_parser_accepts_probe_algorithm() {
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("").unwrap(),
@@ -9973,6 +10051,7 @@ mod tests {
             zone_air_algorithm: "simplified-analytical",
             surface_iteration_count: 1,
             ctf_initial_history_policy: "boundary-u-value",
+            zone_conduction_report_source: "zone-state",
             zone_count: 1,
             surface_count: 6,
             ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
@@ -10310,6 +10389,7 @@ mod tests {
         assert!(json.contains("\"zone_air_algorithm\": \"simplified-analytical\""));
         assert!(json.contains("\"surface_iteration_count\": 1"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
+        assert!(json.contains("\"zone_conduction_report_source\": \"zone-state\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
@@ -10390,6 +10470,7 @@ mod tests {
         assert!(report.contains("Rust Surface First-Sample Trace"));
         assert!(report.contains("surface_iteration_count: 1"));
         assert!(report.contains("ctf_initial_history_policy: boundary-u-value"));
+        assert!(report.contains("zone_conduction_report_source: zone-state"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
@@ -10474,6 +10555,7 @@ mod tests {
             zone_air_algorithm: "energyplus-third-order-probe",
             surface_iteration_count: 3,
             ctf_initial_history_policy: "energyplus-surf-initial",
+            zone_conduction_report_source: "surface-report",
             zone_count: 1,
             surface_count: 6,
             ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
@@ -10780,6 +10862,7 @@ mod tests {
         assert!(json.contains("\"zone_air_algorithm\": \"energyplus-third-order-probe\""));
         assert!(json.contains("\"surface_iteration_count\": 3"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
+        assert!(json.contains("\"zone_conduction_report_source\": \"surface-report\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
@@ -10844,6 +10927,7 @@ mod tests {
         assert!(report.contains("zone_air_algorithm: energyplus-third-order-probe"));
         assert!(report.contains("surface_iteration_count: 3"));
         assert!(report.contains("ctf_initial_history_policy: energyplus-surf-initial"));
+        assert!(report.contains("zone_conduction_report_source: surface-report"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(

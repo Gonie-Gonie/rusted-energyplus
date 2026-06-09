@@ -1073,6 +1073,15 @@ pub enum HeatBalanceCtfInitialHistoryPolicy {
     EnergyPlusSurfInitial,
 }
 
+/// Source used for zone opaque conduction report variables.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceZoneConductionReportSource {
+    /// Use the zone heat-balance state values captured during correction.
+    ZoneState,
+    /// Sum the same per-surface report rates used by surface conduction outputs.
+    SurfaceReport,
+}
+
 /// Options for the heat-balance zone-air diagnostic trace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceSimulationOptions {
@@ -1088,6 +1097,8 @@ pub struct HeatBalanceSimulationOptions {
     pub surface_iteration_count: u32,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
+    /// Source used for zone opaque conduction report variables.
+    pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -1160,6 +1171,7 @@ impl HeatBalanceSimulationOptions {
             surface_iteration_count: 1,
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
+            zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
         }
     }
 
@@ -1185,6 +1197,7 @@ impl HeatBalanceSimulationOptions {
             surface_iteration_count: 1,
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
+            zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
         }
     }
 
@@ -1228,6 +1241,16 @@ impl HeatBalanceSimulationOptions {
         self.ctf_initial_history_policy = ctf_initial_history_policy;
         self
     }
+
+    /// Returns options with an explicit zone opaque conduction report source.
+    #[must_use]
+    pub const fn with_zone_conduction_report_source(
+        mut self,
+        zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
+    ) -> Self {
+        self.zone_conduction_report_source = zone_conduction_report_source;
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -1249,6 +1272,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_iteration_count: u32,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
+    /// Source used for zone opaque conduction report variables.
+    pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
     /// Per-slot CTF history terms after optional warmup, before the run period starts.
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
@@ -4029,6 +4054,34 @@ fn correct_zone_air_temperatures_from_current_surfaces(
     }
 }
 
+fn zone_surface_report_conduction_rates_w(
+    surfaces: &[SurfaceHeatBalanceState],
+    zone_id: ZoneId,
+    use_inside_ctf_outside_temperature_for_conduction_report: bool,
+) -> (f64, f64) {
+    surfaces
+        .iter()
+        .filter(|surface| surface.zone_id == zone_id)
+        .map(|surface| {
+            (
+                surface_inside_conduction_rate_w_for_report(
+                    surface,
+                    use_inside_ctf_outside_temperature_for_conduction_report,
+                ),
+                surface_outside_conduction_rate_w_for_report(
+                    surface,
+                    use_inside_ctf_outside_temperature_for_conduction_report,
+                ),
+            )
+        })
+        .fold(
+            (0.0, 0.0),
+            |(inside_sum, outside_sum), (inside, outside)| {
+                (inside_sum + inside, outside_sum + outside)
+            },
+        )
+}
+
 fn sync_adiabatic_outside_faces_to_inside_faces(surfaces: &mut [SurfaceHeatBalanceState]) {
     for surface in surfaces {
         if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
@@ -4565,6 +4618,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe
     );
+    let use_surface_report_zone_conduction_rates = matches!(
+        options.zone_conduction_report_source,
+        HeatBalanceZoneConductionReportSource::SurfaceReport
+    );
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
         .iter()
@@ -4642,7 +4699,19 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 }
             }
             for (index, trace) in zone_conduction_rates.iter().enumerate() {
-                if let Some(zone_state) = state
+                if use_surface_report_zone_conduction_rates {
+                    let (inside_rate, outside_rate) = zone_surface_report_conduction_rates_w(
+                        &state.surfaces,
+                        trace.zone_id,
+                        use_inside_ctf_outside_temperature_for_conduction_report,
+                    );
+                    zone_conduction_sums[index].0 += inside_rate;
+                    zone_conduction_sums[index].1 += heat_gain_rate_w(inside_rate);
+                    zone_conduction_sums[index].2 += heat_loss_rate_w(inside_rate);
+                    zone_conduction_sums[index].3 += outside_rate;
+                    zone_conduction_sums[index].4 += heat_gain_rate_w(outside_rate);
+                    zone_conduction_sums[index].5 += heat_loss_rate_w(outside_rate);
+                } else if let Some(zone_state) = state
                     .zones
                     .iter()
                     .find(|zone| zone.zone_id == trace.zone_id)
@@ -5381,6 +5450,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         surface_count: state.surfaces.len(),
         surface_iteration_count: options.surface_iteration_count,
         ctf_initial_history_policy: options.ctf_initial_history_policy,
+        zone_conduction_report_source: options.zone_conduction_report_source,
         run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
@@ -10170,12 +10240,13 @@ mod tests {
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
-        InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
-        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
-        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
-        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        QuickOutsideConductionContext, ResultStore, RuntimeError, RuntimeOutputRegistry,
-        SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
+        InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
+        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
+        PlantEquipmentRole, PlantStateProjectionOptions, QuickOutsideConductionContext,
+        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
         advance_surface_ctf_histories,
@@ -10237,6 +10308,7 @@ mod tests {
         zone_air_heat_balance_surface_convection_rate_from_balance_w,
         zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
         zone_air_heat_balance_surface_convection_rate_w, zone_geometry_summaries,
+        zone_surface_report_conduction_rates_w,
     };
     use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
     use ep_model::{
@@ -13218,6 +13290,58 @@ DATA PERIODS
     }
 
     #[test]
+    fn zone_surface_report_conduction_rates_sum_surface_report_terms()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let zone_id = state.zones[0].zone_id;
+        for surface in &mut state.surfaces {
+            surface.ctf = SurfaceCtfState {
+                outside_0_w_per_m2_k: 0.0,
+                cross_0_w_per_m2_k: 0.0,
+                inside_0_w_per_m2_k: 0.0,
+                const_in_part_w_per_m2: 0.0,
+                const_out_part_w_per_m2: 0.0,
+                outside_history_w_per_m2_k: Vec::new(),
+                cross_history_w_per_m2_k: Vec::new(),
+                inside_history_w_per_m2_k: Vec::new(),
+                flux_history: Vec::new(),
+                outside_temperature_history_c: Vec::new(),
+                inside_temperature_history_c: Vec::new(),
+                outside_flux_history_w_per_m2: Vec::new(),
+                inside_flux_history_w_per_m2: Vec::new(),
+            };
+        }
+
+        let [first, second, ..] = state.surfaces.as_mut_slice() else {
+            return Err(std::io::Error::other("missing test surfaces").into());
+        };
+        first.area_m2 = 2.0;
+        first.inside_face_temperature_c = 20.0;
+        first.outside_face_temperature_c = 10.0;
+        first.ctf.cross_0_w_per_m2_k = 1.0;
+        first.ctf.outside_0_w_per_m2_k = 0.5;
+        first.ctf.const_in_part_w_per_m2 = 3.0;
+        first.ctf.const_out_part_w_per_m2 = 4.0;
+
+        second.area_m2 = 3.0;
+        second.inside_face_temperature_c = 18.0;
+        second.outside_face_temperature_c = 12.0;
+        second.ctf.cross_0_w_per_m2_k = 2.0;
+        second.ctf.inside_0_w_per_m2_k = 1.0;
+        second.ctf.outside_0_w_per_m2_k = 1.5;
+        second.ctf.const_in_part_w_per_m2 = -1.0;
+        second.ctf.const_out_part_w_per_m2 = 0.5;
+
+        let (inside, outside) =
+            zone_surface_report_conduction_rates_w(&state.surfaces, zone_id, false);
+        assert!((inside - 41.0).abs() < 1.0e-12);
+        assert!((outside - 74.5).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
     fn heat_balance_zone_air_algorithm_option_defaults_to_simplified() {
         let options = HeatBalanceSimulationOptions::hourly_samples(2);
 
@@ -13226,6 +13350,18 @@ DATA PERIODS
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
         );
         assert_eq!(options.surface_iteration_count, 1);
+        assert_eq!(
+            options.zone_conduction_report_source,
+            HeatBalanceZoneConductionReportSource::ZoneState
+        );
+        assert_eq!(
+            options
+                .with_zone_conduction_report_source(
+                    HeatBalanceZoneConductionReportSource::SurfaceReport
+                )
+                .zone_conduction_report_source,
+            HeatBalanceZoneConductionReportSource::SurfaceReport
+        );
         assert_eq!(
             options
                 .with_zone_air_algorithm(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe)

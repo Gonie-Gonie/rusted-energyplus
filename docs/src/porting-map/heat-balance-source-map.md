@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-10
 ---
 
 # Heat Balance Source Map
@@ -799,6 +799,18 @@ Current Rust boundary:
   surface conduction report path intact and shifts the aggregate conduction
   question back to EnergyPlus advanced report-variable timing rather than the
   inside-CTF outside snapshot alone.
+  A follow-on EnergyPlus source recheck of `UpdateThermalHistories` confirmed
+  that the advanced zone aggregate rows are sums of the per-surface opaque
+  report terms (`SurfOpaqInsFaceCond`/`SurfOpaqOutFaceCond`). A diagnostic Rust
+  probe therefore made the zone aggregate accumulator sum the same per-surface
+  report helpers used by individual surface conduction outputs. It is a no-op
+  against the active ScriptF-flat lane: MAT, surface convection, air storage,
+  zone opaque inside/outside aggregate conduction, floor inside/outside
+  conduction, and floor storage all keep identical RMSE values (`0.037329`,
+  `22.062956`, `9.127258`, `18.143612`, `11.590547`, `16.729618`,
+  `12.216935`, and `28.786920`). This rules out zone-state-vs-surface-report
+  accumulation as the next bottleneck; keep the remaining aggregate work on the
+  upstream surface/source/history values and EnergyPlus report timing.
   Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical

@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-10
 ---
 
 # Zone Air Update Map
@@ -147,3 +147,13 @@ conduction from `18.143612 W` to `22.208305 W` inside and from `11.590547 W` to
 `12.785602 W` outside. The zone-air/aggregate report path therefore still needs
 EnergyPlus advanced report timing mapped separately from the surface CTF solve
 snapshot.
+
+A zone surface-report aggregate sibling then summed per-surface conduction
+report helpers for the zone opaque aggregate rows, matching the EnergyPlus
+`UpdateThermalHistories` aggregate shape. It is neutral: MAT, surface
+convection, air storage, zone inside/outside aggregate conduction, and floor
+storage all retain the active ScriptF-flat RMSE values (`0.037329 C`,
+`22.062956 W`, `9.127258 W`, `18.143612 W`, `11.590547 W`, and `28.786920 W`).
+The next zone-air work therefore stays on `CalcZoneComponentLoadSums` timing,
+`SurfTempInTmp`/hconv ownership, and upstream surface/source/history parity
+rather than on a zone aggregate accumulator source swap.

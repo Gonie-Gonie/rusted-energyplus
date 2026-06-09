@@ -339,6 +339,15 @@ LANES = (
         / "compare/compare-summary.json",
     ),
     ProbeLane(
+        lane="all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-zone-surf-report-warmup-min20-iter20",
+        summary_path=Path(
+            ".runtime/official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-surface-iter20-zone-surf-report"
+        )
+        / ORACLE_VERSION
+        / CASE_ID
+        / "compare/compare-summary.json",
+    ),
+    ProbeLane(
         lane="all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20",
         summary_path=Path(
             ".runtime/official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-surface-iter20"
@@ -524,6 +533,7 @@ REFERENCE_LANES = {
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-surf-refair-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-final-hconv-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
+    "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-zone-surf-report-warmup-min20-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-warmup-min20-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20",
     "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-current-adhist-iter20": "all-ctf-third-order-frozen-hconv-weather-storage-balance-surfconv-iter20",
     "all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5": "all-ctf-analytical-coupled-previous-inside-quick-outside-iter5",
@@ -1273,6 +1283,9 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
         "ctf_initial_history_policy": summary.get(
             "ctf_initial_history_policy", "boundary-u-value"
         ),
+        "zone_conduction_report_source": summary.get(
+            "zone_conduction_report_source", "zone-state"
+        ),
         "surface_iteration_count": summary.get("surface_iteration_count", 1),
         "samples": summary.get("samples"),
         "series_count": summary.get("series_count"),
@@ -1369,17 +1382,18 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"oracle_version: {summary['oracle_version']}",
         f"expected_series_count: {summary['expected_series_count']}",
         "",
-        "| lane | algorithm | CTF seed | CTF init | surface passes | series | artifact | top output | top RMSE | top max abs | status |",
-        "|---|---|---|---|---:|---:|---|---|---:|---:|---|",
+        "| lane | algorithm | CTF seed | CTF init | zone cond src | surface passes | series | artifact | top output | top RMSE | top max abs | status |",
+        "|---|---|---|---|---|---:|---:|---|---|---:|---:|---|",
     ]
     for lane in summary["lanes"]:
         top_output = f"{lane['top_key']} / {lane['top_variable']}"
         lines.append(
-            "| {lane} | {algorithm} | {ctf} | {ctf_init} | {surface_passes} | {series_count} | {artifact_status} | {top} | {rmse} | {max_abs} | {status} |".format(
+            "| {lane} | {algorithm} | {ctf} | {ctf_init} | {zone_cond_src} | {surface_passes} | {series_count} | {artifact_status} | {top} | {rmse} | {max_abs} | {status} |".format(
                 lane=lane["lane"],
                 algorithm=lane["zone_air_algorithm"],
                 ctf=lane["ctf_seed_policy"],
                 ctf_init=lane["ctf_initial_history_policy"],
+                zone_cond_src=lane["zone_conduction_report_source"],
                 surface_passes=lane["surface_iteration_count"],
                 series_count=lane.get("series_count") or "none",
                 artifact_status=lane.get("artifact_status", "unknown"),
