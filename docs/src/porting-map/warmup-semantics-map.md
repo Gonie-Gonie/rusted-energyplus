@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-09
 ---
 
 # Warmup Semantics Map
@@ -58,4 +58,9 @@ shows only negligible movement from the all-CTF lane, so warmup day count alone
 is not the mass-floor fix. EPW exterior forcing is now used during Rust warmup
 when full weather records are available; this source-match refinement only
 nudges current official dynamic metrics and does not change the mass-floor
-CTF/history promotion blocker.
+CTF/history promotion blocker. Re-running the current best converged
+frozen-reference-air/current-longwave lane with the EnergyPlus
+`SurfInitialTemp`-shaped initial CTF history policy is bit-identical after
+warmup, so the next warmup-facing work is the repeated-day history evolution
+and source-order handoff into the run period, not the pre-warmup seed values
+alone.

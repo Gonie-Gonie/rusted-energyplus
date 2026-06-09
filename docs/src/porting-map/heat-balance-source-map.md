@@ -272,6 +272,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   zone-air rows still move the wrong way slightly (`21.039633 W` to
   `21.105254 W` surface convection, `7.496023 W` to `7.547299 W` air storage),
   so this is a stronger candidate cadence but not a conformance promotion.
+- Re-running that converged lane with the EnergyPlus `SurfInitialTemp`-shaped
+  CTF initial history policy is bit-identical after the diagnostic warmup loop:
+  the top floor storage, floor inside/outside conduction, MAT, zone-air
+  surface-convection, air-storage, and latent floor current/history rows all
+  remain unchanged. This rules out the pre-warmup CTF seed as the next active
+  lever; the remaining floor current/history cancellation mismatch must come
+  from warmup-to-run-period history evolution or same-timestep source/face
+  ordering after histories have already been warmed.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
