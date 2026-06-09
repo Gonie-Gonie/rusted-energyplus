@@ -35,6 +35,8 @@ use ep_runtime::{
     NodeStateProjection, NodeStateProjectionOptions, PlantStateProjection,
     PlantStateProjectionOptions, ResultStore, SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+    SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
+    SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
@@ -3375,6 +3377,8 @@ struct HeatBalanceInsideSolveMaxSampleDelta {
     oracle_inside_history_term_w: f64,
     rust_inside_history_term_w: f64,
     inside_history_delta_w: f64,
+    rust_inside_history_temperature_term_w: f64,
+    rust_inside_history_flux_term_w: f64,
     oracle_inside_net_longwave_w: f64,
     rust_inside_net_longwave_w: f64,
     inside_net_longwave_delta_w: f64,
@@ -4538,6 +4542,18 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
                 sample_index,
             )?;
+            let rust_inside_history_temperature = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+            let rust_inside_history_flux = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
 
             let adiabatic_cross =
                 if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
@@ -4637,6 +4653,8 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 oracle_inside_history_term_w,
                 rust_inside_history_term_w: rust_inside_history,
                 inside_history_delta_w: (oracle_inside_history_term_w - rust_inside_history).abs(),
+                rust_inside_history_temperature_term_w: rust_inside_history_temperature,
+                rust_inside_history_flux_term_w: rust_inside_history_flux,
                 oracle_inside_net_longwave_w: inside_net_longwave.oracle_c,
                 rust_inside_net_longwave_w: inside_net_longwave.rust_c,
                 inside_net_longwave_delta_w: inside_net_longwave.abs_delta_c,
@@ -7961,6 +7979,8 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
                 "\"oracle_inside_history_term_w\": {}, ",
                 "\"rust_inside_history_term_w\": {}, ",
                 "\"inside_history_delta_w\": {}, ",
+                "\"rust_inside_history_temperature_term_w\": {}, ",
+                "\"rust_inside_history_flux_term_w\": {}, ",
                 "\"oracle_inside_net_longwave_w\": {}, ",
                 "\"rust_inside_net_longwave_w\": {}, ",
                 "\"inside_net_longwave_delta_w\": {} }}"
@@ -7994,6 +8014,8 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
             json_number(row.oracle_inside_history_term_w),
             json_number(row.rust_inside_history_term_w),
             json_number(row.inside_history_delta_w),
+            json_number(row.rust_inside_history_temperature_term_w),
+            json_number(row.rust_inside_history_flux_term_w),
             json_number(row.oracle_inside_net_longwave_w),
             json_number(row.rust_inside_net_longwave_w),
             json_number(row.inside_net_longwave_delta_w)
@@ -8555,14 +8577,14 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
     rows: &[HeatBalanceInsideSolveMaxSampleDelta],
 ) {
     report.push_str(
-        "| key | construction | boundary | sample_index | implied_numerator_delta_w | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | outside_source_delta_w | history_delta_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
+        "| key | construction | boundary | sample_index | implied_numerator_delta_w | denominator_delta_w_per_m2_k | ref_air_delta_c | ref_air_source_delta_w | outside_source_delta_w | history_delta_w | rust_history_temp_w | rust_history_flux_w | net_lw_delta_w | in_temp_delta_c | oracle_numerator_w | rust_numerator_w | oracle_denominator_w_per_m2_k | rust_denominator_w_per_m2_k | oracle_ref_air_c | rust_ref_air_c |\n",
     );
     report.push_str(
-        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
     );
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             markdown_cell(&row.outside_boundary_condition),
@@ -8573,6 +8595,8 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
             row.reference_air_source_delta_w,
             row.outside_temperature_source_delta_w,
             row.inside_history_delta_w,
+            row.rust_inside_history_temperature_term_w,
+            row.rust_inside_history_flux_term_w,
             row.inside_net_longwave_delta_w,
             row.inside_face_temperature_delta_c,
             row.oracle_implied_solve_numerator_w,
@@ -9890,6 +9914,8 @@ mod tests {
                 oracle_inside_history_term_w: 11.0,
                 rust_inside_history_term_w: 8.0,
                 inside_history_delta_w: 3.0,
+                rust_inside_history_temperature_term_w: 6.0,
+                rust_inside_history_flux_term_w: 2.0,
                 oracle_inside_net_longwave_w: -12.0,
                 rust_inside_net_longwave_w: -10.0,
                 inside_net_longwave_delta_w: 2.0,
@@ -10090,6 +10116,7 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
         assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(json.contains("\"outside_minus_inside_delta_c\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
@@ -10127,6 +10154,7 @@ mod tests {
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(digest.contains("\"rust_inside_history_flux_term_w\""));
         assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
         assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"adiabatic_history_max_sample_deltas\""));
@@ -10170,6 +10198,7 @@ mod tests {
         assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Inside Solve Max-Sample Deltas"));
         assert!(report.contains("implied_numerator_delta_w"));
+        assert!(report.contains("rust_history_temp_w"));
         assert!(report.contains("## Adiabatic History Max-Sample Deltas"));
         assert!(report.contains("out_minus_in_delta_c"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
@@ -10361,6 +10390,8 @@ mod tests {
                 oracle_inside_history_term_w: 6.0,
                 rust_inside_history_term_w: 3.0,
                 inside_history_delta_w: 3.0,
+                rust_inside_history_temperature_term_w: 2.5,
+                rust_inside_history_flux_term_w: 0.5,
                 oracle_inside_net_longwave_w: -3.0,
                 rust_inside_net_longwave_w: -2.0,
                 inside_net_longwave_delta_w: 1.0,
@@ -10527,6 +10558,7 @@ mod tests {
         assert!(json.contains("\"inside_balance_residual_delta_w\""));
         assert!(json.contains("\"inside_solve_max_sample_deltas\""));
         assert!(json.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(json.contains("\"rust_inside_history_temperature_term_w\""));
         assert!(json.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(json.contains("\"outside_minus_inside_delta_c\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
@@ -10553,6 +10585,7 @@ mod tests {
         assert!(digest.contains("\"inside_balance_residual_delta_w\""));
         assert!(digest.contains("\"inside_solve_max_sample_deltas\""));
         assert!(digest.contains("\"implied_solve_numerator_delta_w\""));
+        assert!(digest.contains("\"rust_inside_history_flux_term_w\""));
         assert!(digest.contains("\"adiabatic_history_max_sample_deltas\""));
         assert!(digest.contains("\"inside_current_if_outside_synced_delta_w\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
@@ -10590,6 +10623,7 @@ mod tests {
         assert!(report.contains("residual_delta_w"));
         assert!(report.contains("## Inside Solve Max-Sample Deltas"));
         assert!(report.contains("implied_numerator_delta_w"));
+        assert!(report.contains("rust_history_temp_w"));
         assert!(report.contains("## Adiabatic History Max-Sample Deltas"));
         assert!(report.contains("out_minus_in_delta_c"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));

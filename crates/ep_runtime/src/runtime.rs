@@ -50,6 +50,12 @@ pub const SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE: &str =
 pub const SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE: &str =
     "Surface CTF Inside Face History Term Rate";
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Inside Face History Temperature Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Inside Face History Flux Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
 pub const SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE: &str =
     "Surface CTF Outside Face Current Outside Temperature Term Rate";
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
@@ -1225,6 +1231,8 @@ struct SurfaceHeatBalanceTrace {
     ctf_inside_current_outside_term_rate_w: Vec<f64>,
     ctf_inside_current_inside_term_rate_w: Vec<f64>,
     ctf_inside_history_term_rate_w: Vec<f64>,
+    ctf_inside_history_temperature_term_rate_w: Vec<f64>,
+    ctf_inside_history_flux_term_rate_w: Vec<f64>,
     outside_conduction_rate_w: Vec<f64>,
     outside_conduction_gain_rate_w: Vec<f64>,
     outside_conduction_loss_rate_w: Vec<f64>,
@@ -1259,6 +1267,8 @@ struct SurfaceHeatBalanceTraceSums {
     ctf_inside_current_outside_term_rate_w: f64,
     ctf_inside_current_inside_term_rate_w: f64,
     ctf_inside_history_term_rate_w: f64,
+    ctf_inside_history_temperature_term_rate_w: f64,
+    ctf_inside_history_flux_term_rate_w: f64,
     outside_conduction_rate_w: f64,
     outside_conduction_gain_rate_w: f64,
     outside_conduction_loss_rate_w: f64,
@@ -4280,6 +4290,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             ctf_inside_current_outside_term_rate_w: Vec::with_capacity(options.sample_count),
             ctf_inside_current_inside_term_rate_w: Vec::with_capacity(options.sample_count),
             ctf_inside_history_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_inside_history_temperature_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_inside_history_flux_term_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
@@ -4521,6 +4533,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         surface_ctf_inside_current_inside_term_rate_w(surface_state);
                     sums.ctf_inside_history_term_rate_w +=
                         surface_ctf_inside_history_term_rate_w(surface_state);
+                    sums.ctf_inside_history_temperature_term_rate_w +=
+                        heat_balance_ctf_history_slot_inside_temperature_term_rate_w(
+                            &state.last_ctf_history_slot_terms,
+                            &surface_state.surface_name,
+                        );
+                    sums.ctf_inside_history_flux_term_rate_w +=
+                        heat_balance_ctf_history_slot_inside_flux_term_rate_w(
+                            &state.last_ctf_history_slot_terms,
+                            &surface_state.surface_name,
+                        );
                     sums.outside_conduction_rate_w += outside_rate;
                     sums.outside_conduction_gain_rate_w += heat_gain_rate_w(outside_rate);
                     sums.outside_conduction_loss_rate_w += heat_loss_rate_w(outside_rate);
@@ -4637,6 +4659,12 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .ctf_inside_history_term_rate_w
                 .push(sums.ctf_inside_history_term_rate_w / divisor);
+            trace
+                .ctf_inside_history_temperature_term_rate_w
+                .push(sums.ctf_inside_history_temperature_term_rate_w / divisor);
+            trace
+                .ctf_inside_history_flux_term_rate_w
+                .push(sums.ctf_inside_history_flux_term_rate_w / divisor);
             trace
                 .outside_conduction_rate_w
                 .push(sums.outside_conduction_rate_w / divisor);
@@ -4937,6 +4965,22 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE.to_string(),
             units: "W".to_string(),
             values: trace.ctf_inside_history_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_inside_history_temperature_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_inside_history_flux_term_rate_w,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -7615,6 +7659,28 @@ fn heat_balance_ctf_history_slot_samples(
         .iter()
         .flat_map(surface_ctf_history_slot_samples)
         .collect()
+}
+
+fn heat_balance_ctf_history_slot_inside_temperature_term_rate_w(
+    samples: &[HeatBalanceCtfHistorySlotSample],
+    surface_name: &str,
+) -> f64 {
+    samples
+        .iter()
+        .filter(|sample| sample.surface_name == surface_name)
+        .map(|sample| sample.inside_temperature_term_w)
+        .sum()
+}
+
+fn heat_balance_ctf_history_slot_inside_flux_term_rate_w(
+    samples: &[HeatBalanceCtfHistorySlotSample],
+    surface_name: &str,
+) -> f64 {
+    samples
+        .iter()
+        .filter(|sample| sample.surface_name == surface_name)
+        .map(|sample| sample.inside_flux_term_w)
+        .sum()
 }
 
 fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
@@ -12455,7 +12521,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 191);
+        assert_eq!(simulation.results.series.len(), 203);
 
         let Some(zone_series) = simulation
             .results
@@ -12538,6 +12604,20 @@ DATA PERIODS
         ) else {
             return Err(std::io::Error::other("missing CTF inside history term").into());
         };
+        let Some(inside_history_temperature_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(
+                std::io::Error::other("missing CTF inside history temperature term").into(),
+            );
+        };
+        let Some(inside_history_flux_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF inside history flux term").into());
+        };
         let Some(outside_current_outside_term) = simulation.results.find_series(
             "FLOOR",
             super::SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
@@ -12561,6 +12641,13 @@ DATA PERIODS
                 - inside_current_outside_term.values[0]
                 - inside_current_inside_term.values[0]
                 - inside_history_term.values[0])
+                .abs()
+                < 1.0e-9
+        );
+        assert!(
+            (inside_history_term.values[0]
+                - inside_history_temperature_term.values[0]
+                - inside_history_flux_term.values[0])
                 .abs()
                 < 1.0e-9
         );
