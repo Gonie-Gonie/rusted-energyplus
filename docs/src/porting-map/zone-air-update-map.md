@@ -104,3 +104,11 @@ regress, though: balance-closure surface convection rises from `19.203798 W` to
 `21.039586 W`, and weather-proxy air storage rises from `5.845285 W` to
 `7.495999 W`. This makes frozen surface reference air a useful cadence clue,
 not a standalone promotion path.
+
+A current-pass interior-longwave sibling was added on top of frozen reference
+air after source rechecking EnergyPlus' CTF-only inside loop. It leaves the
+zone-air picture essentially unchanged: MAT nudges from `0.031508 C` to
+`0.031507 C`, but surface convection remains `21.039633 W` and weather-proxy
+air storage remains `7.496023 W`. The next zone-air work is therefore still
+`SurfTempInTmp`/hconv/source-order parity plus owned zone humidity, not
+longwave sampling cadence alone.

@@ -254,5 +254,12 @@ because aggregate outside-face conduction worsens from `20.119228` to
 `31.074699`, and the zone-air latent rows regress. The next conduction step
 should therefore keep the frozen reference-air clue but pair it with full
 inside longwave/source-order and outside aggregate reporting parity work.
+A current-pass interior longwave sibling of the frozen reference-air probe was
+then tested against the same annual diagnostic. It is numerically almost
+neutral: floor storage improves only from `54.561792` to `54.558577`, floor
+inside conduction from `31.673961` to `31.672094`, and outside aggregate
+conduction from `29.132671` to `29.131216`, while the zone-air latent rows stay
+regressed. That rules out longwave sampling cadence alone as the next
+conduction promotion lever.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
 diagnostic gate for that promotion path.

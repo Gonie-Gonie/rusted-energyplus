@@ -249,6 +249,17 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   clue for surface reference-air cadence, but the next candidate must combine it
   with EnergyPlus inside longwave/source-order and outside aggregate reporting
   parity instead of promoting the probe directly.
+- A current-longwave sibling of that frozen-reference-air probe was added after
+  rechecking EnergyPlus 26.1.0's CTF-only inside loop, where
+  `CalcInteriorRadExchange` receives the current `SurfTempIn` vector during the
+  inside-surface iterations. In the current Rust shell this is effectively
+  neutral relative to frozen-reference-air: MAT RMSE moves `0.031508 C` to
+  `0.031507 C`, floor storage `54.561792 W` to `54.558577 W`, floor inside
+  longwave `31.074699 W` to `31.072578 W`, and zone outside aggregate
+  conduction `29.132671 W` to `29.131216 W`, while the latent zone-air rows
+  remain at about `21.0396 W` surface convection and `7.4960 W` air storage.
+  Keep current-pass longwave sampling as source-aligned bookkeeping, not the
+  next bottleneck lever.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
