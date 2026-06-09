@@ -365,6 +365,20 @@ if ($null -eq $topFirstSampleBottleneck.first_sample_delta) {
 if ([int]$topFirstSampleBottleneck.first_sample_delta.index -ne 0) {
     throw "Expected first-sample bottleneck index 0, got $($topFirstSampleBottleneck.first_sample_delta.index)"
 }
+$surfaceFirstSampleTrace = @($summary.surface_first_sample_trace)
+if ($surfaceFirstSampleTrace.Count -lt 6) {
+    throw "Expected surface_first_sample_trace to include first-hour per-surface rows, got $($surfaceFirstSampleTrace.Count)"
+}
+$floorSurfaceFirstTrace = @($surfaceFirstSampleTrace | Where-Object { $_.key -eq "ZN001:FLR001" -and [int]$_.timestep_index -eq 1 })[0]
+if ($null -eq $floorSurfaceFirstTrace) {
+    throw "Expected surface_first_sample_trace to include ZN001:FLR001 timestep 1"
+}
+if ($null -eq $floorSurfaceFirstTrace.outdoor_dry_bulb_c) {
+    throw "Expected surface_first_sample_trace rows to include outdoor_dry_bulb_c"
+}
+if ($null -eq $floorSurfaceFirstTrace.outside_face_temperature_c) {
+    throw "Expected surface_first_sample_trace rows to include outside_face_temperature_c"
+}
 $floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
 if ($null -eq $floorCtfComponent) {
     throw "Expected ctf_component_first_samples to include ZN001:FLR001"
@@ -690,6 +704,9 @@ Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "mark
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
+Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
+Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
+Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
 Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"

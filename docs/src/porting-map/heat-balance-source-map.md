@@ -597,6 +597,16 @@ Current Rust boundary:
   warmup, CTF seed, bottleneck, and series-level delta metadata but omits full
   hourly `sample_rows`, so diagnostic gates can validate large official dynamic
   lanes without repeatedly parsing the full trace payload.
+- The compact digest and markdown report also carry a Rust-only
+  `surface_first_sample_trace` table for the first reported hour. In the active
+  all-CTF, ScriptF-flat, 20-iteration lane this exposes the timestep dry-bulb
+  sequence `2.25, 0.50, -1.25, -3.00 C` and the matching per-surface outside
+  balance terms before hourly averaging. EnergyPlus `WeatherManager` seeds the
+  first weather-day interpolation from either Hour 1 or Hour 24 via
+  `firstHrInterpUseHr1` in `ReadWeatherForDay`, with the RunPeriod field
+  `First Hour Interpolation Starting Values` parsed in `GetRunPeriodData`.
+  This makes RunPeriod first-hour weather handoff the next source-mapped target
+  for the remaining first-sample outside/no-mass and floor CTF residuals.
 - EnergyPlus `UpdateThermalHistories` first computes current CTF inside and
   outside fluxes into `SurfInsideFluxHist(1)` and `SurfOutsideFluxHist(1)`,
   flips the outside flux into `SurfOpaqOutFaceCondFlux` for reporting, then

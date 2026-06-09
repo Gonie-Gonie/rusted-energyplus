@@ -586,6 +586,41 @@ pub struct HeatBalanceCtfHistorySlotFirstSample {
     pub outside_total_term_w: f64,
 }
 
+/// One surface-state sample captured after a zone timestep in the first reported hour.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceSurfaceFirstSampleTrace {
+    /// EnergyPlus-normalized surface name.
+    pub surface_name: String,
+    /// EnergyPlus-normalized construction name.
+    pub construction_name: String,
+    /// One-based zone timestep within the first reported hourly sample.
+    pub timestep_index: u32,
+    /// Outdoor dry-bulb temperature used by this timestep in C.
+    pub outdoor_dry_bulb_c: f64,
+    /// Owning-zone mean air temperature after the timestep in C.
+    pub zone_mean_air_temperature_c: f64,
+    /// Inside face temperature after the timestep in C.
+    pub inside_face_temperature_c: f64,
+    /// Reported outside face temperature after the timestep in C.
+    pub outside_face_temperature_c: f64,
+    /// Inside-face convection heat gain rate in W.
+    pub inside_convection_heat_gain_rate_w: f64,
+    /// Inside-face net longwave heat gain rate in W.
+    pub inside_net_surface_thermal_radiation_heat_gain_rate_w: f64,
+    /// Inside-face conduction heat transfer rate in W.
+    pub inside_conduction_rate_w: f64,
+    /// Outside-face conduction heat transfer rate in W.
+    pub outside_conduction_rate_w: f64,
+    /// Surface heat storage rate in W.
+    pub heat_storage_rate_w: f64,
+    /// Outside-face convection heat gain rate in W.
+    pub outside_convection_heat_gain_rate_w: f64,
+    /// Outside-face net thermal radiation heat gain rate in W.
+    pub outside_net_thermal_radiation_heat_gain_rate_w: f64,
+    /// Outside-face solar radiation heat gain rate in W.
+    pub outside_solar_radiation_heat_gain_rate_w: f64,
+}
+
 /// Per-zone heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ZoneHeatBalanceState {
@@ -1140,6 +1175,8 @@ pub struct HeatBalanceSimulationSummary {
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
     pub first_sample_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
+    /// Per-surface timestep states captured across the first reported hourly sample.
+    pub surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -4243,6 +4280,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
     let mut first_sample_ctf_history_slot_accumulators =
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
+    let mut surface_first_sample_trace = Vec::new();
 
     for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
         .iter()
@@ -4400,6 +4438,35 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         weather_context,
                         options.zone_air_algorithm,
                     );
+                    if hour_index == 0 {
+                        let zone_mean_air_temperature_c = state
+                            .zones
+                            .iter()
+                            .find(|zone| zone.zone_id == surface_state.zone_id)
+                            .map(|zone| zone.mean_air_temperature_c)
+                            .unwrap_or(f64::NAN);
+                        surface_first_sample_trace.push(HeatBalanceSurfaceFirstSampleTrace {
+                            surface_name: surface_state.surface_name.clone(),
+                            construction_name: surface_state.construction_name.clone(),
+                            timestep_index: substep,
+                            outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
+                            zone_mean_air_temperature_c,
+                            inside_face_temperature_c: surface_state.inside_face_temperature_c,
+                            outside_face_temperature_c,
+                            inside_convection_heat_gain_rate_w: inside_convection_heat_gain_rate,
+                            inside_net_surface_thermal_radiation_heat_gain_rate_w:
+                                inside_net_surface_thermal_radiation_heat_gain_rate,
+                            inside_conduction_rate_w: inside_rate,
+                            outside_conduction_rate_w: outside_rate,
+                            heat_storage_rate_w: storage_rate,
+                            outside_convection_heat_gain_rate_w: exterior_terms
+                                .convection_heat_gain_rate_w,
+                            outside_net_thermal_radiation_heat_gain_rate_w: exterior_terms
+                                .net_thermal_radiation_heat_gain_rate_w,
+                            outside_solar_radiation_heat_gain_rate_w: exterior_terms
+                                .solar_radiation_heat_gain_rate_w,
+                        });
+                    }
                     let sums = &mut surface_sums[index];
                     sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
                     sums.outside_face_temperature_c += outside_face_temperature_c;
@@ -4951,6 +5018,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             .into_values()
             .map(HeatBalanceCtfHistorySlotFirstSampleAccumulator::finalize)
             .collect(),
+        surface_first_sample_trace,
     };
 
     Ok(HeatBalanceSimulation {

@@ -29,10 +29,10 @@ use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
     HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfHistorySlotSample,
-    HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceWarmupSummary,
-    HeatBalanceZoneAirAlgorithm, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
-    SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+    HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
+    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+    NodeStateProjection, NodeStateProjectionOptions, PlantStateProjection,
+    PlantStateProjectionOptions, ResultStore, SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
@@ -3206,6 +3206,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
+    surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
 }
@@ -3708,6 +3709,7 @@ fn build_heat_balance_conformance_diagnostic(
             .summary
             .run_period_initial_ctf_history_slots,
         ctf_history_first_sample_slots: simulation.summary.first_sample_ctf_history_slots,
+        surface_first_sample_trace: simulation.summary.surface_first_sample_trace,
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
@@ -6055,6 +6057,10 @@ fn render_heat_balance_conformance_json(
         heat_balance_first_sample_bottlenecks_json(&diagnostic.series)
     ));
     json.push_str(&format!(
+        "  \"surface_first_sample_trace\": {},\n",
+        heat_balance_surface_first_sample_trace_json(&diagnostic.surface_first_sample_trace)
+    ));
+    json.push_str(&format!(
         "  \"ctf_component_first_samples\": {},\n",
         heat_balance_ctf_component_first_samples_json(&diagnostic.ctf_component_first_samples)
     ));
@@ -6250,6 +6256,13 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## First-Sample Bottlenecks\n\n");
     heat_balance_report_first_sample_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Rust Surface First-Sample Trace\n\n");
+    heat_balance_report_surface_first_sample_trace_rows(
+        &mut report,
+        &diagnostic.surface_first_sample_trace,
+    );
     report.push('\n');
 
     report.push_str("## Rust CTF First-Sample Components\n\n");
@@ -6631,6 +6644,53 @@ fn heat_balance_first_sample_bottlenecks_json(series: &[HeatBalanceSeriesDiagnos
     json
 }
 
+fn heat_balance_surface_first_sample_trace_json(
+    rows: &[HeatBalanceSurfaceFirstSampleTrace],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"timestep_index\": {}, ",
+                "\"outdoor_dry_bulb_c\": {}, ",
+                "\"zone_mean_air_temperature_c\": {}, ",
+                "\"inside_face_temperature_c\": {}, ",
+                "\"outside_face_temperature_c\": {}, ",
+                "\"inside_convection_heat_gain_rate_w\": {}, ",
+                "\"inside_net_surface_thermal_radiation_heat_gain_rate_w\": {}, ",
+                "\"inside_conduction_rate_w\": {}, ",
+                "\"outside_conduction_rate_w\": {}, ",
+                "\"heat_storage_rate_w\": {}, ",
+                "\"outside_convection_heat_gain_rate_w\": {}, ",
+                "\"outside_net_thermal_radiation_heat_gain_rate_w\": {}, ",
+                "\"outside_solar_radiation_heat_gain_rate_w\": {} }}"
+            ),
+            json_string(&row.surface_name),
+            json_string(&row.construction_name),
+            row.timestep_index,
+            json_number(row.outdoor_dry_bulb_c),
+            json_number(row.zone_mean_air_temperature_c),
+            json_number(row.inside_face_temperature_c),
+            json_number(row.outside_face_temperature_c),
+            json_number(row.inside_convection_heat_gain_rate_w),
+            json_number(row.inside_net_surface_thermal_radiation_heat_gain_rate_w),
+            json_number(row.inside_conduction_rate_w),
+            json_number(row.outside_conduction_rate_w),
+            json_number(row.heat_storage_rate_w),
+            json_number(row.outside_convection_heat_gain_rate_w),
+            json_number(row.outside_net_thermal_radiation_heat_gain_rate_w),
+            json_number(row.outside_solar_radiation_heat_gain_rate_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_component_first_samples_json(
     rows: &[HeatBalanceCtfComponentFirstSample],
 ) -> String {
@@ -6996,6 +7056,36 @@ fn heat_balance_report_first_sample_bottleneck_rows(
             first_delta.rust_c,
             row.delta.rmse_delta_c,
             row.status
+        ));
+    }
+}
+
+fn heat_balance_report_surface_first_sample_trace_rows(
+    report: &mut String,
+    rows: &[HeatBalanceSurfaceFirstSampleTrace],
+) {
+    report.push_str(
+        "| key | construction | timestep | outdoor_db_c | zone_mat_c | inside_temp_c | outside_temp_c | inside_conv_w | inside_lw_w | inside_cond_w | outside_cond_w | storage_w | outside_conv_w | outside_lw_w | outside_solar_w |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.surface_name),
+            markdown_cell(&row.construction_name),
+            row.timestep_index,
+            row.outdoor_dry_bulb_c,
+            row.zone_mean_air_temperature_c,
+            row.inside_face_temperature_c,
+            row.outside_face_temperature_c,
+            row.inside_convection_heat_gain_rate_w,
+            row.inside_net_surface_thermal_radiation_heat_gain_rate_w,
+            row.inside_conduction_rate_w,
+            row.outside_conduction_rate_w,
+            row.heat_storage_rate_w,
+            row.outside_convection_heat_gain_rate_w,
+            row.outside_net_thermal_radiation_heat_gain_rate_w,
+            row.outside_solar_radiation_heat_gain_rate_w
         ));
     }
 }
@@ -8335,6 +8425,23 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
+                surface_name: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                timestep_index: 1,
+                outdoor_dry_bulb_c: 10.0,
+                zone_mean_air_temperature_c: 23.0,
+                inside_face_temperature_c: 22.0,
+                outside_face_temperature_c: 11.0,
+                inside_convection_heat_gain_rate_w: 1.0,
+                inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
+                inside_conduction_rate_w: -10.0,
+                outside_conduction_rate_w: 10.0,
+                heat_storage_rate_w: 0.0,
+                outside_convection_heat_gain_rate_w: -3.0,
+                outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
+                outside_solar_radiation_heat_gain_rate_w: 5.0,
+            }],
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -8424,6 +8531,8 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"surface_first_sample_trace\""));
+        assert!(json.contains("\"outside_face_temperature_c\": 11.000000000000"));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"inside_current_outside_term_w\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
@@ -8448,6 +8557,8 @@ mod tests {
         assert!(digest.contains("\"series_count\": 2"));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
+        assert!(digest.contains("\"surface_first_sample_trace\""));
+        assert!(digest.contains("\"outdoor_dry_bulb_c\": 10.000000000000"));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"inside_current_outside_term_w\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
@@ -8470,6 +8581,7 @@ mod tests {
         assert!(report.contains("comparison_class: conformance"));
         assert!(report.contains("conformance_claim: true"));
         assert!(report.contains("status: pass"));
+        assert!(report.contains("Rust Surface First-Sample Trace"));
         assert!(report.contains("surface_iteration_count: 1"));
         assert!(report.contains("ctf_initial_history_policy: boundary-u-value"));
         assert!(report.contains("failure_reasons: none"));
@@ -8636,6 +8748,23 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
+                surface_name: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                timestep_index: 1,
+                outdoor_dry_bulb_c: 10.0,
+                zone_mean_air_temperature_c: 23.0,
+                inside_face_temperature_c: 22.0,
+                outside_face_temperature_c: 11.0,
+                inside_convection_heat_gain_rate_w: 1.0,
+                inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
+                inside_conduction_rate_w: -2.0,
+                outside_conduction_rate_w: 1.0,
+                heat_storage_rate_w: 1.0,
+                outside_convection_heat_gain_rate_w: -3.0,
+                outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
+                outside_solar_radiation_heat_gain_rate_w: 5.0,
+            }],
             series: vec![super::HeatBalanceSeriesDiagnostic {
                 output: super::ZoneTemperatureReportOutput {
                     key: "ZONE ONE".to_string(),
@@ -8695,6 +8824,7 @@ mod tests {
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"surface_first_sample_trace\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
@@ -8709,6 +8839,7 @@ mod tests {
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
+        assert!(digest.contains("\"surface_first_sample_trace\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
@@ -8722,6 +8853,7 @@ mod tests {
         assert!(digest.contains("\"series\""));
         assert!(!digest.contains("\"sample_rows\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
+        assert!(report.contains("Rust Surface First-Sample Trace"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));
         assert!(report.contains("oracle_run_period_warmup_days: 20"));
