@@ -84,7 +84,10 @@ Current generators:
   temperature RMSE, then reports storage/conduction RMSE per face-temperature
   RMSE. This keeps CTF amplification cases, where small temperature misses
   become large storage-rate deltas, visible before a runtime candidate is
-  promoted.
+  promoted. It also prints signed `ZN001:FLR001` CTF current/history
+  first-sample deltas and annual current/history RMSE so cancellation can be
+  reviewed directly when a probe improves reported storage but leaves latent
+  mass-floor history mismatch behind.
 
 Conformance-facing scripts should keep this split:
 

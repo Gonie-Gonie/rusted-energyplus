@@ -16,6 +16,7 @@ SURFACE_HEAT_STORAGE_VARIABLE = "Surface Heat Storage Rate"
 SURFACE_INSIDE_TEMPERATURE_VARIABLE = "Surface Inside Face Temperature"
 SURFACE_OUTSIDE_TEMPERATURE_VARIABLE = "Surface Outside Face Temperature"
 SURFACE_DRIVER_LIMIT = 3
+FLOOR_CTF_DRIVER_KEY = "ZN001:FLR001"
 
 
 @dataclass(frozen=True)
@@ -634,6 +635,122 @@ def surface_balance_driver_rows(summary: dict[str, Any]) -> list[dict[str, Any]]
     return rows
 
 
+def nested_numeric(payload: dict[str, Any], *keys: str) -> float | None:
+    value: Any = payload
+    for key in keys:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return numeric(value)
+
+
+def signed_delta(payload: dict[str, Any], rust_key: str, oracle_key: str) -> float | None:
+    rust = numeric(payload.get(rust_key))
+    oracle = numeric(payload.get(oracle_key))
+    if rust is None or oracle is None:
+        return None
+    return rust - oracle
+
+
+def sum_optional(left: float | None, right: float | None) -> float | None:
+    if left is None or right is None:
+        return None
+    return left + right
+
+
+def first_matching_key(rows: Any, key: str) -> dict[str, Any] | None:
+    if not isinstance(rows, list):
+        return None
+    for row in rows:
+        if isinstance(row, dict) and row.get("key") == key:
+            return row
+    return None
+
+
+def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | None:
+    first_sample = first_matching_key(
+        summary.get("ctf_history_first_sample_deltas"),
+        FLOOR_CTF_DRIVER_KEY,
+    )
+    series = first_matching_key(
+        summary.get("ctf_history_series_deltas"),
+        FLOOR_CTF_DRIVER_KEY,
+    )
+    if first_sample is None and series is None:
+        return None
+
+    first_sample = first_sample or {}
+    series = series or {}
+    inside_current_signed = signed_delta(
+        first_sample,
+        "rust_inside_current_term_w",
+        "oracle_inside_current_term_w",
+    )
+    inside_history_signed = signed_delta(
+        first_sample,
+        "rust_inside_history_term_w",
+        "oracle_inside_history_term_w",
+    )
+    outside_current_signed = signed_delta(
+        first_sample,
+        "rust_outside_current_term_w",
+        "oracle_outside_current_term_w",
+    )
+    outside_history_signed = signed_delta(
+        first_sample,
+        "rust_outside_history_term_w",
+        "oracle_outside_history_term_w",
+    )
+    return {
+        "key": FLOOR_CTF_DRIVER_KEY,
+        "construction_name": first_sample.get("construction_name")
+        or series.get("construction_name"),
+        "area_m2": first_sample.get("area_m2") or series.get("area_m2"),
+        "inside_face_temperature_delta_c": first_sample.get(
+            "inside_face_temperature_delta_c"
+        ),
+        "outside_face_temperature_delta_c": first_sample.get(
+            "outside_face_temperature_delta_c"
+        ),
+        "inside_current_signed_delta_w": inside_current_signed,
+        "inside_history_signed_delta_w": inside_history_signed,
+        "inside_cancellation_residual_w": sum_optional(
+            inside_current_signed,
+            inside_history_signed,
+        ),
+        "outside_current_signed_delta_w": outside_current_signed,
+        "outside_history_signed_delta_w": outside_history_signed,
+        "outside_cancellation_residual_w": sum_optional(
+            outside_current_signed,
+            outside_history_signed,
+        ),
+        "inside_current_abs_delta_w": first_sample.get("inside_current_delta_w"),
+        "inside_history_abs_delta_w": first_sample.get("inside_history_delta_w"),
+        "outside_current_abs_delta_w": first_sample.get("outside_current_delta_w"),
+        "outside_history_abs_delta_w": first_sample.get("outside_history_delta_w"),
+        "inside_current_rmse_w": nested_numeric(
+            series,
+            "inside_current_delta",
+            "rmse_delta_c",
+        ),
+        "inside_history_rmse_w": nested_numeric(
+            series,
+            "inside_history_delta",
+            "rmse_delta_c",
+        ),
+        "outside_current_rmse_w": nested_numeric(
+            series,
+            "outside_current_delta",
+            "rmse_delta_c",
+        ),
+        "outside_history_rmse_w": nested_numeric(
+            series,
+            "outside_history_delta",
+            "rmse_delta_c",
+        ),
+    }
+
+
 def metric_identity(metric: dict[str, Any]) -> tuple[str, str]:
     return (str(metric.get("key", "")), str(metric.get("variable", "")))
 
@@ -974,6 +1091,7 @@ def lane_row(repo_root: Path, lane: ProbeLane) -> dict[str, Any] | None:
             SURFACE_HEAT_STORAGE_VARIABLE,
         ),
         "surface_balance_drivers": surface_balance_driver_rows(summary),
+        "floor_ctf_history_driver": floor_ctf_history_driver_row(summary),
     }
 
 
@@ -986,7 +1104,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v13",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v14",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1222,6 +1340,50 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     status=metric.get("status", "none"),
                 )
             )
+    lines.extend(
+        [
+            "",
+            "## Floor CTF History Cancellation Drivers",
+            "",
+            "Signed first-sample current/history deltas show whether large CTF current and history misses cancel into the reported conduction residual. Annual RMSE columns keep the latent current/history mismatch visible even when the reported storage row partially cancels.",
+            "",
+            "| lane | in temp abs C | out temp abs C | in current dW | in history dW | in residual W | out current dW | out history dW | out residual W | in current RMSE | in history RMSE | out current RMSE | out history RMSE |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for lane in summary["lanes"]:
+        driver = lane.get("floor_ctf_history_driver")
+        if not isinstance(driver, dict):
+            continue
+        lines.append(
+            "| {lane} | {in_temp} | {out_temp} | {in_current} | {in_history} | {in_residual} | {out_current} | {out_history} | {out_residual} | {in_current_rmse} | {in_history_rmse} | {out_current_rmse} | {out_history_rmse} |".format(
+                lane=lane["lane"],
+                in_temp=fmt_number(driver.get("inside_face_temperature_delta_c")),
+                out_temp=fmt_number(driver.get("outside_face_temperature_delta_c")),
+                in_current=fmt_signed_number(
+                    driver.get("inside_current_signed_delta_w")
+                ),
+                in_history=fmt_signed_number(
+                    driver.get("inside_history_signed_delta_w")
+                ),
+                in_residual=fmt_signed_number(
+                    driver.get("inside_cancellation_residual_w")
+                ),
+                out_current=fmt_signed_number(
+                    driver.get("outside_current_signed_delta_w")
+                ),
+                out_history=fmt_signed_number(
+                    driver.get("outside_history_signed_delta_w")
+                ),
+                out_residual=fmt_signed_number(
+                    driver.get("outside_cancellation_residual_w")
+                ),
+                in_current_rmse=fmt_number(driver.get("inside_current_rmse_w")),
+                in_history_rmse=fmt_number(driver.get("inside_history_rmse_w")),
+                out_current_rmse=fmt_number(driver.get("outside_current_rmse_w")),
+                out_history_rmse=fmt_number(driver.get("outside_history_rmse_w")),
+            )
+        )
     lines.extend(
         [
             "",
