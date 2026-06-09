@@ -67,3 +67,12 @@ raises the current floor heat-storage/inside-conduction/outside-conduction rows
 to `58.289839 W`, `33.704368 W`, and `24.970278 W`. That keeps the next
 zone-air target on coefficient/source ordering rather than a different hconv
 cadence.
+
+A weather-proxy moist-air storage report fork then isolates the storage side of
+that regression. It leaves the frozen third-order MAT and floor RMSE rows
+unchanged, but lowers `Zone Air Heat Balance Air Energy Storage Rate` RMSE from
+`29.666388 W` to `5.845285 W`; `Zone Air Heat Balance Surface Convection Rate`
+stays at `29.623453 W`. This points the remaining latent zone-air work at
+surface convection source-order/coefficient timing, while proper zone
+`airHumRat` ownership remains required before promoting the moist-air capacity
+formula into the active solver.

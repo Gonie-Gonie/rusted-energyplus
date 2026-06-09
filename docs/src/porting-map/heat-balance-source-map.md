@@ -209,6 +209,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `23.282797 W` to `24.970278 W`. Keep frozen-hconv third-order as the current
   floor/MAT candidate and treat non-frozen third-order as a rejected isolation
   probe, not a promotion path.
+- A report-only weather-air-storage fork of the frozen third-order lane keeps
+  MAT and the floor rows bit-identical to frozen third-order (`0.069817 C`,
+  `54.593582 W`, `31.581604 W`, and `23.282797 W` RMSE for MAT/floor
+  storage/inside/outside conduction), but drops `Zone Air Heat Balance Air
+  Energy Storage Rate` RMSE from `29.666388 W` to `5.845285 W`. The remaining
+  surface-convection row is unchanged at `29.623453 W`, so the air-storage
+  regression is mostly report-capacity/humidity ownership while the surface
+  convection regression is still source-order/coefficient timing.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
@@ -581,7 +589,11 @@ Current Rust boundary:
   freeze from that third-order lane slightly improves MAT and those latent
   air-balance rows (`0.069191`, `28.637227`, and `28.446243` RMSE), but worsens
   the floor storage/inside/outside conduction rows to `58.289839`, `33.704368`,
-  and `24.970278`, so it is only an isolation probe. Rechecking the active
+  and `24.970278`, so it is only an isolation probe. A report-only
+  weather-proxy moist-air storage fork keeps the frozen third-order MAT/floor
+  rows unchanged while lowering air-storage RMSE to `5.845285`; the surface
+  convection row stays at `29.623453`, keeping source-order/coefficient timing
+  as the next zone-air target. Rechecking the active
   analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
   floor RMSE rows and identical first-sample floor history deltas

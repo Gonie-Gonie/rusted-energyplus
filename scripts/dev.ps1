@@ -300,6 +300,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with all EIO CTF rows, previous-inside quick outside solves, grey interior longwave exchange, frozen inside convection coefficients, EnergyPlus third-order zone-air correction, and twenty interleaved surface/zone-air passes."
     }
+    "official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-air-storage-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-air-storage-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic diagnostic with the frozen-hconv third-order lane and weather-proxy moist-air storage reporting."
+    }
     "official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe.ps1"
         Group = "compare"
