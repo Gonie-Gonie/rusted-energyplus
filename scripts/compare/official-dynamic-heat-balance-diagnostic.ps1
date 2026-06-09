@@ -339,6 +339,26 @@ if ($null -eq $topFirstSampleBottleneck.first_sample_delta) {
 if ([int]$topFirstSampleBottleneck.first_sample_delta.index -ne 0) {
     throw "Expected first-sample bottleneck index 0, got $($topFirstSampleBottleneck.first_sample_delta.index)"
 }
+$floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+if ($null -eq $floorCtfComponent) {
+    throw "Expected ctf_component_first_samples to include ZN001:FLR001"
+}
+$insideComponentSum = [double]$floorCtfComponent.inside_current_outside_term_w +
+    [double]$floorCtfComponent.inside_current_inside_term_w +
+    [double]$floorCtfComponent.inside_history_term_w
+if ([Math]::Abs($insideComponentSum - [double]$floorCtfComponent.inside_conduction_rate_w) -gt 1.0e-6) {
+    throw "Expected FLOOR inside CTF component sum to match inside conduction rate"
+}
+$outsideComponentSum = [double]$floorCtfComponent.outside_current_outside_term_w +
+    [double]$floorCtfComponent.outside_current_inside_term_w +
+    [double]$floorCtfComponent.outside_history_term_w
+if ([Math]::Abs($outsideComponentSum - [double]$floorCtfComponent.outside_conduction_rate_w) -gt 1.0e-6) {
+    throw "Expected FLOOR outside CTF component sum to match outside conduction rate"
+}
+$storageFromConduction = -([double]$floorCtfComponent.inside_conduction_rate_w + [double]$floorCtfComponent.outside_conduction_rate_w)
+if ([Math]::Abs($storageFromConduction - [double]$floorCtfComponent.heat_storage_rate_w) -gt 1.0e-6) {
+    throw "Expected FLOOR storage to match the negated inside/outside conduction sum"
+}
 $expectedTopCandidates = @(
     @{
         Key = "ZN001:FLR001"
@@ -598,6 +618,8 @@ Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "mark
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
+Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
+Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"

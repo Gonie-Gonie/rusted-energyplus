@@ -483,9 +483,15 @@ Current Rust boundary:
   first-sample outside opaque aggregate delta is `871.308445 W`, driven by
   floor storage/conduction plus underpredicted wall/roof outside conduction,
   while the floor inside net longwave first-sample delta remains
-  `404.796794 W`. Full inside iteration order, zone predictor/corrector
-  equations, detailed shadowing/reflection, and coupled radiation coefficient
-  update order are not yet wired.
+  `404.796794 W`. The digest now also emits Rust-only first-sample CTF
+  component rows. In the active lane the mass floor's first sample is dominated
+  by CTF history terms (`1229.296987 W` inside and `1297.344600 W` outside),
+  while roof/wall no-mass rows have zero history terms and cancel inside/outside
+  conduction. That keeps the next EnergyPlus source-porting target on the
+  mass-floor warmup/run-period history and coupled source handoff. Full inside
+  iteration order, zone predictor/corrector equations, detailed
+  shadowing/reflection, and coupled radiation coefficient update order are not
+  yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

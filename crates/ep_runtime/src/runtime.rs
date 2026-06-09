@@ -38,6 +38,25 @@ const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 const ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K: f64 = 0.01;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Inside Face Current Outside Temperature Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Inside Face Current Inside Temperature Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Inside Face History Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Outside Face Current Outside Temperature Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Outside Face Current Inside Temperature Term Rate";
+/// Diagnostic-only CTF component rate written for heat-balance source isolation.
+pub const SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE: &str =
+    "Surface CTF Outside Face History Term Rate";
+
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
 /// Source map that owns node-state output registration and update paths.
@@ -1011,10 +1030,16 @@ struct SurfaceHeatBalanceTrace {
     inside_conduction_gain_rate_w: Vec<f64>,
     inside_conduction_loss_rate_w: Vec<f64>,
     inside_conduction_rate_per_area_w_per_m2: Vec<f64>,
+    ctf_inside_current_outside_term_rate_w: Vec<f64>,
+    ctf_inside_current_inside_term_rate_w: Vec<f64>,
+    ctf_inside_history_term_rate_w: Vec<f64>,
     outside_conduction_rate_w: Vec<f64>,
     outside_conduction_gain_rate_w: Vec<f64>,
     outside_conduction_loss_rate_w: Vec<f64>,
     outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
+    ctf_outside_current_outside_term_rate_w: Vec<f64>,
+    ctf_outside_current_inside_term_rate_w: Vec<f64>,
+    ctf_outside_history_term_rate_w: Vec<f64>,
     heat_storage_rate_w: Vec<f64>,
     heat_storage_rate_per_area_w_per_m2: Vec<f64>,
 }
@@ -1039,10 +1064,16 @@ struct SurfaceHeatBalanceTraceSums {
     inside_conduction_gain_rate_w: f64,
     inside_conduction_loss_rate_w: f64,
     inside_conduction_rate_per_area_w_per_m2: f64,
+    ctf_inside_current_outside_term_rate_w: f64,
+    ctf_inside_current_inside_term_rate_w: f64,
+    ctf_inside_history_term_rate_w: f64,
     outside_conduction_rate_w: f64,
     outside_conduction_gain_rate_w: f64,
     outside_conduction_loss_rate_w: f64,
     outside_conduction_rate_per_area_w_per_m2: f64,
+    ctf_outside_current_outside_term_rate_w: f64,
+    ctf_outside_current_inside_term_rate_w: f64,
+    ctf_outside_history_term_rate_w: f64,
     heat_storage_rate_w: f64,
     heat_storage_rate_per_area_w_per_m2: f64,
 }
@@ -3408,10 +3439,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
+            ctf_inside_current_outside_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_inside_current_inside_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_inside_history_term_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
+            ctf_outside_current_outside_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_outside_current_inside_term_rate_w: Vec::with_capacity(options.sample_count),
+            ctf_outside_history_term_rate_w: Vec::with_capacity(options.sample_count),
             heat_storage_rate_w: Vec::with_capacity(options.sample_count),
             heat_storage_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
         })
@@ -3565,11 +3602,23 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     sums.inside_conduction_loss_rate_w += heat_loss_rate_w(inside_rate);
                     sums.inside_conduction_rate_per_area_w_per_m2 +=
                         surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2);
+                    sums.ctf_inside_current_outside_term_rate_w +=
+                        surface_ctf_inside_current_outside_term_rate_w(surface_state);
+                    sums.ctf_inside_current_inside_term_rate_w +=
+                        surface_ctf_inside_current_inside_term_rate_w(surface_state);
+                    sums.ctf_inside_history_term_rate_w +=
+                        surface_ctf_inside_history_term_rate_w(surface_state);
                     sums.outside_conduction_rate_w += outside_rate;
                     sums.outside_conduction_gain_rate_w += heat_gain_rate_w(outside_rate);
                     sums.outside_conduction_loss_rate_w += heat_loss_rate_w(outside_rate);
                     sums.outside_conduction_rate_per_area_w_per_m2 +=
                         surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2);
+                    sums.ctf_outside_current_outside_term_rate_w +=
+                        surface_ctf_outside_current_outside_term_rate_w(surface_state);
+                    sums.ctf_outside_current_inside_term_rate_w +=
+                        surface_ctf_outside_current_inside_term_rate_w(surface_state);
+                    sums.ctf_outside_history_term_rate_w +=
+                        surface_ctf_outside_history_term_rate_w(surface_state);
                     sums.heat_storage_rate_w += storage_rate;
                     sums.heat_storage_rate_per_area_w_per_m2 += storage_rate_per_area;
                 }
@@ -3667,6 +3716,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 .inside_conduction_rate_per_area_w_per_m2
                 .push(sums.inside_conduction_rate_per_area_w_per_m2 / divisor);
             trace
+                .ctf_inside_current_outside_term_rate_w
+                .push(sums.ctf_inside_current_outside_term_rate_w / divisor);
+            trace
+                .ctf_inside_current_inside_term_rate_w
+                .push(sums.ctf_inside_current_inside_term_rate_w / divisor);
+            trace
+                .ctf_inside_history_term_rate_w
+                .push(sums.ctf_inside_history_term_rate_w / divisor);
+            trace
                 .outside_conduction_rate_w
                 .push(sums.outside_conduction_rate_w / divisor);
             trace
@@ -3678,6 +3736,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .outside_conduction_rate_per_area_w_per_m2
                 .push(sums.outside_conduction_rate_per_area_w_per_m2 / divisor);
+            trace
+                .ctf_outside_current_outside_term_rate_w
+                .push(sums.ctf_outside_current_outside_term_rate_w / divisor);
+            trace
+                .ctf_outside_current_inside_term_rate_w
+                .push(sums.ctf_outside_current_inside_term_rate_w / divisor);
+            trace
+                .ctf_outside_history_term_rate_w
+                .push(sums.ctf_outside_history_term_rate_w / divisor);
             trace
                 .heat_storage_rate_w
                 .push(sums.heat_storage_rate_w / divisor);
@@ -3938,6 +4005,30 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
             key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_inside_current_outside_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_inside_current_inside_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_inside_history_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
             variable_name: "Surface Outside Face Conduction Heat Transfer Rate".to_string(),
             units: "W".to_string(),
             values: trace.outside_conduction_rate_w,
@@ -3966,6 +4057,30 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 .to_string(),
             units: "W/m2".to_string(),
             values: trace.outside_conduction_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_outside_current_outside_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_outside_current_inside_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.ctf_outside_history_term_rate_w,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -6284,6 +6399,48 @@ fn surface_outside_conduction_flux_w_per_m2(surface: &SurfaceHeatBalanceState) -
     surface.outside_face_temperature_c * surface.ctf.outside_0_w_per_m2_k
         - surface.inside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
         + surface.ctf.const_out_part_w_per_m2
+}
+
+fn surface_ctf_inside_current_outside_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    surface.area_m2 * surface.outside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+}
+
+fn surface_ctf_inside_current_inside_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    -surface.area_m2 * surface.inside_face_temperature_c * surface.ctf.inside_0_w_per_m2_k
+}
+
+fn surface_ctf_inside_history_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    surface.area_m2 * surface.ctf.const_in_part_w_per_m2
+}
+
+fn surface_ctf_outside_current_outside_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    -surface.area_m2 * surface.outside_face_temperature_c * surface.ctf.outside_0_w_per_m2_k
+}
+
+fn surface_ctf_outside_current_inside_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    surface.area_m2 * surface.inside_face_temperature_c * surface.ctf.cross_0_w_per_m2_k
+}
+
+fn surface_ctf_outside_history_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
+    if surface.area_m2 <= 0.0 {
+        return 0.0;
+    }
+    -surface.area_m2 * surface.ctf.const_out_part_w_per_m2
 }
 
 fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
@@ -10520,7 +10677,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 155);
+        assert_eq!(simulation.results.series.len(), 191);
 
         let Some(zone_series) = simulation
             .results
@@ -10584,6 +10741,58 @@ DATA PERIODS
         assert_eq!(
             outside_conduction_series.values[0],
             -inside_conduction_series.values[0]
+        );
+        let Some(inside_current_outside_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF inside outside term").into());
+        };
+        let Some(inside_current_inside_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF inside inside term").into());
+        };
+        let Some(inside_history_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF inside history term").into());
+        };
+        let Some(outside_current_outside_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF outside outside term").into());
+        };
+        let Some(outside_current_inside_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF outside inside term").into());
+        };
+        let Some(outside_history_term) = simulation.results.find_series(
+            "FLOOR",
+            super::SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing CTF outside history term").into());
+        };
+        assert!(
+            (inside_conduction_series.values[0]
+                - inside_current_outside_term.values[0]
+                - inside_current_inside_term.values[0]
+                - inside_history_term.values[0])
+                .abs()
+                < 1.0e-9
+        );
+        assert!(
+            (outside_conduction_series.values[0]
+                - outside_current_outside_term.values[0]
+                - outside_current_inside_term.values[0]
+                - outside_history_term.values[0])
+                .abs()
+                < 1.0e-9
         );
 
         let Some(storage_series) = simulation

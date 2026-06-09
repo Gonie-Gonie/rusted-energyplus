@@ -30,7 +30,13 @@ use ep_runtime::{
     ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions, HeatBalanceWarmupSummary,
     HeatBalanceZoneAirAlgorithm, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, SimulationMode, SurfaceGeometrySummary,
+    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+    SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+    SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+    SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+    SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+    SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE, SimulationMode, SurfaceGeometrySummary,
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
     build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
     simulate_constant_schedules, simulate_first_zone_uncontrolled,
@@ -3194,8 +3200,23 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_initial_history_policy: &'static str,
     zone_count: usize,
     surface_count: usize,
+    ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceCtfComponentFirstSample {
+    key: String,
+    inside_conduction_rate_w: f64,
+    inside_current_outside_term_w: f64,
+    inside_current_inside_term_w: f64,
+    inside_history_term_w: f64,
+    outside_conduction_rate_w: f64,
+    outside_current_outside_term_w: f64,
+    outside_current_inside_term_w: f64,
+    outside_history_term_w: f64,
+    heat_storage_rate_w: f64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3622,9 +3643,94 @@ fn build_heat_balance_conformance_diagnostic(
         ),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
+        ctf_component_first_samples: heat_balance_ctf_component_first_samples(&simulation.results),
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
+}
+
+fn heat_balance_ctf_component_first_samples(
+    results: &ResultStore,
+) -> Vec<HeatBalanceCtfComponentFirstSample> {
+    let keys = results
+        .series
+        .iter()
+        .filter(|series| {
+            series
+                .variable_name
+                .eq_ignore_ascii_case(SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE)
+        })
+        .map(|series| series.key.clone())
+        .collect::<BTreeSet<_>>();
+
+    keys.into_iter()
+        .filter_map(|key| heat_balance_ctf_component_first_sample_for_key(results, &key))
+        .collect()
+}
+
+fn heat_balance_ctf_component_first_sample_for_key(
+    results: &ResultStore,
+    key: &str,
+) -> Option<HeatBalanceCtfComponentFirstSample> {
+    Some(HeatBalanceCtfComponentFirstSample {
+        key: key.to_string(),
+        inside_conduction_rate_w: heat_balance_first_series_value(
+            results,
+            key,
+            "Surface Inside Face Conduction Heat Transfer Rate",
+        )?,
+        inside_current_outside_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+        )?,
+        inside_current_inside_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+        )?,
+        inside_history_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+        )?,
+        outside_conduction_rate_w: heat_balance_first_series_value(
+            results,
+            key,
+            "Surface Outside Face Conduction Heat Transfer Rate",
+        )?,
+        outside_current_outside_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+        )?,
+        outside_current_inside_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+        )?,
+        outside_history_term_w: heat_balance_first_series_value(
+            results,
+            key,
+            SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
+        )?,
+        heat_storage_rate_w: heat_balance_first_series_value(
+            results,
+            key,
+            "Surface Heat Storage Rate",
+        )?,
+    })
+}
+
+fn heat_balance_first_series_value(
+    results: &ResultStore,
+    key: &str,
+    variable_name: &str,
+) -> Option<f64> {
+    results
+        .find_series(key, variable_name)
+        .and_then(|series| series.values.first().copied())
+        .filter(|value| value.is_finite())
 }
 
 fn load_runtime_ctf_coefficients_from_eio(
@@ -5449,6 +5555,10 @@ fn render_heat_balance_conformance_json(
         "  \"first_sample_bottlenecks\": {},\n",
         heat_balance_first_sample_bottlenecks_json(&diagnostic.series)
     ));
+    json.push_str(&format!(
+        "  \"ctf_component_first_samples\": {},\n",
+        heat_balance_ctf_component_first_samples_json(&diagnostic.ctf_component_first_samples)
+    ));
     let series_json = if include_sample_rows {
         heat_balance_series_json(&diagnostic.series)
     } else {
@@ -5621,6 +5731,13 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## First-Sample Bottlenecks\n\n");
     heat_balance_report_first_sample_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Rust CTF First-Sample Components\n\n");
+    heat_balance_report_ctf_component_first_sample_rows(
+        &mut report,
+        &diagnostic.ctf_component_first_samples,
+    );
     report.push('\n');
 
     report.push_str("## Series\n\n");
@@ -5967,6 +6084,43 @@ fn heat_balance_first_sample_bottlenecks_json(series: &[HeatBalanceSeriesDiagnos
     json
 }
 
+fn heat_balance_ctf_component_first_samples_json(
+    rows: &[HeatBalanceCtfComponentFirstSample],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"inside_conduction_rate_w\": {}, ",
+                "\"inside_current_outside_term_w\": {}, ",
+                "\"inside_current_inside_term_w\": {}, ",
+                "\"inside_history_term_w\": {}, ",
+                "\"outside_conduction_rate_w\": {}, ",
+                "\"outside_current_outside_term_w\": {}, ",
+                "\"outside_current_inside_term_w\": {}, ",
+                "\"outside_history_term_w\": {}, ",
+                "\"heat_storage_rate_w\": {} }}"
+            ),
+            json_string(&row.key),
+            json_number(row.inside_conduction_rate_w),
+            json_number(row.inside_current_outside_term_w),
+            json_number(row.inside_current_inside_term_w),
+            json_number(row.inside_history_term_w),
+            json_number(row.outside_conduction_rate_w),
+            json_number(row.outside_current_outside_term_w),
+            json_number(row.outside_current_inside_term_w),
+            json_number(row.outside_history_term_w),
+            json_number(row.heat_storage_rate_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_series_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
     heat_balance_series_json_with_sample_rows(series, true)
 }
@@ -6091,6 +6245,31 @@ fn heat_balance_report_first_sample_bottleneck_rows(
             first_delta.rust_c,
             row.delta.rmse_delta_c,
             row.status
+        ));
+    }
+}
+
+fn heat_balance_report_ctf_component_first_sample_rows(
+    report: &mut String,
+    rows: &[HeatBalanceCtfComponentFirstSample],
+) {
+    report.push_str(
+        "| key | inside_rate_w | in_x0_out_w | in_z0_in_w | in_history_w | outside_rate_w | out_x0_out_w | out_y0_in_w | out_history_w | storage_w |\n",
+    );
+    report.push_str("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            row.inside_conduction_rate_w,
+            row.inside_current_outside_term_w,
+            row.inside_current_inside_term_w,
+            row.inside_history_term_w,
+            row.outside_conduction_rate_w,
+            row.outside_current_outside_term_w,
+            row.outside_current_inside_term_w,
+            row.outside_history_term_w,
+            row.heat_storage_rate_w
         ));
     }
 }
@@ -7011,6 +7190,18 @@ mod tests {
             ctf_initial_history_policy: "boundary-u-value",
             zone_count: 1,
             surface_count: 6,
+            ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
+                key: "FLOOR".to_string(),
+                inside_conduction_rate_w: -10.0,
+                inside_current_outside_term_w: 30.0,
+                inside_current_inside_term_w: -40.0,
+                inside_history_term_w: 0.0,
+                outside_conduction_rate_w: 10.0,
+                outside_current_outside_term_w: -30.0,
+                outside_current_inside_term_w: 40.0,
+                outside_history_term_w: 0.0,
+                heat_storage_rate_w: 0.0,
+            }],
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -7100,6 +7291,8 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"ctf_component_first_samples\""));
+        assert!(json.contains("\"inside_current_outside_term_w\""));
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"first_delta_sample\""));
         assert!(json.contains("\"max_delta_sample\""));
@@ -7113,6 +7306,8 @@ mod tests {
         assert!(digest.contains("\"series_count\": 2"));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
+        assert!(digest.contains("\"ctf_component_first_samples\""));
+        assert!(digest.contains("\"inside_current_outside_term_w\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"compare_summary_json\": \"compare-summary.json\""));
@@ -7129,6 +7324,10 @@ mod tests {
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("## First-Sample Bottlenecks"));
+        assert!(report.contains("## Rust CTF First-Sample Components"));
+        assert!(
+            report.contains("| FLOOR | -10.000000000000 | 30.000000000000 | -40.000000000000 |")
+        );
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
         assert!(report.contains("## Hourly Samples"));
@@ -7186,6 +7385,18 @@ mod tests {
             ctf_initial_history_policy: "energyplus-surf-initial",
             zone_count: 1,
             surface_count: 6,
+            ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
+                key: "FLOOR".to_string(),
+                inside_conduction_rate_w: -2.0,
+                inside_current_outside_term_w: 3.0,
+                inside_current_inside_term_w: -5.0,
+                inside_history_term_w: 0.0,
+                outside_conduction_rate_w: 1.0,
+                outside_current_outside_term_w: -3.0,
+                outside_current_inside_term_w: 4.0,
+                outside_history_term_w: 0.0,
+                heat_storage_rate_w: 1.0,
+            }],
             series: vec![super::HeatBalanceSeriesDiagnostic {
                 output: super::ZoneTemperatureReportOutput {
                     key: "ZONE ONE".to_string(),
@@ -7245,6 +7456,7 @@ mod tests {
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"first_sample_delta\""));
         assert!(json.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
@@ -7252,6 +7464,7 @@ mod tests {
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
+        assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"first_sample_delta\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
@@ -7273,6 +7486,7 @@ mod tests {
         );
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("## First-Sample Bottlenecks"));
+        assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(report.contains("status: fail"));
     }
 

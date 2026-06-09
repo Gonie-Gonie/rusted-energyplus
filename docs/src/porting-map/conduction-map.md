@@ -154,7 +154,18 @@ from `108.672323` to `108.676973`, so the next correction is not a larger
 fixed iteration count. The compact digest now also ranks first reported sample
 bottlenecks; the active lane's first sample has `871.308445 W` zone outside
 opaque aggregate delta, `813.384495 W` floor storage delta, and
-`404.796794 W` floor inside net-longwave delta. A
+`404.796794 W` floor inside net-longwave delta. The digest also records
+Rust-only first-sample CTF component rows. In the active lane,
+`ZN001:FLR001` reports `430.781218 W` inside conduction from
+`12.337332 W` current outside-temperature, `-810.853101 W` current
+inside-temperature, and `1229.296987 W` history terms, plus
+`317.019053 W` outside conduction from `-990.426013 W` current
+outside-temperature, `10.100465 W` current inside-temperature, and
+`1297.344600 W` history terms. No-mass roof/wall component rows have zero
+history terms and inside/outside conduction cancellation at the first sample,
+so the remaining first-sample storage blocker is concentrated in mass-floor
+history/source handoff rather than in every surface's current-temperature
+terms. A
 full ScriptF interior-longwave source is also not a promotion shortcut in the
 current shell: even a one-pass ScriptF lane diverges to multi-kW floor storage
 and roof inside-longwave errors, so ScriptF parity has to be paired with the
