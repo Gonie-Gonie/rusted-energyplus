@@ -802,6 +802,17 @@ Current Rust boundary:
   `23.106598 W`. Keep frozen inside convection in the active floor solve; the
   remaining convection work should map EnergyPlus' exact initialization/report
   timing instead of live-updating hconv every interleaved pass.
+  The active inside-solve max-sample decomposition now splits the reference-air
+  source delta into hconv-coefficient and reference-air-temperature components.
+  At the floor storage max sample, the implied numerator delta is
+  `646.261894 W`; tracked source coverage is `557.721918 W` (`86.299676%`).
+  The reference-air source contributes `156.447929 W`, but `153.850543 W` of
+  that comes from the hconv coefficient and only `2.597386 W` from the inferred
+  reference-air temperature. The same row splits the implied numerator into
+  `508.476696 W` of inside-temperature movement and `137.785198 W` of solve
+  denominator movement. This makes `InitIntConvCoeff`/inside-iteration cadence
+  the next hconv target; it does not justify thawing the surface reference-air
+  or live-updating hconv through every interleaved solve pass.
   An inside-CTF report probe then tests whether EnergyPlus report/source
   conduction should use the outside temperature snapshot consumed by the last
   inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
