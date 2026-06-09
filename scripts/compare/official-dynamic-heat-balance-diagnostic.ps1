@@ -380,6 +380,19 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([double]$floorHistoryDelta.outside_history_delta_w -le 100.0) {
         throw "Expected active FLOOR outside history delta to remain visible, got $($floorHistoryDelta.outside_history_delta_w)"
     }
+    $floorHistorySeriesDelta = @($summary.ctf_history_series_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorHistorySeriesDelta) {
+        throw "Expected ctf_history_series_deltas to include ZN001:FLR001 in all-eio mode"
+    }
+    if ([int]$floorHistorySeriesDelta.samples -ne 8760) {
+        throw "Expected FLOOR CTF history series deltas to use 8760 samples, got $($floorHistorySeriesDelta.samples)"
+    }
+    if ([double]$floorHistorySeriesDelta.inside_history_delta.rmse_delta_c -le 10.0) {
+        throw "Expected active FLOOR inside history series delta to remain visible, got $($floorHistorySeriesDelta.inside_history_delta.rmse_delta_c)"
+    }
+    if ([double]$floorHistorySeriesDelta.outside_history_delta.rmse_delta_c -le 10.0) {
+        throw "Expected active FLOOR outside history series delta to remain visible, got $($floorHistorySeriesDelta.outside_history_delta.rmse_delta_c)"
+    }
     $floorRunPeriodInitialSlots = @($summary.ctf_history_run_period_initial_slots | Where-Object { $_.key -eq "ZN001:FLR001" })
     if ($floorRunPeriodInitialSlots.Count -lt 5) {
         throw "Expected ctf_history_run_period_initial_slots to include FLOOR #CTFs=5 rows, got $($floorRunPeriodInitialSlots.Count)"
@@ -668,6 +681,9 @@ Assert-Contains -Text $reportText -Pattern "in_temp_abs_delta_c" -Description "m
 Assert-Contains -Text $reportText -Pattern "out_temp_abs_delta_c" -Description "markdown CTF outside face temperature delta column"
 Assert-Contains -Text $reportText -Pattern "in_current_abs_delta_w" -Description "markdown CTF current delta column"
 Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
+Assert-Contains -Text $reportText -Pattern "## CTF History Series Deltas" -Description "markdown CTF history series delta section"
+Assert-Contains -Text $reportText -Pattern "in_history_rmse_w" -Description "markdown CTF history series RMSE column"
+Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "markdown CTF outside history series RMSE column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"

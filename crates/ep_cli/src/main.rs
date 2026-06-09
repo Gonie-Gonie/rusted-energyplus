@@ -3203,6 +3203,7 @@ struct HeatBalanceConformanceDiagnostic {
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
     ctf_history_first_sample_deltas: Vec<HeatBalanceCtfHistoryFirstSampleDelta>,
+    ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
@@ -3249,6 +3250,18 @@ struct HeatBalanceCtfHistoryFirstSampleDelta {
     oracle_outside_history_term_w: f64,
     rust_outside_history_term_w: f64,
     outside_history_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceCtfHistorySeriesDelta {
+    key: String,
+    construction_name: String,
+    area_m2: f64,
+    samples: usize,
+    inside_current_delta: DeltaSummary,
+    inside_history_delta: DeltaSummary,
+    outside_current_delta: DeltaSummary,
+    outside_history_delta: DeltaSummary,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3669,6 +3682,12 @@ fn build_heat_balance_conformance_diagnostic(
         &ctf_coefficients,
         &ctf_component_first_samples,
     );
+    let ctf_history_series_deltas = heat_balance_ctf_history_series_deltas(
+        &simulation_model,
+        &series,
+        &ctf_coefficients,
+        &simulation.results,
+    );
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
@@ -3684,6 +3703,7 @@ fn build_heat_balance_conformance_diagnostic(
         surface_count: simulation.summary.surface_count,
         ctf_component_first_samples,
         ctf_history_first_sample_deltas,
+        ctf_history_series_deltas,
         ctf_history_run_period_initial_slots: simulation
             .summary
             .run_period_initial_ctf_history_slots,
@@ -3891,6 +3911,181 @@ fn heat_balance_ctf_history_first_sample_deltas(
             })
         })
         .collect()
+}
+
+fn heat_balance_ctf_history_series_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    results: &ResultStore,
+) -> Vec<HeatBalanceCtfHistorySeriesDelta> {
+    model
+        .typed
+        .surfaces
+        .iter()
+        .filter_map(|surface| {
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            let zero = ctf_coefficients.iter().find(|coefficient| {
+                coefficient.time_index == 0
+                    && coefficient
+                        .construction_name
+                        .eq_ignore_ascii_case(&construction.name.0)
+            })?;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+
+            let oracle_inside_temperatures = heat_balance_oracle_series_values(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+            )?;
+            let oracle_outside_temperatures = heat_balance_oracle_series_values(
+                series,
+                &surface.name.0,
+                "Surface Outside Face Temperature",
+            )?;
+            let oracle_inside_conduction = heat_balance_oracle_series_values(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Conduction Heat Transfer Rate",
+            )?;
+            let oracle_outside_conduction = heat_balance_oracle_series_values(
+                series,
+                &surface.name.0,
+                "Surface Outside Face Conduction Heat Transfer Rate",
+            )?;
+            let rust_inside_current_outside = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+            )?;
+            let rust_inside_current_inside = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+            )?;
+            let rust_inside_history = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
+            )?;
+            let rust_outside_current_outside = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
+            )?;
+            let rust_outside_current_inside = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+            )?;
+            let rust_outside_history = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
+            )?;
+
+            let samples = [
+                oracle_inside_temperatures.len(),
+                oracle_outside_temperatures.len(),
+                oracle_inside_conduction.len(),
+                oracle_outside_conduction.len(),
+                rust_inside_current_outside.len(),
+                rust_inside_current_inside.len(),
+                rust_inside_history.len(),
+                rust_outside_current_outside.len(),
+                rust_outside_current_inside.len(),
+                rust_outside_history.len(),
+            ]
+            .into_iter()
+            .min()
+            .unwrap_or(0);
+            if samples == 0 {
+                return None;
+            }
+
+            let mut oracle_inside_current = Vec::with_capacity(samples);
+            let mut rust_inside_current = Vec::with_capacity(samples);
+            let mut oracle_inside_history = Vec::with_capacity(samples);
+            let mut oracle_outside_current = Vec::with_capacity(samples);
+            let mut rust_outside_current = Vec::with_capacity(samples);
+            let mut oracle_outside_history = Vec::with_capacity(samples);
+            for index in 0..samples {
+                let oracle_inside_current_term_w = area_m2
+                    * (oracle_outside_temperatures[index] * zero.cross_w_per_m2_k
+                        - oracle_inside_temperatures[index] * zero.inside_w_per_m2_k);
+                let oracle_outside_current_term_w = -area_m2
+                    * (oracle_outside_temperatures[index] * zero.outside_w_per_m2_k
+                        - oracle_inside_temperatures[index] * zero.cross_w_per_m2_k);
+                let rust_inside_current_term_w =
+                    rust_inside_current_outside[index] + rust_inside_current_inside[index];
+                let rust_outside_current_term_w =
+                    rust_outside_current_outside[index] + rust_outside_current_inside[index];
+
+                oracle_inside_current.push(oracle_inside_current_term_w);
+                rust_inside_current.push(rust_inside_current_term_w);
+                oracle_inside_history
+                    .push(oracle_inside_conduction[index] - oracle_inside_current_term_w);
+                oracle_outside_current.push(oracle_outside_current_term_w);
+                rust_outside_current.push(rust_outside_current_term_w);
+                oracle_outside_history
+                    .push(oracle_outside_conduction[index] - oracle_outside_current_term_w);
+            }
+
+            Some(HeatBalanceCtfHistorySeriesDelta {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                area_m2,
+                samples,
+                inside_current_delta: delta_summary(&oracle_inside_current, &rust_inside_current),
+                inside_history_delta: delta_summary(&oracle_inside_history, &rust_inside_history),
+                outside_current_delta: delta_summary(
+                    &oracle_outside_current,
+                    &rust_outside_current,
+                ),
+                outside_history_delta: delta_summary(
+                    &oracle_outside_history,
+                    &rust_outside_history,
+                ),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_oracle_series_values(
+    series: &[HeatBalanceSeriesDiagnostic],
+    key: &str,
+    variable_name: &str,
+) -> Option<Vec<f64>> {
+    series
+        .iter()
+        .find(|series| {
+            series.output.key.eq_ignore_ascii_case(key)
+                && series.output.variable.eq_ignore_ascii_case(variable_name)
+        })
+        .map(|series| {
+            series
+                .sample_rows
+                .iter()
+                .map(|point| point.oracle_c)
+                .collect::<Vec<_>>()
+        })
+}
+
+fn heat_balance_result_series_values(
+    results: &ResultStore,
+    key: &str,
+    variable_name: &str,
+) -> Option<Vec<f64>> {
+    results
+        .find_series(key, variable_name)
+        .map(|series| series.values.clone())
 }
 
 fn heat_balance_oracle_first_value(
@@ -5774,6 +5969,10 @@ fn render_heat_balance_conformance_json(
         )
     ));
     json.push_str(&format!(
+        "  \"ctf_history_series_deltas\": {},\n",
+        heat_balance_ctf_history_series_deltas_json(&diagnostic.ctf_history_series_deltas)
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_run_period_initial_slots\": {},\n",
         heat_balance_ctf_history_slots_json(&diagnostic.ctf_history_run_period_initial_slots)
     ));
@@ -5968,6 +6167,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_ctf_history_first_sample_delta_rows(
         &mut report,
         &diagnostic.ctf_history_first_sample_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## CTF History Series Deltas\n\n");
+    heat_balance_report_ctf_history_series_delta_rows(
+        &mut report,
+        &diagnostic.ctf_history_series_deltas,
     );
     report.push('\n');
 
@@ -6431,6 +6637,39 @@ fn heat_balance_ctf_history_first_sample_deltas_json(
     json
 }
 
+fn heat_balance_ctf_history_series_deltas_json(
+    rows: &[HeatBalanceCtfHistorySeriesDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"samples\": {}, ",
+                "\"inside_current_delta\": {}, ",
+                "\"inside_history_delta\": {}, ",
+                "\"outside_current_delta\": {}, ",
+                "\"outside_history_delta\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.construction_name),
+            json_number(row.area_m2),
+            row.samples,
+            delta_summary_json(&row.inside_current_delta),
+            delta_summary_json(&row.inside_history_delta),
+            delta_summary_json(&row.outside_current_delta),
+            delta_summary_json(&row.outside_history_delta)
+        ));
+    }
+    json.push(']');
+    json
+}
+
 fn heat_balance_ctf_history_slots_json(rows: &[HeatBalanceCtfHistorySlotSample]) -> String {
     let mut json = String::from("[");
     for (index, row) in rows.iter().enumerate() {
@@ -6729,6 +6968,49 @@ fn heat_balance_report_ctf_history_first_sample_delta_rows(
     }
 }
 
+fn heat_balance_report_ctf_history_series_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceCtfHistorySeriesDelta],
+) {
+    report.push_str(
+        "| key | construction | samples | in_current_rmse_w | in_history_rmse_w | out_current_rmse_w | out_history_rmse_w | in_current_max_w | in_history_max_w | out_current_max_w | out_history_max_w | in_current_mean_w | in_history_mean_w | out_current_mean_w | out_history_mean_w |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    let mut sorted = rows.iter().collect::<Vec<_>>();
+    sorted.sort_by(|left, right| {
+        heat_balance_ctf_history_series_max_rmse(right)
+            .total_cmp(&heat_balance_ctf_history_series_max_rmse(left))
+    });
+    for row in sorted {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            row.samples,
+            row.inside_current_delta.rmse_delta_c,
+            row.inside_history_delta.rmse_delta_c,
+            row.outside_current_delta.rmse_delta_c,
+            row.outside_history_delta.rmse_delta_c,
+            row.inside_current_delta.max_abs_delta_c,
+            row.inside_history_delta.max_abs_delta_c,
+            row.outside_current_delta.max_abs_delta_c,
+            row.outside_history_delta.max_abs_delta_c,
+            row.inside_current_delta.mean_abs_delta_c,
+            row.inside_history_delta.mean_abs_delta_c,
+            row.outside_current_delta.mean_abs_delta_c,
+            row.outside_history_delta.mean_abs_delta_c
+        ));
+    }
+}
+
+fn heat_balance_ctf_history_series_max_rmse(row: &HeatBalanceCtfHistorySeriesDelta) -> f64 {
+    row.inside_current_delta
+        .rmse_delta_c
+        .max(row.inside_history_delta.rmse_delta_c)
+        .max(row.outside_current_delta.rmse_delta_c)
+        .max(row.outside_history_delta.rmse_delta_c)
+}
+
 fn heat_balance_report_ctf_history_slot_rows(
     report: &mut String,
     rows: &[HeatBalanceCtfHistorySlotSample],
@@ -6894,6 +7176,29 @@ fn delta_point_json(point: Option<DeltaPoint>) -> String {
         ),
         None => "null".to_string(),
     }
+}
+
+fn delta_summary_json(delta: &DeltaSummary) -> String {
+    format!(
+        concat!(
+            "{{ \"samples\": {}, ",
+            "\"length_match\": {}, ",
+            "\"max_abs_delta_c\": {}, ",
+            "\"mean_abs_delta_c\": {}, ",
+            "\"rmse_delta_c\": {}, ",
+            "\"max_rel_delta\": {}, ",
+            "\"first_delta_sample\": {}, ",
+            "\"max_delta_sample\": {} }}"
+        ),
+        delta.samples,
+        delta.length_match,
+        json_number(delta.max_abs_delta_c),
+        json_number(delta.mean_abs_delta_c),
+        json_number(delta.rmse_delta_c),
+        json_number(delta.max_rel_delta),
+        delta_point_json(delta.first_delta_sample),
+        delta_point_json(delta.max_delta_sample)
+    )
 }
 
 fn delta_points_json(points: &[DeltaPoint]) -> String {
@@ -7771,6 +8076,16 @@ mod tests {
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 2.0,
             }],
+            ctf_history_series_deltas: vec![super::HeatBalanceCtfHistorySeriesDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                area_m2: 100.0,
+                samples: 2,
+                inside_current_delta: super::delta_summary(&[9.0, 11.0], &[10.0, 13.0]),
+                inside_history_delta: super::delta_summary(&[1.0, 2.0], &[0.0, 4.0]),
+                outside_current_delta: super::delta_summary(&[-8.0, -7.0], &[-10.0, -7.5]),
+                outside_history_delta: super::delta_summary(&[2.0, 3.0], &[0.0, 6.0]),
+            }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -7906,6 +8221,9 @@ mod tests {
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"inside_history_delta_w\""));
+        assert!(json.contains("\"ctf_history_series_deltas\""));
+        assert!(json.contains("\"inside_current_delta\""));
+        assert!(json.contains("\"inside_history_delta\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"inside_total_term_w\""));
@@ -7927,6 +8245,9 @@ mod tests {
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
+        assert!(digest.contains("\"ctf_history_series_deltas\""));
+        assert!(digest.contains("\"inside_current_delta\""));
+        assert!(digest.contains("\"inside_history_delta\""));
         assert!(digest.contains("\"ctf_cross_0_w_per_m2_k\""));
         assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
@@ -7956,6 +8277,8 @@ mod tests {
         assert!(report.contains(
             "| FLOOR | FLOOR | 100.000000000000 | 11.000000000000 | 12.000000000000 | 13.000000000000 | 14.000000000000 | 15.000000000000 | 1.000000000000 | 16.000000000000 | 17.000000000000 | 1.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
         ));
+        assert!(report.contains("## CTF History Series Deltas"));
+        assert!(report.contains("in_history_rmse_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
@@ -8053,6 +8376,16 @@ mod tests {
                 oracle_outside_history_term_w: 5.0,
                 rust_outside_history_term_w: 0.0,
                 outside_history_delta_w: 5.0,
+            }],
+            ctf_history_series_deltas: vec![super::HeatBalanceCtfHistorySeriesDelta {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                area_m2: 100.0,
+                samples: 2,
+                inside_current_delta: super::delta_summary(&[6.0, 8.0], &[7.0, 9.0]),
+                inside_history_delta: super::delta_summary(&[4.0, 5.0], &[0.0, 3.0]),
+                outside_current_delta: super::delta_summary(&[-6.0, -9.0], &[-8.0, -8.0]),
+                outside_history_delta: super::delta_summary(&[5.0, 6.0], &[0.0, 4.0]),
             }],
             ctf_history_run_period_initial_slots: vec![super::HeatBalanceCtfHistorySlotSample {
                 surface_name: "FLOOR".to_string(),
@@ -8157,6 +8490,8 @@ mod tests {
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
+        assert!(json.contains("\"ctf_history_series_deltas\""));
+        assert!(json.contains("\"outside_history_delta\""));
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"first_sample_delta\""));
@@ -8169,6 +8504,8 @@ mod tests {
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
+        assert!(digest.contains("\"ctf_history_series_deltas\""));
+        assert!(digest.contains("\"outside_history_delta\""));
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"first_sample_delta\""));
@@ -8194,6 +8531,8 @@ mod tests {
         assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(report.contains("## CTF History First-Sample Deltas"));
+        assert!(report.contains("## CTF History Series Deltas"));
+        assert!(report.contains("out_history_rmse_w"));
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("status: fail"));

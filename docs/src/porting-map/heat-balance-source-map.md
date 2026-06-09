@@ -162,6 +162,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `45.144665` to `471.677285`. Treat the source clue as history/report-order
   work, not a direct current-inside adiabatic outside-face replacement in this
   coupled lane.
+- The heat-balance digest now includes annual CTF derived current/history
+  deltas, not just first-sample rows. In the frozen-hconv best lane, the mass
+  floor dominates this latent decomposition: `ZN001:FLR001` has `8760` samples
+  with inside-current/history RMSE `1122.846780 W`/`1122.029419 W` and
+  outside-current/history RMSE `1122.860933 W`/`1122.261275 W`, while roof and
+  wall history RMSEs are near zero. The floor heat-storage RMSE is much lower
+  (`105.876226 W`) because the large current/history deltas cancel in the
+  reported storage sum. This keeps the next solver target on mass-floor
+  face/history cancellation parity rather than no-mass wall/roof history
+  bookkeeping.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
