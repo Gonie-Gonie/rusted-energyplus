@@ -471,14 +471,21 @@ Current Rust boundary:
   from `84.712495` to `38.774428`; floor storage remains the top active
   diagnostic row at `108.672323` RMSE. Rechecking the active lane with
   EnergyPlus initial CTF histories or a 20-day Rust warmup does not materially
-  move the floor rows, while a one-pass full ScriptF source still diverges in
-  the current simplified coupling shell. The Rust fixed approximate view-factor
-  generation and ScriptF orientation are now unit-checked against the
-  `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
+  move the floor rows, and raising the same interleaved grey-longwave lane from
+  20 to 100 surface iterations slightly worsens the top floor storage RMSE
+  (`108.672323` to `108.676973`). A one-pass full ScriptF source still diverges
+  in the current simplified coupling shell. The Rust fixed approximate
+  view-factor generation and ScriptF orientation are now unit-checked against
+  the `1ZoneUncontrolled` EIO final view-factor/ScriptF values, so the remaining
   ScriptF gap is expected to live in the coupled surface/zone iteration timing
-  rather than in the grey interchange matrix itself. Full inside iteration
-  order, zone predictor/corrector equations, detailed shadowing/reflection, and
-  coupled radiation coefficient update order are not yet wired.
+  rather than in the grey interchange matrix itself. The compact diagnostic
+  digest now carries first reported sample bottlenecks; in the active lane the
+  first-sample outside opaque aggregate delta is `871.308445 W`, driven by
+  floor storage/conduction plus underpredicted wall/roof outside conduction,
+  while the floor inside net longwave first-sample delta remains
+  `404.796794 W`. Full inside iteration order, zone predictor/corrector
+  equations, detailed shadowing/reflection, and coupled radiation coefficient
+  update order are not yet wired.
 - EnergyPlus mass-material CTF coefficient generation, source/sink terms, and
   timestep-dependent transfer-function validation are still unmapped runtime
   work.

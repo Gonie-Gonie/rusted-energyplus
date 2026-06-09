@@ -148,7 +148,13 @@ grey-longwave lane still puts the maximum floor storage/conduction delta at
 run-period sample 0 (`813.384496 W` storage, `465.262159 W` inside conduction,
 and `348.122337 W` outside conduction), so the next CTF-facing blocker is the
 warmup-to-run-period history handoff plus coupled source/history update order,
-not another report-sign adjustment. A
+not another report-sign adjustment. Raising that same active lane to 100
+surface iterations does not reduce the bottleneck, moving floor storage RMSE
+from `108.672323` to `108.676973`, so the next correction is not a larger
+fixed iteration count. The compact digest now also ranks first reported sample
+bottlenecks; the active lane's first sample has `871.308445 W` zone outside
+opaque aggregate delta, `813.384495 W` floor storage delta, and
+`404.796794 W` floor inside net-longwave delta. A
 full ScriptF interior-longwave source is also not a promotion shortcut in the
 current shell: even a one-pass ScriptF lane diverges to multi-kW floor storage
 and roof inside-longwave errors, so ScriptF parity has to be paired with the
