@@ -329,6 +329,16 @@ if ($null -eq $topBottleneck.first_delta_sample) {
 if ($null -eq $topBottleneck.max_delta_sample) {
     throw "Expected top bottleneck to include a max_delta_sample fingerprint"
 }
+$topFirstSampleBottleneck = @($summary.first_sample_bottlenecks)[0]
+if ($null -eq $topFirstSampleBottleneck) {
+    throw "Expected at least one first-sample bottleneck row in heat-balance diagnostic summary"
+}
+if ($null -eq $topFirstSampleBottleneck.first_sample_delta) {
+    throw "Expected first-sample bottleneck to include a first_sample_delta fingerprint"
+}
+if ([int]$topFirstSampleBottleneck.first_sample_delta.index -ne 0) {
+    throw "Expected first-sample bottleneck index 0, got $($topFirstSampleBottleneck.first_sample_delta.index)"
+}
 $expectedTopCandidates = @(
     @{
         Key = "ZN001:FLR001"
@@ -587,6 +597,7 @@ else {
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
+Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"

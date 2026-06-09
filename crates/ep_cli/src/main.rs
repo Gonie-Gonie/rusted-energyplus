@@ -5445,6 +5445,10 @@ fn render_heat_balance_conformance_json(
         "  \"bottlenecks\": {},\n",
         heat_balance_bottlenecks_json(&diagnostic.series)
     ));
+    json.push_str(&format!(
+        "  \"first_sample_bottlenecks\": {},\n",
+        heat_balance_first_sample_bottlenecks_json(&diagnostic.series)
+    ));
     let series_json = if include_sample_rows {
         heat_balance_series_json(&diagnostic.series)
     } else {
@@ -5613,6 +5617,10 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## Bottlenecks\n\n");
     heat_balance_report_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## First-Sample Bottlenecks\n\n");
+    heat_balance_report_first_sample_bottleneck_rows(&mut report, &diagnostic.series);
     report.push('\n');
 
     report.push_str("## Series\n\n");
@@ -5867,8 +5875,36 @@ fn heat_balance_bottleneck_rows(
     rows
 }
 
-fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
-    let rows = heat_balance_bottleneck_rows(series);
+fn heat_balance_first_sample_bottleneck_rows(
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<&HeatBalanceSeriesDiagnostic> {
+    let mut rows = series
+        .iter()
+        .filter(|row| row.samples > 0 && heat_balance_first_sample_delta(row).abs_delta_c > 0.0)
+        .collect::<Vec<_>>();
+    rows.sort_by(|left, right| {
+        let left_delta = heat_balance_first_sample_delta(left).abs_delta_c;
+        let right_delta = heat_balance_first_sample_delta(right).abs_delta_c;
+        right_delta
+            .total_cmp(&left_delta)
+            .then_with(|| right.delta.rmse_delta_c.total_cmp(&left.delta.rmse_delta_c))
+            .then_with(|| left.output.key.cmp(&right.output.key))
+            .then_with(|| left.output.variable.cmp(&right.output.variable))
+    });
+    rows.truncate(HEAT_BALANCE_BOTTLENECK_LIMIT);
+    rows
+}
+
+fn heat_balance_first_sample_delta(row: &HeatBalanceSeriesDiagnostic) -> DeltaPoint {
+    DeltaPoint {
+        index: 0,
+        oracle_c: row.oracle_first_c,
+        rust_c: row.rust_first_c,
+        abs_delta_c: (row.oracle_first_c - row.rust_first_c).abs(),
+    }
+}
+
+fn heat_balance_bottleneck_rows_json(rows: &[&HeatBalanceSeriesDiagnostic]) -> String {
     let mut json = String::from("[");
     for (index, row) in rows.iter().enumerate() {
         if index > 0 {
@@ -5884,6 +5920,41 @@ fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> Stri
             index + 1,
             zone_temperature_output_json(&row.output),
             json_string(row.status),
+            json_number(row.delta.max_abs_delta_c),
+            json_number(row.delta.mean_abs_delta_c),
+            json_number(row.delta.rmse_delta_c),
+            json_number(row.delta.max_rel_delta),
+            delta_point_json(row.delta.first_delta_sample),
+            delta_point_json(row.delta.max_delta_sample)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    heat_balance_bottleneck_rows_json(&heat_balance_bottleneck_rows(series))
+}
+
+fn heat_balance_first_sample_bottlenecks_json(series: &[HeatBalanceSeriesDiagnostic]) -> String {
+    let rows = heat_balance_first_sample_bottleneck_rows(series);
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"rank\": {}, \"output\": {}, \"status\": {}, ",
+                "\"first_sample_delta\": {}, ",
+                "\"max_abs_delta_c\": {}, \"mean_abs_delta_c\": {}, ",
+                "\"rmse_delta_c\": {}, \"max_rel_delta\": {}, ",
+                "\"first_delta_sample\": {}, \"max_delta_sample\": {} }}"
+            ),
+            index + 1,
+            zone_temperature_output_json(&row.output),
+            json_string(row.status),
+            delta_point_json(Some(heat_balance_first_sample_delta(row))),
             json_number(row.delta.max_abs_delta_c),
             json_number(row.delta.mean_abs_delta_c),
             json_number(row.delta.rmse_delta_c),
@@ -5990,6 +6061,34 @@ fn heat_balance_report_bottleneck_rows(
             row.output.class,
             row.delta.max_abs_delta_c,
             row.delta.mean_abs_delta_c,
+            row.delta.rmse_delta_c,
+            row.status
+        ));
+    }
+}
+
+fn heat_balance_report_first_sample_bottleneck_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| rank | key | variable | class | first_abs_delta_c | first_oracle_c | first_rust_c | rmse_delta_c | status |\n",
+    );
+    report.push_str("|---:|---|---|---|---:|---:|---:|---:|---|\n");
+    for (index, row) in heat_balance_first_sample_bottleneck_rows(series)
+        .iter()
+        .enumerate()
+    {
+        let first_delta = heat_balance_first_sample_delta(row);
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {} |\n",
+            index + 1,
+            markdown_cell(&row.output.key),
+            markdown_cell(&row.output.variable),
+            row.output.class,
+            first_delta.abs_delta_c,
+            first_delta.oracle_c,
+            first_delta.rust_c,
             row.delta.rmse_delta_c,
             row.status
         ));
@@ -7000,6 +7099,7 @@ mod tests {
         assert!(json.contains("\"surface_iteration_count\": 1"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"bottlenecks\""));
+        assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"first_delta_sample\""));
         assert!(json.contains("\"max_delta_sample\""));
@@ -7012,6 +7112,7 @@ mod tests {
         assert!(digest.contains("\"case_id\": \"heat_balance_nomass_001\""));
         assert!(digest.contains("\"series_count\": 2"));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
+        assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"compare_summary_json\": \"compare-summary.json\""));
@@ -7027,6 +7128,7 @@ mod tests {
         assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
         assert!(report.contains("## Bottlenecks"));
+        assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
         assert!(report.contains("## Hourly Samples"));
@@ -7142,11 +7244,15 @@ mod tests {
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
+        assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"first_sample_delta\""));
         assert!(json.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"first_sample_bottlenecks\""));
+        assert!(digest.contains("\"first_sample_delta\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
         assert!(digest.contains("\"series\""));
@@ -7166,6 +7272,7 @@ mod tests {
             report.contains("ctf_seed_construction_summaries: R13WALL (#CTFs=1) @ dt=0.250h [included], FLOOR (#CTFs=5) @ dt=0.250h [skipped]")
         );
         assert!(report.contains("## Bottlenecks"));
+        assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("status: fail"));
     }
 
