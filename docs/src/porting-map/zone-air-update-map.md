@@ -139,6 +139,17 @@ from `13.602803 W` to `16.742712 W`. The remaining zone-air surface convection
 gap is therefore not solved by either surface-refair reporting or final
 hconv-only reporting.
 
+A live-hconv solve sibling then refreshed TARP inside convection coefficients
+during every interleaved solve pass on the active ScriptF-flat lane. It lowers
+zone surface-convection RMSE from `22.062956 W` to `18.287879 W`, MAT RMSE from
+`0.037329 C` to `0.024905 C`, and air-storage RMSE from `9.127258 W` to
+`6.815102 W`, but it regresses the dominant floor solve: floor storage rises
+from `28.786920 W` to `35.419283 W`, floor inside conduction from
+`16.729618 W` to `20.807778 W`, and zone opaque inside conduction from
+`18.143612 W` to `23.106598 W`. Keep the active solve on frozen inside
+convection while the next zone-air work maps the EnergyPlus
+`InitIntConvCoeff` cadence and report timing more exactly.
+
 An inside-CTF report sibling then tested whether the aggregate conduction rows
 should use the outside-temperature snapshot consumed by the last inside CTF
 solve. It leaves MAT, surface convection, air storage, floor storage, and

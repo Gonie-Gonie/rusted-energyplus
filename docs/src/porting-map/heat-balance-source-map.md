@@ -788,6 +788,20 @@ Current Rust boundary:
   `SurfTempIn` TARP-report recompute as the missing EnergyPlus hconv/report
   timing; keep the frozen solver coefficient path until a source-level
   `InitIntConvCoeff`/inside-iteration cadence probe can be isolated.
+  A live-hconv solve sibling then keeps the same ScriptF-flat, frozen-reference
+  air, current-longwave, inside-CTF outside-history, and 20-iteration path, but
+  refreshes TARP inside convection coefficients during interleaved solves. It
+  confirms the trade-off expected from EnergyPlus' sparse `InitIntConvCoeff`
+  cadence: zone surface-convection RMSE improves from `22.062956` to
+  `18.287879 W`, MAT RMSE from `0.037329` to `0.024905 C`, and air-storage
+  RMSE from `9.127258` to `6.815102 W`, but the dominant floor CTF rows
+  regress. Floor storage rises from `28.786920` to `35.419283 W` RMSE and max
+  abs from `242.511509` to `299.870146 W`; floor inside conduction rises from
+  `16.729618` to `20.807778 W`, floor inside convection gain from `13.602803`
+  to `15.421154 W`, and zone opaque inside conduction from `18.143612` to
+  `23.106598 W`. Keep frozen inside convection in the active floor solve; the
+  remaining convection work should map EnergyPlus' exact initialization/report
+  timing instead of live-updating hconv every interleaved pass.
   An inside-CTF report probe then tests whether EnergyPlus report/source
   conduction should use the outside temperature snapshot consumed by the last
   inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
