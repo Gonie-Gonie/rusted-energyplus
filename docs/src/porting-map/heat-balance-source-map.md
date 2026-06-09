@@ -185,6 +185,20 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `45.150659`, and latent floor current/history RMSEs all rise by about
   `0.342 W`. Keep longwave source sampling as a secondary source-order detail;
   it is not the next floor-storage lever.
+- A third-order zone-air correction fork was added on top of the frozen-hconv
+  interleaved grey-longwave lane. It is the strongest floor/MAT probe so far:
+  MAT RMSE falls from `0.116074 C` to `0.069817 C`, floor heat-storage RMSE
+  from `105.876226 W` to `54.593582 W`, floor inside conduction from
+  `61.293942 W` to `31.581604 W`, floor outside conduction from
+  `45.144665 W` to `23.282797 W`, and floor inside longwave from
+  `30.262635 W` to `16.615214 W`. It is not a clean promotion yet because the
+  latent zone-air heat-balance rows regress: `Zone Air Heat Balance Surface
+  Convection Rate` RMSE rises from `9.385594 W` to `29.623453 W`, and
+  `Zone Air Heat Balance Air Energy Storage Rate` rises from `16.169222 W` to
+  `29.666388 W`. EnergyPlus 26.1 confirms the third-order air-storage report
+  uses `RhoAir * CpAir * Volume * (MAT - ZTM[0]) / TimeStepSysSec`, so the next
+  target is coupled zone-air source ordering and moist-air capacitance ownership
+  rather than changing the third-order storage report formula.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF
@@ -545,10 +559,16 @@ Current Rust boundary:
   from `0.323407` to `0.117536`, and the zone outside opaque conduction RMSE
   from `84.712495` to `38.774428`; floor storage remains the top active
   diagnostic row at `108.672323` RMSE. Freezing inside convection coefficients
-  at timestep start on the same lane modestly improves the current best
+  at timestep start on the same lane modestly improves the analytical
   diagnostic candidate: floor storage RMSE falls to `105.876226`, MAT RMSE to
   `0.116074`, zone surface-convection RMSE to `9.385594`, and floor inside
-  convection RMSE to `39.128925`. Rechecking the active lane with the
+  convection RMSE to `39.128925`. A coupled third-order zone-air correction on
+  that frozen-hconv lane then cuts the floor-focused top rows again
+  (`54.593582` floor storage, `31.581604` floor inside conduction,
+  `23.282797` floor outside conduction, and `0.069817` MAT RMSE), but exposes a
+  latent zone-air report/source-order trade-off because surface-convection and
+  air-storage RMSE rise to `29.623453` and `29.666388`. Rechecking the active
+  analytical lane with the
   EnergyPlus InitHeatBalance-shaped CTF initial-history seed produces identical
   floor RMSE rows and identical first-sample floor history deltas
   (`1880.111844`/`1769.027186 W`), so the active warmup path washes out that

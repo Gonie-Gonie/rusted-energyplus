@@ -51,3 +51,11 @@ from the previous `108.672323` focus value to `143.623752`, with zone inside
 aggregate conduction rising to `99.724533`. Port `ZoneAirHumRat` ownership and
 the predictor/corrector update order before enabling moist-air capacitance in
 the active solver path.
+
+The current third-order coupled probe is a useful candidate, not a promotion.
+On the frozen-hconv interleaved grey-longwave surface lane it lowers MAT RMSE
+to `0.069817 C` and floor heat-storage RMSE to `54.593582 W`, but the latent
+`Zone Air Heat Balance Surface Convection Rate` and `Zone Air Heat Balance Air
+Energy Storage Rate` rows rise to `29.623453 W` and `29.666388 W` RMSE. Keep
+the next zone-air work on source-order parity and owned moist-air capacitance,
+not on a standalone temperature-solver swap.
