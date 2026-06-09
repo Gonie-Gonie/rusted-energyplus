@@ -482,6 +482,7 @@ impl RuntimeOutputRegistry {
                     "W/m2",
                 ),
                 ("Surface Heat Storage Rate", "W"),
+                ("Surface Heat Storage Rate per Area", "W/m2"),
             ] {
                 self.push_output(
                     &surface.name.0,

@@ -274,7 +274,7 @@ else {
         throw "Expected all-eio policy to skip no constructions"
     }
 }
-if ($summary.series_count -ne 98) {
+if ($summary.series_count -ne 99) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -516,6 +516,9 @@ if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted floor heat storage series"
 }
+if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate per Area" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted floor heat storage per-area series"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Diagnostic Report" -Description "markdown report header"
@@ -557,6 +560,7 @@ Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown
 Assert-Contains -Text $reportText -Pattern "ZN001:WALL001" -Description "markdown wall decomposition key"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Conduction Heat Transfer Rate" -Description "markdown floor outside conduction variable"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate" -Description "markdown floor storage variable"
+Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area" -Description "markdown floor storage per-area variable"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 
 Write-Host "Official dynamic heat-balance diagnostic passed with CTF seed policy $CtfSeedPolicy."

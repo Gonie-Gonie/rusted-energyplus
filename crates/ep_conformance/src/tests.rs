@@ -434,7 +434,7 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
     assert_eq!(manifest.milestone, "v0.33-official-dynamic-diagnostic");
     assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
     assert!(!manifest.conformance_claim);
-    assert_eq!(manifest.outputs.len(), 24);
+    assert_eq!(manifest.outputs.len(), 99);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly
             && output.source == SourceArtifact::Eso
@@ -458,6 +458,11 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:FLR001"
             && output.variable == "Surface Inside Face Conduction Heat Transfer Rate"
+            && output.class == VariableClass::SurfaceState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:FLR001"
+            && output.variable == "Surface Heat Storage Rate per Area"
             && output.class == VariableClass::SurfaceState
     }));
     assert!(manifest.outputs.iter().any(|output| {

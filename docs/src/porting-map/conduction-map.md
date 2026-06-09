@@ -21,6 +21,7 @@ future official ExampleFile transient conduction work.
 | `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | diagnostic-only | official dynamic diagnostic candidate |
+| `Surface Heat Storage Rate per Area` | storage rate divided by surface area | diagnostic-only | official dynamic diagnostic candidate |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |
 | `Zone Opaque Surface Outside Faces Conduction Rate` | sum of surface outside-face conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 
@@ -154,8 +155,9 @@ boundary driver for run-period timesteps, and the official diagnostic manifest
 now includes wall/floor surface decomposition rows, including floor
 outside-face conduction, per-area floor conduction, and floor heat-storage
 diagnostics, plus wall/roof outside convection/radiation/solar source rows,
-raising the tracked official dynamic series count to 80 so aggregate
-cancellation does not hide the next bottleneck. The
+raising the tracked official dynamic series count to 99 after the floor
+storage per-area row was added, so aggregate cancellation does not hide the
+next bottleneck. The
 dynamic probe summary now ranks each lane's top inside-face and outside-face
 conduction driver surfaces and records the best lane per surface, keeping
 aggregate conduction regressions tied to wall/floor/roof source rows before a
@@ -177,6 +179,9 @@ aggregate conduction (`84.810714` RMSE), inside-face aggregate conduction
 RMSE floor storage). The official dynamic manifest now also compares beam,
 sky diffuse, and ground diffuse exterior incident solar component rows so
 future solar fixes can isolate which source term moved.
+The manifest now also includes the floor `Surface Heat Storage Rate per Area`
+row so the leading storage bottleneck is visible in both whole-surface and
+area-normalized form.
 The aggregate zone conduction series remains blocked by unported mass-material
 floor CTF histories and the full surface iteration order. Native
 EnergyPlus-equivalent mass-material CTF coefficient generation, full

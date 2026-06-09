@@ -700,6 +700,15 @@ domain = "surface"
 level = "diagnostic"
 
 [[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Heat Storage Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Inside Face Temperature"
 frequency = "hourly"

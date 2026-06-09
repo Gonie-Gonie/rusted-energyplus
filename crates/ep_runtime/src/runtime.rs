@@ -1016,6 +1016,7 @@ struct SurfaceHeatBalanceTrace {
     outside_conduction_loss_rate_w: Vec<f64>,
     outside_conduction_rate_per_area_w_per_m2: Vec<f64>,
     heat_storage_rate_w: Vec<f64>,
+    heat_storage_rate_per_area_w_per_m2: Vec<f64>,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -1043,6 +1044,7 @@ struct SurfaceHeatBalanceTraceSums {
     outside_conduction_loss_rate_w: f64,
     outside_conduction_rate_per_area_w_per_m2: f64,
     heat_storage_rate_w: f64,
+    heat_storage_rate_per_area_w_per_m2: f64,
 }
 
 struct ZoneConductionTrace {
@@ -3411,6 +3413,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
             outside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
             heat_storage_rate_w: Vec::with_capacity(options.sample_count),
+            heat_storage_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
         })
         .collect::<Vec<_>>();
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
@@ -3513,6 +3516,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     let inside_rate = surface_inside_conduction_rate_w(surface_state);
                     let outside_rate = surface_outside_conduction_rate_w(surface_state);
                     let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
+                    let storage_rate_per_area =
+                        surface_rate_per_area_w_per_m2(storage_rate, surface_state.area_m2);
                     let outside_face_temperature_c = reported_surface_outside_face_temperature_c(
                         &model.typed,
                         surface_state,
@@ -3566,6 +3571,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     sums.outside_conduction_rate_per_area_w_per_m2 +=
                         surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2);
                     sums.heat_storage_rate_w += storage_rate;
+                    sums.heat_storage_rate_per_area_w_per_m2 += storage_rate_per_area;
                 }
             }
         }
@@ -3675,6 +3681,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .heat_storage_rate_w
                 .push(sums.heat_storage_rate_w / divisor);
+            trace
+                .heat_storage_rate_per_area_w_per_m2
+                .push(sums.heat_storage_rate_per_area_w_per_m2 / divisor);
         }
         outdoor_temperatures.push(outdoor_temperature_sum / divisor);
     }
@@ -3961,10 +3970,18 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         handle_index += 1;
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: trace.surface_name,
+            key: trace.surface_name.clone(),
             variable_name: "Surface Heat Storage Rate".to_string(),
             units: "W".to_string(),
             values: trace.heat_storage_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name,
+            variable_name: "Surface Heat Storage Rate per Area".to_string(),
+            units: "W/m2".to_string(),
+            values: trace.heat_storage_rate_per_area_w_per_m2,
         });
         handle_index += 1;
     }
@@ -10473,7 +10490,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 149);
+        assert_eq!(simulation.results.series.len(), 155);
 
         let Some(zone_series) = simulation
             .results
@@ -10552,6 +10569,18 @@ DATA PERIODS
                 + outside_conduction_series.values[0])
                 .abs()
                 < 1.0e-9
+        );
+        let Some(storage_per_area_series) = simulation
+            .results
+            .find_series("FLOOR", "Surface Heat Storage Rate per Area")
+        else {
+            return Err(
+                std::io::Error::other("missing surface heat storage per-area series").into(),
+            );
+        };
+        assert_eq!(storage_per_area_series.values.len(), 2);
+        assert!(
+            (storage_per_area_series.values[0] - storage_series.values[0] / 100.0).abs() < 1.0e-9
         );
 
         let Some(zone_conduction_series) = simulation.results.find_series(
@@ -11770,6 +11799,12 @@ DATA PERIODS
         else {
             return Err(std::io::Error::other("missing floor heat storage").into());
         };
+        let Some(floor_storage_per_area) = simulation
+            .results
+            .find_series("FLOOR", "Surface Heat Storage Rate per Area")
+        else {
+            return Err(std::io::Error::other("missing floor heat storage per-area").into());
+        };
 
         assert_eq!(floor_inside_conduction.values.len(), 2);
         assert_eq!(floor_outside_conduction.values.len(), 2);
@@ -11782,6 +11817,9 @@ DATA PERIODS
                 + floor_outside_conduction.values[0])
                 .abs()
                 < 1.0e-9
+        );
+        assert!(
+            (floor_storage_per_area.values[0] - floor_storage.values[0] / 100.0).abs() < 1.0e-9
         );
 
         Ok(())
@@ -11811,7 +11849,7 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 123);
+        assert_eq!(registry.len(), 129);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
@@ -11830,6 +11868,7 @@ DATA PERIODS
                 "Zone Opaque Surface Outside Faces Conduction Rate",
             ),
             RuntimeOutputRequest::hourly("floor", "Surface Heat Storage Rate"),
+            RuntimeOutputRequest::hourly("floor", "Surface Heat Storage Rate per Area"),
             RuntimeOutputRequest::hourly(
                 "floor",
                 "Surface Outside Face Incident Solar Radiation Rate per Area",
@@ -11842,7 +11881,7 @@ DATA PERIODS
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 9);
+        assert_eq!(resolution.resolved.len(), 10);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }
