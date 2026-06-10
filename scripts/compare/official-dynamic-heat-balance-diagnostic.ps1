@@ -10,6 +10,8 @@ param(
     [int]$WarmupMinimumDays = 0,
     [ValidateRange(1, 200)]
     [int]$SurfaceIterations = 1,
+    [ValidateRange(0, 200)]
+    [int]$InsideHconvReevaluationInterval = 0,
     [ValidateSet("zone-state", "surface-report")]
     [string]$ZoneConductionReportSource = "zone-state"
 )
@@ -83,6 +85,12 @@ $SurfaceIterationOutputSuffix = if ($SurfaceIterations -gt 1) {
 else {
     ""
 }
+$InsideHconvReevaluationOutputSuffix = if ($InsideHconvReevaluationInterval -gt 0) {
+    "-hconv-reeval$InsideHconvReevaluationInterval"
+}
+else {
+    ""
+}
 $ZoneConductionReportOutputSuffix = if ($ZoneConductionReportSource -eq "surface-report") {
     "-zone-surf-report"
 }
@@ -90,10 +98,10 @@ else {
     ""
 }
 $OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
-    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$ZoneConductionReportOutputSuffix\26.1.0"
+    ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$InsideHconvReevaluationOutputSuffix$ZoneConductionReportOutputSuffix\26.1.0"
 }
 else {
-    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$ZoneConductionReportOutputSuffix\26.1.0"
+    ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$InsideHconvReevaluationOutputSuffix$ZoneConductionReportOutputSuffix\26.1.0"
 }
 $OutputRoot = Join-Path $RepoRoot $OutputRootRelative
 $CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
@@ -204,18 +212,20 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy, CTF initial history policy $CtfInitialHistoryPolicy, zone-air algorithm $ZoneAirAlgorithm, warmup minimum days $WarmupMinimumDays, surface iterations $SurfaceIterations, and zone conduction report source $ZoneConductionReportSource."
+Write-Host "Running official dynamic heat-balance diagnostic gate with CTF seed policy $CtfSeedPolicy, CTF initial history policy $CtfInitialHistoryPolicy, zone-air algorithm $ZoneAirAlgorithm, warmup minimum days $WarmupMinimumDays, surface iterations $SurfaceIterations, inside hconv reevaluation interval $InsideHconvReevaluationInterval, and zone conduction report source $ZoneConductionReportSource."
 $policyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY"
 $initialHistoryPolicyEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY"
 $algorithmEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_ALGORITHM"
 $warmupEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS"
 $surfaceIterationsEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS"
+$insideHconvReevaluationIntervalEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL"
 $zoneConductionReportSourceEnvName = "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE"
 $previousPolicy = [Environment]::GetEnvironmentVariable($policyEnvName, "Process")
 $previousInitialHistoryPolicy = [Environment]::GetEnvironmentVariable($initialHistoryPolicyEnvName, "Process")
 $previousAlgorithm = [Environment]::GetEnvironmentVariable($algorithmEnvName, "Process")
 $previousWarmup = [Environment]::GetEnvironmentVariable($warmupEnvName, "Process")
 $previousSurfaceIterations = [Environment]::GetEnvironmentVariable($surfaceIterationsEnvName, "Process")
+$previousInsideHconvReevaluationInterval = [Environment]::GetEnvironmentVariable($insideHconvReevaluationIntervalEnvName, "Process")
 $previousZoneConductionReportSource = [Environment]::GetEnvironmentVariable($zoneConductionReportSourceEnvName, "Process")
 try {
     [Environment]::SetEnvironmentVariable($policyEnvName, $CtfSeedPolicy, "Process")
@@ -228,6 +238,12 @@ try {
         [Environment]::SetEnvironmentVariable($warmupEnvName, $null, "Process")
     }
     [Environment]::SetEnvironmentVariable($surfaceIterationsEnvName, [string]$SurfaceIterations, "Process")
+    if ($InsideHconvReevaluationInterval -gt 0) {
+        [Environment]::SetEnvironmentVariable($insideHconvReevaluationIntervalEnvName, [string]$InsideHconvReevaluationInterval, "Process")
+    }
+    else {
+        [Environment]::SetEnvironmentVariable($insideHconvReevaluationIntervalEnvName, $null, "Process")
+    }
     [Environment]::SetEnvironmentVariable($zoneConductionReportSourceEnvName, $ZoneConductionReportSource, "Process")
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
@@ -244,6 +260,7 @@ finally {
     [Environment]::SetEnvironmentVariable($algorithmEnvName, $previousAlgorithm, "Process")
     [Environment]::SetEnvironmentVariable($warmupEnvName, $previousWarmup, "Process")
     [Environment]::SetEnvironmentVariable($surfaceIterationsEnvName, $previousSurfaceIterations, "Process")
+    [Environment]::SetEnvironmentVariable($insideHconvReevaluationIntervalEnvName, $previousInsideHconvReevaluationInterval, "Process")
     [Environment]::SetEnvironmentVariable($zoneConductionReportSourceEnvName, $previousZoneConductionReportSource, "Process")
 }
 if ($LASTEXITCODE -ne 0) {
@@ -260,6 +277,8 @@ Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup
 Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
 Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: $SurfaceIterations" -Description "surface iteration metadata"
+$expectedInsideHconvReevaluationIntervalLabel = if ($InsideHconvReevaluationInterval -gt 0) { [string]$InsideHconvReevaluationInterval } else { "none" }
+Assert-Contains -Text $text -Pattern "inside_hconv_reevaluation_interval: $expectedInsideHconvReevaluationIntervalLabel" -Description "inside hconv reevaluation interval metadata"
 Assert-Contains -Text $text -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "CTF initial history policy metadata"
 Assert-Contains -Text $text -Pattern "zone_conduction_report_source: $ZoneConductionReportSource" -Description "zone conduction report source metadata"
 Assert-Contains -Text $text -Pattern "compare_digest:" -Description "compact digest artifact path"
@@ -325,6 +344,15 @@ if ($summary.zone_air_algorithm -ne $ZoneAirAlgorithm) {
 }
 if ($summary.surface_iteration_count -ne $SurfaceIterations) {
     throw "Expected surface_iteration_count $SurfaceIterations, got $($summary.surface_iteration_count)"
+}
+$expectedInsideHconvReevaluationInterval = if ($InsideHconvReevaluationInterval -gt 0) { $InsideHconvReevaluationInterval } else { $null }
+if ($null -eq $expectedInsideHconvReevaluationInterval) {
+    if ($null -ne $summary.inside_hconv_reevaluation_interval) {
+        throw "Expected inside_hconv_reevaluation_interval null, got $($summary.inside_hconv_reevaluation_interval)"
+    }
+}
+elseif ($summary.inside_hconv_reevaluation_interval -ne $expectedInsideHconvReevaluationInterval) {
+    throw "Expected inside_hconv_reevaluation_interval $expectedInsideHconvReevaluationInterval, got $($summary.inside_hconv_reevaluation_interval)"
 }
 if ($summary.ctf_initial_history_policy -ne $CtfInitialHistoryPolicy) {
     throw "Expected ctf_initial_history_policy $CtfInitialHistoryPolicy, got $($summary.ctf_initial_history_policy)"
@@ -846,6 +874,7 @@ Assert-Contains -Text $reportText -Pattern "oracle_run_period_warmup_days: 20" -
 Assert-Contains -Text $reportText -Pattern "ctf_seed_policy: $CtfSeedPolicy" -Description "markdown CTF seed policy"
 Assert-Contains -Text $reportText -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "markdown zone-air algorithm"
 Assert-Contains -Text $reportText -Pattern "surface_iteration_count: $SurfaceIterations" -Description "markdown surface iteration metadata"
+Assert-Contains -Text $reportText -Pattern "inside_hconv_reevaluation_interval: $expectedInsideHconvReevaluationIntervalLabel" -Description "markdown inside hconv reevaluation interval metadata"
 Assert-Contains -Text $reportText -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "markdown CTF initial history policy metadata"
 Assert-Contains -Text $reportText -Pattern "zone_conduction_report_source: $ZoneConductionReportSource" -Description "markdown zone conduction report source metadata"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {

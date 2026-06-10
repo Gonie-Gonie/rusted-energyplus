@@ -1101,6 +1101,8 @@ pub struct HeatBalanceSimulationOptions {
     pub zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     /// Number of inside/outside surface-balance passes per zone timestep.
     pub surface_iteration_count: u32,
+    /// Optional frozen inside-convection coefficient re-evaluation interval.
+    pub inside_hconv_reevaluation_interval: Option<u32>,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
     /// Source used for zone opaque conduction report variables.
@@ -1175,6 +1177,7 @@ impl HeatBalanceSimulationOptions {
             warmup: HeatBalanceWarmupOptions::disabled(),
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             surface_iteration_count: 1,
+            inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
@@ -1201,6 +1204,7 @@ impl HeatBalanceSimulationOptions {
             },
             zone_air_algorithm: HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             surface_iteration_count: 1,
+            inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
@@ -1234,6 +1238,19 @@ impl HeatBalanceSimulationOptions {
             1
         } else {
             surface_iteration_count
+        };
+        self
+    }
+
+    /// Returns options with a frozen inside-convection coefficient re-evaluation interval.
+    #[must_use]
+    pub const fn with_inside_hconv_reevaluation_interval(
+        mut self,
+        inside_hconv_reevaluation_interval: Option<u32>,
+    ) -> Self {
+        self.inside_hconv_reevaluation_interval = match inside_hconv_reevaluation_interval {
+            Some(0) => None,
+            interval => interval,
         };
         self
     }
@@ -1276,6 +1293,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_count: usize,
     /// Number of surface-balance passes used per zone timestep.
     pub surface_iteration_count: u32,
+    /// Optional frozen inside-convection coefficient re-evaluation interval.
+    pub inside_hconv_reevaluation_interval: Option<u32>,
     /// Initial CTF temperature/flux history seeding policy.
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
     /// Source used for zone opaque conduction report variables.
@@ -3023,6 +3042,7 @@ pub fn advance_heat_balance_state_one_timestep(
         None,
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         1,
+        None,
     );
 }
 
@@ -3033,6 +3053,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
 ) {
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
@@ -3555,6 +3576,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             freeze_outside_balance_for_surface_iterations,
             freeze_inside_ctf_outside_temperature_for_surface_iterations,
             use_inside_ctf_outside_temperature_for_conduction_report,
+            inside_hconv_reevaluation_interval,
         ))
     } else {
         let current_zone_temperatures = state
@@ -3727,37 +3749,21 @@ fn run_interleaved_surface_zone_balance(
     freeze_outside_balance_for_surface_iterations: bool,
     freeze_inside_ctf_outside_temperature_for_surface_iterations: bool,
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
+    inside_hconv_reevaluation_interval: Option<u32>,
 ) -> InterleavedSurfaceZoneBalanceResult {
-    let frozen_inside_convection_coefficients = if freeze_inside_convection_for_timestep {
-        let zone_temperatures = zones
-            .iter()
-            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-            .collect::<BTreeMap<_, _>>();
-        Some(
-            surfaces
-                .iter()
-                .map(|surface| {
-                    let previous_inside_face_temperature_c = first_pass_inside_temperatures
-                        .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
-                        .unwrap_or(surface.inside_face_temperature_c);
-                    let zone_temperature_c = zone_temperatures
-                        .get(&surface.zone_id)
-                        .copied()
-                        .unwrap_or(surface.inside_face_temperature_c);
-                    (
-                        surface.surface_id,
-                        energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
-                            surface,
-                            previous_inside_face_temperature_c,
-                            zone_temperature_c,
-                        ),
-                    )
-                })
-                .collect::<BTreeMap<_, _>>(),
-        )
-    } else {
-        None
-    };
+    let inside_hconv_reevaluation_interval =
+        inside_hconv_reevaluation_interval.filter(|interval| *interval > 0);
+    let mut inside_convection_coefficients =
+        if freeze_inside_convection_for_timestep || inside_hconv_reevaluation_interval.is_some() {
+            let zone_temperatures = heat_balance_zone_temperature_map(zones);
+            Some(heat_balance_inside_convection_coefficients(
+                surfaces,
+                &zone_temperatures,
+                first_pass_inside_temperatures,
+            ))
+        } else {
+            None
+        };
     let frozen_surface_reference_air_temperatures = if freeze_surface_reference_air_for_timestep {
         Some(
             zones
@@ -3785,10 +3791,16 @@ fn run_interleaved_surface_zone_balance(
         } else {
             None
         };
-        let current_zone_temperatures = zones
-            .iter()
-            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-            .collect::<BTreeMap<_, _>>();
+        let current_zone_temperatures = heat_balance_zone_temperature_map(zones);
+        if let Some(interval) = inside_hconv_reevaluation_interval {
+            if surface_iteration_index > 0 && surface_iteration_index % interval == 0 {
+                inside_convection_coefficients = Some(heat_balance_inside_convection_coefficients(
+                    surfaces,
+                    &current_zone_temperatures,
+                    None,
+                ));
+            }
+        }
         let zone_temperatures = frozen_surface_reference_air_temperatures
             .as_ref()
             .unwrap_or(&current_zone_temperatures);
@@ -3825,7 +3837,7 @@ fn run_interleaved_surface_zone_balance(
             exterior_coefficient_surface_temperatures,
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
-            frozen_inside_convection_coefficients.as_ref(),
+            inside_convection_coefficients.as_ref(),
             frozen_outside_boundary_balances.as_ref(),
             frozen_inside_ctf_outside_temperatures.as_ref(),
             use_inside_ctf_outside_temperature_for_conduction_report,
@@ -4039,6 +4051,40 @@ fn run_surface_balance_passes(
             );
         }
     }
+}
+
+fn heat_balance_zone_temperature_map(zones: &[ZoneHeatBalanceState]) -> BTreeMap<ZoneId, f64> {
+    zones
+        .iter()
+        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+        .collect()
+}
+
+fn heat_balance_inside_convection_coefficients(
+    surfaces: &[SurfaceHeatBalanceState],
+    zone_temperatures: &BTreeMap<ZoneId, f64>,
+    inside_surface_temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) -> BTreeMap<SurfaceId, f64> {
+    surfaces
+        .iter()
+        .map(|surface| {
+            let inside_face_temperature_c = inside_surface_temperature_overrides
+                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            let zone_temperature_c = zone_temperatures
+                .get(&surface.zone_id)
+                .copied()
+                .unwrap_or(surface.inside_face_temperature_c);
+            (
+                surface.surface_id,
+                energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                    surface,
+                    inside_face_temperature_c,
+                    zone_temperature_c,
+                ),
+            )
+        })
+        .collect()
 }
 
 fn correct_zone_air_temperatures_from_current_surfaces(
@@ -4558,6 +4604,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.warmup,
         options.zone_air_algorithm,
         options.surface_iteration_count,
+        options.inside_hconv_reevaluation_interval,
         first_hour_interpolation_starting_values,
     );
     let run_period_initial_ctf_history_slots =
@@ -4719,6 +4766,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 weather_context,
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
+                options.inside_hconv_reevaluation_interval,
             );
 
             for sample in &state.last_ctf_history_slot_terms {
@@ -5498,6 +5546,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_count: state.zones.len(),
         surface_count: state.surfaces.len(),
         surface_iteration_count: options.surface_iteration_count,
+        inside_hconv_reevaluation_interval: options.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: options.ctf_initial_history_policy,
         zone_conduction_report_source: options.zone_conduction_report_source,
         run_period_initial_ctf_history_slots,
@@ -5526,6 +5575,7 @@ fn run_heat_balance_run_period_warmup(
     options: HeatBalanceWarmupOptions,
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
@@ -5576,6 +5626,7 @@ fn run_heat_balance_run_period_warmup(
                     weather_context,
                     zone_air_algorithm,
                     surface_iteration_count,
+                    inside_hconv_reevaluation_interval,
                 );
             }
         }
@@ -13310,6 +13361,7 @@ DATA PERIODS
                 None,
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
+                options.inside_hconv_reevaluation_interval,
             );
             let zone = &state.zones[0];
             surface_convection_sum += zone_air_heat_balance_surface_convection_rate_w(zone);
@@ -14308,6 +14360,7 @@ DATA PERIODS
             options,
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
+            None,
             FirstHourInterpolationStartingValues::Hour24,
         );
         let weather_context_summary = run_heat_balance_run_period_warmup(
@@ -14320,6 +14373,7 @@ DATA PERIODS
             options,
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
+            None,
             FirstHourInterpolationStartingValues::Hour24,
         );
 

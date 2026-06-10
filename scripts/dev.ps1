@@ -355,6 +355,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official dynamic diagnostic with inside CTF outside-history snapshots, ScriptF flat lSR access, and the EnergyPlus run-period warmup count."
     }
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the ScriptF-flat official dynamic diagnostic while re-evaluating frozen inside hconv every two surface passes."
+    }
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1"
         Group = "compare"

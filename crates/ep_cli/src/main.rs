@@ -67,6 +67,8 @@ const HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_WARMUP_MINIMUM_DAYS";
 const HEAT_BALANCE_SURFACE_ITERATIONS_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS";
+const HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL";
 const HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE";
 const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
@@ -765,6 +767,10 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
                 summary.surface_iteration_count
             );
             println!(
+                "  inside_hconv_reevaluation_interval: {}",
+                heat_balance_optional_u32_label(summary.inside_hconv_reevaluation_interval)
+            );
+            println!(
                 "  ctf_initial_history_policy: {}",
                 summary.ctf_initial_history_policy
             );
@@ -844,6 +850,10 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!(
                 "  surface_iteration_count: {}",
                 summary.surface_iteration_count
+            );
+            println!(
+                "  inside_hconv_reevaluation_interval: {}",
+                heat_balance_optional_u32_label(summary.inside_hconv_reevaluation_interval)
             );
             println!(
                 "  ctf_initial_history_policy: {}",
@@ -1062,6 +1072,7 @@ struct HeatBalanceReportSummary {
     tolerance_policy: String,
     zone_air_algorithm: &'static str,
     surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
     zone_conduction_report_source: &'static str,
     status: &'static str,
@@ -1139,6 +1150,7 @@ fn generate_conformance_heat_balance_report(
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
         surface_iteration_count: diagnostic.surface_iteration_count,
+        inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         status: conformance.status,
@@ -1186,6 +1198,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
         surface_iteration_count: diagnostic.surface_iteration_count,
+        inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         status: conformance.status,
@@ -3234,6 +3247,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_seed: HeatBalanceCtfSeedDiagnostic,
     zone_air_algorithm: &'static str,
     surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
     zone_conduction_report_source: &'static str,
     zone_count: usize,
@@ -3800,18 +3814,15 @@ fn build_heat_balance_conformance_diagnostic(
     let simulation_options = if context.conformance_claim {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
     } else {
-        apply_heat_balance_zone_conduction_report_source_from_env(
-            apply_heat_balance_ctf_initial_history_policy_from_env(
-                apply_heat_balance_surface_iterations_from_env(
-                    apply_heat_balance_warmup_minimum_days_from_env(
-                        HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
-                            &simulation_model,
-                            sample_count,
-                        ),
-                    )?,
-                )?,
-            )?,
-        )?
+        let options = HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+            &simulation_model,
+            sample_count,
+        );
+        let options = apply_heat_balance_warmup_minimum_days_from_env(options)?;
+        let options = apply_heat_balance_surface_iterations_from_env(options)?;
+        let options = apply_heat_balance_ctf_initial_history_policy_from_env(options)?;
+        let options = apply_heat_balance_zone_conduction_report_source_from_env(options)?;
+        apply_heat_balance_inside_hconv_reevaluation_interval_from_env(options)?
     }
     .with_zone_air_algorithm(zone_air_algorithm);
     let (ctf_coefficients, ctf_seed) = if context.conformance_claim {
@@ -3916,6 +3927,7 @@ fn build_heat_balance_conformance_diagnostic(
         ctf_seed,
         zone_air_algorithm: heat_balance_zone_air_algorithm_label(zone_air_algorithm),
         surface_iteration_count: simulation.summary.surface_iteration_count,
+        inside_hconv_reevaluation_interval: simulation.summary.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: heat_balance_ctf_initial_history_policy_label(
             simulation.summary.ctf_initial_history_policy,
         ),
@@ -5454,6 +5466,43 @@ fn parse_heat_balance_surface_iterations(value: &str) -> Result<Option<u32>, Str
     Ok(Some(iteration_count))
 }
 
+fn apply_heat_balance_inside_hconv_reevaluation_interval_from_env(
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulationOptions, String> {
+    match std::env::var(HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV) {
+        Ok(value) => {
+            parse_heat_balance_inside_hconv_reevaluation_interval(&value).map(|interval| {
+                match interval {
+                    Some(interval) => {
+                        options.with_inside_hconv_reevaluation_interval(Some(interval))
+                    }
+                    None => options,
+                }
+            })
+        }
+        Err(std::env::VarError::NotPresent) => Ok(options),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_inside_hconv_reevaluation_interval(
+    value: &str,
+) -> Result<Option<u32>, String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return Ok(None);
+    }
+    let interval = trimmed.parse::<u32>().map_err(|error| {
+        format!("unsupported {HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV}: {trimmed}; expected positive integer interval ({error})")
+    })?;
+    if interval == 0 {
+        return Ok(None);
+    }
+    Ok(Some(interval))
+}
+
 fn apply_heat_balance_zone_conduction_report_source_from_env(
     options: HeatBalanceSimulationOptions,
 ) -> Result<HeatBalanceSimulationOptions, String> {
@@ -6682,6 +6731,10 @@ fn print_heat_balance_warmup(prefix: &str, warmup: &HeatBalanceWarmupDiagnostic)
     );
 }
 
+fn heat_balance_optional_u32_label(value: Option<u32>) -> String {
+    value.map_or_else(|| "none".to_string(), |value| value.to_string())
+}
+
 fn heat_balance_warmup_day_count_delta(warmup: &HeatBalanceWarmupDiagnostic) -> Option<i64> {
     warmup
         .oracle_run_period_day_count
@@ -7084,6 +7137,10 @@ fn render_heat_balance_conformance_json(
         diagnostic.surface_iteration_count
     ));
     json.push_str(&format!(
+        "  \"inside_hconv_reevaluation_interval\": {},\n",
+        json_optional_u32(diagnostic.inside_hconv_reevaluation_interval)
+    ));
+    json.push_str(&format!(
         "  \"ctf_initial_history_policy\": {},\n",
         json_string(diagnostic.ctf_initial_history_policy)
     ));
@@ -7324,6 +7381,10 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "surface_iteration_count: {}\n",
         diagnostic.surface_iteration_count
+    ));
+    report.push_str(&format!(
+        "inside_hconv_reevaluation_interval: {}\n",
+        heat_balance_optional_u32_label(diagnostic.inside_hconv_reevaluation_interval)
     ));
     report.push_str(&format!(
         "ctf_initial_history_policy: {}\n",
@@ -10150,6 +10211,24 @@ mod tests {
     }
 
     #[test]
+    fn heat_balance_inside_hconv_reevaluation_parser_accepts_empty_or_positive_count() {
+        assert_eq!(
+            super::parse_heat_balance_inside_hconv_reevaluation_interval("").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_inside_hconv_reevaluation_interval("0").unwrap(),
+            None
+        );
+        assert_eq!(
+            super::parse_heat_balance_inside_hconv_reevaluation_interval("2").unwrap(),
+            Some(2)
+        );
+        assert!(super::parse_heat_balance_inside_hconv_reevaluation_interval("-1").is_err());
+        assert!(super::parse_heat_balance_inside_hconv_reevaluation_interval("live").is_err());
+    }
+
+    #[test]
     fn zone_temperature_delta_summary_tracks_diagnostic_samples() {
         let summary = super::delta_summary(&[1.0, 3.0, 8.0], &[1.0, 4.5, 4.0]);
 
@@ -10269,6 +10348,7 @@ mod tests {
             ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
             zone_air_algorithm: "simplified-analytical",
             surface_iteration_count: 1,
+            inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy: "boundary-u-value",
             zone_conduction_report_source: "zone-state",
             zone_count: 1,
@@ -10631,6 +10711,7 @@ mod tests {
         assert!(json.contains("\"policy\": \"disabled\""));
         assert!(json.contains("\"zone_air_algorithm\": \"simplified-analytical\""));
         assert!(json.contains("\"surface_iteration_count\": 1"));
+        assert!(json.contains("\"inside_hconv_reevaluation_interval\": null"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"zone-state\""));
         assert!(json.contains("\"bottlenecks\""));
@@ -10735,6 +10816,7 @@ mod tests {
         assert!(report.contains("status: pass"));
         assert!(report.contains("Rust Surface First-Sample Trace"));
         assert!(report.contains("surface_iteration_count: 1"));
+        assert!(report.contains("inside_hconv_reevaluation_interval: none"));
         assert!(report.contains("ctf_initial_history_policy: boundary-u-value"));
         assert!(report.contains("zone_conduction_report_source: zone-state"));
         assert!(report.contains("failure_reasons: none"));
@@ -10820,6 +10902,7 @@ mod tests {
             },
             zone_air_algorithm: "energyplus-third-order-probe",
             surface_iteration_count: 3,
+            inside_hconv_reevaluation_interval: Some(2),
             ctf_initial_history_policy: "energyplus-surf-initial",
             zone_conduction_report_source: "surface-report",
             zone_count: 1,
@@ -11151,6 +11234,7 @@ mod tests {
         assert!(json.contains("\"included\": false"));
         assert!(json.contains("\"zone_air_algorithm\": \"energyplus-third-order-probe\""));
         assert!(json.contains("\"surface_iteration_count\": 3"));
+        assert!(json.contains("\"inside_hconv_reevaluation_interval\": 2"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"surface-report\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
@@ -11239,6 +11323,7 @@ mod tests {
         assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
         assert!(report.contains("zone_air_algorithm: energyplus-third-order-probe"));
         assert!(report.contains("surface_iteration_count: 3"));
+        assert!(report.contains("inside_hconv_reevaluation_interval: 2"));
         assert!(report.contains("ctf_initial_history_policy: energyplus-surf-initial"));
         assert!(report.contains("zone_conduction_report_source: surface-report"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
