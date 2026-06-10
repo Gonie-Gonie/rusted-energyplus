@@ -13,8 +13,11 @@ supports release or conformance claims.
 
 Current generators:
 
-- `conformance_evidence_report.py` builds numerical conformance evidence for
-  promoted tolerance-gated cases.
+- `conformance_evidence_report.py` builds the oodocs HTML/PDF/JSON numerical
+  evidence report. The report keeps promoted tolerance-gated cases separate
+  from the active official 1ZoneUncontrolled dynamic diagnostic chapter, which
+  documents porting status, focus physics deltas, bottlenecks, and available
+  timing evidence without promoting the diagnostic case to conformance.
 - `conformance_index_report.py` builds the release conformance index and
   coverage matrices for all tracked manifests.
 - `support_coverage_report.py` builds the user-facing input, output, and

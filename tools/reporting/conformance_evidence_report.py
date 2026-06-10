@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import time
+import tomllib
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,6 +86,15 @@ class CaseSpec:
     oracle_err_path: str
 
 
+@dataclass(frozen=True)
+class DynamicDiagnosticSpec:
+    command: str
+    digest_path: str
+    oracle_end_path: str
+    oracle_err_path: str
+    case_manifest_path: str
+
+
 CASE_SPECS = (
     CaseSpec(
         milestone="v0.8",
@@ -123,12 +133,60 @@ CASE_SPECS = (
     ),
 )
 
+DYNAMIC_DIAGNOSTIC_SPEC = DynamicDiagnosticSpec(
+    command=(
+        "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-"
+        "current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe"
+    ),
+    digest_path=(
+        r".runtime\official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-"
+        r"balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-"
+        r"warmup-min20-surface-iter20\26.1.0\official_1zone_uncontrolled_dynamic_diagnostic_001"
+        r"\compare\compare-digest.json"
+    ),
+    oracle_end_path=(
+        r".runtime\official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-"
+        r"balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-"
+        r"warmup-min20-surface-iter20\26.1.0\official_1zone_uncontrolled_dynamic_diagnostic_001"
+        r"\oracle\eplusout.end"
+    ),
+    oracle_err_path=(
+        r".runtime\official-dynamic-diagnostic-all-ctf-third-order-frozen-hconv-weather-storage-"
+        r"balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-"
+        r"warmup-min20-surface-iter20\26.1.0\official_1zone_uncontrolled_dynamic_diagnostic_001"
+        r"\oracle\eplusout.err"
+    ),
+    case_manifest_path=r"data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml",
+)
+
+PORTING_FOCUS_MILESTONES = {"0.8", "0.9", "0.22", "0.26", "0.33"}
+
+ONE_ZONE_FOCUS_SERIES = (
+    ("ZONE ONE", "Zone Mean Air Temperature", "zone air"),
+    ("ZONE ONE", "Zone Air Heat Balance Internal Convective Heat Gain Rate", "zone source"),
+    ("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate", "zone exchange"),
+    ("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate", "zone storage"),
+    ("ZN001:FLR001", "Surface Heat Storage Rate", "mass floor"),
+    ("ZN001:FLR001", "Surface Inside Face Conduction Heat Transfer Rate", "mass floor"),
+    ("ZN001:FLR001", "Surface Inside Face Convection Heat Gain Rate", "mass floor"),
+    ("ZN001:FLR001", "Surface Inside Face Temperature", "mass floor"),
+    ("ZN001:ROOF001", "Surface Outside Face Convection Heat Gain Rate", "roof exterior"),
+    ("ZN001:ROOF001", "Surface Outside Face Net Thermal Radiation Heat Gain Rate", "roof exterior"),
+    ("ZN001:ROOF001", "Surface Outside Face Solar Radiation Heat Gain Rate", "roof solar"),
+    ("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate", "zone aggregate"),
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build release numerical conformance evidence.")
     parser.add_argument("--repo-root", required=True, type=Path)
     parser.add_argument("--version", default="0.32.0")
     parser.add_argument("--skip-gate-run", action="store_true")
+    parser.add_argument(
+        "--run-dynamic-diagnostic",
+        action="store_true",
+        help="Refresh the active official 1Zone dynamic diagnostic lane before building the report.",
+    )
     return parser.parse_args()
 
 
@@ -189,6 +247,13 @@ def status_label(status: str | None) -> str:
 
 def repo_path(repo_root: Path, relative: str) -> Path:
     return repo_root / Path(relative.replace("\\", "/"))
+
+
+def read_toml(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    with path.open("rb") as handle:
+        return tomllib.load(handle)
 
 
 def run_dev_command(repo_root: Path, command: str) -> float:
@@ -333,10 +398,201 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
     }
 
 
-def build_evidence(repo_root: Path, version: str, skip_gate_run: bool) -> dict[str, Any]:
+def diagnostic_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for series in summary.get("series", []):
+        output = series.get("output")
+        if not isinstance(output, dict):
+            continue
+        rows.append(
+            {
+                "key": output.get("key"),
+                "variable": output.get("variable"),
+                "class": output.get("class"),
+                "frequency": output.get("frequency"),
+                "source": output.get("source"),
+                "level": "diagnostic",
+                "samples": int(series.get("samples", 0)),
+                "status": series.get("status"),
+                "max_abs_delta_c": float(series.get("max_abs_delta_c", 0.0)),
+                "mean_abs_delta_c": float(series.get("mean_abs_delta_c", 0.0)),
+                "rmse_delta_c": float(series.get("rmse_delta_c", 0.0)),
+                "max_rel_delta": float(series.get("max_rel_delta", 0.0)),
+                "first_delta_index": (series.get("first_delta_sample") or {}).get("index"),
+                "max_delta_index": (series.get("max_delta_sample") or {}).get("index"),
+            }
+        )
+    return rows
+
+
+def find_series(
+    series_rows: list[dict[str, Any]],
+    key: str,
+    variable: str,
+) -> dict[str, Any] | None:
+    for row in series_rows:
+        if row.get("key") == key and row.get("variable") == variable:
+            return row
+    return None
+
+
+def load_porting_rows(repo_root: Path) -> list[dict[str, Any]]:
+    milestone_data = read_toml(repo_root / "specs" / "milestones.toml")
+    milestone_rows: list[dict[str, Any]] = []
+    for milestone in milestone_data.get("milestone", []):
+        version = str(milestone.get("version", ""))
+        if version not in PORTING_FOCUS_MILESTONES:
+            continue
+        milestone_rows.append(
+            {
+                "version": f"v{version}",
+                "title": milestone.get("title", ""),
+                "status": milestone.get("status", ""),
+                "claim_level": milestone.get("claim_level", ""),
+                "cases": milestone.get("required_cases", []),
+                "variables": milestone.get("required_variables", []),
+                "not_claimed": milestone.get("not_claimed", []),
+            }
+        )
+    return milestone_rows
+
+
+def build_dynamic_focus_rows(series_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for key, variable, group in ONE_ZONE_FOCUS_SERIES:
+        series = find_series(series_rows, key, variable)
+        if series is None:
+            rows.append(
+                {
+                    "group": group,
+                    "key": key,
+                    "variable": variable,
+                    "status": "missing",
+                    "samples": 0,
+                    "max_abs_delta_c": None,
+                    "mean_abs_delta_c": None,
+                    "rmse_delta_c": None,
+                    "max_delta_index": None,
+                }
+            )
+            continue
+        rows.append(
+            {
+                "group": group,
+                "key": key,
+                "variable": variable,
+                "status": series["status"],
+                "samples": series["samples"],
+                "max_abs_delta_c": series["max_abs_delta_c"],
+                "mean_abs_delta_c": series["mean_abs_delta_c"],
+                "rmse_delta_c": series["rmse_delta_c"],
+                "max_delta_index": series["max_delta_index"],
+            }
+        )
+    return rows
+
+
+def build_dynamic_source_split(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for sample in summary.get("inside_solve_max_sample_deltas", [])[:4]:
+        rows.append(
+            {
+                "key": sample.get("key"),
+                "sample_index": sample.get("sample_index"),
+                "implied_solve_numerator_delta_w": sample.get("implied_solve_numerator_delta_w"),
+                "tracked_solve_source_delta_w": sample.get("tracked_solve_source_delta_w"),
+                "tracked_solve_source_coverage_ratio": sample.get("tracked_solve_source_coverage_ratio"),
+                "reference_air_source_delta_w": sample.get("reference_air_source_delta_w"),
+                "reference_air_coefficient_source_signed_delta_w": sample.get(
+                    "reference_air_coefficient_source_signed_delta_w"
+                ),
+                "reference_air_temperature_source_signed_delta_w": sample.get(
+                    "reference_air_temperature_source_signed_delta_w"
+                ),
+                "inside_history_delta_w": sample.get("inside_history_delta_w"),
+                "inside_net_longwave_delta_w": sample.get("inside_net_longwave_delta_w"),
+                "solve_source_residual_delta_w": sample.get("solve_source_residual_delta_w"),
+            }
+        )
+    return rows
+
+
+def load_dynamic_diagnostic(
+    repo_root: Path,
+    spec: DynamicDiagnosticSpec,
+    run_dynamic_diagnostic: bool,
+) -> dict[str, Any]:
+    gate_elapsed = run_dev_command(repo_root, spec.command) if run_dynamic_diagnostic else None
+    digest_path = repo_path(repo_root, spec.digest_path)
+    if not digest_path.is_file():
+        digest_label = spec.digest_path.replace("\\", "/")
+        return {
+            "available": False,
+            "reason": f"missing digest: {digest_label}",
+            "command": spec.command,
+        }
+
+    summary = json.loads(digest_path.read_text(encoding="utf-8"))
+    manifest = read_toml(repo_path(repo_root, spec.case_manifest_path))
+    series_rows = diagnostic_series(summary)
+    top_bottlenecks = sorted(series_rows, key=lambda row: row["rmse_delta_c"], reverse=True)[:12]
+    err = error_summary(repo_path(repo_root, spec.oracle_err_path))
+    warmup = summary.get("heat_balance_warmup") or {}
+    total_timesteps = int(summary.get("heat_balance_timesteps", 0))
+    warmup_timesteps = int(warmup.get("timestep_count", 0))
+    run_period_timesteps = int(summary.get("heat_balance_run_period_timesteps", 0))
+    return {
+        "available": True,
+        "case_id": summary.get("case_id"),
+        "title": manifest.get("title", "Official 1ZoneUncontrolled dynamic heat-balance diagnostic"),
+        "source_kind": (manifest.get("manifest_v2") or {}).get("source_kind"),
+        "source_file": (manifest.get("manifest_v2") or {}).get("source_file"),
+        "idf": (manifest.get("input") or {}).get("idf"),
+        "weather": (manifest.get("input") or {}).get("weather"),
+        "comparison_class": summary.get("comparison_class"),
+        "conformance_claim": bool(summary.get("conformance_claim")),
+        "status": summary.get("status"),
+        "samples": int(summary.get("samples", 0)),
+        "outputs": len(summary.get("outputs", [])),
+        "series_count": int(summary.get("series_count", len(series_rows))),
+        "zone_count": int(summary.get("zone_count", 0)),
+        "surface_count": int(summary.get("surface_count", 0)),
+        "zone_air_algorithm": summary.get("zone_air_algorithm"),
+        "surface_iteration_count": int(summary.get("surface_iteration_count", 1)),
+        "ctf_seed_policy": (summary.get("ctf_seed") or {}).get("policy"),
+        "ctf_initial_history_policy": summary.get("ctf_initial_history_policy"),
+        "zone_conduction_report_source": summary.get("zone_conduction_report_source"),
+        "max_abs_delta_c": float(summary.get("max_abs_delta_c", 0.0)),
+        "rmse_delta_c": float(summary.get("rmse_delta_c", 0.0)),
+        "max_rel_delta": float(summary.get("max_rel_delta", 0.0)),
+        "heat_balance_timesteps": total_timesteps,
+        "heat_balance_run_period_timesteps": run_period_timesteps,
+        "heat_balance_warmup": warmup,
+        "warmup_timestep_share": (warmup_timesteps / total_timesteps) if total_timesteps else None,
+        "run_period_timestep_share": (run_period_timesteps / total_timesteps) if total_timesteps else None,
+        "gate_elapsed_seconds": gate_elapsed,
+        "energyplus_elapsed_seconds": elapsed_seconds(repo_path(repo_root, spec.oracle_end_path)),
+        "energyplus_warnings": err["warnings"],
+        "energyplus_severes": err["severes"],
+        "gate_script": spec.command,
+        "source_digest_json": spec.digest_path.replace("\\", "/"),
+        "source_report_md": (summary.get("report_contract") or {}).get("path"),
+        "focus_series": build_dynamic_focus_rows(series_rows),
+        "top_bottlenecks": top_bottlenecks,
+        "inside_solve_source_split": build_dynamic_source_split(summary),
+    }
+
+
+def build_evidence(
+    repo_root: Path,
+    version: str,
+    skip_gate_run: bool,
+    run_dynamic_diagnostic: bool,
+) -> dict[str, Any]:
     cases = [load_case_report(repo_root, spec, skip_gate_run) for spec in CASE_SPECS]
     all_series = [series for case in cases for series in case["series"]]
     failed_cases = [case for case in cases if case["status"] != "pass"]
+    dynamic_diagnostic = load_dynamic_diagnostic(repo_root, DYNAMIC_DIAGNOSTIC_SPEC, run_dynamic_diagnostic)
     return {
         "schema_version": 1,
         "version": version,
@@ -351,6 +607,8 @@ def build_evidence(repo_root: Path, version: str, skip_gate_run: bool) -> dict[s
             "rmse_delta_c": max((case["rmse_delta_c"] for case in cases), default=0.0),
         },
         "cases": cases,
+        "porting_milestones": load_porting_rows(repo_root),
+        "active_dynamic_diagnostic": dynamic_diagnostic,
         "artifacts": {
             "html": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.html",
             "pdf": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.pdf",
@@ -467,6 +725,46 @@ def build_dual_bar_figure(
     return fig
 
 
+def build_single_bar_figure(
+    title: str,
+    rows: list[dict[str, Any]],
+    value_key: str,
+    x_label: str,
+    color: str,
+) -> Any:
+    labels = [str(row["id"]) for row in rows]
+    values = [float(row[value_key] or 0.0) for row in rows]
+    max_value = max(values, default=0.0)
+    if max_value <= 0.0:
+        max_value = 1.0
+
+    height = max(2.2, 1.1 + len(rows) * 0.38)
+    fig, ax = plt.subplots(figsize=(7.2, height), dpi=180)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    y_values = list(range(len(rows)))
+    ax.barh(y_values, values, height=0.24, color=color, edgecolor="none")
+    label_offset = max_value * 0.012
+    for y, value in zip(y_values, values):
+        ax.text(
+            value + label_offset,
+            y,
+            chart_value_label(value),
+            va="center",
+            ha="left",
+            fontsize=6.6,
+            color="#4b5563",
+        )
+    ax.set_yticks(y_values, labels)
+    ax.invert_yaxis()
+    ax.set_xlim(0, max_value * 1.18)
+    ax.set_xlabel(x_label, fontsize=9, color="#5b6775")
+    ax.set_title(title, loc="left", fontsize=13, fontweight="bold", color="#17212b", pad=10)
+    style_axis(ax)
+    fig.tight_layout(pad=1.0)
+    return fig
+
+
 def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     accuracy_rows: list[dict[str, Any]] = []
     series_index = 1
@@ -508,7 +806,24 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         "#3c6e9f",
         "#c77d1a",
     )
-    return {"accuracy": accuracy, "timing": timing}
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    dynamic_rows: list[dict[str, Any]] = []
+    if dynamic.get("available"):
+        for index, row in enumerate(dynamic["top_bottlenecks"][:10], start=1):
+            dynamic_rows.append(
+                {
+                    "id": f"D{index:02d}",
+                    "rmse_delta_c": row["rmse_delta_c"],
+                }
+            )
+    dynamic_bottlenecks = build_single_bar_figure(
+        "1Zone Dynamic Diagnostic Bottlenecks",
+        dynamic_rows or [{"id": "D00", "rmse_delta_c": 0.0}],
+        "rmse_delta_c",
+        "RMSE delta",
+        "#7c4d9e",
+    )
+    return {"accuracy": accuracy, "timing": timing, "dynamic_bottlenecks": dynamic_bottlenecks}
 
 
 def table(
@@ -624,6 +939,177 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_porting_table(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for milestone in evidence.get("porting_milestones", []):
+        rows.append(
+            [
+                milestone["version"],
+                milestone["title"],
+                milestone["status"],
+                milestone["claim_level"],
+                ", ".join(milestone["cases"]) or "none",
+                ", ".join(milestone["variables"]) or "none",
+            ]
+        )
+    return table(
+        ["MS", "Algorithm / scope", "Status", "Claim level", "Evidence case", "Proof variables"],
+        rows,
+        "Porting status by milestone and evidence boundary.",
+        [0.42, 1.55, 0.72, 1.05, 1.95, 1.75],
+    )
+
+
+def build_dynamic_setup_table(dynamic: dict[str, Any]) -> Table:
+    if not dynamic.get("available"):
+        return table(
+            ["Field", "Value"],
+            [["Diagnostic artifact", dynamic.get("reason", "missing")]],
+            "Active official 1Zone dynamic diagnostic setup.",
+            [2.1, 4.9],
+        )
+    warmup = dynamic.get("heat_balance_warmup") or {}
+    rows = [
+        ["Case", dynamic["case_id"]],
+        ["Source", dynamic.get("source_file") or dynamic.get("idf")],
+        ["Weather", dynamic.get("weather")],
+        ["Status", dynamic["status"]],
+        ["Conformance claim", str(dynamic["conformance_claim"]).lower()],
+        ["Outputs / series", f"{dynamic['outputs']} / {dynamic['series_count']}"],
+        ["Samples", dynamic["samples"]],
+        ["Zones / surfaces", f"{dynamic['zone_count']} / {dynamic['surface_count']}"],
+        ["Algorithm", dynamic["zone_air_algorithm"]],
+        ["Surface passes", dynamic["surface_iteration_count"]],
+        ["CTF seed / initial history", f"{dynamic['ctf_seed_policy']} / {dynamic['ctf_initial_history_policy']}"],
+        ["Warmup days / timesteps", f"{warmup.get('day_count', 'n/a')} / {warmup.get('timestep_count', 'n/a')}"],
+    ]
+    return table(
+        ["Field", "Value"],
+        rows,
+        "Active official 1ZoneUncontrolled dynamic diagnostic setup.",
+        [1.85, 5.3],
+    )
+
+
+def build_dynamic_focus_table(dynamic: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    if dynamic.get("available"):
+        for row in dynamic["focus_series"]:
+            rows.append(
+                [
+                    row["group"],
+                    key_label(row["key"]),
+                    variable_label(row["variable"]),
+                    status_label(row["status"]),
+                    row["samples"],
+                    compact_number_label(row["max_abs_delta_c"]),
+                    compact_number_label(row["mean_abs_delta_c"]),
+                    compact_number_label(row["rmse_delta_c"]),
+                    row["max_delta_index"],
+                ]
+            )
+    return table(
+        ["Group", "Key", "Output", "OK", "N", "Max abs", "Mean abs", "RMSE", "Max idx"],
+        rows,
+        "1Zone focus metrics for user-visible and latent heat-balance physics.",
+        [0.92, 0.92, 1.8, 0.36, 0.42, 0.62, 0.62, 0.62, 0.52],
+    )
+
+
+def build_dynamic_bottleneck_table(dynamic: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    if dynamic.get("available"):
+        for index, row in enumerate(dynamic["top_bottlenecks"][:10], start=1):
+            rows.append(
+                [
+                    f"D{index:02d}",
+                    key_label(row["key"]),
+                    variable_label(row["variable"]),
+                    compact_number_label(row["max_abs_delta_c"]),
+                    compact_number_label(row["mean_abs_delta_c"]),
+                    compact_number_label(row["rmse_delta_c"]),
+                    row["max_delta_index"],
+                ]
+            )
+    return table(
+        ["ID", "Key", "Output", "Max abs", "Mean abs", "RMSE", "Max idx"],
+        rows,
+        "Largest active 1Zone dynamic diagnostic deltas by RMSE.",
+        [0.4, 0.95, 2.15, 0.72, 0.72, 0.72, 0.55],
+    )
+
+
+def build_dynamic_source_split_table(dynamic: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    if dynamic.get("available"):
+        for row in dynamic["inside_solve_source_split"]:
+            rows.append(
+                [
+                    key_label(row["key"]),
+                    row["sample_index"],
+                    compact_number_label(row["implied_solve_numerator_delta_w"]),
+                    compact_number_label(row["tracked_solve_source_delta_w"]),
+                    percent_label(row["tracked_solve_source_delta_w"], row["implied_solve_numerator_delta_w"], 1),
+                    compact_number_label(row["reference_air_source_delta_w"]),
+                    compact_number_label(row["inside_history_delta_w"]),
+                    compact_number_label(row["inside_net_longwave_delta_w"]),
+                    compact_number_label(row["solve_source_residual_delta_w"]),
+                ]
+            )
+    return table(
+        ["Key", "Idx", "Num dW", "Tracked dW", "Cov", "Ref-air", "History", "LW", "Residual"],
+        rows,
+        "Inside solve max-sample source split for the current floor-storage bottleneck.",
+        [0.85, 0.38, 0.62, 0.72, 0.5, 0.62, 0.62, 0.62, 0.62],
+    )
+
+
+def build_dynamic_timing_table(dynamic: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    if dynamic.get("available"):
+        warmup = dynamic.get("heat_balance_warmup") or {}
+        rows.extend(
+            [
+                [
+                    "Rust warmup",
+                    warmup.get("timestep_count", "n/a"),
+                    percent_label(warmup.get("timestep_count"), dynamic.get("heat_balance_timesteps"), 1),
+                    "stage elapsed not persisted",
+                ],
+                [
+                    "Rust run period",
+                    dynamic.get("heat_balance_run_period_timesteps"),
+                    percent_label(
+                        dynamic.get("heat_balance_run_period_timesteps"),
+                        dynamic.get("heat_balance_timesteps"),
+                        1,
+                    ),
+                    "stage elapsed not persisted",
+                ],
+                [
+                    "Rust diagnostic gate",
+                    dynamic.get("heat_balance_timesteps"),
+                    "100.0%",
+                    "n/a" if dynamic.get("gate_elapsed_seconds") is None else number_label(dynamic["gate_elapsed_seconds"], 3, "s"),
+                ],
+                [
+                    "EnergyPlus oracle",
+                    "n/a",
+                    "n/a",
+                    "n/a"
+                    if dynamic.get("energyplus_elapsed_seconds") is None
+                    else number_label(dynamic["energyplus_elapsed_seconds"], 3, "s"),
+                ],
+            ]
+        )
+    return table(
+        ["Phase", "Timesteps", "Share", "Elapsed"],
+        rows,
+        "Stage timing evidence. Rust phase wall-time requires runner instrumentation beyond current artifacts.",
+        [1.7, 0.9, 0.7, 2.2],
+    )
+
+
 def build_series_detail(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     series_index = 1
@@ -687,9 +1173,10 @@ def build_artifact_paths(evidence: dict[str, Any]) -> Table:
 
 def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document:
     version = evidence["version"]
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
     settings = DocumentSettings(
         metadata_author="rusted-energyplus",
-        subtitle="Release numerical conformance evidence",
+        subtitle="Conformance, porting, and active 1Zone dynamic evidence",
         cover_page=True,
         page_margins=PageMargins(0.55, 0.55, 0.55, 0.55, unit="in"),
         theme=Theme(
@@ -704,86 +1191,102 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         ),
     )
     return Document(
-        f"eplus-rs {version} Numeric Conformance Evidence",
+        f"eplus-rs {version} Conformance Evidence",
         TableOfContents("Table of Contents", max_level=2),
         Chapter(
-            "Claim Boundary",
+            "Scope",
             Box(
                 Paragraph(
-                    "This PDF covers only promoted numerical conformance cases. It does not claim HVAC, node, "
-                    "plant, meter, fenestration, solar-radiation, warmup, sizing, or general ExampleFiles compatibility."
+                    "This report separates promoted numerical conformance from the active official 1ZoneUncontrolled "
+                    "dynamic diagnostic. The 1Zone chapter is evidence for porting progress and bottleneck triage; it "
+                    "is not a promoted conformance claim until its manifest, tolerances, and blocking gate are updated."
                 ),
-                title="Release Scope",
+                title="Evidence Boundary",
                 border_color="#2f6f9f",
                 background_color="#f4f8fb",
                 padding=0.12,
             ),
             Paragraph(
-                "The public numerical conformance claim is limited to the listed cases, variables, tolerance "
-                "policies, and blocking gates. Smoke, diagnostic, typed graph, and baseline-only artifacts remain "
-                "outside this report unless explicitly promoted."
-            ),
-        ),
-        Chapter(
-            "Executive Summary",
-            Paragraph(
                 "Generated UTC: ",
                 code(evidence["generated_at_utc"]),
                 ". EnergyPlus oracle: ",
                 code(evidence["oracle_version"]),
-                ". Report schema: ",
-                code(str(evidence["schema_version"])),
+                ". Promoted aggregate status: ",
+                code(evidence["aggregate"]["status"]),
                 ".",
             ),
             build_metric_table(evidence),
         ),
-        Chapter("Case Matrix", build_case_matrix(evidence)),
-        PageBreak(),
         Chapter(
-            "Accuracy Evidence",
+            "Algorithm Porting Status",
             Paragraph(
-                "The figure uses compact row IDs. Full case, key, and variable names remain in JSON evidence; "
-                "the PDF table uses short labels to keep the release view readable."
+                "The rows below describe what has been ported to tolerance-gated evidence and what remains diagnostic. "
+                "The v0.33 row is intentionally marked diagnostic-only because the official ExampleFile dynamic path "
+                "still has material surface-balance, CTF history, solar, and convection deltas."
             ),
-            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
-            build_accuracy_values(evidence),
+            build_porting_table(evidence),
         ),
         Chapter(
-            "Execution Time Evidence",
+            "Promoted Conformance",
             Paragraph(
-                "Release gate wall-clock covers oracle generation, Rust comparison, and artifact writing. "
-                "EnergyPlus elapsed time is read from eplusout.end and is not a portable performance benchmark."
+                "These cases are the current blocking conformance claims. They remain small by design: each row has a "
+                "manifest, tolerance policy, generated JSON/Markdown comparison, and a blocking gate."
             ),
+            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
+            build_case_matrix(evidence),
+        ),
+        Chapter(
+            "1Zone Dynamic Diagnostic",
+            Paragraph(
+                "This chapter centers the official EnergyPlus 1ZoneUncontrolled ExampleFile. It compares hourly Rust "
+                "outputs against the EnergyPlus 26.1.0 oracle for visible zone variables and latent physical drivers "
+                "such as surface temperatures, convection coefficients, radiation, solar gains, and CTF conduction."
+            ),
+            build_dynamic_setup_table(dynamic),
             Figure(
-                charts["timing"],
-                caption="Release gate wall-clock and EnergyPlus elapsed time.",
+                charts["dynamic_bottlenecks"],
+                caption="Largest 1Zone dynamic diagnostic bottlenecks by RMSE.",
                 width=6.8,
                 placement="H",
             ),
-            build_timing_values(evidence),
+            build_dynamic_focus_table(dynamic),
+            build_dynamic_bottleneck_table(dynamic),
+            build_dynamic_source_split_table(dynamic),
         ),
         PageBreak(),
-        Chapter("Series Detail", build_series_detail(evidence)),
         Chapter(
-            "Evidence Policy and Future Growth",
+            "Execution Time",
             Paragraph(
-                "Future numerical conformance additions should enter this PDF only after they have a manifest, "
-                "requested variables, tolerance policy, Rust result artifact, markdown/JSON report, and blocking gate."
+                "Promoted gate wall-clock includes oracle generation, Rust comparison, and artifact writing. "
+                "EnergyPlus elapsed time is read from eplusout.end. For the active 1Zone diagnostic, current artifacts "
+                "separate warmup and run-period timesteps but do not yet persist Rust wall-time by phase; this table "
+                "therefore records the available staged evidence and makes the missing instrumentation explicit."
+            ),
+            Figure(
+                charts["timing"],
+                caption="Promoted gate wall-clock and EnergyPlus elapsed time.",
+                width=6.8,
+                placement="H",
             ),
             table(
-                ["Rule", "Reason"],
+                ["View", "Contents"],
                 [
-                    ["Keep parser and intake checks out", "They are development hygiene unless tied to a promoted numerical result."],
-                    ["Summarize exploratory experiments", "Low-level rows should retire once a higher-level case supersedes them."],
-                    ["Record divergence and utilization", "Every promoted output needs readable accuracy and tolerance evidence."],
-                    ["Preserve explicit non-claims", "HVAC, node, plant, fenestration, solar, warmup, sizing, and meters need their own gates."],
+                    ["Promoted cases", "Gate wall-clock plus EnergyPlus elapsed for tolerance-gated cases."],
+                    ["1Zone dynamic", "Warmup/run-period timestep split, optional Rust gate wall-clock, EnergyPlus elapsed."],
                 ],
-                "Rules for adding future release evidence.",
-                [2.3, 4.8],
+                "Timing evidence interpretation.",
+                [1.4, 5.4],
             ),
+            build_timing_values(evidence),
+            build_dynamic_timing_table(dynamic),
         ),
         Chapter(
-            "Artifact Paths",
+            "Next Evidence Requirements",
+            Paragraph(
+                "The next report-quality improvement is to persist Rust timing at warmup, run-period, surface-solve, "
+                "and report-writing boundaries. The next conformance improvement remains the active 1Zone dynamic "
+                "bottleneck: floor storage and zone surface-convection deltas before promotion."
+            ),
             build_artifact_paths(evidence),
         ),
         settings=settings,
@@ -813,13 +1316,22 @@ def write_outputs(repo_root: Path, version: str, evidence: dict[str, Any]) -> di
 def main() -> int:
     args = parse_args()
     repo_root = args.repo_root.resolve()
-    evidence = build_evidence(repo_root, args.version, args.skip_gate_run)
+    evidence = build_evidence(
+        repo_root,
+        args.version,
+        args.skip_gate_run,
+        args.run_dynamic_diagnostic,
+    )
     outputs = write_outputs(repo_root, args.version, evidence)
 
     print("Numeric conformance evidence report")
     print(f"  status: {evidence['aggregate']['status']}")
     print(f"  cases: {evidence['aggregate']['case_count']}")
     print(f"  series: {evidence['aggregate']['series_count']}")
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    if dynamic.get("available"):
+        print(f"  active_dynamic_status: {dynamic['status']}")
+        print(f"  active_dynamic_outputs: {dynamic['outputs']}")
     print(f"  max_abs_delta_c: {number_label(evidence['aggregate']['max_abs_delta_c'], 12)}")
     print(f"  html: {outputs['html']}")
     print(f"  pdf: {outputs['pdf']}")

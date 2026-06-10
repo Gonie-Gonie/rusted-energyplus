@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$Version = "0.32.0",
-    [switch]$SkipGateRun
+    [switch]$SkipGateRun,
+    [switch]$RunDynamicDiagnostic
 )
 
 $ErrorActionPreference = "Stop"
@@ -26,6 +27,9 @@ if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
 $arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version)
 if ($SkipGateRun) {
     $arguments += "--skip-gate-run"
+}
+if ($RunDynamicDiagnostic) {
+    $arguments += "--run-dynamic-diagnostic"
 }
 
 & $python @arguments
