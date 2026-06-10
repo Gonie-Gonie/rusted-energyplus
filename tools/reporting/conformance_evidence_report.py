@@ -45,6 +45,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
+    "official_1zone_uncontrolled_dynamic_diagnostic_001": "Official 1Zone dynamic",
 }
 
 KEY_LABELS = {
@@ -939,6 +940,50 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
     )
 
 
+def short_claim_label(claim_level: str) -> str:
+    labels = {
+        "limited-conformance": "limited conf",
+        "declared-variables-only": "declared vars",
+        "diagnostic-only": "diagnostic",
+    }
+    return labels.get(claim_level, claim_level)
+
+
+def short_status_label(status: str) -> str:
+    labels = {
+        "historical": "done",
+        "complete": "done",
+        "in_progress": "active",
+    }
+    return labels.get(status, status)
+
+
+def list_label(values: list[str], max_items: int = 3) -> str:
+    if not values:
+        return "none"
+    shown = values[:max_items]
+    suffix = "" if len(values) <= max_items else f" +{len(values) - max_items}"
+    return ", ".join(shown) + suffix
+
+
+def case_list_label(values: list[str]) -> str:
+    return list_label([case_label(value) for value in values], max_items=3)
+
+
+def variable_list_label(values: list[str]) -> str:
+    return list_label([variable_label(value) for value in values], max_items=3)
+
+
+def heat_balance_algorithm_label(value: str | None) -> str:
+    if not value:
+        return "n/a"
+    if "scriptf-flat-probe" in value:
+        return "third-order ScriptF-flat, frozen hconv/ref-air, current LW, 20 passes"
+    if "live-hconv-probe" in value:
+        return "third-order ScriptF-flat live hconv probe"
+    return value
+
+
 def build_porting_table(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     for milestone in evidence.get("porting_milestones", []):
@@ -946,17 +991,17 @@ def build_porting_table(evidence: dict[str, Any]) -> Table:
             [
                 milestone["version"],
                 milestone["title"],
-                milestone["status"],
-                milestone["claim_level"],
-                ", ".join(milestone["cases"]) or "none",
-                ", ".join(milestone["variables"]) or "none",
+                short_status_label(milestone["status"]),
+                short_claim_label(milestone["claim_level"]),
+                case_list_label(milestone["cases"]),
+                variable_list_label(milestone["variables"]),
             ]
         )
     return table(
         ["MS", "Algorithm / scope", "Status", "Claim level", "Evidence case", "Proof variables"],
         rows,
         "Porting status by milestone and evidence boundary.",
-        [0.42, 1.55, 0.72, 1.05, 1.95, 1.75],
+        [0.42, 1.75, 0.55, 0.85, 1.35, 2.1],
     )
 
 
@@ -978,7 +1023,7 @@ def build_dynamic_setup_table(dynamic: dict[str, Any]) -> Table:
         ["Outputs / series", f"{dynamic['outputs']} / {dynamic['series_count']}"],
         ["Samples", dynamic["samples"]],
         ["Zones / surfaces", f"{dynamic['zone_count']} / {dynamic['surface_count']}"],
-        ["Algorithm", dynamic["zone_air_algorithm"]],
+        ["Algorithm", heat_balance_algorithm_label(dynamic.get("zone_air_algorithm"))],
         ["Surface passes", dynamic["surface_iteration_count"]],
         ["CTF seed / initial history", f"{dynamic['ctf_seed_policy']} / {dynamic['ctf_initial_history_policy']}"],
         ["Warmup days / timesteps", f"{warmup.get('day_count', 'n/a')} / {warmup.get('timestep_count', 'n/a')}"],
