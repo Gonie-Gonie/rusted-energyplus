@@ -197,6 +197,12 @@ def number_label(value: float | int | None, digits: int = 6, suffix: str = "") -
     return f"{float(value):.{digits}f}{suffix}"
 
 
+def elapsed_label(value: float | int | None) -> str:
+    if value is None:
+        return "not rerun"
+    return number_label(value, 3, "s")
+
+
 def percent_label(numerator: float | None, denominator: float | None, digits: int = 3) -> str:
     if numerator is None or denominator in (None, 0):
         return "n/a"
@@ -350,7 +356,7 @@ def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> dict[str, Any]:
-    gate_elapsed = 0.0 if skip_gate_run else run_dev_command(repo_root, spec.command)
+    gate_elapsed = None if skip_gate_run else run_dev_command(repo_root, spec.command)
     summary_path = repo_path(repo_root, spec.summary_path)
     if not summary_path.is_file():
         raise FileNotFoundError(f"Missing conformance summary: {summary_path}")
@@ -435,6 +441,50 @@ def find_series(
         if row.get("key") == key and row.get("variable") == variable:
             return row
     return None
+
+
+def series_metric_label(series: dict[str, Any] | None) -> str:
+    if series is None:
+        return "missing"
+    return (
+        f"RMSE {compact_number_label(series.get('rmse_delta_c'))}; "
+        f"max {compact_number_label(series.get('max_abs_delta_c'))}"
+    )
+
+
+def dynamic_focus_metric_label(dynamic: dict[str, Any], key: str, variable: str) -> str:
+    if not dynamic.get("available"):
+        return "missing diagnostic"
+    return series_metric_label(find_series(dynamic.get("series", []), key, variable))
+
+
+def dynamic_rmse_tiers(series_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    tiers = [
+        ("exact", "RMSE <= 1e-9", 0.0, 1.0e-9),
+        ("very low", "1e-9 < RMSE <= 0.1", 1.0e-9, 0.1),
+        ("low", "0.1 < RMSE <= 1", 0.1, 1.0),
+        ("medium", "1 < RMSE <= 10", 1.0, 10.0),
+        ("high", "RMSE > 10", 10.0, None),
+    ]
+    rows: list[dict[str, Any]] = []
+    for label, boundary, lower, upper in tiers:
+        matched = [
+            row
+            for row in series_rows
+            if float(row.get("rmse_delta_c", 0.0)) > lower
+            and (upper is None or float(row.get("rmse_delta_c", 0.0)) <= upper)
+        ]
+        if label == "exact":
+            matched = [row for row in series_rows if float(row.get("rmse_delta_c", 0.0)) <= upper]
+        rows.append(
+            {
+                "tier": label,
+                "boundary": boundary,
+                "series_count": len(matched),
+                "share": len(matched) / len(series_rows) if series_rows else None,
+            }
+        )
+    return rows
 
 
 def load_porting_rows(repo_root: Path) -> list[dict[str, Any]]:
@@ -578,8 +628,10 @@ def load_dynamic_diagnostic(
         "gate_script": spec.command,
         "source_digest_json": spec.digest_path.replace("\\", "/"),
         "source_report_md": (summary.get("report_contract") or {}).get("path"),
+        "series": series_rows,
         "focus_series": build_dynamic_focus_rows(series_rows),
         "top_bottlenecks": top_bottlenecks,
+        "rmse_tiers": dynamic_rmse_tiers(series_rows),
         "inside_solve_source_split": build_dynamic_source_split(summary),
     }
 
@@ -783,11 +835,16 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     timing_rows = [
         {
             "id": f"C{index + 1:02d}",
-            "primary": case["gate_elapsed_seconds"],
+            "primary": case["gate_elapsed_seconds"] or 0.0,
             "secondary": case["energyplus_elapsed_seconds"] or 0.0,
         }
         for index, case in enumerate(evidence["cases"])
     ]
+    gate_timing_label = (
+        "Release gate wall-clock seconds"
+        if any(case["gate_elapsed_seconds"] is not None for case in evidence["cases"])
+        else "Release gate wall-clock not rerun"
+    )
 
     accuracy = build_dual_bar_figure(
         "Accuracy Against Declared Tolerance",
@@ -801,7 +858,7 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     timing = build_dual_bar_figure(
         "Execution Time Evidence",
         timing_rows,
-        "Release gate wall-clock seconds",
+        gate_timing_label,
         "EnergyPlus elapsed seconds",
         "Seconds",
         "#3c6e9f",
@@ -864,7 +921,7 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
                 case["heat_balance_timesteps"],
                 compact_number_label(case["max_abs_delta_c"]),
                 compact_number_label(case["rmse_delta_c"]),
-                number_label(case["gate_elapsed_seconds"], 3, "s"),
+                elapsed_label(case["gate_elapsed_seconds"]),
                 "n/a"
                 if case["energyplus_elapsed_seconds"] is None
                 else number_label(case["energyplus_elapsed_seconds"], 3, "s"),
@@ -924,7 +981,7 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
                 f"C{index:02d}",
                 case["milestone"],
                 case_label(case["case_id"]),
-                number_label(case["gate_elapsed_seconds"], 3, "s"),
+                elapsed_label(case["gate_elapsed_seconds"]),
                 "n/a"
                 if case["energyplus_elapsed_seconds"] is None
                 else number_label(case["energyplus_elapsed_seconds"], 3, "s"),
@@ -1002,6 +1059,83 @@ def build_porting_table(evidence: dict[str, Any]) -> Table:
         rows,
         "Porting status by milestone and evidence boundary.",
         [0.42, 1.75, 0.55, 0.85, 1.35, 2.1],
+    )
+
+
+def build_algorithm_porting_table(evidence: dict[str, Any]) -> Table:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    warmup = dynamic.get("heat_balance_warmup") or {}
+    rows = [
+        [
+            "Time/weather/schedule",
+            "promoted",
+            "v0.22 gates compare schedule and outdoor dry-bulb series exactly for declared variables.",
+        ],
+        [
+            "No-mass zone/surface balance",
+            "promoted subset",
+            "v0.8/v0.9/v0.25 gates cover no-mass MAT, face temperature, and conduction rows only.",
+        ],
+        [
+            "Internal convective gains",
+            "promoted subset",
+            "v0.26 gate covers declared convective gain magnitude; radiant, latent, and response coupling remain outside claim.",
+        ],
+        [
+            "1Zone zone-air update",
+            "diagnostic",
+            dynamic_focus_metric_label(dynamic, "ZONE ONE", "Zone Mean Air Temperature"),
+        ],
+        [
+            "Surface convection coupling",
+            "diagnostic",
+            dynamic_focus_metric_label(dynamic, "ZONE ONE", "Zone Air Heat Balance Surface Convection Rate"),
+        ],
+        [
+            "Mass-floor CTF storage",
+            "diagnostic bottleneck",
+            dynamic_focus_metric_label(dynamic, "ZN001:FLR001", "Surface Heat Storage Rate"),
+        ],
+        [
+            "Exterior solar/radiation",
+            "diagnostic",
+            dynamic_focus_metric_label(dynamic, "ZN001:ROOF001", "Surface Outside Face Solar Radiation Heat Gain Rate"),
+        ],
+        [
+            "Run-period warmup",
+            "diagnostic matched count",
+            (
+                f"Rust warmup days {warmup.get('day_count', 'n/a')} vs "
+                f"EnergyPlus run-period days {warmup.get('oracle_run_period_day_count', 'n/a')}; "
+                f"converged={str(warmup.get('converged', 'n/a')).lower()}."
+            ),
+        ],
+    ]
+    return table(
+        ["Algorithm area", "Porting level", "Current evidence"],
+        rows,
+        "Algorithm porting level used by the active 1Zone dynamic evidence path.",
+        [1.65, 1.05, 4.55],
+    )
+
+
+def build_dynamic_error_distribution_table(dynamic: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    if dynamic.get("available"):
+        for row in dynamic.get("rmse_tiers", []):
+            rows.append(
+                [
+                    row["tier"],
+                    row["boundary"],
+                    row["series_count"],
+                    percent_label(row["series_count"], dynamic.get("series_count"), 1),
+                ]
+            )
+    return table(
+        ["Tier", "Boundary", "Series", "Share"],
+        rows,
+        "Diagnostic RMSE distribution across all active 1Zone hourly output series. This is not a pass/fail tolerance.",
+        [0.85, 2.05, 0.65, 0.65],
     )
 
 
@@ -1102,9 +1236,9 @@ def build_dynamic_source_split_table(dynamic: dict[str, Any]) -> Table:
                 ]
             )
     return table(
-        ["Key", "Idx", "Num dW", "Tracked dW", "Cov", "Ref-air", "History", "LW", "Residual"],
+        ["Key", "Idx", "Num", "Tracked", "Cov", "Ref", "Hist", "LW", "Res"],
         rows,
-        "Inside solve max-sample source split for the current floor-storage bottleneck.",
+        "Inside solve max-sample source split for the current floor-storage bottleneck. W except coverage.",
         [0.85, 0.38, 0.62, 0.72, 0.5, 0.62, 0.62, 0.62, 0.62],
     )
 
@@ -1113,45 +1247,66 @@ def build_dynamic_timing_table(dynamic: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     if dynamic.get("available"):
         warmup = dynamic.get("heat_balance_warmup") or {}
+        gate_elapsed = dynamic.get("gate_elapsed_seconds")
+        energyplus_elapsed = dynamic.get("energyplus_elapsed_seconds")
+        rust_residual = None
+        if gate_elapsed is not None and energyplus_elapsed is not None:
+            rust_residual = max(float(gate_elapsed) - float(energyplus_elapsed), 0.0)
         rows.extend(
             [
                 [
                     "Rust warmup",
+                    "Rust",
                     warmup.get("timestep_count", "n/a"),
                     percent_label(warmup.get("timestep_count"), dynamic.get("heat_balance_timesteps"), 1),
-                    "stage elapsed not persisted",
+                    "not persisted",
+                    "loop count persisted",
                 ],
                 [
                     "Rust run period",
+                    "Rust",
                     dynamic.get("heat_balance_run_period_timesteps"),
                     percent_label(
                         dynamic.get("heat_balance_run_period_timesteps"),
                         dynamic.get("heat_balance_timesteps"),
                         1,
                     ),
-                    "stage elapsed not persisted",
+                    "not persisted",
+                    "loop count persisted",
                 ],
                 [
-                    "Rust diagnostic gate",
+                    "Rust plus compare residual",
+                    "Rust/report",
                     dynamic.get("heat_balance_timesteps"),
                     "100.0%",
-                    "n/a" if dynamic.get("gate_elapsed_seconds") is None else number_label(dynamic["gate_elapsed_seconds"], 3, "s"),
+                    "n/a" if rust_residual is None else number_label(rust_residual, 3, "s"),
+                    "gate wall minus E+ elapsed",
+                ],
+                [
+                    "Full diagnostic gate",
+                    "orchestrator",
+                    dynamic.get("heat_balance_timesteps"),
+                    "100.0%",
+                    "n/a" if gate_elapsed is None else number_label(gate_elapsed, 3, "s"),
+                    "PowerShell entrypoint wall",
                 ],
                 [
                     "EnergyPlus oracle",
+                    "EnergyPlus",
                     "n/a",
                     "n/a",
                     "n/a"
-                    if dynamic.get("energyplus_elapsed_seconds") is None
-                    else number_label(dynamic["energyplus_elapsed_seconds"], 3, "s"),
+                    if energyplus_elapsed is None
+                    else number_label(energyplus_elapsed, 3, "s"),
+                    "eplusout.end",
                 ],
             ]
         )
     return table(
-        ["Phase", "Timesteps", "Share", "Elapsed"],
+        ["Phase", "Engine", "Timesteps", "Share", "Elapsed", "Source"],
         rows,
-        "Stage timing evidence. Rust phase wall-time requires runner instrumentation beyond current artifacts.",
-        [1.7, 0.9, 0.7, 2.2],
+        "Stage timing evidence. Rust warmup/run-period wall-time still needs runtime phase timers.",
+        [1.35, 0.85, 0.72, 0.55, 0.85, 1.55],
     )
 
 
@@ -1221,7 +1376,7 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
     dynamic = evidence.get("active_dynamic_diagnostic") or {}
     settings = DocumentSettings(
         metadata_author="rusted-energyplus",
-        subtitle="Conformance, porting, and active 1Zone dynamic evidence",
+        subtitle="Algorithm porting status and active official 1Zone dynamic evidence",
         cover_page=True,
         page_margins=PageMargins(0.55, 0.55, 0.55, 0.55, unit="in"),
         theme=Theme(
@@ -1236,17 +1391,17 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         ),
     )
     return Document(
-        f"eplus-rs {version} Conformance Evidence",
+        f"eplus-rs {version} 1Zone Conformance Evidence",
         TableOfContents("Table of Contents", max_level=2),
         Chapter(
-            "Scope",
+            "Evidence Boundary",
             Box(
                 Paragraph(
-                    "This report separates promoted numerical conformance from the active official 1ZoneUncontrolled "
-                    "dynamic diagnostic. The 1Zone chapter is evidence for porting progress and bottleneck triage; it "
-                    "is not a promoted conformance claim until its manifest, tolerances, and blocking gate are updated."
+                    "Promoted numerical conformance and the active official 1ZoneUncontrolled dynamic diagnostic are "
+                    "separated. The 1Zone evidence is the current development target for EnergyPlus 26.1 parity; it is "
+                    "not promoted until the diagnostic case passes its tolerance policy under a blocking gate."
                 ),
-                title="Evidence Boundary",
+                title="Claim Boundary",
                 border_color="#2f6f9f",
                 background_color="#f4f8fb",
                 padding=0.12,
@@ -1265,72 +1420,80 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         Chapter(
             "Algorithm Porting Status",
             Paragraph(
-                "The rows below describe what has been ported to tolerance-gated evidence and what remains diagnostic. "
-                "The v0.33 row is intentionally marked diagnostic-only because the official ExampleFile dynamic path "
-                "still has material surface-balance, CTF history, solar, and convection deltas."
+                "This table is organized by the execution path used by the official 1Zone diagnostic. Rows marked "
+                "promoted are already backed by blocking conformance gates; diagnostic rows are source-mapped and "
+                "measured but still outside the release claim."
             ),
+            build_algorithm_porting_table(evidence),
             build_porting_table(evidence),
         ),
         Chapter(
-            "Promoted Conformance",
+            "1Zone Model Evidence",
             Paragraph(
-                "These cases are the current blocking conformance claims. They remain small by design: each row has a "
-                "manifest, tolerance policy, generated JSON/Markdown comparison, and a blocking gate."
-            ),
-            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
-            build_case_matrix(evidence),
-        ),
-        Chapter(
-            "1Zone Dynamic Diagnostic",
-            Paragraph(
-                "This chapter centers the official EnergyPlus 1ZoneUncontrolled ExampleFile. It compares hourly Rust "
-                "outputs against the EnergyPlus 26.1.0 oracle for visible zone variables and latent physical drivers "
-                "such as surface temperatures, convection coefficients, radiation, solar gains, and CTF conduction."
+                "The active model is the official EnergyPlus 1ZoneUncontrolled ExampleFile with hourly outputs. The "
+                "focus set intentionally includes user-visible state and latent heat-balance drivers so a good MAT "
+                "match cannot hide surface, solar, radiation, or CTF history mismatch."
             ),
             build_dynamic_setup_table(dynamic),
+            build_dynamic_error_distribution_table(dynamic),
+            build_dynamic_focus_table(dynamic),
+        ),
+        Chapter(
+            "1Zone Bottlenecks",
+            Paragraph(
+                "The remaining dominant deltas are concentrated in mass-floor storage, zone surface convection, roof "
+                "outside exchange, and aggregate opaque conduction. The source split keeps the inside-solve numerator "
+                "visible so future probes can target source ownership instead of only the reported output row."
+            ),
             Figure(
                 charts["dynamic_bottlenecks"],
                 caption="Largest 1Zone dynamic diagnostic bottlenecks by RMSE.",
                 width=6.8,
                 placement="H",
             ),
-            build_dynamic_focus_table(dynamic),
             build_dynamic_bottleneck_table(dynamic),
+        ),
+        Chapter(
+            "Inside Solve Split",
+            Paragraph(
+                "The floor-storage bottleneck is traced through the inside-face solve numerator. This split shows how "
+                "much of the implied numerator delta is covered by tracked source terms and how much remains residual."
+            ),
             build_dynamic_source_split_table(dynamic),
         ),
         PageBreak(),
         Chapter(
             "Execution Time",
             Paragraph(
-                "Promoted gate wall-clock includes oracle generation, Rust comparison, and artifact writing. "
-                "EnergyPlus elapsed time is read from eplusout.end. For the active 1Zone diagnostic, current artifacts "
-                "separate warmup and run-period timesteps but do not yet persist Rust wall-time by phase; this table "
-                "therefore records the available staged evidence and makes the missing instrumentation explicit."
+                "EnergyPlus elapsed time is read from eplusout.end. The Rust diagnostic artifact currently persists "
+                "warmup and run-period timestep counts; when the report is regenerated with the dynamic lane enabled, "
+                "the full gate wall-clock is measured and a residual Rust/report wall-clock is shown."
             ),
+            build_dynamic_timing_table(dynamic),
             Figure(
                 charts["timing"],
                 caption="Promoted gate wall-clock and EnergyPlus elapsed time.",
                 width=6.8,
                 placement="H",
             ),
-            table(
-                ["View", "Contents"],
-                [
-                    ["Promoted cases", "Gate wall-clock plus EnergyPlus elapsed for tolerance-gated cases."],
-                    ["1Zone dynamic", "Warmup/run-period timestep split, optional Rust gate wall-clock, EnergyPlus elapsed."],
-                ],
-                "Timing evidence interpretation.",
-                [1.4, 5.4],
-            ),
             build_timing_values(evidence),
-            build_dynamic_timing_table(dynamic),
         ),
         Chapter(
-            "Next Evidence Requirements",
+            "Promoted Gates",
             Paragraph(
-                "The next report-quality improvement is to persist Rust timing at warmup, run-period, surface-solve, "
-                "and report-writing boundaries. The next conformance improvement remains the active 1Zone dynamic "
-                "bottleneck: floor storage and zone surface-convection deltas before promotion."
+                "These smaller gates remain the promoted release boundary while the official dynamic ExampleFile is "
+                "being brought into tolerance. They are retained here as the baseline contract that the 1Zone work must "
+                "not regress."
+            ),
+            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
+            build_case_matrix(evidence),
+        ),
+        Chapter(
+            "Next Work",
+            Paragraph(
+                "The next report-quality improvement is to persist Rust wall-time at warmup, run-period, surface-solve, "
+                "and artifact-writing boundaries. The next numerical target remains the 1Zone dynamic bottleneck: mass "
+                "floor CTF storage/history and zone surface-convection closure before promotion."
             ),
             build_artifact_paths(evidence),
         ),
