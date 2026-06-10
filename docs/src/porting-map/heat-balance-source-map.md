@@ -621,6 +621,15 @@ Current Rust boundary:
   remaining mass-floor storage work should therefore target the warmup/run-period
   history handoff and coupled source update order rather than another outside
   report sign flip.
+- The active 1Zone dynamic lane now emits signed inside-solve CTF current and
+  history source splits at each surface storage max sample. For `ZN001:FLR001`
+  sample 2435, the aggregate history delta (`+312.812546 W`) decomposes as
+  inside conduction signed delta (`-150.334642 W`) minus current CTF signed
+  delta (`-463.147188 W`). The current CTF split shows only `+4.714888 W`
+  outside-current mismatch but `-467.862076 W` inside-current mismatch, so the
+  next floor-storage work should inspect inside current-term temperature
+  alignment/update timing before treating the remaining error as pure history
+  handoff.
 - `ep_model` and `ep_compiler` preserve material surface roughness names using
   EnergyPlus roughness categories so future DOE-2/TARP exterior convection
   ports can use the selected outside layer metadata directly.

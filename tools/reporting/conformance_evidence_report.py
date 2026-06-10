@@ -560,6 +560,12 @@ def build_dynamic_source_split(summary: dict[str, Any]) -> list[dict[str, Any]]:
                 "reference_air_temperature_source_signed_delta_w": sample.get(
                     "reference_air_temperature_source_signed_delta_w"
                 ),
+                "inside_conduction_signed_delta_w": sample.get("inside_conduction_signed_delta_w"),
+                "inside_current_signed_delta_w": sample.get("inside_current_signed_delta_w"),
+                "inside_current_cancellation_delta_w": sample.get(
+                    "inside_current_cancellation_delta_w"
+                ),
+                "inside_history_signed_delta_w": sample.get("inside_history_signed_delta_w"),
                 "inside_history_delta_w": sample.get("inside_history_delta_w"),
                 "inside_net_longwave_delta_w": sample.get("inside_net_longwave_delta_w"),
                 "solve_source_residual_delta_w": sample.get("solve_source_residual_delta_w"),
@@ -1230,16 +1236,20 @@ def build_dynamic_source_split_table(dynamic: dict[str, Any]) -> Table:
                     compact_number_label(row["tracked_solve_source_delta_w"]),
                     percent_label(row["tracked_solve_source_delta_w"], row["implied_solve_numerator_delta_w"], 1),
                     compact_number_label(row["reference_air_source_delta_w"]),
+                    compact_number_label(row["inside_conduction_signed_delta_w"]),
+                    compact_number_label(row["inside_current_signed_delta_w"]),
+                    compact_number_label(row["inside_current_cancellation_delta_w"]),
+                    compact_number_label(row["inside_history_signed_delta_w"]),
                     compact_number_label(row["inside_history_delta_w"]),
                     compact_number_label(row["inside_net_longwave_delta_w"]),
                     compact_number_label(row["solve_source_residual_delta_w"]),
                 ]
             )
     return table(
-        ["Key", "Idx", "Num", "Tracked", "Cov", "Ref", "Hist", "LW", "Res"],
+        ["Key", "Idx", "Num", "Tracked", "Cov", "Ref", "CondS", "CurS", "CurCancel", "HistS", "Hist", "LW", "Res"],
         rows,
-        "Inside solve max-sample source split for the current floor-storage bottleneck. W except coverage.",
-        [0.85, 0.38, 0.62, 0.72, 0.5, 0.62, 0.62, 0.62, 0.62],
+        "Inside solve max-sample source split for the current floor-storage bottleneck. Signed current/history columns separate CTF current alignment from history handoff. W except coverage.",
+        [0.78, 0.35, 0.58, 0.68, 0.45, 0.55, 0.55, 0.55, 0.62, 0.55, 0.55, 0.52, 0.52],
     )
 
 
