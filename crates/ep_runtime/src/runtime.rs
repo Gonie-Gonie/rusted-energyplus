@@ -4561,7 +4561,6 @@ fn heat_balance_uses_previous_mat_surface_convection_report(
 fn heat_balance_uses_balance_surface_convection_report(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> bool {
-    let zone_air_algorithm = heat_balance_zone_air_algorithm_feature_base(zone_air_algorithm);
     matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionProbe
@@ -10759,6 +10758,7 @@ mod tests {
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
         energyplus_zone_air_heat_capacity_j_per_k, energyplus_zone_air_temperature_coefficients,
         exterior_surface_energy_balance, fix_energyplus_approximate_view_factors,
+        heat_balance_uses_balance_surface_convection_report,
         heat_balance_uses_doe2_outside_convection,
         heat_balance_uses_surface_reference_air_convection_report,
         heat_balance_uses_surface_reference_air_surface_convection_report,
@@ -13372,6 +13372,14 @@ DATA PERIODS
         );
         let scriptf_flat_probe =
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe;
+        let converged_surface_probe =
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe;
+        assert!(heat_balance_uses_balance_surface_convection_report(
+            converged_surface_probe
+        ));
+        assert!(!heat_balance_uses_balance_surface_convection_report(
+            scriptf_flat_probe
+        ));
         assert!(
             heat_balance_uses_surface_reference_air_surface_convection_report(scriptf_flat_probe)
         );
