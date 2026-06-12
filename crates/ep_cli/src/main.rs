@@ -3268,6 +3268,8 @@ struct HeatBalanceConformanceDiagnostic {
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
     zone_air_coefficient_deltas: Vec<HeatBalanceZoneAirCoefficientDelta>,
+    zone_air_surface_convection_closure_deltas:
+        Vec<HeatBalanceZoneAirSurfaceConvectionClosureDelta>,
     zone_air_surface_coefficient_deltas: Vec<HeatBalanceZoneAirSurfaceCoefficientDelta>,
     ctf_history_first_sample_deltas: Vec<HeatBalanceCtfHistoryFirstSampleDelta>,
     ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
@@ -3301,6 +3303,18 @@ struct HeatBalanceZoneAirCoefficientDelta {
     mat_delta: DeltaSummary,
     air_storage_delta: DeltaSummary,
     surface_convection_delta: DeltaSummary,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceZoneAirSurfaceConvectionClosureDelta {
+    key: String,
+    surface_count: usize,
+    samples: usize,
+    zone_surface_convection_delta: DeltaSummary,
+    surface_report_sum_delta: DeltaSummary,
+    oracle_closure_residual: DeltaSummary,
+    rust_closure_residual: DeltaSummary,
+    closure_residual_delta: DeltaSummary,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -4015,6 +4029,8 @@ fn build_heat_balance_conformance_diagnostic(
     let ctf_component_first_samples = heat_balance_ctf_component_first_samples(&simulation.results);
     let zone_air_coefficient_deltas =
         heat_balance_zone_air_coefficient_deltas(&simulation_model, &series);
+    let zone_air_surface_convection_closure_deltas =
+        heat_balance_zone_air_surface_convection_closure_deltas(&simulation_model, &series);
     let zone_air_surface_coefficient_deltas =
         heat_balance_zone_air_surface_coefficient_deltas(&simulation_model, &series);
     let ctf_history_first_sample_deltas = heat_balance_ctf_history_first_sample_deltas(
@@ -4080,6 +4096,7 @@ fn build_heat_balance_conformance_diagnostic(
         surface_count: simulation.summary.surface_count,
         ctf_component_first_samples,
         zone_air_coefficient_deltas,
+        zone_air_surface_convection_closure_deltas,
         zone_air_surface_coefficient_deltas,
         ctf_history_first_sample_deltas,
         ctf_history_series_deltas,
@@ -4390,6 +4407,97 @@ fn heat_balance_zone_air_coefficient_deltas(
                 surface_convection_delta: delta_summary(
                     &surface_convection_oracle,
                     &surface_convection_rust,
+                ),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_zone_air_surface_convection_closure_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<HeatBalanceZoneAirSurfaceConvectionClosureDelta> {
+    model
+        .typed
+        .zones
+        .iter()
+        .filter_map(|zone| {
+            let zone_surface_convection = heat_balance_series(
+                series,
+                &zone.name.0,
+                "Zone Air Heat Balance Surface Convection Rate",
+            )?;
+            let surfaces = model
+                .typed
+                .surfaces
+                .iter()
+                .filter(|surface| surface.zone == zone.id)
+                .filter_map(|surface| {
+                    heat_balance_series(
+                        series,
+                        &surface.name.0,
+                        "Surface Inside Face Convection Heat Gain Rate",
+                    )
+                })
+                .collect::<Vec<_>>();
+            if surfaces.is_empty() {
+                return None;
+            }
+
+            let samples = surfaces
+                .iter()
+                .map(|surface| surface.samples)
+                .chain(std::iter::once(zone_surface_convection.samples))
+                .min()
+                .unwrap_or(0);
+            if samples == 0 {
+                return None;
+            }
+
+            let mut oracle_zone_surface_convection = Vec::with_capacity(samples);
+            let mut rust_zone_surface_convection = Vec::with_capacity(samples);
+            let mut oracle_surface_report_sum = Vec::with_capacity(samples);
+            let mut rust_surface_report_sum = Vec::with_capacity(samples);
+            let mut oracle_closure_residual = Vec::with_capacity(samples);
+            let mut rust_closure_residual = Vec::with_capacity(samples);
+            let zero = vec![0.0; samples];
+
+            for sample_index in 0..samples {
+                let oracle_zone = zone_surface_convection.sample_rows[sample_index].oracle_c;
+                let rust_zone = zone_surface_convection.sample_rows[sample_index].rust_c;
+                let oracle_surface_sum = surfaces
+                    .iter()
+                    .map(|surface| surface.sample_rows[sample_index].oracle_c)
+                    .sum::<f64>();
+                let rust_surface_sum = surfaces
+                    .iter()
+                    .map(|surface| surface.sample_rows[sample_index].rust_c)
+                    .sum::<f64>();
+                oracle_zone_surface_convection.push(oracle_zone);
+                rust_zone_surface_convection.push(rust_zone);
+                oracle_surface_report_sum.push(oracle_surface_sum);
+                rust_surface_report_sum.push(rust_surface_sum);
+                oracle_closure_residual.push(oracle_zone + oracle_surface_sum);
+                rust_closure_residual.push(rust_zone + rust_surface_sum);
+            }
+
+            Some(HeatBalanceZoneAirSurfaceConvectionClosureDelta {
+                key: zone.name.0.clone(),
+                surface_count: surfaces.len(),
+                samples,
+                zone_surface_convection_delta: delta_summary(
+                    &oracle_zone_surface_convection,
+                    &rust_zone_surface_convection,
+                ),
+                surface_report_sum_delta: delta_summary(
+                    &oracle_surface_report_sum,
+                    &rust_surface_report_sum,
+                ),
+                oracle_closure_residual: delta_summary(&zero, &oracle_closure_residual),
+                rust_closure_residual: delta_summary(&zero, &rust_closure_residual),
+                closure_residual_delta: delta_summary(
+                    &oracle_closure_residual,
+                    &rust_closure_residual,
                 ),
             })
         })
@@ -8293,6 +8401,12 @@ fn render_heat_balance_conformance_json(
         heat_balance_zone_air_coefficient_deltas_json(&diagnostic.zone_air_coefficient_deltas)
     ));
     json.push_str(&format!(
+        "  \"zone_air_surface_convection_closure_deltas\": {},\n",
+        heat_balance_zone_air_surface_convection_closure_deltas_json(
+            &diagnostic.zone_air_surface_convection_closure_deltas
+        )
+    ));
+    json.push_str(&format!(
         "  \"zone_air_surface_coefficient_deltas\": {},\n",
         heat_balance_zone_air_surface_coefficient_deltas_json(
             &diagnostic.zone_air_surface_coefficient_deltas
@@ -8556,6 +8670,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_zone_air_coefficient_delta_rows(
         &mut report,
         &diagnostic.zone_air_coefficient_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Zone-Air Surface Convection Closure Deltas\n\n");
+    heat_balance_report_zone_air_surface_convection_closure_delta_rows(
+        &mut report,
+        &diagnostic.zone_air_surface_convection_closure_deltas,
     );
     report.push('\n');
 
@@ -9245,6 +9366,39 @@ fn heat_balance_zone_air_coefficient_deltas_json(
             delta_summary_json(&row.mat_delta),
             delta_summary_json(&row.air_storage_delta),
             delta_summary_json(&row.surface_convection_delta)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_zone_air_surface_convection_closure_deltas_json(
+    rows: &[HeatBalanceZoneAirSurfaceConvectionClosureDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"surface_count\": {}, ",
+                "\"samples\": {}, ",
+                "\"zone_surface_convection_delta\": {}, ",
+                "\"surface_report_sum_delta\": {}, ",
+                "\"oracle_closure_residual\": {}, ",
+                "\"rust_closure_residual\": {}, ",
+                "\"closure_residual_delta\": {} }}"
+            ),
+            json_string(&row.key),
+            row.surface_count,
+            row.samples,
+            delta_summary_json(&row.zone_surface_convection_delta),
+            delta_summary_json(&row.surface_report_sum_delta),
+            delta_summary_json(&row.oracle_closure_residual),
+            delta_summary_json(&row.rust_closure_residual),
+            delta_summary_json(&row.closure_residual_delta)
         ));
     }
     json.push(']');
@@ -10334,6 +10488,34 @@ fn heat_balance_report_zone_air_coefficient_delta_rows(
             row.mat_delta.max_abs_delta_c,
             row.air_storage_delta.max_abs_delta_c,
             row.surface_convection_delta.max_abs_delta_c
+        ));
+    }
+}
+
+fn heat_balance_report_zone_air_surface_convection_closure_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceZoneAirSurfaceConvectionClosureDelta],
+) {
+    report.push_str(
+        "| key | surfaces | samples | zone_surface_conv_rmse_w | surface_report_sum_rmse_w | oracle_closure_rmse_w | rust_closure_rmse_w | closure_delta_rmse_w | zone_surface_conv_max_w | surface_report_sum_max_w | oracle_closure_max_w | rust_closure_max_w | closure_delta_max_w |\n",
+    );
+    report.push_str("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            row.surface_count,
+            row.samples,
+            row.zone_surface_convection_delta.rmse_delta_c,
+            row.surface_report_sum_delta.rmse_delta_c,
+            row.oracle_closure_residual.rmse_delta_c,
+            row.rust_closure_residual.rmse_delta_c,
+            row.closure_residual_delta.rmse_delta_c,
+            row.zone_surface_convection_delta.max_abs_delta_c,
+            row.surface_report_sum_delta.max_abs_delta_c,
+            row.oracle_closure_residual.max_abs_delta_c,
+            row.rust_closure_residual.max_abs_delta_c,
+            row.closure_residual_delta.max_abs_delta_c
         ));
     }
 }
@@ -11519,6 +11701,20 @@ mod tests {
         }
     }
 
+    fn sample_zone_air_surface_convection_closure_delta()
+    -> super::HeatBalanceZoneAirSurfaceConvectionClosureDelta {
+        super::HeatBalanceZoneAirSurfaceConvectionClosureDelta {
+            key: "ZONE ONE".to_string(),
+            surface_count: 6,
+            samples: 2,
+            zone_surface_convection_delta: super::delta_summary(&[3.0, 4.0], &[2.5, 4.5]),
+            surface_report_sum_delta: super::delta_summary(&[-2.0, -3.0], &[-1.0, -4.0]),
+            oracle_closure_residual: super::delta_summary(&[0.0, 0.0], &[1.0, 1.0]),
+            rust_closure_residual: super::delta_summary(&[0.0, 0.0], &[1.5, 0.5]),
+            closure_residual_delta: super::delta_summary(&[1.0, 1.0], &[1.5, 0.5]),
+        }
+    }
+
     #[test]
     fn version_command_succeeds() {
         let args = vec!["--version".to_string()];
@@ -12248,6 +12444,9 @@ mod tests {
                 heat_storage_rate_w: 0.0,
             }],
             zone_air_coefficient_deltas: vec![sample_zone_air_coefficient_delta()],
+            zone_air_surface_convection_closure_deltas: vec![
+                sample_zone_air_surface_convection_closure_delta(),
+            ],
             zone_air_surface_coefficient_deltas: vec![sample_zone_air_surface_coefficient_delta()],
             ctf_history_first_sample_deltas: vec![super::HeatBalanceCtfHistoryFirstSampleDelta {
                 key: "FLOOR".to_string(),
@@ -12701,6 +12900,9 @@ mod tests {
         assert!(json.contains("\"sum_ha_delta\""));
         assert!(json.contains("\"temp_dependent_coefficient_delta\""));
         assert!(json.contains("\"temp_history_term_delta\""));
+        assert!(json.contains("\"zone_air_surface_convection_closure_deltas\""));
+        assert!(json.contains("\"surface_report_sum_delta\""));
+        assert!(json.contains("\"closure_residual_delta\""));
         assert!(json.contains("\"zone_air_surface_coefficient_deltas\""));
         assert!(json.contains("\"sum_hat_ref_delta\""));
         assert!(json.contains("\"reference_air_temperature_delta\""));
@@ -12787,6 +12989,9 @@ mod tests {
         assert!(digest.contains("\"sum_ha_delta\""));
         assert!(digest.contains("\"temp_dependent_coefficient_delta\""));
         assert!(digest.contains("\"temp_history_term_delta\""));
+        assert!(digest.contains("\"zone_air_surface_convection_closure_deltas\""));
+        assert!(digest.contains("\"surface_report_sum_delta\""));
+        assert!(digest.contains("\"closure_residual_delta\""));
         assert!(digest.contains("\"zone_air_surface_coefficient_deltas\""));
         assert!(digest.contains("\"sum_hat_ref_delta\""));
         assert!(digest.contains("\"reference_air_temperature_delta\""));
@@ -12883,6 +13088,8 @@ mod tests {
         assert!(report.contains("SumHA_rmse"));
         assert!(report.contains("SumHATsurf_rmse"));
         assert!(report.contains("SumHATref_rmse"));
+        assert!(report.contains("## Zone-Air Surface Convection Closure Deltas"));
+        assert!(report.contains("closure_delta_rmse_w"));
         assert!(report.contains("## Zone-Air Surface Coefficient Deltas"));
         assert!(report.contains("ref_air_temp_rmse"));
         assert!(report.contains("inside_conv_gain_rmse"));
@@ -12996,6 +13203,9 @@ mod tests {
                 heat_storage_rate_w: 1.0,
             }],
             zone_air_coefficient_deltas: vec![sample_zone_air_coefficient_delta()],
+            zone_air_surface_convection_closure_deltas: vec![
+                sample_zone_air_surface_convection_closure_delta(),
+            ],
             zone_air_surface_coefficient_deltas: vec![sample_zone_air_surface_coefficient_delta()],
             ctf_history_first_sample_deltas: vec![super::HeatBalanceCtfHistoryFirstSampleDelta {
                 key: "FLOOR".to_string(),
@@ -13417,6 +13627,9 @@ mod tests {
         assert!(json.contains("\"sum_ha_delta\""));
         assert!(json.contains("\"temp_dependent_coefficient_delta\""));
         assert!(json.contains("\"temp_history_term_delta\""));
+        assert!(json.contains("\"zone_air_surface_convection_closure_deltas\""));
+        assert!(json.contains("\"surface_report_sum_delta\""));
+        assert!(json.contains("\"closure_residual_delta\""));
         assert!(json.contains("\"zone_air_surface_coefficient_deltas\""));
         assert!(json.contains("\"sum_hat_ref_delta\""));
         assert!(json.contains("\"reference_air_temperature_delta\""));
@@ -13491,6 +13704,9 @@ mod tests {
         assert!(digest.contains("\"sum_ha_delta\""));
         assert!(digest.contains("\"temp_dependent_coefficient_delta\""));
         assert!(digest.contains("\"temp_history_term_delta\""));
+        assert!(digest.contains("\"zone_air_surface_convection_closure_deltas\""));
+        assert!(digest.contains("\"surface_report_sum_delta\""));
+        assert!(digest.contains("\"closure_residual_delta\""));
         assert!(digest.contains("\"zone_air_surface_coefficient_deltas\""));
         assert!(digest.contains("\"sum_hat_ref_delta\""));
         assert!(digest.contains("\"reference_air_temperature_delta\""));
@@ -13582,6 +13798,8 @@ mod tests {
         assert!(report.contains("SumHA_rmse"));
         assert!(report.contains("SumHATsurf_rmse"));
         assert!(report.contains("SumHATref_rmse"));
+        assert!(report.contains("## Zone-Air Surface Convection Closure Deltas"));
+        assert!(report.contains("closure_delta_rmse_w"));
         assert!(report.contains("## Zone-Air Surface Coefficient Deltas"));
         assert!(report.contains("ref_air_temp_rmse"));
         assert!(report.contains("inside_conv_gain_rmse"));

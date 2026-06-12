@@ -298,6 +298,8 @@ Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHist
 Assert-Contains -Text $digestText -Pattern '"zone_air_coefficient_deltas"' -Description "compact digest zone-air coefficient diagnostics"
 Assert-Contains -Text $digestText -Pattern '"temp_dependent_coefficient_delta"' -Description "compact digest zone-air TempDepCoef delta"
 Assert-Contains -Text $digestText -Pattern '"temp_history_term_delta"' -Description "compact digest zone-air history-term delta"
+Assert-Contains -Text $digestText -Pattern '"zone_air_surface_convection_closure_deltas"' -Description "compact digest zone-air surface convection closure diagnostics"
+Assert-Contains -Text $digestText -Pattern '"closure_residual_delta"' -Description "compact digest zone-air surface convection closure residual delta"
 Assert-Contains -Text $digestText -Pattern '"zone_air_surface_coefficient_deltas"' -Description "compact digest zone-air surface coefficient diagnostics"
 Assert-Contains -Text $digestText -Pattern '"reference_air_temperature_delta"' -Description "compact digest zone-air surface reference-air temperature delta"
 $summary = $digestText | ConvertFrom-Json
@@ -503,6 +505,33 @@ if ([double]$zoneAirCoefficientDelta.temp_dependent_coefficient_delta.rmse_delta
 }
 if ([double]$zoneAirCoefficientDelta.temp_history_term_delta.rmse_delta_c -lt 0.0) {
     throw "Expected TempHistoryTerm RMSE to be numeric"
+}
+$zoneAirSurfaceConvectionClosureDelta = @($summary.zone_air_surface_convection_closure_deltas | Where-Object { $_.key -eq "ZONE ONE" })[0]
+if ($null -eq $zoneAirSurfaceConvectionClosureDelta) {
+    throw "Expected zone_air_surface_convection_closure_deltas to include ZONE ONE"
+}
+if ([int]$zoneAirSurfaceConvectionClosureDelta.samples -ne 8760) {
+    throw "Expected ZONE ONE surface-convection closure row to use 8760 samples, got $($zoneAirSurfaceConvectionClosureDelta.samples)"
+}
+if ([int]$zoneAirSurfaceConvectionClosureDelta.surface_count -lt 6) {
+    throw "Expected ZONE ONE surface-convection closure row to include six opaque surfaces, got $($zoneAirSurfaceConvectionClosureDelta.surface_count)"
+}
+foreach ($propertyName in @(
+        "zone_surface_convection_delta",
+        "surface_report_sum_delta",
+        "oracle_closure_residual",
+        "rust_closure_residual",
+        "closure_residual_delta"
+    )) {
+    if ($zoneAirSurfaceConvectionClosureDelta.PSObject.Properties.Name -notcontains $propertyName) {
+        throw "Expected ZONE ONE surface-convection closure row to include $propertyName"
+    }
+}
+if ([double]$zoneAirSurfaceConvectionClosureDelta.oracle_closure_residual.rmse_delta_c -le 0.0) {
+    throw "Expected oracle surface-convection closure residual to stay visible, got $($zoneAirSurfaceConvectionClosureDelta.oracle_closure_residual.rmse_delta_c)"
+}
+if ([double]$zoneAirSurfaceConvectionClosureDelta.closure_residual_delta.rmse_delta_c -lt 0.0) {
+    throw "Expected closure residual delta RMSE to be numeric"
 }
 $zoneAirSurfaceCoefficientDeltas = @($summary.zone_air_surface_coefficient_deltas)
 if ($zoneAirSurfaceCoefficientDeltas.Count -lt 6) {
@@ -1046,6 +1075,8 @@ Assert-Contains -Text $reportText -Pattern "TempDepCoef_rmse" -Description "mark
 Assert-Contains -Text $reportText -Pattern "TempIndCoef_rmse" -Description "markdown zone-air TempIndCoef RMSE column"
 Assert-Contains -Text $reportText -Pattern "AirPowerCap_rmse" -Description "markdown zone-air AirPowerCap RMSE column"
 Assert-Contains -Text $reportText -Pattern "TempHistoryTerm_rmse" -Description "markdown zone-air TempHistoryTerm RMSE column"
+Assert-Contains -Text $reportText -Pattern "## Zone-Air Surface Convection Closure Deltas" -Description "markdown zone-air surface convection closure section"
+Assert-Contains -Text $reportText -Pattern "closure_delta_rmse_w" -Description "markdown zone-air surface convection closure delta column"
 Assert-Contains -Text $reportText -Pattern "## Zone-Air Surface Coefficient Deltas" -Description "markdown zone-air surface coefficient delta section"
 Assert-Contains -Text $reportText -Pattern "ref_air_temp_rmse" -Description "markdown zone-air surface reference-air temperature RMSE column"
 Assert-Contains -Text $reportText -Pattern "inside_conv_gain_rmse" -Description "markdown zone-air surface convection gain RMSE column"

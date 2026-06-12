@@ -179,8 +179,8 @@ therefore keep the adiabatic outside report state on the pre-sync outside
 snapshot; the remaining floor storage gap is not a missing current-inside
 outside-face report sync.
 
-The dynamic probe summary now also tracks zone surface-convection report
-closure against the signed sum of individual
+The official dynamic diagnostic digest/report now tracks zone
+surface-convection report closure against the signed sum of individual
 `Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`). On
 the active ScriptF-flat lane the six-surface closure has oracle RMSE
 `67.733212 W`, Rust RMSE `30.140119 W`, and residual-delta RMSE `47.307560 W`.
