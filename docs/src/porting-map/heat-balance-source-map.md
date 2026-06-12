@@ -630,6 +630,14 @@ Current Rust boundary:
   next floor-storage work should inspect inside current-term temperature
   alignment/update timing before treating the remaining error as pure history
   handoff.
+- Re-running the `hconv-reeval2` candidate with the signed split lowers the
+  active top RMSE from `28.786920` to `27.005834` W on floor storage, but it is
+  not promotion-ready: MAT RMSE rises from `0.037329` to `0.037718 C`, floor
+  inside-convection RMSE rises from `13.602803` to `17.038813 W`, and the
+  max-sample history/current split shifts to sample 1091 with reference-air
+  cancellation (`-2.107333 W` total from `79.069518 W` absolute split) while
+  current-inside mismatch remains dominant (`-542.690944 W`). Treat this as a
+  diagnostic lane for hconv/source coupling, not the next active algorithm.
 - `ep_model` and `ep_compiler` preserve material surface roughness names using
   EnergyPlus roughness categories so future DOE-2/TARP exterior convection
   ports can use the selected outside layer metadata directly.
