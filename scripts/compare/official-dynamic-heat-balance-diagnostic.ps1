@@ -498,6 +498,25 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([double]$floorStorageMaxSampleDelta.storage_delta_w -le 0.0) {
         throw "Expected floor storage max-sample CTF delta to retain visible storage_delta_w"
     }
+    foreach ($propertyName in @(
+            "storage_delta_rank",
+            "dominant_storage_surface",
+            "inside_current_outside_term_signed_delta_w",
+            "inside_current_inside_term_signed_delta_w",
+            "inside_current_split_abs_sum_w",
+            "rust_inside_history_temperature_term_w",
+            "rust_inside_history_flux_term_w"
+        )) {
+        if ($floorStorageMaxSampleDelta.PSObject.Properties.Name -notcontains $propertyName) {
+            throw "Expected FLOOR storage max-sample row to include $propertyName"
+        }
+    }
+    if ([int]$floorStorageMaxSampleDelta.storage_delta_rank -ne 1) {
+        throw "Expected FLOOR to be the dominant storage max-sample CTF row, got rank $($floorStorageMaxSampleDelta.storage_delta_rank)"
+    }
+    if (-not [bool]$floorStorageMaxSampleDelta.dominant_storage_surface) {
+        throw "Expected FLOOR storage max-sample row to be marked dominant"
+    }
     $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideBalanceMaxSampleDelta) {
         throw "Expected inside_balance_max_sample_deltas to include ZN001:FLR001 in all-eio mode"
@@ -912,6 +931,11 @@ Assert-Contains -Text $reportText -Pattern "in_history_rmse_w" -Description "mar
 Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "markdown CTF outside history series RMSE column"
 Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -Description "markdown CTF storage max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "storage_delta_w" -Description "markdown CTF storage max-sample delta column"
+Assert-Contains -Text $reportText -Pattern "dominant" -Description "markdown CTF storage dominant column"
+Assert-Contains -Text $reportText -Pattern "current_out_signed_w" -Description "markdown CTF storage current outside split column"
+Assert-Contains -Text $reportText -Pattern "current_in_signed_w" -Description "markdown CTF storage current inside split column"
+Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown CTF storage history temperature split column"
+Assert-Contains -Text $reportText -Pattern "rust_history_flux_w" -Description "markdown CTF storage history flux split column"
 Assert-Contains -Text $reportText -Pattern "## Inside Balance Max-Sample Deltas" -Description "markdown inside-balance max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "residual_delta_w" -Description "markdown inside-balance residual delta column"
 Assert-Contains -Text $reportText -Pattern "## Inside Solve Max-Sample Deltas" -Description "markdown inside-solve max-sample delta section"
