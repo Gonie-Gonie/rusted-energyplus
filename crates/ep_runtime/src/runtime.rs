@@ -64,6 +64,9 @@ pub const SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE: &str =
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
 pub const SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE: &str =
     "Surface CTF Outside Face History Term Rate";
+/// Diagnostic/report variable for EnergyPlus inside surface heat-balance iteration count.
+pub const SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE: &str =
+    "Surface Inside Face Heat Balance Calculation Iteration Count";
 
 /// EnergyPlus `SensedNodeFlagValue` used for unset node temperature setpoints.
 pub const NODE_TEMPERATURE_SETPOINT_SENTINEL_C: f64 = -999.0;
@@ -623,6 +626,8 @@ pub struct HeatBalanceState {
     pub surfaces: Vec<SurfaceHeatBalanceState>,
     /// Most recent per-slot CTF history terms, captured before CTF histories advance.
     pub last_ctf_history_slot_terms: Vec<HeatBalanceCtfHistorySlotSample>,
+    /// Most recent inside surface heat-balance iteration count.
+    pub last_inside_surface_iteration_count: u32,
 }
 
 /// One per-slot CTF history contribution captured for a heat-balance timestep.
@@ -3152,6 +3157,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         zones,
         surfaces,
         last_ctf_history_slot_terms: Vec::new(),
+        last_inside_surface_iteration_count: 0,
     })
 }
 
@@ -3850,12 +3856,17 @@ fn advance_heat_balance_state_one_timestep_internal(
         use_inside_ctf_outside_temperature_for_conduction_report,
     );
 
+    state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
+        .as_ref()
+        .map(|result| result.inside_surface_iteration_count)
+        .unwrap_or_else(|| surface_iteration_count.max(1));
     state.timestep_index += 1;
 }
 
 #[derive(Default)]
 struct InterleavedSurfaceZoneBalanceResult {
     inside_ctf_outside_temperature_snapshots: Option<BTreeMap<SurfaceId, f64>>,
+    inside_surface_iteration_count: u32,
 }
 
 fn run_interleaved_surface_zone_balance(
@@ -3909,8 +3920,10 @@ fn run_interleaved_surface_zone_balance(
         BTreeMap<SurfaceId, SurfaceBoundaryBalanceResult>,
     > = None;
     let mut frozen_inside_ctf_outside_temperatures: Option<BTreeMap<SurfaceId, f64>> = None;
+    let mut inside_surface_iteration_count = 0;
 
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
+        inside_surface_iteration_count = surface_iteration_index + 1;
         let pass_start_inside_temperatures = if converge_surface_iterations_to_energyplus_tolerance
         {
             Some(
@@ -4031,6 +4044,7 @@ fn run_interleaved_surface_zone_balance(
 
     InterleavedSurfaceZoneBalanceResult {
         inside_ctf_outside_temperature_snapshots: frozen_inside_ctf_outside_temperatures,
+        inside_surface_iteration_count,
     }
 }
 
@@ -4766,6 +4780,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
         })
         .collect::<Vec<_>>();
+    let mut inside_surface_iteration_counts = Vec::with_capacity(options.sample_count);
     let mut zone_air_heat_balance_rates = state
         .zones
         .iter()
@@ -4861,6 +4876,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut zone_temperature_sums = vec![0.0; zone_temperatures.len()];
         let mut zone_conduction_sums =
             vec![(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); zone_conduction_rates.len()];
+        let mut inside_surface_iteration_count_sum = 0.0;
         let mut zone_air_heat_balance_sums =
             vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
         let mut zone_air_heat_balance_last =
@@ -4956,6 +4972,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     zone_conduction_sums[index].5 += heat_loss_rate_w(outside_rate);
                 }
             }
+            inside_surface_iteration_count_sum +=
+                f64::from(state.last_inside_surface_iteration_count);
             for (index, (zone_id, _zone_name, _internal, _surface, _storage)) in
                 zone_air_heat_balance_rates.iter().enumerate()
             {
@@ -5186,6 +5204,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace.outside_conduction_gain_rate_w.push(sums.4 / divisor);
             trace.outside_conduction_loss_rate_w.push(sums.5 / divisor);
         }
+        inside_surface_iteration_counts.push(inside_surface_iteration_count_sum);
         for (
             index,
             (
@@ -5381,6 +5400,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         });
         handle_index += 1;
     }
+    results.add_series(OutputSeries {
+        handle: OutputHandle(handle_index),
+        key: "Simulation".to_string(),
+        variable_name: SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE.to_string(),
+        units: String::new(),
+        values: inside_surface_iteration_counts,
+    });
+    handle_index += 1;
     for (
         _zone_id,
         zone_name,
@@ -13313,7 +13340,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 203);
+        assert_eq!(simulation.results.series.len(), 204);
 
         let Some(zone_series) = simulation
             .results
@@ -13332,6 +13359,13 @@ DATA PERIODS
             return Err(std::io::Error::other("missing inside convection series").into());
         };
         assert_eq!(inside_convection_series.values.len(), 2);
+        let Some(iteration_count_series) = simulation.results.find_series(
+            "Simulation",
+            super::SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing inside surface iteration count").into());
+        };
+        assert_eq!(iteration_count_series.values, vec![6.0, 6.0]);
 
         let Some(weather_series) = simulation
             .results

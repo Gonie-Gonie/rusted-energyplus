@@ -42,7 +42,8 @@ use ep_runtime::{
     SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
-    SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE, SimulationMode, SurfaceGeometrySummary,
+    SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
+    SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE, SimulationMode, SurfaceGeometrySummary,
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
     build_hourly_time_axis, energyplus_heat_balance_compatibility_stages, load_epw_dry_bulb_series,
     load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
@@ -3854,6 +3855,7 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
             .eq_ignore_ascii_case("Zone Opaque Surface Outside Faces Conduction Heat Gain Rate")
         || variable
             .eq_ignore_ascii_case("Zone Opaque Surface Outside Faces Conduction Heat Loss Rate")
+        || variable.eq_ignore_ascii_case(SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE)
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Internal Convective Heat Gain Rate")
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Surface Convection Rate")
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Air Energy Storage Rate")

@@ -948,6 +948,15 @@ source = "eso"
 domain = "surface"
 level = "diagnostic"
 
+[[outputs]]
+key = "Simulation"
+variable = "Surface Inside Face Heat Balance Calculation Iteration Count"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
 [[tolerances]]
 variable_class = "zone-state"
 max_abs = 0.000001

@@ -414,7 +414,7 @@ else {
         throw "Expected all-eio policy to mark FLOOR CTF summary as included"
     }
 }
-if ($summary.series_count -ne 99) {
+if ($summary.series_count -ne 100) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
@@ -842,6 +842,11 @@ $expectedTopCandidates = @(
         Description = "zone outside opaque conduction aggregate"
     },
     @{
+        Key = "Simulation"
+        Variable = "Surface Inside Face Heat Balance Calculation Iteration Count"
+        Description = "inside surface heat-balance iteration count"
+    },
+    @{
         Key = "ZN001:ROOF001"
         Variable = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
         Description = "roof inside net surface thermal radiation heat gain"
@@ -996,6 +1001,9 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque S
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Opaque Surface Outside Faces Conduction Heat Loss Rate series"
+}
+if (-not ($summary.series | Where-Object { $_.output.key -eq "Simulation" -and $_.output.variable -eq "Surface Inside Face Heat Balance Calculation Iteration Count" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Surface Inside Face Heat Balance Calculation Iteration Count series"
 }
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Internal Convective Heat Gain Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Air Heat Balance Internal Convective Heat Gain Rate series"
@@ -1160,6 +1168,7 @@ Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Rad
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate" -Description "markdown outside solar source variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate" -Description "markdown zone outside conduction variable"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Heat Balance Calculation Iteration Count" -Description "markdown inside surface iteration count variable"
 Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"
 Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
 Assert-Contains -Text $reportText -Pattern "ZN001:WALL001" -Description "markdown wall decomposition key"

@@ -121,6 +121,12 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
   Rust keeps the default hourly average report mode and exposes a diagnostic
   `zone_air_report_sampling=last-system-state` probe only to isolate timing
   differences.
+- `HeatBalanceSurfaceManager.cc::CalcHeatBalanceInsideSurf*` registers the
+  advanced `Surface Inside Face Heat Balance Calculation Iteration Count` row
+  with key `Simulation`, `TimeStepType::Zone`, and `StoreType::Sum`. It reports
+  `InsideSurfIterations`, which is reset before the inside-surface convergence
+  loop, increments after each pass, and triggers `InitIntConvCoeff` whenever
+  `InsideSurfIterations % ItersReevalConvCoeff == 0`.
 
 ## Data Structure Map
 
@@ -925,6 +931,12 @@ Current Rust boundary:
   denominator movement. This makes `InitIntConvCoeff`/inside-iteration cadence
   the next hconv target; it does not justify thawing the surface reference-air
   or live-updating hconv through every interleaved solve pass.
+  Adding the EnergyPlus advanced
+  `Surface Inside Face Heat Balance Calculation Iteration Count` row confirms
+  that this cadence is not yet matched: on the active ScriptF-flat lane the
+  hourly count RMSE is `10.643041`, with first-hour oracle/Rust counts
+  `18`/`35` and last-hour counts `28`/`22`. Keep the next solver work on the
+  inside-surface convergence loop and sparse hconv reinitialization timing.
   An inside-CTF report probe then tests whether EnergyPlus report/source
   conduction should use the outside temperature snapshot consumed by the last
   inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
