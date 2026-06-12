@@ -1208,6 +1208,15 @@ pub enum HeatBalanceZoneAirReportSampling {
     LastSystemState,
 }
 
+/// Timing for zone-air correction during interleaved surface-balance probes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceSurfaceLoopZoneAirCorrection {
+    /// Correct zone air after every surface loop pass.
+    EachSurfaceIteration,
+    /// Correct zone air once after the inside surface loop converges.
+    AfterSurfaceLoop,
+}
+
 /// Options for the heat-balance zone-air diagnostic trace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceSimulationOptions {
@@ -1229,6 +1238,8 @@ pub struct HeatBalanceSimulationOptions {
     pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
     /// Sampling mode used for zone air heat-balance report variables.
     pub zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
+    /// Timing for zone-air correction during interleaved surface-balance probes.
+    pub surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -1304,6 +1315,8 @@ impl HeatBalanceSimulationOptions {
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
             zone_air_report_sampling: HeatBalanceZoneAirReportSampling::Average,
+            surface_loop_zone_air_correction:
+                HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
         }
     }
 
@@ -1332,6 +1345,8 @@ impl HeatBalanceSimulationOptions {
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
             zone_air_report_sampling: HeatBalanceZoneAirReportSampling::Average,
+            surface_loop_zone_air_correction:
+                HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
         }
     }
 
@@ -1408,6 +1423,16 @@ impl HeatBalanceSimulationOptions {
         self.zone_air_report_sampling = zone_air_report_sampling;
         self
     }
+
+    /// Returns options with explicit zone-air correction timing in the surface loop.
+    #[must_use]
+    pub const fn with_surface_loop_zone_air_correction(
+        mut self,
+        surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+    ) -> Self {
+        self.surface_loop_zone_air_correction = surface_loop_zone_air_correction;
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -1435,6 +1460,8 @@ pub struct HeatBalanceSimulationSummary {
     pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
     /// Sampling mode used for zone air heat-balance report variables.
     pub zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
+    /// Timing for zone-air correction during interleaved surface-balance probes.
+    pub surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     /// Per-slot CTF history terms after optional warmup, before the run period starts.
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
@@ -3180,6 +3207,7 @@ pub fn advance_heat_balance_state_one_timestep(
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
         1,
         None,
+        HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
     );
 }
 
@@ -3191,6 +3219,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
 ) {
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
@@ -3714,6 +3743,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             freeze_inside_ctf_outside_temperature_for_surface_iterations,
             use_inside_ctf_outside_temperature_for_conduction_report,
             inside_hconv_reevaluation_interval,
+            surface_loop_zone_air_correction,
         ))
     } else {
         let current_zone_temperatures = state
@@ -3789,6 +3819,22 @@ fn advance_heat_balance_state_one_timestep_internal(
         }
         None
     };
+
+    if interleave_zone_air_surface_passes
+        && matches!(
+            surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
+        )
+    {
+        correct_zone_air_temperatures_from_current_surfaces(
+            &state.surfaces,
+            &mut state.zones,
+            input.timestep_seconds,
+            true,
+            heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
+            use_inside_ctf_outside_temperature_for_conduction_report,
+        );
+    }
 
     if sync_adiabatic_outside_to_current_inside_before_history {
         sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
@@ -3892,6 +3938,7 @@ fn run_interleaved_surface_zone_balance(
     freeze_inside_ctf_outside_temperature_for_surface_iterations: bool,
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
     inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
 ) -> InterleavedSurfaceZoneBalanceResult {
     let inside_hconv_reevaluation_interval =
         inside_hconv_reevaluation_interval.filter(|interval| *interval > 0);
@@ -4027,14 +4074,19 @@ fn run_interleaved_surface_zone_balance(
                     .fold(0.0, f64::max)
             })
             .unwrap_or(f64::INFINITY);
-        correct_zone_air_temperatures_from_current_surfaces(
-            surfaces,
-            zones,
-            input.timestep_seconds,
-            true,
-            use_third_order_zone_air_correction,
-            use_inside_ctf_outside_temperature_for_conduction_report,
-        );
+        if matches!(
+            surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration
+        ) {
+            correct_zone_air_temperatures_from_current_surfaces(
+                surfaces,
+                zones,
+                input.timestep_seconds,
+                true,
+                use_third_order_zone_air_correction,
+                use_inside_ctf_outside_temperature_for_conduction_report,
+            );
+        }
         if converge_surface_iterations_to_energyplus_tolerance
             && max_inside_surface_delta_c <= ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C
         {
@@ -4750,6 +4802,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.zone_air_algorithm,
         options.surface_iteration_count,
         options.inside_hconv_reevaluation_interval,
+        options.surface_loop_zone_air_correction,
         first_hour_interpolation_starting_values,
     );
     let run_period_initial_ctf_history_slots =
@@ -4916,6 +4969,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
+                options.surface_loop_zone_air_correction,
             );
 
             for sample in &state.last_ctf_history_slot_terms {
@@ -5725,6 +5779,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         ctf_initial_history_policy: options.ctf_initial_history_policy,
         zone_conduction_report_source: options.zone_conduction_report_source,
         zone_air_report_sampling: options.zone_air_report_sampling,
+        surface_loop_zone_air_correction: options.surface_loop_zone_air_correction,
         run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
@@ -5752,6 +5807,7 @@ fn run_heat_balance_run_period_warmup(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
@@ -5803,6 +5859,7 @@ fn run_heat_balance_run_period_warmup(
                     zone_air_algorithm,
                     surface_iteration_count,
                     inside_hconv_reevaluation_interval,
+                    surface_loop_zone_air_correction,
                 );
             }
         }
@@ -10514,7 +10571,8 @@ mod tests {
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
-        HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
+        HeatBalanceSimulationOptions, HeatBalanceStepInput,
+        HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
         HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource,
         InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
@@ -13581,6 +13639,7 @@ DATA PERIODS
                 options.zone_air_algorithm,
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
+                options.surface_loop_zone_air_correction,
             );
             let zone = &state.zones[0];
             last_surface_convection = zone_air_heat_balance_surface_convection_rate_w(zone);
@@ -13693,6 +13752,10 @@ DATA PERIODS
             HeatBalanceZoneAirReportSampling::Average
         );
         assert_eq!(
+            options.surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration
+        );
+        assert_eq!(
             options
                 .with_zone_conduction_report_source(
                     HeatBalanceZoneConductionReportSource::SurfaceReport
@@ -13705,6 +13768,14 @@ DATA PERIODS
                 .with_zone_air_report_sampling(HeatBalanceZoneAirReportSampling::LastSystemState)
                 .zone_air_report_sampling,
             HeatBalanceZoneAirReportSampling::LastSystemState
+        );
+        assert_eq!(
+            options
+                .with_surface_loop_zone_air_correction(
+                    HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
+                )
+                .surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
         );
         assert_eq!(
             options
@@ -14026,6 +14097,36 @@ DATA PERIODS
                 .surface_iteration_count,
             3
         );
+    }
+
+    #[test]
+    fn heat_balance_surface_loop_zone_air_correction_runs_after_loop_probe()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let simulation = simulate_heat_balance_zone_air_temperatures(
+            &model,
+            &[5.0, 35.0],
+            HeatBalanceSimulationOptions::hourly_samples(2)
+                .with_zone_air_algorithm(
+                    HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe,
+                )
+                .with_surface_iteration_count(3)
+                .with_surface_loop_zone_air_correction(
+                    HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop,
+                ),
+        )?;
+
+        assert_eq!(
+            simulation.summary.surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
+        );
+        let zone_temperature = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Temperature")
+            .ok_or_else(|| std::io::Error::other("missing zone temperature series"))?;
+        assert_eq!(zone_temperature.values.len(), 2);
+
+        Ok(())
     }
 
     #[test]
@@ -14604,6 +14705,7 @@ DATA PERIODS
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
             None,
+            HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
             FirstHourInterpolationStartingValues::Hour24,
         );
         let weather_context_summary = run_heat_balance_run_period_warmup(
@@ -14617,6 +14719,7 @@ DATA PERIODS
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
             1,
             None,
+            HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
             FirstHourInterpolationStartingValues::Hour24,
         );
 

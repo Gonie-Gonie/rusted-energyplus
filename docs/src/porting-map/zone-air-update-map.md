@@ -210,3 +210,16 @@ The June 2026 EnergyPlus 26.1.0 source audit narrows this further:
 The official zone-air surface-convection row should therefore be diagnosed
 against `SumHADTsurfs` ownership, not inferred from surface report rows or from
 the solver `SumHA/SumHATsurf/SumHATref` coefficients alone.
+
+An inside-surface loop ordering probe then tested the EnergyPlus source-order
+fact that `CalcHeatBalanceInsideSurf*` converges surface temperatures before
+zone-air correction. Rust now exposes
+`surface_loop_zone_air_correction=after-surface-loop` for this diagnostic, but
+the active ScriptF-flat lane is neutral because its frozen-reference-air surface
+loop is already insensitive to intra-loop zone-air updates: MAT remains
+`0.037329 C` RMSE, zone surface convection `22.062956 W`, air storage
+`9.127258 W`, inside-surface iteration count `10.643041`, floor storage
+`28.786920 W`, and roof outside convection `19.558304 W`. The remaining
+iteration-count and zone-air gaps therefore stay on the inside-surface solve
+itself: `SurfTempInTmp` update parity, ScriptF/longwave source ownership,
+inside hconv re-evaluation state, and the exact non-window convergence set.
