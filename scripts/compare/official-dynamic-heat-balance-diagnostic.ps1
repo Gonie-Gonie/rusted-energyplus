@@ -293,6 +293,8 @@ Assert-FileExists -Path $reportPath -Description "official dynamic diagnostic re
 
 $digestText = Get-Content -LiteralPath $digestPath -Raw
 Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "compact digest sample row payload"
+Assert-Contains -Text $digestText -Pattern '"compatibility_stages"' -Description "compact digest compatibility stage order"
+Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHistories"' -Description "compact digest UpdateThermalHistories stage"
 $summary = $digestText | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected case_id: $($summary.case_id)"
@@ -877,6 +879,8 @@ Assert-Contains -Text $reportText -Pattern "surface_iteration_count: $SurfaceIte
 Assert-Contains -Text $reportText -Pattern "inside_hconv_reevaluation_interval: $expectedInsideHconvReevaluationIntervalLabel" -Description "markdown inside hconv reevaluation interval metadata"
 Assert-Contains -Text $reportText -Pattern "ctf_initial_history_policy: $CtfInitialHistoryPolicy" -Description "markdown CTF initial history policy metadata"
 Assert-Contains -Text $reportText -Pattern "zone_conduction_report_source: $ZoneConductionReportSource" -Description "markdown zone conduction report source metadata"
+Assert-Contains -Text $reportText -Pattern "## EnergyPlus Compatibility Stage Order" -Description "markdown compatibility stage order section"
+Assert-Contains -Text $reportText -Pattern "UpdateThermalHistories" -Description "markdown UpdateThermalHistories stage"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
     Assert-Contains -Text $reportText -Pattern "FLOOR (#CTFs=5) @ dt=0.250h [skipped]" -Description "markdown skipped mass CTF summary"

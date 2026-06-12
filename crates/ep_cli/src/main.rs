@@ -28,12 +28,13 @@ use ep_model::{
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_runtime::{
-    ConstructionCtfCoefficientOverride, ExecutionPlan, ExecutionStep, FirstZoneSimulationOptions,
-    HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfHistorySlotHourlySample,
-    HeatBalanceCtfHistorySlotSample, HeatBalanceCtfInitialHistoryPolicy,
-    HeatBalanceSimulationOptions, HeatBalanceSurfaceFirstSampleTrace, HeatBalanceWarmupSummary,
-    HeatBalanceZoneAirAlgorithm, HeatBalanceZoneConductionReportSource, NodeStateProjection,
-    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    ConstructionCtfCoefficientOverride, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStep,
+    FirstZoneSimulationOptions, HeatBalanceCtfHistorySlotFirstSample,
+    HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
+    HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
+    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
+    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
     SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
@@ -43,8 +44,8 @@ use ep_runtime::{
     SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE, SimulationMode, SurfaceGeometrySummary,
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
-    build_hourly_time_axis, load_epw_dry_bulb_series, load_epw_records,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    build_hourly_time_axis, energyplus_heat_balance_compatibility_stages, load_epw_dry_bulb_series,
+    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures,
     simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection, surface_area_m2,
@@ -3260,6 +3261,7 @@ struct HeatBalanceConformanceDiagnostic {
     inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
     zone_conduction_report_source: &'static str,
+    compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
     zone_count: usize,
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
@@ -3963,6 +3965,7 @@ fn build_heat_balance_conformance_diagnostic(
         zone_conduction_report_source: heat_balance_zone_conduction_report_source_label(
             simulation.summary.zone_conduction_report_source,
         ),
+        compatibility_stages: energyplus_heat_balance_compatibility_stages(),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         ctf_component_first_samples,
@@ -7232,6 +7235,10 @@ fn render_heat_balance_conformance_json(
         "  \"zone_conduction_report_source\": {},\n",
         json_string(diagnostic.zone_conduction_report_source)
     ));
+    json.push_str(&format!(
+        "  \"compatibility_stages\": {},\n",
+        heat_balance_compatibility_stages_json(&diagnostic.compatibility_stages)
+    ));
     json.push_str(&format!("  \"zone_count\": {},\n", diagnostic.zone_count));
     json.push_str(&format!(
         "  \"surface_count\": {},\n",
@@ -7492,6 +7499,10 @@ fn render_heat_balance_conformance_report(
         "max_rel_delta: {:.12}\n\n",
         heat_balance_max_rel_delta(diagnostic)
     ));
+
+    report.push_str("## EnergyPlus Compatibility Stage Order\n\n");
+    heat_balance_report_compatibility_stage_rows(&mut report, &diagnostic.compatibility_stages);
+    report.push('\n');
 
     report.push_str("## Bottlenecks\n\n");
     heat_balance_report_bottleneck_rows(&mut report, &diagnostic.series);
@@ -8081,6 +8092,29 @@ fn heat_balance_surface_first_sample_trace_json(
             json_number(row.outside_convection_heat_gain_rate_w),
             json_number(row.outside_net_thermal_radiation_heat_gain_rate_w),
             json_number(row.outside_solar_radiation_heat_gain_rate_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_compatibility_stages_json(rows: &[EnergyPlusCompatibilityStage]) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"index\": {}, ",
+                "\"stage_name\": {}, ",
+                "\"source_file\": {}, ",
+                "\"source_routine\": {} }}"
+            ),
+            index,
+            json_string(row.stage_name),
+            json_string(row.source_file),
+            json_string(row.source_routine)
         ));
     }
     json.push(']');
@@ -8953,6 +8987,20 @@ fn heat_balance_report_surface_first_sample_trace_rows(
             row.outside_convection_heat_gain_rate_w,
             row.outside_net_thermal_radiation_heat_gain_rate_w,
             row.outside_solar_radiation_heat_gain_rate_w
+        ));
+    }
+}
+
+fn heat_balance_report_compatibility_stage_rows(
+    report: &mut String,
+    rows: &[EnergyPlusCompatibilityStage],
+) {
+    report.push_str("| index | stage | source file | source routine |\n");
+    report.push_str("|---:|---|---|---|\n");
+    for (index, row) in rows.iter().enumerate() {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} |\n",
+            index, row.stage_name, row.source_file, row.source_routine
         ));
     }
 }
@@ -10544,6 +10592,7 @@ mod tests {
             inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy: "boundary-u-value",
             zone_conduction_report_source: "zone-state",
+            compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
             ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
@@ -10926,6 +10975,8 @@ mod tests {
         assert!(json.contains("\"inside_hconv_reevaluation_interval\": null"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"zone-state\""));
+        assert!(json.contains("\"compatibility_stages\""));
+        assert!(json.contains("\"source_routine\": \"UpdateThermalHistories\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
@@ -10982,6 +11033,7 @@ mod tests {
         assert!(json.contains("\"blocking\": true"));
         assert!(digest.contains("\"case_id\": \"heat_balance_nomass_001\""));
         assert!(digest.contains("\"series_count\": 2"));
+        assert!(digest.contains("\"compatibility_stages\""));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
@@ -11041,6 +11093,8 @@ mod tests {
         assert!(report.contains("inside_hconv_reevaluation_interval: none"));
         assert!(report.contains("ctf_initial_history_policy: boundary-u-value"));
         assert!(report.contains("zone_conduction_report_source: zone-state"));
+        assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
+        assert!(report.contains("UpdateThermalHistories"));
         assert!(report.contains("failure_reasons: none"));
         assert!(report.contains("ctf_seed_policy: disabled"));
         assert!(report.contains("zone_air_algorithm: simplified-analytical"));
@@ -11127,6 +11181,7 @@ mod tests {
             inside_hconv_reevaluation_interval: Some(2),
             ctf_initial_history_policy: "energyplus-surf-initial",
             zone_conduction_report_source: "surface-report",
+            compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
             ctf_component_first_samples: vec![super::HeatBalanceCtfComponentFirstSample {
@@ -11478,6 +11533,8 @@ mod tests {
         assert!(json.contains("\"inside_hconv_reevaluation_interval\": 2"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"surface-report\""));
+        assert!(json.contains("\"compatibility_stages\""));
+        assert!(json.contains("\"source_routine\": \"ManageAirHeatBalance\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
@@ -11521,6 +11578,7 @@ mod tests {
         assert!(json.contains("\"max_sample_contexts\""));
         assert!(json.contains("\"trigger_output\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
+        assert!(digest.contains("\"compatibility_stages\""));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
@@ -11577,6 +11635,8 @@ mod tests {
         assert!(report.contains("inside_hconv_reevaluation_interval: 2"));
         assert!(report.contains("ctf_initial_history_policy: energyplus-surf-initial"));
         assert!(report.contains("zone_conduction_report_source: surface-report"));
+        assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
+        assert!(report.contains("ManageAirHeatBalance"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(
