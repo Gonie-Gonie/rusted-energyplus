@@ -636,6 +636,14 @@ Current Rust boundary:
   next floor-storage work should inspect inside current-term temperature
   alignment/update timing before treating the remaining error as pure history
   handoff.
+- The compact diagnostic also emits annual CTF current/history split RMSE by
+  surface. In the active all-CTF, ScriptF-flat, warmup-20, 20-surface-iteration
+  lane, `ZN001:FLR001` has `inside_current_inside_term_delta.rmse_delta_c =
+  231.720702 W` and `inside_current_outside_term_delta.rmse_delta_c =
+  2.886563 W`; the max current-inside split is `717.882711 W`. Roof/wall
+  current-inside RMSE stays below `0.8 W`. This confirms the next numerical
+  bottleneck is floor inside-face current-term timing/source alignment, not the
+  outside current term or a broad coefficient mismatch.
 - Re-running the `hconv-reeval2` candidate with the signed split lowers the
   active top RMSE from `28.786920` to `27.005834` W on floor storage, but it is
   not promotion-ready: MAT RMSE rises from `0.037329` to `0.037718 C`, floor

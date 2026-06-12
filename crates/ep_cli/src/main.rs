@@ -3365,8 +3365,12 @@ struct HeatBalanceCtfHistorySeriesDelta {
     construction_name: String,
     area_m2: f64,
     samples: usize,
+    inside_current_outside_term_delta: DeltaSummary,
+    inside_current_inside_term_delta: DeltaSummary,
     inside_current_delta: DeltaSummary,
     inside_history_delta: DeltaSummary,
+    outside_current_outside_term_delta: DeltaSummary,
+    outside_current_inside_term_delta: DeltaSummary,
     outside_current_delta: DeltaSummary,
     outside_history_delta: DeltaSummary,
 }
@@ -4835,16 +4839,28 @@ fn heat_balance_ctf_history_series_deltas(
                 return None;
             }
 
+            let mut oracle_inside_current_outside = Vec::with_capacity(samples);
+            let mut oracle_inside_current_inside = Vec::with_capacity(samples);
             let mut oracle_inside_current = Vec::with_capacity(samples);
             let mut rust_inside_current = Vec::with_capacity(samples);
             let mut oracle_inside_history = Vec::with_capacity(samples);
+            let mut oracle_outside_current_outside = Vec::with_capacity(samples);
+            let mut oracle_outside_current_inside = Vec::with_capacity(samples);
             let mut oracle_outside_current = Vec::with_capacity(samples);
             let mut rust_outside_current = Vec::with_capacity(samples);
             let mut oracle_outside_history = Vec::with_capacity(samples);
             for index in 0..samples {
+                let oracle_inside_current_outside_term_w =
+                    area_m2 * oracle_outside_temperatures[index] * zero.cross_w_per_m2_k;
+                let oracle_inside_current_inside_term_w =
+                    -area_m2 * oracle_inside_temperatures[index] * zero.inside_w_per_m2_k;
                 let oracle_inside_current_term_w = area_m2
                     * (oracle_outside_temperatures[index] * zero.cross_w_per_m2_k
                         - oracle_inside_temperatures[index] * zero.inside_w_per_m2_k);
+                let oracle_outside_current_outside_term_w =
+                    -area_m2 * oracle_outside_temperatures[index] * zero.outside_w_per_m2_k;
+                let oracle_outside_current_inside_term_w =
+                    area_m2 * oracle_inside_temperatures[index] * zero.cross_w_per_m2_k;
                 let oracle_outside_current_term_w = -area_m2
                     * (oracle_outside_temperatures[index] * zero.outside_w_per_m2_k
                         - oracle_inside_temperatures[index] * zero.cross_w_per_m2_k);
@@ -4853,10 +4869,14 @@ fn heat_balance_ctf_history_series_deltas(
                 let rust_outside_current_term_w =
                     rust_outside_current_outside[index] + rust_outside_current_inside[index];
 
+                oracle_inside_current_outside.push(oracle_inside_current_outside_term_w);
+                oracle_inside_current_inside.push(oracle_inside_current_inside_term_w);
                 oracle_inside_current.push(oracle_inside_current_term_w);
                 rust_inside_current.push(rust_inside_current_term_w);
                 oracle_inside_history
                     .push(oracle_inside_conduction[index] - oracle_inside_current_term_w);
+                oracle_outside_current_outside.push(oracle_outside_current_outside_term_w);
+                oracle_outside_current_inside.push(oracle_outside_current_inside_term_w);
                 oracle_outside_current.push(oracle_outside_current_term_w);
                 rust_outside_current.push(rust_outside_current_term_w);
                 oracle_outside_history
@@ -4868,8 +4888,24 @@ fn heat_balance_ctf_history_series_deltas(
                 construction_name: construction.name.0.clone(),
                 area_m2,
                 samples,
+                inside_current_outside_term_delta: delta_summary(
+                    &oracle_inside_current_outside,
+                    &rust_inside_current_outside,
+                ),
+                inside_current_inside_term_delta: delta_summary(
+                    &oracle_inside_current_inside,
+                    &rust_inside_current_inside,
+                ),
                 inside_current_delta: delta_summary(&oracle_inside_current, &rust_inside_current),
                 inside_history_delta: delta_summary(&oracle_inside_history, &rust_inside_history),
+                outside_current_outside_term_delta: delta_summary(
+                    &oracle_outside_current_outside,
+                    &rust_outside_current_outside,
+                ),
+                outside_current_inside_term_delta: delta_summary(
+                    &oracle_outside_current_inside,
+                    &rust_outside_current_inside,
+                ),
                 outside_current_delta: delta_summary(
                     &oracle_outside_current,
                     &rust_outside_current,
@@ -9015,8 +9051,12 @@ fn heat_balance_ctf_history_series_deltas_json(
                 "\"construction_name\": {}, ",
                 "\"area_m2\": {}, ",
                 "\"samples\": {}, ",
+                "\"inside_current_outside_term_delta\": {}, ",
+                "\"inside_current_inside_term_delta\": {}, ",
                 "\"inside_current_delta\": {}, ",
                 "\"inside_history_delta\": {}, ",
+                "\"outside_current_outside_term_delta\": {}, ",
+                "\"outside_current_inside_term_delta\": {}, ",
                 "\"outside_current_delta\": {}, ",
                 "\"outside_history_delta\": {} }}"
             ),
@@ -9024,8 +9064,12 @@ fn heat_balance_ctf_history_series_deltas_json(
             json_string(&row.construction_name),
             json_number(row.area_m2),
             row.samples,
+            delta_summary_json(&row.inside_current_outside_term_delta),
+            delta_summary_json(&row.inside_current_inside_term_delta),
             delta_summary_json(&row.inside_current_delta),
             delta_summary_json(&row.inside_history_delta),
+            delta_summary_json(&row.outside_current_outside_term_delta),
+            delta_summary_json(&row.outside_current_inside_term_delta),
             delta_summary_json(&row.outside_current_delta),
             delta_summary_json(&row.outside_history_delta)
         ));
@@ -10011,9 +10055,9 @@ fn heat_balance_report_ctf_history_series_delta_rows(
     rows: &[HeatBalanceCtfHistorySeriesDelta],
 ) {
     report.push_str(
-        "| key | construction | samples | in_current_rmse_w | in_history_rmse_w | out_current_rmse_w | out_history_rmse_w | in_current_max_w | in_history_max_w | out_current_max_w | out_history_max_w | in_current_mean_w | in_history_mean_w | out_current_mean_w | out_history_mean_w |\n",
+        "| key | construction | samples | in_curr_out_rmse_w | in_curr_in_rmse_w | in_current_rmse_w | in_history_rmse_w | out_curr_out_rmse_w | out_curr_in_rmse_w | out_current_rmse_w | out_history_rmse_w | in_curr_out_max_w | in_curr_in_max_w | in_current_max_w | in_history_max_w | out_curr_out_max_w | out_curr_in_max_w | out_current_max_w | out_history_max_w | in_current_mean_w | in_history_mean_w | out_current_mean_w | out_history_mean_w |\n",
     );
-    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
     let mut sorted = rows.iter().collect::<Vec<_>>();
     sorted.sort_by(|left, right| {
         heat_balance_ctf_history_series_max_rmse(right)
@@ -10021,16 +10065,24 @@ fn heat_balance_report_ctf_history_series_delta_rows(
     });
     for row in sorted {
         report.push_str(&format!(
-            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             row.samples,
+            row.inside_current_outside_term_delta.rmse_delta_c,
+            row.inside_current_inside_term_delta.rmse_delta_c,
             row.inside_current_delta.rmse_delta_c,
             row.inside_history_delta.rmse_delta_c,
+            row.outside_current_outside_term_delta.rmse_delta_c,
+            row.outside_current_inside_term_delta.rmse_delta_c,
             row.outside_current_delta.rmse_delta_c,
             row.outside_history_delta.rmse_delta_c,
+            row.inside_current_outside_term_delta.max_abs_delta_c,
+            row.inside_current_inside_term_delta.max_abs_delta_c,
             row.inside_current_delta.max_abs_delta_c,
             row.inside_history_delta.max_abs_delta_c,
+            row.outside_current_outside_term_delta.max_abs_delta_c,
+            row.outside_current_inside_term_delta.max_abs_delta_c,
             row.outside_current_delta.max_abs_delta_c,
             row.outside_history_delta.max_abs_delta_c,
             row.inside_current_delta.mean_abs_delta_c,
@@ -10360,9 +10412,13 @@ fn heat_balance_report_adiabatic_history_max_sample_delta_rows(
 }
 
 fn heat_balance_ctf_history_series_max_rmse(row: &HeatBalanceCtfHistorySeriesDelta) -> f64 {
-    row.inside_current_delta
+    row.inside_current_outside_term_delta
         .rmse_delta_c
+        .max(row.inside_current_inside_term_delta.rmse_delta_c)
+        .max(row.inside_current_delta.rmse_delta_c)
         .max(row.inside_history_delta.rmse_delta_c)
+        .max(row.outside_current_outside_term_delta.rmse_delta_c)
+        .max(row.outside_current_inside_term_delta.rmse_delta_c)
         .max(row.outside_current_delta.rmse_delta_c)
         .max(row.outside_history_delta.rmse_delta_c)
 }
@@ -11702,8 +11758,15 @@ mod tests {
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
                 samples: 2,
+                inside_current_outside_term_delta: super::delta_summary(&[3.0, 4.0], &[4.0, 4.5]),
+                inside_current_inside_term_delta: super::delta_summary(&[6.0, 7.0], &[6.0, 8.5]),
                 inside_current_delta: super::delta_summary(&[9.0, 11.0], &[10.0, 13.0]),
                 inside_history_delta: super::delta_summary(&[1.0, 2.0], &[0.0, 4.0]),
+                outside_current_outside_term_delta: super::delta_summary(
+                    &[-10.0, -9.0],
+                    &[-11.0, -9.5],
+                ),
+                outside_current_inside_term_delta: super::delta_summary(&[2.0, 2.0], &[1.0, 2.0]),
                 outside_current_delta: super::delta_summary(&[-8.0, -7.0], &[-10.0, -7.5]),
                 outside_history_delta: super::delta_summary(&[2.0, 3.0], &[0.0, 6.0]),
             }],
@@ -12096,8 +12159,12 @@ mod tests {
         assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"inside_history_delta_w\""));
         assert!(json.contains("\"ctf_history_series_deltas\""));
+        assert!(json.contains("\"inside_current_outside_term_delta\""));
+        assert!(json.contains("\"inside_current_inside_term_delta\""));
         assert!(json.contains("\"inside_current_delta\""));
         assert!(json.contains("\"inside_history_delta\""));
+        assert!(json.contains("\"outside_current_outside_term_delta\""));
+        assert!(json.contains("\"outside_current_inside_term_delta\""));
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"storage_delta_rank\": 1"));
         assert!(json.contains("\"dominant_storage_surface\": true"));
@@ -12172,8 +12239,12 @@ mod tests {
         assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
         assert!(digest.contains("\"ctf_history_series_deltas\""));
+        assert!(digest.contains("\"inside_current_outside_term_delta\""));
+        assert!(digest.contains("\"inside_current_inside_term_delta\""));
         assert!(digest.contains("\"inside_current_delta\""));
         assert!(digest.contains("\"inside_history_delta\""));
+        assert!(digest.contains("\"outside_current_outside_term_delta\""));
+        assert!(digest.contains("\"outside_current_inside_term_delta\""));
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"storage_delta_rank\": 1"));
         assert!(digest.contains("\"dominant_storage_surface\": true"));
@@ -12258,6 +12329,10 @@ mod tests {
             "| FLOOR | FLOOR | 100.000000000000 | 11.000000000000 | 12.000000000000 | 13.000000000000 | 14.000000000000 | 15.000000000000 | 1.000000000000 | 16.000000000000 | 17.000000000000 | 1.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
         ));
         assert!(report.contains("## CTF History Series Deltas"));
+        assert!(report.contains("in_curr_out_rmse_w"));
+        assert!(report.contains("in_curr_in_rmse_w"));
+        assert!(report.contains("out_curr_out_rmse_w"));
+        assert!(report.contains("out_curr_in_rmse_w"));
         assert!(report.contains("in_history_rmse_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("storage_delta_w"));
@@ -12385,8 +12460,15 @@ mod tests {
                 construction_name: "FLOOR".to_string(),
                 area_m2: 100.0,
                 samples: 2,
+                inside_current_outside_term_delta: super::delta_summary(&[2.0, 3.0], &[2.5, 4.0]),
+                inside_current_inside_term_delta: super::delta_summary(&[4.0, 5.0], &[4.5, 5.0]),
                 inside_current_delta: super::delta_summary(&[6.0, 8.0], &[7.0, 9.0]),
                 inside_history_delta: super::delta_summary(&[4.0, 5.0], &[0.0, 3.0]),
+                outside_current_outside_term_delta: super::delta_summary(
+                    &[-8.0, -10.0],
+                    &[-9.0, -9.5],
+                ),
+                outside_current_inside_term_delta: super::delta_summary(&[2.0, 1.0], &[1.0, 1.5]),
                 outside_current_delta: super::delta_summary(&[-6.0, -9.0], &[-8.0, -8.0]),
                 outside_history_delta: super::delta_summary(&[5.0, 6.0], &[0.0, 4.0]),
             }],
@@ -12746,6 +12828,10 @@ mod tests {
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"ctf_history_series_deltas\""));
+        assert!(json.contains("\"inside_current_outside_term_delta\""));
+        assert!(json.contains("\"inside_current_inside_term_delta\""));
+        assert!(json.contains("\"outside_current_outside_term_delta\""));
+        assert!(json.contains("\"outside_current_inside_term_delta\""));
         assert!(json.contains("\"outside_history_delta\""));
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"storage_delta_rank\": 1"));
@@ -12809,7 +12895,11 @@ mod tests {
         assert!(digest.contains("\"inside_convection_gain_delta\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
+        assert!(digest.contains("\"inside_current_outside_term_delta\""));
+        assert!(digest.contains("\"inside_current_inside_term_delta\""));
         assert!(digest.contains("\"ctf_history_series_deltas\""));
+        assert!(digest.contains("\"outside_current_outside_term_delta\""));
+        assert!(digest.contains("\"outside_current_inside_term_delta\""));
         assert!(digest.contains("\"outside_history_delta\""));
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"storage_delta_rank\": 1"));
@@ -12889,6 +12979,10 @@ mod tests {
         assert!(report.contains("inside_conv_gain_rmse"));
         assert!(report.contains("## CTF History First-Sample Deltas"));
         assert!(report.contains("## CTF History Series Deltas"));
+        assert!(report.contains("in_curr_out_rmse_w"));
+        assert!(report.contains("in_curr_in_rmse_w"));
+        assert!(report.contains("out_curr_out_rmse_w"));
+        assert!(report.contains("out_curr_in_rmse_w"));
         assert!(report.contains("out_history_rmse_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("out_history_delta_w"));

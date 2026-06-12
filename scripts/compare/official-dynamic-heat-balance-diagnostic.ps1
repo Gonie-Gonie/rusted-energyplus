@@ -551,6 +551,19 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([int]$floorHistorySeriesDelta.samples -ne 8760) {
         throw "Expected FLOOR CTF history series deltas to use 8760 samples, got $($floorHistorySeriesDelta.samples)"
     }
+    foreach ($propertyName in @(
+            "inside_current_outside_term_delta",
+            "inside_current_inside_term_delta",
+            "outside_current_outside_term_delta",
+            "outside_current_inside_term_delta"
+        )) {
+        if ($floorHistorySeriesDelta.PSObject.Properties.Name -notcontains $propertyName) {
+            throw "Expected FLOOR CTF history series row to include $propertyName"
+        }
+    }
+    if ([double]$floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c -le 10.0) {
+        throw "Expected active FLOOR inside current-inside series delta to remain visible, got $($floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c)"
+    }
     if ([double]$floorHistorySeriesDelta.inside_history_delta.rmse_delta_c -le 10.0) {
         throw "Expected active FLOOR inside history series delta to remain visible, got $($floorHistorySeriesDelta.inside_history_delta.rmse_delta_c)"
     }
@@ -1015,6 +1028,10 @@ Assert-Contains -Text $reportText -Pattern "out_temp_abs_delta_c" -Description "
 Assert-Contains -Text $reportText -Pattern "in_current_abs_delta_w" -Description "markdown CTF current delta column"
 Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
 Assert-Contains -Text $reportText -Pattern "## CTF History Series Deltas" -Description "markdown CTF history series delta section"
+Assert-Contains -Text $reportText -Pattern "in_curr_out_rmse_w" -Description "markdown CTF inside current-outside series RMSE column"
+Assert-Contains -Text $reportText -Pattern "in_curr_in_rmse_w" -Description "markdown CTF inside current-inside series RMSE column"
+Assert-Contains -Text $reportText -Pattern "out_curr_out_rmse_w" -Description "markdown CTF outside current-outside series RMSE column"
+Assert-Contains -Text $reportText -Pattern "out_curr_in_rmse_w" -Description "markdown CTF outside current-inside series RMSE column"
 Assert-Contains -Text $reportText -Pattern "in_history_rmse_w" -Description "markdown CTF history series RMSE column"
 Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "markdown CTF outside history series RMSE column"
 Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -Description "markdown CTF storage max-sample delta section"
