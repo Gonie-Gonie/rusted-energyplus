@@ -358,6 +358,21 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   convection coefficients before the selected inside convection algorithm is
   evaluated. `DataHeatBalance::LowHConvLimit = 0.1 W/m2-K` and
   `HighHConvLimit = 1000 W/m2-K` bound calculated convection coefficients.
+- `DataHeatBalSurface.hh::ItersReevalConvCoeff = 30` is the EnergyPlus
+  inside-convection re-evaluation cadence inside `CalcHeatBalanceInsideSurf*`.
+  The ScriptF-flat official lane now has an explicit
+  `hconv-reeval30-iter20` wrapper using the same cadence and the
+  `energyplus-surf-initial` CTF history seed. With the active twenty-pass cap,
+  this source-aligned cadence is behaviorally neutral: MAT, zone surface
+  convection, air storage, inside-surface iteration count, floor storage, floor
+  inside/outside conduction, floor inside hconv, floor inside convection, and
+  roof outside convection RMSEs all match the no-override active lane
+  bit-for-bit. The `hconv-reeval2` wrapper remains a rejected compensation
+  probe: it lowers overall/floor storage RMSE (`28.786920 W` to
+  `27.005834 W`) and iteration-count RMSE (`10.643041` to `8.639204`), but it
+  worsens MAT (`0.037329 C` to `0.037718 C`), air storage (`9.127258 W` to
+  `9.576803 W`), floor inside hconv (`0.025744` to `0.037803 W/m2-K`), and
+  floor inside convection (`13.602803 W` to `17.038813 W`).
 - `ConvectionCoefficients.cc::CalcASHRAEDetailedIntConvCoeff` dispatches
   inside `SurfaceConvectionAlgorithm:Inside,TARP` surfaces through
   `CalcASHRAETARPNatural(SurfTempIn, RefAirTemp, -CosTilt)`, using ASHRAE

@@ -353,12 +353,17 @@ $Commands = [ordered]@{
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe.ps1"
         Group = "compare"
-        Help = "Run the official dynamic diagnostic with inside CTF outside-history snapshots, ScriptF flat lSR access, and the EnergyPlus run-period warmup count."
+        Help = "Run the official dynamic diagnostic with inside CTF outside-history snapshots, ScriptF flat lSR access, EnergyPlus SurfInitial CTF history seed, and the EnergyPlus run-period warmup count."
     }
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe.ps1"
         Group = "compare"
         Help = "Run the ScriptF-flat official dynamic diagnostic while re-evaluating frozen inside hconv every two surface passes."
+    }
+    "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval30-iter20-probe" = @{
+        Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval30-iter20-probe.ps1"
+        Group = "compare"
+        Help = "Run the ScriptF-flat official dynamic diagnostic with the EnergyPlus 30-pass inside hconv re-evaluation cadence."
     }
     "official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe" = @{
         Path = "compare\official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1"

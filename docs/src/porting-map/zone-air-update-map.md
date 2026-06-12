@@ -223,3 +223,21 @@ loop is already insensitive to intra-loop zone-air updates: MAT remains
 iteration-count and zone-air gaps therefore stay on the inside-surface solve
 itself: `SurfTempInTmp` update parity, ScriptF/longwave source ownership,
 inside hconv re-evaluation state, and the exact non-window convergence set.
+
+The EnergyPlus inside-hconv source cadence has now been split from compensating
+probe values. `DataHeatBalSurface.hh::ItersReevalConvCoeff` is `30`, and the
+new `hconv-reeval30-iter20` wrapper runs the active ScriptF-flat lane with that
+cadence plus the source-aligned `energyplus-surf-initial` CTF seed. Because the
+active lane caps each inside-surface solve at twenty passes, this cadence is
+neutral in the current 1Zone diagnostic: MAT remains `0.037329 C` RMSE, zone
+surface convection `22.062956 W`, air storage `9.127258 W`, inside-surface
+iteration count `10.643041`, and floor storage `28.786920 W`. Re-evaluating
+hconv every two passes is still useful as a sensitivity check but is not
+source-parity: it improves zone surface convection (`22.062956 W` to
+`20.723652 W`), inside-surface iteration count (`10.643041` to `8.639204`),
+and floor storage (`28.786920 W` to `27.005834 W`), while worsening MAT
+(`0.037329 C` to `0.037718 C`), air storage (`9.127258 W` to `9.576803 W`),
+floor inside hconv (`0.025744` to `0.037803 W/m2-K`), and floor inside
+convection (`13.602803 W` to `17.038813 W`). Keep future promotion work on the
+official 30-pass cadence and target the remaining `SurfTempInTmp`/hconv state
+ownership mismatch directly.
