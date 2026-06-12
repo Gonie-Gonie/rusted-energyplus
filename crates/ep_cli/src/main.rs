@@ -73,6 +73,8 @@ const HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV: &str =
 const HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE";
 const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
+const HEAT_BALANCE_REPORT_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
+const HEAT_BALANCE_REPORT_AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
@@ -3265,6 +3267,7 @@ struct HeatBalanceConformanceDiagnostic {
     zone_count: usize,
     surface_count: usize,
     ctf_component_first_samples: Vec<HeatBalanceCtfComponentFirstSample>,
+    zone_air_coefficient_deltas: Vec<HeatBalanceZoneAirCoefficientDelta>,
     ctf_history_first_sample_deltas: Vec<HeatBalanceCtfHistoryFirstSampleDelta>,
     ctf_history_series_deltas: Vec<HeatBalanceCtfHistorySeriesDelta>,
     ctf_storage_max_sample_deltas: Vec<HeatBalanceCtfStorageMaxSampleDelta>,
@@ -3277,6 +3280,25 @@ struct HeatBalanceConformanceDiagnostic {
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceZoneAirCoefficientDelta {
+    key: String,
+    samples: usize,
+    first_divergence_source: String,
+    first_divergence_sample_index: Option<usize>,
+    first_divergence_delta: f64,
+    sum_ha_delta: DeltaSummary,
+    sum_hat_surf_delta: DeltaSummary,
+    sum_hat_ref_delta: DeltaSummary,
+    temp_dependent_coefficient_delta: DeltaSummary,
+    temp_independent_coefficient_delta: DeltaSummary,
+    air_power_cap_delta: DeltaSummary,
+    temp_history_term_delta: DeltaSummary,
+    mat_delta: DeltaSummary,
+    air_storage_delta: DeltaSummary,
+    surface_convection_delta: DeltaSummary,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3949,6 +3971,8 @@ fn build_heat_balance_conformance_diagnostic(
 
     let extracted = series.iter().all(|series| series.status == "extracted");
     let ctf_component_first_samples = heat_balance_ctf_component_first_samples(&simulation.results);
+    let zone_air_coefficient_deltas =
+        heat_balance_zone_air_coefficient_deltas(&simulation_model, &series);
     let ctf_history_first_sample_deltas = heat_balance_ctf_history_first_sample_deltas(
         &simulation_model,
         &series,
@@ -4005,6 +4029,7 @@ fn build_heat_balance_conformance_diagnostic(
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
         ctf_component_first_samples,
+        zone_air_coefficient_deltas,
         ctf_history_first_sample_deltas,
         ctf_history_series_deltas,
         ctf_storage_max_sample_deltas,
@@ -4104,6 +4129,336 @@ fn heat_balance_first_series_value(
         .find_series(key, variable_name)
         .and_then(|series| series.values.first().copied())
         .filter(|value| value.is_finite())
+}
+
+fn heat_balance_zone_air_coefficient_deltas(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<HeatBalanceZoneAirCoefficientDelta> {
+    let zone_geometry = zone_geometry_summaries(&model.typed);
+    model
+        .typed
+        .zones
+        .iter()
+        .filter_map(|zone| {
+            let model_air_power_cap_w_per_k =
+                heat_balance_zone_air_model_air_power_cap_w_per_k(model, &zone_geometry, zone)?;
+            let mat = heat_balance_series(series, &zone.name.0, "Zone Mean Air Temperature")?;
+            let internal_gain = heat_balance_series(
+                series,
+                &zone.name.0,
+                "Zone Air Heat Balance Internal Convective Heat Gain Rate",
+            )?;
+            let air_storage = heat_balance_series(
+                series,
+                &zone.name.0,
+                "Zone Air Heat Balance Air Energy Storage Rate",
+            )?;
+            let surface_convection = heat_balance_series(
+                series,
+                &zone.name.0,
+                "Zone Air Heat Balance Surface Convection Rate",
+            )?;
+            let surfaces = model
+                .typed
+                .surfaces
+                .iter()
+                .filter(|surface| surface.zone == zone.id)
+                .map(|surface| {
+                    let area_m2 = surface_area_m2(&surface.vertices);
+                    let inside_temperature = heat_balance_series(
+                        series,
+                        &surface.name.0,
+                        "Surface Inside Face Temperature",
+                    )?;
+                    let inside_convection_coefficient = heat_balance_series(
+                        series,
+                        &surface.name.0,
+                        "Surface Inside Face Convection Heat Transfer Coefficient",
+                    )?;
+                    let inside_convection = heat_balance_series(
+                        series,
+                        &surface.name.0,
+                        "Surface Inside Face Convection Heat Gain Rate",
+                    )?;
+                    Some((
+                        area_m2,
+                        inside_temperature,
+                        inside_convection_coefficient,
+                        inside_convection,
+                    ))
+                })
+                .collect::<Option<Vec<_>>>()?;
+            if surfaces.is_empty() {
+                return None;
+            }
+
+            let samples = [
+                mat.samples,
+                internal_gain.samples,
+                air_storage.samples,
+                surface_convection.samples,
+            ]
+            .into_iter()
+            .chain(surfaces.iter().flat_map(
+                |(_, inside_temperature, inside_convection_coefficient, inside_convection)| {
+                    [
+                        inside_temperature.samples,
+                        inside_convection_coefficient.samples,
+                        inside_convection.samples,
+                    ]
+                },
+            ))
+            .min()
+            .unwrap_or(0);
+            if samples == 0 {
+                return None;
+            }
+
+            let mut oracle_sum_ha = Vec::with_capacity(samples);
+            let mut rust_sum_ha = Vec::with_capacity(samples);
+            let mut oracle_sum_hat_surf = Vec::with_capacity(samples);
+            let mut rust_sum_hat_surf = Vec::with_capacity(samples);
+            let mut oracle_sum_hat_ref = Vec::with_capacity(samples);
+            let mut rust_sum_hat_ref = Vec::with_capacity(samples);
+            let mut oracle_temp_dep = Vec::with_capacity(samples);
+            let mut rust_temp_dep = Vec::with_capacity(samples);
+            let mut oracle_temp_ind = Vec::with_capacity(samples);
+            let mut rust_temp_ind = Vec::with_capacity(samples);
+            let mut oracle_air_power_cap = Vec::with_capacity(samples);
+            let mut rust_air_power_cap = Vec::with_capacity(samples);
+            let mut oracle_temp_history = Vec::with_capacity(samples);
+            let mut rust_temp_history = Vec::with_capacity(samples);
+
+            for sample_index in 0..samples {
+                let mut oracle_surface_sums = ZoneAirOutputCoefficientSums::default();
+                let mut rust_surface_sums = ZoneAirOutputCoefficientSums::default();
+                for (
+                    area_m2,
+                    inside_temperature,
+                    inside_convection_coefficient,
+                    inside_convection,
+                ) in &surfaces
+                {
+                    oracle_surface_sums.add_surface(
+                        *area_m2,
+                        inside_convection_coefficient.sample_rows[sample_index].oracle_c,
+                        inside_temperature.sample_rows[sample_index].oracle_c,
+                        inside_convection.sample_rows[sample_index].oracle_c,
+                    );
+                    rust_surface_sums.add_surface(
+                        *area_m2,
+                        inside_convection_coefficient.sample_rows[sample_index].rust_c,
+                        inside_temperature.sample_rows[sample_index].rust_c,
+                        inside_convection.sample_rows[sample_index].rust_c,
+                    );
+                }
+
+                let oracle_internal_gain = internal_gain.sample_rows[sample_index].oracle_c;
+                let rust_internal_gain = internal_gain.sample_rows[sample_index].rust_c;
+
+                oracle_sum_ha.push(oracle_surface_sums.sum_ha_w_per_k);
+                rust_sum_ha.push(rust_surface_sums.sum_ha_w_per_k);
+                oracle_sum_hat_surf.push(oracle_surface_sums.sum_hat_surf_w);
+                rust_sum_hat_surf.push(rust_surface_sums.sum_hat_surf_w);
+                oracle_sum_hat_ref.push(oracle_surface_sums.sum_hat_ref_w);
+                rust_sum_hat_ref.push(rust_surface_sums.sum_hat_ref_w);
+                oracle_temp_dep.push(oracle_surface_sums.sum_ha_w_per_k);
+                rust_temp_dep.push(rust_surface_sums.sum_ha_w_per_k);
+                oracle_temp_ind.push(
+                    oracle_internal_gain + oracle_surface_sums.sum_hat_surf_w
+                        - oracle_surface_sums.sum_hat_ref_w,
+                );
+                rust_temp_ind.push(
+                    rust_internal_gain + rust_surface_sums.sum_hat_surf_w
+                        - rust_surface_sums.sum_hat_ref_w,
+                );
+                oracle_air_power_cap.push(model_air_power_cap_w_per_k);
+                rust_air_power_cap.push(model_air_power_cap_w_per_k);
+                oracle_temp_history.push(inferred_third_order_history_term_w(
+                    model_air_power_cap_w_per_k,
+                    mat,
+                    sample_index,
+                    true,
+                ));
+                rust_temp_history.push(inferred_third_order_history_term_w(
+                    model_air_power_cap_w_per_k,
+                    mat,
+                    sample_index,
+                    false,
+                ));
+            }
+
+            let mat_oracle = heat_balance_oracle_values(mat, samples);
+            let mat_rust = heat_balance_rust_values(mat, samples);
+            let air_storage_oracle = heat_balance_oracle_values(air_storage, samples);
+            let air_storage_rust = heat_balance_rust_values(air_storage, samples);
+            let surface_convection_oracle = heat_balance_oracle_values(surface_convection, samples);
+            let surface_convection_rust = heat_balance_rust_values(surface_convection, samples);
+            let first_divergence = first_zone_air_coefficient_divergence(
+                &[
+                    ("SumHA", &oracle_sum_ha, &rust_sum_ha),
+                    ("SumHATsurf", &oracle_sum_hat_surf, &rust_sum_hat_surf),
+                    ("SumHATref", &oracle_sum_hat_ref, &rust_sum_hat_ref),
+                    ("TempDepCoef", &oracle_temp_dep, &rust_temp_dep),
+                    ("TempIndCoef", &oracle_temp_ind, &rust_temp_ind),
+                    ("AirPowerCap", &oracle_air_power_cap, &rust_air_power_cap),
+                    ("TempHistoryTerm", &oracle_temp_history, &rust_temp_history),
+                    ("MAT", &mat_oracle, &mat_rust),
+                    ("AirStorage", &air_storage_oracle, &air_storage_rust),
+                    (
+                        "SurfaceConvection",
+                        &surface_convection_oracle,
+                        &surface_convection_rust,
+                    ),
+                ],
+                samples,
+            );
+
+            Some(HeatBalanceZoneAirCoefficientDelta {
+                key: zone.name.0.clone(),
+                samples,
+                first_divergence_source: first_divergence
+                    .as_ref()
+                    .map(|divergence| divergence.source.to_string())
+                    .unwrap_or_else(|| "none".to_string()),
+                first_divergence_sample_index: first_divergence
+                    .as_ref()
+                    .map(|divergence| divergence.sample_index),
+                first_divergence_delta: first_divergence.as_ref().map_or(0.0, |d| d.delta),
+                sum_ha_delta: delta_summary(&oracle_sum_ha, &rust_sum_ha),
+                sum_hat_surf_delta: delta_summary(&oracle_sum_hat_surf, &rust_sum_hat_surf),
+                sum_hat_ref_delta: delta_summary(&oracle_sum_hat_ref, &rust_sum_hat_ref),
+                temp_dependent_coefficient_delta: delta_summary(&oracle_temp_dep, &rust_temp_dep),
+                temp_independent_coefficient_delta: delta_summary(&oracle_temp_ind, &rust_temp_ind),
+                air_power_cap_delta: delta_summary(&oracle_air_power_cap, &rust_air_power_cap),
+                temp_history_term_delta: delta_summary(&oracle_temp_history, &rust_temp_history),
+                mat_delta: delta_summary(&mat_oracle, &mat_rust),
+                air_storage_delta: delta_summary(&air_storage_oracle, &air_storage_rust),
+                surface_convection_delta: delta_summary(
+                    &surface_convection_oracle,
+                    &surface_convection_rust,
+                ),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_oracle_values(series: &HeatBalanceSeriesDiagnostic, samples: usize) -> Vec<f64> {
+    series
+        .sample_rows
+        .iter()
+        .take(samples)
+        .map(|point| point.oracle_c)
+        .collect()
+}
+
+fn heat_balance_rust_values(series: &HeatBalanceSeriesDiagnostic, samples: usize) -> Vec<f64> {
+    series
+        .sample_rows
+        .iter()
+        .take(samples)
+        .map(|point| point.rust_c)
+        .collect()
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct ZoneAirOutputCoefficientSums {
+    sum_ha_w_per_k: f64,
+    sum_hat_surf_w: f64,
+    sum_hat_ref_w: f64,
+}
+
+impl ZoneAirOutputCoefficientSums {
+    fn add_surface(
+        &mut self,
+        area_m2: f64,
+        hconv_w_per_m2_k: f64,
+        inside_temperature_c: f64,
+        surface_convection_gain_w: f64,
+    ) {
+        let ha_w_per_k = area_m2 * hconv_w_per_m2_k;
+        if !ha_w_per_k.is_finite() || ha_w_per_k.abs() <= f64::EPSILON {
+            return;
+        }
+        let reference_air_temperature_c =
+            inside_temperature_c + surface_convection_gain_w / ha_w_per_k;
+        self.sum_ha_w_per_k += ha_w_per_k;
+        self.sum_hat_surf_w += ha_w_per_k * inside_temperature_c;
+        self.sum_hat_ref_w += ha_w_per_k * reference_air_temperature_c;
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct ZoneAirCoefficientFirstDivergence<'a> {
+    source: &'a str,
+    sample_index: usize,
+    delta: f64,
+}
+
+fn first_zone_air_coefficient_divergence<'a>(
+    components: &[(&'a str, &[f64], &[f64])],
+    samples: usize,
+) -> Option<ZoneAirCoefficientFirstDivergence<'a>> {
+    for sample_index in 0..samples {
+        let mut best_source = None;
+        let mut best_delta = 0.0_f64;
+        for (source, oracle, rust) in components {
+            let delta = (oracle[sample_index] - rust[sample_index]).abs();
+            if delta.is_finite() && delta > best_delta {
+                best_source = Some(*source);
+                best_delta = delta;
+            }
+        }
+        if let Some(source) = best_source.filter(|_| best_delta > 1.0e-9) {
+            return Some(ZoneAirCoefficientFirstDivergence {
+                source,
+                sample_index,
+                delta: best_delta,
+            });
+        }
+    }
+    None
+}
+
+fn heat_balance_zone_air_model_air_power_cap_w_per_k(
+    model: &SimulationModel,
+    zone_geometry: &[ZoneGeometrySummary],
+    zone: &ep_model::Zone,
+) -> Option<f64> {
+    let volume_m3 = zone_geometry
+        .iter()
+        .find(|summary| summary.zone_id == zone.id)
+        .and_then(|summary| summary.volume_m3)?;
+    let zone_multiplier = f64::from(zone.multiplier.max(1));
+    let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    let timestep_seconds = 3600.0 / f64::from(zone_timesteps_per_hour);
+    if volume_m3 <= 0.0 || timestep_seconds <= 0.0 {
+        return None;
+    }
+    Some(
+        volume_m3
+            * zone_multiplier
+            * HEAT_BALANCE_REPORT_AIR_DENSITY_KG_PER_M3
+            * HEAT_BALANCE_REPORT_AIR_SPECIFIC_HEAT_J_PER_KG_K
+            / timestep_seconds,
+    )
+}
+
+fn inferred_third_order_history_term_w(
+    air_power_cap_w_per_k: f64,
+    mat: &HeatBalanceSeriesDiagnostic,
+    sample_index: usize,
+    oracle: bool,
+) -> f64 {
+    if sample_index < 3 {
+        return 0.0;
+    }
+    let sample = |offset: usize| {
+        let point = mat.sample_rows[sample_index - offset];
+        if oracle { point.oracle_c } else { point.rust_c }
+    };
+    air_power_cap_w_per_k * (3.0 * sample(1) - 1.5 * sample(2) + (1.0 / 3.0) * sample(3))
 }
 
 fn heat_balance_ctf_history_first_sample_deltas(
@@ -7430,6 +7785,10 @@ fn render_heat_balance_conformance_json(
         heat_balance_ctf_component_first_samples_json(&diagnostic.ctf_component_first_samples)
     ));
     json.push_str(&format!(
+        "  \"zone_air_coefficient_deltas\": {},\n",
+        heat_balance_zone_air_coefficient_deltas_json(&diagnostic.zone_air_coefficient_deltas)
+    ));
+    json.push_str(&format!(
         "  \"ctf_history_first_sample_deltas\": {},\n",
         heat_balance_ctf_history_first_sample_deltas_json(
             &diagnostic.ctf_history_first_sample_deltas
@@ -7676,6 +8035,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_ctf_component_first_sample_rows(
         &mut report,
         &diagnostic.ctf_component_first_samples,
+    );
+    report.push('\n');
+
+    report.push_str("## Zone-Air Coefficient Deltas\n\n");
+    heat_balance_report_zone_air_coefficient_delta_rows(
+        &mut report,
+        &diagnostic.zone_air_coefficient_deltas,
     );
     report.push('\n');
 
@@ -8301,6 +8667,56 @@ fn heat_balance_ctf_component_first_samples_json(
             json_number(row.outside_current_inside_term_w),
             json_number(row.outside_history_term_w),
             json_number(row.heat_storage_rate_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_zone_air_coefficient_deltas_json(
+    rows: &[HeatBalanceZoneAirCoefficientDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        let first_divergence_sample_index = row
+            .first_divergence_sample_index
+            .map_or_else(|| "null".to_string(), |value| value.to_string());
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"samples\": {}, ",
+                "\"first_divergence_source\": {}, ",
+                "\"first_divergence_sample_index\": {}, ",
+                "\"first_divergence_delta\": {}, ",
+                "\"sum_ha_delta\": {}, ",
+                "\"sum_hat_surf_delta\": {}, ",
+                "\"sum_hat_ref_delta\": {}, ",
+                "\"temp_dependent_coefficient_delta\": {}, ",
+                "\"temp_independent_coefficient_delta\": {}, ",
+                "\"air_power_cap_delta\": {}, ",
+                "\"temp_history_term_delta\": {}, ",
+                "\"mat_delta\": {}, ",
+                "\"air_storage_delta\": {}, ",
+                "\"surface_convection_delta\": {} }}"
+            ),
+            json_string(&row.key),
+            row.samples,
+            json_string(&row.first_divergence_source),
+            first_divergence_sample_index,
+            json_number(row.first_divergence_delta),
+            delta_summary_json(&row.sum_ha_delta),
+            delta_summary_json(&row.sum_hat_surf_delta),
+            delta_summary_json(&row.sum_hat_ref_delta),
+            delta_summary_json(&row.temp_dependent_coefficient_delta),
+            delta_summary_json(&row.temp_independent_coefficient_delta),
+            delta_summary_json(&row.air_power_cap_delta),
+            delta_summary_json(&row.temp_history_term_delta),
+            delta_summary_json(&row.mat_delta),
+            delta_summary_json(&row.air_storage_delta),
+            delta_summary_json(&row.surface_convection_delta)
         ));
     }
     json.push(']');
@@ -9251,6 +9667,51 @@ fn heat_balance_report_ctf_component_first_sample_rows(
     }
 }
 
+fn heat_balance_report_zone_air_coefficient_delta_rows(
+    report: &mut String,
+    rows: &[HeatBalanceZoneAirCoefficientDelta],
+) {
+    report.push_str(
+        "| key | samples | first_divergence_source | first_divergence_sample | first_divergence_delta | SumHA_rmse | SumHATsurf_rmse | SumHATref_rmse | TempDepCoef_rmse | TempIndCoef_rmse | AirPowerCap_rmse | TempHistoryTerm_rmse | MAT_rmse | AirStorage_rmse | SurfaceConvection_rmse | SumHA_max | SumHATsurf_max | SumHATref_max | TempDepCoef_max | TempIndCoef_max | AirPowerCap_max | TempHistoryTerm_max | MAT_max | AirStorage_max | SurfaceConvection_max |\n",
+    );
+    report.push_str(
+        "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+    );
+    for row in rows {
+        let first_divergence_sample = row
+            .first_divergence_sample_index
+            .map_or_else(|| "n/a".to_string(), |value| value.to_string());
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            row.samples,
+            markdown_cell(&row.first_divergence_source),
+            first_divergence_sample,
+            row.first_divergence_delta,
+            row.sum_ha_delta.rmse_delta_c,
+            row.sum_hat_surf_delta.rmse_delta_c,
+            row.sum_hat_ref_delta.rmse_delta_c,
+            row.temp_dependent_coefficient_delta.rmse_delta_c,
+            row.temp_independent_coefficient_delta.rmse_delta_c,
+            row.air_power_cap_delta.rmse_delta_c,
+            row.temp_history_term_delta.rmse_delta_c,
+            row.mat_delta.rmse_delta_c,
+            row.air_storage_delta.rmse_delta_c,
+            row.surface_convection_delta.rmse_delta_c,
+            row.sum_ha_delta.max_abs_delta_c,
+            row.sum_hat_surf_delta.max_abs_delta_c,
+            row.sum_hat_ref_delta.max_abs_delta_c,
+            row.temp_dependent_coefficient_delta.max_abs_delta_c,
+            row.temp_independent_coefficient_delta.max_abs_delta_c,
+            row.air_power_cap_delta.max_abs_delta_c,
+            row.temp_history_term_delta.max_abs_delta_c,
+            row.mat_delta.max_abs_delta_c,
+            row.air_storage_delta.max_abs_delta_c,
+            row.surface_convection_delta.max_abs_delta_c
+        ));
+    }
+}
+
 fn heat_balance_report_ctf_history_first_sample_delta_rows(
     report: &mut String,
     rows: &[HeatBalanceCtfHistoryFirstSampleDelta],
@@ -10188,6 +10649,26 @@ mod tests {
         }
     }
 
+    fn sample_zone_air_coefficient_delta() -> super::HeatBalanceZoneAirCoefficientDelta {
+        super::HeatBalanceZoneAirCoefficientDelta {
+            key: "ZONE ONE".to_string(),
+            samples: 2,
+            first_divergence_source: "TempDepCoef".to_string(),
+            first_divergence_sample_index: Some(1),
+            first_divergence_delta: 2.0,
+            sum_ha_delta: super::delta_summary(&[10.0, 11.0], &[10.0, 9.0]),
+            sum_hat_surf_delta: super::delta_summary(&[100.0, 110.0], &[101.0, 108.0]),
+            sum_hat_ref_delta: super::delta_summary(&[90.0, 95.0], &[89.0, 98.0]),
+            temp_dependent_coefficient_delta: super::delta_summary(&[10.0, 11.0], &[10.0, 9.0]),
+            temp_independent_coefficient_delta: super::delta_summary(&[20.0, 21.0], &[19.0, 22.0]),
+            air_power_cap_delta: super::delta_summary(&[30.0, 31.0], &[30.5, 30.0]),
+            temp_history_term_delta: super::delta_summary(&[40.0, 41.0], &[39.0, 42.0]),
+            mat_delta: super::delta_summary(&[23.0, 23.1], &[23.0, 23.0]),
+            air_storage_delta: super::delta_summary(&[1.0, 2.0], &[1.5, 1.0]),
+            surface_convection_delta: super::delta_summary(&[3.0, 4.0], &[2.5, 4.5]),
+        }
+    }
+
     #[test]
     fn version_command_succeeds() {
         let args = vec!["--version".to_string()];
@@ -10916,6 +11397,7 @@ mod tests {
                 outside_history_term_w: 0.0,
                 heat_storage_rate_w: 0.0,
             }],
+            zone_air_coefficient_deltas: vec![sample_zone_air_coefficient_delta()],
             ctf_history_first_sample_deltas: vec![super::HeatBalanceCtfHistoryFirstSampleDelta {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -11328,6 +11810,11 @@ mod tests {
         assert!(json.contains("\"outside_face_temperature_c\": 11.000000000000"));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"inside_current_outside_term_w\""));
+        assert!(json.contains("\"zone_air_coefficient_deltas\""));
+        assert!(json.contains("\"first_divergence_source\": \"TempDepCoef\""));
+        assert!(json.contains("\"sum_ha_delta\""));
+        assert!(json.contains("\"temp_dependent_coefficient_delta\""));
+        assert!(json.contains("\"temp_history_term_delta\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"inside_history_delta_w\""));
@@ -11395,6 +11882,11 @@ mod tests {
         assert!(digest.contains("\"outdoor_dry_bulb_c\": 10.000000000000"));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"inside_current_outside_term_w\""));
+        assert!(digest.contains("\"zone_air_coefficient_deltas\""));
+        assert!(digest.contains("\"first_divergence_source\": \"TempDepCoef\""));
+        assert!(digest.contains("\"sum_ha_delta\""));
+        assert!(digest.contains("\"temp_dependent_coefficient_delta\""));
+        assert!(digest.contains("\"temp_history_term_delta\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"inside_history_delta_w\""));
@@ -11468,6 +11960,15 @@ mod tests {
         assert!(
             report.contains("| FLOOR | -10.000000000000 | 30.000000000000 | -40.000000000000 |")
         );
+        assert!(report.contains("## Zone-Air Coefficient Deltas"));
+        assert!(report.contains("first_divergence_source"));
+        assert!(report.contains("TempDepCoef_rmse"));
+        assert!(report.contains("TempIndCoef_rmse"));
+        assert!(report.contains("AirPowerCap_rmse"));
+        assert!(report.contains("TempHistoryTerm_rmse"));
+        assert!(report.contains("SumHA_rmse"));
+        assert!(report.contains("SumHATsurf_rmse"));
+        assert!(report.contains("SumHATref_rmse"));
         assert!(report.contains("## CTF History First-Sample Deltas"));
         assert!(report.contains(
             "| FLOOR | FLOOR | 100.000000000000 | 11.000000000000 | 12.000000000000 | 13.000000000000 | 14.000000000000 | 15.000000000000 | 1.000000000000 | 16.000000000000 | 17.000000000000 | 1.000000000000 | 9.000000000000 | 10.000000000000 | 1.000000000000 |"
@@ -11567,6 +12068,7 @@ mod tests {
                 outside_history_term_w: 0.0,
                 heat_storage_rate_w: 1.0,
             }],
+            zone_air_coefficient_deltas: vec![sample_zone_air_coefficient_delta()],
             ctf_history_first_sample_deltas: vec![super::HeatBalanceCtfHistoryFirstSampleDelta {
                 key: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -11947,6 +12449,11 @@ mod tests {
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
+        assert!(json.contains("\"zone_air_coefficient_deltas\""));
+        assert!(json.contains("\"first_divergence_source\": \"TempDepCoef\""));
+        assert!(json.contains("\"sum_ha_delta\""));
+        assert!(json.contains("\"temp_dependent_coefficient_delta\""));
+        assert!(json.contains("\"temp_history_term_delta\""));
         assert!(json.contains("\"ctf_history_first_sample_deltas\""));
         assert!(json.contains("\"inside_current_delta_w\""));
         assert!(json.contains("\"ctf_history_series_deltas\""));
@@ -12002,6 +12509,11 @@ mod tests {
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
+        assert!(digest.contains("\"zone_air_coefficient_deltas\""));
+        assert!(digest.contains("\"first_divergence_source\": \"TempDepCoef\""));
+        assert!(digest.contains("\"sum_ha_delta\""));
+        assert!(digest.contains("\"temp_dependent_coefficient_delta\""));
+        assert!(digest.contains("\"temp_history_term_delta\""));
         assert!(digest.contains("\"ctf_history_first_sample_deltas\""));
         assert!(digest.contains("\"inside_current_delta_w\""));
         assert!(digest.contains("\"ctf_history_series_deltas\""));
@@ -12070,6 +12582,15 @@ mod tests {
         assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
+        assert!(report.contains("## Zone-Air Coefficient Deltas"));
+        assert!(report.contains("first_divergence_source"));
+        assert!(report.contains("TempDepCoef_rmse"));
+        assert!(report.contains("TempIndCoef_rmse"));
+        assert!(report.contains("AirPowerCap_rmse"));
+        assert!(report.contains("TempHistoryTerm_rmse"));
+        assert!(report.contains("SumHA_rmse"));
+        assert!(report.contains("SumHATsurf_rmse"));
+        assert!(report.contains("SumHATref_rmse"));
         assert!(report.contains("## CTF History First-Sample Deltas"));
         assert!(report.contains("## CTF History Series Deltas"));
         assert!(report.contains("out_history_rmse_w"));

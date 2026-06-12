@@ -295,6 +295,9 @@ $digestText = Get-Content -LiteralPath $digestPath -Raw
 Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "compact digest sample row payload"
 Assert-Contains -Text $digestText -Pattern '"compatibility_stages"' -Description "compact digest compatibility stage order"
 Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHistories"' -Description "compact digest UpdateThermalHistories stage"
+Assert-Contains -Text $digestText -Pattern '"zone_air_coefficient_deltas"' -Description "compact digest zone-air coefficient diagnostics"
+Assert-Contains -Text $digestText -Pattern '"temp_dependent_coefficient_delta"' -Description "compact digest zone-air TempDepCoef delta"
+Assert-Contains -Text $digestText -Pattern '"temp_history_term_delta"' -Description "compact digest zone-air history-term delta"
 $summary = $digestText | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected case_id: $($summary.case_id)"
@@ -463,6 +466,41 @@ if ([Math]::Abs($outsideComponentSum - [double]$floorCtfComponent.outside_conduc
 $storageFromConduction = -([double]$floorCtfComponent.inside_conduction_rate_w + [double]$floorCtfComponent.outside_conduction_rate_w)
 if ([Math]::Abs($storageFromConduction - [double]$floorCtfComponent.heat_storage_rate_w) -gt 1.0e-6) {
     throw "Expected FLOOR storage to match the negated inside/outside conduction sum"
+}
+$zoneAirCoefficientDelta = @($summary.zone_air_coefficient_deltas | Where-Object { $_.key -eq "ZONE ONE" })[0]
+if ($null -eq $zoneAirCoefficientDelta) {
+    throw "Expected zone_air_coefficient_deltas to include ZONE ONE"
+}
+if ([int]$zoneAirCoefficientDelta.samples -ne 8760) {
+    throw "Expected ZONE ONE zone-air coefficient deltas to use 8760 samples, got $($zoneAirCoefficientDelta.samples)"
+}
+foreach ($propertyName in @(
+        "first_divergence_source",
+        "first_divergence_sample_index",
+        "first_divergence_delta",
+        "sum_ha_delta",
+        "sum_hat_surf_delta",
+        "sum_hat_ref_delta",
+        "temp_dependent_coefficient_delta",
+        "temp_independent_coefficient_delta",
+        "air_power_cap_delta",
+        "temp_history_term_delta",
+        "mat_delta",
+        "air_storage_delta",
+        "surface_convection_delta"
+    )) {
+    if ($zoneAirCoefficientDelta.PSObject.Properties.Name -notcontains $propertyName) {
+        throw "Expected ZONE ONE zone-air coefficient row to include $propertyName"
+    }
+}
+if ($zoneAirCoefficientDelta.first_divergence_source -eq "none") {
+    throw "Expected active zone-air coefficient row to retain a visible first divergence source"
+}
+if ([double]$zoneAirCoefficientDelta.temp_dependent_coefficient_delta.rmse_delta_c -lt 0.0) {
+    throw "Expected TempDepCoef RMSE to be numeric"
+}
+if ([double]$zoneAirCoefficientDelta.temp_history_term_delta.rmse_delta_c -lt 0.0) {
+    throw "Expected TempHistoryTerm RMSE to be numeric"
 }
 if ($CtfSeedPolicy -eq "all-eio") {
     $floorHistoryDelta = @($summary.ctf_history_first_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
@@ -927,6 +965,15 @@ Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown
 Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
+Assert-Contains -Text $reportText -Pattern "## Zone-Air Coefficient Deltas" -Description "markdown zone-air coefficient delta section"
+Assert-Contains -Text $reportText -Pattern "first_divergence_source" -Description "markdown zone-air first divergence column"
+Assert-Contains -Text $reportText -Pattern "SumHA_rmse" -Description "markdown zone-air SumHA RMSE column"
+Assert-Contains -Text $reportText -Pattern "SumHATsurf_rmse" -Description "markdown zone-air SumHATsurf RMSE column"
+Assert-Contains -Text $reportText -Pattern "SumHATref_rmse" -Description "markdown zone-air SumHATref RMSE column"
+Assert-Contains -Text $reportText -Pattern "TempDepCoef_rmse" -Description "markdown zone-air TempDepCoef RMSE column"
+Assert-Contains -Text $reportText -Pattern "TempIndCoef_rmse" -Description "markdown zone-air TempIndCoef RMSE column"
+Assert-Contains -Text $reportText -Pattern "AirPowerCap_rmse" -Description "markdown zone-air AirPowerCap RMSE column"
+Assert-Contains -Text $reportText -Pattern "TempHistoryTerm_rmse" -Description "markdown zone-air TempHistoryTerm RMSE column"
 Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
 Assert-Contains -Text $reportText -Pattern "ctf_y0" -Description "markdown CTF zero cross coefficient column"
 Assert-Contains -Text $reportText -Pattern "in_temp_abs_delta_c" -Description "markdown CTF inside face temperature delta column"
