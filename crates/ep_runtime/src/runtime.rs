@@ -3820,6 +3820,8 @@ fn advance_heat_balance_state_one_timestep_internal(
                 &state.surfaces,
                 &mut state.zones,
                 input.timestep_seconds,
+                weather_context,
+                input.outdoor_dry_bulb_c,
                 true,
                 heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
                 false,
@@ -3869,6 +3871,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             &state.surfaces,
             &mut state.zones,
             input.timestep_seconds,
+            weather_context,
+            input.outdoor_dry_bulb_c,
             true,
             heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
             use_inside_ctf_outside_temperature_for_conduction_report,
@@ -3936,6 +3940,8 @@ fn advance_heat_balance_state_one_timestep_internal(
         &state.surfaces,
         &mut state.zones,
         input.timestep_seconds,
+        weather_context,
+        input.outdoor_dry_bulb_c,
         correct_zone_air_after_surface_pass && !interleave_zone_air_surface_passes,
         heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
         use_inside_ctf_outside_temperature_for_conduction_report,
@@ -4156,6 +4162,8 @@ fn run_interleaved_surface_zone_balance(
                 surfaces,
                 zones,
                 input.timestep_seconds,
+                weather_context,
+                input.outdoor_dry_bulb_c,
                 true,
                 use_third_order_zone_air_correction,
                 use_inside_ctf_outside_temperature_for_conduction_report,
@@ -4403,10 +4411,18 @@ fn correct_zone_air_temperatures_from_current_surfaces(
     surfaces: &[SurfaceHeatBalanceState],
     zones: &mut [ZoneHeatBalanceState],
     timestep_seconds: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    fallback_dry_bulb_c: f64,
     update_mean_air_temperature: bool,
     use_third_order_zone_air_correction: bool,
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
 ) {
+    update_zone_air_heat_capacities_from_weather_context(
+        zones,
+        weather_context,
+        fallback_dry_bulb_c,
+    );
+
     for zone in zones {
         zone.opaque_surface_heat_gain_w = surfaces
             .iter()
@@ -7238,53 +7254,15 @@ fn energyplus_outdoor_wet_bulb_c(
     Some(wet_bulb_c.min(dry_bulb_c))
 }
 
-#[cfg(test)]
 fn update_zone_air_heat_capacities_from_weather_context(
     zones: &mut [ZoneHeatBalanceState],
     context: Option<HeatBalanceWeatherContext<'_>>,
     fallback_dry_bulb_c: f64,
 ) {
-    let Some(context) = context else {
-        return;
-    };
-    let Some(record) = context.records.get(context.record_index) else {
-        return;
-    };
-
-    let dry_bulb_c = context
-        .zone_timestep
-        .map(|timestep| {
-            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                Some(context.records),
-                context.record_index,
-                fallback_dry_bulb_c,
-                context.zone_steps_per_hour,
-                timestep,
-                context.first_hour_interpolation_starting_values,
-            )
-        })
-        .unwrap_or(fallback_dry_bulb_c);
-    let relative_humidity_percent =
-        energyplus_weather_relative_humidity_for_context(context, record.relative_humidity_percent);
-    let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
-        context,
-        record.atmospheric_pressure_pa,
-    );
-    let Some(humidity_ratio) = energyplus_psychrometric_humidity_ratio_from_rh(
-        dry_bulb_c,
-        (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
-        atmospheric_pressure_pa,
-    ) else {
-        return;
-    };
-
     for zone in zones {
-        if let Some(air_heat_capacity_j_per_k) = energyplus_zone_air_heat_capacity_j_per_k(
-            zone.volume_m3,
-            atmospheric_pressure_pa,
-            zone.mean_air_temperature_c,
-            humidity_ratio,
-        ) {
+        if let Some(air_heat_capacity_j_per_k) =
+            weather_context_zone_air_heat_capacity_j_per_k(zone, context, fallback_dry_bulb_c)
+        {
             zone.air_heat_capacity_j_per_k = air_heat_capacity_j_per_k;
         }
     }
@@ -9289,6 +9267,14 @@ fn energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
 }
 
 fn weather_proxy_zone_air_heat_capacity_j_per_k(
+    zone: &ZoneHeatBalanceState,
+    context: Option<HeatBalanceWeatherContext<'_>>,
+    fallback_dry_bulb_c: f64,
+) -> Option<f64> {
+    weather_context_zone_air_heat_capacity_j_per_k(zone, context, fallback_dry_bulb_c)
+}
+
+fn weather_context_zone_air_heat_capacity_j_per_k(
     zone: &ZoneHeatBalanceState,
     context: Option<HeatBalanceWeatherContext<'_>>,
     fallback_dry_bulb_c: f64,

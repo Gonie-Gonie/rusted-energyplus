@@ -471,13 +471,13 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   until all coefficient inputs are wired from source-mapped runtime state.
   Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance
   formulas used by `AirPowerCap`
-  (`PsyRhoAirFnPbTdbW` and `PsyCpAirFnW`), but they are deliberately not wired
-  into the active dynamic diagnostic solver yet. A direct weather-context
-  experiment that used timestep-interpolated outdoor humidity as the zone
-  `airHumRat` proxy reduced the physical altitude shortcut but worsened the
-  active floor heat-storage and aggregate conduction focus rows; porting the
-  actual zone humidity ratio and predictor/corrector state ownership must come
-  first.
+  (`PsyRhoAirFnPbTdbW` and `PsyCpAirFnW`), and the active dynamic diagnostic
+  solver updates `ZoneHeatBalanceState::air_heat_capacity_j_per_k` from the
+  timestep weather-context pressure/RH proxy immediately before zone-air
+  coefficient construction. This source-order wiring lowered the active
+  `1ZoneUncontrolled` MAT RMSE to `0.022407 C` and the coefficient-level
+  surface-convection RMSE to `4.277641 W`. The actual EnergyPlus-owned
+  `ZoneAirHumRat` path is still a promotion blocker.
 - `DataHeatBalance.cc::ZoneData::setUpOutputVars` registers `Zone Air Heat
   Balance Internal Convective Heat Gain Rate`, `Zone Air Heat Balance Surface
   Convection Rate`, and `Zone Air Heat Balance Air Energy Storage Rate`. Rust
