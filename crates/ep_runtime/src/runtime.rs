@@ -774,6 +774,10 @@ pub struct HeatBalanceSurfaceFirstSampleTrace {
     pub zone_mean_air_temperature_c: f64,
     /// Inside face temperature after the timestep in C.
     pub inside_face_temperature_c: f64,
+    /// Inside face temperature used to calculate inside hconv in C.
+    pub inside_convection_input_inside_face_temperature_c: f64,
+    /// Reference air temperature used to calculate inside hconv in C.
+    pub inside_convection_input_reference_air_temperature_c: f64,
     /// Reported outside face temperature after the timestep in C.
     pub outside_face_temperature_c: f64,
     /// Inside-face convection heat gain rate in W.
@@ -987,6 +991,12 @@ struct SurfaceBoundaryBalanceResult {
     exterior_report_terms: SurfaceExteriorReportTerms,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct InsideConvectionCoefficientInputState {
+    inside_face_temperature_c: f64,
+    reference_air_temperature_c: f64,
+}
+
 /// Per-surface heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SurfaceHeatBalanceState {
@@ -1036,6 +1046,10 @@ pub struct SurfaceHeatBalanceState {
     pub conductance_w_per_k: f64,
     /// Current inside convection coefficient in W/m2-K.
     pub inside_convection_coefficient_w_per_m2_k: f64,
+    /// Inside face temperature used to calculate the current inside convection coefficient in C.
+    pub inside_convection_input_inside_face_temperature_c: f64,
+    /// Reference air temperature used to calculate the current inside convection coefficient in C.
+    pub inside_convection_input_reference_air_temperature_c: f64,
     /// Reference air temperature used by the last inside convection solve in C.
     pub inside_reference_air_temperature_c: f64,
     /// Outside-face temperature used by the last inside CTF solve in C.
@@ -3138,6 +3152,8 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 conductance_w_per_k,
                 inside_convection_coefficient_w_per_m2_k:
                     ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K,
+                inside_convection_input_inside_face_temperature_c: initial_zone_air_temperature_c,
+                inside_convection_input_reference_air_temperature_c: initial_zone_air_temperature_c,
                 inside_reference_air_temperature_c: initial_zone_air_temperature_c,
                 inside_ctf_outside_temperature_c: initial_zone_air_temperature_c,
                 inside_radiant_internal_gain_w_per_m2: 0.0,
@@ -3774,6 +3790,7 @@ fn advance_heat_balance_state_one_timestep_internal(
             None,
             None,
             None,
+            None,
             false,
         );
 
@@ -3811,6 +3828,7 @@ fn advance_heat_balance_state_one_timestep_internal(
                 },
                 use_doe2_outside_convection,
                 interior_longwave_exchange_probe,
+                None,
                 None,
                 None,
                 None,
@@ -3953,6 +3971,17 @@ fn run_interleaved_surface_zone_balance(
         } else {
             None
         };
+    let mut inside_convection_coefficient_inputs =
+        if freeze_inside_convection_for_timestep || inside_hconv_reevaluation_interval.is_some() {
+            let zone_temperatures = heat_balance_zone_temperature_map(zones);
+            Some(heat_balance_inside_convection_coefficient_inputs(
+                surfaces,
+                &zone_temperatures,
+                first_pass_inside_temperatures,
+            ))
+        } else {
+            None
+        };
     let frozen_surface_reference_air_temperatures = if freeze_surface_reference_air_for_timestep {
         Some(
             zones
@@ -3990,6 +4019,12 @@ fn run_interleaved_surface_zone_balance(
                     &current_zone_temperatures,
                     None,
                 ));
+                inside_convection_coefficient_inputs =
+                    Some(heat_balance_inside_convection_coefficient_inputs(
+                        surfaces,
+                        &current_zone_temperatures,
+                        None,
+                    ));
             }
         }
         let zone_temperatures = frozen_surface_reference_air_temperatures
@@ -4029,6 +4064,7 @@ fn run_interleaved_surface_zone_balance(
             use_doe2_outside_convection,
             interior_longwave_exchange_probe,
             inside_convection_coefficients.as_ref(),
+            inside_convection_coefficient_inputs.as_ref(),
             frozen_outside_boundary_balances.as_ref(),
             frozen_inside_ctf_outside_temperatures.as_ref(),
             use_inside_ctf_outside_temperature_for_conduction_report,
@@ -4117,6 +4153,9 @@ fn run_surface_balance_passes(
     use_doe2_outside_convection: bool,
     interior_longwave_exchange_probe: InteriorLongwaveExchangeProbe,
     inside_convection_coefficient_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+    inside_convection_coefficient_input_overrides: Option<
+        &BTreeMap<SurfaceId, InsideConvectionCoefficientInputState>,
+    >,
     outside_boundary_balance_snapshots: Option<&BTreeMap<SurfaceId, SurfaceBoundaryBalanceResult>>,
     inside_ctf_outside_temperature_snapshots: Option<&BTreeMap<SurfaceId, f64>>,
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
@@ -4169,6 +4208,16 @@ fn run_surface_balance_passes(
                 });
             surface.inside_convection_coefficient_w_per_m2_k =
                 inside_convection_coefficient_w_per_m2_k;
+            let inside_convection_input = inside_convection_coefficient_input_overrides
+                .and_then(|inputs| inputs.get(&surface.surface_id).copied())
+                .unwrap_or(InsideConvectionCoefficientInputState {
+                    inside_face_temperature_c: previous_inside_face_temperature_c,
+                    reference_air_temperature_c: zone_temperature_c,
+                });
+            surface.inside_convection_input_inside_face_temperature_c =
+                inside_convection_input.inside_face_temperature_c;
+            surface.inside_convection_input_reference_air_temperature_c =
+                inside_convection_input.reference_air_temperature_c;
 
             update_surface_ctf_history_constants(surface);
             let use_previous_inside_for_boundary = (use_previous_inside_for_outdoor_boundary
@@ -4279,6 +4328,32 @@ fn heat_balance_inside_convection_coefficients(
                     inside_face_temperature_c,
                     zone_temperature_c,
                 ),
+            )
+        })
+        .collect()
+}
+
+fn heat_balance_inside_convection_coefficient_inputs(
+    surfaces: &[SurfaceHeatBalanceState],
+    zone_temperatures: &BTreeMap<ZoneId, f64>,
+    inside_surface_temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) -> BTreeMap<SurfaceId, InsideConvectionCoefficientInputState> {
+    surfaces
+        .iter()
+        .map(|surface| {
+            let inside_face_temperature_c = inside_surface_temperature_overrides
+                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            let reference_air_temperature_c = zone_temperatures
+                .get(&surface.zone_id)
+                .copied()
+                .unwrap_or(surface.inside_face_temperature_c);
+            (
+                surface.surface_id,
+                InsideConvectionCoefficientInputState {
+                    inside_face_temperature_c,
+                    reference_air_temperature_c,
+                },
             )
         })
         .collect()
@@ -5154,6 +5229,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                             outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
                             zone_mean_air_temperature_c,
                             inside_face_temperature_c: surface_state.inside_face_temperature_c,
+                            inside_convection_input_inside_face_temperature_c: surface_state
+                                .inside_convection_input_inside_face_temperature_c,
+                            inside_convection_input_reference_air_temperature_c: surface_state
+                                .inside_convection_input_reference_air_temperature_c,
                             outside_face_temperature_c,
                             inside_convection_heat_gain_rate_w: inside_convection_heat_gain_rate,
                             inside_net_surface_thermal_radiation_heat_gain_rate_w:
@@ -12656,6 +12735,7 @@ DATA PERIODS
             false,
             InteriorLongwaveExchangeProbe::None,
             Some(&inside_convection_coefficients),
+            None,
             Some(&outside_snapshots),
             None,
             false,
@@ -12730,6 +12810,7 @@ DATA PERIODS
             false,
             InteriorLongwaveExchangeProbe::None,
             Some(&inside_convection_coefficients),
+            None,
             None,
             Some(&inside_ctf_outside_temperature_snapshots),
             false,

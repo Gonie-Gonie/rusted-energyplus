@@ -9356,6 +9356,8 @@ fn heat_balance_surface_first_sample_trace_json(
                 "\"outdoor_dry_bulb_c\": {}, ",
                 "\"zone_mean_air_temperature_c\": {}, ",
                 "\"inside_face_temperature_c\": {}, ",
+                "\"inside_convection_input_inside_face_temperature_c\": {}, ",
+                "\"inside_convection_input_reference_air_temperature_c\": {}, ",
                 "\"outside_face_temperature_c\": {}, ",
                 "\"inside_convection_heat_gain_rate_w\": {}, ",
                 "\"inside_net_surface_thermal_radiation_heat_gain_rate_w\": {}, ",
@@ -9372,6 +9374,8 @@ fn heat_balance_surface_first_sample_trace_json(
             json_number(row.outdoor_dry_bulb_c),
             json_number(row.zone_mean_air_temperature_c),
             json_number(row.inside_face_temperature_c),
+            json_number(row.inside_convection_input_inside_face_temperature_c),
+            json_number(row.inside_convection_input_reference_air_temperature_c),
             json_number(row.outside_face_temperature_c),
             json_number(row.inside_convection_heat_gain_rate_w),
             json_number(row.inside_net_surface_thermal_radiation_heat_gain_rate_w),
@@ -10508,18 +10512,22 @@ fn heat_balance_report_surface_first_sample_trace_rows(
     rows: &[HeatBalanceSurfaceFirstSampleTrace],
 ) {
     report.push_str(
-        "| key | construction | timestep | outdoor_db_c | zone_mat_c | inside_temp_c | outside_temp_c | inside_conv_w | inside_lw_w | inside_cond_w | outside_cond_w | storage_w | outside_conv_w | outside_lw_w | outside_solar_w |\n",
+        "| key | construction | timestep | outdoor_db_c | zone_mat_c | inside_temp_c | hconv_input_inside_temp_c | hconv_input_ref_air_c | outside_temp_c | inside_conv_w | inside_lw_w | inside_cond_w | outside_cond_w | storage_w | outside_conv_w | outside_lw_w | outside_solar_w |\n",
     );
-    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    report.push_str(
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+    );
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.surface_name),
             markdown_cell(&row.construction_name),
             row.timestep_index,
             row.outdoor_dry_bulb_c,
             row.zone_mean_air_temperature_c,
             row.inside_face_temperature_c,
+            row.inside_convection_input_inside_face_temperature_c,
+            row.inside_convection_input_reference_air_temperature_c,
             row.outside_face_temperature_c,
             row.inside_convection_heat_gain_rate_w,
             row.inside_net_surface_thermal_radiation_heat_gain_rate_w,
@@ -12951,6 +12959,8 @@ mod tests {
                 outdoor_dry_bulb_c: 10.0,
                 zone_mean_air_temperature_c: 23.0,
                 inside_face_temperature_c: 22.0,
+                inside_convection_input_inside_face_temperature_c: 22.0,
+                inside_convection_input_reference_air_temperature_c: 23.0,
                 outside_face_temperature_c: 11.0,
                 inside_convection_heat_gain_rate_w: 1.0,
                 inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
@@ -13716,6 +13726,8 @@ mod tests {
                 outdoor_dry_bulb_c: 10.0,
                 zone_mean_air_temperature_c: 23.0,
                 inside_face_temperature_c: 22.0,
+                inside_convection_input_inside_face_temperature_c: 22.0,
+                inside_convection_input_reference_air_temperature_c: 23.0,
                 outside_face_temperature_c: 11.0,
                 inside_convection_heat_gain_rate_w: 1.0,
                 inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
