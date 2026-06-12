@@ -298,6 +298,8 @@ Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHist
 Assert-Contains -Text $digestText -Pattern '"zone_air_coefficient_deltas"' -Description "compact digest zone-air coefficient diagnostics"
 Assert-Contains -Text $digestText -Pattern '"temp_dependent_coefficient_delta"' -Description "compact digest zone-air TempDepCoef delta"
 Assert-Contains -Text $digestText -Pattern '"temp_history_term_delta"' -Description "compact digest zone-air history-term delta"
+Assert-Contains -Text $digestText -Pattern '"zone_air_surface_coefficient_deltas"' -Description "compact digest zone-air surface coefficient diagnostics"
+Assert-Contains -Text $digestText -Pattern '"reference_air_temperature_delta"' -Description "compact digest zone-air surface reference-air temperature delta"
 $summary = $digestText | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected case_id: $($summary.case_id)"
@@ -501,6 +503,35 @@ if ([double]$zoneAirCoefficientDelta.temp_dependent_coefficient_delta.rmse_delta
 }
 if ([double]$zoneAirCoefficientDelta.temp_history_term_delta.rmse_delta_c -lt 0.0) {
     throw "Expected TempHistoryTerm RMSE to be numeric"
+}
+$zoneAirSurfaceCoefficientDeltas = @($summary.zone_air_surface_coefficient_deltas)
+if ($zoneAirSurfaceCoefficientDeltas.Count -lt 6) {
+    throw "Expected zone_air_surface_coefficient_deltas to include the six opaque 1Zone surfaces, got $($zoneAirSurfaceCoefficientDeltas.Count)"
+}
+$floorZoneAirSurfaceCoefficientDelta = @($zoneAirSurfaceCoefficientDeltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+if ($null -eq $floorZoneAirSurfaceCoefficientDelta) {
+    throw "Expected zone_air_surface_coefficient_deltas to include ZN001:FLR001"
+}
+foreach ($propertyName in @(
+        "zone_key",
+        "area_m2",
+        "sum_ha_delta",
+        "sum_hat_surf_delta",
+        "sum_hat_ref_delta",
+        "reference_air_temperature_delta",
+        "inside_face_temperature_delta",
+        "inside_hconv_delta",
+        "inside_convection_gain_delta"
+    )) {
+    if ($floorZoneAirSurfaceCoefficientDelta.PSObject.Properties.Name -notcontains $propertyName) {
+        throw "Expected FLOOR zone-air surface coefficient row to include $propertyName"
+    }
+}
+if ([int]$floorZoneAirSurfaceCoefficientDelta.samples -ne 8760) {
+    throw "Expected FLOOR zone-air surface coefficient row to use 8760 samples, got $($floorZoneAirSurfaceCoefficientDelta.samples)"
+}
+if ([double]$floorZoneAirSurfaceCoefficientDelta.area_m2 -le 0.0) {
+    throw "Expected FLOOR zone-air surface coefficient row to include positive area"
 }
 if ($CtfSeedPolicy -eq "all-eio") {
     $floorHistoryDelta = @($summary.ctf_history_first_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
@@ -974,6 +1005,9 @@ Assert-Contains -Text $reportText -Pattern "TempDepCoef_rmse" -Description "mark
 Assert-Contains -Text $reportText -Pattern "TempIndCoef_rmse" -Description "markdown zone-air TempIndCoef RMSE column"
 Assert-Contains -Text $reportText -Pattern "AirPowerCap_rmse" -Description "markdown zone-air AirPowerCap RMSE column"
 Assert-Contains -Text $reportText -Pattern "TempHistoryTerm_rmse" -Description "markdown zone-air TempHistoryTerm RMSE column"
+Assert-Contains -Text $reportText -Pattern "## Zone-Air Surface Coefficient Deltas" -Description "markdown zone-air surface coefficient delta section"
+Assert-Contains -Text $reportText -Pattern "ref_air_temp_rmse" -Description "markdown zone-air surface reference-air temperature RMSE column"
+Assert-Contains -Text $reportText -Pattern "inside_conv_gain_rmse" -Description "markdown zone-air surface convection gain RMSE column"
 Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
 Assert-Contains -Text $reportText -Pattern "ctf_y0" -Description "markdown CTF zero cross coefficient column"
 Assert-Contains -Text $reportText -Pattern "in_temp_abs_delta_c" -Description "markdown CTF inside face temperature delta column"
