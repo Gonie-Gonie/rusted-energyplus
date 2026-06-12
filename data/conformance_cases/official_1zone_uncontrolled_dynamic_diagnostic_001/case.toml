@@ -58,6 +58,15 @@ named_key_comparison = true
 top_rmse_sorted = true
 
 [[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZONE ONE"
 variable = "Zone Mean Air Temperature"
 frequency = "hourly"
@@ -966,6 +975,11 @@ max_rmse = 0.000001
 variable_class = "surface-state"
 max_abs = 0.000001
 max_rmse = 0.000001
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.00001
+max_rmse = 0.00001
 
 [report]
 format = "markdown"

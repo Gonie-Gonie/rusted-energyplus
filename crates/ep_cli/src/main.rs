@@ -1417,10 +1417,10 @@ fn validate_heat_balance_diagnostic_manifest(manifest: &ConformanceCase) -> Resu
         }
         if !matches!(
             output.class,
-            VariableClass::ZoneState | VariableClass::SurfaceState
+            VariableClass::ZoneState | VariableClass::SurfaceState | VariableClass::Weather
         ) {
             return Err(format!(
-                "heat-balance diagnostic requires zone-state or surface-state class, got {} for {}",
+                "heat-balance diagnostic requires zone-state, surface-state, or weather class, got {} for {}",
                 variable_class_label(output.class),
                 output.variable
             ));
@@ -3815,6 +3815,7 @@ fn heat_balance_variable_classes(manifest: &ConformanceCase) -> Vec<VariableClas
 
 fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
     variable.eq_ignore_ascii_case("Zone Mean Air Temperature")
+        || variable.eq_ignore_ascii_case("Site Outdoor Air Drybulb Temperature")
         || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Transfer Coefficient")
