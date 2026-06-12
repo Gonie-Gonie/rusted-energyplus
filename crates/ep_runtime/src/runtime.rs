@@ -8928,23 +8928,15 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
         + actual_solar_altitude_rad.cos()
             * tilt_rad.sin()
             * (actual_solar_azimuth_rad - surface_azimuth_rad).cos();
-    let circumsolar_sunlit_fraction = if tilt_rad.to_degrees() < 2.0 {
-        if actual_cos_incidence > ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
-            1.0
-        } else {
-            0.0
-        }
-    } else {
-        shadowing_period_cos_incidence
-            .map(|cos_incidence| {
-                if cos_incidence > ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
-                    1.0
-                } else {
-                    0.0
-                }
-            })
-            .unwrap_or(0.0)
-    };
+    let circumsolar_sunlit_fraction = shadowing_period_cos_incidence
+        .map(|cos_incidence| {
+            if cos_incidence > ENERGYPLUS_SUN_IS_UP_COS_ZENITH {
+                1.0
+            } else {
+                0.0
+            }
+        })
+        .unwrap_or(0.0);
     let sky_diffuse = diffuse_horizontal
         * energyplus_anisotropic_sky_multiplier(
             surface,
@@ -10763,6 +10755,7 @@ mod tests {
         solar_position_rad_at_local_hour, solar_weather_interpolation_weights, surface_area_m2,
         surface_azimuth_deg, surface_ctf_history_slot_samples, surface_exterior_report_terms,
         surface_geometry_summaries, surface_heat_storage_rate_w,
+        surface_incident_solar_components_hourly_average_w_per_m2,
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
         surface_inside_conduction_flux_w_per_m2, surface_inside_conduction_rate_w,
         surface_inside_convection_heat_gain_rate_per_area_w_per_m2,
@@ -10946,7 +10939,7 @@ mod tests {
     }
 
     #[test]
-    fn surface_solar_preserves_diffuse_at_shadowing_sunrise_edge() {
+    fn surface_solar_uses_shadowing_sunlit_fraction_at_sunrise_edge() {
         let site = SiteLocation {
             name: NormalizedName::new("Golden"),
             latitude_deg: 39.74,
@@ -11015,7 +11008,80 @@ mod tests {
             FirstHourInterpolationStartingValues::Hour24,
         );
 
-        assert!((incident - 7.0).abs() < 1.0e-9);
+        assert!((incident - 6.003845309857875).abs() < 1.0e-9);
+    }
+
+    #[test]
+    fn horizontal_roof_sky_diffuse_matches_energyplus_shadowing_sunrise_edge() {
+        let site = SiteLocation {
+            name: NormalizedName::new("Golden"),
+            latitude_deg: 39.74,
+            longitude_deg: -105.18,
+            time_zone_hours: -7.0,
+            elevation_m: 1829.0,
+        };
+        let mut records = Vec::new();
+        let mut record_index = None;
+        let mut date = Date {
+            year: 2004,
+            month: 1,
+            day_of_month: 1,
+        };
+        for _day in 0..117 {
+            for hour in 1..=24 {
+                if date.month == 4 && date.day_of_month == 26 && hour == 6 {
+                    record_index = Some(records.len());
+                }
+                let (direct_normal_radiation_wh_per_m2, diffuse_horizontal_radiation_wh_per_m2) =
+                    if date.month == 4 && date.day_of_month == 26 && hour == 6 {
+                        (0.0, 42.0)
+                    } else if date.month == 4 && date.day_of_month == 26 && hour == 7 {
+                        (626.0, 70.0)
+                    } else {
+                        (0.0, 0.0)
+                    };
+                records.push(EpwRecord {
+                    year: date.year,
+                    month: date.month,
+                    day: date.day_of_month,
+                    hour,
+                    minute: 0,
+                    dry_bulb_c: 0.0,
+                    dew_point_c: 0.0,
+                    relative_humidity_percent: 50.0,
+                    atmospheric_pressure_pa: 82_000.0,
+                    horizontal_infrared_radiation_wh_per_m2: 0.0,
+                    global_horizontal_radiation_wh_per_m2: 0.0,
+                    direct_normal_radiation_wh_per_m2,
+                    diffuse_horizontal_radiation_wh_per_m2,
+                    wind_direction_deg: 0.0,
+                    wind_speed_m_per_s: 0.0,
+                    liquid_precipitation_depth_mm: 0.0,
+                });
+            }
+            date = next_day(date);
+        }
+        let roof = surface(
+            100,
+            "Spring Sunrise Roof",
+            SurfaceType::Roof,
+            [
+                point(0.0, 0.0, 1.0),
+                point(0.0, 1.0, 1.0),
+                point(1.0, 1.0, 1.0),
+                point(1.0, 0.0, 1.0),
+            ],
+        );
+
+        let components = surface_incident_solar_components_hourly_average_w_per_m2(
+            &roof,
+            &site,
+            &records,
+            record_index.unwrap_or(0),
+            4,
+        );
+
+        assert!((components.sky_diffuse_w_per_m2 - 42.517992377816).abs() < 1.0e-9);
     }
 
     #[test]

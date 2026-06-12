@@ -438,14 +438,16 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   unobstructed exterior opaque surfaces, keeps the EnergyPlus split between
   shadowing-period beam incidence and current timestep `SOLCOS` for Perez
   sky/ground diffuse terms, applies a shadowing-period 0/1 sunlit proxy to the
-  Perez circumsolar term corresponding to EnergyPlus `SurfSunlitFrac`, and
-  writes diagnostic beam, sky diffuse, and ground diffuse incident component
-  rows next to the total incident solar row; detailed shadowing fractions and
-  obstruction reflection factors remain outside the diagnostic claim boundary. At
-  sunrise/sunset shadowing-period edges, Rust preserves the diffuse and
-  ground-reflected solar terms when the current-day EnergyPlus sun-up test is
-  true but the averaged shadowing-period beam position is still below the
-  horizon. `WeatherManager.cc` derives weather day-of-year from the run-period
+  Perez circumsolar term corresponding to EnergyPlus `SurfSunlitFrac` for all
+  exterior opaque surfaces including horizontal roofs, and writes diagnostic
+  beam, sky diffuse, and ground diffuse incident component rows next to the
+  total incident solar row; detailed shadowing fractions and obstruction
+  reflection factors remain outside the diagnostic claim boundary. At
+  sunrise/sunset shadowing-period edges, current timestep `SOLCOS` still drives
+  Perez coefficients, but circumsolar brightening is gated off when the
+  averaged shadowing-period position is below the horizon, matching EnergyPlus
+  lower sky-diffuse reports at those edges. `WeatherManager.cc` derives
+  weather day-of-year from the run-period
   calendar and the EPW leap-year allowance rather than from the source year
   printed on each TMY record, so Rust uses the deterministic non-leap
   run-period ordinal for solar position and shadowing-period coefficients.
