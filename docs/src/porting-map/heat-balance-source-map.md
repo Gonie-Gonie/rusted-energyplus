@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-12
 ---
 
 # Heat Balance Source Map
@@ -13,6 +13,12 @@ Reference source root:
 
 ```text
 .reference/energyplus-src/26.1.0/
+```
+
+Local audit cache used for the June 2026 diagnostic pass:
+
+```text
+.runtime/energyplus-source/v26.1.0/src/EnergyPlus/
 ```
 
 Purpose: record the EnergyPlus source files, routines, data structures, and
@@ -65,6 +71,48 @@ unless the deviation is documented in a case-specific waiver:
 6. internal convective gain summation
 7. zone air predictor/corrector update
 8. output variable registration and sampling
+
+## June 2026 Source-Audit Boundary
+
+The official `1ZoneUncontrolled` dynamic promotion lane must keep the following
+EnergyPlus 26.1.0 ownership boundaries explicit:
+
+- `HeatBalanceManager.cc::ManageHeatBalance` calls `InitHeatBalance`, then
+  `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance`, then
+  `RecKeepHeatBalance`, then `ReportHeatBalance`. Warmup convergence is checked
+  only at end-of-day after reporting, and `DayOfSim` is reset to `0` when the
+  run-period warmup converges.
+- `HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance` calls
+  `InitSurfaceHeatBalance`, `CalcHeatBalanceOutsideSurf`,
+  `CalcHeatBalanceInsideSurf`, `HeatBalanceAirManager::ManageAirHeatBalance`,
+  `UpdateFinalSurfaceHeatBalance`, `UpdateThermalHistories`, then
+  `ReportSurfaceHeatBalance`.
+- `CalcHeatBalanceInsideSurf2CTFOnly` freezes each surface's
+  `SurfTempOutHist` from `SurfOutsideTempHist(1)`, stores
+  `Surface::getInsideAirTemperature` in `RefAirTemp` and
+  `SurfTempEffBulkAir`, builds `SurfTempTerm`, and only re-evaluates
+  `Convect::InitIntConvCoeff` on the `ItersReevalConvCoeff` cadence.
+- The CTF-only inside solve updates `SurfTempInTmp`, then copies it to
+  `SurfTempIn`. For reporting, `SurfTempOut` is set from
+  `SurfOutsideTempHist(1)`. Interzone surfaces are then synchronized by copying
+  the paired inside history into `SurfOutsideTempHist(1)` and
+  `SurfTempOutHist`; a direct current-inside adiabatic report sync is not the
+  generic EnergyPlus reporting path.
+- `UpdateThermalHistories` computes current inside flux from
+  `SurfOutsideTempHist(1)`, current `SurfTempIn`, and
+  `SurfCTFConstInPart`; computes current outside flux from the same current
+  outside history slot and current `SurfTempIn`; writes report conduction
+  variables; then shifts thermal histories. In `SimpleCTFOnly`, slot `1` is
+  hard-copied to slot `2` after shifting.
+- `ZoneTempPredictorCorrector.cc::calcSumHAT` builds solver coefficients from
+  `SurfHConvInt * Area * SurfTempInTmp` plus `SurfTAirRef`-dependent
+  `SumHA`/`SumHATref`. This is separate from the zone-air heat-balance report
+  row.
+- `ZoneTempPredictorCorrector.cc::CalcZoneComponentLoadSums` reports
+  `SumHADTsurfs` by re-walking heat-transfer surfaces with
+  `Surface::getInsideAirTemperature`, `SurfHConvInt`, and `SurfTempInTmp`.
+  Therefore the zone `Surface Convection Rate` row is not required to equal the
+  signed sum of individual surface inside convection report rows.
 
 ## Data Structure Map
 

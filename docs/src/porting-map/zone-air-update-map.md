@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-12
 ---
 
 # Zone Air Update Map
@@ -189,3 +189,12 @@ remaining `SumHADTsurfs` work should stay on EnergyPlus
 `CalcZoneComponentLoadSums` timing, `SurfTempInTmp`, and
 `getInsideAirTemperature`/hconv ownership rather than directly summing surface
 report heat-gain rows.
+
+The June 2026 EnergyPlus 26.1.0 source audit narrows this further:
+`ZoneHeatBalanceData::calcSumHAT` is the solver-coefficient path and
+`CalcZoneComponentLoadSums` is the report path. Both consume
+`SurfTempInTmp` and `SurfHConvInt`, but the report path independently calls
+`Surface::getInsideAirTemperature` and writes `AirReportVars::SumHADTsurfs`.
+The official zone-air surface-convection row should therefore be diagnosed
+against `SumHADTsurfs` ownership, not inferred from surface report rows or from
+the solver `SumHA/SumHATsurf/SumHATref` coefficients alone.

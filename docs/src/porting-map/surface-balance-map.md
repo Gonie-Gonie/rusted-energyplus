@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-12
 ---
 
 # Surface Inside and Outside Balance Map
@@ -87,3 +87,15 @@ before changing the default path. The compiler now preserves explicit
 setting for the default exterior coefficient path; the DOE-2 probe lanes remain
 useful for isolating coefficient changes from the quick-conduction outside-face
 branch.
+
+The June 2026 EnergyPlus source audit fixes the next floor CTF boundary. In
+`CalcHeatBalanceInsideSurf2CTFOnly`, EnergyPlus preloads
+`SurfTempOutHist` from `SurfOutsideTempHist(1)`, solves `SurfTempInTmp`, copies
+it to `SurfTempIn`, writes `SurfTempOut` for reporting from
+`SurfOutsideTempHist(1)`, and only then synchronizes interzone outside-history
+slots from the paired inside history. `UpdateThermalHistories` later computes
+current inside and outside fluxes from that current outside-history slot plus
+current `SurfTempIn`, writes the conduction report variables, and then shifts
+the CTF histories. The active floor-storage work should therefore keep report,
+inside-CTF, and committed-history snapshots separate instead of replacing all
+adiabatic or interzone outside states with the current inside face.

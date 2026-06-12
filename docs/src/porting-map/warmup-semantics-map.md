@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-12
 ---
 
 # Warmup Semantics Map
@@ -64,3 +64,12 @@ frozen-reference-air/current-longwave lane with the EnergyPlus
 warmup, so the next warmup-facing work is the repeated-day history evolution
 and source-order handoff into the run period, not the pre-warmup seed values
 alone.
+
+EnergyPlus 26.1.0 `HeatBalanceManager.cc::ManageHeatBalance` checks warmup
+convergence only after `ManageSurfaceHeatBalance`, end-zone-timestep EMS,
+`RecKeepHeatBalance`, and `ReportHeatBalance`, and only when `WarmupFlag` and
+`EndDayFlag` are both true. When convergence clears `WarmupFlag`, EnergyPlus
+resets `DayOfSim` and `DayOfSimChr` to `0` before the run period proceeds. The
+official 1Zone diagnostic should keep this as a stage boundary: a fixed Rust
+warmup-day count is insufficient unless the surface CTF histories, zone air
+histories, and reporting filter match the post-report end-of-day handoff.
