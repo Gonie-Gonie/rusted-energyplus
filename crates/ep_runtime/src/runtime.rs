@@ -628,6 +628,10 @@ pub struct HeatBalanceState {
     pub last_ctf_history_slot_terms: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Most recent inside surface heat-balance iteration count.
     pub last_inside_surface_iteration_count: u32,
+    /// Final max inside-surface temperature change from the most recent iteration loop.
+    pub last_inside_surface_iteration_max_delta_c: f64,
+    /// Surface that controlled the final max inside-surface temperature change.
+    pub last_inside_surface_iteration_max_delta_surface_name: Option<String>,
 }
 
 /// One per-slot CTF history contribution captured for a heat-balance timestep.
@@ -796,6 +800,19 @@ pub struct HeatBalanceSurfaceFirstSampleTrace {
     pub outside_net_thermal_radiation_heat_gain_rate_w: f64,
     /// Outside-face solar radiation heat gain rate in W.
     pub outside_solar_radiation_heat_gain_rate_w: f64,
+}
+
+/// One inside-surface iteration sample captured after a zone timestep in the first reported hour.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceSurfaceIterationFirstSampleTrace {
+    /// One-based zone timestep within the first reported hourly sample.
+    pub timestep_index: u32,
+    /// Number of inside-surface heat-balance iterations executed in this timestep.
+    pub inside_surface_iteration_count: u32,
+    /// Final max inside-surface temperature change in C.
+    pub max_inside_surface_delta_c: f64,
+    /// Surface that controlled the final max inside-surface temperature change.
+    pub max_delta_surface_name: Option<String>,
 }
 
 /// Per-zone heat-balance state shell.
@@ -1484,6 +1501,8 @@ pub struct HeatBalanceSimulationSummary {
     pub hourly_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     /// Per-surface timestep states captured across the first reported hourly sample.
     pub surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
+    /// Per-timestep inside-surface iteration summary for the first reported hourly sample.
+    pub surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -3201,6 +3220,8 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         surfaces,
         last_ctf_history_slot_terms: Vec::new(),
         last_inside_surface_iteration_count: 0,
+        last_inside_surface_iteration_max_delta_c: f64::NAN,
+        last_inside_surface_iteration_max_delta_surface_name: None,
     })
 }
 
@@ -3924,6 +3945,14 @@ fn advance_heat_balance_state_one_timestep_internal(
         .as_ref()
         .map(|result| result.inside_surface_iteration_count)
         .unwrap_or_else(|| surface_iteration_count.max(1));
+    state.last_inside_surface_iteration_max_delta_c = interleaved_surface_zone_balance_result
+        .as_ref()
+        .map(|result| result.max_inside_surface_delta_c)
+        .unwrap_or(f64::NAN);
+    state.last_inside_surface_iteration_max_delta_surface_name =
+        interleaved_surface_zone_balance_result
+            .as_ref()
+            .and_then(|result| result.max_delta_surface_name.clone());
     state.timestep_index += 1;
 }
 
@@ -3931,6 +3960,8 @@ fn advance_heat_balance_state_one_timestep_internal(
 struct InterleavedSurfaceZoneBalanceResult {
     inside_ctf_outside_temperature_snapshots: Option<BTreeMap<SurfaceId, f64>>,
     inside_surface_iteration_count: u32,
+    max_inside_surface_delta_c: f64,
+    max_delta_surface_name: Option<String>,
 }
 
 fn run_interleaved_surface_zone_balance(
@@ -3997,6 +4028,8 @@ fn run_interleaved_surface_zone_balance(
     > = None;
     let mut frozen_inside_ctf_outside_temperatures: Option<BTreeMap<SurfaceId, f64>> = None;
     let mut inside_surface_iteration_count = 0;
+    let mut final_max_inside_surface_delta_c = f64::NAN;
+    let mut final_max_delta_surface_name = None;
 
     for surface_iteration_index in 0..surface_iteration_count.max(1) {
         inside_surface_iteration_count = surface_iteration_index + 1;
@@ -4097,19 +4130,24 @@ fn run_interleaved_surface_zone_balance(
                     .collect(),
             );
         }
-        let max_inside_surface_delta_c = pass_start_inside_temperatures
+        let (max_inside_surface_delta_c, max_delta_surface_name) = pass_start_inside_temperatures
             .as_ref()
             .map(|temperatures| {
-                surfaces
-                    .iter()
-                    .filter_map(|surface| {
-                        temperatures
-                            .get(&surface.surface_id)
-                            .map(|previous| (surface.inside_face_temperature_c - previous).abs())
-                    })
-                    .fold(0.0, f64::max)
+                surfaces.iter().fold((0.0, None), |best, surface| {
+                    let Some(previous) = temperatures.get(&surface.surface_id) else {
+                        return best;
+                    };
+                    let delta = (surface.inside_face_temperature_c - previous).abs();
+                    if delta > best.0 {
+                        (delta, Some(surface.surface_name.clone()))
+                    } else {
+                        best
+                    }
+                })
             })
-            .unwrap_or(f64::INFINITY);
+            .unwrap_or((f64::INFINITY, None));
+        final_max_inside_surface_delta_c = max_inside_surface_delta_c;
+        final_max_delta_surface_name = max_delta_surface_name;
         if matches!(
             surface_loop_zone_air_correction,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration
@@ -4133,6 +4171,8 @@ fn run_interleaved_surface_zone_balance(
     InterleavedSurfaceZoneBalanceResult {
         inside_ctf_outside_temperature_snapshots: frozen_inside_ctf_outside_temperatures,
         inside_surface_iteration_count,
+        max_inside_surface_delta_c: final_max_inside_surface_delta_c,
+        max_delta_surface_name: final_max_delta_surface_name,
     }
 }
 
@@ -4990,6 +5030,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
     let mut hourly_ctf_history_slots = Vec::new();
     let mut surface_first_sample_trace = Vec::new();
+    let mut surface_iteration_first_sample_trace = Vec::new();
     let use_surface_reference_air_zone_convection_report =
         heat_balance_uses_surface_reference_air_convection_report(options.zone_air_algorithm);
     let use_surface_reference_air_surface_convection_report =
@@ -5117,6 +5158,18 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             }
             inside_surface_iteration_count_sum +=
                 f64::from(state.last_inside_surface_iteration_count);
+            if hour_index == 0 {
+                surface_iteration_first_sample_trace.push(
+                    HeatBalanceSurfaceIterationFirstSampleTrace {
+                        timestep_index: substep,
+                        inside_surface_iteration_count: state.last_inside_surface_iteration_count,
+                        max_inside_surface_delta_c: state.last_inside_surface_iteration_max_delta_c,
+                        max_delta_surface_name: state
+                            .last_inside_surface_iteration_max_delta_surface_name
+                            .clone(),
+                    },
+                );
+            }
             for (index, (zone_id, _zone_name, _internal, _surface, _storage)) in
                 zone_air_heat_balance_rates.iter().enumerate()
             {
@@ -5880,6 +5933,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             .collect(),
         hourly_ctf_history_slots,
         surface_first_sample_trace,
+        surface_iteration_first_sample_trace,
     };
 
     Ok(HeatBalanceSimulation {

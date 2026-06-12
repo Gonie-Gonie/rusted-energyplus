@@ -32,10 +32,10 @@ use ep_runtime::{
     FirstZoneSimulationOptions, HeatBalanceCtfHistorySlotFirstSample,
     HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
-    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceLoopZoneAirCorrection,
-    HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirReportSampling,
-    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
+    HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
+    HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource, NodeStateProjection,
+    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, ResultStore,
     SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
@@ -3312,6 +3312,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
+    surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
 }
@@ -4150,6 +4151,9 @@ fn build_heat_balance_conformance_diagnostic(
         ctf_history_first_sample_slots: simulation.summary.first_sample_ctf_history_slots,
         ctf_history_max_sample_slots,
         surface_first_sample_trace: simulation.summary.surface_first_sample_trace,
+        surface_iteration_first_sample_trace: simulation
+            .summary
+            .surface_iteration_first_sample_trace,
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
@@ -8510,6 +8514,12 @@ fn render_heat_balance_conformance_json(
         heat_balance_surface_first_sample_trace_json(&diagnostic.surface_first_sample_trace)
     ));
     json.push_str(&format!(
+        "  \"surface_iteration_first_sample_trace\": {},\n",
+        heat_balance_surface_iteration_first_sample_trace_json(
+            &diagnostic.surface_iteration_first_sample_trace
+        )
+    ));
+    json.push_str(&format!(
         "  \"ctf_component_first_samples\": {},\n",
         heat_balance_ctf_component_first_samples_json(&diagnostic.ctf_component_first_samples)
     ));
@@ -8781,6 +8791,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_surface_first_sample_trace_rows(
         &mut report,
         &diagnostic.surface_first_sample_trace,
+    );
+    report.push('\n');
+
+    report.push_str("## Rust Surface Iteration First-Sample Trace\n\n");
+    heat_balance_report_surface_iteration_first_sample_trace_rows(
+        &mut report,
+        &diagnostic.surface_iteration_first_sample_trace,
     );
     report.push('\n');
 
@@ -9408,6 +9425,34 @@ fn heat_balance_compatibility_stages_json(rows: &[EnergyPlusCompatibilityStage])
             json_string(row.stage_name),
             json_string(row.source_file),
             json_string(row.source_routine)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_surface_iteration_first_sample_trace_json(
+    rows: &[HeatBalanceSurfaceIterationFirstSampleTrace],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"timestep_index\": {}, ",
+                "\"inside_surface_iteration_count\": {}, ",
+                "\"max_inside_surface_delta_c\": {}, ",
+                "\"max_delta_surface_name\": {} }}"
+            ),
+            row.timestep_index,
+            row.inside_surface_iteration_count,
+            json_number(row.max_inside_surface_delta_c),
+            row.max_delta_surface_name
+                .as_deref()
+                .map(json_string)
+                .unwrap_or_else(|| "null".to_string())
         ));
     }
     json.push(']');
@@ -10537,6 +10582,25 @@ fn heat_balance_report_surface_first_sample_trace_rows(
             row.outside_convection_heat_gain_rate_w,
             row.outside_net_thermal_radiation_heat_gain_rate_w,
             row.outside_solar_radiation_heat_gain_rate_w
+        ));
+    }
+}
+
+fn heat_balance_report_surface_iteration_first_sample_trace_rows(
+    report: &mut String,
+    rows: &[HeatBalanceSurfaceIterationFirstSampleTrace],
+) {
+    report.push_str(
+        "| timestep | inside_surface_iterations | final_max_delta_c | controlling_surface |\n",
+    );
+    report.push_str("|---:|---:|---:|---|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {:.12} | {} |\n",
+            row.timestep_index,
+            row.inside_surface_iteration_count,
+            row.max_inside_surface_delta_c,
+            markdown_cell(row.max_delta_surface_name.as_deref().unwrap_or(""))
         ));
     }
 }
@@ -12971,6 +13035,14 @@ mod tests {
                 outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
                 outside_solar_radiation_heat_gain_rate_w: 5.0,
             }],
+            surface_iteration_first_sample_trace: vec![
+                super::HeatBalanceSurfaceIterationFirstSampleTrace {
+                    timestep_index: 1,
+                    inside_surface_iteration_count: 3,
+                    max_inside_surface_delta_c: 0.001,
+                    max_delta_surface_name: Some("FLOOR".to_string()),
+                },
+            ],
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -13738,6 +13810,14 @@ mod tests {
                 outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
                 outside_solar_radiation_heat_gain_rate_w: 5.0,
             }],
+            surface_iteration_first_sample_trace: vec![
+                super::HeatBalanceSurfaceIterationFirstSampleTrace {
+                    timestep_index: 1,
+                    inside_surface_iteration_count: 3,
+                    max_inside_surface_delta_c: 0.001,
+                    max_delta_surface_name: Some("FLOOR".to_string()),
+                },
+            ],
             series: vec![super::HeatBalanceSeriesDiagnostic {
                 output: super::ZoneTemperatureReportOutput {
                     key: "ZONE ONE".to_string(),
