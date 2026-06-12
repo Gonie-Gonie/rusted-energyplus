@@ -656,6 +656,19 @@ Current Rust boundary:
   steady/no-mass. The next floor-storage probe should therefore focus on
   floor temperature-history state alignment and the current inside-face source
   timing before treating the residual as a flux-history handoff problem.
+- The diagnostic now also emits annual inside-solve source deltas for each
+  surface, using signed zero-baseline source mismatches. In the active lane,
+  `ZN001:FLR001` has `inside_face_temperature_delta.rmse_delta_c =
+  0.017176 C`, `implied_solve_numerator_delta.rmse_delta_c = 293.827236 W`,
+  `tracked_solve_source_delta.rmse_delta_c = 275.530580 W`, and
+  `solve_source_residual_delta.rmse_delta_c = 30.271817 W`. The tracked
+  source split is dominated by `inside_history_delta.rmse_delta_c =
+  228.537244 W` and `reference_air_coefficient_source_delta.rmse_delta_c =
+  117.937364 W`; `reference_air_temperature_source_delta.rmse_delta_c =
+  15.537367 W`, `inside_net_longwave_delta.rmse_delta_c = 10.514138 W`, and
+  `outside_temperature_source_delta.rmse_delta_c = 0`. This makes the next
+  numerical work a floor history-state plus inside reference-air coefficient
+  alignment problem, not an untracked solve residual problem.
 - Re-running the `hconv-reeval2` candidate with the signed split lowers the
   active top RMSE from `28.786920` to `27.005834` W on floor storage, but it is
   not promotion-ready: MAT RMSE rises from `0.037329` to `0.037718 C`, floor

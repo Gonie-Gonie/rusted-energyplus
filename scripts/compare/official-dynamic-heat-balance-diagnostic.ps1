@@ -689,6 +689,32 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ([Math]::Abs($rustInsideHistorySplitSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
         throw "Expected FLOOR inside-solve Rust history split terms to sum to rust_inside_history_term_w"
     }
+    $floorInsideSolveSeriesDelta = @($summary.inside_solve_series_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorInsideSolveSeriesDelta) {
+        throw "Expected inside_solve_series_deltas to include ZN001:FLR001 in all-eio mode"
+    }
+    if ([int]$floorInsideSolveSeriesDelta.samples -ne 8760) {
+        throw "Expected FLOOR inside-solve series deltas to use 8760 samples, got $($floorInsideSolveSeriesDelta.samples)"
+    }
+    foreach ($propertyName in @(
+            "inside_face_temperature_delta",
+            "implied_solve_numerator_delta",
+            "reference_air_source_delta",
+            "reference_air_coefficient_source_delta",
+            "reference_air_temperature_source_delta",
+            "outside_temperature_source_delta",
+            "inside_history_delta",
+            "inside_net_longwave_delta",
+            "tracked_solve_source_delta",
+            "solve_source_residual_delta"
+        )) {
+        if ($floorInsideSolveSeriesDelta.PSObject.Properties.Name -notcontains $propertyName) {
+            throw "Expected FLOOR inside-solve series row to include $propertyName"
+        }
+    }
+    if ([double]$floorInsideSolveSeriesDelta.implied_solve_numerator_delta.rmse_delta_c -le 0.0) {
+        throw "Expected active FLOOR inside-solve implied numerator series delta to remain visible"
+    }
     $floorAdiabaticHistoryMaxSampleDelta = @($summary.adiabatic_history_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorAdiabaticHistoryMaxSampleDelta) {
         throw "Expected adiabatic_history_max_sample_deltas to include ZN001:FLR001 in all-eio mode"
@@ -1055,6 +1081,10 @@ Assert-Contains -Text $reportText -Pattern "implied_numerator_delta_w" -Descript
 Assert-Contains -Text $reportText -Pattern "source_coverage_ratio" -Description "markdown inside-solve source coverage column"
 Assert-Contains -Text $reportText -Pattern "source_residual_delta_w" -Description "markdown inside-solve source residual column"
 Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown inside-solve Rust history temperature split column"
+Assert-Contains -Text $reportText -Pattern "## Inside Solve Series Deltas" -Description "markdown inside-solve series delta section"
+Assert-Contains -Text $reportText -Pattern "implied_num_rmse_w" -Description "markdown inside-solve series implied numerator RMSE column"
+Assert-Contains -Text $reportText -Pattern "source_residual_rmse_w" -Description "markdown inside-solve series residual RMSE column"
+Assert-Contains -Text $reportText -Pattern "ref_air_coeff_rmse_w" -Description "markdown inside-solve series reference-air coefficient RMSE column"
 Assert-Contains -Text $reportText -Pattern "## Adiabatic History Max-Sample Deltas" -Description "markdown adiabatic-history max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "out_minus_in_delta_c" -Description "markdown adiabatic-history outside-minus-inside delta column"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
