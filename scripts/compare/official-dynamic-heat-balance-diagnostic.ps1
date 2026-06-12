@@ -501,6 +501,10 @@ if ($CtfSeedPolicy -eq "all-eio") {
     foreach ($propertyName in @(
             "storage_delta_rank",
             "dominant_storage_surface",
+            "dominant_mismatch_source",
+            "dominant_mismatch_delta_w",
+            "storage_balance_residual_delta_w",
+            "inside_face_temperature_delta_c",
             "inside_current_outside_term_signed_delta_w",
             "inside_current_inside_term_signed_delta_w",
             "inside_current_split_abs_sum_w",
@@ -516,6 +520,9 @@ if ($CtfSeedPolicy -eq "all-eio") {
     }
     if (-not [bool]$floorStorageMaxSampleDelta.dominant_storage_surface) {
         throw "Expected FLOOR storage max-sample row to be marked dominant"
+    }
+    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
+        throw "Expected FLOOR storage max-sample dominant mismatch source to target face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
     }
     $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideBalanceMaxSampleDelta) {
@@ -932,6 +939,9 @@ Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "ma
 Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -Description "markdown CTF storage max-sample delta section"
 Assert-Contains -Text $reportText -Pattern "storage_delta_w" -Description "markdown CTF storage max-sample delta column"
 Assert-Contains -Text $reportText -Pattern "dominant" -Description "markdown CTF storage dominant column"
+Assert-Contains -Text $reportText -Pattern "dominant_mismatch_source" -Description "markdown CTF storage dominant mismatch source column"
+Assert-Contains -Text $reportText -Pattern "storage_balance_residual_delta_w" -Description "markdown CTF storage balance residual column"
+Assert-Contains -Text $reportText -Pattern "inside_temp_delta_c" -Description "markdown CTF storage inside face temperature delta column"
 Assert-Contains -Text $reportText -Pattern "current_out_signed_w" -Description "markdown CTF storage current outside split column"
 Assert-Contains -Text $reportText -Pattern "current_in_signed_w" -Description "markdown CTF storage current inside split column"
 Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown CTF storage history temperature split column"

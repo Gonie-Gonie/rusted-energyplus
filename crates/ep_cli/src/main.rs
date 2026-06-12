@@ -3341,6 +3341,17 @@ struct HeatBalanceCtfStorageMaxSampleDelta {
     dominant_storage_surface: bool,
     sample_index: usize,
     area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    ctf_cross_0_w_per_m2_k: f64,
+    ctf_outside_0_w_per_m2_k: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_signed_delta_c: f64,
+    inside_face_temperature_delta_c: f64,
+    oracle_outside_face_temperature_c: f64,
+    rust_outside_face_temperature_c: f64,
+    outside_face_temperature_signed_delta_c: f64,
+    outside_face_temperature_delta_c: f64,
     oracle_inside_conduction_w: f64,
     rust_inside_conduction_w: f64,
     inside_conduction_delta_w: f64,
@@ -3350,6 +3361,15 @@ struct HeatBalanceCtfStorageMaxSampleDelta {
     oracle_storage_w: f64,
     rust_storage_w: f64,
     storage_delta_w: f64,
+    oracle_storage_from_conduction_w: f64,
+    rust_storage_from_conduction_w: f64,
+    storage_from_conduction_signed_delta_w: f64,
+    storage_from_conduction_delta_w: f64,
+    oracle_storage_balance_residual_w: f64,
+    rust_storage_balance_residual_w: f64,
+    storage_balance_residual_delta_w: f64,
+    dominant_mismatch_source: String,
+    dominant_mismatch_delta_w: f64,
     oracle_inside_current_outside_term_w: f64,
     rust_inside_current_outside_term_w: f64,
     inside_current_outside_term_signed_delta_w: f64,
@@ -4459,6 +4479,12 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 oracle_inside_current_outside_term_w + oracle_inside_current_inside_term_w;
             let rust_inside_current_term_w =
                 rust_inside_current_outside + rust_inside_current_inside;
+            let inside_face_temperature_signed_delta_c =
+                inside_temperature.oracle_c - inside_temperature.rust_c;
+            let inside_face_temperature_delta_c = inside_face_temperature_signed_delta_c.abs();
+            let outside_face_temperature_signed_delta_c =
+                outside_temperature.oracle_c - outside_temperature.rust_c;
+            let outside_face_temperature_delta_c = outside_face_temperature_signed_delta_c.abs();
             let inside_current_outside_term_signed_delta_w =
                 oracle_inside_current_outside_term_w - rust_inside_current_outside;
             let inside_current_outside_term_delta_w =
@@ -4477,6 +4503,7 @@ fn heat_balance_ctf_storage_max_sample_deltas(
             let oracle_inside_history_term_w =
                 inside_conduction.oracle_c - oracle_inside_current_term_w;
             let inside_history_signed_delta_w = oracle_inside_history_term_w - rust_inside_history;
+            let inside_history_delta_w = inside_history_signed_delta_w.abs();
             let oracle_outside_current_term_w = -area_m2
                 * (outside_temperature.oracle_c * zero.outside_w_per_m2_k
                     - inside_temperature.oracle_c * zero.cross_w_per_m2_k);
@@ -4484,6 +4511,43 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 rust_outside_current_outside + rust_outside_current_inside;
             let oracle_outside_history_term_w =
                 outside_conduction.oracle_c - oracle_outside_current_term_w;
+            let outside_current_delta_w =
+                (oracle_outside_current_term_w - rust_outside_current_term_w).abs();
+            let outside_history_delta_w =
+                (oracle_outside_history_term_w - rust_outside_history).abs();
+            let oracle_storage_from_conduction_w =
+                -(inside_conduction.oracle_c + outside_conduction.oracle_c);
+            let rust_storage_from_conduction_w =
+                -(inside_conduction.rust_c + outside_conduction.rust_c);
+            let storage_from_conduction_signed_delta_w =
+                oracle_storage_from_conduction_w - rust_storage_from_conduction_w;
+            let storage_from_conduction_delta_w = storage_from_conduction_signed_delta_w.abs();
+            let oracle_storage_balance_residual_w =
+                storage_point.oracle_c - oracle_storage_from_conduction_w;
+            let rust_storage_balance_residual_w =
+                storage_point.rust_c - rust_storage_from_conduction_w;
+            let storage_balance_residual_delta_w =
+                (oracle_storage_balance_residual_w - rust_storage_balance_residual_w).abs();
+            let (dominant_mismatch_source, dominant_mismatch_delta_w) = [
+                (
+                    "face-temperature-current-outside",
+                    inside_current_outside_term_delta_w,
+                ),
+                (
+                    "face-temperature-current-inside",
+                    inside_current_inside_term_delta_w,
+                ),
+                ("history-vector-inside-total", inside_history_delta_w),
+                ("outside-current-total", outside_current_delta_w),
+                ("outside-history-total", outside_history_delta_w),
+                (
+                    "output-aggregation-storage-balance",
+                    storage_balance_residual_delta_w,
+                ),
+            ]
+            .into_iter()
+            .max_by(|left, right| left.1.total_cmp(&right.1))
+            .unwrap_or(("unknown", 0.0));
 
             Some(HeatBalanceCtfStorageMaxSampleDelta {
                 key: surface.name.0.clone(),
@@ -4492,6 +4556,17 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 dominant_storage_surface: false,
                 sample_index,
                 area_m2,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                ctf_cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+                ctf_outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
+                oracle_inside_face_temperature_c: inside_temperature.oracle_c,
+                rust_inside_face_temperature_c: inside_temperature.rust_c,
+                inside_face_temperature_signed_delta_c,
+                inside_face_temperature_delta_c,
+                oracle_outside_face_temperature_c: outside_temperature.oracle_c,
+                rust_outside_face_temperature_c: outside_temperature.rust_c,
+                outside_face_temperature_signed_delta_c,
+                outside_face_temperature_delta_c,
                 oracle_inside_conduction_w: inside_conduction.oracle_c,
                 rust_inside_conduction_w: inside_conduction.rust_c,
                 inside_conduction_delta_w: inside_conduction.abs_delta_c,
@@ -4501,6 +4576,15 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 oracle_storage_w: storage_point.oracle_c,
                 rust_storage_w: storage_point.rust_c,
                 storage_delta_w: storage_point.abs_delta_c,
+                oracle_storage_from_conduction_w,
+                rust_storage_from_conduction_w,
+                storage_from_conduction_signed_delta_w,
+                storage_from_conduction_delta_w,
+                oracle_storage_balance_residual_w,
+                rust_storage_balance_residual_w,
+                storage_balance_residual_delta_w,
+                dominant_mismatch_source: dominant_mismatch_source.to_string(),
+                dominant_mismatch_delta_w,
                 oracle_inside_current_outside_term_w,
                 rust_inside_current_outside_term_w: rust_inside_current_outside,
                 inside_current_outside_term_signed_delta_w,
@@ -4518,18 +4602,15 @@ fn heat_balance_ctf_storage_max_sample_deltas(
                 oracle_inside_history_term_w,
                 rust_inside_history_term_w: rust_inside_history,
                 inside_history_signed_delta_w,
-                inside_history_delta_w: inside_history_signed_delta_w.abs(),
+                inside_history_delta_w,
                 rust_inside_history_temperature_term_w: rust_inside_history_temperature,
                 rust_inside_history_flux_term_w: rust_inside_history_flux,
                 oracle_outside_current_term_w,
                 rust_outside_current_term_w,
-                outside_current_delta_w: (oracle_outside_current_term_w
-                    - rust_outside_current_term_w)
-                    .abs(),
+                outside_current_delta_w,
                 oracle_outside_history_term_w,
                 rust_outside_history_term_w: rust_outside_history,
-                outside_history_delta_w: (oracle_outside_history_term_w - rust_outside_history)
-                    .abs(),
+                outside_history_delta_w,
             })
         })
         .collect();
@@ -8340,6 +8421,17 @@ fn heat_balance_ctf_storage_max_sample_deltas_json(
                 "\"dominant_storage_surface\": {}, ",
                 "\"sample_index\": {}, ",
                 "\"area_m2\": {}, ",
+                "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                "\"ctf_cross_0_w_per_m2_k\": {}, ",
+                "\"ctf_outside_0_w_per_m2_k\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_signed_delta_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
+                "\"oracle_outside_face_temperature_c\": {}, ",
+                "\"rust_outside_face_temperature_c\": {}, ",
+                "\"outside_face_temperature_signed_delta_c\": {}, ",
+                "\"outside_face_temperature_delta_c\": {}, ",
                 "\"oracle_inside_conduction_w\": {}, ",
                 "\"rust_inside_conduction_w\": {}, ",
                 "\"inside_conduction_delta_w\": {}, ",
@@ -8349,6 +8441,15 @@ fn heat_balance_ctf_storage_max_sample_deltas_json(
                 "\"oracle_storage_w\": {}, ",
                 "\"rust_storage_w\": {}, ",
                 "\"storage_delta_w\": {}, ",
+                "\"oracle_storage_from_conduction_w\": {}, ",
+                "\"rust_storage_from_conduction_w\": {}, ",
+                "\"storage_from_conduction_signed_delta_w\": {}, ",
+                "\"storage_from_conduction_delta_w\": {}, ",
+                "\"oracle_storage_balance_residual_w\": {}, ",
+                "\"rust_storage_balance_residual_w\": {}, ",
+                "\"storage_balance_residual_delta_w\": {}, ",
+                "\"dominant_mismatch_source\": {}, ",
+                "\"dominant_mismatch_delta_w\": {}, ",
                 "\"oracle_inside_current_outside_term_w\": {}, ",
                 "\"rust_inside_current_outside_term_w\": {}, ",
                 "\"inside_current_outside_term_signed_delta_w\": {}, ",
@@ -8382,6 +8483,17 @@ fn heat_balance_ctf_storage_max_sample_deltas_json(
             row.dominant_storage_surface,
             row.sample_index,
             json_number(row.area_m2),
+            json_number(row.ctf_inside_0_w_per_m2_k),
+            json_number(row.ctf_cross_0_w_per_m2_k),
+            json_number(row.ctf_outside_0_w_per_m2_k),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_signed_delta_c),
+            json_number(row.inside_face_temperature_delta_c),
+            json_number(row.oracle_outside_face_temperature_c),
+            json_number(row.rust_outside_face_temperature_c),
+            json_number(row.outside_face_temperature_signed_delta_c),
+            json_number(row.outside_face_temperature_delta_c),
             json_number(row.oracle_inside_conduction_w),
             json_number(row.rust_inside_conduction_w),
             json_number(row.inside_conduction_delta_w),
@@ -8391,6 +8503,15 @@ fn heat_balance_ctf_storage_max_sample_deltas_json(
             json_number(row.oracle_storage_w),
             json_number(row.rust_storage_w),
             json_number(row.storage_delta_w),
+            json_number(row.oracle_storage_from_conduction_w),
+            json_number(row.rust_storage_from_conduction_w),
+            json_number(row.storage_from_conduction_signed_delta_w),
+            json_number(row.storage_from_conduction_delta_w),
+            json_number(row.oracle_storage_balance_residual_w),
+            json_number(row.rust_storage_balance_residual_w),
+            json_number(row.storage_balance_residual_delta_w),
+            json_string(&row.dominant_mismatch_source),
+            json_number(row.dominant_mismatch_delta_w),
             json_number(row.oracle_inside_current_outside_term_w),
             json_number(row.rust_inside_current_outside_term_w),
             json_number(row.inside_current_outside_term_signed_delta_w),
@@ -9211,12 +9332,18 @@ fn heat_balance_report_ctf_storage_max_sample_delta_rows(
     let columns = [
         "rank",
         "dominant",
+        "dominant_mismatch_source",
+        "dominant_mismatch_delta_w",
         "key",
         "construction",
         "sample_index",
         "storage_delta_w",
+        "storage_from_conduction_delta_w",
+        "storage_balance_residual_delta_w",
         "in_cond_delta_w",
         "out_cond_delta_w",
+        "inside_temp_delta_c",
+        "outside_temp_delta_c",
         "current_signed_w",
         "current_delta_w",
         "current_abs_sum_w",
@@ -9233,6 +9360,17 @@ fn heat_balance_report_ctf_storage_max_sample_delta_rows(
         "out_history_delta_w",
         "oracle_storage_w",
         "rust_storage_w",
+        "ctf_z0",
+        "ctf_y0",
+        "ctf_x0",
+        "oracle_inside_temp_c",
+        "rust_inside_temp_c",
+        "oracle_outside_temp_c",
+        "rust_outside_temp_c",
+        "oracle_storage_from_cond_w",
+        "rust_storage_from_cond_w",
+        "oracle_storage_residual_w",
+        "rust_storage_residual_w",
         "oracle_in_current_out_w",
         "rust_in_current_out_w",
         "oracle_in_current_in_w",
@@ -9254,12 +9392,18 @@ fn heat_balance_report_ctf_storage_max_sample_delta_rows(
         let values = [
             row.storage_delta_rank.to_string(),
             row.dominant_storage_surface.to_string(),
+            markdown_cell(&row.dominant_mismatch_source),
+            format!("{:.12}", row.dominant_mismatch_delta_w),
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
             row.sample_index.to_string(),
             format!("{:.12}", row.storage_delta_w),
+            format!("{:.12}", row.storage_from_conduction_delta_w),
+            format!("{:.12}", row.storage_balance_residual_delta_w),
             format!("{:.12}", row.inside_conduction_delta_w),
             format!("{:.12}", row.outside_conduction_delta_w),
+            format!("{:.12}", row.inside_face_temperature_delta_c),
+            format!("{:.12}", row.outside_face_temperature_delta_c),
             format!("{:.12}", row.inside_current_signed_delta_w),
             format!("{:.12}", row.inside_current_delta_w),
             format!("{:.12}", row.inside_current_split_abs_sum_w),
@@ -9276,6 +9420,17 @@ fn heat_balance_report_ctf_storage_max_sample_delta_rows(
             format!("{:.12}", row.outside_history_delta_w),
             format!("{:.12}", row.oracle_storage_w),
             format!("{:.12}", row.rust_storage_w),
+            format!("{:.12}", row.ctf_inside_0_w_per_m2_k),
+            format!("{:.12}", row.ctf_cross_0_w_per_m2_k),
+            format!("{:.12}", row.ctf_outside_0_w_per_m2_k),
+            format!("{:.12}", row.oracle_inside_face_temperature_c),
+            format!("{:.12}", row.rust_inside_face_temperature_c),
+            format!("{:.12}", row.oracle_outside_face_temperature_c),
+            format!("{:.12}", row.rust_outside_face_temperature_c),
+            format!("{:.12}", row.oracle_storage_from_conduction_w),
+            format!("{:.12}", row.rust_storage_from_conduction_w),
+            format!("{:.12}", row.oracle_storage_balance_residual_w),
+            format!("{:.12}", row.rust_storage_balance_residual_w),
             format!("{:.12}", row.oracle_inside_current_outside_term_w),
             format!("{:.12}", row.rust_inside_current_outside_term_w),
             format!("{:.12}", row.oracle_inside_current_inside_term_w),
@@ -10804,6 +10959,17 @@ mod tests {
                 dominant_storage_surface: true,
                 sample_index: 1,
                 area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                ctf_cross_0_w_per_m2_k: 1.0,
+                ctf_outside_0_w_per_m2_k: 2.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_signed_delta_c: -1.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_outside_face_temperature_c: 15.0,
+                rust_outside_face_temperature_c: 14.0,
+                outside_face_temperature_signed_delta_c: 1.0,
+                outside_face_temperature_delta_c: 1.0,
                 oracle_inside_conduction_w: 20.0,
                 rust_inside_conduction_w: 18.0,
                 inside_conduction_delta_w: 2.0,
@@ -10813,6 +10979,15 @@ mod tests {
                 oracle_storage_w: -12.0,
                 rust_storage_w: -11.0,
                 storage_delta_w: 1.0,
+                oracle_storage_from_conduction_w: -12.0,
+                rust_storage_from_conduction_w: -11.0,
+                storage_from_conduction_signed_delta_w: -1.0,
+                storage_from_conduction_delta_w: 1.0,
+                oracle_storage_balance_residual_w: 0.0,
+                rust_storage_balance_residual_w: 0.0,
+                storage_balance_residual_delta_w: 0.0,
+                dominant_mismatch_source: "face-temperature-current-outside".to_string(),
+                dominant_mismatch_delta_w: 5.0,
                 oracle_inside_current_outside_term_w: 1500.0,
                 rust_inside_current_outside_term_w: 1505.0,
                 inside_current_outside_term_signed_delta_w: -5.0,
@@ -11162,6 +11337,9 @@ mod tests {
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"storage_delta_rank\": 1"));
         assert!(json.contains("\"dominant_storage_surface\": true"));
+        assert!(json.contains("\"dominant_mismatch_source\""));
+        assert!(json.contains("\"storage_balance_residual_delta_w\""));
+        assert!(json.contains("\"inside_face_temperature_delta_c\""));
         assert!(json.contains("\"storage_delta_w\""));
         assert!(json.contains("\"inside_current_outside_term_signed_delta_w\""));
         assert!(json.contains("\"inside_current_inside_term_signed_delta_w\""));
@@ -11226,6 +11404,9 @@ mod tests {
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"storage_delta_rank\": 1"));
         assert!(digest.contains("\"dominant_storage_surface\": true"));
+        assert!(digest.contains("\"dominant_mismatch_source\""));
+        assert!(digest.contains("\"storage_balance_residual_delta_w\""));
+        assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"storage_delta_w\""));
         assert!(digest.contains("\"inside_current_outside_term_signed_delta_w\""));
         assert!(digest.contains("\"inside_current_inside_term_signed_delta_w\""));
@@ -11296,6 +11477,9 @@ mod tests {
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("storage_delta_w"));
         assert!(report.contains("dominant"));
+        assert!(report.contains("dominant_mismatch_source"));
+        assert!(report.contains("storage_balance_residual_delta_w"));
+        assert!(report.contains("inside_temp_delta_c"));
         assert!(report.contains("current_out_signed_w"));
         assert!(report.contains("current_in_signed_w"));
         assert!(report.contains("rust_history_temp_w"));
@@ -11426,6 +11610,17 @@ mod tests {
                 dominant_storage_surface: true,
                 sample_index: 1,
                 area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                ctf_cross_0_w_per_m2_k: 1.0,
+                ctf_outside_0_w_per_m2_k: 2.0,
+                oracle_inside_face_temperature_c: 16.0,
+                rust_inside_face_temperature_c: 17.0,
+                inside_face_temperature_signed_delta_c: -1.0,
+                inside_face_temperature_delta_c: 1.0,
+                oracle_outside_face_temperature_c: 15.0,
+                rust_outside_face_temperature_c: 14.0,
+                outside_face_temperature_signed_delta_c: 1.0,
+                outside_face_temperature_delta_c: 1.0,
                 oracle_inside_conduction_w: 12.0,
                 rust_inside_conduction_w: 10.0,
                 inside_conduction_delta_w: 2.0,
@@ -11435,6 +11630,15 @@ mod tests {
                 oracle_storage_w: -7.0,
                 rust_storage_w: -2.0,
                 storage_delta_w: 5.0,
+                oracle_storage_from_conduction_w: -7.0,
+                rust_storage_from_conduction_w: -2.0,
+                storage_from_conduction_signed_delta_w: -5.0,
+                storage_from_conduction_delta_w: 5.0,
+                oracle_storage_balance_residual_w: 0.0,
+                rust_storage_balance_residual_w: 0.0,
+                storage_balance_residual_delta_w: 0.0,
+                dominant_mismatch_source: "history-vector-inside-total".to_string(),
+                dominant_mismatch_delta_w: 3.0,
                 oracle_inside_current_outside_term_w: 1000.0,
                 rust_inside_current_outside_term_w: 1002.0,
                 inside_current_outside_term_signed_delta_w: -2.0,
@@ -11750,6 +11954,9 @@ mod tests {
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(json.contains("\"storage_delta_rank\": 1"));
         assert!(json.contains("\"dominant_storage_surface\": true"));
+        assert!(json.contains("\"dominant_mismatch_source\""));
+        assert!(json.contains("\"storage_balance_residual_delta_w\""));
+        assert!(json.contains("\"inside_face_temperature_delta_c\""));
         assert!(json.contains("\"outside_history_delta_w\""));
         assert!(json.contains("\"inside_current_outside_term_signed_delta_w\""));
         assert!(json.contains("\"inside_current_inside_term_signed_delta_w\""));
@@ -11802,6 +12009,9 @@ mod tests {
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
         assert!(digest.contains("\"storage_delta_rank\": 1"));
         assert!(digest.contains("\"dominant_storage_surface\": true"));
+        assert!(digest.contains("\"dominant_mismatch_source\""));
+        assert!(digest.contains("\"storage_balance_residual_delta_w\""));
+        assert!(digest.contains("\"inside_face_temperature_delta_c\""));
         assert!(digest.contains("\"outside_history_delta_w\""));
         assert!(digest.contains("\"inside_current_outside_term_signed_delta_w\""));
         assert!(digest.contains("\"inside_current_inside_term_signed_delta_w\""));
@@ -11866,6 +12076,9 @@ mod tests {
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("out_history_delta_w"));
         assert!(report.contains("dominant"));
+        assert!(report.contains("dominant_mismatch_source"));
+        assert!(report.contains("storage_balance_residual_delta_w"));
+        assert!(report.contains("inside_temp_delta_c"));
         assert!(report.contains("current_out_signed_w"));
         assert!(report.contains("current_in_signed_w"));
         assert!(report.contains("rust_history_temp_w"));
