@@ -554,6 +554,8 @@ if ($CtfSeedPolicy -eq "all-eio") {
     foreach ($propertyName in @(
             "inside_current_outside_term_delta",
             "inside_current_inside_term_delta",
+            "inside_history_temperature_term_delta",
+            "inside_history_flux_term_delta",
             "outside_current_outside_term_delta",
             "outside_current_inside_term_delta"
         )) {
@@ -1040,6 +1042,8 @@ Assert-Contains -Text $reportText -Pattern "dominant" -Description "markdown CTF
 Assert-Contains -Text $reportText -Pattern "dominant_mismatch_source" -Description "markdown CTF storage dominant mismatch source column"
 Assert-Contains -Text $reportText -Pattern "storage_balance_residual_delta_w" -Description "markdown CTF storage balance residual column"
 Assert-Contains -Text $reportText -Pattern "inside_temp_delta_c" -Description "markdown CTF storage inside face temperature delta column"
+Assert-Contains -Text $reportText -Pattern "in_hist_temp_rms_w" -Description "markdown CTF history temperature split annual column"
+Assert-Contains -Text $reportText -Pattern "in_hist_flux_rms_w" -Description "markdown CTF history flux split annual column"
 Assert-Contains -Text $reportText -Pattern "current_out_signed_w" -Description "markdown CTF storage current outside split column"
 Assert-Contains -Text $reportText -Pattern "current_in_signed_w" -Description "markdown CTF storage current inside split column"
 Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown CTF storage history temperature split column"

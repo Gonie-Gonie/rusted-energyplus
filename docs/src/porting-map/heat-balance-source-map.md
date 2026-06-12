@@ -644,6 +644,18 @@ Current Rust boundary:
   current-inside RMSE stays below `0.8 W`. This confirms the next numerical
   bottleneck is floor inside-face current-term timing/source alignment, not the
   outside current term or a broad coefficient mismatch.
+- The same annual CTF table now exposes Rust's history temperature/flux split
+  magnitudes beside the aggregate oracle-vs-Rust history mismatch. Because
+  EnergyPlus hourly output only exposes total history contribution, these
+  split columns are zero-baseline Rust magnitudes rather than independent
+  oracle split deltas. In the active lane, `ZN001:FLR001`
+  `inside_history_delta.rmse_delta_c = 228.537244 W`, while the Rust split
+  magnitudes are `in_hist_temp_rms_w = 231910.143809 W` and
+  `in_hist_flux_rms_w = 864.878867 W`; roof/wall history split magnitudes are
+  zero in this diagnostic because their CTF history slots remain effectively
+  steady/no-mass. The next floor-storage probe should therefore focus on
+  floor temperature-history state alignment and the current inside-face source
+  timing before treating the residual as a flux-history handoff problem.
 - Re-running the `hconv-reeval2` candidate with the signed split lowers the
   active top RMSE from `28.786920` to `27.005834` W on floor storage, but it is
   not promotion-ready: MAT RMSE rises from `0.037329` to `0.037718 C`, floor

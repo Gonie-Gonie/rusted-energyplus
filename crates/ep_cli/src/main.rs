@@ -3369,6 +3369,8 @@ struct HeatBalanceCtfHistorySeriesDelta {
     inside_current_inside_term_delta: DeltaSummary,
     inside_current_delta: DeltaSummary,
     inside_history_delta: DeltaSummary,
+    inside_history_temperature_term_delta: DeltaSummary,
+    inside_history_flux_term_delta: DeltaSummary,
     outside_current_outside_term_delta: DeltaSummary,
     outside_current_inside_term_delta: DeltaSummary,
     outside_current_delta: DeltaSummary,
@@ -4804,6 +4806,16 @@ fn heat_balance_ctf_history_series_deltas(
                 &surface.name.0,
                 SURFACE_CTF_INSIDE_HISTORY_TERM_RATE_VARIABLE,
             )?;
+            let rust_inside_history_temperature = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_TEMPERATURE_TERM_RATE_VARIABLE,
+            )?;
+            let rust_inside_history_flux = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
+            )?;
             let rust_outside_current_outside = heat_balance_result_series_values(
                 results,
                 &surface.name.0,
@@ -4828,6 +4840,8 @@ fn heat_balance_ctf_history_series_deltas(
                 rust_inside_current_outside.len(),
                 rust_inside_current_inside.len(),
                 rust_inside_history.len(),
+                rust_inside_history_temperature.len(),
+                rust_inside_history_flux.len(),
                 rust_outside_current_outside.len(),
                 rust_outside_current_inside.len(),
                 rust_outside_history.len(),
@@ -4844,6 +4858,10 @@ fn heat_balance_ctf_history_series_deltas(
             let mut oracle_inside_current = Vec::with_capacity(samples);
             let mut rust_inside_current = Vec::with_capacity(samples);
             let mut oracle_inside_history = Vec::with_capacity(samples);
+            // EnergyPlus hourly outputs expose only the aggregate history term.
+            // These zero-baseline summaries report Rust split magnitudes beside
+            // the aggregate oracle-vs-Rust history mismatch.
+            let zero_history_split = vec![0.0; samples];
             let mut oracle_outside_current_outside = Vec::with_capacity(samples);
             let mut oracle_outside_current_inside = Vec::with_capacity(samples);
             let mut oracle_outside_current = Vec::with_capacity(samples);
@@ -4898,6 +4916,14 @@ fn heat_balance_ctf_history_series_deltas(
                 ),
                 inside_current_delta: delta_summary(&oracle_inside_current, &rust_inside_current),
                 inside_history_delta: delta_summary(&oracle_inside_history, &rust_inside_history),
+                inside_history_temperature_term_delta: delta_summary(
+                    &zero_history_split,
+                    &rust_inside_history_temperature[..samples],
+                ),
+                inside_history_flux_term_delta: delta_summary(
+                    &zero_history_split,
+                    &rust_inside_history_flux[..samples],
+                ),
                 outside_current_outside_term_delta: delta_summary(
                     &oracle_outside_current_outside,
                     &rust_outside_current_outside,
@@ -9055,6 +9081,8 @@ fn heat_balance_ctf_history_series_deltas_json(
                 "\"inside_current_inside_term_delta\": {}, ",
                 "\"inside_current_delta\": {}, ",
                 "\"inside_history_delta\": {}, ",
+                "\"inside_history_temperature_term_delta\": {}, ",
+                "\"inside_history_flux_term_delta\": {}, ",
                 "\"outside_current_outside_term_delta\": {}, ",
                 "\"outside_current_inside_term_delta\": {}, ",
                 "\"outside_current_delta\": {}, ",
@@ -9068,6 +9096,8 @@ fn heat_balance_ctf_history_series_deltas_json(
             delta_summary_json(&row.inside_current_inside_term_delta),
             delta_summary_json(&row.inside_current_delta),
             delta_summary_json(&row.inside_history_delta),
+            delta_summary_json(&row.inside_history_temperature_term_delta),
+            delta_summary_json(&row.inside_history_flux_term_delta),
             delta_summary_json(&row.outside_current_outside_term_delta),
             delta_summary_json(&row.outside_current_inside_term_delta),
             delta_summary_json(&row.outside_current_delta),
@@ -10054,42 +10084,115 @@ fn heat_balance_report_ctf_history_series_delta_rows(
     report: &mut String,
     rows: &[HeatBalanceCtfHistorySeriesDelta],
 ) {
-    report.push_str(
-        "| key | construction | samples | in_curr_out_rmse_w | in_curr_in_rmse_w | in_current_rmse_w | in_history_rmse_w | out_curr_out_rmse_w | out_curr_in_rmse_w | out_current_rmse_w | out_history_rmse_w | in_curr_out_max_w | in_curr_in_max_w | in_current_max_w | in_history_max_w | out_curr_out_max_w | out_curr_in_max_w | out_current_max_w | out_history_max_w | in_current_mean_w | in_history_mean_w | out_current_mean_w | out_history_mean_w |\n",
-    );
-    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    let columns = [
+        "key",
+        "construction",
+        "samples",
+        "in_curr_out_rmse_w",
+        "in_curr_in_rmse_w",
+        "in_current_rmse_w",
+        "in_history_rmse_w",
+        "in_hist_temp_rms_w",
+        "in_hist_flux_rms_w",
+        "out_curr_out_rmse_w",
+        "out_curr_in_rmse_w",
+        "out_current_rmse_w",
+        "out_history_rmse_w",
+        "in_curr_out_max_w",
+        "in_curr_in_max_w",
+        "in_current_max_w",
+        "in_history_max_w",
+        "in_hist_temp_max_w",
+        "in_hist_flux_max_w",
+        "out_curr_out_max_w",
+        "out_curr_in_max_w",
+        "out_current_max_w",
+        "out_history_max_w",
+        "in_current_mean_w",
+        "in_history_mean_w",
+        "in_hist_temp_mean_w",
+        "in_hist_flux_mean_w",
+        "out_current_mean_w",
+        "out_history_mean_w",
+    ];
+    report.push_str("| ");
+    report.push_str(&columns.join(" | "));
+    report.push_str(" |\n");
+    let alignments = columns
+        .iter()
+        .enumerate()
+        .map(|(index, _)| if index < 2 { "---" } else { "---:" })
+        .collect::<Vec<_>>();
+    report.push_str("|");
+    report.push_str(&alignments.join("|"));
+    report.push_str("|\n");
     let mut sorted = rows.iter().collect::<Vec<_>>();
     sorted.sort_by(|left, right| {
         heat_balance_ctf_history_series_max_rmse(right)
             .total_cmp(&heat_balance_ctf_history_series_max_rmse(left))
     });
     for row in sorted {
-        report.push_str(&format!(
-            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+        let values = [
             markdown_cell(&row.key),
             markdown_cell(&row.construction_name),
-            row.samples,
-            row.inside_current_outside_term_delta.rmse_delta_c,
-            row.inside_current_inside_term_delta.rmse_delta_c,
-            row.inside_current_delta.rmse_delta_c,
-            row.inside_history_delta.rmse_delta_c,
-            row.outside_current_outside_term_delta.rmse_delta_c,
-            row.outside_current_inside_term_delta.rmse_delta_c,
-            row.outside_current_delta.rmse_delta_c,
-            row.outside_history_delta.rmse_delta_c,
-            row.inside_current_outside_term_delta.max_abs_delta_c,
-            row.inside_current_inside_term_delta.max_abs_delta_c,
-            row.inside_current_delta.max_abs_delta_c,
-            row.inside_history_delta.max_abs_delta_c,
-            row.outside_current_outside_term_delta.max_abs_delta_c,
-            row.outside_current_inside_term_delta.max_abs_delta_c,
-            row.outside_current_delta.max_abs_delta_c,
-            row.outside_history_delta.max_abs_delta_c,
-            row.inside_current_delta.mean_abs_delta_c,
-            row.inside_history_delta.mean_abs_delta_c,
-            row.outside_current_delta.mean_abs_delta_c,
-            row.outside_history_delta.mean_abs_delta_c
-        ));
+            row.samples.to_string(),
+            format!("{:.12}", row.inside_current_outside_term_delta.rmse_delta_c),
+            format!("{:.12}", row.inside_current_inside_term_delta.rmse_delta_c),
+            format!("{:.12}", row.inside_current_delta.rmse_delta_c),
+            format!("{:.12}", row.inside_history_delta.rmse_delta_c),
+            format!(
+                "{:.12}",
+                row.inside_history_temperature_term_delta.rmse_delta_c
+            ),
+            format!("{:.12}", row.inside_history_flux_term_delta.rmse_delta_c),
+            format!(
+                "{:.12}",
+                row.outside_current_outside_term_delta.rmse_delta_c
+            ),
+            format!("{:.12}", row.outside_current_inside_term_delta.rmse_delta_c),
+            format!("{:.12}", row.outside_current_delta.rmse_delta_c),
+            format!("{:.12}", row.outside_history_delta.rmse_delta_c),
+            format!(
+                "{:.12}",
+                row.inside_current_outside_term_delta.max_abs_delta_c
+            ),
+            format!(
+                "{:.12}",
+                row.inside_current_inside_term_delta.max_abs_delta_c
+            ),
+            format!("{:.12}", row.inside_current_delta.max_abs_delta_c),
+            format!("{:.12}", row.inside_history_delta.max_abs_delta_c),
+            format!(
+                "{:.12}",
+                row.inside_history_temperature_term_delta.max_abs_delta_c
+            ),
+            format!("{:.12}", row.inside_history_flux_term_delta.max_abs_delta_c),
+            format!(
+                "{:.12}",
+                row.outside_current_outside_term_delta.max_abs_delta_c
+            ),
+            format!(
+                "{:.12}",
+                row.outside_current_inside_term_delta.max_abs_delta_c
+            ),
+            format!("{:.12}", row.outside_current_delta.max_abs_delta_c),
+            format!("{:.12}", row.outside_history_delta.max_abs_delta_c),
+            format!("{:.12}", row.inside_current_delta.mean_abs_delta_c),
+            format!("{:.12}", row.inside_history_delta.mean_abs_delta_c),
+            format!(
+                "{:.12}",
+                row.inside_history_temperature_term_delta.mean_abs_delta_c
+            ),
+            format!(
+                "{:.12}",
+                row.inside_history_flux_term_delta.mean_abs_delta_c
+            ),
+            format!("{:.12}", row.outside_current_delta.mean_abs_delta_c),
+            format!("{:.12}", row.outside_history_delta.mean_abs_delta_c),
+        ];
+        report.push_str("| ");
+        report.push_str(&values.join(" | "));
+        report.push_str(" |\n");
     }
 }
 
@@ -11762,6 +11865,11 @@ mod tests {
                 inside_current_inside_term_delta: super::delta_summary(&[6.0, 7.0], &[6.0, 8.5]),
                 inside_current_delta: super::delta_summary(&[9.0, 11.0], &[10.0, 13.0]),
                 inside_history_delta: super::delta_summary(&[1.0, 2.0], &[0.0, 4.0]),
+                inside_history_temperature_term_delta: super::delta_summary(
+                    &[0.0, 0.0],
+                    &[6.0, 7.0],
+                ),
+                inside_history_flux_term_delta: super::delta_summary(&[0.0, 0.0], &[2.0, 3.0]),
                 outside_current_outside_term_delta: super::delta_summary(
                     &[-10.0, -9.0],
                     &[-11.0, -9.5],
@@ -12163,6 +12271,8 @@ mod tests {
         assert!(json.contains("\"inside_current_inside_term_delta\""));
         assert!(json.contains("\"inside_current_delta\""));
         assert!(json.contains("\"inside_history_delta\""));
+        assert!(json.contains("\"inside_history_temperature_term_delta\""));
+        assert!(json.contains("\"inside_history_flux_term_delta\""));
         assert!(json.contains("\"outside_current_outside_term_delta\""));
         assert!(json.contains("\"outside_current_inside_term_delta\""));
         assert!(json.contains("\"ctf_storage_max_sample_deltas\""));
@@ -12243,6 +12353,8 @@ mod tests {
         assert!(digest.contains("\"inside_current_inside_term_delta\""));
         assert!(digest.contains("\"inside_current_delta\""));
         assert!(digest.contains("\"inside_history_delta\""));
+        assert!(digest.contains("\"inside_history_temperature_term_delta\""));
+        assert!(digest.contains("\"inside_history_flux_term_delta\""));
         assert!(digest.contains("\"outside_current_outside_term_delta\""));
         assert!(digest.contains("\"outside_current_inside_term_delta\""));
         assert!(digest.contains("\"ctf_storage_max_sample_deltas\""));
@@ -12334,6 +12446,8 @@ mod tests {
         assert!(report.contains("out_curr_out_rmse_w"));
         assert!(report.contains("out_curr_in_rmse_w"));
         assert!(report.contains("in_history_rmse_w"));
+        assert!(report.contains("in_hist_temp_rms_w"));
+        assert!(report.contains("in_hist_flux_rms_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("storage_delta_w"));
         assert!(report.contains("dominant"));
@@ -12464,6 +12578,11 @@ mod tests {
                 inside_current_inside_term_delta: super::delta_summary(&[4.0, 5.0], &[4.5, 5.0]),
                 inside_current_delta: super::delta_summary(&[6.0, 8.0], &[7.0, 9.0]),
                 inside_history_delta: super::delta_summary(&[4.0, 5.0], &[0.0, 3.0]),
+                inside_history_temperature_term_delta: super::delta_summary(
+                    &[0.0, 0.0],
+                    &[2.5, 2.5],
+                ),
+                inside_history_flux_term_delta: super::delta_summary(&[0.0, 0.0], &[0.5, 0.5]),
                 outside_current_outside_term_delta: super::delta_summary(
                     &[-8.0, -10.0],
                     &[-9.0, -9.5],
@@ -12830,6 +12949,8 @@ mod tests {
         assert!(json.contains("\"ctf_history_series_deltas\""));
         assert!(json.contains("\"inside_current_outside_term_delta\""));
         assert!(json.contains("\"inside_current_inside_term_delta\""));
+        assert!(json.contains("\"inside_history_temperature_term_delta\""));
+        assert!(json.contains("\"inside_history_flux_term_delta\""));
         assert!(json.contains("\"outside_current_outside_term_delta\""));
         assert!(json.contains("\"outside_current_inside_term_delta\""));
         assert!(json.contains("\"outside_history_delta\""));
@@ -12898,6 +13019,8 @@ mod tests {
         assert!(digest.contains("\"inside_current_outside_term_delta\""));
         assert!(digest.contains("\"inside_current_inside_term_delta\""));
         assert!(digest.contains("\"ctf_history_series_deltas\""));
+        assert!(digest.contains("\"inside_history_temperature_term_delta\""));
+        assert!(digest.contains("\"inside_history_flux_term_delta\""));
         assert!(digest.contains("\"outside_current_outside_term_delta\""));
         assert!(digest.contains("\"outside_current_inside_term_delta\""));
         assert!(digest.contains("\"outside_history_delta\""));
@@ -12984,6 +13107,8 @@ mod tests {
         assert!(report.contains("out_curr_out_rmse_w"));
         assert!(report.contains("out_curr_in_rmse_w"));
         assert!(report.contains("out_history_rmse_w"));
+        assert!(report.contains("in_hist_temp_rms_w"));
+        assert!(report.contains("in_hist_flux_rms_w"));
         assert!(report.contains("## CTF Storage Max-Sample Deltas"));
         assert!(report.contains("out_history_delta_w"));
         assert!(report.contains("dominant"));
