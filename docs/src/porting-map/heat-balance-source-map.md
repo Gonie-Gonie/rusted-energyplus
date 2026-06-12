@@ -621,6 +621,12 @@ Current Rust boundary:
   remaining mass-floor storage work should therefore target the warmup/run-period
   history handoff and coupled source update order rather than another outside
   report sign flip.
+- `ExecutionPlan.compatibility_stages` records the EnergyPlus heat-balance
+  source-order contract from `GetHeatBalanceInput` through
+  `CheckWarmupConvergence`, including EMS callback barriers and the nested
+  `ManageSurfaceHeatBalance`/`ManageAirHeatBalance`/`UpdateThermalHistories`
+  sequence. This is an ordering and trace scaffold only; it does not promote the
+  active official dynamic case until the numerical bottlenecks below pass.
 - The active 1Zone dynamic lane now emits signed inside-solve CTF current and
   history source splits at each surface storage max sample. For `ZN001:FLR001`
   sample 2435, the aggregate history delta (`+312.812546 W`) decomposes as

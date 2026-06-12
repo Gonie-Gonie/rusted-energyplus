@@ -130,11 +130,24 @@ pub struct ExecutionStage {
     pub steps: Vec<ExecutionStep>,
 }
 
+/// EnergyPlus source routine that owns one compatibility-mode ordering barrier.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct EnergyPlusCompatibilityStage {
+    /// Stable stage name used in Rust reports and traces.
+    pub stage_name: &'static str,
+    /// EnergyPlus source file that owns the stage.
+    pub source_file: &'static str,
+    /// EnergyPlus routine or callback barrier name.
+    pub source_routine: &'static str,
+}
+
 /// Minimal deterministic execution plan.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ExecutionPlan {
     /// Ordered stages.
     pub stages: Vec<ExecutionStage>,
+    /// EnergyPlus heat-balance routine order that compatibility mode must preserve.
+    pub compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
 }
 
 impl ExecutionPlan {
@@ -143,6 +156,98 @@ impl ExecutionPlan {
     pub fn step_count(&self) -> usize {
         self.stages.iter().map(|stage| stage.steps.len()).sum()
     }
+}
+
+/// EnergyPlus heat-balance source order used as the compatibility-mode contract.
+#[must_use]
+pub fn energyplus_heat_balance_compatibility_stages() -> Vec<EnergyPlusCompatibilityStage> {
+    vec![
+        EnergyPlusCompatibilityStage {
+            stage_name: "get-heat-balance-input",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "GetHeatBalanceInput",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "ems-begin-zone-timestep-before-init-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "EMS BeginZoneTimestepBeforeInitHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "init-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "InitHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "ems-begin-zone-timestep-after-init-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "EMS BeginZoneTimestepAfterInitHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "manage-surface-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "ManageSurfaceHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "init-surface-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "InitSurfaceHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "calc-heat-balance-outside-surf",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "CalcHeatBalanceOutsideSurf",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "calc-heat-balance-inside-surf",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "CalcHeatBalanceInsideSurf",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "manage-air-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceAirManager.cc",
+            source_routine: "ManageAirHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "update-final-surface-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "UpdateFinalSurfaceHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "update-thermal-histories",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "UpdateThermalHistories",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "report-surface-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+            source_routine: "ReportSurfaceHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "ems-end-zone-timestep-before-zone-reporting",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "EMS EndZoneTimestepBeforeZoneReporting",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "rec-keep-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "RecKeepHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "report-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "ReportHeatBalance",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "ems-end-zone-timestep-after-zone-reporting",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "EMS EndZoneTimestepAfterZoneReporting",
+        },
+        EnergyPlusCompatibilityStage {
+            stage_name: "check-warmup-convergence",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "CheckWarmupConvergence",
+        },
+    ]
 }
 
 /// Builds the first deterministic execution plan for the typed subset.
@@ -193,6 +298,7 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
                     .collect(),
             },
         ],
+        compatibility_stages: energyplus_heat_balance_compatibility_stages(),
     }
 }
 
@@ -10361,7 +10467,7 @@ mod tests {
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_exterior_longwave_terms, energyplus_exterior_wet_context_fraction,
-        energyplus_exterior_wet_timestep_fraction,
+        energyplus_exterior_wet_timestep_fraction, energyplus_heat_balance_compatibility_stages,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
         energyplus_outdoor_wet_bulb_c, energyplus_psychrometric_humidity_ratio_from_rh,
@@ -10862,6 +10968,28 @@ mod tests {
             plan.stages[2].steps[8],
             ExecutionStep::WriteOutput(OutputHandle(8))
         );
+        assert_eq!(
+            plan.compatibility_stages,
+            energyplus_heat_balance_compatibility_stages()
+        );
+    }
+
+    #[test]
+    fn heat_balance_compatibility_stages_follow_energyplus_source_order() {
+        let stages = energyplus_heat_balance_compatibility_stages();
+
+        assert_eq!(stages.len(), 17);
+        assert_eq!(stages[0].stage_name, "get-heat-balance-input");
+        assert_eq!(stages[0].source_routine, "GetHeatBalanceInput");
+        assert_eq!(stages[4].source_routine, "ManageSurfaceHeatBalance");
+        assert_eq!(stages[5].source_routine, "InitSurfaceHeatBalance");
+        assert_eq!(stages[6].source_routine, "CalcHeatBalanceOutsideSurf");
+        assert_eq!(stages[7].source_routine, "CalcHeatBalanceInsideSurf");
+        assert_eq!(stages[8].source_routine, "ManageAirHeatBalance");
+        assert_eq!(stages[10].source_routine, "UpdateThermalHistories");
+        assert_eq!(stages[11].source_routine, "ReportSurfaceHeatBalance");
+        assert_eq!(stages[14].source_routine, "ReportHeatBalance");
+        assert_eq!(stages[16].source_routine, "CheckWarmupConvergence");
     }
 
     #[test]

@@ -391,6 +391,16 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
             println!("      {index}: {}", execution_step_label(step));
         }
     }
+    println!(
+        "  compatibility_stages: {}",
+        plan.compatibility_stages.len()
+    );
+    for (index, stage) in plan.compatibility_stages.iter().enumerate() {
+        println!(
+            "    {index}: {} -> {}::{}",
+            stage.stage_name, stage.source_file, stage.source_routine
+        );
+    }
 }
 
 fn execution_step_label(step: &ExecutionStep) -> String {
