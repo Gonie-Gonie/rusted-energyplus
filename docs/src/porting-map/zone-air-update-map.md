@@ -169,6 +169,18 @@ The next zone-air work therefore stays on `CalcZoneComponentLoadSums` timing,
 `SurfTempInTmp`/hconv ownership, and upstream surface/source/history parity
 rather than on a zone aggregate accumulator source swap.
 
+EnergyPlus `DataHeatBalance.cc::AirReportVars::setUpOutputVars` registers the
+zone air heat-balance component rows as `System/Average`, while `Zone Mean Air
+Temperature` remains `Zone/Average`. Rust therefore keeps hourly averaging as
+the default report contract and adds `zone_air_report_sampling=last-system-state`
+only as a diagnostic probe to isolate whether the remaining `SumHADTsurfs` gap
+comes from system-timestep sampling rather than surface/source state ownership.
+This probe is rejected as a promotion path: on the active ScriptF-flat lane it
+leaves MAT and floor storage unchanged (`0.037329 C` and `28.786920 W`) while
+worsening `Zone Air Heat Balance Surface Convection Rate` from `22.062956 W` to
+`28.645122 W` RMSE and `Zone Air Heat Balance Air Energy Storage Rate` from
+`9.127258 W` to `42.591381 W` RMSE.
+
 An adiabatic-report sibling then tested whether EnergyPlus reports the
 adiabatic floor outside face after syncing it to the current inside face while
 still committing the pre-sync outside snapshot to CTF history. This is rejected:

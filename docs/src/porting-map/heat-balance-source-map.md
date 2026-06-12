@@ -33,6 +33,7 @@ claim.
 | heat-balance orchestration | `src/EnergyPlus/HeatBalanceManager.cc` | `ep_runtime::heat_balance` |
 | heat-balance declarations | `src/EnergyPlus/HeatBalanceManager.hh` | `ep_runtime::heat_balance` |
 | global heat-balance data | `src/EnergyPlus/DataHeatBalance.hh` | `ep_model`, `ep_runtime::HeatBalanceState` |
+| global heat-balance report registration | `src/EnergyPlus/DataHeatBalance.cc` | `ep_runtime::ResultStore`, conformance report metadata |
 | surface heat balance | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ep_runtime::surface_balance` |
 | surface heat-balance declarations | `src/EnergyPlus/HeatBalanceSurfaceManager.hh` | `ep_runtime::surface_balance` |
 | zone air predictor/corrector | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ep_runtime::zone_air` |
@@ -113,6 +114,13 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
   `Surface::getInsideAirTemperature`, `SurfHConvInt`, and `SurfTempInTmp`.
   Therefore the zone `Surface Convection Rate` row is not required to equal the
   signed sum of individual surface inside convection report rows.
+- `DataHeatBalance.cc::AirReportVars::setUpOutputVars` registers `Zone Mean Air
+  Temperature` as `Zone/Average`, but registers `Zone Air Heat Balance Internal
+  Convective Heat Gain Rate`, `Zone Air Heat Balance Surface Convection Rate`,
+  and `Zone Air Heat Balance Air Energy Storage Rate` as `System/Average`.
+  Rust keeps the default hourly average report mode and exposes a diagnostic
+  `zone_air_report_sampling=last-system-state` probe only to isolate timing
+  differences.
 
 ## Data Structure Map
 

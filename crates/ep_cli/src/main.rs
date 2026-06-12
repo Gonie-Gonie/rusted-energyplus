@@ -33,8 +33,8 @@ use ep_runtime::{
     HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource, NodeStateProjection,
+    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, ResultStore,
     SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
@@ -72,6 +72,8 @@ const HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_INSIDE_HCONV_REEVALUATION_INTERVAL";
 const HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_CONDUCTION_REPORT_SOURCE";
+const HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING_ENV: &str =
+    "RUSTED_ENERGYPLUS_HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING";
 const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
 const HEAT_BALANCE_REPORT_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const HEAT_BALANCE_REPORT_AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
@@ -791,6 +793,10 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
                 "  zone_conduction_report_source: {}",
                 summary.zone_conduction_report_source
             );
+            println!(
+                "  zone_air_report_sampling: {}",
+                summary.zone_air_report_sampling
+            );
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
@@ -875,6 +881,10 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!(
                 "  zone_conduction_report_source: {}",
                 summary.zone_conduction_report_source
+            );
+            println!(
+                "  zone_air_report_sampling: {}",
+                summary.zone_air_report_sampling
             );
             println!("  status: {}", summary.status);
             0
@@ -1088,6 +1098,7 @@ struct HeatBalanceReportSummary {
     inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
     zone_conduction_report_source: &'static str,
+    zone_air_report_sampling: &'static str,
     status: &'static str,
 }
 
@@ -1166,6 +1177,7 @@ fn generate_conformance_heat_balance_report(
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
+        zone_air_report_sampling: diagnostic.zone_air_report_sampling,
         status: conformance.status,
     })
 }
@@ -1214,6 +1226,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
+        zone_air_report_sampling: diagnostic.zone_air_report_sampling,
         status: conformance.status,
     })
 }
@@ -3263,6 +3276,7 @@ struct HeatBalanceConformanceDiagnostic {
     inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
     zone_conduction_report_source: &'static str,
+    zone_air_report_sampling: &'static str,
     compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
     zone_count: usize,
     surface_count: usize,
@@ -3967,6 +3981,7 @@ fn build_heat_balance_conformance_diagnostic(
         let options = apply_heat_balance_surface_iterations_from_env(options)?;
         let options = apply_heat_balance_ctf_initial_history_policy_from_env(options)?;
         let options = apply_heat_balance_zone_conduction_report_source_from_env(options)?;
+        let options = apply_heat_balance_zone_air_report_sampling_from_env(options)?;
         apply_heat_balance_inside_hconv_reevaluation_interval_from_env(options)?
     }
     .with_zone_air_algorithm(zone_air_algorithm);
@@ -4090,6 +4105,9 @@ fn build_heat_balance_conformance_diagnostic(
         ),
         zone_conduction_report_source: heat_balance_zone_conduction_report_source_label(
             simulation.summary.zone_conduction_report_source,
+        ),
+        zone_air_report_sampling: heat_balance_zone_air_report_sampling_label(
+            simulation.summary.zone_air_report_sampling,
         ),
         compatibility_stages: energyplus_heat_balance_compatibility_stages(),
         zone_count: simulation.summary.zone_count,
@@ -6731,6 +6749,31 @@ fn parse_heat_balance_zone_conduction_report_source(
     }
 }
 
+fn apply_heat_balance_zone_air_report_sampling_from_env(
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulationOptions, String> {
+    match std::env::var(HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING_ENV) {
+        Ok(value) => parse_heat_balance_zone_air_report_sampling(&value)
+            .map(|sampling| options.with_zone_air_report_sampling(sampling)),
+        Err(std::env::VarError::NotPresent) => Ok(options),
+        Err(error) => Err(format!(
+            "failed to read {HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING_ENV}: {error}"
+        )),
+    }
+}
+
+fn parse_heat_balance_zone_air_report_sampling(
+    value: &str,
+) -> Result<HeatBalanceZoneAirReportSampling, String> {
+    match value.trim().to_ascii_lowercase().as_str() {
+        "" | "average" => Ok(HeatBalanceZoneAirReportSampling::Average),
+        "last-system-state" => Ok(HeatBalanceZoneAirReportSampling::LastSystemState),
+        other => Err(format!(
+            "unsupported {HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING_ENV}: {other}; expected average or last-system-state"
+        )),
+    }
+}
+
 fn heat_balance_ctf_initial_history_policy_label(
     ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
 ) -> &'static str {
@@ -6746,6 +6789,15 @@ fn heat_balance_zone_conduction_report_source_label(
     match zone_conduction_report_source {
         HeatBalanceZoneConductionReportSource::ZoneState => "zone-state",
         HeatBalanceZoneConductionReportSource::SurfaceReport => "surface-report",
+    }
+}
+
+fn heat_balance_zone_air_report_sampling_label(
+    zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
+) -> &'static str {
+    match zone_air_report_sampling {
+        HeatBalanceZoneAirReportSampling::Average => "average",
+        HeatBalanceZoneAirReportSampling::LastSystemState => "last-system-state",
     }
 }
 
@@ -8352,6 +8404,10 @@ fn render_heat_balance_conformance_json(
         json_string(diagnostic.zone_conduction_report_source)
     ));
     json.push_str(&format!(
+        "  \"zone_air_report_sampling\": {},\n",
+        json_string(diagnostic.zone_air_report_sampling)
+    ));
+    json.push_str(&format!(
         "  \"compatibility_stages\": {},\n",
         heat_balance_compatibility_stages_json(&diagnostic.compatibility_stages)
     ));
@@ -8620,6 +8676,10 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "zone_conduction_report_source: {}\n",
         diagnostic.zone_conduction_report_source
+    ));
+    report.push_str(&format!(
+        "zone_air_report_sampling: {}\n",
+        diagnostic.zone_air_report_sampling
     ));
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
@@ -11967,6 +12027,23 @@ mod tests {
     }
 
     #[test]
+    fn heat_balance_zone_air_report_sampling_parser_accepts_probe_sampling() {
+        assert_eq!(
+            super::parse_heat_balance_zone_air_report_sampling("").unwrap(),
+            ep_runtime::HeatBalanceZoneAirReportSampling::Average
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_report_sampling("average").unwrap(),
+            ep_runtime::HeatBalanceZoneAirReportSampling::Average
+        );
+        assert_eq!(
+            super::parse_heat_balance_zone_air_report_sampling("last-system-state").unwrap(),
+            ep_runtime::HeatBalanceZoneAirReportSampling::LastSystemState
+        );
+        assert!(super::parse_heat_balance_zone_air_report_sampling("last").is_err());
+    }
+
+    #[test]
     fn heat_balance_zone_air_algorithm_parser_accepts_probe_algorithm() {
         assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("").unwrap(),
@@ -12428,6 +12505,7 @@ mod tests {
             inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy: "boundary-u-value",
             zone_conduction_report_source: "zone-state",
+            zone_air_report_sampling: "average",
             compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
@@ -12887,6 +12965,7 @@ mod tests {
         assert!(json.contains("\"inside_hconv_reevaluation_interval\": null"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"boundary-u-value\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"zone-state\""));
+        assert!(json.contains("\"zone_air_report_sampling\": \"average\""));
         assert!(json.contains("\"compatibility_stages\""));
         assert!(json.contains("\"source_routine\": \"UpdateThermalHistories\""));
         assert!(json.contains("\"bottlenecks\""));
@@ -13067,6 +13146,7 @@ mod tests {
         assert!(report.contains("inside_hconv_reevaluation_interval: none"));
         assert!(report.contains("ctf_initial_history_policy: boundary-u-value"));
         assert!(report.contains("zone_conduction_report_source: zone-state"));
+        assert!(report.contains("zone_air_report_sampling: average"));
         assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
         assert!(report.contains("UpdateThermalHistories"));
         assert!(report.contains("failure_reasons: none"));
@@ -13187,6 +13267,7 @@ mod tests {
             inside_hconv_reevaluation_interval: Some(2),
             ctf_initial_history_policy: "energyplus-surf-initial",
             zone_conduction_report_source: "surface-report",
+            zone_air_report_sampling: "last-system-state",
             compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
@@ -13615,6 +13696,7 @@ mod tests {
         assert!(json.contains("\"inside_hconv_reevaluation_interval\": 2"));
         assert!(json.contains("\"ctf_initial_history_policy\": \"energyplus-surf-initial\""));
         assert!(json.contains("\"zone_conduction_report_source\": \"surface-report\""));
+        assert!(json.contains("\"zone_air_report_sampling\": \"last-system-state\""));
         assert!(json.contains("\"compatibility_stages\""));
         assert!(json.contains("\"source_routine\": \"ManageAirHeatBalance\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
@@ -13778,6 +13860,7 @@ mod tests {
         assert!(report.contains("inside_hconv_reevaluation_interval: 2"));
         assert!(report.contains("ctf_initial_history_policy: energyplus-surf-initial"));
         assert!(report.contains("zone_conduction_report_source: surface-report"));
+        assert!(report.contains("zone_air_report_sampling: last-system-state"));
         assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
         assert!(report.contains("ManageAirHeatBalance"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));

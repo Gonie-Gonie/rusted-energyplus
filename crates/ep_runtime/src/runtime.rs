@@ -1194,6 +1194,15 @@ pub enum HeatBalanceZoneConductionReportSource {
     SurfaceReport,
 }
 
+/// Sampling mode used for zone air heat-balance report variables.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceZoneAirReportSampling {
+    /// Average reported values over the zone timesteps in each hour.
+    Average,
+    /// Report the last system state in each hour for source-order probes.
+    LastSystemState,
+}
+
 /// Options for the heat-balance zone-air diagnostic trace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceSimulationOptions {
@@ -1213,6 +1222,8 @@ pub struct HeatBalanceSimulationOptions {
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
     /// Source used for zone opaque conduction report variables.
     pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
+    /// Sampling mode used for zone air heat-balance report variables.
+    pub zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -1287,6 +1298,7 @@ impl HeatBalanceSimulationOptions {
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
+            zone_air_report_sampling: HeatBalanceZoneAirReportSampling::Average,
         }
     }
 
@@ -1314,6 +1326,7 @@ impl HeatBalanceSimulationOptions {
             ctf_initial_history_policy:
                 HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue,
             zone_conduction_report_source: HeatBalanceZoneConductionReportSource::ZoneState,
+            zone_air_report_sampling: HeatBalanceZoneAirReportSampling::Average,
         }
     }
 
@@ -1380,6 +1393,16 @@ impl HeatBalanceSimulationOptions {
         self.zone_conduction_report_source = zone_conduction_report_source;
         self
     }
+
+    /// Returns options with an explicit zone air heat-balance report sampling mode.
+    #[must_use]
+    pub const fn with_zone_air_report_sampling(
+        mut self,
+        zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
+    ) -> Self {
+        self.zone_air_report_sampling = zone_air_report_sampling;
+        self
+    }
 }
 
 /// Summary for the heat-balance zone-air diagnostic trace.
@@ -1405,6 +1428,8 @@ pub struct HeatBalanceSimulationSummary {
     pub ctf_initial_history_policy: HeatBalanceCtfInitialHistoryPolicy,
     /// Source used for zone opaque conduction report variables.
     pub zone_conduction_report_source: HeatBalanceZoneConductionReportSource,
+    /// Sampling mode used for zone air heat-balance report variables.
+    pub zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
     /// Per-slot CTF history terms after optional warmup, before the run period starts.
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
@@ -4838,6 +4863,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             vec![(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); zone_conduction_rates.len()];
         let mut zone_air_heat_balance_sums =
             vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
+        let mut zone_air_heat_balance_last =
+            vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
         let mut surface_sums =
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
@@ -4950,8 +4977,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         options.zone_air_algorithm,
                         third_order_report_air_heat_capacity_j_per_k,
                     );
-                    zone_air_heat_balance_sums[index].0 += zone_state.convective_internal_gain_w;
-                    zone_air_heat_balance_sums[index].1 += if use_final_inside_convection_report {
+                    let surface_convection_rate_w = if use_final_inside_convection_report {
                         zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
                                 &state.surfaces,
                                 &state.zones,
@@ -4980,7 +5006,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     } else {
                         zone_air_heat_balance_surface_convection_rate_w(zone_state)
                     };
-                    zone_air_heat_balance_sums[index].2 += air_storage_rate_w;
+                    let values = (
+                        zone_state.convective_internal_gain_w,
+                        surface_convection_rate_w,
+                        air_storage_rate_w,
+                    );
+                    zone_air_heat_balance_sums[index].0 += values.0;
+                    zone_air_heat_balance_sums[index].1 += values.1;
+                    zone_air_heat_balance_sums[index].2 += values.2;
+                    zone_air_heat_balance_last[index] = values;
                 }
             }
             for (index, trace) in surface_temperatures.iter().enumerate() {
@@ -5163,10 +5197,18 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             ),
         ) in zone_air_heat_balance_rates.iter_mut().enumerate()
         {
-            let sums = zone_air_heat_balance_sums[index];
-            internal_gain_values.push(sums.0 / divisor);
-            surface_convection_values.push(sums.1 / divisor);
-            air_storage_values.push(sums.2 / divisor);
+            let values = match options.zone_air_report_sampling {
+                HeatBalanceZoneAirReportSampling::Average => {
+                    let sums = zone_air_heat_balance_sums[index];
+                    (sums.0 / divisor, sums.1 / divisor, sums.2 / divisor)
+                }
+                HeatBalanceZoneAirReportSampling::LastSystemState => {
+                    zone_air_heat_balance_last[index]
+                }
+            };
+            internal_gain_values.push(values.0);
+            surface_convection_values.push(values.1);
+            air_storage_values.push(values.2);
         }
         for (index, trace) in surface_temperatures.iter_mut().enumerate() {
             let sums = surface_sums[index];
@@ -5655,6 +5697,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         inside_hconv_reevaluation_interval: options.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: options.ctf_initial_history_policy,
         zone_conduction_report_source: options.zone_conduction_report_source,
+        zone_air_report_sampling: options.zone_air_report_sampling,
         run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
@@ -10446,13 +10489,13 @@ mod tests {
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
-        HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
-        InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
-        NODE_STATE_SOURCE_MAP_PATH, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
-        NodeStateProjectionOptions, NodeStateRole, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH,
-        PlantEquipmentRole, PlantStateProjectionOptions, QuickOutsideConductionContext,
-        ResultStore, RuntimeError, RuntimeOutputRegistry, SECONDS_PER_HOUR,
-        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource,
+        InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
+        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
+        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
+        QuickOutsideConductionContext, ResultStore, RuntimeError, RuntimeOutputRegistry,
+        SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
         advance_surface_ctf_histories,
@@ -13465,17 +13508,31 @@ DATA PERIODS
     }
 
     #[test]
-    fn heat_balance_zone_air_rate_outputs_are_hourly_averages()
+    fn heat_balance_zone_air_rate_outputs_follow_report_sampling()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
         let options = HeatBalanceSimulationOptions::hourly_samples(1);
         let simulation = simulate_heat_balance_zone_air_temperatures(&model, &[10.0], options)?;
+        assert_eq!(
+            simulation.summary.zone_air_report_sampling,
+            HeatBalanceZoneAirReportSampling::Average
+        );
+        let last_state_options = options
+            .with_zone_air_report_sampling(HeatBalanceZoneAirReportSampling::LastSystemState);
+        let last_state_simulation =
+            simulate_heat_balance_zone_air_temperatures(&model, &[10.0], last_state_options)?;
+        assert_eq!(
+            last_state_simulation.summary.zone_air_report_sampling,
+            HeatBalanceZoneAirReportSampling::LastSystemState
+        );
         let steps = model.typed.timestep.number_of_timesteps_per_hour.max(1);
         let timestep_seconds = SECONDS_PER_HOUR / f64::from(steps);
         let mut state =
             initialize_heat_balance_state(&model, options.initial_zone_air_temperature_c)?;
         let mut surface_convection_sum = 0.0;
         let mut air_storage_sum = 0.0;
+        let mut last_surface_convection = 0.0;
+        let mut last_air_storage = 0.0;
 
         for _substep in 1..=steps {
             advance_heat_balance_state_one_timestep_internal(
@@ -13492,13 +13549,15 @@ DATA PERIODS
                 options.inside_hconv_reevaluation_interval,
             );
             let zone = &state.zones[0];
-            surface_convection_sum += zone_air_heat_balance_surface_convection_rate_w(zone);
-            air_storage_sum += zone_air_heat_balance_air_storage_rate_w(
+            last_surface_convection = zone_air_heat_balance_surface_convection_rate_w(zone);
+            last_air_storage = zone_air_heat_balance_air_storage_rate_w(
                 zone,
                 timestep_seconds,
                 options.zone_air_algorithm,
                 None,
             );
+            surface_convection_sum += last_surface_convection;
+            air_storage_sum += last_air_storage;
         }
 
         let divisor = f64::from(steps);
@@ -13509,11 +13568,23 @@ DATA PERIODS
         assert!(
             (surface_convection_series.values[0] - surface_convection_sum / divisor).abs() < 1.0e-9
         );
+        let last_surface_convection_series = last_state_simulation
+            .results
+            .find_series("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate")
+            .ok_or_else(|| std::io::Error::other("missing last surface convection series"))?;
+        assert!(
+            (last_surface_convection_series.values[0] - last_surface_convection).abs() < 1.0e-9
+        );
         let air_storage_series = simulation
             .results
             .find_series("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate")
             .ok_or_else(|| std::io::Error::other("missing air storage series"))?;
         assert!((air_storage_series.values[0] - air_storage_sum / divisor).abs() < 1.0e-9);
+        let last_air_storage_series = last_state_simulation
+            .results
+            .find_series("ZONE ONE", "Zone Air Heat Balance Air Energy Storage Rate")
+            .ok_or_else(|| std::io::Error::other("missing last air storage series"))?;
+        assert!((last_air_storage_series.values[0] - last_air_storage).abs() < 1.0e-9);
 
         Ok(())
     }
@@ -13584,12 +13655,22 @@ DATA PERIODS
             HeatBalanceZoneConductionReportSource::ZoneState
         );
         assert_eq!(
+            options.zone_air_report_sampling,
+            HeatBalanceZoneAirReportSampling::Average
+        );
+        assert_eq!(
             options
                 .with_zone_conduction_report_source(
                     HeatBalanceZoneConductionReportSource::SurfaceReport
                 )
                 .zone_conduction_report_source,
             HeatBalanceZoneConductionReportSource::SurfaceReport
+        );
+        assert_eq!(
+            options
+                .with_zone_air_report_sampling(HeatBalanceZoneAirReportSampling::LastSystemState)
+                .zone_air_report_sampling,
+            HeatBalanceZoneAirReportSampling::LastSystemState
         );
         assert_eq!(
             options
