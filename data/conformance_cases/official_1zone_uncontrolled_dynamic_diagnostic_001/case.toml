@@ -67,6 +67,24 @@ domain = "weather"
 level = "diagnostic"
 
 [[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Wetbulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Rain Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
 key = "ZONE ONE"
 variable = "Zone Mean Air Temperature"
 frequency = "hourly"

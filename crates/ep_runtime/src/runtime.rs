@@ -39,6 +39,8 @@ const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 const ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K: f64 = 0.01;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
+const ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE: f64 = 0.0001;
+const ENERGYPLUS_WET_BULB_MAX_ITERATIONS: u32 = 100;
 
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
 pub const SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE: &str =
@@ -5041,6 +5043,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         })
         .collect::<Vec<_>>();
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
+    let mut outdoor_wet_bulb_temperatures = Vec::with_capacity(options.sample_count);
+    let mut rain_statuses = Vec::with_capacity(options.sample_count);
     let mut first_sample_ctf_history_slot_accumulators =
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
     let mut hourly_ctf_history_slots = Vec::new();
@@ -5082,6 +5086,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut surface_sums =
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
+        let mut outdoor_wet_bulb_temperature_sum = 0.0;
+        let mut rain_status_sum = 0.0;
         let mut hourly_ctf_history_slot_accumulators =
             BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
@@ -5102,6 +5108,29 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 substep,
                 first_hour_interpolation_starting_values,
             );
+            let timestep_outdoor_wet_bulb_c = weather_context
+                .map(|context| {
+                    energyplus_exterior_wet_reference_temperature_c(
+                        context,
+                        timestep_outdoor_dry_bulb_c,
+                    )
+                })
+                .unwrap_or(timestep_outdoor_dry_bulb_c);
+            let timestep_rain_status = weather_context
+                .map(|context| {
+                    if energyplus_weather_record_is_rain_at_timestep_with_starting_values(
+                        context.records,
+                        context.record_index,
+                        substep,
+                        steps,
+                        context.first_hour_interpolation_starting_values,
+                    ) {
+                        1.0
+                    } else {
+                        0.0
+                    }
+                })
+                .unwrap_or(0.0);
             advance_heat_balance_state_one_timestep_internal(
                 &model.typed,
                 &mut state,
@@ -5138,6 +5167,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             }
 
             outdoor_temperature_sum += timestep_outdoor_dry_bulb_c;
+            outdoor_wet_bulb_temperature_sum += timestep_outdoor_wet_bulb_c;
+            rain_status_sum += timestep_rain_status;
             for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
                     zone_temperature_sums[index] += zone_state.mean_air_temperature_c;
@@ -5549,6 +5580,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 .push(sums.heat_storage_rate_per_area_w_per_m2 / divisor);
         }
         outdoor_temperatures.push(outdoor_temperature_sum / divisor);
+        outdoor_wet_bulb_temperatures.push(outdoor_wet_bulb_temperature_sum / divisor);
+        rain_statuses.push(rain_status_sum / divisor);
     }
 
     let mut results = ResultStore::new();
@@ -5926,6 +5959,22 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         variable_name: "Site Outdoor Air Drybulb Temperature".to_string(),
         units: "C".to_string(),
         values: outdoor_temperatures,
+    });
+    handle_index += 1;
+    results.add_series(OutputSeries {
+        handle: OutputHandle(handle_index),
+        key: "Environment".to_string(),
+        variable_name: "Site Outdoor Air Wetbulb Temperature".to_string(),
+        units: "C".to_string(),
+        values: outdoor_wet_bulb_temperatures,
+    });
+    handle_index += 1;
+    results.add_series(OutputSeries {
+        handle: OutputHandle(handle_index),
+        key: "Environment".to_string(),
+        variable_name: "Site Rain Status".to_string(),
+        units: String::new(),
+        values: rain_statuses,
     });
 
     let summary = HeatBalanceSimulationSummary {
@@ -7226,24 +7275,27 @@ fn energyplus_outdoor_wet_bulb_c(
         (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
         atmospheric_pressure_pa,
     )?;
-    let mut lower_c = -100.0;
-    let mut upper_c = dry_bulb_c.min(200.0);
-    let mut wet_bulb_c = upper_c;
-    for _ in 0..100 {
-        wet_bulb_c = 0.5 * (lower_c + upper_c);
+    let mut wet_bulb_c = dry_bulb_c;
+    let mut previous_wet_bulb_c = 0.0;
+    let mut previous_error = 0.0;
+    for iteration in 1..=ENERGYPLUS_WET_BULB_MAX_ITERATIONS {
         let new_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
             dry_bulb_c,
             wet_bulb_c,
             atmospheric_pressure_pa,
         )?;
         let error = humidity_ratio - new_humidity_ratio;
-        if error.abs() <= 1.0e-10 {
+        let (next_wet_bulb_c, converged) = energyplus_general_iterate(
+            wet_bulb_c,
+            error,
+            &mut previous_wet_bulb_c,
+            &mut previous_error,
+            iteration,
+            ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE,
+        );
+        wet_bulb_c = next_wet_bulb_c;
+        if converged {
             break;
-        }
-        if new_humidity_ratio > humidity_ratio {
-            upper_c = wet_bulb_c;
-        } else {
-            lower_c = wet_bulb_c;
         }
     }
 
@@ -7252,6 +7304,41 @@ fn energyplus_outdoor_wet_bulb_c(
     }
 
     Some(wet_bulb_c.min(dry_bulb_c))
+}
+
+fn energyplus_general_iterate(
+    current_x: f64,
+    current_y: f64,
+    previous_x: &mut f64,
+    previous_y: &mut f64,
+    iteration: u32,
+    tolerance: f64,
+) -> (f64, bool) {
+    const SMALL: f64 = 1.0e-9;
+    const PERTURB: f64 = 0.1;
+
+    if iteration != 1 && ((current_x - *previous_x).abs() < tolerance || current_y == 0.0) {
+        return (current_x, true);
+    }
+
+    let result_x = if iteration == 1 {
+        if current_x.abs() > SMALL {
+            current_x * (1.0 + PERTURB)
+        } else {
+            PERTURB
+        }
+    } else {
+        let mut delta_y = current_y - *previous_y;
+        if delta_y.abs() < SMALL {
+            delta_y = SMALL;
+        }
+        (current_y * *previous_x - *previous_y * current_x) / delta_y
+    };
+
+    *previous_x = current_x;
+    *previous_y = current_y;
+
+    (result_x, false)
 }
 
 fn update_zone_air_heat_capacities_from_weather_context(
@@ -14746,6 +14833,17 @@ DATA PERIODS
     }
 
     #[test]
+    fn energyplus_outdoor_wet_bulb_uses_energyplus_iterate_branch_near_freezing() {
+        let wet_bulb_c = energyplus_outdoor_wet_bulb_c(8.0, 20.0, 81_500.0)
+            .expect("valid psychrometric wet-bulb");
+
+        assert!(
+            (wet_bulb_c - 0.227_141_685_581).abs() < 1.0e-9,
+            "wet_bulb_c={wet_bulb_c}"
+        );
+    }
+
+    #[test]
     fn exterior_report_terms_use_energyplus_wet_surface_rain_override()
     -> Result<(), Box<dyn std::error::Error>> {
         let typed = cube_model();
@@ -15792,7 +15890,7 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 129);
+        assert_eq!(registry.len(), 131);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
@@ -15821,10 +15919,12 @@ DATA PERIODS
                 "Surface Outside Face Convection Heat Transfer Coefficient",
             ),
             RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Drybulb Temperature"),
+            RuntimeOutputRequest::hourly("environment", "Site Outdoor Air Wetbulb Temperature"),
+            RuntimeOutputRequest::hourly("environment", "Site Rain Status"),
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 10);
+        assert_eq!(resolution.resolved.len(), 12);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

@@ -430,7 +430,7 @@ else {
         throw "Expected all-eio policy to mark FLOOR CTF summary as included"
     }
 }
-$ExpectedSeriesCount = 101
+$ExpectedSeriesCount = 103
 if ($summary.series_count -ne $ExpectedSeriesCount) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
@@ -1173,6 +1173,8 @@ Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slo
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots" -Description "markdown CTF max-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Drybulb Temperature" -Description "markdown weather drybulb variable"
+Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature" -Description "markdown weather wetbulb variable"
+Assert-Contains -Text $reportText -Pattern "Site Rain Status" -Description "markdown weather rain variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate" -Description "markdown inside convection source variable"

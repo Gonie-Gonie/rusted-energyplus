@@ -494,13 +494,19 @@ impl RuntimeOutputRegistry {
             }
         }
 
-        self.push_output(
-            "Environment",
-            "Site Outdoor Air Drybulb Temperature",
-            "C",
-            RuntimeOutputFrequency::Hourly,
-            RuntimeOutputSource::WeatherInput,
-        );
+        for (variable_name, units) in [
+            ("Site Outdoor Air Drybulb Temperature", "C"),
+            ("Site Outdoor Air Wetbulb Temperature", "C"),
+            ("Site Rain Status", ""),
+        ] {
+            self.push_output(
+                "Environment",
+                variable_name,
+                units,
+                RuntimeOutputFrequency::Hourly,
+                RuntimeOutputSource::WeatherInput,
+            );
+        }
 
         for zone in &model.zones {
             for variable_name in [
