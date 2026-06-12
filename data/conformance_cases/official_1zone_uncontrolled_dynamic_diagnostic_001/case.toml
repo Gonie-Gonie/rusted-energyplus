@@ -33,6 +33,30 @@ has_daylighting = false
 idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
 
+[boundary]
+target_case_id = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+source_idf = "EnergyPlus v26.1.0 ExampleFiles/1ZoneUncontrolled.idf"
+weather_file = "EnergyPlus v26.1.0 WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+timesteps_per_hour = 4
+reporting_frequency = "hourly"
+warmup_output = "run-period-only-with-diagnostic-trace"
+
+[boundary.run_period]
+name = "Run Period 1"
+begin_month = 1
+begin_day = 1
+end_month = 12
+end_day = 31
+start_day_of_week = "Tuesday"
+
+[boundary.declared_surface_keys]
+roof = ["ZN001:ROOF001"]
+wall = ["ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004"]
+floor = ["ZN001:FLR001"]
+wildcard_comparison = true
+named_key_comparison = true
+top_rmse_sorted = true
+
 [[outputs]]
 key = "ZONE ONE"
 variable = "Zone Mean Air Temperature"

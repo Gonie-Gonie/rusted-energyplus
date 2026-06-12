@@ -1,7 +1,7 @@
 use crate::{
     CASE_MANIFEST_V2_SCHEMA, CaseTier, ComparisonClass, ManifestError, OutputFrequency,
-    OutputLevel, OutputRegistry, SourceArtifact, ValidationError, VariableClass, load_case_file,
-    load_suite_file, parse_case_str, parse_case_v2_str,
+    OutputLevel, OutputRegistry, SourceArtifact, ValidationError, VariableClass,
+    WarmupOutputPolicy, load_case_file, load_suite_file, parse_case_str, parse_case_v2_str,
 };
 use std::path::PathBuf;
 
@@ -434,6 +434,45 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
     assert_eq!(manifest.milestone, "v0.33-official-dynamic-diagnostic");
     assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
     assert!(!manifest.conformance_claim);
+    let boundary = manifest
+        .boundary
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("official dynamic case should pin its boundary"))?;
+    assert_eq!(boundary.target_case_id, manifest.id);
+    assert_eq!(
+        boundary.source_idf,
+        "EnergyPlus v26.1.0 ExampleFiles/1ZoneUncontrolled.idf"
+    );
+    assert_eq!(
+        boundary.weather_file,
+        "EnergyPlus v26.1.0 WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+    );
+    assert_eq!(boundary.timesteps_per_hour, 4);
+    assert_eq!(boundary.reporting_frequency, OutputFrequency::Hourly);
+    assert_eq!(
+        boundary.warmup_output,
+        WarmupOutputPolicy::RunPeriodOnlyWithDiagnosticTrace
+    );
+    assert_eq!(boundary.run_period.name, "Run Period 1");
+    assert_eq!(boundary.run_period.begin_month, 1);
+    assert_eq!(boundary.run_period.begin_day, 1);
+    assert_eq!(boundary.run_period.end_month, 12);
+    assert_eq!(boundary.run_period.end_day, 31);
+    assert_eq!(boundary.run_period.start_day_of_week, "Tuesday");
+    assert_eq!(boundary.declared_surface_keys.roof, ["ZN001:ROOF001"]);
+    assert_eq!(
+        boundary.declared_surface_keys.wall,
+        [
+            "ZN001:WALL001",
+            "ZN001:WALL002",
+            "ZN001:WALL003",
+            "ZN001:WALL004"
+        ]
+    );
+    assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
+    assert!(boundary.declared_surface_keys.wildcard_comparison);
+    assert!(boundary.declared_surface_keys.named_key_comparison);
+    assert!(boundary.declared_surface_keys.top_rmse_sorted);
     assert_eq!(manifest.outputs.len(), 99);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly

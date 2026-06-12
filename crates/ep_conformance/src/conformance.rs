@@ -32,6 +32,8 @@ pub struct ConformanceCase {
     pub scope: Option<CaseScope>,
     /// Input files used by the oracle and Rust implementation.
     pub input: CaseInput,
+    /// Fixed dynamic-case boundary used to keep candidate promotion scoped.
+    pub boundary: Option<CaseBoundary>,
     /// Requested output variables that define the evidence surface.
     #[serde(default)]
     pub outputs: Vec<OutputRequest>,
@@ -71,6 +73,9 @@ impl ConformanceCase {
         }
         if let Some(epjson) = self.input.epjson.as_deref() {
             require_non_empty("input.epjson", epjson)?;
+        }
+        if let Some(boundary) = self.boundary.as_ref() {
+            boundary.validate()?;
         }
 
         for (index, output) in self.outputs.iter().enumerate() {
@@ -308,6 +313,121 @@ pub struct CaseInput {
     pub weather: Option<String>,
     /// Optional epJSON path produced from the IDF.
     pub epjson: Option<String>,
+}
+
+/// Explicit boundary for a dynamic candidate or diagnostic case.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct CaseBoundary {
+    /// Stable case id whose outputs and gates own this boundary.
+    pub target_case_id: String,
+    /// Human-readable EnergyPlus source IDF contract.
+    pub source_idf: String,
+    /// Human-readable EnergyPlus weather contract.
+    pub weather_file: String,
+    /// RunPeriod used for the compared output series.
+    pub run_period: CaseRunPeriod,
+    /// Zone timesteps per hour from the input object.
+    pub timesteps_per_hour: u32,
+    /// Reporting frequency used by the compared dynamic outputs.
+    pub reporting_frequency: OutputFrequency,
+    /// Warmup-output inclusion policy for the comparison.
+    pub warmup_output: WarmupOutputPolicy,
+    /// Declared surface keys used by named-key comparisons.
+    pub declared_surface_keys: DeclaredSurfaceKeys,
+}
+
+impl CaseBoundary {
+    fn validate(&self) -> Result<(), ValidationError> {
+        require_non_empty("boundary.target_case_id", &self.target_case_id)?;
+        require_non_empty("boundary.source_idf", &self.source_idf)?;
+        require_non_empty("boundary.weather_file", &self.weather_file)?;
+        self.run_period.validate()?;
+        self.declared_surface_keys.validate()
+    }
+}
+
+/// RunPeriod identity and date range for a dynamic case boundary.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct CaseRunPeriod {
+    /// EnergyPlus RunPeriod name.
+    pub name: String,
+    /// Inclusive begin month.
+    pub begin_month: u32,
+    /// Inclusive begin day of month.
+    pub begin_day: u32,
+    /// Inclusive end month.
+    pub end_month: u32,
+    /// Inclusive end day of month.
+    pub end_day: u32,
+    /// Start day-of-week label from the IDF.
+    pub start_day_of_week: String,
+}
+
+impl CaseRunPeriod {
+    fn validate(&self) -> Result<(), ValidationError> {
+        require_non_empty("boundary.run_period.name", &self.name)?;
+        require_non_empty(
+            "boundary.run_period.start_day_of_week",
+            &self.start_day_of_week,
+        )
+    }
+}
+
+/// Whether warmup samples are included in the compared output stream.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum WarmupOutputPolicy {
+    /// Compare only run-period outputs while preserving warmup as diagnostic trace.
+    RunPeriodOnlyWithDiagnosticTrace,
+}
+
+/// Surface keys that must stay stable for named surface comparisons.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct DeclaredSurfaceKeys {
+    /// Roof surface keys.
+    pub roof: Vec<String>,
+    /// Wall surface keys.
+    pub wall: Vec<String>,
+    /// Floor surface keys.
+    pub floor: Vec<String>,
+    /// Whether wildcard `*` request expansion is part of the diagnostic.
+    pub wildcard_comparison: bool,
+    /// Whether named-key comparison is part of the diagnostic.
+    pub named_key_comparison: bool,
+    /// Whether reports sort surfaces by top RMSE.
+    pub top_rmse_sorted: bool,
+}
+
+impl DeclaredSurfaceKeys {
+    fn validate(&self) -> Result<(), ValidationError> {
+        if self.roof.is_empty() {
+            return Err(ValidationError::MissingField {
+                field: "boundary.declared_surface_keys.roof",
+            });
+        }
+        if self.wall.is_empty() {
+            return Err(ValidationError::MissingField {
+                field: "boundary.declared_surface_keys.wall",
+            });
+        }
+        if self.floor.is_empty() {
+            return Err(ValidationError::MissingField {
+                field: "boundary.declared_surface_keys.floor",
+            });
+        }
+        for key in self
+            .roof
+            .iter()
+            .chain(self.wall.iter())
+            .chain(self.floor.iter())
+        {
+            require_non_empty("boundary.declared_surface_keys", key)?;
+        }
+        Ok(())
+    }
 }
 
 /// Test taxonomy used by release and comparison reporting.
