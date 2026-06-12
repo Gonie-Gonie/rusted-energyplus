@@ -349,6 +349,20 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   lever; the remaining floor current/history cancellation mismatch must come
   from warmup-to-run-period history evolution or same-timestep source/face
   ordering after histories have already been warmed.
+- The active ScriptF-flat/current-longwave lane now preserves the previous
+  surface inside-face temperature at timestep entry for EnergyPlus-shaped
+  first-pass longwave work instead of resetting `SurfTempIn` to zone MAT.
+  EnergyPlus enters `CalcHeatBalanceInsideSurf2CTFOnly` with the carried
+  `SurfTempIn` vector, copies it to `SurfTempInsOld`, and then calls
+  `CalcInteriorRadExchange`; Rust therefore keeps the previous surface solve
+  value as the "current" iteration-zero surface temperature for this lane.
+  This sharply reduces the dominant floor current/history cancellation error:
+  active `1ZoneUncontrolled` MAT RMSE falls from `0.022448 C` to `0.009403 C`,
+  floor heat-storage RMSE from `21.090951 W` to `7.549255 W`, floor inside
+  conduction from `12.263226 W` to `4.415549 W`, and floor inside-solve
+  history RMSE from `293.529881 W` to `85.417533 W`. The top remaining rows are
+  now exterior roof/wall convection and radiation, so the next source target is
+  exterior coefficient/report timing rather than mass-floor history seeding.
 - EnergyPlus iterates inside/outside surface balances before committing CTF
   histories for the timestep. Rust default diagnostics still use one pass, but
   `RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_ITERATIONS` and the all-CTF

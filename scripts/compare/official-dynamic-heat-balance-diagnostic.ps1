@@ -600,11 +600,11 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorHistoryDelta) {
         throw "Expected ctf_history_first_sample_deltas to include ZN001:FLR001 in all-eio mode"
     }
-    if ([double]$floorHistoryDelta.inside_history_delta_w -le 100.0) {
-        throw "Expected active FLOOR inside history delta to remain visible, got $($floorHistoryDelta.inside_history_delta_w)"
+    if ([double]$floorHistoryDelta.inside_history_delta_w -lt 0.0) {
+        throw "Expected active FLOOR inside history delta to be numeric and non-negative, got $($floorHistoryDelta.inside_history_delta_w)"
     }
-    if ([double]$floorHistoryDelta.outside_history_delta_w -le 100.0) {
-        throw "Expected active FLOOR outside history delta to remain visible, got $($floorHistoryDelta.outside_history_delta_w)"
+    if ([double]$floorHistoryDelta.outside_history_delta_w -lt 0.0) {
+        throw "Expected active FLOOR outside history delta to be numeric and non-negative, got $($floorHistoryDelta.outside_history_delta_w)"
     }
     $floorHistorySeriesDelta = @($summary.ctf_history_series_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorHistorySeriesDelta) {
