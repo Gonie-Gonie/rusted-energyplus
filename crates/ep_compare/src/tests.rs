@@ -4,7 +4,7 @@ use crate::{
     parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
     parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series,
+    parse_eso_time_series, parse_mtr_time_series,
 };
 
 #[test]
@@ -82,6 +82,62 @@ End of Data Dictionary
     );
 
     Ok(())
+}
+
+#[test]
+fn parses_mtr_time_series_with_hourly_timestamps() -> Result<(), Box<dyn std::error::Error>> {
+    let series = parse_mtr_time_series(
+        r#"Program Version,EnergyPlus
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+150,1,DistrictHeatingWater:Facility [J] !Hourly
+End of Data Dictionary
+1,RUN PERIOD 1,39.74,-105.18,-7.00,1829.00
+2,1,1,1,0,1,0.00,60.00,Tuesday
+150,3.5
+2,1,1,1,0,2,0.00,60.00,Tuesday
+150,4.5
+"#,
+        "DistrictHeatingWater:Facility",
+    )?;
+
+    assert_eq!(series.metadata.id, "150");
+    assert_eq!(series.metadata.meter, "DistrictHeatingWater:Facility");
+    assert_eq!(series.metadata.units.as_deref(), Some("J"));
+    assert_eq!(series.metadata.frequency.as_deref(), Some("Hourly"));
+    assert_eq!(
+        series
+            .samples
+            .iter()
+            .map(|sample| sample.value)
+            .collect::<Vec<_>>(),
+        vec![3.5, 4.5]
+    );
+    assert_eq!(
+        series.samples[0].timestamp.as_deref(),
+        Some(
+            "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+        )
+    );
+
+    Ok(())
+}
+
+#[test]
+fn reports_missing_mtr_meter() {
+    let error = parse_mtr_time_series(
+        r#"Program Version,EnergyPlus
+150,1,DistrictHeatingWater:Facility [J] !Hourly
+End of Data Dictionary
+"#,
+        "DistrictCooling:Facility",
+    )
+    .expect_err("expected missing meter");
+
+    assert_eq!(
+        error.to_string(),
+        "MTR meter not found: DistrictCooling:Facility"
+    );
 }
 
 #[test]

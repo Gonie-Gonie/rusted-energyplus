@@ -153,6 +153,25 @@ if ($summary.zone_demand_synthetic_rc_model -ne $false) {
 if ($summary.requested_meter_count -ne 2) {
     throw "Expected 2 requested diagnostic meter rows, found $($summary.requested_meter_count)"
 }
+if ($summary.rust_meter_time_series_comparison -ne $true) {
+    throw "IdealLoads fuel-efficiency diagnostic must compare Rust hourly facility meter diagnostics"
+}
+$meterRows = @($summary.meter_series)
+if ($summary.meter_series_count -ne 2 -or $meterRows.Count -ne 2) {
+    throw "Expected 2 compared meter series, found count=$($summary.meter_series_count) rows=$($meterRows.Count)"
+}
+if ($summary.meter_tolerance_failures -ne 0) {
+    throw "Expected zero meter tolerance failures, found $($summary.meter_tolerance_failures)"
+}
+if (@($meterRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
+    throw "All IdealLoads fuel-efficiency facility meter diagnostics must pass"
+}
+if (@($meterRows | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.rust_source -eq "rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -and $_.alignment -eq "timestamp" -and $_.expected_samples -eq 24 -and $_.observed_samples -eq 24 -and $_.units -eq "J" }).Count -ne 1) {
+    throw "Missing passing hourly heating facility meter diagnostic row"
+}
+if (@($meterRows | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.rust_source -eq "rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -and $_.alignment -eq "timestamp" -and $_.expected_samples -eq 24 -and $_.observed_samples -eq 24 -and $_.units -eq "J" }).Count -ne 1) {
+    throw "Missing passing hourly cooling facility meter diagnostic row"
+}
 
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
 if ($diagnosticRows.Count -ne 12) {
@@ -220,7 +239,9 @@ $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only no-OA/no-limit sensible IdealLoads branch" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "fuel_efficiency: heating=0.800000000000 cooling=0.750000000000" -Description "markdown fuel efficiency values"
-Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter oracle MTR diagnostic-only; rust_meter_time_series_comparison=false requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic; rust_meter_time_series_comparison=true requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown heating meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown zone heating fuel rate row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy | diagnostic" -Description "markdown zone heating fuel energy row"
 

@@ -155,9 +155,9 @@ remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
 8-substep, 112.5 s system timestep in this fixture, then the `OutputProcessor`
 `Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows in
 this conformance fixture use the blank fuel-efficiency schedule branch. The
-facility meters are tracked as oracle-MTR diagnostics only; Rust meter
-time-series comparison, adaptive system timestep, and fuel-efficiency
-conformance remain outside the claim.
+facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
+diagnostics only; adaptive system timestep, fuel-efficiency conformance, and
+broad meter conformance remain outside the claim.
 
 ## IdealLoads Fuel-Efficiency Diagnostic
 
@@ -179,8 +179,9 @@ values, then uses the same detailed `TimeStepSysSec` energy accumulation for
 fuel energy rows. It compares 12 Detailed series over 110 samples with zero
 tolerance failures. This proves the blank and constant `Schedule:Constant`
 ReportPurchasedAir fuel-efficiency branches diagnostically; non-constant
-efficiency schedules, Rust meter time-series value comparison, and broad fuel
-or meter conformance remain outside the claim.
+efficiency schedules and broad fuel or meter conformance remain outside the
+claim. The same lane compares hourly DistrictHeatingWater/DistrictCooling
+oracle-MTR values against Rust fuel-energy aggregates diagnostically.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

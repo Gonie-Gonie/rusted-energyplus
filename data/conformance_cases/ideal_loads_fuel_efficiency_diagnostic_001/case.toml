@@ -11,7 +11,7 @@ notes = [
   "Heating fuel efficiency is a Schedule:Constant value of 0.8; cooling fuel efficiency is a Schedule:Constant value of 0.75.",
   "Fuel energy rate rows prove the EnergyPlus ReportPurchasedAir raw-rate divided-by-efficiency branch.",
   "Fuel energy rows prove the same efficiency branch with TimeStepSysSec detailed energy accumulation.",
-  "DistrictHeatingWater:Facility and DistrictCooling:Facility meters remain oracle-MTR diagnostic requests only; Rust meter time-series value comparison remains outside this case."
+  "DistrictHeatingWater:Facility and DistrictCooling:Facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy diagnostics; broad meter conformance remains outside this case."
 ]
 
 [manifest_v2]

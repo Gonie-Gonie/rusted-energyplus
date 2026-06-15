@@ -3,12 +3,12 @@ use std::path::{Path, PathBuf};
 
 use ep_compare::{
     SeriesAlignment, SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
-    compare_series_samples_v2, load_eso_time_series,
+    compare_series_samples_v2, load_eso_time_series, load_mtr_time_series,
 };
 use ep_compiler::compile_raw_model;
 use ep_conformance::{
-    ComparisonClass, ConformanceCase, EvidenceDomain, OutputFrequency, OutputLevel, OutputRequest,
-    SourceArtifact, VariableClass,
+    ComparisonClass, ConformanceCase, EvidenceDomain, MeterRequest, OutputFrequency, OutputLevel,
+    OutputRequest, SourceArtifact, VariableClass,
 };
 use ep_model::{
     DemandControlledVentilationType, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
@@ -85,6 +85,10 @@ const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE: &str =
     "EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE: &str = "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only";
+const IDEAL_LOADS_FACILITY_METER_RUST_SOURCE: &str =
+    "rust-ideal-loads-hourly-facility-meter-from-fuel-energy";
+const IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE: &str =
+    "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -116,6 +120,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     energy_report_interval_seconds: f64,
     fuel_efficiency: IdealLoadsFuelEfficiencyContext,
     rows: Vec<IdealLoadsDiagnosticRow>,
+    meter_rows: Vec<IdealLoadsMeterDiagnosticRow>,
     result_store: ResultStore,
     input_trace: IdealLoadsInputTrace,
     mode_counts: IdealLoadsModeCounts,
@@ -191,6 +196,29 @@ struct IdealLoadsDiagnosticRow {
     source: SourceArtifact,
     domain: Option<EvidenceDomain>,
     level: Option<OutputLevel>,
+    units: String,
+    oracle_units: Option<String>,
+    rust_source: &'static str,
+    tolerance: Tolerance,
+    max_rmse_tolerance: Option<f64>,
+    expected_samples: usize,
+    observed_samples: usize,
+    compared_samples: usize,
+    max_abs_delta: f64,
+    mean_abs_delta: f64,
+    rmse_delta: f64,
+    max_rel_delta: f64,
+    alignment: SeriesAlignment,
+    first_divergence: Option<ep_compare::SeriesDivergenceV2>,
+    status: SeriesComparisonStatus,
+}
+
+struct IdealLoadsMeterDiagnosticRow {
+    name: String,
+    frequency: OutputFrequency,
+    source: SourceArtifact,
+    domain: EvidenceDomain,
+    level: OutputLevel,
     units: String,
     oracle_units: Option<String>,
     rust_source: &'static str,
@@ -362,6 +390,28 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
                 "IdealLoads no-OA report requires ESO outputs, got {} for {}",
                 source_artifact_label(output.source),
                 output.variable
+            ));
+        }
+    }
+    for meter in &manifest.meters {
+        if meter.frequency != OutputFrequency::Hourly {
+            return Err(format!(
+                "IdealLoads no-OA report requires hourly meter outputs, got {} for {}",
+                output_frequency_label(meter.frequency),
+                meter.name
+            ));
+        }
+        if meter.source != SourceArtifact::Mtr {
+            return Err(format!(
+                "IdealLoads no-OA report requires MTR meter outputs, got {} for {}",
+                source_artifact_label(meter.source),
+                meter.name
+            ));
+        }
+        if meter.level != OutputLevel::Diagnostic {
+            return Err(format!(
+                "IdealLoads no-OA report currently supports diagnostic-level meter outputs: {}",
+                meter.name
             ));
         }
     }
@@ -993,10 +1043,12 @@ fn build_context<'a>(
     let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
     let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
     let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system)?;
-    let (rows, result_store, mode_counts) = evaluate_rows(
+    let mtr = baseline.output_dir.join("eplusout.mtr");
+    let (rows, meter_rows, result_store, mode_counts) = evaluate_rows(
         manifest,
         &model,
         &baseline.eso,
+        &mtr,
         &input_trace,
         &zone.name.0,
         &zone_air_node.name.0,
@@ -1024,6 +1076,7 @@ fn build_context<'a>(
         energy_report_interval_seconds,
         fuel_efficiency,
         rows,
+        meter_rows,
         result_store,
         input_trace,
         mode_counts,
@@ -1106,6 +1159,7 @@ fn evaluate_rows(
     manifest: &ConformanceCase,
     model: &SimulationModel,
     eso: &Path,
+    mtr: &Path,
     input_trace: &IdealLoadsInputTrace,
     zone_name: &str,
     zone_air_node_name: &str,
@@ -1116,6 +1170,7 @@ fn evaluate_rows(
 ) -> Result<
     (
         Vec<IdealLoadsDiagnosticRow>,
+        Vec<IdealLoadsMeterDiagnosticRow>,
         ResultStore,
         IdealLoadsModeCounts,
     ),
@@ -1356,7 +1411,7 @@ fn evaluate_rows(
             |result| result.zone_total_cooling_rate_w,
         );
     }
-    if manifest_requests_fuel_energy_outputs(manifest) {
+    if manifest_requests_fuel_energy_outputs(manifest) || !manifest.meters.is_empty() {
         let heating_efficiency = fuel_efficiency.heating;
         let cooling_efficiency = fuel_efficiency.cooling;
         let fuel_source = fuel_efficiency.rate_rust_source;
@@ -1466,6 +1521,14 @@ fn evaluate_rows(
         |result| result.supply_mass_flow_rate_kg_per_s,
     );
 
+    let meter_rows = evaluate_meter_rows(
+        manifest,
+        mtr,
+        system_name,
+        &observed_by_variable,
+        &timestamps,
+    )?;
+
     let mut rows = Vec::new();
     let mut result_store = ResultStore::new();
     for output in &manifest.outputs {
@@ -1524,7 +1587,7 @@ fn evaluate_rows(
         });
     }
 
-    Ok((rows, result_store, mode_counts))
+    Ok((rows, meter_rows, result_store, mode_counts))
 }
 
 fn manifest_requests_report_energies(manifest: &ConformanceCase) -> bool {
@@ -1563,6 +1626,153 @@ fn ideal_loads_fuel_energy_variable(variable: &str) -> bool {
             | ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE
             | ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE
     )
+}
+
+fn evaluate_meter_rows(
+    manifest: &ConformanceCase,
+    mtr: &Path,
+    system_name: &str,
+    observed_by_variable: &BTreeMap<(String, String), ObservedSeries>,
+    timestamps: &[Option<String>],
+) -> Result<Vec<IdealLoadsMeterDiagnosticRow>, String> {
+    let mut rows = Vec::new();
+    for meter in &manifest.meters {
+        let expected = load_meter_series(mtr, &meter.name)?;
+        let fuel_energy_variable = ideal_loads_meter_fuel_energy_variable(&meter.name)?;
+        let Some(observed) =
+            observed_by_variable.get(&(system_name.to_string(), fuel_energy_variable.to_string()))
+        else {
+            return Err(format!(
+                "IdealLoads diagnostic report cannot produce Rust meter source series for {} from {}",
+                meter.name, fuel_energy_variable
+            ));
+        };
+        let observed_samples =
+            hourly_meter_samples_from_detailed_energy(&observed.values, timestamps)?;
+        let tolerance = tolerance_for_meter(meter);
+        let max_rmse_tolerance = meter.rmse_tol;
+        let comparison = compare_series_samples_v2(&expected.samples, &observed_samples, tolerance);
+        let mean_abs_delta = mean_abs_delta(&expected.samples, &observed_samples);
+        let status = if comparison.status == SeriesComparisonStatus::Pass
+            && max_rmse_tolerance.is_none_or(|max_rmse| comparison.rmse_delta <= max_rmse)
+        {
+            SeriesComparisonStatus::Pass
+        } else {
+            SeriesComparisonStatus::Fail
+        };
+
+        rows.push(IdealLoadsMeterDiagnosticRow {
+            name: meter.name.clone(),
+            frequency: meter.frequency,
+            source: meter.source,
+            domain: meter.domain,
+            level: meter.level,
+            units: observed.units.to_string(),
+            oracle_units: expected.units.clone(),
+            rust_source: IDEAL_LOADS_FACILITY_METER_RUST_SOURCE,
+            tolerance,
+            max_rmse_tolerance,
+            expected_samples: comparison.expected_samples,
+            observed_samples: comparison.observed_samples,
+            compared_samples: comparison.compared_samples,
+            max_abs_delta: comparison.max_abs_delta,
+            mean_abs_delta,
+            rmse_delta: comparison.rmse_delta,
+            max_rel_delta: comparison.max_rel_delta,
+            alignment: comparison.alignment,
+            first_divergence: comparison.first_divergence,
+            status,
+        });
+    }
+
+    Ok(rows)
+}
+
+fn load_meter_series(mtr: &Path, meter: &str) -> Result<LoadedSeries, String> {
+    let series = load_mtr_time_series(mtr, meter)
+        .map_err(|error| format!("failed to load MTR meter {meter}: {error}"))?;
+    Ok(LoadedSeries {
+        units: series.metadata.units,
+        samples: run_period_samples(series.samples),
+    })
+}
+
+fn ideal_loads_meter_fuel_energy_variable(meter: &str) -> Result<&'static str, String> {
+    if meter.eq_ignore_ascii_case("DistrictHeatingWater:Facility") {
+        Ok(ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY)
+    } else if meter.eq_ignore_ascii_case("DistrictCooling:Facility") {
+        Ok(ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY)
+    } else {
+        Err(format!(
+            "IdealLoads diagnostic report supports only DistrictHeatingWater:Facility and DistrictCooling:Facility meters, got {meter}"
+        ))
+    }
+}
+
+fn hourly_meter_samples_from_detailed_energy(
+    values: &[f64],
+    timestamps: &[Option<String>],
+) -> Result<Vec<SeriesSample>, String> {
+    let mut hourly_values = Vec::<(String, f64)>::new();
+    for (index, value) in values.iter().copied().enumerate() {
+        let timestamp = timestamps
+            .get(index)
+            .and_then(|timestamp| timestamp.as_deref())
+            .ok_or_else(|| {
+                format!(
+                    "IdealLoads meter diagnostic requires timestamped detailed fuel energy sample {index}"
+                )
+            })?;
+        let hourly_timestamp = hourly_meter_timestamp_label(timestamp).ok_or_else(|| {
+            format!("IdealLoads meter diagnostic cannot derive hourly timestamp from {timestamp}")
+        })?;
+        if let Some((_, total)) = hourly_values
+            .iter_mut()
+            .find(|(candidate, _)| candidate == &hourly_timestamp)
+        {
+            *total += value;
+        } else {
+            hourly_values.push((hourly_timestamp, value));
+        }
+    }
+
+    Ok(hourly_values
+        .into_iter()
+        .enumerate()
+        .map(|(index, (timestamp, value))| SeriesSample::timestamped(index, timestamp, value))
+        .collect())
+}
+
+fn hourly_meter_timestamp_label(timestamp: &str) -> Option<String> {
+    Some(format!(
+        "env={};day={};month={};date={};dst={};hour={};start=0.00;end=60.00;day_type={}",
+        timestamp_field(timestamp, "env")?,
+        timestamp_field(timestamp, "day")?,
+        timestamp_field(timestamp, "month")?,
+        timestamp_field(timestamp, "date")?,
+        timestamp_field(timestamp, "dst")?,
+        timestamp_field(timestamp, "hour")?,
+        timestamp_field(timestamp, "day_type")?
+    ))
+}
+
+fn timestamp_field<'a>(timestamp: &'a str, name: &str) -> Option<&'a str> {
+    for field in timestamp.split(';') {
+        let Some((key, value)) = field.split_once('=') else {
+            continue;
+        };
+        if key.trim().eq_ignore_ascii_case(name) {
+            return Some(value.trim());
+        }
+    }
+    None
+}
+
+fn tolerance_for_meter(meter: &MeterRequest) -> Tolerance {
+    Tolerance {
+        absolute: meter.abs_tol.unwrap_or(0.0),
+        relative: meter.rel_tol.unwrap_or(0.0),
+    }
 }
 
 fn ideal_loads_fuel_efficiency_context(
@@ -2028,7 +2238,8 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         context.energy_report_interval_seconds
     ));
     report.push_str(&format!(
-        "meter_source: EnergyPlus Output:Meter oracle MTR diagnostic-only; rust_meter_time_series_comparison=false requested_meters={}\n",
+        "meter_source: {}; rust_meter_time_series_comparison=true requested_meters={}\n",
+        IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE,
         manifest.meters.len()
     ));
     if !manifest.meters.is_empty() {
@@ -2067,6 +2278,15 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "tolerance_failures: {}\n",
         context
             .rows
+            .iter()
+            .filter(|row| row.status == SeriesComparisonStatus::Fail)
+            .count()
+    ));
+    report.push_str(&format!("meter_series: {}\n", context.meter_rows.len()));
+    report.push_str(&format!(
+        "meter_tolerance_failures: {}\n",
+        context
+            .meter_rows
             .iter()
             .filter(|row| row.status == SeriesComparisonStatus::Fail)
             .count()
@@ -2116,6 +2336,35 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             status_label(row.status),
             first_divergence_label(row.first_divergence.as_ref())
         ));
+    }
+    if !context.meter_rows.is_empty() {
+        report.push_str("\n## Meters\n\n");
+        report.push_str("| meter | level | domain | frequency | source | rust_source | units | unit_match | alignment | expected | observed | compared | max_abs_delta | mean_abs_delta | rmse_delta | max_rel_delta | tolerance | status | first_divergence |\n");
+        report.push_str("|---|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|\n");
+        for row in &context.meter_rows {
+            report.push_str(&format!(
+                "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {} | {} | {} |\n",
+                markdown_cell(&row.name),
+                output_level_label(row.level),
+                evidence_domain_label(row.domain),
+                output_frequency_label(row.frequency),
+                source_artifact_label(row.source),
+                row.rust_source,
+                markdown_cell(&row.units),
+                row.unit_match(),
+                alignment_label(row.alignment),
+                row.expected_samples,
+                row.observed_samples,
+                row.compared_samples,
+                row.max_abs_delta,
+                row.mean_abs_delta,
+                row.rmse_delta,
+                row.max_rel_delta,
+                tolerance_label(row.tolerance, row.max_rmse_tolerance),
+                status_label(row.status),
+                first_divergence_label(row.first_divergence.as_ref())
+            ));
+        }
     }
     report
 }
@@ -2610,8 +2859,11 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         json_string(context.fuel_efficiency.energy_rust_source)
     ));
     json.push_str("  \"energy_source\": \"EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed 8-substep fixture branch\",\n");
-    json.push_str("  \"meter_source\": \"EnergyPlus Output:Meter oracle MTR diagnostic-only; Rust meter time-series comparison disabled\",\n");
-    json.push_str("  \"rust_meter_time_series_comparison\": false,\n");
+    json.push_str(&format!(
+        "  \"meter_source\": {},\n",
+        json_string(IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE)
+    ));
+    json.push_str("  \"rust_meter_time_series_comparison\": true,\n");
     json.push_str(&format!(
         "  \"requested_meter_count\": {},\n",
         manifest.meters.len()
@@ -2627,6 +2879,28 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             json_string(optional_output_level_label(Some(meter.level)))
         ));
         if index + 1 < manifest.meters.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ],\n");
+    json.push_str(&format!(
+        "  \"meter_series_count\": {},\n",
+        context.meter_rows.len()
+    ));
+    json.push_str(&format!(
+        "  \"meter_tolerance_failures\": {},\n",
+        context
+            .meter_rows
+            .iter()
+            .filter(|row| row.status == SeriesComparisonStatus::Fail)
+            .count()
+    ));
+    json.push_str("  \"meter_series\": [\n");
+    for (index, row) in context.meter_rows.iter().enumerate() {
+        json.push_str("    ");
+        json.push_str(&meter_row_json(row));
+        if index + 1 < context.meter_rows.len() {
             json.push(',');
         }
         json.push('\n');
@@ -2726,6 +3000,45 @@ fn row_json(row: &IdealLoadsDiagnosticRow) -> String {
         json_string(optional_output_level_label(row.level)),
         json_string(row.domain.map_or("unspecified", evidence_domain_label)),
         json_string(variable_class_label(row.variable_class)),
+        json_string(output_frequency_label(row.frequency)),
+        json_string(source_artifact_label(row.source)),
+        json_string(row.rust_source),
+        json_string(&row.units),
+        row.oracle_units
+            .as_ref()
+            .map_or_else(|| "null".to_string(), |units| json_string(units)),
+        row.unit_match(),
+        json_string(alignment_label(row.alignment)),
+        row.expected_samples,
+        row.observed_samples,
+        row.compared_samples,
+        json_number(row.max_abs_delta),
+        json_number(row.mean_abs_delta),
+        json_number(row.rmse_delta),
+        json_number(row.max_rel_delta),
+        json_number(row.tolerance.absolute),
+        json_number(row.tolerance.relative),
+        row.max_rmse_tolerance
+            .map_or_else(|| "null".to_string(), json_number),
+        json_string(status_label(row.status)),
+        first_divergence_json(row.first_divergence.as_ref())
+    )
+}
+
+fn meter_row_json(row: &IdealLoadsMeterDiagnosticRow) -> String {
+    format!(
+        concat!(
+            "{{\"name\": {}, \"level\": {}, \"domain\": {}, \"frequency\": {}, ",
+            "\"source\": {}, \"rust_source\": {}, \"units\": {}, \"oracle_units\": {}, ",
+            "\"unit_match\": {}, \"alignment\": {}, \"expected_samples\": {}, ",
+            "\"observed_samples\": {}, \"compared_samples\": {}, \"max_abs_delta\": {}, ",
+            "\"mean_abs_delta\": {}, \"rmse_delta\": {}, \"max_rel_delta\": {}, ",
+            "\"max_abs_tolerance\": {}, \"max_rel_tolerance\": {}, ",
+            "\"max_rmse_tolerance\": {}, \"status\": {}, \"first_divergence\": {}}}"
+        ),
+        json_string(&row.name),
+        json_string(output_level_label(row.level)),
+        json_string(evidence_domain_label(row.domain)),
         json_string(output_frequency_label(row.frequency)),
         json_string(source_artifact_label(row.source)),
         json_string(row.rust_source),
@@ -2940,6 +3253,11 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         "  \"fuel_energy_rate_source\": {},\n",
         json_string(context.fuel_efficiency.report_source)
     ));
+    json.push_str("  \"meter_time_series_comparison\": true,\n");
+    json.push_str(&format!(
+        "  \"meter_series_count\": {},\n",
+        context.meter_rows.len()
+    ));
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state\",\n");
     json.push_str(&format!(
@@ -3003,6 +3321,14 @@ fn domain_status_json(rows: &[IdealLoadsDiagnosticRow]) -> String {
 }
 
 impl IdealLoadsDiagnosticRow {
+    fn unit_match(&self) -> bool {
+        self.oracle_units
+            .as_ref()
+            .is_some_and(|oracle_units| oracle_units == &self.units)
+    }
+}
+
+impl IdealLoadsMeterDiagnosticRow {
     fn unit_match(&self) -> bool {
         self.oracle_units
             .as_ref()
