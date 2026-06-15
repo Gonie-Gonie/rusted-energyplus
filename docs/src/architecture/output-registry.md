@@ -20,5 +20,8 @@ handles before timestep execution.
 
 Missing variables become `OutputVariableUnavailable` diagnostics instead of
 empty successful-looking series. Meters are routed through
-`RuntimeMeterRegistry`; until meter algorithms are ported, meter requests become
-explicit `MeterUnavailable` diagnostics rather than empty result columns.
+`RuntimeMeterRegistry`. The no-OA IdealLoads DistrictHeatingWater and
+DistrictCooling facility meter requests resolve to diagnostic meter handles,
+but meter value series are still not produced; unsupported meter requests
+continue to become explicit `MeterUnavailable` diagnostics rather than empty
+result columns.

@@ -1,8 +1,8 @@
 //! Runtime output, meter, diagnostic, and result-store primitives.
 
 use ep_model::{
-    BranchListId, NormalizedName, OutputHandle, OutsideBoundaryCondition, PlantBranchComponent,
-    ScheduleId, SimulationModel, SunExposure, TypedModel,
+    BranchListId, IdealLoadsFuelType, NormalizedName, OutputHandle, OutsideBoundaryCondition,
+    PlantBranchComponent, ScheduleId, SimulationModel, SunExposure, TypedModel,
 };
 use std::collections::BTreeSet;
 
@@ -306,6 +306,7 @@ impl RuntimeOutputRegistry {
     pub fn from_model(model: &SimulationModel) -> Self {
         let mut registry = Self::new();
         registry.register_model_outputs(&model.typed);
+        registry.register_model_meters(&model.typed);
         registry
     }
 
@@ -639,6 +640,21 @@ impl RuntimeOutputRegistry {
             source,
         });
     }
+
+    fn register_model_meters(&mut self, model: &TypedModel) {
+        for system in &model.ideal_loads_air_systems {
+            for fuel_type in [system.heating_fuel_type, system.cooling_fuel_type] {
+                if let Some(meter_name) = ideal_loads_facility_meter_name(fuel_type) {
+                    self.meter_registry.push_meter(
+                        meter_name,
+                        "J",
+                        RuntimeOutputFrequency::Hourly,
+                        RuntimeOutputSource::Meter,
+                    );
+                }
+            }
+        }
+    }
 }
 
 /// Runtime meter registry.
@@ -670,6 +686,31 @@ impl RuntimeMeterRegistry {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.meters.is_empty()
+    }
+
+    fn push_meter(
+        &mut self,
+        name: &str,
+        units: &str,
+        frequency: RuntimeOutputFrequency,
+        source: RuntimeOutputSource,
+    ) {
+        let identity = MeterIdentity::new(name, frequency);
+        if self
+            .meters
+            .iter()
+            .any(|definition| definition.identity() == identity)
+        {
+            return;
+        }
+
+        self.meters.push(RuntimeMeterDefinition {
+            handle: OutputHandle(self.meters.len() as u32),
+            name: name.to_string(),
+            units: units.to_string(),
+            frequency,
+            source,
+        });
     }
 
     /// Resolves meter requests. v0.24 intentionally records unsupported meters
@@ -732,6 +773,14 @@ impl RuntimeMeterRegistry {
             resolved,
             diagnostics,
         }
+    }
+}
+
+fn ideal_loads_facility_meter_name(fuel_type: IdealLoadsFuelType) -> Option<&'static str> {
+    match fuel_type {
+        IdealLoadsFuelType::DistrictHeatingWater => Some("DistrictHeatingWater:Facility"),
+        IdealLoadsFuelType::DistrictCooling => Some("DistrictCooling:Facility"),
+        _ => None,
     }
 }
 

@@ -28,8 +28,8 @@ tolerance, and code organization.
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
 - official ExampleFile static model EIO conformance report gate
-- runtime output registry, meter registry diagnostics, ResultStore duplicate
-  checks, and profile scaffolding
+- runtime output registry, IdealLoads facility meter request handles, meter
+  registry diagnostics, ResultStore duplicate checks, and profile scaffolding
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
@@ -52,7 +52,7 @@ tolerance, and code organization.
   `ideal_loads_no_oa_sensible_conformance_001`, with ReportPurchasedAir
   energy and blank-efficiency fuel energy rows kept diagnostic-only and
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
-  oracle-MTR diagnostics
+  oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive

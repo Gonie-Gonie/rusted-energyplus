@@ -101,7 +101,7 @@ name = "ZoneHVAC:IdealLoadsAirSystem"
 family = "hvac"
 status = "typed"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence, diagnostic ReportPurchasedAir energy and blank-efficiency fuel energy evidence, diagnostic facility meter oracle-MTR requests, and diagnostic outdoor-air design-flow/supply-air/mixed-air/inactive-economizer-heat-recovery evidence for declared output variables only; outdoor-air conformance, humidity, active economizer, active heat recovery, adaptive system timestep, sizing, Rust meter time-series comparison, non-unity efficiency schedules, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence, diagnostic ReportPurchasedAir energy and blank-efficiency fuel energy evidence, diagnostic facility meter oracle-MTR requests with RuntimeMeterRegistry request resolution, and diagnostic outdoor-air design-flow/supply-air/mixed-air/inactive-economizer-heat-recovery evidence for declared output variables only; outdoor-air conformance, humidity, active economizer, active heat recovery, adaptive system timestep, sizing, Rust meter time-series value comparison, non-unity efficiency schedules, and broad HVAC compatibility remain outside the claim."
 
 [[object]]
 name = "DesignSpecification:OutdoorAir"

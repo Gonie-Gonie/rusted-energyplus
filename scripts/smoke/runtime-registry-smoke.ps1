@@ -19,6 +19,7 @@ $tests = @(
     "runtime_output_registry_resolves_declared_model_outputs",
     "runtime_output_registry_diagnoses_unavailable_output",
     "runtime_meter_registry_diagnoses_unavailable_meter",
+    "runtime_meter_registry_resolves_ideal_loads_facility_meters",
     "result_store_diagnostics_report_duplicate_handles",
     "execution_plan_orders_weather_schedule_zone_and_output"
 )

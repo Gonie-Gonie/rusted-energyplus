@@ -16431,6 +16431,31 @@ DATA PERIODS
     }
 
     #[test]
+    fn runtime_meter_registry_resolves_ideal_loads_facility_meters() {
+        let model = ideal_loads_node_state_model();
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        let resolution = registry.meter_registry().resolve_meter_requests(&[
+            RuntimeMeterRequest::hourly("DistrictHeatingWater:Facility"),
+            RuntimeMeterRequest::hourly("DistrictCooling:Facility"),
+        ]);
+
+        assert_eq!(registry.meter_registry().len(), 2);
+        assert_eq!(resolution.resolved.len(), 2);
+        assert!(resolution.diagnostics.is_empty());
+        assert_eq!(
+            resolution.resolved[0].definition.name,
+            "DistrictHeatingWater:Facility"
+        );
+        assert_eq!(resolution.resolved[0].definition.units, "J");
+        assert_eq!(
+            resolution.resolved[1].definition.name,
+            "DistrictCooling:Facility"
+        );
+        assert_eq!(resolution.resolved[1].definition.units, "J");
+    }
+
+    #[test]
     fn result_store_diagnostics_report_duplicate_handles() {
         let mut store = ResultStore::new();
         store.add_series(OutputSeries {
