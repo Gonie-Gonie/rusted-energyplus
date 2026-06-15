@@ -79,6 +79,7 @@ matplotlib for document layout and charts.
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-gains` |
 | `compare-internal-convective-gain-conformance` | compare | run the v0.26 tolerance-gated internal convective gain conformance case | yes | `.runtime/internal-gains-conformance` |
+| `compare-ideal-loads-constant-shr-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSensibleHeatRatio humidity-control case | no | `.runtime/ideal-loads-constant-shr` |
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |

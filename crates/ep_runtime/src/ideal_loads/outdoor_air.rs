@@ -10,6 +10,9 @@ use ep_model::{
 };
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
+const ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.004_84;
+const ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG: f64 = 2500.94;
+const ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.858_95;
 
 /// Zone context needed by `DesignSpecification:OutdoorAir`.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -365,7 +368,9 @@ fn supply_air_state(
 }
 
 fn dry_bulb_from_enthalpy_and_humidity_ratio(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
-    (enthalpy_j_per_kg / 1000.0 - 2501.0 * humidity_ratio) / (1.006 + 1.86 * humidity_ratio)
+    (enthalpy_j_per_kg / 1000.0 - ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG * humidity_ratio)
+        / (ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K
+            + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * humidity_ratio)
 }
 
 fn schedule_multiplier(value: Option<f64>) -> f64 {

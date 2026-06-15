@@ -47,6 +47,54 @@ first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
 support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 only; excluded IdealLoads features remain outside the claim."
 
 [[variable]]
+name = "Zone Ideal Loads Zone Latent Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio humidity-control report parity for one IdealLoads fixture; humidistat, ConstantSupplyHumidityRatio, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Zone Latent Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio latent cooling report parity using EnergyPlus EPW barometric pressure saturation clamp and PsyHFnTdbW/PsyWFnTdbH constants; humidistat, ConstantSupplyHumidityRatio, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Sensible Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio supply-air sensible heating report row for one IdealLoads fixture; broad humidity-control conformance remains outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Sensible Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio supply-air sensible cooling report parity for one IdealLoads fixture; broad humidity-control conformance remains outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Latent Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio supply-air latent heating report row for one IdealLoads fixture; humidistat, ConstantSupplyHumidityRatio, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Latent Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_constant_shr_diagnostic_001"
+first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio supply-air latent cooling report parity using EnergyPlus EPW barometric pressure saturation clamp and PsyHFnTdbW/PsyWFnTdbH constants; humidistat, ConstantSupplyHumidityRatio, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+
+[[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Energy"
 domain = "hvac"
 status = "diagnostic"

@@ -138,6 +138,22 @@ flow-and-capacity cases now have zero tolerance failures across their declared
 its declared 18 Detailed series. No finite-limit row joins the promoted
 no-OA/no-limit conformance boundary.
 
+## Constant SHR Humidity Diagnostic
+
+`ideal_loads_constant_shr_diagnostic_001` adds a diagnostic-only no-OA humidity
+control lane for `ConstantSensibleHeatRatio`. The compare lane resolves
+`ZONE ONE RETURN` as the recirculation/mixed-air proof node, preserves the
+source-order pre-update zone state for the sensible demand calculation, and
+passes EPW barometric pressure into the saturation clamp used by EnergyPlus
+psychrometric routines.
+
+The Rust reconstruction uses EnergyPlus `PsyHFnTdbW`/`PsyWFnTdbH` enthalpy
+constants for the latent split and records zero tolerance failures for the
+declared zone/supply latent and sensible rate rows plus supply humidity ratio.
+This remains diagnostic-only: humidistat control,
+`ConstantSupplyHumidityRatio`, moisture-demand branches, outdoor-air humidity
+control, and broad humidity-control conformance are not promoted.
+
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is not promoted yet. The current
@@ -205,16 +221,17 @@ The conformance output surface is:
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
-blank and constant `Schedule:Constant` fuel energy/rate rows, latent
-IdealLoads outputs, active humidity-control outdoor-air latent behavior,
-heat-recovery outputs,
+blank and constant `Schedule:Constant` fuel energy/rate rows, active
+humidity-control outdoor-air latent behavior, heat-recovery outputs,
 economizer outputs, finite flow/capacity limits, adaptive system timestep,
-broad meter conformance, and
-non-constant efficiency schedules remain diagnostic-only or unsupported until
-their source-order branches are ported or explicitly included in a promoted
-claim. `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` are
-hourly oracle-MTR vs Rust aggregated fuel-energy diagnostics for the no-OA
-fixtures.
+broad meter conformance, and non-constant efficiency schedules remain
+diagnostic-only or unsupported until their source-order branches are ported or
+explicitly included in a promoted claim. `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` are hourly oracle-MTR vs Rust aggregated fuel-energy
+diagnostics for the no-OA fixtures.
+The no-OA `ConstantSensibleHeatRatio` zone/supply latent and sensible rows,
+supply humidity ratio, and return-node humidity proof rows have diagnostic
+evidence only in `ideal_loads_constant_shr_diagnostic_001`.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in

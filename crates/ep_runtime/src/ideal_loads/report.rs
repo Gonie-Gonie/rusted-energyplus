@@ -20,6 +20,24 @@ pub const ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE: &str =
 /// IdealLoads zone sensible cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE: &str =
     "Zone Ideal Loads Zone Sensible Cooling Rate";
+/// IdealLoads zone latent heating rate output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE: &str =
+    "Zone Ideal Loads Zone Latent Heating Rate";
+/// IdealLoads zone latent cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE: &str =
+    "Zone Ideal Loads Zone Latent Cooling Rate";
+/// IdealLoads supply-air sensible heating rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_HEATING_RATE: &str =
+    "Zone Ideal Loads Supply Air Sensible Heating Rate";
+/// IdealLoads supply-air sensible cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_COOLING_RATE: &str =
+    "Zone Ideal Loads Supply Air Sensible Cooling Rate";
+/// IdealLoads supply-air latent heating rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE: &str =
+    "Zone Ideal Loads Supply Air Latent Heating Rate";
+/// IdealLoads supply-air latent cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE: &str =
+    "Zone Ideal Loads Supply Air Latent Cooling Rate";
 /// IdealLoads supply-air total heating rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE: &str =
     "Zone Ideal Loads Supply Air Total Heating Rate";

@@ -7881,7 +7881,9 @@ pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64
     1.004_84e3 + humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO) * 1.858_95e3
 }
 
-fn energyplus_psychrometric_humidity_ratio_from_rh(
+/// Returns EnergyPlus `PsyWFnTdbRhPb`-style humidity ratio from dry-bulb,
+/// relative humidity, and barometric pressure.
+pub fn energyplus_psychrometric_humidity_ratio_from_rh(
     dry_bulb_c: f64,
     relative_humidity: f64,
     atmospheric_pressure_pa: f64,

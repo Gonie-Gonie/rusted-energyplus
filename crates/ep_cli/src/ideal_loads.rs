@@ -11,17 +11,18 @@ use ep_conformance::{
     OutputRequest, SourceArtifact, VariableClass,
 };
 use ep_model::{
-    DemandControlledVentilationType, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
-    IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType, OutputHandle, ScheduleId,
-    SimulationModel,
+    DehumidificationControlType, DemandControlledVentilationType,
+    DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
+    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType,
+    OutputHandle, ScheduleId, SimulationModel,
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
-    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
-    IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries, ResultStore,
-    ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
-    ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+    EpwRecord, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
+    IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
+    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries,
+    ResultStore, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
@@ -34,7 +35,10 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
@@ -45,15 +49,17 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
-    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
-    calc_no_oa_no_limit_sensible_compat, calc_no_oa_sensible_with_limits_and_recirculation_compat,
+    calc_no_oa_no_limit_sensible_with_recirculation_context_compat,
+    calc_no_oa_sensible_with_limits_and_recirculation_compat,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
+    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
     supply_node_update_from_result,
 };
 
@@ -90,6 +96,7 @@ const IDEAL_LOADS_FACILITY_METER_RUST_SOURCE: &str =
 const IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
+const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -1043,7 +1050,9 @@ fn build_context<'a>(
         ));
     }
 
-    let recirculation_node_name = if uses_finite_limits(system) {
+    let recirculation_node_name = if uses_finite_limits(system)
+        || manifest_requests_ideal_loads_recirculation_node(manifest, &model, zone.id, system)?
+    {
         Some(ideal_loads_recirculation_node_name(
             &model, zone.id, system,
         )?)
@@ -1065,6 +1074,7 @@ fn build_context<'a>(
         &model,
         &baseline.eso,
         &mtr,
+        baseline.weather.as_deref(),
         &input_trace,
         &zone.name.0,
         &zone_air_node.name.0,
@@ -1194,6 +1204,7 @@ fn evaluate_rows(
     model: &SimulationModel,
     eso: &Path,
     mtr: &Path,
+    weather: Option<&Path>,
     input_trace: &IdealLoadsInputTrace,
     zone_name: &str,
     zone_air_node_name: &str,
@@ -1233,9 +1244,11 @@ fn evaluate_rows(
     let cooling_setpoint =
         thermostat_setpoint_values(model, zone.id, false, input_trace.sample_count)?;
     let limit_context = ideal_loads_limit_context(model, system)?;
+    let barometric_pressure_trace =
+        ideal_loads_barometric_pressure_trace(model, weather, input_trace, limit_context)?;
     let mut calc_results = Vec::with_capacity(input_trace.sample_count);
     let mut mode_counts = IdealLoadsModeCounts::default();
-    let finite_limit_trace_uses_recirculation = recirculation_node_name.is_some();
+    let finite_limit_trace_uses_recirculation = uses_finite_limits(system);
     for index in 0..input_trace.sample_count {
         let (zone_temperature, zone_humidity_ratio) = if finite_limit_trace_uses_recirculation {
             (
@@ -1258,14 +1271,22 @@ fn evaluate_rows(
             air_temperature_c: zone_temperature,
             air_humidity_ratio: zone_humidity_ratio,
         };
-        let recirculation_state = zone_state;
+        let recirculation_state = if recirculation_node_name.is_some() {
+            IdealLoadsZoneState {
+                air_temperature_c: input_trace.recirculation_node_temperature.samples[index].value,
+                air_humidity_ratio: input_trace.recirculation_node_humidity_ratio.samples[index]
+                    .value,
+            }
+        } else {
+            zone_state
+        };
         let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
         let result = calc_ideal_loads_sensible_compat(
             system,
             zone_state,
             recirculation_state,
             demand,
-            limit_context,
+            limit_context.with_barometric_pressure_pa(barometric_pressure_trace[index]),
         );
         record_mode(&mut mode_counts, result.mode);
         let _node_update = supply_node_update_from_result(supply_node.id, result);
@@ -1429,6 +1450,60 @@ fn evaluate_rows(
         "W",
         result_source,
         |result| result.zone_sensible_cooling_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE,
+        "W",
+        result_source,
+        |result| result.zone_latent_heating_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE,
+        "W",
+        result_source,
+        |result| result.zone_latent_cooling_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_HEATING_RATE,
+        "W",
+        result_source,
+        |result| result.supply_air_sensible_heating_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_COOLING_RATE,
+        "W",
+        result_source,
+        |result| result.supply_air_sensible_cooling_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE,
+        "W",
+        result_source,
+        |result| result.supply_air_latent_heating_rate_w,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
+        "W",
+        result_source,
+        |result| result.supply_air_latent_cooling_rate_w,
     );
     add_result_series(
         &mut observed_by_variable,
@@ -1922,7 +1997,14 @@ fn calc_ideal_loads_sensible_compat(
             limit_context,
         )
     } else {
-        calc_no_oa_no_limit_sensible_compat(system, zone_state, demand, true)
+        calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
+            system,
+            zone_state,
+            recirculation_state,
+            demand,
+            true,
+            limit_context,
+        )
     }
 }
 
@@ -1931,7 +2013,14 @@ fn ideal_loads_limit_context(
     system: &IdealLoadsAirSystem,
 ) -> Result<IdealLoadsSensibleLimitContext, String> {
     if !uses_finite_limits(system) {
-        return Ok(IdealLoadsSensibleLimitContext::default());
+        return Ok(model
+            .typed
+            .site
+            .as_ref()
+            .and_then(|site| {
+                IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m)
+            })
+            .unwrap_or_default());
     }
 
     let site =
@@ -1944,6 +2033,147 @@ fn ideal_loads_limit_context(
             site.elevation_m
         )
     })
+}
+
+fn ideal_loads_barometric_pressure_trace(
+    model: &SimulationModel,
+    weather: Option<&Path>,
+    input_trace: &IdealLoadsInputTrace,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> Result<Vec<f64>, String> {
+    let Some(weather) = weather else {
+        return Ok(vec![
+            limit_context.barometric_pressure_pa;
+            input_trace.sample_count
+        ]);
+    };
+    let weather_records =
+        load_epw_records(weather).map_err(|error| format!("failed to load EPW: {error}"))?;
+    if weather_records.is_empty() {
+        return Ok(vec![
+            limit_context.barometric_pressure_pa;
+            input_trace.sample_count
+        ]);
+    }
+
+    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    let first_hour_interpolation_starting_values = model
+        .typed
+        .run_periods
+        .first()
+        .map(|run_period| run_period.first_hour_interpolation_starting_values)
+        .unwrap_or_default();
+    Ok(input_trace
+        .zone_node_temperature
+        .samples
+        .iter()
+        .take(input_trace.sample_count)
+        .map(|sample| {
+            sample
+                .timestamp
+                .as_deref()
+                .and_then(parse_ideal_loads_timestamp)
+                .and_then(|timestamp| {
+                    ideal_loads_weather_pressure_for_timestamp(
+                        &weather_records,
+                        timestamp,
+                        zone_steps_per_hour,
+                        first_hour_interpolation_starting_values,
+                    )
+                })
+                .unwrap_or(limit_context.barometric_pressure_pa)
+        })
+        .collect())
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct IdealLoadsTimestampFields {
+    month: u32,
+    day_of_month: u32,
+    hour: u32,
+    end_minute: f64,
+}
+
+fn parse_ideal_loads_timestamp(timestamp: &str) -> Option<IdealLoadsTimestampFields> {
+    let mut month = None;
+    let mut day_of_month = None;
+    let mut hour = None;
+    let mut end_minute = None;
+    for field in timestamp.split(';') {
+        let (key, value) = field.split_once('=')?;
+        match key.trim() {
+            "month" => month = value.trim().parse::<u32>().ok(),
+            "date" => day_of_month = value.trim().parse::<u32>().ok(),
+            "hour" => hour = value.trim().parse::<u32>().ok(),
+            "end" => end_minute = value.trim().parse::<f64>().ok(),
+            _ => {}
+        }
+    }
+    Some(IdealLoadsTimestampFields {
+        month: month?,
+        day_of_month: day_of_month?,
+        hour: hour?,
+        end_minute: end_minute?,
+    })
+}
+
+fn ideal_loads_weather_pressure_for_timestamp(
+    weather_records: &[EpwRecord],
+    timestamp: IdealLoadsTimestampFields,
+    zone_steps_per_hour: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> Option<f64> {
+    let record_index = weather_records.iter().position(|record| {
+        record.month == timestamp.month
+            && record.day == timestamp.day_of_month
+            && record.hour == timestamp.hour
+    })?;
+    let record = weather_records.get(record_index)?;
+    let previous_record = previous_ideal_loads_weather_record(
+        weather_records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    )?;
+    let weight = ideal_loads_weather_interpolation_weight(
+        zone_steps_per_hour,
+        ideal_loads_zone_timestep(timestamp.end_minute, zone_steps_per_hour),
+    );
+    Some(
+        previous_record.atmospheric_pressure_pa * (1.0 - weight)
+            + record.atmospheric_pressure_pa * weight,
+    )
+}
+
+fn previous_ideal_loads_weather_record(
+    weather_records: &[EpwRecord],
+    record_index: usize,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> Option<&EpwRecord> {
+    if record_index == 0 {
+        let first_day_record_index = match first_hour_interpolation_starting_values {
+            FirstHourInterpolationStartingValues::Hour1 => 0,
+            FirstHourInterpolationStartingValues::Hour24 => weather_records.len().min(24) - 1,
+        };
+        weather_records.get(first_day_record_index)
+    } else {
+        weather_records.get(record_index - 1)
+    }
+}
+
+fn ideal_loads_zone_timestep(end_minute: f64, zone_steps_per_hour: u32) -> u32 {
+    let steps = zone_steps_per_hour.max(1);
+    let minutes_per_step = 60.0 / f64::from(steps);
+    (end_minute / minutes_per_step)
+        .round()
+        .clamp(1.0, f64::from(steps)) as u32
+}
+
+fn ideal_loads_weather_interpolation_weight(zone_steps_per_hour: u32, zone_timestep: u32) -> f64 {
+    let steps = zone_steps_per_hour.max(1);
+    if steps == 1 {
+        return 1.0;
+    }
+    (f64::from(zone_timestep.clamp(1, steps)) / f64::from(steps)).min(1.0)
 }
 
 fn ideal_loads_recirculation_node_name(
@@ -1982,6 +2212,22 @@ fn ideal_loads_recirculation_node_name(
     })
 }
 
+fn manifest_requests_ideal_loads_recirculation_node(
+    manifest: &ConformanceCase,
+    model: &SimulationModel,
+    zone_id: ep_model::ZoneId,
+    system: &IdealLoadsAirSystem,
+) -> Result<bool, String> {
+    if !uses_ideal_loads_humidity_control(system) {
+        return Ok(false);
+    }
+    let recirculation_node_name = ideal_loads_recirculation_node_name(model, zone_id, system)?;
+    Ok(manifest
+        .outputs
+        .iter()
+        .any(|output| output.key.eq_ignore_ascii_case(&recirculation_node_name)))
+}
+
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {
     if let Some(node_id) = model.typed.node_names.resolve(name) {
         return model
@@ -2014,6 +2260,14 @@ fn ideal_loads_sensible_branch(system: &IdealLoadsAirSystem) -> &'static str {
     }
 }
 
+fn ideal_loads_recirculation_state_source(branch: &str) -> &'static str {
+    if branch == "no-oa-finite-limit-sensible" {
+        IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE
+    } else {
+        IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE
+    }
+}
+
 fn rust_result_source(system: &IdealLoadsAirSystem) -> &'static str {
     if uses_finite_limits(system) {
         "rust-ideal-loads-no-oa-sensible-limited-calc"
@@ -2025,6 +2279,11 @@ fn rust_result_source(system: &IdealLoadsAirSystem) -> &'static str {
 fn uses_finite_limits(system: &IdealLoadsAirSystem) -> bool {
     system.heating_limit != IdealLoadsLimit::NoLimit
         || system.cooling_limit != IdealLoadsLimit::NoLimit
+}
+
+fn uses_ideal_loads_humidity_control(system: &IdealLoadsAirSystem) -> bool {
+    system.dehumidification_control_type != DehumidificationControlType::None
+        || system.humidification_control_type != HumidificationControlType::None
 }
 
 struct ObservedSeries {
@@ -2416,7 +2675,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         ));
         report.push_str(&format!(
             "recirculation_state_source: {}\n",
-            IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE
+            ideal_loads_recirculation_state_source(context.branch)
         ));
     }
     report.push_str(&format!(
@@ -3095,7 +3354,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     if context.recirculation_node_name.is_some() {
         json.push_str(&format!(
             "  \"recirculation_state_source\": {},\n",
-            json_string(IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE)
+            json_string(ideal_loads_recirculation_state_source(context.branch))
         ));
     }
     json.push_str(&format!(
@@ -3445,7 +3704,7 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     if context.recirculation_node_name.is_some() {
         json.push_str(&format!(
             "  \"recirculation_state_source\": {},\n",
-            json_string(IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE)
+            json_string(ideal_loads_recirculation_state_source(context.branch))
         ));
     }
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");

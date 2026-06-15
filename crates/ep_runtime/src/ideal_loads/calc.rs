@@ -2,15 +2,21 @@
 
 use crate::{
     energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
-    zone_equipment::ZoneSysEnergyDemand,
+    energyplus_psychrometric_humidity_ratio_from_rh, zone_equipment::ZoneSysEnergyDemand,
 };
-use ep_model::{AutosizeOrNumber, IdealLoadsAirSystem, IdealLoadsLimit};
+use ep_model::{
+    AutosizeOrNumber, DehumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit,
+};
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
+const MINIMUM_HUMIDITY_RATIO: f64 = 1.0e-5;
 const DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const STANDARD_PRESSURE_SEA_LEVEL_PA: f64 = 101_325.0;
 const ENERGYPLUS_STANDARD_DRY_BULB_C: f64 = 20.0;
 const ENERGYPLUS_STANDARD_HUMIDITY_RATIO: f64 = 0.0;
+const ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.004_84;
+const ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG: f64 = 2500.94;
+const ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.858_95;
 
 /// Operating mode selected by the first IdealLoads sensible subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -39,12 +45,15 @@ pub struct IdealLoadsZoneState {
 pub struct IdealLoadsSensibleLimitContext {
     /// Standard air density in kg/m3 used to convert volumetric limits to mass limits.
     pub standard_air_density_kg_per_m3: f64,
+    /// Barometric pressure in Pa used by supply-air saturation checks.
+    pub barometric_pressure_pa: f64,
 }
 
 impl Default for IdealLoadsSensibleLimitContext {
     fn default() -> Self {
         Self {
             standard_air_density_kg_per_m3: DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3,
+            barometric_pressure_pa: STANDARD_PRESSURE_SEA_LEVEL_PA,
         }
     }
 }
@@ -53,11 +62,21 @@ impl IdealLoadsSensibleLimitContext {
     /// Builds the limit context from EnergyPlus `StdRhoAir` source-order inputs.
     #[must_use]
     pub fn from_site_elevation_m(elevation_m: f64) -> Option<Self> {
+        let base = standard_pressure_elevation_base(elevation_m)?;
+        let barometric_pressure_pa = STANDARD_PRESSURE_SEA_LEVEL_PA * base.powf(5.2559);
         energyplus_standard_air_density_kg_per_m3(elevation_m).map(
             |standard_air_density_kg_per_m3| Self {
                 standard_air_density_kg_per_m3,
+                barometric_pressure_pa,
             },
         )
+    }
+
+    /// Returns a copy using the supplied timestep barometric pressure.
+    #[must_use]
+    pub fn with_barometric_pressure_pa(mut self, barometric_pressure_pa: f64) -> Self {
+        self.barometric_pressure_pa = barometric_pressure_pa;
+        self
     }
 }
 
@@ -88,6 +107,18 @@ pub struct IdealLoadsSensibleResult {
     pub zone_sensible_heating_rate_w: f64,
     /// Zone sensible cooling rate in W.
     pub zone_sensible_cooling_rate_w: f64,
+    /// Zone latent heating rate in W.
+    pub zone_latent_heating_rate_w: f64,
+    /// Zone latent cooling rate in W.
+    pub zone_latent_cooling_rate_w: f64,
+    /// Supply air sensible heating rate in W.
+    pub supply_air_sensible_heating_rate_w: f64,
+    /// Supply air sensible cooling rate in W.
+    pub supply_air_sensible_cooling_rate_w: f64,
+    /// Supply air latent heating rate in W.
+    pub supply_air_latent_heating_rate_w: f64,
+    /// Supply air latent cooling rate in W.
+    pub supply_air_latent_cooling_rate_w: f64,
     /// Supply air total heating rate in W.
     pub supply_air_total_heating_rate_w: f64,
     /// Supply air total cooling rate in W.
@@ -106,9 +137,49 @@ pub fn calc_no_oa_no_limit_sensible_compat(
     demand: ZoneSysEnergyDemand,
     unit_available: bool,
 ) -> IdealLoadsSensibleResult {
+    calc_no_oa_no_limit_sensible_with_context_compat(
+        system,
+        zone_state,
+        demand,
+        unit_available,
+        IdealLoadsSensibleLimitContext::default(),
+    )
+}
+
+/// Calculates the no-outdoor-air, no-limit branch with an explicit
+/// psychrometric context for humidity-control diagnostics.
+#[must_use]
+pub fn calc_no_oa_no_limit_sensible_with_context_compat(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+    unit_available: bool,
+    context: IdealLoadsSensibleLimitContext,
+) -> IdealLoadsSensibleResult {
+    calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
+        system,
+        zone_state,
+        zone_state,
+        demand,
+        unit_available,
+        context,
+    )
+}
+
+/// Calculates the no-outdoor-air, no-limit branch with explicit mixed-air
+/// recirculation state for humidity-control diagnostics.
+#[must_use]
+pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    recirculation_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+    unit_available: bool,
+    context: IdealLoadsSensibleLimitContext,
+) -> IdealLoadsSensibleResult {
     let cp_air_j_per_kg_k =
         energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
-    let supply_humidity_ratio = zone_state.air_humidity_ratio;
+    let supply_humidity_ratio = recirculation_state.air_humidity_ratio;
 
     if !unit_available {
         return zero_result(
@@ -146,6 +217,7 @@ pub fn calc_no_oa_no_limit_sensible_compat(
         let supply_temperature_c = system.maximum_heating_supply_air_temperature_c;
         let supply_enthalpy_j_per_kg =
             moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
+        let zone_sensible_heating_rate_w = heating_load_w;
         IdealLoadsSensibleResult {
             mode: IdealLoadsSensibleMode::Heating,
             cp_air_j_per_kg_k,
@@ -157,31 +229,29 @@ pub fn calc_no_oa_no_limit_sensible_compat(
             cooling_mass_flow_rate_kg_per_s: 0.0,
             zone_total_heating_rate_w: heating_load_w,
             zone_total_cooling_rate_w: 0.0,
-            zone_sensible_heating_rate_w: heating_load_w,
+            zone_sensible_heating_rate_w,
             zone_sensible_cooling_rate_w: 0.0,
+            zone_latent_heating_rate_w: 0.0,
+            zone_latent_cooling_rate_w: 0.0,
+            supply_air_sensible_heating_rate_w: zone_sensible_heating_rate_w,
+            supply_air_sensible_cooling_rate_w: 0.0,
+            supply_air_latent_heating_rate_w: 0.0,
+            supply_air_latent_cooling_rate_w: 0.0,
             supply_air_total_heating_rate_w: heating_load_w,
             supply_air_total_cooling_rate_w: 0.0,
         }
     } else if cooling_mass_flow_rate_kg_per_s > 0.0 {
         let supply_temperature_c = system.minimum_cooling_supply_air_temperature_c;
-        let supply_enthalpy_j_per_kg =
-            moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
-        IdealLoadsSensibleResult {
-            mode: IdealLoadsSensibleMode::Cooling,
+        cooling_result_from_states(
+            system,
+            zone_state,
+            zone_state,
             cp_air_j_per_kg_k,
             supply_temperature_c,
             supply_humidity_ratio,
-            supply_enthalpy_j_per_kg,
-            supply_mass_flow_rate_kg_per_s: cooling_mass_flow_rate_kg_per_s,
-            heating_mass_flow_rate_kg_per_s: 0.0,
             cooling_mass_flow_rate_kg_per_s,
-            zone_total_heating_rate_w: 0.0,
-            zone_total_cooling_rate_w: cooling_load_w,
-            zone_sensible_heating_rate_w: 0.0,
-            zone_sensible_cooling_rate_w: cooling_load_w,
-            supply_air_total_heating_rate_w: 0.0,
-            supply_air_total_cooling_rate_w: cooling_load_w,
-        }
+            context,
+        )
     } else {
         zero_result(
             IdealLoadsSensibleMode::Deadband,
@@ -283,6 +353,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
             supply_humidity_ratio,
             cooling_load_w,
             cooling_mass_flow_rate_kg_per_s,
+            limit_context,
         )
     } else {
         zero_result(
@@ -297,25 +368,31 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
 /// EnergyPlus `PsyHFnTdbW`-style moist-air enthalpy in J/kg.
 #[must_use]
 pub fn moist_air_enthalpy_j_per_kg(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
-    1000.0 * (1.006 * dry_bulb_c + humidity_ratio * (2501.0 + 1.86 * dry_bulb_c))
+    1000.0
+        * (ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c
+            + humidity_ratio
+                * (ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG
+                    + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c))
 }
 
 /// Returns EnergyPlus `StdRhoAir` from site elevation.
 #[must_use]
 pub fn energyplus_standard_air_density_kg_per_m3(elevation_m: f64) -> Option<f64> {
-    if !elevation_m.is_finite() {
-        return None;
-    }
-    let base = 1.0 - 2.255_77e-05 * elevation_m;
-    if base <= 0.0 {
-        return None;
-    }
+    let base = standard_pressure_elevation_base(elevation_m)?;
     let standard_barometric_pressure_pa = STANDARD_PRESSURE_SEA_LEVEL_PA * base.powf(5.2559);
     energyplus_moist_air_density_kg_per_m3(
         standard_barometric_pressure_pa,
         ENERGYPLUS_STANDARD_DRY_BULB_C,
         ENERGYPLUS_STANDARD_HUMIDITY_RATIO,
     )
+}
+
+fn standard_pressure_elevation_base(elevation_m: f64) -> Option<f64> {
+    if !elevation_m.is_finite() {
+        return None;
+    }
+    let base = 1.0 - 2.255_77e-05 * elevation_m;
+    (base > 0.0).then_some(base)
 }
 
 fn limited_heating_mass_flow_rate_kg_per_s(
@@ -442,6 +519,12 @@ fn heating_result_with_limits(
         zone_total_cooling_rate_w: 0.0,
         zone_sensible_heating_rate_w: heating_output_to_zone_w,
         zone_sensible_cooling_rate_w: 0.0,
+        zone_latent_heating_rate_w: 0.0,
+        zone_latent_cooling_rate_w: 0.0,
+        supply_air_sensible_heating_rate_w: heating_output_to_zone_w,
+        supply_air_sensible_cooling_rate_w: 0.0,
+        supply_air_latent_heating_rate_w: 0.0,
+        supply_air_latent_cooling_rate_w: 0.0,
         supply_air_total_heating_rate_w: heating_output_to_zone_w,
         supply_air_total_cooling_rate_w: 0.0,
     }
@@ -455,6 +538,7 @@ fn cooling_result_with_limits(
     supply_humidity_ratio: f64,
     cooling_load_w: f64,
     cooling_mass_flow_rate_kg_per_s: f64,
+    context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
     let mut supply_temperature_c = zone_state.air_temperature_c
         - cooling_load_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
@@ -478,11 +562,75 @@ fn cooling_result_with_limits(
             - cooling_coil_output_w / (cooling_mass_flow_rate_kg_per_s * cp_mixed_air_j_per_kg_k);
     }
 
-    let cooling_output_to_zone_w = cooling_mass_flow_rate_kg_per_s
-        * cp_air_j_per_kg_k
-        * (zone_state.air_temperature_c - supply_temperature_c).max(0.0);
+    cooling_result_from_states(
+        system,
+        zone_state,
+        recirculation_state,
+        cp_air_j_per_kg_k,
+        supply_temperature_c,
+        supply_humidity_ratio,
+        cooling_mass_flow_rate_kg_per_s,
+        context,
+    )
+}
+
+fn cooling_result_from_states(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    mixed_air_state: IdealLoadsZoneState,
+    cp_air_j_per_kg_k: f64,
+    supply_temperature_c: f64,
+    mixed_supply_humidity_ratio: f64,
+    cooling_mass_flow_rate_kg_per_s: f64,
+    context: IdealLoadsSensibleLimitContext,
+) -> IdealLoadsSensibleResult {
+    let mixed_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+        mixed_air_state.air_temperature_c,
+        mixed_air_state.air_humidity_ratio,
+    );
+    let supply_air_sensible_cooling_rate_w = cooling_mass_flow_rate_kg_per_s
+        * energyplus_moist_air_specific_heat_j_per_kg_k(mixed_air_state.air_humidity_ratio)
+        * (mixed_air_state.air_temperature_c - supply_temperature_c).max(0.0);
+    let supply_humidity_ratio = cooling_supply_humidity_ratio(
+        system,
+        mixed_air_state,
+        supply_temperature_c,
+        mixed_supply_humidity_ratio,
+        cooling_mass_flow_rate_kg_per_s,
+        supply_air_sensible_cooling_rate_w,
+        mixed_air_enthalpy_j_per_kg,
+        context,
+    );
     let supply_enthalpy_j_per_kg =
         moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
+    let sensible_coil_load_w = -supply_air_sensible_cooling_rate_w;
+    let latent_coil_load_w =
+        if nearly_equal_humidity(supply_humidity_ratio, mixed_air_state.air_humidity_ratio) {
+            0.0
+        } else {
+            cooling_mass_flow_rate_kg_per_s
+                * (supply_enthalpy_j_per_kg - mixed_air_enthalpy_j_per_kg)
+                - sensible_coil_load_w
+        };
+    let supply_air_latent_heating_rate_w = latent_coil_load_w.max(0.0);
+    let supply_air_latent_cooling_rate_w = latent_coil_load_w.min(0.0).abs();
+
+    let sensible_output_to_zone_w = cooling_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (supply_temperature_c - zone_state.air_temperature_c);
+    let zone_sensible_cooling_rate_w = sensible_output_to_zone_w.min(0.0).abs();
+    let zone_air_enthalpy_j_per_kg =
+        moist_air_enthalpy_j_per_kg(zone_state.air_temperature_c, zone_state.air_humidity_ratio);
+    let latent_output_to_zone_w =
+        if nearly_equal_humidity(supply_humidity_ratio, zone_state.air_humidity_ratio) {
+            0.0
+        } else {
+            cooling_mass_flow_rate_kg_per_s
+                * (supply_enthalpy_j_per_kg - zone_air_enthalpy_j_per_kg)
+                - sensible_output_to_zone_w
+        };
+    let zone_latent_heating_rate_w = latent_output_to_zone_w.max(0.0);
+    let zone_latent_cooling_rate_w = latent_output_to_zone_w.min(0.0).abs();
 
     IdealLoadsSensibleResult {
         mode: IdealLoadsSensibleMode::Cooling,
@@ -494,12 +642,71 @@ fn cooling_result_with_limits(
         heating_mass_flow_rate_kg_per_s: 0.0,
         cooling_mass_flow_rate_kg_per_s,
         zone_total_heating_rate_w: 0.0,
-        zone_total_cooling_rate_w: cooling_output_to_zone_w,
+        zone_total_cooling_rate_w: zone_sensible_cooling_rate_w + zone_latent_cooling_rate_w,
         zone_sensible_heating_rate_w: 0.0,
-        zone_sensible_cooling_rate_w: cooling_output_to_zone_w,
+        zone_sensible_cooling_rate_w,
+        zone_latent_heating_rate_w,
+        zone_latent_cooling_rate_w,
+        supply_air_sensible_heating_rate_w: 0.0,
+        supply_air_sensible_cooling_rate_w,
+        supply_air_latent_heating_rate_w,
+        supply_air_latent_cooling_rate_w,
         supply_air_total_heating_rate_w: 0.0,
-        supply_air_total_cooling_rate_w: cooling_output_to_zone_w,
+        supply_air_total_cooling_rate_w: supply_air_sensible_cooling_rate_w
+            + supply_air_latent_cooling_rate_w,
     }
+}
+
+fn cooling_supply_humidity_ratio(
+    system: &IdealLoadsAirSystem,
+    mixed_air_state: IdealLoadsZoneState,
+    supply_temperature_c: f64,
+    mixed_supply_humidity_ratio: f64,
+    supply_mass_flow_rate_kg_per_s: f64,
+    supply_air_sensible_cooling_rate_w: f64,
+    mixed_air_enthalpy_j_per_kg: f64,
+    context: IdealLoadsSensibleLimitContext,
+) -> f64 {
+    if system.dehumidification_control_type
+        != DehumidificationControlType::ConstantSensibleHeatRatio
+        || supply_mass_flow_rate_kg_per_s <= 0.0
+        || system.cooling_sensible_heat_ratio <= 0.0
+    {
+        return mixed_supply_humidity_ratio;
+    }
+
+    let cooling_total_output_w =
+        supply_air_sensible_cooling_rate_w / system.cooling_sensible_heat_ratio;
+    let supply_enthalpy_j_per_kg = (mixed_air_enthalpy_j_per_kg
+        - cooling_total_output_w / supply_mass_flow_rate_kg_per_s)
+        .max(moist_air_enthalpy_j_per_kg(
+            supply_temperature_c,
+            MINIMUM_HUMIDITY_RATIO,
+        ));
+    let humidity_from_enthalpy =
+        humidity_ratio_from_enthalpy_and_dry_bulb(supply_enthalpy_j_per_kg, supply_temperature_c)
+            .max(MINIMUM_HUMIDITY_RATIO);
+    let supply_humidity_ratio = mixed_supply_humidity_ratio
+        .min(humidity_from_enthalpy)
+        .max(system.minimum_cooling_supply_air_humidity_ratio)
+        .min(mixed_air_state.air_humidity_ratio);
+    let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
+        supply_temperature_c,
+        1.0,
+        context.barometric_pressure_pa,
+    )
+    .unwrap_or(f64::INFINITY);
+    supply_humidity_ratio.min(saturation_humidity_ratio)
+}
+
+fn humidity_ratio_from_enthalpy_and_dry_bulb(enthalpy_j_per_kg: f64, dry_bulb_c: f64) -> f64 {
+    (enthalpy_j_per_kg / 1000.0 - ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
+        / (ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG
+            + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
+}
+
+fn nearly_equal_humidity(left: f64, right: f64) -> bool {
+    (left - right).abs() <= 1.0e-12
 }
 
 fn flow_limit_kg_per_s(
@@ -570,6 +777,12 @@ fn zero_result(
         zone_total_cooling_rate_w: 0.0,
         zone_sensible_heating_rate_w: 0.0,
         zone_sensible_cooling_rate_w: 0.0,
+        zone_latent_heating_rate_w: 0.0,
+        zone_latent_cooling_rate_w: 0.0,
+        supply_air_sensible_heating_rate_w: 0.0,
+        supply_air_sensible_cooling_rate_w: 0.0,
+        supply_air_latent_heating_rate_w: 0.0,
+        supply_air_latent_cooling_rate_w: 0.0,
         supply_air_total_heating_rate_w: 0.0,
         supply_air_total_cooling_rate_w: 0.0,
     }
@@ -626,8 +839,61 @@ mod tests {
         assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
         assert!((result.supply_temperature_c - 13.0).abs() < 1.0e-12);
         assert!((result.supply_mass_flow_rate_kg_per_s - 2400.0 / (cp * 12.0)).abs() < 1.0e-12);
-        assert!((result.zone_total_cooling_rate_w - 2400.0).abs() < 1.0e-12);
+        assert!((result.zone_sensible_cooling_rate_w - 2400.0).abs() < 1.0e-12);
         assert_eq!(result.zone_total_heating_rate_w, 0.0);
+    }
+
+    #[test]
+    fn constant_sensible_heat_ratio_cooling_adds_latent_output() {
+        let mut system = test_system();
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSensibleHeatRatio;
+        system.cooling_sensible_heat_ratio = 0.7;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.009,
+        };
+
+        let result = calc_no_oa_no_limit_sensible_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0),
+            true,
+        );
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
+        let mass_flow = 2400.0 / (cp * 12.0);
+        let supply_enthalpy =
+            moist_air_enthalpy_j_per_kg(result.supply_temperature_c, result.supply_humidity_ratio);
+        let zone_enthalpy = moist_air_enthalpy_j_per_kg(
+            zone_state.air_temperature_c,
+            zone_state.air_humidity_ratio,
+        );
+        let sensible_output_to_zone = mass_flow * cp * (13.0 - 25.0);
+        let expected_latent_cooling = (mass_flow * (supply_enthalpy - zone_enthalpy)
+            - sensible_output_to_zone)
+            .min(0.0)
+            .abs();
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(result.supply_temperature_c, 13.0, 1.0e-12);
+        assert_close(
+            result.supply_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio,
+            1.0e-12,
+        );
+        assert_close(result.supply_air_sensible_cooling_rate_w, 2400.0, 1.0e-9);
+        assert!(result.supply_air_latent_cooling_rate_w > 0.0);
+        assert_close(
+            result.zone_latent_cooling_rate_w,
+            expected_latent_cooling,
+            1.0e-9,
+        );
+        assert_close(
+            result.zone_total_cooling_rate_w,
+            2400.0 + expected_latent_cooling,
+            1.0e-9,
+        );
     }
 
     #[test]
@@ -787,8 +1053,17 @@ mod tests {
             1.0e-12,
         );
         assert_close(result.supply_temperature_c, 13.0, 1.0e-12);
-        assert_close(result.zone_total_cooling_rate_w, expected_output_w, 1.0e-9);
-        assert!(result.zone_total_cooling_rate_w < 2400.0);
+        assert_close(
+            result.zone_sensible_cooling_rate_w,
+            expected_output_w,
+            1.0e-9,
+        );
+        assert_close(
+            result.supply_air_sensible_cooling_rate_w,
+            expected_output_w,
+            1.0e-9,
+        );
+        assert!(result.zone_sensible_cooling_rate_w < 2400.0);
     }
 
     #[test]
@@ -814,7 +1089,7 @@ mod tests {
         let expected_supply_temperature_c =
             25.0 - 1000.0 / (cp * unlimited_mass_flow_rate_kg_per_s);
         assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
-        assert_close(result.zone_total_cooling_rate_w, 1000.0, 1.0e-12);
+        assert_close(result.zone_sensible_cooling_rate_w, 1000.0, 1.0e-12);
         assert_close(
             result.supply_temperature_c,
             expected_supply_temperature_c,
@@ -872,7 +1147,7 @@ mod tests {
             maximum_total_cooling_capacity_w: None,
             heating_availability_schedule: None,
             cooling_availability_schedule: None,
-            dehumidification_control_type: DehumidificationControlType::ConstantSensibleHeatRatio,
+            dehumidification_control_type: DehumidificationControlType::None,
             cooling_sensible_heat_ratio: 0.7,
             humidification_control_type: HumidificationControlType::None,
             design_specification_outdoor_air_object_name: None,
