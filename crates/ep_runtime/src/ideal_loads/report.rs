@@ -38,6 +38,11 @@ pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE: &str =
 /// IdealLoads outdoor-air sensible cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE: &str =
     "Zone Ideal Loads Outdoor Air Sensible Cooling Rate";
+/// IdealLoads mixed-air temperature output variable.
+pub const ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE: &str = "Zone Ideal Loads Mixed Air Temperature";
+/// IdealLoads mixed-air humidity ratio output variable.
+pub const ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO: &str =
+    "Zone Ideal Loads Mixed Air Humidity Ratio";
 
 /// Report payload produced by the no-OA/no-limit sensible calculation.
 #[derive(Clone, Copy, Debug, PartialEq)]

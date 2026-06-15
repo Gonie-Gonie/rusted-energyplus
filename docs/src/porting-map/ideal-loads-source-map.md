@@ -130,24 +130,27 @@ preparatory Rust surface is:
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-economizer,
-  no-heat-recovery, no-humidity Flow/Zone OA sensible report-rate diagnostic
+  no-heat-recovery, no-humidity Flow/Zone OA sensible report-rate and
+  mixed-air state diagnostic
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` adds a diagnostic-only
 Flow/Zone proof lane for the EnergyPlus report variables
 `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
 `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate`, plus
 `Zone Ideal Loads Outdoor Air Sensible Heating Rate` and
-`Zone Ideal Loads Outdoor Air Sensible Cooling Rate`. The compare lane derives
+`Zone Ideal Loads Outdoor Air Sensible Cooling Rate`, plus
+`Zone Ideal Loads Mixed Air Temperature` and
+`Zone Ideal Loads Mixed Air Humidity Ratio`. The compare lane derives
 EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA schedule as
 always 1.0, and writes Rust `ResultStore` series for the 96 Detailed oracle
-samples. The mass and standard-density volume rows are exact; the sensible
-report rows use a 1 W diagnostic tolerance because EnergyPlus sorts them from
-source-order zone/OA state and report-rate mode gates.
+samples. The mass, standard-density volume, and mixed-air rows are exact in
+this fixture; the sensible report rows use a 1 W diagnostic tolerance because
+EnergyPlus sorts them from source-order zone/OA state and report-rate mode
+gates.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no outdoor-air latent load, mixed-air state, supply-air state,
-economizer, heat recovery, or DCV output is part of the promoted IdealLoads
-claim.
+unresolved, and no outdoor-air latent load, supply-air state, economizer, heat
+recovery, or DCV output is part of the promoted IdealLoads claim.
 
 ## Required Proof Variables
 

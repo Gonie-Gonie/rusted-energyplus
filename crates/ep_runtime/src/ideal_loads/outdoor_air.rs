@@ -1,10 +1,15 @@
 //! IdealLoads outdoor-air design-flow and narrow sensible-load helpers.
 
 use crate::{
-    energyplus_moist_air_specific_heat_j_per_kg_k, ideal_loads::IdealLoadsSensibleMode,
+    energyplus_moist_air_specific_heat_j_per_kg_k,
+    ideal_loads::{IdealLoadsSensibleMode, moist_air_enthalpy_j_per_kg},
     zone_equipment::ZoneSysEnergyDemand,
 };
-use ep_model::{DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod};
+use ep_model::{
+    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod, IdealLoadsAirSystem,
+};
+
+const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
 
 /// Zone context needed by `DesignSpecification:OutdoorAir`.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -39,6 +44,12 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
     pub outdoor_air_sensible_heating_rate_w: f64,
     /// Reported OA sensible cooling rate.
     pub outdoor_air_sensible_cooling_rate_w: f64,
+    /// Final supply mass flow used by the no-limit OA branch.
+    pub supply_mass_flow_rate_kg_per_s: f64,
+    /// Mixed-air temperature after OA/recirculation mixing.
+    pub mixed_air_temperature_c: f64,
+    /// Mixed-air humidity ratio after OA/recirculation mixing.
+    pub mixed_air_humidity_ratio: f64,
 }
 
 /// Calculates the design outdoor-air volume flow in m3/s for supported methods.
@@ -105,7 +116,9 @@ pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
 /// then recomputes final `OASenOutput` using zone humidity for report sorting.
 #[must_use]
 pub fn calc_outdoor_air_sensible_report_rates_compat(
+    system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsOutdoorAirNodeState,
+    recirculation_state: IdealLoadsOutdoorAirNodeState,
     outdoor_air_state: IdealLoadsOutdoorAirNodeState,
     demand: ZoneSysEnergyDemand,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
@@ -122,6 +135,9 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
             outdoor_air_sensible_output_w: 0.0,
             outdoor_air_sensible_heating_rate_w: 0.0,
             outdoor_air_sensible_cooling_rate_w: 0.0,
+            supply_mass_flow_rate_kg_per_s: 0.0,
+            mixed_air_temperature_c: recirculation_state.air_temperature_c,
+            mixed_air_humidity_ratio: recirculation_state.air_humidity_ratio,
         };
     }
 
@@ -154,6 +170,20 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
     } else {
         0.0
     };
+    let supply_mass_flow_rate_kg_per_s = outdoor_air_supply_mass_flow_rate_kg_per_s(
+        system,
+        zone_state,
+        demand,
+        mode,
+        final_cp_air_j_per_kg_k,
+        outdoor_air_mass_flow_rate_kg_per_s,
+    );
+    let (mixed_air_temperature_c, mixed_air_humidity_ratio) = mixed_air_state(
+        recirculation_state,
+        outdoor_air_state,
+        outdoor_air_mass_flow_rate_kg_per_s,
+        supply_mass_flow_rate_kg_per_s,
+    );
 
     IdealLoadsOutdoorAirSensibleResult {
         mode,
@@ -161,7 +191,98 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         outdoor_air_sensible_output_w,
         outdoor_air_sensible_heating_rate_w,
         outdoor_air_sensible_cooling_rate_w,
+        supply_mass_flow_rate_kg_per_s,
+        mixed_air_temperature_c,
+        mixed_air_humidity_ratio,
     }
+}
+
+fn outdoor_air_supply_mass_flow_rate_kg_per_s(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsOutdoorAirNodeState,
+    demand: ZoneSysEnergyDemand,
+    mode: IdealLoadsSensibleMode,
+    cp_air_j_per_kg_k: f64,
+    outdoor_air_mass_flow_rate_kg_per_s: f64,
+) -> f64 {
+    let sensible_flow_rate_kg_per_s = match mode {
+        IdealLoadsSensibleMode::Heating => {
+            let delta_t =
+                system.maximum_heating_supply_air_temperature_c - zone_state.air_temperature_c;
+            if delta_t > SMALL_TEMPERATURE_DIFFERENCE_C
+                && demand.remaining_output_req_to_heat_sp_w > 0.0
+            {
+                demand.remaining_output_req_to_heat_sp_w / (cp_air_j_per_kg_k * delta_t)
+            } else {
+                0.0
+            }
+        }
+        IdealLoadsSensibleMode::Cooling => {
+            let delta_t =
+                system.minimum_cooling_supply_air_temperature_c - zone_state.air_temperature_c;
+            if delta_t < -SMALL_TEMPERATURE_DIFFERENCE_C
+                && demand.remaining_output_req_to_cool_sp_w < 0.0
+            {
+                demand.remaining_output_req_to_cool_sp_w / (cp_air_j_per_kg_k * delta_t)
+            } else {
+                0.0
+            }
+        }
+        IdealLoadsSensibleMode::Deadband | IdealLoadsSensibleMode::Off => 0.0,
+    };
+    outdoor_air_mass_flow_rate_kg_per_s
+        .max(sensible_flow_rate_kg_per_s)
+        .max(0.0)
+}
+
+fn mixed_air_state(
+    recirculation_state: IdealLoadsOutdoorAirNodeState,
+    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    outdoor_air_mass_flow_rate_kg_per_s: f64,
+    supply_mass_flow_rate_kg_per_s: f64,
+) -> (f64, f64) {
+    if outdoor_air_mass_flow_rate_kg_per_s <= 0.0 || supply_mass_flow_rate_kg_per_s <= 0.0 {
+        return (
+            recirculation_state.air_temperature_c,
+            recirculation_state.air_humidity_ratio,
+        );
+    }
+    if supply_mass_flow_rate_kg_per_s <= outdoor_air_mass_flow_rate_kg_per_s {
+        return (
+            outdoor_air_state.air_temperature_c,
+            outdoor_air_state.air_humidity_ratio,
+        );
+    }
+
+    let recirculation_mass_flow_rate_kg_per_s =
+        supply_mass_flow_rate_kg_per_s - outdoor_air_mass_flow_rate_kg_per_s;
+    let recirculation_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+        recirculation_state.air_temperature_c,
+        recirculation_state.air_humidity_ratio,
+    );
+    let outdoor_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+        outdoor_air_state.air_temperature_c,
+        outdoor_air_state.air_humidity_ratio,
+    );
+    let mixed_air_enthalpy_j_per_kg = (recirculation_mass_flow_rate_kg_per_s
+        * recirculation_enthalpy_j_per_kg
+        + outdoor_air_mass_flow_rate_kg_per_s * outdoor_air_enthalpy_j_per_kg)
+        / supply_mass_flow_rate_kg_per_s;
+    let mixed_air_humidity_ratio = (recirculation_mass_flow_rate_kg_per_s
+        * recirculation_state.air_humidity_ratio
+        + outdoor_air_mass_flow_rate_kg_per_s * outdoor_air_state.air_humidity_ratio)
+        / supply_mass_flow_rate_kg_per_s;
+    (
+        dry_bulb_from_enthalpy_and_humidity_ratio(
+            mixed_air_enthalpy_j_per_kg,
+            mixed_air_humidity_ratio,
+        ),
+        mixed_air_humidity_ratio,
+    )
+}
+
+fn dry_bulb_from_enthalpy_and_humidity_ratio(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
+    (enthalpy_j_per_kg / 1000.0 - 2501.0 * humidity_ratio) / (1.006 + 1.86 * humidity_ratio)
 }
 
 fn schedule_multiplier(value: Option<f64>) -> f64 {
@@ -190,8 +311,11 @@ fn nonnegative_product(left: f64, right: f64) -> f64 {
 mod tests {
     use super::*;
     use ep_model::{
+        DehumidificationControlType, DemandControlledVentilationType,
         DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
-        DesignSpecificationOutdoorAirMethod, NormalizedName,
+        DesignSpecificationOutdoorAirMethod, HeatRecoveryType, HumidificationControlType,
+        IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+        NormalizedName, OutdoorAirEconomizerType,
     };
 
     #[test]
@@ -280,6 +404,11 @@ mod tests {
     #[test]
     fn sensible_report_sorts_cold_oa_as_heating_load_when_heat_mode_is_active() {
         let result = calc_outdoor_air_sensible_report_rates_compat(
+            &test_system(),
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 21.0,
+                air_humidity_ratio: 0.006,
+            },
             IdealLoadsOutdoorAirNodeState {
                 air_temperature_c: 21.0,
                 air_humidity_ratio: 0.006,
@@ -294,6 +423,8 @@ mod tests {
         );
 
         assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+        assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
+        assert!(result.mixed_air_temperature_c < 21.0);
         assert!(result.outdoor_air_sensible_output_w < 0.0);
         assert_close(
             result.outdoor_air_sensible_heating_rate_w,
@@ -306,6 +437,11 @@ mod tests {
     #[test]
     fn sensible_report_sorts_warm_oa_as_cooling_load_when_cool_mode_is_active() {
         let result = calc_outdoor_air_sensible_report_rates_compat(
+            &test_system(),
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 24.0,
+                air_humidity_ratio: 0.006,
+            },
             IdealLoadsOutdoorAirNodeState {
                 air_temperature_c: 24.0,
                 air_humidity_ratio: 0.006,
@@ -320,6 +456,8 @@ mod tests {
         );
 
         assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
+        assert!(result.mixed_air_temperature_c > 24.0);
         assert!(result.outdoor_air_sensible_output_w > 0.0);
         assert_close(
             result.outdoor_air_sensible_cooling_rate_w,
@@ -358,6 +496,46 @@ mod tests {
             outdoor_air_flow_air_changes_per_hour: 0.0,
             outdoor_air_schedule: None,
             proportional_control_minimum_outdoor_air_flow_rate_schedule: None,
+        }
+    }
+
+    fn test_system() -> IdealLoadsAirSystem {
+        IdealLoadsAirSystem {
+            id: IdealLoadsAirSystemId(0),
+            name: NormalizedName::new("ZONE ONE IDEAL LOADS"),
+            availability_schedule: None,
+            zone_supply_air_node_name: NormalizedName::new("ZONE ONE INLETS"),
+            zone_exhaust_air_node_name: None,
+            system_inlet_air_node_name: None,
+            maximum_heating_supply_air_temperature_c: 50.0,
+            minimum_cooling_supply_air_temperature_c: 13.0,
+            maximum_heating_supply_air_humidity_ratio: 0.0156,
+            minimum_cooling_supply_air_humidity_ratio: 0.0077,
+            heating_limit: IdealLoadsLimit::NoLimit,
+            maximum_heating_air_flow_rate_m3_per_s: None,
+            maximum_sensible_heating_capacity_w: None,
+            cooling_limit: IdealLoadsLimit::NoLimit,
+            maximum_cooling_air_flow_rate_m3_per_s: None,
+            maximum_total_cooling_capacity_w: None,
+            heating_availability_schedule: None,
+            cooling_availability_schedule: None,
+            dehumidification_control_type: DehumidificationControlType::ConstantSensibleHeatRatio,
+            cooling_sensible_heat_ratio: 0.7,
+            humidification_control_type: HumidificationControlType::None,
+            design_specification_outdoor_air_object_name: Some(NormalizedName::new(
+                "OUTDOOR AIR SPEC",
+            )),
+            outdoor_air_inlet_node_name: Some(NormalizedName::new("OUTDOOR AIR NODE")),
+            demand_controlled_ventilation_type: DemandControlledVentilationType::None,
+            outdoor_air_economizer_type: OutdoorAirEconomizerType::NoEconomizer,
+            heat_recovery_type: HeatRecoveryType::None,
+            sensible_heat_recovery_effectiveness: 0.7,
+            latent_heat_recovery_effectiveness: 0.65,
+            design_specification_zonehvac_sizing_object_name: None,
+            heating_fuel_efficiency_schedule: None,
+            heating_fuel_type: IdealLoadsFuelType::DistrictHeatingWater,
+            cooling_fuel_efficiency_schedule: None,
+            cooling_fuel_type: IdealLoadsFuelType::DistrictCooling,
         }
     }
 

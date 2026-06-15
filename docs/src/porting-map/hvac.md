@@ -165,16 +165,20 @@ status: diagnostic
 The case requests `Zone Ideal Loads Outdoor Air Mass Flow Rate`,
 `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate`,
 `Zone Ideal Loads Outdoor Air Sensible Heating Rate`, and
-`Zone Ideal Loads Outdoor Air Sensible Cooling Rate` for the IdealLoads object.
+`Zone Ideal Loads Outdoor Air Sensible Cooling Rate`,
+`Zone Ideal Loads Mixed Air Temperature`, and
+`Zone Ideal Loads Mixed Air Humidity Ratio` for the IdealLoads object.
 The Rust compare lane resolves the referenced `DesignSpecification:OutdoorAir`,
 applies the blank outdoor-air schedule as always 1.0, derives EnergyPlus
 `StdRhoAir` from `Site:Location`, and writes matching Detailed Rust
 `ResultStore` series for the 96 oracle samples. The flow rows are exact; the
-sensible report rows are diagnostic with a 1 W source-order tolerance.
+sensible report rows are diagnostic with a 1 W source-order tolerance. The
+mixed-air state rows match the no-economizer/no-heat-recovery EnergyPlus
+mixing calculation in this fixture.
 
-This evidence does not promote outdoor-air latent loads, mixed-air state,
-supply-air state, DCV, economizer, heat recovery, humidity controls, finite
-limits, or broad IdealLoads outdoor-air conformance.
+This evidence does not promote outdoor-air latent loads, supply-air state, DCV,
+economizer, heat recovery, humidity controls, finite limits, or broad
+IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 
