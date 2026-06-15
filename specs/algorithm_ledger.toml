@@ -350,6 +350,7 @@ energyplus_source = [
 rust_target = [
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_design_outdoor_air_volume_flow_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE",
@@ -373,6 +374,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1",
+  "scripts/compare/compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-area-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-air-changes-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-sum-diagnostic.ps1",
@@ -406,7 +408,7 @@ proof_variables = [
   "Zone Ideal Loads Heat Recovery Active Time",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; active DCV, economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, inactive economizer/heat-recovery report parity, and DifferentialDryBulb economizer OA flow/active-time parity; active DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

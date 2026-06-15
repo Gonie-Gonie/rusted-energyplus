@@ -82,6 +82,7 @@ const ZONE_SYSTEM_PREDICTED_HEATING_LOAD: &str =
 const ZONE_SYSTEM_PREDICTED_COOLING_LOAD: &str =
     "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate";
 const IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS: f64 = 8.0;
+const IDEAL_LOADS_OUTDOOR_AIR_SYSTEM_SUBSTEPS: f64 = 8.0;
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -177,6 +178,8 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     outdoor_air_spec_name: String,
     outdoor_air_method: DesignSpecificationOutdoorAirMethod,
     outdoor_air_node_name: String,
+    outdoor_air_economizer_type: OutdoorAirEconomizerType,
+    heat_recovery_type: HeatRecoveryType,
     standard_air_density_kg_per_m3: f64,
     design_people_count: f64,
     zone_floor_area_m2: f64,
@@ -670,6 +673,24 @@ fn build_outdoor_air_design_flow_context<'a>(
         return Err("IdealLoads outdoor-air diagnostic has no samples".to_string());
     }
 
+    let zone_timestep_hours = ideal_loads_energy_report_interval_seconds(&model) / 3600.0;
+    let sample_timestep_hours = expected_series
+        .first()
+        .map(|series| {
+            series
+                .samples
+                .iter()
+                .take(sample_count)
+                .map(|sample| {
+                    ideal_loads_outdoor_air_sample_timestep_hours(
+                        sample.timestamp.as_deref(),
+                        zone_timestep_hours,
+                    )
+                })
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_else(|| vec![zone_timestep_hours; sample_count]);
+
     let mut sensible_results = Vec::with_capacity(sample_count);
     for index in 0..sample_count {
         let calc_zone_state_index = index.saturating_sub(1);
@@ -697,6 +718,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             outdoor_air_state,
             demand,
             outdoor_air_mass_flow_rate_kg_per_s,
+            sample_timestep_hours[index],
             true,
         ));
     }
@@ -706,8 +728,6 @@ fn build_outdoor_air_design_flow_context<'a>(
     for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
         let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
-            outdoor_air_mass_flow_rate_kg_per_s,
-            design_volume_flow_rate_m3_per_s,
             standard_air_density_kg_per_m3,
             &sensible_results,
             expected.samples.len(),
@@ -772,6 +792,8 @@ fn build_outdoor_air_design_flow_context<'a>(
         outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
         outdoor_air_method: outdoor_air_specification.method,
         outdoor_air_node_name: outdoor_air_node_name.0.clone(),
+        outdoor_air_economizer_type: system.outdoor_air_economizer_type,
+        heat_recovery_type: system.heat_recovery_type,
         standard_air_density_kg_per_m3,
         design_people_count: outdoor_air_context.design_people_count,
         zone_floor_area_m2: outdoor_air_context.zone_floor_area_m2,
@@ -805,9 +827,12 @@ fn validate_outdoor_air_design_flow_boundary(
     if system.demand_controlled_ventilation_type != DemandControlledVentilationType::None {
         return Err("IdealLoads outdoor-air design-flow diagnostic excludes DCV".to_string());
     }
-    if system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer {
+    if !matches!(
+        system.outdoor_air_economizer_type,
+        OutdoorAirEconomizerType::NoEconomizer | OutdoorAirEconomizerType::DifferentialDryBulb
+    ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic excludes economizer".to_string(),
+            "IdealLoads outdoor-air design-flow diagnostic currently supports NoEconomizer or DifferentialDryBulb economizer".to_string(),
         );
     }
     if system.heat_recovery_type != HeatRecoveryType::None {
@@ -844,6 +869,45 @@ fn outdoor_air_method_label(method: DesignSpecificationOutdoorAirMethod) -> &'st
             "ProportionalControlBasedOnOccupancySchedule"
         }
     }
+}
+
+fn outdoor_air_economizer_label(economizer: OutdoorAirEconomizerType) -> &'static str {
+    match economizer {
+        OutdoorAirEconomizerType::NoEconomizer => "NoEconomizer",
+        OutdoorAirEconomizerType::DifferentialDryBulb => "DifferentialDryBulb",
+        OutdoorAirEconomizerType::DifferentialEnthalpy => "DifferentialEnthalpy",
+    }
+}
+
+fn heat_recovery_label(heat_recovery: HeatRecoveryType) -> &'static str {
+    match heat_recovery {
+        HeatRecoveryType::None => "None",
+        HeatRecoveryType::Sensible => "Sensible",
+        HeatRecoveryType::Enthalpy => "Enthalpy",
+    }
+}
+
+fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
+    if context.outdoor_air_economizer_type == OutdoorAirEconomizerType::DifferentialDryBulb {
+        "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialDryBulb economizer active-time/flow parity; DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
+    } else {
+        "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery"
+    }
+}
+
+fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
+    let economizer_source = if context.outdoor_air_economizer_type
+        == OutdoorAirEconomizerType::DifferentialDryBulb
+    {
+        " plus EnergyPlus DifferentialDryBulb economizer OA flow reset when outdoor dry-bulb is below recirculation dry-bulb"
+    } else {
+        ""
+    };
+    format!(
+        "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}",
+        outdoor_air_method_label(context.outdoor_air_method),
+        economizer_source
+    )
 }
 
 fn ideal_loads_outdoor_air_context(model: &TypedModel, zone: &Zone) -> IdealLoadsOutdoorAirContext {
@@ -946,22 +1010,38 @@ fn ideal_loads_bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option
 
 fn outdoor_air_observed_values(
     output: &OutputRequest,
-    outdoor_air_mass_flow_rate_kg_per_s: f64,
-    design_volume_flow_rate_m3_per_s: f64,
     standard_air_density_kg_per_m3: f64,
     sensible_results: &[IdealLoadsOutdoorAirSensibleResult],
     expected_samples: usize,
 ) -> Result<(&'static str, &'static str, Vec<f64>), String> {
+    let outdoor_air_flow_source = if sensible_results
+        .iter()
+        .any(|result| result.economizer_active_time_hr > 0.0)
+    {
+        "rust-ideal-loads-outdoor-air-differential-dry-bulb-economizer"
+    } else {
+        "rust-ideal-loads-outdoor-air-design-flow"
+    };
     match output.variable.as_str() {
         ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE => Ok((
-            "rust-ideal-loads-outdoor-air-design-flow",
+            outdoor_air_flow_source,
             "kg/s",
-            vec![outdoor_air_mass_flow_rate_kg_per_s; expected_samples],
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_mass_flow_rate_kg_per_s)
+                .collect(),
         )),
         ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE => Ok((
-            "rust-ideal-loads-outdoor-air-design-flow",
+            outdoor_air_flow_source,
             "m3/s",
-            vec![design_volume_flow_rate_m3_per_s; expected_samples],
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| {
+                    result.outdoor_air_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3
+                })
+                .collect(),
         )),
         ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE => Ok((
             "rust-ideal-loads-outdoor-air-sensible-report",
@@ -1084,9 +1164,20 @@ fn outdoor_air_observed_values(
             vec![0.0; expected_samples],
         )),
         ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME => Ok((
-            "rust-ideal-loads-outdoor-air-inactive-economizer",
+            if sensible_results
+                .iter()
+                .any(|result| result.economizer_active_time_hr > 0.0)
+            {
+                "rust-ideal-loads-outdoor-air-differential-dry-bulb-economizer"
+            } else {
+                "rust-ideal-loads-outdoor-air-inactive-economizer"
+            },
             "hr",
-            vec![0.0; expected_samples],
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.economizer_active_time_hr)
+                .collect(),
         )),
         ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME => Ok((
             "rust-ideal-loads-outdoor-air-inactive-heat-recovery",
@@ -1336,6 +1427,35 @@ fn ideal_loads_system_timestep_seconds(model: &SimulationModel) -> f64 {
 fn ideal_loads_energy_report_interval_seconds(model: &SimulationModel) -> f64 {
     let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     3600.0 / f64::from(zone_timesteps_per_hour)
+}
+
+fn ideal_loads_outdoor_air_sample_timestep_hours(
+    timestamp: Option<&str>,
+    zone_timestep_hours: f64,
+) -> f64 {
+    let Some(timestamp) = timestamp else {
+        return zone_timestep_hours;
+    };
+    let Some(start_minute) = timestamp_numeric_field(timestamp, "start") else {
+        return zone_timestep_hours;
+    };
+    let Some(end_minute) = timestamp_numeric_field(timestamp, "end") else {
+        return zone_timestep_hours;
+    };
+    let duration_hours = (end_minute - start_minute) / 60.0;
+    if duration_hours > 0.0 && duration_hours < zone_timestep_hours * 0.75 {
+        zone_timestep_hours / IDEAL_LOADS_OUTDOOR_AIR_SYSTEM_SUBSTEPS
+    } else {
+        zone_timestep_hours
+    }
+}
+
+fn timestamp_numeric_field(timestamp: &str, field_name: &str) -> Option<f64> {
+    let prefix = format!("{field_name}=");
+    timestamp
+        .split(';')
+        .find_map(|part| part.strip_prefix(&prefix))
+        .and_then(|value| value.parse::<f64>().ok())
 }
 
 fn load_series(eso: &Path, key: &str, variable: &str) -> Result<LoadedSeries, String> {
@@ -3084,15 +3204,18 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
+    report.push_str(&format!(
+        "claim_boundary: {}\n",
+        outdoor_air_claim_boundary(context)
+    ));
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str(&format!(
-        "outdoor_air_source: DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows\n",
-        outdoor_air_method_label(context.outdoor_air_method)
+        "outdoor_air_source: {}\n",
+        outdoor_air_source_description(context)
     ));
     report.push_str("outdoor_air_schedule: blank-always-1.0\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
@@ -3217,12 +3340,19 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str(&format!(
         "  \"outdoor_air_source\": {},\n",
-        json_string(&format!(
-            "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows",
-            outdoor_air_method_label(context.outdoor_air_method)
-        ))
+        json_string(&outdoor_air_source_description(context))
     ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
+    json.push_str(&format!(
+        "  \"economizer\": {},\n",
+        json_string(outdoor_air_economizer_label(
+            context.outdoor_air_economizer_type
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"heat_recovery\": {},\n",
+        json_string(heat_recovery_label(context.heat_recovery_type))
+    ));
     json.push_str(&format!(
         "  \"zone\": {},\n",
         json_string(&context.zone_name)
@@ -3492,8 +3622,16 @@ fn render_outdoor_air_stage_summary_json(
         json_string(outdoor_air_method_label(context.outdoor_air_method))
     ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
-    json.push_str("  \"economizer\": \"NoEconomizer\",\n");
-    json.push_str("  \"heat_recovery\": \"None\",\n");
+    json.push_str(&format!(
+        "  \"economizer\": {},\n",
+        json_string(outdoor_air_economizer_label(
+            context.outdoor_air_economizer_type
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"heat_recovery\": {},\n",
+        json_string(heat_recovery_label(context.heat_recovery_type))
+    ));
     json.push_str("  \"humidity_control_conformance\": false,\n");
     json.push_str("  \"finite_limit_conformance\": false,\n");
     json.push_str(&format!(

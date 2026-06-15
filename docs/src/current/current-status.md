@@ -39,7 +39,7 @@ variables:
 | Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, no-mass adiabatic conduction series, and selected official `1ZoneUncontrolled` dynamic weather/zone-air/surface-temperature/surface-conduction variables | official `1ZoneUncontrolled` broad diagnostic decomposition, floor storage blocker traces, radiation/solar/convection diagnostics, and non-promoted probe lanes | broad CTF storage parity, EnergyPlus warmup convergence parity outside the official candidate, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
 | Internal gains | `Zone Total Internal Convective Heating Rate` for `internal_gains_001` | static OtherEquipment nominal fields | zone air temperature response to gains, radiant/latent coupling, or broad internal-gain compatibility |
-| HVAC, node, plant | no-OA/no-limit IdealLoads sensible conformance for declared thermostat, IdealLoads rate, and supply-node temperature/flow variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, zero-failure IdealLoads finite flow/capacity diagnostic lanes with return-node proof rows, no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification/humidification humidity-control diagnostics, IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, and inactive economizer/heat-recovery diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active economizer/heat-recovery/DCV/humidity-control/saturation-limit branches, finite-limit conformance, adaptive system timestep, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
+| HVAC, node, plant | no-OA/no-limit IdealLoads sensible conformance for declared thermostat, IdealLoads rate, and supply-node temperature/flow variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, zero-failure IdealLoads finite flow/capacity diagnostic lanes with return-node proof rows, no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification/humidification humidity-control diagnostics, IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, economizer-active-time, and inactive heat-recovery diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active heat-recovery/DCV/humidity-control/saturation-limit branches, DifferentialEnthalpy economizer, finite-limit conformance, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
 model intake, additional weather variables, local fixture geometry/internal
@@ -121,12 +121,13 @@ The current public scope includes:
   zero tolerance failures across the three declared finite-limit fixtures, with
   finite-limit conformance kept outside the claim
 - diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
-  AirChanges/Hour, Sum, and Maximum outdoor-air design-flow evidence for
+  AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb outdoor-air evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive economizer/heat-recovery reports, with active DCV, economizer, heat
-  recovery, active humidity controls, saturation-limit branches, meters, and
-  broad OA compatibility outside the claim
+  economizer active time/inactive heat-recovery reports, with active DCV,
+  DifferentialEnthalpy economizer, heat recovery, active humidity controls,
+  saturation-limit branches, meters, and broad OA compatibility outside the
+  claim
 - official dynamic heat-balance diagnostic reports that retain the broader
   surface/radiation/solar/convection decomposition and probe lanes without
   promoting those diagnostic variables
