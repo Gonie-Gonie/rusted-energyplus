@@ -1384,7 +1384,9 @@ fn build_context<'a>(
         .find(|node| node.id == zone_air_node_edge.node)
         .ok_or_else(|| "missing zone air node".to_string())?;
 
-    let mut boundary = if manifest.conformance_claim {
+    let mut boundary = if manifest_allows_capacity_limit_conformance(manifest, system) {
+        classify_no_oa_sensible_subset(system)
+    } else if manifest.conformance_claim {
         classify_no_oa_no_limit_sensible_subset(system)
     } else {
         classify_no_oa_sensible_subset(system)
@@ -2759,6 +2761,16 @@ fn manifest_allows_constant_supply_humidity_humidification_diagnostic(
             output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
                 || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
         })
+}
+
+fn manifest_allows_capacity_limit_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest.conformance_claim
+        && manifest.id == "ideal_loads_capacity_limit_conformance_001"
+        && system.heating_limit == IdealLoadsLimit::LimitCapacity
+        && system.cooling_limit == IdealLoadsLimit::LimitCapacity
 }
 
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {
@@ -4268,6 +4280,10 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str("  \"heat_recovery\": \"None\",\n");
     json.push_str("  \"humidity_control_conformance\": false,\n");
     json.push_str(&format!(
+        "  \"finite_limit_conformance\": {},\n",
+        context.manifest.conformance_claim && context.branch == "no-oa-finite-limit-sensible"
+    ));
+    json.push_str(&format!(
         "  \"heating_fuel_efficiency\": {},\n",
         json_number(context.fuel_efficiency.heating)
     ));
@@ -4429,7 +4445,9 @@ fn outdoor_air_tolerance_policy(
 }
 
 fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    if context.manifest.conformance_claim {
+    if context.manifest.conformance_claim && context.branch == "no-oa-finite-limit-sensible" {
+        "conformance no-OA finite-limit sensible IdealLoads branch for declared variables only"
+    } else if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
     } else if context.branch == "no-oa-finite-limit-sensible" {
         "diagnostic-only no-OA finite-limit sensible IdealLoads branch"

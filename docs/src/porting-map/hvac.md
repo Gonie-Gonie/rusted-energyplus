@@ -183,10 +183,16 @@ efficiency schedules and broad fuel or meter conformance remain outside the
 claim. The same lane compares hourly DistrictHeatingWater/DistrictCooling
 oracle-MTR values against Rust fuel-energy aggregates diagnostically.
 
-## IdealLoads Finite Flow/Capacity Diagnostics
+## IdealLoads Finite Flow/Capacity Evidence
 
-Three no-OA diagnostic-only lanes exercise finite heating/cooling flow and
-capacity limits without promoting those branches to conformance:
+One no-OA numeric capacity-limit lane is now promoted to conformance for the
+declared thermostat, IdealLoads rate, and supply-node temperature/mass-flow
+outputs:
+
+- `ideal_loads_capacity_limit_conformance_001`
+
+The original no-OA diagnostic-only lanes remain as regression/proof evidence
+for finite heating/cooling flow and capacity limits:
 
 - `ideal_loads_capacity_limit_diagnostic_001`
 - `ideal_loads_flow_limit_diagnostic_001`
@@ -198,11 +204,13 @@ Rust compare lane records the resolved return node as the no-OA recirculation
 node and uses that same-call recirculation state for the finite-limit no-OA
 mixed-air and report calculations.
 
-The capacity-limit, flow-limit, and flow-and-capacity-limit lanes now have
-zero tolerance failures across their declared 18 Detailed series. All three
-lanes keep `comparison_class = "diagnostic-only"`,
+The promoted capacity-limit lane has `comparison_class = "conformance"`,
+`conformance_claim = true`, `tolerance_policy: conformance-gate`, and
+`status: pass`, with 10 conformance rows and 8 diagnostic proof rows across
+188 Detailed samples. The diagnostic capacity-limit, flow-limit, and
+flow-and-capacity-limit lanes keep `comparison_class = "diagnostic-only"`,
 `conformance_claim = false`, `tolerance_policy: diagnostic-draft`, and
-`status: diagnostic`.
+`status: diagnostic` with zero tolerance failures.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
@@ -275,8 +283,8 @@ is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
 This evidence does not promote active DCV, active humidity controls,
-saturation-limit heat-recovery branches, finite-limit conformance, or broad
-IdealLoads outdoor-air conformance.
+saturation-limit heat-recovery branches, flow-limit or flow-and-capacity
+conformance, or broad IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 
@@ -293,6 +301,6 @@ of these exist:
 - markdown report artifact
 - blocking release gate
 
-Variables outside the declared no-OA/no-limit sensible boundary remain
+Variables outside the declared no-OA/no-limit and numeric capacity-limit sensible boundary remain
 baseline-only or diagnostic-only evidence until they receive their own source
 map, Rust state, oracle evidence, and blocking gate.

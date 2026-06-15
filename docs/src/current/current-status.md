@@ -29,17 +29,19 @@ variables:
   weather, zone-air, surface temperature, and surface conduction variables only
 - `ideal_loads_no_oa_sensible_conformance_001` declared no-OA/no-limit
   IdealLoads sensible thermostat, rate, and supply-node variables only
+- `ideal_loads_capacity_limit_conformance_001` declared no-OA numeric
+  capacity-limit IdealLoads thermostat, rate, and supply-node variables only
 
 ## Current Evidence Boundary
 
 | Area | Current conformance | Diagnostic or baseline evidence | Not claimed |
 |---|---|---|---|
-| Numerical time series | 8 promoted conformance manifests, 51 declared hourly/detailed ESO series, and 22 passed release-evidence series | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gates the declared compatibility-candidate variable set; `ideal_loads_no_oa_sensible_conformance_001` gates the declared no-OA/no-limit IdealLoads sensible variable set | broad ExampleFiles dynamic conformance |
+| Numerical time series | 9 promoted conformance manifests, 69 declared hourly/detailed ESO series, and 22 passed release-evidence series | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gates the declared compatibility-candidate variable set; `ideal_loads_no_oa_sensible_conformance_001` gates the declared no-OA/no-limit IdealLoads sensible variable set; `ideal_loads_capacity_limit_conformance_001` gates the declared no-OA numeric capacity-limit IdealLoads sensible variable set | broad ExampleFiles dynamic conformance |
 | Static model | official `1ZoneUncontrolled` EIO surface geometry, Construction CTF, Material CTF Summary, and OtherEquipment nominal fields | generated support/index/release evidence PDFs | dynamic behavior from the static EIO case |
 | Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, no-mass adiabatic conduction series, and selected official `1ZoneUncontrolled` dynamic weather/zone-air/surface-temperature/surface-conduction variables | official `1ZoneUncontrolled` broad diagnostic decomposition, floor storage blocker traces, radiation/solar/convection diagnostics, and non-promoted probe lanes | broad CTF storage parity, EnergyPlus warmup convergence parity outside the official candidate, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
 | Internal gains | `Zone Total Internal Convective Heating Rate` for `internal_gains_001` | static OtherEquipment nominal fields | zone air temperature response to gains, radiant/latent coupling, or broad internal-gain compatibility |
-| HVAC, node, plant | no-OA/no-limit IdealLoads sensible conformance for declared thermostat, IdealLoads rate, and supply-node temperature/flow variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, zero-failure IdealLoads finite flow/capacity diagnostic lanes with return-node proof rows, no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification/humidification humidity-control diagnostics, IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, economizer-active-time, inactive heat-recovery, and heat-recovery active-time/rate diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active DCV/humidity-control/saturation-limit branches, finite-limit conformance, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
+| HVAC, node, plant | no-OA/no-limit and numeric capacity-limit IdealLoads sensible conformance for declared thermostat, IdealLoads rate, and supply-node temperature/flow variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, zero-failure IdealLoads finite flow and flow-and-capacity diagnostic lanes with return-node proof rows, no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification/humidification humidity-control diagnostics, IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, economizer-active-time, inactive heat-recovery, and heat-recovery active-time/rate diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active DCV/humidity-control/saturation-limit branches, finite flow-rate and flow-and-capacity conformance, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
 model intake, additional weather variables, local fixture geometry/internal
@@ -116,10 +118,14 @@ The current public scope includes:
   humidity, predictor/corrector proof rows, outdoor-air, adaptive system
   timestep, sizing, non-constant efficiency schedules, and broad HVAC
   compatibility kept outside the claim
-- diagnostic-only IdealLoads finite flow/capacity evidence for the no-OA
-  sensible branch, including return-node temperature/humidity proof rows and
-  zero tolerance failures across the three declared finite-limit fixtures, with
-  finite-limit conformance kept outside the claim
+- limited IdealLoads no-OA numeric capacity-limit conformance for declared
+  thermostat setpoints, IdealLoads total/sensible/supply-air rates, and
+  supply-node temperature/mass-flow Detailed series, with return-node and
+  humidity rows kept diagnostic-only
+- diagnostic-only IdealLoads finite flow and flow-and-capacity evidence for
+  the no-OA sensible branch, including return-node temperature/humidity proof
+  rows and zero tolerance failures across the remaining finite-limit fixtures,
+  with flow-limit and flow-and-capacity conformance kept outside the claim
 - diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
   AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy,
   Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air evidence for

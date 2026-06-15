@@ -79,6 +79,8 @@ matplotlib for document layout and charts.
 | `compare-internal-gains-smoke` | compare | compare nominal OtherEquipment EIO rows | no | console output |
 | `compare-internal-convective-gain-smoke` | compare | compare internal convective gain ESO trace | no | `.runtime/compare-internal-gains` |
 | `compare-internal-convective-gain-conformance` | compare | run the v0.26 tolerance-gated internal convective gain conformance case | yes | `.runtime/internal-gains-conformance` |
+| `compare-ideal-loads-no-oa-sensible-conformance` | conformance | run the no-OA/no-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-no-oa-sensible` |
+| `compare-ideal-loads-capacity-limit-conformance` | conformance | run the no-OA numeric capacity-limit IdealLoads sensible conformance case | yes | `.runtime/ideal-loads-capacity-limit-conformance` |
 | `compare-ideal-loads-constant-shr-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSensibleHeatRatio humidity-control case | no | `.runtime/ideal-loads-constant-shr` |
 | `compare-ideal-loads-constant-supply-humidity-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio humidity-control case | no | `.runtime/ideal-loads-constant-supply-humidity` |
 | `compare-ideal-loads-constant-supply-humidity-heating-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio heating case | no | `.runtime/ideal-loads-constant-supply-humidity-heating` |
