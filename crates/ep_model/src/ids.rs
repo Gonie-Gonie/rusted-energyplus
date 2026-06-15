@@ -19,6 +19,7 @@ typed_id!(RunPeriodId);
 typed_id!(ThermostatSetpointId);
 typed_id!(ZoneThermostatId);
 typed_id!(IdealLoadsAirSystemId);
+typed_id!(DesignSpecificationOutdoorAirId);
 typed_id!(ZoneEquipmentListId);
 typed_id!(ZoneEquipmentConnectionId);
 typed_id!(NodeId);

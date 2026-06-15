@@ -551,6 +551,52 @@ pub enum HeatRecoveryType {
     Enthalpy,
 }
 
+/// `DesignSpecification:OutdoorAir` method.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DesignSpecificationOutdoorAirMethod {
+    /// Outdoor air flow per person.
+    FlowPerPerson,
+    /// Outdoor air flow per zone floor area.
+    FlowPerArea,
+    /// Outdoor air flow per zone.
+    FlowPerZone,
+    /// Outdoor air changes per hour.
+    AirChangesPerHour,
+    /// Sum applicable outdoor air terms.
+    Sum,
+    /// Maximum applicable outdoor air term.
+    Maximum,
+    /// Indoor air quality procedure.
+    IndoorAirQualityProcedure,
+    /// Proportional control based on design occupancy.
+    ProportionalControlBasedOnDesignOccupancy,
+    /// Proportional control based on occupancy schedule.
+    ProportionalControlBasedOnOccupancySchedule,
+}
+
+/// Typed `DesignSpecification:OutdoorAir` inputs.
+#[derive(Clone, Debug, PartialEq)]
+pub struct DesignSpecificationOutdoorAir {
+    /// Typed ID.
+    pub id: crate::DesignSpecificationOutdoorAirId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Outdoor air method.
+    pub method: DesignSpecificationOutdoorAirMethod,
+    /// Outdoor air flow per person in m3/s-person.
+    pub outdoor_air_flow_per_person_m3_per_s_person: f64,
+    /// Outdoor air flow per zone floor area in m3/s-m2.
+    pub outdoor_air_flow_per_zone_floor_area_m3_per_s_m2: f64,
+    /// Outdoor air flow per zone in m3/s.
+    pub outdoor_air_flow_per_zone_m3_per_s: f64,
+    /// Outdoor air changes per hour.
+    pub outdoor_air_flow_air_changes_per_hour: f64,
+    /// Optional outdoor air schedule.
+    pub outdoor_air_schedule: Option<ScheduleId>,
+    /// Optional proportional control minimum outdoor air flow rate schedule.
+    pub proportional_control_minimum_outdoor_air_flow_rate_schedule: Option<ScheduleId>,
+}
+
 /// Ideal loads purchased energy fuel type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IdealLoadsFuelType {

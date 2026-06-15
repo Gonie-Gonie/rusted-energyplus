@@ -96,11 +96,11 @@ Assert-FileExists -Path ".runtime\release-evidence\v0.28.0\support-coverage-repo
 Assert-FileExists -Path ".runtime\release-evidence\v0.28.0\support-coverage-report.json" -Description "support coverage JSON"
 
 $coverage = Get-Content -LiteralPath ".runtime\release-evidence\v0.28.0\support-coverage-report.json" -Raw | ConvertFrom-Json
-if ($coverage.aggregate.input_object_count -ne 20) {
-    throw "Expected 20 tracked input objects, found $($coverage.aggregate.input_object_count)"
+if ($coverage.aggregate.input_object_count -ne 21) {
+    throw "Expected 21 tracked input objects, found $($coverage.aggregate.input_object_count)"
 }
-if ($coverage.aggregate.input_objects_with_first_evidence_count -ne 20) {
-    throw "Expected first evidence for all 20 input objects, found $($coverage.aggregate.input_objects_with_first_evidence_count)"
+if ($coverage.aggregate.input_objects_with_first_evidence_count -ne 21) {
+    throw "Expected first evidence for all 21 input objects, found $($coverage.aggregate.input_objects_with_first_evidence_count)"
 }
 if (@($coverage.input_objects | Where-Object { [string]::IsNullOrWhiteSpace($_.support_boundary) }).Count -ne 0) {
     throw "Every input object must have a support_boundary"

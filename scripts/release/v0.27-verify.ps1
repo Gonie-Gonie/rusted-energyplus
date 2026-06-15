@@ -96,8 +96,8 @@ Assert-FileExists -Path ".runtime\release-evidence\v0.27.0\support-coverage-repo
 Assert-FileExists -Path ".runtime\release-evidence\v0.27.0\support-coverage-report.json" -Description "support coverage JSON"
 
 $coverage = Get-Content -LiteralPath ".runtime\release-evidence\v0.27.0\support-coverage-report.json" -Raw | ConvertFrom-Json
-if ($coverage.aggregate.input_object_count -ne 20) {
-    throw "Expected 20 tracked input objects, found $($coverage.aggregate.input_object_count)"
+if ($coverage.aggregate.input_object_count -ne 21) {
+    throw "Expected 21 tracked input objects, found $($coverage.aggregate.input_object_count)"
 }
 if ($coverage.aggregate.tracked_output_variable_count -ne 45) {
     throw "Expected 45 tracked output variables, found $($coverage.aggregate.tracked_output_variable_count)"

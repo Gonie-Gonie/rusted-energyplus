@@ -12213,6 +12213,7 @@ fn seed_coverage_status(object_type: &str) -> &'static str {
         "ThermostatSetpoint:DualSetpoint",
         "ZoneControl:Thermostat",
         "NodeList",
+        "DesignSpecification:OutdoorAir",
         "ZoneHVAC:EquipmentConnections",
         "ZoneHVAC:EquipmentList",
         "ZoneHVAC:IdealLoadsAirSystem",
@@ -14585,6 +14586,10 @@ mod tests {
         assert_eq!(super::seed_coverage_status("Output:Variable"), "untracked");
         assert_eq!(
             super::seed_coverage_status("ZoneHVAC:IdealLoadsAirSystem"),
+            "tracked"
+        );
+        assert_eq!(
+            super::seed_coverage_status("DesignSpecification:OutdoorAir"),
             "tracked"
         );
     }

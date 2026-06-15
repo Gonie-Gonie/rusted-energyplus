@@ -116,8 +116,8 @@ if (@($manifest.assets | Where-Object { $_.role -eq "binary-package" -and $_.sha
 if (@($manifest.assets | Where-Object { $_.role -eq "support-coverage-pdf" -and $_.exists }).Count -ne 1) {
     throw "Expected support coverage PDF in release manifest"
 }
-if ($manifest.report_summaries.support_coverage.input_objects -ne 20) {
-    throw "Expected 20 input objects in support coverage summary, found $($manifest.report_summaries.support_coverage.input_objects)"
+if ($manifest.report_summaries.support_coverage.input_objects -ne 21) {
+    throw "Expected 21 input objects in support coverage summary, found $($manifest.report_summaries.support_coverage.input_objects)"
 }
 if ($manifest.report_summaries.support_coverage.output_variables -ne 45) {
     throw "Expected 45 output variables in support coverage summary, found $($manifest.report_summaries.support_coverage.output_variables)"

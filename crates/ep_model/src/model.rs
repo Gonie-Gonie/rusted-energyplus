@@ -2,14 +2,15 @@
 
 use crate::{
     BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, ComponentId, ConnectorId,
-    ConnectorListId, Construction, ConstructionId, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    InternalGainId, LoopId, Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, OtherEquipment, PlantBranch, PlantBranchList, PlantConnector,
-    PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId,
-    ScheduleCompact, ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, Version, Zone, ZoneEquipmentConnection,
-    ZoneEquipmentList, ZoneEquipmentListId, ZoneId, ZoneThermostat, ZoneThermostatId,
+    ConnectorListId, Construction, ConstructionId, DesignSpecificationOutdoorAir,
+    DesignSpecificationOutdoorAirId, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId,
+    LoopId, Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName,
+    OtherEquipment, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind,
+    PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact,
+    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, Surface,
+    SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
+    ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -63,6 +64,10 @@ pub struct TypedModel {
     pub ideal_loads_air_systems: Vec<IdealLoadsAirSystem>,
     /// IdealLoads air system names.
     pub ideal_loads_air_system_names: NameMap<IdealLoadsAirSystemId>,
+    /// DesignSpecification:OutdoorAir objects.
+    pub design_specification_outdoor_air: Vec<DesignSpecificationOutdoorAir>,
+    /// DesignSpecification:OutdoorAir names.
+    pub design_specification_outdoor_air_names: NameMap<DesignSpecificationOutdoorAirId>,
     /// Zone equipment lists.
     pub zone_equipment_lists: Vec<ZoneEquipmentList>,
     /// Zone equipment list names.
@@ -146,6 +151,8 @@ impl Default for TypedModel {
             zone_thermostat_names: NameMap::default(),
             ideal_loads_air_systems: Vec::new(),
             ideal_loads_air_system_names: NameMap::default(),
+            design_specification_outdoor_air: Vec::new(),
+            design_specification_outdoor_air_names: NameMap::default(),
             zone_equipment_lists: Vec::new(),
             zone_equipment_list_names: NameMap::default(),
             zone_equipment_connections: Vec::new(),
@@ -196,6 +203,7 @@ impl TypedModel {
             + self.thermostat_dual_setpoints.len()
             + self.zone_thermostats.len()
             + self.ideal_loads_air_systems.len()
+            + self.design_specification_outdoor_air.len()
             + self.zone_equipment_lists.len()
             + self.zone_equipment_connections.len()
             + self.node_lists.len()
@@ -247,6 +255,8 @@ pub struct ModelGraph {
     pub node_list_members: Vec<NodeListMemberEdge>,
     /// IdealLoads supply-node edges.
     pub ideal_loads_supply_nodes: Vec<IdealLoadsSupplyNodeEdge>,
+    /// IdealLoads outdoor-air design specification edges.
+    pub ideal_loads_outdoor_air_specs: Vec<IdealLoadsOutdoorAirSpecEdge>,
     /// Zone air-node edges.
     pub zone_air_nodes: Vec<ZoneAirNodeEdge>,
     /// Plant loop to branch-list edges.
@@ -334,6 +344,24 @@ impl ModelGraph {
                             ideal_loads_air_system: system.id,
                             node,
                         })
+                })
+                .collect(),
+            ideal_loads_outdoor_air_specs: model
+                .ideal_loads_air_systems
+                .iter()
+                .filter_map(|system| {
+                    let spec_name = system
+                        .design_specification_outdoor_air_object_name
+                        .as_ref()?;
+                    model
+                        .design_specification_outdoor_air_names
+                        .resolve(&spec_name.0)
+                        .map(
+                            |design_specification_outdoor_air| IdealLoadsOutdoorAirSpecEdge {
+                                ideal_loads_air_system: system.id,
+                                design_specification_outdoor_air,
+                            },
+                        )
                 })
                 .collect(),
             zone_air_nodes: model
@@ -484,6 +512,15 @@ pub struct IdealLoadsSupplyNodeEdge {
     pub ideal_loads_air_system: IdealLoadsAirSystemId,
     /// Resolved supply node ID.
     pub node: NodeId,
+}
+
+/// IdealLoads outdoor-air design specification relation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IdealLoadsOutdoorAirSpecEdge {
+    /// IdealLoads system ID.
+    pub ideal_loads_air_system: IdealLoadsAirSystemId,
+    /// Resolved DesignSpecification:OutdoorAir ID.
+    pub design_specification_outdoor_air: DesignSpecificationOutdoorAirId,
 }
 
 /// Zone air-node relation.

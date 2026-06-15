@@ -104,6 +104,13 @@ first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
 support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence for declared output variables only; outdoor air, humidity, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
 
 [[object]]
+name = "DesignSpecification:OutdoorAir"
+family = "hvac"
+status = "typed_graph_only"
+first_evidence = "ideal-loads-outdoor-air-typed-intake-test"
+support_boundary = "Typed for IdealLoads outdoor-air reference and schedule preservation only; no outdoor-air flow, DCV, economizer, heat recovery, or numerical OA conformance claim."
+
+[[object]]
 name = "NodeList"
 family = "hvac"
 status = "typed_graph_only"

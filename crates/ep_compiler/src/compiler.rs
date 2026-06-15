@@ -3,7 +3,8 @@
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    DehumidificationControlType, DemandControlledVentilationType,
+    DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
+    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
     FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
     IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
     InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
@@ -207,6 +208,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ThermostatSetpoint:DualSetpoint",
     "ZoneControl:Thermostat",
     "NodeList",
+    "DesignSpecification:OutdoorAir",
     "ZoneHVAC:IdealLoadsAirSystem",
     "ZoneHVAC:EquipmentList",
     "ZoneHVAC:EquipmentConnections",
@@ -258,6 +260,7 @@ impl<'a> Compiler<'a> {
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_node_lists(&mut model);
+        self.parse_design_specification_outdoor_air(&mut model);
         self.parse_ideal_loads_air_systems(&mut model);
         self.parse_zone_equipment_lists(&mut model);
         self.parse_zone_equipment_connections(&mut model);
@@ -973,6 +976,89 @@ impl<'a> Compiler<'a> {
                 name: NormalizedName::new(&name),
                 nodes,
             });
+        }
+    }
+
+    fn parse_design_specification_outdoor_air(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("DesignSpecification:OutdoorAir") {
+            let Some(id_value) = self.checked_id(
+                "DesignSpecification:OutdoorAir",
+                &name,
+                model.design_specification_outdoor_air.len(),
+            ) else {
+                continue;
+            };
+            let id = DesignSpecificationOutdoorAirId(id_value);
+            if model
+                .design_specification_outdoor_air_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name("DesignSpecification:OutdoorAir", &name);
+                continue;
+            }
+
+            model
+                .design_specification_outdoor_air
+                .push(DesignSpecificationOutdoorAir {
+                    id,
+                    name: NormalizedName::new(&name),
+                    method: self.enum_default(
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        (&object, "outdoor_air_method"),
+                        DesignSpecificationOutdoorAirMethod::FlowPerPerson,
+                        "Flow/Person",
+                        parse_design_specification_outdoor_air_method,
+                    ),
+                    outdoor_air_flow_per_person_m3_per_s_person: self.number_range_default(
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        &object,
+                        "outdoor_air_flow_per_person",
+                        0.00944,
+                        0.0..=f64::INFINITY,
+                    ),
+                    outdoor_air_flow_per_zone_floor_area_m3_per_s_m2: self.number_range_default(
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        &object,
+                        "outdoor_air_flow_per_zone_floor_area",
+                        0.0,
+                        0.0..=f64::INFINITY,
+                    ),
+                    outdoor_air_flow_per_zone_m3_per_s: self.number_range_default(
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        &object,
+                        "outdoor_air_flow_per_zone",
+                        0.0,
+                        0.0..=f64::INFINITY,
+                    ),
+                    outdoor_air_flow_air_changes_per_hour: self.number_range_default(
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        &object,
+                        "outdoor_air_flow_air_changes_per_hour",
+                        0.0,
+                        0.0..=f64::INFINITY,
+                    ),
+                    outdoor_air_schedule: self.optional_schedule_reference(
+                        model,
+                        "DesignSpecification:OutdoorAir",
+                        &name,
+                        &object,
+                        "outdoor_air_schedule_name",
+                    ),
+                    proportional_control_minimum_outdoor_air_flow_rate_schedule: self
+                        .optional_schedule_reference(
+                            model,
+                            "DesignSpecification:OutdoorAir",
+                            &name,
+                            &object,
+                            "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+                        ),
+                });
         }
     }
 
@@ -3755,6 +3841,41 @@ fn parse_demand_controlled_ventilation_type(
     }
 }
 
+fn parse_design_specification_outdoor_air_method(
+    value: &str,
+) -> Option<DesignSpecificationOutdoorAirMethod> {
+    match value {
+        value if value.eq_ignore_ascii_case("Flow/Person") => {
+            Some(DesignSpecificationOutdoorAirMethod::FlowPerPerson)
+        }
+        value if value.eq_ignore_ascii_case("Flow/Area") => {
+            Some(DesignSpecificationOutdoorAirMethod::FlowPerArea)
+        }
+        value if value.eq_ignore_ascii_case("Flow/Zone") => {
+            Some(DesignSpecificationOutdoorAirMethod::FlowPerZone)
+        }
+        value if value.eq_ignore_ascii_case("AirChanges/Hour") => {
+            Some(DesignSpecificationOutdoorAirMethod::AirChangesPerHour)
+        }
+        value if value.eq_ignore_ascii_case("Sum") => {
+            Some(DesignSpecificationOutdoorAirMethod::Sum)
+        }
+        value if value.eq_ignore_ascii_case("Maximum") => {
+            Some(DesignSpecificationOutdoorAirMethod::Maximum)
+        }
+        value if value.eq_ignore_ascii_case("IndoorAirQualityProcedure") => {
+            Some(DesignSpecificationOutdoorAirMethod::IndoorAirQualityProcedure)
+        }
+        value if value.eq_ignore_ascii_case("ProportionalControlBasedOnDesignOccupancy") => {
+            Some(DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnDesignOccupancy)
+        }
+        value if value.eq_ignore_ascii_case("ProportionalControlBasedOnOccupancySchedule") => {
+            Some(DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnOccupancySchedule)
+        }
+        _ => None,
+    }
+}
+
 fn parse_outdoor_air_economizer_type(value: &str) -> Option<OutdoorAirEconomizerType> {
     match value {
         value if value.eq_ignore_ascii_case("NoEconomizer") => {
@@ -3930,10 +4051,10 @@ mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_model::{
         AutosizeOrNumber, DayOfWeek, DehumidificationControlType,
-        FirstHourInterpolationStartingValues, HumidificationControlType, IdealLoadsLimit,
-        InsideSurfaceConvectionAlgorithm, LoadDistributionScheme, MaterialSurfaceRoughness,
-        ModelGraph, OutdoorAirEconomizerType, OutsideSurfaceConvectionAlgorithm,
-        PlantConnectorKind,
+        DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
+        HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
+        LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph, OutdoorAirEconomizerType,
+        OutsideSurfaceConvectionAlgorithm, PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -4249,7 +4370,9 @@ mod tests {
                 "Schedule:Constant": {
                     "Control Type": {"hourly_value": 4},
                     "Heating Setpoint": {"hourly_value": 21},
-                    "Cooling Setpoint": {"hourly_value": 24}
+                    "Cooling Setpoint": {"hourly_value": 24},
+                    "OA Fraction": {"hourly_value": 0.5},
+                    "OA Minimum": {"hourly_value": 0.2}
                 },
                 "Zone": {"Zone One": {}},
                 "ThermostatSetpoint:DualSetpoint": {
@@ -4274,6 +4397,17 @@ mod tests {
                         ]
                     }
                 },
+                "DesignSpecification:OutdoorAir": {
+                    "Outdoor Air Spec": {
+                        "outdoor_air_method": "Sum",
+                        "outdoor_air_flow_per_person": 0.004,
+                        "outdoor_air_flow_per_zone_floor_area": 0.0003,
+                        "outdoor_air_flow_per_zone": 0.02,
+                        "outdoor_air_flow_air_changes_per_hour": 0.5,
+                        "outdoor_air_schedule_name": "OA Fraction",
+                        "proportional_control_minimum_outdoor_air_flow_rate_schedule_name": "OA Minimum"
+                    }
+                },
                 "ZoneHVAC:IdealLoadsAirSystem": {
                     "Zone Ideal Loads": {
                         "zone_supply_air_node_name": "Zone Inlets",
@@ -4288,6 +4422,7 @@ mod tests {
                         "maximum_total_cooling_capacity": "Autosize",
                         "dehumidification_control_type": "ConstantSupplyHumidityRatio",
                         "humidification_control_type": "ConstantSupplyHumidityRatio",
+                        "design_specification_outdoor_air_object_name": "Outdoor Air Spec",
                         "outdoor_air_economizer_type": "NoEconomizer"
                     }
                 },
@@ -4324,6 +4459,7 @@ mod tests {
         };
         assert_eq!(model.thermostat_dual_setpoints.len(), 1);
         assert_eq!(model.zone_thermostats.len(), 1);
+        assert_eq!(model.design_specification_outdoor_air.len(), 1);
         assert_eq!(model.ideal_loads_air_systems.len(), 1);
         assert_eq!(model.zone_equipment_lists.len(), 1);
         assert_eq!(model.zone_equipment_connections.len(), 1);
@@ -4361,6 +4497,24 @@ mod tests {
             OutdoorAirEconomizerType::NoEconomizer
         );
         assert_eq!(
+            model.design_specification_outdoor_air[0].method,
+            DesignSpecificationOutdoorAirMethod::Sum
+        );
+        assert_eq!(
+            model.design_specification_outdoor_air[0]
+                .outdoor_air_flow_per_zone_floor_area_m3_per_s_m2,
+            0.0003
+        );
+        assert_eq!(
+            model.design_specification_outdoor_air[0].outdoor_air_schedule,
+            model.schedule_names.resolve("OA Fraction")
+        );
+        assert_eq!(
+            model.design_specification_outdoor_air[0]
+                .proportional_control_minimum_outdoor_air_flow_rate_schedule,
+            model.schedule_names.resolve("OA Minimum")
+        );
+        assert_eq!(
             model.zone_equipment_lists[0].load_distribution_scheme,
             LoadDistributionScheme::SequentialLoad
         );
@@ -4371,7 +4525,16 @@ mod tests {
         assert_eq!(graph.zone_ideal_loads.len(), 1);
         assert_eq!(graph.node_list_members.len(), 1);
         assert_eq!(graph.ideal_loads_supply_nodes.len(), 1);
+        assert_eq!(graph.ideal_loads_outdoor_air_specs.len(), 1);
         assert_eq!(graph.zone_air_nodes.len(), 1);
+        assert_eq!(
+            graph.ideal_loads_outdoor_air_specs[0].ideal_loads_air_system,
+            model.ideal_loads_air_systems[0].id
+        );
+        assert_eq!(
+            graph.ideal_loads_outdoor_air_specs[0].design_specification_outdoor_air,
+            model.design_specification_outdoor_air[0].id
+        );
         assert_eq!(graph.zone_ideal_loads[0].cooling_sequence, 1);
         assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
 
