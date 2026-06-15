@@ -39,7 +39,7 @@ Milestones are maintained in `specs/milestones.toml`.
 | 0.30 | Algorithm Coverage Metadata | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 | 0.31 | Release Evidence Asset Manifest | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
 | 0.32 | User Coverage Handbook | complete | reporting-infrastructure |  | new numerical conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant numerical conformance, meter conformance |
-| 0.33 | Official Dynamic Heat-Balance Diagnostic | in_progress | diagnostic-only | official_1zone_uncontrolled_dynamic_diagnostic_001 | official ExampleFiles dynamic numerical conformance, warmup parity, surface CTF/conduction parity, solar and exterior convection parity, full EnergyPlus compatibility |
+| 0.33 | Official Dynamic Heat-Balance Diagnostic | in_progress | diagnostic-only | official_1zone_uncontrolled_dynamic_diagnostic_001, official_1zone_uncontrolled_dynamic_conformance_candidate_001 | official ExampleFiles dynamic numerical conformance, warmup parity, surface CTF/conduction parity, solar and exterior convection parity, full EnergyPlus compatibility |
 
 ## Long-Term Targets
 

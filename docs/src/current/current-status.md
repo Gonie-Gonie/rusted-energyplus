@@ -30,7 +30,7 @@ variables:
 
 | Area | Current conformance | Diagnostic or baseline evidence | Not claimed |
 |---|---|---|---|
-| Numerical time series | 5 promoted cases, 12 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` keeps oracle series and `official_1zone_uncontrolled_dynamic_diagnostic_001` reports run-period-filtered Rust deltas with Rust/oracle warmup day metadata | broad ExampleFiles dynamic conformance |
+| Numerical time series | 5 promoted cases, 12 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` pins the promotion variable set in a separate compatibility-candidate lane | broad ExampleFiles dynamic conformance |
 | Static model | official `1ZoneUncontrolled` EIO surface geometry, Construction CTF, Material CTF Summary, and OtherEquipment nominal fields | generated support/index/release evidence PDFs | dynamic behavior from the static EIO case |
 | Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, and no-mass adiabatic conduction series | official `1ZoneUncontrolled` zone, roof/wall/floor surface decomposition, surface/zone conduction, and zone air heat-balance hourly oracle baselines plus failing warmup-aware diagnostic/probe deltas | CTF transient conduction, EnergyPlus warmup convergence parity, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
@@ -48,8 +48,10 @@ The active dynamic expansion target is tracked by
 12 IDF-backed case manifests through v0.26 are in scope, 5 have dynamic
 conformance-gated evidence, and 4 are active dynamic gaps after static fixtures
 and static-only evidence are separated out. There is 1 EnergyPlus ExampleFile
-dynamic candidate through v0.26, `1ZoneUncontrolled.idf`, and it is not gated
-yet; the blocking path remains the official dynamic 1Zone heat-balance tracker.
+dynamic candidate through v0.26, `1ZoneUncontrolled.idf`, and it is now split
+into a diagnostic probe tracker plus a non-blocking compatibility-candidate
+lane; the blocking path remains the official dynamic 1Zone heat-balance
+promotion gate.
 
 Current static model conformance is limited to:
 
@@ -96,12 +98,14 @@ The current public scope includes:
   `internal_gains_001` hourly ESO series
 - official dynamic heat-balance diagnostic reports that run a Rust
   first-run-period-day warmup loop, filter oracle ESO values to run-period
-  samples, compare 30 roof/wall/floor face-temperature, conduction
-  decomposition, and zone air heat-balance series, rank bottleneck series by
-  RMSE, and record EnergyPlus EIO run-period warmup day counts, the current
-  CTF seed policy, surface iteration count, and explicit all-CTF, warmup,
-  surface-iteration, analytical zone-air, analytical surface-first, analytical
-  coupled surface rebalance, and third-order probe metadata without claiming
+  samples, compare roof/wall/floor face-temperature, conduction decomposition,
+  floor storage blocker traces, and zone air heat-balance series, rank
+  bottleneck series by RMSE, record EnergyPlus EIO run-period warmup day
+  counts, the current CTF seed policy, surface iteration count, selected
+  algorithm lane, promotion eligibility, and an active blocker/next-target
+  summary, and keep explicit all-CTF, warmup, surface-iteration, analytical
+  zone-air, analytical surface-first, analytical coupled surface rebalance,
+  third-order probe, and compatibility-candidate metadata without claiming
   parity
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests

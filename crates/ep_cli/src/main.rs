@@ -782,6 +782,14 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
             println!(
+                "  zone_air_algorithm_lane: {}",
+                summary.zone_air_algorithm_lane
+            );
+            println!(
+                "  conformance_promotion_allowed: {}",
+                summary.conformance_promotion_allowed
+            );
+            println!(
                 "  surface_iteration_count: {}",
                 summary.surface_iteration_count
             );
@@ -874,6 +882,14 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             print_heat_balance_warmup("  ", &summary.heat_balance_warmup);
             println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  zone_air_algorithm: {}", summary.zone_air_algorithm);
+            println!(
+                "  zone_air_algorithm_lane: {}",
+                summary.zone_air_algorithm_lane
+            );
+            println!(
+                "  conformance_promotion_allowed: {}",
+                summary.conformance_promotion_allowed
+            );
             println!(
                 "  surface_iteration_count: {}",
                 summary.surface_iteration_count
@@ -1106,6 +1122,8 @@ struct HeatBalanceReportSummary {
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     tolerance_policy: String,
     zone_air_algorithm: &'static str,
+    zone_air_algorithm_lane: &'static str,
+    conformance_promotion_allowed: bool,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
@@ -1186,6 +1204,12 @@ fn generate_conformance_heat_balance_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
+        zone_air_algorithm_lane: heat_balance_zone_air_algorithm_lane_label(
+            diagnostic.zone_air_algorithm,
+        ),
+        conformance_promotion_allowed: heat_balance_zone_air_algorithm_promotion_allowed(
+            diagnostic.zone_air_algorithm,
+        ),
         surface_iteration_count: diagnostic.surface_iteration_count,
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
@@ -1236,6 +1260,12 @@ fn generate_conformance_heat_balance_diagnostic_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
+        zone_air_algorithm_lane: heat_balance_zone_air_algorithm_lane_label(
+            diagnostic.zone_air_algorithm,
+        ),
+        conformance_promotion_allowed: heat_balance_zone_air_algorithm_promotion_allowed(
+            diagnostic.zone_air_algorithm,
+        ),
         surface_iteration_count: diagnostic.surface_iteration_count,
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
@@ -3885,6 +3915,15 @@ fn evaluate_heat_balance_conformance<'a>(
     context: &'a HeatBalanceConformanceContext,
 ) -> HeatBalanceConformance<'a> {
     let mut failure_reasons = Vec::new();
+    if context.case_id == "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+        && !heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+    {
+        failure_reasons.push(format!(
+            "official dynamic conformance candidate requires compatibility-candidate lane, got {} ({})",
+            diagnostic.zone_air_algorithm,
+            heat_balance_zone_air_algorithm_lane_label(diagnostic.zone_air_algorithm)
+        ));
+    }
     if diagnostic.status != "extracted" {
         failure_reasons.push(format!(
             "diagnostic extraction status was {}",
@@ -6529,6 +6568,9 @@ fn parse_heat_balance_zone_air_algorithm(
 ) -> Result<HeatBalanceZoneAirAlgorithm, String> {
     match value.trim().to_ascii_lowercase().as_str() {
         "" | "simplified-analytical" => Ok(HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical),
+        "energyplus-heat-balance-compat-candidate" => {
+            Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate)
+        }
         "energyplus-analytical-probe" => Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe),
         "energyplus-analytical-surface-first-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe)
@@ -6648,7 +6690,7 @@ fn parse_heat_balance_zone_air_algorithm(
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe)
         }
         other => Err(format!(
-            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, energyplus-analytical-coupled-probe, energyplus-analytical-coupled-previous-inside-probe, energyplus-analytical-coupled-previous-inside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-adiabatic-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-previous-mat-surface-convection-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-frozen-outside-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-commit-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-reference-air-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-hconv-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-surface-reference-air-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-final-hconv-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-inside-ctf-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-adiabatic-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-adiabatic-history-commit-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-current-adiabatic-history-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-boundary-probe, or energyplus-third-order-probe"
+            "unsupported {HEAT_BALANCE_ZONE_AIR_ALGORITHM_ENV}: {other}; expected simplified-analytical, energyplus-heat-balance-compat-candidate, energyplus-analytical-probe, energyplus-analytical-surface-first-probe, energyplus-analytical-coupled-probe, energyplus-analytical-coupled-previous-inside-probe, energyplus-analytical-coupled-previous-inside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-adiabatic-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-previous-mat-surface-convection-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-frozen-outside-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-commit-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-reference-air-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-hconv-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-surface-reference-air-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-final-hconv-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-inside-ctf-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-adiabatic-report-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-adiabatic-history-commit-probe, energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-current-adiabatic-history-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe, energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe, energyplus-analytical-coupled-previous-boundary-probe, or energyplus-third-order-probe"
         )),
     }
 }
@@ -6870,6 +6912,9 @@ fn heat_balance_zone_air_algorithm_label(
 ) -> &'static str {
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => "simplified-analytical",
+        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate => {
+            "energyplus-heat-balance-compat-candidate"
+        }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => "energyplus-analytical-probe",
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
             "energyplus-analytical-surface-first-probe"
@@ -6987,6 +7032,22 @@ fn heat_balance_zone_air_algorithm_label(
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => "energyplus-third-order-probe",
     }
+}
+
+fn heat_balance_zone_air_algorithm_lane_label(zone_air_algorithm: &str) -> &'static str {
+    if zone_air_algorithm == "energyplus-heat-balance-compat-candidate" {
+        "compatibility-candidate"
+    } else if zone_air_algorithm == "simplified-analytical" {
+        "diagnostic-only"
+    } else if zone_air_algorithm.ends_with("-probe") {
+        "diagnostic-probe"
+    } else {
+        "unknown"
+    }
+}
+
+fn heat_balance_zone_air_algorithm_promotion_allowed(zone_air_algorithm: &str) -> bool {
+    heat_balance_zone_air_algorithm_lane_label(zone_air_algorithm) == "compatibility-candidate"
 }
 
 fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
@@ -8452,6 +8513,16 @@ fn render_heat_balance_conformance_json(
         json_string(diagnostic.zone_air_algorithm)
     ));
     json.push_str(&format!(
+        "  \"zone_air_algorithm_lane\": {},\n",
+        json_string(heat_balance_zone_air_algorithm_lane_label(
+            diagnostic.zone_air_algorithm
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"conformance_promotion_allowed\": {},\n",
+        heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+    ));
+    json.push_str(&format!(
         "  \"surface_iteration_count\": {},\n",
         diagnostic.surface_iteration_count
     ));
@@ -8503,6 +8574,14 @@ fn render_heat_balance_conformance_json(
     json.push_str(&format!(
         "  \"bottlenecks\": {},\n",
         heat_balance_bottlenecks_json(&diagnostic.series)
+    ));
+    json.push_str(&format!(
+        "  \"active_blocker_summary\": {},\n",
+        json_string(&heat_balance_active_blocker_summary(diagnostic))
+    ));
+    json.push_str(&format!(
+        "  \"next_pr_target\": {},\n",
+        json_string(&heat_balance_next_pr_target(diagnostic))
     ));
     json.push_str(&format!(
         "  \"max_sample_contexts\": {},\n",
@@ -8736,6 +8815,14 @@ fn render_heat_balance_conformance_report(
         diagnostic.zone_air_algorithm
     ));
     report.push_str(&format!(
+        "zone_air_algorithm_lane: {}\n",
+        heat_balance_zone_air_algorithm_lane_label(diagnostic.zone_air_algorithm)
+    ));
+    report.push_str(&format!(
+        "conformance_promotion_allowed: {}\n",
+        heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+    ));
+    report.push_str(&format!(
         "surface_iteration_count: {}\n",
         diagnostic.surface_iteration_count
     ));
@@ -8772,6 +8859,16 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!(
         "max_rel_delta: {:.12}\n\n",
         heat_balance_max_rel_delta(diagnostic)
+    ));
+
+    report.push_str("## Active Blocker Summary\n\n");
+    report.push_str(&format!(
+        "active_blocker: {}\n",
+        heat_balance_active_blocker_summary(diagnostic)
+    ));
+    report.push_str(&format!(
+        "next_pr_target: {}\n\n",
+        heat_balance_next_pr_target(diagnostic)
     ));
 
     report.push_str("## EnergyPlus Compatibility Stage Order\n\n");
@@ -9152,6 +9249,74 @@ fn heat_balance_bottleneck_rows(
     });
     rows.truncate(HEAT_BALANCE_BOTTLENECK_LIMIT);
     rows
+}
+
+fn heat_balance_active_blocker_summary(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
+    if let Some(row) = diagnostic.ctf_storage_max_sample_deltas.first() {
+        return format!(
+            "{}/{} sample={} dominant={} dominant_delta_w={:.12} storage_delta_w={:.12}",
+            row.key,
+            row.construction_name,
+            row.sample_index,
+            row.dominant_mismatch_source,
+            row.dominant_mismatch_delta_w,
+            row.storage_delta_w
+        );
+    }
+
+    if let Some(row) = heat_balance_bottleneck_rows(&diagnostic.series).first() {
+        return format!(
+            "{}/{} rmse={:.12} max_abs={:.12}",
+            row.output.key, row.output.variable, row.delta.rmse_delta_c, row.delta.max_abs_delta_c
+        );
+    }
+
+    "none".to_string()
+}
+
+fn heat_balance_next_pr_target(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
+    if let Some(row) = diagnostic.ctf_storage_max_sample_deltas.first() {
+        return match row.dominant_mismatch_source.as_str() {
+            "face-temperature-current-inside" => {
+                "floor-inside-current-face-temperature-source-timing".to_string()
+            }
+            "face-temperature-current-outside" => {
+                "floor-outside-current-face-temperature-source-timing".to_string()
+            }
+            "history-vector-inside-total" => "warmup-ctf-inside-history-handoff".to_string(),
+            "outside-current-total" => "outside-current-boundary-source-timing".to_string(),
+            "outside-history-total" => "outside-ctf-history-handoff".to_string(),
+            "output-aggregation-storage-balance" => {
+                "storage-output-aggregation-and-sign-convention".to_string()
+            }
+            other => format!("investigate-{other}"),
+        };
+    }
+
+    if let Some(row) = heat_balance_bottleneck_rows(&diagnostic.series).first() {
+        return format!(
+            "reduce-top-rmse-{}-{}",
+            sanitize_target_slug(&row.output.key),
+            sanitize_target_slug(&row.output.variable)
+        );
+    }
+
+    "none".to_string()
+}
+
+fn sanitize_target_slug(value: &str) -> String {
+    let mut slug = String::new();
+    let mut previous_dash = false;
+    for ch in value.chars() {
+        if ch.is_ascii_alphanumeric() {
+            slug.push(ch.to_ascii_lowercase());
+            previous_dash = false;
+        } else if !previous_dash {
+            slug.push('-');
+            previous_dash = true;
+        }
+    }
+    slug.trim_matches('-').to_string()
 }
 
 fn heat_balance_max_sample_contexts(
@@ -12213,6 +12378,13 @@ mod tests {
             ep_runtime::HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
         );
         assert_eq!(
+            super::parse_heat_balance_zone_air_algorithm(
+                "energyplus-heat-balance-compat-candidate"
+            )
+            .unwrap(),
+            ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+        );
+        assert_eq!(
             super::parse_heat_balance_zone_air_algorithm("energyplus-analytical-probe").unwrap(),
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe
         );
@@ -12485,6 +12657,33 @@ mod tests {
             ep_runtime::HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
         );
         assert!(super::parse_heat_balance_zone_air_algorithm("third-order").is_err());
+    }
+
+    #[test]
+    fn heat_balance_zone_air_algorithm_lane_marks_only_candidate_promotable() {
+        assert_eq!(
+            super::heat_balance_zone_air_algorithm_lane_label(
+                "energyplus-heat-balance-compat-candidate"
+            ),
+            "compatibility-candidate"
+        );
+        assert!(super::heat_balance_zone_air_algorithm_promotion_allowed(
+            "energyplus-heat-balance-compat-candidate"
+        ));
+        assert_eq!(
+            super::heat_balance_zone_air_algorithm_lane_label("simplified-analytical"),
+            "diagnostic-only"
+        );
+        assert!(!super::heat_balance_zone_air_algorithm_promotion_allowed(
+            "simplified-analytical"
+        ));
+        assert_eq!(
+            super::heat_balance_zone_air_algorithm_lane_label("energyplus-analytical-probe"),
+            "diagnostic-probe"
+        );
+        assert!(!super::heat_balance_zone_air_algorithm_promotion_allowed(
+            "energyplus-analytical-probe"
+        ));
     }
 
     #[test]

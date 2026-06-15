@@ -76,6 +76,11 @@ whole-surface and per-area form, and the probe lanes isolate
 mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
 correction order, same-timestep coupled surface/zone-air rebalance, and
 quick outside-conduction boundary solves without creating a conformance claim.
+The separate compatibility-candidate command pins the narrower promotion
+variable set, all-EIO CTF seed, EnergyPlus initial CTF histories, 20-day
+minimum warmup, and 20 surface iterations; it still has `conformance_claim =
+false` and currently exists to keep probe lanes out of future promotion
+evidence.
 Heat-balance diagnostic and conformance report writers also emit a compact
 `compare-digest.json` next to the full `compare-summary.json` and
 `compare-report.md`; active gates read the digest for metadata, bottlenecks, and
@@ -88,6 +93,7 @@ available. The full summary preserves hourly sample rows for deeper inspection:
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
+.\scripts\dev.cmd official-dynamic-heat-balance-compat-candidate
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-warmup-20-probe
 .\scripts\dev.cmd official-dynamic-heat-balance-all-ctf-surface-iter3-probe

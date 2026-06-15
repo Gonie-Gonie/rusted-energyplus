@@ -1,0 +1,351 @@
+id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+title = "Official 1ZoneUncontrolled dynamic heat-balance conformance candidate"
+milestone = "v0.33-official-dynamic-diagnostic"
+purpose = "Pin the official 1ZoneUncontrolled dynamic heat-balance candidate boundary separately from the broad diagnostic probe case."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "Expected status is fail until all required dynamic heat-balance variables pass tolerance in the compatibility-candidate lane.",
+  "This candidate uses only the promotion gate variables plus floor storage blocker tracing, while the existing diagnostic case keeps the broader probe surface.",
+  "Diagnostic probe algorithms are not eligible for promotion on this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
+  "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "energy-plus-examplefile"
+source_file = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = ".runtime/energyplus/26.1.0/ExampleFiles/1ZoneUncontrolled.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[boundary]
+target_case_id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+source_idf = "EnergyPlus v26.1.0 ExampleFiles/1ZoneUncontrolled.idf"
+weather_file = "EnergyPlus v26.1.0 WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+timesteps_per_hour = 4
+reporting_frequency = "hourly"
+warmup_output = "run-period-only-with-diagnostic-trace"
+
+[boundary.run_period]
+name = "Run Period 1"
+begin_month = 1
+begin_day = 1
+end_month = 12
+end_day = 31
+start_day_of_week = "Tuesday"
+
+[boundary.declared_surface_keys]
+roof = ["ZN001:ROOF001"]
+wall = ["ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004"]
+floor = ["ZN001:FLR001"]
+wildcard_comparison = false
+named_key_comparison = true
+top_rmse_sorted = true
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Internal Convective Heat Gain Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Surface Convection Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Air Energy Storage Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Outside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Heat Storage Rate"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.00001
+max_rmse = 0.00001
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[[tolerances]]
+variable_class = "surface-state"
+max_abs = 0.000001
+max_rmse = 0.000001
+
+[report]
+format = "markdown"
+path = ".runtime/official-dynamic-compat-candidate/26.1.0/official_1zone_uncontrolled_dynamic_conformance_candidate_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd official-dynamic-heat-balance-compat-candidate"
+blocking = false

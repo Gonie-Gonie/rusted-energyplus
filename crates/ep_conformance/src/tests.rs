@@ -473,7 +473,7 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
     assert!(boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
     assert!(boundary.declared_surface_keys.top_rmse_sorted);
-    assert_eq!(manifest.outputs.len(), 99);
+    assert_eq!(manifest.outputs.len(), 103);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly
             && output.source == SourceArtifact::Eso
@@ -524,13 +524,75 @@ fn loads_official_dynamic_heat_balance_diagnostic_case_fixture()
             && output.variable == "Zone Opaque Surface Inside Faces Conduction Rate"
             && output.class == VariableClass::SurfaceState
     }));
-    assert_eq!(manifest.tolerances.len(), 2);
+    assert_eq!(manifest.tolerances.len(), 3);
+    assert!(
+        manifest
+            .tolerances
+            .iter()
+            .any(|tolerance| tolerance.variable_class == VariableClass::Weather)
+    );
     let gate = manifest.gate.as_ref().ok_or_else(|| {
         std::io::Error::other("official dynamic diagnostic should declare a gate")
     })?;
     assert_eq!(
         gate.script,
         "scripts/dev.cmd official-dynamic-heat-balance-diagnostic"
+    );
+    assert!(!gate.blocking);
+
+    Ok(())
+}
+
+#[test]
+fn loads_official_dynamic_heat_balance_candidate_case_fixture()
+-> Result<(), Box<dyn std::error::Error>> {
+    let manifest = load_case_file(repo_root().join(
+        "data/conformance_cases/official_1zone_uncontrolled_dynamic_conformance_candidate_001/case.toml",
+    ))?;
+
+    assert_eq!(
+        manifest.id,
+        "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+    );
+    assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+    assert!(!manifest.conformance_claim);
+    let boundary = manifest
+        .boundary
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("candidate should pin its boundary"))?;
+    assert_eq!(boundary.target_case_id, manifest.id);
+    assert_eq!(boundary.declared_surface_keys.roof, ["ZN001:ROOF001"]);
+    assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
+    assert!(!boundary.declared_surface_keys.wildcard_comparison);
+    assert!(boundary.declared_surface_keys.named_key_comparison);
+    assert_eq!(manifest.outputs.len(), 30);
+    assert!(manifest.outputs.iter().all(|output| {
+        output.frequency == OutputFrequency::Hourly
+            && output.source == SourceArtifact::Eso
+            && output.level == Some(OutputLevel::Diagnostic)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "Environment"
+            && output.variable == "Site Outdoor Air Drybulb Temperature"
+            && output.class == VariableClass::Weather
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZONE ONE"
+            && output.variable == "Zone Air Heat Balance Surface Convection Rate"
+            && output.class == VariableClass::ZoneState
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:FLR001"
+            && output.variable == "Surface Heat Storage Rate"
+            && output.class == VariableClass::SurfaceState
+    }));
+    let gate = manifest
+        .gate
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("candidate should declare a gate"))?;
+    assert_eq!(
+        gate.script,
+        "scripts/dev.cmd official-dynamic-heat-balance-compat-candidate"
     );
     assert!(!gate.blocking);
 

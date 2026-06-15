@@ -205,6 +205,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the official 1ZoneUncontrolled dynamic heat-balance diagnostic case."
     }
+    "official-dynamic-heat-balance-compat-candidate" = @{
+        Path = "compare\official-dynamic-heat-balance-compat-candidate.ps1"
+        Group = "compare"
+        Help = "Run the official dynamic compatibility candidate lane with fixed all-EIO CTF seed, EnergyPlus initial histories, and 20-day warmup."
+    }
     "official-dynamic-heat-balance-all-ctf-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-probe.ps1"
         Group = "compare"

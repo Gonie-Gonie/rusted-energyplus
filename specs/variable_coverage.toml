@@ -319,6 +319,30 @@ first_evidence = "surface_temperature_nomass_001"
 support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
 
 [[variable]]
+name = "Zone Air Heat Balance Surface Convection Rate"
+domain = "heat_balance"
+status = "diagnostic"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Official 1Zone dynamic compatibility-candidate evidence only; not tolerance-gated conformance until all candidate variables pass."
+
+[[variable]]
+name = "Zone Air Heat Balance Air Energy Storage Rate"
+domain = "heat_balance"
+status = "diagnostic"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Official 1Zone dynamic compatibility-candidate evidence only; not tolerance-gated conformance until all candidate variables pass."
+
+[[variable]]
+name = "Surface Heat Storage Rate"
+domain = "surface"
+status = "diagnostic"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Floor CTF storage blocker diagnostic for the official 1Zone dynamic candidate; not a conformance claim."
+
+[[variable]]
 name = "Site Outdoor Air Drybulb Temperature"
 domain = "weather"
 status = "conformance"

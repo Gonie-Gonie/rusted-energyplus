@@ -4,7 +4,7 @@ param(
     [string]$CtfSeedPolicy = "steady-no-mass-only",
     [ValidateSet("boundary-u-value", "energyplus-surf-initial")]
     [string]$CtfInitialHistoryPolicy = "boundary-u-value",
-    [ValidateSet("simplified-analytical", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-inside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-adiabatic-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-previous-mat-surface-convection-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-frozen-outside-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-commit-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-reference-air-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-hconv-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-surface-reference-air-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-final-hconv-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-inside-ctf-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-adiabatic-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-adiabatic-history-commit-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-current-adiabatic-history-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
+    [ValidateSet("simplified-analytical", "energyplus-heat-balance-compat-candidate", "energyplus-analytical-probe", "energyplus-analytical-surface-first-probe", "energyplus-analytical-coupled-probe", "energyplus-analytical-coupled-previous-inside-probe", "energyplus-analytical-coupled-previous-inside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-adiabatic-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-previous-mat-surface-convection-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-frozen-outside-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-commit-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-reference-air-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-hconv-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-surface-reference-air-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-final-hconv-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-inside-ctf-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-adiabatic-report-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-adiabatic-history-commit-probe", "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-current-adiabatic-history-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe", "energyplus-analytical-coupled-previous-boundary-probe", "energyplus-third-order-probe")]
     [string]$ZoneAirAlgorithm = "simplified-analytical",
     [ValidateRange(0, 365)]
     [int]$WarmupMinimumDays = 0,
@@ -17,7 +17,9 @@ param(
     [ValidateSet("average", "last-system-state")]
     [string]$ZoneAirReportSampling = "average",
     [ValidateSet("each-surface-iteration", "after-surface-loop")]
-    [string]$SurfaceLoopZoneAirCorrection = "each-surface-iteration"
+    [string]$SurfaceLoopZoneAirCorrection = "each-surface-iteration",
+    [string]$CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001",
+    [string]$OutputRootRelativeOverride = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,6 +31,7 @@ Add-CargoBinToPath
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
 $AlgorithmOutputSuffix = switch ($ZoneAirAlgorithm) {
+    "energyplus-heat-balance-compat-candidate" { "-compat-candidate" }
     "energyplus-analytical-probe" { "-analytical" }
     "energyplus-analytical-surface-first-probe" { "-analytical-surface-first" }
     "energyplus-analytical-coupled-probe" { "-analytical-coupled" }
@@ -113,14 +116,19 @@ $SurfaceLoopZoneAirCorrectionOutputSuffix = if ($SurfaceLoopZoneAirCorrection -e
 else {
     ""
 }
-$OutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
+$ComputedOutputRootRelative = if ($CtfSeedPolicy -eq "all-eio") {
     ".runtime\official-dynamic-diagnostic-all-ctf$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$InsideHconvReevaluationOutputSuffix$ZoneConductionReportOutputSuffix$ZoneAirReportSamplingOutputSuffix$SurfaceLoopZoneAirCorrectionOutputSuffix\26.1.0"
 }
 else {
     ".runtime\official-dynamic-diagnostic$AlgorithmOutputSuffix$InitialHistoryOutputSuffix$WarmupOutputSuffix$SurfaceIterationOutputSuffix$InsideHconvReevaluationOutputSuffix$ZoneConductionReportOutputSuffix$ZoneAirReportSamplingOutputSuffix$SurfaceLoopZoneAirCorrectionOutputSuffix\26.1.0"
 }
+$OutputRootRelative = if ($OutputRootRelativeOverride.Trim().Length -gt 0) {
+    $OutputRootRelativeOverride
+}
+else {
+    $ComputedOutputRootRelative
+}
 $OutputRoot = Join-Path $RepoRoot $OutputRootRelative
-$CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 $CasePath = Join-Path $RepoRoot "data\conformance_cases\$CaseId\case.toml"
 $CaseOutputRoot = Join-Path $OutputRoot $CaseId
 $CompareRoot = Join-Path $CaseOutputRoot "compare"
@@ -300,6 +308,18 @@ Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "cl
 Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup enabled"
 Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
 Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
+$expectedAlgorithmLane = if ($ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate") {
+    "compatibility-candidate"
+}
+elseif ($ZoneAirAlgorithm -eq "simplified-analytical") {
+    "diagnostic-only"
+}
+else {
+    "diagnostic-probe"
+}
+$expectedPromotionAllowed = if ($ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate") { "true" } else { "false" }
+Assert-Contains -Text $text -Pattern "zone_air_algorithm_lane: $expectedAlgorithmLane" -Description "zone-air algorithm lane metadata"
+Assert-Contains -Text $text -Pattern "conformance_promotion_allowed: $expectedPromotionAllowed" -Description "conformance promotion lane metadata"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: $SurfaceIterations" -Description "surface iteration metadata"
 $expectedInsideHconvReevaluationIntervalLabel = if ($InsideHconvReevaluationInterval -gt 0) { [string]$InsideHconvReevaluationInterval } else { "none" }
 Assert-Contains -Text $text -Pattern "inside_hconv_reevaluation_interval: $expectedInsideHconvReevaluationIntervalLabel" -Description "inside hconv reevaluation interval metadata"
@@ -313,6 +333,7 @@ Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagno
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
 $digestPath = Join-Path $CompareRoot "compare-digest.json"
 $reportPath = Join-Path $CompareRoot "compare-report.md"
+$isCompatibilityCandidateCase = $CaseId -eq "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 Assert-FileExists -Path $summaryPath -Description "official dynamic diagnostic summary"
 Assert-FileExists -Path $digestPath -Description "official dynamic diagnostic digest"
 Assert-FileExists -Path $reportPath -Description "official dynamic diagnostic report"
@@ -322,12 +343,14 @@ Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "comp
 Assert-Contains -Text $digestText -Pattern '"compatibility_stages"' -Description "compact digest compatibility stage order"
 Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHistories"' -Description "compact digest UpdateThermalHistories stage"
 Assert-Contains -Text $digestText -Pattern '"zone_air_coefficient_deltas"' -Description "compact digest zone-air coefficient diagnostics"
-Assert-Contains -Text $digestText -Pattern '"temp_dependent_coefficient_delta"' -Description "compact digest zone-air TempDepCoef delta"
-Assert-Contains -Text $digestText -Pattern '"temp_history_term_delta"' -Description "compact digest zone-air history-term delta"
 Assert-Contains -Text $digestText -Pattern '"zone_air_surface_convection_closure_deltas"' -Description "compact digest zone-air surface convection closure diagnostics"
-Assert-Contains -Text $digestText -Pattern '"closure_residual_delta"' -Description "compact digest zone-air surface convection closure residual delta"
 Assert-Contains -Text $digestText -Pattern '"zone_air_surface_coefficient_deltas"' -Description "compact digest zone-air surface coefficient diagnostics"
-Assert-Contains -Text $digestText -Pattern '"reference_air_temperature_delta"' -Description "compact digest zone-air surface reference-air temperature delta"
+if (-not $isCompatibilityCandidateCase) {
+    Assert-Contains -Text $digestText -Pattern '"temp_dependent_coefficient_delta"' -Description "compact digest zone-air TempDepCoef delta"
+    Assert-Contains -Text $digestText -Pattern '"temp_history_term_delta"' -Description "compact digest zone-air history-term delta"
+    Assert-Contains -Text $digestText -Pattern '"closure_residual_delta"' -Description "compact digest zone-air surface convection closure residual delta"
+    Assert-Contains -Text $digestText -Pattern '"reference_air_temperature_delta"' -Description "compact digest zone-air surface reference-air temperature delta"
+}
 $summary = $digestText | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected case_id: $($summary.case_id)"
@@ -376,6 +399,13 @@ if ($summary.ctf_seed.policy -ne $CtfSeedPolicy) {
 }
 if ($summary.zone_air_algorithm -ne $ZoneAirAlgorithm) {
     throw "Expected zone-air algorithm $ZoneAirAlgorithm, got $($summary.zone_air_algorithm)"
+}
+if ($summary.zone_air_algorithm_lane -ne $expectedAlgorithmLane) {
+    throw "Expected zone_air_algorithm_lane $expectedAlgorithmLane, got $($summary.zone_air_algorithm_lane)"
+}
+$expectedPromotionAllowedBoolean = $ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate"
+if ($summary.conformance_promotion_allowed -ne $expectedPromotionAllowedBoolean) {
+    throw "Expected conformance_promotion_allowed $expectedPromotionAllowed, got $($summary.conformance_promotion_allowed)"
 }
 if ($summary.surface_iteration_count -ne $SurfaceIterations) {
     throw "Expected surface_iteration_count $SurfaceIterations, got $($summary.surface_iteration_count)"
@@ -430,6 +460,58 @@ else {
         throw "Expected all-eio policy to mark FLOOR CTF summary as included"
     }
 }
+
+if ($isCompatibilityCandidateCase) {
+    if ($summary.series_count -ne 30) {
+        throw "Unexpected candidate series_count: $($summary.series_count)"
+    }
+    if ($summary.zone_air_algorithm_lane -ne "compatibility-candidate") {
+        throw "Candidate case must run the compatibility-candidate lane, got $($summary.zone_air_algorithm_lane)"
+    }
+    if ($summary.conformance_promotion_allowed -ne $true) {
+        throw "Candidate case must mark conformance_promotion_allowed=true"
+    }
+    if ($summary.active_blocker_summary -notmatch "ZN001:FLR001") {
+        throw "Expected candidate active blocker summary to reference ZN001:FLR001, got $($summary.active_blocker_summary)"
+    }
+    if ($summary.next_pr_target -ne "floor-inside-current-face-temperature-source-timing") {
+        throw "Expected candidate next_pr_target to focus floor inside-current timing, got $($summary.next_pr_target)"
+    }
+    foreach ($requiredVariable in @(
+            "Site Outdoor Air Drybulb Temperature",
+            "Zone Mean Air Temperature",
+            "Zone Air Heat Balance Internal Convective Heat Gain Rate",
+            "Zone Air Heat Balance Surface Convection Rate",
+            "Zone Air Heat Balance Air Energy Storage Rate",
+            "Surface Inside Face Temperature",
+            "Surface Outside Face Temperature",
+            "Surface Inside Face Conduction Heat Transfer Rate",
+            "Surface Outside Face Conduction Heat Transfer Rate",
+            "Surface Heat Storage Rate"
+        )) {
+        if (-not ($summary.series | Where-Object { $_.output.variable -eq $requiredVariable -and $_.status -eq "extracted" })) {
+            throw "Missing extracted candidate series: $requiredVariable"
+        }
+    }
+    $floorStorageMaxSampleDelta = @($summary.ctf_storage_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorStorageMaxSampleDelta) {
+        throw "Expected candidate ctf_storage_max_sample_deltas to include ZN001:FLR001"
+    }
+    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
+        throw "Expected candidate dominant mismatch source face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    }
+
+    $reportText = Get-Content -LiteralPath $reportPath -Raw
+    Assert-Contains -Text $reportText -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "candidate markdown algorithm lane"
+    Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
+    Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
+    Assert-Contains -Text $reportText -Pattern "next_pr_target: floor-inside-current-face-temperature-source-timing" -Description "candidate next PR target"
+    Assert-Contains -Text $reportText -Pattern "status: fail" -Description "candidate diagnostic status"
+
+    Write-Host "Official dynamic heat-balance compatibility candidate passed structural checks."
+    return
+}
+
 $ExpectedSeriesCount = 103
 if ($summary.series_count -ne $ExpectedSeriesCount) {
     throw "Unexpected series_count: $($summary.series_count)"

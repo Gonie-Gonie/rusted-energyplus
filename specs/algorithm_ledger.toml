@@ -20,6 +20,34 @@ claim_level = "limited-conformance"
 support_boundary = "Limited conformance only for declared no-mass zone-air heat-balance proof variables; no general heat-balance, HVAC, warmup, or sizing claim."
 
 [[algorithm]]
+id = "official_dynamic_heat_balance_compat_candidate"
+domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceManager.cc",
+  "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+  "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/runtime.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate",
+  "scripts/compare/official-dynamic-heat-balance-compat-candidate.ps1",
+]
+status = "diagnostic_only"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Zone Mean Air Temperature",
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
+  "Surface Inside Face Conduction Heat Transfer Rate",
+  "Surface Outside Face Conduction Heat Transfer Rate",
+  "Zone Air Heat Balance Surface Convection Rate",
+  "Zone Air Heat Balance Air Energy Storage Rate",
+]
+claim_level = "none"
+support_boundary = "Official dynamic 1Zone compatibility candidate lane only; current reports remain diagnostic-only and must not be promoted until all required variables pass the blocking promotion gate."
+
+[[algorithm]]
 id = "surface_inside_temperature"
 domain = "heat_balance"
 source_map = "docs/src/porting-map/heat-balance-source-map.md"

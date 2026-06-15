@@ -486,7 +486,10 @@ version = "0.33"
 title = "Official Dynamic Heat-Balance Diagnostic"
 status = "in_progress"
 claim_level = "diagnostic-only"
-required_cases = ["official_1zone_uncontrolled_dynamic_diagnostic_001"]
+required_cases = [
+  "official_1zone_uncontrolled_dynamic_diagnostic_001",
+  "official_1zone_uncontrolled_dynamic_conformance_candidate_001",
+]
 required_variables = [
   "Zone Mean Air Temperature",
   "Surface Inside Face Conduction Heat Transfer Rate",

@@ -1111,6 +1111,11 @@ pub struct HeatBalanceStepInput {
 pub enum HeatBalanceZoneAirAlgorithm {
     /// Existing simplified analytical diagnostic shell.
     SimplifiedAnalytical,
+    /// Named official dynamic compatibility candidate lane.
+    ///
+    /// This currently executes the closest source-order diagnostic path while
+    /// keeping report metadata separate from ad-hoc probe variants.
+    EnergyPlusHeatBalanceCompatCandidate,
     /// Experimental EnergyPlus analytical predictor path for diagnostics.
     EnergyPlusAnalyticalProbe,
     /// Experimental EnergyPlus analytical correction after the surface pass.
@@ -1196,6 +1201,7 @@ pub enum HeatBalanceZoneAirAlgorithm {
 fn heat_balance_zone_air_algorithm_feature_base(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> HeatBalanceZoneAirAlgorithm {
+    let zone_air_algorithm = heat_balance_zone_air_algorithm_execution_variant(zone_air_algorithm);
     match zone_air_algorithm {
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe
@@ -1208,6 +1214,17 @@ fn heat_balance_zone_air_algorithm_feature_base(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatAdiabaticReportProbe => {
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe
+        }
+        _ => zone_air_algorithm,
+    }
+}
+
+fn heat_balance_zone_air_algorithm_execution_variant(
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> HeatBalanceZoneAirAlgorithm {
+    match zone_air_algorithm {
+        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate => {
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
         }
         _ => zone_air_algorithm,
     }
@@ -3276,6 +3293,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         .iter()
         .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
         .collect::<BTreeMap<_, _>>();
+    let zone_air_algorithm = heat_balance_zone_air_algorithm_execution_variant(zone_air_algorithm);
     let feature_zone_air_algorithm =
         heat_balance_zone_air_algorithm_feature_base(zone_air_algorithm);
     let correct_zone_air_after_surface_pass = matches!(
@@ -3548,6 +3566,9 @@ fn advance_heat_balance_state_one_timestep_internal(
                 zone.air_heat_capacity_j_per_k,
                 input.timestep_seconds,
             ),
+            HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {
                 previous_temperature_c
             }
@@ -4805,7 +4826,8 @@ fn zone_air_heat_balance_air_storage_rate_w(
                     .temp_dependent_coefficient_w_per_k
                     * zone_state.mean_air_temperature_c
         }
-        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
+        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageProbe
@@ -13734,7 +13756,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 204);
+        assert_eq!(simulation.results.series.len(), 206);
 
         let Some(zone_series) = simulation
             .results
