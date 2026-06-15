@@ -153,11 +153,34 @@ over 110 samples. The 10 declared conformance rows are tolerance-gated; the
 remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
 `ReportPurchasedAir` raw `rate * TimeStepSysSec` branch with a fixed
 8-substep, 112.5 s system timestep in this fixture, then the `OutputProcessor`
-`Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows
-also use the blank fuel-efficiency schedule branch. The facility meters are
-tracked as oracle-MTR diagnostics only; Rust meter time-series comparison,
-adaptive system timestep, and non-unity efficiency schedule conformance remain
-outside the claim.
+`Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows in
+this conformance fixture use the blank fuel-efficiency schedule branch. The
+facility meters are tracked as oracle-MTR diagnostics only; Rust meter
+time-series comparison, adaptive system timestep, and fuel-efficiency
+conformance remain outside the claim.
+
+## IdealLoads Fuel-Efficiency Diagnostic
+
+`ideal_loads_fuel_efficiency_diagnostic_001` is a diagnostic-only proof lane
+for the same no-OA/no-limit sensible branch with non-unity constant fuel
+efficiency schedules:
+
+```text
+comparison_class: diagnostic-only
+conformance_claim: false
+tolerance_policy: diagnostic-draft
+status: diagnostic
+```
+
+The fixture sets the heating fuel-efficiency `Schedule:Constant` to 0.8 and
+the cooling fuel-efficiency `Schedule:Constant` to 0.75. The compare lane
+divides the no-OA zone and supply-air heating/cooling rates by those schedule
+values, then uses the same detailed `TimeStepSysSec` energy accumulation for
+fuel energy rows. It compares 12 Detailed series over 110 samples with zero
+tolerance failures. This proves the blank and constant `Schedule:Constant`
+ReportPurchasedAir fuel-efficiency branches diagnostically; non-constant
+efficiency schedules, Rust meter time-series value comparison, and broad fuel
+or meter conformance remain outside the claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

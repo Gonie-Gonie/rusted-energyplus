@@ -11,8 +11,8 @@ Reference version: EnergyPlus 26.1.0
 
 Purpose: map the first limited `ZoneHVAC:IdealLoadsAirSystem`
 numerical-conformance claim to EnergyPlus source functions while keeping
-availability, humidity control, outdoor-air, sizing, fuel, meter, and broad
-HVAC compatibility outside the claim.
+availability, humidity control, outdoor-air, sizing, fuel/meter conformance,
+and broad HVAC compatibility outside the claim.
 
 ## Initial Claim Boundary
 
@@ -182,13 +182,15 @@ The conformance output surface is:
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
-blank-efficiency fuel energy/rate rows, latent IdealLoads outputs, active
-humidity-control outdoor-air latent behavior, heat-recovery outputs,
+blank and constant `Schedule:Constant` fuel energy/rate rows, latent
+IdealLoads outputs, active humidity-control outdoor-air latent behavior,
+heat-recovery outputs,
 economizer outputs, adaptive system timestep, Rust meter time-series
-comparison, and non-unity efficiency schedules remain diagnostic-only until
-their source-order branches are ported or explicitly included in a promoted
-claim. `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` are
-currently requested only as oracle-MTR diagnostics for the no-OA fixture.
+comparison, and non-constant efficiency schedules remain diagnostic-only or
+unsupported until their source-order branches are ported or explicitly included
+in a promoted claim. `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` are currently requested only as oracle-MTR
+diagnostics for the no-OA fixtures.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in
@@ -214,7 +216,8 @@ The current conformance run compares 28 Detailed series over 110 samples. The
 10 declared conformance rows pass their tolerances, diagnostic proof rows also
 pass, and `tolerance-failures.csv` is empty. This creates only the limited
 no-OA/no-limit sensible IdealLoads claim for declared outputs; ReportPurchasedAir
-energy and blank fuel-efficiency energy/rate rows remain diagnostic.
+energy and blank/constant Schedule:Constant fuel-efficiency energy/rate rows
+remain diagnostic.
 
 ## Claim Requirements
 

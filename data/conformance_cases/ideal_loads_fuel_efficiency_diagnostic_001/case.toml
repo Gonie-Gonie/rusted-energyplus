@@ -1,0 +1,199 @@
+id = "ideal_loads_fuel_efficiency_diagnostic_001"
+title = "One-zone no-OA IdealLoads fuel-efficiency diagnostic"
+milestone = "ideal-loads-fuel-meter-diagnostic"
+purpose = "Probe ReportPurchasedAir heating and cooling fuel energy rate/energy parity when constant non-unity fuel-efficiency schedules are active."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This case is diagnostic-only and does not expand the no-OA/no-limit IdealLoads sensible conformance claim.",
+  "The boundary excludes outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
+  "Heating fuel efficiency is a Schedule:Constant value of 0.8; cooling fuel efficiency is a Schedule:Constant value of 0.75.",
+  "Fuel energy rate rows prove the EnergyPlus ReportPurchasedAir raw-rate divided-by-efficiency branch.",
+  "Fuel energy rows prove the same efficiency branch with TimeStepSysSec detailed energy accumulation.",
+  "DistrictHeatingWater:Facility and DistrictCooling:Facility meters remain oracle-MTR diagnostic requests only; Rust meter time-series value comparison remains outside this case."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_fuel_efficiency_diagnostic_001/ideal_loads_fuel_efficiency_diagnostic.idf"
+tier = "B"
+
+[scope]
+domains = ["hvac"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_fuel_efficiency_diagnostic_001/ideal_loads_fuel_efficiency_diagnostic.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Heating Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Cooling Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Heating Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Cooling Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictHeatingWater:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictCooling:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[tolerances]]
+variable_class = "hvac-state"
+max_abs = 1e-3
+max_rmse = 1e-3
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-fuel-efficiency/26.1.0/ideal_loads_fuel_efficiency_diagnostic_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-fuel-efficiency-diagnostic"
+blocking = false

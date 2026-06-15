@@ -12,7 +12,8 @@ use ep_conformance::{
 };
 use ep_model::{
     DemandControlledVentilationType, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
-    IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType, OutputHandle, SimulationModel,
+    IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType, OutputHandle, ScheduleId,
+    SimulationModel,
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
@@ -73,6 +74,17 @@ const ZONE_SYSTEM_PREDICTED_HEATING_LOAD: &str =
 const ZONE_SYSTEM_PREDICTED_COOLING_LOAD: &str =
     "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate";
 const IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS: f64 = 8.0;
+const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
+    "rust-ideal-loads-blank-fuel-efficiency";
+const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
+    "rust-ideal-loads-blank-fuel-efficiency-time-step-energy";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE: &str =
+    "rust-ideal-loads-constant-fuel-efficiency";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
+    "rust-ideal-loads-constant-fuel-efficiency-time-step-energy";
+const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE: &str =
+    "EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE: &str = "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -102,10 +114,42 @@ struct IdealLoadsDiagnosticContext<'a> {
     supply_node_name: String,
     system_timestep_seconds: f64,
     energy_report_interval_seconds: f64,
+    fuel_efficiency: IdealLoadsFuelEfficiencyContext,
     rows: Vec<IdealLoadsDiagnosticRow>,
     result_store: ResultStore,
     input_trace: IdealLoadsInputTrace,
     mode_counts: IdealLoadsModeCounts,
+}
+
+#[derive(Clone, Copy)]
+struct IdealLoadsFuelEfficiencyContext {
+    heating: f64,
+    cooling: f64,
+    report_source: &'static str,
+    rate_rust_source: &'static str,
+    energy_rust_source: &'static str,
+}
+
+impl IdealLoadsFuelEfficiencyContext {
+    fn blank() -> Self {
+        Self {
+            heating: 1.0,
+            cooling: 1.0,
+            report_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE,
+            rate_rust_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE,
+            energy_rust_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE,
+        }
+    }
+
+    fn constant(heating: f64, cooling: f64) -> Self {
+        Self {
+            heating,
+            cooling,
+            report_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE,
+            rate_rust_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE,
+            energy_rust_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE,
+        }
+    }
 }
 
 struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
@@ -948,6 +992,7 @@ fn build_context<'a>(
     let input_trace = load_input_trace(&baseline.eso, &zone.name.0, &zone_air_node.name.0)?;
     let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
     let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
+    let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system)?;
     let (rows, result_store, mode_counts) = evaluate_rows(
         manifest,
         &model,
@@ -958,6 +1003,7 @@ fn build_context<'a>(
         &system.name.0,
         &supply_node.name.0,
         energy_report_interval_seconds,
+        fuel_efficiency,
     )?;
 
     let zone_name = zone.name.0.clone();
@@ -976,6 +1022,7 @@ fn build_context<'a>(
         supply_node_name,
         system_timestep_seconds,
         energy_report_interval_seconds,
+        fuel_efficiency,
         rows,
         result_store,
         input_trace,
@@ -1065,6 +1112,7 @@ fn evaluate_rows(
     system_name: &str,
     supply_node_name: &str,
     energy_report_interval_seconds: f64,
+    fuel_efficiency: IdealLoadsFuelEfficiencyContext,
 ) -> Result<
     (
         Vec<IdealLoadsDiagnosticRow>,
@@ -1309,8 +1357,9 @@ fn evaluate_rows(
         );
     }
     if manifest_requests_fuel_energy_outputs(manifest) {
-        ensure_blank_fuel_efficiency_schedules(system)?;
-        let fuel_source = "rust-ideal-loads-blank-fuel-efficiency";
+        let heating_efficiency = fuel_efficiency.heating;
+        let cooling_efficiency = fuel_efficiency.cooling;
+        let fuel_source = fuel_efficiency.rate_rust_source;
         add_result_series(
             &mut observed_by_variable,
             system_name,
@@ -1318,7 +1367,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.supply_air_total_heating_rate_w,
+            |result| result.supply_air_total_heating_rate_w / heating_efficiency,
         );
         add_result_series(
             &mut observed_by_variable,
@@ -1327,7 +1376,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.supply_air_total_cooling_rate_w,
+            |result| result.supply_air_total_cooling_rate_w / cooling_efficiency,
         );
         add_result_series(
             &mut observed_by_variable,
@@ -1336,7 +1385,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.zone_total_heating_rate_w,
+            |result| result.zone_total_heating_rate_w / heating_efficiency,
         );
         add_result_series(
             &mut observed_by_variable,
@@ -1345,9 +1394,9 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.zone_total_cooling_rate_w,
+            |result| result.zone_total_cooling_rate_w / cooling_efficiency,
         );
-        let fuel_energy_source = "rust-ideal-loads-blank-fuel-efficiency-time-step-energy";
+        let fuel_energy_source = fuel_efficiency.energy_rust_source;
         add_result_energy_series(
             &mut observed_by_variable,
             system_name,
@@ -1356,7 +1405,7 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.supply_air_total_heating_rate_w,
+            |result| result.supply_air_total_heating_rate_w / heating_efficiency,
         );
         add_result_energy_series(
             &mut observed_by_variable,
@@ -1366,7 +1415,7 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.supply_air_total_cooling_rate_w,
+            |result| result.supply_air_total_cooling_rate_w / cooling_efficiency,
         );
         add_result_energy_series(
             &mut observed_by_variable,
@@ -1376,7 +1425,7 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.zone_total_heating_rate_w,
+            |result| result.zone_total_heating_rate_w / heating_efficiency,
         );
         add_result_energy_series(
             &mut observed_by_variable,
@@ -1386,7 +1435,7 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.zone_total_cooling_rate_w,
+            |result| result.zone_total_cooling_rate_w / cooling_efficiency,
         );
     }
     add_result_series(
@@ -1516,16 +1565,54 @@ fn ideal_loads_fuel_energy_variable(variable: &str) -> bool {
     )
 }
 
-fn ensure_blank_fuel_efficiency_schedules(system: &IdealLoadsAirSystem) -> Result<(), String> {
-    if system.heating_fuel_efficiency_schedule.is_some()
-        || system.cooling_fuel_efficiency_schedule.is_some()
+fn ideal_loads_fuel_efficiency_context(
+    model: &SimulationModel,
+    system: &IdealLoadsAirSystem,
+) -> Result<IdealLoadsFuelEfficiencyContext, String> {
+    let heating = ideal_loads_fuel_efficiency_value(
+        model,
+        system.heating_fuel_efficiency_schedule,
+        "heating",
+    )?;
+    let cooling = ideal_loads_fuel_efficiency_value(
+        model,
+        system.cooling_fuel_efficiency_schedule,
+        "cooling",
+    )?;
+    if system.heating_fuel_efficiency_schedule.is_none()
+        && system.cooling_fuel_efficiency_schedule.is_none()
     {
-        return Err(
-            "IdealLoads fuel energy diagnostic currently supports only blank fuel efficiency schedules"
-                .to_string(),
-        );
+        Ok(IdealLoadsFuelEfficiencyContext::blank())
+    } else {
+        Ok(IdealLoadsFuelEfficiencyContext::constant(heating, cooling))
     }
-    Ok(())
+}
+
+fn ideal_loads_fuel_efficiency_value(
+    model: &SimulationModel,
+    schedule_id: Option<ScheduleId>,
+    label: &str,
+) -> Result<f64, String> {
+    let Some(schedule_id) = schedule_id else {
+        return Ok(1.0);
+    };
+    let schedule = model
+        .typed
+        .schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+        .ok_or_else(|| {
+            format!(
+                "IdealLoads {label} fuel energy diagnostic currently supports only blank or Schedule:Constant fuel efficiency schedules"
+            )
+        })?;
+    if !schedule.hourly_value.is_finite() || schedule.hourly_value <= 0.0 {
+        return Err(format!(
+            "IdealLoads {label} fuel efficiency schedule {} must have a positive finite value, got {}",
+            schedule.name.0, schedule.hourly_value
+        ));
+    }
+    Ok(schedule.hourly_value)
 }
 
 fn calc_ideal_loads_sensible_compat(
@@ -1926,7 +2013,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str("zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\n");
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
-    report.push_str("fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\n");
+    report.push_str(&format!(
+        "fuel_energy_rate_source: {}\n",
+        context.fuel_efficiency.report_source
+    ));
+    report.push_str(&format!(
+        "fuel_efficiency: heating={:.12} cooling={:.12}\n",
+        context.fuel_efficiency.heating, context.fuel_efficiency.cooling
+    ));
     report.push_str(&format!(
         "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed_system_substeps={:.0} system_timestep_seconds={:.12} energy_report_interval_seconds={:.12}\n",
         IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS,
@@ -2495,7 +2589,26 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
-    json.push_str("  \"fuel_energy_rate_source\": \"EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\",\n");
+    json.push_str(&format!(
+        "  \"fuel_energy_rate_source\": {},\n",
+        json_string(context.fuel_efficiency.report_source)
+    ));
+    json.push_str(&format!(
+        "  \"heating_fuel_efficiency\": {},\n",
+        json_number(context.fuel_efficiency.heating)
+    ));
+    json.push_str(&format!(
+        "  \"cooling_fuel_efficiency\": {},\n",
+        json_number(context.fuel_efficiency.cooling)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_rate_rust_source\": {},\n",
+        json_string(context.fuel_efficiency.rate_rust_source)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_rust_source\": {},\n",
+        json_string(context.fuel_efficiency.energy_rust_source)
+    ));
     json.push_str("  \"energy_source\": \"EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed 8-substep fixture branch\",\n");
     json.push_str("  \"meter_source\": \"EnergyPlus Output:Meter oracle MTR diagnostic-only; Rust meter time-series comparison disabled\",\n");
     json.push_str("  \"rust_meter_time_series_comparison\": false,\n");
@@ -2815,6 +2928,18 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str("  \"economizer\": \"NoEconomizer\",\n");
     json.push_str("  \"heat_recovery\": \"None\",\n");
     json.push_str("  \"humidity_control_conformance\": false,\n");
+    json.push_str(&format!(
+        "  \"heating_fuel_efficiency\": {},\n",
+        json_number(context.fuel_efficiency.heating)
+    ));
+    json.push_str(&format!(
+        "  \"cooling_fuel_efficiency\": {},\n",
+        json_number(context.fuel_efficiency.cooling)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_rate_source\": {},\n",
+        json_string(context.fuel_efficiency.report_source)
+    ));
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state\",\n");
     json.push_str(&format!(

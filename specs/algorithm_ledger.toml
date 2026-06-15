@@ -128,6 +128,7 @@ rust_target = [
   "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
   "crates/ep_runtime/src/output.rs::RuntimeMeterRegistry",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_no_oa_sensible_report",
+  "scripts/compare/compare-ideal-loads-fuel-efficiency-diagnostic.ps1",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
 ]
 status = "conformance"
@@ -154,7 +155,7 @@ proof_variables = [
   "System Node Mass Flow Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-sensible-conformance"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank fuel-efficiency proof rows, facility meter oracle-MTR requests, and RuntimeMeterRegistry request resolution; outdoor air, humidity control, economizer, heat recovery, sizing, adaptive system timestep, Rust meter time-series value comparison, non-unity efficiency schedules, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank and constant Schedule:Constant fuel-efficiency proof rows, facility meter oracle-MTR requests, and RuntimeMeterRegistry request resolution; outdoor air, humidity control, economizer, heat recovery, sizing, adaptive system timestep, Rust meter time-series value comparison, non-constant efficiency schedules, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"
