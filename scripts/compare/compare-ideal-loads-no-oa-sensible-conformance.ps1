@@ -84,7 +84,7 @@ Assert-Contains -Text $text -Pattern "IdealLoads No-OA Sensible Report" -Descrip
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: conformance" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: true" -Description "claim boundary"
-Assert-Contains -Text $text -Pattern "series: 16" -Description "series count"
+Assert-Contains -Text $text -Pattern "series: 20" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 110" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_policy: conformance-gate" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "conformance status"
@@ -126,7 +126,7 @@ if ($summary.tolerance_failures -ne 0) {
 if ($summary.samples -ne 110) {
     throw "Unexpected IdealLoads sample count: $($summary.samples)"
 }
-if ($summary.series_count -ne 16) {
+if ($summary.series_count -ne 20) {
     throw "Unexpected IdealLoads series count: $($summary.series_count)"
 }
 if ($summary.zone_demand_synthetic_rc_model -ne $false) {
@@ -155,6 +155,19 @@ if ($nodeFlow[0].level -ne "conformance") {
 if ($nodeFlow[0].status -ne "pass") {
     throw "System Node Mass Flow Rate must pass in conformance comparison"
 }
+$fuelRows = @($summary.series | Where-Object { $_.variable -like "Zone Ideal Loads *Fuel Energy Rate" })
+if ($fuelRows.Count -ne 4) {
+    throw "Expected 4 diagnostic fuel energy-rate rows, found $($fuelRows.Count)"
+}
+if (@($fuelRows | Where-Object { $_.level -ne "diagnostic" }).Count -ne 0) {
+    throw "Fuel energy-rate rows must remain diagnostic-only"
+}
+if (@($fuelRows | Where-Object { $_.rust_source -ne "rust-ideal-loads-blank-fuel-efficiency" }).Count -ne 0) {
+    throw "Fuel energy-rate rows must use the blank fuel-efficiency source"
+}
+if (@($fuelRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
+    throw "Fuel energy-rate diagnostic rows must pass"
+}
 
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
 if ($toleranceFailures.Count -ne 0) {
@@ -162,12 +175,12 @@ if ($toleranceFailures.Count -ne 0) {
 }
 
 $resultStore = Get-Content -LiteralPath $resultStorePath -Raw | ConvertFrom-Json
-if ($resultStore.series_count -ne 16 -or $resultStore.sample_count -ne 110) {
+if ($resultStore.series_count -ne 20 -or $resultStore.sample_count -ne 110) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
 $selectedOutputs = Get-Content -LiteralPath $selectedOutputsPath -Raw | ConvertFrom-Json
-if (@($selectedOutputs.series).Count -ne 16) {
+if (@($selectedOutputs.series).Count -ne 20) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
@@ -182,6 +195,8 @@ if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA/no-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
+Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | conformance" -Description "markdown node flow row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown zone heating fuel row"
 
 Write-Host "IdealLoads no-OA sensible conformance comparison artifacts generated."

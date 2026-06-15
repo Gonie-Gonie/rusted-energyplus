@@ -35,8 +35,12 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
@@ -1230,6 +1234,46 @@ fn evaluate_rows(
         result_source,
         |result| result.supply_air_total_cooling_rate_w,
     );
+    if manifest_requests_fuel_energy_rates(manifest) {
+        ensure_blank_fuel_efficiency_schedules(system)?;
+        let fuel_source = "rust-ideal-loads-blank-fuel-efficiency";
+        add_result_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
+            "W",
+            fuel_source,
+            |result| result.supply_air_total_heating_rate_w,
+        );
+        add_result_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
+            "W",
+            fuel_source,
+            |result| result.supply_air_total_cooling_rate_w,
+        );
+        add_result_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE,
+            "W",
+            fuel_source,
+            |result| result.zone_total_heating_rate_w,
+        );
+        add_result_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
+            "W",
+            fuel_source,
+            |result| result.zone_total_cooling_rate_w,
+        );
+    }
     add_result_series(
         &mut observed_by_variable,
         supply_node_name,
@@ -1325,6 +1369,35 @@ fn evaluate_rows(
     }
 
     Ok((rows, result_store, mode_counts))
+}
+
+fn manifest_requests_fuel_energy_rates(manifest: &ConformanceCase) -> bool {
+    manifest
+        .outputs
+        .iter()
+        .any(|output| ideal_loads_fuel_energy_rate_variable(&output.variable))
+}
+
+fn ideal_loads_fuel_energy_rate_variable(variable: &str) -> bool {
+    matches!(
+        variable,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE
+            | ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE
+            | ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE
+            | ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE
+    )
+}
+
+fn ensure_blank_fuel_efficiency_schedules(system: &IdealLoadsAirSystem) -> Result<(), String> {
+    if system.heating_fuel_efficiency_schedule.is_some()
+        || system.cooling_fuel_efficiency_schedule.is_some()
+    {
+        return Err(
+            "IdealLoads fuel energy-rate diagnostic currently supports only blank fuel efficiency schedules"
+                .to_string(),
+        );
+    }
+    Ok(())
 }
 
 fn calc_ideal_loads_sensible_compat(
@@ -1659,6 +1732,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str("zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\n");
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
+    report.push_str("fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\n");
     report.push_str("zone_demand_synthetic_rc_model: false\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
@@ -2205,6 +2279,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
+    json.push_str("  \"fuel_energy_rate_source\": \"EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\",\n");
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");
     json.push_str(&format!(
         "  \"zone\": {},\n",

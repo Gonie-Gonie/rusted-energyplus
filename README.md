@@ -49,7 +49,8 @@ tolerance, and code organization.
 - limited IdealLoads no-OA/no-limit sensible conformance gate for declared
   thermostat setpoints, IdealLoads total/sensible/supply-air rates, and
   supply-node temperature/mass-flow Detailed series in
-  `ideal_loads_no_oa_sensible_conformance_001`
+  `ideal_loads_no_oa_sensible_conformance_001`, with blank-efficiency fuel
+  energy-rate rows kept diagnostic-only
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive

@@ -52,6 +52,10 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Ideal Loads Zone Sensible Cooling Rate` | detailed | IdealLoads HVAC component implementation and zone equipment managers | `calc_no_oa_no_limit_sensible_compat` sampled by the IdealLoads compare lane | conformance for `ideal_loads_no_oa_sensible_conformance_001` only |
 | `Zone Ideal Loads Supply Air Total Heating Rate` | detailed | IdealLoads HVAC component implementation and zone equipment managers | `IdealLoadsReportSnapshot` supply-air totals from the no-OA/no-limit sensible helper | conformance for `ideal_loads_no_oa_sensible_conformance_001` only |
 | `Zone Ideal Loads Supply Air Total Cooling Rate` | detailed | IdealLoads HVAC component implementation and zone equipment managers | `IdealLoadsReportSnapshot` supply-air totals from the no-OA/no-limit sensible helper | conformance for `ideal_loads_no_oa_sensible_conformance_001` only |
+| `Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate` | detailed | `PurchasedAirManager.cc::ReportPurchasedAir` fuel efficiency branch | no-OA supply-air total heating rate divided by blank fuel-efficiency schedule value 1.0 | diagnostic-only for `ideal_loads_no_oa_sensible_conformance_001`; no fuel meter conformance |
+| `Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate` | detailed | `PurchasedAirManager.cc::ReportPurchasedAir` fuel efficiency branch | no-OA supply-air total cooling rate divided by blank fuel-efficiency schedule value 1.0 | diagnostic-only for `ideal_loads_no_oa_sensible_conformance_001`; no fuel meter conformance |
+| `Zone Ideal Loads Zone Heating Fuel Energy Rate` | detailed | `PurchasedAirManager.cc::ReportPurchasedAir` fuel efficiency branch | no-OA zone total heating rate divided by blank fuel-efficiency schedule value 1.0 | diagnostic-only for `ideal_loads_no_oa_sensible_conformance_001`; no fuel meter conformance |
+| `Zone Ideal Loads Zone Cooling Fuel Energy Rate` | detailed | `PurchasedAirManager.cc::ReportPurchasedAir` fuel efficiency branch | no-OA zone total cooling rate divided by blank fuel-efficiency schedule value 1.0 | diagnostic-only for `ideal_loads_no_oa_sensible_conformance_001`; no fuel meter conformance |
 | `Zone Ideal Loads Outdoor Air Mass Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMinOAMassFlow` and `ReportPurchasedAir` | `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` in the IdealLoads outdoor-air design-flow diagnostic lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; no OA load conformance |
 | `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMinOAMassFlow` and `ReportPurchasedAir` | outdoor-air mass flow divided by EnergyPlus `StdRhoAir` in the diagnostic compare lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; no OA load conformance |
 | `Zone Ideal Loads Outdoor Air Sensible Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | `calc_outdoor_air_sensible_report_rates_compat` using source-order zone/OA state proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 1 W source-order tolerance |
@@ -149,8 +153,10 @@ The `ideal_loads_no_oa_sensible_conformance_001` report is a limited
 IdealLoads conformance result for declared thermostat setpoints, IdealLoads
 sensible/total/supply-air rate rows, and IdealLoads supply-node temperature
 and mass flow only. Diagnostic proof rows in that case do not promote humidity
-control, zone predictor/corrector, outdoor-air, sizing, meter, or broad HVAC
-compatibility.
+control, zone predictor/corrector, outdoor-air, sizing, fuel meters, non-unity
+efficiency schedules, or broad HVAC compatibility. The blank-efficiency fuel
+energy-rate rows are diagnostic-only proof of the EnergyPlus
+`ReportPurchasedAir` unity-efficiency branch.
 
 The `ideal_loads_outdoor_air_design_flow_diagnostic_001` report is a
 diagnostic-only Flow/Zone outdoor-air design-flow result for IdealLoads

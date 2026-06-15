@@ -309,6 +309,10 @@ Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Sensible Heating Rate
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Sensible Cooling Rate,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Total Heating Rate,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Total Cooling Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Heating Fuel Energy Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Zone Cooling Fuel Energy Rate,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,Detailed;

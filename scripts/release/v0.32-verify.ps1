@@ -112,8 +112,8 @@ if ($handbook.aggregate.structural_input_count -ne 5) {
 if ($handbook.aggregate.conformance_output_variable_count -ne 43) {
     throw "Expected 43 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
 }
-if ($handbook.aggregate.diagnostic_output_variable_count -ne 33) {
-    throw "Expected 33 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
+if ($handbook.aggregate.diagnostic_output_variable_count -ne 59) {
+    throw "Expected 59 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
 }
 if ($handbook.aggregate.baseline_output_variable_count -ne 6) {
     throw "Expected 6 baseline output variables, found $($handbook.aggregate.baseline_output_variable_count)"
@@ -121,8 +121,8 @@ if ($handbook.aggregate.baseline_output_variable_count -ne 6) {
 if ($handbook.aggregate.conformance_algorithm_count -ne 4) {
     throw "Expected 4 conformance algorithms, found $($handbook.aggregate.conformance_algorithm_count)"
 }
-if ($handbook.aggregate.diagnostic_algorithm_count -ne 2) {
-    throw "Expected 2 diagnostic algorithms, found $($handbook.aggregate.diagnostic_algorithm_count)"
+if ($handbook.aggregate.diagnostic_algorithm_count -ne 3) {
+    throw "Expected 3 diagnostic algorithms, found $($handbook.aggregate.diagnostic_algorithm_count)"
 }
 if ($handbook.aggregate.conformance_case_count -ne 8) {
     throw "Expected 8 promoted conformance cases, found $($handbook.aggregate.conformance_case_count)"

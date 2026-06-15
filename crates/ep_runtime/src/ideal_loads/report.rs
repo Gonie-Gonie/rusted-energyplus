@@ -26,6 +26,18 @@ pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE: &str =
 /// IdealLoads supply-air total cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE: &str =
     "Zone Ideal Loads Supply Air Total Cooling Rate";
+/// IdealLoads supply-air total heating fuel energy rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE: &str =
+    "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate";
+/// IdealLoads supply-air total cooling fuel energy rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE: &str =
+    "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate";
+/// IdealLoads zone heating fuel energy rate output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE: &str =
+    "Zone Ideal Loads Zone Heating Fuel Energy Rate";
+/// IdealLoads zone cooling fuel energy rate output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE: &str =
+    "Zone Ideal Loads Zone Cooling Fuel Energy Rate";
 /// IdealLoads supply-air mass flow rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE: &str =
     "Zone Ideal Loads Supply Air Mass Flow Rate";

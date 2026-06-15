@@ -47,6 +47,38 @@ first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
 support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 only; excluded IdealLoads features remain outside the claim."
 
 [[variable]]
+name = "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic-only blank fuel-efficiency schedule parity for the no-OA/no-limit IdealLoads case; non-unity efficiency schedules, fuel meters, and broad meter conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic-only blank fuel-efficiency schedule parity for the no-OA/no-limit IdealLoads case; non-unity efficiency schedules, fuel meters, and broad meter conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Zone Heating Fuel Energy Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic-only blank fuel-efficiency schedule parity for the no-OA/no-limit IdealLoads case; non-unity efficiency schedules, fuel meters, and broad meter conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Zone Cooling Fuel Energy Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic-only blank fuel-efficiency schedule parity for the no-OA/no-limit IdealLoads case; non-unity efficiency schedules, fuel meters, and broad meter conformance remain outside the claim."
+
+[[variable]]
 name = "Zone Ideal Loads Outdoor Air Mass Flow Rate"
 domain = "hvac"
 status = "diagnostic"

@@ -181,9 +181,10 @@ The conformance output surface is:
 
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
-heating/cooling setpoint-distance proof rows, latent IdealLoads outputs,
-active humidity-control outdoor-air latent behavior, heat-recovery outputs,
-economizer outputs, and meter outputs remain diagnostic-only until their
+heating/cooling setpoint-distance proof rows, blank-efficiency fuel
+energy-rate rows, latent IdealLoads outputs, active humidity-control
+outdoor-air latent behavior, heat-recovery outputs, economizer outputs, fuel
+meters, and non-unity efficiency schedules remain diagnostic-only until their
 source-order branches are ported or explicitly included in a promoted claim.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
@@ -206,10 +207,11 @@ The artifact contract is:
 - `tolerance-failures.csv`
 - `stage-summary.json`
 
-The current conformance run compares 16 Detailed series over 110 samples. The
+The current conformance run compares 20 Detailed series over 110 samples. The
 10 declared conformance rows pass their tolerances, diagnostic proof rows also
 pass, and `tolerance-failures.csv` is empty. This creates only the limited
-no-OA/no-limit sensible IdealLoads claim for declared outputs.
+no-OA/no-limit sensible IdealLoads claim for declared outputs; blank fuel
+efficiency energy-rate rows remain diagnostic.
 
 ## Claim Requirements
 

@@ -143,12 +143,14 @@ status: pass
 ```
 
 The case requests thermostat setpoints, IdealLoads total and sensible rates,
-supply-air total rates, signed zone predicted load, setpoint-distance proof
-loads, zone-air-node proof rows, and supply-node temperature, humidity, and
-mass flow. The conformance compare command writes matching Rust `ResultStore`
-series for 16 Detailed output rows over 110 samples. The 10 declared
-conformance rows are tolerance-gated; the remaining rows are diagnostic proof
-only.
+supply-air total rates, blank-efficiency fuel energy-rate proof rows, signed
+zone predicted load, setpoint-distance proof loads, zone-air-node proof rows,
+and supply-node temperature, humidity, and mass flow. The conformance compare
+command writes matching Rust `ResultStore` series for 20 Detailed output rows
+over 110 samples. The 10 declared conformance rows are tolerance-gated; the
+remaining rows are diagnostic proof only. Fuel energy-rate rows use the
+EnergyPlus `ReportPurchasedAir` blank fuel-efficiency schedule branch and do
+not claim fuel meter or non-unity efficiency schedule conformance.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

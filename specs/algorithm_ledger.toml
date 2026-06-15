@@ -112,6 +112,10 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result",
   "crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE",
   "crates/ep_runtime/src/zone_equipment/mod.rs::ZoneSysEnergyDemand",
   "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_no_oa_sensible_report",
@@ -125,11 +129,15 @@ proof_variables = [
   "Zone Thermostat Cooling Setpoint Temperature",
   "Zone Ideal Loads Zone Total Heating Rate",
   "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate",
+  "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate",
+  "Zone Ideal Loads Zone Heating Fuel Energy Rate",
+  "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
   "System Node Temperature",
   "System Node Mass Flow Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-sensible-conformance"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001; outdoor air, humidity control, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus diagnostic-only blank fuel-efficiency energy-rate proof rows; outdoor air, humidity control, economizer, heat recovery, sizing, fuel meters, non-unity efficiency schedules, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"
