@@ -11,6 +11,7 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | construction_materials_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/construction_materials_001/case.toml |
 | heat_balance_nomass_001 | v0.8-heat-balance | conformance | true | A | zone, surface | conformance | data/conformance_cases/heat_balance_nomass_001/case.toml |
 | ideal_loads_capacity_limit_diagnostic_001 | ideal-loads-finite-limit-diagnostic | diagnostic-only | false | B | zone, hvac, node | diagnostic | data/conformance_cases/ideal_loads_capacity_limit_diagnostic_001/case.toml |
+| ideal_loads_flow_limit_diagnostic_001 | ideal-loads-finite-limit-diagnostic | diagnostic-only | false | B | zone, hvac, node | diagnostic | data/conformance_cases/ideal_loads_flow_limit_diagnostic_001/case.toml |
 | ideal_loads_no_oa_sensible_conformance_001 | ideal-loads-conformance-candidate | conformance | true | B | zone, hvac, node | conformance, diagnostic | data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/case.toml |
 | ideal_loads_thermostat_001 | v0.10-ideal-loads-thermostat | smoke | false | B | zone, hvac | baseline | data/conformance_cases/ideal_loads_thermostat_001/case.toml |
 | internal_gains_001 | v0.26-internal-convective-gains | conformance | true | A | zone, surface, internal-gain | conformance, diagnostic | data/conformance_cases/internal_gains_001/case.toml |
