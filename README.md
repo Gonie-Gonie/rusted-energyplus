@@ -64,12 +64,13 @@ tolerance, and code organization.
   `ideal_loads_humidistat_dehumidification_diagnostic_001`, and
   `ideal_loads_humidistat_humidification_diagnostic_001`; broad
   humidity-control conformance remains outside the claim
-- diagnostic-only IdealLoads Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and
-  Maximum outdoor-air design-flow evidence for
+- diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
+  AirChanges/Hour, Sum, and Maximum outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive
   economizer/heat-recovery reports in
-  `ideal_loads_outdoor_air_design_flow_diagnostic_001` and
+  `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
+  `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
   `ideal_loads_outdoor_air_flow_area_diagnostic_001` and
   `ideal_loads_outdoor_air_air_changes_diagnostic_001`,
   `ideal_loads_outdoor_air_sum_diagnostic_001`, and

@@ -83,6 +83,13 @@ first_evidence = "internal_gains_001"
 support_boundary = "Typed for nominal EIO evidence and declared convective-gain trace only."
 
 [[object]]
+name = "People"
+family = "internal_gains"
+status = "typed"
+first_evidence = "ideal_loads_outdoor_air_flow_person_diagnostic_001"
+support_boundary = "Typed for zone design occupant count used by diagnostic-only IdealLoads Flow/Person outdoor-air design-flow evidence; no people heat-gain numerical conformance claim."
+
+[[object]]
 name = "ThermostatSetpoint:DualSetpoint"
 family = "thermostat"
 status = "typed"
@@ -101,14 +108,14 @@ name = "ZoneHVAC:IdealLoadsAirSystem"
 family = "hvac"
 status = "typed"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence, zero-failure diagnostic finite flow/capacity evidence with return-node proof rows, diagnostic ReportPurchasedAir energy and blank/constant Schedule:Constant fuel-efficiency evidence, diagnostic hourly facility meter oracle-MTR vs Rust aggregated fuel-energy evidence with RuntimeMeterRegistry request resolution, diagnostic no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio cooling/heating, and Humidistat dehumidification/humidification humidity-control latent/sensible/moisture-demand evidence, and diagnostic Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air design-flow/supply-air/mixed-air/inactive-economizer-heat-recovery evidence for declared output variables only; finite-limit conformance, outdoor-air conformance, broad humidity-control conformance, active economizer, active heat recovery, adaptive system timestep, sizing, non-constant efficiency schedules, broad meter conformance, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence, zero-failure diagnostic finite flow/capacity evidence with return-node proof rows, diagnostic ReportPurchasedAir energy and blank/constant Schedule:Constant fuel-efficiency evidence, diagnostic hourly facility meter oracle-MTR vs Rust aggregated fuel-energy evidence with RuntimeMeterRegistry request resolution, diagnostic no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio cooling/heating, and Humidistat dehumidification/humidification humidity-control latent/sensible/moisture-demand evidence, and diagnostic Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air design-flow/supply-air/mixed-air/inactive-economizer-heat-recovery evidence for declared output variables only; finite-limit conformance, outdoor-air conformance, broad humidity-control conformance, active economizer, active heat recovery, adaptive system timestep, sizing, non-constant efficiency schedules, broad meter conformance, and broad HVAC compatibility remain outside the claim."
 
 [[object]]
 name = "DesignSpecification:OutdoorAir"
 family = "hvac"
 status = "diagnostic"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; no active DCV, active economizer, active heat recovery, or numerical OA conformance claim."
+support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; no active DCV, active economizer, active heat recovery, or numerical OA conformance claim."
 
 [[object]]
 name = "NodeList"

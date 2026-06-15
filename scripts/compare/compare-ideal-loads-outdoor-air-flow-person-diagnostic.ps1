@@ -9,8 +9,8 @@ Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 $OracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
-$OutputRoot = Join-Path $RepoRoot ".runtime\ideal-loads-outdoor-air-flow-area\26.1.0"
-$CaseId = "ideal_loads_outdoor_air_flow_area_diagnostic_001"
+$OutputRoot = Join-Path $RepoRoot ".runtime\ideal-loads-outdoor-air-flow-person\26.1.0"
+$CaseId = "ideal_loads_outdoor_air_flow_person_diagnostic_001"
 $CasePath = Join-Path $RepoRoot "data\conformance_cases\$CaseId\case.toml"
 $CaseOutputRoot = Join-Path $OutputRoot $CaseId
 $CompareRoot = Join-Path $CaseOutputRoot "compare"
@@ -72,11 +72,11 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Generating IdealLoads outdoor-air Flow/Area diagnostic comparison artifacts."
+Write-Host "Generating IdealLoads outdoor-air Flow/Person diagnostic comparison artifacts."
 $output = & $cargo.Source run -p ep_cli --quiet -- conformance ideal-loads-outdoor-air-design-flow-report $CasePath $OracleRoot $OutputRoot 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
-    throw "IdealLoads outdoor-air Flow/Area diagnostic comparison failed."
+    throw "IdealLoads outdoor-air Flow/Person diagnostic comparison failed."
 }
 
 $text = ($output -join "`n")
@@ -132,6 +132,9 @@ if ($summary.samples -ne 96) {
 }
 if ($summary.design_volume_flow_rate_m3_per_s -ne 0.05) {
     throw "Unexpected outdoor-air design volume flow: $($summary.design_volume_flow_rate_m3_per_s)"
+}
+if ($summary.design_people_count -ne 5.0) {
+    throw "Unexpected outdoor-air design people count: $($summary.design_people_count)"
 }
 
 $rows = @($summary.series)
@@ -290,14 +293,18 @@ if ($stageSummary.branch -ne "outdoor-air-design-flow") {
 if ($stageSummary.outdoor_air -ne $true) {
     throw "Stage summary must record outdoor_air=true"
 }
-if ($stageSummary.outdoor_air_method -ne "Flow/Area") {
-    throw "Stage summary must record outdoor_air_method=Flow/Area, got $($stageSummary.outdoor_air_method)"
+if ($stageSummary.outdoor_air_method -ne "Flow/Person") {
+    throw "Stage summary must record outdoor_air_method=Flow/Person, got $($stageSummary.outdoor_air_method)"
+}
+if ($stageSummary.design_people_count -ne 5.0) {
+    throw "Stage summary must record design_people_count=5, got $($stageSummary.design_people_count)"
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery" -Description "markdown claim boundary"
-Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Area with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows" -Description "markdown OA source"
+Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Person with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows" -Description "markdown OA source"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
+Assert-Contains -Text $reportText -Pattern "design_people_count: 5.000000000000000" -Description "markdown design people count"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Mass Flow Rate | diagnostic" -Description "markdown OA mass row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate | diagnostic" -Description "markdown OA volume row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Sensible Heating Rate | diagnostic" -Description "markdown OA sensible heating row"
@@ -317,4 +324,4 @@ Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal 
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Economizer Active Time | diagnostic" -Description "markdown inactive economizer active-time row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Active Time | diagnostic" -Description "markdown inactive heat-recovery active-time row"
 
-Write-Host "IdealLoads outdoor-air Flow/Area diagnostic comparison artifacts generated."
+Write-Host "IdealLoads outdoor-air Flow/Person diagnostic comparison artifacts generated."

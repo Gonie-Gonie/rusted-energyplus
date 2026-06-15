@@ -5,7 +5,7 @@ use crate::{
     ConnectorListId, Construction, ConstructionId, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId,
     LoopId, Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName,
-    OtherEquipment, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind,
+    OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind,
     PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact,
     ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, Surface,
     SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
@@ -52,6 +52,10 @@ pub struct TypedModel {
     pub other_equipment: Vec<OtherEquipment>,
     /// OtherEquipment names.
     pub other_equipment_names: NameMap<InternalGainId>,
+    /// Zone occupants from People objects.
+    pub people: Vec<People>,
+    /// People object names.
+    pub people_names: NameMap<InternalGainId>,
     /// Dual setpoint thermostat objects.
     pub thermostat_dual_setpoints: Vec<ThermostatDualSetpoint>,
     /// Dual setpoint names.
@@ -145,6 +149,8 @@ impl Default for TypedModel {
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
+            people: Vec::new(),
+            people_names: NameMap::default(),
             thermostat_dual_setpoints: Vec::new(),
             thermostat_dual_setpoint_names: NameMap::default(),
             zone_thermostats: Vec::new(),
@@ -200,6 +206,7 @@ impl TypedModel {
             + self.schedules.len()
             + self.compact_schedules.len()
             + self.other_equipment.len()
+            + self.people.len()
             + self.thermostat_dual_setpoints.len()
             + self.zone_thermostats.len()
             + self.ideal_loads_air_systems.len()

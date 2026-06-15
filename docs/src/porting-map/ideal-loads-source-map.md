@@ -192,14 +192,23 @@ preparatory Rust surface is:
   schedule references preserved in `TypedModel`
 - `ModelGraph::ideal_loads_outdoor_air_specs` linking an IdealLoads system to
   its referenced outdoor-air design specification
+- `People` typed intake for zone design occupant count used by the
+  diagnostic-only Flow/Person proof lane
 - `calc_design_outdoor_air_volume_flow_m3_per_s` for supported
   `Flow/Person`, `Flow/Area`, `Flow/Zone`, `AirChanges/Hour`, `Sum`, and
   `Maximum` methods
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-economizer,
-  no-heat-recovery, no-humidity Flow/Zone, Flow/Area, AirChanges/Hour, Sum,
-  and Maximum OA report-rate and mixed-air state diagnostic
+  no-heat-recovery, no-humidity Flow/Person, Flow/Zone, Flow/Area,
+  AirChanges/Hour, Sum, and Maximum OA report-rate and mixed-air state
+  diagnostic
+
+`ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
+Flow/Person proof lane. The fixture declares five `People` design occupants
+and 0.01 m3/s-person outdoor air, so the derived design volume remains
+0.05 m3/s before the `StdRhoAir` mass-flow conversion used by the rest of the
+outdoor-air diagnostic lane.
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` adds a diagnostic-only
 Flow/Zone proof lane for the EnergyPlus report variables
@@ -284,7 +293,8 @@ humidity proof rows have diagnostic evidence only in
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in
-`ideal_loads_outdoor_air_design_flow_diagnostic_001` and
+`ideal_loads_outdoor_air_flow_person_diagnostic_001`,
+`ideal_loads_outdoor_air_design_flow_diagnostic_001`,
 `ideal_loads_outdoor_air_flow_area_diagnostic_001`, and
 `ideal_loads_outdoor_air_air_changes_diagnostic_001`,
 `ideal_loads_outdoor_air_sum_diagnostic_001`, and

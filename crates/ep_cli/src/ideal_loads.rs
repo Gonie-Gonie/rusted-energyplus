@@ -14,7 +14,8 @@ use ep_model::{
     AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType,
-    OutputHandle, ScheduleId, SimulationModel, SurfaceType, TypedModel, Zone,
+    OutputHandle, PeopleNumberCalculationMethod, ScheduleId, SimulationModel, SurfaceType,
+    TypedModel, Zone,
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
@@ -177,6 +178,9 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     outdoor_air_method: DesignSpecificationOutdoorAirMethod,
     outdoor_air_node_name: String,
     standard_air_density_kg_per_m3: f64,
+    design_people_count: f64,
+    zone_floor_area_m2: f64,
+    zone_volume_m3: f64,
     design_volume_flow_rate_m3_per_s: f64,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     sample_count: usize,
@@ -769,6 +773,9 @@ fn build_outdoor_air_design_flow_context<'a>(
         outdoor_air_method: outdoor_air_specification.method,
         outdoor_air_node_name: outdoor_air_node_name.0.clone(),
         standard_air_density_kg_per_m3,
+        design_people_count: outdoor_air_context.design_people_count,
+        zone_floor_area_m2: outdoor_air_context.zone_floor_area_m2,
+        zone_volume_m3: outdoor_air_context.zone_volume_m3,
         design_volume_flow_rate_m3_per_s,
         outdoor_air_mass_flow_rate_kg_per_s,
         sample_count,
@@ -783,14 +790,15 @@ fn validate_outdoor_air_design_flow_boundary(
 ) -> Result<(), String> {
     if !matches!(
         method,
-        DesignSpecificationOutdoorAirMethod::FlowPerZone
+        DesignSpecificationOutdoorAirMethod::FlowPerPerson
+            | DesignSpecificationOutdoorAirMethod::FlowPerZone
             | DesignSpecificationOutdoorAirMethod::FlowPerArea
             | DesignSpecificationOutdoorAirMethod::AirChangesPerHour
             | DesignSpecificationOutdoorAirMethod::Sum
             | DesignSpecificationOutdoorAirMethod::Maximum
     ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone, Flow/Area, AirChanges/Hour, Sum, or Maximum"
+            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, or Maximum"
                 .to_string(),
         );
     }
@@ -840,10 +848,33 @@ fn outdoor_air_method_label(method: DesignSpecificationOutdoorAirMethod) -> &'st
 
 fn ideal_loads_outdoor_air_context(model: &TypedModel, zone: &Zone) -> IdealLoadsOutdoorAirContext {
     IdealLoadsOutdoorAirContext {
-        design_people_count: 0.0,
+        design_people_count: ideal_loads_zone_design_people_count(model, zone),
         zone_floor_area_m2: ideal_loads_zone_floor_area_m2(model, zone),
         zone_volume_m3: ideal_loads_zone_volume_m3(model, zone).unwrap_or(0.0),
     }
+}
+
+fn ideal_loads_zone_design_people_count(model: &TypedModel, zone: &Zone) -> f64 {
+    let zone_floor_area_m2 = ideal_loads_zone_floor_area_m2(model, zone);
+    model
+        .people
+        .iter()
+        .filter(|people| people.zone == zone.id)
+        .map(|people| match people.number_of_people_calculation_method {
+            PeopleNumberCalculationMethod::People => people.number_of_people,
+            PeopleNumberCalculationMethod::PeoplePerArea => {
+                people.people_per_floor_area * zone_floor_area_m2
+            }
+            PeopleNumberCalculationMethod::AreaPerPerson => {
+                if people.floor_area_per_person > 0.0 {
+                    zone_floor_area_m2 / people.floor_area_per_person
+                } else {
+                    0.0
+                }
+            }
+        })
+        .filter(|value| value.is_finite() && *value > 0.0)
+        .sum()
 }
 
 fn ideal_loads_zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
@@ -3053,7 +3084,7 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
@@ -3082,6 +3113,15 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "standard_air_density_kg_per_m3: {:.15}\n",
         context.standard_air_density_kg_per_m3
     ));
+    report.push_str(&format!(
+        "design_people_count: {:.15}\n",
+        context.design_people_count
+    ));
+    report.push_str(&format!(
+        "zone_floor_area_m2: {:.15}\n",
+        context.zone_floor_area_m2
+    ));
+    report.push_str(&format!("zone_volume_m3: {:.15}\n", context.zone_volume_m3));
     report.push_str(&format!(
         "design_volume_flow_rate_m3_per_s: {:.15}\n",
         context.design_volume_flow_rate_m3_per_s
@@ -3202,6 +3242,18 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"standard_air_density_kg_per_m3\": {},\n",
         json_number(context.standard_air_density_kg_per_m3)
+    ));
+    json.push_str(&format!(
+        "  \"design_people_count\": {},\n",
+        json_number(context.design_people_count)
+    ));
+    json.push_str(&format!(
+        "  \"zone_floor_area_m2\": {},\n",
+        json_number(context.zone_floor_area_m2)
+    ));
+    json.push_str(&format!(
+        "  \"zone_volume_m3\": {},\n",
+        json_number(context.zone_volume_m3)
     ));
     json.push_str(&format!(
         "  \"design_volume_flow_rate_m3_per_s\": {},\n",
@@ -3455,6 +3507,18 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!(
         "  \"standard_air_density_kg_per_m3\": {},\n",
         json_number(context.standard_air_density_kg_per_m3)
+    ));
+    json.push_str(&format!(
+        "  \"design_people_count\": {},\n",
+        json_number(context.design_people_count)
+    ));
+    json.push_str(&format!(
+        "  \"zone_floor_area_m2\": {},\n",
+        json_number(context.zone_floor_area_m2)
+    ));
+    json.push_str(&format!(
+        "  \"zone_volume_m3\": {},\n",
+        json_number(context.zone_volume_m3)
     ));
     json.push_str(&format!(
         "  \"design_volume_flow_rate_m3_per_s\": {},\n",

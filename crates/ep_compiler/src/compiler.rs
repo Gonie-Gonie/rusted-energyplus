@@ -10,16 +10,16 @@ use ep_model::{
     InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
     MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList,
     NodeListId, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch, PlantBranchComponent,
-    PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
-    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SiteLocation, SolarDistribution, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
+    Point3, PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
+    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -205,6 +205,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Constant",
     "Schedule:Compact",
     "OtherEquipment",
+    "People",
     "ThermostatSetpoint:DualSetpoint",
     "ZoneControl:Thermostat",
     "NodeList",
@@ -273,6 +274,7 @@ impl<'a> Compiler<'a> {
         self.parse_plant_connector_lists(&mut model);
         self.parse_plant_loops(&mut model);
         self.parse_other_equipment(&mut model);
+        self.parse_people(&mut model);
         self.parse_surfaces(&mut model);
 
         let typed_object_count = model.object_count();
@@ -2021,6 +2023,83 @@ impl<'a> Compiler<'a> {
                     &object,
                     "fraction_lost",
                     0.0,
+                ),
+            });
+        }
+    }
+
+    fn parse_people(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("People") {
+            let Some(zone_name) = self.required_string(
+                "People",
+                &name,
+                &object,
+                "zone_or_zonelist_or_space_or_spacelist_name",
+            ) else {
+                continue;
+            };
+            let Some(zone) = self.resolve_name(
+                &model.zone_names,
+                "People",
+                &name,
+                "zone_or_zonelist_or_space_or_spacelist_name",
+                &zone_name,
+                "Zone",
+            ) else {
+                continue;
+            };
+            let number_of_people_schedule = self.optional_schedule_reference(
+                model,
+                "People",
+                &name,
+                &object,
+                "number_of_people_schedule_name",
+            );
+            let Some(id_value) = self.checked_id("People", &name, model.people.len()) else {
+                continue;
+            };
+            let id = InternalGainId(id_value);
+            if model.people_names.insert(&name, id).is_some() {
+                self.duplicate_name("People", &name);
+                continue;
+            }
+
+            model.people.push(People {
+                id,
+                name: NormalizedName::new(&name),
+                zone,
+                number_of_people_schedule,
+                number_of_people_calculation_method: self.enum_default(
+                    "People",
+                    &name,
+                    (&object, "number_of_people_calculation_method"),
+                    PeopleNumberCalculationMethod::People,
+                    "People",
+                    parse_people_number_calculation_method,
+                ),
+                number_of_people: self.number_range_default(
+                    "People",
+                    &name,
+                    &object,
+                    "number_of_people",
+                    0.0,
+                    0.0..=f64::INFINITY,
+                ),
+                people_per_floor_area: self.number_range_default(
+                    "People",
+                    &name,
+                    &object,
+                    "people_per_floor_area",
+                    0.0,
+                    0.0..=f64::INFINITY,
+                ),
+                floor_area_per_person: self.number_range_default(
+                    "People",
+                    &name,
+                    &object,
+                    "floor_area_per_person",
+                    0.0,
+                    0.0..=f64::INFINITY,
                 ),
             });
         }
@@ -3781,6 +3860,27 @@ fn parse_thermostat_control_object_type(value: &str) -> Option<ThermostatControl
     }
 }
 
+fn parse_people_number_calculation_method(value: &str) -> Option<PeopleNumberCalculationMethod> {
+    match value {
+        value if value.eq_ignore_ascii_case("People") => {
+            Some(PeopleNumberCalculationMethod::People)
+        }
+        value
+            if value.eq_ignore_ascii_case("People/Area")
+                || value.eq_ignore_ascii_case("PeoplePerArea") =>
+        {
+            Some(PeopleNumberCalculationMethod::PeoplePerArea)
+        }
+        value
+            if value.eq_ignore_ascii_case("Area/Person")
+                || value.eq_ignore_ascii_case("AreaPerPerson") =>
+        {
+            Some(PeopleNumberCalculationMethod::AreaPerPerson)
+        }
+        _ => None,
+    }
+}
+
 fn parse_ideal_loads_limit(value: &str) -> Option<IdealLoadsLimit> {
     match value {
         value if value.eq_ignore_ascii_case("NoLimit") => Some(IdealLoadsLimit::NoLimit),
@@ -4054,7 +4154,7 @@ mod tests {
         DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
         HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
         LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph, OutdoorAirEconomizerType,
-        OutsideSurfaceConvectionAlgorithm, PlantConnectorKind,
+        OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -4235,6 +4335,14 @@ mod tests {
                         "fraction_radiant": 0.2,
                         "fraction_lost": 0.3
                     }
+                },
+                "People": {
+                    "Occupants": {
+                        "zone_or_zonelist_or_space_or_spacelist_name": "zone one",
+                        "number_of_people_schedule_name": "always on",
+                        "number_of_people_calculation_method": "People",
+                        "number_of_people": 5.0
+                    }
                 }
             }"#,
         )?;
@@ -4264,6 +4372,17 @@ mod tests {
         assert_eq!(model.other_equipment[0].fraction_latent, 0.1);
         assert_eq!(model.other_equipment[0].fraction_radiant, 0.2);
         assert_eq!(model.other_equipment[0].fraction_lost, 0.3);
+        assert_eq!(model.people.len(), 1);
+        assert_eq!(model.people[0].zone.0, 0);
+        assert_eq!(
+            model.people[0].number_of_people_schedule.map(|id| id.0),
+            Some(0)
+        );
+        assert_eq!(
+            model.people[0].number_of_people_calculation_method,
+            PeopleNumberCalculationMethod::People
+        );
+        assert_eq!(model.people[0].number_of_people, 5.0);
 
         Ok(())
     }
