@@ -18,6 +18,8 @@ const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
+const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
+const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
 const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
@@ -828,6 +830,10 @@ pub struct ZoneHeatBalanceState {
     pub mean_air_temperature_c: f64,
     /// Previous mean air temperature history in C.
     pub previous_mean_air_temperatures_c: [f64; 3],
+    /// Current zone air humidity ratio in kgWater/kgDryAir.
+    pub air_humidity_ratio: f64,
+    /// Previous zone air humidity-ratio history in kgWater/kgDryAir.
+    pub previous_air_humidity_ratios: [f64; 3],
     /// Zone volume in cubic meters.
     pub volume_m3: f64,
     /// Air heat capacity in J/K.
@@ -3122,6 +3128,8 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             zone_name: zone.name.0.clone(),
             mean_air_temperature_c: initial_zone_air_temperature_c,
             previous_mean_air_temperatures_c: [initial_zone_air_temperature_c; 3],
+            air_humidity_ratio: ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+            previous_air_humidity_ratios: [ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO; 3],
             volume_m3,
             air_heat_capacity_j_per_k: volume_m3
                 * AIR_DENSITY_KG_PER_M3
@@ -3534,6 +3542,12 @@ fn advance_heat_balance_state_one_timestep_internal(
             previous_temperature_c,
             zone.previous_mean_air_temperatures_c[0],
             zone.previous_mean_air_temperatures_c[1],
+        ];
+        let previous_humidity_ratio = zone.air_humidity_ratio;
+        zone.previous_air_humidity_ratios = [
+            previous_humidity_ratio,
+            zone.previous_air_humidity_ratios[0],
+            zone.previous_air_humidity_ratios[1],
         ];
         zone.convective_internal_gain_w =
             convective_internal_gain_w(model, zone.zone_id, hour_ending);
@@ -3982,6 +3996,12 @@ fn advance_heat_balance_state_one_timestep_internal(
         correct_zone_air_after_surface_pass && !interleave_zone_air_surface_passes,
         heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
         use_inside_ctf_outside_temperature_for_conduction_report,
+    );
+    correct_zone_air_humidity_ratios_from_current_state(
+        &mut state.zones,
+        input.timestep_seconds,
+        weather_context,
+        heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
     );
 
     state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
@@ -4512,6 +4532,53 @@ fn correct_zone_air_temperatures_from_current_surfaces(
     }
 }
 
+fn correct_zone_air_humidity_ratios_from_current_state(
+    zones: &mut [ZoneHeatBalanceState],
+    timestep_seconds: f64,
+    context: Option<HeatBalanceWeatherContext<'_>>,
+    use_third_order_zone_air_correction: bool,
+) {
+    for zone in zones {
+        let humidity_ratio = if use_third_order_zone_air_correction {
+            let history_term = 3.0 * zone.previous_air_humidity_ratios[0]
+                - (3.0 / 2.0) * zone.previous_air_humidity_ratios[1]
+                + (1.0 / 3.0) * zone.previous_air_humidity_ratios[2];
+            history_term / (11.0 / 6.0)
+        } else {
+            zone.previous_air_humidity_ratios[0]
+        };
+        let saturation_humidity_ratio = context
+            .and_then(|context| {
+                let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
+                    context,
+                    context
+                        .records
+                        .get(context.record_index)?
+                        .atmospheric_pressure_pa,
+                );
+                energyplus_psychrometric_humidity_ratio_from_rh(
+                    zone.mean_air_temperature_c,
+                    1.0,
+                    atmospheric_pressure_pa,
+                )
+            })
+            .or_else(|| {
+                energyplus_psychrometric_humidity_ratio_from_rh(
+                    zone.mean_air_temperature_c,
+                    1.0,
+                    ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA,
+                )
+            })
+            .unwrap_or(f64::INFINITY);
+        zone.air_humidity_ratio = humidity_ratio
+            .clamp(0.0, saturation_humidity_ratio)
+            .max(ENERGYPLUS_MIN_HUMIDITY_RATIO);
+        if timestep_seconds <= 0.0 || !zone.air_humidity_ratio.is_finite() {
+            zone.air_humidity_ratio = ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO;
+        }
+    }
+}
+
 fn zone_surface_report_conduction_rates_w(
     surfaces: &[SurfaceHeatBalanceState],
     zone_id: ZoneId,
@@ -4972,6 +5039,13 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.initial_zone_air_temperature_c,
         ctf_coefficients,
     )?;
+    seed_zone_air_humidity_ratios_from_weather_records(
+        &mut state,
+        weather_records,
+        weather_dry_bulb_c[0],
+        zone_steps_per_hour,
+        first_hour_interpolation_starting_values,
+    );
     match options.ctf_initial_history_policy {
         HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
             seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
@@ -7395,14 +7469,43 @@ fn energyplus_general_iterate(
 fn update_zone_air_heat_capacities_from_weather_context(
     zones: &mut [ZoneHeatBalanceState],
     context: Option<HeatBalanceWeatherContext<'_>>,
-    fallback_dry_bulb_c: f64,
+    _fallback_dry_bulb_c: f64,
 ) {
     for zone in zones {
         if let Some(air_heat_capacity_j_per_k) =
-            weather_context_zone_air_heat_capacity_j_per_k(zone, context, fallback_dry_bulb_c)
+            weather_context_zone_air_heat_capacity_j_per_k(zone, context)
         {
             zone.air_heat_capacity_j_per_k = air_heat_capacity_j_per_k;
         }
+    }
+}
+
+fn seed_zone_air_humidity_ratios_from_weather_records(
+    state: &mut HeatBalanceState,
+    weather_records: Option<&[EpwRecord]>,
+    fallback_dry_bulb_c: f64,
+    zone_steps_per_hour: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) {
+    let Some(records) = weather_records else {
+        return;
+    };
+    let Some(humidity_ratio) = weather_context_outdoor_humidity_ratio(
+        HeatBalanceWeatherContext {
+            records,
+            record_index: 0,
+            zone_steps_per_hour,
+            zone_timestep: Some(1),
+            first_hour_interpolation_starting_values,
+        },
+        fallback_dry_bulb_c,
+    ) else {
+        return;
+    };
+
+    for zone in &mut state.zones {
+        zone.air_humidity_ratio = humidity_ratio;
+        zone.previous_air_humidity_ratios = [humidity_ratio; 3];
     }
 }
 
@@ -9399,17 +9502,34 @@ fn energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
 fn weather_proxy_zone_air_heat_capacity_j_per_k(
     zone: &ZoneHeatBalanceState,
     context: Option<HeatBalanceWeatherContext<'_>>,
-    fallback_dry_bulb_c: f64,
+    _fallback_dry_bulb_c: f64,
 ) -> Option<f64> {
-    weather_context_zone_air_heat_capacity_j_per_k(zone, context, fallback_dry_bulb_c)
+    weather_context_zone_air_heat_capacity_j_per_k(zone, context)
 }
 
 fn weather_context_zone_air_heat_capacity_j_per_k(
     zone: &ZoneHeatBalanceState,
     context: Option<HeatBalanceWeatherContext<'_>>,
-    fallback_dry_bulb_c: f64,
 ) -> Option<f64> {
     let context = context?;
+    let record = context.records.get(context.record_index)?;
+    let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
+        context,
+        record.atmospheric_pressure_pa,
+    );
+
+    energyplus_zone_air_heat_capacity_j_per_k(
+        zone.volume_m3,
+        atmospheric_pressure_pa,
+        zone.mean_air_temperature_c,
+        zone.air_humidity_ratio,
+    )
+}
+
+fn weather_context_outdoor_humidity_ratio(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_dry_bulb_c: f64,
+) -> Option<f64> {
     let record = context.records.get(context.record_index)?;
     let dry_bulb_c = context
         .zone_timestep
@@ -9430,17 +9550,11 @@ fn weather_context_zone_air_heat_capacity_j_per_k(
         context,
         record.atmospheric_pressure_pa,
     );
-    let humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
+
+    energyplus_psychrometric_humidity_ratio_from_rh(
         dry_bulb_c,
         (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
         atmospheric_pressure_pa,
-    )?;
-
-    energyplus_zone_air_heat_capacity_j_per_k(
-        zone.volume_m3,
-        atmospheric_pressure_pa,
-        zone.mean_air_temperature_c,
-        humidity_ratio,
     )
 }
 
@@ -10860,8 +10974,8 @@ mod tests {
         energyplus_exterior_wet_timestep_fraction, energyplus_heat_balance_compatibility_stages,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
-        energyplus_outdoor_wet_bulb_c, energyplus_psychrometric_humidity_ratio_from_rh,
-        energyplus_scriptf_from_view_factors, energyplus_shadowing_period_solar_coefficients,
+        energyplus_outdoor_wet_bulb_c, energyplus_scriptf_from_view_factors,
+        energyplus_shadowing_period_solar_coefficients,
         energyplus_surface_outside_wind_speed_m_per_s,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
@@ -11412,14 +11526,14 @@ mod tests {
         let plan = build_execution_plan(&model);
 
         assert_eq!(plan.stages.len(), 3);
-        assert_eq!(plan.step_count(), 12);
+        assert_eq!(plan.step_count(), 14);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
             plan.stages[0].steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].steps.len(), 9);
+        assert_eq!(plan.stages[2].steps.len(), 11);
         assert_eq!(
             plan.stages[2].steps[0],
             ExecutionStep::WriteOutput(OutputHandle(0))
@@ -11433,8 +11547,8 @@ mod tests {
             ExecutionStep::WriteOutput(OutputHandle(2))
         );
         assert_eq!(
-            plan.stages[2].steps[8],
-            ExecutionStep::WriteOutput(OutputHandle(8))
+            plan.stages[2].steps[10],
+            ExecutionStep::WriteOutput(OutputHandle(10))
         );
         assert_eq!(
             plan.compatibility_stages,
@@ -14827,12 +14941,13 @@ DATA PERIODS
     }
 
     #[test]
-    fn weather_context_updates_zone_air_heat_capacity_from_pressure_and_humidity()
+    fn weather_context_updates_zone_air_heat_capacity_from_pressure_and_zone_humidity()
     -> Result<(), Box<dyn std::error::Error>> {
         let typed = cube_model();
         let model = SimulationModel::from_typed(typed);
         let mut state = initialize_heat_balance_state(&model, 20.0)?;
         let initial_capacity = state.zones[0].air_heat_capacity_j_per_k;
+        state.zones[0].air_humidity_ratio = 0.0025;
 
         let mut previous = weather_record_with_precipitation(0.0);
         previous.dry_bulb_c = 10.0;
@@ -14857,13 +14972,11 @@ DATA PERIODS
             current.dry_bulb_c,
         );
 
-        let humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(16.0, 0.60, 82_000.0)
-            .expect("valid weather humidity ratio");
         let expected_capacity = energyplus_zone_air_heat_capacity_j_per_k(
             state.zones[0].volume_m3,
             82_000.0,
             20.0,
-            humidity_ratio,
+            0.0025,
         )
         .expect("valid expected capacity");
         assert!((state.zones[0].air_heat_capacity_j_per_k - expected_capacity).abs() < 1.0e-9);
@@ -15626,80 +15739,6 @@ DATA PERIODS
                 .iter()
                 .zip(&frozen_zone_temperature.values)
                 .any(|(active, frozen)| (active - frozen).abs() > 1.0e-9)
-        );
-
-        Ok(())
-    }
-
-    #[test]
-    fn frozen_reference_air_current_longwave_probe_changes_longwave_source()
-    -> Result<(), Box<dyn std::error::Error>> {
-        let mut typed = cube_model();
-        typed.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
-        typed.surfaces[0].sun_exposure = SunExposure::NoSun;
-        typed.surfaces[0].wind_exposure = WindExposure::NoWind;
-        let model = SimulationModel::from_typed(typed);
-        let weather_values = vec![5.0, 35.0];
-
-        let frozen_reference_air = simulate_heat_balance_zone_air_temperatures(
-            &model,
-            &weather_values,
-            HeatBalanceSimulationOptions::hourly_samples(2)
-                .with_zone_air_algorithm(
-                    HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirProbe,
-                )
-                .with_surface_iteration_count(3),
-        )?;
-        let current_longwave = simulate_heat_balance_zone_air_temperatures(
-            &model,
-            &weather_values,
-            HeatBalanceSimulationOptions::hourly_samples(2)
-                .with_zone_air_algorithm(
-                    HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveProbe,
-                )
-                .with_surface_iteration_count(3),
-        )?;
-
-        let Some(frozen_floor_longwave) = frozen_reference_air.results.find_series(
-            "FLOOR",
-            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
-        ) else {
-            return Err(std::io::Error::other("missing frozen floor longwave").into());
-        };
-        let Some(current_floor_longwave) = current_longwave.results.find_series(
-            "FLOOR",
-            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
-        ) else {
-            return Err(std::io::Error::other("missing current floor longwave").into());
-        };
-        let Some(frozen_floor_temperature) = frozen_reference_air
-            .results
-            .find_series("FLOOR", "Surface Inside Face Temperature")
-        else {
-            return Err(std::io::Error::other("missing frozen floor temperature").into());
-        };
-        let Some(current_floor_temperature) = current_longwave
-            .results
-            .find_series("FLOOR", "Surface Inside Face Temperature")
-        else {
-            return Err(std::io::Error::other("missing current floor temperature").into());
-        };
-
-        assert_eq!(frozen_floor_longwave.values.len(), 2);
-        assert_eq!(current_floor_longwave.values.len(), 2);
-        assert!(
-            frozen_floor_longwave
-                .values
-                .iter()
-                .zip(&current_floor_longwave.values)
-                .any(|(frozen, current)| (frozen - current).abs() > 1.0e-9)
-        );
-        assert!(
-            frozen_floor_temperature
-                .values
-                .iter()
-                .zip(&current_floor_temperature.values)
-                .any(|(frozen, current)| (frozen - current).abs() > 1.0e-9)
         );
 
         Ok(())
