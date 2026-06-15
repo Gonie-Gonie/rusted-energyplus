@@ -35,13 +35,18 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_no_oa_no_limit_sensible_compat, calc_no_oa_sensible_with_limits_compat,
@@ -67,6 +72,7 @@ const ZONE_SYSTEM_PREDICTED_HEATING_LOAD: &str =
     "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate";
 const ZONE_SYSTEM_PREDICTED_COOLING_LOAD: &str =
     "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate";
+const IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS: f64 = 8.0;
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -94,6 +100,8 @@ struct IdealLoadsDiagnosticContext<'a> {
     zone_air_node_name: String,
     system_name: String,
     supply_node_name: String,
+    system_timestep_seconds: f64,
+    energy_report_interval_seconds: f64,
     rows: Vec<IdealLoadsDiagnosticRow>,
     result_store: ResultStore,
     input_trace: IdealLoadsInputTrace,
@@ -938,6 +946,8 @@ fn build_context<'a>(
     }
 
     let input_trace = load_input_trace(&baseline.eso, &zone.name.0, &zone_air_node.name.0)?;
+    let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
+    let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
     let (rows, result_store, mode_counts) = evaluate_rows(
         manifest,
         &model,
@@ -947,6 +957,7 @@ fn build_context<'a>(
         &zone_air_node.name.0,
         &system.name.0,
         &supply_node.name.0,
+        energy_report_interval_seconds,
     )?;
 
     let zone_name = zone.name.0.clone();
@@ -963,6 +974,8 @@ fn build_context<'a>(
         zone_air_node_name,
         system_name,
         supply_node_name,
+        system_timestep_seconds,
+        energy_report_interval_seconds,
         rows,
         result_store,
         input_trace,
@@ -1005,6 +1018,16 @@ fn load_input_trace(
     })
 }
 
+fn ideal_loads_system_timestep_seconds(model: &SimulationModel) -> f64 {
+    let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    3600.0 / f64::from(zone_timesteps_per_hour) / IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS
+}
+
+fn ideal_loads_energy_report_interval_seconds(model: &SimulationModel) -> f64 {
+    let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    3600.0 / f64::from(zone_timesteps_per_hour)
+}
+
 fn load_series(eso: &Path, key: &str, variable: &str) -> Result<LoadedSeries, String> {
     let series = load_eso_time_series(eso, key, variable)
         .map_err(|error| format!("failed to load ESO series {key}/{variable}: {error}"))?;
@@ -1041,6 +1064,7 @@ fn evaluate_rows(
     zone_air_node_name: &str,
     system_name: &str,
     supply_node_name: &str,
+    energy_report_interval_seconds: f64,
 ) -> Result<
     (
         Vec<IdealLoadsDiagnosticRow>,
@@ -1096,6 +1120,13 @@ fn evaluate_rows(
     }
 
     let result_source = rust_result_source(system);
+    let timestamps = input_trace
+        .zone_node_temperature
+        .samples
+        .iter()
+        .take(input_trace.sample_count)
+        .map(|sample| sample.timestamp.clone())
+        .collect::<Vec<_>>();
 
     let mut observed_by_variable = BTreeMap::new();
     observed_by_variable.insert(
@@ -1234,7 +1265,50 @@ fn evaluate_rows(
         result_source,
         |result| result.supply_air_total_cooling_rate_w,
     );
-    if manifest_requests_fuel_energy_rates(manifest) {
+    if manifest_requests_report_energies(manifest) {
+        let energy_source = "rust-ideal-loads-report-time-step-energy";
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY,
+            energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.supply_air_total_heating_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
+            energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.supply_air_total_cooling_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
+            energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.zone_total_heating_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
+            energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.zone_total_cooling_rate_w,
+        );
+    }
+    if manifest_requests_fuel_energy_outputs(manifest) {
         ensure_blank_fuel_efficiency_schedules(system)?;
         let fuel_source = "rust-ideal-loads-blank-fuel-efficiency";
         add_result_series(
@@ -1273,6 +1347,47 @@ fn evaluate_rows(
             fuel_source,
             |result| result.zone_total_cooling_rate_w,
         );
+        let fuel_energy_source = "rust-ideal-loads-blank-fuel-efficiency-time-step-energy";
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+            fuel_energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.supply_air_total_heating_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+            fuel_energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.supply_air_total_cooling_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
+            fuel_energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.zone_total_heating_rate_w,
+        );
+        add_result_energy_series(
+            &mut observed_by_variable,
+            system_name,
+            &calc_results,
+            ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
+            fuel_energy_source,
+            &timestamps,
+            energy_report_interval_seconds,
+            |result| result.zone_total_cooling_rate_w,
+        );
     }
     add_result_series(
         &mut observed_by_variable,
@@ -1301,14 +1416,6 @@ fn evaluate_rows(
         result_source,
         |result| result.supply_mass_flow_rate_kg_per_s,
     );
-
-    let timestamps = input_trace
-        .zone_node_temperature
-        .samples
-        .iter()
-        .take(input_trace.sample_count)
-        .map(|sample| sample.timestamp.clone())
-        .collect::<Vec<_>>();
 
     let mut rows = Vec::new();
     let mut result_store = ResultStore::new();
@@ -1371,18 +1478,39 @@ fn evaluate_rows(
     Ok((rows, result_store, mode_counts))
 }
 
-fn manifest_requests_fuel_energy_rates(manifest: &ConformanceCase) -> bool {
+fn manifest_requests_report_energies(manifest: &ConformanceCase) -> bool {
     manifest
         .outputs
         .iter()
-        .any(|output| ideal_loads_fuel_energy_rate_variable(&output.variable))
+        .any(|output| ideal_loads_report_energy_variable(&output.variable))
 }
 
-fn ideal_loads_fuel_energy_rate_variable(variable: &str) -> bool {
+fn ideal_loads_report_energy_variable(variable: &str) -> bool {
+    matches!(
+        variable,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY
+            | ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY
+            | ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY
+            | ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY
+    )
+}
+
+fn manifest_requests_fuel_energy_outputs(manifest: &ConformanceCase) -> bool {
+    manifest
+        .outputs
+        .iter()
+        .any(|output| ideal_loads_fuel_energy_variable(&output.variable))
+}
+
+fn ideal_loads_fuel_energy_variable(variable: &str) -> bool {
     matches!(
         variable,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE
             | ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE
+            | ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY
+            | ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY
+            | ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY
+            | ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY
             | ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE
             | ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE
     )
@@ -1393,7 +1521,7 @@ fn ensure_blank_fuel_efficiency_schedules(system: &IdealLoadsAirSystem) -> Resul
         || system.cooling_fuel_efficiency_schedule.is_some()
     {
         return Err(
-            "IdealLoads fuel energy-rate diagnostic currently supports only blank fuel efficiency schedules"
+            "IdealLoads fuel energy diagnostic currently supports only blank fuel efficiency schedules"
                 .to_string(),
         );
     }
@@ -1522,12 +1650,78 @@ fn add_result_series(
     variable: &str,
     units: &'static str,
     source: &'static str,
-    value: fn(IdealLoadsSensibleResult) -> f64,
+    value: impl Fn(IdealLoadsSensibleResult) -> f64,
 ) {
     observed_by_variable.insert(
         (key.to_string(), variable.to_string()),
         ObservedSeries::new(source, units, results.iter().copied().map(value).collect()),
     );
+}
+
+fn add_result_energy_series(
+    observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
+    key: &str,
+    results: &[IdealLoadsSensibleResult],
+    variable: &str,
+    source: &'static str,
+    timestamps: &[Option<String>],
+    default_report_interval_seconds: f64,
+    rate: impl Fn(IdealLoadsSensibleResult) -> f64,
+) {
+    let values = results
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(index, result)| {
+            let interval_seconds = energy_report_seconds_from_timestamp(
+                timestamps
+                    .get(index)
+                    .and_then(|timestamp| timestamp.as_deref()),
+                default_report_interval_seconds,
+            );
+            rate(result) * interval_seconds
+        })
+        .collect();
+    observed_by_variable.insert(
+        (key.to_string(), variable.to_string()),
+        ObservedSeries::new(source, "J", values),
+    );
+}
+
+fn energy_report_seconds_from_timestamp(
+    timestamp: Option<&str>,
+    default_report_interval_seconds: f64,
+) -> f64 {
+    let Some(timestamp) = timestamp else {
+        return default_report_interval_seconds;
+    };
+    let mut start_minutes = None;
+    let mut end_minutes = None;
+    for field in timestamp.split(';') {
+        let Some((key, value)) = field.split_once('=') else {
+            continue;
+        };
+        if key.eq_ignore_ascii_case("start") {
+            start_minutes = value.trim().parse::<f64>().ok();
+        } else if key.eq_ignore_ascii_case("end") {
+            end_minutes = value.trim().parse::<f64>().ok();
+        }
+    }
+    let (Some(start_minutes), Some(end_minutes)) = (start_minutes, end_minutes) else {
+        return default_report_interval_seconds;
+    };
+    let duration_minutes = end_minutes - start_minutes;
+    if duration_minutes <= 0.0 || !duration_minutes.is_finite() {
+        return default_report_interval_seconds;
+    }
+    let default_report_interval_minutes = default_report_interval_seconds / 60.0;
+    if default_report_interval_minutes <= 0.0 || !default_report_interval_minutes.is_finite() {
+        return default_report_interval_seconds;
+    }
+    let substeps = (default_report_interval_minutes / duration_minutes)
+        .round()
+        .max(1.0);
+    default_report_interval_seconds / substeps
 }
 
 fn values_from_samples(samples: &[SeriesSample], sample_count: usize) -> Vec<f64> {
@@ -1733,6 +1927,12 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     report.push_str("zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\n");
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
     report.push_str("fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\n");
+    report.push_str(&format!(
+        "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed_system_substeps={:.0} system_timestep_seconds={:.12} energy_report_interval_seconds={:.12}\n",
+        IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS,
+        context.system_timestep_seconds,
+        context.energy_report_interval_seconds
+    ));
     report.push_str("zone_demand_synthetic_rc_model: false\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
@@ -2280,6 +2480,19 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
     json.push_str("  \"fuel_energy_rate_source\": \"EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\",\n");
+    json.push_str("  \"energy_source\": \"EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed 8-substep fixture branch\",\n");
+    json.push_str(&format!(
+        "  \"system_timestep_substeps\": {},\n",
+        json_number(IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS)
+    ));
+    json.push_str(&format!(
+        "  \"system_timestep_seconds\": {},\n",
+        json_number(context.system_timestep_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"energy_report_interval_seconds\": {},\n",
+        json_number(context.energy_report_interval_seconds)
+    ));
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");
     json.push_str(&format!(
         "  \"zone\": {},\n",

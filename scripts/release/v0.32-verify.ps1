@@ -112,8 +112,8 @@ if ($handbook.aggregate.structural_input_count -ne 5) {
 if ($handbook.aggregate.conformance_output_variable_count -ne 43) {
     throw "Expected 43 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
 }
-if ($handbook.aggregate.diagnostic_output_variable_count -ne 59) {
-    throw "Expected 59 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
+if ($handbook.aggregate.diagnostic_output_variable_count -ne 67) {
+    throw "Expected 67 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
 }
 if ($handbook.aggregate.baseline_output_variable_count -ne 6) {
     throw "Expected 6 baseline output variables, found $($handbook.aggregate.baseline_output_variable_count)"

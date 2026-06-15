@@ -26,12 +26,36 @@ pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE: &str =
 /// IdealLoads supply-air total cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE: &str =
     "Zone Ideal Loads Supply Air Total Cooling Rate";
+/// IdealLoads supply-air total heating energy output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY: &str =
+    "Zone Ideal Loads Supply Air Total Heating Energy";
+/// IdealLoads supply-air total cooling energy output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY: &str =
+    "Zone Ideal Loads Supply Air Total Cooling Energy";
+/// IdealLoads supply-air total heating fuel energy output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY: &str =
+    "Zone Ideal Loads Supply Air Total Heating Fuel Energy";
+/// IdealLoads supply-air total cooling fuel energy output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY: &str =
+    "Zone Ideal Loads Supply Air Total Cooling Fuel Energy";
 /// IdealLoads supply-air total heating fuel energy rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE: &str =
     "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate";
 /// IdealLoads supply-air total cooling fuel energy rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE: &str =
     "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate";
+/// IdealLoads zone total heating energy output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY: &str =
+    "Zone Ideal Loads Zone Total Heating Energy";
+/// IdealLoads zone total cooling energy output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY: &str =
+    "Zone Ideal Loads Zone Total Cooling Energy";
+/// IdealLoads zone heating fuel energy output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY: &str =
+    "Zone Ideal Loads Zone Heating Fuel Energy";
+/// IdealLoads zone cooling fuel energy output variable.
+pub const ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY: &str =
+    "Zone Ideal Loads Zone Cooling Fuel Energy";
 /// IdealLoads zone heating fuel energy rate output variable.
 pub const ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE: &str =
     "Zone Ideal Loads Zone Heating Fuel Energy Rate";
