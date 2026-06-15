@@ -87,9 +87,9 @@ plant, meter, or broad heat-balance compatibility.
 | Heat-balance orchestration | `ManageHeatBalance`, `InitHeatBalance` | heat-balance timestep driver and state init | source map plus v0.8/v0.9 narrow gates | partial, no general claim |
 | Zone air update | `ManageZoneAirUpdates`, `correctZoneAirTemps` | zone MAT state advance | `heat_balance_nomass_001` MAT tolerance gate | see `zone-air-update-map.md`; conformance only for declared no-mass case |
 | Surface inside/outside balance | `CalcHeatBalanceInsideSurf`, `CalcHeatBalanceOutsideSurf` | surface temperature trace plus adiabatic/interzone boundary target state | `surface_temperature_nomass_001` tolerance gate plus v0.25 boundary smoke | see `surface-balance-map.md`; conformance only for declared surface variables |
-| Opaque conduction | CTF setup and surface balance reporting | surface and zone conduction result series | no-mass adiabatic conduction series in `surface_temperature_nomass_001`; official diagnostic deltas in `official_1zone_uncontrolled_dynamic_diagnostic_001` | see `conduction-map.md`; no official ExampleFile CTF parity |
+| Opaque conduction | CTF setup and surface balance reporting | surface and zone conduction result series | no-mass adiabatic conduction series in `surface_temperature_nomass_001`; selected whole-surface conduction rows in `official_1zone_uncontrolled_dynamic_conformance_candidate_001`; broader diagnostic deltas in `official_1zone_uncontrolled_dynamic_diagnostic_001` | see `conduction-map.md`; no broad official ExampleFile CTF parity |
 | Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | `internal_gains_001` tolerance gate | conformance only for declared convective trace; not zone air parity alone |
-| Warmup and reporting semantics | warmup convergence and ESO reporting filters | diagnostic Rust warmup loop plus report metadata; full parity future | heat-balance diagnostic reports filter ESO run-period samples and record Rust/oracle warmup day counts | see `warmup-semantics-map.md`; official dynamic cases are diagnostic candidates |
+| Warmup and reporting semantics | warmup convergence and ESO reporting filters | Rust warmup loop plus report metadata; full parity future | the official dynamic compatibility candidate pins the oracle run-period warmup count for its promoted variables, while diagnostic reports retain broader warmup evidence | see `warmup-semantics-map.md`; no broad warmup-convergence claim |
 | Weather and schedules | weather/schedule managers, source map pending expansion | typed weather and schedule traces | smoke comparisons | input evidence only |
 | Dynamic envelope behavior | multiple surface and material managers | not fully ported | none | no claim |
 | Solar, fenestration, infiltration, HVAC coupling | multiple domain managers | not ported for heat-balance conformance | none | no claim |
@@ -250,11 +250,21 @@ A heat-balance claim needs all of these:
 
 Minimum first variables:
 
-- `Zone Mean Air Temperature`: conformance only for `heat_balance_nomass_001`
-- `Surface Inside Face Temperature`: conformance only for `surface_temperature_nomass_001`
-- `Surface Outside Face Temperature`: conformance only for `surface_temperature_nomass_001`
-- surface inside/outside conduction rates and per-area rates: conformance only
-  for no-mass adiabatic `surface_temperature_nomass_001`
+- `Zone Mean Air Temperature`: conformance for `heat_balance_nomass_001` and
+  the official dynamic compatibility candidate
+- selected zone air heat-balance rows: conformance for the official dynamic
+  compatibility candidate
+- `Surface Inside Face Temperature`: conformance for
+  `surface_temperature_nomass_001` and the official dynamic compatibility
+  candidate's declared surfaces
+- `Surface Outside Face Temperature`: conformance for
+  `surface_temperature_nomass_001` and the official dynamic compatibility
+  candidate's declared surfaces
+- surface inside/outside conduction rates: conformance for no-mass adiabatic
+  `surface_temperature_nomass_001` and the official dynamic compatibility
+  candidate's declared whole-surface rows
+- surface conduction per-area rows and zone opaque conduction aggregates:
+  diagnostic-only for official dynamic heat-balance work
 - `Zone Opaque Surface Inside Faces Conduction Rate`: conformance only for
   no-mass adiabatic `surface_temperature_nomass_001`
 - `Zone Opaque Surface Outside Faces Conduction Rate`: diagnostic-only for

@@ -9,8 +9,8 @@ last_reviewed: 2026-06-12
 
 Reference version: EnergyPlus 26.1.0
 
-Purpose: define what must be ported before an official ExampleFile zone air
-temperature series can be promoted with `conformance_claim=true`.
+Purpose: define the promoted official ExampleFile zone-air boundary and what
+must remain outside the claim until broader EnergyPlus zone-air parity exists.
 
 ## Source Anchors
 
@@ -18,7 +18,7 @@ temperature series can be promoted with `conformance_claim=true`.
 |---|---|---|---|
 | zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `advance_heat_balance_state_one_timestep` successor | scalar shell only |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
-| air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | active dynamic lane updates `AirPowerCap` from weather-context pressure/RH proxy; owned `ZoneAirHumRat` still pending |
+| air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
 | surface convection coupling | `HeatBalanceSurfaceManager.cc` | future surface convection aggregate | not ported |
 | HVAC and infiltration coupling | zone equipment and air balance managers | future zone load inputs | not ported |
@@ -36,21 +36,19 @@ An official ExampleFile zone-air series may become conformance only after:
 
 ## Current Boundary
 
-`Zone Mean Air Temperature` is conformance only for the declared no-mass local
-cases. Official `1ZoneUncontrolled` zone temperature is a baseline and failing
-diagnostic candidate. The diagnostic now records run-period filtering and
-Rust/oracle warmup day metadata, but it remains below promotion until the
-predictor/corrector histories, surface coupling, and warmup convergence match
-EnergyPlus.
+`Zone Mean Air Temperature`, `Zone Air Heat Balance Surface Convection Rate`,
+and `Zone Air Heat Balance Air Energy Storage Rate` are now conformance for the
+official `1ZoneUncontrolled` compatibility candidate, in addition to the older
+no-mass local MAT case. The broad diagnostic and probe lanes still exist for
+source-order investigation, but their diagnostic rows do not inherit the
+candidate claim.
 
 The EnergyPlus moist-air capacitance equations are runtime helpers and are now
-wired into the active `1ZoneUncontrolled` dynamic diagnostic solver immediately
+wired into the active `1ZoneUncontrolled` dynamic candidate solver immediately
 before `AirPowerCap`/zone-air coefficient construction. The current lane uses
-the timestep-interpolated weather pressure/RH as a temporary `airHumRat` proxy:
-this dropped MAT RMSE to `0.022407 C`, zone-air storage RMSE to `3.708949 W`,
-and coefficient-level surface convection RMSE to `4.277641 W`. Porting owned
-`ZoneAirHumRat` remains necessary before this can be promoted beyond diagnostic
-coverage.
+the timestep-interpolated weather pressure/RH as a temporary `airHumRat` proxy.
+Porting owned `ZoneAirHumRat` remains necessary before widening the claim
+beyond the declared official dynamic candidate variables.
 
 The current third-order coupled probe is a useful candidate, not a promotion.
 On the frozen-hconv interleaved grey-longwave surface lane it lowers MAT RMSE

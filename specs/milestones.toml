@@ -483,22 +483,28 @@ not_claimed = [
 
 [[milestone]]
 version = "0.33"
-title = "Official Dynamic Heat-Balance Diagnostic"
-status = "in_progress"
-claim_level = "diagnostic-only"
+title = "Official Dynamic Heat-Balance Conformance"
+status = "complete"
+claim_level = "limited-official-dynamic-conformance"
 required_cases = [
   "official_1zone_uncontrolled_dynamic_diagnostic_001",
   "official_1zone_uncontrolled_dynamic_conformance_candidate_001",
 ]
 required_variables = [
+  "Site Outdoor Air Drybulb Temperature",
   "Zone Mean Air Temperature",
+  "Zone Air Heat Balance Internal Convective Heat Gain Rate",
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
   "Surface Inside Face Conduction Heat Transfer Rate",
-  "Zone Opaque Surface Inside Faces Conduction Rate",
+  "Surface Outside Face Conduction Heat Transfer Rate",
+  "Zone Air Heat Balance Surface Convection Rate",
+  "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 not_claimed = [
-  "official ExampleFiles dynamic numerical conformance",
-  "warmup parity",
-  "surface CTF/conduction parity",
+  "broad ExampleFiles dynamic numerical conformance",
+  "general warmup convergence parity outside the official 1ZoneUncontrolled dynamic candidate",
+  "diagnostic storage, radiation, solar, and convection coefficient variables",
   "solar and exterior convection parity",
   "full EnergyPlus compatibility",
 ]

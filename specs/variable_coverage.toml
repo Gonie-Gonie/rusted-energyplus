@@ -148,7 +148,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated only for declared opaque no-mass surface cases; no solar, fenestration, or general surface heat-balance claim."
+support_boundary = "Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general surface heat-balance claim."
 
 [[variable]]
 name = "Surface Outside Face Temperature"
@@ -156,7 +156,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated only for declared opaque no-mass surface cases; no solar, fenestration, or general exterior boundary claim."
+support_boundary = "Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general exterior boundary claim."
 
 [[variable]]
 name = "Zone Mean Air Temperature"
@@ -164,7 +164,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "heat_balance_nomass_001"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Tolerance-gated only for declared no-mass heat-balance cases; no general heat-balance or HVAC claim."
+support_boundary = "Tolerance-gated for declared no-mass heat-balance cases and the official 1ZoneUncontrolled dynamic compatibility-candidate lane; no general heat-balance or HVAC claim."
 
 [[variable]]
 name = "OtherEquipment Internal Gains Nominal Equipment Level"
@@ -231,6 +231,14 @@ first_evidence = "internal_gains_001"
 support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
 
 [[variable]]
+name = "Zone Air Heat Balance Internal Convective Heat Gain Rate"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
+
+[[variable]]
 name = "Schedule Value"
 domain = "schedule"
 status = "conformance"
@@ -284,7 +292,7 @@ domain = "surface"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance plus named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; broad CTF/storage/radiation parity remains outside the claim."
 
 [[variable]]
 name = "Surface Inside Face Conduction Heat Transfer Rate per Area"
@@ -292,7 +300,7 @@ domain = "surface"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance plus named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; broad CTF/storage/radiation parity remains outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Conduction Heat Transfer Rate"
@@ -300,7 +308,7 @@ domain = "surface"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance plus named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; broad CTF/storage/radiation parity remains outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Conduction Heat Transfer Rate per Area"
@@ -308,7 +316,7 @@ domain = "surface"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance plus named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; broad CTF/storage/radiation parity remains outside the claim."
 
 [[variable]]
 name = "Zone Opaque Surface Inside Faces Conduction Rate"
@@ -321,18 +329,18 @@ support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; o
 [[variable]]
 name = "Zone Air Heat Balance Surface Convection Rate"
 domain = "heat_balance"
-status = "diagnostic"
+status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Official 1Zone dynamic compatibility-candidate evidence only; not tolerance-gated conformance until all candidate variables pass."
+support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Zone Air Heat Balance Air Energy Storage Rate"
 domain = "heat_balance"
-status = "diagnostic"
+status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Official 1Zone dynamic compatibility-candidate evidence only; not tolerance-gated conformance until all candidate variables pass."
+support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Surface Heat Storage Rate"
@@ -348,7 +356,7 @@ domain = "weather"
 status = "conformance"
 first_case = "weather_fields_001"
 first_evidence = "weather_fields_001"
-support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
+support_boundary = "Tolerance-gated time-series conformance for the weather case and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate."
 
 [[variable]]
 name = "System Node Mass Flow Rate"

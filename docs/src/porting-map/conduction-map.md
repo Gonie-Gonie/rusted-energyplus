@@ -9,16 +9,17 @@ last_reviewed: 2026-06-10
 
 Reference version: EnergyPlus 26.1.0
 
-Purpose: separate the currently promoted no-mass conduction evidence from the
-future official ExampleFile transient conduction work.
+Purpose: separate the currently promoted no-mass and narrow official dynamic
+conduction evidence from broader future official ExampleFile transient
+conduction work.
 
 ## Output Variables
 
 | Variable | Current Rust source | Current claim | Official ExampleFile status |
 |---|---|---|---|
-| `Surface Inside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF inside flux shell | no-mass adiabatic conformance only | baseline + diagnostic candidate |
+| `Surface Inside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF inside flux shell | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
 | `Surface Inside Face Conduction Heat Transfer Rate per Area` | rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
-| `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic conformance only | baseline candidate |
+| `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 | `Surface Heat Storage Rate per Area` | storage rate divided by surface area | diagnostic-only | official dynamic diagnostic candidate |

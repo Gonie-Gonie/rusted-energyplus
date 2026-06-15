@@ -50,7 +50,7 @@ Each selected case must answer:
 | v0.21 | source-map and algorithm ledger | mapped algorithm entries and promoted/diagnostic first cases | planning guard only |
 | v0.22 | time/weather/schedule conformance | `schedule_constant_001`, `weather_fields_001` | declared variables only: `Schedule Value` and dry-bulb |
 | v0.23 | static model evidence | official `1ZoneUncontrolled.idf` | static EIO fields only: surface, construction/material, OtherEquipment nominal |
-| v0.33 | dynamic heat-balance diagnostic | official `1ZoneUncontrolled.idf` | run-period-filtered zone/surface/conduction and zone air heat-balance deltas plus Rust/oracle warmup metadata; diagnostic-only |
+| v0.33 | dynamic heat-balance conformance | official `1ZoneUncontrolled.idf` | tolerance-gated compatibility-candidate weather, zone-air, surface temperature, and surface conduction variables; broad diagnostic decomposition remains diagnostic-only |
 | v1.0 | locked declared subset | promoted Tier A cases only | release conformance index |
 
 ## Required Case Structure
@@ -108,14 +108,18 @@ Current v0.18 official baseline evidence:
 - manifest-owned staged IDF output request injection
 - official dynamic conformance candidate output requests for zone temperature,
   weather, internal gain, and surface conduction hourly baselines
-- remains `conformance_claim=false` until Rust produces matching hourly
-  values under a blocking gate
+- remains a baseline-only evidence case; the matching Rust hourly comparison is
+  promoted separately by the v0.33 compatibility-candidate gate
 - `official-baseline-smoke`
 - `v0.18-verify`
 
-Current v0.33 official dynamic diagnostic evidence:
+Current v0.33 official dynamic heat-balance evidence:
 
 - `data/conformance_cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml`
+- `data/conformance_cases/official_1zone_uncontrolled_dynamic_conformance_candidate_001/case.toml`
+- blocking compatibility-candidate conformance gate for declared weather,
+  zone-air, roof/wall/floor face-temperature, and surface conduction variables
+  with `conformance_claim=true`
 - run-period-filtered `Zone Mean Air Temperature`, roof/wall/floor
   inside/outside face temperatures, surface conduction, and zone air
   heat-balance hourly Rust-vs-oracle deltas
@@ -124,8 +128,10 @@ Current v0.33 official dynamic diagnostic evidence:
 - explicit all-CTF, analytical zone-air, analytical surface-first, combined
   all-CTF analytical surface-first, and third-order zone-air diagnostic probe
   lanes for structural bottleneck isolation
-- remains `comparison_class=diagnostic-only` and `conformance_claim=false`
-  until the dynamic heat-balance deltas pass under a blocking gate
+- broad probe lanes remain `comparison_class=diagnostic-only` and
+  `conformance_claim=false`; floor storage remains diagnostic-only in the
+  candidate report
+- `official-dynamic-heat-balance-compat-candidate`
 - `official-dynamic-heat-balance-diagnostic`
 - `official-dynamic-heat-balance-all-ctf-probe`
 - `official-dynamic-heat-balance-analytical-probe`

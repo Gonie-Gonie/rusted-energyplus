@@ -67,7 +67,7 @@ Current supporting release and infrastructure gates include:
 .\scripts\dev.cmd v0.32-verify
 ```
 
-The current official dynamic 1Zone tracker is diagnostic-only. The default
+The broad official dynamic 1Zone tracker remains diagnostic-only. The default
 lane compares 99 hourly series, including zone air heat-balance latent terms,
 inside/outside zone opaque conduction aggregates, wall/floor conduction
 decomposition rows, wall/roof exterior source rows, wall/roof exterior incident
@@ -75,12 +75,13 @@ solar decomposition rows, and the floor surface heat-storage diagnostics in
 whole-surface and per-area form, and the probe lanes isolate
 mass-CTF seeding, EnergyPlus analytical zone-air updates, surface-first
 correction order, same-timestep coupled surface/zone-air rebalance, and
-quick outside-conduction boundary solves without creating a conformance claim.
-The separate compatibility-candidate command pins the narrower promotion
+quick outside-conduction boundary solves without broad compatibility claims.
+The separate compatibility-candidate command pins the narrower promoted
 variable set, all-EIO CTF seed, EnergyPlus initial CTF histories, 20-day
-minimum warmup, and 20 surface iterations; it still has `conformance_claim =
-false` and currently exists to keep probe lanes out of future promotion
-evidence.
+minimum warmup, and 20 surface iterations. That candidate now carries
+`conformance_claim = true` with a blocking gate for the promoted weather,
+zone-air, surface-temperature, and surface-conduction outputs while leaving the
+floor surface heat-storage row diagnostic-only.
 Heat-balance diagnostic and conformance report writers also emit a compact
 `compare-digest.json` next to the full `compare-summary.json` and
 `compare-report.md`; active gates read the digest for metadata, bottlenecks, and

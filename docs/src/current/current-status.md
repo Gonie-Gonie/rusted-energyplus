@@ -25,14 +25,16 @@ variables:
 - `schedule_constant_001`
 - `weather_fields_001` dry-bulb only
 - `internal_gains_001` `Zone Total Internal Convective Heating Rate` only
+- `official_1zone_uncontrolled_dynamic_conformance_candidate_001` declared
+  weather, zone-air, surface temperature, and surface conduction variables only
 
 ## Current Evidence Boundary
 
 | Area | Current conformance | Diagnostic or baseline evidence | Not claimed |
 |---|---|---|---|
-| Numerical time series | 5 promoted cases, 12 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` pins the promotion variable set in a separate compatibility-candidate lane | broad ExampleFiles dynamic conformance |
+| Numerical time series | 6 promoted cases, 41 passed hourly series, all tolerance-gated with blocking gates | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gates the declared compatibility-candidate variable set | broad ExampleFiles dynamic conformance |
 | Static model | official `1ZoneUncontrolled` EIO surface geometry, Construction CTF, Material CTF Summary, and OtherEquipment nominal fields | generated support/index/release evidence PDFs | dynamic behavior from the static EIO case |
-| Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, and no-mass adiabatic conduction series | official `1ZoneUncontrolled` zone, roof/wall/floor surface decomposition, surface/zone conduction, and zone air heat-balance hourly oracle baselines plus failing warmup-aware diagnostic/probe deltas | CTF transient conduction, EnergyPlus warmup convergence parity, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
+| Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, no-mass adiabatic conduction series, and selected official `1ZoneUncontrolled` dynamic weather/zone-air/surface-temperature/surface-conduction variables | official `1ZoneUncontrolled` broad diagnostic decomposition, floor storage blocker traces, radiation/solar/convection diagnostics, and non-promoted probe lanes | broad CTF storage parity, EnergyPlus warmup convergence parity outside the official candidate, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
 | Internal gains | `Zone Total Internal Convective Heating Rate` for `internal_gains_001` | static OtherEquipment nominal fields | zone air temperature response to gains, radiant/latent coupling, or broad internal-gain compatibility |
 | HVAC, node, plant | none | node, IdealLoads, and plant-loop baseline/diagnostic reports | HVAC, node, IdealLoads, meter, and plant numerical conformance |
@@ -49,9 +51,8 @@ The active dynamic expansion target is tracked by
 conformance-gated evidence, and 4 are active dynamic gaps after static fixtures
 and static-only evidence are separated out. There is 1 EnergyPlus ExampleFile
 dynamic candidate through v0.26, `1ZoneUncontrolled.idf`, and it is now split
-into a diagnostic probe tracker plus a non-blocking compatibility-candidate
-lane; the blocking path remains the official dynamic 1Zone heat-balance
-promotion gate.
+into a diagnostic probe tracker plus a blocking compatibility-candidate
+conformance gate for declared variables.
 
 Current static model conformance is limited to:
 
@@ -96,17 +97,15 @@ The current public scope includes:
   heat-balance state
 - timestamp-aligned internal convective gain conformance for the declared
   `internal_gains_001` hourly ESO series
-- official dynamic heat-balance diagnostic reports that run a Rust
-  first-run-period-day warmup loop, filter oracle ESO values to run-period
-  samples, compare roof/wall/floor face-temperature, conduction decomposition,
-  floor storage blocker traces, and zone air heat-balance series, rank
-  bottleneck series by RMSE, record EnergyPlus EIO run-period warmup day
-  counts, the current CTF seed policy, surface iteration count, selected
-  algorithm lane, promotion eligibility, and an active blocker/next-target
-  summary, and keep explicit all-CTF, warmup, surface-iteration, analytical
-  zone-air, analytical surface-first, analytical coupled surface rebalance,
-  third-order probe, and compatibility-candidate metadata without claiming
-  parity
+- official dynamic heat-balance conformance reports that run a Rust warmup
+  loop aligned to the EnergyPlus EIO run-period warmup day count, filter oracle
+  ESO values to run-period samples, gate declared weather, zone-air,
+  roof/wall/floor face-temperature, and conduction series in the
+  compatibility-candidate lane, and keep floor storage as diagnostic-only
+  blocker evidence
+- official dynamic heat-balance diagnostic reports that retain the broader
+  surface/radiation/solar/convection decomposition and probe lanes without
+  promoting those diagnostic variables
 - oodocs/matplotlib release evidence documents
 - schema v2 validation for all tracked case manifests
 
@@ -122,8 +121,8 @@ Not claimed:
 - zone air temperature response to internal gains, radiant/latent internal
   gain coupling, or broader heat-balance compatibility from the v0.26
   internal-gain milestone
-- official `1ZoneUncontrolled` dynamic heat-balance parity from the current
-  diagnostic or probe lanes
+- broad official `1ZoneUncontrolled` dynamic heat-balance parity beyond the
+  declared compatibility-candidate variables
 - new numerical conformance from the v0.27 support coverage report
 - new numerical conformance from the v0.31 release evidence asset manifest
 - new numerical conformance from the v0.32 user coverage handbook

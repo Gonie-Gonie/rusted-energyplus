@@ -39,12 +39,14 @@ before official ExampleFile surface temperatures can be promoted.
 ## Current Boundary
 
 No-mass adiabatic surface temperatures and zero-conduction series are promoted.
-Official ExampleFile surface balances now have roof, wall, and floor
-inside/outside face-temperature plus selected conduction deltas in the
-warmup-aware diagnostic report, but they remain failing diagnostic candidates
-until every declared hourly surface delta is below tolerance. Construction layer
-stacks are preserved for future CTF work, but the runtime does not yet generate
-or advance EnergyPlus CTF coefficient histories for mass-material constructions.
+Official ExampleFile surface balances now also promote the named
+`1ZoneUncontrolled` roof, wall, and floor inside/outside face-temperature plus
+selected inside/outside conduction deltas in the compatibility-candidate
+report. Floor `Surface Heat Storage Rate`, radiation, solar, convection
+coefficient, and broader decomposition rows remain diagnostic-only.
+Construction layer stacks are preserved for future native CTF work; the
+candidate uses EIO-seeded CTF coefficients to keep coefficient mismatch outside
+the promoted claim.
 The diagnostic timestep path now feeds the existing roof/wall exterior
 weather/solar balance into the CTF boundary driver, which improves wall, roof,
 and MAT series while exposing that the zone opaque aggregate still depends on

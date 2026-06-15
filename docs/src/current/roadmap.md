@@ -49,19 +49,18 @@ Current direction:
   conformance index JSON, keeping current input, output, algorithm, promoted
   case, and gap boundaries user-readable.
 
-Current post-v0.32 development is focused on dynamic heat-balance conformance
-for the IDFs used through v0.26 evidence: `heat_balance_nomass_001`,
-`surface_temperature_nomass_001`, `internal_gains_001`, and the official
-`1ZoneUncontrolled` ExampleFile tracker. The first active blocker remains
-official `1ZoneUncontrolled` mass-floor CTF/history and zone-air correction
-parity; broader v0.26-example dynamic promotion should wait until that tracker
-has a passing generated report and blocking gate. The planning inventory command
-`scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the IDF-backed case list and
-current dynamic gaps explicit while that runtime work proceeds.
-The inventory now reports active dynamic gaps separately from static fixtures
-and static-only evidence; through v0.26 there is 1 EnergyPlus ExampleFile
-dynamic candidate, `1ZoneUncontrolled.idf`, and it remains ungated until the
-official dynamic tracker passes.
+Current post-v0.32 development has promoted the narrow official dynamic
+heat-balance compatibility candidate for the IDFs used through v0.26 evidence:
+`heat_balance_nomass_001`, `surface_temperature_nomass_001`,
+`internal_gains_001`, and the official `1ZoneUncontrolled` ExampleFile tracker.
+The v0.33 compatibility-candidate gate now passes for the declared weather,
+zone-air, surface-temperature, and surface-conduction variables. Broader
+ExampleFiles dynamic compatibility remains future work because floor storage,
+exterior source decomposition, HVAC, plant, fenestration, and full warmup
+convergence semantics are still outside the promoted claim. The planning
+inventory command `scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the
+IDF-backed case list and remaining dynamic gaps explicit while that runtime
+work proceeds.
 
 The long-term targets remain:
 

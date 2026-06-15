@@ -32,11 +32,13 @@ rust_target = [
   "crates/ep_runtime/src/runtime.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate",
   "scripts/compare/official-dynamic-heat-balance-compat-candidate.ps1",
 ]
-status = "diagnostic_only"
+status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 proof_variables = [
+  "Site Outdoor Air Drybulb Temperature",
   "Zone Mean Air Temperature",
+  "Zone Air Heat Balance Internal Convective Heat Gain Rate",
   "Surface Inside Face Temperature",
   "Surface Outside Face Temperature",
   "Surface Inside Face Conduction Heat Transfer Rate",
@@ -44,8 +46,8 @@ proof_variables = [
   "Zone Air Heat Balance Surface Convection Rate",
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
-claim_level = "none"
-support_boundary = "Official dynamic 1Zone compatibility candidate lane only; current reports remain diagnostic-only and must not be promoted until all required variables pass the blocking promotion gate."
+claim_level = "limited-official-dynamic-conformance"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane; broad heat-balance compatibility and diagnostic-only storage/radiation/solar/convection variables remain outside the claim."
 
 [[algorithm]]
 id = "surface_inside_temperature"

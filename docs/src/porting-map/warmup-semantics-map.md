@@ -16,16 +16,19 @@ dynamic conformance claim is made.
 
 Current promoted numerical reports compare only reported run-period ESO series.
 Warmup iterations are not represented as Rust output samples. This is acceptable
-only for the currently declared local no-mass, schedule, weather, and internal
-gain cases.
+for the declared local no-mass, schedule, weather, internal-gain cases and the
+official 1Zone dynamic compatibility candidate, whose report records warmup
+metadata and compares only run-period samples.
 
-`official_1zone_uncontrolled_dynamic_diagnostic_001` now runs a diagnostic
-Rust warmup loop before recording run-period samples. The loop repeats the
-first run-period weather day, records Rust warmup days/timesteps/convergence,
-passes available EPW records through the same exterior surface forcing context
-used by reported run-period timesteps, and stores the EnergyPlus EIO run-period
-`Environment:WarmupDays` value in the compare summary. This is instrumentation
-for diagnosis only; it is not EnergyPlus warmup parity.
+`official_1zone_uncontrolled_dynamic_conformance_candidate_001` runs a Rust
+warmup loop before recording run-period samples, using the EnergyPlus EIO
+run-period warmup day count as the minimum. The loop repeats the first
+run-period weather day, records Rust warmup days/timesteps/convergence, passes
+available EPW records through the same exterior surface forcing context used by
+reported run-period timesteps, and stores the EnergyPlus EIO run-period
+`Environment:WarmupDays` value in the compare summary. This is sufficient for
+the declared candidate variables; it is still not a broad EnergyPlus warmup
+convergence parity claim.
 
 ## Required Official ExampleFile Work
 
@@ -35,17 +38,17 @@ for diagnosis only; it is not EnergyPlus warmup parity.
 | initial histories | initialize zone air and surface histories from the same semantic state |
 | reporting filter | prove that compared hourly samples exclude warmup exactly as EnergyPlus ESO does |
 | failure diagnosis | if first-hour deltas dominate, report whether the cause is warmup, initial history, or algorithm mismatch |
-| gate policy | do not set `conformance_claim=true` for official dynamic cases until warmup handling is part of the report |
+| gate policy | allow `conformance_claim=true` only for the official dynamic compatibility candidate where warmup metadata, run-period filtering, EIO CTF seeding, and the blocking gate all pass |
 
 ## Current Boundary
 
-Official `1ZoneUncontrolled` dynamic outputs are baseline and diagnostic
-candidates. `official_1zone_uncontrolled_dynamic_diagnostic_001` currently
-keeps the case `conformance_claim=false` while reporting first-hour,
-run-period-filtered deltas, Rust warmup metadata, and oracle run-period warmup
-days. If Rust warmup day count, initial histories, surface CTF history, or
-post-warmup hourly values differ from EnergyPlus, the case must remain
-diagnostic.
+Official `1ZoneUncontrolled` dynamic outputs are split between a broad
+diagnostic tracker and the promoted compatibility candidate.
+`official_1zone_uncontrolled_dynamic_conformance_candidate_001` now uses
+`conformance_claim=true` only for the declared weather, zone-air,
+face-temperature, and conduction variables. The broad diagnostic case remains
+`conformance_claim=false`, and storage/radiation/solar/convection diagnostics
+must not inherit the candidate claim.
 
 Developers can run `scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe`
 to raise the Rust diagnostic warmup minimum to the EnergyPlus run-period warmup
