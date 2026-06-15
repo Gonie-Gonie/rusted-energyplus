@@ -295,7 +295,7 @@ if ($stageSummary.outdoor_air_method -ne "Flow/Area") {
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone, Flow/Area, and AirChanges/Hour mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Area with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows" -Description "markdown OA source"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Mass Flow Rate | diagnostic" -Description "markdown OA mass row"

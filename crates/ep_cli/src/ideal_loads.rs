@@ -786,9 +786,11 @@ fn validate_outdoor_air_design_flow_boundary(
         DesignSpecificationOutdoorAirMethod::FlowPerZone
             | DesignSpecificationOutdoorAirMethod::FlowPerArea
             | DesignSpecificationOutdoorAirMethod::AirChangesPerHour
+            | DesignSpecificationOutdoorAirMethod::Sum
+            | DesignSpecificationOutdoorAirMethod::Maximum
     ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone, Flow/Area, or AirChanges/Hour"
+            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone, Flow/Area, AirChanges/Hour, Sum, or Maximum"
                 .to_string(),
         );
     }
@@ -3051,7 +3053,7 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone, Flow/Area, and AirChanges/Hour mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
