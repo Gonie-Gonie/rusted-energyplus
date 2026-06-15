@@ -3796,6 +3796,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     let freeze_outside_balance_for_surface_iterations = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceFrozenOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
     );
     let freeze_inside_ctf_outside_temperature_for_surface_iterations = matches!(
         zone_air_algorithm,
@@ -4695,8 +4696,12 @@ fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
                 )
             };
 
-        zone.mean_air_temperature_c = system_temperature_history[0];
-        zone.air_humidity_ratio = system_humidity_history[0];
+        let reset_zone_air_state_from_system_history =
+            system_timestep_count != zone.previous_system_timestep_count;
+        if reset_zone_air_state_from_system_history {
+            zone.mean_air_temperature_c = system_temperature_history[0];
+            zone.air_humidity_ratio = system_humidity_history[0];
+        }
         let mut zone_temperature_average_c = 0.0;
         let mut zone_humidity_average = 0.0;
         let mut surface_convection_report_average_w = 0.0;
@@ -5597,7 +5602,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             rain_status_sum += timestep_rain_status;
             for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                    zone_temperature_sums[index] += zone_state.mean_air_temperature_c;
+                    let reported_zone_temperature_c = if matches!(
+                        options.zone_air_algorithm,
+                        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                    ) {
+                        zone_state.zone_timestep_average_air_temperature_c
+                    } else {
+                        zone_state.mean_air_temperature_c
+                    };
+                    zone_temperature_sums[index] += reported_zone_temperature_c;
                 }
             }
             for (index, trace) in zone_conduction_rates.iter().enumerate() {
