@@ -56,6 +56,10 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
     pub outdoor_air_total_cooling_rate_w: f64,
     /// Final supply mass flow used by the no-limit OA branch.
     pub supply_mass_flow_rate_kg_per_s: f64,
+    /// Final supply air temperature for the no-limit OA branch.
+    pub supply_air_temperature_c: f64,
+    /// Final supply air humidity ratio for the no-humidity-control OA branch.
+    pub supply_air_humidity_ratio: f64,
     /// Mixed-air temperature after OA/recirculation mixing.
     pub mixed_air_temperature_c: f64,
     /// Mixed-air humidity ratio after OA/recirculation mixing.
@@ -151,6 +155,8 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
             outdoor_air_total_heating_rate_w: 0.0,
             outdoor_air_total_cooling_rate_w: 0.0,
             supply_mass_flow_rate_kg_per_s: 0.0,
+            supply_air_temperature_c: recirculation_state.air_temperature_c,
+            supply_air_humidity_ratio: recirculation_state.air_humidity_ratio,
             mixed_air_temperature_c: recirculation_state.air_temperature_c,
             mixed_air_humidity_ratio: recirculation_state.air_humidity_ratio,
         };
@@ -214,6 +220,16 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         outdoor_air_mass_flow_rate_kg_per_s,
         supply_mass_flow_rate_kg_per_s,
     );
+    let (supply_air_temperature_c, supply_air_humidity_ratio) = supply_air_state(
+        system,
+        zone_state,
+        demand,
+        mode,
+        final_cp_air_j_per_kg_k,
+        supply_mass_flow_rate_kg_per_s,
+        mixed_air_temperature_c,
+        mixed_air_humidity_ratio,
+    );
 
     IdealLoadsOutdoorAirSensibleResult {
         mode,
@@ -227,6 +243,8 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         outdoor_air_total_heating_rate_w,
         outdoor_air_total_cooling_rate_w,
         supply_mass_flow_rate_kg_per_s,
+        supply_air_temperature_c,
+        supply_air_humidity_ratio,
         mixed_air_temperature_c,
         mixed_air_humidity_ratio,
     }
@@ -314,6 +332,36 @@ fn mixed_air_state(
         ),
         mixed_air_humidity_ratio,
     )
+}
+
+fn supply_air_state(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsOutdoorAirNodeState,
+    demand: ZoneSysEnergyDemand,
+    mode: IdealLoadsSensibleMode,
+    cp_air_j_per_kg_k: f64,
+    supply_mass_flow_rate_kg_per_s: f64,
+    mixed_air_temperature_c: f64,
+    mixed_air_humidity_ratio: f64,
+) -> (f64, f64) {
+    if supply_mass_flow_rate_kg_per_s <= 0.0 {
+        return (mixed_air_temperature_c, mixed_air_humidity_ratio);
+    }
+
+    let supply_air_temperature_c = match mode {
+        IdealLoadsSensibleMode::Cooling => (demand.remaining_output_req_to_cool_sp_w
+            / (cp_air_j_per_kg_k * supply_mass_flow_rate_kg_per_s)
+            + zone_state.air_temperature_c)
+            .max(system.minimum_cooling_supply_air_temperature_c)
+            .min(mixed_air_temperature_c),
+        IdealLoadsSensibleMode::Heating => (demand.remaining_output_req_to_heat_sp_w
+            / (cp_air_j_per_kg_k * supply_mass_flow_rate_kg_per_s)
+            + zone_state.air_temperature_c)
+            .min(system.maximum_heating_supply_air_temperature_c)
+            .max(mixed_air_temperature_c),
+        IdealLoadsSensibleMode::Deadband | IdealLoadsSensibleMode::Off => mixed_air_temperature_c,
+    };
+    (supply_air_temperature_c, mixed_air_humidity_ratio)
 }
 
 fn dry_bulb_from_enthalpy_and_humidity_ratio(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
@@ -460,6 +508,11 @@ mod tests {
         assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
         assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
         assert!(result.mixed_air_temperature_c < 21.0);
+        assert!(result.supply_air_temperature_c >= result.mixed_air_temperature_c);
+        assert_eq!(
+            result.supply_air_humidity_ratio,
+            result.mixed_air_humidity_ratio
+        );
         assert!(result.outdoor_air_sensible_output_w < 0.0);
         assert!(result.outdoor_air_latent_output_w.is_finite());
         assert_eq!(
@@ -499,6 +552,11 @@ mod tests {
         assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
         assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
         assert!(result.mixed_air_temperature_c > 24.0);
+        assert!(result.supply_air_temperature_c <= result.mixed_air_temperature_c);
+        assert_eq!(
+            result.supply_air_humidity_ratio,
+            result.mixed_air_humidity_ratio
+        );
         assert!(result.outdoor_air_sensible_output_w > 0.0);
         assert!(result.outdoor_air_latent_output_w.is_finite());
         assert_eq!(

@@ -26,13 +26,16 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
-    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
-    ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE, ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE,
-    ZoneSysEnergyDemand, calc_no_oa_no_limit_sensible_compat,
-    calc_no_oa_sensible_with_limits_compat, calc_outdoor_air_sensible_report_rates_compat,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
+    ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
+    calc_no_oa_no_limit_sensible_compat, calc_no_oa_sensible_with_limits_compat,
+    calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
     supply_node_update_from_result,
@@ -350,6 +353,10 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE
+                | ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE
+                | ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE
+                | ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE
+                | ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO
                 | ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE
                 | ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO
         ) {
@@ -566,6 +573,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             output,
             outdoor_air_mass_flow_rate_kg_per_s,
             design_volume_flow_rate_m3_per_s,
+            standard_air_density_kg_per_m3,
             &sensible_results,
             expected.samples.len(),
         )?;
@@ -675,6 +683,7 @@ fn outdoor_air_observed_values(
     output: &OutputRequest,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     design_volume_flow_rate_m3_per_s: f64,
+    standard_air_density_kg_per_m3: f64,
     sensible_results: &[IdealLoadsOutdoorAirSensibleResult],
     expected_samples: usize,
 ) -> Result<(&'static str, &'static str, Vec<f64>), String> {
@@ -741,6 +750,44 @@ fn outdoor_air_observed_values(
                 .iter()
                 .take(expected_samples)
                 .map(|result| result.outdoor_air_total_cooling_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-supply-state",
+            "kg/s",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.supply_mass_flow_rate_kg_per_s)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-supply-state",
+            "m3/s",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| {
+                    result.supply_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3
+                })
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE => Ok((
+            "rust-ideal-loads-outdoor-air-supply-state",
+            "C",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.supply_air_temperature_c)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO => Ok((
+            "rust-ideal-loads-outdoor-air-supply-state",
+            "kgWater/kgDryAir",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.supply_air_humidity_ratio)
                 .collect(),
         )),
         ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE => Ok((
@@ -1669,7 +1716,7 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, and mixed-air state\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, and mixed-air state\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)

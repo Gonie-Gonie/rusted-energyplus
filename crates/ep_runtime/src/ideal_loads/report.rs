@@ -26,6 +26,17 @@ pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE: &str =
 /// IdealLoads supply-air total cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE: &str =
     "Zone Ideal Loads Supply Air Total Cooling Rate";
+/// IdealLoads supply-air mass flow rate output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE: &str =
+    "Zone Ideal Loads Supply Air Mass Flow Rate";
+/// IdealLoads supply-air standard-density volume flow output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE: &str =
+    "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate";
+/// IdealLoads supply-air temperature output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE: &str = "Zone Ideal Loads Supply Air Temperature";
+/// IdealLoads supply-air humidity ratio output variable.
+pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO: &str =
+    "Zone Ideal Loads Supply Air Humidity Ratio";
 /// IdealLoads outdoor-air mass flow rate output variable.
 pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE: &str =
     "Zone Ideal Loads Outdoor Air Mass Flow Rate";

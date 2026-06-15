@@ -60,6 +60,10 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Ideal Loads Outdoor Air Latent Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-humidity `LatCoilLoad` report sorting keeps latent cooling at zero | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone Ideal Loads Outdoor Air Total Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-humidity total heating equals sensible heating in the diagnostic compare lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 1 W source-order tolerance |
 | `Zone Ideal Loads Outdoor Air Total Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-humidity total cooling equals sensible cooling in the diagnostic compare lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 1 W source-order tolerance |
+| `Zone Ideal Loads Supply Air Mass Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-limit supply mass selected from OA and sensible flow requirements | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Supply Air Standard Density Volume Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads`, `ReportPurchasedAir`, and `DataEnvironment.hh::StdRhoAir` | supply mass flow divided by EnergyPlus `StdRhoAir` in the diagnostic compare lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Supply Air Temperature` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-limit supply temperature from source-order demand, mass flow, and mixed-air clamp | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 0.02 C tolerance |
+| `Zone Ideal Loads Supply Air Humidity Ratio` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-humidity-control supply humidity follows mixed-air humidity | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone Ideal Loads Mixed Air Temperature` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `SetupOutputVariable` | no-economizer/no-heat-recovery mixed-air state from source-order recirculation/OA proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone Ideal Loads Mixed Air Humidity Ratio` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `SetupOutputVariable` | no-economizer/no-heat-recovery mixed-air state from source-order recirculation/OA proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate` | detailed | `ZoneTempPredictorCorrector.cc`; `DataZoneEnergyDemands.hh` | oracle proof input split into active heat/cool `ZoneSysEnergyDemand` values | diagnostic proof input for `ideal_loads_no_oa_sensible_conformance_001`; not user-facing conformance |
@@ -143,6 +147,7 @@ compatibility.
 The `ideal_loads_outdoor_air_design_flow_diagnostic_001` report is a
 diagnostic-only Flow/Zone outdoor-air design-flow result for IdealLoads
 outdoor-air mass flow, standard-density volume flow, no-humidity
-sensible/latent/total report rates, plus mixed-air temperature and humidity
-ratio. It does not promote supply-air state, DCV, economizer, heat recovery,
-active humidity control, or broad IdealLoads outdoor-air conformance.
+sensible/latent/total report rates, supply-air state, plus mixed-air
+temperature and humidity ratio. It does not promote DCV, economizer, heat
+recovery, active humidity control, saturation-limit branches, or broad
+IdealLoads outdoor-air conformance.

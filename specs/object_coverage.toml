@@ -101,14 +101,14 @@ name = "ZoneHVAC:IdealLoadsAirSystem"
 family = "hvac"
 status = "typed"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence and diagnostic outdoor-air design-flow/mixed-air evidence for declared output variables only; outdoor-air conformance, humidity, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence and diagnostic outdoor-air design-flow/supply-air/mixed-air evidence for declared output variables only; outdoor-air conformance, humidity, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
 
 [[object]]
 name = "DesignSpecification:OutdoorAir"
 family = "hvac"
 status = "diagnostic"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, and no-heat-recovery mixed-air state parity; no DCV, economizer, heat recovery, or numerical OA conformance claim."
+support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, and no-heat-recovery mixed-air state parity; no DCV, economizer, heat recovery, or numerical OA conformance claim."
 
 [[object]]
 name = "NodeList"

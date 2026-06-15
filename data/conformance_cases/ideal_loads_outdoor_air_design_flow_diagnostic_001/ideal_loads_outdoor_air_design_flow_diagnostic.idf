@@ -319,6 +319,10 @@ Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Outdoor Air Latent Heating
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Outdoor Air Latent Cooling Rate,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Outdoor Air Total Heating Rate,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Outdoor Air Total Cooling Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Mass Flow Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Standard Density Volume Flow Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Temperature,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Humidity Ratio,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Mixed Air Temperature,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Mixed Air Humidity Ratio,Detailed;
 Output:Variable,ZONE ONE,Zone Mean Air Temperature,Detailed;
