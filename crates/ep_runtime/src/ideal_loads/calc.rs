@@ -1,10 +1,16 @@
 //! No-OA IdealLoads sensible load calculation.
 
-use crate::{energyplus_moist_air_specific_heat_j_per_kg_k, zone_equipment::ZoneSysEnergyDemand};
+use crate::{
+    energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
+    zone_equipment::ZoneSysEnergyDemand,
+};
 use ep_model::{AutosizeOrNumber, IdealLoadsAirSystem, IdealLoadsLimit};
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
 const DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
+const STANDARD_PRESSURE_SEA_LEVEL_PA: f64 = 101_325.0;
+const ENERGYPLUS_STANDARD_DRY_BULB_C: f64 = 20.0;
+const ENERGYPLUS_STANDARD_HUMIDITY_RATIO: f64 = 0.0;
 
 /// Operating mode selected by the first IdealLoads sensible subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -40,6 +46,18 @@ impl Default for IdealLoadsSensibleLimitContext {
         Self {
             standard_air_density_kg_per_m3: DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3,
         }
+    }
+}
+
+impl IdealLoadsSensibleLimitContext {
+    /// Builds the limit context from EnergyPlus `StdRhoAir` source-order inputs.
+    #[must_use]
+    pub fn from_site_elevation_m(elevation_m: f64) -> Option<Self> {
+        energyplus_standard_air_density_kg_per_m3(elevation_m).map(
+            |standard_air_density_kg_per_m3| Self {
+                standard_air_density_kg_per_m3,
+            },
+        )
     }
 }
 
@@ -253,6 +271,24 @@ pub fn calc_no_oa_sensible_with_limits_compat(
 #[must_use]
 pub fn moist_air_enthalpy_j_per_kg(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
     1000.0 * (1.006 * dry_bulb_c + humidity_ratio * (2501.0 + 1.86 * dry_bulb_c))
+}
+
+/// Returns EnergyPlus `StdRhoAir` from site elevation.
+#[must_use]
+pub fn energyplus_standard_air_density_kg_per_m3(elevation_m: f64) -> Option<f64> {
+    if !elevation_m.is_finite() {
+        return None;
+    }
+    let base = 1.0 - 2.255_77e-05 * elevation_m;
+    if base <= 0.0 {
+        return None;
+    }
+    let standard_barometric_pressure_pa = STANDARD_PRESSURE_SEA_LEVEL_PA * base.powf(5.2559);
+    energyplus_moist_air_density_kg_per_m3(
+        standard_barometric_pressure_pa,
+        ENERGYPLUS_STANDARD_DRY_BULB_C,
+        ENERGYPLUS_STANDARD_HUMIDITY_RATIO,
+    )
 }
 
 fn limited_heating_mass_flow_rate_kg_per_s(
@@ -571,6 +607,17 @@ mod tests {
         assert_eq!(result.mode, IdealLoadsSensibleMode::Off);
         assert_eq!(result.supply_mass_flow_rate_kg_per_s, 0.0);
         assert!((result.supply_temperature_c - 22.5).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn standard_air_density_uses_energyplus_elevation_formula() {
+        let density = energyplus_standard_air_density_kg_per_m3(1829.0)
+            .expect("valid Golden CO elevation standard density");
+        assert_close(density, 0.965_081_520_139_901_8, 1.0e-12);
+
+        let context = IdealLoadsSensibleLimitContext::from_site_elevation_m(1829.0)
+            .expect("valid Golden CO IdealLoads limit context");
+        assert_close(context.standard_air_density_kg_per_m3, density, 1.0e-12);
     }
 
     #[test]

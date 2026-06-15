@@ -438,6 +438,7 @@ fn evaluate_rows(
         thermostat_setpoint_values(model, zone.id, true, input_trace.sample_count)?;
     let cooling_setpoint =
         thermostat_setpoint_values(model, zone.id, false, input_trace.sample_count)?;
+    let limit_context = ideal_loads_limit_context(model, system)?;
     let mut calc_results = Vec::with_capacity(input_trace.sample_count);
     let mut mode_counts = IdealLoadsModeCounts::default();
     for index in 0..input_trace.sample_count {
@@ -456,7 +457,7 @@ fn evaluate_rows(
             air_humidity_ratio: zone_humidity_ratio,
         };
         let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
-        let result = calc_ideal_loads_sensible_compat(system, zone_state, demand);
+        let result = calc_ideal_loads_sensible_compat(system, zone_state, demand, limit_context);
         record_mode(&mut mode_counts, result.mode);
         let _node_update = supply_node_update_from_result(supply_node.id, result);
         calc_results.push(result);
@@ -702,18 +703,33 @@ fn calc_ideal_loads_sensible_compat(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
     demand: ZoneSysEnergyDemand,
+    limit_context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
     if uses_finite_limits(system) {
-        calc_no_oa_sensible_with_limits_compat(
-            system,
-            zone_state,
-            demand,
-            true,
-            IdealLoadsSensibleLimitContext::default(),
-        )
+        calc_no_oa_sensible_with_limits_compat(system, zone_state, demand, true, limit_context)
     } else {
         calc_no_oa_no_limit_sensible_compat(system, zone_state, demand, true)
     }
+}
+
+fn ideal_loads_limit_context(
+    model: &SimulationModel,
+    system: &IdealLoadsAirSystem,
+) -> Result<IdealLoadsSensibleLimitContext, String> {
+    if !uses_finite_limits(system) {
+        return Ok(IdealLoadsSensibleLimitContext::default());
+    }
+
+    let site =
+        model.typed.site.as_ref().ok_or_else(|| {
+            "IdealLoads finite-limit diagnostics require Site:Location".to_string()
+        })?;
+    IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m).ok_or_else(|| {
+        format!(
+            "failed to derive EnergyPlus StdRhoAir from site elevation {}",
+            site.elevation_m
+        )
+    })
 }
 
 fn ideal_loads_sensible_branch(system: &IdealLoadsAirSystem) -> &'static str {
