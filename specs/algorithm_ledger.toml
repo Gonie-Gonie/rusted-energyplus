@@ -107,9 +107,12 @@ energyplus_source = [
   "src/EnergyPlus/OutputProcessor.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::ExecutionStep::EvaluateIdealLoadsAirSystem",
-  "crates/ep_runtime/src/runtime.rs::NodeStateStore",
-  "crates/ep_runtime/src/runtime.rs::simulate_ideal_loads_node_state_projection",
+  "crates/ep_runtime/src/ideal_loads/input.rs::classify_no_oa_no_limit_sensible_subset",
+  "crates/ep_runtime/src/ideal_loads/calc.rs::calc_no_oa_no_limit_sensible_compat",
+  "crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result",
+  "crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot",
+  "crates/ep_runtime/src/zone_equipment/mod.rs::ZoneSysEnergyDemand",
+  "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
 ]
 status = "diagnostic_only"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
