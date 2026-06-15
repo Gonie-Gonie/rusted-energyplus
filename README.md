@@ -51,10 +51,11 @@ tolerance, and code organization.
   supply-node temperature/mass-flow Detailed series in
   `ideal_loads_no_oa_sensible_conformance_001`
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
-  outdoor-air mass flow and standard-density volume flow in
-  `ideal_loads_outdoor_air_design_flow_diagnostic_001`; outdoor-air loads,
-  mixed-air state, DCV, economizer, heat recovery, and broad OA conformance
-  remain outside the claim
+  outdoor-air mass flow, standard-density volume flow, and sensible
+  heating/cooling report rates in
+  `ideal_loads_outdoor_air_design_flow_diagnostic_001`; outdoor-air latent
+  loads, mixed-air state, DCV, economizer, heat recovery, and broad OA
+  conformance remain outside the claim
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,
@@ -93,8 +94,8 @@ Not claimed:
 - general EnergyPlus heat-balance compatibility
 - broad HVAC or plant simulation compatibility
 - broad node, full IdealLoads, meter, or full runtime conformance
-- IdealLoads outdoor-air load, economizer, heat-recovery, DCV, humidity, or
-  meter conformance
+- IdealLoads outdoor-air latent load, mixed-air, economizer, heat-recovery,
+  DCV, humidity, or meter conformance
 - broad ExampleFiles compatibility
 
 ## Quick Start

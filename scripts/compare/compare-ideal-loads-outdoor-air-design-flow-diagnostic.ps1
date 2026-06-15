@@ -84,7 +84,7 @@ Assert-Contains -Text $text -Pattern "IdealLoads Outdoor-Air Design-Flow Report"
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
-Assert-Contains -Text $text -Pattern "series: 2" -Description "series count"
+Assert-Contains -Text $text -Pattern "series: 4" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 96" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_failures_count: 0" -Description "tolerance failures"
 Assert-Contains -Text $text -Pattern "tolerance_policy: diagnostic-draft" -Description "tolerance policy"
@@ -124,7 +124,7 @@ if ($summary.status -ne "diagnostic") {
 if ($summary.tolerance_failures -ne 0) {
     throw "IdealLoads outdoor-air diagnostic should have zero tolerance failures: $($summary.tolerance_failures)"
 }
-if ($summary.series_count -ne 2) {
+if ($summary.series_count -ne 4) {
     throw "Unexpected IdealLoads outdoor-air series count: $($summary.series_count)"
 }
 if ($summary.samples -ne 96) {
@@ -135,8 +135,8 @@ if ($summary.design_volume_flow_rate_m3_per_s -ne 0.05) {
 }
 
 $rows = @($summary.series)
-if ($rows.Count -ne 2) {
-    throw "Expected two outdoor-air diagnostic rows, found $($rows.Count)"
+if ($rows.Count -ne 4) {
+    throw "Expected four outdoor-air diagnostic rows, found $($rows.Count)"
 }
 foreach ($row in $rows) {
     if ($row.level -ne "diagnostic") {
@@ -145,18 +145,26 @@ foreach ($row in $rows) {
     if ($row.status -ne "pass") {
         throw "Outdoor-air row should pass: $($row.variable)"
     }
-    if ($row.rust_source -ne "rust-ideal-loads-outdoor-air-design-flow") {
-        throw "Unexpected Rust source for $($row.variable): $($row.rust_source)"
-    }
 }
 
 $massRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Outdoor Air Mass Flow Rate" })
-if ($massRow.Count -ne 1 -or $massRow[0].units -ne "kg/s") {
+if ($massRow.Count -ne 1 -or $massRow[0].units -ne "kg/s" -or $massRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-design-flow") {
     throw "Missing kg/s outdoor-air mass-flow row"
 }
 $volumeRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate" })
-if ($volumeRow.Count -ne 1 -or $volumeRow[0].units -ne "m3/s") {
+if ($volumeRow.Count -ne 1 -or $volumeRow[0].units -ne "m3/s" -or $volumeRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-design-flow") {
     throw "Missing m3/s outdoor-air standard-density volume-flow row"
+}
+$sensibleHeatingRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Outdoor Air Sensible Heating Rate" })
+if ($sensibleHeatingRow.Count -ne 1 -or $sensibleHeatingRow[0].units -ne "W" -or $sensibleHeatingRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-sensible-report") {
+    throw "Missing W outdoor-air sensible heating row"
+}
+if ($sensibleHeatingRow[0].max_abs_delta -gt 1.0 -or $sensibleHeatingRow[0].rmse_delta -gt 1.0) {
+    throw "Outdoor-air sensible heating row exceeded diagnostic tolerance: max_abs=$($sensibleHeatingRow[0].max_abs_delta) rmse=$($sensibleHeatingRow[0].rmse_delta)"
+}
+$sensibleCoolingRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Outdoor Air Sensible Cooling Rate" })
+if ($sensibleCoolingRow.Count -ne 1 -or $sensibleCoolingRow[0].units -ne "W" -or $sensibleCoolingRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-sensible-report") {
+    throw "Missing W outdoor-air sensible cooling row"
 }
 
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
@@ -165,12 +173,12 @@ if ($toleranceFailures.Count -ne 0) {
 }
 
 $resultStore = Get-Content -LiteralPath $resultStorePath -Raw | ConvertFrom-Json
-if ($resultStore.series_count -ne 2 -or $resultStore.sample_count -ne $summary.samples) {
+if ($resultStore.series_count -ne 4 -or $resultStore.sample_count -ne $summary.samples) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
 $selectedOutputs = Get-Content -LiteralPath $selectedOutputsPath -Raw | ConvertFrom-Json
-if (@($selectedOutputs.series).Count -ne 2) {
+if (@($selectedOutputs.series).Count -ne 4) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
@@ -183,9 +191,11 @@ if ($stageSummary.outdoor_air -ne $true) {
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air design-flow mass/standard-density volume flow" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, and sensible report rates" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Mass Flow Rate | diagnostic" -Description "markdown OA mass row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate | diagnostic" -Description "markdown OA volume row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Sensible Heating Rate | diagnostic" -Description "markdown OA sensible heating row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Sensible Cooling Rate | diagnostic" -Description "markdown OA sensible cooling row"
 
 Write-Host "IdealLoads outdoor-air design-flow diagnostic comparison artifacts generated."

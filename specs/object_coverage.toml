@@ -108,7 +108,7 @@ name = "DesignSpecification:OutdoorAir"
 family = "hvac"
 status = "diagnostic"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone design-flow mass and standard-density volume flow parity; no outdoor-air load, DCV, economizer, heat recovery, or numerical OA conformance claim."
+support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone design-flow mass, standard-density volume flow, and sensible report-rate parity; no outdoor-air latent load, DCV, economizer, heat recovery, or numerical OA conformance claim."
 
 [[object]]
 name = "NodeList"

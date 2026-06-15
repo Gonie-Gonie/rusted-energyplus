@@ -129,19 +129,25 @@ preparatory Rust surface is:
   `Maximum` methods
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
+- `calc_outdoor_air_sensible_report_rates_compat` for the no-economizer,
+  no-heat-recovery, no-humidity Flow/Zone OA sensible report-rate diagnostic
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` adds a diagnostic-only
 Flow/Zone proof lane for the EnergyPlus report variables
 `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
-`Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate`. The compare
-lane derives EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA
-schedule as always 1.0, and writes constant Rust `ResultStore` series for the
-96 Detailed oracle samples.
+`Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate`, plus
+`Zone Ideal Loads Outdoor Air Sensible Heating Rate` and
+`Zone Ideal Loads Outdoor Air Sensible Cooling Rate`. The compare lane derives
+EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA schedule as
+always 1.0, and writes Rust `ResultStore` series for the 96 Detailed oracle
+samples. The mass and standard-density volume rows are exact; the sensible
+report rows use a 1 W diagnostic tolerance because EnergyPlus sorts them from
+source-order zone/OA state and report-rate mode gates.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no outdoor-air sensible/latent load, mixed-air state,
-supply-air state, economizer, heat recovery, or DCV output is part of the
-promoted IdealLoads claim.
+unresolved, and no outdoor-air latent load, mixed-air state, supply-air state,
+economizer, heat recovery, or DCV output is part of the promoted IdealLoads
+claim.
 
 ## Required Proof Variables
 
@@ -161,10 +167,11 @@ The conformance output surface is:
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, latent IdealLoads outputs,
-outdoor-air load outputs, heat-recovery outputs, economizer outputs, and meter
+outdoor-air latent/load-state outputs, heat-recovery outputs, economizer outputs, and meter
 outputs remain diagnostic-only until their source-order branches are ported or
 explicitly included in a promoted claim. The outdoor-air mass-flow and
-standard-density volume-flow outputs have diagnostic evidence only in
+standard-density volume-flow outputs plus outdoor-air sensible heating/cooling
+rate outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`.
 
 ## Conformance Compare Artifacts

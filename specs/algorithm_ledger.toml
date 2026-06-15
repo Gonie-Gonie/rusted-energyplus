@@ -153,9 +153,11 @@ first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 proof_variables = [
   "Zone Ideal Loads Outdoor Air Mass Flow Rate",
   "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate",
+  "Zone Ideal Loads Outdoor Air Sensible Heating Rate",
+  "Zone Ideal Loads Outdoor Air Sensible Cooling Rate",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass and standard-density volume flow parity; outdoor-air sensible/latent loads, mixed-air state, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass, standard-density volume flow, and sensible report-rate parity; outdoor-air latent loads, mixed-air state, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

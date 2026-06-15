@@ -54,6 +54,8 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Ideal Loads Supply Air Total Cooling Rate` | detailed | IdealLoads HVAC component implementation and zone equipment managers | `IdealLoadsReportSnapshot` supply-air totals from the no-OA/no-limit sensible helper | conformance for `ideal_loads_no_oa_sensible_conformance_001` only |
 | `Zone Ideal Loads Outdoor Air Mass Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMinOAMassFlow` and `ReportPurchasedAir` | `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` in the IdealLoads outdoor-air design-flow diagnostic lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; no OA load conformance |
 | `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMinOAMassFlow` and `ReportPurchasedAir` | outdoor-air mass flow divided by EnergyPlus `StdRhoAir` in the diagnostic compare lane | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; no OA load conformance |
+| `Zone Ideal Loads Outdoor Air Sensible Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | `calc_outdoor_air_sensible_report_rates_compat` using source-order zone/OA state proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 1 W source-order tolerance |
+| `Zone Ideal Loads Outdoor Air Sensible Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | `calc_outdoor_air_sensible_report_rates_compat` using source-order zone/OA state proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001`; 1 W source-order tolerance |
 | `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate` | detailed | `ZoneTempPredictorCorrector.cc`; `DataZoneEnergyDemands.hh` | oracle proof input split into active heat/cool `ZoneSysEnergyDemand` values | diagnostic proof input for `ideal_loads_no_oa_sensible_conformance_001`; not user-facing conformance |
 | `System Node Temperature` | detailed | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `supply_node_update_from_result` in the IdealLoads compare lane | conformance for the IdealLoads supply node in `ideal_loads_no_oa_sensible_conformance_001` only |
 | `System Node Humidity Ratio` | detailed | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `supply_node_update_from_result` in the IdealLoads compare lane | diagnostic proof row for `ideal_loads_no_oa_sensible_conformance_001`; not humidity conformance |
@@ -134,7 +136,7 @@ compatibility.
 
 The `ideal_loads_outdoor_air_design_flow_diagnostic_001` report is a
 diagnostic-only Flow/Zone outdoor-air design-flow result for IdealLoads
-outdoor-air mass flow and standard-density volume flow only. It does not
-promote outdoor-air sensible/latent loads, mixed-air state, supply-air state,
-DCV, economizer, heat recovery, humidity control, or broad IdealLoads
-outdoor-air conformance.
+outdoor-air mass flow, standard-density volume flow, and sensible
+heating/cooling report rates only. It does not promote outdoor-air latent
+loads, mixed-air state, supply-air state, DCV, economizer, heat recovery,
+humidity control, or broad IdealLoads outdoor-air conformance.

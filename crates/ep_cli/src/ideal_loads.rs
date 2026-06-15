@@ -16,18 +16,22 @@ use ep_model::{
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    IdealLoadsOutdoorAirContext, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
-    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries,
-    ResultStore, ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+    IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
+    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
+    IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries, ResultStore,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
     ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE, ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE,
     ZoneSysEnergyDemand, calc_no_oa_no_limit_sensible_compat,
-    calc_no_oa_sensible_with_limits_compat, calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s,
-    classify_no_oa_no_limit_sensible_subset, classify_no_oa_sensible_subset,
-    ideal_loads_zone_equipment_stages, supply_node_update_from_result,
+    calc_no_oa_sensible_with_limits_compat, calc_outdoor_air_sensible_report_rates_compat,
+    calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
+    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
+    supply_node_update_from_result,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -39,6 +43,7 @@ use crate::{
 const SYSTEM_NODE_TEMPERATURE: &str = "System Node Temperature";
 const SYSTEM_NODE_HUMIDITY_RATIO: &str = "System Node Humidity Ratio";
 const SYSTEM_NODE_MASS_FLOW_RATE: &str = "System Node Mass Flow Rate";
+const ZONE_AIR_HUMIDITY_RATIO: &str = "Zone Air Humidity Ratio";
 const ZONE_SYSTEM_PREDICTED_SETPOINT_LOAD: &str =
     "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate";
 const ZONE_SYSTEM_PREDICTED_HEATING_LOAD: &str =
@@ -335,6 +340,8 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
             output.variable.as_str(),
             ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE
         ) {
             return Err(format!(
                 "IdealLoads outdoor-air design-flow report cannot produce Rust series for {}",
@@ -386,6 +393,18 @@ fn build_outdoor_air_design_flow_context<'a>(
         .iter()
         .find(|zone| zone.id == edge.zone)
         .ok_or_else(|| "missing controlled zone for IdealLoads edge".to_string())?;
+    let zone_air_node_edge = model
+        .graph
+        .zone_air_nodes
+        .iter()
+        .find(|candidate| candidate.zone == zone.id)
+        .ok_or_else(|| "missing zone air-node edge".to_string())?;
+    let zone_air_node = model
+        .typed
+        .nodes
+        .iter()
+        .find(|node| node.id == zone_air_node_edge.node)
+        .ok_or_else(|| "missing zone air node".to_string())?;
     let system = model
         .typed
         .ideal_loads_air_systems
@@ -449,24 +468,85 @@ fn build_outdoor_air_design_flow_context<'a>(
     for output in &manifest.outputs {
         expected_series.push(load_series(&baseline.eso, &output.key, &output.variable)?);
     }
+    let zone_air_humidity_ratio =
+        load_series(&baseline.eso, &zone.name.0, ZONE_AIR_HUMIDITY_RATIO)?;
+    let zone_node_temperature = load_series(
+        &baseline.eso,
+        &zone_air_node.name.0,
+        SYSTEM_NODE_TEMPERATURE,
+    )?;
+    let outdoor_air_node_temperature = load_series(
+        &baseline.eso,
+        &outdoor_air_node_name.0,
+        SYSTEM_NODE_TEMPERATURE,
+    )?;
+    let outdoor_air_node_humidity_ratio = load_series(
+        &baseline.eso,
+        &outdoor_air_node_name.0,
+        SYSTEM_NODE_HUMIDITY_RATIO,
+    )?;
+    let heating_demand = load_series(
+        &baseline.eso,
+        &zone.name.0,
+        ZONE_SYSTEM_PREDICTED_HEATING_LOAD,
+    )?;
+    let cooling_demand = load_series(
+        &baseline.eso,
+        &zone.name.0,
+        ZONE_SYSTEM_PREDICTED_COOLING_LOAD,
+    )?;
     let sample_count = expected_series
         .iter()
         .map(|series| series.samples.len())
+        .chain([
+            zone_air_humidity_ratio.samples.len(),
+            zone_node_temperature.samples.len(),
+            outdoor_air_node_temperature.samples.len(),
+            outdoor_air_node_humidity_ratio.samples.len(),
+            heating_demand.samples.len(),
+            cooling_demand.samples.len(),
+        ])
         .min()
         .unwrap_or(0);
     if sample_count == 0 {
         return Err("IdealLoads outdoor-air diagnostic has no samples".to_string());
     }
 
+    let mut sensible_results = Vec::with_capacity(sample_count);
+    for index in 0..sample_count {
+        let calc_zone_state_index = index.saturating_sub(1);
+        let zone_state = IdealLoadsOutdoorAirNodeState {
+            air_temperature_c: zone_node_temperature.samples[calc_zone_state_index].value,
+            air_humidity_ratio: zone_air_humidity_ratio.samples[index].value,
+        };
+        let outdoor_air_state = IdealLoadsOutdoorAirNodeState {
+            air_temperature_c: outdoor_air_node_temperature.samples[index].value,
+            air_humidity_ratio: outdoor_air_node_humidity_ratio.samples[index].value,
+        };
+        let demand = ZoneSysEnergyDemand::sensible_only(
+            zone.id,
+            heating_demand.samples[index].value,
+            cooling_demand.samples[index].value,
+        );
+        sensible_results.push(calc_outdoor_air_sensible_report_rates_compat(
+            zone_state,
+            outdoor_air_state,
+            demand,
+            outdoor_air_mass_flow_rate_kg_per_s,
+            true,
+        ));
+    }
+
     let mut rows = Vec::new();
     let mut result_store = ResultStore::new();
     for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
-        let (rust_source, units, value) = outdoor_air_observed_value(
+        let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
             outdoor_air_mass_flow_rate_kg_per_s,
             design_volume_flow_rate_m3_per_s,
+            &sensible_results,
+            expected.samples.len(),
         )?;
-        let observed_values = vec![value; expected.samples.len()];
         let timestamps = expected
             .samples
             .iter()
@@ -569,21 +649,41 @@ fn validate_outdoor_air_design_flow_boundary(
     Ok(())
 }
 
-fn outdoor_air_observed_value(
+fn outdoor_air_observed_values(
     output: &OutputRequest,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     design_volume_flow_rate_m3_per_s: f64,
-) -> Result<(&'static str, &'static str, f64), String> {
+    sensible_results: &[IdealLoadsOutdoorAirSensibleResult],
+    expected_samples: usize,
+) -> Result<(&'static str, &'static str, Vec<f64>), String> {
     match output.variable.as_str() {
         ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE => Ok((
             "rust-ideal-loads-outdoor-air-design-flow",
             "kg/s",
-            outdoor_air_mass_flow_rate_kg_per_s,
+            vec![outdoor_air_mass_flow_rate_kg_per_s; expected_samples],
         )),
         ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE => Ok((
             "rust-ideal-loads-outdoor-air-design-flow",
             "m3/s",
-            design_volume_flow_rate_m3_per_s,
+            vec![design_volume_flow_rate_m3_per_s; expected_samples],
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-sensible-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_sensible_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-sensible-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_sensible_cooling_rate_w)
+                .collect(),
         )),
         _ => Err(format!(
             "IdealLoads outdoor-air design-flow report cannot produce Rust series for {} / {}",
@@ -1493,13 +1593,13 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air design-flow mass/standard-density volume flow\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, and sensible report rates\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
-    report.push_str("outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule and EnergyPlus StdRhoAir from Site:Location\n");
+    report.push_str("outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA state proof rows\n");
     report.push_str("outdoor_air_schedule: blank-always-1.0\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
@@ -1612,7 +1712,7 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string(outdoor_air_tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
-    json.push_str("  \"outdoor_air_source\": \"DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule and EnergyPlus StdRhoAir from Site:Location\",\n");
+    json.push_str("  \"outdoor_air_source\": \"DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA state proof rows\",\n");
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
     json.push_str(&format!(
         "  \"zone\": {},\n",
