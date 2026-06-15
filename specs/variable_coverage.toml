@@ -60,7 +60,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_constant_shr_diagnostic_001"
 first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio and ConstantSupplyHumidityRatio latent cooling report parity using EnergyPlus EPW barometric pressure saturation clamp and PsyHFnTdbW/PsyWFnTdbH constants; humidistat, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification latent cooling report parity using EnergyPlus source-order humidity inputs and psychrometric constants; humidistat humidification, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Sensible Heating Rate"
@@ -76,7 +76,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_constant_shr_diagnostic_001"
 first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio and ConstantSupplyHumidityRatio supply-air sensible cooling report parity for IdealLoads fixtures; broad humidity-control conformance remains outside the claim."
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification supply-air sensible cooling report parity for IdealLoads fixtures; broad humidity-control conformance remains outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Latent Heating Rate"
@@ -92,7 +92,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_constant_shr_diagnostic_001"
 first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio and ConstantSupplyHumidityRatio supply-air latent cooling report parity using EnergyPlus EPW barometric pressure saturation clamp and PsyHFnTdbW/PsyWFnTdbH constants; humidistat, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio, and Humidistat dehumidification supply-air latent cooling report parity using EnergyPlus EPW barometric pressure saturation clamp and PsyHFnTdbW/PsyWFnTdbH constants; humidistat humidification, moisture-demand conformance, and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Energy"
@@ -391,12 +391,28 @@ first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
 support_boundary = "Diagnostic proof input for source-order zone demand in the no-OA/no-limit IdealLoads candidate; not a user-facing conformance output."
 
 [[variable]]
+name = "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_humidistat_dehumidification_diagnostic_001"
+first_evidence = "ideal_loads_humidistat_dehumidification_diagnostic_001"
+support_boundary = "Diagnostic proof input for ZoneSysMoistureDemand in the no-OA Humidistat dehumidification fixture; humidistat humidification and moisture-demand conformance remain outside the claim."
+
+[[variable]]
+name = "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_humidistat_dehumidification_diagnostic_001"
+first_evidence = "ideal_loads_humidistat_dehumidification_diagnostic_001"
+support_boundary = "Diagnostic proof input for ZoneSysMoistureDemand in the no-OA Humidistat dehumidification fixture; moisture-demand conformance and broad humidity-control conformance remain outside the claim."
+
+[[variable]]
 name = "System Node Humidity Ratio"
 domain = "node"
 status = "diagnostic"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Diagnostic proof rows in the no-OA/no-limit IdealLoads case and finite flow/capacity return-node proof rows; humidity control and broad node humidity conformance remain outside the claim."
+support_boundary = "Diagnostic proof rows in the no-OA/no-limit IdealLoads case, finite flow/capacity return-node proof rows, humidity-control return-node/supply-node diagnostics, and Humidistat dehumidification supply humidity parity; broad node humidity conformance remains outside the claim."
 
 [[variable]]
 name = "District Heating Water Rate"
@@ -740,7 +756,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit case, plus zero-failure finite-limit diagnostic evidence; broad HVAC flow balancing and node conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit case, plus zero-failure finite-limit and Humidistat dehumidification diagnostic evidence; broad HVAC flow balancing and node conformance remain outside the claim."
 
 [[variable]]
 name = "System Node Temperature"

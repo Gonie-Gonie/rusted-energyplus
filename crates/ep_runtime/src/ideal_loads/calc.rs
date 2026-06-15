@@ -9,6 +9,7 @@ use ep_model::{
 };
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
+const SMALL_HUMIDITY_RATIO_DIFFERENCE: f64 = 0.00025;
 const MINIMUM_HUMIDITY_RATIO: f64 = 1.0e-5;
 const DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const STANDARD_PRESSURE_SEA_LEVEL_PA: f64 = 101_325.0;
@@ -204,12 +205,15 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
 
     let cooling_delta_t =
         zone_state.air_temperature_c - system.minimum_cooling_supply_air_temperature_c;
-    let cooling_mass_flow_rate_kg_per_s =
+    let cooling_sensible_mass_flow_rate_kg_per_s =
         if cooling_load_w > 0.0 && cooling_delta_t > SMALL_TEMPERATURE_DIFFERENCE_C {
             cooling_load_w / (cp_air_j_per_kg_k * cooling_delta_t)
         } else {
             0.0
         };
+    let cooling_mass_flow_rate_kg_per_s = cooling_sensible_mass_flow_rate_kg_per_s.max(
+        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand),
+    );
 
     if heating_mass_flow_rate_kg_per_s > 0.0
         && heating_mass_flow_rate_kg_per_s >= cooling_mass_flow_rate_kg_per_s
@@ -241,15 +245,15 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
             supply_air_total_cooling_rate_w: 0.0,
         }
     } else if cooling_mass_flow_rate_kg_per_s > 0.0 {
-        let supply_temperature_c = system.minimum_cooling_supply_air_temperature_c;
-        cooling_result_from_states(
+        cooling_result_with_limits(
             system,
             zone_state,
-            zone_state,
+            recirculation_state,
             cp_air_j_per_kg_k,
-            supply_temperature_c,
             supply_humidity_ratio,
+            cooling_load_w,
             cooling_mass_flow_rate_kg_per_s,
+            demand,
             context,
         )
     } else {
@@ -324,13 +328,28 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         cp_air_j_per_kg_k,
         limit_context,
     );
-    let cooling_mass_flow_rate_kg_per_s = limited_cooling_mass_flow_rate_kg_per_s(
+    let cooling_sensible_mass_flow_rate_kg_per_s = limited_cooling_mass_flow_rate_kg_per_s(
         system,
         zone_state,
         cooling_load_w,
         cp_air_j_per_kg_k,
         limit_context,
     );
+    let mut cooling_mass_flow_rate_kg_per_s = cooling_sensible_mass_flow_rate_kg_per_s.max(
+        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand),
+    );
+    if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
+        system.cooling_limit,
+        system.maximum_cooling_air_flow_rate_m3_per_s,
+        limit_context,
+    ) && maximum_mass_flow_rate_kg_per_s > 0.0
+    {
+        cooling_mass_flow_rate_kg_per_s =
+            cooling_mass_flow_rate_kg_per_s.min(maximum_mass_flow_rate_kg_per_s);
+    }
+    if cooling_capacity_limit_is_zero(system) {
+        cooling_mass_flow_rate_kg_per_s = 0.0;
+    }
 
     if heating_mass_flow_rate_kg_per_s > 0.0
         && heating_mass_flow_rate_kg_per_s >= cooling_mass_flow_rate_kg_per_s
@@ -353,6 +372,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
             supply_humidity_ratio,
             cooling_load_w,
             cooling_mass_flow_rate_kg_per_s,
+            demand,
             limit_context,
         )
     } else {
@@ -468,6 +488,27 @@ fn limited_cooling_mass_flow_rate_kg_per_s(
     mass_flow_rate_kg_per_s
 }
 
+fn humidistat_dehumidification_mass_flow_rate_kg_per_s(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+) -> f64 {
+    if system.dehumidification_control_type != DehumidificationControlType::Humidistat
+        || cooling_capacity_limit_is_zero(system)
+    {
+        return 0.0;
+    }
+
+    let moisture_demand_kg_per_s = demand.remaining_output_req_to_dehumid_sp_kg_per_s;
+    let delta_humidity_ratio =
+        system.minimum_cooling_supply_air_humidity_ratio - zone_state.air_humidity_ratio;
+    if delta_humidity_ratio < -SMALL_HUMIDITY_RATIO_DIFFERENCE && moisture_demand_kg_per_s < 0.0 {
+        (moisture_demand_kg_per_s / delta_humidity_ratio).max(0.0)
+    } else {
+        0.0
+    }
+}
+
 fn heating_result_with_limits(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
@@ -538,6 +579,7 @@ fn cooling_result_with_limits(
     supply_humidity_ratio: f64,
     cooling_load_w: f64,
     cooling_mass_flow_rate_kg_per_s: f64,
+    demand: ZoneSysEnergyDemand,
     context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
     let mut supply_temperature_c = zone_state.air_temperature_c
@@ -570,6 +612,7 @@ fn cooling_result_with_limits(
         supply_temperature_c,
         supply_humidity_ratio,
         cooling_mass_flow_rate_kg_per_s,
+        demand,
         context,
     )
 }
@@ -582,6 +625,7 @@ fn cooling_result_from_states(
     supply_temperature_c: f64,
     mixed_supply_humidity_ratio: f64,
     cooling_mass_flow_rate_kg_per_s: f64,
+    demand: ZoneSysEnergyDemand,
     context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
     let mixed_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
@@ -593,10 +637,12 @@ fn cooling_result_from_states(
         * (mixed_air_state.air_temperature_c - supply_temperature_c).max(0.0);
     let supply_humidity_ratio = cooling_supply_humidity_ratio(
         system,
+        zone_state,
         mixed_air_state,
         supply_temperature_c,
         mixed_supply_humidity_ratio,
         cooling_mass_flow_rate_kg_per_s,
+        demand,
         supply_air_sensible_cooling_rate_w,
         mixed_air_enthalpy_j_per_kg,
         context,
@@ -662,10 +708,12 @@ fn cooling_result_from_states(
 
 fn cooling_supply_humidity_ratio(
     system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
     mixed_air_state: IdealLoadsZoneState,
     supply_temperature_c: f64,
     mixed_supply_humidity_ratio: f64,
     supply_mass_flow_rate_kg_per_s: f64,
+    demand: ZoneSysEnergyDemand,
     supply_air_sensible_cooling_rate_w: f64,
     mixed_air_enthalpy_j_per_kg: f64,
     context: IdealLoadsSensibleLimitContext,
@@ -698,6 +746,14 @@ fn cooling_supply_humidity_ratio(
             system
                 .minimum_cooling_supply_air_humidity_ratio
                 .max(MINIMUM_HUMIDITY_RATIO)
+        }
+        DehumidificationControlType::Humidistat if supply_mass_flow_rate_kg_per_s > 0.0 => {
+            let supply_humidity_ratio_for_dehumidification = (demand
+                .remaining_output_req_to_dehumid_sp_kg_per_s
+                / supply_mass_flow_rate_kg_per_s
+                + zone_state.air_humidity_ratio)
+                .max(system.minimum_cooling_supply_air_humidity_ratio);
+            mixed_supply_humidity_ratio.min(supply_humidity_ratio_for_dehumidification)
         }
         _ => mixed_supply_humidity_ratio,
     };
@@ -750,6 +806,13 @@ fn numeric_autosize_value(value: Option<AutosizeOrNumber>) -> Option<f64> {
         Some(AutosizeOrNumber::Value(value)) => Some(value),
         Some(AutosizeOrNumber::Autosize) | None => None,
     }
+}
+
+fn cooling_capacity_limit_is_zero(system: &IdealLoadsAirSystem) -> bool {
+    matches!(
+        capacity_limit_w(system.cooling_limit, system.maximum_total_cooling_capacity_w),
+        Some(capacity_limit_w) if capacity_limit_w <= 0.0
+    )
 }
 
 fn limit_includes_flow_rate(limit: IdealLoadsLimit) -> bool {
@@ -961,6 +1024,60 @@ mod tests {
         );
         assert!(result.zone_latent_heating_rate_w > 0.0);
         assert!(result.supply_air_latent_heating_rate_w > 0.0);
+    }
+
+    #[test]
+    fn humidistat_dehumidification_can_drive_cooling_without_sensible_load() {
+        let mut system = test_system();
+        system.dehumidification_control_type = DehumidificationControlType::Humidistat;
+        system.minimum_cooling_supply_air_humidity_ratio = 0.0077;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 24.0,
+            air_humidity_ratio: 0.011,
+        };
+        let mut demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, 0.0);
+        demand.remaining_output_req_to_dehumid_sp_kg_per_s = -0.00033;
+
+        let result = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(result.supply_mass_flow_rate_kg_per_s, 0.1, 1.0e-12);
+        assert_close(
+            result.supply_temperature_c,
+            zone_state.air_temperature_c,
+            1.0e-12,
+        );
+        assert_close(
+            result.supply_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio,
+            1.0e-12,
+        );
+        assert_close(result.zone_sensible_cooling_rate_w, 0.0, 1.0e-9);
+        assert!(result.zone_latent_cooling_rate_w > 0.0);
+    }
+
+    #[test]
+    fn humidistat_dehumidification_mass_flow_can_exceed_sensible_cooling_flow() {
+        let mut system = test_system();
+        system.dehumidification_control_type = DehumidificationControlType::Humidistat;
+        system.minimum_cooling_supply_air_humidity_ratio = 0.0077;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.011,
+        };
+        let mut demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -1000.0);
+        demand.remaining_output_req_to_dehumid_sp_kg_per_s = -0.00033;
+
+        let result = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
+        let sensible_mass_flow = 1000.0 / (cp * (25.0 - 13.0));
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert!(result.supply_mass_flow_rate_kg_per_s > sensible_mass_flow);
+        assert_close(result.supply_mass_flow_rate_kg_per_s, 0.1, 1.0e-12);
+        assert!(result.supply_temperature_c > system.minimum_cooling_supply_air_temperature_c);
+        assert_close(result.zone_sensible_cooling_rate_w, 1000.0, 1.0e-9);
+        assert!(result.zone_latent_cooling_rate_w > 0.0);
     }
 
     #[test]

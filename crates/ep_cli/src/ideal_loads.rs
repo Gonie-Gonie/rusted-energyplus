@@ -53,7 +53,8 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
+    ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_no_oa_no_limit_sensible_with_recirculation_context_compat,
     calc_no_oa_sensible_with_limits_and_recirculation_compat,
@@ -191,6 +192,8 @@ struct IdealLoadsInputTrace {
     active_demand: LoadedSeries,
     heating_demand: LoadedSeries,
     cooling_demand: LoadedSeries,
+    humidifying_moisture_demand: LoadedSeries,
+    dehumidifying_moisture_demand: LoadedSeries,
 }
 
 #[derive(Clone)]
@@ -1043,7 +1046,9 @@ fn build_context<'a>(
     } else {
         classify_no_oa_sensible_subset(system)
     };
-    if manifest_allows_constant_supply_humidity_diagnostic(manifest, system) {
+    if manifest_allows_constant_supply_humidity_diagnostic(manifest, system)
+        || manifest_allows_humidistat_dehumidification_diagnostic(manifest, system)
+    {
         boundary
             .unsupported_features
             .retain(|feature| *feature != IdealLoadsUnsupportedFeature::Dehumidification);
@@ -1139,6 +1144,20 @@ fn load_input_trace(
     let active_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_SETPOINT_LOAD)?;
     let heating_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_HEATING_LOAD)?;
     let cooling_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_COOLING_LOAD)?;
+    let humidifying_moisture_demand = load_optional_series_or_zero(
+        eso,
+        zone_name,
+        ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD,
+        &active_demand,
+        "kgWater/s",
+    )?;
+    let dehumidifying_moisture_demand = load_optional_series_or_zero(
+        eso,
+        zone_name,
+        ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
+        &active_demand,
+        "kgWater/s",
+    )?;
     let sample_count = [
         zone_node_temperature.samples.len(),
         zone_node_humidity_ratio.samples.len(),
@@ -1147,6 +1166,8 @@ fn load_input_trace(
         active_demand.samples.len(),
         heating_demand.samples.len(),
         cooling_demand.samples.len(),
+        humidifying_moisture_demand.samples.len(),
+        dehumidifying_moisture_demand.samples.len(),
     ]
     .into_iter()
     .min()
@@ -1164,6 +1185,8 @@ fn load_input_trace(
         active_demand,
         heating_demand,
         cooling_demand,
+        humidifying_moisture_demand,
+        dehumidifying_moisture_demand,
     })
 }
 
@@ -1184,6 +1207,34 @@ fn load_series(eso: &Path, key: &str, variable: &str) -> Result<LoadedSeries, St
         units: series.metadata.units,
         samples: run_period_samples(series.samples),
     })
+}
+
+fn load_optional_series_or_zero(
+    eso: &Path,
+    key: &str,
+    variable: &str,
+    reference: &LoadedSeries,
+    units: &str,
+) -> Result<LoadedSeries, String> {
+    match load_eso_time_series(eso, key, variable) {
+        Ok(series) => Ok(LoadedSeries {
+            units: series.metadata.units,
+            samples: run_period_samples(series.samples),
+        }),
+        Err(_) => Ok(LoadedSeries {
+            units: Some(units.to_string()),
+            samples: reference
+                .samples
+                .iter()
+                .enumerate()
+                .map(|(index, sample)| SeriesSample {
+                    index,
+                    timestamp: sample.timestamp.clone(),
+                    value: 0.0,
+                })
+                .collect(),
+        }),
+    }
 }
 
 fn run_period_samples(samples: Vec<SeriesSample>) -> Vec<SeriesSample> {
@@ -1253,9 +1304,10 @@ fn evaluate_rows(
         ideal_loads_barometric_pressure_trace(model, weather, input_trace, limit_context)?;
     let mut calc_results = Vec::with_capacity(input_trace.sample_count);
     let mut mode_counts = IdealLoadsModeCounts::default();
-    let finite_limit_trace_uses_recirculation = uses_finite_limits(system);
+    let source_order_trace_uses_recirculation = recirculation_node_name.is_some()
+        && (uses_finite_limits(system) || uses_ideal_loads_humidity_control(system));
     for index in 0..input_trace.sample_count {
-        let (zone_temperature, zone_humidity_ratio) = if finite_limit_trace_uses_recirculation {
+        let (zone_temperature, zone_humidity_ratio) = if source_order_trace_uses_recirculation {
             (
                 input_trace.recirculation_node_temperature.samples[index].value,
                 input_trace.recirculation_node_humidity_ratio.samples[index].value,
@@ -1285,7 +1337,12 @@ fn evaluate_rows(
         } else {
             zone_state
         };
-        let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
+        let mut demand =
+            ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
+        demand.remaining_output_req_to_humid_sp_kg_per_s =
+            input_trace.humidifying_moisture_demand.samples[index].value;
+        demand.remaining_output_req_to_dehumid_sp_kg_per_s =
+            input_trace.dehumidifying_moisture_demand.samples[index].value;
         let result = calc_ideal_loads_sensible_compat(
             system,
             zone_state,
@@ -1415,6 +1472,34 @@ fn evaluate_rows(
             "W",
             values_from_samples(
                 &input_trace.cooling_demand.samples,
+                input_trace.sample_count,
+            ),
+        ),
+    );
+    observed_by_variable.insert(
+        (
+            zone_name.to_string(),
+            ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD.to_string(),
+        ),
+        ObservedSeries::new(
+            "oracle-zone-system-moisture-demand-input",
+            "kgWater/s",
+            values_from_samples(
+                &input_trace.humidifying_moisture_demand.samples,
+                input_trace.sample_count,
+            ),
+        ),
+    );
+    observed_by_variable.insert(
+        (
+            zone_name.to_string(),
+            ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD.to_string(),
+        ),
+        ObservedSeries::new(
+            "oracle-zone-system-moisture-demand-input",
+            "kgWater/s",
+            values_from_samples(
+                &input_trace.dehumidifying_moisture_demand.samples,
                 input_trace.sample_count,
             ),
         ),
@@ -2243,6 +2328,20 @@ fn manifest_allows_constant_supply_humidity_diagnostic(
         && system.humidification_control_type == HumidificationControlType::None
         && manifest.outputs.iter().any(|output| {
             output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE
+                || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE
+        })
+}
+
+fn manifest_allows_humidistat_dehumidification_diagnostic(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    !manifest.conformance_claim
+        && system.dehumidification_control_type == DehumidificationControlType::Humidistat
+        && system.humidification_control_type == HumidificationControlType::None
+        && manifest.outputs.iter().any(|output| {
+            output.variable == ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD
+                || output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE
                 || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE
         })
 }

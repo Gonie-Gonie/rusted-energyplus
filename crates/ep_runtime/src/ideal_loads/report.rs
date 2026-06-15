@@ -8,6 +8,12 @@ pub const ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE: &str =
 /// Zone thermostat cooling setpoint output variable.
 pub const ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE: &str =
     "Zone Thermostat Cooling Setpoint Temperature";
+/// Zone humidifying moisture demand output variable.
+pub const ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD: &str =
+    "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate";
+/// Zone dehumidifying moisture demand output variable.
+pub const ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD: &str =
+    "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate";
 /// IdealLoads zone total heating rate output variable.
 pub const ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE: &str =
     "Zone Ideal Loads Zone Total Heating Rate";

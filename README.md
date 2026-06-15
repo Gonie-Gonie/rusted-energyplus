@@ -53,12 +53,14 @@ tolerance, and code organization.
   energy and blank-efficiency fuel energy rows kept diagnostic-only and
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
-- diagnostic-only IdealLoads no-OA `ConstantSensibleHeatRatio` and
-  `ConstantSupplyHumidityRatio` humidity-control evidence for zone/supply
-  latent and sensible rate rows plus supply humidity saturation/constant-ratio
-  handling in `ideal_loads_constant_shr_diagnostic_001` and
-  `ideal_loads_constant_supply_humidity_diagnostic_001`; humidistat,
-  moisture-demand, and broad humidity-control conformance remain outside the
+- diagnostic-only IdealLoads no-OA `ConstantSensibleHeatRatio`,
+  `ConstantSupplyHumidityRatio`, and Humidistat dehumidification
+  humidity-control evidence for zone/supply latent and sensible rate rows,
+  moisture-demand proof inputs, and supply humidity handling in
+  `ideal_loads_constant_shr_diagnostic_001`,
+  `ideal_loads_constant_supply_humidity_diagnostic_001`, and
+  `ideal_loads_humidistat_dehumidification_diagnostic_001`; humidistat
+  humidification and broad humidity-control conformance remain outside the
   claim
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity

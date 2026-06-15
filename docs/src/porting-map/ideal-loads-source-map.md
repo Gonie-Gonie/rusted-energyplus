@@ -157,9 +157,18 @@ minimum cooling supply humidity ratio, allows the source's small latent-heating
 report rows when heating availability is on during cooling, and keeps the same
 return-node mixed-air and EPW barometric-pressure saturation proof path.
 
-These remain diagnostic-only: humidistat control, moisture-demand branches,
-outdoor-air humidity control, humidification-side `ConstantSupplyHumidityRatio`,
-and broad humidity-control conformance are not promoted.
+`ideal_loads_humidistat_dehumidification_diagnostic_001` adds a diagnostic-only
+no-OA Humidistat dehumidification lane. The compare path reads EnergyPlus
+`ZoneSysMoistureDemand` proof rows for the humidifying and dehumidifying
+moisture transfer rates, uses the same-timestamp return node as the
+source-order zone state for the first run-period sample, and matches the
+Humidistat dehumidification supply mass flow, supply humidity ratio, and latent
+cooling report rows with zero tolerance failures.
+
+These remain diagnostic-only: humidistat humidification, outdoor-air humidity
+control, humidification-side `ConstantSupplyHumidityRatio`, active economizer
+or heat-recovery humidity interactions, finite-limit Humidistat behavior, and
+broad humidity-control conformance are not promoted.
 
 ## Outdoor-Air Prerequisites
 
