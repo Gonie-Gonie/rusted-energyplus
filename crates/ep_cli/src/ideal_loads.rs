@@ -10,19 +10,24 @@ use ep_conformance::{
     ComparisonClass, ConformanceCase, EvidenceDomain, OutputFrequency, OutputLevel, OutputRequest,
     SourceArtifact, VariableClass,
 };
-use ep_model::{IdealLoadsAirSystem, IdealLoadsLimit, OutputHandle, SimulationModel};
+use ep_model::{
+    DemandControlledVentilationType, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
+    IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType, OutputHandle, SimulationModel,
+};
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
-    IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries, ResultStore,
+    IdealLoadsOutdoorAirContext, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
+    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries,
+    ResultStore, ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
     ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE, ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE,
     ZoneSysEnergyDemand, calc_no_oa_no_limit_sensible_compat,
-    calc_no_oa_sensible_with_limits_compat, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
-    supply_node_update_from_result,
+    calc_no_oa_sensible_with_limits_compat, calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s,
+    classify_no_oa_no_limit_sensible_subset, classify_no_oa_sensible_subset,
+    ideal_loads_zone_equipment_stages, supply_node_update_from_result,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -71,6 +76,22 @@ struct IdealLoadsDiagnosticContext<'a> {
     result_store: ResultStore,
     input_trace: IdealLoadsInputTrace,
     mode_counts: IdealLoadsModeCounts,
+}
+
+struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
+    manifest: &'a ConformanceCase,
+    baseline: &'a BaselineSummary,
+    branch: &'static str,
+    zone_name: String,
+    system_name: String,
+    outdoor_air_spec_name: String,
+    outdoor_air_node_name: String,
+    standard_air_density_kg_per_m3: f64,
+    design_volume_flow_rate_m3_per_s: f64,
+    outdoor_air_mass_flow_rate_kg_per_s: f64,
+    sample_count: usize,
+    rows: Vec<IdealLoadsDiagnosticRow>,
+    result_store: ResultStore,
 }
 
 struct IdealLoadsInputTrace {
@@ -173,6 +194,58 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
     })
 }
 
+pub(crate) fn generate_ideal_loads_outdoor_air_design_flow_report(
+    case_path: &Path,
+    manifest: &ConformanceCase,
+    oracle_root: &Path,
+    output_root: &Path,
+) -> Result<IdealLoadsDiagnosticReportSummary, String> {
+    validate_outdoor_air_design_flow_manifest(manifest)?;
+
+    let case_output_dir = output_root.join(&manifest.id);
+    let oracle_output_dir = case_output_dir.join("oracle");
+    let compare_dir = case_output_dir.join("compare");
+
+    let baseline =
+        generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
+    let (series_count, compared_samples, tolerance_failures_count, tolerance_policy, status) = {
+        let context = build_outdoor_air_design_flow_context(manifest, &baseline)?;
+        write_outdoor_air_artifacts(&compare_dir, &context)?;
+
+        let tolerance_failures_count = context
+            .rows
+            .iter()
+            .filter(|row| row.status == SeriesComparisonStatus::Fail)
+            .count();
+        let status = outdoor_air_overall_status(&context);
+        (
+            context.rows.len(),
+            context.sample_count,
+            tolerance_failures_count,
+            outdoor_air_tolerance_policy(&context),
+            status,
+        )
+    };
+
+    Ok(IdealLoadsDiagnosticReportSummary {
+        baseline,
+        report_dir: compare_dir.clone(),
+        compare_report: compare_dir.join("compare-report.md"),
+        compare_summary: compare_dir.join("compare-summary.json"),
+        selected_outputs: compare_dir.join("selected_outputs.json"),
+        rust_result_store: compare_dir.join("rust-result-store.json"),
+        variable_deltas: compare_dir.join("variable-deltas.csv"),
+        first_divergence: compare_dir.join("first-divergence.csv"),
+        tolerance_failures: compare_dir.join("tolerance-failures.csv"),
+        stage_summary: compare_dir.join("stage-summary.json"),
+        series_count,
+        compared_samples,
+        tolerance_failures_count,
+        tolerance_policy,
+        status,
+    })
+}
+
 fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     if !matches!(
         manifest.comparison_class,
@@ -219,6 +292,304 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Result<(), String> {
+    if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
+        return Err(format!(
+            "IdealLoads outdoor-air design-flow report requires diagnostic-only, got {}",
+            comparison_class_label(manifest.comparison_class)
+        ));
+    }
+    if manifest.conformance_claim {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic must keep conformance_claim false"
+                .to_string(),
+        );
+    }
+    if manifest.outputs.is_empty() {
+        return Err("IdealLoads outdoor-air design-flow report requires outputs".to_string());
+    }
+    for output in &manifest.outputs {
+        if output.frequency != OutputFrequency::Detailed {
+            return Err(format!(
+                "IdealLoads outdoor-air design-flow report requires detailed outputs, got {} for {}",
+                output_frequency_label(output.frequency),
+                output.variable
+            ));
+        }
+        if output.source != SourceArtifact::Eso {
+            return Err(format!(
+                "IdealLoads outdoor-air design-flow report requires ESO outputs, got {} for {}",
+                source_artifact_label(output.source),
+                output.variable
+            ));
+        }
+        if output.level != Some(OutputLevel::Diagnostic) {
+            return Err(format!(
+                "IdealLoads outdoor-air design-flow outputs must be diagnostic-level: {}",
+                output.variable
+            ));
+        }
+        if !matches!(
+            output.variable.as_str(),
+            ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE
+        ) {
+            return Err(format!(
+                "IdealLoads outdoor-air design-flow report cannot produce Rust series for {}",
+                output.variable
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn build_outdoor_air_design_flow_context<'a>(
+    manifest: &'a ConformanceCase,
+    baseline: &'a BaselineSummary,
+) -> Result<IdealLoadsOutdoorAirDiagnosticContext<'a>, String> {
+    let raw_model = load_epjson_file(&baseline.epjson)
+        .map_err(|error| format!("failed to load baseline epJSON: {error}"))?;
+    let compile_result = compile_raw_model(&raw_model);
+    let typed = compile_result.model.ok_or_else(|| {
+        compile_result
+            .report
+            .diagnostics
+            .iter()
+            .map(|diagnostic| diagnostic.message.as_str())
+            .collect::<Vec<_>>()
+            .join("; ")
+    })?;
+    let model = SimulationModel::from_typed(typed);
+    if model.typed.zones.len() != 1 {
+        return Err(format!(
+            "IdealLoads outdoor-air design-flow report requires one zone, got {}",
+            model.typed.zones.len()
+        ));
+    }
+    if model.typed.ideal_loads_air_systems.len() != 1 {
+        return Err(format!(
+            "IdealLoads outdoor-air design-flow report requires one IdealLoads system, got {}",
+            model.typed.ideal_loads_air_systems.len()
+        ));
+    }
+
+    let edge = model
+        .graph
+        .zone_ideal_loads
+        .first()
+        .ok_or_else(|| "missing zone to IdealLoads graph edge".to_string())?;
+    let zone = model
+        .typed
+        .zones
+        .iter()
+        .find(|zone| zone.id == edge.zone)
+        .ok_or_else(|| "missing controlled zone for IdealLoads edge".to_string())?;
+    let system = model
+        .typed
+        .ideal_loads_air_systems
+        .iter()
+        .find(|system| system.id == edge.ideal_loads_air_system)
+        .ok_or_else(|| "missing IdealLoads system for graph edge".to_string())?;
+    let outdoor_air_edge = model
+        .graph
+        .ideal_loads_outdoor_air_specs
+        .iter()
+        .find(|candidate| candidate.ideal_loads_air_system == system.id)
+        .ok_or_else(|| "missing IdealLoads outdoor-air design specification edge".to_string())?;
+    let outdoor_air_specification = model
+        .typed
+        .design_specification_outdoor_air
+        .iter()
+        .find(|specification| specification.id == outdoor_air_edge.design_specification_outdoor_air)
+        .ok_or_else(|| "missing IdealLoads outdoor-air design specification".to_string())?;
+    let outdoor_air_node_name = system
+        .outdoor_air_inlet_node_name
+        .as_ref()
+        .ok_or_else(|| "IdealLoads outdoor-air diagnostic requires an OA inlet node".to_string())?;
+    if outdoor_air_specification.outdoor_air_schedule.is_some() {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic currently requires a blank OA schedule"
+                .to_string(),
+        );
+    }
+
+    validate_outdoor_air_design_flow_boundary(system, outdoor_air_specification.method)?;
+
+    let site =
+        model.typed.site.as_ref().ok_or_else(|| {
+            "IdealLoads outdoor-air diagnostics require Site:Location".to_string()
+        })?;
+    let standard_air_density_kg_per_m3 =
+        IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m)
+            .ok_or_else(|| {
+                format!(
+                    "failed to derive EnergyPlus StdRhoAir from site elevation {}",
+                    site.elevation_m
+                )
+            })?
+            .standard_air_density_kg_per_m3;
+    let outdoor_air_context = IdealLoadsOutdoorAirContext {
+        design_people_count: 0.0,
+        zone_floor_area_m2: 0.0,
+        zone_volume_m3: 0.0,
+    };
+    let outdoor_air_mass_flow_rate_kg_per_s = calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
+        outdoor_air_specification,
+        outdoor_air_context,
+        None,
+        standard_air_density_kg_per_m3,
+    )
+    .ok_or_else(|| "failed to calculate IdealLoads outdoor-air mass flow".to_string())?;
+    let design_volume_flow_rate_m3_per_s =
+        outdoor_air_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3;
+
+    let mut expected_series = Vec::with_capacity(manifest.outputs.len());
+    for output in &manifest.outputs {
+        expected_series.push(load_series(&baseline.eso, &output.key, &output.variable)?);
+    }
+    let sample_count = expected_series
+        .iter()
+        .map(|series| series.samples.len())
+        .min()
+        .unwrap_or(0);
+    if sample_count == 0 {
+        return Err("IdealLoads outdoor-air diagnostic has no samples".to_string());
+    }
+
+    let mut rows = Vec::new();
+    let mut result_store = ResultStore::new();
+    for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
+        let (rust_source, units, value) = outdoor_air_observed_value(
+            output,
+            outdoor_air_mass_flow_rate_kg_per_s,
+            design_volume_flow_rate_m3_per_s,
+        )?;
+        let observed_values = vec![value; expected.samples.len()];
+        let timestamps = expected
+            .samples
+            .iter()
+            .map(|sample| sample.timestamp.clone())
+            .collect::<Vec<_>>();
+        let observed_samples = samples_with_timestamps(&observed_values, &timestamps);
+        let tolerance = tolerance_for_output(manifest, output)?;
+        let max_rmse_tolerance = max_rmse_tolerance_for_output(manifest, output)?;
+        let comparison = compare_series_samples_v2(&expected.samples, &observed_samples, tolerance);
+        let mean_abs_delta = mean_abs_delta(&expected.samples, &observed_samples);
+        let status = if comparison.status == SeriesComparisonStatus::Pass
+            && max_rmse_tolerance.is_none_or(|max_rmse| comparison.rmse_delta <= max_rmse)
+        {
+            SeriesComparisonStatus::Pass
+        } else {
+            SeriesComparisonStatus::Fail
+        };
+
+        result_store.add_series(OutputSeries {
+            handle: OutputHandle(result_store.series.len() as u32),
+            key: output.key.clone(),
+            variable_name: output.variable.clone(),
+            units: units.to_string(),
+            values: observed_values,
+        });
+        rows.push(IdealLoadsDiagnosticRow {
+            key: output.key.clone(),
+            variable: output.variable.clone(),
+            frequency: output.frequency,
+            variable_class: output.class,
+            source: output.source,
+            domain: output.domain,
+            level: output.level,
+            units: units.to_string(),
+            oracle_units: expected.units.clone(),
+            rust_source,
+            tolerance,
+            max_rmse_tolerance,
+            expected_samples: comparison.expected_samples,
+            observed_samples: comparison.observed_samples,
+            compared_samples: comparison.compared_samples,
+            max_abs_delta: comparison.max_abs_delta,
+            mean_abs_delta,
+            rmse_delta: comparison.rmse_delta,
+            max_rel_delta: comparison.max_rel_delta,
+            alignment: comparison.alignment,
+            first_divergence: comparison.first_divergence,
+            status,
+        });
+    }
+
+    Ok(IdealLoadsOutdoorAirDiagnosticContext {
+        manifest,
+        baseline,
+        branch: "outdoor-air-design-flow",
+        zone_name: zone.name.0.clone(),
+        system_name: system.name.0.clone(),
+        outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
+        outdoor_air_node_name: outdoor_air_node_name.0.clone(),
+        standard_air_density_kg_per_m3,
+        design_volume_flow_rate_m3_per_s,
+        outdoor_air_mass_flow_rate_kg_per_s,
+        sample_count,
+        rows,
+        result_store,
+    })
+}
+
+fn validate_outdoor_air_design_flow_boundary(
+    system: &IdealLoadsAirSystem,
+    method: DesignSpecificationOutdoorAirMethod,
+) -> Result<(), String> {
+    if method != DesignSpecificationOutdoorAirMethod::FlowPerZone {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone"
+                .to_string(),
+        );
+    }
+    if system.demand_controlled_ventilation_type != DemandControlledVentilationType::None {
+        return Err("IdealLoads outdoor-air design-flow diagnostic excludes DCV".to_string());
+    }
+    if system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic excludes economizer".to_string(),
+        );
+    }
+    if system.heat_recovery_type != HeatRecoveryType::None {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic excludes heat recovery".to_string(),
+        );
+    }
+    if system.heating_limit != IdealLoadsLimit::NoLimit
+        || system.cooling_limit != IdealLoadsLimit::NoLimit
+    {
+        return Err(
+            "IdealLoads outdoor-air design-flow diagnostic excludes finite flow/capacity limits"
+                .to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn outdoor_air_observed_value(
+    output: &OutputRequest,
+    outdoor_air_mass_flow_rate_kg_per_s: f64,
+    design_volume_flow_rate_m3_per_s: f64,
+) -> Result<(&'static str, &'static str, f64), String> {
+    match output.variable.as_str() {
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-design-flow",
+            "kg/s",
+            outdoor_air_mass_flow_rate_kg_per_s,
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-design-flow",
+            "m3/s",
+            design_volume_flow_rate_m3_per_s,
+        )),
+        _ => Err(format!(
+            "IdealLoads outdoor-air design-flow report cannot produce Rust series for {} / {}",
+            output.key, output.variable
+        )),
+    }
 }
 
 fn build_context<'a>(
@@ -953,6 +1324,62 @@ fn write_artifacts(
     Ok(())
 }
 
+fn write_outdoor_air_artifacts(
+    compare_dir: &Path,
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> Result<(), String> {
+    std::fs::create_dir_all(compare_dir).map_err(|error| {
+        format!("failed to create IdealLoads outdoor-air report directory: {error}")
+    })?;
+    std::fs::write(
+        compare_dir.join("compare-report.md"),
+        render_outdoor_air_markdown(context),
+    )
+    .map_err(|error| format!("failed to write IdealLoads outdoor-air compare report: {error}"))?;
+    std::fs::write(
+        compare_dir.join("compare-summary.json"),
+        render_outdoor_air_summary_json(context),
+    )
+    .map_err(|error| format!("failed to write IdealLoads outdoor-air compare summary: {error}"))?;
+    std::fs::write(
+        compare_dir.join("selected_outputs.json"),
+        render_outdoor_air_selected_outputs_json(context),
+    )
+    .map_err(|error| format!("failed to write IdealLoads outdoor-air selected outputs: {error}"))?;
+    std::fs::write(
+        compare_dir.join("rust-result-store.json"),
+        render_outdoor_air_result_store_json(context),
+    )
+    .map_err(|error| {
+        format!("failed to write IdealLoads outdoor-air Rust result store: {error}")
+    })?;
+    std::fs::write(
+        compare_dir.join("variable-deltas.csv"),
+        render_outdoor_air_variable_deltas_csv(context),
+    )
+    .map_err(|error| format!("failed to write IdealLoads outdoor-air variable deltas: {error}"))?;
+    std::fs::write(
+        compare_dir.join("first-divergence.csv"),
+        render_outdoor_air_first_divergence_csv(context),
+    )
+    .map_err(|error| {
+        format!("failed to write IdealLoads outdoor-air first divergence CSV: {error}")
+    })?;
+    std::fs::write(
+        compare_dir.join("tolerance-failures.csv"),
+        render_outdoor_air_tolerance_failures_csv(context),
+    )
+    .map_err(|error| {
+        format!("failed to write IdealLoads outdoor-air tolerance failures CSV: {error}")
+    })?;
+    std::fs::write(
+        compare_dir.join("stage-summary.json"),
+        render_outdoor_air_stage_summary_json(context),
+    )
+    .map_err(|error| format!("failed to write IdealLoads outdoor-air stage summary: {error}"))?;
+    Ok(())
+}
+
 fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     let manifest = context.manifest;
     let mut report = String::new();
@@ -1050,6 +1477,446 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         ));
     }
     report
+}
+
+fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
+    let manifest = context.manifest;
+    let mut report = String::new();
+    report.push_str("# IdealLoads Outdoor-Air Design-Flow Report\n\n");
+    report.push_str("## Manifest\n\n");
+    report.push_str(&format!("case_id: {}\n", manifest.id));
+    report.push_str(&format!(
+        "comparison_class: {}\n",
+        comparison_class_label(manifest.comparison_class)
+    ));
+    report.push_str(&format!(
+        "conformance_claim: {}\n",
+        manifest.conformance_claim
+    ));
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air design-flow mass/standard-density volume flow\n");
+    report.push_str(&format!(
+        "tolerance_policy: {}\n",
+        outdoor_air_tolerance_policy(context)
+    ));
+    report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
+    report.push_str("outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule and EnergyPlus StdRhoAir from Site:Location\n");
+    report.push_str("outdoor_air_schedule: blank-always-1.0\n");
+    report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
+    report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
+    report.push_str(&format!(
+        "ideal_loads_system: {}\n",
+        markdown_cell(&context.system_name)
+    ));
+    report.push_str(&format!(
+        "outdoor_air_spec: {}\n",
+        markdown_cell(&context.outdoor_air_spec_name)
+    ));
+    report.push_str(&format!(
+        "outdoor_air_node: {}\n",
+        markdown_cell(&context.outdoor_air_node_name)
+    ));
+    report.push_str(&format!(
+        "standard_air_density_kg_per_m3: {:.15}\n",
+        context.standard_air_density_kg_per_m3
+    ));
+    report.push_str(&format!(
+        "design_volume_flow_rate_m3_per_s: {:.15}\n",
+        context.design_volume_flow_rate_m3_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_mass_flow_rate_kg_per_s: {:.15}\n\n",
+        context.outdoor_air_mass_flow_rate_kg_per_s
+    ));
+
+    report.push_str("## Result\n\n");
+    report.push_str(&format!(
+        "status: {}\n",
+        outdoor_air_overall_status(context)
+    ));
+    report.push_str(&format!("series: {}\n", context.rows.len()));
+    report.push_str(&format!("samples: {}\n", context.sample_count));
+    report.push_str(&format!(
+        "tolerance_failures: {}\n\n",
+        context
+            .rows
+            .iter()
+            .filter(|row| row.status == SeriesComparisonStatus::Fail)
+            .count()
+    ));
+
+    report.push_str("## Artifacts\n\n");
+    report.push_str("- selected_outputs.json\n");
+    report.push_str("- rust-result-store.json\n");
+    report.push_str("- compare-summary.json\n");
+    report.push_str("- compare-report.md\n");
+    report.push_str("- variable-deltas.csv\n");
+    report.push_str("- first-divergence.csv\n");
+    report.push_str("- tolerance-failures.csv\n");
+    report.push_str("- stage-summary.json\n\n");
+
+    report.push_str("## Series\n\n");
+    report.push_str("| key | variable | level | domain | class | frequency | rust_source | units | unit_match | alignment | expected | observed | compared | max_abs_delta | mean_abs_delta | rmse_delta | max_rel_delta | tolerance | status | first_divergence |\n");
+    report.push_str("|---|---|---|---|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|\n");
+    for row in &context.rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {} | {} | {} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.variable),
+            optional_output_level_label(row.level),
+            row.domain.map_or("unspecified", evidence_domain_label),
+            variable_class_label(row.variable_class),
+            output_frequency_label(row.frequency),
+            row.rust_source,
+            markdown_cell(&row.units),
+            row.unit_match(),
+            alignment_label(row.alignment),
+            row.expected_samples,
+            row.observed_samples,
+            row.compared_samples,
+            row.max_abs_delta,
+            row.mean_abs_delta,
+            row.rmse_delta,
+            row.max_rel_delta,
+            tolerance_label(row.tolerance, row.max_rmse_tolerance),
+            status_label(row.status),
+            first_divergence_label(row.first_divergence.as_ref())
+        ));
+    }
+    report
+}
+
+fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
+    let manifest = context.manifest;
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!("  \"case_id\": {},\n", json_string(&manifest.id)));
+    json.push_str(&format!(
+        "  \"oracle_version\": {},\n",
+        json_string(&manifest.oracle_version)
+    ));
+    json.push_str(&format!(
+        "  \"comparison_class\": {},\n",
+        json_string(comparison_class_label(manifest.comparison_class))
+    ));
+    json.push_str(&format!(
+        "  \"conformance_claim\": {},\n",
+        manifest.conformance_claim
+    ));
+    json.push_str(&format!(
+        "  \"status\": {},\n",
+        json_string(outdoor_air_overall_status(context))
+    ));
+    json.push_str(&format!(
+        "  \"tolerance_policy\": {},\n",
+        json_string(outdoor_air_tolerance_policy(context))
+    ));
+    json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
+    json.push_str("  \"outdoor_air_source\": \"DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule and EnergyPlus StdRhoAir from Site:Location\",\n");
+    json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
+    json.push_str(&format!(
+        "  \"zone\": {},\n",
+        json_string(&context.zone_name)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_system\": {},\n",
+        json_string(&context.system_name)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_spec\": {},\n",
+        json_string(&context.outdoor_air_spec_name)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_node\": {},\n",
+        json_string(&context.outdoor_air_node_name)
+    ));
+    json.push_str(&format!(
+        "  \"standard_air_density_kg_per_m3\": {},\n",
+        json_number(context.standard_air_density_kg_per_m3)
+    ));
+    json.push_str(&format!(
+        "  \"design_volume_flow_rate_m3_per_s\": {},\n",
+        json_number(context.design_volume_flow_rate_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_kg_per_s)
+    ));
+    json.push_str(&format!("  \"samples\": {},\n", context.sample_count));
+    json.push_str(&format!("  \"series_count\": {},\n", context.rows.len()));
+    json.push_str(&format!(
+        "  \"tolerance_failures\": {},\n",
+        context
+            .rows
+            .iter()
+            .filter(|row| row.status == SeriesComparisonStatus::Fail)
+            .count()
+    ));
+    json.push_str("  \"artifacts\": {\n");
+    json.push_str("    \"oracle_selected_outputs_json\": \"selected_outputs.json\",\n");
+    json.push_str("    \"rust_result_store_json\": \"rust-result-store.json\",\n");
+    json.push_str("    \"compare_summary_json\": \"compare-summary.json\",\n");
+    json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
+    json.push_str("    \"variable_deltas_csv\": \"variable-deltas.csv\",\n");
+    json.push_str("    \"first_divergence_csv\": \"first-divergence.csv\",\n");
+    json.push_str("    \"tolerance_failures_csv\": \"tolerance-failures.csv\",\n");
+    json.push_str("    \"stage_summary_json\": \"stage-summary.json\"\n");
+    json.push_str("  },\n");
+    json.push_str(&format!(
+        "  \"domains\": {},\n",
+        domain_status_json(&context.rows)
+    ));
+    json.push_str("  \"series\": [\n");
+    for (index, row) in context.rows.iter().enumerate() {
+        json.push_str("    ");
+        json.push_str(&row_json(row));
+        if index + 1 < context.rows.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
+}
+
+fn render_outdoor_air_selected_outputs_json(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!(
+        "  \"case_id\": {},\n",
+        json_string(&context.manifest.id)
+    ));
+    json.push_str(&format!(
+        "  \"eso\": {},\n",
+        json_string(&context.baseline.eso.display().to_string())
+    ));
+    json.push_str("  \"series\": [\n");
+    for (index, row) in context.rows.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!("      \"key\": {},\n", json_string(&row.key)));
+        json.push_str(&format!(
+            "      \"variable\": {},\n",
+            json_string(&row.variable)
+        ));
+        json.push_str(&format!(
+            "      \"frequency\": {},\n",
+            json_string(output_frequency_label(row.frequency))
+        ));
+        json.push_str(&format!(
+            "      \"units\": {},\n",
+            row.oracle_units
+                .as_ref()
+                .map_or_else(|| "null".to_string(), |units| json_string(units))
+        ));
+        json.push_str(&format!("      \"samples\": {}\n", row.expected_samples));
+        json.push_str("    }");
+        if index + 1 < context.rows.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
+}
+
+fn render_outdoor_air_result_store_json(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!(
+        "  \"case_id\": {},\n",
+        json_string(&context.manifest.id)
+    ));
+    json.push_str(&format!(
+        "  \"series_count\": {},\n",
+        context.result_store.series.len()
+    ));
+    json.push_str(&format!(
+        "  \"sample_count\": {},\n",
+        context.result_store.sample_count()
+    ));
+    json.push_str("  \"series\": [\n");
+    for (index, series) in context.result_store.series.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!("      \"handle\": {},\n", series.handle.0));
+        json.push_str(&format!("      \"key\": {},\n", json_string(&series.key)));
+        json.push_str(&format!(
+            "      \"variable_name\": {},\n",
+            json_string(&series.variable_name)
+        ));
+        json.push_str(&format!(
+            "      \"units\": {},\n",
+            json_string(&series.units)
+        ));
+        json.push_str("      \"values\": [");
+        for (value_index, value) in series.values.iter().enumerate() {
+            if value_index > 0 {
+                json.push_str(", ");
+            }
+            json.push_str(&json_number(*value));
+        }
+        json.push_str("]\n");
+        json.push_str("    }");
+        if index + 1 < context.result_store.series.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
+}
+
+fn render_outdoor_air_variable_deltas_csv(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut csv = String::from(
+        "key,variable,domain,class,level,expected_samples,observed_samples,compared_samples,max_abs_delta,mean_abs_delta,rmse_delta,max_rel_delta,status\n",
+    );
+    for row in &context.rows {
+        csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            csv_cell(&row.key),
+            csv_cell(&row.variable),
+            row.domain.map_or("unspecified", evidence_domain_label),
+            variable_class_label(row.variable_class),
+            optional_output_level_label(row.level),
+            row.expected_samples,
+            row.observed_samples,
+            row.compared_samples,
+            json_number(row.max_abs_delta),
+            json_number(row.mean_abs_delta),
+            json_number(row.rmse_delta),
+            json_number(row.max_rel_delta),
+            status_label(row.status)
+        ));
+    }
+    csv
+}
+
+fn render_outdoor_air_first_divergence_csv(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut csv =
+        String::from("key,variable,index,timestamp,kind,expected,observed,abs_delta,rel_delta\n");
+    for row in &context.rows {
+        let Some(divergence) = row.first_divergence.as_ref() else {
+            continue;
+        };
+        csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{}\n",
+            csv_cell(&row.key),
+            csv_cell(&row.variable),
+            divergence.index,
+            csv_cell(divergence.timestamp.as_deref().unwrap_or("")),
+            divergence_kind_label(divergence.kind),
+            optional_number_csv(divergence.expected),
+            optional_number_csv(divergence.observed),
+            optional_number_csv(divergence.abs_delta),
+            optional_number_csv(divergence.rel_delta)
+        ));
+    }
+    csv
+}
+
+fn render_outdoor_air_tolerance_failures_csv(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut csv = String::from(
+        "key,variable,domain,class,level,max_abs_delta,rmse_delta,max_abs_tolerance,max_rmse_tolerance,status\n",
+    );
+    for row in &context.rows {
+        if row.status == SeriesComparisonStatus::Pass {
+            continue;
+        }
+        csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{}\n",
+            csv_cell(&row.key),
+            csv_cell(&row.variable),
+            row.domain.map_or("unspecified", evidence_domain_label),
+            variable_class_label(row.variable_class),
+            optional_output_level_label(row.level),
+            json_number(row.max_abs_delta),
+            json_number(row.rmse_delta),
+            json_number(row.tolerance.absolute),
+            row.max_rmse_tolerance
+                .map_or_else(|| "null".to_string(), json_number),
+            status_label(row.status)
+        ));
+    }
+    csv
+}
+
+fn render_outdoor_air_stage_summary_json(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!(
+        "  \"case_id\": {},\n",
+        json_string(&context.manifest.id)
+    ));
+    json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
+    json.push_str("  \"outdoor_air\": true,\n");
+    json.push_str("  \"outdoor_air_method\": \"Flow/Zone\",\n");
+    json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
+    json.push_str("  \"economizer\": \"NoEconomizer\",\n");
+    json.push_str("  \"heat_recovery\": \"None\",\n");
+    json.push_str("  \"humidity_control_conformance\": false,\n");
+    json.push_str("  \"finite_limit_conformance\": false,\n");
+    json.push_str(&format!(
+        "  \"outdoor_air_spec\": {},\n",
+        json_string(&context.outdoor_air_spec_name)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_node\": {},\n",
+        json_string(&context.outdoor_air_node_name)
+    ));
+    json.push_str(&format!(
+        "  \"standard_air_density_kg_per_m3\": {},\n",
+        json_number(context.standard_air_density_kg_per_m3)
+    ));
+    json.push_str(&format!(
+        "  \"design_volume_flow_rate_m3_per_s\": {},\n",
+        json_number(context.design_volume_flow_rate_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_kg_per_s)
+    ));
+    json.push_str("  \"stages\": [\n");
+    let stages = ideal_loads_zone_equipment_stages();
+    for (index, stage) in stages.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"stage_name\": {},\n",
+            json_string(stage.stage_name)
+        ));
+        json.push_str(&format!(
+            "      \"source_file\": {},\n",
+            json_string(stage.source_file)
+        ));
+        json.push_str(&format!(
+            "      \"source_routine\": {}\n",
+            json_string(stage.source_routine)
+        ));
+        json.push_str("    }");
+        if index + 1 < stages.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
 }
 
 fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
@@ -1455,7 +2322,32 @@ fn overall_status(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     }
 }
 
+fn outdoor_air_overall_status(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
+    if context.rows.is_empty() {
+        return "fail";
+    }
+    if context
+        .rows
+        .iter()
+        .all(|row| row.status == SeriesComparisonStatus::Pass)
+    {
+        "diagnostic"
+    } else {
+        "fail"
+    }
+}
+
 fn tolerance_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if context.manifest.conformance_claim {
+        "conformance-gate"
+    } else {
+        "diagnostic-draft"
+    }
+}
+
+fn outdoor_air_tolerance_policy(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> &'static str {
     if context.manifest.conformance_claim {
         "conformance-gate"
     } else {

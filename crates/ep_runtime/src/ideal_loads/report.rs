@@ -26,6 +26,12 @@ pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE: &str =
 /// IdealLoads supply-air total cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE: &str =
     "Zone Ideal Loads Supply Air Total Cooling Rate";
+/// IdealLoads outdoor-air mass flow rate output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Mass Flow Rate";
+/// IdealLoads outdoor-air standard-density volume flow output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate";
 
 /// Report payload produced by the no-OA/no-limit sensible calculation.
 #[derive(Clone, Copy, Debug, PartialEq)]
