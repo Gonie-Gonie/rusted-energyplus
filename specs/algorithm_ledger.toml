@@ -161,7 +161,7 @@ proof_variables = [
   "System Node Mass Flow Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-sensible-conformance"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus diagnostic-only finite flow/capacity evidence with return-node proof rows and tracked gaps, ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank and constant Schedule:Constant fuel-efficiency proof rows, hourly facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics, and RuntimeMeterRegistry request resolution; finite-limit conformance, outdoor air, humidity control, economizer, heat recovery, sizing, adaptive system timestep, non-constant efficiency schedules, broad meter conformance, and broad HVAC compatibility remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus zero-failure diagnostic-only finite flow/capacity evidence with return-node proof rows, ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank and constant Schedule:Constant fuel-efficiency proof rows, hourly facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics, and RuntimeMeterRegistry request resolution; finite-limit conformance, outdoor air, humidity control, economizer, heat recovery, sizing, adaptive system timestep, non-constant efficiency schedules, broad meter conformance, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"

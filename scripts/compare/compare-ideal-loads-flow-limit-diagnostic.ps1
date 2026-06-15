@@ -86,7 +86,7 @@ Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Descri
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
 Assert-Contains -Text $text -Pattern "series: 18" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 128" -Description "detailed sample count"
-Assert-Contains -Text $text -Pattern "tolerance_failures_count: 4" -Description "tracked diagnostic tolerance failures"
+Assert-Contains -Text $text -Pattern "tolerance_failures_count: 0" -Description "zero diagnostic tolerance failures"
 Assert-Contains -Text $text -Pattern "tolerance_policy: diagnostic-draft" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "status: diagnostic" -Description "diagnostic status"
 
@@ -121,8 +121,8 @@ if ($summary.conformance_claim -ne $false) {
 if ($summary.status -ne "diagnostic") {
     throw "Unexpected IdealLoads flow-limit diagnostic status: $($summary.status)"
 }
-if ($summary.tolerance_failures -ne 4) {
-    throw "IdealLoads flow-limit diagnostic should track exactly four flow-sensitive tolerance failures: $($summary.tolerance_failures)"
+if ($summary.tolerance_failures -ne 0) {
+    throw "IdealLoads flow-limit diagnostic should have zero tolerance failures: $($summary.tolerance_failures)"
 }
 if ($summary.samples -ne 128) {
     throw "Unexpected IdealLoads sample count: $($summary.samples)"
@@ -136,7 +136,7 @@ if ($summary.zone_demand_synthetic_rc_model -ne $false) {
 if ($summary.recirculation_node -ne "ZONE ONE RETURN") {
     throw "Unexpected recirculation node: $($summary.recirculation_node)"
 }
-if ($summary.recirculation_state_source -ne "EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state") {
+if ($summary.recirculation_state_source -ne "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations") {
     throw "Unexpected recirculation state source: $($summary.recirculation_state_source)"
 }
 $conformanceRows = @($summary.series | Where-Object { $_.level -eq "conformance" })
@@ -148,19 +148,8 @@ if ($diagnosticRows.Count -ne 18) {
     throw "Expected 18 diagnostic-level output rows, found $($diagnosticRows.Count)"
 }
 $failingRows = @($summary.series | Where-Object { $_.status -ne "pass" })
-if ($failingRows.Count -ne 4) {
-    throw "Expected exactly four diagnostic flow-limit failures, found $($failingRows.Count)"
-}
-$failingVariables = @($failingRows | ForEach-Object { "$($_.key)|$($_.variable)" })
-foreach ($expectedFailure in @(
-    "ZONE ONE IDEAL LOADS|Zone Ideal Loads Zone Total Cooling Rate",
-    "ZONE ONE IDEAL LOADS|Zone Ideal Loads Zone Sensible Cooling Rate",
-    "ZONE ONE IDEAL LOADS|Zone Ideal Loads Supply Air Total Cooling Rate",
-    "ZONE ONE INLET|System Node Mass Flow Rate"
-)) {
-    if ($failingVariables -notcontains $expectedFailure) {
-        throw "Missing expected diagnostic failure row: $expectedFailure"
-    }
+if ($failingRows.Count -ne 0) {
+    throw "Expected all diagnostic flow-limit rows to pass, found $($failingRows.Count) failure(s)"
 }
 $nodeTemperature = @($summary.series | Where-Object { $_.key -eq "ZONE ONE INLET" -and $_.variable -eq "System Node Temperature" })
 if ($nodeTemperature.Count -ne 1 -or $nodeTemperature[0].status -ne "pass") {
@@ -179,8 +168,8 @@ if ($nodeFlow[0].rust_source -ne "rust-ideal-loads-no-oa-sensible-limited-calc")
 if ($nodeFlow[0].level -ne "diagnostic") {
     throw "System Node Mass Flow Rate must be diagnostic-level in the flow-limit case"
 }
-if ($nodeFlow[0].status -ne "fail") {
-    throw "System Node Mass Flow Rate should remain a tracked diagnostic gap until flow-sensitive demand state is matched"
+if ($nodeFlow[0].status -ne "pass") {
+    throw "System Node Mass Flow Rate should pass in the flow-limit diagnostic"
 }
 $recirculationRows = @($summary.series | Where-Object { $_.key -eq "ZONE ONE RETURN" })
 if ($recirculationRows.Count -ne 2) {
@@ -197,8 +186,8 @@ foreach ($recirculationVariable in @("System Node Temperature", "System Node Hum
 }
 
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
-if ($toleranceFailures.Count -ne 4) {
-    throw "Expected four tracked diagnostic tolerance-failures.csv rows, found $($toleranceFailures.Count)"
+if ($toleranceFailures.Count -ne 0) {
+    throw "Expected empty tolerance-failures.csv, found $($toleranceFailures.Count) row(s)"
 }
 
 $resultStore = Get-Content -LiteralPath $resultStorePath -Raw | ConvertFrom-Json

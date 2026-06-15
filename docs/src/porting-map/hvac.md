@@ -195,15 +195,14 @@ capacity limits without promoting those branches to conformance:
 Each fixture now requests 18 Detailed series, including `ZONE ONE RETURN`
 `System Node Temperature` and `System Node Humidity Ratio` proof rows. The
 Rust compare lane records the resolved return node as the no-OA recirculation
-node while keeping the finite-limit solver aligned to the source-order
-pre-update zone air node used by the current diagnostic reconstruction.
+node and uses that same-call recirculation state for the finite-limit no-OA
+mixed-air and report calculations.
 
-The capacity-limit and flow-and-capacity-limit lanes keep two tracked
-supply-node diagnostic gaps, `System Node Temperature` and
-`System Node Mass Flow Rate`. The flow-limit lane keeps four tracked gaps:
-three cooling report-rate rows and supply-node mass flow. All three lanes keep
-`comparison_class = "diagnostic-only"`, `conformance_claim = false`,
-`tolerance_policy: diagnostic-draft`, and `status: diagnostic`.
+The capacity-limit, flow-limit, and flow-and-capacity-limit lanes now have
+zero tolerance failures across their declared 18 Detailed series. All three
+lanes keep `comparison_class = "diagnostic-only"`,
+`conformance_claim = false`, `tolerance_policy: diagnostic-draft`, and
+`status: diagnostic`.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

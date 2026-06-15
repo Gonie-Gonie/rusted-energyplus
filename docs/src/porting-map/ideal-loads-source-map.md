@@ -127,14 +127,16 @@ The Rust helper `calc_no_oa_sensible_with_limits_compat` covers the current
 diagnostic reconstruction for numeric flow and capacity limits. The compare
 lane resolves the EnergyPlus return/exhaust recirculation node and records
 `ZONE ONE RETURN` `System Node Temperature` and `System Node Humidity Ratio`
-as proof rows. Those rows are post-update ESO evidence, so the finite-limit
-solver still uses the source-order pre-update zone air node as the no-OA
-mixed-air proxy until the return-node update ordering is ported directly.
+as proof rows. The finite-limit reconstruction uses that same-call
+recirculation state for the no-OA mixed-air and ReportPurchasedAir
+calculations, matching the declared Detailed rate and supply-node rows in the
+three fixtures.
 
 The current evidence keeps finite limits diagnostic-only. Capacity-only and
-flow-and-capacity cases retain two tracked supply-node gaps. The flow-only
-case retains three cooling report-rate gaps and one supply-node mass-flow gap.
-No finite-limit row joins the promoted no-OA/no-limit conformance boundary.
+flow-and-capacity cases now have zero tolerance failures across their declared
+18 Detailed series. The flow-only case also has zero tolerance failures across
+its declared 18 Detailed series. No finite-limit row joins the promoted
+no-OA/no-limit conformance boundary.
 
 ## Outdoor-Air Prerequisites
 
@@ -218,7 +220,8 @@ outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`.
 The finite flow/capacity limit fixtures have diagnostic evidence only in their
-three finite-limit cases and retain tracked node/report-rate gaps.
+three finite-limit cases; those diagnostic lanes now have zero tolerance
+failures for their declared Detailed rows.
 
 ## Conformance Compare Artifacts
 

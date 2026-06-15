@@ -89,6 +89,7 @@ const IDEAL_LOADS_FACILITY_METER_RUST_SOURCE: &str =
     "rust-ideal-loads-hourly-facility-meter-from-fuel-energy";
 const IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
+const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -1234,14 +1235,22 @@ fn evaluate_rows(
     let limit_context = ideal_loads_limit_context(model, system)?;
     let mut calc_results = Vec::with_capacity(input_trace.sample_count);
     let mut mode_counts = IdealLoadsModeCounts::default();
+    let finite_limit_trace_uses_recirculation = recirculation_node_name.is_some();
     for index in 0..input_trace.sample_count {
-        // CalcPurchAirLoads sees the zone node before the same-timestamp node
-        // output row is updated, so transition samples use the previous row.
-        let calc_zone_state_index = index.saturating_sub(1);
-        let zone_temperature =
-            input_trace.zone_node_temperature.samples[calc_zone_state_index].value;
-        let zone_humidity_ratio =
-            input_trace.zone_node_humidity_ratio.samples[calc_zone_state_index].value;
+        let (zone_temperature, zone_humidity_ratio) = if finite_limit_trace_uses_recirculation {
+            (
+                input_trace.recirculation_node_temperature.samples[index].value,
+                input_trace.recirculation_node_humidity_ratio.samples[index].value,
+            )
+        } else {
+            // CalcPurchAirLoads sees the zone node before the same-timestamp node
+            // output row is updated, so no-limit transition samples use the previous row.
+            let calc_zone_state_index = index.saturating_sub(1);
+            (
+                input_trace.zone_node_temperature.samples[calc_zone_state_index].value,
+                input_trace.zone_node_humidity_ratio.samples[calc_zone_state_index].value,
+            )
+        };
         let active_demand = input_trace.active_demand.samples[index].value;
         let heating_demand = active_demand.max(0.0);
         let cooling_demand = active_demand.min(0.0);
@@ -1249,9 +1258,6 @@ fn evaluate_rows(
             air_temperature_c: zone_temperature,
             air_humidity_ratio: zone_humidity_ratio,
         };
-        // The return/exhaust node ESO series is a post-update proof row. The
-        // diagnostic solver matches EnergyPlus source-order outputs by using
-        // the pre-update zone air node as the no-OA mixed-air proxy.
         let recirculation_state = zone_state;
         let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
         let result = calc_ideal_loads_sensible_compat(
@@ -2408,7 +2414,10 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             "recirculation_node: {}\n",
             markdown_cell(recirculation_node_name)
         ));
-        report.push_str("recirculation_state_source: EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\n");
+        report.push_str(&format!(
+            "recirculation_state_source: {}\n",
+            IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE
+        ));
     }
     report.push_str(&format!(
         "ideal_loads_system: {}\n",
@@ -3084,7 +3093,10 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             .map_or_else(|| "null".to_string(), |name| json_string(name))
     ));
     if context.recirculation_node_name.is_some() {
-        json.push_str("  \"recirculation_state_source\": \"EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\",\n");
+        json.push_str(&format!(
+            "  \"recirculation_state_source\": {},\n",
+            json_string(IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE)
+        ));
     }
     json.push_str(&format!(
         "  \"ideal_loads_system\": {},\n",
@@ -3431,7 +3443,10 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
             .map_or_else(|| "null".to_string(), |name| json_string(name))
     ));
     if context.recirculation_node_name.is_some() {
-        json.push_str("  \"recirculation_state_source\": \"EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\",\n");
+        json.push_str(&format!(
+            "  \"recirculation_state_source\": {},\n",
+            json_string(IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE)
+        ));
     }
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");
     json.push_str("  \"stages\": [\n");

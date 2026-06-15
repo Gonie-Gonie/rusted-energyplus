@@ -692,7 +692,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit case, plus finite-limit diagnostic gap tracking; broad HVAC flow balancing and node conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit case, plus zero-failure finite-limit diagnostic evidence; broad HVAC flow balancing and node conformance remain outside the claim."
 
 [[variable]]
 name = "System Node Temperature"
@@ -700,7 +700,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated IdealLoads supply-node temperature conformance within the no-OA/no-limit case, plus finite-limit diagnostic gap tracking and return-node proof rows; broad HVAC and node conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads supply-node temperature conformance within the no-OA/no-limit case, plus zero-failure finite-limit diagnostic evidence and return-node proof rows; broad HVAC and node conformance remain outside the claim."
 
 [[variable]]
 name = "Plant Supply Side Inlet Temperature"
