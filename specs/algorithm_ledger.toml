@@ -145,6 +145,10 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
@@ -157,11 +161,15 @@ proof_variables = [
   "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate",
   "Zone Ideal Loads Outdoor Air Sensible Heating Rate",
   "Zone Ideal Loads Outdoor Air Sensible Cooling Rate",
+  "Zone Ideal Loads Outdoor Air Latent Heating Rate",
+  "Zone Ideal Loads Outdoor Air Latent Cooling Rate",
+  "Zone Ideal Loads Outdoor Air Total Heating Rate",
+  "Zone Ideal Loads Outdoor Air Total Cooling Rate",
   "Zone Ideal Loads Mixed Air Temperature",
   "Zone Ideal Loads Mixed Air Humidity Ratio",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass, standard-density volume flow, sensible report-rate, and no-heat-recovery mixed-air state parity; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, and no-heat-recovery mixed-air state parity; supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

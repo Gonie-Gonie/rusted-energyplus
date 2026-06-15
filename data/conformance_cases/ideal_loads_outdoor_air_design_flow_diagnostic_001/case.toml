@@ -1,14 +1,14 @@
 id = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 title = "One-zone IdealLoads outdoor-air design-flow and mixed-air diagnostic"
 milestone = "ideal-loads-outdoor-air-diagnostic"
-purpose = "Probe IdealLoads DesignSpecification:OutdoorAir Flow/Zone design-flow parity for outdoor-air mass flow, standard-density volume flow, sensible outdoor-air report rates, and mixed-air state."
+purpose = "Probe IdealLoads DesignSpecification:OutdoorAir Flow/Zone design-flow parity for outdoor-air mass flow, standard-density volume flow, outdoor-air report rates, and mixed-air state."
 comparison_class = "diagnostic-only"
 conformance_claim = false
 oracle_version = "26.1.0"
 notes = [
   "This case is diagnostic-only and does not expand the no-OA/no-limit IdealLoads conformance claim.",
-  "The diagnostic boundary covers only DesignSpecification:OutdoorAir Flow/Zone mass flow, standard-density volume flow, sensible outdoor-air report rates, and mixed-air state with a blank outdoor-air schedule.",
-  "Outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin remain outside this diagnostic claim.",
+  "The diagnostic boundary covers only DesignSpecification:OutdoorAir Flow/Zone mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, and mixed-air state with a blank outdoor-air schedule.",
+  "Active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin remain outside this diagnostic claim.",
   "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust diagnostic derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
 ]
 
@@ -69,6 +69,50 @@ rmse_tol = 1.0
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
 variable = "Zone Ideal Loads Outdoor Air Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Latent Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Cooling Rate"
 frequency = "detailed"
 class = "hvac-state"
 source = "eso"

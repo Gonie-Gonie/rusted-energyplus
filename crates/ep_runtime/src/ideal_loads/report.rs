@@ -38,6 +38,18 @@ pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE: &str =
 /// IdealLoads outdoor-air sensible cooling rate output variable.
 pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE: &str =
     "Zone Ideal Loads Outdoor Air Sensible Cooling Rate";
+/// IdealLoads outdoor-air latent heating rate output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Latent Heating Rate";
+/// IdealLoads outdoor-air latent cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Latent Cooling Rate";
+/// IdealLoads outdoor-air total heating rate output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Total Heating Rate";
+/// IdealLoads outdoor-air total cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE: &str =
+    "Zone Ideal Loads Outdoor Air Total Cooling Rate";
 /// IdealLoads mixed-air temperature output variable.
 pub const ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE: &str = "Zone Ideal Loads Mixed Air Temperature";
 /// IdealLoads mixed-air humidity ratio output variable.

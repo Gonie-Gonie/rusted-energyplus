@@ -44,6 +44,16 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
     pub outdoor_air_sensible_heating_rate_w: f64,
     /// Reported OA sensible cooling rate.
     pub outdoor_air_sensible_cooling_rate_w: f64,
+    /// Final outdoor-air latent output relative to zone conditions.
+    pub outdoor_air_latent_output_w: f64,
+    /// Reported OA latent heating rate.
+    pub outdoor_air_latent_heating_rate_w: f64,
+    /// Reported OA latent cooling rate.
+    pub outdoor_air_latent_cooling_rate_w: f64,
+    /// Reported OA total heating rate.
+    pub outdoor_air_total_heating_rate_w: f64,
+    /// Reported OA total cooling rate.
+    pub outdoor_air_total_cooling_rate_w: f64,
     /// Final supply mass flow used by the no-limit OA branch.
     pub supply_mass_flow_rate_kg_per_s: f64,
     /// Mixed-air temperature after OA/recirculation mixing.
@@ -109,7 +119,7 @@ pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
     )
 }
 
-/// Calculates diagnostic-only IdealLoads outdoor-air sensible report rates.
+/// Calculates diagnostic-only IdealLoads outdoor-air report rates and mixed-air state.
 ///
 /// This mirrors the no-economizer/no-heat-recovery/no-humidity/no-limit subset:
 /// EnergyPlus first uses minimum OA sensible output to choose heat/cool/deadband,
@@ -135,6 +145,11 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
             outdoor_air_sensible_output_w: 0.0,
             outdoor_air_sensible_heating_rate_w: 0.0,
             outdoor_air_sensible_cooling_rate_w: 0.0,
+            outdoor_air_latent_output_w: 0.0,
+            outdoor_air_latent_heating_rate_w: 0.0,
+            outdoor_air_latent_cooling_rate_w: 0.0,
+            outdoor_air_total_heating_rate_w: 0.0,
+            outdoor_air_total_cooling_rate_w: 0.0,
             supply_mass_flow_rate_kg_per_s: 0.0,
             mixed_air_temperature_c: recirculation_state.air_temperature_c,
             mixed_air_humidity_ratio: recirculation_state.air_humidity_ratio,
@@ -170,6 +185,21 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
     } else {
         0.0
     };
+    let outdoor_air_latent_output_w = outdoor_air_mass_flow_rate_kg_per_s
+        * (moist_air_enthalpy_j_per_kg(
+            outdoor_air_state.air_temperature_c,
+            outdoor_air_state.air_humidity_ratio,
+        ) - moist_air_enthalpy_j_per_kg(
+            zone_state.air_temperature_c,
+            zone_state.air_humidity_ratio,
+        ))
+        - outdoor_air_sensible_output_w;
+    let outdoor_air_latent_heating_rate_w = 0.0;
+    let outdoor_air_latent_cooling_rate_w = 0.0;
+    let outdoor_air_total_heating_rate_w =
+        outdoor_air_sensible_heating_rate_w + outdoor_air_latent_heating_rate_w;
+    let outdoor_air_total_cooling_rate_w =
+        outdoor_air_sensible_cooling_rate_w + outdoor_air_latent_cooling_rate_w;
     let supply_mass_flow_rate_kg_per_s = outdoor_air_supply_mass_flow_rate_kg_per_s(
         system,
         zone_state,
@@ -191,6 +221,11 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         outdoor_air_sensible_output_w,
         outdoor_air_sensible_heating_rate_w,
         outdoor_air_sensible_cooling_rate_w,
+        outdoor_air_latent_output_w,
+        outdoor_air_latent_heating_rate_w,
+        outdoor_air_latent_cooling_rate_w,
+        outdoor_air_total_heating_rate_w,
+        outdoor_air_total_cooling_rate_w,
         supply_mass_flow_rate_kg_per_s,
         mixed_air_temperature_c,
         mixed_air_humidity_ratio,
@@ -426,6 +461,12 @@ mod tests {
         assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
         assert!(result.mixed_air_temperature_c < 21.0);
         assert!(result.outdoor_air_sensible_output_w < 0.0);
+        assert!(result.outdoor_air_latent_output_w.is_finite());
+        assert_eq!(
+            result.outdoor_air_total_heating_rate_w,
+            result.outdoor_air_sensible_heating_rate_w
+        );
+        assert_eq!(result.outdoor_air_latent_heating_rate_w, 0.0);
         assert_close(
             result.outdoor_air_sensible_heating_rate_w,
             -result.outdoor_air_sensible_output_w,
@@ -459,6 +500,12 @@ mod tests {
         assert!(result.supply_mass_flow_rate_kg_per_s >= 0.05);
         assert!(result.mixed_air_temperature_c > 24.0);
         assert!(result.outdoor_air_sensible_output_w > 0.0);
+        assert!(result.outdoor_air_latent_output_w.is_finite());
+        assert_eq!(
+            result.outdoor_air_total_cooling_rate_w,
+            result.outdoor_air_sensible_cooling_rate_w
+        );
+        assert_eq!(result.outdoor_air_latent_cooling_rate_w, 0.0);
         assert_close(
             result.outdoor_air_sensible_cooling_rate_w,
             result.outdoor_air_sensible_output_w,

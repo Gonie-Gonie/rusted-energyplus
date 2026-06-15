@@ -52,7 +52,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone outdoor-air design-flow mass parity for one IdealLoads fixture; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone outdoor-air design-flow mass parity for one IdealLoads fixture; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate"
@@ -60,7 +60,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone outdoor-air standard-density volume flow parity using EnergyPlus StdRhoAir from Site:Location; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone outdoor-air standard-density volume flow parity using EnergyPlus StdRhoAir from Site:Location; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Sensible Heating Rate"
@@ -68,7 +68,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone outdoor-air sensible heating report-rate parity within a 1 W source-order tolerance; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone outdoor-air sensible heating report-rate parity within a 1 W source-order tolerance; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Sensible Cooling Rate"
@@ -76,7 +76,39 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone outdoor-air sensible cooling report-rate parity within a 1 W source-order tolerance; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone outdoor-air sensible cooling report-rate parity within a 1 W source-order tolerance; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Outdoor Air Latent Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+support_boundary = "Diagnostic-only Flow/Zone no-humidity outdoor-air latent heating report-rate parity for one IdealLoads fixture; active humidification, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Outdoor Air Latent Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+support_boundary = "Diagnostic-only Flow/Zone no-humidity outdoor-air latent cooling report-rate parity for one IdealLoads fixture; active dehumidification, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Outdoor Air Total Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+support_boundary = "Diagnostic-only Flow/Zone no-humidity outdoor-air total heating report-rate parity within a 1 W source-order tolerance; supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+
+[[variable]]
+name = "Zone Ideal Loads Outdoor Air Total Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+support_boundary = "Diagnostic-only Flow/Zone no-humidity outdoor-air total cooling report-rate parity within a 1 W source-order tolerance; supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Mixed Air Temperature"
@@ -84,7 +116,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone no-economizer/no-heat-recovery mixed-air dry-bulb parity for one IdealLoads fixture; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone no-economizer/no-heat-recovery mixed-air dry-bulb parity for one IdealLoads fixture; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Mixed Air Humidity Ratio"
@@ -92,7 +124,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only Flow/Zone no-economizer/no-heat-recovery mixed-air humidity-ratio parity for one IdealLoads fixture; outdoor-air latent loads, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only Flow/Zone no-economizer/no-heat-recovery mixed-air humidity-ratio parity for one IdealLoads fixture; active humidity-control latent behavior, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate"

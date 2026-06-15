@@ -20,10 +20,13 @@ use ep_runtime::{
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries, ResultStore,
     ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE,
-    ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
@@ -343,6 +346,10 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE
                 | ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE
+                | ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE
                 | ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE
                 | ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO
         ) {
@@ -698,6 +705,42 @@ fn outdoor_air_observed_values(
                 .iter()
                 .take(expected_samples)
                 .map(|result| result.outdoor_air_sensible_cooling_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-latent-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_latent_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-latent-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_latent_cooling_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-total-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_total_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE => Ok((
+            "rust-ideal-loads-outdoor-air-total-report",
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.outdoor_air_total_cooling_rate_w)
                 .collect(),
         )),
         ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE => Ok((
@@ -1626,7 +1669,7 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, sensible report rates, and mixed-air state\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, and mixed-air state\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
