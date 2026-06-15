@@ -658,7 +658,9 @@ impl From<OutputRequest> for OutputSeriesSpec {
 pub enum OutputFrequency {
     /// Static input/report rows with no timestep axis.
     Static,
-    /// Every simulation timestep.
+    /// Every HVAC/system call sample.
+    Detailed,
+    /// Every zone timestep.
     Timestep,
     /// Hourly reporting.
     Hourly,

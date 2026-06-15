@@ -137,15 +137,17 @@ IdealLoads candidate. It is deliberately still diagnostic-only:
 ```text
 comparison_class: diagnostic-only
 conformance_claim: false
-tolerance_policy: none
-status: baseline-only
+tolerance_policy: diagnostic-draft
+status: diagnostic
 ```
 
 The candidate requests thermostat setpoints, IdealLoads total and sensible
-rates, supply-air total rates, and supply-node temperature and mass flow. Its
-manifest carries draft tolerance thresholds for the future promotion gate, but
-the baseline report keeps `tolerance_policy: none` until Rust writes matching
-`ResultStore` series and a blocking conformance gate passes.
+rates, supply-air total rates, signed zone predicted load, setpoint-distance
+proof loads, zone-air-node proof rows, and supply-node temperature, humidity,
+and mass flow. The diagnostic compare command writes matching Rust
+`ResultStore` series for 16 Detailed output rows over 110 samples and currently
+requires zero tolerance failures before a promotion can proceed. It remains a
+non-claim until the manifest, output levels, and release gate are promoted.
 
 ## Promotion Requirements
 

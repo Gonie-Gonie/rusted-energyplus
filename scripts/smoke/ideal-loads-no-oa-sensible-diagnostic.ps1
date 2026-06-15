@@ -97,9 +97,9 @@ if ($LASTEXITCODE -ne 0) {
 $validateText = ($validateOutput -join "`n")
 Assert-Contains -Text $validateText -Pattern "comparison_class: diagnostic-only" -Description "manifest diagnostic class"
 Assert-Contains -Text $validateText -Pattern "conformance_claim: false" -Description "manifest claim boundary"
-Assert-Contains -Text $validateText -Pattern "outputs: 10" -Description "manifest output count"
+Assert-Contains -Text $validateText -Pattern "outputs: 16" -Description "manifest output count"
 Assert-Contains -Text $validateText -Pattern "level=diagnostic" -Description "manifest diagnostic output level"
-Assert-Contains -Text $validateText -Pattern "System Node Mass Flow Rate / hourly / node-state / eso" -Description "manifest node flow output"
+Assert-Contains -Text $validateText -Pattern "System Node Mass Flow Rate / detailed / node-state / eso" -Description "manifest node flow output"
 
 Write-Host "Generating IdealLoads no-OA sensible oracle baseline."
 $baselineOutput = & $cargo.Source run -p ep_cli --quiet -- conformance baseline $CasePath $OracleRoot $OutputRoot 2>&1
@@ -158,7 +158,7 @@ if ($LASTEXITCODE -ne 0) {
 $reportText = ($reportOutput -join "`n")
 Assert-Contains -Text $reportText -Pattern "Conformance Report Skeleton" -Description "report header"
 Assert-Contains -Text $reportText -Pattern "id: $CaseId" -Description "report case id"
-Assert-Contains -Text $reportText -Pattern "series: 10" -Description "report series count"
+Assert-Contains -Text $reportText -Pattern "series: 16" -Description "report series count"
 Assert-Contains -Text $reportText -Pattern "energyplus_warnings: 0" -Description "report warning count"
 Assert-Contains -Text $reportText -Pattern "energyplus_severes: 0" -Description "report severe count"
 Assert-Contains -Text $reportText -Pattern "energyplus_fatals: 0" -Description "report fatal count"
@@ -187,7 +187,7 @@ if ($summary.tolerance_policy -ne "none") {
 if ($summary.status -ne "baseline-only") {
     throw "Unexpected IdealLoads no-OA summary status: $($summary.status)"
 }
-if ($summary.requested_outputs.Count -ne 10) {
+if ($summary.requested_outputs.Count -ne 16) {
     throw "Unexpected IdealLoads no-OA requested output count: $($summary.requested_outputs.Count)"
 }
 

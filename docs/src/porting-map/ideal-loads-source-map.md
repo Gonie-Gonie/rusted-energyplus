@@ -19,7 +19,9 @@ conformance claim is promoted.
 The first candidate case is
 `ideal_loads_no_oa_sensible_conformance_001`. It remains
 `comparison_class = "diagnostic-only"` and `conformance_claim = false` until
-the Rust runtime produces tolerance-gated results for the declared variables.
+the manifest is explicitly promoted. The diagnostic compare lane now produces
+timestamp-aligned Rust result-store artifacts for the declared variables and
+requires zero tolerance failures before promotion.
 
 The initial supported boundary is intentionally narrow:
 
@@ -87,8 +89,22 @@ of these compile-time facts are true:
 - no autosized flow or capacity limit participates in the calculation
 
 `calc_no_oa_no_limit_sensible_compat` now implements the first isolated helper.
-It still requires upstream, source-order zone demand. The helper uses the
-EnergyPlus formula order for:
+It still requires upstream, source-order zone demand. The diagnostic report
+generator feeds it from EnergyPlus proof outputs instead of a simplified RC
+load shortcut:
+
+- `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate` is the
+  active signed demand source. Positive values become
+  `RemainingOutputReqToHeatSP`; negative values become
+  `RemainingOutputReqToCoolSP`.
+- `Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate`
+  and `... Cooling Setpoint ...` stay as diagnostic proof rows because they
+  are setpoint-distance outputs, not active branch selectors.
+- The IdealLoads mass-flow formula uses the source-order pre-update zone air
+  node state. Same-timestamp zone air node outputs are retained as diagnostic
+  proof rows because they show the post-update node state.
+
+The helper uses the EnergyPlus formula order for:
 
 - zone remaining load to heat and cool setpoints
 - `PsyCpAirFnW`
@@ -110,12 +126,36 @@ The initial proof surface is:
 - `Zone Ideal Loads Zone Sensible Cooling Rate`
 - `Zone Ideal Loads Supply Air Total Heating Rate`
 - `Zone Ideal Loads Supply Air Total Cooling Rate`
+- `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate`
 - `System Node Temperature`
 - `System Node Mass Flow Rate`
 
-`System Node Humidity Ratio`, latent IdealLoads outputs, outdoor-air outputs,
+`System Node Humidity Ratio`, zone-air-node proof rows, heating/cooling
+setpoint-distance proof rows, latent IdealLoads outputs, outdoor-air outputs,
 heat-recovery outputs, economizer outputs, and meter outputs remain
-diagnostic-only until their source-order branches are ported.
+diagnostic-only until their source-order branches are ported or explicitly
+included in a promoted claim.
+
+## Diagnostic Compare Artifacts
+
+`scripts/dev.cmd compare-ideal-loads-no-oa-sensible-diagnostic` generates the
+current evidence set under
+`.runtime/ideal-loads-no-oa-sensible/26.1.0/ideal_loads_no_oa_sensible_conformance_001/compare/`.
+The artifact contract is:
+
+- `selected_outputs.json`
+- `rust-result-store.json`
+- `compare-summary.json`
+- `compare-report.md`
+- `variable-deltas.csv`
+- `first-divergence.csv`
+- `tolerance-failures.csv`
+- `stage-summary.json`
+
+The current diagnostic run compares 16 Detailed series over 110 samples. All
+series pass their draft tolerances, and `tolerance-failures.csv` is empty. This
+is promotion evidence only; it does not create an IdealLoads conformance claim
+while the manifest remains diagnostic-only.
 
 ## Promotion Requirements
 

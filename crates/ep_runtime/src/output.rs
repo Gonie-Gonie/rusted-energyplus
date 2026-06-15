@@ -6,6 +6,12 @@ use ep_model::{
 };
 use std::collections::BTreeSet;
 
+use crate::ideal_loads::{
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+};
+
 /// Runtime-native output reporting frequency.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub enum RuntimeOutputFrequency {
@@ -549,6 +555,25 @@ impl RuntimeOutputRegistry {
                     &node.name.0,
                     variable_name,
                     units,
+                    RuntimeOutputFrequency::Hourly,
+                    RuntimeOutputSource::RuntimeState,
+                );
+            }
+        }
+
+        for system in &model.ideal_loads_air_systems {
+            for variable_name in [
+                ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+                ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+                ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
+                ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+            ] {
+                self.push_output(
+                    &system.name.0,
+                    variable_name,
+                    "W",
                     RuntimeOutputFrequency::Hourly,
                     RuntimeOutputSource::RuntimeState,
                 );

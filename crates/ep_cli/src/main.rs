@@ -1,6 +1,7 @@
 //! Command line entry point for eplus-rs.
 
 mod conformance_artifacts;
+mod ideal_loads;
 mod internal_gains;
 mod static_model;
 mod time_weather_schedule;
@@ -53,6 +54,7 @@ use ep_runtime::{
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection, surface_area_m2,
     surface_geometry_summaries, zone_geometry_summaries,
 };
+use ideal_loads::generate_ideal_loads_no_oa_sensible_report;
 use internal_gains::{generate_internal_gains_report, run_compare_internal_convective_gain};
 use static_model::generate_static_model_report;
 use std::collections::BTreeSet;
@@ -95,6 +97,7 @@ const CONFORMANCE_STATIC_MODEL_REPORT_USAGE: &str =
 const CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE: &str = "usage: eplus-rs conformance time-weather-schedule-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
     "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
+const CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-no-oa-sensible-report <case.toml> <oracle-root> <output-root>";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -284,6 +287,7 @@ fn print_help() {
     println!("{CONFORMANCE_HEAT_BALANCE_DIAGNOSTIC_REPORT_USAGE}");
     println!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
     println!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
+    println!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
     println!();
     println!("Future commands:");
     println!("  model validate <input.epJSON>");
@@ -465,6 +469,9 @@ fn run_conformance_command(args: &[String]) -> i32 {
             run_conformance_time_weather_schedule_report(&args[1..])
         }
         Some("internal-gains-report") => run_conformance_internal_gains_report(&args[1..]),
+        Some("ideal-loads-no-oa-sensible-report") => {
+            run_conformance_ideal_loads_no_oa_sensible_report(&args[1..])
+        }
         Some(command) => {
             eprintln!("unsupported conformance command: {command}");
             eprintln!("usage: eplus-rs conformance validate-case <case.toml>");
@@ -481,6 +488,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
             2
         }
         None => {
@@ -499,6 +507,7 @@ fn run_conformance_command(args: &[String]) -> i32 {
             eprintln!("{CONFORMANCE_STATIC_MODEL_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_TIME_WEATHER_SCHEDULE_REPORT_USAGE}");
             eprintln!("{CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE}");
+            eprintln!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
             2
         }
     }
@@ -1034,6 +1043,81 @@ fn run_conformance_internal_gains_report(args: &[String]) -> i32 {
             println!("  conformance_series: {}", summary.conformance_series_count);
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            1
+        }
+    }
+}
+
+fn run_conformance_ideal_loads_no_oa_sensible_report(args: &[String]) -> i32 {
+    let Some(case_path) = args.first() else {
+        eprintln!("missing case manifest path");
+        eprintln!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(oracle_root) = args.get(1) else {
+        eprintln!("missing oracle root path");
+        eprintln!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
+        return 2;
+    };
+    let Some(output_root) = args.get(2) else {
+        eprintln!("missing output root path");
+        eprintln!("{CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE}");
+        return 2;
+    };
+
+    let manifest = match load_case_file(case_path) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if manifest.oracle_version != default_oracle_release().version {
+        eprintln!(
+            "case oracle_version {} does not match locked oracle {}",
+            manifest.oracle_version,
+            default_oracle_release().version
+        );
+        return 1;
+    }
+
+    match generate_ideal_loads_no_oa_sensible_report(
+        Path::new(case_path),
+        &manifest,
+        Path::new(oracle_root),
+        Path::new(output_root),
+    ) {
+        Ok(summary) => {
+            println!("IdealLoads No-OA Sensible Diagnostic Report");
+            print_conformance_case_summary(&manifest);
+            println!("  baseline_dir: {}", summary.baseline.output_dir.display());
+            println!("  report_dir: {}", summary.report_dir.display());
+            println!("  compare_report: {}", summary.compare_report.display());
+            println!("  compare_summary: {}", summary.compare_summary.display());
+            println!("  selected_outputs: {}", summary.selected_outputs.display());
+            println!(
+                "  rust_result_store: {}",
+                summary.rust_result_store.display()
+            );
+            println!("  variable_deltas: {}", summary.variable_deltas.display());
+            println!("  first_divergence: {}", summary.first_divergence.display());
+            println!(
+                "  tolerance_failures: {}",
+                summary.tolerance_failures.display()
+            );
+            println!("  stage_summary: {}", summary.stage_summary.display());
+            println!("  series: {}", summary.series_count);
+            println!("  samples: {}", summary.compared_samples);
+            println!(
+                "  tolerance_failures_count: {}",
+                summary.tolerance_failures_count
+            );
+            println!("  tolerance_policy: diagnostic-draft");
+            println!("  status: {}", summary.status);
+            0
         }
         Err(error) => {
             eprintln!("{error}");
@@ -2118,6 +2202,7 @@ fn comparison_class_label(class: ComparisonClass) -> &'static str {
 fn output_frequency_label(frequency: OutputFrequency) -> &'static str {
     match frequency {
         OutputFrequency::Static => "static",
+        OutputFrequency::Detailed => "detailed",
         OutputFrequency::Timestep => "timestep",
         OutputFrequency::Hourly => "hourly",
         OutputFrequency::Daily => "daily",
@@ -2130,6 +2215,7 @@ fn output_frequency_label(frequency: OutputFrequency) -> &'static str {
 fn output_frequency_idf_label(frequency: OutputFrequency) -> &'static str {
     match frequency {
         OutputFrequency::Static => "RunPeriod",
+        OutputFrequency::Detailed => "Detailed",
         OutputFrequency::Timestep => "Timestep",
         OutputFrequency::Hourly => "Hourly",
         OutputFrequency::Daily => "Daily",
