@@ -373,6 +373,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
   "scripts/compare/compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-area-diagnostic.ps1",
+  "scripts/compare/compare-ideal-loads-outdoor-air-air-changes-diagnostic.ps1",
 ]
 status = "diagnostic_only"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
@@ -402,7 +403,7 @@ proof_variables = [
   "Zone Ideal Loads Heat Recovery Active Time",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Zone and Flow/Area outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; active DCV, economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only IdealLoads Flow/Zone, Flow/Area, and AirChanges/Hour outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; active DCV, economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"
