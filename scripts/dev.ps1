@@ -230,6 +230,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the no-OA IdealLoads ConstantSensibleHeatRatio diagnostic comparison."
     }
+    "compare-ideal-loads-constant-supply-humidity-diagnostic" = @{
+        Path = "compare\compare-ideal-loads-constant-supply-humidity-diagnostic.ps1"
+        Group = "compare"
+        Help = "Run the no-OA IdealLoads ConstantSupplyHumidityRatio diagnostic comparison."
+    }
     "compare-ideal-loads-outdoor-air-design-flow-diagnostic" = @{
         Path = "compare\compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1"
         Group = "compare"

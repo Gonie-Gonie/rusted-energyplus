@@ -138,7 +138,7 @@ flow-and-capacity cases now have zero tolerance failures across their declared
 its declared 18 Detailed series. No finite-limit row joins the promoted
 no-OA/no-limit conformance boundary.
 
-## Constant SHR Humidity Diagnostic
+## Humidity-Control Diagnostics
 
 `ideal_loads_constant_shr_diagnostic_001` adds a diagnostic-only no-OA humidity
 control lane for `ConstantSensibleHeatRatio`. The compare lane resolves
@@ -150,9 +150,16 @@ psychrometric routines.
 The Rust reconstruction uses EnergyPlus `PsyHFnTdbW`/`PsyWFnTdbH` enthalpy
 constants for the latent split and records zero tolerance failures for the
 declared zone/supply latent and sensible rate rows plus supply humidity ratio.
-This remains diagnostic-only: humidistat control,
-`ConstantSupplyHumidityRatio`, moisture-demand branches, outdoor-air humidity
-control, and broad humidity-control conformance are not promoted.
+
+`ideal_loads_constant_supply_humidity_diagnostic_001` adds the matching
+diagnostic-only no-OA `ConstantSupplyHumidityRatio` lane. It uses the EnergyPlus
+minimum cooling supply humidity ratio, allows the source's small latent-heating
+report rows when heating availability is on during cooling, and keeps the same
+return-node mixed-air and EPW barometric-pressure saturation proof path.
+
+These remain diagnostic-only: humidistat control, moisture-demand branches,
+outdoor-air humidity control, humidification-side `ConstantSupplyHumidityRatio`,
+and broad humidity-control conformance are not promoted.
 
 ## Outdoor-Air Prerequisites
 
@@ -229,9 +236,11 @@ diagnostic-only or unsupported until their source-order branches are ported or
 explicitly included in a promoted claim. `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` are hourly oracle-MTR vs Rust aggregated fuel-energy
 diagnostics for the no-OA fixtures.
-The no-OA `ConstantSensibleHeatRatio` zone/supply latent and sensible rows,
-supply humidity ratio, and return-node humidity proof rows have diagnostic
-evidence only in `ideal_loads_constant_shr_diagnostic_001`.
+The no-OA `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio`
+zone/supply latent and sensible rows, supply humidity ratio, and return-node
+humidity proof rows have diagnostic evidence only in
+`ideal_loads_constant_shr_diagnostic_001` and
+`ideal_loads_constant_supply_humidity_diagnostic_001`.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in

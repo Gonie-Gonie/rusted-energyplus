@@ -1038,11 +1038,16 @@ fn build_context<'a>(
         .find(|node| node.id == zone_air_node_edge.node)
         .ok_or_else(|| "missing zone air node".to_string())?;
 
-    let boundary = if manifest.conformance_claim {
+    let mut boundary = if manifest.conformance_claim {
         classify_no_oa_no_limit_sensible_subset(system)
     } else {
         classify_no_oa_sensible_subset(system)
     };
+    if manifest_allows_constant_supply_humidity_diagnostic(manifest, system) {
+        boundary
+            .unsupported_features
+            .retain(|feature| *feature != IdealLoadsUnsupportedFeature::Dehumidification);
+    }
     if !boundary.is_supported() {
         return Err(format!(
             "IdealLoads system is outside no-OA sensible subset: {}",
@@ -2226,6 +2231,20 @@ fn manifest_requests_ideal_loads_recirculation_node(
         .outputs
         .iter()
         .any(|output| output.key.eq_ignore_ascii_case(&recirculation_node_name)))
+}
+
+fn manifest_allows_constant_supply_humidity_diagnostic(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    !manifest.conformance_claim
+        && system.dehumidification_control_type
+            == DehumidificationControlType::ConstantSupplyHumidityRatio
+        && system.humidification_control_type == HumidificationControlType::None
+        && manifest.outputs.iter().any(|output| {
+            output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE
+                || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE
+        })
 }
 
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {

@@ -632,6 +632,8 @@ fn cooling_result_from_states(
     let zone_latent_heating_rate_w = latent_output_to_zone_w.max(0.0);
     let zone_latent_cooling_rate_w = latent_output_to_zone_w.min(0.0).abs();
 
+    let zone_sensible_heating_rate_w = 0.0;
+    let supply_air_sensible_heating_rate_w = 0.0;
     IdealLoadsSensibleResult {
         mode: IdealLoadsSensibleMode::Cooling,
         cp_air_j_per_kg_k,
@@ -641,17 +643,18 @@ fn cooling_result_from_states(
         supply_mass_flow_rate_kg_per_s: cooling_mass_flow_rate_kg_per_s,
         heating_mass_flow_rate_kg_per_s: 0.0,
         cooling_mass_flow_rate_kg_per_s,
-        zone_total_heating_rate_w: 0.0,
+        zone_total_heating_rate_w: zone_sensible_heating_rate_w + zone_latent_heating_rate_w,
         zone_total_cooling_rate_w: zone_sensible_cooling_rate_w + zone_latent_cooling_rate_w,
-        zone_sensible_heating_rate_w: 0.0,
+        zone_sensible_heating_rate_w,
         zone_sensible_cooling_rate_w,
         zone_latent_heating_rate_w,
         zone_latent_cooling_rate_w,
-        supply_air_sensible_heating_rate_w: 0.0,
+        supply_air_sensible_heating_rate_w,
         supply_air_sensible_cooling_rate_w,
         supply_air_latent_heating_rate_w,
         supply_air_latent_cooling_rate_w,
-        supply_air_total_heating_rate_w: 0.0,
+        supply_air_total_heating_rate_w: supply_air_sensible_heating_rate_w
+            + supply_air_latent_heating_rate_w,
         supply_air_total_cooling_rate_w: supply_air_sensible_cooling_rate_w
             + supply_air_latent_cooling_rate_w,
     }
@@ -667,29 +670,37 @@ fn cooling_supply_humidity_ratio(
     mixed_air_enthalpy_j_per_kg: f64,
     context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
-    if system.dehumidification_control_type
-        != DehumidificationControlType::ConstantSensibleHeatRatio
-        || supply_mass_flow_rate_kg_per_s <= 0.0
-        || system.cooling_sensible_heat_ratio <= 0.0
-    {
-        return mixed_supply_humidity_ratio;
-    }
-
-    let cooling_total_output_w =
-        supply_air_sensible_cooling_rate_w / system.cooling_sensible_heat_ratio;
-    let supply_enthalpy_j_per_kg = (mixed_air_enthalpy_j_per_kg
-        - cooling_total_output_w / supply_mass_flow_rate_kg_per_s)
-        .max(moist_air_enthalpy_j_per_kg(
-            supply_temperature_c,
-            MINIMUM_HUMIDITY_RATIO,
-        ));
-    let humidity_from_enthalpy =
-        humidity_ratio_from_enthalpy_and_dry_bulb(supply_enthalpy_j_per_kg, supply_temperature_c)
+    let supply_humidity_ratio = match system.dehumidification_control_type {
+        DehumidificationControlType::ConstantSensibleHeatRatio
+            if supply_mass_flow_rate_kg_per_s > 0.0 && system.cooling_sensible_heat_ratio > 0.0 =>
+        {
+            let cooling_total_output_w =
+                supply_air_sensible_cooling_rate_w / system.cooling_sensible_heat_ratio;
+            let supply_enthalpy_j_per_kg = (mixed_air_enthalpy_j_per_kg
+                - cooling_total_output_w / supply_mass_flow_rate_kg_per_s)
+                .max(moist_air_enthalpy_j_per_kg(
+                    supply_temperature_c,
+                    MINIMUM_HUMIDITY_RATIO,
+                ));
+            let humidity_from_enthalpy = humidity_ratio_from_enthalpy_and_dry_bulb(
+                supply_enthalpy_j_per_kg,
+                supply_temperature_c,
+            )
             .max(MINIMUM_HUMIDITY_RATIO);
-    let supply_humidity_ratio = mixed_supply_humidity_ratio
-        .min(humidity_from_enthalpy)
-        .max(system.minimum_cooling_supply_air_humidity_ratio)
-        .min(mixed_air_state.air_humidity_ratio);
+            mixed_supply_humidity_ratio
+                .min(humidity_from_enthalpy)
+                .max(system.minimum_cooling_supply_air_humidity_ratio)
+                .min(mixed_air_state.air_humidity_ratio)
+        }
+        DehumidificationControlType::ConstantSupplyHumidityRatio
+            if supply_mass_flow_rate_kg_per_s > 0.0 =>
+        {
+            system
+                .minimum_cooling_supply_air_humidity_ratio
+                .max(MINIMUM_HUMIDITY_RATIO)
+        }
+        _ => mixed_supply_humidity_ratio,
+    };
     let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
         supply_temperature_c,
         1.0,
@@ -894,6 +905,62 @@ mod tests {
             2400.0 + expected_latent_cooling,
             1.0e-9,
         );
+    }
+
+    #[test]
+    fn constant_supply_humidity_ratio_cooling_uses_minimum_cooling_humidity() {
+        let mut system = test_system();
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSupplyHumidityRatio;
+        system.minimum_cooling_supply_air_humidity_ratio = 0.0077;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.009,
+        };
+
+        let result = calc_no_oa_no_limit_sensible_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0),
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(
+            result.supply_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio,
+            1.0e-12,
+        );
+        assert!(result.zone_latent_cooling_rate_w > 0.0);
+        assert!(result.supply_air_latent_cooling_rate_w > 0.0);
+    }
+
+    #[test]
+    fn constant_supply_humidity_ratio_cooling_can_humidify_mixed_air_when_heat_available() {
+        let mut system = test_system();
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSupplyHumidityRatio;
+        system.minimum_cooling_supply_air_humidity_ratio = 0.009;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_no_limit_sensible_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0),
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(
+            result.supply_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio,
+            1.0e-12,
+        );
+        assert!(result.zone_latent_heating_rate_w > 0.0);
+        assert!(result.supply_air_latent_heating_rate_w > 0.0);
     }
 
     #[test]
