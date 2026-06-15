@@ -214,10 +214,11 @@ lanes keep `comparison_class = "diagnostic-only"`,
 `ideal_loads_outdoor_air_maximum_diagnostic_001`,
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`, and
-`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` are
+`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
+`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are
 diagnostic-only Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum,
-Maximum, DifferentialDryBulb, DifferentialEnthalpy, and Sensible heat-recovery
-outdoor-air proof lanes:
+Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery,
+and Enthalpy heat-recovery outdoor-air proof lanes:
 
 ```text
 comparison_class: diagnostic-only
@@ -259,17 +260,23 @@ DifferentialDryBulb and DifferentialEnthalpy fixtures use 110 source-order
 Detailed samples because EnergyPlus reports system substeps while the
 economizer is active. The Sensible heat-recovery fixture keeps 96 samples with
 `NoEconomizer` and validates active heat-recovery time plus sensible/total
-rate rows. The no-economizer flow rows are exact; the active economizer flow
-rows use narrow diagnostic tolerances. The sensible and total report rows are
-diagnostic with a 1 W source-order tolerance. The no-humidity latent report,
+rate rows. The Enthalpy heat-recovery fixture also keeps 96 samples with
+`NoEconomizer` and validates active heat-recovery time plus sensible, latent,
+and total rate rows. The no-economizer flow rows are exact; the active
+economizer flow rows use narrow diagnostic tolerances. The sensible and total
+report rows are diagnostic with a 1 W source-order tolerance, except the
+Enthalpy cooling heat-recovery total/latent rows allow a single 6 W
+saturation-limit diagnostic timestep. The no-humidity latent report,
 supply-air state, and mixed-air state rows are diagnostic; supply-air
-temperature stays within 0.02 C. The inactive heat-recovery rows are exact
-zeros for the non-heat-recovery fixtures, and economizer active time is exact
-for the inactive, DifferentialDryBulb, and DifferentialEnthalpy branches.
+temperature stays within 0.02 C, and the Enthalpy humidity-ratio rows allow
+5e-5 kg/kg at that saturation-limit timestep. The inactive heat-recovery rows
+are exact zeros for the non-heat-recovery fixtures, and economizer active time
+is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
+branches.
 
-This evidence does not promote active DCV, Enthalpy heat recovery, active
-humidity controls, saturation-limit branches, finite-limit conformance, or
-broad IdealLoads outdoor-air conformance.
+This evidence does not promote active DCV, active humidity controls,
+saturation-limit heat-recovery branches, finite-limit conformance, or broad
+IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 

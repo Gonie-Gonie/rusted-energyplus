@@ -599,15 +599,14 @@ fn build_outdoor_air_design_flow_context<'a>(
         model.typed.site.as_ref().ok_or_else(|| {
             "IdealLoads outdoor-air diagnostics require Site:Location".to_string()
         })?;
-    let standard_air_density_kg_per_m3 =
-        IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m)
-            .ok_or_else(|| {
-                format!(
-                    "failed to derive EnergyPlus StdRhoAir from site elevation {}",
-                    site.elevation_m
-                )
-            })?
-            .standard_air_density_kg_per_m3;
+    let limit_context = IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m)
+        .ok_or_else(|| {
+            format!(
+                "failed to derive EnergyPlus StdRhoAir from site elevation {}",
+                site.elevation_m
+            )
+        })?;
+    let standard_air_density_kg_per_m3 = limit_context.standard_air_density_kg_per_m3;
     let outdoor_air_context = ideal_loads_outdoor_air_context(&model.typed, zone);
     let outdoor_air_mass_flow_rate_kg_per_s = calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
         outdoor_air_specification,
@@ -690,6 +689,16 @@ fn build_outdoor_air_design_flow_context<'a>(
                 .collect::<Vec<_>>()
         })
         .unwrap_or_else(|| vec![zone_timestep_hours; sample_count]);
+    let barometric_pressure_trace = ideal_loads_barometric_pressure_samples(
+        &model,
+        baseline.weather.as_deref(),
+        expected_series
+            .first()
+            .map(|series| series.samples.as_slice())
+            .unwrap_or(&[]),
+        sample_count,
+        limit_context,
+    )?;
 
     let mut sensible_results = Vec::with_capacity(sample_count);
     for index in 0..sample_count {
@@ -719,6 +728,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             demand,
             outdoor_air_mass_flow_rate_kg_per_s,
             sample_timestep_hours[index],
+            barometric_pressure_trace[index],
             true,
         ));
     }
@@ -841,17 +851,17 @@ fn validate_outdoor_air_design_flow_boundary(
     }
     if !matches!(
         system.heat_recovery_type,
-        HeatRecoveryType::None | HeatRecoveryType::Sensible
+        HeatRecoveryType::None | HeatRecoveryType::Sensible | HeatRecoveryType::Enthalpy
     ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic currently supports no heat recovery or Sensible heat recovery".to_string(),
+            "IdealLoads outdoor-air design-flow diagnostic currently supports no heat recovery, Sensible heat recovery, or Enthalpy heat recovery".to_string(),
         );
     }
-    if system.heat_recovery_type == HeatRecoveryType::Sensible
+    if system.heat_recovery_type != HeatRecoveryType::None
         && system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer
     {
         return Err(
-            "IdealLoads outdoor-air Sensible heat-recovery diagnostic currently requires NoEconomizer"
+            "IdealLoads outdoor-air heat-recovery diagnostic currently requires NoEconomizer"
                 .to_string(),
         );
     }
@@ -906,6 +916,9 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
     }
+    if context.heat_recovery_type == HeatRecoveryType::Enthalpy {
+        return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Enthalpy heat recovery active-time/rate parity; DCV, economizer, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
+    }
     match context.outdoor_air_economizer_type {
         OutdoorAirEconomizerType::DifferentialDryBulb => {
             "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialDryBulb economizer active-time/flow parity; DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
@@ -933,7 +946,10 @@ fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContex
         HeatRecoveryType::Sensible => {
             " plus EnergyPlus Sensible heat recovery OA tempering when recirculation air can beneficially warm or cool outdoor air"
         }
-        HeatRecoveryType::None | HeatRecoveryType::Enthalpy => "",
+        HeatRecoveryType::Enthalpy => {
+            " plus EnergyPlus Enthalpy heat recovery OA tempering when recirculation enthalpy can beneficially warm or cool outdoor air"
+        }
+        HeatRecoveryType::None => "",
     };
     format!(
         "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}{}",
@@ -2494,19 +2510,29 @@ fn ideal_loads_barometric_pressure_trace(
     input_trace: &IdealLoadsInputTrace,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> Result<Vec<f64>, String> {
+    ideal_loads_barometric_pressure_samples(
+        model,
+        weather,
+        &input_trace.zone_node_temperature.samples,
+        input_trace.sample_count,
+        limit_context,
+    )
+}
+
+fn ideal_loads_barometric_pressure_samples(
+    model: &SimulationModel,
+    weather: Option<&Path>,
+    samples: &[SeriesSample],
+    sample_count: usize,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> Result<Vec<f64>, String> {
     let Some(weather) = weather else {
-        return Ok(vec![
-            limit_context.barometric_pressure_pa;
-            input_trace.sample_count
-        ]);
+        return Ok(vec![limit_context.barometric_pressure_pa; sample_count]);
     };
     let weather_records =
         load_epw_records(weather).map_err(|error| format!("failed to load EPW: {error}"))?;
     if weather_records.is_empty() {
-        return Ok(vec![
-            limit_context.barometric_pressure_pa;
-            input_trace.sample_count
-        ]);
+        return Ok(vec![limit_context.barometric_pressure_pa; sample_count]);
     }
 
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
@@ -2516,11 +2542,9 @@ fn ideal_loads_barometric_pressure_trace(
         .first()
         .map(|run_period| run_period.first_hour_interpolation_starting_values)
         .unwrap_or_default();
-    Ok(input_trace
-        .zone_node_temperature
-        .samples
+    Ok(samples
         .iter()
-        .take(input_trace.sample_count)
+        .take(sample_count)
         .map(|sample| {
             sample
                 .timestamp

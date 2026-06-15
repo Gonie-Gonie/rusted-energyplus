@@ -29,7 +29,7 @@ The initial supported boundary is intentionally narrow:
 - one `ZoneHVAC:IdealLoadsAirSystem`
 - no outdoor air requirement
 - no economizer
-- no or diagnostic-only Sensible heat recovery
+- no or diagnostic-only Sensible/Enthalpy heat recovery
 - no humidistat
 - no demand-controlled ventilation
 - no finite flow or capacity limit
@@ -204,7 +204,7 @@ preparatory Rust surface is:
   Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum OA
   report-rate and mixed-air state diagnostic, including no-heat-recovery
   rows, DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
-  and Sensible heat-recovery OA tempering/rate reporting
+  and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -280,10 +280,18 @@ the mixed-air, active-time, sensible-rate, and total-rate evidence
 diagnostic-only. Humidity ratio is unchanged by Sensible heat recovery, so the
 latent heat-recovery rows remain zero.
 
+`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` keeps the same
+Flow/Zone and `NoEconomizer` fixture shape with `HeatRecoveryType = Enthalpy`.
+The Rust lane follows the EnergyPlus enthalpy gate, applies sensible and latent
+heat-recovery effectiveness to the outdoor-air state before mixing, passes EPW
+barometric pressure into the heat-recovery saturation check, and reports 96
+Detailed samples for active-time, sensible, latent, and total heat-recovery
+rows. A single cooling saturation-limit timestep is kept within diagnostic
+tolerance; saturation-limit heat-recovery branch parity is not promoted.
+
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no finite-limit, Enthalpy heat recovery, active
-humidity-control, saturation-limit, or DCV output is part of the promoted
-IdealLoads claim.
+unresolved, and no finite-limit, active humidity-control, saturation-limit
+heat-recovery, or DCV output is part of the promoted IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -304,7 +312,7 @@ The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, active
-humidity-control outdoor-air latent behavior, Enthalpy heat-recovery outputs,
+humidity-control outdoor-air latent behavior,
 economizer outputs, finite flow/capacity limits, adaptive system timestep,
 broad meter conformance, and non-constant efficiency schedules remain
 diagnostic-only or unsupported until their source-order branches are ported or
@@ -319,8 +327,8 @@ humidity proof rows have diagnostic evidence only in
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, inactive
 economizer/heat-recovery outputs, DifferentialDryBulb/DifferentialEnthalpy
-economizer active-time/flow outputs, and Sensible heat-recovery active-time
-and rate outputs have diagnostic evidence only in
+economizer active-time/flow outputs, and Sensible/Enthalpy heat-recovery
+active-time and rate outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
 `ideal_loads_outdoor_air_flow_area_diagnostic_001`, and
@@ -331,7 +339,8 @@ and rate outputs have diagnostic evidence only in
 and
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`,
 and
-`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`.
+`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` and
+`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001`.
 The finite flow/capacity limit fixtures have diagnostic evidence only in their
 three finite-limit cases; those diagnostic lanes now have zero tolerance
 failures for their declared Detailed rows.
