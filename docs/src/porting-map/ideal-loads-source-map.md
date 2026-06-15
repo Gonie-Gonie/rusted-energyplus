@@ -165,9 +165,17 @@ source-order zone state for the first run-period sample, and matches the
 Humidistat dehumidification supply mass flow, supply humidity ratio, and latent
 cooling report rows with zero tolerance failures.
 
-These remain diagnostic-only: humidistat humidification, outdoor-air humidity
-control, humidification-side `ConstantSupplyHumidityRatio`, active economizer
-or heat-recovery humidity interactions, finite-limit Humidistat behavior, and
+`ideal_loads_humidistat_humidification_diagnostic_001` adds the matching
+diagnostic-only no-OA Humidistat humidification lane. It reads the EnergyPlus
+humidifying moisture proof row into `ZoneSysEnergyDemand`, lets the
+humidification mass-flow request exceed the sensible heating flow when needed,
+uses the maximum heating supply humidity ratio with the same saturation clamp,
+and matches the supply humidity and latent heating report rows with zero
+tolerance failures.
+
+These remain diagnostic-only: outdoor-air humidity control,
+humidification-side `ConstantSupplyHumidityRatio`, active economizer or
+heat-recovery humidity interactions, finite-limit Humidistat behavior, and
 broad humidity-control conformance are not promoted.
 
 ## Outdoor-Air Prerequisites

@@ -54,14 +54,14 @@ tolerance, and code organization.
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
 - diagnostic-only IdealLoads no-OA `ConstantSensibleHeatRatio`,
-  `ConstantSupplyHumidityRatio`, and Humidistat dehumidification
+  `ConstantSupplyHumidityRatio`, and Humidistat dehumidification/humidification
   humidity-control evidence for zone/supply latent and sensible rate rows,
   moisture-demand proof inputs, and supply humidity handling in
   `ideal_loads_constant_shr_diagnostic_001`,
   `ideal_loads_constant_supply_humidity_diagnostic_001`, and
-  `ideal_loads_humidistat_dehumidification_diagnostic_001`; humidistat
-  humidification and broad humidity-control conformance remain outside the
-  claim
+  `ideal_loads_humidistat_dehumidification_diagnostic_001`, and
+  `ideal_loads_humidistat_humidification_diagnostic_001`; broad
+  humidity-control conformance remains outside the claim
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive
