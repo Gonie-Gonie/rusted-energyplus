@@ -1384,7 +1384,7 @@ fn build_context<'a>(
         .find(|node| node.id == zone_air_node_edge.node)
         .ok_or_else(|| "missing zone air node".to_string())?;
 
-    let mut boundary = if manifest_allows_capacity_limit_conformance(manifest, system) {
+    let mut boundary = if manifest_allows_finite_limit_conformance(manifest, system) {
         classify_no_oa_sensible_subset(system)
     } else if manifest.conformance_claim {
         classify_no_oa_no_limit_sensible_subset(system)
@@ -2763,14 +2763,25 @@ fn manifest_allows_constant_supply_humidity_humidification_diagnostic(
         })
 }
 
-fn manifest_allows_capacity_limit_conformance(
+fn manifest_allows_finite_limit_conformance(
     manifest: &ConformanceCase,
     system: &IdealLoadsAirSystem,
 ) -> bool {
-    manifest.conformance_claim
-        && manifest.id == "ideal_loads_capacity_limit_conformance_001"
-        && system.heating_limit == IdealLoadsLimit::LimitCapacity
-        && system.cooling_limit == IdealLoadsLimit::LimitCapacity
+    if !manifest.conformance_claim {
+        return false;
+    }
+
+    match manifest.id.as_str() {
+        "ideal_loads_capacity_limit_conformance_001" => {
+            system.heating_limit == IdealLoadsLimit::LimitCapacity
+                && system.cooling_limit == IdealLoadsLimit::LimitCapacity
+        }
+        "ideal_loads_flow_limit_conformance_001" => {
+            system.heating_limit == IdealLoadsLimit::LimitFlowRate
+                && system.cooling_limit == IdealLoadsLimit::LimitFlowRate
+        }
+        _ => false,
+    }
 }
 
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {

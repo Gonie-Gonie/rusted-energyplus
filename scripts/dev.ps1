@@ -220,6 +220,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the no-OA IdealLoads numeric flow-limit diagnostic comparison."
     }
+    "compare-ideal-loads-flow-limit-conformance" = @{
+        Path = "compare\compare-ideal-loads-flow-limit-conformance.ps1"
+        Group = "compare"
+        Help = "Gate the no-OA IdealLoads numeric flow-limit conformance case."
+    }
     "compare-ideal-loads-flow-capacity-limit-diagnostic" = @{
         Path = "compare\compare-ideal-loads-flow-capacity-limit-diagnostic.ps1"
         Group = "compare"

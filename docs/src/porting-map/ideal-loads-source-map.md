@@ -117,9 +117,10 @@ The helper uses the EnergyPlus formula order for:
 
 ## Finite Flow/Capacity Evidence
 
-Finite no-OA capacity limits are promoted by:
+Finite no-OA capacity and flow limits are promoted by:
 
 - `ideal_loads_capacity_limit_conformance_001`
+- `ideal_loads_flow_limit_conformance_001`
 
 The original diagnostic lanes remain available for finite flow/capacity
 regression evidence:
@@ -138,13 +139,14 @@ calculations, matching the declared Detailed rate and supply-node rows in the
 finite fixtures.
 
 The promoted capacity-limit fixture has zero tolerance failures across 18
-Detailed series and 188 samples. It promotes the same 10 user-facing rows as
-the no-OA/no-limit sensible claim: thermostat setpoints, zone total/sensible
-heating/cooling rates, supply-air total heating/cooling rates, supply-node
-temperature, and supply-node mass flow. Return-node temperature/humidity,
-supply-node humidity, and predictor/corrector proof rows remain diagnostic.
-Flow-only and flow-and-capacity finite-limit conformance remain outside the
-claim.
+Detailed series and 188 samples. The promoted flow-limit fixture has zero
+tolerance failures across 18 Detailed series and 128 samples. Both promote the
+same 10 user-facing rows as the no-OA/no-limit sensible claim: thermostat
+setpoints, zone total/sensible heating/cooling rates, supply-air total
+heating/cooling rates, supply-node temperature, and supply-node mass flow.
+Return-node temperature/humidity, supply-node humidity, and
+predictor/corrector proof rows remain diagnostic. Flow-and-capacity
+finite-limit conformance remains outside the claim.
 
 ## Humidity-Control Diagnostics
 
@@ -321,10 +323,10 @@ Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, active
 humidity-control outdoor-air latent behavior, economizer outputs, finite
-flow-only and flow-and-capacity limits, adaptive system timestep, broad meter
-conformance, and non-constant efficiency schedules remain diagnostic-only or
-unsupported until their source-order branches are ported or explicitly
-included in a promoted claim. `DistrictHeatingWater:Facility` and
+flow-and-capacity limits, adaptive system timestep, broad meter conformance,
+and non-constant efficiency schedules remain diagnostic-only or unsupported
+until their source-order branches are ported or explicitly included in a
+promoted claim. `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` are hourly oracle-MTR vs Rust aggregated fuel-energy
 diagnostics for the no-OA fixtures.
 The no-OA `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio`
@@ -349,9 +351,9 @@ and
 and
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` and
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001`.
-The capacity-limit fixture now has a blocking conformance gate, while the
-flow-only and flow-and-capacity limit fixtures remain diagnostic-only with zero
-tolerance failures for their declared Detailed rows.
+The capacity-limit and flow-limit fixtures now have blocking conformance
+gates, while the flow-and-capacity limit fixture remains diagnostic-only with
+zero tolerance failures for its declared Detailed rows.
 
 ## Conformance Compare Artifacts
 
@@ -384,9 +386,16 @@ capacity-limit conformance evidence set under
 That run compares 18 Detailed series over 188 samples. The 10 declared
 conformance rows pass their tolerances, the 8 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA numeric
-capacity-limit sensible claim for declared outputs; flow-only,
-flow-and-capacity, humidity, outdoor-air, economizer, heat-recovery, and broad
-HVAC behavior remain outside the claim.
+capacity-limit sensible claim for declared outputs.
+
+`scripts/dev.cmd compare-ideal-loads-flow-limit-conformance` generates the
+flow-limit conformance evidence set under
+`.runtime/ideal-loads-flow-limit-conformance/26.1.0/ideal_loads_flow_limit_conformance_001/compare/`.
+That run compares 18 Detailed series over 128 samples. The 10 declared
+conformance rows pass their tolerances, the 8 diagnostic proof rows pass, and
+`tolerance-failures.csv` is empty. Together these finite-limit gates still
+exclude flow-and-capacity, humidity, outdoor-air, economizer, heat-recovery,
+and broad HVAC behavior from the claim.
 
 ## Claim Requirements
 

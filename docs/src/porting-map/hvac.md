@@ -185,11 +185,11 @@ oracle-MTR values against Rust fuel-energy aggregates diagnostically.
 
 ## IdealLoads Finite Flow/Capacity Evidence
 
-One no-OA numeric capacity-limit lane is now promoted to conformance for the
-declared thermostat, IdealLoads rate, and supply-node temperature/mass-flow
-outputs:
+Two no-OA finite-limit lanes are now promoted to conformance for the declared
+thermostat, IdealLoads rate, and supply-node temperature/mass-flow outputs:
 
 - `ideal_loads_capacity_limit_conformance_001`
+- `ideal_loads_flow_limit_conformance_001`
 
 The original no-OA diagnostic-only lanes remain as regression/proof evidence
 for finite heating/cooling flow and capacity limits:
@@ -204,13 +204,14 @@ Rust compare lane records the resolved return node as the no-OA recirculation
 node and uses that same-call recirculation state for the finite-limit no-OA
 mixed-air and report calculations.
 
-The promoted capacity-limit lane has `comparison_class = "conformance"`,
-`conformance_claim = true`, `tolerance_policy: conformance-gate`, and
-`status: pass`, with 10 conformance rows and 8 diagnostic proof rows across
-188 Detailed samples. The diagnostic capacity-limit, flow-limit, and
-flow-and-capacity-limit lanes keep `comparison_class = "diagnostic-only"`,
-`conformance_claim = false`, `tolerance_policy: diagnostic-draft`, and
-`status: diagnostic` with zero tolerance failures.
+The promoted capacity-limit and flow-limit lanes have
+`comparison_class = "conformance"`, `conformance_claim = true`,
+`tolerance_policy: conformance-gate`, and `status: pass`, with 10
+conformance rows and 8 diagnostic proof rows. Capacity-limit covers 188
+Detailed samples; flow-limit covers 128 Detailed samples. The diagnostic
+capacity-limit, flow-limit, and flow-and-capacity-limit lanes remain available
+as non-claim regression evidence with zero tolerance failures, and the
+flow-and-capacity-limit branch is still outside the promoted claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
@@ -283,8 +284,8 @@ is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
 This evidence does not promote active DCV, active humidity controls,
-saturation-limit heat-recovery branches, flow-limit or flow-and-capacity
-conformance, or broad IdealLoads outdoor-air conformance.
+saturation-limit heat-recovery branches, flow-and-capacity conformance, or
+broad IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 
@@ -301,6 +302,6 @@ of these exist:
 - markdown report artifact
 - blocking release gate
 
-Variables outside the declared no-OA/no-limit and numeric capacity-limit sensible boundary remain
+Variables outside the declared no-OA/no-limit, numeric capacity-limit, and numeric flow-limit sensible boundary remain
 baseline-only or diagnostic-only evidence until they receive their own source
 map, Rust state, oracle evidence, and blocking gate.
