@@ -115,6 +115,25 @@ The helper uses the EnergyPlus formula order for:
 - supply node temperature, humidity ratio, enthalpy, and mass flow writes
 - reported zone and supply-air IdealLoads rates
 
+## Outdoor-Air Prerequisites
+
+Outdoor-air IdealLoads conformance is not promoted yet. The current
+preparatory Rust surface is:
+
+- `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
+  schedule references preserved in `TypedModel`
+- `ModelGraph::ideal_loads_outdoor_air_specs` linking an IdealLoads system to
+  its referenced outdoor-air design specification
+- `calc_design_outdoor_air_volume_flow_m3_per_s` for supported
+  `Flow/Person`, `Flow/Area`, `Flow/Zone`, `AirChanges/Hour`, `Sum`, and
+  `Maximum` methods
+- `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
+  current OA schedule fraction and `StdRhoAir`
+
+Indoor air quality and proportional-control outdoor-air methods remain
+unresolved, and no outdoor-air load, economizer, heat recovery, or DCV output is
+part of the promoted IdealLoads claim.
+
 ## Required Proof Variables
 
 The conformance output surface is:
