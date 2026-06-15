@@ -61,6 +61,8 @@ use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_MAX_SAMPLE_CONTEXT_LIMIT: usize = 8;
+const OFFICIAL_DYNAMIC_HEAT_BALANCE_CANDIDATE_CASE_ID: &str =
+    "official_1zone_uncontrolled_dynamic_conformance_candidate_001";
 const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
 const HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_INITIAL_HISTORY_POLICY";
@@ -1358,6 +1360,15 @@ fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Res
     if manifest.outputs.is_empty() {
         return Err("heat-balance conformance requires at least one output request".to_string());
     }
+    if !manifest
+        .outputs
+        .iter()
+        .any(|output| output.level == Some(OutputLevel::Conformance))
+    {
+        return Err(
+            "heat-balance conformance requires at least one conformance-level output".to_string(),
+        );
+    }
 
     for output in &manifest.outputs {
         if output.frequency != OutputFrequency::Hourly {
@@ -1376,11 +1387,17 @@ fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Res
         }
         if !matches!(
             output.class,
-            VariableClass::ZoneState | VariableClass::SurfaceState
+            VariableClass::Weather | VariableClass::ZoneState | VariableClass::SurfaceState
         ) {
             return Err(format!(
-                "heat-balance conformance requires zone-state or surface-state class, got {} for {}",
+                "heat-balance conformance requires weather, zone-state, or surface-state class, got {} for {}",
                 variable_class_label(output.class),
+                output.variable
+            ));
+        }
+        if output.level.is_none() {
+            return Err(format!(
+                "heat-balance conformance output must declare a level: {}",
                 output.variable
             ));
         }
@@ -3180,6 +3197,7 @@ struct ZoneTemperatureReportOutput {
     frequency: &'static str,
     class: &'static str,
     source: &'static str,
+    level: Option<&'static str>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -3212,6 +3230,7 @@ fn zone_temperature_report_context_from_manifest(
             frequency: output_frequency_label(output.frequency),
             class: variable_class_label(output.class),
             source: source_artifact_label(output.source),
+            level: output.level.map(output_level_label),
         },
         report: manifest
             .report
@@ -3775,6 +3794,7 @@ fn heat_balance_context_from_manifest(
             frequency: output_frequency_label(output.frequency),
             class: variable_class_label(output.class),
             source: source_artifact_label(output.source),
+            level: output.level.map(output_level_label),
         })
         .collect::<Vec<_>>();
     let tolerances = heat_balance_variable_classes(manifest)
@@ -3915,7 +3935,7 @@ fn evaluate_heat_balance_conformance<'a>(
     context: &'a HeatBalanceConformanceContext,
 ) -> HeatBalanceConformance<'a> {
     let mut failure_reasons = Vec::new();
-    if context.case_id == "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+    if heat_balance_context_requires_compatibility_candidate(context)
         && !heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
     {
         failure_reasons.push(format!(
@@ -3930,7 +3950,19 @@ fn evaluate_heat_balance_conformance<'a>(
             diagnostic.status
         ));
     }
+    if context.conformance_claim
+        && !diagnostic
+            .series
+            .iter()
+            .any(|series| series.output.level == Some("conformance"))
+    {
+        failure_reasons
+            .push("conformance report did not include any conformance-level series".to_string());
+    }
     for series in &diagnostic.series {
+        if !heat_balance_series_is_gated(context, series) {
+            continue;
+        }
         let label = format!("{}/{}", series.output.key, series.output.variable);
         if series.status != "extracted" {
             failure_reasons.push(format!("{label} extraction status was {}", series.status));
@@ -3979,6 +4011,19 @@ fn evaluate_heat_balance_conformance<'a>(
     }
 }
 
+fn heat_balance_context_requires_compatibility_candidate(
+    context: &HeatBalanceConformanceContext,
+) -> bool {
+    context.case_id == OFFICIAL_DYNAMIC_HEAT_BALANCE_CANDIDATE_CASE_ID
+}
+
+fn heat_balance_series_is_gated(
+    context: &HeatBalanceConformanceContext,
+    series: &HeatBalanceSeriesDiagnostic,
+) -> bool {
+    !context.conformance_claim || series.output.level == Some("conformance")
+}
+
 fn build_heat_balance_conformance_diagnostic(
     input_path: &Path,
     weather_path: &Path,
@@ -4025,13 +4070,35 @@ fn build_heat_balance_conformance_diagnostic(
     }
 
     let simulation_model = SimulationModel::from_typed(model);
-    let zone_air_algorithm = if context.conformance_claim {
+    let official_dynamic_candidate = heat_balance_context_requires_compatibility_candidate(context);
+    let official_dynamic_candidate_warmup_days = if official_dynamic_candidate {
+        Some(
+            eio_run_period_warmup_days(eio_path)
+                .map_err(|error| error.to_string())?
+                .ok_or_else(|| {
+                    "official dynamic heat-balance candidate requires EIO warmup days".to_string()
+                })?,
+        )
+    } else {
+        None
+    };
+    let zone_air_algorithm = if official_dynamic_candidate {
+        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+    } else if context.conformance_claim {
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
     } else {
         heat_balance_zone_air_algorithm_from_env()?
     };
-    let simulation_options = if context.conformance_claim {
+    let simulation_options = if context.conformance_claim && !official_dynamic_candidate {
         HeatBalanceSimulationOptions::hourly_samples(sample_count)
+    } else if let Some(warmup_days) = official_dynamic_candidate_warmup_days {
+        HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
+            &simulation_model,
+            sample_count,
+        )
+        .with_warmup_minimum_days(warmup_days)
+        .with_surface_iteration_count(20)
+        .with_ctf_initial_history_policy(HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial)
     } else {
         let options = HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(
             &simulation_model,
@@ -4046,7 +4113,12 @@ fn build_heat_balance_conformance_diagnostic(
         apply_heat_balance_inside_hconv_reevaluation_interval_from_env(options)?
     }
     .with_zone_air_algorithm(zone_air_algorithm);
-    let (ctf_coefficients, ctf_seed) = if context.conformance_claim {
+    let (ctf_coefficients, ctf_seed) = if official_dynamic_candidate {
+        load_runtime_ctf_coefficients_from_eio_with_policy(
+            eio_path,
+            HeatBalanceCtfSeedPolicy::AllEio,
+        )?
+    } else if context.conformance_claim {
         (Vec::new(), disabled_heat_balance_ctf_seed_diagnostic())
     } else {
         load_runtime_ctf_coefficients_from_eio(eio_path)?
@@ -4066,8 +4138,10 @@ fn build_heat_balance_conformance_diagnostic(
         sample_count,
     );
     let mut heat_balance_warmup: HeatBalanceWarmupDiagnostic = simulation.summary.warmup.into();
-    heat_balance_warmup.oracle_run_period_day_count =
-        eio_run_period_warmup_days(eio_path).map_err(|error| error.to_string())?;
+    heat_balance_warmup.oracle_run_period_day_count = match official_dynamic_candidate_warmup_days {
+        Some(days) => Some(days),
+        None => eio_run_period_warmup_days(eio_path).map_err(|error| error.to_string())?,
+    };
 
     let mut series = Vec::with_capacity(oracle_series.len());
     for (output, oracle_values) in oracle_series {
@@ -7102,6 +7176,18 @@ fn heat_balance_max_abs_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> 
         .fold(0.0, f64::max)
 }
 
+fn heat_balance_gated_max_abs_delta(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    context: &HeatBalanceConformanceContext,
+) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .filter(|series| heat_balance_series_is_gated(context, series))
+        .map(|series| series.delta.max_abs_delta_c)
+        .fold(0.0, f64::max)
+}
+
 fn heat_balance_max_rmse_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
     diagnostic
         .series
@@ -7110,10 +7196,34 @@ fn heat_balance_max_rmse_delta(diagnostic: &HeatBalanceConformanceDiagnostic) ->
         .fold(0.0, f64::max)
 }
 
+fn heat_balance_gated_max_rmse_delta(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    context: &HeatBalanceConformanceContext,
+) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .filter(|series| heat_balance_series_is_gated(context, series))
+        .map(|series| series.delta.rmse_delta_c)
+        .fold(0.0, f64::max)
+}
+
 fn heat_balance_max_rel_delta(diagnostic: &HeatBalanceConformanceDiagnostic) -> f64 {
     diagnostic
         .series
         .iter()
+        .map(|series| series.delta.max_rel_delta)
+        .fold(0.0, f64::max)
+}
+
+fn heat_balance_gated_max_rel_delta(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    context: &HeatBalanceConformanceContext,
+) -> f64 {
+    diagnostic
+        .series
+        .iter()
+        .filter(|series| heat_balance_series_is_gated(context, series))
         .map(|series| series.delta.max_rel_delta)
         .fold(0.0, f64::max)
 }
@@ -8281,6 +8391,10 @@ fn render_zone_temperature_report(
         report.push_str(&format!("output_frequency: {}\n", context.output.frequency));
         report.push_str(&format!("output_class: {}\n", context.output.class));
         report.push_str(&format!("output_source: {}\n", context.output.source));
+        report.push_str(&format!(
+            "output_level: {}\n",
+            context.output.level.unwrap_or("none")
+        ));
         if let Some(report_contract) = &context.report {
             report.push_str(&format!("report_format: {}\n", report_contract.format));
             report.push_str(&format!("report_path: {}\n", report_contract.path));
@@ -8561,14 +8675,26 @@ fn render_heat_balance_conformance_json(
     ));
     json.push_str(&format!(
         "  \"max_abs_delta_c\": {},\n",
-        json_number(heat_balance_max_abs_delta(diagnostic))
+        json_number(heat_balance_gated_max_abs_delta(diagnostic, context))
     ));
     json.push_str(&format!(
         "  \"rmse_delta_c\": {},\n",
-        json_number(heat_balance_max_rmse_delta(diagnostic))
+        json_number(heat_balance_gated_max_rmse_delta(diagnostic, context))
     ));
     json.push_str(&format!(
         "  \"max_rel_delta\": {},\n",
+        json_number(heat_balance_gated_max_rel_delta(diagnostic, context))
+    ));
+    json.push_str(&format!(
+        "  \"all_series_max_abs_delta_c\": {},\n",
+        json_number(heat_balance_max_abs_delta(diagnostic))
+    ));
+    json.push_str(&format!(
+        "  \"all_series_rmse_delta_c\": {},\n",
+        json_number(heat_balance_max_rmse_delta(diagnostic))
+    ));
+    json.push_str(&format!(
+        "  \"all_series_max_rel_delta\": {},\n",
         json_number(heat_balance_max_rel_delta(diagnostic))
     ));
     json.push_str(&format!(
@@ -8703,8 +8829,13 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!("outputs: {}\n", context.outputs.len()));
     for output in &context.outputs {
         report.push_str(&format!(
-            "output: {} / {} / {} / {} / {}\n",
-            output.key, output.variable, output.frequency, output.class, output.source
+            "output: {} / {} / {} / {} / {} / {}\n",
+            output.key,
+            output.variable,
+            output.frequency,
+            output.class,
+            output.source,
+            output.level.unwrap_or("none")
         ));
     }
     report.push_str(&format!(
@@ -8850,14 +8981,26 @@ fn render_heat_balance_conformance_report(
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
     report.push_str(&format!(
         "max_abs_delta_c: {:.12}\n",
-        heat_balance_max_abs_delta(diagnostic)
+        heat_balance_gated_max_abs_delta(diagnostic, context)
     ));
     report.push_str(&format!(
         "rmse_delta_c: {:.12}\n",
+        heat_balance_gated_max_rmse_delta(diagnostic, context)
+    ));
+    report.push_str(&format!(
+        "max_rel_delta: {:.12}\n",
+        heat_balance_gated_max_rel_delta(diagnostic, context)
+    ));
+    report.push_str(&format!(
+        "all_series_max_abs_delta_c: {:.12}\n",
+        heat_balance_max_abs_delta(diagnostic)
+    ));
+    report.push_str(&format!(
+        "all_series_rmse_delta_c: {:.12}\n",
         heat_balance_max_rmse_delta(diagnostic)
     ));
     report.push_str(&format!(
-        "max_rel_delta: {:.12}\n\n",
+        "all_series_max_rel_delta: {:.12}\n\n",
         heat_balance_max_rel_delta(diagnostic)
     ));
 
@@ -9028,12 +9171,19 @@ fn report_delta_row(report: &mut String, label: &str, point: Option<DeltaPoint>)
 
 fn zone_temperature_output_json(output: &ZoneTemperatureReportOutput) -> String {
     format!(
-        "{{ \"key\": {}, \"variable\": {}, \"frequency\": {}, \"class\": {}, \"source\": {} }}",
+        concat!(
+            "{{ \"key\": {}, \"variable\": {}, \"frequency\": {}, ",
+            "\"class\": {}, \"source\": {}, \"level\": {} }}"
+        ),
         json_string(&output.key),
         json_string(&output.variable),
         json_string(output.frequency),
         json_string(output.class),
-        json_string(output.source)
+        json_string(output.source),
+        output
+            .level
+            .map(json_string)
+            .unwrap_or_else(|| "null".to_string())
     )
 }
 
@@ -12822,6 +12972,7 @@ mod tests {
                 frequency: "hourly",
                 class: "zone-state",
                 source: "eso",
+                level: None,
             },
             report: Some(super::ZoneTemperatureReportContract {
                 format: "markdown",
@@ -13253,6 +13404,7 @@ mod tests {
                         frequency: "hourly",
                         class: "zone-state",
                         source: "eso",
+                        level: Some("conformance"),
                     },
                     samples: 2,
                     oracle_first_c: 23.0,
@@ -13270,6 +13422,7 @@ mod tests {
                         frequency: "hourly",
                         class: "surface-state",
                         source: "eso",
+                        level: Some("conformance"),
                     },
                     samples: 2,
                     oracle_first_c: 23.0,
@@ -14027,6 +14180,7 @@ mod tests {
                     frequency: "hourly",
                     class: "zone-state",
                     source: "eso",
+                    level: Some("diagnostic"),
                 },
                 samples: 1,
                 oracle_first_c: 1.0,

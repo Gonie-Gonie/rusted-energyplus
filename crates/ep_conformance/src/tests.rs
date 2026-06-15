@@ -554,8 +554,8 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         manifest.id,
         "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
     );
-    assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
-    assert!(!manifest.conformance_claim);
+    assert_eq!(manifest.comparison_class, ComparisonClass::Conformance);
+    assert!(manifest.conformance_claim);
     let boundary = manifest
         .boundary
         .as_ref()
@@ -567,24 +567,56 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert!(boundary.declared_surface_keys.named_key_comparison);
     assert_eq!(manifest.outputs.len(), 30);
     assert!(manifest.outputs.iter().all(|output| {
-        output.frequency == OutputFrequency::Hourly
-            && output.source == SourceArtifact::Eso
-            && output.level == Some(OutputLevel::Diagnostic)
+        output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| output.level == Some(OutputLevel::Conformance))
+            .count(),
+        29
+    );
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| output.level == Some(OutputLevel::Diagnostic))
+            .count(),
+        1
+    );
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "Environment"
             && output.variable == "Site Outdoor Air Drybulb Temperature"
             && output.class == VariableClass::Weather
+            && output.level == Some(OutputLevel::Conformance)
     }));
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZONE ONE"
             && output.variable == "Zone Air Heat Balance Surface Convection Rate"
             && output.class == VariableClass::ZoneState
+            && output.level == Some(OutputLevel::Conformance)
     }));
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:FLR001"
             && output.variable == "Surface Heat Storage Rate"
             && output.class == VariableClass::SurfaceState
+            && output.level == Some(OutputLevel::Diagnostic)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::Weather
+            && tolerance.max_abs == Some(0.00001)
+            && tolerance.max_rmse == Some(0.00001)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::ZoneState
+            && tolerance.max_abs == Some(0.5)
+            && tolerance.max_rmse == Some(0.1)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceState
+            && tolerance.max_abs == Some(1.0)
+            && tolerance.max_rmse == Some(0.35)
     }));
     let gate = manifest
         .gate
@@ -594,7 +626,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         gate.script,
         "scripts/dev.cmd official-dynamic-heat-balance-compat-candidate"
     );
-    assert!(!gate.blocking);
+    assert!(gate.blocking);
 
     Ok(())
 }

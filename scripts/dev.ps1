@@ -208,7 +208,7 @@ $Commands = [ordered]@{
     "official-dynamic-heat-balance-compat-candidate" = @{
         Path = "compare\official-dynamic-heat-balance-compat-candidate.ps1"
         Group = "compare"
-        Help = "Run the official dynamic compatibility candidate lane with fixed all-EIO CTF seed, EnergyPlus initial histories, and 20-day warmup."
+        Help = "Run the official dynamic blocking conformance gate in the compatibility-candidate lane."
     }
     "official-dynamic-heat-balance-all-ctf-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-probe.ps1"
