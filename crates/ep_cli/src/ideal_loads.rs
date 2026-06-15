@@ -123,6 +123,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
     branch: &'static str,
+    constant_shr_conformance_claim: bool,
     zone_name: String,
     zone_air_node_name: String,
     recirculation_node_name: Option<String>,
@@ -1452,11 +1453,13 @@ fn build_context<'a>(
     let system_name = system.name.0.clone();
     let supply_node_name = supply_node.name.0.clone();
     let branch = ideal_loads_sensible_branch(system);
+    let constant_shr_conformance_claim = manifest_allows_constant_shr_conformance(manifest, system);
 
     Ok(IdealLoadsDiagnosticContext {
         manifest,
         baseline,
         branch,
+        constant_shr_conformance_claim,
         zone_name,
         zone_air_node_name,
         recirculation_node_name,
@@ -2786,6 +2789,17 @@ fn manifest_allows_finite_limit_conformance(
         }
         _ => false,
     }
+}
+
+fn manifest_allows_constant_shr_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest.conformance_claim
+        && manifest.id == "ideal_loads_constant_shr_conformance_001"
+        && system.dehumidification_control_type
+            == DehumidificationControlType::ConstantSensibleHeatRatio
+        && system.humidification_control_type == HumidificationControlType::None
 }
 
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {
@@ -4462,6 +4476,8 @@ fn outdoor_air_tolerance_policy(
 fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if context.manifest.conformance_claim && context.branch == "no-oa-finite-limit-sensible" {
         "conformance no-OA finite-limit sensible IdealLoads branch for declared variables only"
+    } else if context.constant_shr_conformance_claim {
+        "conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only"
     } else if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
     } else if context.branch == "no-oa-finite-limit-sensible" {

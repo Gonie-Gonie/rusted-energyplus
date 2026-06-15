@@ -1,0 +1,256 @@
+id = "ideal_loads_constant_shr_conformance_001"
+title = "One-zone no-OA IdealLoads constant SHR conformance"
+milestone = "ideal-loads-humidity-control-conformance"
+purpose = "Claim narrow no-outdoor-air IdealLoads ConstantSensibleHeatRatio cooling numerical conformance for declared cooling latent/sensible/total rate and supply-node rows."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case claims only the declared no-OA ConstantSensibleHeatRatio cooling outputs.",
+  "The boundary excludes ConstantSupplyHumidityRatio, Humidistat, outdoor air, economizer, heat recovery, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
+  "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
+  "Mass-flow and humidity comparison uses the EnergyPlus same-call return-node recirculation state for no-OA humidity-control mixed-air calculations.",
+  "Return-node and zone-air-node rows remain diagnostic proof rows; broad node and broad humidity-control conformance remain outside the claim."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_constant_shr_diagnostic_001/ideal_loads_constant_shr_diagnostic.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "hvac", "node"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_constant_shr_diagnostic_001/ideal_loads_constant_shr_diagnostic.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "conformance"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Mass Flow Rate"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 1e-9
+max_rmse = 1e-9
+
+[[tolerances]]
+variable_class = "hvac-state"
+max_abs = 1e-3
+max_rmse = 1e-3
+
+[[tolerances]]
+variable_class = "node-state"
+max_abs = 1e-6
+max_rmse = 1e-6
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-constant-shr-conformance/26.1.0/ideal_loads_constant_shr_conformance_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-constant-shr-conformance"
+blocking = true

@@ -8,9 +8,9 @@ last_reviewed: 2026-06-15
 # HVAC
 
 Broad HVAC numerical compatibility is not in the current public compatibility
-scope. The current exceptions are the narrow no-OA/no-limit and numeric
-finite-limit IdealLoads sensible claims for declared thermostat, IdealLoads
-rate, and supply-node outputs.
+scope. The current exceptions are the narrow no-OA/no-limit, numeric
+finite-limit, and ConstantSensibleHeatRatio cooling IdealLoads claims for
+declared thermostat, IdealLoads rate, and supply-node outputs.
 
 ## v0.10 Foundation
 
@@ -213,6 +213,21 @@ flow-limit covers 128 Detailed samples, and flow-and-capacity-limit covers 189
 Detailed samples. The original diagnostic finite-limit lanes remain available
 as non-claim regression evidence with zero tolerance failures.
 
+## IdealLoads Constant SHR Conformance
+
+`ideal_loads_constant_shr_conformance_001` promotes the no-OA
+`ConstantSensibleHeatRatio` cooling lane for declared thermostat setpoints,
+cooling total/sensible/latent rate rows, and supply-node
+temperature/mass-flow/humidity rows. It reuses the diagnostic fixture IDF and
+keeps return-node and zone-air-node humidity rows as proof rows only.
+
+The compare run has `comparison_class = "conformance"`, `conformance_claim =
+true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
+18 Detailed series over 96 samples, with 11 conformance rows and 7 diagnostic
+proof rows. `ConstantSupplyHumidityRatio`, Humidistat, outdoor-air humidity,
+finite-limit humidity-control behavior, and broad humidity-control conformance
+remain outside the claim.
+
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
@@ -302,6 +317,7 @@ of these exist:
 - markdown report artifact
 - blocking release gate
 
-Variables outside the declared no-OA/no-limit and numeric finite-limit sensible boundary remain
-baseline-only or diagnostic-only evidence until they receive their own source
-map, Rust state, oracle evidence, and blocking gate.
+Variables outside the declared no-OA/no-limit, numeric finite-limit, and
+ConstantSensibleHeatRatio cooling boundaries remain baseline-only or
+diagnostic-only evidence until they receive their own source map, Rust state,
+oracle evidence, and blocking gate.

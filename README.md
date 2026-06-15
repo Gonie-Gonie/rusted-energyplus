@@ -66,12 +66,15 @@ tolerance, and code organization.
   temperature/flow Detailed series in
   `ideal_loads_flow_capacity_limit_conformance_001`, with return-node and
   humidity proof rows kept diagnostic-only
-- diagnostic-only IdealLoads no-OA `ConstantSensibleHeatRatio`,
-  `ConstantSupplyHumidityRatio` cooling/heating, and Humidistat
-  dehumidification/humidification
-  humidity-control evidence for zone/supply latent and sensible rate rows,
-  moisture-demand proof inputs, and supply humidity handling in
-  `ideal_loads_constant_shr_diagnostic_001`,
+- limited IdealLoads no-OA `ConstantSensibleHeatRatio` cooling conformance
+  gate for declared thermostat, cooling total/sensible/latent rate, and
+  supply-node temperature/flow/humidity Detailed series in
+  `ideal_loads_constant_shr_conformance_001`, with return-node and zone-air
+  humidity proof rows kept diagnostic-only
+- diagnostic-only IdealLoads no-OA `ConstantSupplyHumidityRatio`
+  cooling/heating and Humidistat dehumidification/humidification
+  humidity-control evidence for remaining zone/supply latent and sensible
+  rate rows, moisture-demand proof inputs, and supply humidity handling in
   `ideal_loads_constant_supply_humidity_diagnostic_001`,
   `ideal_loads_constant_supply_humidity_heating_diagnostic_001`,
   `ideal_loads_humidistat_dehumidification_diagnostic_001`, and
@@ -104,8 +107,8 @@ tolerance, and code organization.
   declared v0.22 `Schedule Value` / dry-bulb hourly variables, the v0.26
   internal convective gain hourly variable, and the official
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
-  declared no-OA/no-limit and numeric finite-limit IdealLoads sensible
-  variables
+  declared no-OA/no-limit, numeric finite-limit, and
+  `ConstantSensibleHeatRatio` cooling IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields

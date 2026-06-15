@@ -190,21 +190,24 @@ rust_target = [
   "crates/ep_runtime/src/runtime.rs::energyplus_psychrometric_humidity_ratio_from_rh",
   "crates/ep_cli/src/ideal_loads.rs::ideal_loads_barometric_pressure_trace",
   "scripts/compare/compare-ideal-loads-constant-shr-diagnostic.ps1",
+  "scripts/compare/compare-ideal-loads-constant-shr-conformance.ps1",
 ]
-status = "diagnostic_only"
-first_case = "ideal_loads_constant_shr_diagnostic_001"
-first_evidence = "ideal_loads_constant_shr_diagnostic_001"
+status = "conformance"
+first_case = "ideal_loads_constant_shr_conformance_001"
+first_evidence = "ideal_loads_constant_shr_conformance_001"
 proof_variables = [
-  "Zone Ideal Loads Zone Latent Heating Rate",
+  "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Zone Sensible Cooling Rate",
   "Zone Ideal Loads Zone Latent Cooling Rate",
-  "Zone Ideal Loads Supply Air Sensible Heating Rate",
   "Zone Ideal Loads Supply Air Sensible Cooling Rate",
-  "Zone Ideal Loads Supply Air Latent Heating Rate",
   "Zone Ideal Loads Supply Air Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Cooling Rate",
+  "System Node Temperature",
+  "System Node Mass Flow Rate",
   "System Node Humidity Ratio",
 ]
-claim_level = "none"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio humidity-control latent/sensible report evidence with EnergyPlus enthalpy constants, EPW barometric-pressure saturation clamps, and return-node mixed-air proof rows; humidistat, ConstantSupplyHumidityRatio, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
+claim_level = "limited-ideal-loads-no-oa-constant-shr-cooling-conformance"
+support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for declared cooling total/sensible/latent rate rows and supply-node temperature/mass-flow/humidity rows in ideal_loads_constant_shr_conformance_001. Heating latent rows, return-node and zone-air-node proof rows, ReportPurchasedAir energy/fuel rows, ConstantSupplyHumidityRatio, Humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_constant_supply_humidity_control"

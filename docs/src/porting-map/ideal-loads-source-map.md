@@ -149,18 +149,22 @@ heating/cooling rates, supply-air total heating/cooling rates, supply-node
 temperature, and supply-node mass flow. Return-node temperature/humidity,
 supply-node humidity, and predictor/corrector proof rows remain diagnostic.
 
-## Humidity-Control Diagnostics
+## Humidity-Control Evidence
 
-`ideal_loads_constant_shr_diagnostic_001` adds a diagnostic-only no-OA humidity
-control lane for `ConstantSensibleHeatRatio`. The compare lane resolves
-`ZONE ONE RETURN` as the recirculation/mixed-air proof node, preserves the
-source-order pre-update zone state for the sensible demand calculation, and
-passes EPW barometric pressure into the saturation clamp used by EnergyPlus
-psychrometric routines.
+`ideal_loads_constant_shr_conformance_001` promotes a narrow no-OA
+`ConstantSensibleHeatRatio` cooling lane for the declared thermostat,
+cooling total/sensible/latent rate, and supply-node temperature/mass-flow/
+humidity rows. `ideal_loads_constant_shr_diagnostic_001` remains available as
+non-claim regression/proof evidence for the broader diagnostic output set. The
+compare lane resolves `ZONE ONE RETURN` as the recirculation/mixed-air proof
+node, preserves the source-order pre-update zone state for the sensible demand
+calculation, and passes EPW barometric pressure into the saturation clamp used
+by EnergyPlus psychrometric routines.
 
 The Rust reconstruction uses EnergyPlus `PsyHFnTdbW`/`PsyWFnTdbH` enthalpy
 constants for the latent split and records zero tolerance failures for the
-declared zone/supply latent and sensible rate rows plus supply humidity ratio.
+promoted Constant SHR cooling rows plus return-node and zone-air-node proof
+rows.
 
 `ideal_loads_constant_supply_humidity_diagnostic_001` adds the matching
 diagnostic-only no-OA `ConstantSupplyHumidityRatio` lane. It uses the EnergyPlus
@@ -190,10 +194,10 @@ uses the maximum heating supply humidity ratio with the same saturation clamp,
 and matches the supply humidity and latent heating report rows with zero
 tolerance failures.
 
-These remain diagnostic-only: outdoor-air humidity control, DifferentialDryBulb
-economizer humidity interactions, heat-recovery humidity interactions,
-finite-limit humidity-control behavior, and broad humidity-control conformance
-are not promoted.
+These remain diagnostic-only: `ConstantSupplyHumidityRatio`, Humidistat,
+outdoor-air humidity control, DifferentialDryBulb economizer humidity
+interactions, heat-recovery humidity interactions, finite-limit
+humidity-control behavior, and broad humidity-control conformance.
 
 ## Outdoor-Air Prerequisites
 
@@ -301,9 +305,9 @@ rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no outdoor-air finite-limit, active humidity-control,
-saturation-limit heat-recovery, or DCV output is part of the promoted
-IdealLoads claim.
+unresolved, and no outdoor-air finite-limit, outdoor-air humidity-control,
+other active humidity-control, saturation-limit heat-recovery, or DCV output is
+part of the promoted IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -319,9 +323,17 @@ The conformance output surface is:
 - `Zone Ideal Loads Supply Air Total Cooling Rate`
 - `System Node Temperature`
 - `System Node Mass Flow Rate`
+- `Zone Ideal Loads Zone Latent Cooling Rate` for the no-OA
+  `ConstantSensibleHeatRatio` cooling case only
+- `Zone Ideal Loads Supply Air Sensible Cooling Rate` for the no-OA
+  `ConstantSensibleHeatRatio` cooling case only
+- `Zone Ideal Loads Supply Air Latent Cooling Rate` for the no-OA
+  `ConstantSensibleHeatRatio` cooling case only
+- `System Node Humidity Ratio` for the no-OA `ConstantSensibleHeatRatio`
+  supply node only
 
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
-Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
+Transfer Rate`, non-promoted humidity-ratio rows, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, active
 humidity-control outdoor-air latent behavior, economizer outputs, finite-limit
@@ -330,12 +342,13 @@ conformance, and non-constant efficiency schedules remain diagnostic-only or
 unsupported until their source-order branches are ported or explicitly
 included in a promoted claim. `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` are hourly oracle-MTR vs Rust aggregated fuel-energy
-diagnostics for the no-OA fixtures.
-The no-OA `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio`
-zone/supply latent and sensible rows, supply humidity ratio, and return-node
-humidity proof rows have diagnostic evidence only in
-`ideal_loads_constant_shr_diagnostic_001` and
-`ideal_loads_constant_supply_humidity_diagnostic_001`.
+diagnostics for the no-OA fixtures. The no-OA `ConstantSensibleHeatRatio`
+cooling total/sensible/latent rows and supply-node humidity ratio have narrow
+conformance evidence in `ideal_loads_constant_shr_conformance_001`; its
+return-node and zone-air-node humidity proof rows remain diagnostic. The no-OA
+`ConstantSupplyHumidityRatio` zone/supply latent and sensible rows, supply
+humidity ratio, and return-node humidity proof rows have diagnostic evidence
+only in `ideal_loads_constant_supply_humidity_diagnostic_001`.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, inactive
 economizer/heat-recovery outputs, DifferentialDryBulb/DifferentialEnthalpy
@@ -406,6 +419,16 @@ conformance rows pass their tolerances, the 8 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. Together these finite-limit gates still
 exclude humidity, outdoor-air, economizer, heat-recovery, and broad HVAC
 behavior from the claim.
+
+`scripts/dev.cmd compare-ideal-loads-constant-shr-conformance` generates the
+ConstantSensibleHeatRatio cooling conformance evidence set under
+`.runtime/ideal-loads-constant-shr-conformance/26.1.0/ideal_loads_constant_shr_conformance_001/compare/`.
+That run compares 18 Detailed series over 96 samples. The 11 declared
+conformance rows pass their tolerances, the 7 diagnostic proof rows pass, and
+`tolerance-failures.csv` is empty. This adds only the no-OA Constant SHR
+cooling claim for declared outputs; ConstantSupplyHumidityRatio, Humidistat,
+return-node and zone-air-node humidity proof rows, outdoor-air, economizer,
+heat-recovery, and broad HVAC behavior remain outside the claim.
 
 ## Claim Requirements
 
