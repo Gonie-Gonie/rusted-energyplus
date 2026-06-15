@@ -22,9 +22,9 @@ tolerance, and code organization.
 - release conformance index and coverage matrix report generation
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
-- `specs/variable_coverage.toml` as the canonical current output-variable
-  scope: 51 tracked variables, 33 conformance variables, 7 diagnostic
-  variables, and 11 baseline variables
+- support coverage metadata and manifests as the canonical current
+  output-variable scope: 82 tracked variables, 43 conformance variables, 33
+  diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
 - official ExampleFile static model EIO conformance report gate
@@ -33,8 +33,9 @@ tolerance, and code organization.
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
-- 41 passed numerical time series separated from broader declared conformance
-  output requests in the user coverage handbook
+- 51 declared numerical hourly/detailed series and 22 passed release-evidence
+  series separated from broader declared conformance output requests in the
+  user coverage handbook
 - no-mass adiabatic surface conduction rate/per-area conformance for the
   declared `surface_temperature_nomass_001` hourly series
 - official `1ZoneUncontrolled` dynamic heat-balance conformance gate for
@@ -45,12 +46,17 @@ tolerance, and code organization.
   broader run-period-filtered zone temperature, surface conduction, and
   diagnostic decomposition deltas; this broad probe remains explicitly
   `conformance_claim=false`
+- limited IdealLoads no-OA/no-limit sensible conformance gate for declared
+  thermostat setpoints, IdealLoads total/sensible/supply-air rates, and
+  supply-node temperature/mass-flow Detailed series in
+  `ideal_loads_no_oa_sensible_conformance_001`
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,
   declared v0.22 `Schedule Value` / dry-bulb hourly variables, the v0.26
   internal convective gain hourly variable, and the official
-  `1ZoneUncontrolled` dynamic compatibility-candidate variables
+  `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
+  declared no-OA/no-limit IdealLoads sensible variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
@@ -80,8 +86,8 @@ tolerance, and code organization.
 Not claimed:
 
 - general EnergyPlus heat-balance compatibility
-- HVAC or plant simulation compatibility
-- node, IdealLoads, meter, or full runtime conformance
+- broad HVAC or plant simulation compatibility
+- broad node, full IdealLoads, meter, or full runtime conformance
 - broad ExampleFiles compatibility
 
 ## Quick Start

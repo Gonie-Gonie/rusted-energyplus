@@ -65,7 +65,7 @@ function Assert-CleanEnergyPlusErr {
     $fatalLines = @($errText -split "`r?`n" | Where-Object { $_.Contains("** Fatal") })
     if ($warningLines.Count -gt 0 -or $severeLines.Count -gt 0 -or $fatalLines.Count -gt 0) {
         Write-Host $errText
-        throw "IdealLoads no-OA sensible diagnostic baseline must not rely on EnergyPlus warning/severe/fatal auto-fixes."
+        throw "IdealLoads no-OA sensible conformance baseline must not rely on EnergyPlus warning/severe/fatal auto-fixes."
     }
     Write-Host "OK clean EnergyPlus ERR: warnings=0 severes=0 fatals=0"
 }
@@ -77,7 +77,7 @@ foreach ($path in @(
     $CasePath
 )) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        throw "Missing required IdealLoads no-OA sensible diagnostic input: $path"
+        throw "Missing required IdealLoads no-OA sensible conformance input: $path"
     }
 }
 
@@ -88,17 +88,17 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Validating IdealLoads no-OA sensible diagnostic case manifest."
+Write-Host "Validating IdealLoads no-OA sensible conformance case manifest."
 $validateOutput = & $cargo.Source run -p ep_cli --quiet -- conformance validate-case-v2 $CasePath 2>&1
 if ($LASTEXITCODE -ne 0) {
     $validateOutput | ForEach-Object { Write-Host $_ }
-    throw "IdealLoads no-OA sensible diagnostic case manifest validation failed."
+    throw "IdealLoads no-OA sensible conformance case manifest validation failed."
 }
 $validateText = ($validateOutput -join "`n")
-Assert-Contains -Text $validateText -Pattern "comparison_class: diagnostic-only" -Description "manifest diagnostic class"
-Assert-Contains -Text $validateText -Pattern "conformance_claim: false" -Description "manifest claim boundary"
+Assert-Contains -Text $validateText -Pattern "comparison_class: conformance" -Description "manifest conformance class"
+Assert-Contains -Text $validateText -Pattern "conformance_claim: true" -Description "manifest claim boundary"
 Assert-Contains -Text $validateText -Pattern "outputs: 16" -Description "manifest output count"
-Assert-Contains -Text $validateText -Pattern "level=diagnostic" -Description "manifest diagnostic output level"
+Assert-Contains -Text $validateText -Pattern "level=conformance" -Description "manifest conformance output level"
 Assert-Contains -Text $validateText -Pattern "System Node Mass Flow Rate / detailed / node-state / eso" -Description "manifest node flow output"
 
 Write-Host "Generating IdealLoads no-OA sensible oracle baseline."
@@ -110,13 +110,13 @@ if ($LASTEXITCODE -ne 0) {
 $baselineText = ($baselineOutput -join "`n")
 Assert-Contains -Text $baselineText -Pattern "Conformance Baseline" -Description "baseline header"
 Assert-Contains -Text $baselineText -Pattern "id: $CaseId" -Description "baseline case id"
-Assert-Contains -Text $baselineText -Pattern "comparison_class: diagnostic-only" -Description "baseline diagnostic class"
-Assert-Contains -Text $baselineText -Pattern "conformance_claim: false" -Description "baseline claim boundary"
+Assert-Contains -Text $baselineText -Pattern "comparison_class: conformance" -Description "baseline conformance class"
+Assert-Contains -Text $baselineText -Pattern "conformance_claim: true" -Description "baseline claim boundary"
 Assert-Contains -Text $baselineText -Pattern "status: generated" -Description "baseline status"
-Assert-FileExists -Path $EpJsonPath -Description "converted diagnostic epJSON"
-Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.eso") -Description "diagnostic EnergyPlus ESO"
-Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.err") -Description "diagnostic EnergyPlus ERR"
-Assert-FileExists -Path (Join-Path $CaseOutputRoot "case-expanded.toml") -Description "diagnostic expanded manifest"
+Assert-FileExists -Path $EpJsonPath -Description "converted conformance epJSON"
+Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.eso") -Description "conformance EnergyPlus ESO"
+Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.err") -Description "conformance EnergyPlus ERR"
+Assert-FileExists -Path (Join-Path $CaseOutputRoot "case-expanded.toml") -Description "conformance expanded manifest"
 Assert-CleanEnergyPlusErr -Path (Join-Path $CaseOutputRoot "eplusout.err")
 
 Write-Host "Compiling IdealLoads no-OA sensible typed model."
@@ -162,27 +162,27 @@ Assert-Contains -Text $reportText -Pattern "series: 16" -Description "report ser
 Assert-Contains -Text $reportText -Pattern "energyplus_warnings: 0" -Description "report warning count"
 Assert-Contains -Text $reportText -Pattern "energyplus_severes: 0" -Description "report severe count"
 Assert-Contains -Text $reportText -Pattern "energyplus_fatals: 0" -Description "report fatal count"
-Assert-Contains -Text $reportText -Pattern "tolerance_policy: none" -Description "report non-claim tolerance boundary"
+Assert-Contains -Text $reportText -Pattern "tolerance_policy: none" -Description "report oracle-only tolerance boundary"
 Assert-Contains -Text $reportText -Pattern "status: baseline-only" -Description "report status"
 
 $ReportCaseRoot = Join-Path $ReportRoot $CaseId
 $MarkdownReport = Join-Path $ReportCaseRoot "compare-report.md"
 $SummaryReport = Join-Path $ReportCaseRoot "compare-summary.json"
-Assert-FileExists -Path $MarkdownReport -Description "diagnostic candidate markdown report"
-Assert-FileExists -Path $SummaryReport -Description "diagnostic candidate summary report"
+Assert-FileExists -Path $MarkdownReport -Description "conformance baseline markdown report"
+Assert-FileExists -Path $SummaryReport -Description "conformance baseline summary report"
 
 $summary = Get-Content -LiteralPath $SummaryReport -Raw | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
     throw "Unexpected IdealLoads no-OA summary case_id: $($summary.case_id)"
 }
-if ($summary.comparison_class -ne "diagnostic-only") {
+if ($summary.comparison_class -ne "conformance") {
     throw "Unexpected IdealLoads no-OA summary comparison_class: $($summary.comparison_class)"
 }
-if ($summary.conformance_claim -ne $false) {
-    throw "IdealLoads no-OA diagnostic summary must keep conformance_claim=false"
+if ($summary.conformance_claim -ne $true) {
+    throw "IdealLoads no-OA conformance summary must set conformance_claim=true"
 }
 if ($summary.tolerance_policy -ne "none") {
-    throw "IdealLoads no-OA diagnostic summary must keep tolerance_policy=none until compare artifacts exist"
+    throw "IdealLoads no-OA baseline summary must keep tolerance_policy=none until compare artifacts exist"
 }
 if ($summary.status -ne "baseline-only") {
     throw "Unexpected IdealLoads no-OA summary status: $($summary.status)"
@@ -191,4 +191,4 @@ if ($summary.requested_outputs.Count -ne 16) {
     throw "Unexpected IdealLoads no-OA requested output count: $($summary.requested_outputs.Count)"
 }
 
-Write-Host "IdealLoads no-OA sensible diagnostic passed."
+Write-Host "IdealLoads no-OA sensible conformance smoke passed."

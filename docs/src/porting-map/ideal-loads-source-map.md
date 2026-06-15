@@ -1,6 +1,6 @@
 ---
 status: active
-claim_level: diagnostic-only
+claim_level: limited-ideal-loads-no-oa-sensible-conformance
 owner: runtime
 last_reviewed: 2026-06-15
 ---
@@ -9,19 +9,19 @@ last_reviewed: 2026-06-15
 
 Reference version: EnergyPlus 26.1.0
 
-Purpose: map the first `ZoneHVAC:IdealLoadsAirSystem` numerical-conformance
-candidate to EnergyPlus source functions before any IdealLoads load,
-air-node, availability, humidity, outdoor-air, sizing, fuel, or meter
-conformance claim is promoted.
+Purpose: map the first limited `ZoneHVAC:IdealLoadsAirSystem`
+numerical-conformance claim to EnergyPlus source functions while keeping
+availability, humidity control, outdoor-air, sizing, fuel, meter, and broad
+HVAC compatibility outside the claim.
 
 ## Initial Claim Boundary
 
-The first candidate case is
-`ideal_loads_no_oa_sensible_conformance_001`. It remains
-`comparison_class = "diagnostic-only"` and `conformance_claim = false` until
-the manifest is explicitly promoted. The diagnostic compare lane now produces
-timestamp-aligned Rust result-store artifacts for the declared variables and
-requires zero tolerance failures before promotion.
+The first promoted case is
+`ideal_loads_no_oa_sensible_conformance_001`. It now uses
+`comparison_class = "conformance"` and `conformance_claim = true` for declared
+conformance-level variables only. The compare lane produces timestamp-aligned
+Rust result-store artifacts, requires zero tolerance failures, and remains a
+blocking gate.
 
 The initial supported boundary is intentionally narrow:
 
@@ -72,8 +72,9 @@ ZoneEquipmentManager::ManageZoneEquipment
   -> PurchasedAirManager::ReportPurchasedAir
 ```
 
-The Rust compatibility path must preserve this ordering for the diagnostic
-candidate before any variable is promoted to conformance.
+The Rust compatibility path preserves this ordering for the promoted
+no-OA/no-limit sensible boundary and must be extended before any excluded
+feature is promoted.
 
 ## No-OA Sensible Fast Path
 
@@ -89,7 +90,7 @@ of these compile-time facts are true:
 - no autosized flow or capacity limit participates in the calculation
 
 `calc_no_oa_no_limit_sensible_compat` now implements the first isolated helper.
-It still requires upstream, source-order zone demand. The diagnostic report
+It still requires upstream, source-order zone demand. The conformance report
 generator feeds it from EnergyPlus proof outputs instead of a simplified RC
 load shortcut:
 
@@ -116,7 +117,7 @@ The helper uses the EnergyPlus formula order for:
 
 ## Required Proof Variables
 
-The initial proof surface is:
+The conformance output surface is:
 
 - `Zone Thermostat Heating Setpoint Temperature`
 - `Zone Thermostat Cooling Setpoint Temperature`
@@ -126,19 +127,19 @@ The initial proof surface is:
 - `Zone Ideal Loads Zone Sensible Cooling Rate`
 - `Zone Ideal Loads Supply Air Total Heating Rate`
 - `Zone Ideal Loads Supply Air Total Cooling Rate`
-- `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate`
 - `System Node Temperature`
 - `System Node Mass Flow Rate`
 
-`System Node Humidity Ratio`, zone-air-node proof rows, heating/cooling
-setpoint-distance proof rows, latent IdealLoads outputs, outdoor-air outputs,
-heat-recovery outputs, economizer outputs, and meter outputs remain
-diagnostic-only until their source-order branches are ported or explicitly
-included in a promoted claim.
+The active signed `Zone System Predicted Sensible Load to Setpoint Heat
+Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
+heating/cooling setpoint-distance proof rows, latent IdealLoads outputs,
+outdoor-air outputs, heat-recovery outputs, economizer outputs, and meter
+outputs remain diagnostic-only until their source-order branches are ported or
+explicitly included in a promoted claim.
 
-## Diagnostic Compare Artifacts
+## Conformance Compare Artifacts
 
-`scripts/dev.cmd compare-ideal-loads-no-oa-sensible-diagnostic` generates the
+`scripts/dev.cmd compare-ideal-loads-no-oa-sensible-conformance` generates the
 current evidence set under
 `.runtime/ideal-loads-no-oa-sensible/26.1.0/ideal_loads_no_oa_sensible_conformance_001/compare/`.
 The artifact contract is:
@@ -152,15 +153,14 @@ The artifact contract is:
 - `tolerance-failures.csv`
 - `stage-summary.json`
 
-The current diagnostic run compares 16 Detailed series over 110 samples. All
-series pass their draft tolerances, and `tolerance-failures.csv` is empty. This
-is promotion evidence only; it does not create an IdealLoads conformance claim
-while the manifest remains diagnostic-only.
+The current conformance run compares 16 Detailed series over 110 samples. The
+10 declared conformance rows pass their tolerances, diagnostic proof rows also
+pass, and `tolerance-failures.csv` is empty. This creates only the limited
+no-OA/no-limit sensible IdealLoads claim for declared outputs.
 
-## Promotion Requirements
+## Claim Requirements
 
-The candidate can become an IdealLoads conformance claim only when all of these
-exist:
+The claim remains valid only while all of these exist:
 
 - `comparison_class = "conformance"`
 - `conformance_claim = true`
@@ -174,5 +174,5 @@ exist:
 - markdown report artifact
 - blocking gate
 
-Until then, the case is a diagnostic candidate and not an IdealLoads numerical
-conformance result.
+Any broader IdealLoads feature must add its own evidence before joining the
+conformance boundary.

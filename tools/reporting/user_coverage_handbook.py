@@ -71,6 +71,20 @@ def boundary_text(row: dict[str, Any]) -> str:
     return str(row.get("support_boundary") or row.get("notes") or "")
 
 
+def compact_text(value: Any, max_chars: int = 180) -> str:
+    text = str(value)
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
+
+
+def compact_join(values: list[str], max_items: int = 4) -> str:
+    if len(values) <= max_items:
+        return ", ".join(values)
+    shown = ", ".join(values[:max_items])
+    return f"{shown}, ... (+{len(values) - max_items})"
+
+
 def conformance_manifest_outputs(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted_rows(take_rows(rows, "conformance"), "case_id", "key", "variable")
 
@@ -82,7 +96,7 @@ def declared_numerical_series(rows: list[dict[str, Any]]) -> list[dict[str, Any]
             for row in rows
             if status_bucket(row) == "conformance"
             and str(row.get("source", "")).lower() == "eso"
-            and str(row.get("frequency", "")).lower() in {"hourly", "timestep", "daily", "monthly"}
+            and str(row.get("frequency", "")).lower() in {"detailed", "hourly", "timestep", "daily", "monthly"}
         ],
         "case_id",
         "key",
@@ -327,8 +341,8 @@ def algorithm_table(rows: list[dict[str, Any]], caption: str) -> Table:
                 row.get("id", ""),
                 row.get("domain", ""),
                 row.get("first_evidence", ""),
-                ", ".join(row.get("proof_variables", [])),
-                boundary_text(row),
+                compact_join(row.get("proof_variables", [])),
+                compact_text(boundary_text(row)),
             ]
             for row in rows
         ],

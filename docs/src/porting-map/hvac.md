@@ -1,15 +1,16 @@
 ---
 status: active
-claim_level: baseline-only
+claim_level: limited-ideal-loads-no-oa-sensible-conformance
 owner: runtime
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-15
 ---
 
 # HVAC
 
-HVAC numerical compatibility is not in the current public compatibility scope.
-v0.10 adds the IdealLoads typed graph foundation so later HVAC work has named
-model nodes, graph edges, and output requests to build on.
+Broad HVAC numerical compatibility is not in the current public compatibility
+scope. The current exception is the narrow
+`ideal_loads_no_oa_sensible_conformance_001` claim for declared no-OA/no-limit
+IdealLoads sensible outputs.
 
 ## v0.10 Foundation
 
@@ -129,25 +130,25 @@ functions and state transitions for:
 The exact source-function map, Rust result state, and tolerance gate must be
 recorded before any numerical claim is promoted.
 
-## IdealLoads No-OA Sensible Candidate
+## IdealLoads No-OA Sensible Conformance
 
-`ideal_loads_no_oa_sensible_conformance_001` stages the first narrow
-IdealLoads candidate. It is deliberately still diagnostic-only:
+`ideal_loads_no_oa_sensible_conformance_001` is the first narrow IdealLoads
+conformance gate:
 
 ```text
-comparison_class: diagnostic-only
-conformance_claim: false
-tolerance_policy: diagnostic-draft
-status: diagnostic
+comparison_class: conformance
+conformance_claim: true
+tolerance_policy: conformance-gate
+status: pass
 ```
 
-The candidate requests thermostat setpoints, IdealLoads total and sensible
-rates, supply-air total rates, signed zone predicted load, setpoint-distance
-proof loads, zone-air-node proof rows, and supply-node temperature, humidity,
-and mass flow. The diagnostic compare command writes matching Rust
-`ResultStore` series for 16 Detailed output rows over 110 samples and currently
-requires zero tolerance failures before a promotion can proceed. It remains a
-non-claim until the manifest, output levels, and release gate are promoted.
+The case requests thermostat setpoints, IdealLoads total and sensible rates,
+supply-air total rates, signed zone predicted load, setpoint-distance proof
+loads, zone-air-node proof rows, and supply-node temperature, humidity, and
+mass flow. The conformance compare command writes matching Rust `ResultStore`
+series for 16 Detailed output rows over 110 samples. The 10 declared
+conformance rows are tolerance-gated; the remaining rows are diagnostic proof
+only.
 
 ## Promotion Requirements
 
@@ -164,5 +165,6 @@ of these exist:
 - markdown report artifact
 - blocking release gate
 
-Until then, IdealLoads rates and thermostat behavior remain baseline-only or
-diagnostic-only evidence.
+Variables outside the declared no-OA/no-limit sensible boundary remain
+baseline-only or diagnostic-only evidence until they receive their own source
+map, Rust state, oracle evidence, and blocking gate.

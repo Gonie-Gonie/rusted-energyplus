@@ -21,7 +21,7 @@ Object coverage is maintained in `specs/object_coverage.toml`.
 | OtherEquipment | internal_gains | typed | internal_gains_001 | Typed for nominal EIO evidence and declared convective-gain trace only. |
 | ThermostatSetpoint:DualSetpoint | thermostat | typed | ideal_loads_thermostat_001 | Typed for thermostat graph wiring; no HVAC control algorithm conformance. |
 | ZoneControl:Thermostat | thermostat | typed | ideal_loads_thermostat_001 | Typed for thermostat references; no load-control numerical conformance. |
-| ZoneHVAC:IdealLoadsAirSystem | hvac | typed_graph_only | ideal_loads_thermostat_001 | Typed graph only; no IdealLoads load or HVAC numerical conformance. |
+| ZoneHVAC:IdealLoadsAirSystem | hvac | typed | ideal_loads_no_oa_sensible_conformance_001 | Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence for declared output variables only; outdoor air, humidity, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim. |
 | NodeList | hvac | typed_graph_only | air_side_node_diagnostic_001 | Typed graph and node expansion only; node outputs remain diagnostic. |
 | PlantLoop | plant | typed_graph_only | plant_loop_diagnostic_001 | Typed graph and diagnostic projection only; no plant loop simulation conformance. |
 | Pump:ConstantSpeed | plant | typed_graph_only | plant-loop-skeleton-smoke | Typed graph equipment reference only; no pump performance or flow-control algorithm. |

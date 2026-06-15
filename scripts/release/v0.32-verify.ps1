@@ -103,35 +103,35 @@ $handbook = Get-Content -LiteralPath ".runtime\release-evidence\v0.32.0\user-cov
 if ($handbook.aggregate.status -ne "pass") {
     throw "Expected user coverage handbook status pass, found $($handbook.aggregate.status)"
 }
-if ($handbook.aggregate.typed_input_count -ne 14) {
-    throw "Expected 14 typed inputs, found $($handbook.aggregate.typed_input_count)"
+if ($handbook.aggregate.typed_input_count -ne 15) {
+    throw "Expected 15 typed inputs, found $($handbook.aggregate.typed_input_count)"
 }
-if ($handbook.aggregate.structural_input_count -ne 6) {
-    throw "Expected 6 structural inputs, found $($handbook.aggregate.structural_input_count)"
+if ($handbook.aggregate.structural_input_count -ne 5) {
+    throw "Expected 5 structural inputs, found $($handbook.aggregate.structural_input_count)"
 }
-if ($handbook.aggregate.conformance_output_variable_count -ne 30) {
-    throw "Expected 30 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
+if ($handbook.aggregate.conformance_output_variable_count -ne 43) {
+    throw "Expected 43 conformance output variables, found $($handbook.aggregate.conformance_output_variable_count)"
 }
-if ($handbook.aggregate.diagnostic_output_variable_count -ne 9) {
-    throw "Expected 9 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
+if ($handbook.aggregate.diagnostic_output_variable_count -ne 33) {
+    throw "Expected 33 diagnostic output variables, found $($handbook.aggregate.diagnostic_output_variable_count)"
 }
-if ($handbook.aggregate.baseline_output_variable_count -ne 11) {
-    throw "Expected 11 baseline output variables, found $($handbook.aggregate.baseline_output_variable_count)"
+if ($handbook.aggregate.baseline_output_variable_count -ne 6) {
+    throw "Expected 6 baseline output variables, found $($handbook.aggregate.baseline_output_variable_count)"
 }
-if ($handbook.aggregate.conformance_algorithm_count -ne 2) {
-    throw "Expected 2 conformance algorithms, found $($handbook.aggregate.conformance_algorithm_count)"
+if ($handbook.aggregate.conformance_algorithm_count -ne 4) {
+    throw "Expected 4 conformance algorithms, found $($handbook.aggregate.conformance_algorithm_count)"
 }
 if ($handbook.aggregate.diagnostic_algorithm_count -ne 2) {
     throw "Expected 2 diagnostic algorithms, found $($handbook.aggregate.diagnostic_algorithm_count)"
 }
-if ($handbook.aggregate.conformance_case_count -ne 6) {
-    throw "Expected 6 promoted conformance cases, found $($handbook.aggregate.conformance_case_count)"
+if ($handbook.aggregate.conformance_case_count -ne 8) {
+    throw "Expected 8 promoted conformance cases, found $($handbook.aggregate.conformance_case_count)"
 }
-if ($handbook.aggregate.declared_numerical_series_count -ne 12) {
-    throw "Expected 12 declared numerical series, found $($handbook.aggregate.declared_numerical_series_count)"
+if ($handbook.aggregate.declared_numerical_series_count -ne 51) {
+    throw "Expected 51 declared numerical series, found $($handbook.aggregate.declared_numerical_series_count)"
 }
-if ($handbook.aggregate.passed_numerical_series_count -ne 12) {
-    throw "Expected 12 passed numerical series, found $($handbook.aggregate.passed_numerical_series_count)"
+if ($handbook.aggregate.passed_numerical_series_count -ne 22) {
+    throw "Expected 22 passed numerical series, found $($handbook.aggregate.passed_numerical_series_count)"
 }
 if (@($handbook.user_decision_rules).Count -lt 4) {
     throw "Expected at least 4 user decision rules"
@@ -151,7 +151,7 @@ if ($manifest.aggregate.missing_required_asset_count -ne 0) {
 if (@($manifest.assets | Where-Object { $_.role -eq "user-coverage-handbook-pdf" -and $_.exists }).Count -ne 1) {
     throw "Expected user coverage handbook PDF in release manifest"
 }
-if ($manifest.report_summaries.user_coverage_handbook.typed_inputs -ne 14) {
+if ($manifest.report_summaries.user_coverage_handbook.typed_inputs -ne 15) {
     throw "Expected user coverage handbook summary in release manifest"
 }
 

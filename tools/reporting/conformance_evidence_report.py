@@ -36,7 +36,9 @@ ORACLE_VERSION = "26.1.0"
 CLAIM_BOUNDARY = (
     "Only declared v0.8/v0.9 no-mass heat-balance including no-mass adiabatic "
     "surface conduction, v0.22 time/weather/schedule, and v0.26 internal "
-    "convective gain numerical conformance variables are promoted."
+    "convective gain numerical conformance variables, the official dynamic "
+    "compatibility-candidate variables, and the declared no-OA/no-limit "
+    "IdealLoads sensible variables are promoted."
 )
 
 CASE_LABELS = {
@@ -46,6 +48,7 @@ CASE_LABELS = {
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
     "official_1zone_uncontrolled_dynamic_diagnostic_001": "Official 1Zone dynamic",
+    "ideal_loads_no_oa_sensible_conformance_001": "IdealLoads no-OA",
 }
 
 KEY_LABELS = {
@@ -67,6 +70,16 @@ VARIABLE_LABELS = {
     "Schedule Value": "Schedule value",
     "Site Outdoor Air Drybulb Temperature": "Outdoor drybulb",
     "Zone Total Internal Convective Heating Rate": "Internal convective",
+    "Zone Thermostat Heating Setpoint Temperature": "Heat SP",
+    "Zone Thermostat Cooling Setpoint Temperature": "Cool SP",
+    "Zone Ideal Loads Zone Total Heating Rate": "IL total heat",
+    "Zone Ideal Loads Zone Total Cooling Rate": "IL total cool",
+    "Zone Ideal Loads Zone Sensible Heating Rate": "IL sens heat",
+    "Zone Ideal Loads Zone Sensible Cooling Rate": "IL sens cool",
+    "Zone Ideal Loads Supply Air Total Heating Rate": "IL supply heat",
+    "Zone Ideal Loads Supply Air Total Cooling Rate": "IL supply cool",
+    "System Node Temperature": "Node temp",
+    "System Node Mass Flow Rate": "Node flow",
 }
 
 CLASS_LABELS = {
@@ -75,6 +88,9 @@ CLASS_LABELS = {
     "schedule": "sched",
     "weather": "weather",
     "internal-gain": "gain",
+    "zone-state": "zone",
+    "hvac-state": "hvac",
+    "node-state": "node",
 }
 
 
@@ -131,6 +147,22 @@ CASE_SPECS = (
         summary_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\internal-gains-conformance\26.1.0\internal_gains_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="IdealLoads",
+        command="compare-ideal-loads-no-oa-sensible-conformance",
+        summary_path=(
+            r".runtime\ideal-loads-no-oa-sensible\26.1.0"
+            r"\ideal_loads_no_oa_sensible_conformance_001\compare\compare-summary.json"
+        ),
+        oracle_end_path=(
+            r".runtime\ideal-loads-no-oa-sensible\26.1.0"
+            r"\ideal_loads_no_oa_sensible_conformance_001\oracle\eplusout.end"
+        ),
+        oracle_err_path=(
+            r".runtime\ideal-loads-no-oa-sensible\26.1.0"
+            r"\ideal_loads_no_oa_sensible_conformance_001\oracle\eplusout.err"
+        ),
     ),
 )
 
@@ -730,7 +762,7 @@ def build_dual_bar_figure(
     marker_size = max_value * 0.003
     secondary_visible = [value if value > 0.0 else marker_size for value in secondary]
 
-    height = max(2.2, 1.15 + len(rows) * 0.46)
+    height = min(7.0, max(2.2, 1.15 + len(rows) * 0.28))
     fig, ax = plt.subplots(figsize=(7.2, height), dpi=180)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
@@ -1498,7 +1530,7 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             Figure(
                 charts["dynamic_bottlenecks"],
                 caption="Largest 1Zone dynamic diagnostic bottlenecks by RMSE.",
-                width=6.8,
+                width=6.4,
                 placement="H",
             ),
             build_dynamic_bottleneck_table(dynamic),
@@ -1523,7 +1555,7 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             Figure(
                 charts["timing"],
                 caption="Promoted gate wall-clock and EnergyPlus elapsed time.",
-                width=6.8,
+                width=6.4,
                 placement="H",
             ),
             build_timing_values(evidence),
@@ -1535,7 +1567,7 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 "being brought into tolerance. They are retained here as the baseline contract that the 1Zone work must "
                 "not regress."
             ),
-            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.8, placement="H"),
+            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.4, placement="H"),
             build_case_matrix(evidence),
         ),
         Chapter(

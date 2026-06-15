@@ -41,7 +41,7 @@ impl IdealLoadsSubsetBoundary {
     }
 }
 
-/// Classifies an IdealLoads system for the first diagnostic candidate.
+/// Classifies an IdealLoads system for the first no-OA/no-limit sensible claim.
 #[must_use]
 pub fn classify_no_oa_no_limit_sensible_subset(
     system: &IdealLoadsAirSystem,

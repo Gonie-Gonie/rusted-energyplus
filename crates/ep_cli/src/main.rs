@@ -1091,7 +1091,8 @@ fn run_conformance_ideal_loads_no_oa_sensible_report(args: &[String]) -> i32 {
         Path::new(output_root),
     ) {
         Ok(summary) => {
-            println!("IdealLoads No-OA Sensible Diagnostic Report");
+            let exit_code = if summary.status == "fail" { 1 } else { 0 };
+            println!("IdealLoads No-OA Sensible Report");
             print_conformance_case_summary(&manifest);
             println!("  baseline_dir: {}", summary.baseline.output_dir.display());
             println!("  report_dir: {}", summary.report_dir.display());
@@ -1115,9 +1116,9 @@ fn run_conformance_ideal_loads_no_oa_sensible_report(args: &[String]) -> i32 {
                 "  tolerance_failures_count: {}",
                 summary.tolerance_failures_count
             );
-            println!("  tolerance_policy: diagnostic-draft");
+            println!("  tolerance_policy: {}", summary.tolerance_policy);
             println!("  status: {}", summary.status);
-            0
+            exit_code
         }
         Err(error) => {
             eprintln!("{error}");

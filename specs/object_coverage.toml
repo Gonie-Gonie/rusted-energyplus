@@ -99,9 +99,9 @@ support_boundary = "Typed for thermostat references; no load-control numerical c
 [[object]]
 name = "ZoneHVAC:IdealLoadsAirSystem"
 family = "hvac"
-status = "typed_graph_only"
-first_evidence = "ideal_loads_thermostat_001"
-support_boundary = "Typed graph only; no IdealLoads load or HVAC numerical conformance."
+status = "typed"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads sensible conformance evidence for declared output variables only; outdoor air, humidity, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
 
 [[object]]
 name = "NodeList"

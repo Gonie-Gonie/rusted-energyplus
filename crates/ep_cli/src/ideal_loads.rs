@@ -53,6 +53,7 @@ pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) series_count: usize,
     pub(crate) compared_samples: usize,
     pub(crate) tolerance_failures_count: usize,
+    pub(crate) tolerance_policy: &'static str,
     pub(crate) status: &'static str,
 }
 
@@ -131,7 +132,7 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
 
     let baseline =
         generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
-    let (series_count, compared_samples, tolerance_failures_count, status) = {
+    let (series_count, compared_samples, tolerance_failures_count, tolerance_policy, status) = {
         let context = build_context(manifest, &baseline)?;
         write_artifacts(&compare_dir, &context)?;
 
@@ -140,24 +141,12 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
             .iter()
             .filter(|row| row.status == SeriesComparisonStatus::Fail)
             .count();
-        let status = if context
-            .rows
-            .iter()
-            .filter(|row| row.level == Some(OutputLevel::Conformance))
-            .all(|row| row.status == SeriesComparisonStatus::Pass)
-        {
-            if manifest.conformance_claim {
-                "pass"
-            } else {
-                "diagnostic"
-            }
-        } else {
-            "fail"
-        };
+        let status = overall_status(&context);
         (
             context.rows.len(),
             context.input_trace.sample_count,
             tolerance_failures_count,
+            tolerance_policy(&context),
             status,
         )
     };
@@ -176,6 +165,7 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
         series_count,
         compared_samples,
         tolerance_failures_count,
+        tolerance_policy,
         status,
     })
 }
@@ -193,6 +183,17 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     if manifest.comparison_class == ComparisonClass::DiagnosticOnly && manifest.conformance_claim {
         return Err(
             "diagnostic-only IdealLoads report must keep conformance_claim false".to_string(),
+        );
+    }
+    if manifest.conformance_claim
+        && !manifest
+            .outputs
+            .iter()
+            .any(|output| output.level == Some(OutputLevel::Conformance))
+    {
+        return Err(
+            "conformance IdealLoads report requires at least one conformance-level output"
+                .to_string(),
         );
     }
     if manifest.outputs.is_empty() {
@@ -886,7 +887,7 @@ fn write_artifacts(
 fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     let manifest = context.manifest;
     let mut report = String::new();
-    report.push_str("# IdealLoads No-OA Sensible Diagnostic Report\n\n");
+    report.push_str("# IdealLoads No-OA Sensible Report\n\n");
     report.push_str("## Manifest\n\n");
     report.push_str(&format!("case_id: {}\n", manifest.id));
     report.push_str(&format!(
@@ -897,8 +898,11 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only no-OA/no-limit sensible IdealLoads branch\n");
-    report.push_str("tolerance_policy: diagnostic-draft\n");
+    report.push_str(&format!("claim_boundary: {}\n", claim_boundary(context)));
+    report.push_str(&format!(
+        "tolerance_policy: {}\n",
+        tolerance_policy(context)
+    ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str("zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\n");
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
@@ -1001,7 +1005,10 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "  \"status\": {},\n",
         json_string(overall_status(context))
     ));
-    json.push_str("  \"tolerance_policy\": \"diagnostic-draft\",\n");
+    json.push_str(&format!(
+        "  \"tolerance_policy\": {},\n",
+        json_string(tolerance_policy(context))
+    ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
@@ -1367,6 +1374,8 @@ fn overall_status(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         .collect::<Vec<_>>();
     if conformance_rows.is_empty() && !context.manifest.conformance_claim {
         "diagnostic"
+    } else if conformance_rows.is_empty() {
+        "fail"
     } else if conformance_rows
         .iter()
         .all(|row| row.status == SeriesComparisonStatus::Pass)
@@ -1374,6 +1383,22 @@ fn overall_status(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "pass"
     } else {
         "fail"
+    }
+}
+
+fn tolerance_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if context.manifest.conformance_claim {
+        "conformance-gate"
+    } else {
+        "diagnostic-draft"
+    }
+}
+
+fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if context.manifest.conformance_claim {
+        "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
+    } else {
+        "diagnostic-only no-OA/no-limit sensible IdealLoads branch"
     }
 }
 

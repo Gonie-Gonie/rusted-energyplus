@@ -115,7 +115,7 @@ rust_target = [
   "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_no_oa_sensible_report",
 ]
-status = "diagnostic_only"
+status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
 proof_variables = [
@@ -126,8 +126,8 @@ proof_variables = [
   "System Node Temperature",
   "System Node Mass Flow Rate",
 ]
-claim_level = "none"
-support_boundary = "Diagnostic zero-failure no-OA/no-limit IdealLoads Detailed compare only; no conformance claim until promotion."
+claim_level = "limited-ideal-loads-no-oa-sensible-conformance"
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001; outdoor air, humidity control, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

@@ -383,6 +383,20 @@ def doc_table(headers: list[str], rows: list[list[Any]], caption: str) -> Table:
     )
 
 
+def compact_text(value: Any, max_chars: int = 180) -> str:
+    text = str(value)
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
+
+
+def compact_join(values: list[str], max_items: int = 4) -> str:
+    if len(values) <= max_items:
+        return ", ".join(values)
+    shown = ", ".join(values[:max_items])
+    return f"{shown}, ... (+{len(values) - max_items})"
+
+
 def build_metric_table(report: dict[str, Any]) -> Table:
     aggregate = report["aggregate"]
     rows = [
@@ -461,9 +475,8 @@ def build_algorithm_table(report: dict[str, Any]) -> Table:
             row["user_status"],
             row["claim_level"],
             row["first_evidence"],
-            ", ".join(row["proof_variables"]),
-            row["source_map"],
-            row["support_boundary"],
+            compact_join(row["proof_variables"]),
+            compact_text(row["support_boundary"]),
         ]
         for row in report["algorithms"]
     ]
@@ -475,11 +488,10 @@ def build_algorithm_table(report: dict[str, Any]) -> Table:
             "Claim level",
             "First evidence",
             "Proof outputs",
-            "Source map",
             "Boundary",
         ],
         rows,
-        "Supported algorithm coverage.",
+        "Supported algorithm coverage summary. Full source-map details are preserved in JSON.",
     )
 
 

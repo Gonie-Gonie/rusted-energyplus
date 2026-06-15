@@ -120,10 +120,10 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.11 air-side node baseline evidence and Rust projection."
     }
-    "ideal-loads-no-oa-sensible-diagnostic" = @{
-        Path = "smoke\ideal-loads-no-oa-sensible-diagnostic.ps1"
+    "ideal-loads-no-oa-sensible-conformance" = @{
+        Path = "smoke\ideal-loads-no-oa-sensible-conformance.ps1"
         Group = "smoke"
-        Help = "Stage the no-OA/no-limit IdealLoads sensible diagnostic candidate."
+        Help = "Gate the no-OA/no-limit IdealLoads sensible conformance case."
     }
     "plant-loop-skeleton-smoke" = @{
         Path = "smoke\plant-loop-skeleton-smoke.ps1"
@@ -200,10 +200,10 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the v0.8 tolerance-gated heat-balance conformance case."
     }
-    "compare-ideal-loads-no-oa-sensible-diagnostic" = @{
-        Path = "compare\compare-ideal-loads-no-oa-sensible-diagnostic.ps1"
+    "compare-ideal-loads-no-oa-sensible-conformance" = @{
+        Path = "compare\compare-ideal-loads-no-oa-sensible-conformance.ps1"
         Group = "compare"
-        Help = "Generate diagnostic compare artifacts for the no-OA/no-limit IdealLoads sensible candidate."
+        Help = "Gate the no-OA/no-limit IdealLoads sensible conformance case."
     }
     "compare-surface-temperature-conformance" = @{
         Path = "compare\compare-surface-temperature-conformance.ps1"

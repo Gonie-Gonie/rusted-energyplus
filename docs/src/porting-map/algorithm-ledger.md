@@ -2,7 +2,7 @@
 status: active
 claim_level: conformance-boundary
 owner: core
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-15
 ---
 
 # Algorithm Ledger
@@ -48,7 +48,7 @@ and maintenance notes; keep row-level algorithm state in the spec.
 | Internal convective gains | `HeatBalanceInternalHeatGains.cc`, `InternalHeatGains.cc` | runtime internal-gain trace | ESO smoke comparison | not zone air compatibility by itself |
 | No-mass zone mean air temperature | `ManageHeatBalance`, `ManageZoneAirUpdates`, `correctZoneAirTemps` | heat-balance state and zone MAT trace | v0.8 promoted conformance case | only `heat_balance_nomass_001` MAT |
 | No-mass surface temperatures | `CalcHeatBalanceOutsideSurf`, `CalcHeatBalanceInsideSurf` | surface state trace | v0.9 promoted conformance case | only `surface_temperature_nomass_001` declared variables |
-| Thermostat and IdealLoads intake | thermostat and air-system source mapping pending | execution-plan placeholders and typed graph | v0.10 baseline-only smoke | not HVAC or load conformance |
+| Thermostat and IdealLoads no-OA sensible branch | `PurchasedAirManager.cc`, `ZoneEquipmentManager.cc`, `ZoneTempPredictorCorrector.cc`, and node/source maps | `ep_runtime::ideal_loads` helper, zone equipment demand state, and supply-node update | `ideal_loads_no_oa_sensible_conformance_001` promoted conformance gate | declared no-OA/no-limit thermostat, IdealLoads rate, supply-node temperature, and supply-node flow variables only |
 | Air-side node state | node and HVAC manager source map | `NodeStateStore` projection plumbing | v0.11 diagnostic-only baseline/projection | not node or HVAC numerical conformance |
 | Node source mapping policy | node state source map | planning guard | v0.12 policy/readiness | no new numerical claim |
 | PlantLoop typed graph | plant manager source map pending at v0.13 | typed PlantLoop graph edges | v0.13 smoke gate | no plant loop simulation |
