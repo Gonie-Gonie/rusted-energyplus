@@ -84,6 +84,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-constant-supply-humidity-heating-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio heating case | no | `.runtime/ideal-loads-constant-supply-humidity-heating` |
 | `compare-ideal-loads-humidistat-dehumidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat dehumidification case | no | `.runtime/ideal-loads-humidistat-dehumidification` |
 | `compare-ideal-loads-humidistat-humidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat humidification case | no | `.runtime/ideal-loads-humidistat-humidification` |
+| `compare-ideal-loads-outdoor-air-flow-area-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Area outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-area` |
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |
 | `compare-surface-temperature-conformance` | compare | run the v0.9 tolerance-gated surface-temperature conformance case | yes | `.runtime/surface-temperature-conformance` |

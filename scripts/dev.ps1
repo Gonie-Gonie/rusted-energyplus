@@ -255,6 +255,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the IdealLoads outdoor-air Flow/Zone design-flow diagnostic comparison."
     }
+    "compare-ideal-loads-outdoor-air-flow-area-diagnostic" = @{
+        Path = "compare\compare-ideal-loads-outdoor-air-flow-area-diagnostic.ps1"
+        Group = "compare"
+        Help = "Run the IdealLoads outdoor-air Flow/Area design-flow diagnostic comparison."
+    }
     "compare-surface-temperature-conformance" = @{
         Path = "compare\compare-surface-temperature-conformance.ps1"
         Group = "compare"

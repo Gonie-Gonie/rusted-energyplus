@@ -11,10 +11,10 @@ use ep_conformance::{
     OutputRequest, SourceArtifact, VariableClass,
 };
 use ep_model::{
-    DehumidificationControlType, DemandControlledVentilationType,
+    AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType,
-    OutputHandle, ScheduleId, SimulationModel,
+    OutputHandle, ScheduleId, SimulationModel, SurfaceType, TypedModel, Zone,
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
@@ -61,7 +61,7 @@ use ep_runtime::{
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
-    supply_node_update_from_result,
+    supply_node_update_from_result, surface_area_m2,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -174,6 +174,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     zone_name: String,
     system_name: String,
     outdoor_air_spec_name: String,
+    outdoor_air_method: DesignSpecificationOutdoorAirMethod,
     outdoor_air_node_name: String,
     standard_air_density_kg_per_m3: f64,
     design_volume_flow_rate_m3_per_s: f64,
@@ -600,11 +601,7 @@ fn build_outdoor_air_design_flow_context<'a>(
                 )
             })?
             .standard_air_density_kg_per_m3;
-    let outdoor_air_context = IdealLoadsOutdoorAirContext {
-        design_people_count: 0.0,
-        zone_floor_area_m2: 0.0,
-        zone_volume_m3: 0.0,
-    };
+    let outdoor_air_context = ideal_loads_outdoor_air_context(&model.typed, zone);
     let outdoor_air_mass_flow_rate_kg_per_s = calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
         outdoor_air_specification,
         outdoor_air_context,
@@ -769,6 +766,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         zone_name: zone.name.0.clone(),
         system_name: system.name.0.clone(),
         outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
+        outdoor_air_method: outdoor_air_specification.method,
         outdoor_air_node_name: outdoor_air_node_name.0.clone(),
         standard_air_density_kg_per_m3,
         design_volume_flow_rate_m3_per_s,
@@ -783,9 +781,13 @@ fn validate_outdoor_air_design_flow_boundary(
     system: &IdealLoadsAirSystem,
     method: DesignSpecificationOutdoorAirMethod,
 ) -> Result<(), String> {
-    if method != DesignSpecificationOutdoorAirMethod::FlowPerZone {
+    if !matches!(
+        method,
+        DesignSpecificationOutdoorAirMethod::FlowPerZone
+            | DesignSpecificationOutdoorAirMethod::FlowPerArea
+    ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone"
+            "IdealLoads outdoor-air design-flow diagnostic currently requires Flow/Zone or Flow/Area"
                 .to_string(),
         );
     }
@@ -811,6 +813,101 @@ fn validate_outdoor_air_design_flow_boundary(
         );
     }
     Ok(())
+}
+
+fn outdoor_air_method_label(method: DesignSpecificationOutdoorAirMethod) -> &'static str {
+    match method {
+        DesignSpecificationOutdoorAirMethod::FlowPerPerson => "Flow/Person",
+        DesignSpecificationOutdoorAirMethod::FlowPerArea => "Flow/Area",
+        DesignSpecificationOutdoorAirMethod::FlowPerZone => "Flow/Zone",
+        DesignSpecificationOutdoorAirMethod::AirChangesPerHour => "AirChanges/Hour",
+        DesignSpecificationOutdoorAirMethod::Sum => "Sum",
+        DesignSpecificationOutdoorAirMethod::Maximum => "Maximum",
+        DesignSpecificationOutdoorAirMethod::IndoorAirQualityProcedure => {
+            "IndoorAirQualityProcedure"
+        }
+        DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnDesignOccupancy => {
+            "ProportionalControlBasedOnDesignOccupancy"
+        }
+        DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnOccupancySchedule => {
+            "ProportionalControlBasedOnOccupancySchedule"
+        }
+    }
+}
+
+fn ideal_loads_outdoor_air_context(model: &TypedModel, zone: &Zone) -> IdealLoadsOutdoorAirContext {
+    IdealLoadsOutdoorAirContext {
+        design_people_count: 0.0,
+        zone_floor_area_m2: ideal_loads_zone_floor_area_m2(model, zone),
+        zone_volume_m3: ideal_loads_zone_volume_m3(model, zone).unwrap_or(0.0),
+    }
+}
+
+fn ideal_loads_zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+    model
+        .surfaces
+        .iter()
+        .filter(|surface| surface.zone == zone.id && surface.surface_type == SurfaceType::Floor)
+        .map(|surface| surface_area_m2(&surface.vertices))
+        .sum()
+}
+
+fn ideal_loads_zone_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
+    if let AutoOrNumber::Value(volume_m3) = zone.volume
+        && volume_m3 > 0.0
+    {
+        return Some(volume_m3);
+    }
+    if let Some(volume_m3) = ideal_loads_bounding_box_volume_m3(model, zone)
+        && volume_m3 > 0.0
+    {
+        return Some(volume_m3);
+    }
+    let AutoOrNumber::Value(ceiling_height_m) = zone.ceiling_height else {
+        return None;
+    };
+    if ceiling_height_m <= 0.0 {
+        return None;
+    }
+    let floor_area_m2 = ideal_loads_zone_floor_area_m2(model, zone);
+    if floor_area_m2 > 0.0 {
+        Some(floor_area_m2 * ceiling_height_m)
+    } else {
+        None
+    }
+}
+
+fn ideal_loads_bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option<f64> {
+    let mut bounds: Option<(f64, f64, f64, f64, f64, f64)> = None;
+    for surface in model
+        .surfaces
+        .iter()
+        .filter(|surface| surface.zone == zone.id)
+    {
+        for vertex in &surface.vertices {
+            let x = vertex.x_m + zone.origin.x_m;
+            let y = vertex.y_m + zone.origin.y_m;
+            let z = vertex.z_m + zone.origin.z_m;
+            bounds = Some(match bounds {
+                Some((min_x, max_x, min_y, max_y, min_z, max_z)) => (
+                    min_x.min(x),
+                    max_x.max(x),
+                    min_y.min(y),
+                    max_y.max(y),
+                    min_z.min(z),
+                    max_z.max(z),
+                ),
+                None => (x, x, y, y, z, z),
+            });
+        }
+    }
+    let (min_x, max_x, min_y, max_y, min_z, max_z) = bounds?;
+    let volume_m3 = (max_x - min_x) * (max_y - min_y) * (max_z - min_z);
+    if volume_m3 > 0.0 {
+        Some(volume_m3)
+    } else {
+        None
+    }
 }
 
 fn outdoor_air_observed_values(
@@ -2953,13 +3050,16 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "conformance_claim: {}\n",
         manifest.conformance_claim
     ));
-    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
+    report.push_str("claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone and Flow/Area mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery\n");
     report.push_str(&format!(
         "tolerance_policy: {}\n",
         outdoor_air_tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
-    report.push_str("outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows\n");
+    report.push_str(&format!(
+        "outdoor_air_source: DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows\n",
+        outdoor_air_method_label(context.outdoor_air_method)
+    ));
     report.push_str("outdoor_air_schedule: blank-always-1.0\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
@@ -3072,7 +3172,13 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string(outdoor_air_tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
-    json.push_str("  \"outdoor_air_source\": \"DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows\",\n");
+    json.push_str(&format!(
+        "  \"outdoor_air_source\": {},\n",
+        json_string(&format!(
+            "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows",
+            outdoor_air_method_label(context.outdoor_air_method)
+        ))
+    ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
     json.push_str(&format!(
         "  \"zone\": {},\n",
@@ -3326,7 +3432,10 @@ fn render_outdoor_air_stage_summary_json(
     ));
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
     json.push_str("  \"outdoor_air\": true,\n");
-    json.push_str("  \"outdoor_air_method\": \"Flow/Zone\",\n");
+    json.push_str(&format!(
+        "  \"outdoor_air_method\": {},\n",
+        json_string(outdoor_air_method_label(context.outdoor_air_method))
+    ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
     json.push_str("  \"economizer\": \"NoEconomizer\",\n");
     json.push_str("  \"heat_recovery\": \"None\",\n");

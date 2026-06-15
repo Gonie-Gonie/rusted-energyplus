@@ -64,11 +64,12 @@ tolerance, and code organization.
   `ideal_loads_humidistat_dehumidification_diagnostic_001`, and
   `ideal_loads_humidistat_humidification_diagnostic_001`; broad
   humidity-control conformance remains outside the claim
-- diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
+- diagnostic-only IdealLoads Flow/Zone and Flow/Area outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive
   economizer/heat-recovery reports in
-  `ideal_loads_outdoor_air_design_flow_diagnostic_001`; active DCV,
+  `ideal_loads_outdoor_air_design_flow_diagnostic_001` and
+  `ideal_loads_outdoor_air_flow_area_diagnostic_001`; active DCV,
   economizer, heat recovery, active humidity control, saturation-limit
   branches, and broad OA conformance remain outside the claim
 - oodocs/matplotlib release evidence generation

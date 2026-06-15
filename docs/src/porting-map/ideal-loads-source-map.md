@@ -198,7 +198,7 @@ preparatory Rust surface is:
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-economizer,
-  no-heat-recovery, no-humidity Flow/Zone OA report-rate and
+  no-heat-recovery, no-humidity Flow/Zone and Flow/Area OA report-rate and
   mixed-air state diagnostic
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` adds a diagnostic-only
@@ -226,6 +226,12 @@ sensible/total report rows use a 1 W diagnostic tolerance, and supply-air
 temperature uses 0.02 C because EnergyPlus sorts them from source-order
 zone/OA state and report-rate mode gates. Inactive economizer/heat-recovery
 rows are exact zeros.
+
+`ideal_loads_outdoor_air_flow_area_diagnostic_001` exercises the same
+diagnostic surface with a `Flow/Area` `DesignSpecification:OutdoorAir`. The
+compare path derives the zone floor area from typed floor surfaces before
+applying EnergyPlus `StdRhoAir`, and the same 22 Detailed report series pass
+with zero tolerance failures.
 
 Indoor air quality and proportional-control outdoor-air methods remain
 unresolved, and no finite-limit, active economizer, active heat recovery,
@@ -266,7 +272,8 @@ humidity proof rows have diagnostic evidence only in
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in
-`ideal_loads_outdoor_air_design_flow_diagnostic_001`.
+`ideal_loads_outdoor_air_design_flow_diagnostic_001` and
+`ideal_loads_outdoor_air_flow_area_diagnostic_001`.
 The finite flow/capacity limit fixtures have diagnostic evidence only in their
 three finite-limit cases; those diagnostic lanes now have zero tolerance
 failures for their declared Detailed rows.

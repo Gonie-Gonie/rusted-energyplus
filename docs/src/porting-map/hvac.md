@@ -206,8 +206,9 @@ lanes keep `comparison_class = "diagnostic-only"`,
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
-`ideal_loads_outdoor_air_design_flow_diagnostic_001` is a diagnostic-only
-Flow/Zone outdoor-air proof lane:
+`ideal_loads_outdoor_air_design_flow_diagnostic_001` and
+`ideal_loads_outdoor_air_flow_area_diagnostic_001` are diagnostic-only
+Flow/Zone and Flow/Area outdoor-air proof lanes:
 
 ```text
 comparison_class: diagnostic-only
@@ -240,13 +241,13 @@ The case requests `Zone Ideal Loads Outdoor Air Mass Flow Rate`,
 `Zone Ideal Loads Heat Recovery Active Time` for the IdealLoads object.
 The Rust compare lane resolves the referenced `DesignSpecification:OutdoorAir`,
 applies the blank outdoor-air schedule as always 1.0, derives EnergyPlus
-`StdRhoAir` from `Site:Location`, and writes matching Detailed Rust
-`ResultStore` series for the 96 oracle samples. The flow rows are exact; the
-sensible and total report rows are diagnostic with a 1 W source-order
-tolerance. The no-humidity latent report, supply-air mass/volume/humidity, and
-mixed-air state rows are exact; supply-air temperature stays within 0.02 C in
-this no-economizer/no-heat-recovery fixture. The inactive economizer and
-heat-recovery rows are exact zeros.
+`StdRhoAir` from `Site:Location`, derives Flow/Area floor area from typed floor
+surfaces, and writes matching Detailed Rust `ResultStore` series for the 96
+oracle samples. The flow rows are exact; the sensible and total report rows are
+diagnostic with a 1 W source-order tolerance. The no-humidity latent report,
+supply-air mass/volume/humidity, and mixed-air state rows are exact; supply-air
+temperature stays within 0.02 C in these no-economizer/no-heat-recovery
+fixtures. The inactive economizer and heat-recovery rows are exact zeros.
 
 This evidence does not promote active DCV, economizer, heat recovery, active
 humidity controls, saturation-limit branches, finite-limit conformance, or
