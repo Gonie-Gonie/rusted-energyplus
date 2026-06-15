@@ -117,10 +117,11 @@ The helper uses the EnergyPlus formula order for:
 
 ## Finite Flow/Capacity Evidence
 
-Finite no-OA capacity and flow limits are promoted by:
+Finite no-OA capacity, flow, and flow-and-capacity limits are promoted by:
 
 - `ideal_loads_capacity_limit_conformance_001`
 - `ideal_loads_flow_limit_conformance_001`
+- `ideal_loads_flow_capacity_limit_conformance_001`
 
 The original diagnostic lanes remain available for finite flow/capacity
 regression evidence:
@@ -140,13 +141,13 @@ finite fixtures.
 
 The promoted capacity-limit fixture has zero tolerance failures across 18
 Detailed series and 188 samples. The promoted flow-limit fixture has zero
-tolerance failures across 18 Detailed series and 128 samples. Both promote the
-same 10 user-facing rows as the no-OA/no-limit sensible claim: thermostat
-setpoints, zone total/sensible heating/cooling rates, supply-air total
-heating/cooling rates, supply-node temperature, and supply-node mass flow.
-Return-node temperature/humidity, supply-node humidity, and
-predictor/corrector proof rows remain diagnostic. Flow-and-capacity
-finite-limit conformance remains outside the claim.
+tolerance failures across 18 Detailed series and 128 samples. The promoted
+flow-and-capacity-limit fixture has zero tolerance failures across 18 Detailed
+series and 189 samples. All three promote the same 10 user-facing rows as the
+no-OA/no-limit sensible claim: thermostat setpoints, zone total/sensible
+heating/cooling rates, supply-air total heating/cooling rates, supply-node
+temperature, and supply-node mass flow. Return-node temperature/humidity,
+supply-node humidity, and predictor/corrector proof rows remain diagnostic.
 
 ## Humidity-Control Diagnostics
 
@@ -300,8 +301,9 @@ rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no finite-limit, active humidity-control, saturation-limit
-heat-recovery, or DCV output is part of the promoted IdealLoads claim.
+unresolved, and no outdoor-air finite-limit, active humidity-control,
+saturation-limit heat-recovery, or DCV output is part of the promoted
+IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -322,11 +324,11 @@ The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, active
-humidity-control outdoor-air latent behavior, economizer outputs, finite
-flow-and-capacity limits, adaptive system timestep, broad meter conformance,
-and non-constant efficiency schedules remain diagnostic-only or unsupported
-until their source-order branches are ported or explicitly included in a
-promoted claim. `DistrictHeatingWater:Facility` and
+humidity-control outdoor-air latent behavior, economizer outputs, finite-limit
+humidity or energy behavior, adaptive system timestep, broad meter
+conformance, and non-constant efficiency schedules remain diagnostic-only or
+unsupported until their source-order branches are ported or explicitly
+included in a promoted claim. `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` are hourly oracle-MTR vs Rust aggregated fuel-energy
 diagnostics for the no-OA fixtures.
 The no-OA `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio`
@@ -351,9 +353,9 @@ and
 and
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` and
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001`.
-The capacity-limit and flow-limit fixtures now have blocking conformance
-gates, while the flow-and-capacity limit fixture remains diagnostic-only with
-zero tolerance failures for its declared Detailed rows.
+The capacity-limit, flow-limit, and flow-and-capacity-limit fixtures now have
+blocking conformance gates for their declared thermostat, IdealLoads rate, and
+supply-node temperature/mass-flow rows.
 
 ## Conformance Compare Artifacts
 
@@ -393,9 +395,17 @@ flow-limit conformance evidence set under
 `.runtime/ideal-loads-flow-limit-conformance/26.1.0/ideal_loads_flow_limit_conformance_001/compare/`.
 That run compares 18 Detailed series over 128 samples. The 10 declared
 conformance rows pass their tolerances, the 8 diagnostic proof rows pass, and
+`tolerance-failures.csv` is empty. This adds only the no-OA numeric flow-limit
+sensible claim for declared outputs.
+
+`scripts/dev.cmd compare-ideal-loads-flow-capacity-limit-conformance`
+generates the flow-and-capacity-limit conformance evidence set under
+`.runtime/ideal-loads-flow-capacity-limit-conformance/26.1.0/ideal_loads_flow_capacity_limit_conformance_001/compare/`.
+That run compares 18 Detailed series over 189 samples. The 10 declared
+conformance rows pass their tolerances, the 8 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. Together these finite-limit gates still
-exclude flow-and-capacity, humidity, outdoor-air, economizer, heat-recovery,
-and broad HVAC behavior from the claim.
+exclude humidity, outdoor-air, economizer, heat-recovery, and broad HVAC
+behavior from the claim.
 
 ## Claim Requirements
 

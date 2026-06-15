@@ -2780,6 +2780,10 @@ fn manifest_allows_finite_limit_conformance(
             system.heating_limit == IdealLoadsLimit::LimitFlowRate
                 && system.cooling_limit == IdealLoadsLimit::LimitFlowRate
         }
+        "ideal_loads_flow_capacity_limit_conformance_001" => {
+            system.heating_limit == IdealLoadsLimit::LimitFlowRateAndCapacity
+                && system.cooling_limit == IdealLoadsLimit::LimitFlowRateAndCapacity
+        }
         _ => false,
     }
 }

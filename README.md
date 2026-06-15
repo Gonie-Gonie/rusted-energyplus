@@ -61,6 +61,11 @@ tolerance, and code organization.
   declared thermostat, IdealLoads rate, and supply-node temperature/flow
   Detailed series in `ideal_loads_flow_limit_conformance_001`, with
   return-node and humidity proof rows kept diagnostic-only
+- limited IdealLoads no-OA numeric flow-and-capacity-limit conformance gate
+  for the same declared thermostat, IdealLoads rate, and supply-node
+  temperature/flow Detailed series in
+  `ideal_loads_flow_capacity_limit_conformance_001`, with return-node and
+  humidity proof rows kept diagnostic-only
 - diagnostic-only IdealLoads no-OA `ConstantSensibleHeatRatio`,
   `ConstantSupplyHumidityRatio` cooling/heating, and Humidistat
   dehumidification/humidification
@@ -99,8 +104,8 @@ tolerance, and code organization.
   declared v0.22 `Schedule Value` / dry-bulb hourly variables, the v0.26
   internal convective gain hourly variable, and the official
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
-  declared no-OA/no-limit, numeric capacity-limit, and numeric flow-limit
-  IdealLoads sensible variables
+  declared no-OA/no-limit and numeric finite-limit IdealLoads sensible
+  variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
