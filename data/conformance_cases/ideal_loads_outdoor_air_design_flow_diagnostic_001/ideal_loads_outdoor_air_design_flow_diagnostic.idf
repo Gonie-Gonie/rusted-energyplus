@@ -325,6 +325,14 @@ Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Temperature,Det
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Supply Air Humidity Ratio,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Mixed Air Temperature,Detailed;
 Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Mixed Air Humidity Ratio,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Sensible Heating Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Latent Heating Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Total Heating Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Sensible Cooling Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Latent Cooling Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Total Cooling Rate,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Economizer Active Time,Detailed;
+Output:Variable,ZONE ONE IDEAL LOADS,Zone Ideal Loads Heat Recovery Active Time,Detailed;
 Output:Variable,ZONE ONE,Zone Mean Air Temperature,Detailed;
 Output:Variable,ZONE ONE,Zone Air Humidity Ratio,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,Detailed;

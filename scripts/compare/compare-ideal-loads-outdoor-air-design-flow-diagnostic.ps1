@@ -84,7 +84,7 @@ Assert-Contains -Text $text -Pattern "IdealLoads Outdoor-Air Design-Flow Report"
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
-Assert-Contains -Text $text -Pattern "series: 14" -Description "series count"
+Assert-Contains -Text $text -Pattern "series: 22" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 96" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_failures_count: 0" -Description "tolerance failures"
 Assert-Contains -Text $text -Pattern "tolerance_policy: diagnostic-draft" -Description "tolerance policy"
@@ -124,7 +124,7 @@ if ($summary.status -ne "diagnostic") {
 if ($summary.tolerance_failures -ne 0) {
     throw "IdealLoads outdoor-air diagnostic should have zero tolerance failures: $($summary.tolerance_failures)"
 }
-if ($summary.series_count -ne 14) {
+if ($summary.series_count -ne 22) {
     throw "Unexpected IdealLoads outdoor-air series count: $($summary.series_count)"
 }
 if ($summary.samples -ne 96) {
@@ -135,8 +135,8 @@ if ($summary.design_volume_flow_rate_m3_per_s -ne 0.05) {
 }
 
 $rows = @($summary.series)
-if ($rows.Count -ne 14) {
-    throw "Expected fourteen outdoor-air diagnostic rows, found $($rows.Count)"
+if ($rows.Count -ne 22) {
+    throw "Expected twenty-two outdoor-air diagnostic rows, found $($rows.Count)"
 }
 foreach ($row in $rows) {
     if ($row.level -ne "diagnostic") {
@@ -237,18 +237,49 @@ if ($mixedAirHumidityRatioRow[0].max_abs_delta -gt 0.000001 -or $mixedAirHumidit
     throw "Mixed-air humidity-ratio row exceeded diagnostic tolerance: max_abs=$($mixedAirHumidityRatioRow[0].max_abs_delta) rmse=$($mixedAirHumidityRatioRow[0].rmse_delta)"
 }
 
+foreach ($heatRecoveryVariable in @(
+    "Zone Ideal Loads Heat Recovery Sensible Heating Rate",
+    "Zone Ideal Loads Heat Recovery Latent Heating Rate",
+    "Zone Ideal Loads Heat Recovery Total Heating Rate",
+    "Zone Ideal Loads Heat Recovery Sensible Cooling Rate",
+    "Zone Ideal Loads Heat Recovery Latent Cooling Rate",
+    "Zone Ideal Loads Heat Recovery Total Cooling Rate"
+)) {
+    $heatRecoveryRow = @($rows | Where-Object { $_.variable -eq $heatRecoveryVariable })
+    if ($heatRecoveryRow.Count -ne 1 -or $heatRecoveryRow[0].units -ne "W" -or $heatRecoveryRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-inactive-heat-recovery") {
+        throw "Missing W inactive heat-recovery row: $heatRecoveryVariable"
+    }
+    if ($heatRecoveryRow[0].max_abs_delta -gt 0.000000001 -or $heatRecoveryRow[0].rmse_delta -gt 0.000000001) {
+        throw "Inactive heat-recovery row exceeded zero diagnostic tolerance: variable=$heatRecoveryVariable max_abs=$($heatRecoveryRow[0].max_abs_delta) rmse=$($heatRecoveryRow[0].rmse_delta)"
+    }
+}
+$economizerActiveRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Economizer Active Time" })
+if ($economizerActiveRow.Count -ne 1 -or $economizerActiveRow[0].units -ne "hr" -or $economizerActiveRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-inactive-economizer") {
+    throw "Missing hr inactive economizer active-time row"
+}
+if ($economizerActiveRow[0].max_abs_delta -gt 0.000000001 -or $economizerActiveRow[0].rmse_delta -gt 0.000000001) {
+    throw "Inactive economizer active-time row exceeded zero diagnostic tolerance: max_abs=$($economizerActiveRow[0].max_abs_delta) rmse=$($economizerActiveRow[0].rmse_delta)"
+}
+$heatRecoveryActiveRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Heat Recovery Active Time" })
+if ($heatRecoveryActiveRow.Count -ne 1 -or $heatRecoveryActiveRow[0].units -ne "hr" -or $heatRecoveryActiveRow[0].rust_source -ne "rust-ideal-loads-outdoor-air-inactive-heat-recovery") {
+    throw "Missing hr inactive heat-recovery active-time row"
+}
+if ($heatRecoveryActiveRow[0].max_abs_delta -gt 0.000000001 -or $heatRecoveryActiveRow[0].rmse_delta -gt 0.000000001) {
+    throw "Inactive heat-recovery active-time row exceeded zero diagnostic tolerance: max_abs=$($heatRecoveryActiveRow[0].max_abs_delta) rmse=$($heatRecoveryActiveRow[0].rmse_delta)"
+}
+
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
 if ($toleranceFailures.Count -ne 0) {
     throw "Expected empty tolerance-failures.csv, found $($toleranceFailures.Count) rows"
 }
 
 $resultStore = Get-Content -LiteralPath $resultStorePath -Raw | ConvertFrom-Json
-if ($resultStore.series_count -ne 14 -or $resultStore.sample_count -ne $summary.samples) {
+if ($resultStore.series_count -ne 22 -or $resultStore.sample_count -ne $summary.samples) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
 $selectedOutputs = Get-Content -LiteralPath $selectedOutputsPath -Raw | ConvertFrom-Json
-if (@($selectedOutputs.series).Count -ne 14) {
+if (@($selectedOutputs.series).Count -ne 22) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
@@ -261,7 +292,7 @@ if ($stageSummary.outdoor_air -ne $true) {
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, and mixed-air state" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Mass Flow Rate | diagnostic" -Description "markdown OA mass row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate | diagnostic" -Description "markdown OA volume row"
@@ -277,5 +308,9 @@ Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal 
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Humidity Ratio | diagnostic" -Description "markdown supply-air humidity-ratio row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Mixed Air Temperature | diagnostic" -Description "markdown mixed-air temperature row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Mixed Air Humidity Ratio | diagnostic" -Description "markdown mixed-air humidity-ratio row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Sensible Heating Rate | diagnostic" -Description "markdown inactive heat-recovery sensible heating row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Total Cooling Rate | diagnostic" -Description "markdown inactive heat-recovery total cooling row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Economizer Active Time | diagnostic" -Description "markdown inactive economizer active-time row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Active Time | diagnostic" -Description "markdown inactive heat-recovery active-time row"
 
 Write-Host "IdealLoads outdoor-air design-flow diagnostic comparison artifacts generated."

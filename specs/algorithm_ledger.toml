@@ -155,6 +155,14 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
 ]
 status = "diagnostic_only"
@@ -175,9 +183,17 @@ proof_variables = [
   "Zone Ideal Loads Supply Air Humidity Ratio",
   "Zone Ideal Loads Mixed Air Temperature",
   "Zone Ideal Loads Mixed Air Humidity Ratio",
+  "Zone Ideal Loads Heat Recovery Sensible Heating Rate",
+  "Zone Ideal Loads Heat Recovery Latent Heating Rate",
+  "Zone Ideal Loads Heat Recovery Total Heating Rate",
+  "Zone Ideal Loads Heat Recovery Sensible Cooling Rate",
+  "Zone Ideal Loads Heat Recovery Latent Cooling Rate",
+  "Zone Ideal Loads Heat Recovery Total Cooling Rate",
+  "Zone Ideal Loads Economizer Active Time",
+  "Zone Ideal Loads Heat Recovery Active Time",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, and no-heat-recovery mixed-air state parity; DCV, economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, no-heat-recovery mixed-air state, and inactive economizer/heat-recovery report parity; active DCV, economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

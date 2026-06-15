@@ -7,8 +7,8 @@ conformance_claim = false
 oracle_version = "26.1.0"
 notes = [
   "This case is diagnostic-only and does not expand the no-OA/no-limit IdealLoads conformance claim.",
-  "The diagnostic boundary covers only DesignSpecification:OutdoorAir Flow/Zone mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, and mixed-air state with a blank outdoor-air schedule.",
-  "Active humidity-control latent behavior, DCV, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin remain outside this diagnostic claim.",
+  "The diagnostic boundary covers only DesignSpecification:OutdoorAir Flow/Zone mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, and inactive economizer/heat-recovery reports with a blank outdoor-air schedule.",
+  "Active humidity-control latent behavior, active DCV, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin remain outside this diagnostic claim.",
   "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust diagnostic derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
 ]
 
@@ -186,6 +186,94 @@ domain = "hvac"
 level = "diagnostic"
 abs_tol = 0.000001
 rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Sensible Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Latent Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Economizer Active Time"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Active Time"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
 
 [[tolerances]]
 variable_class = "hvac-state"

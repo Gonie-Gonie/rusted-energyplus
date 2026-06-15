@@ -66,6 +66,14 @@ source files and Rust result locations before promoting conformance claims.
 | `Zone Ideal Loads Supply Air Humidity Ratio` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | no-humidity-control supply humidity follows mixed-air humidity | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone Ideal Loads Mixed Air Temperature` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `SetupOutputVariable` | no-economizer/no-heat-recovery mixed-air state from source-order recirculation/OA proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone Ideal Loads Mixed Air Humidity Ratio` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `SetupOutputVariable` | no-economizer/no-heat-recovery mixed-air state from source-order recirculation/OA proof rows | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Sensible Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero sensible heating | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Latent Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero latent heating | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Total Heating Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero total heating | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Sensible Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero sensible cooling | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Latent Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero latent cooling | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Total Cooling Rate` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero total cooling | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Economizer Active Time` | detailed | `PurchasedAirManager.cc::CalcPurchAirLoads` and `ReportPurchasedAir` | inactive economizer reports zero active time | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
+| `Zone Ideal Loads Heat Recovery Active Time` | detailed | `PurchasedAirManager.cc::CalcPurchAirMixedAir` and `ReportPurchasedAir` | inactive heat recovery reports zero active time | diagnostic-only for `ideal_loads_outdoor_air_design_flow_diagnostic_001` |
 | `Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate` | detailed | `ZoneTempPredictorCorrector.cc`; `DataZoneEnergyDemands.hh` | oracle proof input split into active heat/cool `ZoneSysEnergyDemand` values | diagnostic proof input for `ideal_loads_no_oa_sensible_conformance_001`; not user-facing conformance |
 | `System Node Temperature` | detailed | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `supply_node_update_from_result` in the IdealLoads compare lane | conformance for the IdealLoads supply node in `ideal_loads_no_oa_sensible_conformance_001` only |
 | `System Node Humidity Ratio` | detailed | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc`; `PurchasedAirManager.cc`; `ZoneEquipmentManager.cc` | `supply_node_update_from_result` in the IdealLoads compare lane | diagnostic proof row for `ideal_loads_no_oa_sensible_conformance_001`; not humidity conformance |
@@ -148,6 +156,7 @@ The `ideal_loads_outdoor_air_design_flow_diagnostic_001` report is a
 diagnostic-only Flow/Zone outdoor-air design-flow result for IdealLoads
 outdoor-air mass flow, standard-density volume flow, no-humidity
 sensible/latent/total report rates, supply-air state, plus mixed-air
-temperature and humidity ratio. It does not promote DCV, economizer, heat
-recovery, active humidity control, saturation-limit branches, or broad
-IdealLoads outdoor-air conformance.
+temperature and humidity ratio, plus inactive economizer/heat-recovery rows.
+It does not promote active DCV, economizer, heat recovery, active humidity
+control, saturation-limit branches, or broad IdealLoads outdoor-air
+conformance.

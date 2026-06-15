@@ -66,6 +66,29 @@ pub const ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE: &str = "Zone Ideal Loads Mixed
 /// IdealLoads mixed-air humidity ratio output variable.
 pub const ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO: &str =
     "Zone Ideal Loads Mixed Air Humidity Ratio";
+/// IdealLoads heat recovery sensible heating rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Sensible Heating Rate";
+/// IdealLoads heat recovery latent heating rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Latent Heating Rate";
+/// IdealLoads heat recovery total heating rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Total Heating Rate";
+/// IdealLoads heat recovery sensible cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Sensible Cooling Rate";
+/// IdealLoads heat recovery latent cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Latent Cooling Rate";
+/// IdealLoads heat recovery total cooling rate output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE: &str =
+    "Zone Ideal Loads Heat Recovery Total Cooling Rate";
+/// IdealLoads economizer active time output variable.
+pub const ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME: &str = "Zone Ideal Loads Economizer Active Time";
+/// IdealLoads heat recovery active time output variable.
+pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME: &str =
+    "Zone Ideal Loads Heat Recovery Active Time";
 
 /// Report payload produced by the no-OA/no-limit sensible calculation.
 #[derive(Clone, Copy, Debug, PartialEq)]

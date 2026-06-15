@@ -148,18 +148,21 @@ Flow/Zone proof lane for the EnergyPlus report variables
 `Zone Ideal Loads Supply Air Temperature`,
 `Zone Ideal Loads Supply Air Humidity Ratio`, plus
 `Zone Ideal Loads Mixed Air Temperature` and
-`Zone Ideal Loads Mixed Air Humidity Ratio`. The compare lane derives
+`Zone Ideal Loads Mixed Air Humidity Ratio`, plus inactive
+heat-recovery/economizer report variables. The compare lane derives
 EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA schedule as
 always 1.0, and writes Rust `ResultStore` series for the 96 Detailed oracle
 samples. The outdoor-air mass/volume, no-humidity latent, supply-air
 mass/volume/humidity, and mixed-air rows are exact in this fixture; the
 sensible/total report rows use a 1 W diagnostic tolerance, and supply-air
 temperature uses 0.02 C because EnergyPlus sorts them from source-order
-zone/OA state and report-rate mode gates.
+zone/OA state and report-rate mode gates. Inactive economizer/heat-recovery
+rows are exact zeros.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no economizer, heat recovery, active humidity-control,
-saturation-limit, or DCV output is part of the promoted IdealLoads claim.
+unresolved, and no active economizer, active heat recovery, active
+humidity-control, saturation-limit, or DCV output is part of the promoted
+IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -183,8 +186,8 @@ active humidity-control outdoor-air latent behavior, heat-recovery outputs,
 economizer outputs, and meter outputs remain diagnostic-only until their
 source-order branches are ported or explicitly included in a promoted claim.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
-outdoor-air report-rate, supply-air state, and mixed-air state outputs have
-diagnostic evidence only in
+outdoor-air report-rate, supply-air state, mixed-air state, and inactive
+economizer/heat-recovery outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`.
 
 ## Conformance Compare Artifacts

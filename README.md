@@ -52,10 +52,11 @@ tolerance, and code organization.
   `ideal_loads_no_oa_sensible_conformance_001`
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, and mixed-air state in
-  `ideal_loads_outdoor_air_design_flow_diagnostic_001`; DCV, economizer, heat
-  recovery, active humidity control, saturation-limit branches, and broad OA
-  conformance remain outside the claim
+  outdoor-air report rates, supply-air state, mixed-air state, and inactive
+  economizer/heat-recovery reports in
+  `ideal_loads_outdoor_air_design_flow_diagnostic_001`; active DCV,
+  economizer, heat recovery, active humidity control, saturation-limit
+  branches, and broad OA conformance remain outside the claim
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,

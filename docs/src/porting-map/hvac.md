@@ -175,7 +175,15 @@ The case requests `Zone Ideal Loads Outdoor Air Mass Flow Rate`,
 `Zone Ideal Loads Supply Air Temperature`,
 `Zone Ideal Loads Supply Air Humidity Ratio`,
 `Zone Ideal Loads Mixed Air Temperature`, and
-`Zone Ideal Loads Mixed Air Humidity Ratio` for the IdealLoads object.
+`Zone Ideal Loads Mixed Air Humidity Ratio`,
+`Zone Ideal Loads Heat Recovery Sensible Heating Rate`,
+`Zone Ideal Loads Heat Recovery Latent Heating Rate`,
+`Zone Ideal Loads Heat Recovery Total Heating Rate`,
+`Zone Ideal Loads Heat Recovery Sensible Cooling Rate`,
+`Zone Ideal Loads Heat Recovery Latent Cooling Rate`,
+`Zone Ideal Loads Heat Recovery Total Cooling Rate`,
+`Zone Ideal Loads Economizer Active Time`, and
+`Zone Ideal Loads Heat Recovery Active Time` for the IdealLoads object.
 The Rust compare lane resolves the referenced `DesignSpecification:OutdoorAir`,
 applies the blank outdoor-air schedule as always 1.0, derives EnergyPlus
 `StdRhoAir` from `Site:Location`, and writes matching Detailed Rust
@@ -183,11 +191,12 @@ applies the blank outdoor-air schedule as always 1.0, derives EnergyPlus
 sensible and total report rows are diagnostic with a 1 W source-order
 tolerance. The no-humidity latent report, supply-air mass/volume/humidity, and
 mixed-air state rows are exact; supply-air temperature stays within 0.02 C in
-this no-economizer/no-heat-recovery fixture.
+this no-economizer/no-heat-recovery fixture. The inactive economizer and
+heat-recovery rows are exact zeros.
 
-This evidence does not promote DCV, economizer, heat recovery, active humidity
-controls, saturation-limit branches, finite limits, or broad IdealLoads
-outdoor-air conformance.
+This evidence does not promote active DCV, economizer, heat recovery, active
+humidity controls, saturation-limit branches, finite limits, or broad
+IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 
