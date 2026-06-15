@@ -146,15 +146,18 @@ The case requests thermostat setpoints, IdealLoads total and sensible rates,
 supply-air total rates, ReportPurchasedAir total energy rows, blank-efficiency
 fuel energy/rate proof rows, signed zone predicted load, setpoint-distance
 proof loads, zone-air-node proof rows, and supply-node temperature, humidity,
-and mass flow. The conformance compare command writes matching Rust
-`ResultStore` series for 28 Detailed output rows over 110 samples. The 10
-declared conformance rows are tolerance-gated; the remaining rows are
-diagnostic proof only. Energy rows use the EnergyPlus `ReportPurchasedAir`
-raw `rate * TimeStepSysSec` branch with a fixed 8-substep, 112.5 s system
-timestep in this fixture, then the `OutputProcessor` `Sum` report interval
-emits the 900 s zone-timestep total. Fuel energy rows also use the blank
-fuel-efficiency schedule branch and do not claim adaptive system timestep,
-fuel meter, or non-unity efficiency schedule conformance.
+and mass flow, plus hourly `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` oracle-MTR requests. The conformance compare
+command writes matching Rust `ResultStore` series for 28 Detailed output rows
+over 110 samples. The 10 declared conformance rows are tolerance-gated; the
+remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
+`ReportPurchasedAir` raw `rate * TimeStepSysSec` branch with a fixed
+8-substep, 112.5 s system timestep in this fixture, then the `OutputProcessor`
+`Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows
+also use the blank fuel-efficiency schedule branch. The facility meters are
+tracked as oracle-MTR diagnostics only; Rust meter time-series comparison,
+adaptive system timestep, and non-unity efficiency schedule conformance remain
+outside the claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

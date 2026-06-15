@@ -97,6 +97,7 @@ $variableDeltasPath = Join-Path $CompareRoot "variable-deltas.csv"
 $firstDivergencePath = Join-Path $CompareRoot "first-divergence.csv"
 $toleranceFailuresPath = Join-Path $CompareRoot "tolerance-failures.csv"
 $stageSummaryPath = Join-Path $CompareRoot "stage-summary.json"
+$oracleMtrPath = Join-Path (Join-Path $CaseOutputRoot "oracle") "eplusout.mtr"
 
 Assert-FileExists -Path $summaryPath -Description "IdealLoads compare summary"
 Assert-FileExists -Path $reportPath -Description "IdealLoads markdown report"
@@ -106,6 +107,7 @@ Assert-FileExists -Path $variableDeltasPath -Description "IdealLoads variable de
 Assert-FileExists -Path $firstDivergencePath -Description "IdealLoads first divergence CSV"
 Assert-FileExists -Path $toleranceFailuresPath -Description "IdealLoads tolerance failures CSV"
 Assert-FileExists -Path $stageSummaryPath -Description "IdealLoads stage summary"
+Assert-FileExists -Path $oracleMtrPath -Description "IdealLoads oracle MTR"
 
 $summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
 if ($summary.case_id -ne $CaseId) {
@@ -198,6 +200,22 @@ if ([Math]::Abs([double]$summary.system_timestep_seconds - 112.5) -gt 1.0e-9) {
 if ([Math]::Abs([double]$summary.energy_report_interval_seconds - 900.0) -gt 1.0e-9) {
     throw "Unexpected IdealLoads energy report interval seconds: $($summary.energy_report_interval_seconds)"
 }
+if ($summary.rust_meter_time_series_comparison -ne $false) {
+    throw "IdealLoads meter requests must remain oracle-MTR diagnostics only"
+}
+if ($summary.requested_meter_count -ne 2) {
+    throw "Expected 2 requested diagnostic meter rows, found $($summary.requested_meter_count)"
+}
+$requestedMeters = @($summary.requested_meters)
+if ($requestedMeters.Count -ne 2) {
+    throw "Expected 2 requested_meters entries, found $($requestedMeters.Count)"
+}
+if (@($requestedMeters | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.source -eq "mtr" -and $_.level -eq "diagnostic" }).Count -ne 1) {
+    throw "Missing diagnostic DistrictHeatingWater:Facility MTR request in summary"
+}
+if (@($requestedMeters | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.source -eq "mtr" -and $_.level -eq "diagnostic" }).Count -ne 1) {
+    throw "Missing diagnostic DistrictCooling:Facility MTR request in summary"
+}
 
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
 if ($toleranceFailures.Count -ne 0) {
@@ -214,6 +232,10 @@ if (@($selectedOutputs.series).Count -ne 28) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
+$oracleMtrText = Get-Content -LiteralPath $oracleMtrPath -Raw
+Assert-Contains -Text $oracleMtrText -Pattern "DistrictHeatingWater:Facility" -Description "oracle MTR heating meter"
+Assert-Contains -Text $oracleMtrText -Pattern "DistrictCooling:Facility" -Description "oracle MTR cooling meter"
+
 $stageSummary = Get-Content -LiteralPath $stageSummaryPath -Raw | ConvertFrom-Json
 if ($stageSummary.branch -ne "no-oa-no-limit-sensible") {
     throw "Unexpected IdealLoads branch: $($stageSummary.branch)"
@@ -227,6 +249,8 @@ Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA/no
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed_system_substeps=8 system_timestep_seconds=112.500000000000 energy_report_interval_seconds=900.000000000000" -Description "markdown energy source"
+Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter oracle MTR diagnostic-only; rust_meter_time_series_comparison=false requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "meter_requests: DistrictHeatingWater:Facility, DistrictCooling:Facility" -Description "markdown meter requests"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | conformance" -Description "markdown node flow row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown zone heating fuel row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy | diagnostic" -Description "markdown zone heating fuel energy row"

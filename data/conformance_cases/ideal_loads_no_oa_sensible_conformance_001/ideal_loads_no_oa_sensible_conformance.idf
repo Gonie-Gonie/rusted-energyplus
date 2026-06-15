@@ -329,3 +329,5 @@ Output:Variable,ZONE ONE INLET,System Node Mass Flow Rate,Detailed;
 Output:Variable,ZONE ONE AIR NODE,System Node Temperature,Detailed;
 Output:Variable,ZONE ONE AIR NODE,System Node Humidity Ratio,Detailed;
 Output:Variable,ZONE ONE INLET,System Node Humidity Ratio,Detailed;
+Output:Meter,DistrictHeatingWater:Facility,Hourly;
+Output:Meter,DistrictCooling:Facility,Hourly;

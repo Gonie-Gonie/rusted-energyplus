@@ -184,9 +184,11 @@ Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank-efficiency fuel energy/rate rows, latent IdealLoads outputs, active
 humidity-control outdoor-air latent behavior, heat-recovery outputs,
-economizer outputs, adaptive system timestep, fuel meters, and non-unity
-efficiency schedules remain diagnostic-only until their source-order branches
-are ported or explicitly included in a promoted claim.
+economizer outputs, adaptive system timestep, Rust meter time-series
+comparison, and non-unity efficiency schedules remain diagnostic-only until
+their source-order branches are ported or explicitly included in a promoted
+claim. `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` are
+currently requested only as oracle-MTR diagnostics for the no-OA fixture.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in

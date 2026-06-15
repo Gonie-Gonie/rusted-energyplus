@@ -12,7 +12,8 @@ notes = [
   "IdealLoads rate and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow formulas.",
   "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
   "Mass-flow comparison uses the source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows.",
-  "Energy and fuel energy rows are diagnostic-only proof for the ReportPurchasedAir rate-to-TimeStepSysSec fixed 8-substep fixture branch and blank fuel-efficiency branch; meter outputs and non-unity efficiency schedules remain outside the claim."
+  "Energy and fuel energy rows are diagnostic-only proof for the ReportPurchasedAir rate-to-TimeStepSysSec fixed 8-substep fixture branch and blank fuel-efficiency branch.",
+  "DistrictHeatingWater:Facility and DistrictCooling:Facility meters are tracked as oracle-MTR diagnostic requests only; Rust meter time-series comparison, non-unity efficiency schedules, and broad meter conformance remain outside the claim."
 ]
 
 [manifest_v2]
@@ -343,6 +344,24 @@ domain = "node"
 level = "diagnostic"
 abs_tol = 1e-9
 rmse_tol = 1e-9
+
+[[meters]]
+name = "DistrictHeatingWater:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictCooling:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
 
 [[tolerances]]
 variable_class = "zone-state"

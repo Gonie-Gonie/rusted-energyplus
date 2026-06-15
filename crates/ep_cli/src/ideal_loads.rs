@@ -1933,6 +1933,22 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         context.system_timestep_seconds,
         context.energy_report_interval_seconds
     ));
+    report.push_str(&format!(
+        "meter_source: EnergyPlus Output:Meter oracle MTR diagnostic-only; rust_meter_time_series_comparison=false requested_meters={}\n",
+        manifest.meters.len()
+    ));
+    if !manifest.meters.is_empty() {
+        let meter_names = manifest
+            .meters
+            .iter()
+            .map(|meter| meter.name.as_str())
+            .collect::<Vec<_>>()
+            .join(", ");
+        report.push_str(&format!(
+            "meter_requests: {}\n",
+            markdown_cell(&meter_names)
+        ));
+    }
     report.push_str("zone_demand_synthetic_rc_model: false\n");
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
@@ -2481,6 +2497,28 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
     json.push_str("  \"fuel_energy_rate_source\": \"EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only\",\n");
     json.push_str("  \"energy_source\": \"EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed 8-substep fixture branch\",\n");
+    json.push_str("  \"meter_source\": \"EnergyPlus Output:Meter oracle MTR diagnostic-only; Rust meter time-series comparison disabled\",\n");
+    json.push_str("  \"rust_meter_time_series_comparison\": false,\n");
+    json.push_str(&format!(
+        "  \"requested_meter_count\": {},\n",
+        manifest.meters.len()
+    ));
+    json.push_str("  \"requested_meters\": [\n");
+    for (index, meter) in manifest.meters.iter().enumerate() {
+        json.push_str(&format!(
+            "    {{\"name\": {}, \"frequency\": {}, \"source\": {}, \"domain\": {}, \"level\": {}}}",
+            json_string(&meter.name),
+            json_string(output_frequency_label(meter.frequency)),
+            json_string(source_artifact_label(meter.source)),
+            json_string(evidence_domain_label(meter.domain)),
+            json_string(optional_output_level_label(Some(meter.level)))
+        ));
+        if index + 1 < manifest.meters.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ],\n");
     json.push_str(&format!(
         "  \"system_timestep_substeps\": {},\n",
         json_number(IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS)

@@ -98,8 +98,11 @@ $validateText = ($validateOutput -join "`n")
 Assert-Contains -Text $validateText -Pattern "comparison_class: conformance" -Description "manifest conformance class"
 Assert-Contains -Text $validateText -Pattern "conformance_claim: true" -Description "manifest claim boundary"
 Assert-Contains -Text $validateText -Pattern "outputs: 28" -Description "manifest output count"
+Assert-Contains -Text $validateText -Pattern "meters: 2" -Description "manifest diagnostic meter count"
 Assert-Contains -Text $validateText -Pattern "level=conformance" -Description "manifest conformance output level"
 Assert-Contains -Text $validateText -Pattern "System Node Mass Flow Rate / detailed / node-state / eso" -Description "manifest node flow output"
+Assert-Contains -Text $validateText -Pattern "DistrictHeatingWater:Facility / hourly / mtr / meter / diagnostic" -Description "manifest heating meter"
+Assert-Contains -Text $validateText -Pattern "DistrictCooling:Facility / hourly / mtr / meter / diagnostic" -Description "manifest cooling meter"
 
 Write-Host "Generating IdealLoads no-OA sensible oracle baseline."
 $baselineOutput = & $cargo.Source run -p ep_cli --quiet -- conformance baseline $CasePath $OracleRoot $OutputRoot 2>&1
@@ -115,9 +118,14 @@ Assert-Contains -Text $baselineText -Pattern "conformance_claim: true" -Descript
 Assert-Contains -Text $baselineText -Pattern "status: generated" -Description "baseline status"
 Assert-FileExists -Path $EpJsonPath -Description "converted conformance epJSON"
 Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.eso") -Description "conformance EnergyPlus ESO"
+Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.mtr") -Description "conformance EnergyPlus MTR"
 Assert-FileExists -Path (Join-Path $CaseOutputRoot "eplusout.err") -Description "conformance EnergyPlus ERR"
 Assert-FileExists -Path (Join-Path $CaseOutputRoot "case-expanded.toml") -Description "conformance expanded manifest"
 Assert-CleanEnergyPlusErr -Path (Join-Path $CaseOutputRoot "eplusout.err")
+
+$mtrText = Get-Content -LiteralPath (Join-Path $CaseOutputRoot "eplusout.mtr") -Raw
+Assert-Contains -Text $mtrText -Pattern "DistrictHeatingWater:Facility" -Description "oracle MTR heating meter"
+Assert-Contains -Text $mtrText -Pattern "DistrictCooling:Facility" -Description "oracle MTR cooling meter"
 
 Write-Host "Compiling IdealLoads no-OA sensible typed model."
 $compileOutput = & $cargo.Source run -p ep_cli --quiet -- compile $EpJsonPath 2>&1

@@ -50,7 +50,9 @@ tolerance, and code organization.
   thermostat setpoints, IdealLoads total/sensible/supply-air rates, and
   supply-node temperature/mass-flow Detailed series in
   `ideal_loads_no_oa_sensible_conformance_001`, with ReportPurchasedAir
-  energy and blank-efficiency fuel energy rows kept diagnostic-only
+  energy and blank-efficiency fuel energy rows kept diagnostic-only and
+  DistrictHeatingWater/DistrictCooling facility meters tracked only as
+  oracle-MTR diagnostics
 - diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, and inactive
@@ -97,7 +99,7 @@ Not claimed:
 - broad HVAC or plant simulation compatibility
 - broad node, full IdealLoads, meter, or full runtime conformance
 - IdealLoads economizer, heat-recovery, DCV, humidity, saturation-limit, or
-  meter conformance
+  meter conformance beyond oracle-MTR diagnostic tracking
 - broad ExampleFiles compatibility
 
 ## Quick Start
