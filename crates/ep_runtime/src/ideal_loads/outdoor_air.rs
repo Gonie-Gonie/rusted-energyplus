@@ -1,5 +1,9 @@
-//! IdealLoads outdoor-air design-flow helpers.
+//! IdealLoads outdoor-air design-flow and narrow sensible-load helpers.
 
+use crate::{
+    energyplus_moist_air_specific_heat_j_per_kg_k, ideal_loads::IdealLoadsSensibleMode,
+    zone_equipment::ZoneSysEnergyDemand,
+};
 use ep_model::{DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod};
 
 /// Zone context needed by `DesignSpecification:OutdoorAir`.
@@ -11,6 +15,30 @@ pub struct IdealLoadsOutdoorAirContext {
     pub zone_floor_area_m2: f64,
     /// Zone volume in m3 used by AirChanges/Hour.
     pub zone_volume_m3: f64,
+}
+
+/// Zone or outdoor-air node conditions used by the OA sensible-load subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct IdealLoadsOutdoorAirNodeState {
+    /// Air temperature in C.
+    pub air_temperature_c: f64,
+    /// Air humidity ratio in kgWater/kgDryAir.
+    pub air_humidity_ratio: f64,
+}
+
+/// Diagnostic report values for the narrow IdealLoads OA sensible branch.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct IdealLoadsOutdoorAirSensibleResult {
+    /// Operating mode inferred from EnergyPlus minimum-OA sensible gate.
+    pub mode: IdealLoadsSensibleMode,
+    /// EnergyPlus minimum-OA sensible output used for mode selection.
+    pub minimum_outdoor_air_sensible_output_w: f64,
+    /// Final outdoor-air sensible output relative to zone conditions.
+    pub outdoor_air_sensible_output_w: f64,
+    /// Reported OA sensible heating rate.
+    pub outdoor_air_sensible_heating_rate_w: f64,
+    /// Reported OA sensible cooling rate.
+    pub outdoor_air_sensible_cooling_rate_w: f64,
 }
 
 /// Calculates the design outdoor-air volume flow in m3/s for supported methods.
@@ -68,6 +96,72 @@ pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
             * schedule_multiplier(schedule_value)
             * standard_air_density_kg_per_m3,
     )
+}
+
+/// Calculates diagnostic-only IdealLoads outdoor-air sensible report rates.
+///
+/// This mirrors the no-economizer/no-heat-recovery/no-humidity/no-limit subset:
+/// EnergyPlus first uses minimum OA sensible output to choose heat/cool/deadband,
+/// then recomputes final `OASenOutput` using zone humidity for report sorting.
+#[must_use]
+pub fn calc_outdoor_air_sensible_report_rates_compat(
+    zone_state: IdealLoadsOutdoorAirNodeState,
+    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    demand: ZoneSysEnergyDemand,
+    outdoor_air_mass_flow_rate_kg_per_s: f64,
+    unit_available: bool,
+) -> IdealLoadsOutdoorAirSensibleResult {
+    if !unit_available || outdoor_air_mass_flow_rate_kg_per_s <= 0.0 {
+        return IdealLoadsOutdoorAirSensibleResult {
+            mode: if unit_available {
+                IdealLoadsSensibleMode::Deadband
+            } else {
+                IdealLoadsSensibleMode::Off
+            },
+            minimum_outdoor_air_sensible_output_w: 0.0,
+            outdoor_air_sensible_output_w: 0.0,
+            outdoor_air_sensible_heating_rate_w: 0.0,
+            outdoor_air_sensible_cooling_rate_w: 0.0,
+        };
+    }
+
+    let delta_t = outdoor_air_state.air_temperature_c - zone_state.air_temperature_c;
+    let minimum_cp_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(outdoor_air_state.air_humidity_ratio);
+    let minimum_outdoor_air_sensible_output_w =
+        outdoor_air_mass_flow_rate_kg_per_s * minimum_cp_air_j_per_kg_k * delta_t;
+
+    let mode = if minimum_outdoor_air_sensible_output_w >= demand.remaining_output_req_to_cool_sp_w
+    {
+        IdealLoadsSensibleMode::Cooling
+    } else if minimum_outdoor_air_sensible_output_w < demand.remaining_output_req_to_heat_sp_w {
+        IdealLoadsSensibleMode::Heating
+    } else {
+        IdealLoadsSensibleMode::Deadband
+    };
+
+    let final_cp_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
+    let outdoor_air_sensible_output_w =
+        outdoor_air_mass_flow_rate_kg_per_s * final_cp_air_j_per_kg_k * delta_t;
+    let outdoor_air_sensible_heating_rate_w = if mode == IdealLoadsSensibleMode::Heating {
+        (-outdoor_air_sensible_output_w).max(0.0)
+    } else {
+        0.0
+    };
+    let outdoor_air_sensible_cooling_rate_w = if mode == IdealLoadsSensibleMode::Cooling {
+        outdoor_air_sensible_output_w.max(0.0)
+    } else {
+        0.0
+    };
+
+    IdealLoadsOutdoorAirSensibleResult {
+        mode,
+        minimum_outdoor_air_sensible_output_w,
+        outdoor_air_sensible_output_w,
+        outdoor_air_sensible_heating_rate_w,
+        outdoor_air_sensible_cooling_rate_w,
+    }
 }
 
 fn schedule_multiplier(value: Option<f64>) -> f64 {
@@ -181,6 +275,58 @@ mod tests {
         );
 
         assert_eq!(result, Some(0.12));
+    }
+
+    #[test]
+    fn sensible_report_sorts_cold_oa_as_heating_load_when_heat_mode_is_active() {
+        let result = calc_outdoor_air_sensible_report_rates_compat(
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 21.0,
+                air_humidity_ratio: 0.006,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 5.0,
+                air_humidity_ratio: 0.004,
+            },
+            ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 100.0, 0.0),
+            0.05,
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+        assert!(result.outdoor_air_sensible_output_w < 0.0);
+        assert_close(
+            result.outdoor_air_sensible_heating_rate_w,
+            -result.outdoor_air_sensible_output_w,
+            1.0e-12,
+        );
+        assert_eq!(result.outdoor_air_sensible_cooling_rate_w, 0.0);
+    }
+
+    #[test]
+    fn sensible_report_sorts_warm_oa_as_cooling_load_when_cool_mode_is_active() {
+        let result = calc_outdoor_air_sensible_report_rates_compat(
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 24.0,
+                air_humidity_ratio: 0.006,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 32.0,
+                air_humidity_ratio: 0.008,
+            },
+            ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 0.0, -50.0),
+            0.05,
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert!(result.outdoor_air_sensible_output_w > 0.0);
+        assert_close(
+            result.outdoor_air_sensible_cooling_rate_w,
+            result.outdoor_air_sensible_output_w,
+            1.0e-12,
+        );
+        assert_eq!(result.outdoor_air_sensible_heating_rate_w, 0.0);
     }
 
     #[test]
