@@ -150,6 +150,29 @@ series for 16 Detailed output rows over 110 samples. The 10 declared
 conformance rows are tolerance-gated; the remaining rows are diagnostic proof
 only.
 
+## IdealLoads Outdoor-Air Design-Flow Diagnostic
+
+`ideal_loads_outdoor_air_design_flow_diagnostic_001` is a diagnostic-only
+Flow/Zone outdoor-air proof lane:
+
+```text
+comparison_class: diagnostic-only
+conformance_claim: false
+tolerance_policy: diagnostic-draft
+status: diagnostic
+```
+
+The case requests only `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
+`Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate` for the
+IdealLoads object. The Rust compare lane resolves the referenced
+`DesignSpecification:OutdoorAir`, applies the blank outdoor-air schedule as
+always 1.0, derives EnergyPlus `StdRhoAir` from `Site:Location`, and writes
+matching Detailed Rust `ResultStore` series for the 96 oracle samples.
+
+This evidence does not promote outdoor-air sensible/latent loads, mixed-air
+state, supply-air state, DCV, economizer, heat recovery, humidity controls,
+finite limits, or broad IdealLoads outdoor-air conformance.
+
 ## Promotion Requirements
 
 An IdealLoads output can move from baseline-only to conformance only when all

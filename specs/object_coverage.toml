@@ -106,9 +106,9 @@ support_boundary = "Typed input support plus limited no-OA/no-limit IdealLoads s
 [[object]]
 name = "DesignSpecification:OutdoorAir"
 family = "hvac"
-status = "typed_graph_only"
-first_evidence = "ideal-loads-outdoor-air-typed-intake-test"
-support_boundary = "Typed for IdealLoads outdoor-air reference and schedule preservation only; no outdoor-air flow, DCV, economizer, heat recovery, or numerical OA conformance claim."
+status = "diagnostic"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+support_boundary = "Typed for IdealLoads outdoor-air reference/schedule preservation plus diagnostic-only Flow/Zone design-flow mass and standard-density volume flow parity; no outdoor-air load, DCV, economizer, heat recovery, or numerical OA conformance claim."
 
 [[object]]
 name = "NodeList"

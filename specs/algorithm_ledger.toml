@@ -109,11 +109,13 @@ energyplus_source = [
 rust_target = [
   "crates/ep_runtime/src/ideal_loads/input.rs::classify_no_oa_no_limit_sensible_subset",
   "crates/ep_runtime/src/ideal_loads/calc.rs::calc_no_oa_no_limit_sensible_compat",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result",
   "crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot",
   "crates/ep_runtime/src/zone_equipment/mod.rs::ZoneSysEnergyDemand",
   "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_no_oa_sensible_report",
+  "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
 ]
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
@@ -128,6 +130,32 @@ proof_variables = [
 ]
 claim_level = "limited-ideal-loads-no-oa-sensible-conformance"
 support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance only for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001; outdoor air, humidity control, economizer, heat recovery, sizing, meters, and broad HVAC compatibility remain outside the claim."
+
+[[algorithm]]
+id = "ideal_loads_outdoor_air_design_flow"
+domain = "hvac"
+source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/PurchasedAirManager.cc",
+  "src/EnergyPlus/DataEnvironment.hh",
+  "src/EnergyPlus/OutputProcessor.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_design_outdoor_air_volume_flow_m3_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE",
+  "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
+]
+status = "diagnostic_only"
+first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+proof_variables = [
+  "Zone Ideal Loads Outdoor Air Mass Flow Rate",
+  "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate",
+]
+claim_level = "none"
+support_boundary = "Diagnostic-only IdealLoads Flow/Zone outdoor-air design-flow mass and standard-density volume flow parity; outdoor-air sensible/latent loads, mixed-air state, supply-air state, DCV, economizer, heat recovery, humidity controls, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"
