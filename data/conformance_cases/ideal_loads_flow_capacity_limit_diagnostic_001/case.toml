@@ -1,0 +1,235 @@
+id = "ideal_loads_flow_capacity_limit_diagnostic_001"
+title = "One-zone no-OA IdealLoads flow-and-capacity-limit diagnostic"
+milestone = "ideal-loads-finite-limit-diagnostic"
+purpose = "Probe no-outdoor-air IdealLoads sensible numerical parity when numeric heating and cooling flow-rate and capacity limits are active together."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This case is diagnostic-only and does not expand the no-OA/no-limit IdealLoads conformance claim.",
+  "The boundary excludes outdoor air, economizer, heat recovery, humidistats, DCV, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
+  "Numeric flow-rate and capacity limits are applied together to the no-OA sensible branch to prepare a future finite-limit claim.",
+  "IdealLoads rate and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow formulas.",
+  "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
+  "Mass-flow comparison uses the source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_flow_capacity_limit_diagnostic_001/ideal_loads_flow_capacity_limit_diagnostic.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "hvac", "node"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_flow_capacity_limit_diagnostic_001/ideal_loads_flow_capacity_limit_diagnostic.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Sensible Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Mass Flow Rate"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE AIR NODE"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE INLET"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 1e-9
+max_rmse = 1e-9
+
+[[tolerances]]
+variable_class = "hvac-state"
+max_abs = 1e-3
+max_rmse = 1e-3
+
+[[tolerances]]
+variable_class = "node-state"
+max_abs = 1e-6
+max_rmse = 1e-6
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-flow-capacity-limit/26.1.0/ideal_loads_flow_capacity_limit_diagnostic_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-flow-capacity-limit-diagnostic"
+blocking = false
