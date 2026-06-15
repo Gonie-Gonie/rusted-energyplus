@@ -295,8 +295,11 @@ fn calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s(
     outdoor_air_mass_flow_rate_kg_per_s: &mut f64,
 ) -> f64 {
     if mode != IdealLoadsSensibleMode::Cooling
-        || system.outdoor_air_economizer_type != OutdoorAirEconomizerType::DifferentialDryBulb
-        || outdoor_air_state.air_temperature_c >= recirculation_state.air_temperature_c
+        || !economizer_allows_outdoor_air_flow_reset(
+            system.outdoor_air_economizer_type,
+            recirculation_state,
+            outdoor_air_state,
+        )
     {
         return 0.0;
     }
@@ -320,6 +323,30 @@ fn calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s(
 
     *outdoor_air_mass_flow_rate_kg_per_s = economizer_supply_mass_flow_rate_kg_per_s.max(0.0);
     system_timestep_hours.max(0.0)
+}
+
+fn economizer_allows_outdoor_air_flow_reset(
+    economizer_type: OutdoorAirEconomizerType,
+    recirculation_state: IdealLoadsOutdoorAirNodeState,
+    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+) -> bool {
+    match economizer_type {
+        OutdoorAirEconomizerType::NoEconomizer => false,
+        OutdoorAirEconomizerType::DifferentialDryBulb => {
+            outdoor_air_state.air_temperature_c < recirculation_state.air_temperature_c
+        }
+        OutdoorAirEconomizerType::DifferentialEnthalpy => {
+            let outdoor_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+                outdoor_air_state.air_temperature_c,
+                outdoor_air_state.air_humidity_ratio,
+            );
+            let recirculation_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+                recirculation_state.air_temperature_c,
+                recirculation_state.air_humidity_ratio,
+            );
+            outdoor_air_enthalpy_j_per_kg < recirculation_enthalpy_j_per_kg
+        }
+    }
 }
 
 fn outdoor_air_supply_mass_flow_rate_kg_per_s(
@@ -665,6 +692,38 @@ mod tests {
             IdealLoadsOutdoorAirNodeState {
                 air_temperature_c: 10.0,
                 air_humidity_ratio: 0.004,
+            },
+            ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 0.0, -500.0),
+            0.01,
+            0.25,
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert!(result.outdoor_air_mass_flow_rate_kg_per_s > 0.01);
+        assert_eq!(result.economizer_active_time_hr, 0.25);
+        assert!(
+            result.supply_mass_flow_rate_kg_per_s >= result.outdoor_air_mass_flow_rate_kg_per_s
+        );
+    }
+
+    #[test]
+    fn differential_enthalpy_economizer_raises_outdoor_air_flow_when_cooling() {
+        let mut system = test_system();
+        system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialEnthalpy;
+        let result = calc_outdoor_air_sensible_report_rates_compat(
+            &system,
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 24.0,
+                air_humidity_ratio: 0.010,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 24.0,
+                air_humidity_ratio: 0.010,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 12.0,
+                air_humidity_ratio: 0.002,
             },
             ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 0.0, -500.0),
             0.01,

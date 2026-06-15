@@ -86,6 +86,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-humidistat-humidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat humidification case | no | `.runtime/ideal-loads-humidistat-humidification` |
 | `compare-ideal-loads-outdoor-air-air-changes-diagnostic` | diagnostic | run the diagnostic-only IdealLoads AirChanges/Hour outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-air-changes` |
 | `compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-diagnostic` | diagnostic | run the diagnostic-only IdealLoads DifferentialDryBulb outdoor-air economizer case | no | `.runtime/ideal-loads-outdoor-air-differential-dry-bulb-economizer` |
+| `compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic` | diagnostic | run the diagnostic-only IdealLoads DifferentialEnthalpy outdoor-air economizer case | no | `.runtime/ideal-loads-outdoor-air-differential-enthalpy-economizer` |
 | `compare-ideal-loads-outdoor-air-flow-area-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Area outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-area` |
 | `compare-ideal-loads-outdoor-air-flow-person-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Person outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-person` |
 | `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |

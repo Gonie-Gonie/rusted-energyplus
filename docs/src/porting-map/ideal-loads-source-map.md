@@ -203,7 +203,8 @@ preparatory Rust surface is:
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-heat-recovery,
   no-humidity Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and
   Maximum OA report-rate and mixed-air state diagnostic, including
-  DifferentialDryBulb economizer OA flow reset and active-time reporting
+  DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset and
+  active-time reporting
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -263,10 +264,17 @@ source-order Detailed samples, including system substep active-time rows, and
 checks that economizer active time is nonzero and outdoor-air mass flow rises
 above the design minimum.
 
+`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`
+uses the same Flow/Zone low-minimum fixture shape for the EnergyPlus
+`DifferentialEnthalpy` economizer reset. The Rust lane compares outdoor-air
+enthalpy against the recirculation enthalpy before applying the same source
+cooling-flow reset, reports 110 source-order Detailed samples, and keeps the
+active-time/flow evidence diagnostic-only.
+
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no finite-limit, DifferentialEnthalpy economizer, active heat
-recovery, active humidity-control, saturation-limit, or DCV output is part of
-the promoted IdealLoads claim.
+unresolved, and no finite-limit, active heat recovery, active
+humidity-control, saturation-limit, or DCV output is part of the promoted
+IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -301,15 +309,17 @@ humidity proof rows have diagnostic evidence only in
 `ideal_loads_constant_supply_humidity_diagnostic_001`.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, inactive
-economizer/heat-recovery outputs, and DifferentialDryBulb economizer
-active-time/flow outputs have diagnostic evidence only in
+economizer/heat-recovery outputs, and DifferentialDryBulb/DifferentialEnthalpy
+economizer active-time/flow outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
 `ideal_loads_outdoor_air_flow_area_diagnostic_001`, and
 `ideal_loads_outdoor_air_air_changes_diagnostic_001`,
 `ideal_loads_outdoor_air_sum_diagnostic_001`,
 `ideal_loads_outdoor_air_maximum_diagnostic_001`, and
-`ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`.
+`ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
+and
+`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`.
 The finite flow/capacity limit fixtures have diagnostic evidence only in their
 three finite-limit cases; those diagnostic lanes now have zero tolerance
 failures for their declared Detailed rows.

@@ -68,18 +68,19 @@ tolerance, and code organization.
   AirChanges/Hour, Sum, and Maximum outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, inactive
-  economizer/heat-recovery reports, and DifferentialDryBulb economizer
-  active-time/flow parity in
+  economizer/heat-recovery reports, and DifferentialDryBulb and
+  DifferentialEnthalpy economizer active-time/flow parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
   `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
   `ideal_loads_outdoor_air_flow_area_diagnostic_001` and
   `ideal_loads_outdoor_air_air_changes_diagnostic_001`,
   `ideal_loads_outdoor_air_sum_diagnostic_001`, and
   `ideal_loads_outdoor_air_maximum_diagnostic_001`, plus
-  `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`;
-  active DCV, DifferentialEnthalpy economizer, heat recovery, active humidity
-  control, saturation-limit branches, and broad OA conformance remain outside
-  the claim
+  `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`
+  and
+  `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`;
+  active DCV, heat recovery, active humidity control, saturation-limit
+  branches, and broad OA conformance remain outside the claim
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,

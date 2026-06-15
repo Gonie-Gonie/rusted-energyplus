@@ -728,6 +728,7 @@ fn build_outdoor_air_design_flow_context<'a>(
     for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
         let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
+            system.outdoor_air_economizer_type,
             standard_air_density_kg_per_m3,
             &sensible_results,
             expected.samples.len(),
@@ -829,10 +830,12 @@ fn validate_outdoor_air_design_flow_boundary(
     }
     if !matches!(
         system.outdoor_air_economizer_type,
-        OutdoorAirEconomizerType::NoEconomizer | OutdoorAirEconomizerType::DifferentialDryBulb
+        OutdoorAirEconomizerType::NoEconomizer
+            | OutdoorAirEconomizerType::DifferentialDryBulb
+            | OutdoorAirEconomizerType::DifferentialEnthalpy
     ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic currently supports NoEconomizer or DifferentialDryBulb economizer".to_string(),
+            "IdealLoads outdoor-air design-flow diagnostic currently supports NoEconomizer, DifferentialDryBulb, or DifferentialEnthalpy economizer".to_string(),
         );
     }
     if system.heat_recovery_type != HeatRecoveryType::None {
@@ -888,20 +891,28 @@ fn heat_recovery_label(heat_recovery: HeatRecoveryType) -> &'static str {
 }
 
 fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
-    if context.outdoor_air_economizer_type == OutdoorAirEconomizerType::DifferentialDryBulb {
-        "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialDryBulb economizer active-time/flow parity; DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
-    } else {
-        "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery"
+    match context.outdoor_air_economizer_type {
+        OutdoorAirEconomizerType::DifferentialDryBulb => {
+            "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialDryBulb economizer active-time/flow parity; DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
+        }
+        OutdoorAirEconomizerType::DifferentialEnthalpy => {
+            "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialEnthalpy economizer active-time/flow parity; DCV, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
+        }
+        OutdoorAirEconomizerType::NoEconomizer => {
+            "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and inactive economizer/heat recovery"
+        }
     }
 }
 
 fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
-    let economizer_source = if context.outdoor_air_economizer_type
-        == OutdoorAirEconomizerType::DifferentialDryBulb
-    {
-        " plus EnergyPlus DifferentialDryBulb economizer OA flow reset when outdoor dry-bulb is below recirculation dry-bulb"
-    } else {
-        ""
+    let economizer_source = match context.outdoor_air_economizer_type {
+        OutdoorAirEconomizerType::DifferentialDryBulb => {
+            " plus EnergyPlus DifferentialDryBulb economizer OA flow reset when outdoor dry-bulb is below recirculation dry-bulb"
+        }
+        OutdoorAirEconomizerType::DifferentialEnthalpy => {
+            " plus EnergyPlus DifferentialEnthalpy economizer OA flow reset when outdoor enthalpy is below recirculation enthalpy"
+        }
+        OutdoorAirEconomizerType::NoEconomizer => "",
     };
     format!(
         "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}",
@@ -1010,6 +1021,7 @@ fn ideal_loads_bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option
 
 fn outdoor_air_observed_values(
     output: &OutputRequest,
+    outdoor_air_economizer_type: OutdoorAirEconomizerType,
     standard_air_density_kg_per_m3: f64,
     sensible_results: &[IdealLoadsOutdoorAirSensibleResult],
     expected_samples: usize,
@@ -1018,7 +1030,7 @@ fn outdoor_air_observed_values(
         .iter()
         .any(|result| result.economizer_active_time_hr > 0.0)
     {
-        "rust-ideal-loads-outdoor-air-differential-dry-bulb-economizer"
+        outdoor_air_economizer_source(outdoor_air_economizer_type)
     } else {
         "rust-ideal-loads-outdoor-air-design-flow"
     };
@@ -1168,7 +1180,7 @@ fn outdoor_air_observed_values(
                 .iter()
                 .any(|result| result.economizer_active_time_hr > 0.0)
             {
-                "rust-ideal-loads-outdoor-air-differential-dry-bulb-economizer"
+                outdoor_air_economizer_source(outdoor_air_economizer_type)
             } else {
                 "rust-ideal-loads-outdoor-air-inactive-economizer"
             },
@@ -1188,6 +1200,20 @@ fn outdoor_air_observed_values(
             "IdealLoads outdoor-air design-flow report cannot produce Rust series for {} / {}",
             output.key, output.variable
         )),
+    }
+}
+
+fn outdoor_air_economizer_source(
+    outdoor_air_economizer_type: OutdoorAirEconomizerType,
+) -> &'static str {
+    match outdoor_air_economizer_type {
+        OutdoorAirEconomizerType::DifferentialDryBulb => {
+            "rust-ideal-loads-outdoor-air-differential-dry-bulb-economizer"
+        }
+        OutdoorAirEconomizerType::DifferentialEnthalpy => {
+            "rust-ideal-loads-outdoor-air-differential-enthalpy-economizer"
+        }
+        OutdoorAirEconomizerType::NoEconomizer => "rust-ideal-loads-outdoor-air-design-flow",
     }
 }
 
