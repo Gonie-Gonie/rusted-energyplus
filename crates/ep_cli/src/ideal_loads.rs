@@ -10,17 +10,19 @@ use ep_conformance::{
     ComparisonClass, ConformanceCase, EvidenceDomain, OutputFrequency, OutputLevel, OutputRequest,
     SourceArtifact, VariableClass,
 };
-use ep_model::{OutputHandle, SimulationModel};
+use ep_model::{IdealLoadsAirSystem, IdealLoadsLimit, OutputHandle, SimulationModel};
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    IdealLoadsSensibleMode, IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
-    IdealLoadsZoneState, OutputSeries, ResultStore, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
-    ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
-    calc_no_oa_no_limit_sensible_compat, classify_no_oa_no_limit_sensible_subset,
-    ideal_loads_zone_equipment_stages, supply_node_update_from_result,
+    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
+    IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries, ResultStore,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+    ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE, ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE,
+    ZoneSysEnergyDemand, calc_no_oa_no_limit_sensible_compat,
+    calc_no_oa_sensible_with_limits_compat, classify_no_oa_no_limit_sensible_subset,
+    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
+    supply_node_update_from_result,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -60,6 +62,7 @@ pub(crate) struct IdealLoadsDiagnosticReportSummary {
 struct IdealLoadsDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
+    branch: &'static str,
     zone_name: String,
     zone_air_node_name: String,
     system_name: String,
@@ -290,10 +293,14 @@ fn build_context<'a>(
         .find(|node| node.id == zone_air_node_edge.node)
         .ok_or_else(|| "missing zone air node".to_string())?;
 
-    let boundary = classify_no_oa_no_limit_sensible_subset(system);
+    let boundary = if manifest.conformance_claim {
+        classify_no_oa_no_limit_sensible_subset(system)
+    } else {
+        classify_no_oa_sensible_subset(system)
+    };
     if !boundary.is_supported() {
         return Err(format!(
-            "IdealLoads system is outside no-OA/no-limit subset: {}",
+            "IdealLoads system is outside no-OA sensible subset: {}",
             unsupported_features_label(&boundary.unsupported_features)
         ));
     }
@@ -314,10 +321,12 @@ fn build_context<'a>(
     let zone_air_node_name = zone_air_node.name.0.clone();
     let system_name = system.name.0.clone();
     let supply_node_name = supply_node.name.0.clone();
+    let branch = ideal_loads_sensible_branch(system);
 
     Ok(IdealLoadsDiagnosticContext {
         manifest,
         baseline,
+        branch,
         zone_name,
         zone_air_node_name,
         system_name,
@@ -442,19 +451,18 @@ fn evaluate_rows(
         let active_demand = input_trace.active_demand.samples[index].value;
         let heating_demand = active_demand.max(0.0);
         let cooling_demand = active_demand.min(0.0);
-        let result = calc_no_oa_no_limit_sensible_compat(
-            system,
-            IdealLoadsZoneState {
-                air_temperature_c: zone_temperature,
-                air_humidity_ratio: zone_humidity_ratio,
-            },
-            ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand),
-            true,
-        );
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: zone_temperature,
+            air_humidity_ratio: zone_humidity_ratio,
+        };
+        let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
+        let result = calc_ideal_loads_sensible_compat(system, zone_state, demand);
         record_mode(&mut mode_counts, result.mode);
         let _node_update = supply_node_update_from_result(supply_node.id, result);
         calc_results.push(result);
     }
+
+    let result_source = rust_result_source(system);
 
     let mut observed_by_variable = BTreeMap::new();
     observed_by_variable.insert(
@@ -545,6 +553,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         "W",
+        result_source,
         |result| result.zone_total_heating_rate_w,
     );
     add_result_series(
@@ -553,6 +562,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
         "W",
+        result_source,
         |result| result.zone_total_cooling_rate_w,
     );
     add_result_series(
@@ -561,6 +571,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
         "W",
+        result_source,
         |result| result.zone_sensible_heating_rate_w,
     );
     add_result_series(
@@ -569,6 +580,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
         "W",
+        result_source,
         |result| result.zone_sensible_cooling_rate_w,
     );
     add_result_series(
@@ -577,6 +589,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
         "W",
+        result_source,
         |result| result.supply_air_total_heating_rate_w,
     );
     add_result_series(
@@ -585,6 +598,7 @@ fn evaluate_rows(
         &calc_results,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
         "W",
+        result_source,
         |result| result.supply_air_total_cooling_rate_w,
     );
     add_result_series(
@@ -593,6 +607,7 @@ fn evaluate_rows(
         &calc_results,
         SYSTEM_NODE_TEMPERATURE,
         "C",
+        result_source,
         |result| result.supply_temperature_c,
     );
     add_result_series(
@@ -601,6 +616,7 @@ fn evaluate_rows(
         &calc_results,
         SYSTEM_NODE_HUMIDITY_RATIO,
         "kgWater/kgDryAir",
+        result_source,
         |result| result.supply_humidity_ratio,
     );
     add_result_series(
@@ -609,6 +625,7 @@ fn evaluate_rows(
         &calc_results,
         SYSTEM_NODE_MASS_FLOW_RATE,
         "kg/s",
+        result_source,
         |result| result.supply_mass_flow_rate_kg_per_s,
     );
 
@@ -681,6 +698,45 @@ fn evaluate_rows(
     Ok((rows, result_store, mode_counts))
 }
 
+fn calc_ideal_loads_sensible_compat(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+) -> IdealLoadsSensibleResult {
+    if uses_finite_limits(system) {
+        calc_no_oa_sensible_with_limits_compat(
+            system,
+            zone_state,
+            demand,
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        )
+    } else {
+        calc_no_oa_no_limit_sensible_compat(system, zone_state, demand, true)
+    }
+}
+
+fn ideal_loads_sensible_branch(system: &IdealLoadsAirSystem) -> &'static str {
+    if uses_finite_limits(system) {
+        "no-oa-finite-limit-sensible"
+    } else {
+        "no-oa-no-limit-sensible"
+    }
+}
+
+fn rust_result_source(system: &IdealLoadsAirSystem) -> &'static str {
+    if uses_finite_limits(system) {
+        "rust-ideal-loads-no-oa-sensible-limited-calc"
+    } else {
+        "rust-ideal-loads-no-oa-sensible-calc"
+    }
+}
+
+fn uses_finite_limits(system: &IdealLoadsAirSystem) -> bool {
+    system.heating_limit != IdealLoadsLimit::NoLimit
+        || system.cooling_limit != IdealLoadsLimit::NoLimit
+}
+
 struct ObservedSeries {
     source: &'static str,
     units: &'static str,
@@ -748,15 +804,12 @@ fn add_result_series(
     results: &[IdealLoadsSensibleResult],
     variable: &str,
     units: &'static str,
+    source: &'static str,
     value: fn(IdealLoadsSensibleResult) -> f64,
 ) {
     observed_by_variable.insert(
         (key.to_string(), variable.to_string()),
-        ObservedSeries::new(
-            "rust-ideal-loads-no-oa-sensible-calc",
-            units,
-            results.iter().copied().map(value).collect(),
-        ),
+        ObservedSeries::new(source, units, results.iter().copied().map(value).collect()),
     );
 }
 
@@ -1291,7 +1344,7 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         "  \"case_id\": {},\n",
         json_string(&context.manifest.id)
     ));
-    json.push_str("  \"branch\": \"no-oa-no-limit-sensible\",\n");
+    json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
     json.push_str("  \"outdoor_air\": false,\n");
     json.push_str("  \"economizer\": \"NoEconomizer\",\n");
     json.push_str("  \"heat_recovery\": \"None\",\n");
@@ -1397,6 +1450,8 @@ fn tolerance_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
 fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
+    } else if context.branch == "no-oa-finite-limit-sensible" {
+        "diagnostic-only no-OA finite-limit sensible IdealLoads branch"
     } else {
         "diagnostic-only no-OA/no-limit sensible IdealLoads branch"
     }
@@ -1511,6 +1566,8 @@ fn unsupported_features_label(features: &[IdealLoadsUnsupportedFeature]) -> Stri
             IdealLoadsUnsupportedFeature::CoolingLimit => "cooling-limit",
             IdealLoadsUnsupportedFeature::Humidification => "humidification",
             IdealLoadsUnsupportedFeature::Dehumidification => "dehumidification",
+            IdealLoadsUnsupportedFeature::UnresolvedHeatingLimit => "unresolved-heating-limit",
+            IdealLoadsUnsupportedFeature::UnresolvedCoolingLimit => "unresolved-cooling-limit",
         })
         .collect::<Vec<_>>()
         .join(",")
