@@ -120,6 +120,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Gate the v0.11 air-side node baseline evidence and Rust projection."
     }
+    "ideal-loads-no-oa-sensible-diagnostic" = @{
+        Path = "smoke\ideal-loads-no-oa-sensible-diagnostic.ps1"
+        Group = "smoke"
+        Help = "Stage the no-OA/no-limit IdealLoads sensible diagnostic candidate."
+    }
     "plant-loop-skeleton-smoke" = @{
         Path = "smoke\plant-loop-skeleton-smoke.ps1"
         Group = "smoke"

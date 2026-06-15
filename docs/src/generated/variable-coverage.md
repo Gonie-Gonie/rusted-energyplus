@@ -9,6 +9,10 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 |---|---|---|---|---|
 | Zone Ideal Loads Zone Total Cooling Rate | hvac | baseline | air_side_node_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | Zone Ideal Loads Zone Total Heating Rate | hvac | baseline | air_side_node_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
+| Zone Ideal Loads Zone Sensible Heating Rate | hvac | diagnostic | ideal_loads_no_oa_sensible_conformance_001 | Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed. |
+| Zone Ideal Loads Zone Sensible Cooling Rate | hvac | diagnostic | ideal_loads_no_oa_sensible_conformance_001 | Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed. |
+| Zone Ideal Loads Supply Air Total Heating Rate | hvac | diagnostic | ideal_loads_no_oa_sensible_conformance_001 | Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed. |
+| Zone Ideal Loads Supply Air Total Cooling Rate | hvac | diagnostic | ideal_loads_no_oa_sensible_conformance_001 | Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed. |
 | System Node Humidity Ratio | node | baseline | air_side_node_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | District Heating Water Rate | plant | baseline | plant_loop_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | Plant Load Profile Heat Transfer Rate | plant | baseline | plant_loop_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |

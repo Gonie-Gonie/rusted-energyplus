@@ -26,6 +26,7 @@
 # Porting Maps
 
 - [Output Variable Source Map](porting-map/output-variable-source-map.md)
+- [IdealLoads Source Map](porting-map/ideal-loads-source-map.md)
 - [Zone Air Update Map](porting-map/zone-air-update-map.md)
 - [Surface Balance Map](porting-map/surface-balance-map.md)
 - [Conduction Map](porting-map/conduction-map.md)

@@ -112,8 +112,11 @@ evidence.
 
 ## EnergyPlus Source Areas To Map Next
 
-Before a load-conformance claim, the remaining source maps must identify the
-specific EnergyPlus 26.1.0 functions and state transitions for:
+`ideal-loads-source-map.md` now records the first `PurchasedAirManager` and
+zone-equipment function map for the no-OA/no-limit sensible diagnostic
+candidate. Before a load-conformance claim, the remaining source maps and Rust
+state must still identify or implement the specific EnergyPlus 26.1.0
+functions and state transitions for:
 
 - zone thermostat control type and setpoint selection
 - IdealLoads sensible and latent load calculation
@@ -123,11 +126,26 @@ specific EnergyPlus 26.1.0 functions and state transitions for:
 - humidification and dehumidification control
 - output variable registration and meter accounting
 
-Likely source areas include `ZoneTempPredictorCorrector`,
-`ZoneEquipmentManager`, `ZoneAirLoopEquipmentManager`, `HVACManager`, and the
-IdealLoads component implementation in the EnergyPlus HVAC source tree. The
-exact source-function map must be recorded before any numerical claim is
-promoted.
+The exact source-function map, Rust result state, and tolerance gate must be
+recorded before any numerical claim is promoted.
+
+## IdealLoads No-OA Sensible Candidate
+
+`ideal_loads_no_oa_sensible_conformance_001` stages the first narrow
+IdealLoads candidate. It is deliberately still diagnostic-only:
+
+```text
+comparison_class: diagnostic-only
+conformance_claim: false
+tolerance_policy: none
+status: baseline-only
+```
+
+The candidate requests thermostat setpoints, IdealLoads total and sensible
+rates, supply-air total rates, and supply-node temperature and mass flow. Its
+manifest carries draft tolerance thresholds for the future promotion gate, but
+the baseline report keeps `tolerance_policy: none` until Rust writes matching
+`ResultStore` series and a blocking conformance gate passes.
 
 ## Promotion Requirements
 

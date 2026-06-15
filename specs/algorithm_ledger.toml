@@ -92,6 +92,40 @@ claim_level = "none"
 support_boundary = "Diagnostic node-state projection only; no HVAC loop, node, or flow numerical conformance."
 
 [[algorithm]]
+id = "ideal_loads_air_system"
+domain = "hvac"
+source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/PurchasedAirManager.cc",
+  "src/EnergyPlus/PurchasedAirManager.hh",
+  "src/EnergyPlus/ZoneEquipmentManager.cc",
+  "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+  "src/EnergyPlus/DataZoneEnergyDemands.hh",
+  "src/EnergyPlus/DataLoopNode.hh",
+  "src/EnergyPlus/ScheduleManager.hh",
+  "src/EnergyPlus/Psychrometrics.hh",
+  "src/EnergyPlus/OutputProcessor.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/runtime.rs::ExecutionStep::EvaluateIdealLoadsAirSystem",
+  "crates/ep_runtime/src/runtime.rs::NodeStateStore",
+  "crates/ep_runtime/src/runtime.rs::simulate_ideal_loads_node_state_projection",
+]
+status = "diagnostic_only"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+proof_variables = [
+  "Zone Thermostat Heating Setpoint Temperature",
+  "Zone Thermostat Cooling Setpoint Temperature",
+  "Zone Ideal Loads Zone Total Heating Rate",
+  "Zone Ideal Loads Zone Total Cooling Rate",
+  "System Node Temperature",
+  "System Node Mass Flow Rate",
+]
+claim_level = "none"
+support_boundary = "Diagnostic no-OA/no-limit IdealLoads sensible conformance candidate only; no load, node, humidity, outdoor-air, sizing, meter, or HVAC numerical conformance claim."
+
+[[algorithm]]
 id = "plant_loop_state_projection"
 domain = "plant"
 source_map = "docs/src/porting-map/plant-source-map.md"

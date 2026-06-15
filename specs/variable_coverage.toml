@@ -15,6 +15,38 @@ first_evidence = "air_side_node_diagnostic_001"
 support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
 
 [[variable]]
+name = "Zone Ideal Loads Zone Sensible Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Ideal Loads Zone Sensible Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Total Heating Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Ideal Loads Supply Air Total Cooling Rate"
+domain = "hvac"
+status = "diagnostic"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
+support_boundary = "Diagnostic no-OA/no-limit IdealLoads candidate output with draft tolerance metadata only; Rust numerical parity is not claimed."
+
+[[variable]]
 name = "System Node Humidity Ratio"
 domain = "node"
 status = "baseline"
