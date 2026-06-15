@@ -1053,7 +1053,9 @@ fn build_context<'a>(
             .unsupported_features
             .retain(|feature| *feature != IdealLoadsUnsupportedFeature::Dehumidification);
     }
-    if manifest_allows_humidistat_humidification_diagnostic(manifest, system) {
+    if manifest_allows_constant_supply_humidity_humidification_diagnostic(manifest, system)
+        || manifest_allows_humidistat_humidification_diagnostic(manifest, system)
+    {
         boundary
             .unsupported_features
             .retain(|feature| *feature != IdealLoadsUnsupportedFeature::Humidification);
@@ -2361,6 +2363,20 @@ fn manifest_allows_humidistat_humidification_diagnostic(
         && manifest.outputs.iter().any(|output| {
             output.variable == ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD
                 || output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
+                || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
+        })
+}
+
+fn manifest_allows_constant_supply_humidity_humidification_diagnostic(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    !manifest.conformance_claim
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type
+            == HumidificationControlType::ConstantSupplyHumidityRatio
+        && manifest.outputs.iter().any(|output| {
+            output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
                 || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
         })
 }

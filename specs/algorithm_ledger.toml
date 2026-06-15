@@ -232,7 +232,38 @@ proof_variables = [
   "System Node Humidity Ratio",
 ]
 claim_level = "none"
-support_boundary = "Diagnostic-only no-OA ConstantSupplyHumidityRatio humidity-control latent/sensible report evidence with EnergyPlus minimum cooling supply humidity ratio, latent-heating total-rate sorting during cooling, EPW barometric-pressure saturation clamps, and return-node mixed-air proof rows; humidistat, moisture-demand branches, outdoor-air humidity control, humidification-side ConstantSupplyHumidityRatio, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Diagnostic-only no-OA ConstantSupplyHumidityRatio cooling-side humidity-control latent/sensible report evidence with EnergyPlus minimum cooling supply humidity ratio, latent-heating total-rate sorting during cooling, EPW barometric-pressure saturation clamps, and return-node mixed-air proof rows; humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
+
+[[algorithm]]
+id = "ideal_loads_constant_supply_humidity_heating_control"
+domain = "hvac"
+source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/PurchasedAirManager.cc",
+  "src/EnergyPlus/Psychrometrics.hh",
+  "src/EnergyPlus/OutputProcessor.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/ideal_loads/calc.rs::calc_no_oa_no_limit_sensible_with_recirculation_context_compat",
+  "crates/ep_runtime/src/ideal_loads/calc.rs::heating_supply_humidity_ratio",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE",
+  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE",
+  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_constant_supply_humidity_humidification_diagnostic",
+  "scripts/compare/compare-ideal-loads-constant-supply-humidity-heating-diagnostic.ps1",
+]
+status = "diagnostic_only"
+first_case = "ideal_loads_constant_supply_humidity_heating_diagnostic_001"
+first_evidence = "ideal_loads_constant_supply_humidity_heating_diagnostic_001"
+proof_variables = [
+  "Zone Ideal Loads Zone Latent Heating Rate",
+  "Zone Ideal Loads Supply Air Latent Heating Rate",
+  "Zone Ideal Loads Zone Total Heating Rate",
+  "Zone Ideal Loads Supply Air Total Heating Rate",
+  "System Node Humidity Ratio",
+  "System Node Mass Flow Rate",
+]
+claim_level = "none"
+support_boundary = "Diagnostic-only no-OA ConstantSupplyHumidityRatio heating-side humidity-control evidence with EnergyPlus maximum heating supply humidity ratio, saturation clamp, and latent heating report parity; humidistat, moisture-demand branches, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidity behavior, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_humidistat_dehumidification_control"

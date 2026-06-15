@@ -659,6 +659,11 @@ fn heating_supply_humidity_ratio(
                     .min(system.maximum_heating_supply_air_humidity_ratio);
             mixed_supply_humidity_ratio.max(supply_humidity_ratio_for_humidification)
         }
+        HumidificationControlType::ConstantSupplyHumidityRatio
+            if supply_mass_flow_rate_kg_per_s > 0.0 =>
+        {
+            system.maximum_heating_supply_air_humidity_ratio
+        }
         _ => mixed_supply_humidity_ratio,
     };
     let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
@@ -1216,6 +1221,34 @@ mod tests {
         );
         assert!(result.supply_temperature_c < system.maximum_heating_supply_air_temperature_c);
         assert_close(result.zone_sensible_heating_rate_w, 3000.0, 1.0e-9);
+        assert_close(
+            result.supply_humidity_ratio,
+            system.maximum_heating_supply_air_humidity_ratio,
+            1.0e-12,
+        );
+        assert!(result.zone_latent_heating_rate_w > 0.0);
+        assert!(result.supply_air_latent_heating_rate_w > 0.0);
+        assert!(result.zone_total_heating_rate_w > result.zone_sensible_heating_rate_w);
+    }
+
+    #[test]
+    fn constant_supply_humidity_ratio_heating_uses_maximum_heating_humidity() {
+        let mut system = test_system();
+        system.humidification_control_type = HumidificationControlType::ConstantSupplyHumidityRatio;
+        system.maximum_heating_supply_air_humidity_ratio = 0.0156;
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 20.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_no_limit_sensible_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0),
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
         assert_close(
             result.supply_humidity_ratio,
             system.maximum_heating_supply_air_humidity_ratio,
