@@ -29,7 +29,7 @@ The initial supported boundary is intentionally narrow:
 - one `ZoneHVAC:IdealLoadsAirSystem`
 - no outdoor air requirement
 - no economizer
-- no heat recovery
+- no or diagnostic-only Sensible heat recovery
 - no humidistat
 - no demand-controlled ventilation
 - no finite flow or capacity limit
@@ -200,11 +200,11 @@ preparatory Rust surface is:
   `Maximum` methods
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
-- `calc_outdoor_air_sensible_report_rates_compat` for the no-heat-recovery,
-  no-humidity Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and
-  Maximum OA report-rate and mixed-air state diagnostic, including
-  DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset and
-  active-time reporting
+- `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
+  Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum OA
+  report-rate and mixed-air state diagnostic, including no-heat-recovery
+  rows, DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
+  and Sensible heat-recovery OA tempering/rate reporting
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -271,8 +271,17 @@ enthalpy against the recirculation enthalpy before applying the same source
 cooling-flow reset, reports 110 source-order Detailed samples, and keeps the
 active-time/flow evidence diagnostic-only.
 
+`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` keeps the
+Flow/Zone outdoor-air method with `NoEconomizer` and
+`HeatRecoveryType = Sensible`. The Rust lane applies the EnergyPlus sensible
+heat-recovery outdoor-air tempering branch when recirculation air can
+beneficially warm or cool outdoor air, reports 96 Detailed samples, and keeps
+the mixed-air, active-time, sensible-rate, and total-rate evidence
+diagnostic-only. Humidity ratio is unchanged by Sensible heat recovery, so the
+latent heat-recovery rows remain zero.
+
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no finite-limit, active heat recovery, active
+unresolved, and no finite-limit, Enthalpy heat recovery, active
 humidity-control, saturation-limit, or DCV output is part of the promoted
 IdealLoads claim.
 
@@ -295,7 +304,7 @@ The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, `System Node Humidity Ratio`, zone-air-node proof rows,
 heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, active
-humidity-control outdoor-air latent behavior, heat-recovery outputs,
+humidity-control outdoor-air latent behavior, Enthalpy heat-recovery outputs,
 economizer outputs, finite flow/capacity limits, adaptive system timestep,
 broad meter conformance, and non-constant efficiency schedules remain
 diagnostic-only or unsupported until their source-order branches are ported or
@@ -309,8 +318,9 @@ humidity proof rows have diagnostic evidence only in
 `ideal_loads_constant_supply_humidity_diagnostic_001`.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, inactive
-economizer/heat-recovery outputs, and DifferentialDryBulb/DifferentialEnthalpy
-economizer active-time/flow outputs have diagnostic evidence only in
+economizer/heat-recovery outputs, DifferentialDryBulb/DifferentialEnthalpy
+economizer active-time/flow outputs, and Sensible heat-recovery active-time
+and rate outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
 `ideal_loads_outdoor_air_flow_area_diagnostic_001`, and
@@ -319,7 +329,9 @@ economizer active-time/flow outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_maximum_diagnostic_001`, and
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
 and
-`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`.
+`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`,
+and
+`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`.
 The finite flow/capacity limit fixtures have diagnostic evidence only in their
 three finite-limit cases; those diagnostic lanes now have zero tolerance
 failures for their declared Detailed rows.

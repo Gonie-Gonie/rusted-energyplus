@@ -90,6 +90,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-outdoor-air-flow-area-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Area outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-area` |
 | `compare-ideal-loads-outdoor-air-flow-person-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Person outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-person` |
 | `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |
+| `compare-ideal-loads-outdoor-air-sensible-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sensible heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery` |
 | `compare-ideal-loads-outdoor-air-sum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-sum` |
 | `compare-zone-smoke` | diagnostic | extract heat-balance zone-temperature deltas and report artifacts only | no | `.runtime/compare-zone/compare` |
 | `compare-heat-balance-conformance` | compare | run the v0.8 tolerance-gated heat-balance conformance case | yes | `.runtime/heat-balance-conformance` |

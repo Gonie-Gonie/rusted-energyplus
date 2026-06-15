@@ -6,8 +6,8 @@ use crate::{
     zone_equipment::ZoneSysEnergyDemand,
 };
 use ep_model::{
-    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod, IdealLoadsAirSystem,
-    OutdoorAirEconomizerType,
+    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
+    IdealLoadsAirSystem, OutdoorAirEconomizerType,
 };
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
@@ -72,6 +72,24 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
     pub mixed_air_humidity_ratio: f64,
     /// Reported economizer active time for this system timestep.
     pub economizer_active_time_hr: f64,
+    /// Final heat-recovery sensible output relative to outdoor-air inlet conditions.
+    pub heat_recovery_sensible_output_w: f64,
+    /// Final heat-recovery latent output relative to outdoor-air inlet conditions.
+    pub heat_recovery_latent_output_w: f64,
+    /// Reported heat-recovery sensible heating rate.
+    pub heat_recovery_sensible_heating_rate_w: f64,
+    /// Reported heat-recovery sensible cooling rate.
+    pub heat_recovery_sensible_cooling_rate_w: f64,
+    /// Reported heat-recovery latent heating rate.
+    pub heat_recovery_latent_heating_rate_w: f64,
+    /// Reported heat-recovery latent cooling rate.
+    pub heat_recovery_latent_cooling_rate_w: f64,
+    /// Reported heat-recovery total heating rate.
+    pub heat_recovery_total_heating_rate_w: f64,
+    /// Reported heat-recovery total cooling rate.
+    pub heat_recovery_total_cooling_rate_w: f64,
+    /// Reported heat-recovery active time for this system timestep.
+    pub heat_recovery_active_time_hr: f64,
 }
 
 /// Calculates the design outdoor-air volume flow in m3/s for supported methods.
@@ -179,6 +197,15 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
             mixed_air_temperature_c: recirculation_state.air_temperature_c,
             mixed_air_humidity_ratio: recirculation_state.air_humidity_ratio,
             economizer_active_time_hr: 0.0,
+            heat_recovery_sensible_output_w: 0.0,
+            heat_recovery_latent_output_w: 0.0,
+            heat_recovery_sensible_heating_rate_w: 0.0,
+            heat_recovery_sensible_cooling_rate_w: 0.0,
+            heat_recovery_latent_heating_rate_w: 0.0,
+            heat_recovery_latent_cooling_rate_w: 0.0,
+            heat_recovery_total_heating_rate_w: 0.0,
+            heat_recovery_total_cooling_rate_w: 0.0,
+            heat_recovery_active_time_hr: 0.0,
         };
     }
 
@@ -245,12 +272,17 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         final_cp_air_j_per_kg_k,
         outdoor_air_mass_flow_rate_kg_per_s,
     );
-    let (mixed_air_temperature_c, mixed_air_humidity_ratio) = mixed_air_state(
+    let mixed_air_result = mixed_air_state(
+        system,
         recirculation_state,
         outdoor_air_state,
+        mode,
+        system_timestep_hours,
         outdoor_air_mass_flow_rate_kg_per_s,
         supply_mass_flow_rate_kg_per_s,
     );
+    let mixed_air_temperature_c = mixed_air_result.mixed_air_temperature_c;
+    let mixed_air_humidity_ratio = mixed_air_result.mixed_air_humidity_ratio;
     let (supply_air_temperature_c, supply_air_humidity_ratio) = supply_air_state(
         system,
         zone_state,
@@ -280,6 +312,17 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         mixed_air_temperature_c,
         mixed_air_humidity_ratio,
         economizer_active_time_hr,
+        heat_recovery_sensible_output_w: mixed_air_result.heat_recovery_sensible_output_w,
+        heat_recovery_latent_output_w: mixed_air_result.heat_recovery_latent_output_w,
+        heat_recovery_sensible_heating_rate_w: mixed_air_result
+            .heat_recovery_sensible_heating_rate_w,
+        heat_recovery_sensible_cooling_rate_w: mixed_air_result
+            .heat_recovery_sensible_cooling_rate_w,
+        heat_recovery_latent_heating_rate_w: mixed_air_result.heat_recovery_latent_heating_rate_w,
+        heat_recovery_latent_cooling_rate_w: mixed_air_result.heat_recovery_latent_cooling_rate_w,
+        heat_recovery_total_heating_rate_w: mixed_air_result.heat_recovery_total_heating_rate_w,
+        heat_recovery_total_cooling_rate_w: mixed_air_result.heat_recovery_total_cooling_rate_w,
+        heat_recovery_active_time_hr: mixed_air_result.heat_recovery_active_time_hr,
     }
 }
 
@@ -387,50 +430,152 @@ fn outdoor_air_supply_mass_flow_rate_kg_per_s(
         .max(0.0)
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct IdealLoadsMixedAirResult {
+    mixed_air_temperature_c: f64,
+    mixed_air_humidity_ratio: f64,
+    heat_recovery_sensible_output_w: f64,
+    heat_recovery_latent_output_w: f64,
+    heat_recovery_sensible_heating_rate_w: f64,
+    heat_recovery_sensible_cooling_rate_w: f64,
+    heat_recovery_latent_heating_rate_w: f64,
+    heat_recovery_latent_cooling_rate_w: f64,
+    heat_recovery_total_heating_rate_w: f64,
+    heat_recovery_total_cooling_rate_w: f64,
+    heat_recovery_active_time_hr: f64,
+}
+
 fn mixed_air_state(
+    system: &IdealLoadsAirSystem,
     recirculation_state: IdealLoadsOutdoorAirNodeState,
     outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    mode: IdealLoadsSensibleMode,
+    system_timestep_hours: f64,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     supply_mass_flow_rate_kg_per_s: f64,
-) -> (f64, f64) {
+) -> IdealLoadsMixedAirResult {
     if outdoor_air_mass_flow_rate_kg_per_s <= 0.0 || supply_mass_flow_rate_kg_per_s <= 0.0 {
-        return (
-            recirculation_state.air_temperature_c,
-            recirculation_state.air_humidity_ratio,
-        );
-    }
-    if supply_mass_flow_rate_kg_per_s <= outdoor_air_mass_flow_rate_kg_per_s {
-        return (
-            outdoor_air_state.air_temperature_c,
-            outdoor_air_state.air_humidity_ratio,
-        );
+        return IdealLoadsMixedAirResult {
+            mixed_air_temperature_c: recirculation_state.air_temperature_c,
+            mixed_air_humidity_ratio: recirculation_state.air_humidity_ratio,
+            heat_recovery_sensible_output_w: 0.0,
+            heat_recovery_latent_output_w: 0.0,
+            heat_recovery_sensible_heating_rate_w: 0.0,
+            heat_recovery_sensible_cooling_rate_w: 0.0,
+            heat_recovery_latent_heating_rate_w: 0.0,
+            heat_recovery_latent_cooling_rate_w: 0.0,
+            heat_recovery_total_heating_rate_w: 0.0,
+            heat_recovery_total_cooling_rate_w: 0.0,
+            heat_recovery_active_time_hr: 0.0,
+        };
     }
 
-    let recirculation_mass_flow_rate_kg_per_s =
-        supply_mass_flow_rate_kg_per_s - outdoor_air_mass_flow_rate_kg_per_s;
+    let heat_recovery_active = heat_recovery_allows_outdoor_air_tempering(
+        system.heat_recovery_type,
+        recirculation_state,
+        outdoor_air_state,
+        mode,
+    );
+    let heat_recovery_active_time_hr = if heat_recovery_active {
+        system_timestep_hours.max(0.0)
+    } else {
+        0.0
+    };
+
+    let outdoor_air_after_heat_recovery_temperature_c = if heat_recovery_active {
+        outdoor_air_state.air_temperature_c
+            + system.sensible_heat_recovery_effectiveness
+                * (recirculation_state.air_temperature_c - outdoor_air_state.air_temperature_c)
+    } else {
+        outdoor_air_state.air_temperature_c
+    };
+    let outdoor_air_after_heat_recovery_humidity_ratio = outdoor_air_state.air_humidity_ratio;
     let recirculation_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
         recirculation_state.air_temperature_c,
         recirculation_state.air_humidity_ratio,
     );
-    let outdoor_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+    let outdoor_air_inlet_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
         outdoor_air_state.air_temperature_c,
         outdoor_air_state.air_humidity_ratio,
     );
-    let mixed_air_enthalpy_j_per_kg = (recirculation_mass_flow_rate_kg_per_s
-        * recirculation_enthalpy_j_per_kg
-        + outdoor_air_mass_flow_rate_kg_per_s * outdoor_air_enthalpy_j_per_kg)
-        / supply_mass_flow_rate_kg_per_s;
-    let mixed_air_humidity_ratio = (recirculation_mass_flow_rate_kg_per_s
-        * recirculation_state.air_humidity_ratio
-        + outdoor_air_mass_flow_rate_kg_per_s * outdoor_air_state.air_humidity_ratio)
-        / supply_mass_flow_rate_kg_per_s;
-    (
-        dry_bulb_from_enthalpy_and_humidity_ratio(
-            mixed_air_enthalpy_j_per_kg,
+    let outdoor_air_after_heat_recovery_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
+        outdoor_air_after_heat_recovery_temperature_c,
+        outdoor_air_after_heat_recovery_humidity_ratio,
+    );
+    let (mixed_air_temperature_c, mixed_air_humidity_ratio) = if supply_mass_flow_rate_kg_per_s
+        <= outdoor_air_mass_flow_rate_kg_per_s
+    {
+        (
+            outdoor_air_after_heat_recovery_temperature_c,
+            outdoor_air_after_heat_recovery_humidity_ratio,
+        )
+    } else {
+        let recirculation_mass_flow_rate_kg_per_s =
+            supply_mass_flow_rate_kg_per_s - outdoor_air_mass_flow_rate_kg_per_s;
+        let mixed_air_enthalpy_j_per_kg = (recirculation_mass_flow_rate_kg_per_s
+            * recirculation_enthalpy_j_per_kg
+            + outdoor_air_mass_flow_rate_kg_per_s
+                * outdoor_air_after_heat_recovery_enthalpy_j_per_kg)
+            / supply_mass_flow_rate_kg_per_s;
+        let mixed_air_humidity_ratio = (recirculation_mass_flow_rate_kg_per_s
+            * recirculation_state.air_humidity_ratio
+            + outdoor_air_mass_flow_rate_kg_per_s * outdoor_air_after_heat_recovery_humidity_ratio)
+            / supply_mass_flow_rate_kg_per_s;
+        (
+            dry_bulb_from_enthalpy_and_humidity_ratio(
+                mixed_air_enthalpy_j_per_kg,
+                mixed_air_humidity_ratio,
+            ),
             mixed_air_humidity_ratio,
-        ),
+        )
+    };
+    let cp_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(outdoor_air_state.air_humidity_ratio);
+    let heat_recovery_sensible_output_w = outdoor_air_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (outdoor_air_after_heat_recovery_temperature_c - outdoor_air_state.air_temperature_c);
+    let heat_recovery_latent_output_w = outdoor_air_mass_flow_rate_kg_per_s
+        * (outdoor_air_after_heat_recovery_enthalpy_j_per_kg - outdoor_air_inlet_enthalpy_j_per_kg)
+        - heat_recovery_sensible_output_w;
+    let heat_recovery_sensible_heating_rate_w = heat_recovery_sensible_output_w.max(0.0);
+    let heat_recovery_sensible_cooling_rate_w = heat_recovery_sensible_output_w.min(0.0).abs();
+    let heat_recovery_latent_heating_rate_w = heat_recovery_latent_output_w.max(0.0);
+    let heat_recovery_latent_cooling_rate_w = heat_recovery_latent_output_w.min(0.0).abs();
+    IdealLoadsMixedAirResult {
+        mixed_air_temperature_c,
         mixed_air_humidity_ratio,
-    )
+        heat_recovery_sensible_output_w,
+        heat_recovery_latent_output_w,
+        heat_recovery_sensible_heating_rate_w,
+        heat_recovery_sensible_cooling_rate_w,
+        heat_recovery_latent_heating_rate_w,
+        heat_recovery_latent_cooling_rate_w,
+        heat_recovery_total_heating_rate_w: heat_recovery_sensible_heating_rate_w
+            + heat_recovery_latent_heating_rate_w,
+        heat_recovery_total_cooling_rate_w: heat_recovery_sensible_cooling_rate_w
+            + heat_recovery_latent_cooling_rate_w,
+        heat_recovery_active_time_hr,
+    }
+}
+
+fn heat_recovery_allows_outdoor_air_tempering(
+    heat_recovery_type: HeatRecoveryType,
+    recirculation_state: IdealLoadsOutdoorAirNodeState,
+    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    mode: IdealLoadsSensibleMode,
+) -> bool {
+    if heat_recovery_type != HeatRecoveryType::Sensible {
+        return false;
+    }
+    match mode {
+        IdealLoadsSensibleMode::Heating => {
+            recirculation_state.air_temperature_c > outdoor_air_state.air_temperature_c
+        }
+        IdealLoadsSensibleMode::Cooling => {
+            recirculation_state.air_temperature_c < outdoor_air_state.air_temperature_c
+        }
+        IdealLoadsSensibleMode::Deadband | IdealLoadsSensibleMode::Off => false,
+    }
 }
 
 fn supply_air_state(
@@ -736,6 +881,41 @@ mod tests {
         assert_eq!(result.economizer_active_time_hr, 0.25);
         assert!(
             result.supply_mass_flow_rate_kg_per_s >= result.outdoor_air_mass_flow_rate_kg_per_s
+        );
+    }
+
+    #[test]
+    fn sensible_heat_recovery_reports_active_heating_output() {
+        let mut system = test_system();
+        system.heat_recovery_type = HeatRecoveryType::Sensible;
+        let result = calc_outdoor_air_sensible_report_rates_compat(
+            &system,
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 21.0,
+                air_humidity_ratio: 0.006,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 21.0,
+                air_humidity_ratio: 0.006,
+            },
+            IdealLoadsOutdoorAirNodeState {
+                air_temperature_c: 0.0,
+                air_humidity_ratio: 0.004,
+            },
+            ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 500.0, 0.0),
+            0.01,
+            0.25,
+            true,
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+        assert_eq!(result.heat_recovery_active_time_hr, 0.25);
+        assert!(result.heat_recovery_sensible_heating_rate_w > 0.0);
+        assert_eq!(result.heat_recovery_sensible_cooling_rate_w, 0.0);
+        assert_close(result.heat_recovery_latent_output_w, 0.0, 1.0e-9);
+        assert_eq!(
+            result.heat_recovery_total_heating_rate_w,
+            result.heat_recovery_sensible_heating_rate_w
         );
     }
 

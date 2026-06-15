@@ -729,6 +729,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
             system.outdoor_air_economizer_type,
+            system.heat_recovery_type,
             standard_air_density_kg_per_m3,
             &sensible_results,
             expected.samples.len(),
@@ -838,9 +839,20 @@ fn validate_outdoor_air_design_flow_boundary(
             "IdealLoads outdoor-air design-flow diagnostic currently supports NoEconomizer, DifferentialDryBulb, or DifferentialEnthalpy economizer".to_string(),
         );
     }
-    if system.heat_recovery_type != HeatRecoveryType::None {
+    if !matches!(
+        system.heat_recovery_type,
+        HeatRecoveryType::None | HeatRecoveryType::Sensible
+    ) {
         return Err(
-            "IdealLoads outdoor-air design-flow diagnostic excludes heat recovery".to_string(),
+            "IdealLoads outdoor-air design-flow diagnostic currently supports no heat recovery or Sensible heat recovery".to_string(),
+        );
+    }
+    if system.heat_recovery_type == HeatRecoveryType::Sensible
+        && system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer
+    {
+        return Err(
+            "IdealLoads outdoor-air Sensible heat-recovery diagnostic currently requires NoEconomizer"
+                .to_string(),
         );
     }
     if system.heating_limit != IdealLoadsLimit::NoLimit
@@ -891,6 +903,9 @@ fn heat_recovery_label(heat_recovery: HeatRecoveryType) -> &'static str {
 }
 
 fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
+    if context.heat_recovery_type == HeatRecoveryType::Sensible {
+        return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
+    }
     match context.outdoor_air_economizer_type {
         OutdoorAirEconomizerType::DifferentialDryBulb => {
             "diagnostic-only IdealLoads outdoor-air Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and DifferentialDryBulb economizer active-time/flow parity; DCV, DifferentialEnthalpy economizer, heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim"
@@ -914,10 +929,17 @@ fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContex
         }
         OutdoorAirEconomizerType::NoEconomizer => "",
     };
+    let heat_recovery_source = match context.heat_recovery_type {
+        HeatRecoveryType::Sensible => {
+            " plus EnergyPlus Sensible heat recovery OA tempering when recirculation air can beneficially warm or cool outdoor air"
+        }
+        HeatRecoveryType::None | HeatRecoveryType::Enthalpy => "",
+    };
     format!(
-        "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}",
+        "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}{}",
         outdoor_air_method_label(context.outdoor_air_method),
-        economizer_source
+        economizer_source,
+        heat_recovery_source
     )
 }
 
@@ -1022,6 +1044,7 @@ fn ideal_loads_bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option
 fn outdoor_air_observed_values(
     output: &OutputRequest,
     outdoor_air_economizer_type: OutdoorAirEconomizerType,
+    heat_recovery_type: HeatRecoveryType,
     standard_air_density_kg_per_m3: f64,
     sensible_results: &[IdealLoadsOutdoorAirSensibleResult],
     expected_samples: usize,
@@ -1165,15 +1188,59 @@ fn outdoor_air_observed_values(
                 .map(|result| result.mixed_air_humidity_ratio)
                 .collect(),
         )),
-        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE
-        | ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE
-        | ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE
-        | ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE
-        | ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE
-        | ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE => Ok((
-            "rust-ideal-loads-outdoor-air-inactive-heat-recovery",
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
             "W",
-            vec![0.0; expected_samples],
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_sensible_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_latent_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_total_heating_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_sensible_cooling_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_latent_cooling_rate_w)
+                .collect(),
+        )),
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE => Ok((
+            outdoor_air_heat_recovery_source(heat_recovery_type),
+            "W",
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_total_cooling_rate_w)
+                .collect(),
         )),
         ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME => Ok((
             if sensible_results
@@ -1192,9 +1259,13 @@ fn outdoor_air_observed_values(
                 .collect(),
         )),
         ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME => Ok((
-            "rust-ideal-loads-outdoor-air-inactive-heat-recovery",
+            outdoor_air_heat_recovery_source(heat_recovery_type),
             "hr",
-            vec![0.0; expected_samples],
+            sensible_results
+                .iter()
+                .take(expected_samples)
+                .map(|result| result.heat_recovery_active_time_hr)
+                .collect(),
         )),
         _ => Err(format!(
             "IdealLoads outdoor-air design-flow report cannot produce Rust series for {} / {}",
@@ -1214,6 +1285,14 @@ fn outdoor_air_economizer_source(
             "rust-ideal-loads-outdoor-air-differential-enthalpy-economizer"
         }
         OutdoorAirEconomizerType::NoEconomizer => "rust-ideal-loads-outdoor-air-design-flow",
+    }
+}
+
+fn outdoor_air_heat_recovery_source(heat_recovery_type: HeatRecoveryType) -> &'static str {
+    match heat_recovery_type {
+        HeatRecoveryType::None => "rust-ideal-loads-outdoor-air-inactive-heat-recovery",
+        HeatRecoveryType::Sensible => "rust-ideal-loads-outdoor-air-sensible-heat-recovery",
+        HeatRecoveryType::Enthalpy => "rust-ideal-loads-outdoor-air-enthalpy-heat-recovery",
     }
 }
 
