@@ -1,9 +1,10 @@
-//! No-OA/no-limit IdealLoads sensible load calculation.
+//! No-OA IdealLoads sensible load calculation.
 
 use crate::{energyplus_moist_air_specific_heat_j_per_kg_k, zone_equipment::ZoneSysEnergyDemand};
-use ep_model::IdealLoadsAirSystem;
+use ep_model::{AutosizeOrNumber, IdealLoadsAirSystem, IdealLoadsLimit};
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
+const DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 
 /// Operating mode selected by the first IdealLoads sensible subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -27,7 +28,22 @@ pub struct IdealLoadsZoneState {
     pub air_humidity_ratio: f64,
 }
 
-/// Result of the no-OA/no-limit sensible calculation.
+/// Runtime context needed for numeric IdealLoads flow limits.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct IdealLoadsSensibleLimitContext {
+    /// Standard air density in kg/m3 used to convert volumetric limits to mass limits.
+    pub standard_air_density_kg_per_m3: f64,
+}
+
+impl Default for IdealLoadsSensibleLimitContext {
+    fn default() -> Self {
+        Self {
+            standard_air_density_kg_per_m3: DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3,
+        }
+    }
+}
+
+/// Result of the no-OA sensible calculation.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IdealLoadsSensibleResult {
     /// Selected operating mode.
@@ -158,10 +174,302 @@ pub fn calc_no_oa_no_limit_sensible_compat(
     }
 }
 
+/// Calculates the no-outdoor-air sensible-only IdealLoads branch with numeric
+/// flow and capacity limits.
+///
+/// `Autosize` limits are treated as unresolved and are therefore not applied by
+/// this helper. Runtime sizing support must provide numeric values before a
+/// finite-limit case can be promoted to conformance.
+#[must_use]
+pub fn calc_no_oa_sensible_with_limits_compat(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+    unit_available: bool,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> IdealLoadsSensibleResult {
+    let cp_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
+    let supply_humidity_ratio = zone_state.air_humidity_ratio;
+
+    if !unit_available {
+        return zero_result(
+            IdealLoadsSensibleMode::Off,
+            cp_air_j_per_kg_k,
+            zone_state.air_temperature_c,
+            supply_humidity_ratio,
+        );
+    }
+
+    let heating_load_w = demand.remaining_output_req_to_heat_sp_w.max(0.0);
+    let cooling_load_w = demand.remaining_output_req_to_cool_sp_w.abs().max(0.0);
+
+    let heating_mass_flow_rate_kg_per_s = limited_heating_mass_flow_rate_kg_per_s(
+        system,
+        zone_state,
+        heating_load_w,
+        cp_air_j_per_kg_k,
+        limit_context,
+    );
+    let cooling_mass_flow_rate_kg_per_s = limited_cooling_mass_flow_rate_kg_per_s(
+        system,
+        zone_state,
+        cooling_load_w,
+        cp_air_j_per_kg_k,
+        limit_context,
+    );
+
+    if heating_mass_flow_rate_kg_per_s > 0.0
+        && heating_mass_flow_rate_kg_per_s >= cooling_mass_flow_rate_kg_per_s
+    {
+        heating_result_with_limits(
+            system,
+            zone_state,
+            cp_air_j_per_kg_k,
+            supply_humidity_ratio,
+            heating_load_w,
+            heating_mass_flow_rate_kg_per_s,
+        )
+    } else if cooling_mass_flow_rate_kg_per_s > 0.0 {
+        cooling_result_with_limits(
+            system,
+            zone_state,
+            cp_air_j_per_kg_k,
+            supply_humidity_ratio,
+            cooling_load_w,
+            cooling_mass_flow_rate_kg_per_s,
+        )
+    } else {
+        zero_result(
+            IdealLoadsSensibleMode::Deadband,
+            cp_air_j_per_kg_k,
+            zone_state.air_temperature_c,
+            supply_humidity_ratio,
+        )
+    }
+}
+
 /// EnergyPlus `PsyHFnTdbW`-style moist-air enthalpy in J/kg.
 #[must_use]
 pub fn moist_air_enthalpy_j_per_kg(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
     1000.0 * (1.006 * dry_bulb_c + humidity_ratio * (2501.0 + 1.86 * dry_bulb_c))
+}
+
+fn limited_heating_mass_flow_rate_kg_per_s(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    heating_load_w: f64,
+    cp_air_j_per_kg_k: f64,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> f64 {
+    if matches!(
+        capacity_limit_w(
+            system.heating_limit,
+            system.maximum_sensible_heating_capacity_w,
+        ),
+        Some(capacity_limit_w) if capacity_limit_w <= 0.0
+    ) {
+        return 0.0;
+    }
+
+    let heating_delta_t =
+        system.maximum_heating_supply_air_temperature_c - zone_state.air_temperature_c;
+    let mut mass_flow_rate_kg_per_s =
+        if heating_load_w > 0.0 && heating_delta_t > SMALL_TEMPERATURE_DIFFERENCE_C {
+            heating_load_w / (cp_air_j_per_kg_k * heating_delta_t)
+        } else {
+            0.0
+        };
+
+    if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
+        system.heating_limit,
+        system.maximum_heating_air_flow_rate_m3_per_s,
+        limit_context,
+    ) && maximum_mass_flow_rate_kg_per_s > 0.0
+    {
+        mass_flow_rate_kg_per_s = mass_flow_rate_kg_per_s.min(maximum_mass_flow_rate_kg_per_s);
+    }
+
+    mass_flow_rate_kg_per_s
+}
+
+fn limited_cooling_mass_flow_rate_kg_per_s(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    cooling_load_w: f64,
+    cp_air_j_per_kg_k: f64,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> f64 {
+    if matches!(
+        capacity_limit_w(system.cooling_limit, system.maximum_total_cooling_capacity_w),
+        Some(capacity_limit_w) if capacity_limit_w <= 0.0
+    ) {
+        return 0.0;
+    }
+
+    let cooling_delta_t =
+        zone_state.air_temperature_c - system.minimum_cooling_supply_air_temperature_c;
+    let mut mass_flow_rate_kg_per_s =
+        if cooling_load_w > 0.0 && cooling_delta_t > SMALL_TEMPERATURE_DIFFERENCE_C {
+            cooling_load_w / (cp_air_j_per_kg_k * cooling_delta_t)
+        } else {
+            0.0
+        };
+
+    if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
+        system.cooling_limit,
+        system.maximum_cooling_air_flow_rate_m3_per_s,
+        limit_context,
+    ) && maximum_mass_flow_rate_kg_per_s > 0.0
+    {
+        mass_flow_rate_kg_per_s = mass_flow_rate_kg_per_s.min(maximum_mass_flow_rate_kg_per_s);
+    }
+
+    mass_flow_rate_kg_per_s
+}
+
+fn heating_result_with_limits(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    cp_air_j_per_kg_k: f64,
+    supply_humidity_ratio: f64,
+    heating_load_w: f64,
+    heating_mass_flow_rate_kg_per_s: f64,
+) -> IdealLoadsSensibleResult {
+    let mut supply_temperature_c = zone_state.air_temperature_c
+        + heating_load_w / (cp_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
+    supply_temperature_c = supply_temperature_c
+        .min(system.maximum_heating_supply_air_temperature_c)
+        .max(zone_state.air_temperature_c);
+
+    let mut heating_output_w = heating_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (supply_temperature_c - zone_state.air_temperature_c).max(0.0);
+
+    if let Some(maximum_heating_capacity_w) = capacity_limit_w(
+        system.heating_limit,
+        system.maximum_sensible_heating_capacity_w,
+    ) && heating_output_w > maximum_heating_capacity_w
+    {
+        heating_output_w = maximum_heating_capacity_w;
+        supply_temperature_c = zone_state.air_temperature_c
+            + heating_output_w / (cp_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
+    }
+
+    let supply_enthalpy_j_per_kg =
+        moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
+
+    IdealLoadsSensibleResult {
+        mode: IdealLoadsSensibleMode::Heating,
+        cp_air_j_per_kg_k,
+        supply_temperature_c,
+        supply_humidity_ratio,
+        supply_enthalpy_j_per_kg,
+        supply_mass_flow_rate_kg_per_s: heating_mass_flow_rate_kg_per_s,
+        heating_mass_flow_rate_kg_per_s,
+        cooling_mass_flow_rate_kg_per_s: 0.0,
+        zone_total_heating_rate_w: heating_output_w,
+        zone_total_cooling_rate_w: 0.0,
+        zone_sensible_heating_rate_w: heating_output_w,
+        zone_sensible_cooling_rate_w: 0.0,
+        supply_air_total_heating_rate_w: heating_output_w,
+        supply_air_total_cooling_rate_w: 0.0,
+    }
+}
+
+fn cooling_result_with_limits(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    cp_air_j_per_kg_k: f64,
+    supply_humidity_ratio: f64,
+    cooling_load_w: f64,
+    cooling_mass_flow_rate_kg_per_s: f64,
+) -> IdealLoadsSensibleResult {
+    let mut supply_temperature_c = zone_state.air_temperature_c
+        - cooling_load_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
+    supply_temperature_c = supply_temperature_c
+        .max(system.minimum_cooling_supply_air_temperature_c)
+        .min(zone_state.air_temperature_c);
+
+    let mut cooling_output_w = cooling_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (zone_state.air_temperature_c - supply_temperature_c).max(0.0);
+
+    if let Some(maximum_cooling_capacity_w) = capacity_limit_w(
+        system.cooling_limit,
+        system.maximum_total_cooling_capacity_w,
+    ) && cooling_output_w > maximum_cooling_capacity_w
+    {
+        cooling_output_w = maximum_cooling_capacity_w;
+        supply_temperature_c = zone_state.air_temperature_c
+            - cooling_output_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
+    }
+
+    let supply_enthalpy_j_per_kg =
+        moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
+
+    IdealLoadsSensibleResult {
+        mode: IdealLoadsSensibleMode::Cooling,
+        cp_air_j_per_kg_k,
+        supply_temperature_c,
+        supply_humidity_ratio,
+        supply_enthalpy_j_per_kg,
+        supply_mass_flow_rate_kg_per_s: cooling_mass_flow_rate_kg_per_s,
+        heating_mass_flow_rate_kg_per_s: 0.0,
+        cooling_mass_flow_rate_kg_per_s,
+        zone_total_heating_rate_w: 0.0,
+        zone_total_cooling_rate_w: cooling_output_w,
+        zone_sensible_heating_rate_w: 0.0,
+        zone_sensible_cooling_rate_w: cooling_output_w,
+        supply_air_total_heating_rate_w: 0.0,
+        supply_air_total_cooling_rate_w: cooling_output_w,
+    }
+}
+
+fn flow_limit_kg_per_s(
+    limit: IdealLoadsLimit,
+    flow_limit_m3_per_s: Option<AutosizeOrNumber>,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> Option<f64> {
+    if !limit_includes_flow_rate(limit) {
+        return None;
+    }
+
+    numeric_autosize_value(flow_limit_m3_per_s).map(|flow_limit_m3_per_s| {
+        flow_limit_m3_per_s * limit_context.standard_air_density_kg_per_m3
+    })
+}
+
+fn capacity_limit_w(
+    limit: IdealLoadsLimit,
+    capacity_limit_w: Option<AutosizeOrNumber>,
+) -> Option<f64> {
+    if !limit_includes_capacity(limit) {
+        return None;
+    }
+
+    numeric_autosize_value(capacity_limit_w)
+}
+
+fn numeric_autosize_value(value: Option<AutosizeOrNumber>) -> Option<f64> {
+    match value {
+        Some(AutosizeOrNumber::Value(value)) => Some(value),
+        Some(AutosizeOrNumber::Autosize) | None => None,
+    }
+}
+
+fn limit_includes_flow_rate(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
+}
+
+fn limit_includes_capacity(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
 }
 
 fn zero_result(
@@ -196,9 +504,9 @@ mod tests {
     use super::*;
     use crate::zone_equipment::ZoneSysEnergyDemand;
     use ep_model::{
-        DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
-        HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-        IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
+        AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
+        HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+        IdealLoadsFuelType, IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
     };
 
     #[test]
@@ -263,6 +571,198 @@ mod tests {
         assert_eq!(result.mode, IdealLoadsSensibleMode::Off);
         assert_eq!(result.supply_mass_flow_rate_kg_per_s, 0.0);
         assert!((result.supply_temperature_c - 22.5).abs() < 1.0e-12);
+    }
+
+    #[test]
+    fn limit_aware_helper_matches_no_limit_heating_result() {
+        let system = test_system();
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 20.0,
+            air_humidity_ratio: 0.008,
+        };
+        let demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0);
+
+        let expected = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
+        let actual = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            demand,
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        assert_eq!(actual.mode, expected.mode);
+        assert_close(
+            actual.supply_temperature_c,
+            expected.supply_temperature_c,
+            1.0e-12,
+        );
+        assert_close(
+            actual.supply_mass_flow_rate_kg_per_s,
+            expected.supply_mass_flow_rate_kg_per_s,
+            1.0e-12,
+        );
+        assert_close(
+            actual.zone_total_heating_rate_w,
+            expected.zone_total_heating_rate_w,
+            1.0e-9,
+        );
+    }
+
+    #[test]
+    fn heating_flow_limit_clamps_mass_flow_and_actual_output() {
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitFlowRate;
+        system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.05));
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 20.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0),
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(0.008);
+        let maximum_mass_flow_rate_kg_per_s = 0.05 * DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3;
+        let expected_output_w = maximum_mass_flow_rate_kg_per_s * cp * 30.0;
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+        assert_close(
+            result.supply_mass_flow_rate_kg_per_s,
+            maximum_mass_flow_rate_kg_per_s,
+            1.0e-12,
+        );
+        assert_close(result.supply_temperature_c, 50.0, 1.0e-12);
+        assert_close(result.zone_total_heating_rate_w, expected_output_w, 1.0e-9);
+        assert!(result.zone_total_heating_rate_w < 3000.0);
+    }
+
+    #[test]
+    fn heating_capacity_limit_caps_output_and_adjusts_supply_temperature() {
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1000.0));
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 20.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0),
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(0.008);
+        let unlimited_mass_flow_rate_kg_per_s = 3000.0 / (cp * 30.0);
+        let expected_supply_temperature_c =
+            20.0 + 1000.0 / (cp * unlimited_mass_flow_rate_kg_per_s);
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+        assert_close(result.zone_total_heating_rate_w, 1000.0, 1.0e-12);
+        assert_close(
+            result.supply_temperature_c,
+            expected_supply_temperature_c,
+            1.0e-12,
+        );
+    }
+
+    #[test]
+    fn cooling_flow_limit_clamps_mass_flow_and_actual_output() {
+        let mut system = test_system();
+        system.cooling_limit = IdealLoadsLimit::LimitFlowRate;
+        system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.05));
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0),
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(0.008);
+        let maximum_mass_flow_rate_kg_per_s = 0.05 * DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3;
+        let expected_output_w = maximum_mass_flow_rate_kg_per_s * cp * 12.0;
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(
+            result.supply_mass_flow_rate_kg_per_s,
+            maximum_mass_flow_rate_kg_per_s,
+            1.0e-12,
+        );
+        assert_close(result.supply_temperature_c, 13.0, 1.0e-12);
+        assert_close(result.zone_total_cooling_rate_w, expected_output_w, 1.0e-9);
+        assert!(result.zone_total_cooling_rate_w < 2400.0);
+    }
+
+    #[test]
+    fn cooling_capacity_limit_caps_output_and_adjusts_supply_temperature() {
+        let mut system = test_system();
+        system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(1000.0));
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 25.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -2400.0),
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        let cp = energyplus_moist_air_specific_heat_j_per_kg_k(0.008);
+        let unlimited_mass_flow_rate_kg_per_s = 2400.0 / (cp * 12.0);
+        let expected_supply_temperature_c =
+            25.0 - 1000.0 / (cp * unlimited_mass_flow_rate_kg_per_s);
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_close(result.zone_total_cooling_rate_w, 1000.0, 1.0e-12);
+        assert_close(
+            result.supply_temperature_c,
+            expected_supply_temperature_c,
+            1.0e-12,
+        );
+    }
+
+    #[test]
+    fn zero_capacity_limit_disables_sensible_branch_flow() {
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(0.0));
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 20.0,
+            air_humidity_ratio: 0.008,
+        };
+
+        let result = calc_no_oa_sensible_with_limits_compat(
+            &system,
+            zone_state,
+            ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0),
+            true,
+            IdealLoadsSensibleLimitContext::default(),
+        );
+
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Deadband);
+        assert_eq!(result.supply_mass_flow_rate_kg_per_s, 0.0);
+        assert_eq!(result.zone_total_heating_rate_w, 0.0);
+    }
+
+    fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+        assert!(
+            (actual - expected).abs() <= tolerance,
+            "{actual} was not within {tolerance} of {expected}"
+        );
     }
 
     fn test_system() -> IdealLoadsAirSystem {
