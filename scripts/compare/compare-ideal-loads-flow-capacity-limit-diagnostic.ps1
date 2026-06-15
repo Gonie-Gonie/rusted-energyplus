@@ -84,7 +84,7 @@ Assert-Contains -Text $text -Pattern "IdealLoads No-OA Sensible Report" -Descrip
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: diagnostic-only" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: false" -Description "claim boundary"
-Assert-Contains -Text $text -Pattern "series: 16" -Description "series count"
+Assert-Contains -Text $text -Pattern "series: 18" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 189" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_failures_count: 2" -Description "tracked diagnostic tolerance failures"
 Assert-Contains -Text $text -Pattern "tolerance_policy: diagnostic-draft" -Description "tolerance policy"
@@ -127,19 +127,25 @@ if ($summary.tolerance_failures -ne 2) {
 if ($summary.samples -ne 189) {
     throw "Unexpected IdealLoads sample count: $($summary.samples)"
 }
-if ($summary.series_count -ne 16) {
+if ($summary.series_count -ne 18) {
     throw "Unexpected IdealLoads series count: $($summary.series_count)"
 }
 if ($summary.zone_demand_synthetic_rc_model -ne $false) {
     throw "IdealLoads flow-and-capacity-limit diagnostic must not synthesize zone demand from an RC shortcut"
+}
+if ($summary.recirculation_node -ne "ZONE ONE RETURN") {
+    throw "Unexpected recirculation node: $($summary.recirculation_node)"
+}
+if ($summary.recirculation_state_source -ne "EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state") {
+    throw "Unexpected recirculation state source: $($summary.recirculation_state_source)"
 }
 $conformanceRows = @($summary.series | Where-Object { $_.level -eq "conformance" })
 if ($conformanceRows.Count -ne 0) {
     throw "Expected no conformance-level output rows in diagnostic case, found $($conformanceRows.Count)"
 }
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 16) {
-    throw "Expected 16 diagnostic-level output rows, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 18) {
+    throw "Expected 18 diagnostic-level output rows, found $($diagnosticRows.Count)"
 }
 $failingRows = @($summary.series | Where-Object { $_.status -ne "pass" })
 if ($failingRows.Count -ne 2) {
@@ -177,6 +183,19 @@ if ($nodeFlow[0].level -ne "diagnostic") {
 if ($nodeFlow[0].status -ne "fail") {
     throw "System Node Mass Flow Rate should remain a tracked diagnostic gap until finite-limit demand state is matched"
 }
+$recirculationRows = @($summary.series | Where-Object { $_.key -eq "ZONE ONE RETURN" })
+if ($recirculationRows.Count -ne 2) {
+    throw "Expected two recirculation proof rows, found $($recirculationRows.Count)"
+}
+foreach ($recirculationVariable in @("System Node Temperature", "System Node Humidity Ratio")) {
+    $row = @($recirculationRows | Where-Object { $_.variable -eq $recirculationVariable })
+    if ($row.Count -ne 1) {
+        throw "Missing recirculation proof row: $recirculationVariable"
+    }
+    if ($row[0].status -ne "pass" -or $row[0].rust_source -ne "oracle-recirculation-node-input" -or $row[0].level -ne "diagnostic") {
+        throw "Unexpected recirculation proof row status/source for $recirculationVariable"
+    }
+}
 
 $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
 if ($toleranceFailures.Count -ne 2) {
@@ -184,12 +203,12 @@ if ($toleranceFailures.Count -ne 2) {
 }
 
 $resultStore = Get-Content -LiteralPath $resultStorePath -Raw | ConvertFrom-Json
-if ($resultStore.series_count -ne 16 -or $resultStore.sample_count -ne 189) {
+if ($resultStore.series_count -ne 18 -or $resultStore.sample_count -ne 189) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
 $selectedOutputs = Get-Content -LiteralPath $selectedOutputsPath -Raw | ConvertFrom-Json
-if (@($selectedOutputs.series).Count -ne 16) {
+if (@($selectedOutputs.series).Count -ne 18) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
@@ -204,6 +223,8 @@ if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only no-OA finite-limit sensible IdealLoads branch" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
+Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | diagnostic" -Description "markdown node flow row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE RETURN | System Node Temperature | diagnostic" -Description "markdown recirculation temperature row"
 
 Write-Host "IdealLoads no-OA flow-and-capacity-limit diagnostic comparison artifacts generated."

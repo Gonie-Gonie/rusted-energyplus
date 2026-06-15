@@ -206,9 +206,34 @@ pub fn calc_no_oa_sensible_with_limits_compat(
     unit_available: bool,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
+    calc_no_oa_sensible_with_limits_and_recirculation_compat(
+        system,
+        zone_state,
+        zone_state,
+        demand,
+        unit_available,
+        limit_context,
+    )
+}
+
+/// Calculates the no-outdoor-air sensible-only IdealLoads branch with numeric
+/// flow/capacity limits and explicit no-OA recirculation node state.
+///
+/// EnergyPlus capacity-limit adjustments use the mixed-air state, which is the
+/// recirculation node state when outdoor air is inactive. The zone load and
+/// final output-to-zone calculation still use the controlled zone node state.
+#[must_use]
+pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
+    system: &IdealLoadsAirSystem,
+    zone_state: IdealLoadsZoneState,
+    recirculation_state: IdealLoadsZoneState,
+    demand: ZoneSysEnergyDemand,
+    unit_available: bool,
+    limit_context: IdealLoadsSensibleLimitContext,
+) -> IdealLoadsSensibleResult {
     let cp_air_j_per_kg_k =
         energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
-    let supply_humidity_ratio = zone_state.air_humidity_ratio;
+    let supply_humidity_ratio = recirculation_state.air_humidity_ratio;
 
     if !unit_available {
         return zero_result(
@@ -243,6 +268,7 @@ pub fn calc_no_oa_sensible_with_limits_compat(
         heating_result_with_limits(
             system,
             zone_state,
+            recirculation_state,
             cp_air_j_per_kg_k,
             supply_humidity_ratio,
             heating_load_w,
@@ -252,6 +278,7 @@ pub fn calc_no_oa_sensible_with_limits_compat(
         cooling_result_with_limits(
             system,
             zone_state,
+            recirculation_state,
             cp_air_j_per_kg_k,
             supply_humidity_ratio,
             cooling_load_w,
@@ -367,6 +394,7 @@ fn limited_cooling_mass_flow_rate_kg_per_s(
 fn heating_result_with_limits(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
+    recirculation_state: IdealLoadsZoneState,
     cp_air_j_per_kg_k: f64,
     supply_humidity_ratio: f64,
     heating_load_w: f64,
@@ -376,21 +404,27 @@ fn heating_result_with_limits(
         + heating_load_w / (cp_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
     supply_temperature_c = supply_temperature_c
         .min(system.maximum_heating_supply_air_temperature_c)
-        .max(zone_state.air_temperature_c);
+        .max(recirculation_state.air_temperature_c);
 
-    let mut heating_output_w = heating_mass_flow_rate_kg_per_s
-        * cp_air_j_per_kg_k
-        * (supply_temperature_c - zone_state.air_temperature_c).max(0.0);
+    let cp_mixed_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(recirculation_state.air_humidity_ratio);
+    let mut heating_coil_output_w = heating_mass_flow_rate_kg_per_s
+        * cp_mixed_air_j_per_kg_k
+        * (supply_temperature_c - recirculation_state.air_temperature_c).max(0.0);
 
     if let Some(maximum_heating_capacity_w) = capacity_limit_w(
         system.heating_limit,
         system.maximum_sensible_heating_capacity_w,
-    ) && heating_output_w > maximum_heating_capacity_w
+    ) && heating_coil_output_w > maximum_heating_capacity_w
     {
-        heating_output_w = maximum_heating_capacity_w;
-        supply_temperature_c = zone_state.air_temperature_c
-            + heating_output_w / (cp_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
+        heating_coil_output_w = maximum_heating_capacity_w;
+        supply_temperature_c = recirculation_state.air_temperature_c
+            + heating_coil_output_w / (cp_mixed_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
     }
+
+    let heating_output_to_zone_w = heating_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (supply_temperature_c - zone_state.air_temperature_c).max(0.0);
 
     let supply_enthalpy_j_per_kg =
         moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
@@ -404,11 +438,11 @@ fn heating_result_with_limits(
         supply_mass_flow_rate_kg_per_s: heating_mass_flow_rate_kg_per_s,
         heating_mass_flow_rate_kg_per_s,
         cooling_mass_flow_rate_kg_per_s: 0.0,
-        zone_total_heating_rate_w: heating_output_w,
+        zone_total_heating_rate_w: heating_output_to_zone_w,
         zone_total_cooling_rate_w: 0.0,
-        zone_sensible_heating_rate_w: heating_output_w,
+        zone_sensible_heating_rate_w: heating_output_to_zone_w,
         zone_sensible_cooling_rate_w: 0.0,
-        supply_air_total_heating_rate_w: heating_output_w,
+        supply_air_total_heating_rate_w: heating_output_to_zone_w,
         supply_air_total_cooling_rate_w: 0.0,
     }
 }
@@ -416,6 +450,7 @@ fn heating_result_with_limits(
 fn cooling_result_with_limits(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
+    recirculation_state: IdealLoadsZoneState,
     cp_air_j_per_kg_k: f64,
     supply_humidity_ratio: f64,
     cooling_load_w: f64,
@@ -425,22 +460,27 @@ fn cooling_result_with_limits(
         - cooling_load_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
     supply_temperature_c = supply_temperature_c
         .max(system.minimum_cooling_supply_air_temperature_c)
-        .min(zone_state.air_temperature_c);
+        .min(recirculation_state.air_temperature_c);
 
-    let mut cooling_output_w = cooling_mass_flow_rate_kg_per_s
-        * cp_air_j_per_kg_k
-        * (zone_state.air_temperature_c - supply_temperature_c).max(0.0);
+    let cp_mixed_air_j_per_kg_k =
+        energyplus_moist_air_specific_heat_j_per_kg_k(recirculation_state.air_humidity_ratio);
+    let mut cooling_coil_output_w = cooling_mass_flow_rate_kg_per_s
+        * cp_mixed_air_j_per_kg_k
+        * (recirculation_state.air_temperature_c - supply_temperature_c).max(0.0);
 
     if let Some(maximum_cooling_capacity_w) = capacity_limit_w(
         system.cooling_limit,
         system.maximum_total_cooling_capacity_w,
-    ) && cooling_output_w > maximum_cooling_capacity_w
+    ) && cooling_coil_output_w >= maximum_cooling_capacity_w
     {
-        cooling_output_w = maximum_cooling_capacity_w;
-        supply_temperature_c = zone_state.air_temperature_c
-            - cooling_output_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
+        cooling_coil_output_w = maximum_cooling_capacity_w;
+        supply_temperature_c = recirculation_state.air_temperature_c
+            - cooling_coil_output_w / (cooling_mass_flow_rate_kg_per_s * cp_mixed_air_j_per_kg_k);
     }
 
+    let cooling_output_to_zone_w = cooling_mass_flow_rate_kg_per_s
+        * cp_air_j_per_kg_k
+        * (zone_state.air_temperature_c - supply_temperature_c).max(0.0);
     let supply_enthalpy_j_per_kg =
         moist_air_enthalpy_j_per_kg(supply_temperature_c, supply_humidity_ratio);
 
@@ -454,11 +494,11 @@ fn cooling_result_with_limits(
         heating_mass_flow_rate_kg_per_s: 0.0,
         cooling_mass_flow_rate_kg_per_s,
         zone_total_heating_rate_w: 0.0,
-        zone_total_cooling_rate_w: cooling_output_w,
+        zone_total_cooling_rate_w: cooling_output_to_zone_w,
         zone_sensible_heating_rate_w: 0.0,
-        zone_sensible_cooling_rate_w: cooling_output_w,
+        zone_sensible_cooling_rate_w: cooling_output_to_zone_w,
         supply_air_total_heating_rate_w: 0.0,
-        supply_air_total_cooling_rate_w: cooling_output_w,
+        supply_air_total_cooling_rate_w: cooling_output_to_zone_w,
     }
 }
 

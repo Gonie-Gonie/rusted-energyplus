@@ -115,6 +115,27 @@ The helper uses the EnergyPlus formula order for:
 - supply node temperature, humidity ratio, enthalpy, and mass flow writes
 - reported zone and supply-air IdealLoads rates
 
+## Finite Flow/Capacity Diagnostics
+
+Finite no-OA flow and capacity limits are tracked diagnostically by:
+
+- `ideal_loads_capacity_limit_diagnostic_001`
+- `ideal_loads_flow_limit_diagnostic_001`
+- `ideal_loads_flow_capacity_limit_diagnostic_001`
+
+The Rust helper `calc_no_oa_sensible_with_limits_compat` covers the current
+diagnostic reconstruction for numeric flow and capacity limits. The compare
+lane resolves the EnergyPlus return/exhaust recirculation node and records
+`ZONE ONE RETURN` `System Node Temperature` and `System Node Humidity Ratio`
+as proof rows. Those rows are post-update ESO evidence, so the finite-limit
+solver still uses the source-order pre-update zone air node as the no-OA
+mixed-air proxy until the return-node update ordering is ported directly.
+
+The current evidence keeps finite limits diagnostic-only. Capacity-only and
+flow-and-capacity cases retain two tracked supply-node gaps. The flow-only
+case retains three cooling report-rate gaps and one supply-node mass-flow gap.
+No finite-limit row joins the promoted no-OA/no-limit conformance boundary.
+
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is not promoted yet. The current
@@ -160,9 +181,9 @@ zone/OA state and report-rate mode gates. Inactive economizer/heat-recovery
 rows are exact zeros.
 
 Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no active economizer, active heat recovery, active
-humidity-control, saturation-limit, or DCV output is part of the promoted
-IdealLoads claim.
+unresolved, and no finite-limit, active economizer, active heat recovery,
+active humidity-control, saturation-limit, or DCV output is part of the
+promoted IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -185,7 +206,8 @@ heating/cooling setpoint-distance proof rows, ReportPurchasedAir energy rows,
 blank and constant `Schedule:Constant` fuel energy/rate rows, latent
 IdealLoads outputs, active humidity-control outdoor-air latent behavior,
 heat-recovery outputs,
-economizer outputs, adaptive system timestep, broad meter conformance, and
+economizer outputs, finite flow/capacity limits, adaptive system timestep,
+broad meter conformance, and
 non-constant efficiency schedules remain diagnostic-only or unsupported until
 their source-order branches are ported or explicitly included in a promoted
 claim. `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` are
@@ -195,6 +217,8 @@ The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, and inactive
 economizer/heat-recovery outputs have diagnostic evidence only in
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`.
+The finite flow/capacity limit fixtures have diagnostic evidence only in their
+three finite-limit cases and retain tracked node/report-rate gaps.
 
 ## Conformance Compare Artifacts
 

@@ -183,6 +183,28 @@ efficiency schedules and broad fuel or meter conformance remain outside the
 claim. The same lane compares hourly DistrictHeatingWater/DistrictCooling
 oracle-MTR values against Rust fuel-energy aggregates diagnostically.
 
+## IdealLoads Finite Flow/Capacity Diagnostics
+
+Three no-OA diagnostic-only lanes exercise finite heating/cooling flow and
+capacity limits without promoting those branches to conformance:
+
+- `ideal_loads_capacity_limit_diagnostic_001`
+- `ideal_loads_flow_limit_diagnostic_001`
+- `ideal_loads_flow_capacity_limit_diagnostic_001`
+
+Each fixture now requests 18 Detailed series, including `ZONE ONE RETURN`
+`System Node Temperature` and `System Node Humidity Ratio` proof rows. The
+Rust compare lane records the resolved return node as the no-OA recirculation
+node while keeping the finite-limit solver aligned to the source-order
+pre-update zone air node used by the current diagnostic reconstruction.
+
+The capacity-limit and flow-and-capacity-limit lanes keep two tracked
+supply-node diagnostic gaps, `System Node Temperature` and
+`System Node Mass Flow Rate`. The flow-limit lane keeps four tracked gaps:
+three cooling report-rate rows and supply-node mass flow. All three lanes keep
+`comparison_class = "diagnostic-only"`, `conformance_claim = false`,
+`tolerance_policy: diagnostic-draft`, and `status: diagnostic`.
+
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` is a diagnostic-only
@@ -228,8 +250,8 @@ this no-economizer/no-heat-recovery fixture. The inactive economizer and
 heat-recovery rows are exact zeros.
 
 This evidence does not promote active DCV, economizer, heat recovery, active
-humidity controls, saturation-limit branches, finite limits, or broad
-IdealLoads outdoor-air conformance.
+humidity controls, saturation-limit branches, finite-limit conformance, or
+broad IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 

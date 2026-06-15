@@ -50,7 +50,7 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
-    calc_no_oa_no_limit_sensible_compat, calc_no_oa_sensible_with_limits_compat,
+    calc_no_oa_no_limit_sensible_compat, calc_no_oa_sensible_with_limits_and_recirculation_compat,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages,
@@ -114,6 +114,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     branch: &'static str,
     zone_name: String,
     zone_air_node_name: String,
+    recirculation_node_name: Option<String>,
     system_name: String,
     supply_node_name: String,
     system_timestep_seconds: f64,
@@ -177,6 +178,8 @@ struct IdealLoadsInputTrace {
     sample_count: usize,
     zone_node_temperature: LoadedSeries,
     zone_node_humidity_ratio: LoadedSeries,
+    recirculation_node_temperature: LoadedSeries,
+    recirculation_node_humidity_ratio: LoadedSeries,
     active_demand: LoadedSeries,
     heating_demand: LoadedSeries,
     cooling_demand: LoadedSeries,
@@ -1039,7 +1042,19 @@ fn build_context<'a>(
         ));
     }
 
-    let input_trace = load_input_trace(&baseline.eso, &zone.name.0, &zone_air_node.name.0)?;
+    let recirculation_node_name = if uses_finite_limits(system) {
+        Some(ideal_loads_recirculation_node_name(
+            &model, zone.id, system,
+        )?)
+    } else {
+        None
+    };
+    let input_trace = load_input_trace(
+        &baseline.eso,
+        &zone.name.0,
+        &zone_air_node.name.0,
+        recirculation_node_name.as_deref(),
+    )?;
     let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
     let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
     let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system)?;
@@ -1052,6 +1067,7 @@ fn build_context<'a>(
         &input_trace,
         &zone.name.0,
         &zone_air_node.name.0,
+        recirculation_node_name.as_deref(),
         &system.name.0,
         &supply_node.name.0,
         energy_report_interval_seconds,
@@ -1070,6 +1086,7 @@ fn build_context<'a>(
         branch,
         zone_name,
         zone_air_node_name,
+        recirculation_node_name,
         system_name,
         supply_node_name,
         system_timestep_seconds,
@@ -1087,16 +1104,30 @@ fn load_input_trace(
     eso: &Path,
     zone_name: &str,
     zone_air_node_name: &str,
+    recirculation_node_name: Option<&str>,
 ) -> Result<IdealLoadsInputTrace, String> {
     let zone_node_temperature = load_series(eso, zone_air_node_name, SYSTEM_NODE_TEMPERATURE)?;
     let zone_node_humidity_ratio =
         load_series(eso, zone_air_node_name, SYSTEM_NODE_HUMIDITY_RATIO)?;
+    let (recirculation_node_temperature, recirculation_node_humidity_ratio) =
+        match recirculation_node_name {
+            Some(recirculation_node_name) => (
+                load_series(eso, recirculation_node_name, SYSTEM_NODE_TEMPERATURE)?,
+                load_series(eso, recirculation_node_name, SYSTEM_NODE_HUMIDITY_RATIO)?,
+            ),
+            None => (
+                zone_node_temperature.clone(),
+                zone_node_humidity_ratio.clone(),
+            ),
+        };
     let active_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_SETPOINT_LOAD)?;
     let heating_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_HEATING_LOAD)?;
     let cooling_demand = load_series(eso, zone_name, ZONE_SYSTEM_PREDICTED_COOLING_LOAD)?;
     let sample_count = [
         zone_node_temperature.samples.len(),
         zone_node_humidity_ratio.samples.len(),
+        recirculation_node_temperature.samples.len(),
+        recirculation_node_humidity_ratio.samples.len(),
         active_demand.samples.len(),
         heating_demand.samples.len(),
         cooling_demand.samples.len(),
@@ -1112,6 +1143,8 @@ fn load_input_trace(
         sample_count,
         zone_node_temperature,
         zone_node_humidity_ratio,
+        recirculation_node_temperature,
+        recirculation_node_humidity_ratio,
         active_demand,
         heating_demand,
         cooling_demand,
@@ -1163,6 +1196,7 @@ fn evaluate_rows(
     input_trace: &IdealLoadsInputTrace,
     zone_name: &str,
     zone_air_node_name: &str,
+    recirculation_node_name: Option<&str>,
     system_name: &str,
     supply_node_name: &str,
     energy_report_interval_seconds: f64,
@@ -1215,8 +1249,18 @@ fn evaluate_rows(
             air_temperature_c: zone_temperature,
             air_humidity_ratio: zone_humidity_ratio,
         };
+        // The return/exhaust node ESO series is a post-update proof row. The
+        // diagnostic solver matches EnergyPlus source-order outputs by using
+        // the pre-update zone air node as the no-OA mixed-air proxy.
+        let recirculation_state = zone_state;
         let demand = ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
-        let result = calc_ideal_loads_sensible_compat(system, zone_state, demand, limit_context);
+        let result = calc_ideal_loads_sensible_compat(
+            system,
+            zone_state,
+            recirculation_state,
+            demand,
+            limit_context,
+        );
         record_mode(&mut mode_counts, result.mode);
         let _node_update = supply_node_update_from_result(supply_node.id, result);
         calc_results.push(result);
@@ -1274,6 +1318,36 @@ fn evaluate_rows(
             ),
         ),
     );
+    if let Some(recirculation_node_name) = recirculation_node_name {
+        observed_by_variable.insert(
+            (
+                recirculation_node_name.to_string(),
+                SYSTEM_NODE_TEMPERATURE.to_string(),
+            ),
+            ObservedSeries::new(
+                "oracle-recirculation-node-input",
+                "C",
+                values_from_samples(
+                    &input_trace.recirculation_node_temperature.samples,
+                    input_trace.sample_count,
+                ),
+            ),
+        );
+        observed_by_variable.insert(
+            (
+                recirculation_node_name.to_string(),
+                SYSTEM_NODE_HUMIDITY_RATIO.to_string(),
+            ),
+            ObservedSeries::new(
+                "oracle-recirculation-node-input",
+                "kgWater/kgDryAir",
+                values_from_samples(
+                    &input_trace.recirculation_node_humidity_ratio.samples,
+                    input_trace.sample_count,
+                ),
+            ),
+        );
+    }
     observed_by_variable.insert(
         (
             zone_name.to_string(),
@@ -1828,11 +1902,19 @@ fn ideal_loads_fuel_efficiency_value(
 fn calc_ideal_loads_sensible_compat(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
+    recirculation_state: IdealLoadsZoneState,
     demand: ZoneSysEnergyDemand,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
     if uses_finite_limits(system) {
-        calc_no_oa_sensible_with_limits_compat(system, zone_state, demand, true, limit_context)
+        calc_no_oa_sensible_with_limits_and_recirculation_compat(
+            system,
+            zone_state,
+            recirculation_state,
+            demand,
+            true,
+            limit_context,
+        )
     } else {
         calc_no_oa_no_limit_sensible_compat(system, zone_state, demand, true)
     }
@@ -1856,6 +1938,66 @@ fn ideal_loads_limit_context(
             site.elevation_m
         )
     })
+}
+
+fn ideal_loads_recirculation_node_name(
+    model: &SimulationModel,
+    zone_id: ep_model::ZoneId,
+    system: &IdealLoadsAirSystem,
+) -> Result<String, String> {
+    if let Some(exhaust_node_name) = system.zone_exhaust_air_node_name.as_ref() {
+        return resolve_first_node_or_list_name(model, &exhaust_node_name.0).ok_or_else(|| {
+            format!(
+                "failed to resolve IdealLoads exhaust/recirculation node {}",
+                exhaust_node_name.0
+            )
+        });
+    }
+
+    let connection = model
+        .typed
+        .zone_equipment_connections
+        .iter()
+        .find(|connection| connection.zone == zone_id)
+        .ok_or_else(|| {
+            "missing ZoneHVAC:EquipmentConnections for finite-limit recirculation node".to_string()
+        })?;
+    let Some(return_node_name) = connection.zone_return_air_node_or_nodelist_name.as_ref() else {
+        return Err(
+            "finite-limit IdealLoads diagnostic requires a zone return air node or node list"
+                .to_string(),
+        );
+    };
+    resolve_first_node_or_list_name(model, &return_node_name.0).ok_or_else(|| {
+        format!(
+            "failed to resolve IdealLoads return/recirculation node {}",
+            return_node_name.0
+        )
+    })
+}
+
+fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {
+    if let Some(node_id) = model.typed.node_names.resolve(name) {
+        return model
+            .typed
+            .nodes
+            .iter()
+            .find(|node| node.id == node_id)
+            .map(|node| node.name.0.clone());
+    }
+    let node_list_id = model.typed.node_list_names.resolve(name)?;
+    let node_list = model
+        .typed
+        .node_lists
+        .iter()
+        .find(|node_list| node_list.id == node_list_id)?;
+    let node_id = node_list.nodes.first()?;
+    model
+        .typed
+        .nodes
+        .iter()
+        .find(|node| node.id == *node_id)
+        .map(|node| node.name.0.clone())
 }
 
 fn ideal_loads_sensible_branch(system: &IdealLoadsAirSystem) -> &'static str {
@@ -2261,6 +2403,13 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "zone_air_node: {}\n",
         markdown_cell(&context.zone_air_node_name)
     ));
+    if let Some(recirculation_node_name) = context.recirculation_node_name.as_ref() {
+        report.push_str(&format!(
+            "recirculation_node: {}\n",
+            markdown_cell(recirculation_node_name)
+        ));
+        report.push_str("recirculation_state_source: EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\n");
+    }
     report.push_str(&format!(
         "ideal_loads_system: {}\n",
         markdown_cell(&context.system_name)
@@ -2928,6 +3077,16 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         json_string(&context.zone_air_node_name)
     ));
     json.push_str(&format!(
+        "  \"recirculation_node\": {},\n",
+        context
+            .recirculation_node_name
+            .as_ref()
+            .map_or_else(|| "null".to_string(), |name| json_string(name))
+    ));
+    if context.recirculation_node_name.is_some() {
+        json.push_str("  \"recirculation_state_source\": \"EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\",\n");
+    }
+    json.push_str(&format!(
         "  \"ideal_loads_system\": {},\n",
         json_string(&context.system_name)
     ));
@@ -3264,6 +3423,16 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         "  \"zone_air_node\": {},\n",
         json_string(&context.zone_air_node_name)
     ));
+    json.push_str(&format!(
+        "  \"recirculation_node\": {},\n",
+        context
+            .recirculation_node_name
+            .as_ref()
+            .map_or_else(|| "null".to_string(), |name| json_string(name))
+    ));
+    if context.recirculation_node_name.is_some() {
+        json.push_str("  \"recirculation_state_source\": \"EnergyPlus return/exhaust recirculation node proof row; Rust finite-limit reconstruction uses source-order zone air node for no-OA mixed-air state\",\n");
+    }
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");
     json.push_str("  \"stages\": [\n");
     let stages = ideal_loads_zone_equipment_stages();

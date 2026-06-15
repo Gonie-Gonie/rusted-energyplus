@@ -201,6 +201,28 @@ abs_tol = 1e-9
 rmse_tol = 1e-9
 
 [[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Temperature"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE RETURN"
+variable = "System Node Humidity Ratio"
+frequency = "detailed"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
 key = "ZONE ONE INLET"
 variable = "System Node Humidity Ratio"
 frequency = "detailed"
