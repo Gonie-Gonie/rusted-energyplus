@@ -3268,6 +3268,33 @@ fn evaluate_rows(
         result_source,
         |result| result.supply_air_total_cooling_rate_w,
     );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+        "kg/s",
+        result_source,
+        |result| result.supply_mass_flow_rate_kg_per_s,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+        "C",
+        result_source,
+        |result| result.supply_temperature_c,
+    );
+    add_result_series(
+        &mut observed_by_variable,
+        system_name,
+        &calc_results,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+        "kgWater/kgDryAir",
+        result_source,
+        |result| result.supply_humidity_ratio,
+    );
     if manifest_requests_report_energies(manifest) {
         let energy_source = "rust-ideal-loads-report-time-step-energy";
         add_result_energy_series(

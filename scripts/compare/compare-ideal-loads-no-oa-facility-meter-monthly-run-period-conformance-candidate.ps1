@@ -186,7 +186,7 @@ Assert-Contains -Text $text -Pattern "IdealLoads No-OA Sensible Report" -Descrip
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: conformance" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: true" -Description "claim boundary"
-Assert-Contains -Text $text -Pattern "series: 28" -Description "series count"
+Assert-Contains -Text $text -Pattern "series: 31" -Description "series count"
 Assert-Contains -Text $text -Pattern "samples: 39292" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_policy: conformance-gate" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "conformance status"
@@ -230,7 +230,7 @@ if ($summary.tolerance_policy -ne "conformance-gate") {
 if ($summary.samples -ne 39292) {
     throw "Unexpected IdealLoads sample count: $($summary.samples)"
 }
-if ($summary.series_count -ne 28) {
+if ($summary.series_count -ne 31) {
     throw "Unexpected IdealLoads series count: $($summary.series_count)"
 }
 if ($summary.meter_source -ne "EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance") {
@@ -245,12 +245,29 @@ if ($conformanceRows.Count -ne 0) {
     throw "Expected zero conformance-level ESO output rows in meter-only candidate, found $($conformanceRows.Count)"
 }
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 28) {
-    throw "Expected 28 diagnostic ESO output rows, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 31) {
+    throw "Expected 31 diagnostic ESO output rows, found $($diagnosticRows.Count)"
 }
 $diagnosticFailures = @($diagnosticRows | Where-Object { $_.status -ne "pass" })
 if ($summary.tolerance_failures -ne $diagnosticFailures.Count) {
     throw "Expected tolerance_failures to match diagnostic output failures: summary=$($summary.tolerance_failures) diagnostic=$($diagnosticFailures.Count)"
+}
+
+$supplyAirStateRows = @($summary.series | Where-Object {
+        $_.key -eq "ZONE ONE IDEAL LOADS" -and $_.variable -in @(
+            "Zone Ideal Loads Supply Air Mass Flow Rate",
+            "Zone Ideal Loads Supply Air Temperature",
+            "Zone Ideal Loads Supply Air Humidity Ratio"
+        )
+    })
+if ($supplyAirStateRows.Count -ne 3) {
+    throw "Expected 3 diagnostic supply-air report state rows, found $($supplyAirStateRows.Count)"
+}
+if (@($supplyAirStateRows | Where-Object { $_.level -ne "diagnostic" }).Count -ne 0) {
+    throw "Supply-air report state rows must remain diagnostic-only in the meter candidate"
+}
+if (@($supplyAirStateRows | Where-Object { $_.alignment -ne "timestamp" }).Count -ne 0) {
+    throw "Supply-air report state rows must use timestamp alignment"
 }
 
 $nodeFlow = @($summary.series | Where-Object { $_.variable -eq "System Node Mass Flow Rate" })
@@ -368,12 +385,12 @@ if (@($toleranceFailures | Where-Object { $_.level -ne "diagnostic" -or $_.domai
 }
 
 $resultStore = Read-JsonFile -Path $resultStorePath
-if ($resultStore.series_count -ne 28 -or $resultStore.sample_count -ne 39292) {
+if ($resultStore.series_count -ne 31 -or $resultStore.sample_count -ne 39292) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
 $selectedOutputs = Read-JsonFile -Path $selectedOutputsPath
-if (@($selectedOutputs.series).Count -ne 28) {
+if (@($selectedOutputs.series).Count -ne 31) {
     throw "Unexpected selected_outputs series count: $(@($selectedOutputs.series).Count)"
 }
 
@@ -453,6 +470,9 @@ Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | co
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | monthly | mtr | rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -Description "markdown monthly cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | annual | mtr | rust-ideal-loads-annual-facility-meter-from-fuel-energy" -Description "markdown annual cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | run-period | mtr | rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -Description "markdown run-period cooling meter row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Mass Flow Rate | diagnostic" -Description "markdown diagnostic supply-air mass flow row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Temperature | diagnostic" -Description "markdown diagnostic supply-air temperature row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Humidity Ratio | diagnostic" -Description "markdown diagnostic supply-air humidity row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | diagnostic" -Description "markdown diagnostic node flow row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown diagnostic zone heating fuel rate row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy | diagnostic" -Description "markdown diagnostic zone heating fuel energy row"

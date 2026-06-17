@@ -7,7 +7,8 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "This case claims only the declared no-OA monthly, annual, and run-period facility meter rows for DistrictHeatingWater:Facility and DistrictCooling:Facility.",
-  "Rate, energy, fuel-energy, thermostat, node, demand, and humidity rows remain diagnostic proof evidence in this meter candidate.",
+  "Rate, supply-air report state, energy, fuel-energy, thermostat, node, demand, and humidity rows remain diagnostic proof evidence in this meter candidate.",
+  "The supply-air report temperature/mass-flow rows and supply-node temperature/mass-flow rows intentionally expose the remaining adaptive system timestep state-reconstruction gap without entering the meter conformance gate.",
   "The Rust meter series are aggregated from detailed ReportPurchasedAir fuel-energy rows through RuntimeMeterRegistry-resolved IdealLoads facility meter bindings, grouped by month, summed over the single calendar-year annual report period, or summed over the run period to match the EnergyPlus MTR oracle.",
   "The boundary excludes non-unity and non-constant fuel-efficiency schedules, multi-year annual grouping, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter conformance.",
   "The compare gate applies the declared monthly, annual, and run-period meter tolerances to EnergyPlus MTR oracle series and Rust aggregated fuel-energy series."
@@ -124,6 +125,39 @@ domain = "hvac"
 level = "diagnostic"
 abs_tol = 1e-3
 rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Mass Flow Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Temperature"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-6
+rmse_tol = 1e-6
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Humidity Ratio"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
