@@ -5,6 +5,7 @@ use super::{
         DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3, energyplus_standard_air_density_kg_per_m3,
         moist_air_enthalpy_j_per_kg,
     },
+    types::*,
 };
 use crate::energyplus_moist_air_specific_heat_j_per_kg_k;
 use crate::zone_equipment::ZoneSysEnergyDemand;
