@@ -172,11 +172,13 @@ and mass flow only. Diagnostic proof rows in that case do not promote humidity
 control, zone predictor/corrector, outdoor-air, adaptive system timestep,
 sizing, broad meter conformance beyond the declared no-OA hourly facility
 meter candidate, non-constant efficiency schedules, or broad HVAC
-compatibility. The energy and blank/constant Schedule:Constant
-fuel energy rows are diagnostic-only proof of the EnergyPlus
-`ReportPurchasedAir` rate-to-`TimeStepSysSec`, `OutputProcessor` Sum reporting,
-and fuel-efficiency branches. `DistrictHeatingWater:Facility` and
-`DistrictCooling:Facility` meters are promoted only in
+compatibility. The non-fuel energy rows are promoted only by
+`ideal_loads_no_oa_report_energy_conformance_candidate_001`, which gates the
+EnergyPlus `ReportPurchasedAir` rate-to-`TimeStepSysSec` and
+`OutputProcessor` Sum path for declared supply-air and zone total
+heating/cooling energy rows. Blank/constant Schedule:Constant fuel energy rows
+remain diagnostic-only proof of the fuel-efficiency branches.
+`DistrictHeatingWater:Facility` and `DistrictCooling:Facility` meters are promoted only in
 `ideal_loads_no_oa_facility_meter_conformance_candidate_001`; that meter-only
 candidate keeps the ReportPurchasedAir energy/fuel-energy and node rows as
 diagnostic proof evidence.

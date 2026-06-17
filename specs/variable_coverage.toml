@@ -97,34 +97,34 @@ support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conf
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Energy"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_no_oa_sensible_conformance_001"
-first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum parity for the no-OA/no-limit IdealLoads case; these rows are proof evidence for the declared no-OA hourly facility meter candidate, while adaptive system timestep and broad meter conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+first_evidence = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001; fuel-energy rows, adaptive system timestep behavior, and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Cooling Energy"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_no_oa_sensible_conformance_001"
-first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum parity for the no-OA/no-limit IdealLoads case; these rows are proof evidence for the declared no-OA hourly facility meter candidate, while adaptive system timestep and broad meter conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+first_evidence = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001; fuel-energy rows, adaptive system timestep behavior, and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Total Heating Energy"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_no_oa_sensible_conformance_001"
-first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum parity for the no-OA/no-limit IdealLoads case; these rows are proof evidence for the declared no-OA hourly facility meter candidate, while adaptive system timestep and broad meter conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+first_evidence = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001; fuel-energy rows, adaptive system timestep behavior, and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Total Cooling Energy"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_no_oa_sensible_conformance_001"
-first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Diagnostic-only ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum parity for the no-OA/no-limit IdealLoads case; these rows are proof evidence for the declared no-OA hourly facility meter candidate, while adaptive system timestep and broad meter conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+first_evidence = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001; fuel-energy rows, adaptive system timestep behavior, and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Fuel Energy"

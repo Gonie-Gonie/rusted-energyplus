@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 82 tracked variables, 64 conformance variables, 12
+  output-variable scope: 82 tracked variables, 68 conformance variables, 8
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -50,9 +50,17 @@ tolerance, and code organization.
   thermostat setpoints, IdealLoads total/sensible/supply-air rates, and
   supply-node temperature/mass-flow Detailed series in
   `ideal_loads_no_oa_sensible_conformance_001`, with ReportPurchasedAir
-  energy and blank-efficiency fuel energy rows kept diagnostic-only and
+  non-fuel energy rows promoted only in
+  `ideal_loads_no_oa_report_energy_conformance_candidate_001`, blank-efficiency
+  fuel energy rows kept diagnostic-only, and
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
+- limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate for
+  declared supply-air total heating/cooling energy and zone total
+  heating/cooling energy rows in
+  `ideal_loads_no_oa_report_energy_conformance_candidate_001`, with fuel-energy
+  rows, rates, node, demand, humidity, and facility meter rows kept diagnostic
+  proof only
 - limited IdealLoads no-OA hourly facility meter conformance candidate for
   `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` in
   `ideal_loads_no_oa_facility_meter_conformance_candidate_001`, with
@@ -179,6 +187,7 @@ tolerance, and code organization.
   internal convective gain hourly variable, and the official
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
+  ReportPurchasedAir non-fuel energy, no-OA hourly facility meter,
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
   `AirChanges/Hour`, `Sum`, `Maximum`, `DifferentialDryBulb` economizer, and

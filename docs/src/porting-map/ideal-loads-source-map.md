@@ -511,9 +511,18 @@ The current conformance run compares 28 Detailed series over 110 samples. The
 pass, the two hourly facility meter diagnostic rows pass in
 `compare-summary.json`/`compare-report.md`, and `tolerance-failures.csv` is
 empty. This creates only the limited no-OA/no-limit sensible IdealLoads claim
-for declared outputs; ReportPurchasedAir energy, blank/constant
-Schedule:Constant fuel-efficiency energy/rate rows, and hourly facility meters
-remain diagnostic.
+for declared outputs; ReportPurchasedAir non-fuel energy rows are promoted
+only by the separate report-energy candidate, and blank/constant
+Schedule:Constant fuel-efficiency energy/rate rows plus hourly facility meters
+remain diagnostic in this case.
+
+`scripts/dev.cmd compare-ideal-loads-no-oa-report-energy-conformance-candidate`
+generates the report-energy evidence set under
+`.runtime/ideal-loads-no-oa-report-energy-conformance/26.1.0/ideal_loads_no_oa_report_energy_conformance_candidate_001/compare/`.
+That run compares 28 Detailed series over 110 samples. Only the four declared
+non-fuel ReportPurchasedAir energy rows are promoted; fuel-energy, rate,
+thermostat, demand, humidity, node, and facility meter rows remain diagnostic
+proof evidence, and `tolerance-failures.csv` is empty.
 
 `scripts/dev.cmd compare-ideal-loads-no-oa-facility-meter-conformance-candidate`
 generates the meter-only evidence set under
