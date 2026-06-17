@@ -294,7 +294,7 @@ rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
 
-## IdealLoads Outdoor-Air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, and Sum Conformance
+## IdealLoads Outdoor-Air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum Conformance
 
 `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
 blank-schedule `DesignSpecification:OutdoorAir` `Flow/Zone` lane for declared
@@ -334,7 +334,7 @@ air method, `NoEconomizer`, no heat recovery, no OA schedule, no finite
 flow/capacity limits, no DCV, default `ConstantSensibleHeatRatio`
 dehumidification, and no humidification control.
 
-Maximum, active economizer, active heat
+Active economizer, active heat
 recovery, active DCV, active humidity controls, heat-recovery saturation-limit
 branches, and broad IdealLoads outdoor-air conformance remain outside this
 claim.
@@ -348,14 +348,13 @@ claim.
 `ideal_loads_outdoor_air_sum_diagnostic_001`,
 `ideal_loads_outdoor_air_maximum_diagnostic_001`,
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
-`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`, and
+`ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are remaining
-diagnostic-only Maximum,
-DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy
-heat-recovery outdoor-air proof lanes, plus the original Flow/Zone,
-Flow/Person, Flow/Area, AirChanges/Hour, and Sum diagnostic predecessor
-fixtures:
+diagnostic-only DifferentialDryBulb, DifferentialEnthalpy, Sensible
+heat-recovery, and Enthalpy heat-recovery outdoor-air proof lanes, plus the
+original Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum
+diagnostic predecessor fixtures:
 
 ```text
 comparison_class: diagnostic-only
@@ -412,9 +411,10 @@ is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
-Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, and Sum conformance candidates,
-active DCV, active humidity controls, saturation-limit heat-recovery branches,
-or broad IdealLoads outdoor-air conformance.
+Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum
+conformance candidates, active DCV, active humidity controls,
+saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
+conformance.
 
 ## Promotion Requirements
 

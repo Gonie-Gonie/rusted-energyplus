@@ -121,8 +121,14 @@ tolerance, and code organization.
   report rates, supply-air state, and mixed-air state Detailed series in
   `ideal_loads_outdoor_air_sum_conformance_candidate_001`, with traced
   Flow/Area, Flow/Zone, and AirChanges/Hour component-flow proof inputs
-- diagnostic-only IdealLoads remaining Maximum,
-  active economizer, and active heat-recovery outdoor-air evidence
+- limited IdealLoads outdoor-air `Maximum` conformance candidate gate for
+  declared outdoor-air mass/standard-density volume flow, no-humidity
+  outdoor-air report rates, supply-air state, and mixed-air state Detailed
+  series in `ideal_loads_outdoor_air_maximum_conformance_candidate_001`, with
+  traced component-flow proof inputs and AirChanges/Hour selected as the
+  governing maximum
+- diagnostic-only IdealLoads remaining active economizer and active
+  heat-recovery outdoor-air evidence
   for outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, inactive
   economizer/heat-recovery reports, DifferentialDryBulb and
@@ -150,8 +156,8 @@ tolerance, and code organization.
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
-  Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`, and
-  `AirChanges/Hour` IdealLoads variables
+  Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
+  `AirChanges/Hour`, `Sum`, and `Maximum` IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
