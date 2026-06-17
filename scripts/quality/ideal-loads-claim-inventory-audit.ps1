@@ -248,6 +248,18 @@ foreach ($case in $promotedCases) {
     $promotedCaseIds[$case.Id] = $true
 }
 
+$currentNumericalSectionMatch = [regex]::Match(
+    $currentStatusText,
+    '(?ms)^Current numerical conformance is limited to promoted cases and their declared\s+variables:\s*(?<body>.*?)(?=^## Current Evidence Boundary)'
+)
+if (-not $currentNumericalSectionMatch.Success) {
+    throw "current-status promoted numerical conformance section missing"
+}
+$currentNumericalSection = $currentNumericalSectionMatch.Groups["body"].Value
+foreach ($case in $promotedCases) {
+    Assert-TextMatches -Text $currentNumericalSection -Pattern ([regex]::Escape($case.Id)) -Description "$($case.Id) current-status promoted numerical conformance list"
+}
+
 $algorithmBlocks = [regex]::Matches($algorithmLedgerText, '(?ms)^\[\[algorithm\]\]\s*(?<body>.*?)(?=^\[\[algorithm\]\]|\z)')
 $idealLoadsAlgorithmCount = 0
 foreach ($block in $algorithmBlocks) {
@@ -340,6 +352,7 @@ Write-Host "  diagnostic_or_baseline_ideal_loads_cases: $diagnosticOrBaselineCou
 Write-Host "  conformance_blocks_checked: $(($promotedCases | Measure-Object -Property Blocks -Sum).Sum)"
 Write-Host "  report_metadata_guards_checked: $reportMetadataGuardCount"
 Write-Host "  source_map_anchors_checked: $sourceMapAnchorCount"
+Write-Host "  current_status_promoted_list_refs: $($promotedCases.Count)"
 Write-Host "  variable_coverage_ideal_loads_refs: $idealLoadsCoverageRefs"
 Write-Host "  algorithm_ledger_ideal_loads_blocks: $idealLoadsAlgorithmCount"
 Write-Host "  user_handbook_boundary_markers: $($handbookBoundaryPatterns.Count)"

@@ -32,6 +32,8 @@ variables:
 - `ideal_loads_no_oa_report_energy_conformance_candidate_001` declared
   no-OA ReportPurchasedAir supply-air and zone total heating/cooling
   non-fuel energy variables only
+- `ideal_loads_blank_fuel_efficiency_conformance_candidate_001` declared
+  no-OA blank fuel-efficiency fuel energy-rate and fuel energy variables only
 - `ideal_loads_constant_fuel_efficiency_conformance_candidate_001` declared
   no-OA constant Schedule:Constant fuel-efficiency fuel energy-rate and fuel
   energy variables only
@@ -63,6 +65,9 @@ variables:
 - `ideal_loads_no_oa_facility_meter_conformance_candidate_001` declared
   no-OA hourly `DistrictHeatingWater:Facility` and `DistrictCooling:Facility`
   meters only
+- `ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001`
+  declared no-OA monthly and run-period `DistrictHeatingWater:Facility` and
+  `DistrictCooling:Facility` meters only
 - `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` declared
   outdoor-air Flow/Zone mass/volume, no-humidity report-rate, supply-air
   state, and mixed-air state variables only
