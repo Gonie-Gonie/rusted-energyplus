@@ -492,8 +492,8 @@ energyplus_source = [
   "src/EnergyPlus/PlantUtilities.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::PlantStateStore",
-  "crates/ep_runtime/src/runtime.rs::simulate_plant_state_projection",
+  "crates/ep_runtime/src/plant/state.rs::PlantStateStore",
+  "crates/ep_runtime/src/plant/state.rs::simulate_plant_state_projection",
 ]
 status = "diagnostic_only"
 first_case = "plant_loop_diagnostic_001"

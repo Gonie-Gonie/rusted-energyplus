@@ -72,8 +72,8 @@ Assert-FileExists -Path "docs\src\porting-map\plant-source-map.md" -Description 
 Assert-FileExists -Path "scripts\smoke\plant-loop-projection-smoke.ps1" -Description "v0.16 plant projection smoke"
 Assert-FileExists -Path "scripts\release\conformance-evidence-report.ps1" -Description "numeric conformance evidence release script"
 
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "PlantStateProjectionEvidencePolicy" -Description "plant projection evidence policy"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "simulate_plant_state_projection" -Description "plant projection runtime function"
+Assert-Contains -Path "crates\ep_runtime\src\plant\state.rs" -Pattern "PlantStateProjectionEvidencePolicy" -Description "plant projection evidence policy"
+Assert-Contains -Path "crates\ep_runtime\src\plant\state.rs" -Pattern "simulate_plant_state_projection" -Description "plant projection runtime function"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "plant-state-projection" -Description "plant projection CLI command"
 Assert-Contains -Path "scripts\smoke\plant-loop-projection-smoke.ps1" -Pattern "algorithm_parity: false" -Description "v0.16 algorithm boundary"
 Assert-Contains -Path "scripts\smoke\plant-loop-projection-smoke.ps1" -Pattern "plant-state-summary.json" -Description "v0.16 projection JSON artifact"
