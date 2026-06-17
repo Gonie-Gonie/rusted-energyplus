@@ -286,15 +286,16 @@ Not claimed:
 
 - general EnergyPlus heat-balance compatibility
 - broad HVAC or plant simulation compatibility
-- broad node, full IdealLoads, meter, or full runtime conformance
+- broad node, full IdealLoads, broad meter conformance, or full runtime
+  conformance
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
   and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
   declared Sensible and Enthalpy candidates, broader DCV combinations beyond
   the declared OccupancySchedule and CO2Setpoint Flow/Person candidates,
   humidity, CO2 contaminant-balance/concentration conformance,
-  saturation-limit generality, or meter conformance beyond the declared no-OA
-  hourly and monthly/run-period facility meter candidates, including annual
-  meter aggregation
+  saturation-limit generality, or broad meter conformance beyond the declared
+  no-OA hourly and monthly/run-period facility meter candidates, including
+  annual meter aggregation
 - broad ExampleFiles compatibility
 
 ## Quick Start

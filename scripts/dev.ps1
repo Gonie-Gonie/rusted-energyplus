@@ -60,6 +60,11 @@ $Commands = [ordered]@{
         Group = "quality"
         Help = "Guard IdealLoads calc, dispatch, node, and zone-equipment module boundaries."
     }
+    "ideal-loads-claim-inventory-audit" = @{
+        Path = "quality\ideal-loads-claim-inventory-audit.ps1"
+        Group = "quality"
+        Help = "Guard IdealLoads conformance claim inventory across manifests, docs, and gates."
+    }
     "perf" = @{
         Path = "quality\perf.ps1"
         Group = "quality"
