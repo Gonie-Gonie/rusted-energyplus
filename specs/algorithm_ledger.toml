@@ -227,22 +227,26 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_constant_supply_humidity_diagnostic",
+  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_constant_supply_humidity_cooling_conformance",
   "scripts/compare/compare-ideal-loads-constant-supply-humidity-diagnostic.ps1",
+  "scripts/compare/compare-ideal-loads-constant-supply-humidity-cooling-conformance-candidate.ps1",
 ]
-status = "diagnostic_only"
-first_case = "ideal_loads_constant_supply_humidity_diagnostic_001"
-first_evidence = "ideal_loads_constant_supply_humidity_diagnostic_001"
+status = "conformance"
+first_case = "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001"
+first_evidence = "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001"
 proof_variables = [
-  "Zone Ideal Loads Zone Latent Heating Rate",
+  "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Zone Sensible Cooling Rate",
   "Zone Ideal Loads Zone Latent Cooling Rate",
-  "Zone Ideal Loads Supply Air Sensible Heating Rate",
   "Zone Ideal Loads Supply Air Sensible Cooling Rate",
-  "Zone Ideal Loads Supply Air Latent Heating Rate",
   "Zone Ideal Loads Supply Air Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Cooling Rate",
+  "System Node Temperature",
+  "System Node Mass Flow Rate",
   "System Node Humidity Ratio",
 ]
-claim_level = "none"
-support_boundary = "Diagnostic-only no-OA ConstantSupplyHumidityRatio cooling-side humidity-control latent/sensible report evidence with EnergyPlus minimum cooling supply humidity ratio, latent-heating total-rate sorting during cooling, EPW barometric-pressure saturation clamps, and return-node mixed-air proof rows; humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
+claim_level = "limited-ideal-loads-no-oa-constant-supply-humidity-cooling-conformance"
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling conformance for declared thermostat, cooling total/sensible/latent rate, supply-air cooling report-rate, and supply-node temperature/mass-flow/humidity rows in ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001. Heating-side ConstantSupplyHumidityRatio, return-node and zone-air-node proof rows, ReportPurchasedAir energy/fuel rows, meters, humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_constant_supply_humidity_heating_control"

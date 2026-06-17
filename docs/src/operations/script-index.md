@@ -86,6 +86,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-constant-shr-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSensibleHeatRatio humidity-control case | no | `.runtime/ideal-loads-constant-shr` |
 | `compare-ideal-loads-constant-shr-conformance` | conformance | run the no-OA ConstantSensibleHeatRatio cooling IdealLoads conformance case | yes | `.runtime/ideal-loads-constant-shr-conformance` |
 | `compare-ideal-loads-constant-supply-humidity-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio humidity-control case | no | `.runtime/ideal-loads-constant-supply-humidity` |
+| `compare-ideal-loads-constant-supply-humidity-cooling-conformance-candidate` | conformance | run the no-OA ConstantSupplyHumidityRatio cooling IdealLoads conformance candidate | yes | `.runtime/ideal-loads-constant-supply-humidity-cooling-conformance` |
 | `compare-ideal-loads-constant-supply-humidity-heating-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA ConstantSupplyHumidityRatio heating case | no | `.runtime/ideal-loads-constant-supply-humidity-heating` |
 | `compare-ideal-loads-humidistat-dehumidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat dehumidification case | no | `.runtime/ideal-loads-humidistat-dehumidification` |
 | `compare-ideal-loads-humidistat-humidification-diagnostic` | diagnostic | run the diagnostic-only IdealLoads no-OA Humidistat humidification case | no | `.runtime/ideal-loads-humidistat-humidification` |

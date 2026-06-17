@@ -71,11 +71,16 @@ tolerance, and code organization.
   supply-node temperature/flow/humidity Detailed series in
   `ideal_loads_constant_shr_conformance_001`, with return-node and zone-air
   humidity proof rows kept diagnostic-only
-- diagnostic-only IdealLoads no-OA `ConstantSupplyHumidityRatio`
-  cooling/heating and Humidistat dehumidification/humidification
-  humidity-control evidence for remaining zone/supply latent and sensible
-  rate rows, moisture-demand proof inputs, and supply humidity handling in
-  `ideal_loads_constant_supply_humidity_diagnostic_001`,
+- limited IdealLoads no-OA `ConstantSupplyHumidityRatio` cooling conformance
+  candidate gate for declared thermostat, cooling total/sensible/latent rate,
+  and supply-node temperature/flow/humidity Detailed series in
+  `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`,
+  with heating rows, return-node and zone-air humidity proof rows,
+  ReportPurchasedAir energy/fuel rows, and meters kept diagnostic-only
+- diagnostic-only IdealLoads no-OA `ConstantSupplyHumidityRatio` heating and
+  Humidistat dehumidification/humidification humidity-control evidence for
+  remaining zone/supply latent and sensible rate rows, moisture-demand proof
+  inputs, and supply humidity handling in
   `ideal_loads_constant_supply_humidity_heating_diagnostic_001`,
   `ideal_loads_humidistat_dehumidification_diagnostic_001`, and
   `ideal_loads_humidistat_humidification_diagnostic_001`; broad
