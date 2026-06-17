@@ -303,6 +303,9 @@ foreach ($case in $promotedCases) {
         "declared_ideal_loads_branch",
         "inactive_branches",
         "ideal_loads_feature_flags",
+        "trace_level",
+        "trace_payload",
+        "trace_side_effect_policy",
         "source_order_wrapper",
         "ideal_loads_runtime_binding_source",
         "purchased_air_name_lookup_policy",
@@ -384,6 +387,15 @@ foreach ($case in $promotedCases) {
     $expectedFeatureFlagsLabel = (($idealLoadsFeatureFlagNames | ForEach-Object {
         "$_=$(Format-JsonBoolLabel $summary.ideal_loads_feature_flags.$_)"
     }) -join ", ")
+    $expectedTracePayload = if ($summary.selected_purchased_air_branch -eq "outdoor_air") {
+        "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates"
+    }
+    else {
+        "mode_counts, source-order demand inputs, selected branch, supply state, and report rates"
+    }
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_level" -Expected "default-conformance" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_payload" -Expected $expectedTracePayload -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_side_effect_policy" -Expected "trace/report serialization only; calculations are complete before artifact rendering" -Description "$($case.Id) compare summary"
     $reportFieldExpectations = [ordered]@{
         "case_id" = $case.Id
         "comparison_class" = "conformance"
@@ -402,6 +414,9 @@ foreach ($case in $promotedCases) {
         "declared_ideal_loads_branch" = [string]$summary.declared_ideal_loads_branch
         "inactive_branches" = (@($summary.inactive_branches) -join ", ")
         "ideal_loads_feature_flags" = $expectedFeatureFlagsLabel
+        "trace_level" = "default-conformance"
+        "trace_payload" = $expectedTracePayload
+        "trace_side_effect_policy" = "trace/report serialization only; calculations are complete before artifact rendering"
         "source_map_anchor" = "docs/src/porting-map/ideal-loads-source-map.md"
         "node_output_timestamp_alignment" = "timestamp"
         "node_output_store_type" = "ep_runtime::ResultStore"
@@ -437,6 +452,9 @@ foreach ($case in $promotedCases) {
         "declared_ideal_loads_branch",
         "inactive_branches",
         "ideal_loads_feature_flags",
+        "trace_level",
+        "trace_payload",
+        "trace_side_effect_policy",
         "source_order_wrapper",
         "ideal_loads_runtime_binding_source",
         "purchased_air_name_lookup_policy",
@@ -511,6 +529,9 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_runtime_binding_source" -Expected ([string]$summary.ideal_loads_runtime_binding_source) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "purchased_air_name_lookup_policy" -Expected ([string]$summary.purchased_air_name_lookup_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_level" -Expected ([string]$summary.trace_level) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_payload" -Expected ([string]$summary.trace_payload) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_side_effect_policy" -Expected ([string]$summary.trace_side_effect_policy) -Description "$($case.Id) stage summary"
     foreach ($flagName in $idealLoadsFeatureFlagNames) {
         Assert-JsonPropertyExists -Object $stageSummary.ideal_loads_feature_flags -PropertyName $flagName -Description "$($case.Id) stage summary ideal_loads_feature_flags"
         if ($stageSummary.ideal_loads_feature_flags.$flagName -ne $summary.ideal_loads_feature_flags.$flagName) {

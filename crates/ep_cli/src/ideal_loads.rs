@@ -223,6 +223,12 @@ const IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER: &str =
     "ep_runtime::ideal_loads::sim_purchased_air_compat";
 const IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER: &str =
     "ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat";
+const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
+const IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY: &str =
+    "trace/report serialization only; calculations are complete before artifact rendering";
+const IDEAL_LOADS_NO_OA_TRACE_PAYLOAD: &str =
+    "mode_counts, source-order demand inputs, selected branch, supply state, and report rates";
+const IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD: &str = "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -5079,6 +5085,18 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         ideal_loads_feature_flags_label(context.feature_flags)
     ));
     report.push_str(&format!(
+        "trace_level: {}\n",
+        IDEAL_LOADS_TRACE_LEVEL_DEFAULT
+    ));
+    report.push_str(&format!(
+        "trace_payload: {}\n",
+        IDEAL_LOADS_NO_OA_TRACE_PAYLOAD
+    ));
+    report.push_str(&format!(
+        "trace_side_effect_policy: {}\n",
+        IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY
+    ));
+    report.push_str(&format!(
         "source_map_anchor: {}\n",
         IDEAL_LOADS_SOURCE_MAP_ANCHOR
     ));
@@ -5293,6 +5311,18 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "ideal_loads_feature_flags: {}\n",
         ideal_loads_feature_flags_label(context.feature_flags)
+    ));
+    report.push_str(&format!(
+        "trace_level: {}\n",
+        IDEAL_LOADS_TRACE_LEVEL_DEFAULT
+    ));
+    report.push_str(&format!(
+        "trace_payload: {}\n",
+        IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD
+    ));
+    report.push_str(&format!(
+        "trace_side_effect_policy: {}\n",
+        IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY
     ));
     report.push_str(&format!(
         "source_map_anchor: {}\n",
@@ -5584,6 +5614,18 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"trace_level\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+    ));
+    json.push_str(&format!(
+        "  \"trace_payload\": {},\n",
+        json_string(IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD)
+    ));
+    json.push_str(&format!(
+        "  \"trace_side_effect_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
@@ -6101,6 +6143,18 @@ fn render_outdoor_air_stage_summary_json(
         ideal_loads_feature_flags_json(context.feature_flags)
     ));
     json.push_str(&format!(
+        "  \"trace_level\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+    ));
+    json.push_str(&format!(
+        "  \"trace_payload\": {},\n",
+        json_string(IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD)
+    ));
+    json.push_str(&format!(
+        "  \"trace_side_effect_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
+    ));
+    json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
         json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
     ));
@@ -6472,6 +6526,18 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"trace_level\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+    ));
+    json.push_str(&format!(
+        "  \"trace_payload\": {},\n",
+        json_string(IDEAL_LOADS_NO_OA_TRACE_PAYLOAD)
+    ));
+    json.push_str(&format!(
+        "  \"trace_side_effect_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
@@ -7099,6 +7165,18 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"trace_level\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+    ));
+    json.push_str(&format!(
+        "  \"trace_payload\": {},\n",
+        json_string(IDEAL_LOADS_NO_OA_TRACE_PAYLOAD)
+    ));
+    json.push_str(&format!(
+        "  \"trace_side_effect_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
