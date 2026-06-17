@@ -390,11 +390,12 @@ energyplus_source = [
 ]
 rust_target = [
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::design_outdoor_air_volume_flow_components_m3_per_s",
-  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_design_outdoor_air_volume_flow_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
-  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s",
-  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air/economizer.rs::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air/psychrometrics.rs::heat_recovery_saturation_adjusted_state",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE",

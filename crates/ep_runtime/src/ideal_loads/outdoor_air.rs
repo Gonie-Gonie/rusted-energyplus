@@ -1,20 +1,27 @@
 //! IdealLoads outdoor-air design-flow and narrow sensible-load helpers.
 
+mod dcv;
+mod economizer;
+mod psychrometrics;
+
+pub use dcv::*;
+
 use crate::{
-    energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psychrometric_humidity_ratio_from_rh,
+    energyplus_moist_air_specific_heat_j_per_kg_k,
     ideal_loads::{IdealLoadsSensibleMode, moist_air_enthalpy_j_per_kg},
     zone_equipment::ZoneSysEnergyDemand,
 };
 use ep_model::{
     DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
-    IdealLoadsAirSystem, OutdoorAirEconomizerType,
+    IdealLoadsAirSystem,
 };
 
-const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
-const ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.004_84;
-const ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG: f64 = 2500.94;
-const ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.858_95;
-const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
+use economizer::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s;
+use psychrometrics::{
+    dry_bulb_from_enthalpy_and_humidity_ratio, heat_recovery_saturation_adjusted_state,
+};
+
+pub(super) const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
 
 /// Zone context needed by `DesignSpecification:OutdoorAir`.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -121,26 +128,7 @@ pub fn design_outdoor_air_volume_flow_components_m3_per_s(
     )
 }
 
-/// Calculates outdoor-air volume flow with OccupancySchedule DCV current people.
-///
-/// EnergyPlus `CalcPurchAirMinOAMassFlow` calls
-/// `DataSizing::calcDesignSpecificationOutdoorAir` with `UseOccSchFlag=true`
-/// for `OccupancySchedule` DCV, which replaces design occupants with the
-/// current scheduled occupants for the per-person term.
-#[must_use]
-pub fn occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s(
-    specification: &DesignSpecificationOutdoorAir,
-    context: IdealLoadsOutdoorAirContext,
-    current_people_count: f64,
-) -> Option<IdealLoadsOutdoorAirDesignFlowComponents> {
-    design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
-        specification,
-        context,
-        current_people_count,
-    )
-}
-
-fn design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
+pub(super) fn design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
     specification: &DesignSpecificationOutdoorAir,
     context: IdealLoadsOutdoorAirContext,
     people_count: f64,
@@ -210,32 +198,6 @@ pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
         calc_design_outdoor_air_volume_flow_m3_per_s(specification, context)?;
     Some(
         design_volume_flow_m3_per_s
-            * schedule_multiplier(schedule_value)
-            * standard_air_density_kg_per_m3,
-    )
-}
-
-/// Applies OccupancySchedule DCV current people, OA schedule, and StdRhoAir.
-#[must_use]
-pub fn calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s(
-    specification: &DesignSpecificationOutdoorAir,
-    context: IdealLoadsOutdoorAirContext,
-    current_people_count: f64,
-    schedule_value: Option<f64>,
-    standard_air_density_kg_per_m3: f64,
-) -> Option<f64> {
-    if !standard_air_density_kg_per_m3.is_finite() || standard_air_density_kg_per_m3 < 0.0 {
-        return None;
-    }
-    let dcv_volume_flow_m3_per_s =
-        occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s(
-            specification,
-            context,
-            current_people_count,
-        )?
-        .final_design_volume_flow_rate_m3_per_s;
-    Some(
-        dcv_volume_flow_m3_per_s
             * schedule_multiplier(schedule_value)
             * standard_air_density_kg_per_m3,
     )
@@ -410,72 +372,6 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         heat_recovery_total_heating_rate_w: mixed_air_result.heat_recovery_total_heating_rate_w,
         heat_recovery_total_cooling_rate_w: mixed_air_result.heat_recovery_total_cooling_rate_w,
         heat_recovery_active_time_hr: mixed_air_result.heat_recovery_active_time_hr,
-    }
-}
-
-fn calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s(
-    system: &IdealLoadsAirSystem,
-    zone_state: IdealLoadsOutdoorAirNodeState,
-    recirculation_state: IdealLoadsOutdoorAirNodeState,
-    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
-    demand: ZoneSysEnergyDemand,
-    mode: IdealLoadsSensibleMode,
-    cp_air_j_per_kg_k: f64,
-    system_timestep_hours: f64,
-    outdoor_air_mass_flow_rate_kg_per_s: &mut f64,
-) -> f64 {
-    if mode != IdealLoadsSensibleMode::Cooling
-        || !economizer_allows_outdoor_air_flow_reset(
-            system.outdoor_air_economizer_type,
-            recirculation_state,
-            outdoor_air_state,
-        )
-    {
-        return 0.0;
-    }
-
-    let delta_t = outdoor_air_state.air_temperature_c - zone_state.air_temperature_c;
-    if delta_t >= -SMALL_TEMPERATURE_DIFFERENCE_C
-        || demand.remaining_output_req_to_cool_sp_w >= 0.0
-        || !cp_air_j_per_kg_k.is_finite()
-        || cp_air_j_per_kg_k <= 0.0
-    {
-        return 0.0;
-    }
-
-    let economizer_supply_mass_flow_rate_kg_per_s =
-        demand.remaining_output_req_to_cool_sp_w / (cp_air_j_per_kg_k * delta_t);
-    if !economizer_supply_mass_flow_rate_kg_per_s.is_finite()
-        || economizer_supply_mass_flow_rate_kg_per_s <= *outdoor_air_mass_flow_rate_kg_per_s
-    {
-        return 0.0;
-    }
-
-    *outdoor_air_mass_flow_rate_kg_per_s = economizer_supply_mass_flow_rate_kg_per_s.max(0.0);
-    system_timestep_hours.max(0.0)
-}
-
-fn economizer_allows_outdoor_air_flow_reset(
-    economizer_type: OutdoorAirEconomizerType,
-    recirculation_state: IdealLoadsOutdoorAirNodeState,
-    outdoor_air_state: IdealLoadsOutdoorAirNodeState,
-) -> bool {
-    match economizer_type {
-        OutdoorAirEconomizerType::NoEconomizer => false,
-        OutdoorAirEconomizerType::DifferentialDryBulb => {
-            outdoor_air_state.air_temperature_c < recirculation_state.air_temperature_c
-        }
-        OutdoorAirEconomizerType::DifferentialEnthalpy => {
-            let outdoor_air_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
-                outdoor_air_state.air_temperature_c,
-                outdoor_air_state.air_humidity_ratio,
-            );
-            let recirculation_enthalpy_j_per_kg = moist_air_enthalpy_j_per_kg(
-                recirculation_state.air_temperature_c,
-                recirculation_state.air_humidity_ratio,
-            );
-            outdoor_air_enthalpy_j_per_kg < recirculation_enthalpy_j_per_kg
-        }
     }
 }
 
@@ -696,28 +592,6 @@ fn heat_recovery_allows_outdoor_air_tempering(
     }
 }
 
-fn heat_recovery_saturation_adjusted_state(
-    temperature_c: f64,
-    humidity_ratio: f64,
-    enthalpy_j_per_kg: f64,
-    barometric_pressure_pa: f64,
-) -> (f64, f64) {
-    let Some(saturation_temperature_c) = saturation_temperature_from_enthalpy_and_pressure_c(
-        enthalpy_j_per_kg,
-        barometric_pressure_pa,
-    ) else {
-        return (temperature_c, humidity_ratio);
-    };
-    if saturation_temperature_c <= temperature_c {
-        return (temperature_c, humidity_ratio);
-    }
-    (
-        saturation_temperature_c,
-        humidity_ratio_from_enthalpy_and_dry_bulb(enthalpy_j_per_kg, saturation_temperature_c)
-            .max(ENERGYPLUS_MIN_HUMIDITY_RATIO),
-    )
-}
-
 fn supply_air_state(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsOutdoorAirNodeState,
@@ -748,65 +622,7 @@ fn supply_air_state(
     (supply_air_temperature_c, mixed_air_humidity_ratio)
 }
 
-fn dry_bulb_from_enthalpy_and_humidity_ratio(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
-    (enthalpy_j_per_kg / 1000.0 - ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG * humidity_ratio)
-        / (ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K
-            + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * humidity_ratio)
-}
-
-fn humidity_ratio_from_enthalpy_and_dry_bulb(enthalpy_j_per_kg: f64, dry_bulb_c: f64) -> f64 {
-    (enthalpy_j_per_kg / 1000.0 - ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
-        / (ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG
-            + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
-}
-
-fn saturation_temperature_from_enthalpy_and_pressure_c(
-    enthalpy_j_per_kg: f64,
-    barometric_pressure_pa: f64,
-) -> Option<f64> {
-    if !enthalpy_j_per_kg.is_finite()
-        || !barometric_pressure_pa.is_finite()
-        || barometric_pressure_pa <= 0.0
-    {
-        return None;
-    }
-
-    let mut low_c = -100.0;
-    let mut high_c = 200.0;
-    let low_enthalpy = saturated_air_enthalpy_j_per_kg(low_c, barometric_pressure_pa)?;
-    let high_enthalpy = saturated_air_enthalpy_j_per_kg(high_c, barometric_pressure_pa)?;
-    if enthalpy_j_per_kg <= low_enthalpy {
-        return Some(low_c);
-    }
-    if enthalpy_j_per_kg >= high_enthalpy {
-        return Some(high_c);
-    }
-
-    for _ in 0..80 {
-        let mid_c = 0.5 * (low_c + high_c);
-        let mid_enthalpy = saturated_air_enthalpy_j_per_kg(mid_c, barometric_pressure_pa)?;
-        if mid_enthalpy < enthalpy_j_per_kg {
-            low_c = mid_c;
-        } else {
-            high_c = mid_c;
-        }
-    }
-    Some(0.5 * (low_c + high_c))
-}
-
-fn saturated_air_enthalpy_j_per_kg(temperature_c: f64, barometric_pressure_pa: f64) -> Option<f64> {
-    let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
-        temperature_c,
-        1.0,
-        barometric_pressure_pa,
-    )?;
-    Some(moist_air_enthalpy_j_per_kg(
-        temperature_c,
-        saturation_humidity_ratio,
-    ))
-}
-
-fn schedule_multiplier(value: Option<f64>) -> f64 {
+pub(super) fn schedule_multiplier(value: Option<f64>) -> f64 {
     let Some(value) = value else {
         return 1.0;
     };
