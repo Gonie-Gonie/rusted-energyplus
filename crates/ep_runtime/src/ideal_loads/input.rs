@@ -6,6 +6,66 @@ use ep_model::{
     OutdoorAirEconomizerType,
 };
 
+/// Compile-stage IdealLoads feature flags used to choose compatibility branches.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct IdealLoadsFeatureFlags {
+    /// Outdoor-air design object or inlet node is present.
+    pub has_outdoor_air: bool,
+    /// Outdoor-air economizer is active.
+    pub has_economizer: bool,
+    /// Heat recovery is active.
+    pub has_heat_recovery: bool,
+    /// Demand controlled ventilation is active.
+    pub has_dcv: bool,
+    /// Humidistat humidity control is active.
+    pub has_humidistat: bool,
+    /// ConstantSensibleHeatRatio dehumidification branch is active.
+    pub has_constant_shr: bool,
+    /// ConstantSupplyHumidityRatio humidity branch is active.
+    pub has_constant_supply_humidity: bool,
+    /// Heating or cooling flow limit is active.
+    pub has_flow_limit: bool,
+    /// Heating or cooling capacity limit is active.
+    pub has_capacity_limit: bool,
+    /// Autosize appears in any IdealLoads flow or capacity limit field.
+    pub has_autosize: bool,
+}
+
+impl IdealLoadsFeatureFlags {
+    /// Builds feature flags from a typed IdealLoads system.
+    #[must_use]
+    pub fn from_system(system: &IdealLoadsAirSystem) -> Self {
+        Self {
+            has_outdoor_air: system
+                .design_specification_outdoor_air_object_name
+                .is_some()
+                || system.outdoor_air_inlet_node_name.is_some(),
+            has_economizer: system.outdoor_air_economizer_type
+                != OutdoorAirEconomizerType::NoEconomizer,
+            has_heat_recovery: system.heat_recovery_type != HeatRecoveryType::None,
+            has_dcv: system.demand_controlled_ventilation_type
+                != DemandControlledVentilationType::None,
+            has_humidistat: system.dehumidification_control_type
+                == DehumidificationControlType::Humidistat
+                || system.humidification_control_type == HumidificationControlType::Humidistat,
+            has_constant_shr: system.dehumidification_control_type
+                == DehumidificationControlType::ConstantSensibleHeatRatio,
+            has_constant_supply_humidity: system.dehumidification_control_type
+                == DehumidificationControlType::ConstantSupplyHumidityRatio
+                || system.humidification_control_type
+                    == HumidificationControlType::ConstantSupplyHumidityRatio,
+            has_flow_limit: limit_includes_flow_rate(system.heating_limit)
+                || limit_includes_flow_rate(system.cooling_limit),
+            has_capacity_limit: limit_includes_capacity(system.heating_limit)
+                || limit_includes_capacity(system.cooling_limit),
+            has_autosize: is_autosize(system.maximum_heating_air_flow_rate_m3_per_s)
+                || is_autosize(system.maximum_sensible_heating_capacity_w)
+                || is_autosize(system.maximum_cooling_air_flow_rate_m3_per_s)
+                || is_autosize(system.maximum_total_cooling_capacity_w),
+        }
+    }
+}
+
 /// Unsupported feature flags that keep the first IdealLoads case diagnostic.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IdealLoadsUnsupportedFeature {
@@ -95,21 +155,18 @@ fn no_oa_sensible_unsupported_features(
     system: &IdealLoadsAirSystem,
 ) -> Vec<IdealLoadsUnsupportedFeature> {
     let mut unsupported_features = Vec::new();
+    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
 
-    if system
-        .design_specification_outdoor_air_object_name
-        .is_some()
-        || system.outdoor_air_inlet_node_name.is_some()
-    {
+    if feature_flags.has_outdoor_air {
         unsupported_features.push(IdealLoadsUnsupportedFeature::OutdoorAir);
     }
-    if system.demand_controlled_ventilation_type != DemandControlledVentilationType::None {
+    if feature_flags.has_dcv {
         unsupported_features.push(IdealLoadsUnsupportedFeature::DemandControlledVentilation);
     }
-    if system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer {
+    if feature_flags.has_economizer {
         unsupported_features.push(IdealLoadsUnsupportedFeature::Economizer);
     }
-    if system.heat_recovery_type != HeatRecoveryType::None {
+    if feature_flags.has_heat_recovery {
         unsupported_features.push(IdealLoadsUnsupportedFeature::HeatRecovery);
     }
     if system.humidification_control_type != HumidificationControlType::None {
@@ -143,4 +200,22 @@ fn limit_fields_are_numeric(
 
 fn is_numeric(value: Option<AutosizeOrNumber>) -> bool {
     matches!(value, Some(AutosizeOrNumber::Value(_)))
+}
+
+fn is_autosize(value: Option<AutosizeOrNumber>) -> bool {
+    matches!(value, Some(AutosizeOrNumber::Autosize))
+}
+
+fn limit_includes_flow_rate(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
+}
+
+fn limit_includes_capacity(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
 }

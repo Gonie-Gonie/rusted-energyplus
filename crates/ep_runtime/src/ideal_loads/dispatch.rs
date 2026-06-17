@@ -2,19 +2,16 @@
 
 use crate::{
     ideal_loads::{
-        IdealLoadsInitFlags, IdealLoadsReportSnapshot, IdealLoadsSensibleLimitContext,
-        IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState,
-        calc_no_oa_no_limit_sensible_with_recirculation_context_compat,
+        IdealLoadsFeatureFlags, IdealLoadsInitFlags, IdealLoadsReportSnapshot,
+        IdealLoadsSensibleLimitContext, IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
+        IdealLoadsZoneState, calc_no_oa_no_limit_sensible_with_recirculation_context_compat,
         calc_no_oa_sensible_with_limits_and_recirculation_compat, classify_no_oa_sensible_subset,
         supply_node_update_from_result,
     },
     node::IdealLoadsSupplyNodeUpdate,
     zone_equipment::ZoneSysEnergyDemand,
 };
-use ep_model::{
-    DehumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsLimit,
-    NodeId,
-};
+use ep_model::{DehumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, NodeId};
 
 /// Rust-visible branch selected inside `CalcPurchAirLoads`.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -230,12 +227,12 @@ pub fn sim_purchased_air_compat(
 /// Selects the Rust-visible PurchasedAir branch for a supported no-OA compatibility system.
 #[must_use]
 pub fn select_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPurchasedAirBranch {
-    let has_flow_limit =
-        limit_includes_flow(system.heating_limit) || limit_includes_flow(system.cooling_limit);
-    let has_capacity_limit = limit_includes_capacity(system.heating_limit)
-        || limit_includes_capacity(system.cooling_limit);
+    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
 
-    match (has_flow_limit, has_capacity_limit) {
+    match (
+        feature_flags.has_flow_limit,
+        feature_flags.has_capacity_limit,
+    ) {
         (true, true) => IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity,
         (true, false) => IdealLoadsPurchasedAirBranch::NoOaFiniteFlow,
         (false, true) => IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
@@ -289,11 +286,8 @@ fn classify_purchased_air_compat_subset(
 }
 
 fn supports_no_oa_humidity_diagnostic_branch(system: &IdealLoadsAirSystem) -> bool {
-    if limit_includes_flow(system.heating_limit)
-        || limit_includes_flow(system.cooling_limit)
-        || limit_includes_capacity(system.heating_limit)
-        || limit_includes_capacity(system.cooling_limit)
-    {
+    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
+    if feature_flags.has_flow_limit || feature_flags.has_capacity_limit {
         return false;
     }
 
@@ -314,26 +308,12 @@ fn supports_no_oa_humidity_diagnostic_branch(system: &IdealLoadsAirSystem) -> bo
     )
 }
 
-const fn limit_includes_flow(limit: IdealLoadsLimit) -> bool {
-    matches!(
-        limit,
-        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
-    )
-}
-
-const fn limit_includes_capacity(limit: IdealLoadsLimit) -> bool {
-    matches!(
-        limit,
-        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
-    )
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use ep_model::{
         AutosizeOrNumber, DemandControlledVentilationType, HeatRecoveryType, IdealLoadsFuelType,
-        NormalizedName, OutdoorAirEconomizerType, ZoneId,
+        IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
     };
 
     #[test]
@@ -344,6 +324,38 @@ mod tests {
         assert_eq!(stages[2].source_routine, "CalcPurchAirLoads");
         assert_eq!(stages[3].source_routine, "UpdatePurchasedAir");
         assert_eq!(stages[4].source_routine, "ReportPurchasedAir");
+    }
+
+    #[test]
+    fn ideal_loads_feature_flags_capture_compile_specialization_inputs() {
+        let mut system = test_system();
+        system.design_specification_outdoor_air_object_name = Some(NormalizedName::new("OA SPEC"));
+        system.outdoor_air_inlet_node_name = Some(NormalizedName::new("OA NODE"));
+        system.demand_controlled_ventilation_type =
+            DemandControlledVentilationType::OccupancySchedule;
+        system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialDryBulb;
+        system.heat_recovery_type = HeatRecoveryType::Sensible;
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSupplyHumidityRatio;
+        system.humidification_control_type = ep_model::HumidificationControlType::Humidistat;
+        system.heating_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+        system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Autosize);
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(500.0));
+        system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(300.0));
+
+        let flags = IdealLoadsFeatureFlags::from_system(&system);
+
+        assert!(flags.has_outdoor_air);
+        assert!(flags.has_economizer);
+        assert!(flags.has_heat_recovery);
+        assert!(flags.has_dcv);
+        assert!(flags.has_humidistat);
+        assert!(!flags.has_constant_shr);
+        assert!(flags.has_constant_supply_humidity);
+        assert!(flags.has_flow_limit);
+        assert!(flags.has_capacity_limit);
+        assert!(flags.has_autosize);
     }
 
     #[test]
