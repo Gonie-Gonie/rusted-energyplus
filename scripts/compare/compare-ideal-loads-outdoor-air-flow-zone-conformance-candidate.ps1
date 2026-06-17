@@ -331,9 +331,30 @@ if ($stageSummary.outdoor_air -ne $true) {
 if ($stageSummary.outdoor_air_method -ne "Flow/Zone") {
     throw "Stage summary must record outdoor_air_method=Flow/Zone, got $($stageSummary.outdoor_air_method)"
 }
+if ($stageSummary.source_map_anchor -ne "docs/src/porting-map/ideal-loads-source-map.md") {
+    throw "Unexpected stage source-map anchor: $($stageSummary.source_map_anchor)"
+}
+if ($stageSummary.node_output_timestamp_alignment -ne "timestamp") {
+    throw "Unexpected stage node timestamp alignment: $($stageSummary.node_output_timestamp_alignment)"
+}
+if ($stageSummary.selected_purchased_air_branch -ne "outdoor_air") {
+    throw "Unexpected stage PurchasedAir branch: $($stageSummary.selected_purchased_air_branch)"
+}
+if ($stageSummary.declared_ideal_loads_branch -ne "outdoor_air_flow_zone") {
+    throw "Unexpected stage declared branch: $($stageSummary.declared_ideal_loads_branch)"
+}
+$inactiveBranches = @($stageSummary.inactive_branches)
+if (($inactiveBranches -join ", ") -ne "economizer, heat_recovery, dcv, humidistat, autosizing, saturation_limit") {
+    throw "Unexpected stage inactive branches: $($inactiveBranches -join ', ')"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Flow/Zone branch for declared variables only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: outdoor_air" -Description "markdown PurchasedAir branch"
+Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch: outdoor_air_flow_zone" -Description "markdown declared branch"
+Assert-Contains -Text $reportText -Pattern "inactive_branches: economizer, heat_recovery, dcv, humidistat, autosizing, saturation_limit" -Description "markdown inactive branches"
+Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
+Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows" -Description "markdown OA source"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Outdoor Air Mass Flow Rate | conformance" -Description "markdown OA mass row"

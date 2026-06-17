@@ -1834,6 +1834,69 @@ fn demand_controlled_ventilation_label(dcv: DemandControlledVentilationType) -> 
     }
 }
 
+fn outdoor_air_selected_purchased_air_branch() -> &'static str {
+    "outdoor_air"
+}
+
+fn outdoor_air_declared_ideal_loads_branch(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> &'static str {
+    if manifest_allows_outdoor_air_flow_zone_conformance_manifest(context.manifest) {
+        "outdoor_air_flow_zone"
+    } else if manifest_allows_outdoor_air_flow_person_conformance_manifest(context.manifest) {
+        "outdoor_air_flow_person"
+    } else if manifest_allows_outdoor_air_flow_area_conformance_manifest(context.manifest) {
+        "outdoor_air_flow_area"
+    } else if manifest_allows_outdoor_air_air_changes_conformance_manifest(context.manifest) {
+        "outdoor_air_air_changes"
+    } else if manifest_allows_outdoor_air_sum_conformance_manifest(context.manifest) {
+        "outdoor_air_sum"
+    } else if manifest_allows_outdoor_air_maximum_conformance_manifest(context.manifest) {
+        "outdoor_air_maximum"
+    } else if manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
+        context.manifest,
+    ) {
+        "outdoor_air_differential_dry_bulb_economizer"
+    } else if manifest_allows_outdoor_air_differential_enthalpy_economizer_conformance_manifest(
+        context.manifest,
+    ) {
+        "outdoor_air_differential_enthalpy_economizer"
+    } else if manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(
+        context.manifest,
+    ) {
+        "outdoor_air_sensible_heat_recovery"
+    } else if manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(
+        context.manifest,
+    ) {
+        "outdoor_air_enthalpy_heat_recovery"
+    } else if manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest(context.manifest) {
+        "outdoor_air_occupancy_dcv"
+    } else if manifest_allows_outdoor_air_co2_dcv_conformance_manifest(context.manifest) {
+        "outdoor_air_co2_dcv"
+    } else {
+        "outdoor_air_diagnostic"
+    }
+}
+
+fn outdoor_air_inactive_branches(
+    context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
+) -> Vec<&'static str> {
+    let mut branches = Vec::new();
+    if context.outdoor_air_economizer_type == OutdoorAirEconomizerType::NoEconomizer {
+        branches.push("economizer");
+    }
+    if context.heat_recovery_type == HeatRecoveryType::None {
+        branches.push("heat_recovery");
+    }
+    if context.demand_controlled_ventilation_type == DemandControlledVentilationType::None {
+        branches.push("dcv");
+    }
+    branches.push("humidistat");
+    branches.push("autosizing");
+    branches.push("saturation_limit");
+    branches
+}
+
 fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
     if manifest_allows_outdoor_air_flow_zone_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Flow/Zone branch for declared variables only";
@@ -5111,6 +5174,26 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str(&format!(
+        "selected_purchased_air_branch: {}\n",
+        outdoor_air_selected_purchased_air_branch()
+    ));
+    report.push_str(&format!(
+        "declared_ideal_loads_branch: {}\n",
+        outdoor_air_declared_ideal_loads_branch(context)
+    ));
+    report.push_str(&format!(
+        "inactive_branches: {}\n",
+        outdoor_air_inactive_branches(context).join(", ")
+    ));
+    report.push_str(&format!(
+        "source_map_anchor: {}\n",
+        IDEAL_LOADS_SOURCE_MAP_ANCHOR
+    ));
+    report.push_str(&format!(
+        "node_output_timestamp_alignment: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT
+    ));
+    report.push_str(&format!(
         "node_output_store_type: {}\n",
         IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE
     ));
@@ -5295,6 +5378,26 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string(outdoor_air_tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
+    json.push_str(&format!(
+        "  \"source_map_anchor\": {},\n",
+        json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_timestamp_alignment\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
+    json.push_str(&format!(
+        "  \"selected_purchased_air_branch\": {},\n",
+        json_string(outdoor_air_selected_purchased_air_branch())
+    ));
+    json.push_str(&format!(
+        "  \"declared_ideal_loads_branch\": {},\n",
+        json_string(outdoor_air_declared_ideal_loads_branch(context))
+    ));
+    json.push_str(&format!(
+        "  \"inactive_branches\": {},\n",
+        json_string_array(&outdoor_air_inactive_branches(context))
+    ));
     json.push_str(&format!(
         "  \"node_output_store_type\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
@@ -5663,6 +5766,26 @@ fn render_outdoor_air_stage_summary_json(
     ));
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
     json.push_str("  \"outdoor_air\": true,\n");
+    json.push_str(&format!(
+        "  \"source_map_anchor\": {},\n",
+        json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_timestamp_alignment\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
+    json.push_str(&format!(
+        "  \"selected_purchased_air_branch\": {},\n",
+        json_string(outdoor_air_selected_purchased_air_branch())
+    ));
+    json.push_str(&format!(
+        "  \"declared_ideal_loads_branch\": {},\n",
+        json_string(outdoor_air_declared_ideal_loads_branch(context))
+    ));
+    json.push_str(&format!(
+        "  \"inactive_branches\": {},\n",
+        json_string_array(&outdoor_air_inactive_branches(context))
+    ));
     json.push_str(&format!(
         "  \"node_output_store_type\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)

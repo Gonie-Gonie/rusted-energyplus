@@ -358,6 +358,11 @@ if ($stageSummary.current_people_count_min -ne 0.0 -or $stageSummary.current_peo
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Flow/Person OccupancySchedule DCV branch for declared variables only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: outdoor_air" -Description "markdown PurchasedAir branch"
+Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch:" -Description "markdown declared branch"
+Assert-Contains -Text $reportText -Pattern "inactive_branches:" -Description "markdown inactive branches"
+Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
+Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Person with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows plus EnergyPlus OccupancySchedule DCV current People schedule occupancy through DataSizing::calcDesignSpecificationOutdoorAir(UseOccSchFlag=true)" -Description "markdown OA source"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 Assert-Contains -Text $reportText -Pattern "demand_controlled_ventilation_type: OccupancySchedule" -Description "markdown DCV guard"
