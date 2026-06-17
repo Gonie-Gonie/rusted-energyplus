@@ -108,6 +108,10 @@ feature is promoted.
 Rust. Conformance reports expose `ideal_loads_runtime_binding_source` as
 `compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding` and
 `purchased_air_name_lookup_policy` as `PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs`.
+Current conformance reports expose `ideal_loads_invocation_path` as
+`zone-equipment-validated source-order PurchasedAir wrapper`,
+`direct_calc_helper_invocation` as `false`, and
+`zone_equipment_dispatch_execution_boundary` as `validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper`.
 
 ## No-OA Sensible Fast Path
 

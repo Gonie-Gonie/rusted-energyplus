@@ -223,6 +223,10 @@ const IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER: &str =
     "ep_runtime::ideal_loads::sim_purchased_air_compat";
 const IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER: &str =
     "ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat";
+const IDEAL_LOADS_INVOCATION_PATH: &str =
+    "zone-equipment-validated source-order PurchasedAir wrapper";
+const IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION: bool = false;
+const IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY: &str = "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper";
 const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
 const IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY: &str =
     "trace/report serialization only; calculations are complete before artifact rendering";
@@ -5035,6 +5039,18 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER
     ));
     report.push_str(&format!(
+        "ideal_loads_invocation_path: {}\n",
+        IDEAL_LOADS_INVOCATION_PATH
+    ));
+    report.push_str(&format!(
+        "direct_calc_helper_invocation: {}\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_execution_boundary: {}\n",
+        IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY
+    ));
+    report.push_str(&format!(
         "ideal_loads_runtime_binding_source: {}\n",
         IDEAL_LOADS_RUNTIME_BINDING_SOURCE
     ));
@@ -5257,6 +5273,18 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "source_order_wrapper: {}\n",
         IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER
+    ));
+    report.push_str(&format!(
+        "ideal_loads_invocation_path: {}\n",
+        IDEAL_LOADS_INVOCATION_PATH
+    ));
+    report.push_str(&format!(
+        "direct_calc_helper_invocation: {}\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_execution_boundary: {}\n",
+        IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY
     ));
     report.push_str(&format!(
         "ideal_loads_runtime_binding_source: {}\n",
@@ -5582,6 +5610,18 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_invocation_path\": {},\n",
+        json_string(IDEAL_LOADS_INVOCATION_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"direct_calc_helper_invocation\": {},\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_execution_boundary\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY)
     ));
     json.push_str(&format!(
         "  \"ideal_loads_runtime_binding_source\": {},\n",
@@ -6111,6 +6151,18 @@ fn render_outdoor_air_stage_summary_json(
         json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_invocation_path\": {},\n",
+        json_string(IDEAL_LOADS_INVOCATION_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"direct_calc_helper_invocation\": {},\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_execution_boundary\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY)
+    ));
+    json.push_str(&format!(
         "  \"ideal_loads_runtime_binding_source\": {},\n",
         json_string(IDEAL_LOADS_RUNTIME_BINDING_SOURCE)
     ));
@@ -6442,6 +6494,18 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_invocation_path\": {},\n",
+        json_string(IDEAL_LOADS_INVOCATION_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"direct_calc_helper_invocation\": {},\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_execution_boundary\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY)
     ));
     json.push_str(&format!(
         "  \"ideal_loads_runtime_binding_source\": {},\n",
@@ -7141,6 +7205,18 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_invocation_path\": {},\n",
+        json_string(IDEAL_LOADS_INVOCATION_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"direct_calc_helper_invocation\": {},\n",
+        IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_execution_boundary\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY)
     ));
     json.push_str(&format!(
         "  \"ideal_loads_runtime_binding_source\": {},\n",

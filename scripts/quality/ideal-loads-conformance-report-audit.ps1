@@ -307,6 +307,9 @@ foreach ($case in $promotedCases) {
         "trace_payload",
         "trace_side_effect_policy",
         "source_order_wrapper",
+        "ideal_loads_invocation_path",
+        "direct_calc_helper_invocation",
+        "zone_equipment_dispatch_execution_boundary",
         "ideal_loads_runtime_binding_source",
         "purchased_air_name_lookup_policy",
         "source_map_anchor",
@@ -350,6 +353,9 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $summary -PropertyName "energy_output_timestep_source" -Expected "ReportPurchasedAir rate * TimeStepSysSec" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_aggregation_source" -Expected "ep_runtime::RuntimeMeterRegistry" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_fuel_energy_binding_source" -Expected "ep_runtime::ideal_loads_facility_meter_binding" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_invocation_path" -Expected "zone-equipment-validated source-order PurchasedAir wrapper" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "direct_calc_helper_invocation" -Expected $false -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_equipment_dispatch_execution_boundary" -Expected "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_runtime_binding_source" -Expected "compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "purchased_air_name_lookup_policy" -Expected "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) compare summary"
@@ -402,6 +408,9 @@ foreach ($case in $promotedCases) {
         "conformance_claim" = "true"
         "status" = "pass"
         "source_order_wrapper" = $expectedSourceOrderWrapper
+        "ideal_loads_invocation_path" = "zone-equipment-validated source-order PurchasedAir wrapper"
+        "direct_calc_helper_invocation" = "false"
+        "zone_equipment_dispatch_execution_boundary" = "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper"
         "ideal_loads_runtime_binding_source" = [string]$summary.ideal_loads_runtime_binding_source
         "purchased_air_name_lookup_policy" = [string]$summary.purchased_air_name_lookup_policy
         "zone_equipment_dispatch_path" = "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir"
@@ -456,6 +465,9 @@ foreach ($case in $promotedCases) {
         "trace_payload",
         "trace_side_effect_policy",
         "source_order_wrapper",
+        "ideal_loads_invocation_path",
+        "direct_calc_helper_invocation",
+        "zone_equipment_dispatch_execution_boundary",
         "ideal_loads_runtime_binding_source",
         "purchased_air_name_lookup_policy",
         "source_map_anchor",
@@ -527,6 +539,9 @@ foreach ($case in $promotedCases) {
     }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_invocation_path" -Expected ([string]$summary.ideal_loads_invocation_path) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "direct_calc_helper_invocation" -Expected $false -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_equipment_dispatch_execution_boundary" -Expected ([string]$summary.zone_equipment_dispatch_execution_boundary) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_runtime_binding_source" -Expected ([string]$summary.ideal_loads_runtime_binding_source) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "purchased_air_name_lookup_policy" -Expected ([string]$summary.purchased_air_name_lookup_policy) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_level" -Expected ([string]$summary.trace_level) -Description "$($case.Id) stage summary"
