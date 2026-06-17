@@ -113,6 +113,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_DIFFERENTIAL_ENTHALPY_ECONOMIZER_CONFORMANCE_CASE_
     "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEAT_RECOVERY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001";
+const IDEAL_LOADS_OUTDOOR_AIR_ENTHALPY_HEAT_RECOVERY_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_no_oa_facility_meter_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS: &[&str] =
@@ -820,6 +822,14 @@ fn manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(
         && manifest.conformance_claim
 }
 
+fn manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_ENTHALPY_HEAT_RECOVERY_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn manifest_allows_outdoor_air_active_economizer_conformance_manifest(
     manifest: &ConformanceCase,
 ) -> bool {
@@ -833,6 +843,7 @@ fn manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(
     manifest: &ConformanceCase,
 ) -> bool {
     manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(manifest)
+        || manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(manifest)
 }
 
 fn manifest_is_no_oa_facility_meter_conformance_candidate(manifest: &ConformanceCase) -> bool {
@@ -949,6 +960,12 @@ fn outdoor_air_conformance_expectations_for_manifest(
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::Sensible,
+        ))
+    } else if manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(manifest) {
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerZone,
+            OutdoorAirEconomizerType::NoEconomizer,
+            HeatRecoveryType::Enthalpy,
         ))
     } else {
         None
@@ -1465,6 +1482,9 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     }
     if manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Sensible heat recovery branch for declared variables only";
+    }
+    if manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(context.manifest) {
+        return "conformance IdealLoads outdoor-air Enthalpy heat recovery branch for declared variables only; general heat-recovery saturation-limit branch parity remains outside the claim";
     }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";

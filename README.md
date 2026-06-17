@@ -172,11 +172,15 @@ tolerance, and code organization.
   Detailed series in
   `ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`,
   with inactive economizer active-time kept diagnostic-only
-- diagnostic-only IdealLoads remaining Enthalpy heat-recovery outdoor-air
-  evidence for outdoor-air mass flow, standard-density volume flow,
-  no-humidity outdoor-air report rates, supply-air state, mixed-air state,
-  inactive economizer/heat-recovery reports, and Enthalpy heat-recovery
-  active-time/rate parity in
+- limited IdealLoads outdoor-air `Enthalpy` heat-recovery conformance
+  candidate gate for declared Flow/Zone outdoor-air mass/standard-density
+  volume flow, no-humidity outdoor-air report rates, supply-air state,
+  mixed-air state, Enthalpy heat-recovery rate, and heat-recovery active-time
+  Detailed series in
+  `ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001`,
+  with inactive economizer active-time kept diagnostic-only and the fixture's
+  single saturation-limit timestep covered only by declared tolerances
+- diagnostic-only IdealLoads remaining outdoor-air predecessor evidence in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
   `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
   `ideal_loads_outdoor_air_flow_area_diagnostic_001`,
@@ -190,7 +194,7 @@ tolerance, and code organization.
   `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` and
   `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001`;
   active DCV, active humidity control, heat-recovery saturation-limit
-  branches, and broad OA conformance remain outside the claim
+  branch generality, and broad OA conformance remain outside the claim
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,
@@ -203,8 +207,8 @@ tolerance, and code organization.
   `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
   `AirChanges/Hour`, `Sum`, `Maximum`, `DifferentialDryBulb` economizer, and
-  `DifferentialEnthalpy` economizer, and `Sensible` heat-recovery IdealLoads
-  variables
+  `DifferentialEnthalpy` economizer, and `Sensible`/`Enthalpy` heat-recovery
+  IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
@@ -238,8 +242,9 @@ Not claimed:
 - broad node, full IdealLoads, meter, or full runtime conformance
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
   and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
-  declared Sensible candidate, DCV, humidity, saturation-limit, or meter
-  conformance beyond the declared no-OA hourly facility meter candidate
+  declared Sensible and Enthalpy candidates, DCV, humidity, saturation-limit
+  generality, or meter conformance beyond the declared no-OA hourly facility
+  meter candidate
 - broad ExampleFiles compatibility
 
 ## Quick Start
