@@ -113,6 +113,10 @@ const IDEAL_LOADS_OUTDOOR_AIR_DIFFERENTIAL_ENTHALPY_ECONOMIZER_CONFORMANCE_CASE_
     "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEAT_RECOVERY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001";
+const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_no_oa_facility_meter_conformance_candidate_001";
+const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS: &[&str] =
+    &["DistrictHeatingWater:Facility", "DistrictCooling:Facility"];
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -126,8 +130,10 @@ const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE: &str =
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE: &str = "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only";
 const IDEAL_LOADS_FACILITY_METER_RUST_SOURCE: &str =
     "rust-ideal-loads-hourly-facility-meter-from-fuel-energy";
-const IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE: &str =
+const IDEAL_LOADS_FACILITY_METER_DIAGNOSTIC_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
+const IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
+    "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
@@ -329,11 +335,7 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
         let context = build_context(manifest, &baseline)?;
         write_artifacts(&compare_dir, &context)?;
 
-        let tolerance_failures_count = context
-            .rows
-            .iter()
-            .filter(|row| row.status == SeriesComparisonStatus::Fail)
-            .count();
+        let tolerance_failures_count = tolerance_failures_count(&context);
         let status = overall_status(&context);
         (
             context.rows.len(),
@@ -431,13 +433,11 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         );
     }
     if manifest.conformance_claim
-        && !manifest
-            .outputs
-            .iter()
-            .any(|output| output.level == Some(OutputLevel::Conformance))
+        && !manifest_has_conformance_output(manifest)
+        && !manifest_has_conformance_meter(manifest)
     {
         return Err(
-            "conformance IdealLoads report requires at least one conformance-level output"
+            "conformance IdealLoads report requires at least one conformance-level output or meter"
                 .to_string(),
         );
     }
@@ -460,6 +460,25 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             ));
         }
     }
+    if manifest_is_no_oa_facility_meter_conformance_candidate(manifest) {
+        if manifest_has_conformance_output(manifest) {
+            return Err(
+                "IdealLoads facility meter conformance candidate must keep ESO output rows diagnostic"
+                    .to_string(),
+            );
+        }
+        for expected_meter in IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS {
+            if !manifest.meters.iter().any(|meter| {
+                meter.name.eq_ignore_ascii_case(expected_meter)
+                    && meter.level == OutputLevel::Conformance
+            }) {
+                return Err(format!(
+                    "IdealLoads facility meter conformance candidate is missing conformance meter {expected_meter}"
+                ));
+            }
+        }
+    }
+
     for meter in &manifest.meters {
         if meter.frequency != OutputFrequency::Hourly {
             return Err(format!(
@@ -475,9 +494,15 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
                 meter.name
             ));
         }
-        if meter.level != OutputLevel::Diagnostic {
+        if meter.level == OutputLevel::Diagnostic {
+            continue;
+        }
+        if !manifest_is_no_oa_facility_meter_conformance_candidate(manifest)
+            || !is_declared_no_oa_facility_meter_conformance_meter(&meter.name)
+            || meter.level != OutputLevel::Conformance
+        {
             return Err(format!(
-                "IdealLoads no-OA report currently supports diagnostic-level meter outputs: {}",
+                "IdealLoads no-OA report supports conformance-level meters only for the declared facility meter candidate: {}",
                 meter.name
             ));
         }
@@ -716,6 +741,32 @@ fn manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(
     manifest: &ConformanceCase,
 ) -> bool {
     manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(manifest)
+}
+
+fn manifest_is_no_oa_facility_meter_conformance_candidate(manifest: &ConformanceCase) -> bool {
+    manifest.id == IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
+fn manifest_has_conformance_output(manifest: &ConformanceCase) -> bool {
+    manifest
+        .outputs
+        .iter()
+        .any(|output| output.level == Some(OutputLevel::Conformance))
+}
+
+fn manifest_has_conformance_meter(manifest: &ConformanceCase) -> bool {
+    manifest
+        .meters
+        .iter()
+        .any(|meter| meter.level == OutputLevel::Conformance)
+}
+
+fn is_declared_no_oa_facility_meter_conformance_meter(name: &str) -> bool {
+    IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS
+        .iter()
+        .any(|expected| name.eq_ignore_ascii_case(expected))
 }
 
 fn outdoor_air_conformance_expectations_for_manifest(
@@ -3887,7 +3938,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     report.push_str(&format!(
         "meter_source: {}; rust_meter_time_series_comparison=true requested_meters={}\n",
-        IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE,
+        facility_meter_report_source(context),
         manifest.meters.len()
     ));
     report.push_str(&format!(
@@ -4016,11 +4067,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     report.push_str(&format!("samples: {}\n", context.input_trace.sample_count));
     report.push_str(&format!(
         "tolerance_failures: {}\n",
-        context
-            .rows
-            .iter()
-            .filter(|row| row.status == SeriesComparisonStatus::Fail)
-            .count()
+        tolerance_failures_count(context)
     ));
     report.push_str(&format!("meter_series: {}\n", context.meter_rows.len()));
     report.push_str(&format!(
@@ -4961,7 +5008,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     json.push_str(&format!(
         "  \"meter_source\": {},\n",
-        json_string(IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE)
+        json_string(facility_meter_report_source(context))
     ));
     json.push_str(&format!(
         "  \"meter_aggregation_source\": {},\n",
@@ -5063,11 +5110,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!("  \"series_count\": {},\n", context.rows.len()));
     json.push_str(&format!(
         "  \"tolerance_failures\": {},\n",
-        context
-            .rows
-            .iter()
-            .filter(|row| row.status == SeriesComparisonStatus::Fail)
-            .count()
+        tolerance_failures_count(context)
     ));
     json.push_str(&format!(
         "  \"mode_counts\": {{\"off\": {}, \"deadband\": {}, \"cooling\": {}, \"heating\": {}}},\n",
@@ -5366,6 +5409,25 @@ fn render_tolerance_failures_csv(context: &IdealLoadsDiagnosticContext<'_>) -> S
             status_label(row.status)
         ));
     }
+    for row in &context.meter_rows {
+        if row.status == SeriesComparisonStatus::Pass {
+            continue;
+        }
+        csv.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{}\n",
+            "",
+            csv_cell(&row.name),
+            evidence_domain_label(row.domain),
+            "meter",
+            output_level_label(row.level),
+            json_number(row.max_abs_delta),
+            json_number(row.rmse_delta),
+            json_number(row.tolerance.absolute),
+            row.max_rmse_tolerance
+                .map_or_else(|| "null".to_string(), json_number),
+            status_label(row.status)
+        ));
+    }
     csv
 }
 
@@ -5650,18 +5712,28 @@ impl IdealLoadsMeterDiagnosticRow {
 }
 
 fn overall_status(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    let conformance_rows = context
+    let has_conformance_output = context
+        .rows
+        .iter()
+        .any(|row| row.level == Some(OutputLevel::Conformance));
+    let has_conformance_meter = context
+        .meter_rows
+        .iter()
+        .any(|row| row.level == OutputLevel::Conformance);
+    if !has_conformance_output && !has_conformance_meter && !context.manifest.conformance_claim {
+        "diagnostic"
+    } else if !has_conformance_output && !has_conformance_meter {
+        "fail"
+    } else if context
         .rows
         .iter()
         .filter(|row| row.level == Some(OutputLevel::Conformance))
-        .collect::<Vec<_>>();
-    if conformance_rows.is_empty() && !context.manifest.conformance_claim {
-        "diagnostic"
-    } else if conformance_rows.is_empty() {
-        "fail"
-    } else if conformance_rows
-        .iter()
         .all(|row| row.status == SeriesComparisonStatus::Pass)
+        && context
+            .meter_rows
+            .iter()
+            .filter(|row| row.level == OutputLevel::Conformance)
+            .all(|row| row.status == SeriesComparisonStatus::Pass)
     {
         "pass"
     } else {
@@ -5707,6 +5779,34 @@ fn outdoor_air_tolerance_policy(
     }
 }
 
+fn tolerance_failures_count(context: &IdealLoadsDiagnosticContext<'_>) -> usize {
+    let output_failures = context
+        .rows
+        .iter()
+        .filter(|row| row.status == SeriesComparisonStatus::Fail)
+        .count();
+    let conformance_meter_failures = context
+        .meter_rows
+        .iter()
+        .filter(|row| {
+            row.level == OutputLevel::Conformance && row.status == SeriesComparisonStatus::Fail
+        })
+        .count();
+    output_failures + conformance_meter_failures
+}
+
+fn facility_meter_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if context
+        .meter_rows
+        .iter()
+        .any(|row| row.level == OutputLevel::Conformance)
+    {
+        IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE
+    } else {
+        IDEAL_LOADS_FACILITY_METER_DIAGNOSTIC_REPORT_SOURCE
+    }
+}
+
 fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if context.manifest.conformance_claim && context.branch == "no-oa-finite-limit-sensible" {
         "conformance no-OA finite-limit sensible IdealLoads branch for declared variables only"
@@ -5720,6 +5820,8 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables only"
     } else if context.humidistat_humidification_conformance_claim {
         "conformance no-OA Humidistat humidification IdealLoads branch for declared variables only"
+    } else if manifest_is_no_oa_facility_meter_conformance_candidate(context.manifest) {
+        "conformance no-OA hourly IdealLoads facility meter aggregation for declared facility meters only"
     } else if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
     } else if context.branch == "no-oa-finite-limit-sensible" {

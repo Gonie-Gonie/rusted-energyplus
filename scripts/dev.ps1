@@ -205,6 +205,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Gate the no-OA/no-limit IdealLoads sensible conformance case."
     }
+    "compare-ideal-loads-no-oa-facility-meter-conformance-candidate" = @{
+        Path = "compare\compare-ideal-loads-no-oa-facility-meter-conformance-candidate.ps1"
+        Group = "compare"
+        Help = "Gate the no-OA IdealLoads hourly facility meter conformance candidate."
+    }
     "compare-ideal-loads-capacity-limit-diagnostic" = @{
         Path = "compare\compare-ideal-loads-capacity-limit-diagnostic.ps1"
         Group = "compare"

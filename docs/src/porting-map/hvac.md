@@ -9,8 +9,9 @@ last_reviewed: 2026-06-15
 
 Broad HVAC numerical compatibility is not in the current public compatibility
 scope. The current exceptions are the narrow no-OA/no-limit, numeric
-finite-limit, and ConstantSensibleHeatRatio cooling IdealLoads claims for
-declared thermostat, IdealLoads rate, and supply-node outputs.
+finite-limit, ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio,
+Humidistat, outdoor-air, Sensible heat-recovery, and no-OA hourly facility
+meter IdealLoads claims for declared outputs and meters only.
 
 ## v0.10 Foundation
 
@@ -158,6 +159,30 @@ this conformance fixture use the blank fuel-efficiency schedule branch. The
 facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
 diagnostics only; adaptive system timestep, fuel-efficiency conformance, and
 broad meter conformance remain outside the claim.
+
+## IdealLoads No-OA Facility Meter Conformance
+
+`ideal_loads_no_oa_facility_meter_conformance_candidate_001` is a meter-only
+conformance gate for the same no-OA/no-limit sensible fixture:
+
+```text
+comparison_class: conformance
+conformance_claim: true
+tolerance_policy: conformance-gate
+status: pass
+```
+
+Only the hourly `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` MTR rows are conformance-level. The 28 Detailed ESO
+rows in the case remain diagnostic proof evidence for ReportPurchasedAir rate,
+energy, fuel-energy, thermostat, demand, humidity, and node behavior. The Rust
+side aggregates the detailed fuel-energy series through
+`ep_runtime::RuntimeMeterRegistry` and
+`ep_runtime::ideal_loads_facility_meter_binding`, compares them against
+EnergyPlus hourly MTR values, and keeps broad meter conformance,
+non-constant efficiency schedules, monthly/annual meter aggregation, outdoor
+air, humidity controls, finite limits, air loops, plant loops, EMS, and
+PythonPlugin behavior outside the claim.
 
 ## IdealLoads Fuel-Efficiency Diagnostic
 

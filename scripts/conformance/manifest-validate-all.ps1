@@ -43,15 +43,16 @@ foreach ($caseFile in $caseFiles) {
     if (-not $text.Contains($requiredStatus)) {
         throw "Missing valid status marker for $relative"
     }
+    $hasConformanceEvidence = $text.Contains("level=conformance") -or [regex]::IsMatch($text, "(?m)^\s+.+ /\s*conformance\s*$")
     if ($text.Contains("conformance_claim: true")) {
-        if (-not $text.Contains("level=conformance")) {
-            throw "Conformance case lacks a conformance-level output: $relative"
+        if (-not $hasConformanceEvidence) {
+            throw "Conformance case lacks a conformance-level output or meter: $relative"
         }
         $conformanceCount += 1
     }
     else {
-        if ($text.Contains("level=conformance")) {
-            throw "Non-conformance case has conformance-level output: $relative"
+        if ($hasConformanceEvidence) {
+            throw "Non-conformance case has conformance-level output or meter: $relative"
         }
         $diagnosticOrBaselineCount += 1
     }

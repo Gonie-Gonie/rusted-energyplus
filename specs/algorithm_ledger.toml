@@ -137,6 +137,9 @@ rust_target = [
   "scripts/compare/compare-ideal-loads-flow-limit-conformance.ps1",
   "scripts/compare/compare-ideal-loads-flow-capacity-limit-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-flow-capacity-limit-conformance.ps1",
+  "crates/ep_runtime/src/output.rs::RuntimeMeterRegistry",
+  "crates/ep_runtime/src/output.rs::ideal_loads_facility_meter_binding",
+  "scripts/compare/compare-ideal-loads-no-oa-facility-meter-conformance-candidate.ps1",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
 ]
 status = "conformance"
@@ -167,8 +170,8 @@ proof_variables = [
   "System Node Humidity Ratio",
   "System Node Mass Flow Rate",
 ]
-claim_level = "limited-ideal-loads-no-oa-sensible-finite-limit-conformance"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for declared thermostat, IdealLoads rate, and supply-node temperature/mass-flow outputs in ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001. ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank and constant Schedule:Constant fuel-efficiency proof rows, hourly facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics, RuntimeMeterRegistry request resolution, and selected no-OA humidity-control diagnostics remain evidence only; outdoor air conformance, humidity-control conformance, economizer, heat recovery, sizing, adaptive system timestep, non-constant efficiency schedules, broad meter conformance, and broad HVAC compatibility remain outside the claim."
+claim_level = "limited-ideal-loads-no-oa-sensible-finite-limit-meter-conformance"
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for declared thermostat, IdealLoads rate, and supply-node temperature/mass-flow outputs in ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA hourly DistrictHeatingWater:Facility and DistrictCooling:Facility meter conformance in ideal_loads_no_oa_facility_meter_conformance_candidate_001. ReportPurchasedAir rate-to-TimeStepSysSec, OutputProcessor Sum, blank and constant Schedule:Constant fuel-efficiency proof rows, RuntimeMeterRegistry request resolution, and selected no-OA humidity-control diagnostics remain evidence only outside the declared meter rows; outdoor air conformance, humidity-control conformance, economizer, heat recovery, sizing, adaptive system timestep, non-constant efficiency schedules, broad meter conformance beyond the declared no-OA hourly facility meter candidate, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_constant_shr_humidity_control"

@@ -5,7 +5,7 @@
 
 Case metadata is read from `data/conformance_cases/*/case.toml`.
 
-| Case | Milestone | Class | Claim | Tier | Domains | Output levels | Manifest |
+| Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |
 |---|---|---|---|---|---|---|---|
 | air_side_node_diagnostic_001 | v0.11-air-side-node-diagnostic | diagnostic-only | false | B | zone, hvac, node | baseline | data/conformance_cases/air_side_node_diagnostic_001/case.toml |
 | construction_materials_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/construction_materials_001/case.toml |
@@ -27,6 +27,7 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | ideal_loads_humidistat_dehumidification_diagnostic_001 | ideal-loads-humidity-control-diagnostic | diagnostic-only | false | B | zone, hvac, node | diagnostic | data/conformance_cases/ideal_loads_humidistat_dehumidification_diagnostic_001/case.toml |
 | ideal_loads_humidistat_humidification_conformance_candidate_001 | ideal-loads-humidity-control-conformance | conformance | true | B | zone, hvac, node | conformance, diagnostic | data/conformance_cases/ideal_loads_humidistat_humidification_conformance_candidate_001/case.toml |
 | ideal_loads_humidistat_humidification_diagnostic_001 | ideal-loads-humidity-control-diagnostic | diagnostic-only | false | B | zone, hvac, node | diagnostic | data/conformance_cases/ideal_loads_humidistat_humidification_diagnostic_001/case.toml |
+| ideal_loads_no_oa_facility_meter_conformance_candidate_001 | ideal-loads-meter-conformance | conformance | true | B | zone, hvac, node | conformance, diagnostic | data/conformance_cases/ideal_loads_no_oa_facility_meter_conformance_candidate_001/case.toml |
 | ideal_loads_no_oa_sensible_conformance_001 | ideal-loads-conformance-candidate | conformance | true | B | zone, hvac, node | conformance, diagnostic | data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/case.toml |
 | ideal_loads_outdoor_air_air_changes_conformance_candidate_001 | ideal-loads-outdoor-air-conformance | conformance | true | B | zone, hvac | conformance, diagnostic | data/conformance_cases/ideal_loads_outdoor_air_air_changes_conformance_candidate_001/case.toml |
 | ideal_loads_outdoor_air_air_changes_diagnostic_001 | ideal-loads-outdoor-air-diagnostic | diagnostic-only | false | B | zone, hvac | diagnostic | data/conformance_cases/ideal_loads_outdoor_air_air_changes_diagnostic_001/case.toml |

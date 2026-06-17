@@ -152,7 +152,15 @@ def conformance_case_index(repo_root: Path) -> str:
         manifest = data.get("manifest_v2", {})
         scope = data.get("scope", {})
         outputs = data.get("outputs", [])
-        levels = sorted({str(output.get("level", "")) for output in outputs if output.get("level")})
+        meters = data.get("meters", [])
+        evidence_requests = [*outputs, *meters]
+        levels = sorted(
+            {
+                str(request.get("level", ""))
+                for request in evidence_requests
+                if request.get("level")
+            }
+        )
         rows.append(
             [
                 str(data.get("id", path.parent.name)),
@@ -178,7 +186,7 @@ def conformance_case_index(repo_root: Path) -> str:
                 "Claim",
                 "Tier",
                 "Domains",
-                "Output levels",
+                "Evidence levels",
                 "Manifest",
             ],
             rows,

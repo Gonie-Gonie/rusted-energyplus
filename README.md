@@ -53,6 +53,11 @@ tolerance, and code organization.
   energy and blank-efficiency fuel energy rows kept diagnostic-only and
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
+- limited IdealLoads no-OA hourly facility meter conformance candidate for
+  `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` in
+  `ideal_loads_no_oa_facility_meter_conformance_candidate_001`, with
+  ReportPurchasedAir rate, energy, fuel-energy, thermostat, demand, humidity,
+  and node rows kept diagnostic proof only
 - limited IdealLoads no-OA numeric capacity-limit conformance gate for the
   same declared thermostat, IdealLoads rate, and supply-node temperature/flow
   Detailed series in `ideal_loads_capacity_limit_conformance_001`, with
@@ -213,7 +218,7 @@ Not claimed:
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
   and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
   declared Sensible candidate, DCV, humidity, saturation-limit, or meter
-  conformance beyond oracle-MTR diagnostic tracking
+  conformance beyond the declared no-OA hourly facility meter candidate
 - broad ExampleFiles compatibility
 
 ## Quick Start

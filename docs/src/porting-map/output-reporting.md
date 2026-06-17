@@ -26,8 +26,9 @@ Current foundations:
 - manifest metadata in diagnostic MAT `compare-summary.json` and report
 - manifest-driven static model `compare-summary.json` and `compare-report.md`
   generation for declared EIO rows
-- runtime IdealLoads facility meter handle resolution plus unavailable-output
-  and unavailable-meter diagnostics
+- runtime IdealLoads facility meter handle resolution, the declared no-OA
+  hourly facility meter conformance candidate, plus unavailable-output and
+  unavailable-meter diagnostics
 
 Current v0.6 artifact contract:
 
