@@ -331,6 +331,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
     branch: &'static str,
+    zone_equipment_dispatch: IdealLoadsZoneEquipmentDispatchValidation,
     zone_name: String,
     system_name: String,
     outdoor_air_spec_name: String,
@@ -1299,6 +1300,19 @@ fn build_outdoor_air_design_flow_context<'a>(
         .iter()
         .find(|system| system.id == edge.ideal_loads_air_system)
         .ok_or_else(|| "missing IdealLoads system for graph edge".to_string())?;
+    let zone_equipment_dispatch = validate_ideal_loads_zone_equipment_dispatch(&model, system.id);
+    if !zone_equipment_dispatch.is_dispatchable() {
+        return Err(format!(
+            "IdealLoads outdoor-air zone equipment dispatch prerequisites failed: {}",
+            label_list_or_none(&zone_equipment_dispatch.issue_codes())
+        ));
+    }
+    if manifest.conformance_claim && !zone_equipment_dispatch.is_conformance_candidate() {
+        return Err(format!(
+            "IdealLoads outdoor-air conformance candidate requires single-zone/single-equipment dispatch scope: {}",
+            label_list_or_none(&zone_equipment_dispatch.warning_codes())
+        ));
+    }
     let outdoor_air_edge = model
         .graph
         .ideal_loads_outdoor_air_specs
@@ -1638,6 +1652,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         manifest,
         baseline,
         branch: "outdoor-air-design-flow",
+        zone_equipment_dispatch,
         zone_name: zone.name.0.clone(),
         system_name: system.name.0.clone(),
         outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
@@ -5178,7 +5193,35 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         .map(|stage| stage.source_routine)
         .collect::<Vec<_>>()
         .join(" -> ");
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "zone_equipment_dispatch_path: {}\n",
+        IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_validation: {}\n",
+        context.zone_equipment_dispatch.dispatch_status_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_conformance_candidate: {}\n",
+        context
+            .zone_equipment_dispatch
+            .conformance_candidate_status_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_scope: {}\n",
+        context.zone_equipment_dispatch.scope_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_issues: {}\n",
+        label_list_or_none(&zone_equipment_dispatch_issues)
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_warnings: {}\n",
+        label_list_or_none(&zone_equipment_dispatch_warnings)
+    ));
     report.push_str(&format!(
         "purchased_air_source_order: {}\n",
         purchased_air_source_order
@@ -5218,6 +5261,38 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "node_output_report_source: {}\n",
         IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE
+    ));
+    report.push_str(&format!(
+        "zone_demand_source: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE
+    ));
+    report.push_str(&format!(
+        "zone_demand_struct_source: {}::{}\n",
+        ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+    ));
+    report.push_str(&format!(
+        "zone_demand_heating_field: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD
+    ));
+    report.push_str(&format!(
+        "zone_demand_heating_sign_convention: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION
+    ));
+    report.push_str(&format!(
+        "zone_demand_cooling_field: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD
+    ));
+    report.push_str(&format!(
+        "zone_demand_cooling_sign_convention: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION
+    ));
+    report.push_str(&format!(
+        "zone_demand_mismatch_classification: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION
+    ));
+    report.push_str(&format!(
+        "zone_demand_fixture_mode: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE
     ));
     report.push_str(&format!(
         "outdoor_air_source: {}\n",
@@ -5767,6 +5842,8 @@ fn render_outdoor_air_tolerance_failures_csv(
 fn render_outdoor_air_stage_summary_json(
     context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
 ) -> String {
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -5795,6 +5872,34 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!(
         "  \"inactive_branches\": {},\n",
         json_string_array(&outdoor_air_inactive_branches(context))
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_path\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_validation\": {},\n",
+        json_string(context.zone_equipment_dispatch.dispatch_status_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_conformance_candidate\": {},\n",
+        json_string(
+            context
+                .zone_equipment_dispatch
+                .conformance_candidate_status_label()
+        )
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_scope\": {},\n",
+        json_string(context.zone_equipment_dispatch.scope_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_issues\": {},\n",
+        json_string_array(&zone_equipment_dispatch_issues)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_warnings\": {},\n",
+        json_string_array(&zone_equipment_dispatch_warnings)
     ));
     json.push_str(&format!(
         "  \"node_output_store_type\": {},\n",
@@ -5845,8 +5950,16 @@ fn render_outdoor_air_stage_summary_json(
         ))
     ));
     json.push_str(&format!(
+        "  \"zone_demand_heating_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD)
+    ));
+    json.push_str(&format!(
         "  \"zone_demand_heating_sign_convention\": {},\n",
         json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD)
     ));
     json.push_str(&format!(
         "  \"zone_demand_cooling_sign_convention\": {},\n",
