@@ -106,7 +106,12 @@ tolerance, and code organization.
   series in `ideal_loads_outdoor_air_flow_person_conformance_candidate_001`,
   using traced five-person design-occupant proof input; People heat-gain
   conformance is not claimed
-- diagnostic-only IdealLoads remaining Flow/Area, AirChanges/Hour, Sum,
+- limited IdealLoads outdoor-air `Flow/Area` conformance candidate gate for
+  declared outdoor-air mass/standard-density volume flow, no-humidity
+  outdoor-air report rates, supply-air state, and mixed-air state Detailed
+  series in `ideal_loads_outdoor_air_flow_area_conformance_candidate_001`,
+  using traced 1 m2 zone-floor-area proof input
+- diagnostic-only IdealLoads remaining AirChanges/Hour, Sum,
   Maximum, active economizer, and active heat-recovery outdoor-air evidence
   for outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, inactive
@@ -115,7 +120,7 @@ tolerance, and code organization.
   Enthalpy heat-recovery active-time/rate parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
   `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
-  `ideal_loads_outdoor_air_flow_area_diagnostic_001` and
+  `ideal_loads_outdoor_air_flow_area_diagnostic_001`,
   `ideal_loads_outdoor_air_air_changes_diagnostic_001`,
   `ideal_loads_outdoor_air_sum_diagnostic_001`, and
   `ideal_loads_outdoor_air_maximum_diagnostic_001`, plus
@@ -135,7 +140,8 @@ tolerance, and code organization.
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
-  Humidistat, and outdoor-air `Flow/Zone`/`Flow/Person` IdealLoads variables
+  Humidistat, and outdoor-air `Flow/Zone`/`Flow/Person`/`Flow/Area`
+  IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
