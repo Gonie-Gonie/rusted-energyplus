@@ -192,6 +192,43 @@ foreach ($case in $promotedCases) {
     if (($summary.PSObject.Properties.Name -contains "meter_tolerance_failures") -and $summary.meter_tolerance_failures -ne 0) {
         throw "$($case.Id) summary meter_tolerance_failures must be 0, got $($summary.meter_tolerance_failures)"
     }
+    $outputRows = @($summary.series)
+    if (($summary.PSObject.Properties.Name -contains "series_count") -and $summary.series_count -ne $outputRows.Count) {
+        throw "$($case.Id) summary series_count mismatch: expected $($summary.series_count), got $($outputRows.Count)"
+    }
+    foreach ($row in $outputRows) {
+        if ($row.level -notin @("conformance", "diagnostic")) {
+            throw "$($case.Id) output row has unexpected level '$($row.level)': $($row.key) / $($row.variable)"
+        }
+        if ($row.status -ne "pass") {
+            throw "$($case.Id) output row did not pass: $($row.key) / $($row.variable) = $($row.status)"
+        }
+    }
+    $meterRows = @()
+    if ($summary.PSObject.Properties.Name -contains "meter_series") {
+        $meterRows = @($summary.meter_series)
+        if (($summary.PSObject.Properties.Name -contains "meter_series_count") -and $summary.meter_series_count -ne $meterRows.Count) {
+            throw "$($case.Id) summary meter_series_count mismatch: expected $($summary.meter_series_count), got $($meterRows.Count)"
+        }
+        foreach ($meterRow in $meterRows) {
+            if ($meterRow.level -notin @("conformance", "diagnostic")) {
+                throw "$($case.Id) meter row has unexpected level '$($meterRow.level)': $($meterRow.name)"
+            }
+            if ($meterRow.status -ne "pass") {
+                throw "$($case.Id) meter row did not pass: $($meterRow.name) = $($meterRow.status)"
+            }
+        }
+    }
+    $conformanceOutputRows = @($outputRows | Where-Object { $_.level -eq "conformance" })
+    $diagnosticOutputRows = @($outputRows | Where-Object { $_.level -eq "diagnostic" })
+    $conformanceMeterRows = @($meterRows | Where-Object { $_.level -eq "conformance" })
+    $diagnosticMeterRows = @($meterRows | Where-Object { $_.level -eq "diagnostic" })
+    if (($conformanceOutputRows.Count + $conformanceMeterRows.Count) -eq 0) {
+        throw "$($case.Id) summary must include at least one conformance output or meter row"
+    }
+    if (($diagnosticOutputRows.Count + $diagnosticMeterRows.Count) -eq 0) {
+        throw "$($case.Id) summary must include diagnostic rows separated from conformance rows"
+    }
 
     $stageSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath $stageSummaryPath | ConvertFrom-Json
     foreach ($propertyName in @(
