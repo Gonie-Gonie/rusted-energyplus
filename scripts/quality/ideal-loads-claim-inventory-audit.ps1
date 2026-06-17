@@ -146,8 +146,41 @@ $readmeText = Read-RepoText -Path "README.md"
 $currentStatusText = Read-RepoText -Path "docs\src\current\current-status.md"
 $variableCoverageText = Read-RepoText -Path "specs\variable_coverage.toml"
 $algorithmLedgerText = Read-RepoText -Path "specs\algorithm_ledger.toml"
+$idealLoadsSourceMapText = Read-RepoText -Path "docs\src\porting-map\ideal-loads-source-map.md"
 $userCoverageHandbookText = Read-RepoText -Path "docs\src\conformance\user-coverage-handbook.md"
 $devText = Read-RepoText -Path "scripts\dev.ps1"
+
+$sourceMapAnchorCount = 0
+foreach ($anchor in @(
+    "Reference version: EnergyPlus 26.1.0",
+    "src/EnergyPlus/PurchasedAirManager.cc",
+    "src/EnergyPlus/PurchasedAirManager.hh",
+    "src/EnergyPlus/ZoneEquipmentManager.cc",
+    "src/EnergyPlus/DataZoneEnergyDemands.hh",
+    "src/EnergyPlus/DataLoopNode.hh",
+    "src/EnergyPlus/ScheduleManager.hh",
+    "src/EnergyPlus/Psychrometrics.hh",
+    "src/EnergyPlus/OutputProcessor.cc",
+    "src/EnergyPlus/HVACSizingSimulationManager.cc",
+    "autosized IdealLoads flow/capacity conformance remains"
+)) {
+    Assert-TextMatches -Text $idealLoadsSourceMapText -Pattern ([regex]::Escape($anchor)) -Description "IdealLoads source-map anchor: $anchor"
+    $sourceMapAnchorCount += 1
+}
+
+foreach ($anchor in @(
+    "src/EnergyPlus/PurchasedAirManager.cc",
+    "src/EnergyPlus/PurchasedAirManager.hh",
+    "src/EnergyPlus/ZoneEquipmentManager.cc",
+    "src/EnergyPlus/DataZoneEnergyDemands.hh",
+    "src/EnergyPlus/DataLoopNode.hh",
+    "src/EnergyPlus/ScheduleManager.hh",
+    "src/EnergyPlus/Psychrometrics.hh",
+    "src/EnergyPlus/OutputProcessor.cc"
+)) {
+    Assert-TextMatches -Text $algorithmLedgerText -Pattern ([regex]::Escape($anchor)) -Description "IdealLoads algorithm ledger source anchor: $anchor"
+    $sourceMapAnchorCount += 1
+}
 
 $caseFiles = @(
     Get-ChildItem -LiteralPath "data\conformance_cases" -Directory |
@@ -306,6 +339,7 @@ Write-Host "  promoted_ideal_loads_cases: $($promotedCases.Count)"
 Write-Host "  diagnostic_or_baseline_ideal_loads_cases: $diagnosticOrBaselineCount"
 Write-Host "  conformance_blocks_checked: $(($promotedCases | Measure-Object -Property Blocks -Sum).Sum)"
 Write-Host "  report_metadata_guards_checked: $reportMetadataGuardCount"
+Write-Host "  source_map_anchors_checked: $sourceMapAnchorCount"
 Write-Host "  variable_coverage_ideal_loads_refs: $idealLoadsCoverageRefs"
 Write-Host "  algorithm_ledger_ideal_loads_blocks: $idealLoadsAlgorithmCount"
 Write-Host "  user_handbook_boundary_markers: $($handbookBoundaryPatterns.Count)"

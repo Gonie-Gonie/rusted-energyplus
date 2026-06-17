@@ -14,6 +14,32 @@ numerical-conformance claim to EnergyPlus source functions while keeping
 availability, humidity control, outdoor-air, sizing, broad fuel/meter
 conformance, and broad HVAC compatibility outside the claim.
 
+## Required EnergyPlus Source Anchors
+
+The IdealLoads conformance boundary is guarded against these EnergyPlus
+source anchors:
+
+- `src/EnergyPlus/PurchasedAirManager.cc`: source-order
+  `SimPurchasedAir`, `InitPurchasedAir`, `CalcPurchAirLoads`,
+  `UpdatePurchasedAir`, and `ReportPurchasedAir` behavior.
+- `src/EnergyPlus/PurchasedAirManager.hh`: IdealLoads data shape and
+  PurchasedAir manager declarations.
+- `src/EnergyPlus/ZoneEquipmentManager.cc`: zone equipment dispatch path into
+  `PurchasedAirManager::SimPurchasedAir`.
+- `src/EnergyPlus/DataZoneEnergyDemands.hh`: `ZoneSysEnergyDemand` fields for
+  active heating/cooling demand.
+- `src/EnergyPlus/DataLoopNode.hh`: system node state fields used by
+  `UpdatePurchasedAir` and node output reporting.
+- `src/EnergyPlus/ScheduleManager.hh`: schedule lookup semantics for
+  availability, outdoor-air, and fuel-efficiency schedule fixtures.
+- `src/EnergyPlus/Psychrometrics.hh`: `PsyCpAirFnW`, enthalpy, humidity-ratio,
+  and standard-density psychrometric helpers.
+- `src/EnergyPlus/OutputProcessor.cc`: `SetupOutputVariable`, detailed
+  timestep reporting, and OutputProcessor sum/meter aggregation semantics.
+- `src/EnergyPlus/HVACSizingSimulationManager.cc`: deferred autosizing
+  extension anchor only; autosized IdealLoads flow/capacity conformance remains
+  outside the current claim.
+
 ## Initial Claim Boundary
 
 The first promoted case is
