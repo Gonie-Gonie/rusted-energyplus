@@ -71,6 +71,29 @@ function Get-ResultSeries {
     return $series[0]
 }
 
+function Assert-PurchasedAirSourceOrder {
+    param([Parameter(Mandatory = $true)]$StageSummary)
+
+    $purchasedAirStages = @($StageSummary.purchased_air_stages)
+    $expectedPurchasedAirRoutines = @(
+        "GetPurchasedAir",
+        "InitPurchasedAir",
+        "CalcPurchAirLoads",
+        "UpdatePurchasedAir",
+        "ReportPurchasedAir"
+    )
+    if ($purchasedAirStages.Count -ne $expectedPurchasedAirRoutines.Count) {
+        throw "Expected $($expectedPurchasedAirRoutines.Count) PurchasedAir stages, found $($purchasedAirStages.Count)"
+    }
+    for ($stageIndex = 0; $stageIndex -lt $expectedPurchasedAirRoutines.Count; $stageIndex++) {
+        $actualRoutine = $purchasedAirStages[$stageIndex].source_routine
+        if ($actualRoutine -ne $expectedPurchasedAirRoutines[$stageIndex]) {
+            throw "Unexpected PurchasedAir stage at index ${stageIndex}: $actualRoutine"
+        }
+    }
+    Write-Host "OK PurchasedAir source order: $($expectedPurchasedAirRoutines -join ' -> ')"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -215,10 +238,13 @@ if ($stageSummary.branch -ne "no-oa-no-limit-sensible") {
 if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
     throw "Stage summary must record that no RC demand shortcut is used"
 }
+Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
+Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Latent Cooling Rate | conformance" -Description "markdown zone latent cooling row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Latent Cooling Rate | conformance" -Description "markdown supply latent cooling row"

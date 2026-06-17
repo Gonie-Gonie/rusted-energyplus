@@ -77,6 +77,29 @@ function Assert-SeriesRow {
     Write-Host "OK $Description`: $Key / $Variable"
 }
 
+function Assert-PurchasedAirSourceOrder {
+    param([Parameter(Mandatory = $true)]$StageSummary)
+
+    $purchasedAirStages = @($StageSummary.purchased_air_stages)
+    $expectedPurchasedAirRoutines = @(
+        "GetPurchasedAir",
+        "InitPurchasedAir",
+        "CalcPurchAirLoads",
+        "UpdatePurchasedAir",
+        "ReportPurchasedAir"
+    )
+    if ($purchasedAirStages.Count -ne $expectedPurchasedAirRoutines.Count) {
+        throw "Expected $($expectedPurchasedAirRoutines.Count) PurchasedAir stages, found $($purchasedAirStages.Count)"
+    }
+    for ($stageIndex = 0; $stageIndex -lt $expectedPurchasedAirRoutines.Count; $stageIndex++) {
+        $actualRoutine = $purchasedAirStages[$stageIndex].source_routine
+        if ($actualRoutine -ne $expectedPurchasedAirRoutines[$stageIndex]) {
+            throw "Unexpected PurchasedAir stage at index ${stageIndex}: $actualRoutine"
+        }
+    }
+    Write-Host "OK PurchasedAir source order: $($expectedPurchasedAirRoutines -join ' -> ')"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -224,10 +247,13 @@ if ($stageSummary.finite_limit_conformance -ne $true) {
 if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
     throw "Stage summary must record that no RC demand shortcut is used"
 }
+Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA finite-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
+Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | conformance" -Description "markdown node flow row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE RETURN | System Node Temperature | diagnostic" -Description "markdown recirculation temperature row"

@@ -22,7 +22,7 @@ use ep_runtime::{
     EpwRecord, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
     IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
     IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries,
-    ResultStore, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    ResultStore, SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
@@ -57,12 +57,10 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
-    calc_no_oa_no_limit_sensible_with_recirculation_context_compat,
-    calc_no_oa_sensible_with_limits_and_recirculation_compat,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
-    supply_node_update_from_result, surface_area_m2,
+    purchased_air_source_order_stages, sim_purchased_air_compat, surface_area_m2,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -1727,15 +1725,24 @@ fn evaluate_rows(
             input_trace.humidifying_moisture_demand.samples[index].value;
         demand.remaining_output_req_to_dehumid_sp_kg_per_s =
             input_trace.dehumidifying_moisture_demand.samples[index].value;
-        let result = calc_ideal_loads_sensible_compat(
+        let purchased_air = sim_purchased_air_compat(SimPurchasedAirCompatInput {
             system,
+            supply_node: supply_node.id,
             zone_state,
             recirculation_state,
             demand,
-            limit_context.with_barometric_pressure_pa(barometric_pressure_trace[index]),
-        );
+            unit_available: true,
+            limit_context: limit_context
+                .with_barometric_pressure_pa(barometric_pressure_trace[index]),
+        })
+        .map_err(|error| {
+            format!(
+                "IdealLoads SimPurchasedAir compatibility path rejected system {:?}: {:?}",
+                error.system_id, error.unsupported_features
+            )
+        })?;
+        let result = purchased_air.calculation;
         record_mode(&mut mode_counts, result.mode);
-        let _node_update = supply_node_update_from_result(supply_node.id, result);
         calc_results.push(result);
     }
 
@@ -2452,34 +2459,6 @@ fn ideal_loads_fuel_efficiency_value(
         ));
     }
     Ok(schedule.hourly_value)
-}
-
-fn calc_ideal_loads_sensible_compat(
-    system: &IdealLoadsAirSystem,
-    zone_state: IdealLoadsZoneState,
-    recirculation_state: IdealLoadsZoneState,
-    demand: ZoneSysEnergyDemand,
-    limit_context: IdealLoadsSensibleLimitContext,
-) -> IdealLoadsSensibleResult {
-    if uses_finite_limits(system) {
-        calc_no_oa_sensible_with_limits_and_recirculation_compat(
-            system,
-            zone_state,
-            recirculation_state,
-            demand,
-            true,
-            limit_context,
-        )
-    } else {
-        calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
-            system,
-            zone_state,
-            recirculation_state,
-            demand,
-            true,
-            limit_context,
-        )
-    }
 }
 
 fn ideal_loads_limit_context(
@@ -3256,6 +3235,16 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "ideal_loads_system: {}\n",
         markdown_cell(&context.system_name)
     ));
+    let purchased_air_source_order = purchased_air_source_order_stages()
+        .iter()
+        .map(|stage| stage.source_routine)
+        .collect::<Vec<_>>()
+        .join(" -> ");
+    report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "purchased_air_source_order: {}\n",
+        purchased_air_source_order
+    ));
     report.push_str(&format!(
         "supply_node: {}\n\n",
         markdown_cell(&context.supply_node_name)
@@ -3858,6 +3847,33 @@ fn render_outdoor_air_stage_summary_json(
         }
         json.push('\n');
     }
+    json.push_str("  ],\n");
+    json.push_str("  \"purchased_air_stages\": [\n");
+    let purchased_air_stages = purchased_air_source_order_stages();
+    for (index, stage) in purchased_air_stages.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"stage_name\": {},\n",
+            json_string(stage.stage_name)
+        ));
+        json.push_str(&format!(
+            "      \"source_file\": {},\n",
+            json_string(stage.source_file)
+        ));
+        json.push_str(&format!(
+            "      \"source_routine\": {},\n",
+            json_string(stage.source_routine)
+        ));
+        json.push_str(&format!(
+            "      \"rust_equivalent\": {}\n",
+            json_string(stage.rust_equivalent)
+        ));
+        json.push_str("    }");
+        if index + 1 < purchased_air_stages.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
     json.push_str("  ]\n");
     json.push_str("}\n");
     json
@@ -4367,6 +4383,33 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         ));
         json.push_str("    }");
         if index + 1 < stages.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ],\n");
+    json.push_str("  \"purchased_air_stages\": [\n");
+    let purchased_air_stages = purchased_air_source_order_stages();
+    for (index, stage) in purchased_air_stages.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"stage_name\": {},\n",
+            json_string(stage.stage_name)
+        ));
+        json.push_str(&format!(
+            "      \"source_file\": {},\n",
+            json_string(stage.source_file)
+        ));
+        json.push_str(&format!(
+            "      \"source_routine\": {},\n",
+            json_string(stage.source_routine)
+        ));
+        json.push_str(&format!(
+            "      \"rust_equivalent\": {}\n",
+            json_string(stage.rust_equivalent)
+        ));
+        json.push_str("    }");
+        if index + 1 < purchased_air_stages.len() {
             json.push(',');
         }
         json.push('\n');
