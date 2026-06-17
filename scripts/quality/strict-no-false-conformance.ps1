@@ -58,6 +58,66 @@ function Assert-PathMissing {
     Write-Host "OK retained path absent for $Description`: $Path"
 }
 
+function Assert-CaseOutputLevel {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Key,
+        [Parameter(Mandatory = $true)][string]$Variable,
+        [Parameter(Mandatory = $true)][string]$Level,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing file for case output guard: $Path"
+    }
+
+    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $outputBlockPattern = '(?ms)^\[\[outputs\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
+    $blocks = [regex]::Matches($text, $outputBlockPattern)
+    $keyPattern = '(?m)^key\s*=\s*"' + [regex]::Escape($Key) + '"\s*$'
+    $variablePattern = '(?m)^variable\s*=\s*"' + [regex]::Escape($Variable) + '"\s*$'
+    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
+
+    foreach ($block in $blocks) {
+        $body = $block.Groups[1].Value
+        if ($body -match $keyPattern -and $body -match $variablePattern -and $body -match $levelPattern) {
+            Write-Host "OK output level for $Description`: $Key / $Variable = $Level"
+            return
+        }
+    }
+
+    throw "Missing required output level for $Description`: key=$Key variable=$Variable level=$Level"
+}
+
+function Assert-CaseMeterLevel {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$Level,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing file for case meter guard: $Path"
+    }
+
+    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $meterBlockPattern = '(?ms)^\[\[meters\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
+    $blocks = [regex]::Matches($text, $meterBlockPattern)
+    $namePattern = '(?m)^name\s*=\s*"' + [regex]::Escape($Name) + '"\s*$'
+    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
+
+    foreach ($block in $blocks) {
+        $body = $block.Groups[1].Value
+        if ($body -match $namePattern -and $body -match $levelPattern) {
+            Write-Host "OK meter level for $Description`: $Name = $Level"
+            return
+        }
+    }
+
+    throw "Missing required meter level for $Description`: name=$Name level=$Level"
+}
+
 Assert-DoesNotContain -Path "README.md" -Pattern "first runtime path for an uncontrolled one-zone building subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "ResultStore output from the first uncontrolled one-zone simulation subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "zone temperature comparison passes" -Description "README scope"
@@ -211,6 +271,61 @@ Assert-Contains -Path "data\conformance_cases\internal_gains_001\case.toml" -Pat
 Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Pattern 'comparison_class = "smoke"' -Description "v0.10 case class"
 Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Pattern "conformance_claim = false" -Description "v0.10 manifest claim boundary"
 Assert-Contains -Path "data\conformance_cases\ideal_loads_thermostat_001\case.toml" -Pattern 'class = "hvac-state"' -Description "v0.10 HVAC output class"
+Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA/no-limit sensible conformance gate" -Description "IdealLoads no-OA README claim"
+Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA numeric capacity-limit conformance gate" -Description "IdealLoads capacity-limit README claim"
+Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA numeric flow-limit conformance gate" -Description "IdealLoads flow-limit README claim"
+Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA numeric flow-and-capacity-limit conformance gate" -Description "IdealLoads flow-capacity README claim"
+Assert-Contains -Path "README.md" -Pattern 'limited IdealLoads no-OA `ConstantSensibleHeatRatio` cooling conformance' -Description "IdealLoads constant-SHR README claim"
+Assert-Contains -Path "README.md" -Pattern 'diagnostic-only IdealLoads no-OA `ConstantSupplyHumidityRatio`' -Description "IdealLoads humidity diagnostic README boundary"
+Assert-Contains -Path "README.md" -Pattern "diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area" -Description "IdealLoads OA diagnostic README boundary"
+Assert-Contains -Path "README.md" -Pattern "IdealLoads economizer, heat-recovery, DCV, humidity, saturation-limit, or" -Description "IdealLoads broad non-claim README boundary"
+Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ConstantSensibleHeatRatio cooling conformance" -Description "IdealLoads current-status conformance boundary"
+Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "broad HVAC, broad node, full IdealLoads, active DCV, broad or other humidity-control branches" -Description "IdealLoads current-status broad non-claim boundary"
+Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "ideal_loads_no_oa_sensible_conformance_001, no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance" -Description "IdealLoads variable coverage finite-limit boundary"
+Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "ConstantSupplyHumidityRatio and Humidistat dehumidification latent cooling remain diagnostic-only" -Description "IdealLoads humidity variable coverage boundary"
+Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "broad OA conformance remain outside the claim" -Description "IdealLoads OA variable coverage boundary"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'claim_level = "limited-ideal-loads-no-oa-sensible-finite-limit-conformance"' -Description "IdealLoads finite-limit algorithm claim"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'claim_level = "limited-ideal-loads-no-oa-constant-shr-cooling-conformance"' -Description "IdealLoads constant-SHR algorithm claim"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern "outdoor air conformance, humidity-control conformance, economizer, heat recovery" -Description "IdealLoads algorithm broad non-claim boundary"
+Assert-DoesNotContain -Path "data\conformance_cases\ideal_loads_capacity_limit_conformance_001\case.toml" -Pattern "flow-only and flow-and-capacity finite-limit cases remain diagnostic-only evidence" -Description "IdealLoads capacity obsolete finite-limit note"
+Assert-DoesNotContain -Path "data\conformance_cases\ideal_loads_flow_limit_conformance_001\case.toml" -Pattern "flow-and-capacity finite-limit cases remain diagnostic-only evidence" -Description "IdealLoads flow obsolete finite-limit note"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "IdealLoads no-OA case class"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Pattern "conformance_claim = true" -Description "IdealLoads no-OA case claim"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Pattern "broad meter conformance remains outside the claim" -Description "IdealLoads meter diagnostic boundary"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_capacity_limit_conformance_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "IdealLoads capacity case class"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_flow_limit_conformance_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "IdealLoads flow case class"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_flow_capacity_limit_conformance_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "IdealLoads flow-capacity case class"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Pattern 'comparison_class = "conformance"' -Description "IdealLoads constant-SHR case class"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_capacity_limit_conformance_001\case.toml" -Pattern "flow-limit and flow-and-capacity finite-limit branches are claimed only by their separate conformance manifests" -Description "IdealLoads capacity finite-limit note"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_flow_limit_conformance_001\case.toml" -Pattern "flow-and-capacity finite-limit behavior is claimed only by its separate conformance manifest" -Description "IdealLoads flow finite-limit note"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Pattern "blocking = true" -Description "IdealLoads no-OA blocking gate"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_capacity_limit_conformance_001\case.toml" -Pattern "blocking = true" -Description "IdealLoads capacity blocking gate"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_flow_limit_conformance_001\case.toml" -Pattern "blocking = true" -Description "IdealLoads flow blocking gate"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_flow_capacity_limit_conformance_001\case.toml" -Pattern "blocking = true" -Description "IdealLoads flow-capacity blocking gate"
+Assert-Contains -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Pattern "blocking = true" -Description "IdealLoads constant-SHR blocking gate"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Zone Total Heating Rate" -Level "conformance" -Description "IdealLoads no-OA heating rate"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Zone Total Cooling Rate" -Level "conformance" -Description "IdealLoads no-OA cooling rate"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Key "ZONE ONE INLET" -Variable "System Node Temperature" -Level "conformance" -Description "IdealLoads no-OA supply temperature"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Key "ZONE ONE INLET" -Variable "System Node Humidity Ratio" -Level "diagnostic" -Description "IdealLoads no-OA supply humidity diagnostic"
+Assert-CaseMeterLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Name "DistrictHeatingWater:Facility" -Level "diagnostic" -Description "IdealLoads heating facility meter"
+Assert-CaseMeterLevel -Path "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\case.toml" -Name "DistrictCooling:Facility" -Level "diagnostic" -Description "IdealLoads cooling facility meter"
+foreach ($case in @(
+    "ideal_loads_capacity_limit_conformance_001",
+    "ideal_loads_flow_limit_conformance_001",
+    "ideal_loads_flow_capacity_limit_conformance_001"
+)) {
+    $casePath = "data\conformance_cases\$case\case.toml"
+    Assert-Contains -Path $casePath -Pattern "conformance_claim = true" -Description "$case manifest claim"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Zone Sensible Heating Rate" -Level "conformance" -Description "$case sensible heating"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Zone Sensible Cooling Rate" -Level "conformance" -Description "$case sensible cooling"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE INLET" -Variable "System Node Temperature" -Level "conformance" -Description "$case supply temperature"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE INLET" -Variable "System Node Mass Flow Rate" -Level "conformance" -Description "$case supply mass flow"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE RETURN" -Variable "System Node Humidity Ratio" -Level "diagnostic" -Description "$case return humidity diagnostic"
+}
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Zone Latent Cooling Rate" -Level "conformance" -Description "IdealLoads constant-SHR zone latent cooling"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Supply Air Latent Cooling Rate" -Level "conformance" -Description "IdealLoads constant-SHR supply latent cooling"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Key "ZONE ONE INLET" -Variable "System Node Humidity Ratio" -Level "conformance" -Description "IdealLoads constant-SHR supply humidity"
+Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_constant_shr_conformance_001\case.toml" -Key "ZONE ONE RETURN" -Variable "System Node Humidity Ratio" -Level "diagnostic" -Description "IdealLoads constant-SHR return humidity diagnostic"
 Assert-Contains -Path "scripts\smoke\ideal-loads-thermostat-smoke.ps1" -Pattern "status: baseline-only" -Description "v0.10 smoke gate baseline-only status"
 Assert-Contains -Path "scripts\smoke\ideal-loads-thermostat-smoke.ps1" -Pattern "baseline_nonzero_count" -Description "v0.10 nonzero baseline gate"
 Assert-Contains -Path "data\conformance_cases\air_side_node_diagnostic_001\case.toml" -Pattern 'comparison_class = "diagnostic-only"' -Description "v0.11 case class"

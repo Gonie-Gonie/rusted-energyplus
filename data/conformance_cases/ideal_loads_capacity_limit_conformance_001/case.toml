@@ -8,7 +8,7 @@ oracle_version = "26.1.0"
 notes = [
   "This case claims only the declared no-OA capacity-limit IdealLoads sensible conformance outputs.",
   "The boundary excludes outdoor air, economizer, heat recovery, humidistats, DCV, finite flow-rate limits, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
-  "Numeric heating and cooling capacity limits are active; flow-only and flow-and-capacity finite-limit cases remain diagnostic-only evidence.",
+  "Numeric heating and cooling capacity limits are active; flow-limit and flow-and-capacity finite-limit branches are claimed only by their separate conformance manifests.",
   "IdealLoads rate and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow formulas.",
   "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
   "Mass-flow comparison uses the EnergyPlus same-call return-node recirculation state for finite-limit no-OA mixed-air and report calculations.",
