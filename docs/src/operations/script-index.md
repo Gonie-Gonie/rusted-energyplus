@@ -107,6 +107,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |
 | `compare-ideal-loads-outdoor-air-maximum-conformance-candidate` | conformance | run the IdealLoads Maximum outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-maximum-conformance` |
 | `compare-ideal-loads-outdoor-air-sensible-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sensible heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery` |
+| `compare-ideal-loads-outdoor-air-sensible-heat-recovery-conformance-candidate` | conformance | run the IdealLoads Sensible heat-recovery outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery-conformance` |
 | `compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Enthalpy heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-enthalpy-heat-recovery` |
 | `compare-ideal-loads-outdoor-air-sum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-sum` |
 | `compare-ideal-loads-outdoor-air-sum-conformance-candidate` | conformance | run the IdealLoads Sum outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-sum-conformance` |

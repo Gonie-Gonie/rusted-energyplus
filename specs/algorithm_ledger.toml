@@ -410,6 +410,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_maximum_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_differential_enthalpy_economizer_conformance_manifest",
+  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1",
@@ -420,6 +421,7 @@ rust_target = [
   "scripts/compare/compare-ideal-loads-outdoor-air-maximum-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-conformance-candidate.ps1",
+  "scripts/compare/compare-ideal-loads-outdoor-air-sensible-heat-recovery-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-area-diagnostic.ps1",
@@ -456,8 +458,8 @@ proof_variables = [
   "Zone Ideal Loads Economizer Active Time",
   "Zone Ideal Loads Heat Recovery Active Time",
 ]
-claim_level = "limited-ideal-loads-outdoor-air-flow-zone-flow-person-flow-area-air-changes-sum-maximum-differential-dry-bulb-differential-enthalpy-economizer-conformance"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer conformance for declared mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, and economizer active-time rows in ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001, and ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001, with inactive heat-recovery rows kept diagnostic-only. Active heat recovery, active DCV, active humidity controls, heat-recovery saturation-limit branches, People heat gains, and broad OA conformance remain outside the claim."
+claim_level = "limited-ideal-loads-outdoor-air-flow-zone-flow-person-flow-area-air-changes-sum-maximum-differential-dry-bulb-differential-enthalpy-economizer-sensible-heat-recovery-conformance"
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer, and Flow/Zone Sensible heat-recovery conformance for declared mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, economizer active-time, Sensible heat-recovery active-time, and Sensible heat-recovery rate rows in ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001, ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001, and ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001. Enthalpy heat recovery, heat-recovery saturation-limit branches, active DCV, active humidity controls, People heat gains, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

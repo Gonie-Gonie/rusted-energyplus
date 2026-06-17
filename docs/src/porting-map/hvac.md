@@ -357,7 +357,17 @@ and verifies outdoor-air mass flow rises above the 0.001 m3/s design minimum
 when outdoor enthalpy is below recirculation enthalpy. Inactive heat-recovery
 rows remain diagnostic-only proof rows in this case.
 
-Active heat recovery, active DCV, active humidity controls,
+`ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`
+promotes the matching Flow/Zone blank-schedule outdoor-air lane with
+`NoEconomizer` and `HeatRecoveryType = Sensible`. It compares 96 Detailed
+samples, promotes the same 14 outdoor-air/supply/mixed rows plus the six
+Sensible heat-recovery rate rows and `Zone Ideal Loads Heat Recovery Active
+Time`, keeps inactive economizer active time diagnostic-only, and requires
+heat-recovery active time to be nonzero. Sensible heat recovery leaves humidity
+unchanged, so the latent heat-recovery rows remain zero-valued conformance rows
+inside this narrow fixture.
+
+Enthalpy heat recovery, active DCV, active humidity controls,
 heat-recovery saturation-limit branches, and broad IdealLoads outdoor-air
 conformance remain outside this claim.
 
@@ -375,8 +385,9 @@ conformance remain outside this claim.
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are diagnostic
 predecessor and remaining proof lanes. The DifferentialDryBulb and
 DifferentialEnthalpy diagnostics are predecessors for the promoted economizer
-conformance candidates; Sensible heat-recovery and Enthalpy heat-recovery
-remain diagnostic-only active outdoor-air proof lanes.
+conformance candidates; the Sensible heat-recovery diagnostic is the
+predecessor for the promoted Sensible heat-recovery conformance candidate; and
+Enthalpy heat-recovery remains a diagnostic-only active outdoor-air proof lane.
 
 ```text
 comparison_class: diagnostic-only
@@ -416,28 +427,31 @@ Sum/Maximum aggregate methods over those supported terms, and writes matching
 Detailed Rust `ResultStore` series for the 96 no-economizer oracle samples. The
 DifferentialDryBulb and DifferentialEnthalpy fixtures use 110 source-order
 Detailed samples because EnergyPlus reports system substeps while the
-economizer is active. The Sensible heat-recovery fixture keeps 96 samples with
-`NoEconomizer` and validates active heat-recovery time plus sensible/total
-rate rows. The Enthalpy heat-recovery fixture also keeps 96 samples with
-`NoEconomizer` and validates active heat-recovery time plus sensible, latent,
-and total rate rows. The no-economizer flow rows are exact; the active
-economizer flow rows use narrow diagnostic tolerances. The sensible and total
-report rows are diagnostic with a 1 W source-order tolerance, except the
-Enthalpy cooling heat-recovery total/latent rows allow a single 6 W
-saturation-limit diagnostic timestep. The no-humidity latent report,
-supply-air state, and mixed-air state rows are diagnostic; supply-air
-temperature stays within 0.02 C, and the Enthalpy humidity-ratio rows allow
-5e-5 kg/kg at that saturation-limit timestep. The inactive heat-recovery rows
-are exact zeros for the non-heat-recovery fixtures, and economizer active time
-is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
-branches.
+economizer is active. The Sensible heat-recovery diagnostic and conformance
+fixtures keep 96 samples with `NoEconomizer` and validate active heat-recovery
+time plus sensible/total rate rows; the promoted candidate also gates the
+unchanged-humidity latent zero rows. The Enthalpy heat-recovery fixture keeps
+96 samples with `NoEconomizer` and validates active heat-recovery time plus
+sensible, latent, and total rate rows as diagnostic-only evidence. The
+no-economizer flow rows are exact; the active economizer flow rows use narrow
+diagnostic tolerances. The sensible and total report rows are diagnostic or
+conformance according to each manifest's output levels with a 1 W source-order
+tolerance, except the Enthalpy cooling heat-recovery total/latent rows allow a
+single 6 W saturation-limit diagnostic timestep. The no-humidity latent report,
+supply-air state, and mixed-air state rows are diagnostic or conformance
+according to each manifest's output levels; supply-air temperature stays
+within 0.02 C, and the Enthalpy humidity-ratio rows allow 5e-5 kg/kg at that
+saturation-limit timestep. The inactive heat-recovery rows are exact zeros for
+the non-heat-recovery fixtures, and economizer active time is exact for the
+inactive, DifferentialDryBulb, DifferentialEnthalpy, and Sensible
+heat-recovery branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
 Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and
-Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer
-conformance candidates, active DCV, active humidity controls,
-saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
-conformance.
+Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer and Sensible
+heat-recovery conformance candidates, Enthalpy heat recovery, active DCV,
+active humidity controls, saturation-limit heat-recovery branches, or broad
+IdealLoads outdoor-air conformance.
 
 ## Promotion Requirements
 

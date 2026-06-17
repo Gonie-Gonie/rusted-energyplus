@@ -366,14 +366,20 @@ cooling-flow reset, reports 110 source-order Detailed samples, promotes the
 same 14 outdoor-air/supply/mixed rows plus `Zone Ideal Loads Economizer Active
 Time`, and keeps inactive heat-recovery rows diagnostic-only.
 
-`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` keeps the
-Flow/Zone outdoor-air method with `NoEconomizer` and
-`HeatRecoveryType = Sensible`. The Rust lane applies the EnergyPlus sensible
-heat-recovery outdoor-air tempering branch when recirculation air can
-beneficially warm or cool outdoor air, reports 96 Detailed samples, and keeps
-the mixed-air, active-time, sensible-rate, and total-rate evidence
-diagnostic-only. Humidity ratio is unchanged by Sensible heat recovery, so the
-latent heat-recovery rows remain zero.
+`ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` is the
+diagnostic predecessor for the same Flow/Zone outdoor-air method with
+`NoEconomizer` and `HeatRecoveryType = Sensible`.
+
+`ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`
+promotes that Sensible heat-recovery fixture shape for declared outdoor-air
+mass/volume, no-humidity report-rate, supply-air state, mixed-air state,
+Sensible heat-recovery rate, and heat-recovery active-time rows. The Rust lane
+applies the EnergyPlus sensible heat-recovery outdoor-air tempering branch
+when recirculation air can beneficially warm or cool outdoor air, reports 96
+Detailed samples, keeps inactive economizer active-time diagnostic-only, and
+requires heat-recovery active time to be nonzero. Humidity ratio is unchanged
+by Sensible heat recovery, so the latent heat-recovery rows are zero-valued
+conformance rows inside this narrow fixture.
 
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` keeps the same
 Flow/Zone and `NoEconomizer` fixture shape with `HeatRecoveryType = Enthalpy`.
@@ -384,10 +390,10 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality, proportional-control, and active heat-recovery outdoor-air
-methods remain diagnostic or unresolved, and no outdoor-air
-finite-limit, outdoor-air humidity-control, other active humidity-control,
-saturation-limit heat-recovery, or DCV output is part of the promoted
+Indoor air quality, proportional-control, Enthalpy heat-recovery, and
+heat-recovery saturation-limit outdoor-air methods remain diagnostic or
+unresolved, and no outdoor-air finite-limit, outdoor-air humidity-control,
+other active humidity-control, or DCV output is part of the promoted
 IdealLoads claim.
 
 ## Required Proof Variables
@@ -430,8 +436,11 @@ The conformance output surface is:
   `Zone Ideal Loads Supply Air Humidity Ratio` for the promoted outdoor-air
   candidates
 - `Zone Ideal Loads Mixed Air Temperature` and
-  `Zone Ideal Loads Mixed Air Humidity Ratio` for the promoted no-heat-recovery
-  outdoor-air candidates
+  `Zone Ideal Loads Mixed Air Humidity Ratio` for the promoted outdoor-air
+  candidates
+- `Zone Ideal Loads Heat Recovery Sensible/Latent/Total Heating/Cooling Rate`
+  and `Zone Ideal Loads Heat Recovery Active Time` for the promoted Sensible
+  heat-recovery outdoor-air candidate
 
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, non-promoted humidity-ratio rows, zone-air-node proof rows,
@@ -460,10 +469,10 @@ The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, and mixed-air state rows have
 promoted conformance evidence in the Flow/Zone, Flow/Person, Flow/Area,
 AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb/DifferentialEnthalpy
-economizer conformance candidates. Inactive economizer/heat-recovery outputs
-and Sensible/Enthalpy heat-recovery active-time and rate outputs remain
-diagnostic evidence in the original
-outdoor-air predecessor fixtures and active outdoor-air proof lanes:
+economizer and Sensible heat-recovery conformance candidates. Inactive
+economizer/heat-recovery outputs and Enthalpy heat-recovery active-time and
+rate outputs remain diagnostic evidence in the original outdoor-air
+predecessor fixtures and active outdoor-air proof lanes:
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
 `ideal_loads_outdoor_air_flow_area_diagnostic_001`,

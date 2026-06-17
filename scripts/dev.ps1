@@ -335,6 +335,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the IdealLoads outdoor-air Sensible heat-recovery diagnostic comparison."
     }
+    "compare-ideal-loads-outdoor-air-sensible-heat-recovery-conformance-candidate" = @{
+        Path = "compare\compare-ideal-loads-outdoor-air-sensible-heat-recovery-conformance-candidate.ps1"
+        Group = "compare"
+        Help = "Gate the IdealLoads outdoor-air Sensible heat-recovery conformance candidate."
+    }
     "compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-diagnostic" = @{
         Path = "compare\compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-diagnostic.ps1"
         Group = "compare"

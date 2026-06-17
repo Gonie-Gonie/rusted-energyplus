@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 82 tracked variables, 57 conformance variables, 19
+  output-variable scope: 82 tracked variables, 64 conformance variables, 12
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -33,7 +33,7 @@ tolerance, and code organization.
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
-- 51 declared numerical hourly/detailed series and 22 passed release-evidence
+- 52 declared numerical hourly/detailed series and 22 passed release-evidence
   series separated from broader declared conformance output requests in the
   user coverage handbook
 - no-mass adiabatic surface conduction rate/per-area conformance for the
@@ -141,11 +141,18 @@ tolerance, and code organization.
   `ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001`,
   using a low minimum outdoor-air flow so the source enthalpy comparison resets
   the cooling outdoor-air flow above the design minimum
-- diagnostic-only IdealLoads remaining active heat-recovery outdoor-air evidence
-  for outdoor-air mass flow, standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, mixed-air state, inactive
-  economizer/heat-recovery reports, and Sensible and
-  Enthalpy heat-recovery active-time/rate parity in
+- limited IdealLoads outdoor-air `Sensible` heat-recovery conformance
+  candidate gate for declared Flow/Zone outdoor-air mass/standard-density
+  volume flow, no-humidity outdoor-air report rates, supply-air state,
+  mixed-air state, Sensible heat-recovery rate, and heat-recovery active-time
+  Detailed series in
+  `ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`,
+  with inactive economizer active-time kept diagnostic-only
+- diagnostic-only IdealLoads remaining Enthalpy heat-recovery outdoor-air
+  evidence for outdoor-air mass flow, standard-density volume flow,
+  no-humidity outdoor-air report rates, supply-air state, mixed-air state,
+  inactive economizer/heat-recovery reports, and Enthalpy heat-recovery
+  active-time/rate parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
   `ideal_loads_outdoor_air_design_flow_diagnostic_001`,
   `ideal_loads_outdoor_air_flow_area_diagnostic_001`,
@@ -170,7 +177,8 @@ tolerance, and code organization.
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
   `AirChanges/Hour`, `Sum`, `Maximum`, `DifferentialDryBulb` economizer, and
-  `DifferentialEnthalpy` economizer IdealLoads variables
+  `DifferentialEnthalpy` economizer, and `Sensible` heat-recovery IdealLoads
+  variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
@@ -203,8 +211,9 @@ Not claimed:
 - broad HVAC or plant simulation compatibility
 - broad node, full IdealLoads, meter, or full runtime conformance
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
-  and DifferentialEnthalpy candidates, heat-recovery, DCV, humidity,
-  saturation-limit, or meter conformance beyond oracle-MTR diagnostic tracking
+  and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
+  declared Sensible candidate, DCV, humidity, saturation-limit, or meter
+  conformance beyond oracle-MTR diagnostic tracking
 - broad ExampleFiles compatibility
 
 ## Quick Start
