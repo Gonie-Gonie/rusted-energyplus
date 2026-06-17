@@ -85,6 +85,29 @@ function Assert-JsonPropertyEquals {
     }
 }
 
+function Assert-TextContains {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Needle,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not $Text.Contains($Needle)) {
+        throw "$Description missing text: $Needle"
+    }
+}
+
+function Assert-ReportFieldEquals {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Field,
+        [Parameter(Mandatory = $true)][string]$Expected,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    Assert-TextContains -Text $Text -Needle "${Field}: $Expected" -Description $Description
+}
+
 function Get-RepoPath {
     param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -173,6 +196,7 @@ foreach ($case in $promotedCases) {
     Assert-FileExists -Path $stageSummaryPath -Description "$($case.Id) stage summary"
     Assert-FileExists -Path $toleranceFailuresPath -Description "$($case.Id) tolerance failures CSV"
 
+    $reportText = Get-Content -Encoding UTF8 -Raw -LiteralPath $reportPath
     $summary = Get-Content -Encoding UTF8 -Raw -LiteralPath $summaryPath | ConvertFrom-Json
     if ($summary.case_id -ne $case.Id) {
         throw "$($case.Id) summary case_id mismatch: $($summary.case_id)"
@@ -279,6 +303,40 @@ foreach ($case in $promotedCases) {
     }
     if (@($summary.zone_equipment_dispatch_warnings).Count -ne 0) {
         throw "$($case.Id) compare summary zone_equipment_dispatch_warnings must be empty"
+    }
+    $reportFieldExpectations = [ordered]@{
+        "case_id" = $case.Id
+        "comparison_class" = "conformance"
+        "conformance_claim" = "true"
+        "status" = "pass"
+        "source_order_wrapper" = "ep_runtime::ideal_loads::sim_purchased_air_compat"
+        "zone_equipment_dispatch_path" = "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir"
+        "zone_equipment_dispatch_validation" = "pass"
+        "zone_equipment_conformance_candidate" = "pass"
+        "zone_equipment_scope" = "single-zone-single-equipment"
+        "zone_equipment_dispatch_issues" = "none"
+        "zone_equipment_dispatch_warnings" = "none"
+        "selected_purchased_air_branch" = [string]$summary.selected_purchased_air_branch
+        "declared_ideal_loads_branch" = [string]$summary.declared_ideal_loads_branch
+        "inactive_branches" = (@($summary.inactive_branches) -join ", ")
+        "source_map_anchor" = "docs/src/porting-map/ideal-loads-source-map.md"
+        "node_output_timestamp_alignment" = "timestamp"
+        "node_output_store_type" = "ep_runtime::ResultStore"
+        "node_output_state_struct" = "ep_runtime::node::IdealLoadsSupplyNodeUpdate"
+        "node_output_update_source" = "UpdatePurchasedAir"
+        "node_output_report_source" = "ReportPurchasedAir"
+        "purchased_air_source_order" = "GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir"
+        "zone_demand_source" = "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs"
+        "zone_demand_struct_source" = "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand"
+        "zone_demand_heating_field" = "RemainingOutputReqToHeatSP"
+        "zone_demand_heating_sign_convention" = "positive W requests heating; non-positive means no active heating request"
+        "zone_demand_cooling_field" = "RemainingOutputReqToCoolSP"
+        "zone_demand_cooling_sign_convention" = "negative W requests cooling; non-negative means no active cooling request"
+        "zone_demand_mismatch_classification" = "upstream_zone_heat_balance_input"
+        "zone_demand_fixture_mode" = "source-order-oracle-demand-input"
+    }
+    foreach ($reportField in $reportFieldExpectations.GetEnumerator()) {
+        Assert-ReportFieldEquals -Text $reportText -Field $reportField.Key -Expected $reportField.Value -Description "$($case.Id) compare report"
     }
 
     $stageSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath $stageSummaryPath | ConvertFrom-Json
