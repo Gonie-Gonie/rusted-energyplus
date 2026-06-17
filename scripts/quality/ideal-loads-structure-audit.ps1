@@ -379,6 +379,8 @@ Assert-Contains -Path $idealLoadsCli -Pattern 'trace_overhead_accounting' -Descr
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_validation' -Description "IdealLoads report zone-equipment dispatch validation metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_conformance_candidate' -Description "IdealLoads report zone-equipment conformance-candidate metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_feature_flags' -Description "IdealLoads report feature flag metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_feature_dispatch_policy' -Description "IdealLoads report feature-dispatch policy metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_prebound_id_contract' -Description "IdealLoads report prebound-ID contract metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_runtime_binding_source' -Description "IdealLoads report typed-ID binding metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'purchased_air_name_lookup_policy' -Description "IdealLoads report string lookup policy metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'sim_purchased_air_compat' -Description "IdealLoads no-OA report generator uses source-order wrapper"

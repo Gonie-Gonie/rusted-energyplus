@@ -112,6 +112,12 @@ Current conformance reports expose `ideal_loads_invocation_path` as
 `zone-equipment-validated source-order PurchasedAir wrapper`,
 `direct_calc_helper_invocation` as `false`, and
 `zone_equipment_dispatch_execution_boundary` as `validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper`.
+Reports also expose `ideal_loads_feature_dispatch_policy` and
+`ideal_loads_prebound_id_contract`: compile feature flags select the
+branch-specific source-order compatibility function, unsupported active feature
+combinations emit diagnostics instead of approximate fallback, and the
+IdealLoads system, zone, node, and availability schedule references are typed
+before the simulation loop.
 Each IdealLoads case manifest sets `[trace].level`; reports echo that value in
 `trace_level` and identify `trace_level_source` as `case manifest [trace].level`.
 Trace level only selects the evidence payload: `ResultStore` values are computed

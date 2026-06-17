@@ -227,6 +227,8 @@ const IDEAL_LOADS_INVOCATION_PATH: &str =
     "zone-equipment-validated source-order PurchasedAir wrapper";
 const IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION: bool = false;
 const IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY: &str = "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper";
+const IDEAL_LOADS_FEATURE_DISPATCH_POLICY: &str = "compile feature flags select branch-specific source-order compat functions; unsupported active feature combinations emit diagnostics instead of approximate fallback";
+const IDEAL_LOADS_PREBOUND_ID_CONTRACT: &str = "compile-stage IdealLoadsAirSystemId, ZoneId, supply NodeId, return NodeId, zone air NodeId, optional outdoor air NodeId, availability ScheduleId, heating availability ScheduleId, and cooling availability ScheduleId";
 const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
 const IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT: &str =
     "built-in default; override with case manifest [trace].level";
@@ -5106,6 +5108,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         ideal_loads_feature_flags_label(context.feature_flags)
     ));
     report.push_str(&format!(
+        "ideal_loads_feature_dispatch_policy: {}\n",
+        IDEAL_LOADS_FEATURE_DISPATCH_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_prebound_id_contract: {}\n",
+        IDEAL_LOADS_PREBOUND_ID_CONTRACT
+    ));
+    report.push_str(&format!(
         "trace_level: {}\n",
         ideal_loads_trace_level(context.manifest)
     ));
@@ -5356,6 +5366,14 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "ideal_loads_feature_flags: {}\n",
         ideal_loads_feature_flags_label(context.feature_flags)
+    ));
+    report.push_str(&format!(
+        "ideal_loads_feature_dispatch_policy: {}\n",
+        IDEAL_LOADS_FEATURE_DISPATCH_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_prebound_id_contract: {}\n",
+        IDEAL_LOADS_PREBOUND_ID_CONTRACT
     ));
     report.push_str(&format!(
         "trace_level: {}\n",
@@ -5683,6 +5701,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_feature_dispatch_policy\": {},\n",
+        json_string(IDEAL_LOADS_FEATURE_DISPATCH_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_prebound_id_contract\": {},\n",
+        json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
@@ -6236,6 +6262,14 @@ fn render_outdoor_air_stage_summary_json(
         ideal_loads_feature_flags_json(context.feature_flags)
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_feature_dispatch_policy\": {},\n",
+        json_string(IDEAL_LOADS_FEATURE_DISPATCH_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_prebound_id_contract\": {},\n",
+        json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
+    ));
+    json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(context.manifest))
     ));
@@ -6643,6 +6677,14 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_feature_dispatch_policy\": {},\n",
+        json_string(IDEAL_LOADS_FEATURE_DISPATCH_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_prebound_id_contract\": {},\n",
+        json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
@@ -7323,6 +7365,14 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"ideal_loads_feature_flags\": {},\n",
         ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_feature_dispatch_policy\": {},\n",
+        json_string(IDEAL_LOADS_FEATURE_DISPATCH_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_prebound_id_contract\": {},\n",
+        json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
