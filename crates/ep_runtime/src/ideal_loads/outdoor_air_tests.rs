@@ -3,7 +3,7 @@ use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType,
+    IdealLoadsLimit, NodeId, NormalizedName, OutdoorAirEconomizerType,
 };
 
 #[test]
@@ -179,6 +179,88 @@ fn sensible_report_sorts_warm_oa_as_cooling_load_when_cool_mode_is_active() {
         1.0e-12,
     );
     assert_eq!(result.outdoor_air_sensible_heating_rate_w, 0.0);
+}
+
+#[test]
+fn sim_purchased_air_outdoor_air_wrapper_matches_calc_update_and_trace() {
+    let system = test_system();
+    let zone_state = IdealLoadsOutdoorAirNodeState {
+        air_temperature_c: 21.0,
+        air_humidity_ratio: 0.006,
+    };
+    let recirculation_state = IdealLoadsOutdoorAirNodeState {
+        air_temperature_c: 21.0,
+        air_humidity_ratio: 0.006,
+    };
+    let outdoor_air_state = IdealLoadsOutdoorAirNodeState {
+        air_temperature_c: 5.0,
+        air_humidity_ratio: 0.004,
+    };
+    let demand = ZoneSysEnergyDemand::sensible_only(ep_model::ZoneId(0), 100.0, 0.0);
+    let minimum_outdoor_air_mass_flow_rate_kg_per_s = 0.05;
+    let system_timestep_hours = 0.25;
+    let barometric_pressure_pa = 101_325.0;
+
+    let expected_calculation = calc_outdoor_air_sensible_report_rates_compat(
+        &system,
+        zone_state,
+        recirculation_state,
+        outdoor_air_state,
+        demand,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        system_timestep_hours,
+        barometric_pressure_pa,
+        true,
+    );
+    let output = sim_purchased_air_outdoor_air_compat(SimPurchasedAirOutdoorAirCompatInput {
+        system: &system,
+        supply_node: NodeId(9),
+        zone_state,
+        recirculation_state,
+        outdoor_air_state,
+        demand,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        system_timestep_hours,
+        barometric_pressure_pa,
+        unit_available: true,
+    });
+
+    assert_eq!(output.system_id, system.id);
+    assert_eq!(output.selected_branch, "outdoor_air");
+    assert_eq!(
+        output.init_flags,
+        IdealLoadsInitFlags::source_order_candidate()
+    );
+    assert_eq!(output.calculation, expected_calculation);
+    assert_eq!(output.supply_node_update.node, NodeId(9));
+    assert_eq!(
+        output.supply_node_update.temperature_c,
+        expected_calculation.supply_air_temperature_c
+    );
+    assert_eq!(
+        output.supply_node_update.humidity_ratio,
+        expected_calculation.supply_air_humidity_ratio
+    );
+    assert_eq!(
+        output.supply_node_update.mass_flow_rate_kg_per_s,
+        expected_calculation.supply_mass_flow_rate_kg_per_s
+    );
+    assert_close(
+        output.supply_node_update.enthalpy_j_per_kg,
+        moist_air_enthalpy_j_per_kg(
+            expected_calculation.supply_air_temperature_c,
+            expected_calculation.supply_air_humidity_ratio,
+        ),
+        1.0e-9,
+    );
+    assert_eq!(output.trace.zone_state, zone_state);
+    assert_eq!(output.trace.recirculation_state, recirculation_state);
+    assert_eq!(output.trace.outdoor_air_state, outdoor_air_state);
+    assert_eq!(output.trace.demand, demand);
+    assert_eq!(
+        output.trace.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s
+    );
 }
 
 #[test]
