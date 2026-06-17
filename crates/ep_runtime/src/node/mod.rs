@@ -1,7 +1,9 @@
 //! Air-side node compatibility facade.
 
+mod projection;
 mod state;
 
+pub use projection::*;
 pub use state::*;
 
 use ep_model::NodeId;

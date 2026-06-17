@@ -129,7 +129,7 @@ Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Patter
 Assert-Contains -Path "docs\src\conformance\numeric-release-evidence.md" -Pattern "v0.8/v0.9 cases only" -Description "numeric evidence claim boundary"
 Assert-Contains -Path "docs\src\porting-map\output-variable-source-map.md" -Pattern "node-state-source-map.md" -Description "output variable node source map"
 Assert-Contains -Path "docs\src\porting-map\hvac.md" -Pattern "v0.12 Node Source Map" -Description "HVAC node source map section"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "NodeStateProjectionEvidencePolicy" -Description "Rust node projection evidence policy"
+Assert-Contains -Path "crates\ep_runtime\src\node\projection.rs" -Pattern "NodeStateProjectionEvidencePolicy" -Description "Rust node projection evidence policy"
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "NODE_TEMPERATURE_SETPOINT_SENTINEL_C" -Description "Rust node setpoint sentinel"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "evidence_policy" -Description "node projection JSON evidence policy"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "timestamp_rule" -Description "node projection timestamp gate"

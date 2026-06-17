@@ -77,7 +77,7 @@ Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "pub struct NodeLi
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "pub struct ZoneAirNodeEdge" -Description "v0.11 zone air node graph edge"
 Assert-Contains -Path "crates\ep_model\src\model.rs" -Pattern "pub struct IdealLoadsSupplyNodeEdge" -Description "v0.11 IdealLoads supply node graph edge"
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "pub struct NodeStateStore" -Description "v0.11 Rust node state store"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "simulate_ideal_loads_node_state_projection" -Description "v0.11 Rust node-state projection"
+Assert-Contains -Path "crates\ep_runtime\src\node\projection.rs" -Pattern "simulate_ideal_loads_node_state_projection" -Description "v0.11 Rust node-state projection"
 Assert-Contains -Path "crates\ep_cli\src\main.rs" -Pattern "run node-state-projection" -Description "v0.11 node-state projection CLI"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "algorithm_parity: false" -Description "v0.11 node projection boundary"
 Assert-Contains -Path "scripts\smoke\air-side-node-diagnostic-smoke.ps1" -Pattern "state_nodes: 3" -Description "v0.11 node projection state count"

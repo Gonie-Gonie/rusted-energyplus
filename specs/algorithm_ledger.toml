@@ -79,7 +79,7 @@ energyplus_source = [
 ]
 rust_target = [
   "crates/ep_runtime/src/node/state.rs::NodeStateStore",
-  "crates/ep_runtime/src/runtime.rs::simulate_ideal_loads_node_state_projection",
+  "crates/ep_runtime/src/node/projection.rs::simulate_ideal_loads_node_state_projection",
 ]
 status = "diagnostic_only"
 first_case = "air_side_node_diagnostic_001"
