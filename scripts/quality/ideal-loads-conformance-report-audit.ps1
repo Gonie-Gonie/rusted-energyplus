@@ -264,6 +264,13 @@ foreach ($case in $promotedCases) {
         "node_output_state_struct",
         "node_output_update_source",
         "node_output_report_source",
+        "rate_output_source",
+        "rate_output_timestep_source",
+        "energy_output_timestep_source",
+        "energy_output_level_policy",
+        "fuel_energy_output_level_policy",
+        "meter_aggregation_source",
+        "meter_fuel_energy_binding_source",
         "zone_demand_source",
         "zone_demand_struct_source",
         "zone_demand_heating_field",
@@ -287,6 +294,11 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_report_source" -Expected "ReportPurchasedAir" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "rate_output_source" -Expected "ReportPurchasedAir after UpdatePurchasedAir" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "rate_output_timestep_source" -Expected "Detailed system timestep values" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "energy_output_timestep_source" -Expected "ReportPurchasedAir rate * TimeStepSysSec" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_aggregation_source" -Expected "ep_runtime::RuntimeMeterRegistry" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_fuel_energy_binding_source" -Expected "ep_runtime::ideal_loads_facility_meter_binding" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_struct_source" -Expected "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_heating_field" -Expected "RemainingOutputReqToHeatSP" -Description "$($case.Id) compare summary"
@@ -333,6 +345,13 @@ foreach ($case in $promotedCases) {
         "node_output_state_struct" = "ep_runtime::node::IdealLoadsSupplyNodeUpdate"
         "node_output_update_source" = "UpdatePurchasedAir"
         "node_output_report_source" = "ReportPurchasedAir"
+        "rate_output_source" = [string]$summary.rate_output_source
+        "rate_output_timestep_source" = [string]$summary.rate_output_timestep_source
+        "energy_output_timestep_source" = [string]$summary.energy_output_timestep_source
+        "energy_output_level_policy" = [string]$summary.energy_output_level_policy
+        "fuel_energy_output_level_policy" = [string]$summary.fuel_energy_output_level_policy
+        "meter_aggregation_source" = [string]$summary.meter_aggregation_source
+        "meter_fuel_energy_binding_source" = [string]$summary.meter_fuel_energy_binding_source
         "purchased_air_source_order" = "GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir"
         "zone_demand_source" = "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs"
         "zone_demand_struct_source" = "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand"
@@ -361,6 +380,13 @@ foreach ($case in $promotedCases) {
         "node_output_state_struct",
         "node_output_update_source",
         "node_output_report_source",
+        "rate_output_source",
+        "rate_output_timestep_source",
+        "energy_output_timestep_source",
+        "energy_output_level_policy",
+        "fuel_energy_output_level_policy",
+        "meter_aggregation_source",
+        "meter_fuel_energy_binding_source",
         "zone_demand_source",
         "zone_demand_struct_source",
         "zone_demand_heating_field",
@@ -421,6 +447,13 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_report_source" -Expected "ReportPurchasedAir" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "rate_output_source" -Expected "ReportPurchasedAir after UpdatePurchasedAir" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "rate_output_timestep_source" -Expected "Detailed system timestep values" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "energy_output_timestep_source" -Expected "ReportPurchasedAir rate * TimeStepSysSec" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "energy_output_level_policy" -Expected ([string]$summary.energy_output_level_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "fuel_energy_output_level_policy" -Expected ([string]$summary.fuel_energy_output_level_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "meter_aggregation_source" -Expected "ep_runtime::RuntimeMeterRegistry" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "meter_fuel_energy_binding_source" -Expected "ep_runtime::ideal_loads_facility_meter_binding" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_struct_source" -Expected "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_heating_field" -Expected "RemainingOutputReqToHeatSP" -Description "$($case.Id) stage summary"

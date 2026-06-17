@@ -5289,6 +5289,34 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE
     ));
     report.push_str(&format!(
+        "rate_output_source: {}\n",
+        IDEAL_LOADS_RATE_OUTPUT_SOURCE
+    ));
+    report.push_str(&format!(
+        "rate_output_timestep_source: {}\n",
+        IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE
+    ));
+    report.push_str(&format!(
+        "energy_output_timestep_source: {}\n",
+        IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE
+    ));
+    report.push_str(&format!(
+        "energy_output_level_policy: {}\n",
+        IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY
+    ));
+    report.push_str(&format!(
+        "fuel_energy_output_level_policy: {}\n",
+        IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY
+    ));
+    report.push_str(&format!(
+        "meter_aggregation_source: {}\n",
+        IDEAL_LOADS_METER_AGGREGATION_SOURCE
+    ));
+    report.push_str(&format!(
+        "meter_fuel_energy_binding_source: {}\n",
+        IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE
+    ));
+    report.push_str(&format!(
         "zone_demand_source: {}\n",
         ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE
     ));
@@ -5558,6 +5586,34 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"node_output_report_source\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"meter_aggregation_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_AGGREGATION_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"meter_fuel_energy_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE)
     ));
     json.push_str(&format!(
         "  \"outdoor_air_source\": {},\n",
@@ -5988,6 +6044,34 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!(
         "  \"node_output_report_source\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"meter_aggregation_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_AGGREGATION_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"meter_fuel_energy_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE)
     ));
     json.push_str(&format!(
         "  \"outdoor_air_method\": {},\n",
