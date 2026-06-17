@@ -66,6 +66,7 @@ function Assert-LineLimit {
 }
 
 $calcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
+$calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $noOaCalc = "crates\ep_runtime\src\ideal_loads\calc\no_oa.rs"
 $calcPsychrometrics = "crates\ep_runtime\src\ideal_loads\calc\psychrometrics.rs"
 $noOaTests = "crates\ep_runtime\src\ideal_loads\calc\no_oa_tests.rs"
@@ -97,6 +98,7 @@ $zoneEquipmentDispatch = "crates\ep_runtime\src\zone_equipment\dispatch.rs"
 $zoneEquipmentTests = "crates\ep_runtime\src\zone_equipment\tests.rs"
 
 Assert-FileExists -Path $calcRoot -Description "IdealLoads calc module root"
+Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $noOaCalc -Description "IdealLoads no-OA calc module"
 Assert-FileExists -Path $calcPsychrometrics -Description "IdealLoads calc psychrometrics module"
 Assert-FileExists -Path $noOaTests -Description "IdealLoads no-OA calc tests"
@@ -128,6 +130,7 @@ Assert-FileExists -Path $zoneEquipmentDispatch -Description "Zone equipment disp
 Assert-FileExists -Path $zoneEquipmentTests -Description "Zone equipment tests module"
 
 Assert-LineLimit -Path $calcRoot -Limit 1200 -Description "IdealLoads calc module root"
+Assert-LineLimit -Path $calcLimits -Limit 300 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $noOaCalc -Limit 1200 -Description "IdealLoads no-OA calc module"
 Assert-LineLimit -Path $calcPsychrometrics -Limit 300 -Description "IdealLoads calc psychrometrics module"
 Assert-LineLimit -Path $noOaTests -Limit 1200 -Description "IdealLoads no-OA calc tests"
@@ -149,8 +152,10 @@ Assert-LineLimit -Path $zoneEquipmentDemand -Limit 200 -Description "Zone equipm
 Assert-LineLimit -Path $zoneEquipmentDispatch -Limit 400 -Description "Zone equipment dispatch module"
 Assert-LineLimit -Path $zoneEquipmentTests -Limit 400 -Description "Zone equipment tests module"
 
+Assert-Contains -Path $calcRoot -Pattern 'mod limits;' -Description "IdealLoads calc limits submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod no_oa;' -Description "no-OA calc submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod psychrometrics;' -Description "IdealLoads calc psychrometrics submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use limits::IdealLoadsSensibleLimitContext;' -Description "IdealLoads calc limits public re-export"
 Assert-Contains -Path $calcRoot -Pattern 'pub use no_oa::\*;' -Description "no-OA calc public re-export"
 Assert-Contains -Path $calcRoot -Pattern 'pub use psychrometrics::' -Description "IdealLoads calc psychrometrics public re-export"
 Assert-Contains -Path $calcRoot -Pattern 'mod no_oa_tests;' -Description "no-OA calc test module declaration"
@@ -164,6 +169,9 @@ Assert-Contains -Path $noOaCalc -Pattern 'fn heating_result_with_limits\s*\(' -D
 Assert-Contains -Path $noOaCalc -Pattern 'fn cooling_result_with_limits\s*\(' -Description "cooling branch helper"
 Assert-Contains -Path $noOaCalc -Pattern 'fn humidistat_dehumidification_mass_flow_rate_kg_per_s\s*\(' -Description "dehumidification diagnostic branch helper"
 Assert-Contains -Path $noOaCalc -Pattern 'fn humidistat_humidification_mass_flow_rate_kg_per_s\s*\(' -Description "humidification diagnostic branch helper"
+Assert-Contains -Path $calcLimits -Pattern 'pub struct IdealLoadsSensibleLimitContext' -Description "IdealLoads sensible limit context"
+Assert-Contains -Path $calcLimits -Pattern 'fn flow_limit_kg_per_s\s*\(' -Description "IdealLoads flow limit helper"
+Assert-Contains -Path $calcLimits -Pattern 'fn capacity_limit_w\s*\(' -Description "IdealLoads capacity limit helper"
 Assert-Contains -Path $calcPsychrometrics -Pattern 'pub fn moist_air_enthalpy_j_per_kg\s*\(' -Description "IdealLoads moist-air enthalpy helper"
 Assert-Contains -Path $calcPsychrometrics -Pattern 'pub fn energyplus_standard_air_density_kg_per_m3\s*\(' -Description "IdealLoads standard air density helper"
 Assert-Contains -Path $calcPsychrometrics -Pattern 'fn humidity_ratio_from_enthalpy_and_dry_bulb\s*\(' -Description "IdealLoads humidity-from-enthalpy helper"
@@ -171,6 +179,9 @@ Assert-NotContains -Path $noOaCalc -Pattern '#\[test\]' -Description "unit tests
 Assert-NotContains -Path $noOaCalc -Pattern 'pub fn moist_air_enthalpy_j_per_kg\s*\(' -Description "moist-air enthalpy helper in no-OA calc module"
 Assert-NotContains -Path $noOaCalc -Pattern 'pub fn energyplus_standard_air_density_kg_per_m3\s*\(' -Description "standard air density helper in no-OA calc module"
 Assert-NotContains -Path $noOaCalc -Pattern 'fn humidity_ratio_from_enthalpy_and_dry_bulb\s*\(' -Description "humidity-from-enthalpy helper in no-OA calc module"
+Assert-NotContains -Path $noOaCalc -Pattern 'pub struct IdealLoadsSensibleLimitContext' -Description "limit context in no-OA calc module"
+Assert-NotContains -Path $noOaCalc -Pattern 'fn flow_limit_kg_per_s\s*\(' -Description "flow limit helper in no-OA calc module"
+Assert-NotContains -Path $noOaCalc -Pattern 'fn capacity_limit_w\s*\(' -Description "capacity limit helper in no-OA calc module"
 Assert-Contains -Path $noOaTests -Pattern '#\[test\]' -Description "unit tests in no-OA test module"
 
 Assert-Contains -Path $idealLoadsMod -Pattern 'mod meters;' -Description "IdealLoads meter submodule declaration"

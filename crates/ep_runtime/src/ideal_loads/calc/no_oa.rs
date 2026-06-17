@@ -4,15 +4,15 @@ use crate::{
     energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psychrometric_humidity_ratio_from_rh,
     zone_equipment::ZoneSysEnergyDemand,
 };
-use ep_model::{
-    AutosizeOrNumber, DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
-    IdealLoadsLimit,
-};
+use ep_model::{DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem};
 
+use super::limits::{
+    IdealLoadsSensibleLimitContext, capacity_limit_w, cooling_capacity_limit_is_zero,
+    flow_limit_kg_per_s, heating_capacity_limit_is_zero,
+};
 use super::psychrometrics::{
-    DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3, MINIMUM_HUMIDITY_RATIO, STANDARD_PRESSURE_SEA_LEVEL_PA,
-    energyplus_standard_air_density_kg_per_m3, humidity_ratio_from_enthalpy_and_dry_bulb,
-    moist_air_enthalpy_j_per_kg, nearly_equal_humidity, standard_pressure_elevation_base,
+    MINIMUM_HUMIDITY_RATIO, humidity_ratio_from_enthalpy_and_dry_bulb, moist_air_enthalpy_j_per_kg,
+    nearly_equal_humidity,
 };
 
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
@@ -38,46 +38,6 @@ pub struct IdealLoadsZoneState {
     pub air_temperature_c: f64,
     /// Zone air humidity ratio in kgWater/kgDryAir.
     pub air_humidity_ratio: f64,
-}
-
-/// Runtime context needed for numeric IdealLoads flow limits.
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct IdealLoadsSensibleLimitContext {
-    /// Standard air density in kg/m3 used to convert volumetric limits to mass limits.
-    pub standard_air_density_kg_per_m3: f64,
-    /// Barometric pressure in Pa used by supply-air saturation checks.
-    pub barometric_pressure_pa: f64,
-}
-
-impl Default for IdealLoadsSensibleLimitContext {
-    fn default() -> Self {
-        Self {
-            standard_air_density_kg_per_m3: DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3,
-            barometric_pressure_pa: STANDARD_PRESSURE_SEA_LEVEL_PA,
-        }
-    }
-}
-
-impl IdealLoadsSensibleLimitContext {
-    /// Builds the limit context from EnergyPlus `StdRhoAir` source-order inputs.
-    #[must_use]
-    pub fn from_site_elevation_m(elevation_m: f64) -> Option<Self> {
-        let base = standard_pressure_elevation_base(elevation_m)?;
-        let barometric_pressure_pa = STANDARD_PRESSURE_SEA_LEVEL_PA * base.powf(5.2559);
-        energyplus_standard_air_density_kg_per_m3(elevation_m).map(
-            |standard_air_density_kg_per_m3| Self {
-                standard_air_density_kg_per_m3,
-                barometric_pressure_pa,
-            },
-        )
-    }
-
-    /// Returns a copy using the supplied timestep barometric pressure.
-    #[must_use]
-    pub fn with_barometric_pressure_pa(mut self, barometric_pressure_pa: f64) -> Self {
-        self.barometric_pressure_pa = barometric_pressure_pa;
-        self
-    }
 }
 
 /// Result of the no-OA sensible calculation.
@@ -836,69 +796,6 @@ fn cooling_supply_humidity_ratio(
     )
     .unwrap_or(f64::INFINITY);
     supply_humidity_ratio.min(saturation_humidity_ratio)
-}
-
-fn flow_limit_kg_per_s(
-    limit: IdealLoadsLimit,
-    flow_limit_m3_per_s: Option<AutosizeOrNumber>,
-    limit_context: IdealLoadsSensibleLimitContext,
-) -> Option<f64> {
-    if !limit_includes_flow_rate(limit) {
-        return None;
-    }
-
-    numeric_autosize_value(flow_limit_m3_per_s).map(|flow_limit_m3_per_s| {
-        flow_limit_m3_per_s * limit_context.standard_air_density_kg_per_m3
-    })
-}
-
-fn capacity_limit_w(
-    limit: IdealLoadsLimit,
-    capacity_limit_w: Option<AutosizeOrNumber>,
-) -> Option<f64> {
-    if !limit_includes_capacity(limit) {
-        return None;
-    }
-
-    numeric_autosize_value(capacity_limit_w)
-}
-
-fn numeric_autosize_value(value: Option<AutosizeOrNumber>) -> Option<f64> {
-    match value {
-        Some(AutosizeOrNumber::Value(value)) => Some(value),
-        Some(AutosizeOrNumber::Autosize) | None => None,
-    }
-}
-
-fn cooling_capacity_limit_is_zero(system: &IdealLoadsAirSystem) -> bool {
-    matches!(
-        capacity_limit_w(system.cooling_limit, system.maximum_total_cooling_capacity_w),
-        Some(capacity_limit_w) if capacity_limit_w <= 0.0
-    )
-}
-
-fn heating_capacity_limit_is_zero(system: &IdealLoadsAirSystem) -> bool {
-    matches!(
-        capacity_limit_w(
-            system.heating_limit,
-            system.maximum_sensible_heating_capacity_w,
-        ),
-        Some(capacity_limit_w) if capacity_limit_w <= 0.0
-    )
-}
-
-fn limit_includes_flow_rate(limit: IdealLoadsLimit) -> bool {
-    matches!(
-        limit,
-        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
-    )
-}
-
-fn limit_includes_capacity(limit: IdealLoadsLimit) -> bool {
-    matches!(
-        limit,
-        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
-    )
 }
 
 fn zero_result(
