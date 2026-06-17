@@ -156,8 +156,17 @@ tolerance, and code organization.
   no-humidity outdoor-air report rates, supply-air state, and mixed-air state
   Detailed series in
   `ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001`, using
-  traced non-constant People occupancy schedule values; `CO2Setpoint` DCV and
-  broader DCV combinations remain outside the claim
+  traced non-constant People occupancy schedule values; broader DCV
+  combinations remain outside the claim
+- limited IdealLoads outdoor-air `CO2Setpoint` DCV conformance candidate gate
+  for declared Flow/Person outdoor-air mass/standard-density volume flow,
+  no-humidity outdoor-air report rates, supply-air state, and mixed-air state
+  Detailed series in
+  `ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001`, using the
+  EnergyPlus `Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate` proof
+  input to apply the source-order `max(minimum OA, CO2 demand)` adjustment;
+  CO2 contaminant-balance/concentration conformance, People heat-gain
+  conformance, and broader DCV combinations remain outside the claim
 - limited IdealLoads outdoor-air `Flow/Area` conformance candidate gate for
   declared outdoor-air mass/standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, and mixed-air state Detailed
@@ -221,9 +230,9 @@ tolerance, and code organization.
   and
   `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` and
   `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001`;
-  `CO2Setpoint` DCV, broader DCV combinations, active humidity control,
-  heat-recovery saturation-limit branch generality, and broad OA conformance
-  remain outside the claim
+  broader DCV combinations, CO2 contaminant-balance/concentration
+  conformance, active humidity control, heat-recovery saturation-limit branch
+  generality, and broad OA conformance remain outside the claim
 - oodocs/matplotlib release evidence generation
 - Case Manifest and Output Request Schema v2 validation
 - tolerance-gated conformance only for declared v0.8/v0.9 no-mass cases,
@@ -272,8 +281,9 @@ Not claimed:
 - broad node, full IdealLoads, meter, or full runtime conformance
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
   and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
-  declared Sensible and Enthalpy candidates, `CO2Setpoint` or broader DCV
-  combinations beyond the declared OccupancySchedule candidate, humidity,
+  declared Sensible and Enthalpy candidates, broader DCV combinations beyond
+  the declared OccupancySchedule and CO2Setpoint Flow/Person candidates,
+  humidity, CO2 contaminant-balance/concentration conformance,
   saturation-limit generality, or meter conformance beyond the declared no-OA
   hourly facility meter candidate
 - broad ExampleFiles compatibility

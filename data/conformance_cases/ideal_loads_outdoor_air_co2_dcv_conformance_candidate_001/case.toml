@@ -1,0 +1,292 @@
+id = "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001"
+title = "One-zone IdealLoads outdoor-air CO2Setpoint DCV conformance candidate"
+milestone = "ideal-loads-outdoor-air-dcv-conformance"
+purpose = "Claim narrow IdealLoads DesignSpecification:OutdoorAir Flow/Person CO2Setpoint DCV conformance for declared outdoor-air mass/volume, no-humidity outdoor-air report rates, supply-air state, and mixed-air state rows."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case claims only the declared DesignSpecification:OutdoorAir Flow/Person rows with ZoneHVAC:IdealLoadsAirSystem Demand Controlled Ventilation Type = CO2Setpoint.",
+  "The boundary covers CO2Setpoint DCV mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, and mixed-air state with a blank outdoor-air schedule.",
+  "Inactive economizer and inactive heat-recovery report rows remain diagnostic proof evidence.",
+  "The fixture declares five People design occupants with a non-constant all-days occupancy schedule, 120 W/person activity, 3.82E-8 m3/s-W CO2 generation, 600 ppm CO2 setpoint, 400 ppm outdoor CO2, and 0.01 m3/s-person outdoor air, so CO2Setpoint DCV raises the minimum outdoor-air mass flow above the design minimum when EnergyPlus ZoneSysContDemand requires it.",
+  "The EnergyPlus proof input for the CO2 branch is the zone System timestep output Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate, source-mapped to ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP.",
+  "People heat gains, CO2 contaminant balance conformance, CO2 concentration conformance, Sum/Maximum DCV combinations, active humidity-control latent behavior, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad outdoor-air conformance remain outside this claim.",
+  "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust conformance candidate derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001/ideal_loads_outdoor_air_co2_dcv.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "hvac"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001/ideal_loads_outdoor_air_co2_dcv.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Mass Flow Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Sensible Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 4.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Latent Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 4.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Mass Flow Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Temperature"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.02
+rmse_tol = 0.02
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Humidity Ratio"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Mixed Air Temperature"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.02
+rmse_tol = 0.02
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Mixed Air Humidity Ratio"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 0.000001
+rmse_tol = 0.000001
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Sensible Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Latent Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Economizer Active Time"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Active Time"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[tolerances]]
+variable_class = "hvac-state"
+max_abs = 1.0
+max_rmse = 1.0
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-outdoor-air-co2-dcv-conformance/26.1.0/ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-outdoor-air-co2-dcv-conformance-candidate"
+blocking = true

@@ -222,10 +222,10 @@ conformance.
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone,
-Flow/Person, Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour,
-Sum, Maximum, Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer,
-and Flow/Zone Sensible/Enthalpy heat-recovery candidate rows. The current Rust
-surface is:
+Flow/Person, Flow/Person OccupancySchedule DCV, Flow/Person CO2Setpoint DCV,
+Flow/Area, AirChanges/Hour, Sum, Maximum, Flow/Zone
+DifferentialDryBulb/DifferentialEnthalpy economizer, and Flow/Zone
+Sensible/Enthalpy heat-recovery candidate rows. The current Rust surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
@@ -250,6 +250,11 @@ surface is:
   EnergyPlus OccupancySchedule DCV path that recomputes the Flow/Person
   minimum outdoor-air flow from current People schedule occupancy before the
   `StdRhoAir` conversion
+- `Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate` as the EnergyPlus
+  System/Average proof input for
+  `ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP`, combined with the
+  source-order `CalcPurchAirMinOAMassFlow` `max(minimum OA, CO2 demand)` branch
+  for the declared Flow/Person CO2Setpoint DCV candidate
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
   Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and
   DifferentialDryBulb/DifferentialEnthalpy economizer OA report-rate and
@@ -259,6 +264,7 @@ surface is:
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
   `manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest`,
+  `manifest_allows_outdoor_air_co2_dcv_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_area_conformance_manifest`,
   `manifest_allows_outdoor_air_air_changes_conformance_manifest`,
   `manifest_allows_outdoor_air_sum_conformance_manifest`,
@@ -268,8 +274,9 @@ surface is:
   and
   `validate_outdoor_air_conformance_boundary` in
   `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone, Flow/Person,
-  Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour, Sum, Maximum,
-  and DifferentialDryBulb/DifferentialEnthalpy economizer candidates
+  Flow/Person OccupancySchedule DCV, Flow/Person CO2Setpoint DCV, Flow/Area,
+  AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb/DifferentialEnthalpy
+  economizer candidates
 
 `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -289,7 +296,19 @@ varies from 0 to 5 people, the minimum outdoor-air volume varies from 0.0 to
 latent, supply-air, mixed-air, and inactive proof rows keep the existing strict
 tolerances; outdoor-air sensible and total heating rows use the case-declared
 4 W absolute and 1 W RMSE tolerance for a single source-order timestep edge.
-`CO2Setpoint` DCV and broader DCV method combinations remain outside the
+`ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001` promotes the
+Flow/Person proof lane with `Demand Controlled Ventilation Type =
+CO2Setpoint`. The fixture declares five `People` design occupants, a
+non-constant all-days compact occupancy schedule, 120 W/person activity,
+3.82E-8 m3/s-W CO2 generation, a 600 ppm CO2 setpoint, a 400 ppm outdoor CO2
+schedule, and 0.01 m3/s-person outdoor air. EnergyPlus
+`ZoneContaminantPredictorCorrector::PredictZoneContaminants` writes
+`ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP` and exposes it through
+`Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate`; `CalcPurchAirMinOAMassFlow`
+then applies `max(minimum OA, OutputRequiredToCO2SP)`. The candidate claims only
+the resulting IdealLoads outdoor-air, supply-air, and mixed-air rows. CO2
+contaminant-balance conformance, CO2 concentration conformance, People
+heat-gain conformance, and broader DCV method combinations remain outside the
 claim.
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` remains the diagnostic
@@ -420,11 +439,11 @@ saturation-limit timestep only through declared humidity-ratio and
 latent/total-cooling tolerances; general saturation-limit heat-recovery branch
 parity is not promoted.
 
-Indoor air quality, proportional-control, heat-recovery saturation-limit
-generality, outdoor-air finite limits, outdoor-air humidity-control, other
-active humidity-control, `CO2Setpoint` DCV, and broader DCV method combinations
-remain diagnostic or unresolved and are not part of the promoted IdealLoads
-claim.
+Indoor air quality beyond the declared CO2Setpoint proof input,
+proportional-control, heat-recovery saturation-limit generality, outdoor-air
+finite limits, outdoor-air humidity-control, other active humidity-control, and
+broader DCV method combinations remain diagnostic or unresolved and are not
+part of the promoted IdealLoads claim.
 
 ## Required Proof Variables
 
@@ -475,7 +494,8 @@ The conformance output surface is:
 - `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
   `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate` for the
   promoted Flow/Zone, Flow/Person, Flow/Person OccupancySchedule DCV,
-  Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air candidates
+  Flow/Person CO2Setpoint DCV, Flow/Area, AirChanges/Hour, Sum, and Maximum
+  outdoor-air candidates
 - `Zone Ideal Loads Outdoor Air Sensible/Latent/Total Heating/Cooling Rate`
   for the no-active-humidity-control promoted outdoor-air candidates
 - `Zone Ideal Loads Supply Air Mass Flow Rate`,
