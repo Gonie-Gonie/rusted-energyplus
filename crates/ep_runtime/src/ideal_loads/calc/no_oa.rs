@@ -1,24 +1,22 @@
 //! No-OA IdealLoads sensible load calculation.
 
 use crate::{
-    energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
-    energyplus_psychrometric_humidity_ratio_from_rh, zone_equipment::ZoneSysEnergyDemand,
+    energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psychrometric_humidity_ratio_from_rh,
+    zone_equipment::ZoneSysEnergyDemand,
 };
 use ep_model::{
     AutosizeOrNumber, DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
     IdealLoadsLimit,
 };
 
+use super::psychrometrics::{
+    DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3, MINIMUM_HUMIDITY_RATIO, STANDARD_PRESSURE_SEA_LEVEL_PA,
+    energyplus_standard_air_density_kg_per_m3, humidity_ratio_from_enthalpy_and_dry_bulb,
+    moist_air_enthalpy_j_per_kg, nearly_equal_humidity, standard_pressure_elevation_base,
+};
+
 const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
 const SMALL_HUMIDITY_RATIO_DIFFERENCE: f64 = 0.00025;
-const MINIMUM_HUMIDITY_RATIO: f64 = 1.0e-5;
-pub(super) const DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
-const STANDARD_PRESSURE_SEA_LEVEL_PA: f64 = 101_325.0;
-const ENERGYPLUS_STANDARD_DRY_BULB_C: f64 = 20.0;
-const ENERGYPLUS_STANDARD_HUMIDITY_RATIO: f64 = 0.0;
-const ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.004_84;
-const ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG: f64 = 2500.94;
-const ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K: f64 = 1.858_95;
 
 /// Operating mode selected by the first IdealLoads sensible subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -389,36 +387,6 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
             supply_humidity_ratio,
         )
     }
-}
-
-/// EnergyPlus `PsyHFnTdbW`-style moist-air enthalpy in J/kg.
-#[must_use]
-pub fn moist_air_enthalpy_j_per_kg(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
-    1000.0
-        * (ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c
-            + humidity_ratio
-                * (ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG
-                    + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c))
-}
-
-/// Returns EnergyPlus `StdRhoAir` from site elevation.
-#[must_use]
-pub fn energyplus_standard_air_density_kg_per_m3(elevation_m: f64) -> Option<f64> {
-    let base = standard_pressure_elevation_base(elevation_m)?;
-    let standard_barometric_pressure_pa = STANDARD_PRESSURE_SEA_LEVEL_PA * base.powf(5.2559);
-    energyplus_moist_air_density_kg_per_m3(
-        standard_barometric_pressure_pa,
-        ENERGYPLUS_STANDARD_DRY_BULB_C,
-        ENERGYPLUS_STANDARD_HUMIDITY_RATIO,
-    )
-}
-
-fn standard_pressure_elevation_base(elevation_m: f64) -> Option<f64> {
-    if !elevation_m.is_finite() {
-        return None;
-    }
-    let base = 1.0 - 2.255_77e-05 * elevation_m;
-    (base > 0.0).then_some(base)
 }
 
 fn limited_heating_mass_flow_rate_kg_per_s(
@@ -868,16 +836,6 @@ fn cooling_supply_humidity_ratio(
     )
     .unwrap_or(f64::INFINITY);
     supply_humidity_ratio.min(saturation_humidity_ratio)
-}
-
-fn humidity_ratio_from_enthalpy_and_dry_bulb(enthalpy_j_per_kg: f64, dry_bulb_c: f64) -> f64 {
-    (enthalpy_j_per_kg / 1000.0 - ENERGYPLUS_DRY_AIR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
-        / (ENERGYPLUS_WATER_VAPOR_ENTHALPY_OFFSET_KJ_PER_KG
-            + ENERGYPLUS_WATER_VAPOR_ENTHALPY_COEFFICIENT_KJ_PER_KG_K * dry_bulb_c)
-}
-
-fn nearly_equal_humidity(left: f64, right: f64) -> bool {
-    (left - right).abs() <= 1.0e-12
 }
 
 fn flow_limit_kg_per_s(
