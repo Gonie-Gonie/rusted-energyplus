@@ -145,6 +145,8 @@ function Assert-ConformanceGateReportMetadataGuards {
 $readmeText = Read-RepoText -Path "README.md"
 $currentStatusText = Read-RepoText -Path "docs\src\current\current-status.md"
 $variableCoverageText = Read-RepoText -Path "specs\variable_coverage.toml"
+$algorithmLedgerText = Read-RepoText -Path "specs\algorithm_ledger.toml"
+$userCoverageHandbookText = Read-RepoText -Path "docs\src\conformance\user-coverage-handbook.md"
 $devText = Read-RepoText -Path "scripts\dev.ps1"
 
 $caseFiles = @(
@@ -192,6 +194,7 @@ foreach ($caseFile in $caseFiles) {
         $casePattern = [regex]::Escape($caseId)
         Assert-TextMatches -Text $readmeText -Pattern $casePattern -Description "$caseId README claim inventory"
         Assert-TextMatches -Text $currentStatusText -Pattern $casePattern -Description "$caseId current-status claim inventory"
+        Assert-TextMatches -Text $algorithmLedgerText -Pattern $casePattern -Description "$caseId algorithm ledger claim inventory"
 
         $promotedCases += [pscustomobject]@{
             Id = $caseId
@@ -210,6 +213,38 @@ foreach ($caseFile in $caseFiles) {
 $promotedCaseIds = @{}
 foreach ($case in $promotedCases) {
     $promotedCaseIds[$case.Id] = $true
+}
+
+$algorithmBlocks = [regex]::Matches($algorithmLedgerText, '(?ms)^\[\[algorithm\]\]\s*(?<body>.*?)(?=^\[\[algorithm\]\]|\z)')
+$idealLoadsAlgorithmCount = 0
+foreach ($block in $algorithmBlocks) {
+    $body = $block.Groups["body"].Value
+    $id = Get-TomlString -Text $body -Key "id" -Description "algorithm ledger block"
+    if ($id -notlike "ideal_loads*") {
+        continue
+    }
+
+    $idealLoadsAlgorithmCount += 1
+    $sourceMap = Get-TomlString -Text $body -Key "source_map" -Description "$id algorithm ledger block"
+    if ($sourceMap -ne "docs/src/porting-map/ideal-loads-source-map.md") {
+        throw "$id must use the IdealLoads source map, got $sourceMap"
+    }
+
+    $status = Get-TomlString -Text $body -Key "status" -Description "$id algorithm ledger block"
+    if ($status -eq "conformance") {
+        $claimLevel = Get-TomlString -Text $body -Key "claim_level" -Description "$id algorithm ledger block"
+        if ($claimLevel -notmatch '^limited-') {
+            throw "$id conformance algorithm must retain limited claim_level, got $claimLevel"
+        }
+
+        $supportBoundary = Get-TomlString -Text $body -Key "support_boundary" -Description "$id algorithm ledger block"
+        Assert-TextMatches -Text $supportBoundary -Pattern "declared" -Description "$id algorithm support boundary declared scope"
+        Assert-TextMatches -Text $supportBoundary -Pattern "remain outside the claim" -Description "$id algorithm support boundary exclusions"
+    }
+}
+
+if ($idealLoadsAlgorithmCount -eq 0) {
+    throw "No IdealLoads algorithm ledger blocks found."
 }
 
 $coverageBlocks = [regex]::Matches($variableCoverageText, '(?ms)^\[\[variable\]\]\s*(?<body>.*?)(?=^\[|\z)')
@@ -249,9 +284,28 @@ foreach ($entry in $broadExclusionPatterns) {
     Assert-TextMatches -Text $currentStatusText -Pattern $pattern -Description "current-status $($entry[1])"
 }
 
+$handbookBoundaryPatterns = @(
+    @("which output variables are promoted conformance, diagnostic, or baseline only", "handbook output-level distinction"),
+    @("which conformance cases define the current public numerical claim", "handbook public-claim distinction"),
+    @("which conformance output requests are declared versus which numerical", "handbook declared-output distinction"),
+    @("time-series actually passed release evidence", "handbook passed-series distinction"),
+    @("which gaps must not be inferred from neighboring support rows", "handbook gap-inference boundary"),
+    @("does not add new numerical", "handbook no-new-claim boundary"),
+    @("full EnergyPlus compatibility", "handbook full-compatibility boundary"),
+    @("HVAC numerical conformance", "handbook HVAC boundary"),
+    @("meter conformance", "handbook meter boundary")
+)
+
+foreach ($entry in $handbookBoundaryPatterns) {
+    $pattern = [regex]::Escape($entry[0])
+    Assert-TextMatches -Text $userCoverageHandbookText -Pattern $pattern -Description $entry[1]
+}
+
 Write-Host "IdealLoads claim inventory audit complete."
 Write-Host "  promoted_ideal_loads_cases: $($promotedCases.Count)"
 Write-Host "  diagnostic_or_baseline_ideal_loads_cases: $diagnosticOrBaselineCount"
 Write-Host "  conformance_blocks_checked: $(($promotedCases | Measure-Object -Property Blocks -Sum).Sum)"
 Write-Host "  report_metadata_guards_checked: $reportMetadataGuardCount"
 Write-Host "  variable_coverage_ideal_loads_refs: $idealLoadsCoverageRefs"
+Write-Host "  algorithm_ledger_ideal_loads_blocks: $idealLoadsAlgorithmCount"
+Write-Host "  user_handbook_boundary_markers: $($handbookBoundaryPatterns.Count)"
