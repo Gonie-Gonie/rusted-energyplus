@@ -5492,6 +5492,10 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str(&format!(
+        "  \"source_order_wrapper\": {},\n",
+        json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",
         json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
     ));
@@ -5918,6 +5922,10 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
     json.push_str("  \"outdoor_air\": true,\n");
     json.push_str(&format!(
+        "  \"source_order_wrapper\": {},\n",
+        json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",
         json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
     ));
@@ -6194,6 +6202,10 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         json_string(tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
+    json.push_str(&format!(
+        "  \"source_order_wrapper\": {},\n",
+        json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
     json.push_str(&format!(
         "  \"zone_demand_source\": {},\n",
         json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
@@ -6777,6 +6789,10 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         json_string(&context.manifest.id)
     ));
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
+    json.push_str(&format!(
+        "  \"source_order_wrapper\": {},\n",
+        json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
     json.push_str(&format!(
         "  \"selected_purchased_air_branch\": {},\n",
         json_string(context.selected_purchased_air_branch)

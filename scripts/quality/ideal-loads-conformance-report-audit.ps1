@@ -257,6 +257,7 @@ foreach ($case in $promotedCases) {
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
+        "source_order_wrapper",
         "source_map_anchor",
         "node_output_timestamp_alignment",
         "node_output_store_type",
@@ -310,6 +311,7 @@ foreach ($case in $promotedCases) {
     else {
         "ep_runtime::ideal_loads::sim_purchased_air_compat"
     }
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) compare summary"
     $reportFieldExpectations = [ordered]@{
         "case_id" = $case.Id
         "comparison_class" = "conformance"
@@ -352,6 +354,7 @@ foreach ($case in $promotedCases) {
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
+        "source_order_wrapper",
         "source_map_anchor",
         "node_output_timestamp_alignment",
         "node_output_store_type",
@@ -413,6 +416,7 @@ foreach ($case in $promotedCases) {
         throw "$($case.Id) stage summary source_map_anchor mismatch: $($stageSummary.source_map_anchor)"
     }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_store_type" -Expected "ep_runtime::ResultStore" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) stage summary"
