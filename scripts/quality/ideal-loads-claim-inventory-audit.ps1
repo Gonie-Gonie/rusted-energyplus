@@ -136,6 +136,8 @@ function Assert-ConformanceGateReportMetadataGuards {
         "purchased_air_name_lookup_policy",
         "ideal_loads_feature_flags",
         "trace_level_source",
+        "trace_result_invariance_policy",
+        "trace_overhead_accounting",
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",

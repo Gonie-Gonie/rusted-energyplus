@@ -374,6 +374,8 @@ Assert-Contains -Path $idealLoadsCli -Pattern 'direct_calc_helper_invocation' -D
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_execution_boundary' -Description "IdealLoads report zone-equipment execution boundary metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_trace_level\s*\(' -Description "IdealLoads report manifest trace-level helper"
 Assert-Contains -Path $idealLoadsCli -Pattern 'trace_level_source' -Description "IdealLoads report trace-level source metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'trace_result_invariance_policy' -Description "IdealLoads report trace-result invariance metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'trace_overhead_accounting' -Description "IdealLoads report trace overhead accounting metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_validation' -Description "IdealLoads report zone-equipment dispatch validation metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_conformance_candidate' -Description "IdealLoads report zone-equipment conformance-candidate metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_feature_flags' -Description "IdealLoads report feature flag metadata"

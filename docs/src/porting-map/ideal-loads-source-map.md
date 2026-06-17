@@ -114,6 +114,9 @@ Current conformance reports expose `ideal_loads_invocation_path` as
 `zone_equipment_dispatch_execution_boundary` as `validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper`.
 Each IdealLoads case manifest sets `[trace].level`; reports echo that value in
 `trace_level` and identify `trace_level_source` as `case manifest [trace].level`.
+Trace level only selects the evidence payload: `ResultStore` values are computed
+before report serialization, and trace/report overhead is accounted separately
+from numerical conformance comparisons.
 
 ## No-OA Sensible Fast Path
 

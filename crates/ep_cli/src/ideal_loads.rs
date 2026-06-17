@@ -233,6 +233,8 @@ const IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT: &str =
 const IDEAL_LOADS_TRACE_LEVEL_SOURCE_MANIFEST: &str = "case manifest [trace].level";
 const IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY: &str =
     "trace/report serialization only; calculations are complete before artifact rendering";
+const IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY: &str = "trace level selects evidence payload only; ResultStore values are computed before report serialization";
+const IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING: &str = "trace/report serialization overhead is outside numerical conformance comparison and measured separately from simulation results";
 const IDEAL_LOADS_NO_OA_TRACE_PAYLOAD: &str =
     "mode_counts, source-order demand inputs, selected branch, supply state, and report rates";
 const IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD: &str = "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates";
@@ -5120,6 +5122,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY
     ));
     report.push_str(&format!(
+        "trace_result_invariance_policy: {}\n",
+        IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY
+    ));
+    report.push_str(&format!(
+        "trace_overhead_accounting: {}\n",
+        IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING
+    ));
+    report.push_str(&format!(
         "source_map_anchor: {}\n",
         IDEAL_LOADS_SOURCE_MAP_ANCHOR
     ));
@@ -5362,6 +5372,14 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "trace_side_effect_policy: {}\n",
         IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY
+    ));
+    report.push_str(&format!(
+        "trace_result_invariance_policy: {}\n",
+        IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY
+    ));
+    report.push_str(&format!(
+        "trace_overhead_accounting: {}\n",
+        IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING
     ));
     report.push_str(&format!(
         "source_map_anchor: {}\n",
@@ -5681,6 +5699,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"trace_side_effect_policy\": {},\n",
         json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_result_invariance_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_overhead_accounting\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
@@ -6226,6 +6252,14 @@ fn render_outdoor_air_stage_summary_json(
         json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
     ));
     json.push_str(&format!(
+        "  \"trace_result_invariance_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_overhead_accounting\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING)
+    ));
+    json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
         json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
     ));
@@ -6625,6 +6659,14 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"trace_side_effect_policy\": {},\n",
         json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_result_invariance_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_overhead_accounting\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
@@ -7297,6 +7339,14 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"trace_side_effect_policy\": {},\n",
         json_string(IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_result_invariance_policy\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"trace_overhead_accounting\": {},\n",
+        json_string(IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",

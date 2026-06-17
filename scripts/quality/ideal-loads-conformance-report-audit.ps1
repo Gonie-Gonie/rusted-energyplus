@@ -199,6 +199,9 @@ $idealLoadsFeatureFlagNames = @(
     "has_capacity_limit",
     "has_autosize"
 )
+$expectedTraceSideEffectPolicy = "trace/report serialization only; calculations are complete before artifact rendering"
+$expectedTraceResultInvariancePolicy = "trace level selects evidence payload only; ResultStore values are computed before report serialization"
+$expectedTraceOverheadAccounting = "trace/report serialization overhead is outside numerical conformance comparison and measured separately from simulation results"
 
 $devCmd = Join-Path $RepoRoot "scripts\dev.cmd"
 $caseIndex = 0
@@ -307,6 +310,8 @@ foreach ($case in $promotedCases) {
         "trace_level_source",
         "trace_payload",
         "trace_side_effect_policy",
+        "trace_result_invariance_policy",
+        "trace_overhead_accounting",
         "source_order_wrapper",
         "ideal_loads_invocation_path",
         "direct_calc_helper_invocation",
@@ -403,7 +408,9 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_level" -Expected "default-conformance" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_level_source" -Expected "case manifest [trace].level" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_payload" -Expected $expectedTracePayload -Description "$($case.Id) compare summary"
-    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_side_effect_policy" -Expected "trace/report serialization only; calculations are complete before artifact rendering" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_side_effect_policy" -Expected $expectedTraceSideEffectPolicy -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_result_invariance_policy" -Expected $expectedTraceResultInvariancePolicy -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_overhead_accounting" -Expected $expectedTraceOverheadAccounting -Description "$($case.Id) compare summary"
     $reportFieldExpectations = [ordered]@{
         "case_id" = $case.Id
         "comparison_class" = "conformance"
@@ -428,7 +435,9 @@ foreach ($case in $promotedCases) {
         "trace_level" = "default-conformance"
         "trace_level_source" = "case manifest [trace].level"
         "trace_payload" = $expectedTracePayload
-        "trace_side_effect_policy" = "trace/report serialization only; calculations are complete before artifact rendering"
+        "trace_side_effect_policy" = $expectedTraceSideEffectPolicy
+        "trace_result_invariance_policy" = $expectedTraceResultInvariancePolicy
+        "trace_overhead_accounting" = $expectedTraceOverheadAccounting
         "source_map_anchor" = "docs/src/porting-map/ideal-loads-source-map.md"
         "node_output_timestamp_alignment" = "timestamp"
         "node_output_store_type" = "ep_runtime::ResultStore"
@@ -468,6 +477,8 @@ foreach ($case in $promotedCases) {
         "trace_level_source",
         "trace_payload",
         "trace_side_effect_policy",
+        "trace_result_invariance_policy",
+        "trace_overhead_accounting",
         "source_order_wrapper",
         "ideal_loads_invocation_path",
         "direct_calc_helper_invocation",
@@ -552,6 +563,8 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_level_source" -Expected ([string]$summary.trace_level_source) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_payload" -Expected ([string]$summary.trace_payload) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_side_effect_policy" -Expected ([string]$summary.trace_side_effect_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_result_invariance_policy" -Expected ([string]$summary.trace_result_invariance_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_overhead_accounting" -Expected ([string]$summary.trace_overhead_accounting) -Description "$($case.Id) stage summary"
     foreach ($flagName in $idealLoadsFeatureFlagNames) {
         Assert-JsonPropertyExists -Object $stageSummary.ideal_loads_feature_flags -PropertyName $flagName -Description "$($case.Id) stage summary ideal_loads_feature_flags"
         if ($stageSummary.ideal_loads_feature_flags.$flagName -ne $summary.ideal_loads_feature_flags.$flagName) {
