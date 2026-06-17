@@ -380,13 +380,16 @@ domain = "hvac"
 source_map = "docs/src/porting-map/ideal-loads-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/PurchasedAirManager.cc",
+  "src/EnergyPlus/DataSizing.cc",
   "src/EnergyPlus/DataEnvironment.hh",
   "src/EnergyPlus/OutputProcessor.cc",
 ]
 rust_target = [
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::design_outdoor_air_volume_flow_components_m3_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_design_outdoor_air_volume_flow_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE",
@@ -411,6 +414,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_zone_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_person_conformance_manifest",
+  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_area_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_air_changes_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_sum_conformance_manifest",
@@ -421,6 +425,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-conformance-candidate.ps1",
+  "scripts/compare/compare-ideal-loads-outdoor-air-occupancy-dcv-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-zone-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-area-conformance-candidate.ps1",
@@ -467,8 +472,8 @@ proof_variables = [
   "Zone Ideal Loads Economizer Active Time",
   "Zone Ideal Loads Heat Recovery Active Time",
 ]
-claim_level = "limited-ideal-loads-outdoor-air-flow-zone-flow-person-flow-area-air-changes-sum-maximum-differential-dry-bulb-differential-enthalpy-economizer-sensible-enthalpy-heat-recovery-conformance"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer, and Flow/Zone Sensible/Enthalpy heat-recovery conformance for declared mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, economizer active-time, heat-recovery active-time, and heat-recovery rate rows in ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001, ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001, ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001, and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001. General heat-recovery saturation-limit branch parity, active DCV, active humidity controls, People heat gains, and broad OA conformance remain outside the claim."
+claim_level = "limited-ideal-loads-outdoor-air-flow-zone-flow-person-occupancy-dcv-flow-area-air-changes-sum-maximum-differential-dry-bulb-differential-enthalpy-economizer-sensible-enthalpy-heat-recovery-conformance"
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour, Sum, Maximum, Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer, and Flow/Zone Sensible/Enthalpy heat-recovery conformance for declared mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, economizer active-time, heat-recovery active-time, and heat-recovery rate rows in ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001, ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001, ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001, and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001. The OccupancySchedule DCV candidate covers current People schedule occupancy only for the declared Flow/Person outdoor-air minimum-flow adjustment. General heat-recovery saturation-limit branch parity, `CO2Setpoint` DCV, broader DCV combinations, active humidity controls, People heat gains, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

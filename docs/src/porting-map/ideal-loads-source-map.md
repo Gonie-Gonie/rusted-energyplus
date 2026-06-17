@@ -51,8 +51,10 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::size_ideal_loads_air_system_compat` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
+| `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air.rs::calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s` |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result` |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot` |
+| `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
 | `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/mod.rs::ideal_loads_zone_equipment_stages` |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/mod.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/mod.rs::ZoneSysEnergyDemand` |
@@ -220,24 +222,34 @@ conformance.
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone,
-Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone
-DifferentialDryBulb/DifferentialEnthalpy economizer candidate rows. The
-current Rust surface is:
+Flow/Person, Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour,
+Sum, Maximum, Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer,
+and Flow/Zone Sensible/Enthalpy heat-recovery candidate rows. The current Rust
+surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
 - `ModelGraph::ideal_loads_outdoor_air_specs` linking an IdealLoads system to
   its referenced outdoor-air design specification
 - `People` typed intake for zone design occupant count used by the Flow/Person
-  conformance candidate and diagnostic proof lane
+  conformance candidate, current People occupancy schedule values used by the
+  Flow/Person OccupancySchedule DCV conformance candidate, and the diagnostic
+  proof lane
 - `design_outdoor_air_volume_flow_components_m3_per_s` for reporting the
   Flow/Person, Flow/Area, Flow/Zone, and AirChanges/Hour component terms plus
   the selected final design volume flow
+- `occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` for
+  source-order `UseOccSchFlag=true` Flow/Person component terms using current
+  People schedule occupancy
 - `calc_design_outdoor_air_volume_flow_m3_per_s` for supported
   `Flow/Person`, `Flow/Area`, `Flow/Zone`, `AirChanges/Hour`, `Sum`, and
   `Maximum` methods
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
+- `calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s` for the
+  EnergyPlus OccupancySchedule DCV path that recomputes the Flow/Person
+  minimum outdoor-air flow from current People schedule occupancy before the
+  `StdRhoAir` conversion
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
   Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and
   DifferentialDryBulb/DifferentialEnthalpy economizer OA report-rate and
@@ -246,6 +258,7 @@ current Rust surface is:
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
+  `manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_area_conformance_manifest`,
   `manifest_allows_outdoor_air_air_changes_conformance_manifest`,
   `manifest_allows_outdoor_air_sum_conformance_manifest`,
@@ -255,8 +268,8 @@ current Rust surface is:
   and
   `validate_outdoor_air_conformance_boundary` in
   `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone, Flow/Person,
-  Flow/Area, AirChanges/Hour, Sum, Maximum, and
-  DifferentialDryBulb/DifferentialEnthalpy economizer candidates
+  Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour, Sum, Maximum,
+  and DifferentialDryBulb/DifferentialEnthalpy economizer candidates
 
 `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -264,6 +277,20 @@ and 0.01 m3/s-person outdoor air, so the derived design volume is 0.05 m3/s
 before the `StdRhoAir` mass-flow conversion used by the rest of the outdoor-air
 lane. The People occupancy schedule is zero to avoid adding People heat gains;
 People heat-gain conformance remains outside the claim.
+
+`ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001` promotes the
+Flow/Person proof lane with `Demand Controlled Ventilation Type =
+OccupancySchedule`. The fixture declares five `People` design occupants, a
+non-constant all-days compact occupancy schedule that steps from 0.0 to 1.0 to
+0.5, a zero activity schedule, and 0.01 m3/s-person outdoor air. That isolates
+EnergyPlus `UseOccSchFlag=true` outdoor-air behavior: current People occupancy
+varies from 0 to 5 people, the minimum outdoor-air volume varies from 0.0 to
+0.05 m3/s, and People heat gains remain outside the claim. The mass/volume,
+latent, supply-air, mixed-air, and inactive proof rows keep the existing strict
+tolerances; outdoor-air sensible and total heating rows use the case-declared
+4 W absolute and 1 W RMSE tolerance for a single source-order timestep edge.
+`CO2Setpoint` DCV and broader DCV method combinations remain outside the
+claim.
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Flow/Person fixture shape.
@@ -395,8 +422,9 @@ parity is not promoted.
 
 Indoor air quality, proportional-control, heat-recovery saturation-limit
 generality, outdoor-air finite limits, outdoor-air humidity-control, other
-active humidity-control, and DCV outputs remain diagnostic or unresolved and are
-not part of the promoted IdealLoads claim.
+active humidity-control, `CO2Setpoint` DCV, and broader DCV method combinations
+remain diagnostic or unresolved and are not part of the promoted IdealLoads
+claim.
 
 ## Required Proof Variables
 
@@ -446,8 +474,8 @@ The conformance output surface is:
   `ConstantSupplyHumidityRatio` cooling/heating supply nodes only
 - `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
   `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate` for the
-  promoted Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and
-  Maximum outdoor-air candidates
+  promoted Flow/Zone, Flow/Person, Flow/Person OccupancySchedule DCV,
+  Flow/Area, AirChanges/Hour, Sum, and Maximum outdoor-air candidates
 - `Zone Ideal Loads Outdoor Air Sensible/Latent/Total Heating/Cooling Rate`
   for the no-active-humidity-control promoted outdoor-air candidates
 - `Zone Ideal Loads Supply Air Mass Flow Rate`,
@@ -500,9 +528,10 @@ its cooling, return-node humidity, zone-air humidity, energy/fuel, and meter
 rows remain diagnostic.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, and mixed-air state rows have
-promoted conformance evidence in the Flow/Zone, Flow/Person, Flow/Area,
-AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb/DifferentialEnthalpy
-economizer and Sensible/Enthalpy heat-recovery conformance candidates.
+promoted conformance evidence in the Flow/Zone, Flow/Person,
+Flow/Person OccupancySchedule DCV, Flow/Area, AirChanges/Hour, Sum, Maximum,
+and DifferentialDryBulb/DifferentialEnthalpy economizer and Sensible/Enthalpy
+heat-recovery conformance candidates.
 Inactive economizer/heat-recovery outputs and the original diagnostic
 outdoor-air predecessor fixtures remain diagnostic evidence:
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,

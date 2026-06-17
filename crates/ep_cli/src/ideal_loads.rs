@@ -69,6 +69,7 @@ use ep_runtime::{
     ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
+    calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, design_outdoor_air_volume_flow_components_m3_per_s,
@@ -115,6 +116,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEAT_RECOVERY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_ENTHALPY_HEAT_RECOVERY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001";
+const IDEAL_LOADS_OUTDOOR_AIR_OCCUPANCY_DCV_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_no_oa_facility_meter_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS: &[&str] =
@@ -321,10 +324,13 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     outdoor_air_spec_name: String,
     outdoor_air_method: DesignSpecificationOutdoorAirMethod,
     outdoor_air_node_name: String,
+    demand_controlled_ventilation_type: DemandControlledVentilationType,
     outdoor_air_economizer_type: OutdoorAirEconomizerType,
     heat_recovery_type: HeatRecoveryType,
     standard_air_density_kg_per_m3: f64,
     design_people_count: f64,
+    current_people_count_min: f64,
+    current_people_count_max: f64,
     zone_floor_area_m2: f64,
     zone_volume_m3: f64,
     flow_per_person_m3_per_s: f64,
@@ -333,6 +339,8 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     air_changes_m3_per_s: f64,
     design_volume_flow_rate_m3_per_s: f64,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
+    outdoor_air_mass_flow_rate_min_kg_per_s: f64,
+    outdoor_air_mass_flow_rate_max_kg_per_s: f64,
     sample_count: usize,
     rows: Vec<IdealLoadsDiagnosticRow>,
     result_store: ResultStore,
@@ -948,6 +956,14 @@ fn manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(
         && manifest.conformance_claim
 }
 
+fn manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_OCCUPANCY_DCV_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn manifest_allows_outdoor_air_active_economizer_conformance_manifest(
     manifest: &ConformanceCase,
 ) -> bool {
@@ -1046,42 +1062,49 @@ fn outdoor_air_conformance_expectations_for_manifest(
     DesignSpecificationOutdoorAirMethod,
     OutdoorAirEconomizerType,
     HeatRecoveryType,
+    DemandControlledVentilationType,
 )> {
     if manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_flow_person_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::FlowPerPerson,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_flow_area_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::FlowPerArea,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_air_changes_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::AirChangesPerHour,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_sum_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::Sum,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_maximum_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::Maximum,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
         manifest,
@@ -1090,6 +1113,7 @@ fn outdoor_air_conformance_expectations_for_manifest(
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::DifferentialDryBulb,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_differential_enthalpy_economizer_conformance_manifest(
         manifest,
@@ -1098,18 +1122,28 @@ fn outdoor_air_conformance_expectations_for_manifest(
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::DifferentialEnthalpy,
             HeatRecoveryType::None,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_sensible_heat_recovery_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::Sensible,
+            DemandControlledVentilationType::None,
         ))
     } else if manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(manifest) {
         Some((
             DesignSpecificationOutdoorAirMethod::FlowPerZone,
             OutdoorAirEconomizerType::NoEconomizer,
             HeatRecoveryType::Enthalpy,
+            DemandControlledVentilationType::None,
+        ))
+    } else if manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest(manifest) {
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerPerson,
+            OutdoorAirEconomizerType::NoEconomizer,
+            HeatRecoveryType::None,
+            DemandControlledVentilationType::OccupancySchedule,
         ))
     } else {
         None
@@ -1120,7 +1154,7 @@ fn outdoor_air_conformance_method_for_manifest(
     manifest: &ConformanceCase,
 ) -> Option<DesignSpecificationOutdoorAirMethod> {
     outdoor_air_conformance_expectations_for_manifest(manifest)
-        .map(|(method, _economizer, _heat_recovery)| method)
+        .map(|(method, _economizer, _heat_recovery, _dcv)| method)
 }
 
 fn outdoor_air_conformance_variable_for_manifest(
@@ -1216,9 +1250,13 @@ fn build_outdoor_air_design_flow_context<'a>(
         );
     }
 
-    validate_outdoor_air_design_flow_boundary(system, outdoor_air_specification.method)?;
-    if let Some((conformance_method, conformance_economizer, conformance_heat_recovery)) =
-        outdoor_air_conformance_expectations_for_manifest(manifest)
+    validate_outdoor_air_design_flow_boundary(system, outdoor_air_specification.method, manifest)?;
+    if let Some((
+        conformance_method,
+        conformance_economizer,
+        conformance_heat_recovery,
+        conformance_dcv,
+    )) = outdoor_air_conformance_expectations_for_manifest(manifest)
     {
         validate_outdoor_air_conformance_boundary(
             system,
@@ -1226,6 +1264,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             conformance_method,
             conformance_economizer,
             conformance_heat_recovery,
+            conformance_dcv,
         )?;
     }
 
@@ -1249,15 +1288,16 @@ fn build_outdoor_air_design_flow_context<'a>(
     .ok_or_else(|| {
         "failed to calculate IdealLoads outdoor-air design-flow components".to_string()
     })?;
-    let outdoor_air_mass_flow_rate_kg_per_s = calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
-        outdoor_air_specification,
-        outdoor_air_context,
-        None,
-        standard_air_density_kg_per_m3,
-    )
-    .ok_or_else(|| "failed to calculate IdealLoads outdoor-air mass flow".to_string())?;
+    let outdoor_air_design_mass_flow_rate_kg_per_s =
+        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
+            outdoor_air_specification,
+            outdoor_air_context,
+            None,
+            standard_air_density_kg_per_m3,
+        )
+        .ok_or_else(|| "failed to calculate IdealLoads outdoor-air mass flow".to_string())?;
     let design_volume_flow_rate_m3_per_s =
-        outdoor_air_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3;
+        outdoor_air_design_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3;
 
     let mut expected_series = Vec::with_capacity(manifest.outputs.len());
     for output in &manifest.outputs {
@@ -1312,6 +1352,50 @@ fn build_outdoor_air_design_flow_context<'a>(
     if sample_count == 0 {
         return Err("IdealLoads outdoor-air diagnostic has no samples".to_string());
     }
+    let timestamps = expected_series
+        .first()
+        .map(|series| {
+            series
+                .samples
+                .iter()
+                .take(sample_count)
+                .map(|sample| sample.timestamp.clone())
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    let current_people_counts = if system.demand_controlled_ventilation_type
+        == DemandControlledVentilationType::OccupancySchedule
+    {
+        ideal_loads_zone_current_people_counts(&model, zone, sample_count, &timestamps)?
+    } else {
+        vec![outdoor_air_context.design_people_count; sample_count]
+    };
+    let (current_people_count_min, current_people_count_max) =
+        finite_min_max(&current_people_counts);
+    let outdoor_air_mass_flow_rates = if system.demand_controlled_ventilation_type
+        == DemandControlledVentilationType::OccupancySchedule
+    {
+        current_people_counts
+            .iter()
+            .map(|current_people_count| {
+                calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s(
+                    outdoor_air_specification,
+                    outdoor_air_context,
+                    *current_people_count,
+                    None,
+                    standard_air_density_kg_per_m3,
+                )
+                .ok_or_else(|| {
+                    "failed to calculate IdealLoads OccupancySchedule DCV outdoor-air mass flow"
+                        .to_string()
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    } else {
+        vec![outdoor_air_design_mass_flow_rate_kg_per_s; sample_count]
+    };
+    let (outdoor_air_mass_flow_rate_min_kg_per_s, outdoor_air_mass_flow_rate_max_kg_per_s) =
+        finite_min_max(&outdoor_air_mass_flow_rates);
 
     let zone_timestep_hours = ideal_loads_energy_report_interval_seconds(&model) / 3600.0;
     let sample_timestep_hours = expected_series
@@ -1367,7 +1451,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             recirculation_state,
             outdoor_air_state,
             demand,
-            outdoor_air_mass_flow_rate_kg_per_s,
+            outdoor_air_mass_flow_rates[index],
             sample_timestep_hours[index],
             barometric_pressure_trace[index],
             true,
@@ -1379,6 +1463,7 @@ fn build_outdoor_air_design_flow_context<'a>(
     for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
         let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
+            system.demand_controlled_ventilation_type,
             system.outdoor_air_economizer_type,
             system.heat_recovery_type,
             standard_air_density_kg_per_m3,
@@ -1445,10 +1530,13 @@ fn build_outdoor_air_design_flow_context<'a>(
         outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
         outdoor_air_method: outdoor_air_specification.method,
         outdoor_air_node_name: outdoor_air_node_name.0.clone(),
+        demand_controlled_ventilation_type: system.demand_controlled_ventilation_type,
         outdoor_air_economizer_type: system.outdoor_air_economizer_type,
         heat_recovery_type: system.heat_recovery_type,
         standard_air_density_kg_per_m3,
         design_people_count: outdoor_air_context.design_people_count,
+        current_people_count_min,
+        current_people_count_max,
         zone_floor_area_m2: outdoor_air_context.zone_floor_area_m2,
         zone_volume_m3: outdoor_air_context.zone_volume_m3,
         flow_per_person_m3_per_s: design_flow_components.flow_per_person_m3_per_s,
@@ -1456,7 +1544,9 @@ fn build_outdoor_air_design_flow_context<'a>(
         flow_per_zone_m3_per_s: design_flow_components.flow_per_zone_m3_per_s,
         air_changes_m3_per_s: design_flow_components.air_changes_m3_per_s,
         design_volume_flow_rate_m3_per_s,
-        outdoor_air_mass_flow_rate_kg_per_s,
+        outdoor_air_mass_flow_rate_kg_per_s: outdoor_air_design_mass_flow_rate_kg_per_s,
+        outdoor_air_mass_flow_rate_min_kg_per_s,
+        outdoor_air_mass_flow_rate_max_kg_per_s,
         sample_count,
         rows,
         result_store,
@@ -1466,6 +1556,7 @@ fn build_outdoor_air_design_flow_context<'a>(
 fn validate_outdoor_air_design_flow_boundary(
     system: &IdealLoadsAirSystem,
     method: DesignSpecificationOutdoorAirMethod,
+    manifest: &ConformanceCase,
 ) -> Result<(), String> {
     if !matches!(
         method,
@@ -1481,8 +1572,23 @@ fn validate_outdoor_air_design_flow_boundary(
                 .to_string(),
         );
     }
-    if system.demand_controlled_ventilation_type != DemandControlledVentilationType::None {
-        return Err("IdealLoads outdoor-air design-flow diagnostic excludes DCV".to_string());
+    match system.demand_controlled_ventilation_type {
+        DemandControlledVentilationType::None => {}
+        DemandControlledVentilationType::OccupancySchedule
+            if manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest(manifest)
+                && method == DesignSpecificationOutdoorAirMethod::FlowPerPerson => {}
+        DemandControlledVentilationType::OccupancySchedule => {
+            return Err(
+                "IdealLoads outdoor-air design-flow diagnostic supports OccupancySchedule DCV only for the declared Flow/Person DCV conformance candidate"
+                    .to_string(),
+            );
+        }
+        DemandControlledVentilationType::Co2Setpoint => {
+            return Err(
+                "IdealLoads outdoor-air design-flow diagnostic excludes CO2Setpoint DCV"
+                    .to_string(),
+            );
+        }
     }
     if !matches!(
         system.outdoor_air_economizer_type,
@@ -1527,6 +1633,7 @@ fn validate_outdoor_air_conformance_boundary(
     expected_method: DesignSpecificationOutdoorAirMethod,
     expected_economizer: OutdoorAirEconomizerType,
     expected_heat_recovery: HeatRecoveryType,
+    expected_dcv: DemandControlledVentilationType,
 ) -> Result<(), String> {
     if method != expected_method {
         return Err(format!(
@@ -1545,6 +1652,12 @@ fn validate_outdoor_air_conformance_boundary(
         return Err(format!(
             "IdealLoads outdoor-air conformance candidate requires {} heat recovery",
             heat_recovery_label(expected_heat_recovery)
+        ));
+    }
+    if system.demand_controlled_ventilation_type != expected_dcv {
+        return Err(format!(
+            "IdealLoads outdoor-air conformance candidate requires {} demand controlled ventilation",
+            demand_controlled_ventilation_label(expected_dcv)
         ));
     }
     if system.dehumidification_control_type
@@ -1595,6 +1708,14 @@ fn heat_recovery_label(heat_recovery: HeatRecoveryType) -> &'static str {
     }
 }
 
+fn demand_controlled_ventilation_label(dcv: DemandControlledVentilationType) -> &'static str {
+    match dcv {
+        DemandControlledVentilationType::None => "None",
+        DemandControlledVentilationType::OccupancySchedule => "OccupancySchedule",
+        DemandControlledVentilationType::Co2Setpoint => "CO2Setpoint",
+    }
+}
+
 fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
     if manifest_allows_outdoor_air_flow_zone_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Flow/Zone branch for declared variables only";
@@ -1630,6 +1751,9 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     if manifest_allows_outdoor_air_enthalpy_heat_recovery_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Enthalpy heat recovery branch for declared variables only; general heat-recovery saturation-limit branch parity remains outside the claim";
     }
+    if manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest(context.manifest) {
+        return "conformance IdealLoads outdoor-air Flow/Person OccupancySchedule DCV branch for declared variables only; CO2Setpoint DCV and broader DCV methods remain outside the claim";
+    }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
     }
@@ -1650,6 +1774,12 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
 }
 
 fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
+    let dcv_source = match context.demand_controlled_ventilation_type {
+        DemandControlledVentilationType::OccupancySchedule => {
+            " plus EnergyPlus OccupancySchedule DCV current People schedule occupancy through DataSizing::calcDesignSpecificationOutdoorAir(UseOccSchFlag=true)"
+        }
+        DemandControlledVentilationType::None | DemandControlledVentilationType::Co2Setpoint => "",
+    };
     let economizer_source = match context.outdoor_air_economizer_type {
         OutdoorAirEconomizerType::DifferentialDryBulb => {
             " plus EnergyPlus DifferentialDryBulb economizer OA flow reset when outdoor dry-bulb is below recirculation dry-bulb"
@@ -1669,8 +1799,9 @@ fn outdoor_air_source_description(context: &IdealLoadsOutdoorAirDiagnosticContex
         HeatRecoveryType::None => "",
     };
     format!(
-        "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}{}",
+        "DesignSpecification:OutdoorAir {} with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows{}{}{}",
         outdoor_air_method_label(context.outdoor_air_method),
+        dcv_source,
         economizer_source,
         heat_recovery_source
     )
@@ -1690,21 +1821,126 @@ fn ideal_loads_zone_design_people_count(model: &TypedModel, zone: &Zone) -> f64 
         .people
         .iter()
         .filter(|people| people.zone == zone.id)
-        .map(|people| match people.number_of_people_calculation_method {
-            PeopleNumberCalculationMethod::People => people.number_of_people,
-            PeopleNumberCalculationMethod::PeoplePerArea => {
-                people.people_per_floor_area * zone_floor_area_m2
-            }
-            PeopleNumberCalculationMethod::AreaPerPerson => {
-                if people.floor_area_per_person > 0.0 {
-                    zone_floor_area_m2 / people.floor_area_per_person
-                } else {
-                    0.0
-                }
-            }
-        })
+        .map(|people| ideal_loads_people_design_count(people, zone_floor_area_m2))
         .filter(|value| value.is_finite() && *value > 0.0)
         .sum()
+}
+
+fn ideal_loads_zone_current_people_counts(
+    model: &SimulationModel,
+    zone: &Zone,
+    sample_count: usize,
+    timestamps: &[Option<String>],
+) -> Result<Vec<f64>, String> {
+    let zone_floor_area_m2 = ideal_loads_zone_floor_area_m2(&model.typed, zone);
+    let mut values = vec![0.0; sample_count];
+    for people in model
+        .typed
+        .people
+        .iter()
+        .filter(|people| people.zone == zone.id)
+    {
+        let design_count = ideal_loads_people_design_count(people, zone_floor_area_m2);
+        if !design_count.is_finite() || design_count <= 0.0 {
+            continue;
+        }
+        let schedule_values = ideal_loads_optional_schedule_values(
+            model,
+            people.number_of_people_schedule,
+            &format!("People/{} number-of-people", people.name.0),
+            sample_count,
+            timestamps,
+        )?;
+        for (value, schedule_value) in values.iter_mut().zip(schedule_values.iter()) {
+            if !schedule_value.is_finite() || *schedule_value < 0.0 {
+                return Err(format!(
+                    "IdealLoads OccupancySchedule DCV requires nonnegative finite People schedule values, got {} for {}",
+                    schedule_value, people.name.0
+                ));
+            }
+            *value += design_count * schedule_value;
+        }
+    }
+    Ok(values)
+}
+
+fn ideal_loads_people_design_count(people: &ep_model::People, zone_floor_area_m2: f64) -> f64 {
+    match people.number_of_people_calculation_method {
+        PeopleNumberCalculationMethod::People => people.number_of_people,
+        PeopleNumberCalculationMethod::PeoplePerArea => {
+            people.people_per_floor_area * zone_floor_area_m2
+        }
+        PeopleNumberCalculationMethod::AreaPerPerson => {
+            if people.floor_area_per_person > 0.0 {
+                zone_floor_area_m2 / people.floor_area_per_person
+            } else {
+                0.0
+            }
+        }
+    }
+}
+
+fn ideal_loads_optional_schedule_values(
+    model: &SimulationModel,
+    schedule_id: Option<ScheduleId>,
+    label: &str,
+    sample_count: usize,
+    timestamps: &[Option<String>],
+) -> Result<Vec<f64>, String> {
+    let Some(schedule_id) = schedule_id else {
+        return Ok(vec![1.0; sample_count]);
+    };
+    if let Some(schedule) = model
+        .typed
+        .schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+    {
+        return Ok(vec![schedule.hourly_value; sample_count]);
+    }
+    let schedule = model
+        .typed
+        .compact_schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
+        .ok_or_else(|| {
+            format!(
+                "IdealLoads {label} supports blank, Schedule:Constant, or all-days Schedule:Compact schedules"
+            )
+        })?;
+    let mut values = Vec::with_capacity(sample_count);
+    for index in 0..sample_count {
+        let timestamp = timestamps
+            .get(index)
+            .and_then(|timestamp| timestamp.as_deref());
+        let minute_of_day = minute_of_day_from_timestamp(timestamp).ok_or_else(|| {
+            format!(
+                "IdealLoads {label} Schedule:Compact requires timestamped detailed sample {index}"
+            )
+        })?;
+        let value = compact_schedule_value(&schedule.segments, minute_of_day).ok_or_else(|| {
+            format!(
+                "IdealLoads {label} schedule {} has no value for minute {}",
+                schedule.name.0, minute_of_day
+            )
+        })?;
+        values.push(value);
+    }
+    Ok(values)
+}
+
+fn finite_min_max(values: &[f64]) -> (f64, f64) {
+    let mut min_value = f64::INFINITY;
+    let mut max_value = f64::NEG_INFINITY;
+    for value in values.iter().copied().filter(|value| value.is_finite()) {
+        min_value = min_value.min(value);
+        max_value = max_value.max(value);
+    }
+    if min_value == f64::INFINITY {
+        (0.0, 0.0)
+    } else {
+        (min_value, max_value)
+    }
 }
 
 fn ideal_loads_zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
@@ -1776,6 +2012,7 @@ fn ideal_loads_bounding_box_volume_m3(model: &TypedModel, zone: &Zone) -> Option
 
 fn outdoor_air_observed_values(
     output: &OutputRequest,
+    demand_controlled_ventilation_type: DemandControlledVentilationType,
     outdoor_air_economizer_type: OutdoorAirEconomizerType,
     heat_recovery_type: HeatRecoveryType,
     standard_air_density_kg_per_m3: f64,
@@ -1787,6 +2024,10 @@ fn outdoor_air_observed_values(
         .any(|result| result.economizer_active_time_hr > 0.0)
     {
         outdoor_air_economizer_source(outdoor_air_economizer_type)
+    } else if demand_controlled_ventilation_type
+        == DemandControlledVentilationType::OccupancySchedule
+    {
+        "rust-ideal-loads-outdoor-air-occupancy-schedule-dcv"
     } else {
         "rust-ideal-loads-outdoor-air-design-flow"
     };
@@ -4649,6 +4890,10 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         outdoor_air_source_description(context)
     ));
     report.push_str("outdoor_air_schedule: blank-always-1.0\n");
+    report.push_str(&format!(
+        "demand_controlled_ventilation_type: {}\n",
+        demand_controlled_ventilation_label(context.demand_controlled_ventilation_type)
+    ));
     report.push_str(&format!("oracle_version: {}\n", manifest.oracle_version));
     report.push_str(&format!("zone: {}\n", markdown_cell(&context.zone_name)));
     report.push_str(&format!(
@@ -4670,6 +4915,14 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "design_people_count: {:.15}\n",
         context.design_people_count
+    ));
+    report.push_str(&format!(
+        "current_people_count_min: {:.15}\n",
+        context.current_people_count_min
+    ));
+    report.push_str(&format!(
+        "current_people_count_max: {:.15}\n",
+        context.current_people_count_max
     ));
     report.push_str(&format!(
         "zone_floor_area_m2: {:.15}\n",
@@ -4697,8 +4950,16 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         context.design_volume_flow_rate_m3_per_s
     ));
     report.push_str(&format!(
-        "outdoor_air_mass_flow_rate_kg_per_s: {:.15}\n\n",
+        "outdoor_air_mass_flow_rate_kg_per_s: {:.15}\n",
         context.outdoor_air_mass_flow_rate_kg_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_mass_flow_rate_min_kg_per_s: {:.15}\n",
+        context.outdoor_air_mass_flow_rate_min_kg_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_mass_flow_rate_max_kg_per_s: {:.15}\n\n",
+        context.outdoor_air_mass_flow_rate_max_kg_per_s
     ));
 
     report.push_str("## Result\n\n");
@@ -4806,6 +5067,12 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string(&outdoor_air_source_description(context))
     ));
     json.push_str(&format!(
+        "  \"demand_controlled_ventilation_type\": {},\n",
+        json_string(demand_controlled_ventilation_label(
+            context.demand_controlled_ventilation_type
+        ))
+    ));
+    json.push_str(&format!(
         "  \"zone_demand_source\": {},\n",
         json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
     ));
@@ -4868,6 +5135,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_number(context.design_people_count)
     ));
     json.push_str(&format!(
+        "  \"current_people_count_min\": {},\n",
+        json_number(context.current_people_count_min)
+    ));
+    json.push_str(&format!(
+        "  \"current_people_count_max\": {},\n",
+        json_number(context.current_people_count_max)
+    ));
+    json.push_str(&format!(
         "  \"zone_floor_area_m2\": {},\n",
         json_number(context.zone_floor_area_m2)
     ));
@@ -4898,6 +5173,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"outdoor_air_mass_flow_rate_kg_per_s\": {},\n",
         json_number(context.outdoor_air_mass_flow_rate_kg_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_min_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_min_kg_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_max_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_max_kg_per_s)
     ));
     json.push_str(&format!("  \"samples\": {},\n", context.sample_count));
     json.push_str(&format!("  \"series_count\": {},\n", context.rows.len()));
@@ -5145,6 +5428,12 @@ fn render_outdoor_air_stage_summary_json(
     ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
     json.push_str(&format!(
+        "  \"demand_controlled_ventilation_type\": {},\n",
+        json_string(demand_controlled_ventilation_label(
+            context.demand_controlled_ventilation_type
+        ))
+    ));
+    json.push_str(&format!(
         "  \"economizer\": {},\n",
         json_string(outdoor_air_economizer_label(
             context.outdoor_air_economizer_type
@@ -5200,6 +5489,14 @@ fn render_outdoor_air_stage_summary_json(
         json_number(context.design_people_count)
     ));
     json.push_str(&format!(
+        "  \"current_people_count_min\": {},\n",
+        json_number(context.current_people_count_min)
+    ));
+    json.push_str(&format!(
+        "  \"current_people_count_max\": {},\n",
+        json_number(context.current_people_count_max)
+    ));
+    json.push_str(&format!(
         "  \"zone_floor_area_m2\": {},\n",
         json_number(context.zone_floor_area_m2)
     ));
@@ -5230,6 +5527,14 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!(
         "  \"outdoor_air_mass_flow_rate_kg_per_s\": {},\n",
         json_number(context.outdoor_air_mass_flow_rate_kg_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_min_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_min_kg_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_mass_flow_rate_max_kg_per_s\": {},\n",
+        json_number(context.outdoor_air_mass_flow_rate_max_kg_per_s)
     ));
     json.push_str("  \"stages\": [\n");
     let stages = ideal_loads_zone_equipment_stages();

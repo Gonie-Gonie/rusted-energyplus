@@ -108,6 +108,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-outdoor-air-flow-area-conformance-candidate` | conformance | run the IdealLoads Flow/Area outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-area-conformance` |
 | `compare-ideal-loads-outdoor-air-flow-zone-conformance-candidate` | conformance | run the IdealLoads Flow/Zone outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-zone-conformance` |
 | `compare-ideal-loads-outdoor-air-flow-person-conformance-candidate` | conformance | run the IdealLoads Flow/Person outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-person-conformance` |
+| `compare-ideal-loads-outdoor-air-occupancy-dcv-conformance-candidate` | conformance | run the IdealLoads OccupancySchedule DCV outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-occupancy-dcv-conformance` |
 | `compare-ideal-loads-outdoor-air-flow-person-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Person outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-person` |
 | `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |
 | `compare-ideal-loads-outdoor-air-maximum-conformance-candidate` | conformance | run the IdealLoads Maximum outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-maximum-conformance` |

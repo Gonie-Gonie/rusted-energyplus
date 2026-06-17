@@ -114,9 +114,40 @@ pub fn design_outdoor_air_volume_flow_components_m3_per_s(
     specification: &DesignSpecificationOutdoorAir,
     context: IdealLoadsOutdoorAirContext,
 ) -> Option<IdealLoadsOutdoorAirDesignFlowComponents> {
+    design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
+        specification,
+        context,
+        context.design_people_count,
+    )
+}
+
+/// Calculates outdoor-air volume flow with OccupancySchedule DCV current people.
+///
+/// EnergyPlus `CalcPurchAirMinOAMassFlow` calls
+/// `DataSizing::calcDesignSpecificationOutdoorAir` with `UseOccSchFlag=true`
+/// for `OccupancySchedule` DCV, which replaces design occupants with the
+/// current scheduled occupants for the per-person term.
+#[must_use]
+pub fn occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s(
+    specification: &DesignSpecificationOutdoorAir,
+    context: IdealLoadsOutdoorAirContext,
+    current_people_count: f64,
+) -> Option<IdealLoadsOutdoorAirDesignFlowComponents> {
+    design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
+        specification,
+        context,
+        current_people_count,
+    )
+}
+
+fn design_outdoor_air_volume_flow_components_for_people_count_m3_per_s(
+    specification: &DesignSpecificationOutdoorAir,
+    context: IdealLoadsOutdoorAirContext,
+    people_count: f64,
+) -> Option<IdealLoadsOutdoorAirDesignFlowComponents> {
     let per_person = nonnegative_product(
         specification.outdoor_air_flow_per_person_m3_per_s_person,
-        context.design_people_count,
+        people_count,
     );
     let per_area = nonnegative_product(
         specification.outdoor_air_flow_per_zone_floor_area_m3_per_s_m2,
@@ -184,6 +215,32 @@ pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
     )
 }
 
+/// Applies OccupancySchedule DCV current people, OA schedule, and StdRhoAir.
+#[must_use]
+pub fn calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s(
+    specification: &DesignSpecificationOutdoorAir,
+    context: IdealLoadsOutdoorAirContext,
+    current_people_count: f64,
+    schedule_value: Option<f64>,
+    standard_air_density_kg_per_m3: f64,
+) -> Option<f64> {
+    if !standard_air_density_kg_per_m3.is_finite() || standard_air_density_kg_per_m3 < 0.0 {
+        return None;
+    }
+    let dcv_volume_flow_m3_per_s =
+        occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s(
+            specification,
+            context,
+            current_people_count,
+        )?
+        .final_design_volume_flow_rate_m3_per_s;
+    Some(
+        dcv_volume_flow_m3_per_s
+            * schedule_multiplier(schedule_value)
+            * standard_air_density_kg_per_m3,
+    )
+}
+
 /// Calculates diagnostic-only IdealLoads outdoor-air report rates and mixed-air state.
 ///
 /// This mirrors the no-economizer/no-heat-recovery/no-humidity/no-limit subset:
@@ -207,16 +264,9 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         } else {
             0.0
         };
-    if !unit_available
-        || (outdoor_air_mass_flow_rate_kg_per_s <= 0.0
-            && system.outdoor_air_economizer_type == OutdoorAirEconomizerType::NoEconomizer)
-    {
+    if !unit_available {
         return IdealLoadsOutdoorAirSensibleResult {
-            mode: if unit_available {
-                IdealLoadsSensibleMode::Deadband
-            } else {
-                IdealLoadsSensibleMode::Off
-            },
+            mode: IdealLoadsSensibleMode::Off,
             minimum_outdoor_air_sensible_output_w: 0.0,
             outdoor_air_mass_flow_rate_kg_per_s: 0.0,
             outdoor_air_sensible_output_w: 0.0,
@@ -777,6 +827,10 @@ fn nonnegative(value: f64) -> f64 {
 fn nonnegative_product(left: f64, right: f64) -> f64 {
     nonnegative(left) * nonnegative(right)
 }
+
+#[cfg(test)]
+#[path = "outdoor_air_dcv_tests.rs"]
+mod outdoor_air_dcv_tests;
 
 #[cfg(test)]
 mod tests {
