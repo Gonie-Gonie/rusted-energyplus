@@ -12,10 +12,11 @@ pub use design_flow::*;
 
 use crate::{
     energyplus_moist_air_specific_heat_j_per_kg_k,
-    ideal_loads::{IdealLoadsSensibleMode, moist_air_enthalpy_j_per_kg},
+    ideal_loads::{IdealLoadsInitFlags, IdealLoadsSensibleMode, moist_air_enthalpy_j_per_kg},
+    node::IdealLoadsSupplyNodeUpdate,
     zone_equipment::ZoneSysEnergyDemand,
 };
-use ep_model::IdealLoadsAirSystem;
+use ep_model::{IdealLoadsAirSystem, IdealLoadsAirSystemId, NodeId};
 
 use economizer::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s;
 use mixed_air::mixed_air_state;
@@ -87,6 +88,109 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
     pub heat_recovery_total_cooling_rate_w: f64,
     /// Reported heat-recovery active time for this system timestep.
     pub heat_recovery_active_time_hr: f64,
+}
+
+/// Inputs consumed by the outdoor-air source-order PurchasedAir wrapper.
+#[derive(Clone, Copy, Debug)]
+pub struct SimPurchasedAirOutdoorAirCompatInput<'a> {
+    /// Prebound typed IdealLoads system.
+    pub system: &'a IdealLoadsAirSystem,
+    /// Resolved supply node to update.
+    pub supply_node: NodeId,
+    /// Zone state visible to `CalcPurchAirLoads`.
+    pub zone_state: IdealLoadsOutdoorAirNodeState,
+    /// Recirculation/mixed-air inlet state.
+    pub recirculation_state: IdealLoadsOutdoorAirNodeState,
+    /// Outdoor-air inlet state.
+    pub outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    /// Source-order zone demand snapshot.
+    pub demand: ZoneSysEnergyDemand,
+    /// Minimum outdoor-air mass flow after design-flow/DCV scheduling.
+    pub minimum_outdoor_air_mass_flow_rate_kg_per_s: f64,
+    /// System timestep used by active-time report variables.
+    pub system_timestep_hours: f64,
+    /// Barometric pressure used by heat-recovery saturation handling.
+    pub barometric_pressure_pa: f64,
+    /// Availability-schedule result for this timestep.
+    pub unit_available: bool,
+}
+
+/// Outdoor-air PurchasedAir wrapper result in source order.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SimPurchasedAirOutdoorAirCompatOutput {
+    /// Typed IdealLoads system ID used instead of a runtime string lookup.
+    pub system_id: IdealLoadsAirSystemId,
+    /// Rust-visible branch selected inside `CalcPurchAirLoads`.
+    pub selected_branch: &'static str,
+    /// `InitPurchasedAir` equivalent flags.
+    pub init_flags: IdealLoadsInitFlags,
+    /// `CalcPurchAirLoads` equivalent outdoor-air result.
+    pub calculation: IdealLoadsOutdoorAirSensibleResult,
+    /// `UpdatePurchasedAir` equivalent node write.
+    pub supply_node_update: IdealLoadsSupplyNodeUpdate,
+    /// Optional diagnostic trace payload for source-order auditing.
+    pub trace: IdealLoadsOutdoorAirPurchasedAirTrace,
+}
+
+/// Diagnostic trace payload for the outdoor-air PurchasedAir wrapper.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct IdealLoadsOutdoorAirPurchasedAirTrace {
+    /// Zone state consumed by the calc stage.
+    pub zone_state: IdealLoadsOutdoorAirNodeState,
+    /// Recirculation state consumed by the calc stage.
+    pub recirculation_state: IdealLoadsOutdoorAirNodeState,
+    /// Outdoor-air state consumed by the calc stage.
+    pub outdoor_air_state: IdealLoadsOutdoorAirNodeState,
+    /// Zone demand consumed by the calc stage.
+    pub demand: ZoneSysEnergyDemand,
+    /// Minimum outdoor-air mass flow consumed by the calc stage.
+    pub minimum_outdoor_air_mass_flow_rate_kg_per_s: f64,
+}
+
+/// Executes the outdoor-air source-order `SimPurchasedAir` equivalent.
+#[must_use]
+pub fn sim_purchased_air_outdoor_air_compat(
+    input: SimPurchasedAirOutdoorAirCompatInput<'_>,
+) -> SimPurchasedAirOutdoorAirCompatOutput {
+    let init_flags = IdealLoadsInitFlags::source_order_candidate();
+    let calculation = calc_outdoor_air_sensible_report_rates_compat(
+        input.system,
+        input.zone_state,
+        input.recirculation_state,
+        input.outdoor_air_state,
+        input.demand,
+        input.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        input.system_timestep_hours,
+        input.barometric_pressure_pa,
+        input.unit_available,
+    );
+    let supply_node_update = IdealLoadsSupplyNodeUpdate {
+        node: input.supply_node,
+        temperature_c: calculation.supply_air_temperature_c,
+        humidity_ratio: calculation.supply_air_humidity_ratio,
+        mass_flow_rate_kg_per_s: calculation.supply_mass_flow_rate_kg_per_s,
+        enthalpy_j_per_kg: moist_air_enthalpy_j_per_kg(
+            calculation.supply_air_temperature_c,
+            calculation.supply_air_humidity_ratio,
+        ),
+    };
+    let trace = IdealLoadsOutdoorAirPurchasedAirTrace {
+        zone_state: input.zone_state,
+        recirculation_state: input.recirculation_state,
+        outdoor_air_state: input.outdoor_air_state,
+        demand: input.demand,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s: input
+            .minimum_outdoor_air_mass_flow_rate_kg_per_s,
+    };
+
+    SimPurchasedAirOutdoorAirCompatOutput {
+        system_id: input.system.id,
+        selected_branch: "outdoor_air",
+        init_flags,
+        calculation,
+        supply_node_update,
+        trace,
+    }
 }
 
 /// Calculates diagnostic-only IdealLoads outdoor-air report rates and mixed-air state.

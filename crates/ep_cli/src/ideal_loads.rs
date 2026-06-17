@@ -29,8 +29,9 @@ use ep_runtime::{
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
     OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRegistry,
-    SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
-    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+    SimPurchasedAirCompatInput, SimPurchasedAirOutdoorAirCompatInput,
+    ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
+    ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
@@ -70,12 +71,12 @@ use ep_runtime::{
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
-    calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, design_outdoor_air_volume_flow_components_m3_per_s,
     ideal_loads_facility_meter_binding, ideal_loads_zone_equipment_stages, load_epw_records,
     purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
-    surface_area_m2, validate_ideal_loads_zone_equipment_dispatch,
+    sim_purchased_air_outdoor_air_compat, surface_area_m2,
+    validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -217,6 +218,10 @@ const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus re
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
 const IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT: &str = "timestamp";
+const IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER: &str =
+    "ep_runtime::ideal_loads::sim_purchased_air_compat";
+const IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER: &str =
+    "ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -1300,6 +1305,18 @@ fn build_outdoor_air_design_flow_context<'a>(
         .iter()
         .find(|system| system.id == edge.ideal_loads_air_system)
         .ok_or_else(|| "missing IdealLoads system for graph edge".to_string())?;
+    let supply_edge = model
+        .graph
+        .ideal_loads_supply_nodes
+        .iter()
+        .find(|candidate| candidate.ideal_loads_air_system == system.id)
+        .ok_or_else(|| "missing IdealLoads supply-node edge".to_string())?;
+    let supply_node = model
+        .typed
+        .nodes
+        .iter()
+        .find(|node| node.id == supply_edge.node)
+        .ok_or_else(|| "missing IdealLoads supply node".to_string())?;
     let zone_equipment_dispatch = validate_ideal_loads_zone_equipment_dispatch(&model, system.id);
     if !zone_equipment_dispatch.is_dispatchable() {
         return Err(format!(
@@ -1572,17 +1589,20 @@ fn build_outdoor_air_design_flow_context<'a>(
             heating_demand.samples[index].value,
             cooling_demand.samples[index].value,
         );
-        sensible_results.push(calc_outdoor_air_sensible_report_rates_compat(
-            system,
-            zone_state,
-            recirculation_state,
-            outdoor_air_state,
-            demand,
-            outdoor_air_mass_flow_rates[index],
-            sample_timestep_hours[index],
-            barometric_pressure_trace[index],
-            true,
-        ));
+        let purchased_air =
+            sim_purchased_air_outdoor_air_compat(SimPurchasedAirOutdoorAirCompatInput {
+                system,
+                supply_node: supply_node.id,
+                zone_state,
+                recirculation_state,
+                outdoor_air_state,
+                demand,
+                minimum_outdoor_air_mass_flow_rate_kg_per_s: outdoor_air_mass_flow_rates[index],
+                system_timestep_hours: sample_timestep_hours[index],
+                barometric_pressure_pa: barometric_pressure_trace[index],
+                unit_available: true,
+            });
+        sensible_results.push(purchased_air.calculation);
     }
 
     let mut rows = Vec::new();
@@ -4998,7 +5018,10 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         .join(" -> ");
     let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
     let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
-    report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "source_order_wrapper: {}\n",
+        IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER
+    ));
     report.push_str(&format!(
         "zone_equipment_dispatch_path: {}\n",
         IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH
@@ -5195,7 +5218,10 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         .join(" -> ");
     let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
     let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
-    report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "source_order_wrapper: {}\n",
+        IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER
+    ));
     report.push_str(&format!(
         "zone_equipment_dispatch_path: {}\n",
         IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH

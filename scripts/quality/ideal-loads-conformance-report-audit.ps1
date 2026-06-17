@@ -304,12 +304,18 @@ foreach ($case in $promotedCases) {
     if (@($summary.zone_equipment_dispatch_warnings).Count -ne 0) {
         throw "$($case.Id) compare summary zone_equipment_dispatch_warnings must be empty"
     }
+    $expectedSourceOrderWrapper = if ($summary.selected_purchased_air_branch -eq "outdoor_air") {
+        "ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat"
+    }
+    else {
+        "ep_runtime::ideal_loads::sim_purchased_air_compat"
+    }
     $reportFieldExpectations = [ordered]@{
         "case_id" = $case.Id
         "comparison_class" = "conformance"
         "conformance_claim" = "true"
         "status" = "pass"
-        "source_order_wrapper" = "ep_runtime::ideal_loads::sim_purchased_air_compat"
+        "source_order_wrapper" = $expectedSourceOrderWrapper
         "zone_equipment_dispatch_path" = "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir"
         "zone_equipment_dispatch_validation" = "pass"
         "zone_equipment_conformance_candidate" = "pass"

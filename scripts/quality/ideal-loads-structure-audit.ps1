@@ -249,6 +249,7 @@ Assert-Contains -Path $outdoorAirMixedAir -Pattern 'fn heat_recovery_allows_outd
 Assert-Contains -Path $outdoorAirPsychrometrics -Pattern 'fn heat_recovery_saturation_adjusted_state\s*\(' -Description "heat recovery saturation helper"
 Assert-Contains -Path $outdoorAirSupply -Pattern 'fn outdoor_air_supply_mass_flow_rate_kg_per_s\s*\(' -Description "outdoor-air supply mass-flow helper"
 Assert-Contains -Path $outdoorAirSupply -Pattern 'fn supply_air_state\s*\(' -Description "outdoor-air supply state helper"
+Assert-Contains -Path $outdoorAir -Pattern 'pub fn sim_purchased_air_outdoor_air_compat\s*\(' -Description "outdoor-air source-order wrapper"
 Assert-NotContains -Path $outdoorAir -Pattern 'pub fn design_outdoor_air_volume_flow_components_m3_per_s\s*\(' -Description "outdoor-air design-flow component helper in outdoor-air root"
 Assert-NotContains -Path $outdoorAir -Pattern 'pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s\s*\(' -Description "outdoor-air scheduled mass-flow helper in outdoor-air root"
 Assert-NotContains -Path $outdoorAir -Pattern 'fn nonnegative_product\s*\(' -Description "outdoor-air design-flow scalar helper in outdoor-air root"
@@ -334,5 +335,7 @@ Assert-Contains -Path $runtime -Pattern 'ExecutionStep::EvaluateIdealLoadsAirSys
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_path' -Description "IdealLoads report zone-equipment dispatch path metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_validation' -Description "IdealLoads report zone-equipment dispatch validation metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_conformance_candidate' -Description "IdealLoads report zone-equipment conformance-candidate metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'sim_purchased_air_outdoor_air_compat' -Description "IdealLoads outdoor-air report generator uses source-order wrapper"
+Assert-NotContains -Path $idealLoadsCli -Pattern 'calc_outdoor_air_sensible_report_rates_compat' -Description "direct outdoor-air calc helper call in report generator"
 
 Write-Host "IdealLoads structure audit complete."

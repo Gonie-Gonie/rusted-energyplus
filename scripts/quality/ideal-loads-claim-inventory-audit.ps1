@@ -128,7 +128,7 @@ function Assert-ConformanceGateReportMetadataGuards {
         "tolerance_failures",
         "conformanceRows",
         "diagnostic",
-        "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat",
+        "source_order_wrapper:",
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",

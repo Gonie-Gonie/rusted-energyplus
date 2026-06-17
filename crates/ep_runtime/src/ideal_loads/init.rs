@@ -16,9 +16,9 @@ pub struct IdealLoadsInitFlags {
 }
 
 impl IdealLoadsInitFlags {
-    /// Returns the initialized flag set for the no-OA/no-limit candidate.
+    /// Returns the initialized flag set for a source-order PurchasedAir candidate.
     #[must_use]
-    pub const fn no_oa_no_limit_candidate() -> Self {
+    pub const fn source_order_candidate() -> Self {
         Self {
             one_time_checked: true,
             environment_initialized: true,
@@ -26,5 +26,11 @@ impl IdealLoadsInitFlags {
             equipment_list_checked: true,
             return_plenum_inactive: true,
         }
+    }
+
+    /// Returns the initialized flag set for the no-OA/no-limit candidate.
+    #[must_use]
+    pub const fn no_oa_no_limit_candidate() -> Self {
+        Self::source_order_candidate()
     }
 }
