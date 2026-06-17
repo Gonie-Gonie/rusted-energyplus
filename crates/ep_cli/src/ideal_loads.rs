@@ -11,7 +11,7 @@ use ep_conformance::{
     OutputRequest, SourceArtifact, VariableClass,
 };
 use ep_model::{
-    AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType,
+    AutoOrNumber, AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType,
     OutputHandle, PeopleNumberCalculationMethod, ScheduleId, SimulationModel, SurfaceType,
@@ -60,7 +60,8 @@ use ep_runtime::{
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
-    purchased_air_source_order_stages, sim_purchased_air_compat, surface_area_m2,
+    purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
+    surface_area_m2,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -98,6 +99,8 @@ const IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
+const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
+const IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT: &str = "timestamp";
 
 pub(crate) struct IdealLoadsDiagnosticReportSummary {
     pub(crate) baseline: BaselineSummary,
@@ -121,6 +124,9 @@ struct IdealLoadsDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
     branch: &'static str,
+    selected_purchased_air_branch: &'static str,
+    declared_ideal_loads_branch: &'static str,
+    inactive_branches: Vec<&'static str>,
     constant_shr_conformance_claim: bool,
     zone_name: String,
     zone_air_node_name: String,
@@ -1451,12 +1457,18 @@ fn build_context<'a>(
     let system_name = system.name.0.clone();
     let supply_node_name = supply_node.name.0.clone();
     let branch = ideal_loads_sensible_branch(system);
+    let selected_purchased_air_branch = select_purchased_air_branch(system).label();
+    let declared_ideal_loads_branch = declared_ideal_loads_branch(manifest, system);
+    let inactive_branches = inactive_ideal_loads_branches(system);
     let constant_shr_conformance_claim = manifest_allows_constant_shr_conformance(manifest, system);
 
     Ok(IdealLoadsDiagnosticContext {
         manifest,
         baseline,
         branch,
+        selected_purchased_air_branch,
+        declared_ideal_loads_branch,
+        inactive_branches,
         constant_shr_conformance_claim,
         zone_name,
         zone_air_node_name,
@@ -2813,6 +2825,59 @@ fn ideal_loads_sensible_branch(system: &IdealLoadsAirSystem) -> &'static str {
     }
 }
 
+fn inactive_ideal_loads_branches(system: &IdealLoadsAirSystem) -> Vec<&'static str> {
+    let mut branches = Vec::new();
+    if !uses_outdoor_air(system) {
+        branches.push("outdoor_air");
+    }
+    if system.outdoor_air_economizer_type == OutdoorAirEconomizerType::NoEconomizer {
+        branches.push("economizer");
+    }
+    if system.heat_recovery_type == HeatRecoveryType::None {
+        branches.push("heat_recovery");
+    }
+    if system.dehumidification_control_type != DehumidificationControlType::Humidistat
+        && system.humidification_control_type != HumidificationControlType::Humidistat
+    {
+        branches.push("humidistat");
+    }
+    if system.demand_controlled_ventilation_type == DemandControlledVentilationType::None {
+        branches.push("dcv");
+    }
+    if !uses_autosizing(system) {
+        branches.push("autosizing");
+    }
+    branches.push("saturation_limit");
+    branches
+}
+
+fn declared_ideal_loads_branch(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> &'static str {
+    if manifest.id.contains("constant_supply_humidity_heating") {
+        "constant_supply_humidity_heating"
+    } else if manifest.id.contains("constant_supply_humidity") {
+        "constant_supply_humidity_cooling"
+    } else if manifest.id.contains("humidistat_dehumidification") {
+        "humidistat_dehumidification"
+    } else if manifest.id.contains("humidistat_humidification") {
+        "humidistat_humidification"
+    } else if manifest.id.contains("constant_shr") {
+        "constant_shr"
+    } else if manifest.id.contains("flow_capacity_limit") {
+        "flow_and_capacity"
+    } else if manifest.id.contains("flow_limit") {
+        "finite_flow"
+    } else if manifest.id.contains("capacity_limit") {
+        "finite_capacity"
+    } else if uses_finite_limits(system) {
+        select_purchased_air_branch(system).label()
+    } else {
+        "no_oa_sensible"
+    }
+}
+
 fn ideal_loads_recirculation_state_source(branch: &str) -> &'static str {
     if branch == "no-oa-finite-limit-sensible" {
         IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE
@@ -2832,6 +2897,35 @@ fn rust_result_source(system: &IdealLoadsAirSystem) -> &'static str {
 fn uses_finite_limits(system: &IdealLoadsAirSystem) -> bool {
     system.heating_limit != IdealLoadsLimit::NoLimit
         || system.cooling_limit != IdealLoadsLimit::NoLimit
+}
+
+fn uses_outdoor_air(system: &IdealLoadsAirSystem) -> bool {
+    system
+        .design_specification_outdoor_air_object_name
+        .is_some()
+        || system.outdoor_air_inlet_node_name.is_some()
+}
+
+fn uses_autosizing(system: &IdealLoadsAirSystem) -> bool {
+    system
+        .design_specification_zonehvac_sizing_object_name
+        .is_some()
+        || matches!(
+            system.maximum_heating_air_flow_rate_m3_per_s,
+            Some(AutosizeOrNumber::Autosize)
+        )
+        || matches!(
+            system.maximum_sensible_heating_capacity_w,
+            Some(AutosizeOrNumber::Autosize)
+        )
+        || matches!(
+            system.maximum_cooling_air_flow_rate_m3_per_s,
+            Some(AutosizeOrNumber::Autosize)
+        )
+        || matches!(
+            system.maximum_total_cooling_capacity_w,
+            Some(AutosizeOrNumber::Autosize)
+        )
 }
 
 fn uses_ideal_loads_humidity_control(system: &IdealLoadsAirSystem) -> bool {
@@ -3241,6 +3335,26 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         .collect::<Vec<_>>()
         .join(" -> ");
     report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "selected_purchased_air_branch: {}\n",
+        context.selected_purchased_air_branch
+    ));
+    report.push_str(&format!(
+        "declared_ideal_loads_branch: {}\n",
+        context.declared_ideal_loads_branch
+    ));
+    report.push_str(&format!(
+        "inactive_branches: {}\n",
+        context.inactive_branches.join(", ")
+    ));
+    report.push_str(&format!(
+        "source_map_anchor: {}\n",
+        IDEAL_LOADS_SOURCE_MAP_ANCHOR
+    ));
+    report.push_str(&format!(
+        "node_output_timestamp_alignment: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT
+    ));
     report.push_str(&format!(
         "purchased_air_source_order: {}\n",
         purchased_air_source_order
@@ -3909,6 +4023,26 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
     json.push_str(&format!(
+        "  \"source_map_anchor\": {},\n",
+        json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_timestamp_alignment\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
+    json.push_str(&format!(
+        "  \"selected_purchased_air_branch\": {},\n",
+        json_string(context.selected_purchased_air_branch)
+    ));
+    json.push_str(&format!(
+        "  \"declared_ideal_loads_branch\": {},\n",
+        json_string(context.declared_ideal_loads_branch)
+    ));
+    json.push_str(&format!(
+        "  \"inactive_branches\": {},\n",
+        json_string_array(&context.inactive_branches)
+    ));
+    json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
         json_string(context.fuel_efficiency.report_source)
     ));
@@ -4063,6 +4197,18 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     }
     json.push_str("  ]\n");
     json.push_str("}\n");
+    json
+}
+
+fn json_string_array(values: &[&str]) -> String {
+    let mut json = String::from("[");
+    for (index, value) in values.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&json_string(value));
+    }
+    json.push(']');
     json
 }
 
@@ -4320,6 +4466,26 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         json_string(&context.manifest.id)
     ));
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
+    json.push_str(&format!(
+        "  \"selected_purchased_air_branch\": {},\n",
+        json_string(context.selected_purchased_air_branch)
+    ));
+    json.push_str(&format!(
+        "  \"declared_ideal_loads_branch\": {},\n",
+        json_string(context.declared_ideal_loads_branch)
+    ));
+    json.push_str(&format!(
+        "  \"inactive_branches\": {},\n",
+        json_string_array(&context.inactive_branches)
+    ));
+    json.push_str(&format!(
+        "  \"source_map_anchor\": {},\n",
+        json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_timestamp_alignment\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
     json.push_str("  \"outdoor_air\": false,\n");
     json.push_str("  \"economizer\": \"NoEconomizer\",\n");
     json.push_str("  \"heat_recovery\": \"None\",\n");

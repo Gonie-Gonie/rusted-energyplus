@@ -279,6 +279,12 @@ $stageSummary = Get-Content -LiteralPath $stageSummaryPath -Raw | ConvertFrom-Js
 if ($stageSummary.branch -ne "no-oa-no-limit-sensible") {
     throw "Unexpected IdealLoads branch: $($stageSummary.branch)"
 }
+if ($stageSummary.selected_purchased_air_branch -ne "constant_shr") {
+    throw "Unexpected PurchasedAir branch: $($stageSummary.selected_purchased_air_branch)"
+}
+if ($stageSummary.declared_ideal_loads_branch -ne "no_oa_sensible") {
+    throw "Unexpected declared IdealLoads branch: $($stageSummary.declared_ideal_loads_branch)"
+}
 if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
     throw "Stage summary must record that no RC demand shortcut is used"
 }
@@ -288,6 +294,11 @@ $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA/no-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: constant_shr" -Description "markdown PurchasedAir branch"
+Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch: no_oa_sensible" -Description "markdown declared branch"
+Assert-Contains -Text $reportText -Pattern "inactive_branches: outdoor_air, economizer, heat_recovery, humidistat, dcv, autosizing, saturation_limit" -Description "markdown inactive branches"
+Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
+Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
 Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed_system_substeps=8 system_timestep_seconds=112.500000000000 energy_report_interval_seconds=900.000000000000" -Description "markdown energy source"

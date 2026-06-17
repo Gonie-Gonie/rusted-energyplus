@@ -29,6 +29,14 @@ pub enum IdealLoadsPurchasedAirBranch {
     NoOaFiniteFlowAndCapacity,
     /// No outdoor air ConstantSensibleHeatRatio cooling branch.
     NoOaConstantSensibleHeatRatioCooling,
+    /// No outdoor air ConstantSupplyHumidityRatio cooling branch.
+    NoOaConstantSupplyHumidityCooling,
+    /// No outdoor air ConstantSupplyHumidityRatio heating branch.
+    NoOaConstantSupplyHumidityHeating,
+    /// No outdoor air humidistat dehumidification branch.
+    NoOaHumidistatDehumidification,
+    /// No outdoor air humidistat humidification branch.
+    NoOaHumidistatHumidification,
 }
 
 impl IdealLoadsPurchasedAirBranch {
@@ -41,6 +49,10 @@ impl IdealLoadsPurchasedAirBranch {
             Self::NoOaFiniteFlow => "finite_flow",
             Self::NoOaFiniteFlowAndCapacity => "flow_and_capacity",
             Self::NoOaConstantSensibleHeatRatioCooling => "constant_shr",
+            Self::NoOaConstantSupplyHumidityCooling => "constant_supply_humidity_cooling",
+            Self::NoOaConstantSupplyHumidityHeating => "constant_supply_humidity_heating",
+            Self::NoOaHumidistatDehumidification => "humidistat_dehumidification",
+            Self::NoOaHumidistatHumidification => "humidistat_humidification",
         }
     }
 
@@ -166,7 +178,7 @@ pub struct SimPurchasedAirCompatError {
 pub fn sim_purchased_air_compat(
     input: SimPurchasedAirCompatInput<'_>,
 ) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
-    let boundary = classify_no_oa_sensible_subset(input.system);
+    let boundary = classify_purchased_air_compat_subset(input.system);
     if !boundary.is_supported() {
         return Err(SimPurchasedAirCompatError {
             system_id: input.system.id,
@@ -174,7 +186,7 @@ pub fn sim_purchased_air_compat(
         });
     }
 
-    let branch = selected_purchased_air_branch(input.system);
+    let branch = select_purchased_air_branch(input.system);
     let init_flags = IdealLoadsInitFlags::no_oa_no_limit_candidate();
     let calculation = if branch.uses_finite_limit_calc() {
         calc_no_oa_sensible_with_limits_and_recirculation_compat(
@@ -215,7 +227,9 @@ pub fn sim_purchased_air_compat(
     })
 }
 
-fn selected_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPurchasedAirBranch {
+/// Selects the Rust-visible PurchasedAir branch for a supported no-OA compatibility system.
+#[must_use]
+pub fn select_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPurchasedAirBranch {
     let has_flow_limit =
         limit_includes_flow(system.heating_limit) || limit_includes_flow(system.cooling_limit);
     let has_capacity_limit = limit_includes_capacity(system.heating_limit)
@@ -231,8 +245,73 @@ fn selected_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPurc
         {
             IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling
         }
+        (false, false)
+            if system.dehumidification_control_type
+                == DehumidificationControlType::ConstantSupplyHumidityRatio =>
+        {
+            IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
+        }
+        (false, false)
+            if system.dehumidification_control_type == DehumidificationControlType::Humidistat =>
+        {
+            IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification
+        }
+        (false, false)
+            if system.humidification_control_type
+                == ep_model::HumidificationControlType::ConstantSupplyHumidityRatio =>
+        {
+            IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
+        }
+        (false, false)
+            if system.humidification_control_type
+                == ep_model::HumidificationControlType::Humidistat =>
+        {
+            IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification
+        }
         (false, false) => IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible,
     }
+}
+
+fn classify_purchased_air_compat_subset(
+    system: &IdealLoadsAirSystem,
+) -> crate::ideal_loads::IdealLoadsSubsetBoundary {
+    let mut boundary = classify_no_oa_sensible_subset(system);
+    if supports_no_oa_humidity_diagnostic_branch(system) {
+        boundary.unsupported_features.retain(|feature| {
+            !matches!(
+                feature,
+                IdealLoadsUnsupportedFeature::Dehumidification
+                    | IdealLoadsUnsupportedFeature::Humidification
+            )
+        });
+    }
+    boundary
+}
+
+fn supports_no_oa_humidity_diagnostic_branch(system: &IdealLoadsAirSystem) -> bool {
+    if limit_includes_flow(system.heating_limit)
+        || limit_includes_flow(system.cooling_limit)
+        || limit_includes_capacity(system.heating_limit)
+        || limit_includes_capacity(system.cooling_limit)
+    {
+        return false;
+    }
+
+    matches!(
+        (
+            system.dehumidification_control_type,
+            system.humidification_control_type
+        ),
+        (
+            DehumidificationControlType::ConstantSupplyHumidityRatio
+                | DehumidificationControlType::Humidistat,
+            ep_model::HumidificationControlType::None
+        ) | (
+            DehumidificationControlType::None,
+            ep_model::HumidificationControlType::ConstantSupplyHumidityRatio
+                | ep_model::HumidificationControlType::Humidistat
+        )
+    )
 }
 
 const fn limit_includes_flow(limit: IdealLoadsLimit) -> bool {
@@ -361,6 +440,34 @@ mod tests {
                 .unsupported_features
                 .contains(&IdealLoadsUnsupportedFeature::OutdoorAir)
         );
+    }
+
+    #[test]
+    fn sim_purchased_air_wrapper_labels_constant_supply_humidity_diagnostic_branch() {
+        let mut system = test_system();
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSupplyHumidityRatio;
+
+        let state = IdealLoadsZoneState {
+            air_temperature_c: 26.0,
+            air_humidity_ratio: 0.012,
+        };
+        let output = sim_purchased_air_compat(SimPurchasedAirCompatInput {
+            system: &system,
+            supply_node: NodeId(1),
+            zone_state: state,
+            recirculation_state: state,
+            demand: ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -1000.0),
+            unit_available: true,
+            limit_context: IdealLoadsSensibleLimitContext::default(),
+        })
+        .expect("supported no-OA ConstantSupplyHumidityRatio diagnostic branch");
+
+        assert_eq!(
+            output.branch,
+            IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
+        );
+        assert_eq!(output.branch.label(), "constant_supply_humidity_cooling");
     }
 
     fn test_system() -> IdealLoadsAirSystem {
