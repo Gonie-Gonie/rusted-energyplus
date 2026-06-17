@@ -124,6 +124,12 @@ source-order direct evaluation with no cross-timestep cache or reordering, and
 `ideal_loads_psychrometric_cache_policy` requires any future cache to use the
 exact temperature, humidity ratio, and pressure tuple while preserving
 EnergyPlus evaluation order.
+Output-handle evidence now resolves each manifest-declared IdealLoads output to
+a stable `OutputHandle` before comparison rows are evaluated. Rate and node
+series are exported through `ResultStore` with those handles, meter rows are
+resolved through `RuntimeMeterRegistry` before aggregation, diagnostic rows are
+emitted only when declared by the manifest, and duplicate output requests fail
+during handle setup before artifact export.
 Each IdealLoads case manifest sets `[trace].level`; reports echo that value in
 `trace_level` and identify `trace_level_source` as `case manifest [trace].level`.
 Trace level only selects the evidence payload: `ResultStore` values are computed

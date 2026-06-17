@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use ep_compare::{
@@ -231,6 +231,12 @@ const IDEAL_LOADS_FEATURE_DISPATCH_POLICY: &str = "compile feature flags select 
 const IDEAL_LOADS_PREBOUND_ID_CONTRACT: &str = "compile-stage IdealLoadsAirSystemId, ZoneId, supply NodeId, return NodeId, zone air NodeId, optional outdoor air NodeId, availability ScheduleId, heating availability ScheduleId, and cooling availability ScheduleId";
 const IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY: &str = "compatibility reports use source-order direct psychrometric evaluation; no cross-timestep cache or reordering is enabled";
 const IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY: &str = "future compatibility cache must key exact temperature, humidity ratio, and pressure tuple and preserve EnergyPlus evaluation order";
+const IDEAL_LOADS_OUTPUT_HANDLE_REGISTRATION_POLICY: &str = "manifest output requests are resolved to stable OutputHandle values before IdealLoads comparison rows are evaluated";
+const IDEAL_LOADS_OUTPUT_HANDLE_WRITE_POLICY: &str = "rate and node ResultStore series use pre-resolved OutputHandle values; meter rows use RuntimeMeterRegistry-resolved handles before aggregation";
+const IDEAL_LOADS_DIAGNOSTIC_OUTPUT_REQUEST_POLICY: &str = "diagnostic rows are emitted only for manifest-declared diagnostic outputs or meters and are separated from conformance rows";
+const IDEAL_LOADS_REPORT_EXPORT_ORDER_POLICY: &str = "compare artifacts are exported after IdealLoads calculations populate comparison rows, meter rows, and ResultStore";
+const IDEAL_LOADS_DETAILED_OUTPUT_LOOKUP_POLICY: &str = "Detailed output key/variable lookup is confined to post-calculation report assembly; simulation calculations use typed IDs and pre-resolved handles";
+const IDEAL_LOADS_DUPLICATE_OUTPUT_HANDLE_POLICY: &str = "duplicate manifest output requests fail during handle setup; duplicate ResultStore handles and identities fail ep_runtime::ResultStore::diagnostics";
 const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
 const IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT: &str =
     "built-in default; override with case manifest [trace].level";
@@ -408,6 +414,7 @@ struct LoadedSeries {
 }
 
 struct IdealLoadsDiagnosticRow {
+    handle: OutputHandle,
     key: String,
     variable: String,
     frequency: OutputFrequency,
@@ -431,6 +438,8 @@ struct IdealLoadsDiagnosticRow {
     first_divergence: Option<ep_compare::SeriesDivergenceV2>,
     status: SeriesComparisonStatus,
 }
+
+type IdealLoadsOutputHandleMap = BTreeMap<(String, String, OutputFrequency), OutputHandle>;
 
 struct IdealLoadsMeterDiagnosticRow {
     name: String,
@@ -1627,9 +1636,11 @@ fn build_outdoor_air_design_flow_context<'a>(
         sensible_results.push(purchased_air.calculation);
     }
 
+    let output_handles = resolve_ideal_loads_output_handles(manifest)?;
     let mut rows = Vec::new();
     let mut result_store = ResultStore::new();
     for (output, expected) in manifest.outputs.iter().zip(expected_series.iter()) {
+        let output_handle = ideal_loads_output_handle(&output_handles, output)?;
         let (rust_source, units, observed_values) = outdoor_air_observed_values(
             output,
             system.demand_controlled_ventilation_type,
@@ -1658,13 +1669,14 @@ fn build_outdoor_air_design_flow_context<'a>(
         };
 
         result_store.add_series(OutputSeries {
-            handle: OutputHandle(result_store.series.len() as u32),
+            handle: output_handle,
             key: output.key.clone(),
             variable_name: output.variable.clone(),
             units: units.to_string(),
             values: observed_values,
         });
         rows.push(IdealLoadsDiagnosticRow {
+            handle: output_handle,
             key: output.key.clone(),
             variable: output.variable.clone(),
             frequency: output.frequency,
@@ -3416,9 +3428,11 @@ fn evaluate_rows(
         &timestamps,
     )?;
 
+    let output_handles = resolve_ideal_loads_output_handles(manifest)?;
     let mut rows = Vec::new();
     let mut result_store = ResultStore::new();
     for output in &manifest.outputs {
+        let output_handle = ideal_loads_output_handle(&output_handles, output)?;
         let expected = load_series(eso, &output.key, &output.variable)?;
         let Some(observed) =
             observed_by_variable.get(&(output.key.clone(), output.variable.clone()))
@@ -3442,13 +3456,14 @@ fn evaluate_rows(
         };
 
         result_store.add_series(OutputSeries {
-            handle: OutputHandle(result_store.series.len() as u32),
+            handle: output_handle,
             key: output.key.clone(),
             variable_name: output.variable.clone(),
             units: observed.units.to_string(),
             values: observed.values.clone(),
         });
         rows.push(IdealLoadsDiagnosticRow {
+            handle: output_handle,
             key: output.key.clone(),
             variable: output.variable.clone(),
             frequency: output.frequency,
@@ -4744,6 +4759,51 @@ fn samples_with_timestamps(values: &[f64], timestamps: &[Option<String>]) -> Vec
         .collect()
 }
 
+fn resolve_ideal_loads_output_handles(
+    manifest: &ConformanceCase,
+) -> Result<IdealLoadsOutputHandleMap, String> {
+    let mut seen = BTreeSet::new();
+    let mut handles = BTreeMap::new();
+    for output in &manifest.outputs {
+        let identity = ideal_loads_output_identity(output);
+        if !seen.insert(identity.clone()) {
+            return Err(format!(
+                "IdealLoads output handle setup rejected duplicate output request {} / {} ({})",
+                output.key,
+                output.variable,
+                output_frequency_label(output.frequency)
+            ));
+        }
+        handles.insert(identity, OutputHandle(handles.len() as u32));
+    }
+    Ok(handles)
+}
+
+fn ideal_loads_output_handle(
+    handles: &IdealLoadsOutputHandleMap,
+    output: &OutputRequest,
+) -> Result<OutputHandle, String> {
+    handles
+        .get(&ideal_loads_output_identity(output))
+        .copied()
+        .ok_or_else(|| {
+            format!(
+                "IdealLoads output handle setup is missing {} / {} ({})",
+                output.key,
+                output.variable,
+                output_frequency_label(output.frequency)
+            )
+        })
+}
+
+fn ideal_loads_output_identity(output: &OutputRequest) -> (String, String, OutputFrequency) {
+    (
+        NormalizedName::new(&output.key).0,
+        output.variable.trim().to_ascii_lowercase(),
+        output.frequency,
+    )
+}
+
 fn tolerance_for_output(
     manifest: &ConformanceCase,
     output: &OutputRequest,
@@ -5125,6 +5185,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "ideal_loads_psychrometric_cache_policy: {}\n",
         IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY
     ));
+    push_ideal_loads_output_handle_policy_markdown(&mut report);
     report.push_str(&format!(
         "trace_level: {}\n",
         ideal_loads_trace_level(context.manifest)
@@ -5393,6 +5454,7 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "ideal_loads_psychrometric_cache_policy: {}\n",
         IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY
     ));
+    push_ideal_loads_output_handle_policy_markdown(&mut report);
     report.push_str(&format!(
         "trace_level: {}\n",
         ideal_loads_trace_level(context.manifest)
@@ -5736,6 +5798,7 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
         json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
+    push_ideal_loads_output_handle_policy_json(&mut json);
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(manifest))
@@ -6303,6 +6366,7 @@ fn render_outdoor_air_stage_summary_json(
         "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
         json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
+    push_ideal_loads_output_handle_policy_json(&mut json);
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(context.manifest))
@@ -6728,6 +6792,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
         json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
+    push_ideal_loads_output_handle_policy_json(&mut json);
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(manifest))
@@ -6985,6 +7050,60 @@ fn ideal_loads_trace_level_source(manifest: &ConformanceCase) -> &'static str {
     }
 }
 
+fn push_ideal_loads_output_handle_policy_markdown(report: &mut String) {
+    report.push_str(&format!(
+        "ideal_loads_output_handle_registration_policy: {}\n",
+        IDEAL_LOADS_OUTPUT_HANDLE_REGISTRATION_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_output_handle_write_policy: {}\n",
+        IDEAL_LOADS_OUTPUT_HANDLE_WRITE_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_diagnostic_output_request_policy: {}\n",
+        IDEAL_LOADS_DIAGNOSTIC_OUTPUT_REQUEST_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_report_export_order_policy: {}\n",
+        IDEAL_LOADS_REPORT_EXPORT_ORDER_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_detailed_output_lookup_policy: {}\n",
+        IDEAL_LOADS_DETAILED_OUTPUT_LOOKUP_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_duplicate_output_handle_policy: {}\n",
+        IDEAL_LOADS_DUPLICATE_OUTPUT_HANDLE_POLICY
+    ));
+}
+
+fn push_ideal_loads_output_handle_policy_json(json: &mut String) {
+    json.push_str(&format!(
+        "  \"ideal_loads_output_handle_registration_policy\": {},\n",
+        json_string(IDEAL_LOADS_OUTPUT_HANDLE_REGISTRATION_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_output_handle_write_policy\": {},\n",
+        json_string(IDEAL_LOADS_OUTPUT_HANDLE_WRITE_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_diagnostic_output_request_policy\": {},\n",
+        json_string(IDEAL_LOADS_DIAGNOSTIC_OUTPUT_REQUEST_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_report_export_order_policy\": {},\n",
+        json_string(IDEAL_LOADS_REPORT_EXPORT_ORDER_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_detailed_output_lookup_policy\": {},\n",
+        json_string(IDEAL_LOADS_DETAILED_OUTPUT_LOOKUP_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_duplicate_output_handle_policy\": {},\n",
+        json_string(IDEAL_LOADS_DUPLICATE_OUTPUT_HANDLE_POLICY)
+    ));
+}
+
 fn ideal_loads_feature_flags_label(flags: IdealLoadsFeatureFlags) -> String {
     format!(
         concat!(
@@ -7051,7 +7170,7 @@ fn label_list_or_none(values: &[&str]) -> String {
 fn row_json(row: &IdealLoadsDiagnosticRow) -> String {
     format!(
         concat!(
-            "{{\"key\": {}, \"variable\": {}, \"level\": {}, \"domain\": {}, ",
+            "{{\"handle\": {}, \"key\": {}, \"variable\": {}, \"level\": {}, \"domain\": {}, ",
             "\"class\": {}, \"frequency\": {}, \"source\": {}, \"rust_source\": {}, ",
             "\"units\": {}, \"oracle_units\": {}, \"unit_match\": {}, ",
             "\"alignment\": {}, \"expected_samples\": {}, \"observed_samples\": {}, ",
@@ -7060,6 +7179,7 @@ fn row_json(row: &IdealLoadsDiagnosticRow) -> String {
             "\"max_rel_tolerance\": {}, \"max_rmse_tolerance\": {}, \"status\": {}, ",
             "\"first_divergence\": {}}}"
         ),
+        row.handle.0,
         json_string(&row.key),
         json_string(&row.variable),
         json_string(optional_output_level_label(row.level)),
@@ -7424,6 +7544,7 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
         json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
+    push_ideal_loads_output_handle_policy_json(&mut json);
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(context.manifest))
