@@ -144,7 +144,7 @@ rust_target = [
   "scripts/compare/compare-ideal-loads-flow-capacity-limit-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-flow-capacity-limit-conformance.ps1",
   "crates/ep_runtime/src/output.rs::RuntimeMeterRegistry",
-  "crates/ep_runtime/src/output.rs::ideal_loads_facility_meter_binding",
+  "crates/ep_runtime/src/ideal_loads/meters.rs::ideal_loads_facility_meter_binding",
   "scripts/compare/compare-ideal-loads-no-oa-facility-meter-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-no-oa-report-energy-conformance-candidate.ps1",
