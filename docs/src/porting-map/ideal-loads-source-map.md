@@ -220,7 +220,8 @@ conformance.
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone,
-Flow/Person, and Flow/Area candidate rows. The current Rust surface is:
+Flow/Person, Flow/Area, and AirChanges/Hour candidate rows. The current Rust
+surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
@@ -240,10 +241,11 @@ Flow/Person, and Flow/Area candidate rows. The current Rust surface is:
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
-  `manifest_allows_outdoor_air_flow_area_conformance_manifest`, and
+  `manifest_allows_outdoor_air_flow_area_conformance_manifest`,
+  `manifest_allows_outdoor_air_air_changes_conformance_manifest`, and
   `validate_outdoor_air_conformance_boundary` in
   `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone, Flow/Person,
-  and Flow/Area candidates
+  Flow/Area, and AirChanges/Hour candidates
 
 `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -298,11 +300,16 @@ economizer/heat-recovery rows diagnostic-only.
 `ideal_loads_outdoor_air_flow_area_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Flow/Area fixture shape.
 
-`ideal_loads_outdoor_air_air_changes_diagnostic_001` repeats the surface with
-an `AirChanges/Hour` `DesignSpecification:OutdoorAir`. The fixture uses 180 ACH
-over the explicit 1 m3 zone volume, so the derived design volume remains
-0.05 m3/s before the same `StdRhoAir` mass-flow conversion and 22-series
-diagnostic comparison.
+`ideal_loads_outdoor_air_air_changes_conformance_candidate_001` promotes the
+AirChanges/Hour proof lane. The fixture uses 180 ACH over the explicit 1 m3
+zone volume, so the derived design volume remains 0.05 m3/s before the same
+`StdRhoAir` mass-flow conversion. The compare path derives the typed zone
+volume, promotes the same 14 outdoor-air/supply/mixed rows as the Flow/Zone,
+Flow/Person, and Flow/Area candidates, and keeps inactive
+economizer/heat-recovery rows diagnostic-only.
+
+`ideal_loads_outdoor_air_air_changes_diagnostic_001` remains the diagnostic
+predecessor artifact for the same AirChanges/Hour fixture shape.
 
 `ideal_loads_outdoor_air_sum_diagnostic_001` and
 `ideal_loads_outdoor_air_maximum_diagnostic_001` exercise the aggregate
@@ -343,8 +350,8 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality, proportional-control, AirChanges/Hour, Sum,
-Maximum, active economizer, and active heat-recovery outdoor-air methods remain
+Indoor air quality, proportional-control, Sum, Maximum, active economizer, and
+active heat-recovery outdoor-air methods remain
 diagnostic or unresolved, and no outdoor-air
 finite-limit, outdoor-air humidity-control, other active humidity-control,
 saturation-limit heat-recovery, or DCV output is part of the promoted

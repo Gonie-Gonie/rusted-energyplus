@@ -101,6 +101,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_FLOW_PERSON_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_flow_person_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_FLOW_AREA_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_flow_area_conformance_candidate_001";
+const IDEAL_LOADS_OUTDOOR_AIR_AIR_CHANGES_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_air_changes_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -608,6 +610,14 @@ fn manifest_allows_outdoor_air_flow_area_conformance_manifest(manifest: &Conform
         && manifest.conformance_claim
 }
 
+fn manifest_allows_outdoor_air_air_changes_conformance_manifest(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_AIR_CHANGES_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn outdoor_air_conformance_method_for_manifest(
     manifest: &ConformanceCase,
 ) -> Option<DesignSpecificationOutdoorAirMethod> {
@@ -617,6 +627,8 @@ fn outdoor_air_conformance_method_for_manifest(
         Some(DesignSpecificationOutdoorAirMethod::FlowPerPerson)
     } else if manifest_allows_outdoor_air_flow_area_conformance_manifest(manifest) {
         Some(DesignSpecificationOutdoorAirMethod::FlowPerArea)
+    } else if manifest_allows_outdoor_air_air_changes_conformance_manifest(manifest) {
+        Some(DesignSpecificationOutdoorAirMethod::AirChangesPerHour)
     } else {
         None
     }
@@ -1077,6 +1089,9 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     }
     if manifest_allows_outdoor_air_flow_area_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Flow/Area branch for declared variables only";
+    }
+    if manifest_allows_outdoor_air_air_changes_conformance_manifest(context.manifest) {
+        return "conformance IdealLoads outdoor-air AirChanges/Hour branch for declared variables only";
     }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
