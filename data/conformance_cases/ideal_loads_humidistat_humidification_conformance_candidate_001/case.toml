@@ -17,6 +17,9 @@ notes = [
   "Saturation-limit behavior, ReportPurchasedAir energy/fuel rows, and facility meters remain diagnostic-only proof evidence; broad humidity-control and broad meter conformance remain outside the claim."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

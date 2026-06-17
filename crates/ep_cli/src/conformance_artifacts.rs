@@ -463,6 +463,12 @@ fn render_expanded_case_manifest(
     push_toml_string_field(&mut toml, "oracle_version", &manifest.oracle_version);
     toml.push('\n');
 
+    if let Some(trace) = manifest.trace.as_ref() {
+        toml.push_str("[trace]\n");
+        push_toml_string_field(&mut toml, "level", &trace.level);
+        toml.push('\n');
+    }
+
     toml.push_str("[input]\n");
     push_toml_string_field(&mut toml, "source_idf", &manifest.input.idf);
     push_toml_string_field(&mut toml, "staged_idf", "input.idf");

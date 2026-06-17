@@ -13,6 +13,9 @@ notes = [
   "The compare gate applies the declared monthly and run-period meter tolerances to EnergyPlus MTR oracle series and Rust aggregated fuel-energy series."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

@@ -11,6 +11,9 @@ notes = [
   "The fixture includes a deterministic envelope and internal gain schedule so the baseline IdealLoads heating and cooling rates both contain nonzero samples."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

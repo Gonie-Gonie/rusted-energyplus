@@ -14,6 +14,9 @@ notes = [
   "Mass-flow comparison uses the source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

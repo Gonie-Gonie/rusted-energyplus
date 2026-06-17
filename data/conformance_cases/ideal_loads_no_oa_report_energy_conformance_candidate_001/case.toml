@@ -13,6 +13,9 @@ notes = [
   "The compare gate applies the declared energy tolerances to Rust ResultStore non-fuel energy series only."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

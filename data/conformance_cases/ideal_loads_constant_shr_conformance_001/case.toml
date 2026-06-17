@@ -13,6 +13,9 @@ notes = [
   "Return-node and zone-air-node rows remain diagnostic proof rows; broad node and broad humidity-control conformance remain outside the claim."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

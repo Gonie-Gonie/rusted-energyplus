@@ -304,6 +304,7 @@ foreach ($case in $promotedCases) {
         "inactive_branches",
         "ideal_loads_feature_flags",
         "trace_level",
+        "trace_level_source",
         "trace_payload",
         "trace_side_effect_policy",
         "source_order_wrapper",
@@ -400,6 +401,7 @@ foreach ($case in $promotedCases) {
         "mode_counts, source-order demand inputs, selected branch, supply state, and report rates"
     }
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_level" -Expected "default-conformance" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_level_source" -Expected "case manifest [trace].level" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_payload" -Expected $expectedTracePayload -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "trace_side_effect_policy" -Expected "trace/report serialization only; calculations are complete before artifact rendering" -Description "$($case.Id) compare summary"
     $reportFieldExpectations = [ordered]@{
@@ -424,6 +426,7 @@ foreach ($case in $promotedCases) {
         "inactive_branches" = (@($summary.inactive_branches) -join ", ")
         "ideal_loads_feature_flags" = $expectedFeatureFlagsLabel
         "trace_level" = "default-conformance"
+        "trace_level_source" = "case manifest [trace].level"
         "trace_payload" = $expectedTracePayload
         "trace_side_effect_policy" = "trace/report serialization only; calculations are complete before artifact rendering"
         "source_map_anchor" = "docs/src/porting-map/ideal-loads-source-map.md"
@@ -462,6 +465,7 @@ foreach ($case in $promotedCases) {
         "inactive_branches",
         "ideal_loads_feature_flags",
         "trace_level",
+        "trace_level_source",
         "trace_payload",
         "trace_side_effect_policy",
         "source_order_wrapper",
@@ -545,6 +549,7 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_runtime_binding_source" -Expected ([string]$summary.ideal_loads_runtime_binding_source) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "purchased_air_name_lookup_policy" -Expected ([string]$summary.purchased_air_name_lookup_policy) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_level" -Expected ([string]$summary.trace_level) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_level_source" -Expected ([string]$summary.trace_level_source) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_payload" -Expected ([string]$summary.trace_payload) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "trace_side_effect_policy" -Expected ([string]$summary.trace_side_effect_policy) -Description "$($case.Id) stage summary"
     foreach ($flagName in $idealLoadsFeatureFlagNames) {

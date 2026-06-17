@@ -14,6 +14,9 @@ notes = [
   "DistrictHeatingWater:Facility and DistrictCooling:Facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy diagnostics; broad meter conformance remains outside this case."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

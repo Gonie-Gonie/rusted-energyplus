@@ -12,6 +12,9 @@ notes = [
   "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust diagnostic derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

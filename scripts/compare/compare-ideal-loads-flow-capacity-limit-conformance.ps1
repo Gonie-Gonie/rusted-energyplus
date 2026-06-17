@@ -382,6 +382,7 @@ Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_execution_bo
 Assert-Contains -Text $reportText -Pattern "ideal_loads_runtime_binding_source: compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding" -Description "markdown typed-ID binding source"
 Assert-Contains -Text $reportText -Pattern "purchased_air_name_lookup_policy: PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs" -Description "markdown runtime string lookup policy"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_feature_flags:" -Description "markdown IdealLoads feature flags"
+Assert-Contains -Text $reportText -Pattern "trace_level_source: case manifest [trace].level" -Description "markdown trace level source"
 Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_path: ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir" -Description "markdown zone equipment dispatch path"
 Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_validation: pass" -Description "markdown zone equipment dispatch validation"
 Assert-Contains -Text $reportText -Pattern "zone_equipment_conformance_candidate: pass" -Description "markdown zone equipment conformance candidate"

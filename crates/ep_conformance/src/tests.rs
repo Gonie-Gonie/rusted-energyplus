@@ -828,6 +828,9 @@ source_kind = "local-fixture"
 source_file = "schedule_constant.idf"
 tier = "A"
 
+[trace]
+level = "default-conformance"
+
 [scope]
 domains = ["schedule"]
 has_zone = false
@@ -878,9 +881,41 @@ blocking = true
         manifest.manifest_v2.as_ref().map(|metadata| metadata.tier),
         Some(CaseTier::A)
     );
+    assert_eq!(
+        manifest.trace.as_ref().map(|trace| trace.level.as_str()),
+        Some("default-conformance")
+    );
     assert_eq!(manifest.outputs[0].level, Some(OutputLevel::Conformance));
 
     Ok(())
+}
+
+#[test]
+fn rejects_empty_trace_level() {
+    let result = parse_case_str(
+        r#"
+id = "empty_trace"
+title = "Empty trace"
+milestone = "P1"
+purpose = "Prove trace level validation."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[trace]
+level = ""
+
+[input]
+idf = "fixture.idf"
+"#,
+    );
+
+    assert!(matches!(
+        result,
+        Err(ManifestError::Validation(ValidationError::MissingField {
+            field: "trace.level"
+        }))
+    ));
 }
 
 #[test]

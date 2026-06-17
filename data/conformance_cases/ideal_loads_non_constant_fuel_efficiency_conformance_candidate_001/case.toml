@@ -15,6 +15,9 @@ notes = [
   "The boundary excludes blank and constant fuel-efficiency conformance, monthly/annual meter aggregation, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter/HVAC conformance."
 ]
 
+[trace]
+level = "default-conformance"
+
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"

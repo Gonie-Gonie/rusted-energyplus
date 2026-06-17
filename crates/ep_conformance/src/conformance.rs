@@ -28,6 +28,8 @@ pub struct ConformanceCase {
     pub oracle_version: String,
     /// v0.17 Case Manifest v2 metadata.
     pub manifest_v2: Option<ManifestV2Metadata>,
+    /// Optional trace/report verbosity contract for generated evidence.
+    pub trace: Option<TraceContract>,
     /// Domain and feature flags used by ExampleFiles coverage planning.
     pub scope: Option<CaseScope>,
     /// Input files used by the oracle and Rust implementation.
@@ -76,6 +78,9 @@ impl ConformanceCase {
         }
         if let Some(boundary) = self.boundary.as_ref() {
             boundary.validate()?;
+        }
+        if let Some(trace) = self.trace.as_ref() {
+            trace.validate()?;
         }
 
         for (index, output) in self.outputs.iter().enumerate() {
@@ -185,6 +190,20 @@ impl ConformanceCase {
         }
 
         Ok(())
+    }
+}
+
+/// Optional trace/report verbosity selected by one case manifest.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct TraceContract {
+    /// Stable trace level label consumed by case-specific report generators.
+    pub level: String,
+}
+
+impl TraceContract {
+    fn validate(&self) -> Result<(), ValidationError> {
+        require_non_empty("trace.level", &self.level)
     }
 }
 

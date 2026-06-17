@@ -228,6 +228,9 @@ const IDEAL_LOADS_INVOCATION_PATH: &str =
 const IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION: bool = false;
 const IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY: &str = "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper";
 const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
+const IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT: &str =
+    "built-in default; override with case manifest [trace].level";
+const IDEAL_LOADS_TRACE_LEVEL_SOURCE_MANIFEST: &str = "case manifest [trace].level";
 const IDEAL_LOADS_TRACE_SIDE_EFFECT_POLICY: &str =
     "trace/report serialization only; calculations are complete before artifact rendering";
 const IDEAL_LOADS_NO_OA_TRACE_PAYLOAD: &str =
@@ -5102,7 +5105,11 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     report.push_str(&format!(
         "trace_level: {}\n",
-        IDEAL_LOADS_TRACE_LEVEL_DEFAULT
+        ideal_loads_trace_level(context.manifest)
+    ));
+    report.push_str(&format!(
+        "trace_level_source: {}\n",
+        ideal_loads_trace_level_source(context.manifest)
     ));
     report.push_str(&format!(
         "trace_payload: {}\n",
@@ -5342,7 +5349,11 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     ));
     report.push_str(&format!(
         "trace_level: {}\n",
-        IDEAL_LOADS_TRACE_LEVEL_DEFAULT
+        ideal_loads_trace_level(context.manifest)
+    ));
+    report.push_str(&format!(
+        "trace_level_source: {}\n",
+        ideal_loads_trace_level_source(context.manifest)
     ));
     report.push_str(&format!(
         "trace_payload: {}\n",
@@ -5657,7 +5668,11 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
-        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+        json_string(ideal_loads_trace_level(manifest))
+    ));
+    json.push_str(&format!(
+        "  \"trace_level_source\": {},\n",
+        json_string(ideal_loads_trace_level_source(manifest))
     ));
     json.push_str(&format!(
         "  \"trace_payload\": {},\n",
@@ -6196,7 +6211,11 @@ fn render_outdoor_air_stage_summary_json(
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
-        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+        json_string(ideal_loads_trace_level(context.manifest))
+    ));
+    json.push_str(&format!(
+        "  \"trace_level_source\": {},\n",
+        json_string(ideal_loads_trace_level_source(context.manifest))
     ));
     json.push_str(&format!(
         "  \"trace_payload\": {},\n",
@@ -6593,7 +6612,11 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
-        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+        json_string(ideal_loads_trace_level(manifest))
+    ));
+    json.push_str(&format!(
+        "  \"trace_level_source\": {},\n",
+        json_string(ideal_loads_trace_level_source(manifest))
     ));
     json.push_str(&format!(
         "  \"trace_payload\": {},\n",
@@ -6817,6 +6840,23 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  ]\n");
     json.push_str("}\n");
     json
+}
+
+fn ideal_loads_trace_level(manifest: &ConformanceCase) -> &str {
+    manifest
+        .trace
+        .as_ref()
+        .map_or(IDEAL_LOADS_TRACE_LEVEL_DEFAULT, |trace| {
+            trace.level.as_str()
+        })
+}
+
+fn ideal_loads_trace_level_source(manifest: &ConformanceCase) -> &'static str {
+    if manifest.trace.is_some() {
+        IDEAL_LOADS_TRACE_LEVEL_SOURCE_MANIFEST
+    } else {
+        IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT
+    }
 }
 
 fn ideal_loads_feature_flags_label(flags: IdealLoadsFeatureFlags) -> String {
@@ -7244,7 +7284,11 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
-        json_string(IDEAL_LOADS_TRACE_LEVEL_DEFAULT)
+        json_string(ideal_loads_trace_level(context.manifest))
+    ));
+    json.push_str(&format!(
+        "  \"trace_level_source\": {},\n",
+        json_string(ideal_loads_trace_level_source(context.manifest))
     ));
     json.push_str(&format!(
         "  \"trace_payload\": {},\n",
