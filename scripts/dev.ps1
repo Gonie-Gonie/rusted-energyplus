@@ -250,6 +250,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the no-OA IdealLoads constant fuel-efficiency diagnostic comparison."
     }
+    "compare-ideal-loads-constant-fuel-efficiency-conformance-candidate" = @{
+        Path = "compare\compare-ideal-loads-constant-fuel-efficiency-conformance-candidate.ps1"
+        Group = "compare"
+        Help = "Gate the no-OA IdealLoads constant fuel-efficiency conformance candidate."
+    }
     "compare-ideal-loads-constant-shr-diagnostic" = @{
         Path = "compare\compare-ideal-loads-constant-shr-diagnostic.ps1"
         Group = "compare"

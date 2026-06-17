@@ -127,6 +127,22 @@ const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS: &[&str] = &[
 ];
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA non-fuel ReportPurchasedAir energy rows only";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_constant_fuel_efficiency_conformance_candidate_001";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS: &[&str] = &[
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
+];
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
+    "conformance for declared no-OA constant Schedule:Constant fuel-efficiency rows only";
+const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE: &str =
+    "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -471,6 +487,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         }
         if output.level == Some(OutputLevel::Conformance)
             && ideal_loads_fuel_energy_variable(&output.variable)
+            && !manifest_is_constant_fuel_efficiency_conformance_candidate(manifest)
         {
             return Err(format!(
                 "IdealLoads fuel-energy outputs remain diagnostic until fuel-efficiency path conformance is separately proven: {}",
@@ -525,6 +542,30 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             }) {
                 return Err(format!(
                     "IdealLoads report-energy conformance candidate is missing conformance output {expected_output}"
+                ));
+            }
+        }
+    }
+    if manifest_is_constant_fuel_efficiency_conformance_candidate(manifest) {
+        for output in manifest
+            .outputs
+            .iter()
+            .filter(|output| output.level == Some(OutputLevel::Conformance))
+        {
+            if !is_declared_constant_fuel_efficiency_conformance_output(&output.variable) {
+                return Err(format!(
+                    "IdealLoads constant fuel-efficiency conformance candidate supports only declared fuel-energy rows, got {}",
+                    output.variable
+                ));
+            }
+        }
+        for expected_output in IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable.eq_ignore_ascii_case(expected_output)
+                    && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads constant fuel-efficiency conformance candidate is missing conformance output {expected_output}"
                 ));
             }
         }
@@ -806,6 +847,12 @@ fn manifest_is_no_oa_report_energy_conformance_candidate(manifest: &ConformanceC
         && manifest.conformance_claim
 }
 
+fn manifest_is_constant_fuel_efficiency_conformance_candidate(manifest: &ConformanceCase) -> bool {
+    manifest.id == IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn manifest_has_conformance_output(manifest: &ConformanceCase) -> bool {
     manifest
         .outputs
@@ -828,6 +875,12 @@ fn is_declared_no_oa_facility_meter_conformance_meter(name: &str) -> bool {
 
 fn is_declared_no_oa_report_energy_conformance_output(variable: &str) -> bool {
     IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS
+        .iter()
+        .any(|expected| variable.eq_ignore_ascii_case(expected))
+}
+
+fn is_declared_constant_fuel_efficiency_conformance_output(variable: &str) -> bool {
+    IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS
         .iter()
         .any(|expected| variable.eq_ignore_ascii_case(expected))
 }
@@ -3967,7 +4020,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
     report.push_str(&format!(
         "fuel_energy_rate_source: {}\n",
-        context.fuel_efficiency.report_source
+        fuel_energy_report_source(context)
     ));
     report.push_str(&format!(
         "fuel_efficiency: heating={:.12} cooling={:.12}\n",
@@ -3998,7 +4051,7 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     report.push_str(&format!(
         "fuel_energy_output_level_policy: {}\n",
-        IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY
+        fuel_energy_output_level_policy(context)
     ));
     report.push_str(&format!(
         "meter_source: {}; rust_meter_time_series_comparison=true requested_meters={}\n",
@@ -5031,7 +5084,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
-        json_string(context.fuel_efficiency.report_source)
+        json_string(fuel_energy_report_source(context))
     ));
     json.push_str(&format!(
         "  \"heating_fuel_efficiency\": {},\n",
@@ -5074,7 +5127,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     json.push_str(&format!(
         "  \"fuel_energy_output_level_policy\": {},\n",
-        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
+        json_string(fuel_energy_output_level_policy(context))
     ));
     json.push_str(&format!(
         "  \"meter_source\": {},\n",
@@ -5594,7 +5647,7 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     ));
     json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
-        json_string(context.fuel_efficiency.report_source)
+        json_string(fuel_energy_report_source(context))
     ));
     json.push_str(&format!(
         "  \"rate_output_source\": {},\n",
@@ -5614,7 +5667,7 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     ));
     json.push_str(&format!(
         "  \"fuel_energy_output_level_policy\": {},\n",
-        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
+        json_string(fuel_energy_output_level_policy(context))
     ));
     json.push_str(&format!(
         "  \"meter_aggregation_source\": {},\n",
@@ -5893,6 +5946,22 @@ fn report_energy_source_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'s
     }
 }
 
+fn fuel_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY
+    } else {
+        IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY
+    }
+}
+
+fn fuel_energy_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
+    if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
+    } else {
+        context.fuel_efficiency.report_source
+    }
+}
+
 fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if context.manifest.conformance_claim && context.branch == "no-oa-finite-limit-sensible" {
         "conformance no-OA finite-limit sensible IdealLoads branch for declared variables only"
@@ -5910,6 +5979,8 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA hourly IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {
         "conformance no-OA ReportPurchasedAir rate-to-TimeStepSysSec energy for declared non-fuel energy rows only"
+    } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        "conformance no-OA constant Schedule:Constant IdealLoads fuel-efficiency for declared fuel-energy rows only"
     } else if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
     } else if context.branch == "no-oa-finite-limit-sensible" {
