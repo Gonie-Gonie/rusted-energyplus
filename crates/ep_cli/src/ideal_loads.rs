@@ -13,19 +13,21 @@ use ep_conformance::{
 use ep_model::{
     AutoOrNumber, AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues, HeatRecoveryType,
-    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, OutdoorAirEconomizerType,
-    OutputHandle, PeopleNumberCalculationMethod, ScheduleId, SimulationModel, SurfaceType,
-    TypedModel, Zone,
+    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsLimit, NormalizedName,
+    OutdoorAirEconomizerType, OutputHandle, PeopleNumberCalculationMethod, ScheduleId,
+    SimulationModel, SurfaceType, TypedModel, Zone,
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    EpwRecord, IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE, IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT,
+    EpwRecord, IDEAL_LOADS_METER_AGGREGATION_SOURCE, IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE,
+    IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE, IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT,
     IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE, IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE,
     IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH, IdealLoadsOutdoorAirContext,
     IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
-    OutputSeries, ResultStore, SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputRegistry,
+    SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
@@ -67,9 +69,10 @@ use ep_runtime::{
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
-    purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
-    surface_area_m2, validate_ideal_loads_zone_equipment_dispatch,
+    classify_no_oa_sensible_subset, ideal_loads_facility_meter_binding,
+    ideal_loads_zone_equipment_stages, load_epw_records, purchased_air_source_order_stages,
+    select_purchased_air_branch, sim_purchased_air_compat, surface_area_m2,
+    validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -2194,6 +2197,7 @@ fn evaluate_rows(
 
     let meter_rows = evaluate_meter_rows(
         manifest,
+        model,
         mtr,
         system_name,
         &observed_by_variable,
@@ -2301,15 +2305,67 @@ fn ideal_loads_fuel_energy_variable(variable: &str) -> bool {
 
 fn evaluate_meter_rows(
     manifest: &ConformanceCase,
+    model: &SimulationModel,
     mtr: &Path,
     system_name: &str,
     observed_by_variable: &BTreeMap<(String, String), ObservedSeries>,
     timestamps: &[Option<String>],
 ) -> Result<Vec<IdealLoadsMeterDiagnosticRow>, String> {
+    let meter_requests = manifest
+        .meters
+        .iter()
+        .map(|meter| {
+            if meter.frequency != OutputFrequency::Hourly {
+                Err(format!(
+                    "IdealLoads diagnostic meter aggregation currently requires hourly meters, got {} for {}",
+                    output_frequency_label(meter.frequency),
+                    meter.name
+                ))
+            } else {
+                Ok(RuntimeMeterRequest::hourly(meter.name.clone()))
+            }
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    let meter_registry = RuntimeOutputRegistry::from_model(model);
+    let meter_resolution = meter_registry
+        .meter_registry()
+        .resolve_meter_requests(&meter_requests);
+    if meter_resolution.diagnostics.has_errors() {
+        let diagnostics = meter_resolution
+            .diagnostics
+            .diagnostics
+            .iter()
+            .map(|diagnostic| diagnostic.message.as_str())
+            .collect::<Vec<_>>()
+            .join("; ");
+        return Err(format!(
+            "IdealLoads diagnostic meter aggregation requires MeterRegistry-resolved meters: {diagnostics}"
+        ));
+    }
+    let fuel_energy_bindings = ideal_loads_meter_fuel_energy_bindings(model);
     let mut rows = Vec::new();
     for meter in &manifest.meters {
+        let resolved_meter = meter_resolution
+            .resolved
+            .iter()
+            .find(|resolved| resolved.request.name.eq_ignore_ascii_case(&meter.name))
+            .ok_or_else(|| {
+                format!(
+                    "IdealLoads diagnostic meter aggregation did not resolve {} through MeterRegistry",
+                    meter.name
+                )
+            })?;
         let expected = load_meter_series(mtr, &meter.name)?;
-        let fuel_energy_variable = ideal_loads_meter_fuel_energy_variable(&meter.name)?;
+        let resolved_meter_key = NormalizedName::new(&resolved_meter.definition.name).0;
+        let fuel_energy_variable = fuel_energy_bindings
+            .get(&resolved_meter_key)
+            .copied()
+            .ok_or_else(|| {
+                format!(
+                    "IdealLoads diagnostic meter aggregation has no fuel-energy binding for MeterRegistry meter {}",
+                    resolved_meter.definition.name
+                )
+            })?;
         let Some(observed) =
             observed_by_variable.get(&(system_name.to_string(), fuel_energy_variable.to_string()))
         else {
@@ -2368,16 +2424,21 @@ fn load_meter_series(mtr: &Path, meter: &str) -> Result<LoadedSeries, String> {
     })
 }
 
-fn ideal_loads_meter_fuel_energy_variable(meter: &str) -> Result<&'static str, String> {
-    if meter.eq_ignore_ascii_case("DistrictHeatingWater:Facility") {
-        Ok(ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY)
-    } else if meter.eq_ignore_ascii_case("DistrictCooling:Facility") {
-        Ok(ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY)
-    } else {
-        Err(format!(
-            "IdealLoads diagnostic report supports only DistrictHeatingWater:Facility and DistrictCooling:Facility meters, got {meter}"
-        ))
+fn ideal_loads_meter_fuel_energy_bindings(
+    model: &SimulationModel,
+) -> BTreeMap<String, &'static str> {
+    let mut bindings = BTreeMap::new();
+    for system in &model.typed.ideal_loads_air_systems {
+        for fuel_type in [system.heating_fuel_type, system.cooling_fuel_type] {
+            if let Some(binding) = ideal_loads_facility_meter_binding(fuel_type) {
+                bindings.insert(
+                    NormalizedName::new(binding.meter_name).0,
+                    binding.fuel_energy_variable,
+                );
+            }
+        }
     }
+    bindings
 }
 
 fn hourly_meter_samples_from_detailed_energy(
@@ -3349,6 +3410,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "meter_source: {}; rust_meter_time_series_comparison=true requested_meters={}\n",
         IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE,
         manifest.meters.len()
+    ));
+    report.push_str(&format!(
+        "meter_aggregation_source: {}\n",
+        IDEAL_LOADS_METER_AGGREGATION_SOURCE
+    ));
+    report.push_str(&format!(
+        "meter_fuel_energy_binding_source: {}\n",
+        IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE
     ));
     if !manifest.meters.is_empty() {
         let meter_names = manifest
@@ -4347,6 +4416,14 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         "  \"meter_source\": {},\n",
         json_string(IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE)
     ));
+    json.push_str(&format!(
+        "  \"meter_aggregation_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_AGGREGATION_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"meter_fuel_energy_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE)
+    ));
     json.push_str("  \"rust_meter_time_series_comparison\": true,\n");
     json.push_str(&format!(
         "  \"requested_meter_count\": {},\n",
@@ -4839,6 +4916,14 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
         json_string(context.fuel_efficiency.report_source)
+    ));
+    json.push_str(&format!(
+        "  \"meter_aggregation_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_AGGREGATION_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"meter_fuel_energy_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE)
     ));
     json.push_str("  \"meter_time_series_comparison\": true,\n");
     json.push_str(&format!(

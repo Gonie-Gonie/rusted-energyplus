@@ -156,6 +156,12 @@ if ($summary.requested_meter_count -ne 2) {
 if ($summary.rust_meter_time_series_comparison -ne $true) {
     throw "IdealLoads fuel-efficiency diagnostic must compare Rust hourly facility meter diagnostics"
 }
+if ($summary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
+    throw "Unexpected meter aggregation source: $($summary.meter_aggregation_source)"
+}
+if ($summary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
+    throw "Unexpected meter fuel-energy binding source: $($summary.meter_fuel_energy_binding_source)"
+}
 $meterRows = @($summary.meter_series)
 if ($summary.meter_series_count -ne 2 -or $meterRows.Count -ne 2) {
     throw "Expected 2 compared meter series, found count=$($summary.meter_series_count) rows=$($meterRows.Count)"
@@ -230,6 +236,12 @@ if ([Math]::Abs([double]$stageSummary.heating_fuel_efficiency - 0.8) -gt 1.0e-12
 if ([Math]::Abs([double]$stageSummary.cooling_fuel_efficiency - 0.75) -gt 1.0e-12) {
     throw "Unexpected stage cooling fuel efficiency: $($stageSummary.cooling_fuel_efficiency)"
 }
+if ($stageSummary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
+    throw "Unexpected stage meter aggregation source: $($stageSummary.meter_aggregation_source)"
+}
+if ($stageSummary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
+    throw "Unexpected stage meter fuel-energy binding source: $($stageSummary.meter_fuel_energy_binding_source)"
+}
 
 $oracleMtrText = Get-Content -LiteralPath $oracleMtrPath -Raw
 Assert-Contains -Text $oracleMtrText -Pattern "DistrictHeatingWater:Facility" -Description "oracle MTR heating meter"
@@ -240,6 +252,8 @@ Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only no-O
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "fuel_efficiency: heating=0.800000000000 cooling=0.750000000000" -Description "markdown fuel efficiency values"
 Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic; rust_meter_time_series_comparison=true requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "meter_aggregation_source: ep_runtime::RuntimeMeterRegistry" -Description "markdown meter aggregation source"
+Assert-Contains -Text $reportText -Pattern "meter_fuel_energy_binding_source: ep_runtime::ideal_loads_facility_meter_binding" -Description "markdown meter fuel-energy binding source"
 Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown heating meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown zone heating fuel rate row"

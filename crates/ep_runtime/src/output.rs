@@ -7,9 +7,12 @@ use ep_model::{
 use std::collections::BTreeSet;
 
 use crate::ideal_loads::{
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
 };
 
 /// Runtime-native output reporting frequency.
@@ -59,6 +62,21 @@ pub enum RuntimeOutputSource {
     /// Value is not implemented yet but has a declared meter registry entry.
     Meter,
 }
+
+/// Runtime binding from an IdealLoads fuel type to a facility meter source row.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IdealLoadsFacilityMeterBinding {
+    /// Registered EnergyPlus-style facility meter name.
+    pub meter_name: &'static str,
+    /// Detailed IdealLoads fuel-energy output that feeds this diagnostic meter.
+    pub fuel_energy_variable: &'static str,
+}
+
+/// Source label for IdealLoads facility-meter aggregation in reports.
+pub const IDEAL_LOADS_METER_AGGREGATION_SOURCE: &str = "ep_runtime::RuntimeMeterRegistry";
+/// Source label for IdealLoads meter-to-fuel-energy output binding in reports.
+pub const IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE: &str =
+    "ep_runtime::ideal_loads_facility_meter_binding";
 
 /// One runtime output request resolved before execution.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -644,9 +662,9 @@ impl RuntimeOutputRegistry {
     fn register_model_meters(&mut self, model: &TypedModel) {
         for system in &model.ideal_loads_air_systems {
             for fuel_type in [system.heating_fuel_type, system.cooling_fuel_type] {
-                if let Some(meter_name) = ideal_loads_facility_meter_name(fuel_type) {
+                if let Some(binding) = ideal_loads_facility_meter_binding(fuel_type) {
                     self.meter_registry.push_meter(
-                        meter_name,
+                        binding.meter_name,
                         "J",
                         RuntimeOutputFrequency::Hourly,
                         RuntimeOutputSource::Meter,
@@ -776,10 +794,20 @@ impl RuntimeMeterRegistry {
     }
 }
 
-fn ideal_loads_facility_meter_name(fuel_type: IdealLoadsFuelType) -> Option<&'static str> {
+/// Returns the diagnostic facility meter binding for a supported IdealLoads fuel.
+#[must_use]
+pub fn ideal_loads_facility_meter_binding(
+    fuel_type: IdealLoadsFuelType,
+) -> Option<IdealLoadsFacilityMeterBinding> {
     match fuel_type {
-        IdealLoadsFuelType::DistrictHeatingWater => Some("DistrictHeatingWater:Facility"),
-        IdealLoadsFuelType::DistrictCooling => Some("DistrictCooling:Facility"),
+        IdealLoadsFuelType::DistrictHeatingWater => Some(IdealLoadsFacilityMeterBinding {
+            meter_name: "DistrictHeatingWater:Facility",
+            fuel_energy_variable: ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+        }),
+        IdealLoadsFuelType::DistrictCooling => Some(IdealLoadsFacilityMeterBinding {
+            meter_name: "DistrictCooling:Facility",
+            fuel_energy_variable: ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+        }),
         _ => None,
     }
 }

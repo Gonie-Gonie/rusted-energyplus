@@ -16554,10 +16554,16 @@ DATA PERIODS
     fn runtime_meter_registry_resolves_ideal_loads_facility_meters() {
         let model = ideal_loads_node_state_model();
         let registry = RuntimeOutputRegistry::from_model(&model);
+        let heating_binding =
+            crate::ideal_loads_facility_meter_binding(IdealLoadsFuelType::DistrictHeatingWater)
+                .expect("district heating meter binding");
+        let cooling_binding =
+            crate::ideal_loads_facility_meter_binding(IdealLoadsFuelType::DistrictCooling)
+                .expect("district cooling meter binding");
 
         let resolution = registry.meter_registry().resolve_meter_requests(&[
-            RuntimeMeterRequest::hourly("DistrictHeatingWater:Facility"),
-            RuntimeMeterRequest::hourly("DistrictCooling:Facility"),
+            RuntimeMeterRequest::hourly(heating_binding.meter_name),
+            RuntimeMeterRequest::hourly(cooling_binding.meter_name),
         ]);
 
         assert_eq!(registry.meter_registry().len(), 2);
@@ -16567,10 +16573,18 @@ DATA PERIODS
             resolution.resolved[0].definition.name,
             "DistrictHeatingWater:Facility"
         );
+        assert_eq!(
+            heating_binding.fuel_energy_variable,
+            crate::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY
+        );
         assert_eq!(resolution.resolved[0].definition.units, "J");
         assert_eq!(
             resolution.resolved[1].definition.name,
             "DistrictCooling:Facility"
+        );
+        assert_eq!(
+            cooling_binding.fuel_energy_variable,
+            crate::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY
         );
         assert_eq!(resolution.resolved[1].definition.units, "J");
     }

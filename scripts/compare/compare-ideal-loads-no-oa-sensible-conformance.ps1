@@ -289,6 +289,12 @@ if ([Math]::Abs([double]$summary.energy_report_interval_seconds - 900.0) -gt 1.0
 if ($summary.rust_meter_time_series_comparison -ne $true) {
     throw "IdealLoads meter requests must compare Rust hourly facility meter diagnostics"
 }
+if ($summary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
+    throw "Unexpected meter aggregation source: $($summary.meter_aggregation_source)"
+}
+if ($summary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
+    throw "Unexpected meter fuel-energy binding source: $($summary.meter_fuel_energy_binding_source)"
+}
 if ($summary.requested_meter_count -ne 2) {
     throw "Expected 2 requested diagnostic meter rows, found $($summary.requested_meter_count)"
 }
@@ -355,6 +361,12 @@ Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 Assert-ZoneEquipmentDispatch -StageSummary $stageSummary
 Assert-ZoneSysEnergyDemandEvidence -StageSummary $stageSummary
 Assert-NodeOutputEvidence -StageSummary $stageSummary
+if ($stageSummary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
+    throw "Unexpected stage meter aggregation source: $($stageSummary.meter_aggregation_source)"
+}
+if ($stageSummary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
+    throw "Unexpected stage meter fuel-energy binding source: $($stageSummary.meter_fuel_energy_binding_source)"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA/no-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
@@ -385,6 +397,8 @@ Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurch
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed_system_substeps=8 system_timestep_seconds=112.500000000000 energy_report_interval_seconds=900.000000000000" -Description "markdown energy source"
 Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic; rust_meter_time_series_comparison=true requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "meter_aggregation_source: ep_runtime::RuntimeMeterRegistry" -Description "markdown meter aggregation source"
+Assert-Contains -Text $reportText -Pattern "meter_fuel_energy_binding_source: ep_runtime::ideal_loads_facility_meter_binding" -Description "markdown meter fuel-energy binding source"
 Assert-Contains -Text $reportText -Pattern "meter_requests: DistrictHeatingWater:Facility, DistrictCooling:Facility" -Description "markdown meter requests"
 Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown heating meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown cooling meter row"
