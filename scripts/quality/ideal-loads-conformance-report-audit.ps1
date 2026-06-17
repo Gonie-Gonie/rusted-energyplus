@@ -58,6 +58,33 @@ function Assert-FileExists {
     }
 }
 
+function Assert-JsonPropertyExists {
+    param(
+        [Parameter(Mandatory = $true)]$Object,
+        [Parameter(Mandatory = $true)][string]$PropertyName,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not ($Object.PSObject.Properties.Name -contains $PropertyName)) {
+        throw "$Description missing $PropertyName"
+    }
+}
+
+function Assert-JsonPropertyEquals {
+    param(
+        [Parameter(Mandatory = $true)]$Object,
+        [Parameter(Mandatory = $true)][string]$PropertyName,
+        [Parameter(Mandatory = $true)]$Expected,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    Assert-JsonPropertyExists -Object $Object -PropertyName $PropertyName -Description $Description
+    $actual = $Object.$PropertyName
+    if ($actual -ne $Expected) {
+        throw "$Description $PropertyName mismatch: expected $Expected, got $actual"
+    }
+}
+
 function Get-RepoPath {
     param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -168,15 +195,40 @@ foreach ($case in $promotedCases) {
 
     $stageSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath $stageSummaryPath | ConvertFrom-Json
     foreach ($propertyName in @(
+        "stages",
         "purchased_air_stages",
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
         "source_map_anchor",
-        "node_output_timestamp_alignment"
+        "node_output_timestamp_alignment",
+        "node_output_store_type",
+        "node_output_state_struct",
+        "node_output_update_source",
+        "node_output_report_source",
+        "zone_demand_source",
+        "zone_demand_struct_source",
+        "zone_demand_heating_sign_convention",
+        "zone_demand_cooling_sign_convention",
+        "zone_demand_mismatch_classification",
+        "zone_demand_fixture_mode"
     )) {
-        if (-not ($stageSummary.PSObject.Properties.Name -contains $propertyName)) {
-            throw "$($case.Id) stage summary missing $propertyName"
+        Assert-JsonPropertyExists -Object $stageSummary -PropertyName $propertyName -Description "$($case.Id) stage summary"
+    }
+
+    $expectedZoneEquipmentRoutines = @(
+        "ManageZoneEquipment",
+        "SimZoneEquipment",
+        "SimPurchasedAir"
+    )
+    $zoneEquipmentStages = @($stageSummary.stages)
+    if ($zoneEquipmentStages.Count -ne $expectedZoneEquipmentRoutines.Count) {
+        throw "$($case.Id) expected $($expectedZoneEquipmentRoutines.Count) ZoneEquipment stages, got $($zoneEquipmentStages.Count)"
+    }
+    for ($stageIndex = 0; $stageIndex -lt $expectedZoneEquipmentRoutines.Count; $stageIndex++) {
+        $actualRoutine = $zoneEquipmentStages[$stageIndex].source_routine
+        if ($actualRoutine -ne $expectedZoneEquipmentRoutines[$stageIndex]) {
+            throw "$($case.Id) ZoneEquipment source-order mismatch at ${stageIndex}: expected $($expectedZoneEquipmentRoutines[$stageIndex]), got $actualRoutine"
         }
     }
 
@@ -200,8 +252,31 @@ foreach ($case in $promotedCases) {
     if ($stageSummary.source_map_anchor -ne "docs/src/porting-map/ideal-loads-source-map.md") {
         throw "$($case.Id) stage summary source_map_anchor mismatch: $($stageSummary.source_map_anchor)"
     }
-    if ($stageSummary.node_output_timestamp_alignment -ne "timestamp") {
-        throw "$($case.Id) stage summary node_output_timestamp_alignment mismatch: $($stageSummary.node_output_timestamp_alignment)"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_store_type" -Expected "ep_runtime::ResultStore" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_report_source" -Expected "ReportPurchasedAir" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_struct_source" -Expected "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_heating_sign_convention" -Expected "positive W requests heating; non-positive means no active heating request" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_cooling_sign_convention" -Expected "negative W requests cooling; non-negative means no active cooling request" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_mismatch_classification" -Expected "upstream_zone_heat_balance_input" -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_fixture_mode" -Expected "source-order-oracle-demand-input" -Description "$($case.Id) stage summary"
+
+    if ($stageSummary.selected_purchased_air_branch -ne "outdoor_air") {
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_heating_field" -Expected "RemainingOutputReqToHeatSP" -Description "$($case.Id) stage summary"
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_demand_cooling_field" -Expected "RemainingOutputReqToCoolSP" -Description "$($case.Id) stage summary"
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_equipment_dispatch_path" -Expected "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir" -Description "$($case.Id) stage summary"
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_equipment_dispatch_validation" -Expected "pass" -Description "$($case.Id) stage summary"
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_equipment_conformance_candidate" -Expected "pass" -Description "$($case.Id) stage summary"
+        Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "zone_equipment_scope" -Expected "single-zone-single-equipment" -Description "$($case.Id) stage summary"
+        if (@($stageSummary.zone_equipment_dispatch_issues).Count -ne 0) {
+            throw "$($case.Id) stage summary zone_equipment_dispatch_issues must be empty"
+        }
+        if (@($stageSummary.zone_equipment_dispatch_warnings).Count -ne 0) {
+            throw "$($case.Id) stage summary zone_equipment_dispatch_warnings must be empty"
+        }
     }
 }
 
