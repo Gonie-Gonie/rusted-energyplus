@@ -204,6 +204,8 @@ $expectedTraceResultInvariancePolicy = "trace level selects evidence payload onl
 $expectedTraceOverheadAccounting = "trace/report serialization overhead is outside numerical conformance comparison and measured separately from simulation results"
 $expectedIdealLoadsFeatureDispatchPolicy = "compile feature flags select branch-specific source-order compat functions; unsupported active feature combinations emit diagnostics instead of approximate fallback"
 $expectedIdealLoadsPreboundIdContract = "compile-stage IdealLoadsAirSystemId, ZoneId, supply NodeId, return NodeId, zone air NodeId, optional outdoor air NodeId, availability ScheduleId, heating availability ScheduleId, and cooling availability ScheduleId"
+$expectedIdealLoadsPsychrometricEvaluationPolicy = "compatibility reports use source-order direct psychrometric evaluation; no cross-timestep cache or reordering is enabled"
+$expectedIdealLoadsPsychrometricCachePolicy = "future compatibility cache must key exact temperature, humidity ratio, and pressure tuple and preserve EnergyPlus evaluation order"
 
 $devCmd = Join-Path $RepoRoot "scripts\dev.cmd"
 $caseIndex = 0
@@ -310,6 +312,8 @@ foreach ($case in $promotedCases) {
         "ideal_loads_feature_flags",
         "ideal_loads_feature_dispatch_policy",
         "ideal_loads_prebound_id_contract",
+        "ideal_loads_psychrometric_evaluation_policy",
+        "ideal_loads_psychrometric_cache_policy",
         "trace_level",
         "trace_level_source",
         "trace_payload",
@@ -405,6 +409,8 @@ foreach ($case in $promotedCases) {
     }) -join ", ")
     Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_feature_dispatch_policy" -Expected $expectedIdealLoadsFeatureDispatchPolicy -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_prebound_id_contract" -Expected $expectedIdealLoadsPreboundIdContract -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_psychrometric_evaluation_policy" -Expected $expectedIdealLoadsPsychrometricEvaluationPolicy -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_psychrometric_cache_policy" -Expected $expectedIdealLoadsPsychrometricCachePolicy -Description "$($case.Id) compare summary"
     $expectedTracePayload = if ($summary.selected_purchased_air_branch -eq "outdoor_air") {
         "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates"
     }
@@ -440,6 +446,8 @@ foreach ($case in $promotedCases) {
         "ideal_loads_feature_flags" = $expectedFeatureFlagsLabel
         "ideal_loads_feature_dispatch_policy" = $expectedIdealLoadsFeatureDispatchPolicy
         "ideal_loads_prebound_id_contract" = $expectedIdealLoadsPreboundIdContract
+        "ideal_loads_psychrometric_evaluation_policy" = $expectedIdealLoadsPsychrometricEvaluationPolicy
+        "ideal_loads_psychrometric_cache_policy" = $expectedIdealLoadsPsychrometricCachePolicy
         "trace_level" = "default-conformance"
         "trace_level_source" = "case manifest [trace].level"
         "trace_payload" = $expectedTracePayload
@@ -483,6 +491,8 @@ foreach ($case in $promotedCases) {
         "ideal_loads_feature_flags",
         "ideal_loads_feature_dispatch_policy",
         "ideal_loads_prebound_id_contract",
+        "ideal_loads_psychrometric_evaluation_policy",
+        "ideal_loads_psychrometric_cache_policy",
         "trace_level",
         "trace_level_source",
         "trace_payload",
@@ -583,6 +593,8 @@ foreach ($case in $promotedCases) {
     }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_feature_dispatch_policy" -Expected ([string]$summary.ideal_loads_feature_dispatch_policy) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_prebound_id_contract" -Expected ([string]$summary.ideal_loads_prebound_id_contract) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_psychrometric_evaluation_policy" -Expected ([string]$summary.ideal_loads_psychrometric_evaluation_policy) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_psychrometric_cache_policy" -Expected ([string]$summary.ideal_loads_psychrometric_cache_policy) -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_store_type" -Expected "ep_runtime::ResultStore" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) stage summary"

@@ -229,6 +229,8 @@ const IDEAL_LOADS_DIRECT_CALC_HELPER_INVOCATION: bool = false;
 const IDEAL_LOADS_ZONE_EQUIPMENT_EXECUTION_BOUNDARY: &str = "validated typed ZoneEquipmentManager path; report generator invokes source-order PurchasedAir wrapper";
 const IDEAL_LOADS_FEATURE_DISPATCH_POLICY: &str = "compile feature flags select branch-specific source-order compat functions; unsupported active feature combinations emit diagnostics instead of approximate fallback";
 const IDEAL_LOADS_PREBOUND_ID_CONTRACT: &str = "compile-stage IdealLoadsAirSystemId, ZoneId, supply NodeId, return NodeId, zone air NodeId, optional outdoor air NodeId, availability ScheduleId, heating availability ScheduleId, and cooling availability ScheduleId";
+const IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY: &str = "compatibility reports use source-order direct psychrometric evaluation; no cross-timestep cache or reordering is enabled";
+const IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY: &str = "future compatibility cache must key exact temperature, humidity ratio, and pressure tuple and preserve EnergyPlus evaluation order";
 const IDEAL_LOADS_TRACE_LEVEL_DEFAULT: &str = "default-conformance";
 const IDEAL_LOADS_TRACE_LEVEL_SOURCE_DEFAULT: &str =
     "built-in default; override with case manifest [trace].level";
@@ -5116,6 +5118,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         IDEAL_LOADS_PREBOUND_ID_CONTRACT
     ));
     report.push_str(&format!(
+        "ideal_loads_psychrometric_evaluation_policy: {}\n",
+        IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_psychrometric_cache_policy: {}\n",
+        IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY
+    ));
+    report.push_str(&format!(
         "trace_level: {}\n",
         ideal_loads_trace_level(context.manifest)
     ));
@@ -5374,6 +5384,14 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "ideal_loads_prebound_id_contract: {}\n",
         IDEAL_LOADS_PREBOUND_ID_CONTRACT
+    ));
+    report.push_str(&format!(
+        "ideal_loads_psychrometric_evaluation_policy: {}\n",
+        IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY
+    ));
+    report.push_str(&format!(
+        "ideal_loads_psychrometric_cache_policy: {}\n",
+        IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY
     ));
     report.push_str(&format!(
         "trace_level: {}\n",
@@ -5709,6 +5727,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"ideal_loads_prebound_id_contract\": {},\n",
         json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_evaluation_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
@@ -6270,6 +6296,14 @@ fn render_outdoor_air_stage_summary_json(
         json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_evaluation_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
+    ));
+    json.push_str(&format!(
         "  \"trace_level\": {},\n",
         json_string(ideal_loads_trace_level(context.manifest))
     ));
@@ -6685,6 +6719,14 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"ideal_loads_prebound_id_contract\": {},\n",
         json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_evaluation_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",
@@ -7373,6 +7415,14 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"ideal_loads_prebound_id_contract\": {},\n",
         json_string(IDEAL_LOADS_PREBOUND_ID_CONTRACT)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_evaluation_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_EVALUATION_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_psychrometric_cache_policy\": {},\n",
+        json_string(IDEAL_LOADS_PSYCHROMETRIC_CACHE_POLICY)
     ));
     json.push_str(&format!(
         "  \"trace_level\": {},\n",

@@ -118,6 +118,12 @@ branch-specific source-order compatibility function, unsupported active feature
 combinations emit diagnostics instead of approximate fallback, and the
 IdealLoads system, zone, node, and availability schedule references are typed
 before the simulation loop.
+Psychrometric evidence metadata is intentionally conservative:
+`ideal_loads_psychrometric_evaluation_policy` says the compatibility reports use
+source-order direct evaluation with no cross-timestep cache or reordering, and
+`ideal_loads_psychrometric_cache_policy` requires any future cache to use the
+exact temperature, humidity ratio, and pressure tuple while preserving
+EnergyPlus evaluation order.
 Each IdealLoads case manifest sets `[trace].level`; reports echo that value in
 `trace_level` and identify `trace_level_source` as `case manifest [trace].level`.
 Trace level only selects the evidence payload: `ResultStore` values are computed

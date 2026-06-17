@@ -137,6 +137,8 @@ function Assert-ConformanceGateReportMetadataGuards {
         "ideal_loads_feature_flags",
         "ideal_loads_feature_dispatch_policy",
         "ideal_loads_prebound_id_contract",
+        "ideal_loads_psychrometric_evaluation_policy",
+        "ideal_loads_psychrometric_cache_policy",
         "trace_level_source",
         "trace_result_invariance_policy",
         "trace_overhead_accounting",
