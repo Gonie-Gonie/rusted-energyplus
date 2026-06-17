@@ -343,25 +343,29 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/calc.rs::heating_supply_humidity_ratio",
   "crates/ep_runtime/src/zone_equipment/mod.rs::ZoneSysEnergyDemand",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD",
-  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE",
-  "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE",
-  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_humidistat_humidification_diagnostic",
-  "scripts/compare/compare-ideal-loads-humidistat-humidification-diagnostic.ps1",
-]
-status = "diagnostic_only"
-first_case = "ideal_loads_humidistat_humidification_diagnostic_001"
-first_evidence = "ideal_loads_humidistat_humidification_diagnostic_001"
-proof_variables = [
-  "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
-  "Zone Ideal Loads Zone Latent Heating Rate",
-  "Zone Ideal Loads Supply Air Latent Heating Rate",
-  "Zone Ideal Loads Zone Total Heating Rate",
-  "Zone Ideal Loads Supply Air Total Heating Rate",
-  "System Node Humidity Ratio",
-  "System Node Mass Flow Rate",
-]
-claim_level = "none"
-support_boundary = "Diagnostic-only no-OA Humidistat humidification evidence using EnergyPlus ZoneSysMoistureDemand inputs, source-order return-node zone state, maximum heating humidity ratio, saturation clamp, and latent heating report parity; outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, and broad humidity-control conformance remain outside the claim."
+    "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE",
+    "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE",
+    "crates/ep_cli/src/ideal_loads.rs::manifest_allows_humidistat_humidification_diagnostic",
+    "crates/ep_cli/src/ideal_loads.rs::manifest_allows_humidistat_humidification_conformance",
+    "scripts/compare/compare-ideal-loads-humidistat-humidification-diagnostic.ps1",
+    "scripts/compare/compare-ideal-loads-humidistat-humidification-conformance-candidate.ps1",
+  ]
+  status = "conformance"
+  first_case = "ideal_loads_humidistat_humidification_conformance_candidate_001"
+  first_evidence = "ideal_loads_humidistat_humidification_conformance_candidate_001"
+  proof_variables = [
+    "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
+    "Zone Ideal Loads Zone Total Heating Rate",
+    "Zone Ideal Loads Zone Sensible Heating Rate",
+    "Zone Ideal Loads Zone Latent Heating Rate",
+    "Zone Ideal Loads Supply Air Sensible Heating Rate",
+    "Zone Ideal Loads Supply Air Latent Heating Rate",
+    "Zone Ideal Loads Supply Air Total Heating Rate",
+    "System Node Humidity Ratio",
+    "System Node Mass Flow Rate",
+  ]
+  claim_level = "limited-ideal-loads-no-oa-humidistat-humidification-conformance"
+  support_boundary = "Tolerance-gated no-OA Humidistat humidification conformance for declared thermostat, heating total/sensible/latent rate, supply-air heating report-rate, and supply-node temperature/mass-flow/humidity rows in ideal_loads_humidistat_humidification_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are traced diagnostic proof inputs; humidistat schedule-to-moisture-demand calculation, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, ReportPurchasedAir energy/fuel rows, meters, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"

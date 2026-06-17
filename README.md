@@ -89,11 +89,12 @@ tolerance, and code organization.
   `ideal_loads_humidistat_dehumidification_conformance_candidate_001`, using
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
   calculation and broad humidity-control conformance remain outside the claim
-- diagnostic-only IdealLoads no-OA Humidistat humidification humidity-control
-  evidence for remaining zone/supply latent and sensible rate rows,
-  moisture-demand proof inputs, and supply humidity handling in
-  `ideal_loads_humidistat_humidification_diagnostic_001`; broad
-  humidity-control conformance remains outside the claim
+- limited IdealLoads no-OA Humidistat humidification conformance candidate
+  gate for declared thermostat, heating total/sensible/latent rate, and
+  supply-node temperature/flow/humidity Detailed series in
+  `ideal_loads_humidistat_humidification_conformance_candidate_001`, using
+  traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
+  calculation and broad humidity-control conformance remain outside the claim
 - diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
   AirChanges/Hour, Sum, and Maximum outdoor-air design-flow evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity

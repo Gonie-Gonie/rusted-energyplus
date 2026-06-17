@@ -145,6 +145,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     constant_supply_humidity_cooling_conformance_claim: bool,
     constant_supply_humidity_heating_conformance_claim: bool,
     humidistat_dehumidification_conformance_claim: bool,
+    humidistat_humidification_conformance_claim: bool,
     zone_name: String,
     zone_air_node_name: String,
     recirculation_node_name: Option<String>,
@@ -1438,6 +1439,7 @@ fn build_context<'a>(
     if manifest_allows_constant_supply_humidity_humidification_diagnostic(manifest, system)
         || manifest_allows_constant_supply_humidity_heating_conformance(manifest, system)
         || manifest_allows_humidistat_humidification_diagnostic(manifest, system)
+        || manifest_allows_humidistat_humidification_conformance(manifest, system)
     {
         boundary
             .unsupported_features
@@ -1500,6 +1502,8 @@ fn build_context<'a>(
         manifest_allows_constant_supply_humidity_heating_conformance(manifest, system);
     let humidistat_dehumidification_conformance_claim =
         manifest_allows_humidistat_dehumidification_conformance(manifest, system);
+    let humidistat_humidification_conformance_claim =
+        manifest_allows_humidistat_humidification_conformance(manifest, system);
 
     Ok(IdealLoadsDiagnosticContext {
         manifest,
@@ -1513,6 +1517,7 @@ fn build_context<'a>(
         constant_supply_humidity_cooling_conformance_claim,
         constant_supply_humidity_heating_conformance_claim,
         humidistat_dehumidification_conformance_claim,
+        humidistat_humidification_conformance_claim,
         zone_name,
         zone_air_node_name,
         recirculation_node_name,
@@ -2878,6 +2883,24 @@ fn manifest_allows_humidistat_humidification_diagnostic(
             output.variable == ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD
                 || output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
                 || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
+        })
+}
+
+fn manifest_allows_humidistat_humidification_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest.conformance_claim
+        && manifest.id == "ideal_loads_humidistat_humidification_conformance_candidate_001"
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type == HumidificationControlType::Humidistat
+        && manifest.outputs.iter().any(|output| {
+            output.level == Some(OutputLevel::Conformance)
+                && output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
+        })
+        && manifest.outputs.iter().any(|output| {
+            output.level == Some(OutputLevel::Conformance)
+                && output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
         })
 }
 
@@ -5279,6 +5302,8 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables only"
     } else if context.humidistat_dehumidification_conformance_claim {
         "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables only"
+    } else if context.humidistat_humidification_conformance_claim {
+        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables only"
     } else if context.manifest.conformance_claim {
         "conformance no-OA/no-limit sensible IdealLoads branch for declared variables only"
     } else if context.branch == "no-oa-finite-limit-sensible" {
