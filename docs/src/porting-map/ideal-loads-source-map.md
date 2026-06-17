@@ -187,13 +187,17 @@ heating report rows with zero tolerance failures. The original
 `ideal_loads_constant_supply_humidity_heating_diagnostic_001` remains available
 as non-claim regression/proof evidence for the broader diagnostic output set.
 
-`ideal_loads_humidistat_dehumidification_diagnostic_001` adds a diagnostic-only
-no-OA Humidistat dehumidification lane. The compare path reads EnergyPlus
-`ZoneSysMoistureDemand` proof rows for the humidifying and dehumidifying
-moisture transfer rates, uses the same-timestamp return node as the
-source-order zone state for the first run-period sample, and matches the
-Humidistat dehumidification supply mass flow, supply humidity ratio, and latent
-cooling report rows with zero tolerance failures.
+`ideal_loads_humidistat_dehumidification_conformance_candidate_001` promotes
+the no-OA Humidistat dehumidification lane for declared thermostat,
+cooling total/sensible/latent rate, supply-air cooling report-rate, and
+supply-node temperature/mass-flow/humidity rows. The compare path reads
+EnergyPlus `ZoneSysMoistureDemand` proof rows for the humidifying and
+dehumidifying moisture transfer rates, uses the same-timestamp return node as
+the source-order zone state for the first run-period sample, and matches the
+Humidistat dehumidification supply mass flow, supply humidity ratio, and
+cooling report rows with zero tolerance failures. The original
+`ideal_loads_humidistat_dehumidification_diagnostic_001` remains available as
+non-claim regression/proof evidence for the broader diagnostic output set.
 
 `ideal_loads_humidistat_humidification_diagnostic_001` adds the matching
 diagnostic-only no-OA Humidistat humidification lane. It reads the EnergyPlus
@@ -203,7 +207,8 @@ uses the maximum heating supply humidity ratio with the same saturation clamp,
 and matches the supply humidity and latent heating report rows with zero
 tolerance failures.
 
-These remain diagnostic-only: Humidistat, outdoor-air humidity control,
+These remain diagnostic-only: Humidistat schedule-to-moisture-demand
+calculation, Humidistat humidification, outdoor-air humidity control,
 DifferentialDryBulb economizer humidity interactions, heat-recovery humidity
 interactions, finite-limit humidity-control behavior, and broad humidity-control
 conformance.
@@ -471,6 +476,18 @@ pass their tolerances, the 25 diagnostic proof rows pass, and
 heating claim for declared outputs; Humidistat, return-node and zone-air-node
 humidity proof rows, ReportPurchasedAir energy/fuel rows, meters, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
+
+`scripts/dev.cmd compare-ideal-loads-humidistat-dehumidification-conformance-candidate`
+generates the Humidistat dehumidification conformance evidence set under
+`.runtime/ideal-loads-humidistat-dehumidification-conformance/26.1.0/ideal_loads_humidistat_dehumidification_conformance_candidate_001/compare/`.
+That run compares 38 Detailed/hourly series. The 11 declared conformance rows
+pass their tolerances, the 27 diagnostic proof rows pass, and
+`tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
+dehumidification claim for declared outputs; EnergyPlus moisture-demand rows,
+humidistat schedule-to-moisture-demand calculation, Humidistat humidification,
+return-node and zone-air-node humidity proof rows, ReportPurchasedAir
+energy/fuel rows, meters, outdoor-air, economizer, heat-recovery, and broad
+HVAC behavior remain outside the claim.
 
 ## Claim Requirements
 

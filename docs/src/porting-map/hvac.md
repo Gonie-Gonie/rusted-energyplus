@@ -260,6 +260,23 @@ true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
 Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
 broad humidity-control conformance remain outside the claim.
 
+## IdealLoads Humidistat Dehumidification Conformance
+
+`ideal_loads_humidistat_dehumidification_conformance_candidate_001` promotes
+the no-OA `Humidistat` dehumidification lane for declared thermostat setpoints,
+cooling total/sensible/latent rate rows, supply-air cooling report rows, and
+supply-node temperature/mass-flow/humidity rows. It reuses the diagnostic
+fixture IDF and keeps EnergyPlus moisture-demand rows, heating rows,
+return-node and zone-air-node humidity rows, ReportPurchasedAir energy/fuel
+rows, and facility meters as proof rows only.
+
+The compare run has `comparison_class = "conformance"`, `conformance_claim =
+true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
+38 Detailed/hourly series with 11 conformance rows and 27 diagnostic proof
+rows. Humidistat schedule-to-moisture-demand calculation, Humidistat
+humidification, outdoor-air humidity, finite-limit humidity-control behavior,
+and broad humidity-control conformance remain outside the claim.
+
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
