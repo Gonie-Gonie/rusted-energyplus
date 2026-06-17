@@ -168,6 +168,7 @@ foreach ($case in $promotedCases) {
 
     $stageSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath $stageSummaryPath | ConvertFrom-Json
     foreach ($propertyName in @(
+        "purchased_air_stages",
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
@@ -177,6 +178,30 @@ foreach ($case in $promotedCases) {
         if (-not ($stageSummary.PSObject.Properties.Name -contains $propertyName)) {
             throw "$($case.Id) stage summary missing $propertyName"
         }
+    }
+
+    $expectedPurchasedAirRoutines = @(
+        "GetPurchasedAir",
+        "InitPurchasedAir",
+        "CalcPurchAirLoads",
+        "UpdatePurchasedAir",
+        "ReportPurchasedAir"
+    )
+    $purchasedAirStages = @($stageSummary.purchased_air_stages)
+    if ($purchasedAirStages.Count -ne $expectedPurchasedAirRoutines.Count) {
+        throw "$($case.Id) expected $($expectedPurchasedAirRoutines.Count) PurchasedAir stages, got $($purchasedAirStages.Count)"
+    }
+    for ($stageIndex = 0; $stageIndex -lt $expectedPurchasedAirRoutines.Count; $stageIndex++) {
+        $actualRoutine = $purchasedAirStages[$stageIndex].source_routine
+        if ($actualRoutine -ne $expectedPurchasedAirRoutines[$stageIndex]) {
+            throw "$($case.Id) PurchasedAir source-order mismatch at ${stageIndex}: expected $($expectedPurchasedAirRoutines[$stageIndex]), got $actualRoutine"
+        }
+    }
+    if ($stageSummary.source_map_anchor -ne "docs/src/porting-map/ideal-loads-source-map.md") {
+        throw "$($case.Id) stage summary source_map_anchor mismatch: $($stageSummary.source_map_anchor)"
+    }
+    if ($stageSummary.node_output_timestamp_alignment -ne "timestamp") {
+        throw "$($case.Id) stage summary node_output_timestamp_alignment mismatch: $($stageSummary.node_output_timestamp_alignment)"
     }
 }
 
