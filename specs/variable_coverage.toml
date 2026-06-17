@@ -196,7 +196,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum mass-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001 with blank OA schedule, NoEconomizer, no heat recovery, and default ConstantSensibleHeatRatio dehumidification. Active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer mass-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001 with blank OA schedule, NoEconomizer for the design-flow candidates, DifferentialDryBulb for the economizer candidate, no heat recovery, and default ConstantSensibleHeatRatio dehumidification. DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate"
@@ -204,7 +204,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum standard-density volume-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001 using EnergyPlus StdRhoAir from Site:Location. Active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer standard-density volume-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001 using EnergyPlus StdRhoAir from Site:Location. DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Sensible Heating Rate"
@@ -212,7 +212,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum sensible heating report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer sensible heating report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Sensible Cooling Rate"
@@ -220,7 +220,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum sensible cooling report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer sensible cooling report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Latent Heating Rate"
@@ -228,7 +228,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum no-humidity latent heating report-rate conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active humidification/dehumidification branches, active economizer, heat recovery, DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer no-humidity latent heating report-rate conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, active humidification/dehumidification branches, DifferentialEnthalpy economizer, active heat recovery, DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Latent Cooling Rate"
@@ -236,7 +236,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum no-humidity latent cooling report-rate conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active dehumidification/humidification branches, active economizer, heat recovery, DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer no-humidity latent cooling report-rate conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, active dehumidification/humidification branches, DifferentialEnthalpy economizer, active heat recovery, DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Total Heating Rate"
@@ -244,7 +244,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum total heating report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer total heating report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Total Cooling Rate"
@@ -252,7 +252,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum total cooling report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer total cooling report-rate conformance within a 1 W source-order tolerance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Mass Flow Rate"
@@ -260,7 +260,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum supply mass-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer supply mass-flow conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate"
@@ -268,7 +268,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum supply standard-density volume-flow conformance using EnergyPlus StdRhoAir from Site:Location for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer supply standard-density volume-flow conformance using EnergyPlus StdRhoAir from Site:Location for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Temperature"
@@ -276,7 +276,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum supply temperature conformance within 0.02 C for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer supply temperature conformance within 0.02 C for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Humidity Ratio"
@@ -284,7 +284,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum no-active-humidity-control supply humidity-ratio conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active humidity controls, active economizer, heat recovery, DCV, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer no-active-humidity-control supply humidity-ratio conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, active humidity controls, DifferentialEnthalpy economizer, active heat recovery, DCV, heat-recovery saturation-limit branches, and broad HVAC/OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Mixed Air Temperature"
@@ -292,7 +292,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum no-heat-recovery mixed-air dry-bulb conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer no-heat-recovery mixed-air dry-bulb conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Mixed Air Humidity Ratio"
@@ -300,7 +300,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum no-heat-recovery mixed-air humidity-ratio conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, and ideal_loads_outdoor_air_maximum_conformance_candidate_001. Other outdoor-air methods, active economizer, heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone DifferentialDryBulb economizer no-heat-recovery mixed-air humidity-ratio conformance for ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, ideal_loads_outdoor_air_flow_person_conformance_candidate_001, ideal_loads_outdoor_air_flow_area_conformance_candidate_001, ideal_loads_outdoor_air_air_changes_conformance_candidate_001, ideal_loads_outdoor_air_sum_conformance_candidate_001, ideal_loads_outdoor_air_maximum_conformance_candidate_001, and ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Other outdoor-air methods, DifferentialEnthalpy economizer, active heat recovery, DCV, active humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Sensible Heating Rate"
@@ -308,7 +308,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery sensible heating report-rate parity for eight IdealLoads outdoor-air fixtures plus active Sensible heat-recovery sensible heating parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery sensible heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery sensible heating report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus active Sensible heat-recovery sensible heating parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery sensible heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Latent Heating Rate"
@@ -316,7 +316,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery latent heating report-rate parity for eight IdealLoads outdoor-air fixtures plus Sensible heat-recovery unchanged-humidity latent zero parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery latent heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery latent heating report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus Sensible heat-recovery unchanged-humidity latent zero parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery latent heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Total Heating Rate"
@@ -324,7 +324,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery total heating report-rate parity for eight IdealLoads outdoor-air fixtures plus active Sensible heat-recovery total heating parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery total heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery total heating report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus active Sensible heat-recovery total heating parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery total heating parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"
@@ -332,7 +332,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery sensible cooling report-rate parity for eight IdealLoads outdoor-air fixtures plus active Sensible heat-recovery sensible cooling parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery sensible cooling parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery sensible cooling report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus active Sensible heat-recovery sensible cooling parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery sensible cooling parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"
@@ -340,7 +340,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery latent cooling report-rate parity for eight IdealLoads outdoor-air fixtures plus Sensible heat-recovery unchanged-humidity latent zero parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery latent cooling diagnostic evidence for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery latent cooling report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus Sensible heat-recovery unchanged-humidity latent zero parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery latent cooling diagnostic evidence for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Total Cooling Rate"
@@ -348,15 +348,15 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery total cooling report-rate parity for eight IdealLoads outdoor-air fixtures plus active Sensible heat-recovery total cooling parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery total cooling diagnostic evidence for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery total cooling report-rate parity for no-heat-recovery IdealLoads outdoor-air fixtures plus active Sensible heat-recovery total cooling parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery total cooling diagnostic evidence for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, humidity controls, heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Economizer Active Time"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive economizer active-time parity for six no-economizer IdealLoads outdoor-air fixtures plus the Sensible and Enthalpy heat-recovery Flow/Zone fixtures and DifferentialDryBulb/DifferentialEnthalpy economizer active-time parity; DCV and broad OA conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001"
+first_evidence = "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001"
+support_boundary = "Tolerance-gated IdealLoads DifferentialDryBulb economizer active-time conformance for ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001. Inactive economizer active-time parity and DifferentialEnthalpy economizer active-time parity remain diagnostic-only; active DCV and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Active Time"
@@ -364,7 +364,7 @@ domain = "hvac"
 status = "diagnostic"
 first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
 first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-support_boundary = "Diagnostic-only inactive heat-recovery active-time parity for eight IdealLoads outdoor-air fixtures plus active Sensible heat-recovery active-time parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery active-time parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+support_boundary = "Diagnostic-only inactive heat-recovery active-time parity for no-heat-recovery IdealLoads outdoor-air fixtures plus active Sensible heat-recovery active-time parity for ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001 and active Enthalpy heat-recovery active-time parity for ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001; DCV, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate"

@@ -107,6 +107,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_SUM_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_sum_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_MAXIMUM_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_maximum_conformance_candidate_001";
+const IDEAL_LOADS_OUTDOOR_AIR_DIFFERENTIAL_DRY_BULB_ECONOMIZER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -498,6 +500,17 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
                 ));
             }
         }
+        if manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
+            manifest,
+        ) && !manifest.outputs.iter().any(|output| {
+            output.variable == ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME
+                && output.level == Some(OutputLevel::Conformance)
+        }) {
+            return Err(
+                "IdealLoads outdoor-air DifferentialDryBulb economizer conformance is missing conformance row for Zone Ideal Loads Economizer Active Time"
+                    .to_string(),
+            );
+        }
     } else if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
         return Err(format!(
             "IdealLoads outdoor-air design-flow report requires diagnostic-only unless it is an approved outdoor-air conformance candidate, got {}",
@@ -529,7 +542,10 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
             ));
         }
         if outdoor_air_conformance {
-            let expected_level = if outdoor_air_conformance_variable(output.variable.as_str()) {
+            let expected_level = if outdoor_air_conformance_variable_for_manifest(
+                manifest,
+                output.variable.as_str(),
+            ) {
                 OutputLevel::Conformance
             } else {
                 OutputLevel::Diagnostic
@@ -638,28 +654,76 @@ fn manifest_allows_outdoor_air_maximum_conformance_manifest(manifest: &Conforman
         && manifest.conformance_claim
 }
 
-fn outdoor_air_conformance_method_for_manifest(
+fn manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
     manifest: &ConformanceCase,
-) -> Option<DesignSpecificationOutdoorAirMethod> {
+) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_DIFFERENTIAL_DRY_BULB_ECONOMIZER_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
+fn outdoor_air_conformance_expectations_for_manifest(
+    manifest: &ConformanceCase,
+) -> Option<(
+    DesignSpecificationOutdoorAirMethod,
+    OutdoorAirEconomizerType,
+)> {
     if manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::FlowPerZone)
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerZone,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
     } else if manifest_allows_outdoor_air_flow_person_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::FlowPerPerson)
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerPerson,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
     } else if manifest_allows_outdoor_air_flow_area_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::FlowPerArea)
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerArea,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
     } else if manifest_allows_outdoor_air_air_changes_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::AirChangesPerHour)
+        Some((
+            DesignSpecificationOutdoorAirMethod::AirChangesPerHour,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
     } else if manifest_allows_outdoor_air_sum_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::Sum)
+        Some((
+            DesignSpecificationOutdoorAirMethod::Sum,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
     } else if manifest_allows_outdoor_air_maximum_conformance_manifest(manifest) {
-        Some(DesignSpecificationOutdoorAirMethod::Maximum)
+        Some((
+            DesignSpecificationOutdoorAirMethod::Maximum,
+            OutdoorAirEconomizerType::NoEconomizer,
+        ))
+    } else if manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
+        manifest,
+    ) {
+        Some((
+            DesignSpecificationOutdoorAirMethod::FlowPerZone,
+            OutdoorAirEconomizerType::DifferentialDryBulb,
+        ))
     } else {
         None
     }
 }
 
-fn outdoor_air_conformance_variable(variable: &str) -> bool {
+fn outdoor_air_conformance_method_for_manifest(
+    manifest: &ConformanceCase,
+) -> Option<DesignSpecificationOutdoorAirMethod> {
+    outdoor_air_conformance_expectations_for_manifest(manifest).map(|(method, _economizer)| method)
+}
+
+fn outdoor_air_conformance_variable_for_manifest(
+    manifest: &ConformanceCase,
+    variable: &str,
+) -> bool {
     OUTDOOR_AIR_CONFORMANCE_VARIABLES.contains(&variable)
+        || (manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
+            manifest,
+        ) && variable == ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME)
 }
 
 fn build_outdoor_air_design_flow_context<'a>(
@@ -745,11 +809,14 @@ fn build_outdoor_air_design_flow_context<'a>(
     }
 
     validate_outdoor_air_design_flow_boundary(system, outdoor_air_specification.method)?;
-    if let Some(conformance_method) = outdoor_air_conformance_method_for_manifest(manifest) {
+    if let Some((conformance_method, conformance_economizer)) =
+        outdoor_air_conformance_expectations_for_manifest(manifest)
+    {
         validate_outdoor_air_conformance_boundary(
             system,
             outdoor_air_specification.method,
             conformance_method,
+            conformance_economizer,
         )?;
     }
 
@@ -1049,6 +1116,7 @@ fn validate_outdoor_air_conformance_boundary(
     system: &IdealLoadsAirSystem,
     method: DesignSpecificationOutdoorAirMethod,
     expected_method: DesignSpecificationOutdoorAirMethod,
+    expected_economizer: OutdoorAirEconomizerType,
 ) -> Result<(), String> {
     if method != expected_method {
         return Err(format!(
@@ -1057,10 +1125,11 @@ fn validate_outdoor_air_conformance_boundary(
             outdoor_air_method_label(expected_method)
         ));
     }
-    if system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer {
-        return Err(
-            "IdealLoads outdoor-air conformance candidate excludes active economizer".to_string(),
-        );
+    if system.outdoor_air_economizer_type != expected_economizer {
+        return Err(format!(
+            "IdealLoads outdoor-air conformance candidate requires {} economizer",
+            outdoor_air_economizer_label(expected_economizer)
+        ));
     }
     if system.heat_recovery_type != HeatRecoveryType::None {
         return Err(
@@ -1133,6 +1202,11 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     }
     if manifest_allows_outdoor_air_maximum_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air Maximum branch for declared variables only";
+    }
+    if manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(
+        context.manifest,
+    ) {
+        return "conformance IdealLoads outdoor-air DifferentialDryBulb economizer branch for declared variables only";
     }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";

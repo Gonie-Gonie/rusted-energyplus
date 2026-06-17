@@ -127,11 +127,18 @@ tolerance, and code organization.
   series in `ideal_loads_outdoor_air_maximum_conformance_candidate_001`, with
   traced component-flow proof inputs and AirChanges/Hour selected as the
   governing maximum
-- diagnostic-only IdealLoads remaining active economizer and active
+- limited IdealLoads outdoor-air `DifferentialDryBulb` economizer conformance
+  candidate gate for declared Flow/Zone outdoor-air mass/standard-density
+  volume flow, no-humidity outdoor-air report rates, supply-air state,
+  mixed-air state, and economizer active-time Detailed series in
+  `ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001`,
+  using a low minimum outdoor-air flow so the source dry-bulb comparison resets
+  the cooling outdoor-air flow above the design minimum
+- diagnostic-only IdealLoads remaining DifferentialEnthalpy economizer and active
   heat-recovery outdoor-air evidence
   for outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, inactive
-  economizer/heat-recovery reports, DifferentialDryBulb and
+  economizer/heat-recovery reports,
   DifferentialEnthalpy economizer active-time/flow parity, and Sensible and
   Enthalpy heat-recovery active-time/rate parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
@@ -157,7 +164,8 @@ tolerance, and code organization.
   declared no-OA/no-limit, numeric finite-limit, and
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
-  `AirChanges/Hour`, `Sum`, and `Maximum` IdealLoads variables
+  `AirChanges/Hour`, `Sum`, `Maximum`, and `DifferentialDryBulb` economizer
+  IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields
@@ -189,8 +197,9 @@ Not claimed:
 - general EnergyPlus heat-balance compatibility
 - broad HVAC or plant simulation compatibility
 - broad node, full IdealLoads, meter, or full runtime conformance
-- IdealLoads economizer, heat-recovery, DCV, humidity, saturation-limit, or
-  meter conformance beyond oracle-MTR diagnostic tracking
+- IdealLoads economizer conformance beyond the declared DifferentialDryBulb
+  candidate, heat-recovery, DCV, humidity, saturation-limit, or meter
+  conformance beyond oracle-MTR diagnostic tracking
 - broad ExampleFiles compatibility
 
 ## Quick Start

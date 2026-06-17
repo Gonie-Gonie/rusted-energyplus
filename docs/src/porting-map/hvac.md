@@ -294,7 +294,7 @@ rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
 
-## IdealLoads Outdoor-Air Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum Conformance
+## IdealLoads Outdoor-Air Design Flow And DifferentialDryBulb Conformance
 
 `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
 blank-schedule `DesignSpecification:OutdoorAir` `Flow/Zone` lane for declared
@@ -327,14 +327,28 @@ declared output surface. It reports the component proof terms separately:
 0.000 m3/s Flow/Person, 0.015 m3/s Flow/Area, 0.025 m3/s Flow/Zone, and
 0.010 m3/s AirChanges/Hour, which sum to the 0.05 m3/s design volume.
 
-Each candidate compares 22 Detailed series with 14 conformance rows and 8
-diagnostic proof rows. The diagnostic rows are inactive economizer and inactive
-heat-recovery report variables only. The guard requires the declared outdoor-
-air method, `NoEconomizer`, no heat recovery, no OA schedule, no finite
-flow/capacity limits, no DCV, default `ConstantSensibleHeatRatio`
-dehumidification, and no humidification control.
+`ideal_loads_outdoor_air_maximum_conformance_candidate_001` promotes the
+matching blank-schedule `DesignSpecification:OutdoorAir` `Maximum` lane for
+the same declared output surface. It reports the same component proof terms as
+the Sum lane, but selects the 0.050 m3/s AirChanges/Hour term as the governing
+design volume.
 
-Active economizer, active heat
+The six no-economizer design-flow candidates each compare 22 Detailed series
+with 14 conformance rows and 8 diagnostic proof rows. The diagnostic rows are
+inactive economizer and inactive heat-recovery report variables only. The
+guard requires the declared outdoor-air method, `NoEconomizer`, no heat
+recovery, no OA schedule, no finite flow/capacity limits, no DCV, default
+`ConstantSensibleHeatRatio` dehumidification, and no humidification control.
+
+`ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001`
+promotes the matching Flow/Zone low-minimum outdoor-air lane with
+`DifferentialDryBulb` economizer enabled. It compares 110 source-order Detailed
+samples, promotes the 14 outdoor-air/supply/mixed rows plus
+`Zone Ideal Loads Economizer Active Time`, checks that active time is nonzero,
+and verifies outdoor-air mass flow rises above the 0.001 m3/s design minimum.
+Inactive heat-recovery rows remain diagnostic-only proof rows in this case.
+
+DifferentialEnthalpy economizer, active heat
 recovery, active DCV, active humidity controls, heat-recovery saturation-limit
 branches, and broad IdealLoads outdoor-air conformance remain outside this
 claim.
@@ -350,11 +364,11 @@ claim.
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
-`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are remaining
-diagnostic-only DifferentialDryBulb, DifferentialEnthalpy, Sensible
-heat-recovery, and Enthalpy heat-recovery outdoor-air proof lanes, plus the
-original Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum
-diagnostic predecessor fixtures:
+`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are diagnostic
+predecessor and remaining proof lanes. The DifferentialDryBulb diagnostic is
+the predecessor for the promoted DDB conformance candidate; DifferentialEnthalpy,
+Sensible heat-recovery, and Enthalpy heat-recovery remain diagnostic-only
+active outdoor-air proof lanes.
 
 ```text
 comparison_class: diagnostic-only
@@ -411,8 +425,10 @@ is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
-Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum
+Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and
+Flow/Zone DifferentialDryBulb economizer
 conformance candidates, active DCV, active humidity controls,
+DifferentialEnthalpy economizer,
 saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
 conformance.
 

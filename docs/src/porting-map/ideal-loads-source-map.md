@@ -213,15 +213,15 @@ diagnostic output set.
 
 These remain diagnostic-only: Humidistat schedule-to-moisture-demand
 calculation, outdoor-air humidity control,
-DifferentialDryBulb economizer humidity interactions, heat-recovery humidity
+DifferentialEnthalpy economizer humidity interactions, heat-recovery humidity
 interactions, finite-limit humidity-control behavior, and broad humidity-control
 conformance.
 
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone,
-Flow/Person, Flow/Area, AirChanges/Hour, Sum, and Maximum candidate rows. The
-current Rust surface is:
+Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and Flow/Zone
+DifferentialDryBulb economizer candidate rows. The current Rust surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
@@ -238,19 +238,23 @@ current Rust surface is:
 - `calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s` for applying the
   current OA schedule fraction and `StdRhoAir`
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
-  Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, and Maximum OA
-  report-rate and mixed-air state diagnostic, including no-heat-recovery
-  rows, DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
+  Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and
+  DifferentialDryBulb economizer OA report-rate and mixed-air state evidence,
+  including no-heat-recovery rows, DifferentialDryBulb and
+  DifferentialEnthalpy economizer OA flow reset,
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_area_conformance_manifest`,
   `manifest_allows_outdoor_air_air_changes_conformance_manifest`,
   `manifest_allows_outdoor_air_sum_conformance_manifest`,
-  `manifest_allows_outdoor_air_maximum_conformance_manifest`, and
+  `manifest_allows_outdoor_air_maximum_conformance_manifest`,
+  `manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest`,
+  and
   `validate_outdoor_air_conformance_boundary` in
   `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone, Flow/Person,
-  Flow/Area, AirChanges/Hour, Sum, and Maximum candidates
+  Flow/Area, AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb economizer
+  candidates
 
 `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -334,13 +338,19 @@ outdoor-air/supply/mixed rows.
 `ideal_loads_outdoor_air_maximum_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Maximum fixture shape.
 
-`ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`
-keeps the Flow/Zone outdoor-air method but lowers the minimum design flow to
-0.001 m3/s so the cooling branch can exercise the EnergyPlus
+`ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001`
+promotes the Flow/Zone outdoor-air method with the minimum design flow lowered
+to 0.001 m3/s so the cooling branch can exercise the EnergyPlus
 `DifferentialDryBulb` economizer reset. The compare lane reports 110
-source-order Detailed samples, including system substep active-time rows, and
-checks that economizer active time is nonzero and outdoor-air mass flow rises
-above the design minimum.
+source-order Detailed samples, including system substep active-time rows,
+promotes the same 14 outdoor-air/supply/mixed rows plus
+`Zone Ideal Loads Economizer Active Time`, and checks that economizer active
+time is nonzero and outdoor-air mass flow rises above the design minimum. Its
+inactive heat-recovery rows remain diagnostic-only proof rows.
+
+`ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`
+remains the diagnostic predecessor artifact for the same DifferentialDryBulb
+fixture shape.
 
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`
 uses the same Flow/Zone low-minimum fixture shape for the EnergyPlus
@@ -367,9 +377,8 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality, proportional-control, active economizer, and
-active heat-recovery outdoor-air methods remain
-diagnostic or unresolved, and no outdoor-air
+Indoor air quality, proportional-control, DifferentialEnthalpy economizer, and
+active heat-recovery outdoor-air methods remain diagnostic or unresolved, and no outdoor-air
 finite-limit, outdoor-air humidity-control, other active humidity-control,
 saturation-limit heat-recovery, or DCV output is part of the promoted
 IdealLoads claim.
@@ -443,10 +452,11 @@ rows remain diagnostic.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, and mixed-air state rows have
 promoted conformance evidence in the Flow/Zone, Flow/Person, Flow/Area,
-AirChanges/Hour, Sum, and Maximum conformance candidates. Inactive
-economizer/heat-recovery outputs, DifferentialDryBulb/DifferentialEnthalpy
-economizer active-time/flow outputs, and Sensible/Enthalpy heat-recovery
-active-time and rate outputs remain diagnostic evidence in the original
+AirChanges/Hour, Sum, Maximum, and DifferentialDryBulb economizer conformance
+candidates. Inactive economizer/heat-recovery outputs,
+DifferentialEnthalpy economizer active-time/flow outputs, and
+Sensible/Enthalpy heat-recovery active-time and rate outputs remain diagnostic
+evidence in the original
 outdoor-air predecessor fixtures and active outdoor-air proof lanes:
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
 `ideal_loads_outdoor_air_design_flow_diagnostic_001`,

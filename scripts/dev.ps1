@@ -315,6 +315,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Run the IdealLoads outdoor-air DifferentialDryBulb economizer diagnostic comparison."
     }
+    "compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-conformance-candidate" = @{
+        Path = "compare\compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-conformance-candidate.ps1"
+        Group = "compare"
+        Help = "Gate the IdealLoads outdoor-air DifferentialDryBulb economizer conformance candidate."
+    }
     "compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic" = @{
         Path = "compare\compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic.ps1"
         Group = "compare"
