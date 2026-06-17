@@ -111,6 +111,14 @@ pub const fn purchased_air_source_order_stages() -> [IdealLoadsPurchasedAirStage
     ]
 }
 
+/// Runtime binding evidence for the IdealLoads compatibility path.
+pub const IDEAL_LOADS_RUNTIME_BINDING_SOURCE: &str =
+    "compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding";
+
+/// Runtime string lookup policy for PurchasedAir compatibility.
+pub const IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY: &str =
+    "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs";
+
 /// Inputs consumed by the source-order PurchasedAir wrapper.
 #[derive(Clone, Copy, Debug)]
 pub struct SimPurchasedAirCompatInput<'a> {

@@ -104,6 +104,11 @@ The Rust compatibility path preserves this ordering for the promoted
 no-OA/no-limit sensible boundary and must be extended before any excluded
 feature is promoted.
 
+`GetPurchasedAir` name lookup is represented as compile-stage typed binding in
+Rust. Conformance reports expose `ideal_loads_runtime_binding_source` as
+`compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding` and
+`purchased_air_name_lookup_policy` as `PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs`.
+
 ## No-OA Sensible Fast Path
 
 The first implementation target may dispatch to a narrow helper only when all

@@ -24,7 +24,8 @@ use ep_runtime::{
     IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE, IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE,
     IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT, IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE,
     IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE, IDEAL_LOADS_RATE_OUTPUT_SOURCE,
-    IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
+    IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_RUNTIME_BINDING_SOURCE,
+    IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
     IdealLoadsFeatureFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
     IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
     IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
@@ -5028,6 +5029,14 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER
     ));
     report.push_str(&format!(
+        "ideal_loads_runtime_binding_source: {}\n",
+        IDEAL_LOADS_RUNTIME_BINDING_SOURCE
+    ));
+    report.push_str(&format!(
+        "purchased_air_name_lookup_policy: {}\n",
+        IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY
+    ));
+    report.push_str(&format!(
         "zone_equipment_dispatch_path: {}\n",
         IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH
     ));
@@ -5230,6 +5239,14 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "source_order_wrapper: {}\n",
         IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER
+    ));
+    report.push_str(&format!(
+        "ideal_loads_runtime_binding_source: {}\n",
+        IDEAL_LOADS_RUNTIME_BINDING_SOURCE
+    ));
+    report.push_str(&format!(
+        "purchased_air_name_lookup_policy: {}\n",
+        IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY
     ));
     report.push_str(&format!(
         "zone_equipment_dispatch_path: {}\n",
@@ -5535,6 +5552,14 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_runtime_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_BINDING_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"purchased_air_name_lookup_policy\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY)
     ));
     json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",
@@ -5999,6 +6024,14 @@ fn render_outdoor_air_stage_summary_json(
         json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_runtime_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_BINDING_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"purchased_air_name_lookup_policy\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY)
+    ));
+    json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",
         json_string(IDEAL_LOADS_SOURCE_MAP_ANCHOR)
     ));
@@ -6310,6 +6343,14 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_runtime_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_BINDING_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"purchased_air_name_lookup_policy\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY)
     ));
     json.push_str(&format!(
         "  \"zone_demand_source\": {},\n",
@@ -6944,6 +6985,14 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_runtime_binding_source\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_BINDING_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"purchased_air_name_lookup_policy\": {},\n",
+        json_string(IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY)
     ));
     json.push_str(&format!(
         "  \"selected_purchased_air_branch\": {},\n",

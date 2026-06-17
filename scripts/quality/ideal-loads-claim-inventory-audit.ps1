@@ -129,6 +129,9 @@ function Assert-ConformanceGateReportMetadataGuards {
         "conformanceRows",
         "diagnostic",
         "source_order_wrapper:",
+        "ideal_loads_runtime_binding_source",
+        "purchased_air_name_lookup_policy",
+        "ideal_loads_feature_flags",
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
@@ -162,6 +165,8 @@ foreach ($anchor in @(
     "src/EnergyPlus/Psychrometrics.hh",
     "src/EnergyPlus/OutputProcessor.cc",
     "src/EnergyPlus/HVACSizingSimulationManager.cc",
+    "compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding",
+    "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs",
     "autosized IdealLoads flow/capacity conformance remains"
 )) {
     Assert-TextMatches -Text $idealLoadsSourceMapText -Pattern ([regex]::Escape($anchor)) -Description "IdealLoads source-map anchor: $anchor"

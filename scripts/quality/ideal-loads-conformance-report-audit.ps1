@@ -285,6 +285,8 @@ foreach ($case in $promotedCases) {
         "inactive_branches",
         "ideal_loads_feature_flags",
         "source_order_wrapper",
+        "ideal_loads_runtime_binding_source",
+        "purchased_air_name_lookup_policy",
         "source_map_anchor",
         "node_output_timestamp_alignment",
         "node_output_store_type",
@@ -326,6 +328,8 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $summary -PropertyName "energy_output_timestep_source" -Expected "ReportPurchasedAir rate * TimeStepSysSec" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_aggregation_source" -Expected "ep_runtime::RuntimeMeterRegistry" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "meter_fuel_energy_binding_source" -Expected "ep_runtime::ideal_loads_facility_meter_binding" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_runtime_binding_source" -Expected "compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "purchased_air_name_lookup_policy" -Expected "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_struct_source" -Expected "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_heating_field" -Expected "RemainingOutputReqToHeatSP" -Description "$($case.Id) compare summary"
@@ -367,6 +371,8 @@ foreach ($case in $promotedCases) {
         "conformance_claim" = "true"
         "status" = "pass"
         "source_order_wrapper" = $expectedSourceOrderWrapper
+        "ideal_loads_runtime_binding_source" = [string]$summary.ideal_loads_runtime_binding_source
+        "purchased_air_name_lookup_policy" = [string]$summary.purchased_air_name_lookup_policy
         "zone_equipment_dispatch_path" = "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir"
         "zone_equipment_dispatch_validation" = "pass"
         "zone_equipment_conformance_candidate" = "pass"
@@ -413,6 +419,8 @@ foreach ($case in $promotedCases) {
         "inactive_branches",
         "ideal_loads_feature_flags",
         "source_order_wrapper",
+        "ideal_loads_runtime_binding_source",
+        "purchased_air_name_lookup_policy",
         "source_map_anchor",
         "node_output_timestamp_alignment",
         "node_output_store_type",
@@ -482,6 +490,8 @@ foreach ($case in $promotedCases) {
     }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "ideal_loads_runtime_binding_source" -Expected ([string]$summary.ideal_loads_runtime_binding_source) -Description "$($case.Id) stage summary"
+    Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "purchased_air_name_lookup_policy" -Expected ([string]$summary.purchased_air_name_lookup_policy) -Description "$($case.Id) stage summary"
     foreach ($flagName in $idealLoadsFeatureFlagNames) {
         Assert-JsonPropertyExists -Object $stageSummary.ideal_loads_feature_flags -PropertyName $flagName -Description "$($case.Id) stage summary ideal_loads_feature_flags"
         if ($stageSummary.ideal_loads_feature_flags.$flagName -ne $summary.ideal_loads_feature_flags.$flagName) {

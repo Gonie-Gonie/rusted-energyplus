@@ -280,6 +280,8 @@ Assert-NotContains -Path $outdoorAir -Pattern 'energyplus_psychrometric_humidity
 
 Assert-Contains -Path $dispatch -Pattern 'pub fn sim_purchased_air_compat\s*\(' -Description "SimPurchasedAir source-order wrapper"
 Assert-Contains -Path $dispatch -Pattern 'purchased_air_source_order_stages\s*\(' -Description "PurchasedAir source-order stage summary"
+Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_RUNTIME_BINDING_SOURCE' -Description "IdealLoads runtime typed-ID binding metadata"
+Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY' -Description "IdealLoads runtime string lookup policy metadata"
 Assert-Contains -Path $dispatch -Pattern 'IdealLoadsFeatureFlags::from_system' -Description "PurchasedAir branch dispatch uses compile feature flags"
 Assert-Contains -Path $dispatch -Pattern 'calc_no_oa_sensible_with_limits_and_recirculation_compat\s*\(' -Description "finite-limit branch dispatch"
 Assert-Contains -Path $dispatch -Pattern 'calc_no_oa_no_limit_sensible_with_recirculation_context_compat\s*\(' -Description "no-limit branch dispatch"
@@ -352,6 +354,8 @@ Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_path' -De
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_dispatch_validation' -Description "IdealLoads report zone-equipment dispatch validation metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'zone_equipment_conformance_candidate' -Description "IdealLoads report zone-equipment conformance-candidate metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_feature_flags' -Description "IdealLoads report feature flag metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_runtime_binding_source' -Description "IdealLoads report typed-ID binding metadata"
+Assert-Contains -Path $idealLoadsCli -Pattern 'purchased_air_name_lookup_policy' -Description "IdealLoads report string lookup policy metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'sim_purchased_air_outdoor_air_compat' -Description "IdealLoads outdoor-air report generator uses source-order wrapper"
 Assert-NotContains -Path $idealLoadsCli -Pattern 'calc_outdoor_air_sensible_report_rates_compat' -Description "direct outdoor-air calc helper call in report generator"
 
