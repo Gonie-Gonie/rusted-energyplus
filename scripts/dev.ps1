@@ -65,6 +65,11 @@ $Commands = [ordered]@{
         Group = "quality"
         Help = "Guard IdealLoads conformance claim inventory across manifests, docs, and gates."
     }
+    "ideal-loads-conformance-report-audit" = @{
+        Path = "quality\ideal-loads-conformance-report-audit.ps1"
+        Group = "quality"
+        Help = "Run every promoted IdealLoads conformance gate and verify generated report artifacts."
+    }
     "perf" = @{
         Path = "quality\perf.ps1"
         Group = "quality"
