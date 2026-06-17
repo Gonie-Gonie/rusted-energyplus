@@ -8,6 +8,16 @@ pub use crate::{
 
 use ep_model::NodeId;
 
+/// Store that owns IdealLoads node output time series in Rust reports.
+pub const IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE: &str = "ep_runtime::ResultStore";
+/// State transfer struct populated from the final IdealLoads supply-node update.
+pub const IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT: &str =
+    "ep_runtime::node::IdealLoadsSupplyNodeUpdate";
+/// EnergyPlus source routine that finalizes supply node state before reporting.
+pub const IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE: &str = "UpdatePurchasedAir";
+/// EnergyPlus source routine that reports purchased-air and node output values.
+pub const IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE: &str = "ReportPurchasedAir";
+
 /// Final node values written by the narrow IdealLoads compatibility path.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IdealLoadsSupplyNodeUpdate {

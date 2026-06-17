@@ -19,7 +19,9 @@ use ep_model::{
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    EpwRecord, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH, IdealLoadsOutdoorAirContext,
+    EpwRecord, IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE, IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT,
+    IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE, IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE,
+    IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH, IdealLoadsOutdoorAirContext,
     IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
@@ -3436,6 +3438,22 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT
     ));
     report.push_str(&format!(
+        "node_output_store_type: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE
+    ));
+    report.push_str(&format!(
+        "node_output_state_struct: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT
+    ));
+    report.push_str(&format!(
+        "node_output_update_source: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE
+    ));
+    report.push_str(&format!(
+        "node_output_report_source: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE
+    ));
+    report.push_str(&format!(
         "purchased_air_source_order: {}\n",
         purchased_air_source_order
     ));
@@ -3567,6 +3585,22 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
     report.push_str(&format!(
+        "node_output_store_type: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE
+    ));
+    report.push_str(&format!(
+        "node_output_state_struct: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT
+    ));
+    report.push_str(&format!(
+        "node_output_update_source: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE
+    ));
+    report.push_str(&format!(
+        "node_output_report_source: {}\n",
+        IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE
+    ));
+    report.push_str(&format!(
         "outdoor_air_source: {}\n",
         outdoor_air_source_description(context)
     ));
@@ -3691,6 +3725,22 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string(outdoor_air_tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
+    json.push_str(&format!(
+        "  \"node_output_store_type\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_state_struct\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_update_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_report_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
+    ));
     json.push_str(&format!(
         "  \"outdoor_air_source\": {},\n",
         json_string(&outdoor_air_source_description(context))
@@ -3998,6 +4048,22 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!("  \"branch\": {},\n", json_string(context.branch)));
     json.push_str("  \"outdoor_air\": true,\n");
     json.push_str(&format!(
+        "  \"node_output_store_type\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_state_struct\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_update_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_report_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
+    ));
+    json.push_str(&format!(
         "  \"outdoor_air_method\": {},\n",
         json_string(outdoor_air_method_label(context.outdoor_air_method))
     ));
@@ -4199,6 +4265,22 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"node_output_timestamp_alignment\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_store_type\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_state_struct\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_update_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_report_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
     ));
     json.push_str(&format!(
         "  \"selected_purchased_air_branch\": {},\n",
@@ -4721,6 +4803,22 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"node_output_timestamp_alignment\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_store_type\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_state_struct\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_update_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"node_output_report_source\": {},\n",
+        json_string(IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE)
     ));
     json.push_str("  \"outdoor_air\": false,\n");
     json.push_str("  \"economizer\": \"NoEconomizer\",\n");

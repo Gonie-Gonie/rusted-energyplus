@@ -140,6 +140,23 @@ function Assert-ZoneSysEnergyDemandEvidence {
     Write-Host "OK ZoneSysEnergyDemand source/sign metadata"
 }
 
+function Assert-NodeOutputEvidence {
+    param([Parameter(Mandatory = $true)]$StageSummary)
+
+    if ($StageSummary.node_output_store_type -ne "ep_runtime::ResultStore") {
+        throw "Unexpected node output store type: $($StageSummary.node_output_store_type)"
+    }
+    if ($StageSummary.node_output_state_struct -ne "ep_runtime::node::IdealLoadsSupplyNodeUpdate") {
+        throw "Unexpected node output state struct: $($StageSummary.node_output_state_struct)"
+    }
+    if ($StageSummary.node_output_update_source -ne "UpdatePurchasedAir") {
+        throw "Unexpected node output update source: $($StageSummary.node_output_update_source)"
+    }
+    if ($StageSummary.node_output_report_source -ne "ReportPurchasedAir") {
+        throw "Unexpected node output report source: $($StageSummary.node_output_report_source)"
+    }
+    Write-Host "OK node output store/update/report metadata"
+}
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -293,6 +310,7 @@ if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
 Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 Assert-ZoneEquipmentDispatch -StageSummary $stageSummary
 Assert-ZoneSysEnergyDemandEvidence -StageSummary $stageSummary
+Assert-NodeOutputEvidence -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only" -Description "markdown claim boundary"
@@ -315,6 +333,10 @@ Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch: constan
 Assert-Contains -Text $reportText -Pattern "inactive_branches: outdoor_air, economizer, heat_recovery, humidistat, dcv, autosizing, saturation_limit" -Description "markdown inactive branches"
 Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
 Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
+Assert-Contains -Text $reportText -Pattern "node_output_store_type: ep_runtime::ResultStore" -Description "markdown node output store type"
+Assert-Contains -Text $reportText -Pattern "node_output_state_struct: ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "markdown node output state struct"
+Assert-Contains -Text $reportText -Pattern "node_output_update_source: UpdatePurchasedAir" -Description "markdown node output update source"
+Assert-Contains -Text $reportText -Pattern "node_output_report_source: ReportPurchasedAir" -Description "markdown node output report source"
 Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Latent Cooling Rate | conformance" -Description "markdown zone latent cooling row"
