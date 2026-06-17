@@ -11363,7 +11363,9 @@ mod tests {
         zone_air_heat_balance_surface_convection_rate_w, zone_geometry_summaries,
         zone_surface_report_conduction_rates_w,
     };
-    use crate::{RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputRequest};
+    use crate::{
+        RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRequest,
+    };
     use ep_model::{
         AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, Construction, ConstructionId,
         DehumidificationControlType, DemandControlledVentilationType,
@@ -16564,10 +16566,15 @@ DATA PERIODS
         let resolution = registry.meter_registry().resolve_meter_requests(&[
             RuntimeMeterRequest::hourly(heating_binding.meter_name),
             RuntimeMeterRequest::hourly(cooling_binding.meter_name),
+            RuntimeMeterRequest::new(heating_binding.meter_name, RuntimeOutputFrequency::Monthly),
+            RuntimeMeterRequest::new(
+                cooling_binding.meter_name,
+                RuntimeOutputFrequency::RunPeriod,
+            ),
         ]);
 
-        assert_eq!(registry.meter_registry().len(), 2);
-        assert_eq!(resolution.resolved.len(), 2);
+        assert_eq!(registry.meter_registry().len(), 6);
+        assert_eq!(resolution.resolved.len(), 4);
         assert!(resolution.diagnostics.is_empty());
         assert_eq!(
             resolution.resolved[0].definition.name,
@@ -16587,6 +16594,14 @@ DATA PERIODS
             crate::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY
         );
         assert_eq!(resolution.resolved[1].definition.units, "J");
+        assert_eq!(
+            resolution.resolved[2].definition.frequency,
+            RuntimeOutputFrequency::Monthly
+        );
+        assert_eq!(
+            resolution.resolved[3].definition.frequency,
+            RuntimeOutputFrequency::RunPeriod
+        );
     }
 
     #[test]

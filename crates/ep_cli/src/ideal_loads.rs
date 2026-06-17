@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use ep_compare::{
     SeriesAlignment, SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
-    compare_series_samples_v2, load_eso_time_series, load_mtr_time_series,
+    compare_series_samples_v2, load_eso_time_series, load_mtr_time_series_for_frequency,
 };
 use ep_compiler::compile_raw_model;
 use ep_conformance::{
@@ -28,7 +28,7 @@ use ep_runtime::{
     IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
-    OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputRegistry,
+    OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRegistry,
     SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
@@ -124,6 +124,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_CO2_DCV_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_no_oa_facility_meter_conformance_candidate_001";
+const IDEAL_LOADS_NO_OA_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS: &[&str] =
     &["DistrictHeatingWater:Facility", "DistrictCooling:Facility"];
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_CASE_ID: &str =
@@ -199,12 +201,18 @@ const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE: &str =
     "EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE: &str = "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only";
-const IDEAL_LOADS_FACILITY_METER_RUST_SOURCE: &str =
+const IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE: &str =
     "rust-ideal-loads-hourly-facility-meter-from-fuel-energy";
+const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUST_SOURCE: &str =
+    "rust-ideal-loads-monthly-facility-meter-from-fuel-energy";
+const IDEAL_LOADS_FACILITY_METER_RUN_PERIOD_RUST_SOURCE: &str =
+    "rust-ideal-loads-run-period-facility-meter-from-fuel-energy";
 const IDEAL_LOADS_FACILITY_METER_DIAGNOSTIC_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
 const IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy conformance";
+const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE: &str =
+    "EnergyPlus Output:Meter monthly/run-period MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
@@ -590,7 +598,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             ));
         }
     }
-    if manifest_is_no_oa_facility_meter_conformance_candidate(manifest) {
+    if manifest_is_declared_no_oa_facility_meter_conformance_candidate(manifest) {
         if manifest_has_conformance_output(manifest) {
             return Err(
                 "IdealLoads facility meter conformance candidate must keep ESO output rows diagnostic"
@@ -598,13 +606,17 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             );
         }
         for expected_meter in IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS {
-            if !manifest.meters.iter().any(|meter| {
-                meter.name.eq_ignore_ascii_case(expected_meter)
-                    && meter.level == OutputLevel::Conformance
-            }) {
-                return Err(format!(
-                    "IdealLoads facility meter conformance candidate is missing conformance meter {expected_meter}"
-                ));
+            for expected_frequency in required_facility_meter_conformance_frequencies(manifest) {
+                if !manifest.meters.iter().any(|meter| {
+                    meter.name.eq_ignore_ascii_case(expected_meter)
+                        && meter.frequency == *expected_frequency
+                        && meter.level == OutputLevel::Conformance
+                }) {
+                    return Err(format!(
+                        "IdealLoads facility meter conformance candidate is missing {} conformance meter {expected_meter}",
+                        output_frequency_label(*expected_frequency)
+                    ));
+                }
             }
         }
     }
@@ -706,9 +718,9 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     }
 
     for meter in &manifest.meters {
-        if meter.frequency != OutputFrequency::Hourly {
+        if !is_supported_ideal_loads_meter_frequency(meter.frequency) {
             return Err(format!(
-                "IdealLoads no-OA report requires hourly meter outputs, got {} for {}",
+                "IdealLoads no-OA report supports hourly, monthly, and run-period meter outputs, got {} for {}",
                 output_frequency_label(meter.frequency),
                 meter.name
             ));
@@ -723,13 +735,15 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         if meter.level == OutputLevel::Diagnostic {
             continue;
         }
-        if !manifest_is_no_oa_facility_meter_conformance_candidate(manifest)
+        if !manifest_is_declared_no_oa_facility_meter_conformance_candidate(manifest)
             || !is_declared_no_oa_facility_meter_conformance_meter(&meter.name)
+            || !facility_meter_frequency_allowed_for_manifest(manifest, meter.frequency)
             || meter.level != OutputLevel::Conformance
         {
             return Err(format!(
-                "IdealLoads no-OA report supports conformance-level meters only for the declared facility meter candidate: {}",
-                meter.name
+                "IdealLoads no-OA report supports conformance-level meters only for declared facility meter candidates: {} ({})",
+                meter.name,
+                output_frequency_label(meter.frequency)
             ));
         }
     }
@@ -998,6 +1012,21 @@ fn manifest_is_no_oa_facility_meter_conformance_candidate(manifest: &Conformance
         && manifest.conformance_claim
 }
 
+fn manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest.id == IDEAL_LOADS_NO_OA_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
+fn manifest_is_declared_no_oa_facility_meter_conformance_candidate(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest_is_no_oa_facility_meter_conformance_candidate(manifest)
+        || manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(manifest)
+}
+
 fn manifest_is_no_oa_report_energy_conformance_candidate(manifest: &ConformanceCase) -> bool {
     manifest.id == IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_CASE_ID
         && manifest.comparison_class == ComparisonClass::Conformance
@@ -1042,6 +1071,30 @@ fn is_declared_no_oa_facility_meter_conformance_meter(name: &str) -> bool {
     IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS
         .iter()
         .any(|expected| name.eq_ignore_ascii_case(expected))
+}
+
+fn is_supported_ideal_loads_meter_frequency(frequency: OutputFrequency) -> bool {
+    matches!(
+        frequency,
+        OutputFrequency::Hourly | OutputFrequency::Monthly | OutputFrequency::RunPeriod
+    )
+}
+
+fn required_facility_meter_conformance_frequencies(
+    manifest: &ConformanceCase,
+) -> &'static [OutputFrequency] {
+    if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(manifest) {
+        &[OutputFrequency::Monthly, OutputFrequency::RunPeriod]
+    } else {
+        &[OutputFrequency::Hourly]
+    }
+}
+
+fn facility_meter_frequency_allowed_for_manifest(
+    manifest: &ConformanceCase,
+    frequency: OutputFrequency,
+) -> bool {
+    required_facility_meter_conformance_frequencies(manifest).contains(&frequency)
 }
 
 fn is_declared_no_oa_report_energy_conformance_output(variable: &str) -> bool {
@@ -3350,17 +3403,7 @@ fn evaluate_meter_rows(
     let meter_requests = manifest
         .meters
         .iter()
-        .map(|meter| {
-            if meter.frequency != OutputFrequency::Hourly {
-                Err(format!(
-                    "IdealLoads diagnostic meter aggregation currently requires hourly meters, got {} for {}",
-                    output_frequency_label(meter.frequency),
-                    meter.name
-                ))
-            } else {
-                Ok(RuntimeMeterRequest::hourly(meter.name.clone()))
-            }
-        })
+        .map(|meter| runtime_meter_request_for_manifest_meter(meter))
         .collect::<Result<Vec<_>, String>>()?;
     let meter_registry = RuntimeOutputRegistry::from_model(model);
     let meter_resolution = meter_registry
@@ -3391,7 +3434,7 @@ fn evaluate_meter_rows(
                     meter.name
                 )
             })?;
-        let expected = load_meter_series(mtr, &meter.name)?;
+        let expected = load_meter_series(mtr, &meter.name, meter.frequency)?;
         let resolved_meter_key = NormalizedName::new(&resolved_meter.definition.name).0;
         let fuel_energy_variable = fuel_energy_bindings
             .get(&resolved_meter_key)
@@ -3411,7 +3454,7 @@ fn evaluate_meter_rows(
             ));
         };
         let observed_samples =
-            hourly_meter_samples_from_detailed_energy(&observed.values, timestamps)?;
+            meter_samples_from_detailed_energy(&observed.values, timestamps, meter.frequency)?;
         let tolerance = tolerance_for_meter(meter);
         let max_rmse_tolerance = meter.rmse_tol;
         let comparison = compare_series_samples_v2(&expected.samples, &observed_samples, tolerance);
@@ -3432,7 +3475,7 @@ fn evaluate_meter_rows(
             level: meter.level,
             units: observed.units.to_string(),
             oracle_units: expected.units.clone(),
-            rust_source: IDEAL_LOADS_FACILITY_METER_RUST_SOURCE,
+            rust_source: facility_meter_rust_source(meter.frequency),
             tolerance,
             max_rmse_tolerance,
             expected_samples: comparison.expected_samples,
@@ -3451,13 +3494,63 @@ fn evaluate_meter_rows(
     Ok(rows)
 }
 
-fn load_meter_series(mtr: &Path, meter: &str) -> Result<LoadedSeries, String> {
-    let series = load_mtr_time_series(mtr, meter)
-        .map_err(|error| format!("failed to load MTR meter {meter}: {error}"))?;
+fn runtime_meter_request_for_manifest_meter(
+    meter: &MeterRequest,
+) -> Result<RuntimeMeterRequest, String> {
+    let frequency = runtime_meter_frequency(meter.frequency).ok_or_else(|| {
+        format!(
+            "IdealLoads diagnostic meter aggregation supports hourly, monthly, and run-period meters, got {} for {}",
+            output_frequency_label(meter.frequency),
+            meter.name
+        )
+    })?;
+    Ok(RuntimeMeterRequest::new(meter.name.clone(), frequency))
+}
+
+fn runtime_meter_frequency(frequency: OutputFrequency) -> Option<RuntimeOutputFrequency> {
+    match frequency {
+        OutputFrequency::Hourly => Some(RuntimeOutputFrequency::Hourly),
+        OutputFrequency::Monthly => Some(RuntimeOutputFrequency::Monthly),
+        OutputFrequency::RunPeriod => Some(RuntimeOutputFrequency::RunPeriod),
+        OutputFrequency::Static
+        | OutputFrequency::Detailed
+        | OutputFrequency::Timestep
+        | OutputFrequency::Daily
+        | OutputFrequency::Annual => None,
+    }
+}
+
+fn load_meter_series(
+    mtr: &Path,
+    meter: &str,
+    frequency: OutputFrequency,
+) -> Result<LoadedSeries, String> {
+    let frequency_label = output_frequency_idf_label_for_mtr(frequency)?;
+    let series =
+        load_mtr_time_series_for_frequency(mtr, meter, frequency_label).map_err(|error| {
+            format!(
+                "failed to load MTR meter {} ({}): {}",
+                meter,
+                output_frequency_label(frequency),
+                error
+            )
+        })?;
     Ok(LoadedSeries {
         units: series.metadata.units,
         samples: run_period_samples(series.samples),
     })
+}
+
+fn output_frequency_idf_label_for_mtr(frequency: OutputFrequency) -> Result<&'static str, String> {
+    match frequency {
+        OutputFrequency::Hourly => Ok("Hourly"),
+        OutputFrequency::Monthly => Ok("Monthly"),
+        OutputFrequency::RunPeriod => Ok("RunPeriod"),
+        _ => Err(format!(
+            "IdealLoads MTR meter loading does not support {} frequency",
+            output_frequency_label(frequency)
+        )),
+    }
 }
 
 fn ideal_loads_meter_fuel_energy_bindings(
@@ -3475,6 +3568,26 @@ fn ideal_loads_meter_fuel_energy_bindings(
         }
     }
     bindings
+}
+
+fn meter_samples_from_detailed_energy(
+    values: &[f64],
+    timestamps: &[Option<String>],
+    frequency: OutputFrequency,
+) -> Result<Vec<SeriesSample>, String> {
+    match frequency {
+        OutputFrequency::Hourly => hourly_meter_samples_from_detailed_energy(values, timestamps),
+        OutputFrequency::Monthly => monthly_meter_samples_from_detailed_energy(values, timestamps),
+        OutputFrequency::RunPeriod => Ok(vec![SeriesSample {
+            index: 0,
+            timestamp: None,
+            value: values.iter().sum(),
+        }]),
+        _ => Err(format!(
+            "IdealLoads meter aggregation does not support {} frequency",
+            output_frequency_label(frequency)
+        )),
+    }
 }
 
 fn hourly_meter_samples_from_detailed_energy(
@@ -3511,6 +3624,44 @@ fn hourly_meter_samples_from_detailed_energy(
         .collect())
 }
 
+fn monthly_meter_samples_from_detailed_energy(
+    values: &[f64],
+    timestamps: &[Option<String>],
+) -> Result<Vec<SeriesSample>, String> {
+    let mut monthly_values = Vec::<(String, f64)>::new();
+    for (index, value) in values.iter().copied().enumerate() {
+        let timestamp = timestamps
+            .get(index)
+            .and_then(|timestamp| timestamp.as_deref())
+            .ok_or_else(|| {
+                format!(
+                    "IdealLoads meter diagnostic requires timestamped detailed fuel energy sample {index}"
+                )
+            })?;
+        let monthly_timestamp = monthly_meter_timestamp_label(timestamp).ok_or_else(|| {
+            format!("IdealLoads meter diagnostic cannot derive monthly timestamp from {timestamp}")
+        })?;
+        if let Some((_, total)) = monthly_values
+            .iter_mut()
+            .find(|(candidate, _)| candidate == &monthly_timestamp)
+        {
+            *total += value;
+        } else {
+            monthly_values.push((monthly_timestamp, value));
+        }
+    }
+
+    Ok(monthly_values
+        .into_iter()
+        .enumerate()
+        .map(|(index, (_, value))| SeriesSample {
+            index,
+            timestamp: None,
+            value,
+        })
+        .collect())
+}
+
 fn hourly_meter_timestamp_label(timestamp: &str) -> Option<String> {
     Some(format!(
         "env={};day={};month={};date={};dst={};hour={};start=0.00;end=60.00;day_type={}",
@@ -3522,6 +3673,23 @@ fn hourly_meter_timestamp_label(timestamp: &str) -> Option<String> {
         timestamp_field(timestamp, "hour")?,
         timestamp_field(timestamp, "day_type")?
     ))
+}
+
+fn monthly_meter_timestamp_label(timestamp: &str) -> Option<String> {
+    Some(format!(
+        "env={};month={}",
+        timestamp_field(timestamp, "env")?,
+        timestamp_field(timestamp, "month")?
+    ))
+}
+
+fn facility_meter_rust_source(frequency: OutputFrequency) -> &'static str {
+    match frequency {
+        OutputFrequency::Hourly => IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE,
+        OutputFrequency::Monthly => IDEAL_LOADS_FACILITY_METER_MONTHLY_RUST_SOURCE,
+        OutputFrequency::RunPeriod => IDEAL_LOADS_FACILITY_METER_RUN_PERIOD_RUST_SOURCE,
+        _ => IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE,
+    }
 }
 
 fn timestamp_field<'a>(timestamp: &'a str, name: &str) -> Option<&'a str> {
@@ -6653,7 +6821,14 @@ fn tolerance_failures_count(context: &IdealLoadsDiagnosticContext<'_>) -> usize 
 }
 
 fn facility_meter_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    if context
+    if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(context.manifest)
+        && context
+            .meter_rows
+            .iter()
+            .any(|row| row.level == OutputLevel::Conformance)
+    {
+        IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE
+    } else if context
         .meter_rows
         .iter()
         .any(|row| row.level == OutputLevel::Conformance)
@@ -6717,6 +6892,10 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables only"
     } else if context.humidistat_humidification_conformance_claim {
         "conformance no-OA Humidistat humidification IdealLoads branch for declared variables only"
+    } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
+        context.manifest,
+    ) {
+        "conformance no-OA monthly/run-period IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_facility_meter_conformance_candidate(context.manifest) {
         "conformance no-OA hourly IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {

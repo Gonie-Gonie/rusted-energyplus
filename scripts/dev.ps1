@@ -215,6 +215,11 @@ $Commands = [ordered]@{
         Group = "compare"
         Help = "Gate the no-OA IdealLoads hourly facility meter conformance candidate."
     }
+    "compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate" = @{
+        Path = "compare\compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate.ps1"
+        Group = "compare"
+        Help = "Gate the no-OA IdealLoads monthly/run-period facility meter conformance candidate."
+    }
     "compare-ideal-loads-no-oa-report-energy-conformance-candidate" = @{
         Path = "compare\compare-ideal-loads-no-oa-report-energy-conformance-candidate.ps1"
         Group = "compare"

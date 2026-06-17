@@ -58,8 +58,10 @@ tolerance, and code organization.
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`,
   all-days Schedule:Compact fuel-efficiency rows promoted only in
   `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`,
-  DistrictHeatingWater/DistrictCooling facility meters tracked only as
-  oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
+  DistrictHeatingWater/DistrictCooling facility meters promoted only by the
+  separate hourly and monthly/run-period facility meter candidates, and
+  tracked as oracle-MTR diagnostics in this sensible case with
+  RuntimeMeterRegistry request resolution
 - limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate for
   declared supply-air total heating/cooling energy and zone total
   heating/cooling energy rows in
@@ -98,6 +100,12 @@ tolerance, and code organization.
   `ideal_loads_no_oa_facility_meter_conformance_candidate_001`, with
   ReportPurchasedAir rate, energy, fuel-energy, thermostat, demand, humidity,
   and node rows kept diagnostic proof only
+- limited IdealLoads no-OA monthly/run-period facility meter conformance
+  candidate for `DistrictHeatingWater:Facility` and
+  `DistrictCooling:Facility` in
+  `ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001`,
+  with ReportPurchasedAir rate, energy, fuel-energy, thermostat, demand,
+  humidity, and node rows kept diagnostic proof only
 - limited IdealLoads no-OA numeric capacity-limit conformance gate for the
   same declared thermostat, IdealLoads rate, and supply-node temperature/flow
   Detailed series in `ideal_loads_capacity_limit_conformance_001`, with
@@ -242,8 +250,8 @@ tolerance, and code organization.
   declared no-OA/no-limit, numeric finite-limit, and
   ReportPurchasedAir non-fuel energy, blank fuel-efficiency, constant
   Schedule:Constant fuel-efficiency, all-days Schedule:Compact
-  fuel-efficiency, no-OA hourly facility meter, `ConstantSensibleHeatRatio`,
-  `ConstantSupplyHumidityRatio`,
+  fuel-efficiency, no-OA hourly and monthly/run-period facility meter,
+  `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`,
   `OccupancySchedule` DCV, `Flow/Area`, `AirChanges/Hour`, `Sum`, `Maximum`,
   `DifferentialDryBulb` economizer, `DifferentialEnthalpy` economizer, and
@@ -285,7 +293,8 @@ Not claimed:
   the declared OccupancySchedule and CO2Setpoint Flow/Person candidates,
   humidity, CO2 contaminant-balance/concentration conformance,
   saturation-limit generality, or meter conformance beyond the declared no-OA
-  hourly facility meter candidate
+  hourly and monthly/run-period facility meter candidates, including annual
+  meter aggregation
 - broad ExampleFiles compatibility
 
 ## Quick Start

@@ -4,7 +4,7 @@ use crate::{
     parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
     parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series, parse_mtr_time_series,
+    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -137,6 +137,64 @@ End of Data Dictionary
     assert_eq!(
         error.to_string(),
         "MTR meter not found: DistrictCooling:Facility"
+    );
+}
+
+#[test]
+fn parses_mtr_time_series_by_frequency() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = r#"Program Version,EnergyPlus
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Meters Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Meters Requested
+150,1,DistrictHeatingWater:Facility [J] !Hourly
+151,9,DistrictHeatingWater:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+152,11,DistrictHeatingWater:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+End of Data Dictionary
+1,RUN PERIOD 1,39.74,-105.18,-7.00,1829.00
+2,1,1,1,0,1,0.00,60.00,Tuesday
+150,3.5
+4,1,1
+151,10.0,0.0,1,1,15,10.0,1,1,60
+5,1
+152,10.0,0.0,1,1,1,15,10.0,1,1,60
+"#;
+
+    let monthly =
+        parse_mtr_time_series_for_frequency(contents, "DistrictHeatingWater:Facility", "Monthly")?;
+    let run_period = parse_mtr_time_series_for_frequency(
+        contents,
+        "DistrictHeatingWater:Facility",
+        "RunPeriod",
+    )?;
+
+    assert_eq!(monthly.metadata.id, "151");
+    assert_eq!(monthly.metadata.frequency.as_deref(), Some("Monthly"));
+    assert_eq!(monthly.samples.len(), 1);
+    assert_eq!(monthly.samples[0].value, 10.0);
+    assert_eq!(run_period.metadata.id, "152");
+    assert_eq!(run_period.metadata.frequency.as_deref(), Some("RunPeriod"));
+    assert_eq!(run_period.samples.len(), 1);
+    assert_eq!(run_period.samples[0].value, 10.0);
+
+    Ok(())
+}
+
+#[test]
+fn reports_missing_mtr_frequency() {
+    let error = parse_mtr_time_series_for_frequency(
+        r#"Program Version,EnergyPlus
+150,1,DistrictHeatingWater:Facility [J] !Hourly
+End of Data Dictionary
+"#,
+        "DistrictHeatingWater:Facility",
+        "Monthly",
+    )
+    .expect_err("expected missing frequency");
+
+    assert_eq!(
+        error.to_string(),
+        "MTR meter not found: DistrictHeatingWater:Facility (Monthly)"
     );
 }
 

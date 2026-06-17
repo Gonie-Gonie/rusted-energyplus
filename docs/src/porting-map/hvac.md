@@ -11,8 +11,8 @@ Broad HVAC numerical compatibility is not in the current public compatibility
 scope. The current exceptions are the narrow no-OA/no-limit, numeric
 finite-limit, ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio,
 Humidistat, outdoor-air, Sensible heat-recovery, blank/constant/all-days
-Schedule:Compact fuel-efficiency, and no-OA hourly facility meter IdealLoads
-claims for declared outputs and meters only.
+Schedule:Compact fuel-efficiency, and no-OA hourly plus monthly/run-period
+facility meter IdealLoads claims for declared outputs and meters only.
 
 ## v0.10 Foundation
 
@@ -158,8 +158,9 @@ remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
 `Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows in
 this conformance fixture use the blank fuel-efficiency schedule branch. The
 facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
-diagnostics only; adaptive system timestep and broad meter conformance remain
-outside the claim. Fuel-efficiency conformance is claimed only by the separate
+diagnostics only in this sensible case; adaptive system timestep, annual meter
+aggregation, and broad meter conformance remain outside the claim.
+Fuel-efficiency conformance is claimed only by the separate
 blank, constant Schedule:Constant, and all-days Schedule:Compact
 fuel-efficiency candidates.
 
@@ -184,9 +185,15 @@ side aggregates the detailed fuel-energy series through
 `ep_runtime::ideal_loads_facility_meter_binding`, compares them against
 EnergyPlus hourly MTR values, and keeps broad meter conformance,
 fuel-efficiency schedules beyond the declared blank/constant/all-days
-Schedule:Compact candidates, monthly/annual meter aggregation, outdoor air,
+Schedule:Compact candidates, daily/annual meter aggregation, outdoor air,
 humidity controls, finite limits, air loops, plant loops, EMS, and
 PythonPlugin behavior outside the claim.
+
+`ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001`
+extends that meter-only branch to monthly and run-period MTR rows for the same
+two facility meters. Its 28 Detailed ESO rows remain diagnostic proof
+evidence, the Rust side groups detailed fuel-energy by month or sums it over
+the run period, and annual meter aggregation remains outside the claim.
 
 ## IdealLoads Fuel-Efficiency Diagnostic
 

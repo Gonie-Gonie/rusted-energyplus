@@ -115,13 +115,19 @@ pub struct RuntimeMeterRequest {
 }
 
 impl RuntimeMeterRequest {
+    /// Creates a meter request for a specific reporting frequency.
+    #[must_use]
+    pub fn new(name: impl Into<String>, frequency: RuntimeOutputFrequency) -> Self {
+        Self {
+            name: name.into(),
+            frequency,
+        }
+    }
+
     /// Creates an hourly meter request.
     #[must_use]
     pub fn hourly(name: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-            frequency: RuntimeOutputFrequency::Hourly,
-        }
+        Self::new(name, RuntimeOutputFrequency::Hourly)
     }
 
     fn identity(&self) -> MeterIdentity {
@@ -663,12 +669,18 @@ impl RuntimeOutputRegistry {
         for system in &model.ideal_loads_air_systems {
             for fuel_type in [system.heating_fuel_type, system.cooling_fuel_type] {
                 if let Some(binding) = ideal_loads_facility_meter_binding(fuel_type) {
-                    self.meter_registry.push_meter(
-                        binding.meter_name,
-                        "J",
+                    for frequency in [
                         RuntimeOutputFrequency::Hourly,
-                        RuntimeOutputSource::Meter,
-                    );
+                        RuntimeOutputFrequency::Monthly,
+                        RuntimeOutputFrequency::RunPeriod,
+                    ] {
+                        self.meter_registry.push_meter(
+                            binding.meter_name,
+                            "J",
+                            frequency,
+                            RuntimeOutputSource::Meter,
+                        );
+                    }
                 }
             }
         }

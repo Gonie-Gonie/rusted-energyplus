@@ -37,6 +37,13 @@ pub enum MtrError {
         /// EnergyPlus meter name.
         meter: String,
     },
+    /// Requested meter/frequency pair was not present in the MTR dictionary.
+    MissingMeterFrequency {
+        /// EnergyPlus meter name.
+        meter: String,
+        /// Requested reporting frequency.
+        frequency: String,
+    },
     /// A matching data row could not be parsed.
     InvalidValue {
         /// One-based line number.
@@ -51,6 +58,9 @@ impl Display for MtrError {
         match self {
             Self::Io(error) => write!(formatter, "failed to read MTR: {error}"),
             Self::MissingMeter { meter } => write!(formatter, "MTR meter not found: {meter}"),
+            Self::MissingMeterFrequency { meter, frequency } => {
+                write!(formatter, "MTR meter not found: {meter} ({frequency})")
+            }
             Self::InvalidValue { line, text } => {
                 write!(formatter, "invalid MTR value at line {line}: {text}")
             }
@@ -62,7 +72,9 @@ impl std::error::Error for MtrError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
-            Self::MissingMeter { .. } | Self::InvalidValue { .. } => None,
+            Self::MissingMeter { .. }
+            | Self::MissingMeterFrequency { .. }
+            | Self::InvalidValue { .. } => None,
         }
     }
 }
@@ -82,9 +94,37 @@ pub fn load_mtr_time_series(
     parse_mtr_time_series(&contents, meter)
 }
 
+/// Loads one MTR series by meter name and reporting frequency.
+pub fn load_mtr_time_series_for_frequency(
+    path: impl AsRef<Path>,
+    meter: &str,
+    frequency: &str,
+) -> Result<MtrTimeSeries, MtrError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_mtr_time_series_for_frequency(&contents, meter, frequency)
+}
+
 /// Parses one timestamp-aware MTR series by meter name.
 pub fn parse_mtr_time_series(contents: &str, meter: &str) -> Result<MtrTimeSeries, MtrError> {
+    parse_mtr_time_series_impl(contents, meter, None)
+}
+
+/// Parses one MTR series by meter name and reporting frequency.
+pub fn parse_mtr_time_series_for_frequency(
+    contents: &str,
+    meter: &str,
+    frequency: &str,
+) -> Result<MtrTimeSeries, MtrError> {
+    parse_mtr_time_series_impl(contents, meter, Some(frequency))
+}
+
+fn parse_mtr_time_series_impl(
+    contents: &str,
+    meter: &str,
+    frequency: Option<&str>,
+) -> Result<MtrTimeSeries, MtrError> {
     let normalized_meter = normalize_name(meter);
+    let normalized_frequency = frequency.map(normalize_name);
     let mut dictionary_done = false;
     let mut selected_metadata = None;
     let mut samples = Vec::new();
@@ -100,7 +140,11 @@ pub fn parse_mtr_time_series(contents: &str, meter: &str) -> Result<MtrTimeSerie
         }
 
         if !dictionary_done {
-            if let Some(metadata) = matching_dictionary_metadata(trimmed, &normalized_meter) {
+            if let Some(metadata) = matching_dictionary_metadata(
+                trimmed,
+                &normalized_meter,
+                normalized_frequency.as_deref(),
+            ) {
                 selected_metadata = Some(metadata);
             }
             continue;
@@ -153,6 +197,12 @@ pub fn parse_mtr_time_series(contents: &str, meter: &str) -> Result<MtrTimeSerie
     }
 
     let Some(metadata) = selected_metadata else {
+        if let Some(frequency) = frequency {
+            return Err(MtrError::MissingMeterFrequency {
+                meter: meter.to_string(),
+                frequency: frequency.to_string(),
+            });
+        }
         return Err(MtrError::MissingMeter {
             meter: meter.to_string(),
         });
@@ -161,13 +211,23 @@ pub fn parse_mtr_time_series(contents: &str, meter: &str) -> Result<MtrTimeSerie
     Ok(MtrTimeSeries { metadata, samples })
 }
 
-fn matching_dictionary_metadata(line: &str, normalized_meter: &str) -> Option<MtrSeriesMetadata> {
+fn matching_dictionary_metadata(
+    line: &str,
+    normalized_meter: &str,
+    normalized_frequency: Option<&str>,
+) -> Option<MtrSeriesMetadata> {
     let mut parts = line.splitn(3, ',');
     let id = parts.next()?.trim();
     let _value_count = parts.next()?;
     let meter_text = parts.next()?.trim();
     let (meter, units, frequency) = parse_meter_metadata(meter_text);
-    if normalize_name(&meter) == normalized_meter {
+    if normalize_name(&meter) == normalized_meter
+        && normalized_frequency.is_none_or(|expected| {
+            frequency
+                .as_deref()
+                .is_some_and(|actual| normalize_name(actual) == expected)
+        })
+    {
         return Some(MtrSeriesMetadata {
             id: id.to_string(),
             meter,
