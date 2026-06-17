@@ -156,6 +156,21 @@ if ($summary.requested_meter_count -ne 2) {
 if ($summary.rust_meter_time_series_comparison -ne $true) {
     throw "IdealLoads fuel-efficiency diagnostic must compare Rust hourly facility meter diagnostics"
 }
+if ($summary.rate_output_source -ne "ReportPurchasedAir after UpdatePurchasedAir") {
+    throw "Unexpected rate output source: $($summary.rate_output_source)"
+}
+if ($summary.rate_output_timestep_source -ne "Detailed system timestep values") {
+    throw "Unexpected rate output timestep source: $($summary.rate_output_timestep_source)"
+}
+if ($summary.energy_output_timestep_source -ne "ReportPurchasedAir rate * TimeStepSysSec") {
+    throw "Unexpected energy output timestep source: $($summary.energy_output_timestep_source)"
+}
+if ($summary.energy_output_level_policy -ne "diagnostic-only until rate-to-energy parity is separately proven") {
+    throw "Unexpected energy output level policy: $($summary.energy_output_level_policy)"
+}
+if ($summary.fuel_energy_output_level_policy -ne "diagnostic-only until fuel-efficiency path is separately proven") {
+    throw "Unexpected fuel energy output level policy: $($summary.fuel_energy_output_level_policy)"
+}
 if ($summary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
     throw "Unexpected meter aggregation source: $($summary.meter_aggregation_source)"
 }
@@ -242,6 +257,21 @@ if ($stageSummary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry
 if ($stageSummary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
     throw "Unexpected stage meter fuel-energy binding source: $($stageSummary.meter_fuel_energy_binding_source)"
 }
+if ($stageSummary.rate_output_source -ne "ReportPurchasedAir after UpdatePurchasedAir") {
+    throw "Unexpected stage rate output source: $($stageSummary.rate_output_source)"
+}
+if ($stageSummary.rate_output_timestep_source -ne "Detailed system timestep values") {
+    throw "Unexpected stage rate output timestep source: $($stageSummary.rate_output_timestep_source)"
+}
+if ($stageSummary.energy_output_timestep_source -ne "ReportPurchasedAir rate * TimeStepSysSec") {
+    throw "Unexpected stage energy output timestep source: $($stageSummary.energy_output_timestep_source)"
+}
+if ($stageSummary.energy_output_level_policy -ne "diagnostic-only until rate-to-energy parity is separately proven") {
+    throw "Unexpected stage energy output level policy: $($stageSummary.energy_output_level_policy)"
+}
+if ($stageSummary.fuel_energy_output_level_policy -ne "diagnostic-only until fuel-efficiency path is separately proven") {
+    throw "Unexpected stage fuel energy output level policy: $($stageSummary.fuel_energy_output_level_policy)"
+}
 
 $oracleMtrText = Get-Content -LiteralPath $oracleMtrPath -Raw
 Assert-Contains -Text $oracleMtrText -Pattern "DistrictHeatingWater:Facility" -Description "oracle MTR heating meter"
@@ -252,6 +282,11 @@ Assert-Contains -Text $reportText -Pattern "claim_boundary: diagnostic-only no-O
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "fuel_efficiency: heating=0.800000000000 cooling=0.750000000000" -Description "markdown fuel efficiency values"
 Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic; rust_meter_time_series_comparison=true requested_meters=2" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedAir after UpdatePurchasedAir" -Description "markdown rate output source"
+Assert-Contains -Text $reportText -Pattern "rate_output_timestep_source: Detailed system timestep values" -Description "markdown rate output timestep source"
+Assert-Contains -Text $reportText -Pattern "energy_output_timestep_source: ReportPurchasedAir rate * TimeStepSysSec" -Description "markdown energy output timestep source"
+Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: diagnostic-only until rate-to-energy parity is separately proven" -Description "markdown energy output level policy"
+Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: diagnostic-only until fuel-efficiency path is separately proven" -Description "markdown fuel energy output level policy"
 Assert-Contains -Text $reportText -Pattern "meter_aggregation_source: ep_runtime::RuntimeMeterRegistry" -Description "markdown meter aggregation source"
 Assert-Contains -Text $reportText -Pattern "meter_fuel_energy_binding_source: ep_runtime::ideal_loads_facility_meter_binding" -Description "markdown meter fuel-energy binding source"
 Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | diagnostic | meter | hourly | mtr | rust-ideal-loads-hourly-facility-meter-from-fuel-energy" -Description "markdown heating meter row"

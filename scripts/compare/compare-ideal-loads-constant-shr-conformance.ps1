@@ -157,6 +157,50 @@ function Assert-NodeOutputEvidence {
     }
     Write-Host "OK node output store/update/report metadata"
 }
+function Assert-ReportPurchasedAirOutputEvidence {
+    param(
+        [Parameter(Mandatory = $true)]$Summary,
+        [Parameter(Mandatory = $true)]$StageSummary
+    )
+
+    $expectedRateSource = "ReportPurchasedAir after UpdatePurchasedAir"
+    $expectedRateTimestep = "Detailed system timestep values"
+    $expectedEnergyTimestep = "ReportPurchasedAir rate * TimeStepSysSec"
+    $expectedEnergyPolicy = "diagnostic-only until rate-to-energy parity is separately proven"
+    $expectedFuelPolicy = "diagnostic-only until fuel-efficiency path is separately proven"
+
+    if ($Summary.rate_output_source -ne $expectedRateSource) {
+        throw "Unexpected rate output source: $($Summary.rate_output_source)"
+    }
+    if ($Summary.rate_output_timestep_source -ne $expectedRateTimestep) {
+        throw "Unexpected rate output timestep source: $($Summary.rate_output_timestep_source)"
+    }
+    if ($Summary.energy_output_timestep_source -ne $expectedEnergyTimestep) {
+        throw "Unexpected energy output timestep source: $($Summary.energy_output_timestep_source)"
+    }
+    if ($Summary.energy_output_level_policy -ne $expectedEnergyPolicy) {
+        throw "Unexpected energy output level policy: $($Summary.energy_output_level_policy)"
+    }
+    if ($Summary.fuel_energy_output_level_policy -ne $expectedFuelPolicy) {
+        throw "Unexpected fuel energy output level policy: $($Summary.fuel_energy_output_level_policy)"
+    }
+    if ($StageSummary.rate_output_source -ne $expectedRateSource) {
+        throw "Unexpected stage rate output source: $($StageSummary.rate_output_source)"
+    }
+    if ($StageSummary.rate_output_timestep_source -ne $expectedRateTimestep) {
+        throw "Unexpected stage rate output timestep source: $($StageSummary.rate_output_timestep_source)"
+    }
+    if ($StageSummary.energy_output_timestep_source -ne $expectedEnergyTimestep) {
+        throw "Unexpected stage energy output timestep source: $($StageSummary.energy_output_timestep_source)"
+    }
+    if ($StageSummary.energy_output_level_policy -ne $expectedEnergyPolicy) {
+        throw "Unexpected stage energy output level policy: $($StageSummary.energy_output_level_policy)"
+    }
+    if ($StageSummary.fuel_energy_output_level_policy -ne $expectedFuelPolicy) {
+        throw "Unexpected stage fuel energy output level policy: $($StageSummary.fuel_energy_output_level_policy)"
+    }
+    Write-Host "OK ReportPurchasedAir output source/timestep/policy metadata"
+}
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -311,6 +355,7 @@ Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 Assert-ZoneEquipmentDispatch -StageSummary $stageSummary
 Assert-ZoneSysEnergyDemandEvidence -StageSummary $stageSummary
 Assert-NodeOutputEvidence -StageSummary $stageSummary
+Assert-ReportPurchasedAirOutputEvidence -Summary $summary -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only" -Description "markdown claim boundary"
@@ -338,6 +383,11 @@ Assert-Contains -Text $reportText -Pattern "node_output_state_struct: ep_runtime
 Assert-Contains -Text $reportText -Pattern "node_output_update_source: UpdatePurchasedAir" -Description "markdown node output update source"
 Assert-Contains -Text $reportText -Pattern "node_output_report_source: ReportPurchasedAir" -Description "markdown node output report source"
 Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
+Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedAir after UpdatePurchasedAir" -Description "markdown rate output source"
+Assert-Contains -Text $reportText -Pattern "rate_output_timestep_source: Detailed system timestep values" -Description "markdown rate output timestep source"
+Assert-Contains -Text $reportText -Pattern "energy_output_timestep_source: ReportPurchasedAir rate * TimeStepSysSec" -Description "markdown energy output timestep source"
+Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: diagnostic-only until rate-to-energy parity is separately proven" -Description "markdown energy output level policy"
+Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: diagnostic-only until fuel-efficiency path is separately proven" -Description "markdown fuel energy output level policy"
 Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Latent Cooling Rate | conformance" -Description "markdown zone latent cooling row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Latent Cooling Rate | conformance" -Description "markdown supply latent cooling row"

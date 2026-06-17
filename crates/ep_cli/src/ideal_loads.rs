@@ -19,11 +19,13 @@ use ep_model::{
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    EpwRecord, IDEAL_LOADS_METER_AGGREGATION_SOURCE, IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE,
-    IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE, IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT,
-    IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE, IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE,
-    IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH, IdealLoadsOutdoorAirContext,
-    IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
+    EpwRecord, IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE,
+    IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_METER_AGGREGATION_SOURCE,
+    IDEAL_LOADS_METER_FUEL_ENERGY_BINDING_SOURCE, IDEAL_LOADS_NODE_OUTPUT_REPORT_SOURCE,
+    IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT, IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE,
+    IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE, IDEAL_LOADS_RATE_OUTPUT_SOURCE,
+    IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
+    IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
     IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
     IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
     OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputRegistry,
@@ -3407,6 +3409,26 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         context.energy_report_interval_seconds
     ));
     report.push_str(&format!(
+        "rate_output_source: {}\n",
+        IDEAL_LOADS_RATE_OUTPUT_SOURCE
+    ));
+    report.push_str(&format!(
+        "rate_output_timestep_source: {}\n",
+        IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE
+    ));
+    report.push_str(&format!(
+        "energy_output_timestep_source: {}\n",
+        IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE
+    ));
+    report.push_str(&format!(
+        "energy_output_level_policy: {}\n",
+        IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY
+    ));
+    report.push_str(&format!(
+        "fuel_energy_output_level_policy: {}\n",
+        IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY
+    ));
+    report.push_str(&format!(
         "meter_source: {}; rust_meter_time_series_comparison=true requested_meters={}\n",
         IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE,
         manifest.meters.len()
@@ -4413,6 +4435,26 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     ));
     json.push_str("  \"energy_source\": \"EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; diagnostic-only fixed 8-substep fixture branch\",\n");
     json.push_str(&format!(
+        "  \"rate_output_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
         "  \"meter_source\": {},\n",
         json_string(IDEAL_LOADS_FACILITY_METER_REPORT_SOURCE)
     ));
@@ -4916,6 +4958,26 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
         json_string(context.fuel_efficiency.report_source)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"rate_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_timestep_source\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY)
+    ));
+    json.push_str(&format!(
+        "  \"fuel_energy_output_level_policy\": {},\n",
+        json_string(IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY)
     ));
     json.push_str(&format!(
         "  \"meter_aggregation_source\": {},\n",
