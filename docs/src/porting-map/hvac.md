@@ -157,8 +157,9 @@ remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
 `Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows in
 this conformance fixture use the blank fuel-efficiency schedule branch. The
 facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
-diagnostics only; adaptive system timestep, fuel-efficiency conformance, and
-broad meter conformance remain outside the claim.
+diagnostics only; adaptive system timestep and broad meter conformance remain
+outside the claim. Fuel-efficiency conformance is claimed only by the separate
+blank and constant fuel-efficiency candidates.
 
 ## IdealLoads No-OA Facility Meter Conformance
 
@@ -202,11 +203,17 @@ the cooling fuel-efficiency `Schedule:Constant` to 0.75. The compare lane
 divides the no-OA zone and supply-air heating/cooling rates by those schedule
 values, then uses the same detailed `TimeStepSysSec` energy accumulation for
 fuel energy rows. It compares 12 Detailed series over 110 samples with zero
-tolerance failures. This proves the blank and constant `Schedule:Constant`
-ReportPurchasedAir fuel-efficiency branches diagnostically; non-constant
-efficiency schedules and broad fuel or meter conformance remain outside the
-claim. The same lane compares hourly DistrictHeatingWater/DistrictCooling
-oracle-MTR values against Rust fuel-energy aggregates diagnostically.
+tolerance failures.
+
+`ideal_loads_blank_fuel_efficiency_conformance_candidate_001` promotes only
+the declared no-OA blank fuel energy-rate and fuel energy rows. The matching
+`ideal_loads_constant_fuel_efficiency_conformance_candidate_001` promotes only
+the declared no-OA constant `Schedule:Constant` fuel energy-rate and fuel
+energy rows. Raw IdealLoads rates and facility meters remain proof evidence in
+those cases; non-constant efficiency schedules and broad fuel or meter
+conformance remain outside the claim. The diagnostic lane still compares
+hourly DistrictHeatingWater/DistrictCooling oracle-MTR values against Rust
+fuel-energy aggregates diagnostically.
 
 ## IdealLoads Finite Flow/Capacity Evidence
 

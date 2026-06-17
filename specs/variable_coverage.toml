@@ -132,7 +132,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy"
@@ -140,7 +140,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Heating Fuel Energy"
@@ -148,7 +148,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Cooling Fuel Energy"
@@ -156,7 +156,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate"
@@ -164,7 +164,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rate rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rate rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate"
@@ -172,7 +172,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rate rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rate rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Heating Fuel Energy Rate"
@@ -180,7 +180,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rate rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rate rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Cooling Fuel Energy Rate"
@@ -188,7 +188,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rate rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001; blank-efficiency conformance, non-constant efficiency schedules, and broad meter conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA blank fuel-efficiency conformance in ideal_loads_blank_fuel_efficiency_conformance_candidate_001 and constant Schedule:Constant fuel-efficiency conformance in ideal_loads_constant_fuel_efficiency_conformance_candidate_001 for declared fuel-energy rate rows; non-constant efficiency schedules and broad meter conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Outdoor Air Mass Flow Rate"

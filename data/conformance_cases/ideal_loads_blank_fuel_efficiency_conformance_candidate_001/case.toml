@@ -1,24 +1,23 @@
-id = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
-title = "One-zone no-OA IdealLoads constant fuel-efficiency conformance candidate"
-milestone = "ideal-loads-constant-fuel-efficiency-conformance"
-purpose = "Claim narrow no-outdoor-air IdealLoads constant Schedule:Constant fuel-efficiency conformance for declared fuel energy rate and energy rows only."
+id = "ideal_loads_blank_fuel_efficiency_conformance_candidate_001"
+title = "One-zone no-OA IdealLoads blank fuel-efficiency conformance candidate"
+milestone = "ideal-loads-blank-fuel-efficiency-conformance"
+purpose = "Claim narrow no-outdoor-air IdealLoads blank fuel-efficiency conformance for declared fuel energy rate and energy rows only."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "This case claims only the declared no-OA constant Schedule:Constant fuel-efficiency rows.",
-  "Heating fuel efficiency is a Schedule:Constant value of 0.8; cooling fuel efficiency is a Schedule:Constant value of 0.75.",
-  "Fuel energy rate rows prove the EnergyPlus ReportPurchasedAir raw-rate divided-by-efficiency branch.",
-  "Fuel energy rows prove the same efficiency branch with TimeStepSysSec detailed energy accumulation.",
+  "This case claims only the declared no-OA blank fuel-efficiency rows.",
+  "Heating and cooling fuel-efficiency schedule fields are blank, so EnergyPlus uses unity efficiency.",
+  "Fuel energy rate rows prove the EnergyPlus ReportPurchasedAir raw-rate blank-efficiency branch.",
+  "Fuel energy rows prove the same blank-efficiency branch with TimeStepSysSec detailed energy accumulation.",
   "Raw IdealLoads rate rows and DistrictHeatingWater:Facility/DistrictCooling:Facility meters remain diagnostic proof evidence.",
-  "Blank fuel-efficiency conformance is claimed only by ideal_loads_blank_fuel_efficiency_conformance_candidate_001.",
-  "The boundary excludes non-constant fuel-efficiency schedules, monthly/annual meter aggregation, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter/HVAC conformance."
+  "The boundary excludes constant and non-constant fuel-efficiency schedules, monthly/annual meter aggregation, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter/HVAC conformance."
 ]
 
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"
-source_file = "data/conformance_cases/ideal_loads_fuel_efficiency_diagnostic_001/ideal_loads_fuel_efficiency_diagnostic.idf"
+source_file = "data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/ideal_loads_no_oa_sensible_conformance.idf"
 tier = "B"
 
 [scope]
@@ -33,7 +32,7 @@ has_python_plugin = false
 has_daylighting = false
 
 [input]
-idf = "data/conformance_cases/ideal_loads_fuel_efficiency_diagnostic_001/ideal_loads_fuel_efficiency_diagnostic.idf"
+idf = "data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/ideal_loads_no_oa_sensible_conformance.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
 
 [[outputs]]
@@ -193,8 +192,8 @@ max_rmse = 1e-3
 
 [report]
 format = "markdown"
-path = ".runtime/ideal-loads-constant-fuel-efficiency-conformance/26.1.0/ideal_loads_constant_fuel_efficiency_conformance_candidate_001/compare/compare-report.md"
+path = ".runtime/ideal-loads-blank-fuel-efficiency-conformance/26.1.0/ideal_loads_blank_fuel_efficiency_conformance_candidate_001/compare/compare-report.md"
 
 [gate]
-script = "scripts/dev.cmd compare-ideal-loads-constant-fuel-efficiency-conformance-candidate"
+script = "scripts/dev.cmd compare-ideal-loads-blank-fuel-efficiency-conformance-candidate"
 blocking = true

@@ -51,10 +51,11 @@ tolerance, and code organization.
   supply-node temperature/mass-flow Detailed series in
   `ideal_loads_no_oa_sensible_conformance_001`, with ReportPurchasedAir
   non-fuel energy rows promoted only in
-  `ideal_loads_no_oa_report_energy_conformance_candidate_001`, constant
+  `ideal_loads_no_oa_report_energy_conformance_candidate_001`, blank
+  fuel-efficiency rows promoted only in
+  `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, constant
   Schedule:Constant fuel-efficiency rows promoted only in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`,
-  blank-efficiency fuel energy rows kept diagnostic-only, and
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
 - limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate for
@@ -63,15 +64,22 @@ tolerance, and code organization.
   `ideal_loads_no_oa_report_energy_conformance_candidate_001`, with constant
   Schedule:Constant fuel-efficiency rows promoted only in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`, and
-  blank-efficiency fuel-energy, rates, node, demand, humidity, and facility
-  meter rows kept diagnostic proof only
+  blank fuel-efficiency rows promoted only in
+  `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`; raw rates,
+  node, demand, humidity, and facility meter rows are kept diagnostic proof
+  only
+- limited IdealLoads no-OA blank fuel-efficiency conformance candidate for
+  declared supply-air/zone heating/cooling fuel energy-rate and fuel energy
+  rows in
+  `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, with raw
+  IdealLoads rate and facility meter rows kept diagnostic proof only;
+  constant and non-constant efficiency schedules remain outside this claim
 - limited IdealLoads no-OA constant Schedule:Constant fuel-efficiency
   conformance candidate for declared supply-air/zone heating/cooling fuel
   energy-rate and fuel energy rows in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`, with raw
   IdealLoads rate and facility meter rows kept diagnostic proof only;
-  blank-efficiency and non-constant efficiency schedules remain outside the
-  claim
+  blank and non-constant efficiency schedules remain outside this claim
 - limited IdealLoads no-OA hourly facility meter conformance candidate for
   `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` in
   `ideal_loads_no_oa_facility_meter_conformance_candidate_001`, with
