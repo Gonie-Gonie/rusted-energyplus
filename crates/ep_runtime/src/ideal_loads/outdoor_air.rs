@@ -36,6 +36,21 @@ pub struct IdealLoadsOutdoorAirNodeState {
     pub air_humidity_ratio: f64,
 }
 
+/// Component terms for `DesignSpecification:OutdoorAir` design flow.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct IdealLoadsOutdoorAirDesignFlowComponents {
+    /// Flow/Person contribution in m3/s.
+    pub flow_per_person_m3_per_s: f64,
+    /// Flow/Area contribution in m3/s.
+    pub flow_per_area_m3_per_s: f64,
+    /// Flow/Zone contribution in m3/s.
+    pub flow_per_zone_m3_per_s: f64,
+    /// AirChanges/Hour contribution in m3/s.
+    pub air_changes_m3_per_s: f64,
+    /// Final selected design flow for the requested method in m3/s.
+    pub final_design_volume_flow_rate_m3_per_s: f64,
+}
+
 /// Diagnostic report values for the narrow IdealLoads OA sensible branch.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IdealLoadsOutdoorAirSensibleResult {
@@ -95,10 +110,10 @@ pub struct IdealLoadsOutdoorAirSensibleResult {
 
 /// Calculates the design outdoor-air volume flow in m3/s for supported methods.
 #[must_use]
-pub fn calc_design_outdoor_air_volume_flow_m3_per_s(
+pub fn design_outdoor_air_volume_flow_components_m3_per_s(
     specification: &DesignSpecificationOutdoorAir,
     context: IdealLoadsOutdoorAirContext,
-) -> Option<f64> {
+) -> Option<IdealLoadsOutdoorAirDesignFlowComponents> {
     let per_person = nonnegative_product(
         specification.outdoor_air_flow_per_person_m3_per_s_person,
         context.design_people_count,
@@ -113,21 +128,40 @@ pub fn calc_design_outdoor_air_volume_flow_m3_per_s(
         context.zone_volume_m3,
     ) / 3600.0;
 
-    match specification.method {
-        DesignSpecificationOutdoorAirMethod::FlowPerPerson => Some(per_person),
-        DesignSpecificationOutdoorAirMethod::FlowPerArea => Some(per_area),
-        DesignSpecificationOutdoorAirMethod::FlowPerZone => Some(per_zone),
-        DesignSpecificationOutdoorAirMethod::AirChangesPerHour => Some(air_changes),
-        DesignSpecificationOutdoorAirMethod::Sum => {
-            Some(per_person + per_area + per_zone + air_changes)
-        }
+    let final_design_volume_flow_rate_m3_per_s = match specification.method {
+        DesignSpecificationOutdoorAirMethod::FlowPerPerson => per_person,
+        DesignSpecificationOutdoorAirMethod::FlowPerArea => per_area,
+        DesignSpecificationOutdoorAirMethod::FlowPerZone => per_zone,
+        DesignSpecificationOutdoorAirMethod::AirChangesPerHour => air_changes,
+        DesignSpecificationOutdoorAirMethod::Sum => per_person + per_area + per_zone + air_changes,
         DesignSpecificationOutdoorAirMethod::Maximum => {
-            Some(per_person.max(per_area).max(per_zone).max(air_changes))
+            per_person.max(per_area).max(per_zone).max(air_changes)
         }
         DesignSpecificationOutdoorAirMethod::IndoorAirQualityProcedure
         | DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnDesignOccupancy
-        | DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnOccupancySchedule => None,
-    }
+        | DesignSpecificationOutdoorAirMethod::ProportionalControlBasedOnOccupancySchedule => {
+            return None;
+        }
+    };
+    Some(IdealLoadsOutdoorAirDesignFlowComponents {
+        flow_per_person_m3_per_s: per_person,
+        flow_per_area_m3_per_s: per_area,
+        flow_per_zone_m3_per_s: per_zone,
+        air_changes_m3_per_s: air_changes,
+        final_design_volume_flow_rate_m3_per_s,
+    })
+}
+
+/// Calculates the design outdoor-air volume flow in m3/s for supported methods.
+#[must_use]
+pub fn calc_design_outdoor_air_volume_flow_m3_per_s(
+    specification: &DesignSpecificationOutdoorAir,
+    context: IdealLoadsOutdoorAirContext,
+) -> Option<f64> {
+    Some(
+        design_outdoor_air_volume_flow_components_m3_per_s(specification, context)?
+            .final_design_volume_flow_rate_m3_per_s,
+    )
 }
 
 /// Applies the current OA schedule and standard density to the design volume flow.

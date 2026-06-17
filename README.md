@@ -116,8 +116,13 @@ tolerance, and code organization.
   outdoor-air report rates, supply-air state, and mixed-air state Detailed
   series in `ideal_loads_outdoor_air_air_changes_conformance_candidate_001`,
   using traced 1 m3 zone-volume proof input
-- diagnostic-only IdealLoads remaining Sum,
-  Maximum, active economizer, and active heat-recovery outdoor-air evidence
+- limited IdealLoads outdoor-air `Sum` conformance candidate gate for declared
+  outdoor-air mass/standard-density volume flow, no-humidity outdoor-air
+  report rates, supply-air state, and mixed-air state Detailed series in
+  `ideal_loads_outdoor_air_sum_conformance_candidate_001`, with traced
+  Flow/Area, Flow/Zone, and AirChanges/Hour component-flow proof inputs
+- diagnostic-only IdealLoads remaining Maximum,
+  active economizer, and active heat-recovery outdoor-air evidence
   for outdoor-air mass flow, standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, mixed-air state, inactive
   economizer/heat-recovery reports, DifferentialDryBulb and

@@ -71,10 +71,10 @@ use ep_runtime::{
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_outdoor_air_sensible_report_rates_compat,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, ideal_loads_facility_meter_binding,
-    ideal_loads_zone_equipment_stages, load_epw_records, purchased_air_source_order_stages,
-    select_purchased_air_branch, sim_purchased_air_compat, surface_area_m2,
-    validate_ideal_loads_zone_equipment_dispatch,
+    classify_no_oa_sensible_subset, design_outdoor_air_volume_flow_components_m3_per_s,
+    ideal_loads_facility_meter_binding, ideal_loads_zone_equipment_stages, load_epw_records,
+    purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
+    surface_area_m2, validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -103,6 +103,8 @@ const IDEAL_LOADS_OUTDOOR_AIR_FLOW_AREA_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_flow_area_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_AIR_CHANGES_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_air_changes_conformance_candidate_001";
+const IDEAL_LOADS_OUTDOOR_AIR_SUM_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_sum_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -215,6 +217,10 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     design_people_count: f64,
     zone_floor_area_m2: f64,
     zone_volume_m3: f64,
+    flow_per_person_m3_per_s: f64,
+    flow_per_area_m3_per_s: f64,
+    flow_per_zone_m3_per_s: f64,
+    air_changes_m3_per_s: f64,
     design_volume_flow_rate_m3_per_s: f64,
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     sample_count: usize,
@@ -618,6 +624,12 @@ fn manifest_allows_outdoor_air_air_changes_conformance_manifest(
         && manifest.conformance_claim
 }
 
+fn manifest_allows_outdoor_air_sum_conformance_manifest(manifest: &ConformanceCase) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_SUM_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn outdoor_air_conformance_method_for_manifest(
     manifest: &ConformanceCase,
 ) -> Option<DesignSpecificationOutdoorAirMethod> {
@@ -629,6 +641,8 @@ fn outdoor_air_conformance_method_for_manifest(
         Some(DesignSpecificationOutdoorAirMethod::FlowPerArea)
     } else if manifest_allows_outdoor_air_air_changes_conformance_manifest(manifest) {
         Some(DesignSpecificationOutdoorAirMethod::AirChangesPerHour)
+    } else if manifest_allows_outdoor_air_sum_conformance_manifest(manifest) {
+        Some(DesignSpecificationOutdoorAirMethod::Sum)
     } else {
         None
     }
@@ -742,6 +756,13 @@ fn build_outdoor_air_design_flow_context<'a>(
         })?;
     let standard_air_density_kg_per_m3 = limit_context.standard_air_density_kg_per_m3;
     let outdoor_air_context = ideal_loads_outdoor_air_context(&model.typed, zone);
+    let design_flow_components = design_outdoor_air_volume_flow_components_m3_per_s(
+        outdoor_air_specification,
+        outdoor_air_context,
+    )
+    .ok_or_else(|| {
+        "failed to calculate IdealLoads outdoor-air design-flow components".to_string()
+    })?;
     let outdoor_air_mass_flow_rate_kg_per_s = calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
         outdoor_air_specification,
         outdoor_air_context,
@@ -944,6 +965,10 @@ fn build_outdoor_air_design_flow_context<'a>(
         design_people_count: outdoor_air_context.design_people_count,
         zone_floor_area_m2: outdoor_air_context.zone_floor_area_m2,
         zone_volume_m3: outdoor_air_context.zone_volume_m3,
+        flow_per_person_m3_per_s: design_flow_components.flow_per_person_m3_per_s,
+        flow_per_area_m3_per_s: design_flow_components.flow_per_area_m3_per_s,
+        flow_per_zone_m3_per_s: design_flow_components.flow_per_zone_m3_per_s,
+        air_changes_m3_per_s: design_flow_components.air_changes_m3_per_s,
         design_volume_flow_rate_m3_per_s,
         outdoor_air_mass_flow_rate_kg_per_s,
         sample_count,
@@ -1092,6 +1117,9 @@ fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_
     }
     if manifest_allows_outdoor_air_air_changes_conformance_manifest(context.manifest) {
         return "conformance IdealLoads outdoor-air AirChanges/Hour branch for declared variables only";
+    }
+    if manifest_allows_outdoor_air_sum_conformance_manifest(context.manifest) {
+        return "conformance IdealLoads outdoor-air Sum branch for declared variables only";
     }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
@@ -3975,6 +4003,22 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     ));
     report.push_str(&format!("zone_volume_m3: {:.15}\n", context.zone_volume_m3));
     report.push_str(&format!(
+        "outdoor_air_flow_per_person_m3_per_s: {:.15}\n",
+        context.flow_per_person_m3_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_flow_per_area_m3_per_s: {:.15}\n",
+        context.flow_per_area_m3_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_flow_per_zone_m3_per_s: {:.15}\n",
+        context.flow_per_zone_m3_per_s
+    ));
+    report.push_str(&format!(
+        "outdoor_air_air_changes_m3_per_s: {:.15}\n",
+        context.air_changes_m3_per_s
+    ));
+    report.push_str(&format!(
         "design_volume_flow_rate_m3_per_s: {:.15}\n",
         context.design_volume_flow_rate_m3_per_s
     ));
@@ -4156,6 +4200,22 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"zone_volume_m3\": {},\n",
         json_number(context.zone_volume_m3)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_person_m3_per_s\": {},\n",
+        json_number(context.flow_per_person_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_area_m3_per_s\": {},\n",
+        json_number(context.flow_per_area_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_zone_m3_per_s\": {},\n",
+        json_number(context.flow_per_zone_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_air_changes_m3_per_s\": {},\n",
+        json_number(context.air_changes_m3_per_s)
     ));
     json.push_str(&format!(
         "  \"design_volume_flow_rate_m3_per_s\": {},\n",
@@ -4472,6 +4532,22 @@ fn render_outdoor_air_stage_summary_json(
     json.push_str(&format!(
         "  \"zone_volume_m3\": {},\n",
         json_number(context.zone_volume_m3)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_person_m3_per_s\": {},\n",
+        json_number(context.flow_per_person_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_area_m3_per_s\": {},\n",
+        json_number(context.flow_per_area_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_flow_per_zone_m3_per_s\": {},\n",
+        json_number(context.flow_per_zone_m3_per_s)
+    ));
+    json.push_str(&format!(
+        "  \"outdoor_air_air_changes_m3_per_s\": {},\n",
+        json_number(context.air_changes_m3_per_s)
     ));
     json.push_str(&format!(
         "  \"design_volume_flow_rate_m3_per_s\": {},\n",

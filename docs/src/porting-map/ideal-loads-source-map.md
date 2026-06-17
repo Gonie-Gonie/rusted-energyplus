@@ -220,8 +220,8 @@ conformance.
 ## Outdoor-Air Prerequisites
 
 Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone,
-Flow/Person, Flow/Area, and AirChanges/Hour candidate rows. The current Rust
-surface is:
+Flow/Person, Flow/Area, AirChanges/Hour, and Sum candidate rows. The current
+Rust surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
@@ -229,6 +229,9 @@ surface is:
   its referenced outdoor-air design specification
 - `People` typed intake for zone design occupant count used by the Flow/Person
   conformance candidate and diagnostic proof lane
+- `design_outdoor_air_volume_flow_components_m3_per_s` for reporting the
+  Flow/Person, Flow/Area, Flow/Zone, and AirChanges/Hour component terms plus
+  the selected final design volume flow
 - `calc_design_outdoor_air_volume_flow_m3_per_s` for supported
   `Flow/Person`, `Flow/Area`, `Flow/Zone`, `AirChanges/Hour`, `Sum`, and
   `Maximum` methods
@@ -242,10 +245,11 @@ surface is:
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_area_conformance_manifest`,
-  `manifest_allows_outdoor_air_air_changes_conformance_manifest`, and
+  `manifest_allows_outdoor_air_air_changes_conformance_manifest`,
+  `manifest_allows_outdoor_air_sum_conformance_manifest`, and
   `validate_outdoor_air_conformance_boundary` in
   `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone, Flow/Person,
-  Flow/Area, and AirChanges/Hour candidates
+  Flow/Area, AirChanges/Hour, and Sum candidates
 
 `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -311,10 +315,16 @@ economizer/heat-recovery rows diagnostic-only.
 `ideal_loads_outdoor_air_air_changes_diagnostic_001` remains the diagnostic
 predecessor artifact for the same AirChanges/Hour fixture shape.
 
-`ideal_loads_outdoor_air_sum_diagnostic_001` and
-`ideal_loads_outdoor_air_maximum_diagnostic_001` exercise the aggregate
-`DesignSpecification:OutdoorAir` methods. The Sum fixture combines Flow/Area,
-Flow/Zone, and AirChanges/Hour terms to 0.05 m3/s; the Maximum fixture selects
+`ideal_loads_outdoor_air_sum_conformance_candidate_001` promotes the Sum proof
+lane. The fixture combines 0.015 m3/s Flow/Area, 0.025 m3/s Flow/Zone, and
+0.010 m3/s AirChanges/Hour component terms to 0.05 m3/s, and the compare gate
+checks each component term in `compare-summary.json`, `stage-summary.json`, and
+`compare-report.md` before claiming the same 14 outdoor-air/supply/mixed rows.
+`ideal_loads_outdoor_air_sum_diagnostic_001` remains the diagnostic predecessor
+artifact for the same Sum fixture shape.
+
+`ideal_loads_outdoor_air_maximum_diagnostic_001` exercises the remaining
+aggregate `DesignSpecification:OutdoorAir` method. The Maximum fixture selects
 the AirChanges/Hour term as the same 0.05 m3/s governing design volume.
 
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`
@@ -350,7 +360,7 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality, proportional-control, Sum, Maximum, active economizer, and
+Indoor air quality, proportional-control, Maximum, active economizer, and
 active heat-recovery outdoor-air methods remain
 diagnostic or unresolved, and no outdoor-air
 finite-limit, outdoor-air humidity-control, other active humidity-control,
