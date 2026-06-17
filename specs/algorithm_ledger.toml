@@ -401,8 +401,10 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME",
   "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
+  "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_zone_conformance_manifest",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-person-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-design-flow-diagnostic.ps1",
+  "scripts/compare/compare-ideal-loads-outdoor-air-flow-zone-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-dry-bulb-economizer-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-flow-area-diagnostic.ps1",
@@ -412,9 +414,9 @@ rust_target = [
   "scripts/compare/compare-ideal-loads-outdoor-air-sensible-heat-recovery-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-outdoor-air-enthalpy-heat-recovery-diagnostic.ps1",
 ]
-status = "diagnostic_only"
-first_case = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
-first_evidence = "ideal_loads_outdoor_air_design_flow_diagnostic_001"
+status = "conformance"
+first_case = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
+first_evidence = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 proof_variables = [
   "Zone Ideal Loads Outdoor Air Mass Flow Rate",
   "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate",
@@ -439,8 +441,8 @@ proof_variables = [
   "Zone Ideal Loads Economizer Active Time",
   "Zone Ideal Loads Heat Recovery Active Time",
 ]
-claim_level = "none"
-support_boundary = "Diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air design-flow mass, standard-density volume flow, no-humidity outdoor-air report-rate, supply-air state, mixed-air state, inactive economizer/heat-recovery report parity, DifferentialDryBulb/DifferentialEnthalpy economizer OA flow/active-time parity, and heat-recovery active-time/rate parity; active DCV, humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
+claim_level = "limited-ideal-loads-outdoor-air-flow-zone-conformance"
+support_boundary = "Tolerance-gated IdealLoads outdoor-air Flow/Zone conformance for declared mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, and mixed-air state rows in ideal_loads_outdoor_air_flow_zone_conformance_candidate_001, with inactive economizer and inactive heat-recovery rows kept diagnostic-only. Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, active economizer, active heat recovery, active DCV, active humidity controls, heat-recovery saturation-limit branches, and broad OA conformance remain outside the claim."
 
 [[algorithm]]
 id = "plant_loop_state_projection"

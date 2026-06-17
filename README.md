@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 82 tracked variables, 43 conformance variables, 33
+  output-variable scope: 82 tracked variables, 57 conformance variables, 19
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -95,11 +95,16 @@ tolerance, and code organization.
   `ideal_loads_humidistat_humidification_conformance_candidate_001`, using
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
   calculation and broad humidity-control conformance remain outside the claim
-- diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
-  AirChanges/Hour, Sum, and Maximum outdoor-air design-flow evidence for
-  outdoor-air mass flow, standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, mixed-air state, inactive
-  economizer/heat-recovery reports, DifferentialDryBulb and
+- limited IdealLoads outdoor-air `Flow/Zone` conformance candidate gate for
+  declared outdoor-air mass/standard-density volume flow, no-humidity
+  outdoor-air report rates, supply-air state, and mixed-air state Detailed
+  series in `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001`,
+  with inactive economizer and inactive heat-recovery rows kept diagnostic-only
+- diagnostic-only IdealLoads remaining Flow/Person, Flow/Area,
+  AirChanges/Hour, Sum, Maximum, active economizer, and active heat-recovery
+  outdoor-air evidence for outdoor-air mass flow, standard-density volume
+  flow, no-humidity outdoor-air report rates, supply-air state, mixed-air
+  state, inactive economizer/heat-recovery reports, DifferentialDryBulb and
   DifferentialEnthalpy economizer active-time/flow parity, and Sensible and
   Enthalpy heat-recovery active-time/rate parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
@@ -123,7 +128,8 @@ tolerance, and code organization.
   internal convective gain hourly variable, and the official
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
-  `ConstantSensibleHeatRatio` cooling IdealLoads variables
+  `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
+  Humidistat, and outdoor-air `Flow/Zone` IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields

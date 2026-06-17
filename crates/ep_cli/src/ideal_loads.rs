@@ -95,6 +95,8 @@ const ZONE_SYSTEM_PREDICTED_COOLING_LOAD: &str =
     "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate";
 const IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS: f64 = 8.0;
 const IDEAL_LOADS_OUTDOOR_AIR_SYSTEM_SUBSTEPS: f64 = 8.0;
+const IDEAL_LOADS_OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-blank-fuel-efficiency";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
@@ -464,13 +466,31 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
 }
 
 fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Result<(), String> {
-    if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
+    let flow_zone_conformance =
+        manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest);
+    if flow_zone_conformance {
+        if manifest.comparison_class != ComparisonClass::Conformance {
+            return Err(format!(
+                "IdealLoads outdoor-air Flow/Zone conformance requires comparison_class=conformance, got {}",
+                comparison_class_label(manifest.comparison_class)
+            ));
+        }
+        for variable in OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_VARIABLES {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable == *variable && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads outdoor-air Flow/Zone conformance is missing conformance row for {variable}"
+                ));
+            }
+        }
+    } else if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
         return Err(format!(
-            "IdealLoads outdoor-air design-flow report requires diagnostic-only, got {}",
+            "IdealLoads outdoor-air design-flow report requires diagnostic-only unless it is the Flow/Zone conformance candidate, got {}",
             comparison_class_label(manifest.comparison_class)
         ));
     }
-    if manifest.conformance_claim {
+    if !flow_zone_conformance && manifest.conformance_claim {
         return Err(
             "IdealLoads outdoor-air design-flow diagnostic must keep conformance_claim false"
                 .to_string(),
@@ -494,7 +514,21 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
                 output.variable
             ));
         }
-        if output.level != Some(OutputLevel::Diagnostic) {
+        if flow_zone_conformance {
+            let expected_level =
+                if outdoor_air_flow_zone_conformance_variable(output.variable.as_str()) {
+                    OutputLevel::Conformance
+                } else {
+                    OutputLevel::Diagnostic
+                };
+            if output.level != Some(expected_level) {
+                return Err(format!(
+                    "IdealLoads outdoor-air Flow/Zone conformance expects {} level for {}",
+                    output_level_label(expected_level),
+                    output.variable
+                ));
+            }
+        } else if output.level != Some(OutputLevel::Diagnostic) {
             return Err(format!(
                 "IdealLoads outdoor-air design-flow outputs must be diagnostic-level: {}",
                 output.variable
@@ -532,6 +566,33 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
         }
     }
     Ok(())
+}
+
+const OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_VARIABLES: &[&str] = &[
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+    ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE,
+    ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO,
+];
+
+fn manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest: &ConformanceCase) -> bool {
+    manifest.id == IDEAL_LOADS_OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
+fn outdoor_air_flow_zone_conformance_variable(variable: &str) -> bool {
+    OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_VARIABLES.contains(&variable)
 }
 
 fn build_outdoor_air_design_flow_context<'a>(
@@ -617,6 +678,12 @@ fn build_outdoor_air_design_flow_context<'a>(
     }
 
     validate_outdoor_air_design_flow_boundary(system, outdoor_air_specification.method)?;
+    if manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest) {
+        validate_outdoor_air_flow_zone_conformance_boundary(
+            system,
+            outdoor_air_specification.method,
+        )?;
+    }
 
     let site =
         model.typed.site.as_ref().ok_or_else(|| {
@@ -899,6 +966,39 @@ fn validate_outdoor_air_design_flow_boundary(
     Ok(())
 }
 
+fn validate_outdoor_air_flow_zone_conformance_boundary(
+    system: &IdealLoadsAirSystem,
+    method: DesignSpecificationOutdoorAirMethod,
+) -> Result<(), String> {
+    if method != DesignSpecificationOutdoorAirMethod::FlowPerZone {
+        return Err(
+            "IdealLoads outdoor-air Flow/Zone conformance candidate requires Flow/Zone".to_string(),
+        );
+    }
+    if system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer {
+        return Err(
+            "IdealLoads outdoor-air Flow/Zone conformance candidate excludes active economizer"
+                .to_string(),
+        );
+    }
+    if system.heat_recovery_type != HeatRecoveryType::None {
+        return Err(
+            "IdealLoads outdoor-air Flow/Zone conformance candidate excludes heat recovery"
+                .to_string(),
+        );
+    }
+    if system.dehumidification_control_type
+        != DehumidificationControlType::ConstantSensibleHeatRatio
+        || system.humidification_control_type != HumidificationControlType::None
+    {
+        return Err(
+            "IdealLoads outdoor-air Flow/Zone conformance candidate requires default ConstantSensibleHeatRatio dehumidification and no humidification control"
+                .to_string(),
+        );
+    }
+    Ok(())
+}
+
 fn outdoor_air_method_label(method: DesignSpecificationOutdoorAirMethod) -> &'static str {
     match method {
         DesignSpecificationOutdoorAirMethod::FlowPerPerson => "Flow/Person",
@@ -936,6 +1036,9 @@ fn heat_recovery_label(heat_recovery: HeatRecoveryType) -> &'static str {
 }
 
 fn outdoor_air_claim_boundary(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
+    if manifest_allows_outdoor_air_flow_zone_conformance_manifest(context.manifest) {
+        return "conformance IdealLoads outdoor-air Flow/Zone branch for declared variables only";
+    }
     if context.heat_recovery_type == HeatRecoveryType::Sensible {
         return "diagnostic-only IdealLoads outdoor-air Flow/Zone mass, standard-density volume, outdoor-air report rates, supply-air state, mixed-air state, and Sensible heat recovery active-time/rate parity; DCV, economizer, Enthalpy heat recovery, humidity controls, saturation-limit branches, and broad OA conformance remain outside the claim";
     }
@@ -5259,15 +5362,20 @@ fn overall_status(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
 }
 
 fn outdoor_air_overall_status(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> &'static str {
-    if context.rows.is_empty() {
-        return "fail";
-    }
-    if context
+    let conformance_rows = context
         .rows
+        .iter()
+        .filter(|row| row.level == Some(OutputLevel::Conformance))
+        .collect::<Vec<_>>();
+    if conformance_rows.is_empty() && !context.manifest.conformance_claim {
+        "diagnostic"
+    } else if conformance_rows.is_empty() {
+        "fail"
+    } else if conformance_rows
         .iter()
         .all(|row| row.status == SeriesComparisonStatus::Pass)
     {
-        "diagnostic"
+        "pass"
     } else {
         "fail"
     }

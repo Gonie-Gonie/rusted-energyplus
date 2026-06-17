@@ -39,17 +39,32 @@ variables:
 - `ideal_loads_constant_shr_conformance_001` declared no-OA
   `ConstantSensibleHeatRatio` cooling thermostat, rate, and supply-node
   variables only
+- `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`
+  declared no-OA `ConstantSupplyHumidityRatio` cooling thermostat, rate, and
+  supply-node variables only
+- `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
+  declared no-OA `ConstantSupplyHumidityRatio` heating thermostat, rate, and
+  supply-node variables only
+- `ideal_loads_humidistat_dehumidification_conformance_candidate_001`
+  declared no-OA Humidistat dehumidification thermostat, rate, and supply-node
+  variables only
+- `ideal_loads_humidistat_humidification_conformance_candidate_001` declared
+  no-OA Humidistat humidification thermostat, rate, and supply-node variables
+  only
+- `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` declared
+  outdoor-air Flow/Zone mass/volume, no-humidity report-rate, supply-air
+  state, and mixed-air state variables only
 
 ## Current Evidence Boundary
 
 | Area | Current conformance | Diagnostic or baseline evidence | Not claimed |
 |---|---|---|---|
-| Numerical time series | 16 promoted conformance manifests, 271 declared hourly/detailed ESO series, and 22 passed release-evidence series | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gates the declared compatibility-candidate variable set; `ideal_loads_no_oa_sensible_conformance_001` gates the declared no-OA/no-limit IdealLoads sensible variable set; `ideal_loads_capacity_limit_conformance_001`, `ideal_loads_flow_limit_conformance_001`, and `ideal_loads_flow_capacity_limit_conformance_001` gate the declared no-OA finite-limit IdealLoads sensible variable set; `ideal_loads_constant_shr_conformance_001` gates the declared no-OA ConstantSensibleHeatRatio cooling variable set; `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001` and `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001` gate the declared no-OA ConstantSupplyHumidityRatio cooling/heating variable sets; `ideal_loads_humidistat_dehumidification_conformance_candidate_001` and `ideal_loads_humidistat_humidification_conformance_candidate_001` gate the declared no-OA Humidistat humidity-control variable sets | broad ExampleFiles dynamic conformance |
+| Numerical time series | 17 promoted conformance manifests, 293 declared hourly/detailed ESO series, and 22 passed release-evidence series | `official_1zone_uncontrolled_baseline_001` keeps oracle series; `official_1zone_uncontrolled_dynamic_diagnostic_001` keeps broad run-period-filtered probe deltas; `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gates the declared compatibility-candidate variable set; `ideal_loads_no_oa_sensible_conformance_001` gates the declared no-OA/no-limit IdealLoads sensible variable set; `ideal_loads_capacity_limit_conformance_001`, `ideal_loads_flow_limit_conformance_001`, and `ideal_loads_flow_capacity_limit_conformance_001` gate the declared no-OA finite-limit IdealLoads sensible variable set; `ideal_loads_constant_shr_conformance_001` gates the declared no-OA ConstantSensibleHeatRatio cooling variable set; `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001` and `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001` gate the declared no-OA ConstantSupplyHumidityRatio cooling/heating variable sets; `ideal_loads_humidistat_dehumidification_conformance_candidate_001` and `ideal_loads_humidistat_humidification_conformance_candidate_001` gate the declared no-OA Humidistat humidity-control variable sets; `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` gates the declared outdoor-air Flow/Zone variable set | broad ExampleFiles dynamic conformance |
 | Static model | official `1ZoneUncontrolled` EIO surface geometry, Construction CTF, Material CTF Summary, and OtherEquipment nominal fields | generated support/index/release evidence PDFs | dynamic behavior from the static EIO case |
 | Heat balance | no-mass zone MAT, no-mass surface inside/outside temperature, no-mass adiabatic conduction series, and selected official `1ZoneUncontrolled` dynamic weather/zone-air/surface-temperature/surface-conduction variables | official `1ZoneUncontrolled` broad diagnostic decomposition, floor storage blocker traces, radiation/solar/convection diagnostics, and non-promoted probe lanes | broad CTF storage parity, EnergyPlus warmup convergence parity outside the official candidate, solar, radiation exchange, fenestration, infiltration, zone air predictor/corrector parity, or general heat-balance compatibility |
 | Time, weather, schedule | `Schedule Value` and `Site Outdoor Air Drybulb Temperature` hourly series | dewpoint, relative humidity, pressure, wind speed, and wind direction diagnostics | broad weather processor compatibility |
 | Internal gains | `Zone Total Internal Convective Heating Rate` for `internal_gains_001` | static OtherEquipment nominal fields | zone air temperature response to gains, radiant/latent coupling, or broad internal-gain compatibility |
-| HVAC, node, plant | no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio cooling/heating, and Humidistat dehumidification/humidification conformance for declared thermostat, IdealLoads rate, and supply-node temperature/flow/humidity variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, finite-limit return-node proof rows, ConstantSensibleHeatRatio return/zone-node humidity proof rows, ConstantSupplyHumidityRatio cooling/heating return/zone-node humidity and energy/fuel/meter proof rows, no-OA Humidistat dehumidification/humidification moisture-demand proof inputs and energy/fuel/meter proof rows, IdealLoads Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, economizer-active-time, inactive heat-recovery, and heat-recovery active-time/rate diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active DCV, broad or remaining humidity-control branches, humidistat moisture-demand conformance, saturation-limit branches, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
+| HVAC, node, plant | no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio cooling/heating, Humidistat dehumidification/humidification, and outdoor-air Flow/Zone conformance for declared thermostat, IdealLoads rate, supply-node, outdoor-air, supply-air-state, and mixed-air-state variables only | node proof rows, ReportPurchasedAir IdealLoads energy and blank/constant Schedule:Constant fuel energy proof rows, hourly IdealLoads facility meter oracle-MTR vs Rust aggregated fuel-energy diagnostics with RuntimeMeterRegistry request resolution, finite-limit return-node proof rows, ConstantSensibleHeatRatio return/zone-node humidity proof rows, ConstantSupplyHumidityRatio cooling/heating return/zone-node humidity and energy/fuel/meter proof rows, no-OA Humidistat dehumidification/humidification moisture-demand proof inputs and energy/fuel/meter proof rows, remaining IdealLoads Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air mass/standard-density volume-flow, no-humidity report-rate, supply-air-state, mixed-air-state, economizer-active-time, inactive heat-recovery, and heat-recovery active-time/rate diagnostic evidence, and plant-loop baseline/diagnostic reports | broad HVAC, broad node, full IdealLoads, active DCV, broad or remaining humidity-control branches, outdoor-air methods beyond Flow/Zone, active economizer/heat recovery, humidistat moisture-demand conformance, saturation-limit branches, broad meter conformance, non-constant efficiency schedules, and plant numerical conformance |
 
 The repository also contains smoke, baseline-only, and diagnostic evidence for
 model intake, additional weather variables, local fixture geometry/internal
@@ -142,11 +157,27 @@ The current public scope includes:
   declared thermostat setpoints, cooling total/sensible/latent rate rows, and
   supply-node temperature/mass-flow/humidity Detailed series, with return-node
   and zone-air humidity rows kept diagnostic-only
-- diagnostic-only IdealLoads Flow/Person, Flow/Zone, Flow/Area,
+- limited IdealLoads no-OA `ConstantSupplyHumidityRatio` cooling/heating
+  conformance for declared thermostat setpoints, total/sensible/latent rate
+  rows, supply-air report rows, and supply-node temperature/mass-flow/humidity
+  Detailed series, with opposite-side rows, return-node/zone-air humidity
+  rows, ReportPurchasedAir energy/fuel rows, and meters kept diagnostic-only
+- limited IdealLoads no-OA Humidistat dehumidification/humidification
+  conformance for declared thermostat setpoints, total/sensible/latent rate
+  rows, supply-air report rows, and supply-node temperature/mass-flow/humidity
+  Detailed series, with EnergyPlus moisture-demand rows, opposite-side rows,
+  return-node/zone-air humidity rows, ReportPurchasedAir energy/fuel rows, and
+  meters kept diagnostic-only
+- limited IdealLoads outdoor-air `Flow/Zone` conformance for declared
+  outdoor-air mass/standard-density volume flow, no-humidity
+  sensible/latent/total report rates, supply-air state, and mixed-air state
+  Detailed series, with inactive economizer and inactive heat-recovery rows
+  kept diagnostic-only
+- diagnostic-only IdealLoads remaining Flow/Person, Flow/Area,
   AirChanges/Hour, Sum, Maximum, DifferentialDryBulb, DifferentialEnthalpy,
   Sensible heat-recovery, and Enthalpy heat-recovery outdoor-air evidence for
   outdoor-air mass flow, standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  sensible/latent/total report rates, supply-air state, mixed-air state,
   economizer active time, inactive heat-recovery reports, and heat-recovery
   active-time/rate rows, with active DCV, active humidity controls,
   heat-recovery saturation-limit branches, meters, and broad OA

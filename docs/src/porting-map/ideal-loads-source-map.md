@@ -219,8 +219,8 @@ conformance.
 
 ## Outdoor-Air Prerequisites
 
-Outdoor-air IdealLoads conformance is not promoted yet. The current
-preparatory Rust surface is:
+Outdoor-air IdealLoads conformance is promoted only for the declared Flow/Zone
+candidate rows. The current Rust surface is:
 
 - `DesignSpecification:OutdoorAir` typed intake with method, flow terms, and
   schedule references preserved in `TypedModel`
@@ -238,6 +238,9 @@ preparatory Rust surface is:
   report-rate and mixed-air state diagnostic, including no-heat-recovery
   rows, DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
+- `manifest_allows_outdoor_air_flow_zone_conformance_manifest` and
+  `validate_outdoor_air_flow_zone_conformance_boundary` in
+  `crates/ep_cli/src/ideal_loads.rs` for the one promoted Flow/Zone candidate
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
 Flow/Person proof lane. The fixture declares five `People` design occupants
@@ -245,8 +248,8 @@ and 0.01 m3/s-person outdoor air, so the derived design volume remains
 0.05 m3/s before the `StdRhoAir` mass-flow conversion used by the rest of the
 outdoor-air diagnostic lane.
 
-`ideal_loads_outdoor_air_design_flow_diagnostic_001` adds a diagnostic-only
-Flow/Zone proof lane for the EnergyPlus report variables
+`ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
+same Flow/Zone fixture shape for declared EnergyPlus report variables
 `Zone Ideal Loads Outdoor Air Mass Flow Rate` and
 `Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate`, plus
 `Zone Ideal Loads Outdoor Air Sensible Heating Rate` and
@@ -260,16 +263,22 @@ Flow/Zone proof lane for the EnergyPlus report variables
 `Zone Ideal Loads Supply Air Temperature`,
 `Zone Ideal Loads Supply Air Humidity Ratio`, plus
 `Zone Ideal Loads Mixed Air Temperature` and
-`Zone Ideal Loads Mixed Air Humidity Ratio`, plus inactive
-heat-recovery/economizer report variables. The compare lane derives
+`Zone Ideal Loads Mixed Air Humidity Ratio`. Inactive heat-recovery/economizer
+report variables remain diagnostic proof rows. The compare lane derives
 EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA schedule as
 always 1.0, and writes Rust `ResultStore` series for the 96 Detailed oracle
 samples. The outdoor-air mass/volume, no-humidity latent, supply-air
 mass/volume/humidity, and mixed-air rows are exact in this fixture; the
-sensible/total report rows use a 1 W diagnostic tolerance, and supply-air
-temperature uses 0.02 C because EnergyPlus sorts them from source-order
-zone/OA state and report-rate mode gates. Inactive economizer/heat-recovery
-rows are exact zeros.
+sensible/total report rows use a 1 W conformance tolerance, and supply-air
+temperature uses 0.02 C because EnergyPlus sorts them from source-order zone/OA
+state and report-rate mode gates. The guard requires Flow/Zone, blank OA
+schedule, `NoEconomizer`, no heat recovery, no finite flow/capacity limits, no
+DCV, default `ConstantSensibleHeatRatio` dehumidification, and no
+humidification control. Inactive economizer/heat-recovery rows are exact zeros
+but are not promoted.
+
+`ideal_loads_outdoor_air_design_flow_diagnostic_001` remains the diagnostic
+predecessor artifact for the same Flow/Zone fixture shape.
 
 `ideal_loads_outdoor_air_flow_area_diagnostic_001` exercises the same
 diagnostic surface with a `Flow/Area` `DesignSpecification:OutdoorAir`. The
@@ -322,10 +331,12 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality and proportional-control outdoor-air methods remain
-unresolved, and no outdoor-air finite-limit, outdoor-air humidity-control,
-other active humidity-control, saturation-limit heat-recovery, or DCV output is
-part of the promoted IdealLoads claim.
+Indoor air quality, proportional-control, Flow/Person, Flow/Area,
+AirChanges/Hour, Sum, Maximum, active economizer, and active heat-recovery
+outdoor-air methods remain diagnostic or unresolved, and no outdoor-air
+finite-limit, outdoor-air humidity-control, other active humidity-control,
+saturation-limit heat-recovery, or DCV output is part of the promoted
+IdealLoads claim.
 
 ## Required Proof Variables
 

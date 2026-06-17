@@ -294,6 +294,28 @@ rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
 
+## IdealLoads Outdoor-Air Flow/Zone Conformance
+
+`ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
+blank-schedule `DesignSpecification:OutdoorAir` `Flow/Zone` lane for declared
+outdoor-air mass flow, standard-density volume flow, no-humidity outdoor-air
+sensible/latent/total report rates, supply-air mass/volume/temperature/humidity
+state, and mixed-air temperature/humidity state rows. It uses
+`comparison_class = "conformance"`, `conformance_claim = true`,
+`tolerance_policy: conformance-gate`, and `status: pass`.
+
+The candidate compares 22 Detailed series with 14 conformance rows and 8
+diagnostic proof rows. The diagnostic rows are inactive economizer and inactive
+heat-recovery report variables only. The guard requires Flow/Zone,
+`NoEconomizer`, no heat recovery, no OA schedule, no finite flow/capacity
+limits, no DCV, default `ConstantSensibleHeatRatio` dehumidification, and no
+humidification control.
+
+Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, active economizer,
+active heat recovery, active DCV, active humidity controls, heat-recovery
+saturation-limit branches, and broad IdealLoads outdoor-air conformance remain
+outside this claim.
+
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
 `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
@@ -305,10 +327,11 @@ remain outside the claim.
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`, and
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
-`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are
-diagnostic-only Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum,
-Maximum, DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery,
-and Enthalpy heat-recovery outdoor-air proof lanes:
+`ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are remaining
+diagnostic-only Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum,
+DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy
+heat-recovery outdoor-air proof lanes, plus the original Flow/Zone diagnostic
+predecessor fixture:
 
 ```text
 comparison_class: diagnostic-only
@@ -364,7 +387,8 @@ are exact zeros for the non-heat-recovery fixtures, and economizer active time
 is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
-This evidence does not promote active DCV, active humidity controls,
+This evidence does not promote outdoor-air methods beyond the separate
+Flow/Zone conformance candidate, active DCV, active humidity controls,
 saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
 conformance.
 
