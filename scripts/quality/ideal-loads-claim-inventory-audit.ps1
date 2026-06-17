@@ -91,6 +91,57 @@ function Assert-ConformanceBlocksHaveTolerances {
     return $conformanceBlockCount
 }
 
+function Get-DevCommandScriptPath {
+    param(
+        [Parameter(Mandatory = $true)][string]$DevText,
+        [Parameter(Mandatory = $true)][string]$Command
+    )
+
+    $pattern = '(?ms)^\s*"' + [regex]::Escape($Command) + '"\s*=\s*@\{\s*Path\s*=\s*"(?<path>[^"]+)"'
+    $match = [regex]::Match($DevText, $pattern)
+    if (-not $match.Success) {
+        throw "Dev command missing script path: $Command"
+    }
+
+    return Join-Path "scripts" $match.Groups["path"].Value
+}
+
+function Assert-ConformanceGateReportMetadataGuards {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$CaseId
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "$CaseId gate script missing: $Path"
+    }
+
+    $scriptText = Read-RepoText -Path $Path
+    $requiredMarkers = @(
+        "compare-summary.json",
+        "compare-report.md",
+        "stage-summary.json",
+        "tolerance-failures.csv",
+        "comparison_class",
+        "conformance_claim",
+        "status",
+        "tolerance_failures",
+        "conformanceRows",
+        "diagnostic",
+        "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat",
+        "selected_purchased_air_branch",
+        "declared_ideal_loads_branch",
+        "inactive_branches",
+        "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md",
+        "node_output_timestamp_alignment: timestamp",
+        "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir"
+    )
+
+    foreach ($marker in $requiredMarkers) {
+        Assert-TextMatches -Text $scriptText -Pattern ([regex]::Escape($marker)) -Description "$CaseId gate metadata guard: $marker"
+    }
+}
+
 $readmeText = Read-RepoText -Path "README.md"
 $currentStatusText = Read-RepoText -Path "docs\src\current\current-status.md"
 $variableCoverageText = Read-RepoText -Path "specs\variable_coverage.toml"
@@ -110,6 +161,7 @@ if ($caseFiles.Count -eq 0) {
 
 $promotedCases = @()
 $diagnosticOrBaselineCount = 0
+$reportMetadataGuardCount = 0
 foreach ($caseFile in $caseFiles) {
     $text = Read-RepoText -Path $caseFile
     $caseId = Get-TomlString -Text $text -Key "id" -Description $caseFile
@@ -133,6 +185,9 @@ foreach ($caseFile in $caseFiles) {
         $gateCommand = $gateMatch.Groups["command"].Value
         $gateCommandPattern = '(?m)^\s*"' + [regex]::Escape($gateCommand) + '"\s*=\s*@\{'
         Assert-TextMatches -Text $devText -Pattern $gateCommandPattern -Description "$caseId dev gate command $gateCommand"
+        $gateScriptPath = Get-DevCommandScriptPath -DevText $devText -Command $gateCommand
+        Assert-ConformanceGateReportMetadataGuards -Path $gateScriptPath -CaseId $caseId
+        $reportMetadataGuardCount += 1
 
         $casePattern = [regex]::Escape($caseId)
         Assert-TextMatches -Text $readmeText -Pattern $casePattern -Description "$caseId README claim inventory"
@@ -198,4 +253,5 @@ Write-Host "IdealLoads claim inventory audit complete."
 Write-Host "  promoted_ideal_loads_cases: $($promotedCases.Count)"
 Write-Host "  diagnostic_or_baseline_ideal_loads_cases: $diagnosticOrBaselineCount"
 Write-Host "  conformance_blocks_checked: $(($promotedCases | Measure-Object -Property Blocks -Sum).Sum)"
+Write-Host "  report_metadata_guards_checked: $reportMetadataGuardCount"
 Write-Host "  variable_coverage_ideal_loads_refs: $idealLoadsCoverageRefs"

@@ -264,6 +264,13 @@ Assert-Contains -Text $oracleMtrText -Pattern "DistrictCooling:Facility" -Descri
 
 $reportText = Read-TextFile -Path $reportPath
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA non-constant Schedule:Compact IdealLoads fuel-efficiency for declared fuel-energy rows only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: constant_shr" -Description "markdown PurchasedAir branch"
+Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch: no_oa_sensible" -Description "markdown declared branch"
+Assert-Contains -Text $reportText -Pattern "inactive_branches: outdoor_air, economizer, heat_recovery, humidistat, dcv, autosizing, saturation_limit" -Description "markdown inactive branches"
+Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
+Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
+Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_rate_source: EnergyPlus ReportPurchasedAir non-constant Schedule:Compact fuel-efficiency schedule branch" -Description "markdown fuel source"
 Assert-Contains -Text $reportText -Pattern "fuel_efficiency: heating=0.800000000000 cooling=0.750000000000" -Description "markdown fuel efficiency representative values"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: conformance for declared no-OA non-constant Schedule:Compact fuel-efficiency rows only" -Description "markdown fuel energy output level policy"

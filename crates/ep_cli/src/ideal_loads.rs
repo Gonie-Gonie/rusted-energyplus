@@ -5173,6 +5173,16 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         outdoor_air_tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
+    let purchased_air_source_order = purchased_air_source_order_stages()
+        .iter()
+        .map(|stage| stage.source_routine)
+        .collect::<Vec<_>>()
+        .join(" -> ");
+    report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "purchased_air_source_order: {}\n",
+        purchased_air_source_order
+    ));
     report.push_str(&format!(
         "selected_purchased_air_branch: {}\n",
         outdoor_air_selected_purchased_air_branch()

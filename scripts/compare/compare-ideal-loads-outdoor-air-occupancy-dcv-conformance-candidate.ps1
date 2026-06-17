@@ -358,6 +358,8 @@ if ($stageSummary.current_people_count_min -ne 0.0 -or $stageSummary.current_peo
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Flow/Person OccupancySchedule DCV branch for declared variables only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: outdoor_air" -Description "markdown PurchasedAir branch"
 Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch:" -Description "markdown declared branch"
 Assert-Contains -Text $reportText -Pattern "inactive_branches:" -Description "markdown inactive branches"
