@@ -229,6 +229,57 @@ foreach ($case in $promotedCases) {
     if (($diagnosticOutputRows.Count + $diagnosticMeterRows.Count) -eq 0) {
         throw "$($case.Id) summary must include diagnostic rows separated from conformance rows"
     }
+    foreach ($propertyName in @(
+        "selected_purchased_air_branch",
+        "declared_ideal_loads_branch",
+        "inactive_branches",
+        "source_map_anchor",
+        "node_output_timestamp_alignment",
+        "node_output_store_type",
+        "node_output_state_struct",
+        "node_output_update_source",
+        "node_output_report_source",
+        "zone_demand_source",
+        "zone_demand_struct_source",
+        "zone_demand_heating_field",
+        "zone_demand_heating_sign_convention",
+        "zone_demand_cooling_field",
+        "zone_demand_cooling_sign_convention",
+        "zone_demand_mismatch_classification",
+        "zone_demand_fixture_mode",
+        "zone_equipment_dispatch_path",
+        "zone_equipment_dispatch_validation",
+        "zone_equipment_conformance_candidate",
+        "zone_equipment_scope",
+        "zone_equipment_dispatch_issues",
+        "zone_equipment_dispatch_warnings"
+    )) {
+        Assert-JsonPropertyExists -Object $summary -PropertyName $propertyName -Description "$($case.Id) compare summary"
+    }
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "source_map_anchor" -Expected "docs/src/porting-map/ideal-loads-source-map.md" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_store_type" -Expected "ep_runtime::ResultStore" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "node_output_report_source" -Expected "ReportPurchasedAir" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_source" -Expected "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_struct_source" -Expected "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_heating_field" -Expected "RemainingOutputReqToHeatSP" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_heating_sign_convention" -Expected "positive W requests heating; non-positive means no active heating request" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_cooling_field" -Expected "RemainingOutputReqToCoolSP" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_cooling_sign_convention" -Expected "negative W requests cooling; non-negative means no active cooling request" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_mismatch_classification" -Expected "upstream_zone_heat_balance_input" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_demand_fixture_mode" -Expected "source-order-oracle-demand-input" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_equipment_dispatch_path" -Expected "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_equipment_dispatch_validation" -Expected "pass" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_equipment_conformance_candidate" -Expected "pass" -Description "$($case.Id) compare summary"
+    Assert-JsonPropertyEquals -Object $summary -PropertyName "zone_equipment_scope" -Expected "single-zone-single-equipment" -Description "$($case.Id) compare summary"
+    if (@($summary.zone_equipment_dispatch_issues).Count -ne 0) {
+        throw "$($case.Id) compare summary zone_equipment_dispatch_issues must be empty"
+    }
+    if (@($summary.zone_equipment_dispatch_warnings).Count -ne 0) {
+        throw "$($case.Id) compare summary zone_equipment_dispatch_warnings must be empty"
+    }
 
     $stageSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath $stageSummaryPath | ConvertFrom-Json
     foreach ($propertyName in @(

@@ -5438,6 +5438,8 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
 
 fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticContext<'_>) -> String {
     let manifest = context.manifest;
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -5484,6 +5486,34 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         json_string_array(&outdoor_air_inactive_branches(context))
     ));
     json.push_str(&format!(
+        "  \"zone_equipment_dispatch_path\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_validation\": {},\n",
+        json_string(context.zone_equipment_dispatch.dispatch_status_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_conformance_candidate\": {},\n",
+        json_string(
+            context
+                .zone_equipment_dispatch
+                .conformance_candidate_status_label()
+        )
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_scope\": {},\n",
+        json_string(context.zone_equipment_dispatch.scope_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_issues\": {},\n",
+        json_string_array(&zone_equipment_dispatch_issues)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_warnings\": {},\n",
+        json_string_array(&zone_equipment_dispatch_warnings)
+    ));
+    json.push_str(&format!(
         "  \"node_output_store_type\": {},\n",
         json_string(IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE)
     ));
@@ -5521,8 +5551,16 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         ))
     ));
     json.push_str(&format!(
+        "  \"zone_demand_heating_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD)
+    ));
+    json.push_str(&format!(
         "  \"zone_demand_heating_sign_convention\": {},\n",
         json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD)
     ));
     json.push_str(&format!(
         "  \"zone_demand_cooling_sign_convention\": {},\n",
