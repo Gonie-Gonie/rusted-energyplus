@@ -10,8 +10,9 @@ last_reviewed: 2026-06-15
 Broad HVAC numerical compatibility is not in the current public compatibility
 scope. The current exceptions are the narrow no-OA/no-limit, numeric
 finite-limit, ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio,
-Humidistat, outdoor-air, Sensible heat-recovery, and no-OA hourly facility
-meter IdealLoads claims for declared outputs and meters only.
+Humidistat, outdoor-air, Sensible heat-recovery, blank/constant/all-days
+Schedule:Compact fuel-efficiency, and no-OA hourly facility meter IdealLoads
+claims for declared outputs and meters only.
 
 ## v0.10 Foundation
 
@@ -159,7 +160,8 @@ this conformance fixture use the blank fuel-efficiency schedule branch. The
 facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
 diagnostics only; adaptive system timestep and broad meter conformance remain
 outside the claim. Fuel-efficiency conformance is claimed only by the separate
-blank and constant fuel-efficiency candidates.
+blank, constant Schedule:Constant, and all-days Schedule:Compact
+fuel-efficiency candidates.
 
 ## IdealLoads No-OA Facility Meter Conformance
 
@@ -181,8 +183,9 @@ side aggregates the detailed fuel-energy series through
 `ep_runtime::RuntimeMeterRegistry` and
 `ep_runtime::ideal_loads_facility_meter_binding`, compares them against
 EnergyPlus hourly MTR values, and keeps broad meter conformance,
-non-constant efficiency schedules, monthly/annual meter aggregation, outdoor
-air, humidity controls, finite limits, air loops, plant loops, EMS, and
+fuel-efficiency schedules beyond the declared blank/constant/all-days
+Schedule:Compact candidates, monthly/annual meter aggregation, outdoor air,
+humidity controls, finite limits, air loops, plant loops, EMS, and
 PythonPlugin behavior outside the claim.
 
 ## IdealLoads Fuel-Efficiency Diagnostic
@@ -209,8 +212,11 @@ tolerance failures.
 the declared no-OA blank fuel energy-rate and fuel energy rows. The matching
 `ideal_loads_constant_fuel_efficiency_conformance_candidate_001` promotes only
 the declared no-OA constant `Schedule:Constant` fuel energy-rate and fuel
-energy rows. Raw IdealLoads rates and facility meters remain proof evidence in
-those cases; non-constant efficiency schedules and broad fuel or meter
+energy rows. `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`
+promotes only the declared no-OA all-days `Schedule:Compact` fuel energy-rate
+and fuel energy rows. Raw IdealLoads rates and facility meters remain proof
+evidence in those cases; fuel-efficiency schedules beyond the declared
+blank/constant/all-days Schedule:Compact candidates and broad fuel or meter
 conformance remain outside the claim. The diagnostic lane still compares
 hourly DistrictHeatingWater/DistrictCooling oracle-MTR values against Rust
 fuel-energy aggregates diagnostically.

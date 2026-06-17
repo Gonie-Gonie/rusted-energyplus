@@ -1,0 +1,200 @@
+id = "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001"
+title = "One-zone no-OA IdealLoads non-constant fuel-efficiency conformance candidate"
+milestone = "ideal-loads-non-constant-fuel-efficiency-conformance"
+purpose = "Claim narrow no-outdoor-air IdealLoads non-constant Schedule:Compact fuel-efficiency conformance for declared fuel energy rate and energy rows only."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case claims only the declared no-OA non-constant Schedule:Compact fuel-efficiency rows.",
+  "Heating fuel efficiency is an all-days Schedule:Compact profile with 0.8 from 00:00-06:00, 1.0 from 06:00-18:00, and 0.65 from 18:00-24:00.",
+  "Cooling fuel efficiency is an all-days Schedule:Compact profile with 0.75 from 00:00-06:00, 0.9 from 06:00-18:00, and 0.85 from 18:00-24:00.",
+  "Fuel energy rate rows prove the EnergyPlus ReportPurchasedAir raw-rate divided-by-schedule-value branch for detailed samples.",
+  "Fuel energy rows prove the same Schedule:Compact efficiency branch with TimeStepSysSec detailed energy accumulation.",
+  "Raw IdealLoads rate rows and DistrictHeatingWater:Facility/DistrictCooling:Facility meters remain diagnostic proof evidence.",
+  "The boundary excludes blank and constant fuel-efficiency conformance, monthly/annual meter aggregation, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter/HVAC conformance."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001/ideal_loads_non_constant_fuel_efficiency_conformance_candidate.idf"
+tier = "B"
+
+[scope]
+domains = ["hvac", "schedule"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001/ideal_loads_non_constant_fuel_efficiency_conformance_candidate.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "diagnostic"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Heating Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Cooling Fuel Energy Rate"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1e-3
+rmse_tol = 1e-3
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Heating Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[outputs]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Cooling Fuel Energy"
+frequency = "detailed"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictHeatingWater:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictCooling:Facility"
+frequency = "hourly"
+source = "mtr"
+domain = "meter"
+level = "diagnostic"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[tolerances]]
+variable_class = "hvac-state"
+max_abs = 1e-3
+max_rmse = 1e-3
+
+[report]
+format = "markdown"
+path = ".runtime/ideal-loads-non-constant-fuel-efficiency-conformance/26.1.0/ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-non-constant-fuel-efficiency-conformance-candidate"
+blocking = true

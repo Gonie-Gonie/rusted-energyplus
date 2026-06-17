@@ -133,6 +133,8 @@ const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_constant_fuel_efficiency_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_blank_fuel_efficiency_conformance_candidate_001";
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS: &[&str] = &[
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
@@ -153,12 +155,26 @@ const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS: &[&str] = &[
     ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
 ];
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS: &[&str] = &[
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
+];
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA blank fuel-efficiency rows only";
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
+    "conformance for declared no-OA non-constant Schedule:Compact fuel-efficiency rows only";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA constant Schedule:Constant fuel-efficiency rows only";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE: &str =
     "EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch";
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE: &str =
+    "EnergyPlus ReportPurchasedAir non-constant Schedule:Compact fuel-efficiency schedule branch";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE: &str =
     "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE: &str =
@@ -169,6 +185,10 @@ const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE: &str =
     "rust-ideal-loads-constant-fuel-efficiency";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
     "rust-ideal-loads-constant-fuel-efficiency-time-step-energy";
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE: &str =
+    "rust-ideal-loads-non-constant-fuel-efficiency";
+const IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE: &str =
+    "rust-ideal-loads-non-constant-fuel-efficiency-time-step-energy";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE: &str =
     "EnergyPlus ReportPurchasedAir blank fuel-efficiency schedule branch; diagnostic-only";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE: &str = "EnergyPlus ReportPurchasedAir constant Schedule:Constant fuel-efficiency schedule branch; diagnostic-only";
@@ -229,34 +249,66 @@ struct IdealLoadsDiagnosticContext<'a> {
     mode_counts: IdealLoadsModeCounts,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 struct IdealLoadsFuelEfficiencyContext {
     heating: f64,
     cooling: f64,
+    heating_values: Vec<f64>,
+    cooling_values: Vec<f64>,
     report_source: &'static str,
     rate_rust_source: &'static str,
     energy_rust_source: &'static str,
 }
 
 impl IdealLoadsFuelEfficiencyContext {
-    fn blank() -> Self {
+    fn blank(sample_count: usize) -> Self {
         Self {
             heating: 1.0,
             cooling: 1.0,
+            heating_values: vec![1.0; sample_count],
+            cooling_values: vec![1.0; sample_count],
             report_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_REPORT_SOURCE,
             rate_rust_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_RATE_SOURCE,
             energy_rust_source: IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_ENERGY_SOURCE,
         }
     }
 
-    fn constant(heating: f64, cooling: f64) -> Self {
+    fn constant(heating: f64, cooling: f64, sample_count: usize) -> Self {
         Self {
             heating,
             cooling,
+            heating_values: vec![heating; sample_count],
+            cooling_values: vec![cooling; sample_count],
             report_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_REPORT_SOURCE,
             rate_rust_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE,
             energy_rust_source: IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE,
         }
+    }
+
+    fn non_constant(heating_values: Vec<f64>, cooling_values: Vec<f64>) -> Self {
+        Self {
+            heating: heating_values.first().copied().unwrap_or(1.0),
+            cooling: cooling_values.first().copied().unwrap_or(1.0),
+            heating_values,
+            cooling_values,
+            report_source: IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE,
+            rate_rust_source: IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_RATE_SOURCE,
+            energy_rust_source: IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_ENERGY_SOURCE,
+        }
+    }
+
+    fn heating_at(&self, index: usize) -> f64 {
+        self.heating_values
+            .get(index)
+            .copied()
+            .unwrap_or(self.heating)
+    }
+
+    fn cooling_at(&self, index: usize) -> f64 {
+        self.cooling_values
+            .get(index)
+            .copied()
+            .unwrap_or(self.cooling)
     }
 }
 
@@ -507,6 +559,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             && ideal_loads_fuel_energy_variable(&output.variable)
             && !manifest_is_blank_fuel_efficiency_conformance_candidate(manifest)
             && !manifest_is_constant_fuel_efficiency_conformance_candidate(manifest)
+            && !manifest_is_non_constant_fuel_efficiency_conformance_candidate(manifest)
         {
             return Err(format!(
                 "IdealLoads fuel-energy outputs remain diagnostic until fuel-efficiency path conformance is separately proven: {}",
@@ -561,6 +614,30 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             }) {
                 return Err(format!(
                     "IdealLoads report-energy conformance candidate is missing conformance output {expected_output}"
+                ));
+            }
+        }
+    }
+    if manifest_is_non_constant_fuel_efficiency_conformance_candidate(manifest) {
+        for output in manifest
+            .outputs
+            .iter()
+            .filter(|output| output.level == Some(OutputLevel::Conformance))
+        {
+            if !is_declared_non_constant_fuel_efficiency_conformance_output(&output.variable) {
+                return Err(format!(
+                    "IdealLoads non-constant fuel-efficiency conformance candidate supports only declared fuel-energy rows, got {}",
+                    output.variable
+                ));
+            }
+        }
+        for expected_output in IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable.eq_ignore_ascii_case(expected_output)
+                    && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads non-constant fuel-efficiency conformance candidate is missing conformance output {expected_output}"
                 ));
             }
         }
@@ -905,6 +982,14 @@ fn manifest_is_blank_fuel_efficiency_conformance_candidate(manifest: &Conformanc
         && manifest.conformance_claim
 }
 
+fn manifest_is_non_constant_fuel_efficiency_conformance_candidate(
+    manifest: &ConformanceCase,
+) -> bool {
+    manifest.id == IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn manifest_is_constant_fuel_efficiency_conformance_candidate(manifest: &ConformanceCase) -> bool {
     manifest.id == IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID
         && manifest.comparison_class == ComparisonClass::Conformance
@@ -939,6 +1024,12 @@ fn is_declared_no_oa_report_energy_conformance_output(variable: &str) -> bool {
 
 fn is_declared_blank_fuel_efficiency_conformance_output(variable: &str) -> bool {
     IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS
+        .iter()
+        .any(|expected| variable.eq_ignore_ascii_case(expected))
+}
+
+fn is_declared_non_constant_fuel_efficiency_conformance_output(variable: &str) -> bool {
+    IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS
         .iter()
         .any(|expected| variable.eq_ignore_ascii_case(expected))
 }
@@ -2072,7 +2163,7 @@ fn build_context<'a>(
     )?;
     let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
     let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
-    let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system)?;
+    let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system, &input_trace)?;
     let mtr = baseline.output_dir.join("eplusout.mtr");
     let (rows, meter_rows, result_store, mode_counts) = evaluate_rows(
         manifest,
@@ -2087,7 +2178,7 @@ fn build_context<'a>(
         &system.name.0,
         &supply_node.name.0,
         energy_report_interval_seconds,
-        fuel_efficiency,
+        fuel_efficiency.clone(),
     )?;
 
     let zone_name = zone.name.0.clone();
@@ -2711,47 +2802,49 @@ fn evaluate_rows(
         );
     }
     if manifest_requests_fuel_energy_outputs(manifest) || !manifest.meters.is_empty() {
-        let heating_efficiency = fuel_efficiency.heating;
-        let cooling_efficiency = fuel_efficiency.cooling;
         let fuel_source = fuel_efficiency.rate_rust_source;
-        add_result_series(
+        add_result_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.supply_air_total_heating_rate_w / heating_efficiency,
+            |index, result| {
+                result.supply_air_total_heating_rate_w / fuel_efficiency.heating_at(index)
+            },
         );
-        add_result_series(
+        add_result_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.supply_air_total_cooling_rate_w / cooling_efficiency,
+            |index, result| {
+                result.supply_air_total_cooling_rate_w / fuel_efficiency.cooling_at(index)
+            },
         );
-        add_result_series(
+        add_result_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
             ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.zone_total_heating_rate_w / heating_efficiency,
+            |index, result| result.zone_total_heating_rate_w / fuel_efficiency.heating_at(index),
         );
-        add_result_series(
+        add_result_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
             ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY_RATE,
             "W",
             fuel_source,
-            |result| result.zone_total_cooling_rate_w / cooling_efficiency,
+            |index, result| result.zone_total_cooling_rate_w / fuel_efficiency.cooling_at(index),
         );
         let fuel_energy_source = fuel_efficiency.energy_rust_source;
-        add_result_energy_series(
+        add_result_energy_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
@@ -2759,9 +2852,11 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.supply_air_total_heating_rate_w / heating_efficiency,
+            |index, result| {
+                result.supply_air_total_heating_rate_w / fuel_efficiency.heating_at(index)
+            },
         );
-        add_result_energy_series(
+        add_result_energy_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
@@ -2769,9 +2864,11 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.supply_air_total_cooling_rate_w / cooling_efficiency,
+            |index, result| {
+                result.supply_air_total_cooling_rate_w / fuel_efficiency.cooling_at(index)
+            },
         );
-        add_result_energy_series(
+        add_result_energy_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
@@ -2779,9 +2876,9 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.zone_total_heating_rate_w / heating_efficiency,
+            |index, result| result.zone_total_heating_rate_w / fuel_efficiency.heating_at(index),
         );
-        add_result_energy_series(
+        add_result_energy_series_indexed(
             &mut observed_by_variable,
             system_name,
             &calc_results,
@@ -2789,7 +2886,7 @@ fn evaluate_rows(
             fuel_energy_source,
             &timestamps,
             energy_report_interval_seconds,
-            |result| result.zone_total_cooling_rate_w / cooling_efficiency,
+            |index, result| result.zone_total_cooling_rate_w / fuel_efficiency.cooling_at(index),
         );
     }
     add_result_series(
@@ -3135,51 +3232,159 @@ fn tolerance_for_meter(meter: &MeterRequest) -> Tolerance {
 fn ideal_loads_fuel_efficiency_context(
     model: &SimulationModel,
     system: &IdealLoadsAirSystem,
+    input_trace: &IdealLoadsInputTrace,
 ) -> Result<IdealLoadsFuelEfficiencyContext, String> {
-    let heating = ideal_loads_fuel_efficiency_value(
+    let timestamps = input_trace
+        .zone_node_temperature
+        .samples
+        .iter()
+        .take(input_trace.sample_count)
+        .map(|sample| sample.timestamp.clone())
+        .collect::<Vec<_>>();
+    let heating = ideal_loads_fuel_efficiency_values(
         model,
         system.heating_fuel_efficiency_schedule,
         "heating",
+        input_trace.sample_count,
+        &timestamps,
     )?;
-    let cooling = ideal_loads_fuel_efficiency_value(
+    let cooling = ideal_loads_fuel_efficiency_values(
         model,
         system.cooling_fuel_efficiency_schedule,
         "cooling",
+        input_trace.sample_count,
+        &timestamps,
     )?;
     if system.heating_fuel_efficiency_schedule.is_none()
         && system.cooling_fuel_efficiency_schedule.is_none()
     {
-        Ok(IdealLoadsFuelEfficiencyContext::blank())
+        Ok(IdealLoadsFuelEfficiencyContext::blank(
+            input_trace.sample_count,
+        ))
+    } else if heating.is_constant && cooling.is_constant {
+        Ok(IdealLoadsFuelEfficiencyContext::constant(
+            heating.representative,
+            cooling.representative,
+            input_trace.sample_count,
+        ))
     } else {
-        Ok(IdealLoadsFuelEfficiencyContext::constant(heating, cooling))
+        Ok(IdealLoadsFuelEfficiencyContext::non_constant(
+            heating.values,
+            cooling.values,
+        ))
     }
 }
 
-fn ideal_loads_fuel_efficiency_value(
+struct IdealLoadsFuelEfficiencyValues {
+    values: Vec<f64>,
+    representative: f64,
+    is_constant: bool,
+}
+
+fn ideal_loads_fuel_efficiency_values(
     model: &SimulationModel,
     schedule_id: Option<ScheduleId>,
     label: &str,
-) -> Result<f64, String> {
+    sample_count: usize,
+    timestamps: &[Option<String>],
+) -> Result<IdealLoadsFuelEfficiencyValues, String> {
     let Some(schedule_id) = schedule_id else {
-        return Ok(1.0);
+        return Ok(IdealLoadsFuelEfficiencyValues {
+            values: vec![1.0; sample_count],
+            representative: 1.0,
+            is_constant: true,
+        });
     };
-    let schedule = model
+    if let Some(schedule) = model
         .typed
         .schedules
         .iter()
         .find(|schedule| schedule.id == schedule_id)
+    {
+        validate_fuel_efficiency_value(schedule.hourly_value, label, &schedule.name.0)?;
+        return Ok(IdealLoadsFuelEfficiencyValues {
+            values: vec![schedule.hourly_value; sample_count],
+            representative: schedule.hourly_value,
+            is_constant: true,
+        });
+    }
+    let schedule = model
+        .typed
+        .compact_schedules
+        .iter()
+        .find(|schedule| schedule.id == schedule_id)
         .ok_or_else(|| {
             format!(
-                "IdealLoads {label} fuel energy diagnostic currently supports only blank or Schedule:Constant fuel efficiency schedules"
+                "IdealLoads {label} fuel energy diagnostic supports blank, Schedule:Constant, or all-days Schedule:Compact fuel efficiency schedules"
             )
         })?;
-    if !schedule.hourly_value.is_finite() || schedule.hourly_value <= 0.0 {
+    let mut values = Vec::with_capacity(sample_count);
+    for index in 0..sample_count {
+        let timestamp = timestamps
+            .get(index)
+            .and_then(|timestamp| timestamp.as_deref());
+        let minute_of_day = minute_of_day_from_timestamp(timestamp).ok_or_else(|| {
+            format!(
+                "IdealLoads {label} Schedule:Compact fuel efficiency requires timestamped detailed sample {index}"
+            )
+        })?;
+        let value = compact_schedule_value(&schedule.segments, minute_of_day).ok_or_else(|| {
+            format!(
+                "IdealLoads {label} fuel efficiency schedule {} has no value for minute {}",
+                schedule.name.0, minute_of_day
+            )
+        })?;
+        validate_fuel_efficiency_value(value, label, &schedule.name.0)?;
+        values.push(value);
+    }
+    let representative = values.first().copied().unwrap_or(1.0);
+    let is_constant = values
+        .iter()
+        .all(|value| (*value - representative).abs() <= f64::EPSILON);
+    Ok(IdealLoadsFuelEfficiencyValues {
+        values,
+        representative,
+        is_constant,
+    })
+}
+
+fn validate_fuel_efficiency_value(
+    value: f64,
+    label: &str,
+    schedule_name: &str,
+) -> Result<(), String> {
+    if !value.is_finite() || value <= 0.0 {
         return Err(format!(
             "IdealLoads {label} fuel efficiency schedule {} must have a positive finite value, got {}",
-            schedule.name.0, schedule.hourly_value
+            schedule_name, value
         ));
     }
-    Ok(schedule.hourly_value)
+    Ok(())
+}
+
+fn minute_of_day_from_timestamp(timestamp: Option<&str>) -> Option<u32> {
+    let timestamp = timestamp?;
+    let hour = timestamp_numeric_field(timestamp, "hour")?;
+    let end_minute = timestamp_numeric_field(timestamp, "end")?;
+    if !hour.is_finite() || !end_minute.is_finite() {
+        return None;
+    }
+    let hour = hour.round().clamp(1.0, 24.0);
+    let minute = ((hour - 1.0) * 60.0 + end_minute)
+        .round()
+        .clamp(1.0, 1440.0);
+    Some(minute as u32)
+}
+
+fn compact_schedule_value(
+    segments: &[ep_model::ScheduleCompactSegment],
+    minute_of_day: u32,
+) -> Option<f64> {
+    segments
+        .iter()
+        .find(|segment| minute_of_day <= segment.until_minute_of_day)
+        .map(|segment| segment.value)
+        .or_else(|| segments.last().map(|segment| segment.value))
 }
 
 fn ideal_loads_limit_context(
@@ -3792,6 +3997,30 @@ fn add_result_series(
     );
 }
 
+fn add_result_series_indexed(
+    observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
+    key: &str,
+    results: &[IdealLoadsSensibleResult],
+    variable: &str,
+    units: &'static str,
+    source: &'static str,
+    value: impl Fn(usize, IdealLoadsSensibleResult) -> f64,
+) {
+    observed_by_variable.insert(
+        (key.to_string(), variable.to_string()),
+        ObservedSeries::new(
+            source,
+            units,
+            results
+                .iter()
+                .copied()
+                .enumerate()
+                .map(|(index, result)| value(index, result))
+                .collect(),
+        ),
+    );
+}
+
 fn add_result_energy_series(
     observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
     key: &str,
@@ -3814,6 +4043,36 @@ fn add_result_energy_series(
                 default_report_interval_seconds,
             );
             rate(result) * interval_seconds
+        })
+        .collect();
+    observed_by_variable.insert(
+        (key.to_string(), variable.to_string()),
+        ObservedSeries::new(source, "J", values),
+    );
+}
+
+fn add_result_energy_series_indexed(
+    observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
+    key: &str,
+    results: &[IdealLoadsSensibleResult],
+    variable: &str,
+    source: &'static str,
+    timestamps: &[Option<String>],
+    default_report_interval_seconds: f64,
+    rate: impl Fn(usize, IdealLoadsSensibleResult) -> f64,
+) {
+    let values = results
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(index, result)| {
+            let interval_seconds = energy_report_seconds_from_timestamp(
+                timestamps
+                    .get(index)
+                    .and_then(|timestamp| timestamp.as_deref()),
+                default_report_interval_seconds,
+            );
+            rate(index, result) * interval_seconds
         })
         .collect();
     observed_by_variable.insert(
@@ -6020,7 +6279,9 @@ fn report_energy_source_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'s
 }
 
 fn fuel_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    if manifest_is_blank_fuel_efficiency_conformance_candidate(context.manifest) {
+    if manifest_is_non_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY
+    } else if manifest_is_blank_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_POLICY
     } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY
@@ -6030,7 +6291,9 @@ fn fuel_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) ->
 }
 
 fn fuel_energy_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    if manifest_is_blank_fuel_efficiency_conformance_candidate(context.manifest) {
+    if manifest_is_non_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_NON_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
+    } else if manifest_is_blank_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
     } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
@@ -6056,6 +6319,8 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA hourly IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {
         "conformance no-OA ReportPurchasedAir rate-to-TimeStepSysSec energy for declared non-fuel energy rows only"
+    } else if manifest_is_non_constant_fuel_efficiency_conformance_candidate(context.manifest) {
+        "conformance no-OA non-constant Schedule:Compact IdealLoads fuel-efficiency for declared fuel-energy rows only"
     } else if manifest_is_blank_fuel_efficiency_conformance_candidate(context.manifest) {
         "conformance no-OA blank IdealLoads fuel-efficiency for declared fuel-energy rows only"
     } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {

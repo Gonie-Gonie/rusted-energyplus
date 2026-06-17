@@ -420,12 +420,14 @@ The conformance output surface is:
   `Zone Ideal Loads Supply Air Total Cooling Fuel Energy Rate`,
   `Zone Ideal Loads Zone Heating Fuel Energy Rate`, and
   `Zone Ideal Loads Zone Cooling Fuel Energy Rate` for the no-OA blank
-  fuel-efficiency and constant Schedule:Constant fuel-efficiency candidates
+  fuel-efficiency, constant Schedule:Constant fuel-efficiency, and all-days
+  Schedule:Compact fuel-efficiency candidates
 - `Zone Ideal Loads Supply Air Total Heating Fuel Energy`,
   `Zone Ideal Loads Supply Air Total Cooling Fuel Energy`,
   `Zone Ideal Loads Zone Heating Fuel Energy`, and
   `Zone Ideal Loads Zone Cooling Fuel Energy` for the no-OA blank
-  fuel-efficiency and constant Schedule:Constant fuel-efficiency candidates
+  fuel-efficiency, constant Schedule:Constant fuel-efficiency, and all-days
+  Schedule:Compact fuel-efficiency candidates
 - `System Node Temperature`
 - `System Node Mass Flow Rate`
 - `Zone Ideal Loads Zone Latent Cooling Rate` for the no-OA
@@ -466,14 +468,18 @@ heating/cooling setpoint-distance proof rows, active humidity-control
 outdoor-air latent behavior,
 economizer outputs, finite-limit humidity or energy behavior, adaptive system
 timestep, broad meter conformance beyond the declared no-OA hourly facility
-meter candidate, and non-constant efficiency schedules remain diagnostic-only
-or unsupported until their source-order branches are ported or explicitly
+meter candidate, and fuel-efficiency schedules beyond the declared
+blank/constant/all-days Schedule:Compact candidates remain diagnostic-only or
+unsupported until their source-order branches are ported or explicitly
 included in a promoted claim. Blank fuel-efficiency energy/rate rows have
 narrow conformance evidence in
 `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`; constant
 Schedule:Constant fuel-efficiency energy/rate rows have narrow conformance
 evidence in
-`ideal_loads_constant_fuel_efficiency_conformance_candidate_001`; its raw
+`ideal_loads_constant_fuel_efficiency_conformance_candidate_001`; all-days
+Schedule:Compact fuel-efficiency energy/rate rows have narrow conformance
+evidence in
+`ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`; raw
 IdealLoads rate rows and facility meter rows remain diagnostic.
 `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` have a narrow
 hourly oracle-MTR vs Rust aggregated fuel-energy conformance candidate in
@@ -538,8 +544,10 @@ for declared outputs; ReportPurchasedAir non-fuel energy rows are promoted
 only by the separate report-energy candidate, constant Schedule:Constant
 fuel-efficiency energy/rate rows are promoted only by the separate constant
 fuel-efficiency candidate, blank fuel-efficiency energy/rate rows are promoted
-only by the separate blank fuel-efficiency candidate, and hourly facility
-meters remain diagnostic in this case.
+only by the separate blank fuel-efficiency candidate, all-days Schedule:Compact
+fuel-efficiency energy/rate rows are promoted only by the separate non-constant
+fuel-efficiency candidate, and hourly facility meters remain diagnostic in this
+case.
 
 `scripts/dev.cmd compare-ideal-loads-no-oa-report-energy-conformance-candidate`
 generates the report-energy evidence set under
@@ -548,9 +556,10 @@ That run compares 28 Detailed series over 110 samples. Only the four declared
 non-fuel ReportPurchasedAir energy rows are promoted; constant
 Schedule:Constant fuel-efficiency rows are promoted only by their separate
 candidate, blank fuel-efficiency rows are promoted only by their separate
-candidate, and raw rate, thermostat, demand, humidity, node, and facility
-meter rows remain diagnostic proof evidence; `tolerance-failures.csv` is
-empty.
+candidate, all-days Schedule:Compact fuel-efficiency rows are promoted only by
+their separate candidate, and raw rate, thermostat, demand, humidity, node, and
+facility meter rows remain diagnostic proof evidence; `tolerance-failures.csv`
+is empty.
 
 `scripts/dev.cmd compare-ideal-loads-blank-fuel-efficiency-conformance-candidate`
 generates the blank fuel-efficiency evidence set under
@@ -558,8 +567,9 @@ generates the blank fuel-efficiency evidence set under
 That run compares 12 Detailed series over 110 samples. Only the eight declared
 blank fuel energy-rate and fuel energy rows are promoted; raw IdealLoads rate
 rows and the two facility meter rows remain diagnostic proof evidence, and
-`tolerance-failures.csv` is empty. Constant and non-constant efficiency
-schedules plus broad meter conformance remain outside this claim.
+`tolerance-failures.csv` is empty. Constant Schedule:Constant and all-days
+Schedule:Compact efficiency schedules plus broad meter conformance remain
+outside this claim.
 
 `scripts/dev.cmd compare-ideal-loads-constant-fuel-efficiency-conformance-candidate`
 generates the constant fuel-efficiency evidence set under
@@ -567,8 +577,19 @@ generates the constant fuel-efficiency evidence set under
 That run compares 12 Detailed series over 110 samples. Only the eight declared
 constant Schedule:Constant fuel energy-rate and fuel energy rows are promoted;
 raw IdealLoads rate rows and the two facility meter rows remain diagnostic
-proof evidence, and `tolerance-failures.csv` is empty. Blank and non-constant
-efficiency schedules plus broad meter conformance remain outside this claim.
+proof evidence, and `tolerance-failures.csv` is empty. Blank and all-days
+Schedule:Compact efficiency schedules plus broad meter conformance remain
+outside this claim.
+
+`scripts/dev.cmd compare-ideal-loads-non-constant-fuel-efficiency-conformance-candidate`
+generates the all-days Schedule:Compact fuel-efficiency evidence set under
+`.runtime/ideal-loads-non-constant-fuel-efficiency-conformance/26.1.0/ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001/compare/`.
+That run compares 12 Detailed series over 110 samples. Only the eight declared
+all-days Schedule:Compact fuel energy-rate and fuel energy rows are promoted;
+raw IdealLoads rate rows and the two facility meter rows remain diagnostic
+proof evidence, and `tolerance-failures.csv` is empty. Blank and constant
+Schedule:Constant efficiency schedules plus broad meter conformance remain
+outside this claim.
 
 `scripts/dev.cmd compare-ideal-loads-no-oa-facility-meter-conformance-candidate`
 generates the meter-only evidence set under

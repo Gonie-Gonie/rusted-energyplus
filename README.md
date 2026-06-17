@@ -56,6 +56,8 @@ tolerance, and code organization.
   `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, constant
   Schedule:Constant fuel-efficiency rows promoted only in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`,
+  all-days Schedule:Compact fuel-efficiency rows promoted only in
+  `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`,
   DistrictHeatingWater/DistrictCooling facility meters tracked only as
   oracle-MTR diagnostics with RuntimeMeterRegistry request resolution
 - limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate for
@@ -65,7 +67,9 @@ tolerance, and code organization.
   Schedule:Constant fuel-efficiency rows promoted only in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`, and
   blank fuel-efficiency rows promoted only in
-  `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`; raw rates,
+  `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, and all-days
+  Schedule:Compact fuel-efficiency rows promoted only in
+  `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`; raw rates,
   node, demand, humidity, and facility meter rows are kept diagnostic proof
   only
 - limited IdealLoads no-OA blank fuel-efficiency conformance candidate for
@@ -73,13 +77,22 @@ tolerance, and code organization.
   rows in
   `ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, with raw
   IdealLoads rate and facility meter rows kept diagnostic proof only;
-  constant and non-constant efficiency schedules remain outside this claim
+  constant Schedule:Constant and all-days Schedule:Compact efficiency
+  schedules remain outside this claim
 - limited IdealLoads no-OA constant Schedule:Constant fuel-efficiency
   conformance candidate for declared supply-air/zone heating/cooling fuel
   energy-rate and fuel energy rows in
   `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`, with raw
   IdealLoads rate and facility meter rows kept diagnostic proof only;
-  blank and non-constant efficiency schedules remain outside this claim
+  blank and all-days Schedule:Compact efficiency schedules remain outside this
+  claim
+- limited IdealLoads no-OA all-days Schedule:Compact fuel-efficiency
+  conformance candidate for declared supply-air/zone heating/cooling fuel
+  energy-rate and fuel energy rows in
+  `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`, with
+  raw IdealLoads rate and facility meter rows kept diagnostic proof only;
+  blank and constant Schedule:Constant efficiency schedules remain outside
+  this claim
 - limited IdealLoads no-OA hourly facility meter conformance candidate for
   `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` in
   `ideal_loads_no_oa_facility_meter_conformance_candidate_001`, with
@@ -210,7 +223,8 @@ tolerance, and code organization.
   internal convective gain hourly variable, and the official
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
-  ReportPurchasedAir non-fuel energy, constant Schedule:Constant
+  ReportPurchasedAir non-fuel energy, blank fuel-efficiency, constant
+  Schedule:Constant fuel-efficiency, all-days Schedule:Compact
   fuel-efficiency, no-OA hourly facility meter, `ConstantSensibleHeatRatio`,
   `ConstantSupplyHumidityRatio`,
   Humidistat, and outdoor-air `Flow/Zone`, `Flow/Person`, `Flow/Area`,
