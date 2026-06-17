@@ -19,10 +19,11 @@ use ep_model::{
 };
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    EpwRecord, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
-    IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
-    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature, IdealLoadsZoneState, OutputSeries,
-    ResultStore, SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    EpwRecord, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH, IdealLoadsOutdoorAirContext,
+    IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
+    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
+    IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
+    OutputSeries, ResultStore, SimPurchasedAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
@@ -61,7 +62,7 @@ use ep_runtime::{
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, ideal_loads_zone_equipment_stages, load_epw_records,
     purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
-    surface_area_m2,
+    surface_area_m2, validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
@@ -127,6 +128,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     selected_purchased_air_branch: &'static str,
     declared_ideal_loads_branch: &'static str,
     inactive_branches: Vec<&'static str>,
+    zone_equipment_dispatch: IdealLoadsZoneEquipmentDispatchValidation,
     constant_shr_conformance_claim: bool,
     zone_name: String,
     zone_air_node_name: String,
@@ -1364,6 +1366,19 @@ fn build_context<'a>(
         .iter()
         .find(|system| system.id == edge.ideal_loads_air_system)
         .ok_or_else(|| "missing IdealLoads system for graph edge".to_string())?;
+    let zone_equipment_dispatch = validate_ideal_loads_zone_equipment_dispatch(&model, system.id);
+    if !zone_equipment_dispatch.is_dispatchable() {
+        return Err(format!(
+            "IdealLoads zone equipment dispatch prerequisites failed: {}",
+            label_list_or_none(&zone_equipment_dispatch.issue_codes())
+        ));
+    }
+    if manifest.conformance_claim && !zone_equipment_dispatch.is_conformance_candidate() {
+        return Err(format!(
+            "IdealLoads conformance candidate requires single-zone/single-equipment dispatch scope: {}",
+            label_list_or_none(&zone_equipment_dispatch.warning_codes())
+        ));
+    }
     let supply_edge = model
         .graph
         .ideal_loads_supply_nodes
@@ -1469,6 +1484,7 @@ fn build_context<'a>(
         selected_purchased_air_branch,
         declared_ideal_loads_branch,
         inactive_branches,
+        zone_equipment_dispatch,
         constant_shr_conformance_claim,
         zone_name,
         zone_air_node_name,
@@ -3334,7 +3350,35 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         .map(|stage| stage.source_routine)
         .collect::<Vec<_>>()
         .join(" -> ");
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     report.push_str("source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat\n");
+    report.push_str(&format!(
+        "zone_equipment_dispatch_path: {}\n",
+        IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_validation: {}\n",
+        context.zone_equipment_dispatch.dispatch_status_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_conformance_candidate: {}\n",
+        context
+            .zone_equipment_dispatch
+            .conformance_candidate_status_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_scope: {}\n",
+        context.zone_equipment_dispatch.scope_label()
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_issues: {}\n",
+        label_list_or_none(&zone_equipment_dispatch_issues)
+    ));
+    report.push_str(&format!(
+        "zone_equipment_dispatch_warnings: {}\n",
+        label_list_or_none(&zone_equipment_dispatch_warnings)
+    ));
     report.push_str(&format!(
         "selected_purchased_air_branch: {}\n",
         context.selected_purchased_air_branch
@@ -3995,6 +4039,8 @@ fn render_outdoor_air_stage_summary_json(
 
 fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     let manifest = context.manifest;
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -4041,6 +4087,34 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"inactive_branches\": {},\n",
         json_string_array(&context.inactive_branches)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_path\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_validation\": {},\n",
+        json_string(context.zone_equipment_dispatch.dispatch_status_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_conformance_candidate\": {},\n",
+        json_string(
+            context
+                .zone_equipment_dispatch
+                .conformance_candidate_status_label()
+        )
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_scope\": {},\n",
+        json_string(context.zone_equipment_dispatch.scope_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_issues\": {},\n",
+        json_string_array(&zone_equipment_dispatch_issues)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_warnings\": {},\n",
+        json_string_array(&zone_equipment_dispatch_warnings)
     ));
     json.push_str(&format!(
         "  \"fuel_energy_rate_source\": {},\n",
@@ -4210,6 +4284,14 @@ fn json_string_array(values: &[&str]) -> String {
     }
     json.push(']');
     json
+}
+
+fn label_list_or_none(values: &[&str]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values.join(", ")
+    }
 }
 
 fn row_json(row: &IdealLoadsDiagnosticRow) -> String {
@@ -4458,6 +4540,8 @@ fn render_tolerance_failures_csv(context: &IdealLoadsDiagnosticContext<'_>) -> S
 }
 
 fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
+    let zone_equipment_dispatch_issues = context.zone_equipment_dispatch.issue_codes();
+    let zone_equipment_dispatch_warnings = context.zone_equipment_dispatch.warning_codes();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -4477,6 +4561,34 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"inactive_branches\": {},\n",
         json_string_array(&context.inactive_branches)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_path\": {},\n",
+        json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_validation\": {},\n",
+        json_string(context.zone_equipment_dispatch.dispatch_status_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_conformance_candidate\": {},\n",
+        json_string(
+            context
+                .zone_equipment_dispatch
+                .conformance_candidate_status_label()
+        )
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_scope\": {},\n",
+        json_string(context.zone_equipment_dispatch.scope_label())
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_issues\": {},\n",
+        json_string_array(&zone_equipment_dispatch_issues)
+    ));
+    json.push_str(&format!(
+        "  \"zone_equipment_dispatch_warnings\": {},\n",
+        json_string_array(&zone_equipment_dispatch_warnings)
     ));
     json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",

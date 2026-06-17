@@ -8,7 +8,7 @@ use ep_model::{
     OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranchComponent, PlantLoop,
     Point3, RunPeriod, RunPeriodId, ScheduleCompactSegment, ScheduleId, SimulationModel,
     SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure,
-    Zone, ZoneEquipmentConnection, ZoneId, ZoneThermostatId,
+    Zone, ZoneEquipmentConnection, ZoneEquipmentListId, ZoneId, ZoneThermostatId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -124,6 +124,10 @@ pub enum ExecutionStep {
     EvaluateZoneThermostat(ZoneThermostatId),
     /// Solve one zone.
     SolveZone(ZoneId),
+    /// Enter EnergyPlus `ZoneEquipmentManager::ManageZoneEquipment` for one zone.
+    ManageZoneEquipment(ZoneId),
+    /// Dispatch one `ZoneHVAC:EquipmentList` through `SimZoneEquipment`.
+    SimZoneEquipment(ZoneEquipmentListId),
     /// Evaluate one IdealLoads air system assigned to a zone.
     EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Write one output handle.
@@ -266,6 +270,7 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     setup_steps.extend(schedule_ids(&model.typed).map(ExecutionStep::EvaluateSchedule));
 
     let mut zone_steps = Vec::new();
+    let mut zone_equipment_steps = Vec::new();
     for zone in &model.typed.zones {
         zone_steps.extend(
             model
@@ -276,16 +281,21 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
                 .map(|edge| ExecutionStep::EvaluateZoneThermostat(edge.thermostat)),
         );
         zone_steps.push(ExecutionStep::SolveZone(zone.id));
-        zone_steps.extend(
-            model
-                .graph
-                .zone_ideal_loads
-                .iter()
-                .filter(|edge| edge.zone == zone.id)
-                .map(|edge| {
-                    ExecutionStep::EvaluateIdealLoadsAirSystem(edge.ideal_loads_air_system)
-                }),
-        );
+        let zone_ideal_loads = model
+            .graph
+            .zone_ideal_loads
+            .iter()
+            .filter(|edge| edge.zone == zone.id)
+            .collect::<Vec<_>>();
+        if !zone_ideal_loads.is_empty() {
+            zone_equipment_steps.push(ExecutionStep::ManageZoneEquipment(zone.id));
+        }
+        for edge in zone_ideal_loads {
+            zone_equipment_steps.push(ExecutionStep::SimZoneEquipment(edge.equipment_list));
+            zone_equipment_steps.push(ExecutionStep::EvaluateIdealLoadsAirSystem(
+                edge.ideal_loads_air_system,
+            ));
+        }
     }
 
     ExecutionPlan {
@@ -297,6 +307,10 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
             ExecutionStage {
                 name: "zone".to_string(),
                 steps: zone_steps,
+            },
+            ExecutionStage {
+                name: "zone-equipment".to_string(),
+                steps: zone_equipment_steps,
             },
             ExecutionStage {
                 name: "output".to_string(),
@@ -11849,7 +11863,7 @@ mod tests {
 
         let plan = build_execution_plan(&model);
 
-        assert_eq!(plan.stages.len(), 3);
+        assert_eq!(plan.stages.len(), 4);
         assert_eq!(plan.step_count(), 14);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
@@ -11857,21 +11871,23 @@ mod tests {
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].steps.len(), 11);
+        assert_eq!(plan.stages[2].name, "zone-equipment");
+        assert!(plan.stages[2].steps.is_empty());
+        assert_eq!(plan.stages[3].steps.len(), 11);
         assert_eq!(
-            plan.stages[2].steps[0],
+            plan.stages[3].steps[0],
             ExecutionStep::WriteOutput(OutputHandle(0))
         );
         assert_eq!(
-            plan.stages[2].steps[1],
+            plan.stages[3].steps[1],
             ExecutionStep::WriteOutput(OutputHandle(1))
         );
         assert_eq!(
-            plan.stages[2].steps[2],
+            plan.stages[3].steps[2],
             ExecutionStep::WriteOutput(OutputHandle(2))
         );
         assert_eq!(
-            plan.stages[2].steps[10],
+            plan.stages[3].steps[10],
             ExecutionStep::WriteOutput(OutputHandle(10))
         );
         assert_eq!(
@@ -12019,14 +12035,24 @@ mod tests {
 
         assert_eq!(model.graph.zone_thermostats.len(), 1);
         assert_eq!(model.graph.zone_ideal_loads.len(), 1);
-        assert_eq!(plan.stages[1].steps.len(), 3);
+        assert_eq!(plan.stages[1].steps.len(), 2);
         assert_eq!(
             plan.stages[1].steps[0],
             ExecutionStep::EvaluateZoneThermostat(ZoneThermostatId(0))
         );
         assert_eq!(plan.stages[1].steps[1], ExecutionStep::SolveZone(ZoneId(0)));
+        assert_eq!(plan.stages[2].name, "zone-equipment");
+        assert_eq!(plan.stages[2].steps.len(), 3);
         assert_eq!(
-            plan.stages[1].steps[2],
+            plan.stages[2].steps[0],
+            ExecutionStep::ManageZoneEquipment(ZoneId(0))
+        );
+        assert_eq!(
+            plan.stages[2].steps[1],
+            ExecutionStep::SimZoneEquipment(ZoneEquipmentListId(0))
+        );
+        assert_eq!(
+            plan.stages[2].steps[2],
             ExecutionStep::EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
     }

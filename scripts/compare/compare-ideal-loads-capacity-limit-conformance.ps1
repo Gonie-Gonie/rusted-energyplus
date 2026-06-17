@@ -100,6 +100,31 @@ function Assert-PurchasedAirSourceOrder {
     Write-Host "OK PurchasedAir source order: $($expectedPurchasedAirRoutines -join ' -> ')"
 }
 
+function Assert-ZoneEquipmentDispatch {
+    param([Parameter(Mandatory = $true)]$StageSummary)
+
+    $expectedPath = "ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir"
+    if ($StageSummary.zone_equipment_dispatch_path -ne $expectedPath) {
+        throw "Unexpected zone equipment dispatch path: $($StageSummary.zone_equipment_dispatch_path)"
+    }
+    if ($StageSummary.zone_equipment_dispatch_validation -ne "pass") {
+        throw "Zone equipment dispatch validation did not pass: $($StageSummary.zone_equipment_dispatch_validation)"
+    }
+    if ($StageSummary.zone_equipment_conformance_candidate -ne "pass") {
+        throw "Zone equipment dispatch is not a conformance candidate: $($StageSummary.zone_equipment_conformance_candidate)"
+    }
+    if ($StageSummary.zone_equipment_scope -ne "single-zone-single-equipment") {
+        throw "Unexpected zone equipment dispatch scope: $($StageSummary.zone_equipment_scope)"
+    }
+    if (@($StageSummary.zone_equipment_dispatch_issues).Count -ne 0) {
+        throw "Unexpected zone equipment dispatch issues: $($StageSummary.zone_equipment_dispatch_issues -join ', ')"
+    }
+    if (@($StageSummary.zone_equipment_dispatch_warnings).Count -ne 0) {
+        throw "Unexpected zone equipment dispatch warnings: $($StageSummary.zone_equipment_dispatch_warnings -join ', ')"
+    }
+    Write-Host "OK zone equipment dispatch path: $expectedPath"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -254,11 +279,18 @@ if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
     throw "Stage summary must record that no RC demand shortcut is used"
 }
 Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
+Assert-ZoneEquipmentDispatch -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA finite-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_path: ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir" -Description "markdown zone equipment dispatch path"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_validation: pass" -Description "markdown zone equipment dispatch validation"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_conformance_candidate: pass" -Description "markdown zone equipment conformance candidate"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_scope: single-zone-single-equipment" -Description "markdown zone equipment scope"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_issues: none" -Description "markdown zone equipment dispatch issues"
+Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_warnings: none" -Description "markdown zone equipment dispatch warnings"
 Assert-Contains -Text $reportText -Pattern "selected_purchased_air_branch: finite_capacity" -Description "markdown PurchasedAir branch"
 Assert-Contains -Text $reportText -Pattern "declared_ideal_loads_branch: finite_capacity" -Description "markdown declared branch"
 Assert-Contains -Text $reportText -Pattern "inactive_branches: outdoor_air, economizer, heat_recovery, humidistat, dcv, autosizing, saturation_limit" -Description "markdown inactive branches"

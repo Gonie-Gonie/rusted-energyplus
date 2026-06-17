@@ -429,6 +429,10 @@ fn execution_step_label(step: &ExecutionStep) -> String {
             format!("EvaluateZoneThermostat({})", id.0)
         }
         ExecutionStep::SolveZone(id) => format!("SolveZone({})", id.0),
+        ExecutionStep::ManageZoneEquipment(id) => {
+            format!("ManageZoneEquipment({})", id.0)
+        }
+        ExecutionStep::SimZoneEquipment(id) => format!("SimZoneEquipment({})", id.0),
         ExecutionStep::EvaluateIdealLoadsAirSystem(id) => {
             format!("EvaluateIdealLoadsAirSystem({})", id.0)
         }
