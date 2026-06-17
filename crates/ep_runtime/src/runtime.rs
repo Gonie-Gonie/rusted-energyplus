@@ -15425,14 +15425,15 @@ DATA PERIODS
             RuntimeMeterRequest::hourly(heating_binding.meter_name),
             RuntimeMeterRequest::hourly(cooling_binding.meter_name),
             RuntimeMeterRequest::new(heating_binding.meter_name, RuntimeOutputFrequency::Monthly),
+            RuntimeMeterRequest::new(heating_binding.meter_name, RuntimeOutputFrequency::Annual),
             RuntimeMeterRequest::new(
                 cooling_binding.meter_name,
                 RuntimeOutputFrequency::RunPeriod,
             ),
         ]);
 
-        assert_eq!(registry.meter_registry().len(), 6);
-        assert_eq!(resolution.resolved.len(), 4);
+        assert_eq!(registry.meter_registry().len(), 8);
+        assert_eq!(resolution.resolved.len(), 5);
         assert!(resolution.diagnostics.is_empty());
         assert_eq!(
             resolution.resolved[0].definition.name,
@@ -15458,6 +15459,10 @@ DATA PERIODS
         );
         assert_eq!(
             resolution.resolved[3].definition.frequency,
+            RuntimeOutputFrequency::Annual
+        );
+        assert_eq!(
+            resolution.resolved[4].definition.frequency,
             RuntimeOutputFrequency::RunPeriod
         );
     }

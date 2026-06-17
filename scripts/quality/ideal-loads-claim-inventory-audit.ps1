@@ -339,7 +339,7 @@ $broadExclusionPatterns = @(
     @("full IdealLoads", "full IdealLoads exclusion"),
     @("broad HVAC", "broad HVAC exclusion"),
     @("broad meter conformance", "broad meter exclusion"),
-    @("annual meter aggregation", "annual meter aggregation exclusion"),
+    @("multi-year annual grouping", "multi-year annual grouping exclusion"),
     @("broader DCV combinations", "broader DCV exclusion"),
     @("IdealLoads autosizing", "IdealLoads autosizing exclusion"),
     @("AirLoop integration", "AirLoop integration exclusion"),

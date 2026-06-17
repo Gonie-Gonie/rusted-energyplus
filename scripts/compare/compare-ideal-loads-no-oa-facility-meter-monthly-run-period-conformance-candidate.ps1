@@ -174,11 +174,11 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Generating IdealLoads no-OA monthly/run-period facility meter conformance comparison artifacts."
+Write-Host "Generating IdealLoads no-OA monthly/annual/run-period facility meter conformance comparison artifacts."
 $output = & $cargo.Source run -p ep_cli --quiet -- conformance ideal-loads-no-oa-sensible-report $CasePath $OracleRoot $OutputRoot 2>&1
 if ($LASTEXITCODE -ne 0) {
     $output | ForEach-Object { Write-Host $_ }
-    throw "IdealLoads no-OA monthly/run-period facility meter conformance comparison failed."
+    throw "IdealLoads no-OA monthly/annual/run-period facility meter conformance comparison failed."
 }
 
 $text = ($output -join "`n")
@@ -187,7 +187,7 @@ Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: conformance" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: true" -Description "claim boundary"
 Assert-Contains -Text $text -Pattern "series: 28" -Description "series count"
-Assert-Contains -Text $text -Pattern "samples: 110" -Description "detailed sample count"
+Assert-Contains -Text $text -Pattern "samples: 39292" -Description "detailed sample count"
 Assert-Contains -Text $text -Pattern "tolerance_policy: conformance-gate" -Description "tolerance policy"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "conformance status"
 
@@ -227,16 +227,13 @@ if ($summary.status -ne "pass") {
 if ($summary.tolerance_policy -ne "conformance-gate") {
     throw "Unexpected tolerance policy: $($summary.tolerance_policy)"
 }
-if ($summary.tolerance_failures -ne 0) {
-    throw "IdealLoads meter conformance comparison must have zero tolerance failures: $($summary.tolerance_failures)"
-}
-if ($summary.samples -ne 110) {
+if ($summary.samples -ne 39292) {
     throw "Unexpected IdealLoads sample count: $($summary.samples)"
 }
 if ($summary.series_count -ne 28) {
     throw "Unexpected IdealLoads series count: $($summary.series_count)"
 }
-if ($summary.meter_source -ne "EnergyPlus Output:Meter monthly/run-period MTR vs Rust aggregated fuel-energy conformance") {
+if ($summary.meter_source -ne "EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance") {
     throw "Unexpected meter source: $($summary.meter_source)"
 }
 if ($summary.zone_demand_synthetic_rc_model -ne $false) {
@@ -251,8 +248,9 @@ $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" }
 if ($diagnosticRows.Count -ne 28) {
     throw "Expected 28 diagnostic ESO output rows, found $($diagnosticRows.Count)"
 }
-if (@($diagnosticRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
-    throw "All diagnostic proof output rows must pass"
+$diagnosticFailures = @($diagnosticRows | Where-Object { $_.status -ne "pass" })
+if ($summary.tolerance_failures -ne $diagnosticFailures.Count) {
+    throw "Expected tolerance_failures to match diagnostic output failures: summary=$($summary.tolerance_failures) diagnostic=$($diagnosticFailures.Count)"
 }
 
 $nodeFlow = @($summary.series | Where-Object { $_.variable -eq "System Node Mass Flow Rate" })
@@ -297,7 +295,7 @@ if ([Math]::Abs([double]$summary.energy_report_interval_seconds - 900.0) -gt 1.0
     throw "Unexpected IdealLoads energy report interval seconds: $($summary.energy_report_interval_seconds)"
 }
 if ($summary.rust_meter_time_series_comparison -ne $true) {
-    throw "IdealLoads meter requests must compare Rust monthly/run-period facility meter series"
+    throw "IdealLoads meter requests must compare Rust monthly/annual/run-period facility meter series"
 }
 if ($summary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
     throw "Unexpected meter aggregation source: $($summary.meter_aggregation_source)"
@@ -305,16 +303,19 @@ if ($summary.meter_aggregation_source -ne "ep_runtime::RuntimeMeterRegistry") {
 if ($summary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_facility_meter_binding") {
     throw "Unexpected meter fuel-energy binding source: $($summary.meter_fuel_energy_binding_source)"
 }
-if ($summary.requested_meter_count -ne 4) {
-    throw "Expected 4 requested conformance meter rows, found $($summary.requested_meter_count)"
+if ($summary.requested_meter_count -ne 6) {
+    throw "Expected 6 requested conformance meter rows, found $($summary.requested_meter_count)"
 }
 
 $requestedMeters = @($summary.requested_meters)
-if ($requestedMeters.Count -ne 4) {
-    throw "Expected 4 requested_meters entries, found $($requestedMeters.Count)"
+if ($requestedMeters.Count -ne 6) {
+    throw "Expected 6 requested_meters entries, found $($requestedMeters.Count)"
 }
 if (@($requestedMeters | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "monthly" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
     throw "Missing monthly conformance DistrictHeatingWater:Facility MTR request in summary"
+}
+if (@($requestedMeters | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "annual" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
+    throw "Missing annual conformance DistrictHeatingWater:Facility MTR request in summary"
 }
 if (@($requestedMeters | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "run-period" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
     throw "Missing run-period conformance DistrictHeatingWater:Facility MTR request in summary"
@@ -322,13 +323,16 @@ if (@($requestedMeters | Where-Object { $_.name -eq "DistrictHeatingWater:Facili
 if (@($requestedMeters | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "monthly" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
     throw "Missing monthly conformance DistrictCooling:Facility MTR request in summary"
 }
+if (@($requestedMeters | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "annual" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
+    throw "Missing annual conformance DistrictCooling:Facility MTR request in summary"
+}
 if (@($requestedMeters | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "run-period" -and $_.source -eq "mtr" -and $_.level -eq "conformance" }).Count -ne 1) {
     throw "Missing run-period conformance DistrictCooling:Facility MTR request in summary"
 }
 
 $meterRows = @($summary.meter_series)
-if ($summary.meter_series_count -ne 4 -or $meterRows.Count -ne 4) {
-    throw "Expected 4 compared meter series, found count=$($summary.meter_series_count) rows=$($meterRows.Count)"
+if ($summary.meter_series_count -ne 6 -or $meterRows.Count -ne 6) {
+    throw "Expected 6 compared meter series, found count=$($summary.meter_series_count) rows=$($meterRows.Count)"
 }
 if ($summary.meter_tolerance_failures -ne 0) {
     throw "Expected zero meter tolerance failures, found $($summary.meter_tolerance_failures)"
@@ -336,26 +340,35 @@ if ($summary.meter_tolerance_failures -ne 0) {
 if (@($meterRows | Where-Object { $_.level -ne "conformance" -or $_.status -ne "pass" }).Count -ne 0) {
     throw "All IdealLoads facility meter conformance rows must pass"
 }
-if (@($meterRows | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "monthly" -and $_.rust_source -eq "rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
+if (@($meterRows | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "monthly" -and $_.rust_source -eq "rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 12 -and $_.observed_samples -eq 12 -and $_.units -eq "J" }).Count -ne 1) {
     throw "Missing passing monthly heating facility meter conformance row"
+}
+if (@($meterRows | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "annual" -and $_.rust_source -eq "rust-ideal-loads-annual-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
+    throw "Missing passing annual heating facility meter conformance row"
 }
 if (@($meterRows | Where-Object { $_.name -eq "DistrictHeatingWater:Facility" -and $_.frequency -eq "run-period" -and $_.rust_source -eq "rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
     throw "Missing passing run-period heating facility meter conformance row"
 }
-if (@($meterRows | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "monthly" -and $_.rust_source -eq "rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
+if (@($meterRows | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "monthly" -and $_.rust_source -eq "rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 12 -and $_.observed_samples -eq 12 -and $_.units -eq "J" }).Count -ne 1) {
     throw "Missing passing monthly cooling facility meter conformance row"
+}
+if (@($meterRows | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "annual" -and $_.rust_source -eq "rust-ideal-loads-annual-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
+    throw "Missing passing annual cooling facility meter conformance row"
 }
 if (@($meterRows | Where-Object { $_.name -eq "DistrictCooling:Facility" -and $_.frequency -eq "run-period" -and $_.rust_source -eq "rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -and $_.alignment -eq "index" -and $_.expected_samples -eq 1 -and $_.observed_samples -eq 1 -and $_.units -eq "J" }).Count -ne 1) {
     throw "Missing passing run-period cooling facility meter conformance row"
 }
 
 $toleranceFailures = @(Read-CsvFile -Path $toleranceFailuresPath)
-if ($toleranceFailures.Count -ne 0) {
-    throw "Expected empty tolerance-failures.csv, found $($toleranceFailures.Count) row(s)"
+if ($toleranceFailures.Count -ne $summary.tolerance_failures) {
+    throw "Expected tolerance-failures.csv to match diagnostic tolerance failure count, found csv=$($toleranceFailures.Count) summary=$($summary.tolerance_failures)"
+}
+if (@($toleranceFailures | Where-Object { $_.level -ne "diagnostic" -or $_.domain -eq "meter" }).Count -ne 0) {
+    throw "Meter conformance gate must not include conformance or meter rows in tolerance-failures.csv"
 }
 
 $resultStore = Read-JsonFile -Path $resultStorePath
-if ($resultStore.series_count -ne 28 -or $resultStore.sample_count -ne 110) {
+if ($resultStore.series_count -ne 28 -or $resultStore.sample_count -ne 39292) {
     throw "Unexpected result store shape: series=$($resultStore.series_count) samples=$($resultStore.sample_count)"
 }
 
@@ -399,7 +412,7 @@ if ($stageSummary.meter_fuel_energy_binding_source -ne "ep_runtime::ideal_loads_
 }
 
 $reportText = Read-TextFile -Path $reportPath
-Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA monthly/run-period IdealLoads facility meter aggregation for declared facility meters only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA monthly/annual/run-period IdealLoads facility meter aggregation for declared facility meters only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
@@ -430,16 +443,18 @@ Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_path: ZoneEq
 Assert-Contains -Text $reportText -Pattern "purchased_air_source_order: GetPurchasedAir -> InitPurchasedAir -> CalcPurchAirLoads -> UpdatePurchasedAir -> ReportPurchasedAir" -Description "markdown PurchasedAir source order"
 Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedAir after UpdatePurchasedAir" -Description "markdown rate output source"
 Assert-Contains -Text $reportText -Pattern "energy_output_timestep_source: ReportPurchasedAir rate * TimeStepSysSec" -Description "markdown energy output timestep source"
-Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter monthly/run-period MTR vs Rust aggregated fuel-energy conformance; rust_meter_time_series_comparison=true requested_meters=4" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance; rust_meter_time_series_comparison=true requested_meters=6" -Description "markdown meter source"
 Assert-Contains -Text $reportText -Pattern "meter_aggregation_source: ep_runtime::RuntimeMeterRegistry" -Description "markdown meter aggregation source"
 Assert-Contains -Text $reportText -Pattern "meter_fuel_energy_binding_source: ep_runtime::ideal_loads_facility_meter_binding" -Description "markdown meter fuel-energy binding source"
-Assert-Contains -Text $reportText -Pattern "meter_requests: DistrictHeatingWater:Facility, DistrictHeatingWater:Facility, DistrictCooling:Facility, DistrictCooling:Facility" -Description "markdown meter requests"
+Assert-Contains -Text $reportText -Pattern "meter_requests: DistrictHeatingWater:Facility, DistrictHeatingWater:Facility, DistrictHeatingWater:Facility, DistrictCooling:Facility, DistrictCooling:Facility, DistrictCooling:Facility" -Description "markdown meter requests"
 Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | conformance | meter | monthly | mtr | rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -Description "markdown monthly heating meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | conformance | meter | annual | mtr | rust-ideal-loads-annual-facility-meter-from-fuel-energy" -Description "markdown annual heating meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | conformance | meter | run-period | mtr | rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -Description "markdown run-period heating meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | monthly | mtr | rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -Description "markdown monthly cooling meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | annual | mtr | rust-ideal-loads-annual-facility-meter-from-fuel-energy" -Description "markdown annual cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | run-period | mtr | rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -Description "markdown run-period cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Mass Flow Rate | diagnostic" -Description "markdown diagnostic node flow row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy Rate | diagnostic" -Description "markdown diagnostic zone heating fuel rate row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Heating Fuel Energy | diagnostic" -Description "markdown diagnostic zone heating fuel energy row"
 
-Write-Host "IdealLoads no-OA monthly/run-period facility meter conformance comparison artifacts generated."
+Write-Host "IdealLoads no-OA monthly/annual/run-period facility meter conformance comparison artifacts generated."

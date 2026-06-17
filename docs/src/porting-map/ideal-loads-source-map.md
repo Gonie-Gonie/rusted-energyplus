@@ -574,7 +574,8 @@ heating/cooling setpoint-distance proof rows, active humidity-control
 outdoor-air latent behavior,
 economizer outputs, finite-limit humidity or energy behavior, adaptive system
 timestep, broad meter conformance beyond the declared no-OA hourly and
-monthly/run-period facility meter candidates, annual meter aggregation, and
+monthly/annual/run-period facility meter candidates, multi-year annual
+grouping, and
 fuel-efficiency schedules beyond the declared
 blank/constant/all-days Schedule:Compact candidates remain diagnostic-only or
 unsupported until their source-order branches are ported or explicitly
@@ -591,7 +592,7 @@ IdealLoads rate rows and facility meter rows remain diagnostic.
 `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` have a narrow
 hourly oracle-MTR vs Rust aggregated fuel-energy conformance candidate in
 `ideal_loads_no_oa_facility_meter_conformance_candidate_001` and a narrow
-monthly/run-period oracle-MTR vs Rust aggregated fuel-energy conformance
+monthly/annual/run-period oracle-MTR vs Rust aggregated fuel-energy conformance
 candidate in
 `ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001`;
 outside those cases, facility meter rows remain diagnostic. The no-OA
@@ -713,16 +714,18 @@ and node rows remain diagnostic proof evidence inside the meter candidate, and
 `tolerance-failures.csv` is empty.
 
 `scripts/dev.cmd compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate`
-generates the monthly/run-period meter-only evidence set under
+generates the monthly/annual/run-period meter-only evidence set under
 `.runtime/ideal-loads-no-oa-facility-meter-monthly-run-period-conformance/26.1.0/ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001/compare/`.
-That run compares 28 Detailed diagnostic proof rows over 110 samples plus four
-monthly/run-period MTR facility meter rows, one monthly and one run-period row
-for each declared facility meter. Only the monthly/run-period
+That run compares 28 Detailed diagnostic proof rows over 39292 samples plus six
+monthly/annual/run-period MTR facility meter rows, one monthly, one annual,
+and one run-period row for each declared facility meter. Only the
+monthly/annual/run-period
 `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` meter rows are
 promoted; ReportPurchasedAir rate, energy, fuel-energy, thermostat, demand,
 humidity, and node rows remain diagnostic proof evidence inside the meter
-candidate, annual meter aggregation remains outside the claim, and
-`tolerance-failures.csv` is empty.
+candidate, multi-year annual grouping remains outside the claim, and
+the two full-year diagnostic node rows in `tolerance-failures.csv` remain
+outside the meter conformance gate.
 
 `scripts/dev.cmd compare-ideal-loads-capacity-limit-conformance` generates the
 capacity-limit conformance evidence set under

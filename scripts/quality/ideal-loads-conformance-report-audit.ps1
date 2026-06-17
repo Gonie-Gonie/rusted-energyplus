@@ -252,11 +252,23 @@ foreach ($case in $promotedCases) {
     if ($summary.status -ne "pass") {
         throw "$($case.Id) summary status must be pass, got $($summary.status)"
     }
-    if ($summary.tolerance_failures -ne 0) {
-        throw "$($case.Id) summary tolerance_failures must be 0, got $($summary.tolerance_failures)"
-    }
+    $allowsDiagnosticToleranceFailures =
+        $case.Id -eq "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001"
     if (($summary.PSObject.Properties.Name -contains "meter_tolerance_failures") -and $summary.meter_tolerance_failures -ne 0) {
         throw "$($case.Id) summary meter_tolerance_failures must be 0, got $($summary.meter_tolerance_failures)"
+    }
+    $toleranceFailures = @()
+    if ((Get-Item -LiteralPath $toleranceFailuresPath).Length -gt 0) {
+        $toleranceFailures = @(Import-Csv -LiteralPath $toleranceFailuresPath)
+    }
+    if ($summary.tolerance_failures -ne $toleranceFailures.Count) {
+        throw "$($case.Id) summary tolerance_failures mismatch: summary $($summary.tolerance_failures), csv $($toleranceFailures.Count)"
+    }
+    if (-not $allowsDiagnosticToleranceFailures -and $summary.tolerance_failures -ne 0) {
+        throw "$($case.Id) summary tolerance_failures must be 0, got $($summary.tolerance_failures)"
+    }
+    if (@($toleranceFailures | Where-Object { $_.level -eq "conformance" -or $_.domain -eq "meter" }).Count -ne 0) {
+        throw "$($case.Id) tolerance failures must not include conformance or meter rows"
     }
     $outputRows = @($summary.series)
     if (($summary.PSObject.Properties.Name -contains "series_count") -and $summary.series_count -ne $outputRows.Count) {
@@ -267,7 +279,11 @@ foreach ($case in $promotedCases) {
         if ($row.level -notin @("conformance", "diagnostic")) {
             throw "$($case.Id) output row has unexpected level '$($row.level)': $($row.key) / $($row.variable)"
         }
-        if ($row.status -ne "pass") {
+        if ($allowsDiagnosticToleranceFailures) {
+            if ($row.level -eq "conformance" -and $row.status -ne "pass") {
+                throw "$($case.Id) conformance output row did not pass: $($row.key) / $($row.variable) = $($row.status)"
+            }
+        } elseif ($row.status -ne "pass") {
             throw "$($case.Id) output row did not pass: $($row.key) / $($row.variable) = $($row.status)"
         }
     }

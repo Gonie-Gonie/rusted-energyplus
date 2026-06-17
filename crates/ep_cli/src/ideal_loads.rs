@@ -207,14 +207,15 @@ const IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE: &str =
     "rust-ideal-loads-hourly-facility-meter-from-fuel-energy";
 const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUST_SOURCE: &str =
     "rust-ideal-loads-monthly-facility-meter-from-fuel-energy";
+const IDEAL_LOADS_FACILITY_METER_ANNUAL_RUST_SOURCE: &str =
+    "rust-ideal-loads-annual-facility-meter-from-fuel-energy";
 const IDEAL_LOADS_FACILITY_METER_RUN_PERIOD_RUST_SOURCE: &str =
     "rust-ideal-loads-run-period-facility-meter-from-fuel-energy";
 const IDEAL_LOADS_FACILITY_METER_DIAGNOSTIC_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic";
 const IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy conformance";
-const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE: &str =
-    "EnergyPlus Output:Meter monthly/run-period MTR vs Rust aggregated fuel-energy conformance";
+const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE: &str = "EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
@@ -757,7 +758,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
     for meter in &manifest.meters {
         if !is_supported_ideal_loads_meter_frequency(meter.frequency) {
             return Err(format!(
-                "IdealLoads no-OA report supports hourly, monthly, and run-period meter outputs, got {} for {}",
+                "IdealLoads no-OA report supports hourly, monthly, annual, and run-period meter outputs, got {} for {}",
                 output_frequency_label(meter.frequency),
                 meter.name
             ));
@@ -1113,7 +1114,10 @@ fn is_declared_no_oa_facility_meter_conformance_meter(name: &str) -> bool {
 fn is_supported_ideal_loads_meter_frequency(frequency: OutputFrequency) -> bool {
     matches!(
         frequency,
-        OutputFrequency::Hourly | OutputFrequency::Monthly | OutputFrequency::RunPeriod
+        OutputFrequency::Hourly
+            | OutputFrequency::Monthly
+            | OutputFrequency::Annual
+            | OutputFrequency::RunPeriod
     )
 }
 
@@ -1121,7 +1125,11 @@ fn required_facility_meter_conformance_frequencies(
     manifest: &ConformanceCase,
 ) -> &'static [OutputFrequency] {
     if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(manifest) {
-        &[OutputFrequency::Monthly, OutputFrequency::RunPeriod]
+        &[
+            OutputFrequency::Monthly,
+            OutputFrequency::Annual,
+            OutputFrequency::RunPeriod,
+        ]
     } else {
         &[OutputFrequency::Hourly]
     }
@@ -3637,7 +3645,7 @@ fn runtime_meter_request_for_manifest_meter(
 ) -> Result<RuntimeMeterRequest, String> {
     let frequency = runtime_meter_frequency(meter.frequency).ok_or_else(|| {
         format!(
-            "IdealLoads diagnostic meter aggregation supports hourly, monthly, and run-period meters, got {} for {}",
+            "IdealLoads diagnostic meter aggregation supports hourly, monthly, annual, and run-period meters, got {} for {}",
             output_frequency_label(meter.frequency),
             meter.name
         )
@@ -3649,12 +3657,12 @@ fn runtime_meter_frequency(frequency: OutputFrequency) -> Option<RuntimeOutputFr
     match frequency {
         OutputFrequency::Hourly => Some(RuntimeOutputFrequency::Hourly),
         OutputFrequency::Monthly => Some(RuntimeOutputFrequency::Monthly),
+        OutputFrequency::Annual => Some(RuntimeOutputFrequency::Annual),
         OutputFrequency::RunPeriod => Some(RuntimeOutputFrequency::RunPeriod),
         OutputFrequency::Static
         | OutputFrequency::Detailed
         | OutputFrequency::Timestep
-        | OutputFrequency::Daily
-        | OutputFrequency::Annual => None,
+        | OutputFrequency::Daily => None,
     }
 }
 
@@ -3683,6 +3691,7 @@ fn output_frequency_idf_label_for_mtr(frequency: OutputFrequency) -> Result<&'st
     match frequency {
         OutputFrequency::Hourly => Ok("Hourly"),
         OutputFrequency::Monthly => Ok("Monthly"),
+        OutputFrequency::Annual => Ok("Annual"),
         OutputFrequency::RunPeriod => Ok("RunPeriod"),
         _ => Err(format!(
             "IdealLoads MTR meter loading does not support {} frequency",
@@ -3716,6 +3725,11 @@ fn meter_samples_from_detailed_energy(
     match frequency {
         OutputFrequency::Hourly => hourly_meter_samples_from_detailed_energy(values, timestamps),
         OutputFrequency::Monthly => monthly_meter_samples_from_detailed_energy(values, timestamps),
+        OutputFrequency::Annual => Ok(vec![SeriesSample {
+            index: 0,
+            timestamp: None,
+            value: values.iter().sum(),
+        }]),
         OutputFrequency::RunPeriod => Ok(vec![SeriesSample {
             index: 0,
             timestamp: None,
@@ -3825,6 +3839,7 @@ fn facility_meter_rust_source(frequency: OutputFrequency) -> &'static str {
     match frequency {
         OutputFrequency::Hourly => IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE,
         OutputFrequency::Monthly => IDEAL_LOADS_FACILITY_METER_MONTHLY_RUST_SOURCE,
+        OutputFrequency::Annual => IDEAL_LOADS_FACILITY_METER_ANNUAL_RUST_SOURCE,
         OutputFrequency::RunPeriod => IDEAL_LOADS_FACILITY_METER_RUN_PERIOD_RUST_SOURCE,
         _ => IDEAL_LOADS_FACILITY_METER_HOURLY_RUST_SOURCE,
     }
@@ -7985,7 +8000,7 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
         context.manifest,
     ) {
-        "conformance no-OA monthly/run-period IdealLoads facility meter aggregation for declared facility meters only"
+        "conformance no-OA monthly/annual/run-period IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_facility_meter_conformance_candidate(context.manifest) {
         "conformance no-OA hourly IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {

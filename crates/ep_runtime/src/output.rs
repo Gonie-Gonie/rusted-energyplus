@@ -655,6 +655,7 @@ impl RuntimeOutputRegistry {
                     for frequency in [
                         RuntimeOutputFrequency::Hourly,
                         RuntimeOutputFrequency::Monthly,
+                        RuntimeOutputFrequency::Annual,
                         RuntimeOutputFrequency::RunPeriod,
                     ] {
                         self.meter_registry.push_meter(

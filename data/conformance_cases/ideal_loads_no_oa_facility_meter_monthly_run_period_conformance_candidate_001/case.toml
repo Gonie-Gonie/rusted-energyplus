@@ -1,16 +1,16 @@
 id = "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001"
-title = "One-zone no-OA IdealLoads monthly/run-period facility meter conformance candidate"
+title = "One-zone no-OA IdealLoads monthly/annual/run-period facility meter conformance candidate"
 milestone = "ideal-loads-meter-conformance"
-purpose = "Claim narrow no-outdoor-air IdealLoads monthly and run-period facility meter conformance for DistrictHeatingWater:Facility and DistrictCooling:Facility only, with rate, energy, fuel-energy, and node rows retained as diagnostic proof evidence."
+purpose = "Claim narrow no-outdoor-air IdealLoads monthly, annual, and run-period facility meter conformance for DistrictHeatingWater:Facility and DistrictCooling:Facility only, with rate, energy, fuel-energy, and node rows retained as diagnostic proof evidence."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "This case claims only the declared no-OA monthly and run-period facility meter rows for DistrictHeatingWater:Facility and DistrictCooling:Facility.",
+  "This case claims only the declared no-OA monthly, annual, and run-period facility meter rows for DistrictHeatingWater:Facility and DistrictCooling:Facility.",
   "Rate, energy, fuel-energy, thermostat, node, demand, and humidity rows remain diagnostic proof evidence in this meter candidate.",
-  "The Rust meter series are aggregated from detailed ReportPurchasedAir fuel-energy rows through RuntimeMeterRegistry-resolved IdealLoads facility meter bindings, grouped by month or summed over the run period to match the EnergyPlus MTR oracle.",
-  "The boundary excludes non-unity and non-constant fuel-efficiency schedules, annual meter aggregation, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter conformance.",
-  "The compare gate applies the declared monthly and run-period meter tolerances to EnergyPlus MTR oracle series and Rust aggregated fuel-energy series."
+  "The Rust meter series are aggregated from detailed ReportPurchasedAir fuel-energy rows through RuntimeMeterRegistry-resolved IdealLoads facility meter bindings, grouped by month, summed over the single calendar-year annual report period, or summed over the run period to match the EnergyPlus MTR oracle.",
+  "The boundary excludes non-unity and non-constant fuel-efficiency schedules, multi-year annual grouping, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad meter conformance.",
+  "The compare gate applies the declared monthly, annual, and run-period meter tolerances to EnergyPlus MTR oracle series and Rust aggregated fuel-energy series."
 ]
 
 [trace]
@@ -19,7 +19,7 @@ level = "default-conformance"
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"
-source_file = "data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/ideal_loads_no_oa_sensible_conformance.idf"
+source_file = "data/conformance_cases/ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001/ideal_loads_no_oa_facility_meter_monthly_annual_run_period_conformance.idf"
 tier = "B"
 
 [scope]
@@ -34,7 +34,7 @@ has_python_plugin = false
 has_daylighting = false
 
 [input]
-idf = "data/conformance_cases/ideal_loads_no_oa_sensible_conformance_001/ideal_loads_no_oa_sensible_conformance.idf"
+idf = "data/conformance_cases/ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001/ideal_loads_no_oa_facility_meter_monthly_annual_run_period_conformance.idf"
 weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
 
 [[outputs]]
@@ -356,6 +356,15 @@ rmse_tol = 1.0
 
 [[meters]]
 name = "DistrictHeatingWater:Facility"
+frequency = "annual"
+source = "mtr"
+domain = "meter"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictHeatingWater:Facility"
 frequency = "run-period"
 source = "mtr"
 domain = "meter"
@@ -366,6 +375,15 @@ rmse_tol = 1.0
 [[meters]]
 name = "DistrictCooling:Facility"
 frequency = "monthly"
+source = "mtr"
+domain = "meter"
+level = "conformance"
+abs_tol = 1.0
+rmse_tol = 1.0
+
+[[meters]]
+name = "DistrictCooling:Facility"
+frequency = "annual"
 source = "mtr"
 domain = "meter"
 level = "conformance"
