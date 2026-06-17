@@ -55,7 +55,12 @@ use ep_runtime::{
     ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
     ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD,
+    ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION, ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE,
+    ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD, ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION,
+    ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE, ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION,
+    ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT,
+    ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
     calc_outdoor_air_sensible_report_rates_compat,
@@ -3291,7 +3296,38 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
-    report.push_str("zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\n");
+    report.push_str(&format!(
+        "zone_demand_source: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE
+    ));
+    report.push_str(&format!(
+        "zone_demand_struct_source: {}::{}\n",
+        ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+    ));
+    report.push_str(&format!(
+        "zone_demand_heating_field: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD
+    ));
+    report.push_str(&format!(
+        "zone_demand_heating_sign_convention: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION
+    ));
+    report.push_str(&format!(
+        "zone_demand_cooling_field: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD
+    ));
+    report.push_str(&format!(
+        "zone_demand_cooling_sign_convention: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION
+    ));
+    report.push_str(&format!(
+        "zone_demand_mismatch_classification: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION
+    ));
+    report.push_str(&format!(
+        "zone_demand_fixture_mode: {}\n",
+        ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE
+    ));
     report.push_str("zone_state_source: source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\n");
     report.push_str(&format!(
         "fuel_energy_rate_source: {}\n",
@@ -3659,6 +3695,33 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         "  \"outdoor_air_source\": {},\n",
         json_string(&outdoor_air_source_description(context))
     ));
+    json.push_str(&format!(
+        "  \"zone_demand_source\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_struct_source\": {},\n",
+        json_string(&format!(
+            "{}::{}",
+            ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_mismatch_classification\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_fixture_mode\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE)
+    ));
     json.push_str("  \"outdoor_air_schedule\": \"blank-always-1.0\",\n");
     json.push_str(&format!(
         "  \"economizer\": {},\n",
@@ -3949,6 +4012,33 @@ fn render_outdoor_air_stage_summary_json(
         "  \"heat_recovery\": {},\n",
         json_string(heat_recovery_label(context.heat_recovery_type))
     ));
+    json.push_str(&format!(
+        "  \"zone_demand_source\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_struct_source\": {},\n",
+        json_string(&format!(
+            "{}::{}",
+            ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_mismatch_classification\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_fixture_mode\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE)
+    ));
     json.push_str("  \"humidity_control_conformance\": false,\n");
     json.push_str("  \"finite_limit_conformance\": false,\n");
     json.push_str(&format!(
@@ -4066,7 +4156,41 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         json_string(tolerance_policy(context))
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
-    json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
+    json.push_str(&format!(
+        "  \"zone_demand_source\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_struct_source\": {},\n",
+        json_string(&format!(
+            "{}::{}",
+            ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_mismatch_classification\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_fixture_mode\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE)
+    ));
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows\",\n");
     json.push_str(&format!(
         "  \"source_map_anchor\": {},\n",
@@ -4623,7 +4747,41 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
         "  \"meter_series_count\": {},\n",
         context.meter_rows.len()
     ));
-    json.push_str("  \"zone_demand_source\": \"EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs\",\n");
+    json.push_str(&format!(
+        "  \"zone_demand_source\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_struct_source\": {},\n",
+        json_string(&format!(
+            "{}::{}",
+            ZONE_SYS_ENERGY_DEMAND_SOURCE_FILE, ZONE_SYS_ENERGY_DEMAND_SOURCE_STRUCT
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_FIELD)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_heating_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_field\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_FIELD)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_cooling_sign_convention\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_mismatch_classification\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION)
+    ));
+    json.push_str(&format!(
+        "  \"zone_demand_fixture_mode\": {},\n",
+        json_string(ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE)
+    ));
     json.push_str("  \"zone_state_source\": \"source-order pre-update zone air node state\",\n");
     json.push_str(&format!(
         "  \"zone_air_node\": {},\n",

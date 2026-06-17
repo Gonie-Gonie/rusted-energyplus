@@ -104,6 +104,27 @@ function Assert-ZoneEquipmentDispatch {
     Write-Host "OK zone equipment dispatch path: $expectedPath"
 }
 
+function Assert-ZoneSysEnergyDemandEvidence {
+    param([Parameter(Mandatory = $true)]$StageSummary)
+
+    if ($StageSummary.zone_demand_struct_source -ne "src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand") {
+        throw "Unexpected ZoneSysEnergyDemand source: $($StageSummary.zone_demand_struct_source)"
+    }
+    if ($StageSummary.zone_demand_heating_field -ne "RemainingOutputReqToHeatSP") {
+        throw "Unexpected heating demand field: $($StageSummary.zone_demand_heating_field)"
+    }
+    if ($StageSummary.zone_demand_cooling_field -ne "RemainingOutputReqToCoolSP") {
+        throw "Unexpected cooling demand field: $($StageSummary.zone_demand_cooling_field)"
+    }
+    if ($StageSummary.zone_demand_mismatch_classification -ne "upstream_zone_heat_balance_input") {
+        throw "Unexpected demand mismatch classification: $($StageSummary.zone_demand_mismatch_classification)"
+    }
+    if ($StageSummary.zone_demand_fixture_mode -ne "source-order-oracle-demand-input") {
+        throw "Unexpected demand fixture mode: $($StageSummary.zone_demand_fixture_mode)"
+    }
+    Write-Host "OK ZoneSysEnergyDemand source/sign metadata"
+}
+
 foreach ($path in @(
     (Join-Path $OracleRoot "energyplus.exe"),
     (Join-Path $OracleRoot "ConvertInputFormat.exe"),
@@ -315,10 +336,17 @@ if ($stageSummary.zone_demand_synthetic_rc_model -ne $false) {
 }
 Assert-PurchasedAirSourceOrder -StageSummary $stageSummary
 Assert-ZoneEquipmentDispatch -StageSummary $stageSummary
+Assert-ZoneSysEnergyDemandEvidence -StageSummary $stageSummary
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA/no-limit sensible IdealLoads branch for declared variables only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: false" -Description "markdown demand source guard"
+Assert-Contains -Text $reportText -Pattern "zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "markdown ZoneSysEnergyDemand source"
+Assert-Contains -Text $reportText -Pattern "zone_demand_struct_source: src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "markdown ZoneSysEnergyDemand source struct"
+Assert-Contains -Text $reportText -Pattern "zone_demand_heating_sign_convention: positive W requests heating; non-positive means no active heating request" -Description "markdown heating demand sign"
+Assert-Contains -Text $reportText -Pattern "zone_demand_cooling_sign_convention: negative W requests cooling; non-negative means no active cooling request" -Description "markdown cooling demand sign"
+Assert-Contains -Text $reportText -Pattern "zone_demand_mismatch_classification: upstream_zone_heat_balance_input" -Description "markdown demand mismatch classification"
+Assert-Contains -Text $reportText -Pattern "zone_demand_fixture_mode: source-order-oracle-demand-input" -Description "markdown demand fixture mode"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_path: ZoneEquipmentManager::ManageZoneEquipment -> SimZoneEquipment -> ZoneEquipType::PurchasedAir -> PurchasedAirManager::SimPurchasedAir" -Description "markdown zone equipment dispatch path"
 Assert-Contains -Text $reportText -Pattern "zone_equipment_dispatch_validation: pass" -Description "markdown zone equipment dispatch validation"
