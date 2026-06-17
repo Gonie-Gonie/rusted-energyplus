@@ -5,6 +5,7 @@ mod design_flow;
 mod economizer;
 mod mixed_air;
 mod psychrometrics;
+mod supply;
 
 pub use dcv::*;
 pub use design_flow::*;
@@ -18,6 +19,7 @@ use ep_model::IdealLoadsAirSystem;
 
 use economizer::calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s;
 use mixed_air::mixed_air_state;
+use supply::{outdoor_air_supply_mass_flow_rate_kg_per_s, supply_air_state};
 
 pub(super) const SMALL_TEMPERATURE_DIFFERENCE_C: f64 = 0.001;
 
@@ -257,74 +259,6 @@ pub fn calc_outdoor_air_sensible_report_rates_compat(
         heat_recovery_total_cooling_rate_w: mixed_air_result.heat_recovery_total_cooling_rate_w,
         heat_recovery_active_time_hr: mixed_air_result.heat_recovery_active_time_hr,
     }
-}
-
-fn outdoor_air_supply_mass_flow_rate_kg_per_s(
-    system: &IdealLoadsAirSystem,
-    zone_state: IdealLoadsOutdoorAirNodeState,
-    demand: ZoneSysEnergyDemand,
-    mode: IdealLoadsSensibleMode,
-    cp_air_j_per_kg_k: f64,
-    outdoor_air_mass_flow_rate_kg_per_s: f64,
-) -> f64 {
-    let sensible_flow_rate_kg_per_s = match mode {
-        IdealLoadsSensibleMode::Heating => {
-            let delta_t =
-                system.maximum_heating_supply_air_temperature_c - zone_state.air_temperature_c;
-            if delta_t > SMALL_TEMPERATURE_DIFFERENCE_C
-                && demand.remaining_output_req_to_heat_sp_w > 0.0
-            {
-                demand.remaining_output_req_to_heat_sp_w / (cp_air_j_per_kg_k * delta_t)
-            } else {
-                0.0
-            }
-        }
-        IdealLoadsSensibleMode::Cooling => {
-            let delta_t =
-                system.minimum_cooling_supply_air_temperature_c - zone_state.air_temperature_c;
-            if delta_t < -SMALL_TEMPERATURE_DIFFERENCE_C
-                && demand.remaining_output_req_to_cool_sp_w < 0.0
-            {
-                demand.remaining_output_req_to_cool_sp_w / (cp_air_j_per_kg_k * delta_t)
-            } else {
-                0.0
-            }
-        }
-        IdealLoadsSensibleMode::Deadband | IdealLoadsSensibleMode::Off => 0.0,
-    };
-    outdoor_air_mass_flow_rate_kg_per_s
-        .max(sensible_flow_rate_kg_per_s)
-        .max(0.0)
-}
-
-fn supply_air_state(
-    system: &IdealLoadsAirSystem,
-    zone_state: IdealLoadsOutdoorAirNodeState,
-    demand: ZoneSysEnergyDemand,
-    mode: IdealLoadsSensibleMode,
-    cp_air_j_per_kg_k: f64,
-    supply_mass_flow_rate_kg_per_s: f64,
-    mixed_air_temperature_c: f64,
-    mixed_air_humidity_ratio: f64,
-) -> (f64, f64) {
-    if supply_mass_flow_rate_kg_per_s <= 0.0 {
-        return (mixed_air_temperature_c, mixed_air_humidity_ratio);
-    }
-
-    let supply_air_temperature_c = match mode {
-        IdealLoadsSensibleMode::Cooling => (demand.remaining_output_req_to_cool_sp_w
-            / (cp_air_j_per_kg_k * supply_mass_flow_rate_kg_per_s)
-            + zone_state.air_temperature_c)
-            .max(system.minimum_cooling_supply_air_temperature_c)
-            .min(mixed_air_temperature_c),
-        IdealLoadsSensibleMode::Heating => (demand.remaining_output_req_to_heat_sp_w
-            / (cp_air_j_per_kg_k * supply_mass_flow_rate_kg_per_s)
-            + zone_state.air_temperature_c)
-            .min(system.maximum_heating_supply_air_temperature_c)
-            .max(mixed_air_temperature_c),
-        IdealLoadsSensibleMode::Deadband | IdealLoadsSensibleMode::Off => mixed_air_temperature_c,
-    };
-    (supply_air_temperature_c, mixed_air_humidity_ratio)
 }
 
 #[cfg(test)]
