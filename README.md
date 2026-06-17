@@ -100,11 +100,17 @@ tolerance, and code organization.
   outdoor-air report rates, supply-air state, and mixed-air state Detailed
   series in `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001`,
   with inactive economizer and inactive heat-recovery rows kept diagnostic-only
-- diagnostic-only IdealLoads remaining Flow/Person, Flow/Area,
-  AirChanges/Hour, Sum, Maximum, active economizer, and active heat-recovery
-  outdoor-air evidence for outdoor-air mass flow, standard-density volume
-  flow, no-humidity outdoor-air report rates, supply-air state, mixed-air
-  state, inactive economizer/heat-recovery reports, DifferentialDryBulb and
+- limited IdealLoads outdoor-air `Flow/Person` conformance candidate gate for
+  declared outdoor-air mass/standard-density volume flow, no-humidity
+  outdoor-air report rates, supply-air state, and mixed-air state Detailed
+  series in `ideal_loads_outdoor_air_flow_person_conformance_candidate_001`,
+  using traced five-person design-occupant proof input; People heat-gain
+  conformance is not claimed
+- diagnostic-only IdealLoads remaining Flow/Area, AirChanges/Hour, Sum,
+  Maximum, active economizer, and active heat-recovery outdoor-air evidence
+  for outdoor-air mass flow, standard-density volume flow, no-humidity
+  outdoor-air report rates, supply-air state, mixed-air state, inactive
+  economizer/heat-recovery reports, DifferentialDryBulb and
   DifferentialEnthalpy economizer active-time/flow parity, and Sensible and
   Enthalpy heat-recovery active-time/rate parity in
   `ideal_loads_outdoor_air_flow_person_diagnostic_001`,
@@ -129,7 +135,7 @@ tolerance, and code organization.
   `1ZoneUncontrolled` dynamic compatibility-candidate variables, plus the
   declared no-OA/no-limit, numeric finite-limit, and
   `ConstantSensibleHeatRatio`, `ConstantSupplyHumidityRatio`,
-  Humidistat, and outdoor-air `Flow/Zone` IdealLoads variables
+  Humidistat, and outdoor-air `Flow/Zone`/`Flow/Person` IdealLoads variables
 - static EIO model conformance only for the declared v0.23 official
   `1ZoneUncontrolled` surface, construction/material, and OtherEquipment
   nominal fields

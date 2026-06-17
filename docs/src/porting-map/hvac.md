@@ -294,7 +294,7 @@ rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
 
-## IdealLoads Outdoor-Air Flow/Zone Conformance
+## IdealLoads Outdoor-Air Flow/Zone and Flow/Person Conformance
 
 `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
 blank-schedule `DesignSpecification:OutdoorAir` `Flow/Zone` lane for declared
@@ -304,17 +304,23 @@ state, and mixed-air temperature/humidity state rows. It uses
 `comparison_class = "conformance"`, `conformance_claim = true`,
 `tolerance_policy: conformance-gate`, and `status: pass`.
 
-The candidate compares 22 Detailed series with 14 conformance rows and 8
-diagnostic proof rows. The diagnostic rows are inactive economizer and inactive
-heat-recovery report variables only. The guard requires Flow/Zone,
-`NoEconomizer`, no heat recovery, no OA schedule, no finite flow/capacity
-limits, no DCV, default `ConstantSensibleHeatRatio` dehumidification, and no
-humidification control.
+`ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
+matching blank-schedule `DesignSpecification:OutdoorAir` `Flow/Person` lane
+for the same declared output surface. It uses a typed five-person design
+occupant count and 0.01 m3/s-person outdoor-air rate to derive the 0.05 m3/s
+design volume. People heat-gain behavior is not part of this claim.
 
-Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, active economizer,
-active heat recovery, active DCV, active humidity controls, heat-recovery
-saturation-limit branches, and broad IdealLoads outdoor-air conformance remain
-outside this claim.
+Each candidate compares 22 Detailed series with 14 conformance rows and 8
+diagnostic proof rows. The diagnostic rows are inactive economizer and inactive
+heat-recovery report variables only. The guard requires the declared outdoor-
+air method, `NoEconomizer`, no heat recovery, no OA schedule, no finite
+flow/capacity limits, no DCV, default `ConstantSensibleHeatRatio`
+dehumidification, and no humidification control.
+
+Flow/Area, AirChanges/Hour, Sum, Maximum, active economizer, active heat
+recovery, active DCV, active humidity controls, heat-recovery saturation-limit
+branches, and broad IdealLoads outdoor-air conformance remain outside this
+claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
@@ -328,10 +334,10 @@ outside this claim.
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`, and
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are remaining
-diagnostic-only Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum,
+diagnostic-only Flow/Area, AirChanges/Hour, Sum, Maximum,
 DifferentialDryBulb, DifferentialEnthalpy, Sensible heat-recovery, and Enthalpy
-heat-recovery outdoor-air proof lanes, plus the original Flow/Zone diagnostic
-predecessor fixture:
+heat-recovery outdoor-air proof lanes, plus the original Flow/Zone and
+Flow/Person diagnostic predecessor fixtures:
 
 ```text
 comparison_class: diagnostic-only
@@ -388,9 +394,9 @@ is exact for the inactive, DifferentialDryBulb, and DifferentialEnthalpy
 branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
-Flow/Zone conformance candidate, active DCV, active humidity controls,
-saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
-conformance.
+Flow/Zone and Flow/Person conformance candidates, active DCV, active humidity
+controls, saturation-limit heat-recovery branches, or broad IdealLoads
+outdoor-air conformance.
 
 ## Promotion Requirements
 

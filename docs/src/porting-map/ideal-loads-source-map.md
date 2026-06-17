@@ -226,8 +226,8 @@ candidate rows. The current Rust surface is:
   schedule references preserved in `TypedModel`
 - `ModelGraph::ideal_loads_outdoor_air_specs` linking an IdealLoads system to
   its referenced outdoor-air design specification
-- `People` typed intake for zone design occupant count used by the
-  diagnostic-only Flow/Person proof lane
+- `People` typed intake for zone design occupant count used by the Flow/Person
+  conformance candidate and diagnostic proof lane
 - `calc_design_outdoor_air_volume_flow_m3_per_s` for supported
   `Flow/Person`, `Flow/Area`, `Flow/Zone`, `AirChanges/Hour`, `Sum`, and
   `Maximum` methods
@@ -238,15 +238,21 @@ candidate rows. The current Rust surface is:
   report-rate and mixed-air state diagnostic, including no-heat-recovery
   rows, DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
-- `manifest_allows_outdoor_air_flow_zone_conformance_manifest` and
-  `validate_outdoor_air_flow_zone_conformance_boundary` in
-  `crates/ep_cli/src/ideal_loads.rs` for the one promoted Flow/Zone candidate
+- `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
+  `manifest_allows_outdoor_air_flow_person_conformance_manifest`, and
+  `validate_outdoor_air_conformance_boundary` in
+  `crates/ep_cli/src/ideal_loads.rs` for the promoted Flow/Zone and
+  Flow/Person candidates
 
-`ideal_loads_outdoor_air_flow_person_diagnostic_001` adds a diagnostic-only
+`ideal_loads_outdoor_air_flow_person_conformance_candidate_001` promotes the
 Flow/Person proof lane. The fixture declares five `People` design occupants
-and 0.01 m3/s-person outdoor air, so the derived design volume remains
-0.05 m3/s before the `StdRhoAir` mass-flow conversion used by the rest of the
-outdoor-air diagnostic lane.
+and 0.01 m3/s-person outdoor air, so the derived design volume is 0.05 m3/s
+before the `StdRhoAir` mass-flow conversion used by the rest of the outdoor-air
+lane. The People occupancy schedule is zero to avoid adding People heat gains;
+People heat-gain conformance remains outside the claim.
+
+`ideal_loads_outdoor_air_flow_person_diagnostic_001` remains the diagnostic
+predecessor artifact for the same Flow/Person fixture shape.
 
 `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
 same Flow/Zone fixture shape for declared EnergyPlus report variables
@@ -331,9 +337,9 @@ Detailed samples for active-time, sensible, latent, and total heat-recovery
 rows. A single cooling saturation-limit timestep is kept within diagnostic
 tolerance; saturation-limit heat-recovery branch parity is not promoted.
 
-Indoor air quality, proportional-control, Flow/Person, Flow/Area,
-AirChanges/Hour, Sum, Maximum, active economizer, and active heat-recovery
-outdoor-air methods remain diagnostic or unresolved, and no outdoor-air
+Indoor air quality, proportional-control, Flow/Area, AirChanges/Hour, Sum,
+Maximum, active economizer, and active heat-recovery outdoor-air methods remain
+diagnostic or unresolved, and no outdoor-air
 finite-limit, outdoor-air humidity-control, other active humidity-control,
 saturation-limit heat-recovery, or DCV output is part of the promoted
 IdealLoads claim.

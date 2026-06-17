@@ -98,6 +98,7 @@ matplotlib for document layout and charts.
 | `compare-ideal-loads-outdoor-air-differential-enthalpy-economizer-diagnostic` | diagnostic | run the diagnostic-only IdealLoads DifferentialEnthalpy outdoor-air economizer case | no | `.runtime/ideal-loads-outdoor-air-differential-enthalpy-economizer` |
 | `compare-ideal-loads-outdoor-air-flow-area-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Area outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-area` |
 | `compare-ideal-loads-outdoor-air-flow-zone-conformance-candidate` | conformance | run the IdealLoads Flow/Zone outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-zone-conformance` |
+| `compare-ideal-loads-outdoor-air-flow-person-conformance-candidate` | conformance | run the IdealLoads Flow/Person outdoor-air conformance candidate | yes | `.runtime/ideal-loads-outdoor-air-flow-person-conformance` |
 | `compare-ideal-loads-outdoor-air-flow-person-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Flow/Person outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-flow-person` |
 | `compare-ideal-loads-outdoor-air-maximum-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Maximum outdoor-air design-flow case | no | `.runtime/ideal-loads-outdoor-air-maximum` |
 | `compare-ideal-loads-outdoor-air-sensible-heat-recovery-diagnostic` | diagnostic | run the diagnostic-only IdealLoads Sensible heat-recovery outdoor-air case | no | `.runtime/ideal-loads-outdoor-air-sensible-heat-recovery` |
