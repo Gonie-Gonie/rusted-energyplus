@@ -288,6 +288,9 @@ Not claimed:
 - broad HVAC or plant simulation compatibility
 - broad node, full IdealLoads, broad meter conformance, or full runtime
   conformance
+- IdealLoads autosizing, AirLoop integration, PlantLoop integration, multiple
+  equipment interaction, or fuel-efficiency schedules beyond the declared
+  blank/constant/all-days Schedule:Compact candidates
 - IdealLoads economizer conformance beyond the declared DifferentialDryBulb
   and DifferentialEnthalpy candidates, heat-recovery conformance beyond the
   declared Sensible and Enthalpy candidates, broader DCV combinations beyond

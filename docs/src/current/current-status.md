@@ -344,6 +344,9 @@ Not claimed:
 - broad HVAC compatibility
 - plant compatibility
 - broad node, full IdealLoads, meter, or broad weather conformance
+- IdealLoads autosizing, AirLoop integration, PlantLoop integration, multiple
+  equipment interaction, or fuel-efficiency schedules beyond the declared
+  blank/constant/all-days Schedule:Compact candidates
 - dynamic compatibility for the v0.23 static model case
 - new numerical conformance from the v0.24 runtime-infrastructure milestone
 - zone air temperature response to internal gains, radiant/latent internal

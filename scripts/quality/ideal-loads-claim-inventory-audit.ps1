@@ -341,11 +341,16 @@ $broadExclusionPatterns = @(
     @("broad meter conformance", "broad meter exclusion"),
     @("annual meter aggregation", "annual meter aggregation exclusion"),
     @("broader DCV combinations", "broader DCV exclusion"),
+    @("IdealLoads autosizing", "IdealLoads autosizing exclusion"),
+    @("AirLoop integration", "AirLoop integration exclusion"),
+    @("PlantLoop integration", "PlantLoop integration exclusion"),
+    @("multiple equipment interaction", "multiple equipment interaction exclusion"),
+    @("fuel-efficiency schedules beyond the declared blank/constant/all-days Schedule:Compact candidates", "fuel-efficiency schedule exclusion"),
     @("CO2 contaminant-balance/concentration conformance", "CO2 contaminant boundary")
 )
 
 foreach ($entry in $broadExclusionPatterns) {
-    $pattern = [regex]::Escape($entry[0])
+    $pattern = [regex]::Escape($entry[0]) -replace '\\ ', '\s+'
     Assert-TextMatches -Text $readmeText -Pattern $pattern -Description "README $($entry[1])"
     Assert-TextMatches -Text $currentStatusText -Pattern $pattern -Description "current-status $($entry[1])"
 }
