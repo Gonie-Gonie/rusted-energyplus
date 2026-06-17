@@ -40,7 +40,7 @@ foreach ($root in $roots) {
     foreach ($file in $files) {
         $fullPath = (Resolve-Path -LiteralPath $file.FullName).Path
         $relative = $fullPath.Substring($RepoRoot.Length).TrimStart("\", "/")
-        $lineCount = (Get-Content -LiteralPath $file.FullName | Measure-Object -Line).Lines
+        $lineCount = (Get-Content -Encoding UTF8 -LiteralPath $file.FullName | Measure-Object -Line).Lines
         if ($lineCount -gt $failLimit) {
             if ($waiverSet.Contains($relative)) {
                 Write-Host ("WAIVE {0}: {1} LOC (legacy refactor target)" -f $relative, $lineCount)

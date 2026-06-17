@@ -55,6 +55,11 @@ $Commands = [ordered]@{
         Group = "quality"
         Help = "Warn or fail on oversized source files, with explicit legacy waivers."
     }
+    "ideal-loads-structure-audit" = @{
+        Path = "quality\ideal-loads-structure-audit.ps1"
+        Group = "quality"
+        Help = "Guard IdealLoads calc, dispatch, node, and zone-equipment module boundaries."
+    }
     "perf" = @{
         Path = "quality\perf.ps1"
         Group = "quality"
