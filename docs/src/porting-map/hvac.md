@@ -294,7 +294,7 @@ rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
 
-## IdealLoads Outdoor-Air Design Flow And DifferentialDryBulb Conformance
+## IdealLoads Outdoor-Air Design Flow And Economizer Conformance
 
 `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` promotes the
 blank-schedule `DesignSpecification:OutdoorAir` `Flow/Zone` lane for declared
@@ -348,10 +348,18 @@ samples, promotes the 14 outdoor-air/supply/mixed rows plus
 and verifies outdoor-air mass flow rises above the 0.001 m3/s design minimum.
 Inactive heat-recovery rows remain diagnostic-only proof rows in this case.
 
-DifferentialEnthalpy economizer, active heat
-recovery, active DCV, active humidity controls, heat-recovery saturation-limit
-branches, and broad IdealLoads outdoor-air conformance remain outside this
-claim.
+`ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001`
+promotes the matching Flow/Zone low-minimum outdoor-air lane with
+`DifferentialEnthalpy` economizer enabled. It compares 110 source-order
+Detailed samples, promotes the same 14 outdoor-air/supply/mixed rows plus
+`Zone Ideal Loads Economizer Active Time`, checks that active time is nonzero,
+and verifies outdoor-air mass flow rises above the 0.001 m3/s design minimum
+when outdoor enthalpy is below recirculation enthalpy. Inactive heat-recovery
+rows remain diagnostic-only proof rows in this case.
+
+Active heat recovery, active DCV, active humidity controls,
+heat-recovery saturation-limit branches, and broad IdealLoads outdoor-air
+conformance remain outside this claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 
@@ -365,10 +373,10 @@ claim.
 `ideal_loads_outdoor_air_differential_enthalpy_economizer_diagnostic_001`,
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001`, and
 `ideal_loads_outdoor_air_enthalpy_heat_recovery_diagnostic_001` are diagnostic
-predecessor and remaining proof lanes. The DifferentialDryBulb diagnostic is
-the predecessor for the promoted DDB conformance candidate; DifferentialEnthalpy,
-Sensible heat-recovery, and Enthalpy heat-recovery remain diagnostic-only
-active outdoor-air proof lanes.
+predecessor and remaining proof lanes. The DifferentialDryBulb and
+DifferentialEnthalpy diagnostics are predecessors for the promoted economizer
+conformance candidates; Sensible heat-recovery and Enthalpy heat-recovery
+remain diagnostic-only active outdoor-air proof lanes.
 
 ```text
 comparison_class: diagnostic-only
@@ -426,9 +434,8 @@ branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
 Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and
-Flow/Zone DifferentialDryBulb economizer
+Flow/Zone DifferentialDryBulb/DifferentialEnthalpy economizer
 conformance candidates, active DCV, active humidity controls,
-DifferentialEnthalpy economizer,
 saturation-limit heat-recovery branches, or broad IdealLoads outdoor-air
 conformance.
 
