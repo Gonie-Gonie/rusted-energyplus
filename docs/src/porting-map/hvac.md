@@ -224,9 +224,9 @@ keeps return-node and zone-air-node humidity rows as proof rows only.
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
 18 Detailed series over 96 samples, with 11 conformance rows and 7 diagnostic
-proof rows. `ConstantSupplyHumidityRatio`, Humidistat, outdoor-air humidity,
-finite-limit humidity-control behavior, and broad humidity-control conformance
-remain outside the claim.
+proof rows. `ConstantSupplyHumidityRatio` is covered by separate cooling/heating
+candidates; Humidistat, outdoor-air humidity, finite-limit humidity-control
+behavior, and broad humidity-control conformance remain outside this claim.
 
 ## IdealLoads Constant Supply Humidity Cooling Conformance
 
@@ -241,9 +241,24 @@ meters as proof rows only.
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
 36 Detailed/hourly series with 11 conformance rows and 25 diagnostic proof rows.
-Heating-side `ConstantSupplyHumidityRatio`, Humidistat, outdoor-air humidity,
-finite-limit humidity-control behavior, and broad humidity-control conformance
-remain outside the claim.
+Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
+broad humidity-control conformance remain outside the claim.
+
+## IdealLoads Constant Supply Humidity Heating Conformance
+
+`ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
+promotes the no-OA `ConstantSupplyHumidityRatio` heating lane for declared
+thermostat setpoints, heating total/sensible/latent rate rows, supply-air
+heating report rows, and supply-node temperature/mass-flow/humidity rows. It
+reuses the diagnostic fixture IDF and keeps cooling rows, return-node and
+zone-air-node humidity rows, ReportPurchasedAir energy/fuel rows, and facility
+meters as proof rows only.
+
+The compare run has `comparison_class = "conformance"`, `conformance_claim =
+true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
+36 Detailed/hourly series with 11 conformance rows and 25 diagnostic proof rows.
+Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
+broad humidity-control conformance remain outside the claim.
 
 ## IdealLoads Outdoor-Air Design-Flow Diagnostic
 

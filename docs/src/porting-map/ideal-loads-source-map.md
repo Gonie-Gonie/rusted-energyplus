@@ -177,11 +177,15 @@ The original `ideal_loads_constant_supply_humidity_diagnostic_001` remains
 available as non-claim regression/proof evidence for the broader diagnostic
 output set.
 
-`ideal_loads_constant_supply_humidity_heating_diagnostic_001` adds the
-heating-side no-OA `ConstantSupplyHumidityRatio` lane. It uses the EnergyPlus
+`ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
+promotes the heating-side no-OA `ConstantSupplyHumidityRatio` lane for declared
+thermostat, heating total/sensible/latent rate, supply-air heating report-rate,
+and supply-node temperature/mass-flow/humidity rows. It uses the EnergyPlus
 maximum heating supply humidity ratio in heating mode, keeps the same
 return-node mixed-air and saturation proof path, and matches active latent
-heating report rows with zero tolerance failures.
+heating report rows with zero tolerance failures. The original
+`ideal_loads_constant_supply_humidity_heating_diagnostic_001` remains available
+as non-claim regression/proof evidence for the broader diagnostic output set.
 
 `ideal_loads_humidistat_dehumidification_diagnostic_001` adds a diagnostic-only
 no-OA Humidistat dehumidification lane. The compare path reads EnergyPlus
@@ -199,10 +203,10 @@ uses the maximum heating supply humidity ratio with the same saturation clamp,
 and matches the supply humidity and latent heating report rows with zero
 tolerance failures.
 
-These remain diagnostic-only: heating-side `ConstantSupplyHumidityRatio`,
-Humidistat, outdoor-air humidity control, DifferentialDryBulb economizer
-humidity interactions, heat-recovery humidity interactions, finite-limit
-humidity-control behavior, and broad humidity-control conformance.
+These remain diagnostic-only: Humidistat, outdoor-air humidity control,
+DifferentialDryBulb economizer humidity interactions, heat-recovery humidity
+interactions, finite-limit humidity-control behavior, and broad humidity-control
+conformance.
 
 ## Outdoor-Air Prerequisites
 
@@ -334,8 +338,14 @@ The conformance output surface is:
   `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio` cooling cases
 - `Zone Ideal Loads Supply Air Latent Cooling Rate` for the no-OA
   `ConstantSensibleHeatRatio` and `ConstantSupplyHumidityRatio` cooling cases
+- `Zone Ideal Loads Zone Latent Heating Rate` for the no-OA
+  `ConstantSupplyHumidityRatio` heating case
+- `Zone Ideal Loads Supply Air Sensible Heating Rate` for the no-OA
+  `ConstantSupplyHumidityRatio` heating case
+- `Zone Ideal Loads Supply Air Latent Heating Rate` for the no-OA
+  `ConstantSupplyHumidityRatio` heating case
 - `System Node Humidity Ratio` for the no-OA `ConstantSensibleHeatRatio` and
-  `ConstantSupplyHumidityRatio` cooling supply nodes only
+  `ConstantSupplyHumidityRatio` cooling/heating supply nodes only
 
 The active signed `Zone System Predicted Sensible Load to Setpoint Heat
 Transfer Rate`, non-promoted humidity-ratio rows, zone-air-node proof rows,
@@ -354,8 +364,12 @@ return-node and zone-air-node humidity proof rows remain diagnostic. The no-OA
 `ConstantSupplyHumidityRatio` cooling zone/supply latent and sensible rows plus
 supply-node humidity ratio have narrow conformance evidence in
 `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`; its
-heating, return-node humidity, zone-air humidity, energy/fuel, and meter rows
-remain diagnostic.
+return-node humidity, zone-air humidity, energy/fuel, and meter rows remain
+diagnostic. The no-OA `ConstantSupplyHumidityRatio` heating zone/supply latent
+and sensible rows plus supply-node humidity ratio have narrow conformance
+evidence in `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`;
+its cooling, return-node humidity, zone-air humidity, energy/fuel, and meter
+rows remain diagnostic.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, mixed-air state, inactive
 economizer/heat-recovery outputs, DifferentialDryBulb/DifferentialEnthalpy
@@ -444,10 +458,19 @@ generates the ConstantSupplyHumidityRatio cooling conformance evidence set under
 That run compares 36 Detailed/hourly series. The 11 declared conformance rows
 pass their tolerances, the 25 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA ConstantSupplyHumidityRatio
-cooling claim for declared outputs; heating-side ConstantSupplyHumidityRatio,
-Humidistat, return-node and zone-air-node humidity proof rows, ReportPurchasedAir
-energy/fuel rows, meters, outdoor-air, economizer, heat-recovery, and broad HVAC
-behavior remain outside the claim.
+cooling claim for declared outputs; Humidistat, return-node and zone-air-node
+humidity proof rows, ReportPurchasedAir energy/fuel rows, meters, outdoor-air,
+economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
+
+`scripts/dev.cmd compare-ideal-loads-constant-supply-humidity-heating-conformance-candidate`
+generates the ConstantSupplyHumidityRatio heating conformance evidence set under
+`.runtime/ideal-loads-constant-supply-humidity-heating-conformance/26.1.0/ideal_loads_constant_supply_humidity_heating_conformance_candidate_001/compare/`.
+That run compares 36 Detailed/hourly series. The 11 declared conformance rows
+pass their tolerances, the 25 diagnostic proof rows pass, and
+`tolerance-failures.csv` is empty. This adds only the no-OA ConstantSupplyHumidityRatio
+heating claim for declared outputs; Humidistat, return-node and zone-air-node
+humidity proof rows, ReportPurchasedAir energy/fuel rows, meters, outdoor-air,
+economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 
 ## Claim Requirements
 

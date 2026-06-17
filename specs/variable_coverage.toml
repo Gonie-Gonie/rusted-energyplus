@@ -12,7 +12,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus ConstantSupplyHumidityRatio heating and Humidistat humidification diagnostic evidence; excluded IdealLoads features remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; excluded IdealLoads features remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Sensible Heating Rate"
@@ -20,7 +20,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus ConstantSupplyHumidityRatio heating and Humidistat humidification diagnostic evidence; excluded IdealLoads features remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; excluded IdealLoads features remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Sensible Cooling Rate"
@@ -36,7 +36,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus ConstantSupplyHumidityRatio heating and Humidistat humidification diagnostic evidence; excluded IdealLoads features remain outside the claim."
+support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001 plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; excluded IdealLoads features remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Cooling Rate"
@@ -49,10 +49,10 @@ support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conforman
 [[variable]]
 name = "Zone Ideal Loads Zone Latent Heating Rate"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_constant_shr_diagnostic_001"
-first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio cooling/heating, and Humidistat humidification humidity-control report parity for non-promoted heating/proof rows; ConstantSupplyHumidityRatio cooling has a separate conformance candidate, while moisture-demand conformance and broad humidity-control conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; Humidistat humidification latent heating remains diagnostic-only, and moisture-demand plus broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Latent Cooling Rate"
@@ -65,10 +65,10 @@ support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conf
 [[variable]]
 name = "Zone Ideal Loads Supply Air Sensible Heating Rate"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_constant_shr_diagnostic_001"
-first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio cooling/heating, and Humidistat humidification supply-air sensible heating report row for IdealLoads fixtures; broad humidity-control conformance remains outside the claim."
+status = "conformance"
+first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; Humidistat humidification supply-air sensible heating remains diagnostic-only, and broad humidity-control conformance remains outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Sensible Cooling Rate"
@@ -81,10 +81,10 @@ support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conf
 [[variable]]
 name = "Zone Ideal Loads Supply Air Latent Heating Rate"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_constant_shr_diagnostic_001"
-first_evidence = "ideal_loads_constant_shr_diagnostic_001"
-support_boundary = "Diagnostic-only no-OA ConstantSensibleHeatRatio, ConstantSupplyHumidityRatio cooling/heating, and Humidistat humidification supply-air latent heating report row for IdealLoads fixtures; moisture-demand conformance and broad humidity-control conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001; Humidistat humidification supply-air latent heating remains diagnostic-only, and moisture-demand plus broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Latent Cooling Rate"
@@ -412,7 +412,7 @@ domain = "node"
 status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
-support_boundary = "Tolerance-gated supply-node humidity ratio conformance for the no-OA ConstantSensibleHeatRatio cooling case ideal_loads_constant_shr_conformance_001 and the no-OA ConstantSupplyHumidityRatio cooling candidate ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001. No-OA/no-limit, finite-limit, return-node, zone-air-node, ConstantSupplyHumidityRatio heating, and Humidistat humidity rows remain diagnostic-only, and broad node humidity conformance remains outside the claim."
+support_boundary = "Tolerance-gated supply-node humidity ratio conformance for the no-OA ConstantSensibleHeatRatio cooling case ideal_loads_constant_shr_conformance_001 and the no-OA ConstantSupplyHumidityRatio cooling/heating candidates ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001 and ideal_loads_constant_supply_humidity_heating_conformance_candidate_001. No-OA/no-limit, finite-limit, return-node, zone-air-node, and Humidistat humidity rows remain diagnostic-only, and broad node humidity conformance remains outside the claim."
 
 [[variable]]
 name = "District Heating Water Rate"
@@ -756,7 +756,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit, numeric finite-limit, ConstantSensibleHeatRatio cooling, and ConstantSupplyHumidityRatio cooling cases, plus ConstantSupplyHumidityRatio heating and Humidistat dehumidification/humidification diagnostic evidence; broad HVAC flow balancing and node conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads supply-node mass-flow conformance within the no-OA/no-limit, numeric finite-limit, ConstantSensibleHeatRatio cooling, and ConstantSupplyHumidityRatio cooling/heating cases, plus Humidistat dehumidification/humidification diagnostic evidence; broad HVAC flow balancing and node conformance remain outside the claim."
 
 [[variable]]
 name = "System Node Temperature"
@@ -764,7 +764,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
 first_evidence = "ideal_loads_no_oa_sensible_conformance_001"
-support_boundary = "Tolerance-gated IdealLoads supply-node temperature conformance within the no-OA/no-limit, numeric finite-limit, ConstantSensibleHeatRatio cooling, and ConstantSupplyHumidityRatio cooling cases, with return-node proof rows kept diagnostic; broad HVAC and node conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads supply-node temperature conformance within the no-OA/no-limit, numeric finite-limit, ConstantSensibleHeatRatio cooling, and ConstantSupplyHumidityRatio cooling/heating cases, with return-node proof rows kept diagnostic; broad HVAC and node conformance remain outside the claim."
 
 [[variable]]
 name = "Plant Supply Side Inlet Temperature"
