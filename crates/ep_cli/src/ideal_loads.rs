@@ -25,13 +25,13 @@ use ep_runtime::{
     IDEAL_LOADS_NODE_OUTPUT_STATE_STRUCT, IDEAL_LOADS_NODE_OUTPUT_STORE_TYPE,
     IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE, IDEAL_LOADS_RATE_OUTPUT_SOURCE,
     IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
-    IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult,
-    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsSensibleResult,
-    IdealLoadsUnsupportedFeature, IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
-    OutputSeries, ResultStore, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRegistry,
-    SimPurchasedAirCompatInput, SimPurchasedAirOutdoorAirCompatInput,
-    ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
-    ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+    IdealLoadsFeatureFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
+    IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
+    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
+    IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState, OutputSeries, ResultStore,
+    RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRegistry, SimPurchasedAirCompatInput,
+    SimPurchasedAirOutdoorAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
@@ -248,6 +248,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     selected_purchased_air_branch: &'static str,
     declared_ideal_loads_branch: &'static str,
     inactive_branches: Vec<&'static str>,
+    feature_flags: IdealLoadsFeatureFlags,
     zone_equipment_dispatch: IdealLoadsZoneEquipmentDispatchValidation,
     constant_shr_conformance_claim: bool,
     constant_supply_humidity_cooling_conformance_claim: bool,
@@ -336,6 +337,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
     branch: &'static str,
+    feature_flags: IdealLoadsFeatureFlags,
     zone_equipment_dispatch: IdealLoadsZoneEquipmentDispatchValidation,
     zone_name: String,
     system_name: String,
@@ -1672,6 +1674,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         manifest,
         baseline,
         branch: "outdoor-air-design-flow",
+        feature_flags: IdealLoadsFeatureFlags::from_system(system),
         zone_equipment_dispatch,
         zone_name: zone.name.0.clone(),
         system_name: system.name.0.clone(),
@@ -2654,6 +2657,7 @@ fn build_context<'a>(
     let selected_purchased_air_branch = select_purchased_air_branch(system).label();
     let declared_ideal_loads_branch = declared_ideal_loads_branch(manifest, system);
     let inactive_branches = inactive_ideal_loads_branches(system);
+    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
     let constant_shr_conformance_claim = manifest_allows_constant_shr_conformance(manifest, system);
     let constant_supply_humidity_cooling_conformance_claim =
         manifest_allows_constant_supply_humidity_cooling_conformance(manifest, system);
@@ -2671,6 +2675,7 @@ fn build_context<'a>(
         selected_purchased_air_branch,
         declared_ideal_loads_branch,
         inactive_branches,
+        feature_flags,
         zone_equipment_dispatch,
         constant_shr_conformance_claim,
         constant_supply_humidity_cooling_conformance_claim,
@@ -5061,6 +5066,10 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         context.inactive_branches.join(", ")
     ));
     report.push_str(&format!(
+        "ideal_loads_feature_flags: {}\n",
+        ideal_loads_feature_flags_label(context.feature_flags)
+    ));
+    report.push_str(&format!(
         "source_map_anchor: {}\n",
         IDEAL_LOADS_SOURCE_MAP_ANCHOR
     ));
@@ -5263,6 +5272,10 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
     report.push_str(&format!(
         "inactive_branches: {}\n",
         outdoor_air_inactive_branches(context).join(", ")
+    ));
+    report.push_str(&format!(
+        "ideal_loads_feature_flags: {}\n",
+        ideal_loads_feature_flags_label(context.feature_flags)
     ));
     report.push_str(&format!(
         "source_map_anchor: {}\n",
@@ -5542,6 +5555,10 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
     json.push_str(&format!(
         "  \"inactive_branches\": {},\n",
         json_string_array(&outdoor_air_inactive_branches(context))
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_feature_flags\": {},\n",
+        ideal_loads_feature_flags_json(context.feature_flags)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
@@ -6002,6 +6019,10 @@ fn render_outdoor_air_stage_summary_json(
         json_string_array(&outdoor_air_inactive_branches(context))
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_feature_flags\": {},\n",
+        ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
         json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
     ));
@@ -6363,6 +6384,10 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         json_string_array(&context.inactive_branches)
     ));
     json.push_str(&format!(
+        "  \"ideal_loads_feature_flags\": {},\n",
+        ideal_loads_feature_flags_json(context.feature_flags)
+    ));
+    json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",
         json_string(IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH)
     ));
@@ -6576,6 +6601,49 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str("  ]\n");
     json.push_str("}\n");
     json
+}
+
+fn ideal_loads_feature_flags_label(flags: IdealLoadsFeatureFlags) -> String {
+    format!(
+        concat!(
+            "has_outdoor_air={}, has_economizer={}, has_heat_recovery={}, ",
+            "has_dcv={}, has_humidistat={}, has_constant_shr={}, ",
+            "has_constant_supply_humidity={}, has_flow_limit={}, ",
+            "has_capacity_limit={}, has_autosize={}"
+        ),
+        flags.has_outdoor_air,
+        flags.has_economizer,
+        flags.has_heat_recovery,
+        flags.has_dcv,
+        flags.has_humidistat,
+        flags.has_constant_shr,
+        flags.has_constant_supply_humidity,
+        flags.has_flow_limit,
+        flags.has_capacity_limit,
+        flags.has_autosize
+    )
+}
+
+fn ideal_loads_feature_flags_json(flags: IdealLoadsFeatureFlags) -> String {
+    format!(
+        concat!(
+            "{{\"has_outdoor_air\": {}, \"has_economizer\": {}, ",
+            "\"has_heat_recovery\": {}, \"has_dcv\": {}, ",
+            "\"has_humidistat\": {}, \"has_constant_shr\": {}, ",
+            "\"has_constant_supply_humidity\": {}, \"has_flow_limit\": {}, ",
+            "\"has_capacity_limit\": {}, \"has_autosize\": {}}}"
+        ),
+        flags.has_outdoor_air,
+        flags.has_economizer,
+        flags.has_heat_recovery,
+        flags.has_dcv,
+        flags.has_humidistat,
+        flags.has_constant_shr,
+        flags.has_constant_supply_humidity,
+        flags.has_flow_limit,
+        flags.has_capacity_limit,
+        flags.has_autosize
+    )
 }
 
 fn json_string_array(values: &[&str]) -> String {
@@ -6888,6 +6956,10 @@ fn render_stage_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> Strin
     json.push_str(&format!(
         "  \"inactive_branches\": {},\n",
         json_string_array(&context.inactive_branches)
+    ));
+    json.push_str(&format!(
+        "  \"ideal_loads_feature_flags\": {},\n",
+        ideal_loads_feature_flags_json(context.feature_flags)
     ));
     json.push_str(&format!(
         "  \"zone_equipment_dispatch_path\": {},\n",

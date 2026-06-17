@@ -108,6 +108,19 @@ function Assert-ReportFieldEquals {
     Assert-TextContains -Text $Text -Needle "${Field}: $Expected" -Description $Description
 }
 
+function Format-JsonBoolLabel {
+    param([Parameter(Mandatory = $true)]$Value)
+
+    if ($Value -eq $true) {
+        return "true"
+    }
+    if ($Value -eq $false) {
+        return "false"
+    }
+
+    throw "Expected JSON bool, got $Value"
+}
+
 function Get-RepoPath {
     param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -173,6 +186,19 @@ if ($CaseId -ne "" -and $promotedCases.Count -eq 0) {
 if ($promotedCases.Count -eq 0) {
     throw "No promoted IdealLoads conformance cases found."
 }
+
+$idealLoadsFeatureFlagNames = @(
+    "has_outdoor_air",
+    "has_economizer",
+    "has_heat_recovery",
+    "has_dcv",
+    "has_humidistat",
+    "has_constant_shr",
+    "has_constant_supply_humidity",
+    "has_flow_limit",
+    "has_capacity_limit",
+    "has_autosize"
+)
 
 $devCmd = Join-Path $RepoRoot "scripts\dev.cmd"
 $caseIndex = 0
@@ -257,6 +283,7 @@ foreach ($case in $promotedCases) {
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
+        "ideal_loads_feature_flags",
         "source_order_wrapper",
         "source_map_anchor",
         "node_output_timestamp_alignment",
@@ -324,6 +351,16 @@ foreach ($case in $promotedCases) {
         "ep_runtime::ideal_loads::sim_purchased_air_compat"
     }
     Assert-JsonPropertyEquals -Object $summary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) compare summary"
+    foreach ($flagName in $idealLoadsFeatureFlagNames) {
+        Assert-JsonPropertyExists -Object $summary.ideal_loads_feature_flags -PropertyName $flagName -Description "$($case.Id) compare summary ideal_loads_feature_flags"
+    }
+    $expectedOutdoorAirFeatureFlag = $summary.selected_purchased_air_branch -eq "outdoor_air"
+    if ($summary.ideal_loads_feature_flags.has_outdoor_air -ne $expectedOutdoorAirFeatureFlag) {
+        throw "$($case.Id) compare summary ideal_loads_feature_flags.has_outdoor_air mismatch for selected branch $($summary.selected_purchased_air_branch)"
+    }
+    $expectedFeatureFlagsLabel = (($idealLoadsFeatureFlagNames | ForEach-Object {
+        "$_=$(Format-JsonBoolLabel $summary.ideal_loads_feature_flags.$_)"
+    }) -join ", ")
     $reportFieldExpectations = [ordered]@{
         "case_id" = $case.Id
         "comparison_class" = "conformance"
@@ -339,6 +376,7 @@ foreach ($case in $promotedCases) {
         "selected_purchased_air_branch" = [string]$summary.selected_purchased_air_branch
         "declared_ideal_loads_branch" = [string]$summary.declared_ideal_loads_branch
         "inactive_branches" = (@($summary.inactive_branches) -join ", ")
+        "ideal_loads_feature_flags" = $expectedFeatureFlagsLabel
         "source_map_anchor" = "docs/src/porting-map/ideal-loads-source-map.md"
         "node_output_timestamp_alignment" = "timestamp"
         "node_output_store_type" = "ep_runtime::ResultStore"
@@ -373,6 +411,7 @@ foreach ($case in $promotedCases) {
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",
         "inactive_branches",
+        "ideal_loads_feature_flags",
         "source_order_wrapper",
         "source_map_anchor",
         "node_output_timestamp_alignment",
@@ -443,6 +482,12 @@ foreach ($case in $promotedCases) {
     }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_timestamp_alignment" -Expected "timestamp" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "source_order_wrapper" -Expected $expectedSourceOrderWrapper -Description "$($case.Id) stage summary"
+    foreach ($flagName in $idealLoadsFeatureFlagNames) {
+        Assert-JsonPropertyExists -Object $stageSummary.ideal_loads_feature_flags -PropertyName $flagName -Description "$($case.Id) stage summary ideal_loads_feature_flags"
+        if ($stageSummary.ideal_loads_feature_flags.$flagName -ne $summary.ideal_loads_feature_flags.$flagName) {
+            throw "$($case.Id) stage summary ideal_loads_feature_flags.$flagName mismatch"
+        }
+    }
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_store_type" -Expected "ep_runtime::ResultStore" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_state_struct" -Expected "ep_runtime::node::IdealLoadsSupplyNodeUpdate" -Description "$($case.Id) stage summary"
     Assert-JsonPropertyEquals -Object $stageSummary -PropertyName "node_output_update_source" -Expected "UpdatePurchasedAir" -Description "$($case.Id) stage summary"
