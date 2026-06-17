@@ -78,7 +78,7 @@ energyplus_source = [
   "src/EnergyPlus/OutputProcessor.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::NodeStateStore",
+  "crates/ep_runtime/src/node/state.rs::NodeStateStore",
   "crates/ep_runtime/src/runtime.rs::simulate_ideal_loads_node_state_projection",
 ]
 status = "diagnostic_only"
