@@ -215,15 +215,18 @@ foreach ($case in $promotedCases) {
     $compareRoot = Split-Path -Parent $reportPath
     $summaryPath = Join-Path $compareRoot "compare-summary.json"
     $stageSummaryPath = Join-Path $compareRoot "stage-summary.json"
+    $resultStorePath = Join-Path $compareRoot "rust-result-store.json"
     $toleranceFailuresPath = Join-Path $compareRoot "tolerance-failures.csv"
 
     Assert-FileExists -Path $reportPath -Description "$($case.Id) compare report"
     Assert-FileExists -Path $summaryPath -Description "$($case.Id) compare summary"
     Assert-FileExists -Path $stageSummaryPath -Description "$($case.Id) stage summary"
+    Assert-FileExists -Path $resultStorePath -Description "$($case.Id) Rust result store"
     Assert-FileExists -Path $toleranceFailuresPath -Description "$($case.Id) tolerance failures CSV"
 
     $reportText = Get-Content -Encoding UTF8 -Raw -LiteralPath $reportPath
     $summary = Get-Content -Encoding UTF8 -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+    $resultStore = Get-Content -Encoding UTF8 -Raw -LiteralPath $resultStorePath | ConvertFrom-Json
     if ($summary.case_id -ne $case.Id) {
         throw "$($case.Id) summary case_id mismatch: $($summary.case_id)"
     }
@@ -279,6 +282,22 @@ foreach ($case in $promotedCases) {
     if (($diagnosticOutputRows.Count + $diagnosticMeterRows.Count) -eq 0) {
         throw "$($case.Id) summary must include diagnostic rows separated from conformance rows"
     }
+
+    Assert-JsonPropertyEquals -Object $resultStore -PropertyName "duplicate_guard" -Expected "ep_runtime::ResultStore::diagnostics" -Description "$($case.Id) Rust result store"
+    Assert-JsonPropertyEquals -Object $resultStore -PropertyName "diagnostic_count" -Expected 0 -Description "$($case.Id) Rust result store"
+    Assert-JsonPropertyEquals -Object $resultStore -PropertyName "series_count" -Expected $outputRows.Count -Description "$($case.Id) Rust result store"
+    Assert-JsonPropertyEquals -Object $resultStore.profile -PropertyName "series_count" -Expected $outputRows.Count -Description "$($case.Id) Rust result store profile"
+    Assert-JsonPropertyEquals -Object $resultStore.profile -PropertyName "sample_count" -Expected $resultStore.sample_count -Description "$($case.Id) Rust result store profile"
+    Assert-JsonPropertyEquals -Object $resultStore.profile -PropertyName "empty_series_count" -Expected 0 -Description "$($case.Id) Rust result store profile"
+    $resultStoreSeries = @($resultStore.series)
+    if ($resultStoreSeries.Count -ne $outputRows.Count) {
+        throw "$($case.Id) Rust result store series count mismatch: expected $($outputRows.Count), got $($resultStoreSeries.Count)"
+    }
+    $uniqueHandles = @($resultStoreSeries | ForEach-Object { $_.handle } | Sort-Object -Unique)
+    if ($uniqueHandles.Count -ne $resultStoreSeries.Count) {
+        throw "$($case.Id) Rust result store contains duplicate output handles"
+    }
+
     foreach ($propertyName in @(
         "selected_purchased_air_branch",
         "declared_ideal_loads_branch",

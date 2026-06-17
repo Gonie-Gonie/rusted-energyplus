@@ -5878,6 +5878,8 @@ fn render_outdoor_air_selected_outputs_json(
 fn render_outdoor_air_result_store_json(
     context: &IdealLoadsOutdoorAirDiagnosticContext<'_>,
 ) -> String {
+    let diagnostics = context.result_store.diagnostics();
+    let profile = context.result_store.profile();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -5893,6 +5895,49 @@ fn render_outdoor_air_result_store_json(
         "  \"sample_count\": {},\n",
         context.result_store.sample_count()
     ));
+    json.push_str("  \"profile\": {\n");
+    json.push_str(&format!(
+        "    \"series_count\": {},\n",
+        profile.series_count
+    ));
+    json.push_str(&format!(
+        "    \"sample_count\": {},\n",
+        profile.sample_count
+    ));
+    json.push_str(&format!(
+        "    \"empty_series_count\": {}\n",
+        profile.empty_series_count
+    ));
+    json.push_str("  },\n");
+    json.push_str("  \"duplicate_guard\": \"ep_runtime::ResultStore::diagnostics\",\n");
+    json.push_str(&format!(
+        "  \"diagnostic_count\": {},\n",
+        diagnostics.diagnostics.len()
+    ));
+    json.push_str("  \"diagnostics\": [\n");
+    for (index, diagnostic) in diagnostics.diagnostics.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"code\": {},\n",
+            json_string(&format!("{:?}", diagnostic.code))
+        ));
+        json.push_str(&format!(
+            "      \"message\": {},\n",
+            json_string(&diagnostic.message)
+        ));
+        json.push_str(&format!(
+            "      \"handle\": {}\n",
+            diagnostic
+                .handle
+                .map_or_else(|| "null".to_string(), |handle| handle.0.to_string())
+        ));
+        json.push_str("    }");
+        if index + 1 < diagnostics.diagnostics.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ],\n");
     json.push_str("  \"series\": [\n");
     for (index, series) in context.result_store.series.iter().enumerate() {
         json.push_str("    {\n");
@@ -6831,6 +6876,8 @@ fn render_selected_outputs_json(context: &IdealLoadsDiagnosticContext<'_>) -> St
 }
 
 fn render_result_store_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
+    let diagnostics = context.result_store.diagnostics();
+    let profile = context.result_store.profile();
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -6846,6 +6893,49 @@ fn render_result_store_json(context: &IdealLoadsDiagnosticContext<'_>) -> String
         "  \"sample_count\": {},\n",
         context.result_store.sample_count()
     ));
+    json.push_str("  \"profile\": {\n");
+    json.push_str(&format!(
+        "    \"series_count\": {},\n",
+        profile.series_count
+    ));
+    json.push_str(&format!(
+        "    \"sample_count\": {},\n",
+        profile.sample_count
+    ));
+    json.push_str(&format!(
+        "    \"empty_series_count\": {}\n",
+        profile.empty_series_count
+    ));
+    json.push_str("  },\n");
+    json.push_str("  \"duplicate_guard\": \"ep_runtime::ResultStore::diagnostics\",\n");
+    json.push_str(&format!(
+        "  \"diagnostic_count\": {},\n",
+        diagnostics.diagnostics.len()
+    ));
+    json.push_str("  \"diagnostics\": [\n");
+    for (index, diagnostic) in diagnostics.diagnostics.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"code\": {},\n",
+            json_string(&format!("{:?}", diagnostic.code))
+        ));
+        json.push_str(&format!(
+            "      \"message\": {},\n",
+            json_string(&diagnostic.message)
+        ));
+        json.push_str(&format!(
+            "      \"handle\": {}\n",
+            diagnostic
+                .handle
+                .map_or_else(|| "null".to_string(), |handle| handle.0.to_string())
+        ));
+        json.push_str("    }");
+        if index + 1 < diagnostics.diagnostics.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ],\n");
     json.push_str("  \"series\": [\n");
     for (index, series) in context.result_store.series.iter().enumerate() {
         json.push_str("    {\n");
