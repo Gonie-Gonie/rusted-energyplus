@@ -1,5 +1,6 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
+mod humidity;
 mod limits;
 mod no_oa;
 mod psychrometrics;
