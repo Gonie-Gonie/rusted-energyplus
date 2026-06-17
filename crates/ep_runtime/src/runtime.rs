@@ -11292,10 +11292,10 @@ mod tests {
         InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
         NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
-        OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        QuickOutsideConductionContext, ResultStore, RuntimeError, RuntimeOutputRegistry,
-        SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
-        SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
+        NodeStateStore, OutputSeries, PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole,
+        PlantStateProjectionOptions, QuickOutsideConductionContext, ResultStore, RuntimeError,
+        RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
+        SimulationState, SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
         advance_surface_ctf_histories,
         advance_surface_ctf_histories_with_outside_temperature_override,
@@ -12152,6 +12152,74 @@ mod tests {
         );
 
         Ok(())
+    }
+
+    #[test]
+    fn ideal_loads_node_state_projection_resolves_supply_zone_and_return_node_ids()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = ideal_loads_node_state_model();
+
+        let projection = simulate_ideal_loads_node_state_projection(
+            &model,
+            NodeStateProjectionOptions::hourly_samples(1),
+        )?;
+
+        assert_eq!(
+            projection
+                .summary
+                .nodes
+                .iter()
+                .map(|node| (node.node_id, node.node_name.as_str(), node.role))
+                .collect::<Vec<_>>(),
+            vec![
+                (NodeId(0), "ZONE ONE INLET", NodeStateRole::Supply),
+                (NodeId(1), "ZONE ONE AIR NODE", NodeStateRole::ZoneAir),
+                (NodeId(2), "ZONE ONE RETURN", NodeStateRole::ReturnAir),
+            ]
+        );
+        assert_eq!(
+            projection
+                .state
+                .find_by_key("zone one inlet")
+                .unwrap()
+                .node_id,
+            NodeId(0)
+        );
+        assert_eq!(
+            projection
+                .state
+                .find_by_key("Zone One Air Node")
+                .unwrap()
+                .node_id,
+            NodeId(1)
+        );
+        assert_eq!(
+            projection
+                .state
+                .find_by_id(NodeId(2))
+                .unwrap()
+                .node_name
+                .as_str(),
+            "ZONE ONE RETURN"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn node_state_store_initializes_without_ideal_loads_result_structs() {
+        let mut typed = TypedModel::default();
+        let node_id = push_node(&mut typed, "Standalone Air Node");
+
+        let state = NodeStateStore::from_typed_model(&typed, 21.5, 0.0085);
+
+        assert!(typed.ideal_loads_air_systems.is_empty());
+        assert_eq!(state.len(), 1);
+        let node = state.find_by_key("standalone air node").unwrap();
+        assert_eq!(node.node_id, node_id);
+        assert_eq!(node.temperature_c, 21.5);
+        assert_eq!(node.humidity_ratio, 0.0085);
+        assert_eq!(node.mass_flow_rate_kg_per_s, 0.0);
     }
 
     #[test]
@@ -16442,6 +16510,30 @@ DATA PERIODS
     }
 
     #[test]
+    fn runtime_output_registry_diagnoses_unavailable_system_node_output() {
+        let model = ideal_loads_node_state_model();
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        let resolution = registry.resolve_output_requests(&[RuntimeOutputRequest::hourly(
+            "ZONE ONE INLET",
+            NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+        )]);
+
+        assert!(resolution.resolved.is_empty());
+        assert!(resolution.diagnostics.has_errors());
+        let diagnostic = &resolution.diagnostics.diagnostics[0];
+        assert_eq!(
+            diagnostic.code,
+            RuntimeDiagnosticCode::OutputVariableUnavailable
+        );
+        assert_eq!(diagnostic.key.as_deref(), Some("ZONE ONE INLET"));
+        assert_eq!(
+            diagnostic.variable_name.as_deref(),
+            Some(NODE_STATE_EXCLUDED_SETPOINT_VARIABLE)
+        );
+    }
+
+    #[test]
     fn runtime_meter_registry_diagnoses_unavailable_meter() {
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
@@ -16509,6 +16601,40 @@ DATA PERIODS
             RuntimeDiagnosticCode::DuplicateOutputHandle
         );
         assert_eq!(store.profile().series_count, 2);
+    }
+
+    #[test]
+    fn result_store_diagnostics_report_duplicate_system_node_handles() {
+        let mut store = ResultStore::new();
+        store.add_series(OutputSeries {
+            handle: OutputHandle(7),
+            key: "ZONE ONE INLET".to_string(),
+            variable_name: "System Node Temperature".to_string(),
+            units: "C".to_string(),
+            values: vec![50.0],
+        });
+        store.add_series(OutputSeries {
+            handle: OutputHandle(7),
+            key: "ZONE ONE INLET".to_string(),
+            variable_name: "System Node Humidity Ratio".to_string(),
+            units: "kgWater/kgDryAir".to_string(),
+            values: vec![0.0156],
+        });
+
+        let diagnostics = store.diagnostics();
+
+        assert!(diagnostics.has_errors());
+        let diagnostic = &diagnostics.diagnostics[0];
+        assert_eq!(
+            diagnostic.code,
+            RuntimeDiagnosticCode::DuplicateOutputHandle
+        );
+        assert_eq!(diagnostic.key.as_deref(), Some("ZONE ONE INLET"));
+        assert_eq!(
+            diagnostic.variable_name.as_deref(),
+            Some("System Node Humidity Ratio")
+        );
+        assert_eq!(diagnostic.handle, Some(OutputHandle(7)));
     }
 
     #[test]
