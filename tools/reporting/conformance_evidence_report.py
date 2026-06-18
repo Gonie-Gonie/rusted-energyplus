@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import statistics
 import subprocess
@@ -210,6 +211,22 @@ ONE_ZONE_FOCUS_SERIES = (
     ("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate", "zone aggregate"),
 )
 
+TIME_SERIES_MAX_POINTS = 720
+
+DYNAMIC_TIME_SERIES_TARGETS = (
+    ("ZONE ONE", "Zone Mean Air Temperature", "comfort-facing MAT"),
+    ("ZONE ONE", "Zone Air Heat Balance Surface Convection Rate", "zone/surface exchange"),
+    ("ZN001:FLR001", "Surface Heat Storage Rate", "mass floor storage"),
+    ("ZONE ONE", "Zone Opaque Surface Inside Faces Conduction Rate", "zone conduction aggregate"),
+)
+
+IDEAL_LOADS_TIME_SERIES_TARGETS = (
+    ("ZONE ONE IDEAL LOADS", "Zone Ideal Loads Zone Total Heating Rate", "zone demand"),
+    ("ZONE ONE IDEAL LOADS", "Zone Ideal Loads Zone Total Cooling Rate", "zone demand"),
+    ("ZONE ONE INLET", "System Node Temperature", "supply node"),
+    ("ZONE ONE INLET", "System Node Mass Flow Rate", "supply node"),
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build release numerical conformance evidence.")
@@ -306,6 +323,258 @@ def relative_repo_path(repo_root: Path, path: Path) -> str:
         return path.relative_to(repo_root).as_posix()
     except ValueError:
         return path.as_posix()
+
+
+def normalized_lookup_key(value: str | None) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip()).upper()
+
+
+def parse_eso_variable_field(field: str) -> tuple[str, str | None, str | None]:
+    value, _, frequency = field.partition("!")
+    value = value.strip()
+    units_match = re.search(r"\[([^\]]*)\]\s*$", value)
+    units = units_match.group(1).strip() if units_match else None
+    variable = re.sub(r"\s*\[[^\]]*\]\s*$", "", value).strip()
+    return variable, units, frequency.strip() or None
+
+
+def load_eso_series(
+    eso_path: Path,
+    targets: tuple[tuple[str, str, str], ...],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    target_lookup = {
+        (normalized_lookup_key(key), normalized_lookup_key(variable)): (key, variable, group)
+        for key, variable, group in targets
+    }
+    code_lookup: dict[int, tuple[str, str]] = {}
+    series = {
+        (key, variable): {"key": key, "variable": variable, "group": group, "units": None, "values": []}
+        for key, variable, group in targets
+    }
+    if not eso_path.is_file():
+        return series
+
+    in_dictionary = True
+    with eso_path.open("r", encoding="utf-8", errors="replace") as handle:
+        for raw_line in handle:
+            line = raw_line.strip()
+            if not line:
+                continue
+            if in_dictionary:
+                if line == "End of Data Dictionary":
+                    in_dictionary = False
+                    continue
+                parts = line.split(",")
+                if len(parts) < 4:
+                    continue
+                try:
+                    code_id = int(parts[0])
+                    value_count = int(parts[1])
+                except ValueError:
+                    continue
+                if value_count != 1:
+                    continue
+                key = parts[2].strip()
+                variable, units, _frequency = parse_eso_variable_field(",".join(parts[3:]))
+                target = target_lookup.get((normalized_lookup_key(key), normalized_lookup_key(variable)))
+                if target is None:
+                    continue
+                target_key = (target[0], target[1])
+                code_lookup[code_id] = target_key
+                series[target_key]["units"] = units
+                continue
+
+            code_text, separator, value_text = line.partition(",")
+            if not separator:
+                continue
+            try:
+                code_id = int(code_text)
+            except ValueError:
+                continue
+            target_key = code_lookup.get(code_id)
+            if target_key is None:
+                continue
+            try:
+                series[target_key]["values"].append(float(value_text.strip()))
+            except ValueError:
+                continue
+    return series
+
+
+def load_result_store_series(
+    result_store_path: Path,
+    targets: tuple[tuple[str, str, str], ...],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    target_lookup = {
+        (normalized_lookup_key(key), normalized_lookup_key(variable)): (key, variable, group)
+        for key, variable, group in targets
+    }
+    series = {
+        (key, variable): {"key": key, "variable": variable, "group": group, "units": None, "values": []}
+        for key, variable, group in targets
+    }
+    if not result_store_path.is_file():
+        return series
+    store = json.loads(result_store_path.read_text(encoding="utf-8"))
+    for row in store.get("series", []):
+        key = row.get("key")
+        variable = row.get("variable_name")
+        target = target_lookup.get((normalized_lookup_key(key), normalized_lookup_key(variable)))
+        if target is None:
+            continue
+        target_key = (target[0], target[1])
+        values: list[float] = []
+        for value in row.get("values", []):
+            if value is None:
+                continue
+            values.append(float(value))
+        series[target_key] = {
+            "key": target[0],
+            "variable": target[1],
+            "group": target[2],
+            "units": row.get("units"),
+            "values": values,
+        }
+    return series
+
+
+def downsample_indices(length: int, max_points: int, keep_indices: list[int] | None = None) -> list[int]:
+    if length <= 0:
+        return []
+    keep = {index for index in (keep_indices or []) if 0 <= index < length}
+    if length <= max_points:
+        return list(range(length))
+    step = max(1, math.ceil(length / max_points))
+    indices = set(range(0, length, step))
+    indices.add(length - 1)
+    indices.update(keep)
+    return sorted(indices)
+
+
+def sample_row_numeric(row: dict[str, Any], *names: str) -> float | None:
+    for name in names:
+        value = row.get(name)
+        if value is None:
+            continue
+        return float(value)
+    return None
+
+
+def build_time_series_record(
+    system: str,
+    key: str,
+    variable: str,
+    group: str,
+    units: str | None,
+    oracle_values: list[float],
+    rust_values: list[float],
+    source: str,
+) -> dict[str, Any] | None:
+    sample_count = min(len(oracle_values), len(rust_values))
+    if sample_count <= 0:
+        return None
+
+    oracle = oracle_values[:sample_count]
+    rust = rust_values[:sample_count]
+    deltas = [abs(left - right) for left, right in zip(oracle, rust)]
+    max_delta_index = max(range(sample_count), key=lambda index: deltas[index])
+    rmse = math.sqrt(statistics.fmean(delta * delta for delta in deltas))
+    mean_abs = statistics.fmean(deltas)
+    indices = downsample_indices(sample_count, TIME_SERIES_MAX_POINTS, [0, max_delta_index, sample_count - 1])
+    return {
+        "system": system,
+        "group": group,
+        "key": key,
+        "variable": variable,
+        "units": units or "",
+        "sample_count": sample_count,
+        "plotted_points": len(indices),
+        "source": source,
+        "max_abs_delta": deltas[max_delta_index],
+        "mean_abs_delta": mean_abs,
+        "rmse_delta": rmse,
+        "max_delta_index": max_delta_index,
+        "x": indices,
+        "oracle": [oracle[index] for index in indices],
+        "rust": [rust[index] for index in indices],
+        "delta": [deltas[index] for index in indices],
+    }
+
+
+def build_dynamic_time_series(repo_root: Path, digest_path: Path) -> list[dict[str, Any]]:
+    summary_path = digest_path.parent / "compare-summary.json"
+    if not summary_path.is_file():
+        return []
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    records: list[dict[str, Any]] = []
+    for key, variable, group in DYNAMIC_TIME_SERIES_TARGETS:
+        matched: dict[str, Any] | None = None
+        for series in summary.get("series", []):
+            output = series.get("output") or {}
+            if output.get("key") == key and output.get("variable") == variable:
+                matched = series
+                break
+        if matched is None:
+            continue
+        oracle_values: list[float] = []
+        rust_values: list[float] = []
+        for row in matched.get("sample_rows", []):
+            oracle_value = sample_row_numeric(row, "oracle", "oracle_c", "oracle_w", "oracle_value")
+            rust_value = sample_row_numeric(row, "rust", "rust_c", "rust_w", "rust_value")
+            if oracle_value is None or rust_value is None:
+                continue
+            oracle_values.append(oracle_value)
+            rust_values.append(rust_value)
+        output = matched.get("output") or {}
+        record = build_time_series_record(
+            "1Zone Uncontrolled",
+            key,
+            variable,
+            group,
+            output.get("units"),
+            oracle_values,
+            rust_values,
+            f"{relative_repo_path(repo_root, summary_path)} sample_rows",
+        )
+        if record is not None:
+            records.append(record)
+    return records
+
+
+def build_ideal_loads_time_series(repo_root: Path) -> list[dict[str, Any]]:
+    compare_root = repo_path(
+        repo_root,
+        r".runtime\ideal-loads-no-oa-sensible\26.1.0"
+        r"\ideal_loads_no_oa_sensible_conformance_001\compare",
+    )
+    selected_outputs_path = compare_root / "selected_outputs.json"
+    result_store_path = compare_root / "rust-result-store.json"
+    if not selected_outputs_path.is_file():
+        return []
+    selected_outputs = json.loads(selected_outputs_path.read_text(encoding="utf-8"))
+    eso_path = Path(selected_outputs.get("eso", ""))
+    if not eso_path.is_absolute():
+        eso_path = repo_root / eso_path
+    oracle_series = load_eso_series(eso_path, IDEAL_LOADS_TIME_SERIES_TARGETS)
+    rust_series = load_result_store_series(result_store_path, IDEAL_LOADS_TIME_SERIES_TARGETS)
+
+    records: list[dict[str, Any]] = []
+    for key, variable, group in IDEAL_LOADS_TIME_SERIES_TARGETS:
+        oracle = oracle_series[(key, variable)]
+        rust = rust_series[(key, variable)]
+        record = build_time_series_record(
+            "IdealLoadsAirSystem No-OA",
+            key,
+            variable,
+            group,
+            rust.get("units") or oracle.get("units"),
+            oracle.get("values", []),
+            rust.get("values", []),
+            f"{relative_repo_path(repo_root, eso_path)} + {relative_repo_path(repo_root, result_store_path)}",
+        )
+        if record is not None:
+            records.append(record)
+    return records
 
 
 def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
@@ -878,6 +1147,7 @@ def load_dynamic_diagnostic(
     summary = json.loads(digest_path.read_text(encoding="utf-8"))
     manifest = read_toml(repo_path(repo_root, spec.case_manifest_path))
     series_rows = diagnostic_series(summary)
+    time_series = build_dynamic_time_series(repo_root, digest_path)
     top_bottlenecks = sorted(series_rows, key=lambda row: row["rmse_delta_c"], reverse=True)[:12]
     oracle_end_path = digest_path.parent.parent / "oracle" / "eplusout.end"
     oracle_err_path = digest_path.parent.parent / "oracle" / "eplusout.err"
@@ -928,6 +1198,7 @@ def load_dynamic_diagnostic(
         "top_bottlenecks": top_bottlenecks,
         "rmse_tiers": dynamic_rmse_tiers(series_rows),
         "inside_solve_source_split": build_dynamic_source_split(summary),
+        "time_series": time_series,
         "timing_samples": timing_samples,
         "timing_statistics": summarize_timing_samples(timing_samples),
     }
@@ -951,6 +1222,12 @@ def build_evidence(
         run_dynamic_diagnostic,
         dynamic_timing_repeats,
     )
+    time_series_records: list[dict[str, Any]] = []
+    if dynamic_diagnostic.get("available"):
+        time_series_records.extend(dynamic_diagnostic.get("time_series", []))
+    time_series_records.extend(build_ideal_loads_time_series(repo_root))
+    for index, record in enumerate(time_series_records, start=1):
+        record["id"] = f"TS{index:02d}"
     return {
         "schema_version": 1,
         "version": version,
@@ -991,6 +1268,7 @@ def build_evidence(
         "cases": cases,
         "porting_milestones": load_porting_rows(repo_root),
         "active_dynamic_diagnostic": dynamic_diagnostic,
+        "time_series": time_series_records,
         "artifacts": {
             "html": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.html",
             "pdf": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.pdf",
@@ -1147,6 +1425,55 @@ def build_single_bar_figure(
     return fig
 
 
+def build_time_series_figure(record: dict[str, Any]) -> Any:
+    x_values = [float(value) for value in record.get("x", [])]
+    oracle_values = [float(value) for value in record.get("oracle", [])]
+    rust_values = [float(value) for value in record.get("rust", [])]
+    delta_values = [float(value) for value in record.get("delta", [])]
+    units = record.get("units") or "value"
+    title = f"{record.get('id', '')} {record.get('system', '')}: {variable_label(record.get('variable'))}"
+
+    fig, (value_ax, delta_ax) = plt.subplots(
+        2,
+        1,
+        figsize=(7.2, 4.7),
+        dpi=180,
+        sharex=True,
+        gridspec_kw={"height_ratios": [2.7, 1.0], "hspace": 0.08},
+    )
+    fig.patch.set_facecolor("white")
+    for ax in (value_ax, delta_ax):
+        ax.set_facecolor("white")
+        style_axis(ax)
+
+    value_ax.plot(x_values, oracle_values, color="#1f4e79", linewidth=1.35, label="Oracle")
+    value_ax.plot(x_values, rust_values, color="#d97706", linewidth=1.05, linestyle="--", label="Rust")
+    delta_ax.plot(x_values, delta_values, color="#7c4d9e", linewidth=1.15, label="Abs delta")
+
+    value_ax.set_title(title, loc="left", fontsize=12.5, fontweight="bold", color="#17212b", pad=9)
+    value_ax.set_ylabel(units, fontsize=8.5, color="#5b6775")
+    delta_ax.set_ylabel("abs delta", fontsize=8.5, color="#5b6775")
+    delta_ax.set_xlabel("Sample index", fontsize=8.5, color="#5b6775")
+    value_ax.legend(loc="upper right", fontsize=7.2, frameon=False, ncol=2)
+    delta_ax.legend(loc="upper right", fontsize=7.2, frameon=False)
+    value_ax.text(
+        0.0,
+        1.01,
+        (
+            f"N={record.get('sample_count')} plotted={record.get('plotted_points')} "
+            f"max={compact_number_label(record.get('max_abs_delta'))} "
+            f"RMSE={compact_number_label(record.get('rmse_delta'))}"
+        ),
+        transform=value_ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=7.2,
+        color="#5b6775",
+    )
+    fig.subplots_adjust(left=0.12, right=0.98, top=0.89, bottom=0.12, hspace=0.12)
+    return fig
+
+
 def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     accuracy_rows: list[dict[str, Any]] = []
     series_index = 1
@@ -1205,7 +1532,22 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         "RMSE delta",
         "#7c4d9e",
     )
-    return {"accuracy": accuracy, "timing": timing, "dynamic_bottlenecks": dynamic_bottlenecks}
+    time_series = [
+        {
+            "figure": build_time_series_figure(record),
+            "caption": (
+                f"{record['id']} Oracle/Rust time-series overlay for "
+                f"{record['system']} / {record['key']} / {record['variable']}."
+            ),
+        }
+        for record in evidence.get("time_series", [])
+    ]
+    return {
+        "accuracy": accuracy,
+        "timing": timing,
+        "dynamic_bottlenecks": dynamic_bottlenecks,
+        "time_series": time_series,
+    }
 
 
 def table(
@@ -2151,6 +2493,56 @@ def build_artifact_paths(evidence: dict[str, Any]) -> Table:
     return table(["Artifact", "Path"], rows, "Generated release evidence artifacts.", [1.5, 5.6])
 
 
+def time_series_source_label(source: str | None) -> str:
+    if source is None:
+        return ""
+    if "sample_rows" in source:
+        return "dynamic compare-summary sample_rows"
+    if "+" in source:
+        return "Oracle ESO + Rust result store"
+    return source
+
+
+def build_time_series_catalog_table(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for record in evidence.get("time_series", []):
+        rows.append(
+            [
+                record.get("id"),
+                record.get("system"),
+                key_label(record.get("key")),
+                variable_label(record.get("variable")),
+                record.get("group"),
+                record.get("sample_count"),
+                compact_number_label(record.get("max_abs_delta")),
+                compact_number_label(record.get("rmse_delta")),
+                time_series_source_label(record.get("source")),
+            ]
+        )
+    if not rows:
+        rows.append(["", "missing", "", "", "", "", "", "", "No time-series sample artifacts were found."])
+    return table(
+        ["ID", "System", "Key", "Output", "Group", "N", "Max", "RMSE", "Source"],
+        rows,
+        "Oracle/Rust time-series overlays added to this report.",
+        [0.42, 1.15, 0.72, 1.25, 0.82, 0.42, 0.55, 0.55, 2.4],
+    )
+
+
+def build_time_series_figures(charts: dict[str, Any]) -> list[Figure]:
+    figures: list[Figure] = []
+    for chart in charts.get("time_series", []):
+        figures.append(
+            Figure(
+                chart["figure"],
+                caption=chart["caption"],
+                width=6.4,
+                placement="H",
+            )
+        )
+    return figures
+
+
 def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document:
     version = evidence["version"]
     dynamic = evidence.get("active_dynamic_diagnostic") or {}
@@ -2241,6 +2633,16 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             build_ideal_loads_setup_table(evidence),
             build_ideal_loads_boundary_table(evidence),
         ),
+        Chapter(
+            "Time Series Overlays",
+            Paragraph(
+                "These figures compare Oracle and Rust on the same output sample index. The upper trace overlays the "
+                "reported value and the lower trace shows absolute delta. Dynamic 1Zone rows come from the diagnostic "
+                "compare-summary sample rows; IdealLoads rows pair the Oracle ESO stream with the Rust result store."
+            ),
+            build_time_series_catalog_table(evidence),
+            *build_time_series_figures(charts),
+        ),
         PageBreak(),
         Chapter(
             "Ported Algorithms",
@@ -2314,6 +2716,15 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
     )
 
 
+def close_charts(charts: dict[str, Any]) -> None:
+    for key, chart in charts.items():
+        if key == "time_series":
+            for item in chart:
+                plt.close(item["figure"])
+            continue
+        plt.close(chart)
+
+
 def write_outputs(repo_root: Path, version: str, evidence: dict[str, Any]) -> dict[str, Path]:
     evidence_root = repo_root / ".runtime" / "release-evidence" / f"v{version}"
     evidence_root.mkdir(parents=True, exist_ok=True)
@@ -2328,8 +2739,7 @@ def write_outputs(repo_root: Path, version: str, evidence: dict[str, Any]) -> di
         document.save_html(html_path)
         document.save_pdf(pdf_path)
     finally:
-        for chart in charts.values():
-            plt.close(chart)
+        close_charts(charts)
 
     return {"json": json_path, "html": html_path, "pdf": pdf_path}
 
