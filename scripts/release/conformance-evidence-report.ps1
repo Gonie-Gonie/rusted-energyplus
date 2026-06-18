@@ -2,7 +2,9 @@
 param(
     [string]$Version = "0.32.0",
     [switch]$SkipGateRun,
-    [switch]$RunDynamicDiagnostic
+    [switch]$RunDynamicDiagnostic,
+    [int]$TimingRepeats = 3,
+    [int]$DynamicTimingRepeats = 1
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,7 +26,17 @@ if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
     throw "Missing report generator: $script"
 }
 
-$arguments = @($script, "--repo-root", $RepoRoot, "--version", $Version)
+$arguments = @(
+    $script,
+    "--repo-root",
+    $RepoRoot,
+    "--version",
+    $Version,
+    "--timing-repeats",
+    $TimingRepeats,
+    "--dynamic-timing-repeats",
+    $DynamicTimingRepeats
+)
 if ($SkipGateRun) {
     $arguments += "--skip-gate-run"
 }

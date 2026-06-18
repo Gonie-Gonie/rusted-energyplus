@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import statistics
 import subprocess
 import time
 import tomllib
@@ -34,11 +35,11 @@ from matplotlib.ticker import FuncFormatter
 
 ORACLE_VERSION = "26.1.0"
 CLAIM_BOUNDARY = (
-    "Only declared v0.8/v0.9 no-mass heat-balance including no-mass adiabatic "
-    "surface conduction, v0.22 time/weather/schedule, and v0.26 internal "
-    "convective gain numerical conformance variables, the official dynamic "
-    "compatibility-candidate variables, and the declared no-OA/no-limit "
-    "IdealLoads sensible variables are promoted."
+    "This document compares the official 1ZoneUncontrolled dynamic heat-balance target and the "
+    "ZoneHVAC:IdealLoadsAirSystem no-outdoor-air sensible target. Existing promoted gates remain "
+    "regression locks for declared variables only; broad 1Zone dynamic and broad IdealLoads/HVAC "
+    "compatibility are not claimed until the target output families in this report pass their own "
+    "blocking gates."
 )
 
 CASE_LABELS = {
@@ -216,9 +217,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--version", default="0.32.0")
     parser.add_argument("--skip-gate-run", action="store_true")
     parser.add_argument(
+        "--timing-repeats",
+        type=int,
+        default=3,
+        help="Number of repeated promoted-gate timing runs when gates are refreshed.",
+    )
+    parser.add_argument(
         "--run-dynamic-diagnostic",
         action="store_true",
         help="Refresh the active official 1Zone dynamic diagnostic lane before building the report.",
+    )
+    parser.add_argument(
+        "--dynamic-timing-repeats",
+        type=int,
+        default=1,
+        help="Number of repeated official 1Zone diagnostic timing runs when that lane is refreshed.",
     )
     return parser.parse_args()
 
@@ -286,6 +299,29 @@ def status_label(status: str | None) -> str:
 
 def repo_path(repo_root: Path, relative: str) -> Path:
     return repo_root / Path(relative.replace("\\", "/"))
+
+
+def relative_repo_path(repo_root: Path, path: Path) -> str:
+    try:
+        return path.relative_to(repo_root).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
+    requested = repo_path(repo_root, spec.digest_path)
+    if requested.is_file():
+        return requested
+    candidates = sorted(
+        (
+            path
+            for path in (repo_root / ".runtime").glob("**/official_1zone_uncontrolled_dynamic_*/compare/compare-digest.json")
+            if path.is_file()
+        ),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    return candidates[0] if candidates else requested
 
 
 def read_toml(path: Path) -> dict[str, Any]:
@@ -366,6 +402,59 @@ def timing_report(
     }
 
 
+def timing_sample(run_index: int, timing: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "run": run_index,
+        "release_gate_wall_seconds": timing.get("release_gate_wall_seconds"),
+        "ep_cli_total_wall_seconds": timing.get("ep_cli_total_wall_seconds"),
+        "energyplus_oracle_wall_seconds": timing.get("energyplus_oracle_wall_seconds"),
+        "rust_compare_report_wall_seconds": timing.get("rust_compare_report_wall_seconds"),
+        "release_gate_overhead_seconds": timing.get("release_gate_overhead_seconds"),
+        "energyplus_reported_elapsed_seconds": timing.get("energyplus_reported_elapsed_seconds"),
+        "phases": timing.get("phases", []),
+    }
+
+
+def numeric_values(values: list[Any]) -> list[float]:
+    return [float(value) for value in values if value is not None]
+
+
+def timing_stat(values: list[Any]) -> dict[str, Any]:
+    samples = numeric_values(values)
+    if not samples:
+        return {"count": 0, "min": None, "median": None, "mean": None, "max": None, "stdev": None}
+    return {
+        "count": len(samples),
+        "min": min(samples),
+        "median": statistics.median(samples),
+        "mean": statistics.fmean(samples),
+        "max": max(samples),
+        "stdev": statistics.stdev(samples) if len(samples) > 1 else 0.0,
+    }
+
+
+def summarize_timing_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
+    fields = [
+        "release_gate_wall_seconds",
+        "ep_cli_total_wall_seconds",
+        "energyplus_oracle_wall_seconds",
+        "rust_compare_report_wall_seconds",
+        "rust_report_residual_seconds",
+        "release_gate_overhead_seconds",
+        "energyplus_reported_elapsed_seconds",
+    ]
+    summary = {field: timing_stat([sample.get(field) for sample in samples]) for field in fields}
+    phase_samples: dict[str, list[float]] = {}
+    for sample in samples:
+        for phase in sample.get("phases", []):
+            name = phase.get("name")
+            wall = phase.get("wall_seconds")
+            if name is not None and wall is not None:
+                phase_samples.setdefault(str(name), []).append(float(wall))
+    summary["phases"] = {name: timing_stat(values) for name, values in sorted(phase_samples.items())}
+    return summary
+
+
 def error_summary(path: Path) -> dict[str, int | None]:
     if not path.is_file():
         return {"warnings": None, "severes": None}
@@ -383,22 +472,27 @@ def tolerance_for_class(summary: dict[str, Any], output_class: str) -> float | N
     return None
 
 
-def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
+def normalized_series_rows(summary: dict[str, Any], level_filter: str | None = None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for series in summary.get("series", []):
         if "output" in series:
             output = series["output"]
-            tolerance = tolerance_for_class(summary, output["class"])
+            level = series.get("level", "conformance")
+            if level_filter is not None and level != level_filter:
+                continue
+            tolerance = tolerance_for_class(summary, output.get("class", ""))
             first_delta = series.get("first_delta_sample") or {}
             max_delta = series.get("max_delta_sample") or {}
             rows.append(
                 {
                     "key": output.get("key"),
                     "variable": output.get("variable"),
+                    "domain": output.get("domain"),
                     "class": output.get("class"),
                     "frequency": output.get("frequency"),
                     "source": output.get("source"),
-                    "level": "conformance",
+                    "level": level,
+                    "units": output.get("units"),
                     "samples": int(series.get("samples", 0)),
                     "status": series.get("status"),
                     "max_abs_delta_c": float(series.get("max_abs_delta_c", 0.0)),
@@ -413,20 +507,23 @@ def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
             )
             continue
 
-        if series.get("level") != "conformance":
+        level = series.get("level", "conformance")
+        if level_filter is not None and level != level_filter:
             continue
         rows.append(
             {
                 "key": series.get("key"),
                 "variable": series.get("variable"),
+                "domain": series.get("domain"),
                 "class": series.get("class"),
                 "frequency": series.get("frequency"),
                 "source": series.get("source"),
-                "level": series.get("level"),
+                "level": level,
+                "units": series.get("units"),
                 "samples": int(series.get("compared_samples", series.get("observed_samples", 0))),
                 "status": series.get("status"),
                 "max_abs_delta_c": float(series.get("max_abs_delta", 0.0)),
-                "mean_abs_delta_c": 0.0,
+                "mean_abs_delta_c": float(series.get("mean_abs_delta", 0.0)),
                 "rmse_delta_c": float(series.get("rmse_delta", 0.0)),
                 "max_rel_delta": float(series.get("max_rel_delta", 0.0)),
                 "tolerance_max_abs_c": float(series.get("max_abs_tolerance", 0.0)),
@@ -435,27 +532,77 @@ def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
                 "max_delta_index": None,
             }
         )
+
+    for meter in summary.get("meter_series", []):
+        level = meter.get("level", "diagnostic")
+        if level_filter is not None and level != level_filter:
+            continue
+        rows.append(
+            {
+                "key": meter.get("name"),
+                "variable": meter.get("name"),
+                "domain": meter.get("domain", "meter"),
+                "class": "meter",
+                "frequency": meter.get("frequency"),
+                "source": meter.get("source"),
+                "level": level,
+                "units": meter.get("units"),
+                "samples": int(meter.get("compared_samples", meter.get("observed_samples", 0))),
+                "status": meter.get("status"),
+                "max_abs_delta_c": float(meter.get("max_abs_delta", 0.0)),
+                "mean_abs_delta_c": float(meter.get("mean_abs_delta", 0.0)),
+                "rmse_delta_c": float(meter.get("rmse_delta", 0.0)),
+                "max_rel_delta": float(meter.get("max_rel_delta", 0.0)),
+                "tolerance_max_abs_c": float(meter.get("max_abs_tolerance", 0.0)),
+                "tolerance_max_rmse_c": float(meter.get("max_rmse_tolerance", 0.0)),
+                "first_delta_index": (meter.get("first_divergence") or {}).get("index"),
+                "max_delta_index": None,
+            }
+        )
     return rows
 
 
-def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> dict[str, Any]:
-    gate_elapsed = None if skip_gate_run else run_dev_command(repo_root, spec.command)
+def promoted_series(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    return normalized_series_rows(summary, "conformance")
+
+
+def load_case_report(
+    repo_root: Path,
+    spec: CaseSpec,
+    skip_gate_run: bool,
+    timing_repeats: int,
+) -> dict[str, Any]:
     summary_path = repo_path(repo_root, spec.summary_path)
-    if not summary_path.is_file():
+    if skip_gate_run and not summary_path.is_file():
         raise FileNotFoundError(f"Missing conformance summary: {summary_path}")
 
-    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    timing_samples: list[dict[str, Any]] = []
+    gate_elapsed = None
+    summary: dict[str, Any] = {}
+    energyplus_elapsed = None
+    if summary_path.is_file():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        energyplus_elapsed = elapsed_seconds(repo_path(repo_root, spec.oracle_end_path))
+    if not skip_gate_run:
+        for run_index in range(1, max(timing_repeats, 1) + 1):
+            gate_elapsed = run_dev_command(repo_root, spec.command)
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            energyplus_elapsed = elapsed_seconds(repo_path(repo_root, spec.oracle_end_path))
+            timing_samples.append(timing_sample(run_index, timing_report(summary, gate_elapsed, energyplus_elapsed)))
+    if not summary:
+        raise FileNotFoundError(f"Missing conformance summary: {summary_path}")
+
     if summary.get("comparison_class") != "conformance" or summary.get("conformance_claim") is not True:
         raise ValueError(f"Summary is not a promoted conformance claim: {summary_path}")
     if summary.get("status") != "pass":
         raise ValueError(f"Conformance summary did not pass: {summary.get('case_id')}")
 
     series_reports = promoted_series(summary)
+    all_series_reports = normalized_series_rows(summary)
     if not series_reports:
         raise ValueError(f"Conformance summary has no promoted conformance series: {summary_path}")
 
     err = error_summary(repo_path(repo_root, spec.oracle_err_path))
-    energyplus_elapsed = elapsed_seconds(repo_path(repo_root, spec.oracle_end_path))
     timing = timing_report(summary, gate_elapsed, energyplus_elapsed)
     max_abs_delta = max((series["max_abs_delta_c"] for series in series_reports), default=0.0)
     rmse_delta = max((series["rmse_delta_c"] for series in series_reports), default=0.0)
@@ -491,6 +638,28 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
         "source_summary_json": spec.summary_path.replace("\\", "/"),
         "source_report_md": (summary.get("report_contract") or {}).get("path"),
         "series": series_reports,
+        "all_series": all_series_reports,
+        "diagnostic_series": [series for series in all_series_reports if series.get("level") != "conformance"],
+        "timing_samples": timing_samples,
+        "timing_statistics": summarize_timing_samples(timing_samples),
+        "raw_summary": {
+            key: summary.get(key)
+            for key in [
+                "claim_boundary",
+                "selected_purchased_air_branch",
+                "declared_ideal_loads_branch",
+                "inactive_branches",
+                "ideal_loads_feature_flags",
+                "zone_demand_fixture_mode",
+                "zone_demand_mismatch_classification",
+                "zone_equipment_dispatch_path",
+                "zone_equipment_dispatch_validation",
+                "energy_source",
+                "fuel_energy_rate_source",
+                "meter_source",
+            ]
+            if key in summary
+        },
     }
 
 
@@ -673,26 +842,51 @@ def load_dynamic_diagnostic(
     repo_root: Path,
     spec: DynamicDiagnosticSpec,
     run_dynamic_diagnostic: bool,
+    dynamic_timing_repeats: int,
 ) -> dict[str, Any]:
-    gate_elapsed = run_dev_command(repo_root, spec.command) if run_dynamic_diagnostic else None
-    digest_path = repo_path(repo_root, spec.digest_path)
+    timing_samples: list[dict[str, Any]] = []
+    gate_elapsed = None
+    if run_dynamic_diagnostic:
+        for run_index in range(1, max(dynamic_timing_repeats, 1) + 1):
+            gate_elapsed = run_dev_command(repo_root, spec.command)
+            digest_path_for_sample = resolve_dynamic_digest_path(repo_root, spec)
+            oracle_end_for_sample = digest_path_for_sample.parent.parent / "oracle" / "eplusout.end"
+            energyplus_elapsed_for_sample = elapsed_seconds(oracle_end_for_sample)
+            rust_residual = None
+            if gate_elapsed is not None and energyplus_elapsed_for_sample is not None:
+                rust_residual = max(float(gate_elapsed) - float(energyplus_elapsed_for_sample), 0.0)
+            timing_samples.append(
+                {
+                    "run": run_index,
+                    "release_gate_wall_seconds": gate_elapsed,
+                    "energyplus_reported_elapsed_seconds": energyplus_elapsed_for_sample,
+                    "rust_report_residual_seconds": rust_residual,
+                }
+            )
+
+    digest_path = resolve_dynamic_digest_path(repo_root, spec)
     if not digest_path.is_file():
         digest_label = spec.digest_path.replace("\\", "/")
         return {
             "available": False,
             "reason": f"missing digest: {digest_label}",
             "command": spec.command,
+            "timing_samples": timing_samples,
+            "timing_statistics": summarize_timing_samples(timing_samples),
         }
 
     summary = json.loads(digest_path.read_text(encoding="utf-8"))
     manifest = read_toml(repo_path(repo_root, spec.case_manifest_path))
     series_rows = diagnostic_series(summary)
     top_bottlenecks = sorted(series_rows, key=lambda row: row["rmse_delta_c"], reverse=True)[:12]
-    err = error_summary(repo_path(repo_root, spec.oracle_err_path))
+    oracle_end_path = digest_path.parent.parent / "oracle" / "eplusout.end"
+    oracle_err_path = digest_path.parent.parent / "oracle" / "eplusout.err"
+    err = error_summary(oracle_err_path)
     warmup = summary.get("heat_balance_warmup") or {}
     total_timesteps = int(summary.get("heat_balance_timesteps", 0))
     warmup_timesteps = int(warmup.get("timestep_count", 0))
     run_period_timesteps = int(summary.get("heat_balance_run_period_timesteps", 0))
+    energyplus_elapsed = elapsed_seconds(oracle_end_path)
     return {
         "available": True,
         "case_id": summary.get("case_id"),
@@ -723,17 +917,19 @@ def load_dynamic_diagnostic(
         "warmup_timestep_share": (warmup_timesteps / total_timesteps) if total_timesteps else None,
         "run_period_timestep_share": (run_period_timesteps / total_timesteps) if total_timesteps else None,
         "gate_elapsed_seconds": gate_elapsed,
-        "energyplus_elapsed_seconds": elapsed_seconds(repo_path(repo_root, spec.oracle_end_path)),
+        "energyplus_elapsed_seconds": energyplus_elapsed,
         "energyplus_warnings": err["warnings"],
         "energyplus_severes": err["severes"],
         "gate_script": spec.command,
-        "source_digest_json": spec.digest_path.replace("\\", "/"),
+        "source_digest_json": relative_repo_path(repo_root, digest_path),
         "source_report_md": (summary.get("report_contract") or {}).get("path"),
         "series": series_rows,
         "focus_series": build_dynamic_focus_rows(series_rows),
         "top_bottlenecks": top_bottlenecks,
         "rmse_tiers": dynamic_rmse_tiers(series_rows),
         "inside_solve_source_split": build_dynamic_source_split(summary),
+        "timing_samples": timing_samples,
+        "timing_statistics": summarize_timing_samples(timing_samples),
     }
 
 
@@ -742,18 +938,27 @@ def build_evidence(
     version: str,
     skip_gate_run: bool,
     run_dynamic_diagnostic: bool,
+    timing_repeats: int,
+    dynamic_timing_repeats: int,
 ) -> dict[str, Any]:
-    cases = [load_case_report(repo_root, spec, skip_gate_run) for spec in CASE_SPECS]
+    cases = [load_case_report(repo_root, spec, skip_gate_run, timing_repeats) for spec in CASE_SPECS]
     all_series = [series for case in cases for series in case["series"]]
     failed_cases = [case for case in cases if case["status"] != "pass"]
     timing_cases = [case["timing"] for case in cases]
-    dynamic_diagnostic = load_dynamic_diagnostic(repo_root, DYNAMIC_DIAGNOSTIC_SPEC, run_dynamic_diagnostic)
+    dynamic_diagnostic = load_dynamic_diagnostic(
+        repo_root,
+        DYNAMIC_DIAGNOSTIC_SPEC,
+        run_dynamic_diagnostic,
+        dynamic_timing_repeats,
+    )
     return {
         "schema_version": 1,
         "version": version,
         "oracle_version": ORACLE_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "claim_boundary": CLAIM_BOUNDARY,
+        "timing_repeats": 0 if skip_gate_run else max(timing_repeats, 1),
+        "dynamic_timing_repeats": 0 if not run_dynamic_diagnostic else max(dynamic_timing_repeats, 1),
         "aggregate": {
             "status": "fail" if failed_cases else "pass",
             "case_count": len(cases),
@@ -1520,6 +1725,368 @@ def build_dynamic_timing_table(dynamic: dict[str, Any]) -> Table:
     )
 
 
+def ideal_loads_case(evidence: dict[str, Any]) -> dict[str, Any] | None:
+    for case in evidence.get("cases", []):
+        if case.get("case_id") == "ideal_loads_no_oa_sensible_conformance_001":
+            return case
+    return None
+
+
+def mean_stat_label(stats: dict[str, Any], field: str, digits: int = 3) -> str:
+    value = (stats.get(field) or {}).get("mean")
+    return "n/a" if value is None else number_label(value, digits, "s")
+
+
+def spread_stat_label(stats: dict[str, Any], field: str) -> str:
+    row = stats.get(field) or {}
+    if row.get("count", 0) == 0 or row.get("min") is None or row.get("max") is None:
+        return "n/a"
+    return f"{number_label(row['min'], 3, 's')} - {number_label(row['max'], 3, 's')}"
+
+
+def build_two_case_scope_table(evidence: dict[str, Any]) -> Table:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    ideal = ideal_loads_case(evidence) or {}
+    dynamic_status = "missing"
+    if dynamic.get("available"):
+        dynamic_status = "candidate pass" if dynamic.get("status") == "pass" else str(dynamic.get("status"))
+    rows = [
+        [
+            "1Zone Uncontrolled",
+            dynamic.get("case_id", "official_1zone_uncontrolled_dynamic_diagnostic_001"),
+            "official EnergyPlus ExampleFile",
+            dynamic_status,
+            dynamic.get("series_count", "missing"),
+            dynamic.get("samples", "missing"),
+            "Zone/surface heat balance, CTF history, convection, radiation, solar, weather coupling",
+        ],
+        [
+            "IdealLoadsAirSystem No OA",
+            ideal.get("case_id", "ideal_loads_no_oa_sensible_conformance_001"),
+            "single-zone IdealLoads fixture",
+            ideal.get("status", "missing"),
+            ideal.get("reported_series_count", "missing"),
+            ideal.get("samples", "missing"),
+            "PurchasedAir no-outdoor-air sensible branch, demand input, supply node, report outputs",
+        ],
+    ]
+    return table(
+        ["System", "Case", "Source", "Status", "Series", "Samples", "Primary comparison boundary"],
+        rows,
+        "Two system-level comparisons used as the main conformance evidence boundary.",
+        [1.15, 1.72, 1.15, 0.72, 0.48, 0.55, 2.1],
+    )
+
+
+def build_ideal_loads_setup_table(evidence: dict[str, Any]) -> Table:
+    case = ideal_loads_case(evidence)
+    if case is None:
+        return table(["Field", "Value"], [["IdealLoads case", "missing"]], "IdealLoadsAirSystem setup.", [1.8, 5.2])
+    raw = case.get("raw_summary") or {}
+    flags = raw.get("ideal_loads_feature_flags") or {}
+    active_flags = [name for name, active in flags.items() if active]
+    inactive = raw.get("inactive_branches") or []
+    rows = [
+        ["Case", case["case_id"]],
+        ["Claim", "limited no-OA/no-limit sensible declared outputs"],
+        ["Selected branch", raw.get("selected_purchased_air_branch", "n/a")],
+        ["Declared branch", raw.get("declared_ideal_loads_branch", "n/a")],
+        ["Active feature flags", list_label(active_flags, 8)],
+        ["Inactive branches", list_label(inactive, 8)],
+        ["Zone demand source", raw.get("zone_demand_fixture_mode", "n/a")],
+        ["Dispatch validation", raw.get("zone_equipment_dispatch_validation", "n/a")],
+        ["Dispatch path", raw.get("zone_equipment_dispatch_path", "n/a")],
+    ]
+    return table(["Field", "Value"], rows, "IdealLoadsAirSystem No-OA comparison setup.", [1.55, 5.55])
+
+
+def build_ported_algorithm_table(evidence: dict[str, Any]) -> Table:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    ideal = ideal_loads_case(evidence) or {}
+    rows = [
+        [
+            "Both",
+            "Time/weather/schedule ingestion",
+            "ported for declared fields",
+            "Schedule value and outdoor dry-bulb gates pass exactly.",
+            "Controls 1Zone weather boundary and IdealLoads availability/setpoint schedules.",
+        ],
+        [
+            "1Zone",
+            "Zone air heat balance scaffold",
+            "limited + diagnostic",
+            dynamic_focus_metric_label(dynamic, "ZONE ONE", "Zone Mean Air Temperature"),
+            "Directly affects Zone Mean Air Temperature and comfort/load-facing outputs.",
+        ],
+        [
+            "1Zone",
+            "Opaque surface state and CTF plumbing",
+            "diagnostic candidate",
+            dynamic_focus_metric_label(dynamic, "ZN001:FLR001", "Surface Heat Storage Rate"),
+            "Controls surface temperatures, storage, conduction, and the zone convection term.",
+        ],
+        [
+            "IdealLoads",
+            "PurchasedAir no-OA sensible branch",
+            "promoted for this fixture",
+            f"{ideal.get('series_count', 'n/a')} conformance rows; max abs {compact_number_label(ideal.get('max_abs_delta_c'))}.",
+            "Controls total/sensible/supply-air heating and cooling rates when OA, limits, and humidity branches are inactive.",
+        ],
+        [
+            "IdealLoads",
+            "Zone equipment dispatch and typed IDs",
+            "validated for single equipment",
+            (ideal.get("raw_summary") or {}).get("zone_equipment_dispatch_validation", "n/a"),
+            "Keeps report path close to EnergyPlus ZoneEquipmentManager/PurchasedAirManager order.",
+        ],
+        [
+            "IdealLoads",
+            "Supply node update and ResultStore output handles",
+            "promoted for selected rows",
+            "System Node Temperature and Mass Flow Rate rows pass in no-OA fixture.",
+            "Directly affects common HVAC node outputs requested by users and downstream loop coupling.",
+        ],
+    ]
+    return table(
+        ["System", "Algorithm", "Porting state", "Current evidence", "Why it matters"],
+        rows,
+        "Algorithms already ported or source-mapped enough to support the two comparison systems.",
+        [0.72, 1.45, 0.95, 1.75, 2.15],
+    )
+
+
+def build_unported_impact_table(_evidence: dict[str, Any]) -> Table:
+    rows = [
+        [
+            "1Zone",
+            "Massive-wall CTF history closure",
+            "not promoted",
+            "Surface Heat Storage Rate, inside/outside conduction, Zone Opaque Surface Inside Faces Conduction Rate",
+            "Can produce MAT drift even when no-mass gates are exact; errors accumulate through thermal storage/history.",
+        ],
+        [
+            "1Zone",
+            "Surface convection live coupling",
+            "diagnostic",
+            "Zone Air Heat Balance Surface Convection Rate, face temperatures, MAT",
+            "Affects the dominant zone-air exchange term; mismatch can move comfort temperature and surface heat flows.",
+        ],
+        [
+            "1Zone",
+            "Exterior radiation/solar/weather boundary closure",
+            "diagnostic",
+            "Outside face radiation, solar gain, outside convection, roof/wall temperatures",
+            "Changes surface boundary heat flow and storage, especially for roof and exterior walls.",
+        ],
+        [
+            "1Zone",
+            "Full warmup/convergence parity",
+            "diagnostic",
+            "All dynamic run-period outputs",
+            "Different initial histories can look like algorithm error in early timesteps and bias storage terms.",
+        ],
+        [
+            "IdealLoads",
+            "Outdoor air branch beyond this No-OA fixture",
+            "out of this case",
+            "OA mass flow, OA sensible/latent/total rates, mixed air node state, economizer, heat recovery",
+            "No-OA removes a major source of load and psychrometric branching; OA-active behavior must be judged separately.",
+        ],
+        [
+            "IdealLoads",
+            "Broad humidity and moisture-demand coupling",
+            "partly separate candidate evidence",
+            "Latent heating/cooling rates, supply humidity ratio, zone-air humidity, humidistat outputs",
+            "Can change sensible/total split and node humidity even when dry no-OA sensible rates pass.",
+        ],
+        [
+            "IdealLoads",
+            "Meters, fuel efficiency, adaptive system timestep, loop integration",
+            "outside this no-OA case",
+            "Fuel energy, facility meters, AirLoopHVAC/PlantLoop-facing outputs",
+            "User billing/energy outputs and loop interactions need separate gates before broad HVAC compatibility is claimed.",
+        ],
+    ]
+    return table(
+        ["System", "Gap", "State", "Affected user outputs", "Qualitative impact"],
+        rows,
+        "Algorithms and coupling paths not yet promoted, with expected impact on the two systems.",
+        [0.65, 1.2, 0.82, 2.0, 2.45],
+    )
+
+
+def find_case_series(case: dict[str, Any] | None, variable: str, key: str | None = None) -> dict[str, Any] | None:
+    if case is None:
+        return None
+    for row in case.get("all_series", []):
+        if row.get("variable") == variable and (key is None or row.get("key") == key):
+            return row
+    return None
+
+
+def target_metric_label(row: dict[str, Any] | None) -> str:
+    if row is None:
+        return "not in current case"
+    return f"{status_label(row.get('status'))}; max {compact_number_label(row.get('max_abs_delta_c'))}; RMSE {compact_number_label(row.get('rmse_delta_c'))}"
+
+
+def build_user_output_target_table(evidence: dict[str, Any]) -> Table:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    ideal = ideal_loads_case(evidence)
+    dynamic_series = dynamic.get("series", []) if dynamic.get("available") else []
+    rows: list[list[Any]] = []
+    dynamic_targets = [
+        ("1Zone", "Zone Mean Air Temperature", "comfort/control state", "Match hourly MAT after storage, convection, and weather coupling close."),
+        ("1Zone", "Surface Inside Face Temperature", "surface comfort/radiant proxy", "Match mass-surface history and inside boundary solve."),
+        ("1Zone", "Surface Heat Storage Rate", "thermal mass", "Close CTF storage/history before promoting massive-wall dynamic conformance."),
+        ("1Zone", "Zone Air Heat Balance Surface Convection Rate", "zone heat balance", "Close surface convection coupling because it feeds MAT directly."),
+        ("1Zone", "Surface Outside Face Solar Radiation Heat Gain Rate", "solar boundary", "Keep solar/radiation diagnostics visible so MAT parity is not accidental."),
+    ]
+    for system, variable, output_class, target in dynamic_targets:
+        row = next((item for item in dynamic_series if item.get("variable") == variable), None)
+        rows.append([system, variable_label(variable), output_class, target_metric_label(row), target])
+
+    ideal_targets = [
+        ("Zone Ideal Loads Zone Total Heating Rate", "load rate", "Promote across OA, limits, humidity, and dispatch combinations, not only no-OA sensible."),
+        ("Zone Ideal Loads Zone Total Cooling Rate", "load rate", "Promote across OA, economizer, heat recovery, and latent branches."),
+        ("Zone Ideal Loads Supply Air Total Heating Rate", "supply rate", "Keep source-order ReportPurchasedAir rate semantics and supply-node update aligned."),
+        ("System Node Temperature", "node output", "Preserve supply-node state when OA/mixed-air and humidity paths activate."),
+        ("System Node Mass Flow Rate", "node output", "Preserve flow limiting and standard-density assumptions across finite-limit/OA branches."),
+        ("Zone Ideal Loads Supply Air Total Heating Energy", "energy output", "Rate-to-timestep energy must stay aligned with EnergyPlus reporting semantics."),
+        ("DistrictHeatingWater:Facility", "meter", "Facility meters need separate aggregation and frequency gates before broad energy claim."),
+        ("Zone Ideal Loads Outdoor Air Mass Flow Rate", "outdoor air", "No-OA fixture deliberately excludes this; OA-active cases change load and node state materially."),
+    ]
+    for variable, output_class, target in ideal_targets:
+        row = find_case_series(ideal, variable)
+        rows.append(["IdealLoads", variable_label(variable), output_class, target_metric_label(row), target])
+
+    return table(
+        ["System", "User-facing output", "Class", "Current evidence", "What still has to be proven"],
+        rows,
+        "Conformance targets organized around outputs users are likely to request, not just rows already matched.",
+        [0.72, 1.75, 0.8, 1.25, 2.55],
+    )
+
+
+def build_ideal_loads_boundary_table(evidence: dict[str, Any]) -> Table:
+    case = ideal_loads_case(evidence)
+    if case is None:
+        return table(["Boundary", "State", "Impact"], [["IdealLoads", "missing", "missing"]], "IdealLoads boundary.", [1.4, 1.2, 4.4])
+    rows = [
+        [
+            "No outdoor air",
+            "active restriction",
+            "Removes OA mass-flow, mixed-air, economizer, heat-recovery, and OA latent/sensible report-rate branches from this proof.",
+        ],
+        [
+            "No flow/capacity limit",
+            "active restriction",
+            "The no-OA case proves the unconstrained branch; finite-limit branches need their own gates because mass flow and supply temperature can change.",
+        ],
+        [
+            "Sensible only",
+            "active restriction",
+            "Latent and humidity-control outputs are not proved by this case unless explicitly included by a separate humidity branch gate.",
+        ],
+        [
+            "Oracle demand input",
+            (case.get("raw_summary") or {}).get("zone_demand_fixture_mode", "n/a"),
+            "This isolates PurchasedAir parity; upstream zone heat-balance demand mismatch is classified separately.",
+        ],
+        [
+            "Energy/fuel/meter rows",
+            "diagnostic in this no-OA report",
+            "Useful as evidence, but broad billing/energy conformance needs dedicated frequency and aggregation gates.",
+        ],
+    ]
+    return table(
+        ["Boundary", "State", "Why this changes conformance"],
+        rows,
+        "Why the IdealLoads No-OA condition is a material comparison boundary.",
+        [1.35, 1.35, 4.25],
+    )
+
+
+def build_timing_statistics_table(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for index, case in enumerate(evidence["cases"], start=1):
+        stats = case.get("timing_statistics") or {}
+        sample_count = (stats.get("release_gate_wall_seconds") or {}).get("count", 0)
+        rows.append(
+            [
+                f"C{index:02d}",
+                case_label(case["case_id"]),
+                sample_count,
+                mean_stat_label(stats, "rust_compare_report_wall_seconds"),
+                mean_stat_label(stats, "energyplus_oracle_wall_seconds"),
+                mean_stat_label(stats, "ep_cli_total_wall_seconds"),
+                mean_stat_label(stats, "release_gate_wall_seconds"),
+                spread_stat_label(stats, "release_gate_wall_seconds"),
+            ]
+        )
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    if dynamic.get("available"):
+        stats = dynamic.get("timing_statistics") or {}
+        sample_count = (stats.get("release_gate_wall_seconds") or {}).get("count", 0)
+        rows.append(
+            [
+                "D01",
+                "Official 1Zone dynamic",
+                sample_count,
+                mean_stat_label(stats, "rust_report_residual_seconds"),
+                "n/a",
+                "n/a",
+                mean_stat_label(stats, "release_gate_wall_seconds"),
+                spread_stat_label(stats, "release_gate_wall_seconds"),
+            ]
+        )
+    return table(
+        ["ID", "Case", "N", "Rust/report mean", "E+ oracle mean", "ep_cli mean", "Gate mean", "Gate min-max"],
+        rows,
+        "Repeated timing statistics. Promoted gates use internal ep_cli timing; dynamic residual is gate wall minus EnergyPlus self elapsed.",
+        [0.42, 1.8, 0.35, 0.82, 0.82, 0.75, 0.72, 1.05],
+    )
+
+
+def build_timing_sample_table(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for index, case in enumerate(evidence["cases"], start=1):
+        for sample in case.get("timing_samples", []):
+            rows.append(
+                [
+                    f"C{index:02d}",
+                    sample.get("run"),
+                    case_label(case["case_id"]),
+                    number_label(sample.get("rust_compare_report_wall_seconds"), 3, "s"),
+                    number_label(sample.get("energyplus_oracle_wall_seconds"), 3, "s"),
+                    number_label(sample.get("ep_cli_total_wall_seconds"), 3, "s"),
+                    number_label(sample.get("release_gate_wall_seconds"), 3, "s"),
+                    number_label(sample.get("release_gate_overhead_seconds"), 3, "s"),
+                ]
+            )
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    if dynamic.get("available"):
+        for sample in dynamic.get("timing_samples", []):
+            rows.append(
+                [
+                    "D01",
+                    sample.get("run"),
+                    "Official 1Zone dynamic",
+                    number_label(sample.get("rust_report_residual_seconds"), 3, "s"),
+                    "self " + number_label(sample.get("energyplus_reported_elapsed_seconds"), 3, "s"),
+                    "n/a",
+                    number_label(sample.get("release_gate_wall_seconds"), 3, "s"),
+                    "n/a",
+                ]
+            )
+    return table(
+        ["ID", "Run", "Case", "Rust/report", "E+ oracle/self", "ep_cli", "Gate", "Overhead"],
+        rows,
+        "Raw timing samples used for repeated timing statistics.",
+        [0.42, 0.35, 1.75, 0.75, 0.75, 0.65, 0.65, 0.7],
+    )
+
+
 def build_series_detail(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     series_index = 1
@@ -1589,7 +2156,7 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
     dynamic = evidence.get("active_dynamic_diagnostic") or {}
     settings = DocumentSettings(
         metadata_author="rusted-energyplus",
-        subtitle="Algorithm porting status and active official 1Zone dynamic evidence",
+        subtitle="1Zone Uncontrolled and IdealLoadsAirSystem comparison boundary",
         cover_page=True,
         page_margins=PageMargins(0.55, 0.55, 0.55, 0.55, unit="in"),
         theme=Theme(
@@ -1604,15 +2171,16 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         ),
     )
     return Document(
-        f"eplus-rs {version} 1Zone Conformance Evidence",
+        f"eplus-rs {version} Conformance Gap Evidence",
         TableOfContents("Table of Contents", max_level=2),
         Chapter(
-            "Evidence Boundary",
+            "Comparison Scope",
             Box(
                 Paragraph(
-                    "Promoted numerical conformance and the active official 1ZoneUncontrolled dynamic diagnostic are "
-                    "separated. The 1Zone evidence is the current development target for EnergyPlus 26.1 parity; it is "
-                    "not promoted until the diagnostic case passes its tolerance policy under a blocking gate."
+                    "This report is organized around two system-level comparisons: the official 1ZoneUncontrolled "
+                    "dynamic heat-balance model and a ZoneHVAC:IdealLoadsAirSystem no-outdoor-air sensible branch. "
+                    "Promoted small gates are retained as regression evidence, but the main tables emphasize outputs "
+                    "that still have to be matched before broader user-facing conformance can be claimed."
                 ),
                 title="Claim Boundary",
                 border_color="#2f6f9f",
@@ -1628,36 +2196,31 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 code(evidence["aggregate"]["status"]),
                 ".",
             ),
+            build_two_case_scope_table(evidence),
             build_metric_table(evidence),
         ),
         Chapter(
-            "Algorithm Porting Status",
+            "Outputs To Match",
             Paragraph(
-                "This table is organized by the execution path used by the official 1Zone diagnostic. Rows marked "
-                "promoted are already backed by blocking conformance gates; diagnostic rows are source-mapped and "
-                "measured but still outside the release claim."
+                "The table below is intentionally target-oriented. A zero in a promoted subset does not by itself "
+                "settle broad conformance; each row calls out the user-facing output family and the remaining proof "
+                "needed for the two selected systems."
             ),
-            build_algorithm_porting_table(evidence),
-            build_porting_table(evidence),
+            build_user_output_target_table(evidence),
         ),
         Chapter(
-            "1Zone Model Evidence",
+            "1Zone Uncontrolled",
             Paragraph(
                 "The active model is the official EnergyPlus 1ZoneUncontrolled ExampleFile with hourly outputs. The "
-                "focus set intentionally includes user-visible state and latent heat-balance drivers so a good MAT "
-                "match cannot hide surface, solar, radiation, or CTF history mismatch."
+                "loaded artifact may be a diagnostic or conformance-candidate lane; its current status is shown in "
+                "the setup table. Even when that candidate passes, broad heat-balance compatibility remains limited "
+                "to the listed output families until additional constructions, schedules, and boundary conditions are "
+                "covered. The focus set includes comfort-facing MAT plus storage, convection, solar, radiation, and "
+                "conduction rows so a good MAT match cannot hide the source of remaining heat-balance error."
             ),
             build_dynamic_setup_table(dynamic),
             build_dynamic_error_distribution_table(dynamic),
             build_dynamic_focus_table(dynamic),
-        ),
-        Chapter(
-            "1Zone Bottlenecks",
-            Paragraph(
-                "The remaining dominant deltas are concentrated in mass-floor storage, zone surface convection, roof "
-                "outside exchange, and aggregate opaque conduction. The source split keeps the inside-solve numerator "
-                "visible so future probes can target source ownership instead of only the reported output row."
-            ),
             Figure(
                 charts["dynamic_bottlenecks"],
                 caption="Largest 1Zone dynamic diagnostic bottlenecks by RMSE.",
@@ -1665,23 +2228,49 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 placement="H",
             ),
             build_dynamic_bottleneck_table(dynamic),
+            build_dynamic_source_split_table(dynamic),
         ),
         Chapter(
-            "Inside Solve Split",
+            "IdealLoadsAirSystem",
             Paragraph(
-                "The floor-storage bottleneck is traced through the inside-face solve numerator. This split shows how "
-                "much of the implied numerator delta is covered by tracked source terms and how much remains residual."
+                "The IdealLoadsAirSystem comparison here is deliberately a No-OA, no-limit, sensible branch. No-OA is "
+                "a material boundary: enabling outdoor air activates additional mass-flow, mixed-air, economizer, heat "
+                "recovery, and latent report paths that can change the conformance result even when the no-OA sensible "
+                "branch is exact."
             ),
-            build_dynamic_source_split_table(dynamic),
+            build_ideal_loads_setup_table(evidence),
+            build_ideal_loads_boundary_table(evidence),
         ),
         PageBreak(),
         Chapter(
+            "Ported Algorithms",
+            Paragraph(
+                "Porting state is split from numeric accuracy. Rows below summarize the implemented or source-mapped "
+                "algorithms that currently support the two system comparisons, along with why each algorithm matters "
+                "for user-visible outputs."
+            ),
+            build_ported_algorithm_table(evidence),
+            build_algorithm_porting_table(evidence),
+            build_porting_table(evidence),
+        ),
+        Chapter(
+            "Not Yet Ported",
+            Paragraph(
+                "The gaps below are the places most likely to explain remaining mismatch or to invalidate a narrow "
+                "claim when the test case is expanded. The qualitative impact column states how each missing or "
+                "diagnostic-only path can move the selected systems' outputs."
+            ),
+            build_unported_impact_table(evidence),
+        ),
+        Chapter(
             "Execution Time",
             Paragraph(
-                "Figure timing compares the same conformance-case evidence scope: EnergyPlus oracle output production "
-                "wall-clock versus Rust compare/report evidence production wall-clock after the oracle files exist. "
-                "Release gate wall-clock, cargo/script/assert overhead, IDF conversion, and EnergyPlus self-reported "
-                "elapsed time are recorded separately so unlike scopes are not plotted against each other."
+                "Timing rows distinguish exactly what is being measured. EnergyPlus oracle wall-clock is the "
+                "energyplus.exe run that produces oracle files. Rust compare/report wall-clock starts after oracle "
+                "files exist and includes Rust model/oracle loading, algorithm evaluation, comparison, and artifact "
+                "writing. ep_cli total adds baseline staging, EnergyPlus oracle execution, IDF conversion, and manifest "
+                "writes. Release gate wall-clock also includes cargo, PowerShell, and assertion overhead. Repeated "
+                "samples are reported separately from the last-run phase breakdown."
             ),
             build_dynamic_timing_table(dynamic),
             Figure(
@@ -1690,25 +2279,34 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 width=6.4,
                 placement="H",
             ),
+            build_timing_statistics_table(evidence),
+            build_timing_sample_table(evidence),
             build_timing_values(evidence),
             build_phase_timing_values(evidence),
         ),
         Chapter(
-            "Promoted Gates",
+            "Regression Gates",
             Paragraph(
-                "These smaller gates remain the promoted release boundary while the official dynamic ExampleFile is "
-                "being brought into tolerance. They are retained here as the baseline contract that the 1Zone work must "
-                "not regress."
+                "These promoted gates are not the definition of broad conformance. They are regression locks for "
+                "already matched declared variables, kept here so work on the two larger systems does not break the "
+                "known exact subsets."
             ),
-            Figure(charts["accuracy"], caption="Accuracy against declared tolerance.", width=6.4, placement="H"),
+            Figure(
+                charts["accuracy"],
+                caption="Promoted regression-gate accuracy for declared variables only.",
+                width=6.4,
+                placement="H",
+            ),
             build_case_matrix(evidence),
+            build_series_detail(evidence),
         ),
         Chapter(
             "Next Work",
             Paragraph(
-                "The next timing-quality improvement is to add runtime-internal subphase timers inside the dynamic "
-                "heat-balance solver itself. The next numerical target remains the 1Zone dynamic bottleneck: mass "
-                "floor CTF storage/history and zone surface-convection closure before promotion."
+                "The next numerical target is to close the 1Zone dynamic bottleneck around mass-floor CTF "
+                "storage/history, surface convection, and exterior boundary exchange. The next IdealLoads target is "
+                "to keep no-OA exact while promoting OA, humidity, economizer, heat-recovery, meter, and loop-coupling "
+                "rows only when each branch has its own source-order gate."
             ),
             build_artifact_paths(evidence),
         ),
@@ -1744,6 +2342,8 @@ def main() -> int:
         args.version,
         args.skip_gate_run,
         args.run_dynamic_diagnostic,
+        args.timing_repeats,
+        args.dynamic_timing_repeats,
     )
     outputs = write_outputs(repo_root, args.version, evidence)
 
