@@ -394,6 +394,38 @@ def ideal_loads_branch_heatmap_plot(repo_root: Path, version: str) -> Any:
     return fig
 
 
+def ideal_loads_meter_comparison_plot(repo_root: Path) -> Any:
+    summaries = sorted(
+        (repo_root / ".runtime").glob("ideal-loads-*facility-meter*/26.1.0/*/compare/compare-summary.json")
+    )
+    rows: list[dict[str, Any]] = []
+    for path in summaries:
+        summary = load_json(path)
+        for meter in summary.get("meter_series", []):
+            rows.append(
+                {
+                    "label": f"{meter.get('name')} {meter.get('frequency')}",
+                    "max_abs_delta": float(meter.get("max_abs_delta") or 0.0),
+                    "status": meter.get("status"),
+                }
+            )
+    fig, ax = plt.subplots(figsize=(8.4, max(3.2, 0.34 * len(rows) + 1.2)))
+    labels = [row["label"] for row in rows] or ["missing"]
+    values = [row["max_abs_delta"] for row in rows] or [0.0]
+    y_values = list(range(len(labels)))
+    ax.barh(y_values, values, color="#3d7f5f", edgecolor="none")
+    max_value = max(values, default=1.0) or 1.0
+    for y, value in zip(y_values, values):
+        ax.text(value + max_value * 0.012, y, f"{value:.3g}", va="center", fontsize=7)
+    ax.set_yticks(y_values, labels)
+    ax.invert_yaxis()
+    ax.set_xlabel("Max absolute delta (J)")
+    ax.set_title("IdealLoads Facility Meter Comparison", loc="left", fontweight="bold")
+    style_axis(ax, "x")
+    fig.tight_layout()
+    return fig
+
+
 def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Path) -> dict[str, Any]:
     ensure_dir(output_dir)
     ensure_dir(latest_dir)
@@ -440,6 +472,13 @@ def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Pat
         output_dir,
         latest_dir,
         "ideal_loads_branch_status_heatmap.png",
+        plots,
+    )
+    save_figure(
+        ideal_loads_meter_comparison_plot(repo_root),
+        output_dir,
+        latest_dir,
+        "ideal_loads_meter_comparison.png",
         plots,
     )
     save_figure(stage_timing_plot(evidence), output_dir, latest_dir, "stage_timing_stacked_bar.png", plots)
