@@ -3046,7 +3046,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["Evidence manifest", "partial", "Manifest snapshot is embedded; final hashes require post-PDF release-evidence-manifest."],
         ["Coverage charts", "done", "Variable status and declared-vs-passed charts are included."],
         ["Case coverage matrix", "partial", "PDF includes excerpt; full matrix remains JSON."],
-        ["1Zone time-series plots", "partial", "MAT/convection/storage/conduction overlays included; heatmap/histogram still pending."],
+        ["1Zone time-series plots", "partial", "MAT/convection/storage/conduction overlays in PDF; surface plot/heatmap/histogram exported as plot assets."],
         ["IdealLoads time-series plots", "partial", "No-OA rates/node overlays included; branch heatmap/meter plot pending."],
         ["Performance evidence", "partial", "3 repeat gate timings included; N=10 median/p90 summary pending."],
         ["Stability evidence", "partial", "Stability summary/table added; intentional failure fixtures and repeated-hash proof pending."],

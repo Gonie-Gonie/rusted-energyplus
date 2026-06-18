@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import shutil
 from pathlib import Path
 from typing import Any
@@ -100,6 +101,56 @@ def find_time_series(evidence: dict[str, Any], system_prefix: str, variable: str
     return None
 
 
+def dynamic_compare_summary(repo_root: Path, evidence: dict[str, Any]) -> dict[str, Any]:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    digest = dynamic.get("source_digest_json")
+    if not digest:
+        return {}
+    digest_path = repo_root / str(digest)
+    summary_path = digest_path.parent / "compare-summary.json"
+    if not summary_path.is_file():
+        return {}
+    return load_json(summary_path)
+
+
+def sample_value(row: dict[str, Any], *names: str) -> float | None:
+    for name in names:
+        value = row.get(name)
+        if value is not None:
+            return float(value)
+    return None
+
+
+def dynamic_series(summary: dict[str, Any], key: str | None, variable: str) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for series in summary.get("series", []):
+        output = series.get("output") or {}
+        if output.get("variable") != variable:
+            continue
+        if key is not None and output.get("key") != key:
+            continue
+        rows.append(series)
+    return rows
+
+
+def series_rows(series: dict[str, Any]) -> tuple[list[int], list[float], list[float], list[float]]:
+    x_values: list[int] = []
+    oracle: list[float] = []
+    rust: list[float] = []
+    delta: list[float] = []
+    for row in series.get("sample_rows", []):
+        oracle_value = sample_value(row, "oracle", "oracle_c", "oracle_w", "oracle_value")
+        rust_value = sample_value(row, "rust", "rust_c", "rust_w", "rust_value")
+        if oracle_value is None or rust_value is None:
+            continue
+        index = int(row.get("index", len(x_values)))
+        x_values.append(index)
+        oracle.append(oracle_value)
+        rust.append(rust_value)
+        delta.append(abs(oracle_value - rust_value))
+    return x_values, oracle, rust, delta
+
+
 def plot_record(record: dict[str, Any], title: str, ylabel: str | None = None) -> Any:
     x_values = record.get("x", [])
     fig, (value_ax, delta_ax) = plt.subplots(
@@ -120,6 +171,91 @@ def plot_record(record: dict[str, Any], title: str, ylabel: str | None = None) -
     delta_ax.legend(loc="upper right", frameon=False)
     style_axis(value_ax, "x")
     style_axis(delta_ax, "x")
+    return fig
+
+
+def one_zone_surface_temperature_plot(summary: dict[str, Any]) -> Any:
+    matches = dynamic_series(summary, None, "Surface Inside Face Temperature")
+    selected: list[dict[str, Any]] = []
+    wanted = [("FLR", "floor"), ("ROOF", "roof"), ("WALL", "wall")]
+    for token, _label in wanted:
+        match = next(
+            (
+                series
+                for series in matches
+                if token in str((series.get("output") or {}).get("key", "")).upper()
+            ),
+            None,
+        )
+        if match is not None:
+            selected.append(match)
+    fig, ax = plt.subplots(figsize=(8.2, 4.6))
+    for series in selected:
+        output = series.get("output") or {}
+        key = str(output.get("key", "surface"))
+        x_values, oracle, rust, _delta = series_rows(series)
+        step = max(1, math.ceil(len(x_values) / 720)) if x_values else 1
+        sample = slice(None, None, step)
+        ax.plot(x_values[sample], oracle[sample], label=f"{key} oracle", linewidth=1.1)
+        ax.plot(x_values[sample], rust[sample], label=f"{key} rust", linewidth=0.9, linestyle="--")
+    ax.set_title("1Zone Representative Surface Inside Face Temperature", loc="left", fontweight="bold")
+    ax.set_xlabel("Sample index")
+    ax.set_ylabel("C")
+    ax.legend(loc="upper right", frameon=False, fontsize=7, ncol=2)
+    style_axis(ax, "x")
+    fig.tight_layout()
+    return fig
+
+
+def one_zone_conduction_delta_heatmap(summary: dict[str, Any]) -> Any:
+    matches = dynamic_series(summary, None, "Surface Inside Face Conduction Heat Transfer Rate")
+    matches = [series for series in matches if str((series.get("output") or {}).get("key", "")).startswith("ZN001:")]
+    labels: list[str] = []
+    matrix: list[list[float]] = []
+    for series in matches[:12]:
+        output = series.get("output") or {}
+        x_values, _oracle, _rust, delta = series_rows(series)
+        if not delta:
+            continue
+        step = max(1, math.ceil(len(delta) / 480))
+        labels.append(str(output.get("key", "surface")))
+        matrix.append(delta[::step])
+    if not matrix:
+        matrix = [[0.0]]
+        labels = ["missing"]
+    fig, ax = plt.subplots(figsize=(8.4, max(2.8, 0.38 * len(labels) + 1.2)))
+    image = ax.imshow(matrix, aspect="auto", cmap="magma")
+    ax.set_title("1Zone Surface Conduction Absolute Delta Heatmap", loc="left", fontweight="bold")
+    ax.set_xlabel("Downsampled sample index")
+    ax.set_ylabel("Surface key")
+    ax.set_yticks(range(len(labels)), labels)
+    ax.tick_params(axis="y", labelsize=7)
+    fig.colorbar(image, ax=ax, fraction=0.028, pad=0.02, label="abs delta W")
+    fig.tight_layout()
+    return fig
+
+
+def one_zone_delta_histogram(summary: dict[str, Any]) -> Any:
+    targets = [
+        ("ZONE ONE", "Zone Mean Air Temperature", "MAT"),
+        (None, "Surface Inside Face Temperature", "Surface IFT"),
+        (None, "Surface Inside Face Conduction Heat Transfer Rate", "Surface conduction"),
+    ]
+    fig, ax = plt.subplots(figsize=(8.2, 4.4))
+    colors = ["#2f6f9f", "#c77d1a", "#7c4d9e"]
+    for color, (key, variable, label) in zip(colors, targets, strict=True):
+        values: list[float] = []
+        for series in dynamic_series(summary, key, variable):
+            _x_values, _oracle, _rust, delta = series_rows(series)
+            values.extend(delta)
+        if values:
+            ax.hist(values, bins=60, alpha=0.42, label=label, color=color)
+    ax.set_title("1Zone Delta Distribution", loc="left", fontweight="bold")
+    ax.set_xlabel("Absolute delta")
+    ax.set_ylabel("Sample count")
+    ax.legend(loc="upper right", frameon=False)
+    style_axis(ax)
+    fig.tight_layout()
     return fig
 
 
@@ -272,6 +408,29 @@ def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Pat
             output_dir,
             latest_dir,
             "1zone_zone_mean_air_temperature.png",
+            plots,
+        )
+    dynamic_summary = dynamic_compare_summary(repo_root, evidence)
+    if dynamic_summary:
+        save_figure(
+            one_zone_surface_temperature_plot(dynamic_summary),
+            output_dir,
+            latest_dir,
+            "1zone_surface_inside_face_temperature.png",
+            plots,
+        )
+        save_figure(
+            one_zone_conduction_delta_heatmap(dynamic_summary),
+            output_dir,
+            latest_dir,
+            "1zone_surface_conduction_delta_heatmap.png",
+            plots,
+        )
+        save_figure(
+            one_zone_delta_histogram(dynamic_summary),
+            output_dir,
+            latest_dir,
+            "1zone_delta_histogram.png",
             plots,
         )
     save_figure(ideal_loads_rates_plot(evidence), output_dir, latest_dir, "ideal_loads_zone_total_rates.png", plots)
