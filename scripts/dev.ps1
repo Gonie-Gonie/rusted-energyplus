@@ -35,6 +35,11 @@ $Commands = [ordered]@{
         Group = "gui"
         Help = "Open the EPLaunch-style Windows UI for arbitrary IDF runs."
     }
+    "build-launcher-exe" = @{
+        Path = "gui\build-launcher-exe.ps1"
+        Group = "gui"
+        Help = "Build the no-console Windows launcher exe for local testing or release packaging."
+    }
     "check" = @{
         Path = "quality\check.ps1"
         Group = "quality"

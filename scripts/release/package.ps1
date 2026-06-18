@@ -73,7 +73,6 @@ if ($binaryVersion -ne $expectedVersion) {
 Copy-RepoItem -Source (Join-Path $RepoRoot "README.md") -Destination (Join-Path $stageRoot "README.md")
 Copy-RepoItem -Source (Join-Path $RepoRoot "CONTRIBUTING.md") -Destination (Join-Path $stageRoot "CONTRIBUTING.md")
 Copy-RepoItem -Source (Join-Path $RepoRoot "CHANGELOG.md") -Destination (Join-Path $stageRoot "CHANGELOG.md")
-Copy-RepoItem -Source (Join-Path $RepoRoot "eplus-rs-launch.cmd") -Destination (Join-Path $stageRoot "eplus-rs-launch.cmd")
 Copy-RepoItem -Source (Join-Path $RepoRoot "Cargo.toml") -Destination (Join-Path $stageRoot "Cargo.toml")
 Copy-RepoItem -Source (Join-Path $RepoRoot "Cargo.lock") -Destination (Join-Path $stageRoot "Cargo.lock")
 Copy-RepoItem -Source (Join-Path $RepoRoot "rust-toolchain.toml") -Destination (Join-Path $stageRoot "rust-toolchain.toml")
@@ -87,6 +86,8 @@ Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_cases") -Destinatio
 Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_suites") -Destination (Join-Path $stageRoot "data\conformance_suites")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\src") -Destination (Join-Path $stageRoot "docs\src")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\book.toml") -Destination (Join-Path $stageRoot "docs\book.toml")
+
+& (Join-Path $RepoRoot "scripts\gui\build-launcher-exe.ps1") -OutputPath (Join-Path $stageRoot "eplus-rs-launch.exe")
 
 if (-not $SkipOracle) {
     $resolvedOracleRuntimeRoot = if ([System.IO.Path]::IsPathRooted($OracleRuntimeRoot)) {

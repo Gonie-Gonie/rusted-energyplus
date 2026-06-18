@@ -313,7 +313,9 @@ Not claimed:
 .\scripts\dev.cmd check
 ```
 
-Double-click `eplus-rs-launch.cmd` for a small EPLaunch-style UI.
+Release packages include `eplus-rs-launch.exe` for the small EPLaunch-style UI.
+From a checkout, use `.\scripts\dev.cmd launch-ui` or build a local launcher
+with `.\scripts\dev.cmd build-launcher-exe`.
 
 Useful focused checks:
 

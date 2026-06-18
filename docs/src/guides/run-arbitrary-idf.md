@@ -10,8 +10,9 @@ is inside the declared boundary.
 eplus-rs run .\model.idf -w .\weather.epw -d .\out --oracle-baseline --compare-oracle
 ```
 
-On Windows, double-click `eplus-rs-launch.cmd` to open the small button-based
-launcher for the same pipeline.
+On Windows release packages, double-click `eplus-rs-launch.exe` to open the
+small button-based launcher for the same pipeline. From a source checkout, use
+`.\scripts\dev.cmd launch-ui` or `.\scripts\dev.cmd build-launcher-exe`.
 
 Important boundaries:
 
