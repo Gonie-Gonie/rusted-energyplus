@@ -7,14 +7,10 @@ last_reviewed: 2026-06-15
 
 # Current Status
 
-The current public release line is v0.32.0. It adds a user coverage handbook on
-top of the v0.31 release evidence asset manifest, v0.30 algorithm coverage
-metadata, v0.29 output variable coverage metadata, v0.28 input object coverage
-metadata, the v0.27 user-facing support coverage report, v0.26 internal convective gain
-conformance, v0.25 opaque no-mass heat-balance boundary handling, v0.24
-runtime registry infrastructure, v0.23 official ExampleFile static model
-evidence, and v0.22 declared time, weather, and schedule numerical
-conformance.
+The current public release line is v0.1.0. It packages the accumulated limited
+conformance evidence, user coverage handbook, release evidence manifest,
+arbitrary IDF/epJSON support-assessment pipeline, no-console Windows launcher,
+and locked EnergyPlus 26.1.0 oracle runtime.
 
 Current numerical conformance is limited to promoted cases and their declared
 variables:

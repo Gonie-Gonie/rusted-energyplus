@@ -41,11 +41,11 @@ The false-claim guard is:
 Release evidence documents use the repo-local Python environment and oodocs:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
-.\scripts\dev.cmd conformance-index-report -Version 0.32.0
-.\scripts\dev.cmd support-coverage-report -Version 0.32.0
-.\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
-.\scripts\dev.cmd release-evidence-manifest -Version 0.32.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.1.0
+.\scripts\dev.cmd conformance-index-report -Version 0.1.0
+.\scripts\dev.cmd support-coverage-report -Version 0.1.0
+.\scripts\dev.cmd user-coverage-handbook -Version 0.1.0
+.\scripts\dev.cmd release-evidence-manifest -Version 0.1.0
 ```
 
 The current declared conformance gates are:
@@ -64,7 +64,7 @@ Current supporting release and infrastructure gates include:
 ```powershell
 .\scripts\dev.cmd runtime-registry-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
-.\scripts\dev.cmd v0.32-verify
+.\scripts\dev.cmd v0.1-verify
 ```
 
 The broad official dynamic 1Zone tracker remains diagnostic-only. The default

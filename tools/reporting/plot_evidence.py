@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Export evidence-pack plots as PNG assets.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.32.0")
+    parser.add_argument("--version", default="0.1.0")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--latest-dir", type=Path)
     return parser.parse_args()

@@ -7,24 +7,24 @@ last_reviewed: 2026-06-08
 
 # Release Process
 
-Release checks are launched through `scripts/dev.cmd`. Version-specific gates
-remain available for completed milestones, while current planning should prefer
-spec-led verification and generated evidence.
+Release checks are launched through `scripts/dev.cmd`. The current public
+release gate is `v0.1-verify`; older milestone gates remain as historical
+development aids when their version assumptions still match the checkout.
 
 The local release package command is:
 
 ```powershell
-.\scripts\dev.cmd package -Version 0.32.0
+.\scripts\dev.cmd package -Version 0.1.0
 ```
 
 The numerical evidence document command is:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
-.\scripts\dev.cmd conformance-index-report -Version 0.32.0
-.\scripts\dev.cmd support-coverage-report -Version 0.32.0
-.\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
-.\scripts\dev.cmd release-evidence-manifest -Version 0.32.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.1.0
+.\scripts\dev.cmd conformance-index-report -Version 0.1.0
+.\scripts\dev.cmd support-coverage-report -Version 0.1.0
+.\scripts\dev.cmd user-coverage-handbook -Version 0.1.0
+.\scripts\dev.cmd release-evidence-manifest -Version 0.1.0
 ```
 
 Evidence, index, support coverage, user handbook, and release asset manifest

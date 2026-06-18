@@ -34,7 +34,7 @@ GITHUB_RELEASE_POLICY = (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build the release evidence asset manifest.")
     parser.add_argument("--repo-root", required=True, type=Path)
-    parser.add_argument("--version", default="0.32.0")
+    parser.add_argument("--version", default="0.1.0")
     parser.add_argument("--target", default="windows-x64")
     return parser.parse_args()
 

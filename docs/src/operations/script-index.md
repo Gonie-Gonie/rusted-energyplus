@@ -138,6 +138,8 @@ matplotlib for document layout and charts.
 | `official-dynamic-heat-balance-probe-summary` | diagnostic | summarize existing official dynamic heat-balance probe lanes with the report Python | no | `.runtime/official-dynamic-probe-summary.*` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
+| `launch-ui` | gui | open the EPLaunch-style Windows UI for arbitrary IDF runs | no | local WinForms window |
+| `build-launcher-exe` | gui | build the no-console Windows launcher exe for local testing or release packaging | yes for release package | `target/launcher/eplus-rs-launch.exe` |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |
@@ -151,7 +153,7 @@ matplotlib for document layout and charts.
 | `user-coverage-handbook` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user decision guide for supported inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `release-evidence-manifest` | release | generate oodocs PDF/HTML/JSON/Markdown release package and evidence asset manifest | yes for release coverage | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
-| `v0.32-verify` | release | verify v0.32 user coverage handbook gate | yes | user coverage handbook PDF/HTML/JSON/Markdown, release manifest |
+| `v0.1-verify` | release | verify the v0.1.0 public limited-conformance release gate | yes | release package, launcher exe, oracle, conformance evidence, coverage reports, release manifest |
 
 Only the current release gate is retained as a runnable script. Historical
 release gates and notes remain available through git history and tags.

@@ -24,19 +24,19 @@ Use it to answer:
 Generate it after the support and index reports:
 
 ```powershell
-.\scripts\dev.cmd support-coverage-report -Version 0.32.0
-.\scripts\dev.cmd conformance-index-report -Version 0.32.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
-.\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
+.\scripts\dev.cmd support-coverage-report -Version 0.1.0
+.\scripts\dev.cmd conformance-index-report -Version 0.1.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.1.0
+.\scripts\dev.cmd user-coverage-handbook -Version 0.1.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.32.0/user-coverage-handbook.md
-.runtime/release-evidence/v0.32.0/user-coverage-handbook.html
-.runtime/release-evidence/v0.32.0/user-coverage-handbook.pdf
-.runtime/release-evidence/v0.32.0/user-coverage-handbook.json
+.runtime/release-evidence/v0.1.0/user-coverage-handbook.md
+.runtime/release-evidence/v0.1.0/user-coverage-handbook.html
+.runtime/release-evidence/v0.1.0/user-coverage-handbook.pdf
+.runtime/release-evidence/v0.1.0/user-coverage-handbook.json
 ```
 
 ## Difference From Support Coverage

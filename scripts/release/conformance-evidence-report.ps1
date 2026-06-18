@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = "0.32.0",
+    [string]$Version = "0.1.0",
     [switch]$SkipGateRun,
     [switch]$RunDynamicDiagnostic,
     [int]$TimingRepeats = 3,

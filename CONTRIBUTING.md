@@ -21,7 +21,7 @@ Use the same scripts locally and in CI:
 .\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 .\scripts\dev.cmd check
 .\scripts\dev.cmd oracle-smoke
-.\scripts\dev.cmd v0.32-verify
+.\scripts\dev.cmd v0.1-verify
 .\scripts\dev.cmd raw-model-smoke
 .\scripts\dev.cmd typed-model-smoke
 .\scripts\dev.cmd package

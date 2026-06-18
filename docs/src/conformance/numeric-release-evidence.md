@@ -15,15 +15,15 @@ Release assets beside the binary zip.
 Current command:
 
 ```powershell
-.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.1.0
 ```
 
 Current generated files:
 
 ```text
-.runtime/release-evidence/v0.32.0/numeric-conformance-evidence.html
-.runtime/release-evidence/v0.32.0/numeric-conformance-evidence.pdf
-.runtime/release-evidence/v0.32.0/numeric-conformance-evidence.json
+.runtime/release-evidence/v0.1.0/numeric-conformance-evidence.html
+.runtime/release-evidence/v0.1.0/numeric-conformance-evidence.pdf
+.runtime/release-evidence/v0.1.0/numeric-conformance-evidence.json
 ```
 
 Current GitHub Release asset names:

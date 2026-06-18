@@ -14,21 +14,21 @@ coverage, and evidence files should exist beside the release notes?
 Generate it after the release package and evidence reports:
 
 ```powershell
-.\scripts\dev.cmd package -Version 0.32.0
-.\scripts\dev.cmd conformance-evidence-report -Version 0.32.0
-.\scripts\dev.cmd conformance-index-report -Version 0.32.0
-.\scripts\dev.cmd support-coverage-report -Version 0.32.0
-.\scripts\dev.cmd user-coverage-handbook -Version 0.32.0
-.\scripts\dev.cmd release-evidence-manifest -Version 0.32.0
+.\scripts\dev.cmd package -Version 0.1.0
+.\scripts\dev.cmd conformance-evidence-report -Version 0.1.0
+.\scripts\dev.cmd conformance-index-report -Version 0.1.0
+.\scripts\dev.cmd support-coverage-report -Version 0.1.0
+.\scripts\dev.cmd user-coverage-handbook -Version 0.1.0
+.\scripts\dev.cmd release-evidence-manifest -Version 0.1.0
 ```
 
 Artifacts are written to:
 
 ```text
-.runtime/release-evidence/v0.32.0/release-evidence-manifest.md
-.runtime/release-evidence/v0.32.0/release-evidence-manifest.html
-.runtime/release-evidence/v0.32.0/release-evidence-manifest.pdf
-.runtime/release-evidence/v0.32.0/release-evidence-manifest.json
+.runtime/release-evidence/v0.1.0/release-evidence-manifest.md
+.runtime/release-evidence/v0.1.0/release-evidence-manifest.html
+.runtime/release-evidence/v0.1.0/release-evidence-manifest.pdf
+.runtime/release-evidence/v0.1.0/release-evidence-manifest.json
 ```
 
 The PDF and HTML are generated with `oodocs`; the JSON records file paths,

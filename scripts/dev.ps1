@@ -840,18 +840,24 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Verify the v0.32 user coverage handbook gate."
     }
+    "v0.1-verify" = @{
+        Path = "release\v0.1-verify.ps1"
+        Group = "release"
+        Help = "Verify the v0.1.0 public limited-conformance release gate."
+    }
 }
 
 $Aliases = @{
     "docs" = "docs-check"
     "guard" = "strict-no-false-conformance"
+    "verify-v0.1" = "v0.1-verify"
     "verify-v0.32" = "v0.32-verify"
 }
 
 function Show-Commands {
     Write-Host "Usage: .\scripts\dev.cmd <command> [args...]"
     Write-Host ""
-    foreach ($group in @("setup", "quality", "smoke", "compare", "conformance", "release")) {
+    foreach ($group in @("setup", "gui", "quality", "smoke", "compare", "conformance", "release")) {
         Write-Host "[$group]"
         foreach ($name in $Commands.Keys) {
             $entry = $Commands[$name]

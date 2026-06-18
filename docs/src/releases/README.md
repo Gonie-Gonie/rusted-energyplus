@@ -9,9 +9,9 @@ Current release notes record:
 - supported scope
 - known limitations
 
-Only the latest active release note is retained in the working tree. Older
-release notes remain available through git history and tags, which keeps the
-repository lighter while preserving auditability.
+The public release note is retained in the working tree. Internal evidence
+milestone notes may also remain when release guards still reference their
+claim-boundary text.
 
 Publishing:
 
@@ -25,4 +25,5 @@ when a token is present.
 
 Release notes:
 
-- [v0.32.0](v0.32.0.md)
+- [v0.1.0](v0.1.0.md)
+- [v0.32.0 internal evidence milestone](v0.32.0.md)

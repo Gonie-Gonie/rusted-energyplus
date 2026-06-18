@@ -22,12 +22,12 @@ Run the local check suite:
 Verify the current public release gate:
 
 ```powershell
-.\scripts\dev.cmd v0.32-verify
+.\scripts\dev.cmd v0.1-verify
 ```
 
-v0.32 adds the user coverage handbook. It reorganizes the support coverage
-matrix into user decision rules for currently supported inputs, outputs,
-algorithms, promoted cases, and known gaps.
+v0.1.0 is the public limited-conformance release gate. It packages the CLI,
+launcher, oracle runtime, declared conformance evidence, support coverage, user
+coverage handbook, and release evidence manifest.
 
 Development-only diagnostic scripts are listed in
 `operations/script-index.md`. They are useful during porting, but they do not
