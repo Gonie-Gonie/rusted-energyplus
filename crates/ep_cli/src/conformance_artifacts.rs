@@ -4,6 +4,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::time::{Duration, Instant};
 
 use crate::{
     comparison_class_label, first_value_label, json_string, last_value_label, markdown_cell,
@@ -23,6 +24,7 @@ pub(crate) struct BaselineSummary {
     pub(crate) injected_outputs: usize,
     pub(crate) injected_meters: usize,
     pub(crate) injected_surface_details: bool,
+    pub(crate) timing: BaselineTimingSummary,
 }
 
 pub(crate) struct ReportSkeletonSummary {
@@ -31,6 +33,91 @@ pub(crate) struct ReportSkeletonSummary {
     pub(crate) warning_count: usize,
     pub(crate) severe_count: usize,
     pub(crate) fatal_count: usize,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct BaselineTimingSummary {
+    pub(crate) input_stage_wall_seconds: f64,
+    pub(crate) energyplus_oracle_wall_seconds: f64,
+    pub(crate) idf_converter_wall_seconds: f64,
+    pub(crate) oracle_output_copy_wall_seconds: f64,
+    pub(crate) expanded_manifest_write_wall_seconds: f64,
+    pub(crate) total_wall_seconds: f64,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct ReportTimingSummary {
+    pub(crate) baseline: BaselineTimingSummary,
+    pub(crate) rust_context_wall_seconds: f64,
+    pub(crate) rust_artifact_write_wall_seconds: f64,
+    pub(crate) rust_compare_report_wall_seconds: f64,
+    pub(crate) total_wall_seconds: f64,
+}
+
+pub(crate) fn elapsed_seconds_since(start: Instant) -> f64 {
+    duration_seconds(start.elapsed())
+}
+
+pub(crate) fn append_timing_to_json_object(
+    mut json: String,
+    timing: &ReportTimingSummary,
+) -> String {
+    let trailing_whitespace_len = json.len() - json.trim_end().len();
+    if trailing_whitespace_len > 0 {
+        json.truncate(json.len() - trailing_whitespace_len);
+    }
+    if !json.ends_with('}') {
+        return json;
+    }
+    json.pop();
+    json.push_str(",\n  \"timing\": ");
+    json.push_str(&report_timing_json(timing));
+    json.push_str("\n}\n");
+    json
+}
+
+fn duration_seconds(duration: Duration) -> f64 {
+    duration.as_secs_f64()
+}
+
+fn report_timing_json(timing: &ReportTimingSummary) -> String {
+    format!(
+        concat!(
+            "{{\n",
+            "    \"schema_version\": 1,\n",
+            "    \"measurement\": \"wall-clock seconds measured inside ep_cli unless noted\",\n",
+            "    \"primary_comparison_scope\": \"EnergyPlus oracle output production wall-clock versus Rust compare/evidence production wall-clock for the same conformance case\",\n",
+            "    \"energyplus_oracle_wall_seconds\": {:.9},\n",
+            "    \"rust_compare_report_wall_seconds\": {:.9},\n",
+            "    \"ep_cli_total_wall_seconds\": {:.9},\n",
+            "    \"phases\": [\n",
+            "      {{ \"name\": \"oracle_input_stage\", \"engine\": \"ep_cli\", \"wall_seconds\": {:.9}, \"scope\": \"stage IDF/weather/output requests before EnergyPlus\" }},\n",
+            "      {{ \"name\": \"energyplus_oracle\", \"engine\": \"EnergyPlus\", \"wall_seconds\": {:.9}, \"scope\": \"energyplus.exe process that produces oracle ESO/EIO/MTR/ERR files\" }},\n",
+            "      {{ \"name\": \"idf_converter\", \"engine\": \"EnergyPlus ConvertInputFormat\", \"wall_seconds\": {:.9}, \"scope\": \"ConvertInputFormat.exe writes epJSON used by Rust comparison\" }},\n",
+            "      {{ \"name\": \"oracle_output_copy\", \"engine\": \"ep_cli\", \"wall_seconds\": {:.9}, \"scope\": \"copy EnergyPlus outputs from short run dir when required\" }},\n",
+            "      {{ \"name\": \"expanded_manifest_write\", \"engine\": \"ep_cli\", \"wall_seconds\": {:.9}, \"scope\": \"persist expanded case manifest\" }},\n",
+            "      {{ \"name\": \"baseline_total\", \"engine\": \"ep_cli+EnergyPlus\", \"wall_seconds\": {:.9}, \"scope\": \"all oracle baseline preparation and EnergyPlus output production\" }},\n",
+            "      {{ \"name\": \"rust_context\", \"engine\": \"rusted-energyplus\", \"wall_seconds\": {:.9}, \"scope\": \"load model/oracle files, evaluate Rust path, and compare requested series\" }},\n",
+            "      {{ \"name\": \"rust_artifact_write\", \"engine\": \"rusted-energyplus\", \"wall_seconds\": {:.9}, \"scope\": \"write compare JSON/CSV/Markdown artifacts\" }},\n",
+            "      {{ \"name\": \"rust_compare_report\", \"engine\": \"rusted-energyplus\", \"wall_seconds\": {:.9}, \"scope\": \"Rust context plus artifact write after oracle files exist\" }},\n",
+            "      {{ \"name\": \"ep_cli_total\", \"engine\": \"ep_cli\", \"wall_seconds\": {:.9}, \"scope\": \"full ep_cli conformance command excluding cargo/script startup\" }}\n",
+            "    ]\n",
+            "  }}"
+        ),
+        timing.baseline.energyplus_oracle_wall_seconds,
+        timing.rust_compare_report_wall_seconds,
+        timing.total_wall_seconds,
+        timing.baseline.input_stage_wall_seconds,
+        timing.baseline.energyplus_oracle_wall_seconds,
+        timing.baseline.idf_converter_wall_seconds,
+        timing.baseline.oracle_output_copy_wall_seconds,
+        timing.baseline.expanded_manifest_write_wall_seconds,
+        timing.baseline.total_wall_seconds,
+        timing.rust_context_wall_seconds,
+        timing.rust_artifact_write_wall_seconds,
+        timing.rust_compare_report_wall_seconds,
+        timing.total_wall_seconds
+    )
 }
 
 pub(crate) fn generate_conformance_baseline(
@@ -53,6 +140,7 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     oracle_root: &Path,
     output_dir: &Path,
 ) -> Result<BaselineSummary, String> {
+    let total_start = Instant::now();
     let energyplus = oracle_root.join("energyplus.exe");
     if !energyplus.is_file() {
         return Err(format!(
@@ -82,6 +170,7 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         None => None,
     };
 
+    let input_stage_start = Instant::now();
     std::fs::create_dir_all(output_dir)
         .map_err(|error| format!("failed to create baseline output directory: {error}"))?;
     let input_idf = output_dir.join("input.idf");
@@ -116,6 +205,7 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     } else {
         None
     };
+    let input_stage_wall_seconds = elapsed_seconds_since(input_stage_start);
 
     let mut energyplus_command = Command::new(&energyplus);
     if let Some(run_dir) = short_run_dir.as_ref() {
@@ -130,9 +220,11 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         }
         energyplus_command.arg("-d").arg(output_arg).arg(input_arg);
     }
+    let energyplus_start = Instant::now();
     let energyplus_output = energyplus_command
         .output()
         .map_err(|error| format!("failed to start EnergyPlus: {error}"))?;
+    let energyplus_oracle_wall_seconds = elapsed_seconds_since(energyplus_start);
     if !energyplus_output.status.success() {
         let err_path = short_run_dir
             .as_ref()
@@ -146,11 +238,13 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     }
 
     let converter_dir = short_run_dir.as_deref().unwrap_or(output_dir);
+    let converter_start = Instant::now();
     let converter_output = Command::new(&converter)
         .arg("input.idf")
         .current_dir(converter_dir)
         .output()
         .map_err(|error| format!("failed to start IDF converter: {error}"))?;
+    let idf_converter_wall_seconds = elapsed_seconds_since(converter_start);
     if !converter_output.status.success() {
         return Err(command_failure_message(
             "IDF conversion",
@@ -159,9 +253,11 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         ));
     }
 
+    let output_copy_start = Instant::now();
     if let Some(run_dir) = short_run_dir.as_ref() {
         copy_regular_files(run_dir, output_dir)?;
     }
+    let oracle_output_copy_wall_seconds = elapsed_seconds_since(output_copy_start);
 
     let eso = output_dir.join("eplusout.eso");
     if !eso.is_file() {
@@ -180,11 +276,14 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         return Err(format!("IDF converter did not write {}", epjson.display()));
     }
     let expanded_manifest = output_dir.join("case-expanded.toml");
+    let expanded_manifest_start = Instant::now();
     std::fs::write(
         &expanded_manifest,
         render_expanded_case_manifest(manifest, source_weather.as_deref(), &injection),
     )
     .map_err(|error| format!("failed to write expanded case manifest: {error}"))?;
+    let expanded_manifest_write_wall_seconds = elapsed_seconds_since(expanded_manifest_start);
+    let total_wall_seconds = elapsed_seconds_since(total_start);
 
     Ok(BaselineSummary {
         output_dir: output_dir.to_path_buf(),
@@ -197,6 +296,14 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         injected_outputs: injection.outputs,
         injected_meters: injection.meters,
         injected_surface_details: injection.surface_details,
+        timing: BaselineTimingSummary {
+            input_stage_wall_seconds,
+            energyplus_oracle_wall_seconds,
+            idf_converter_wall_seconds,
+            oracle_output_copy_wall_seconds,
+            expanded_manifest_write_wall_seconds,
+            total_wall_seconds,
+        },
     })
 }
 

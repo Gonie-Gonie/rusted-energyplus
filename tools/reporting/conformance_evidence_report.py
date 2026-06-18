@@ -315,6 +315,57 @@ def elapsed_seconds(path: Path) -> float | None:
     )
 
 
+def phase_seconds(timing: dict[str, Any], phase_name: str) -> float | None:
+    for phase in timing.get("phases") or []:
+        if phase.get("name") == phase_name and phase.get("wall_seconds") is not None:
+            return float(phase["wall_seconds"])
+    return None
+
+
+def timing_report(
+    summary: dict[str, Any],
+    gate_elapsed: float | None,
+    energyplus_elapsed: float | None,
+) -> dict[str, Any]:
+    timing = summary.get("timing")
+    if not isinstance(timing, dict):
+        timing = {}
+    phases = timing.get("phases") if isinstance(timing.get("phases"), list) else []
+    energyplus_oracle_wall = timing.get("energyplus_oracle_wall_seconds")
+    if energyplus_oracle_wall is None:
+        energyplus_oracle_wall = phase_seconds(timing, "energyplus_oracle")
+    if energyplus_oracle_wall is None:
+        energyplus_oracle_wall = energyplus_elapsed
+    rust_compare_report_wall = timing.get("rust_compare_report_wall_seconds")
+    if rust_compare_report_wall is None:
+        rust_compare_report_wall = phase_seconds(timing, "rust_compare_report")
+    ep_cli_total_wall = timing.get("ep_cli_total_wall_seconds")
+    if ep_cli_total_wall is None:
+        ep_cli_total_wall = phase_seconds(timing, "ep_cli_total")
+    gate_overhead = None
+    if gate_elapsed is not None and ep_cli_total_wall is not None:
+        gate_overhead = max(float(gate_elapsed) - float(ep_cli_total_wall), 0.0)
+    return {
+        "schema_version": int(timing.get("schema_version", 1)),
+        "measurement": timing.get("measurement", "wall-clock seconds"),
+        "primary_comparison_scope": timing.get(
+            "primary_comparison_scope",
+            "EnergyPlus oracle output production wall-clock versus Rust compare/evidence production wall-clock",
+        ),
+        "energyplus_oracle_wall_seconds": None
+        if energyplus_oracle_wall is None
+        else float(energyplus_oracle_wall),
+        "rust_compare_report_wall_seconds": None
+        if rust_compare_report_wall is None
+        else float(rust_compare_report_wall),
+        "ep_cli_total_wall_seconds": None if ep_cli_total_wall is None else float(ep_cli_total_wall),
+        "release_gate_wall_seconds": gate_elapsed,
+        "release_gate_overhead_seconds": gate_overhead,
+        "energyplus_reported_elapsed_seconds": energyplus_elapsed,
+        "phases": phases,
+    }
+
+
 def error_summary(path: Path) -> dict[str, int | None]:
     if not path.is_file():
         return {"warnings": None, "severes": None}
@@ -404,6 +455,8 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
         raise ValueError(f"Conformance summary has no promoted conformance series: {summary_path}")
 
     err = error_summary(repo_path(repo_root, spec.oracle_err_path))
+    energyplus_elapsed = elapsed_seconds(repo_path(repo_root, spec.oracle_end_path))
+    timing = timing_report(summary, gate_elapsed, energyplus_elapsed)
     max_abs_delta = max((series["max_abs_delta_c"] for series in series_reports), default=0.0)
     rmse_delta = max((series["rmse_delta_c"] for series in series_reports), default=0.0)
     return {
@@ -427,7 +480,11 @@ def load_case_report(repo_root: Path, spec: CaseSpec, skip_gate_run: bool) -> di
             summary.get("max_rel_delta", max((series["max_rel_delta"] for series in series_reports), default=0.0))
         ),
         "gate_elapsed_seconds": gate_elapsed,
-        "energyplus_elapsed_seconds": elapsed_seconds(repo_path(repo_root, spec.oracle_end_path)),
+        "energyplus_elapsed_seconds": energyplus_elapsed,
+        "energyplus_oracle_wall_seconds": timing["energyplus_oracle_wall_seconds"],
+        "rust_compare_report_wall_seconds": timing["rust_compare_report_wall_seconds"],
+        "release_gate_overhead_seconds": timing["release_gate_overhead_seconds"],
+        "timing": timing,
         "energyplus_warnings": err["warnings"],
         "energyplus_severes": err["severes"],
         "gate_script": (summary.get("gate") or {}).get("script"),
@@ -689,6 +746,7 @@ def build_evidence(
     cases = [load_case_report(repo_root, spec, skip_gate_run) for spec in CASE_SPECS]
     all_series = [series for case in cases for series in case["series"]]
     failed_cases = [case for case in cases if case["status"] != "pass"]
+    timing_cases = [case["timing"] for case in cases]
     dynamic_diagnostic = load_dynamic_diagnostic(repo_root, DYNAMIC_DIAGNOSTIC_SPEC, run_dynamic_diagnostic)
     return {
         "schema_version": 1,
@@ -702,6 +760,28 @@ def build_evidence(
             "series_count": len(all_series),
             "max_abs_delta_c": max((case["max_abs_delta_c"] for case in cases), default=0.0),
             "rmse_delta_c": max((case["rmse_delta_c"] for case in cases), default=0.0),
+        },
+        "timing": {
+            "primary_comparison_scope": (
+                "EnergyPlus oracle output production wall-clock versus Rust compare/evidence "
+                "production wall-clock for the same conformance case. Release gate wall-clock, "
+                "cargo/script/assert overhead, IDF conversion, and EnergyPlus self-reported "
+                "elapsed time are reported separately."
+            ),
+            "energyplus_oracle_wall_seconds": sum(
+                timing["energyplus_oracle_wall_seconds"] or 0.0 for timing in timing_cases
+            ),
+            "rust_compare_report_wall_seconds": sum(
+                timing["rust_compare_report_wall_seconds"] or 0.0 for timing in timing_cases
+            ),
+            "ep_cli_total_wall_seconds": sum(timing["ep_cli_total_wall_seconds"] or 0.0 for timing in timing_cases),
+            "release_gate_wall_seconds": sum(timing["release_gate_wall_seconds"] or 0.0 for timing in timing_cases),
+            "release_gate_overhead_seconds": sum(
+                timing["release_gate_overhead_seconds"] or 0.0 for timing in timing_cases
+            ),
+            "energyplus_reported_elapsed_seconds": sum(
+                timing["energyplus_reported_elapsed_seconds"] or 0.0 for timing in timing_cases
+            ),
         },
         "cases": cases,
         "porting_milestones": load_porting_rows(repo_root),
@@ -879,16 +959,11 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     timing_rows = [
         {
             "id": f"C{index + 1:02d}",
-            "primary": case["gate_elapsed_seconds"] or 0.0,
-            "secondary": case["energyplus_elapsed_seconds"] or 0.0,
+            "primary": case["rust_compare_report_wall_seconds"] or 0.0,
+            "secondary": case["energyplus_oracle_wall_seconds"] or 0.0,
         }
         for index, case in enumerate(evidence["cases"])
     ]
-    gate_timing_label = (
-        "Release gate wall-clock seconds"
-        if any(case["gate_elapsed_seconds"] is not None for case in evidence["cases"])
-        else "Release gate wall-clock not rerun"
-    )
 
     accuracy = build_dual_bar_figure(
         "Accuracy Against Declared Tolerance",
@@ -900,10 +975,10 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         "#1f7a5a",
     )
     timing = build_dual_bar_figure(
-        "Execution Time Evidence",
+        "Same-Scope Case Timing",
         timing_rows,
-        gate_timing_label,
-        "EnergyPlus elapsed seconds",
+        "Rust compare/report wall-clock",
+        "EnergyPlus oracle wall-clock",
         "Seconds",
         "#3c6e9f",
         "#c77d1a",
@@ -965,10 +1040,12 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
                 case["heat_balance_timesteps"],
                 compact_number_label(case["max_abs_delta_c"]),
                 compact_number_label(case["rmse_delta_c"]),
-                elapsed_label(case["gate_elapsed_seconds"]),
                 "n/a"
-                if case["energyplus_elapsed_seconds"] is None
-                else number_label(case["energyplus_elapsed_seconds"], 3, "s"),
+                if case["rust_compare_report_wall_seconds"] is None
+                else number_label(case["rust_compare_report_wall_seconds"], 3, "s"),
+                "n/a"
+                if case["energyplus_oracle_wall_seconds"] is None
+                else number_label(case["energyplus_oracle_wall_seconds"], 3, "s"),
             ]
         )
     return table(
@@ -982,8 +1059,8 @@ def build_case_matrix(evidence: dict[str, Any]) -> Table:
             "HB ts",
             "Max abs",
             "RMSE",
-            "Gate",
-            "E+ elapsed",
+            "Rust wall",
+            "E+ wall",
         ],
         rows,
         "Promoted numerical conformance case matrix.",
@@ -1020,12 +1097,27 @@ def build_accuracy_values(evidence: dict[str, Any]) -> Table:
 def build_timing_values(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     for index, case in enumerate(evidence["cases"], start=1):
+        timing = case["timing"]
         rows.append(
             [
                 f"C{index:02d}",
                 case["milestone"],
                 case_label(case["case_id"]),
+                "n/a"
+                if timing["rust_compare_report_wall_seconds"] is None
+                else number_label(timing["rust_compare_report_wall_seconds"], 3, "s"),
+                "n/a"
+                if timing["energyplus_oracle_wall_seconds"] is None
+                else number_label(timing["energyplus_oracle_wall_seconds"], 3, "s"),
+                percent_label(
+                    timing["rust_compare_report_wall_seconds"],
+                    timing["energyplus_oracle_wall_seconds"],
+                    1,
+                ),
                 elapsed_label(case["gate_elapsed_seconds"]),
+                "n/a"
+                if timing["release_gate_overhead_seconds"] is None
+                else number_label(timing["release_gate_overhead_seconds"], 3, "s"),
                 "n/a"
                 if case["energyplus_elapsed_seconds"] is None
                 else number_label(case["energyplus_elapsed_seconds"], 3, "s"),
@@ -1034,10 +1126,46 @@ def build_timing_values(evidence: dict[str, Any]) -> Table:
             ]
         )
     return table(
-        ["ID", "Milestone", "Case", "Gate wall", "E+ elapsed", "E+ warnings", "E+ severes"],
+        [
+            "ID",
+            "Milestone",
+            "Case",
+            "Rust wall",
+            "E+ wall",
+            "Rust/E+",
+            "Gate wall",
+            "Gate overhead",
+            "E+ self",
+            "E+ warnings",
+            "E+ severes",
+        ],
         rows,
-        "Execution time and EnergyPlus error summary values.",
-        [0.55, 0.75, 1.8, 0.85, 0.85, 0.8, 0.8],
+        "Same-scope case timing plus release-gate overhead and EnergyPlus self-reported elapsed time.",
+        [0.42, 0.58, 1.32, 0.72, 0.72, 0.64, 0.72, 0.82, 0.65, 0.55, 0.55],
+    )
+
+
+def build_phase_timing_values(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for index, case in enumerate(evidence["cases"], start=1):
+        total = case["timing"].get("ep_cli_total_wall_seconds")
+        for phase in case["timing"].get("phases", []):
+            wall = phase.get("wall_seconds")
+            rows.append(
+                [
+                    f"C{index:02d}",
+                    case_label(case["case_id"]),
+                    phase.get("name", ""),
+                    phase.get("engine", ""),
+                    "n/a" if wall is None else number_label(wall, 3, "s"),
+                    percent_label(wall, total, 1),
+                ]
+            )
+    return table(
+        ["ID", "Case", "Phase", "Engine", "Wall", "Share"],
+        rows,
+        "Detailed phase timing recorded in each compare-summary.json timing object.",
+        [0.42, 1.12, 1.72, 1.45, 0.72, 0.55],
     )
 
 
@@ -1433,14 +1561,17 @@ def build_series_detail(evidence: dict[str, Any]) -> Table:
 
 def build_metric_table(evidence: dict[str, Any]) -> Table:
     aggregate = evidence["aggregate"]
+    timing = evidence["timing"]
     rows = [
         ["Cases", aggregate["case_count"]],
         ["Series", aggregate["series_count"]],
         ["Max abs delta", number_label(aggregate["max_abs_delta_c"], 12)],
         ["Max RMSE", number_label(aggregate["rmse_delta_c"], 12)],
         ["Gate status", aggregate["status"]],
+        ["Rust compare/report wall", number_label(timing["rust_compare_report_wall_seconds"], 3, "s")],
+        ["EnergyPlus oracle wall", number_label(timing["energyplus_oracle_wall_seconds"], 3, "s")],
     ]
-    return table(["Metric", "Value"], rows, "Release evidence summary metrics.", [2.4, 2.2])
+    return table(["Metric", "Value"], rows, "Release evidence summary metrics.", [2.6, 2.2])
 
 
 def build_artifact_paths(evidence: dict[str, Any]) -> Table:
@@ -1547,18 +1678,20 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         Chapter(
             "Execution Time",
             Paragraph(
-                "EnergyPlus elapsed time is read from eplusout.end. The Rust diagnostic artifact currently persists "
-                "warmup and run-period timestep counts; when the report is regenerated with the dynamic lane enabled, "
-                "the full gate wall-clock is measured and a residual Rust/report wall-clock is shown."
+                "Figure timing compares the same conformance-case evidence scope: EnergyPlus oracle output production "
+                "wall-clock versus Rust compare/report evidence production wall-clock after the oracle files exist. "
+                "Release gate wall-clock, cargo/script/assert overhead, IDF conversion, and EnergyPlus self-reported "
+                "elapsed time are recorded separately so unlike scopes are not plotted against each other."
             ),
             build_dynamic_timing_table(dynamic),
             Figure(
                 charts["timing"],
-                caption="Promoted gate wall-clock and EnergyPlus elapsed time.",
+                caption="Same-scope Rust evidence production and EnergyPlus oracle production wall-clock.",
                 width=6.4,
                 placement="H",
             ),
             build_timing_values(evidence),
+            build_phase_timing_values(evidence),
         ),
         Chapter(
             "Promoted Gates",
@@ -1573,8 +1706,8 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
         Chapter(
             "Next Work",
             Paragraph(
-                "The next report-quality improvement is to persist Rust wall-time at warmup, run-period, surface-solve, "
-                "and artifact-writing boundaries. The next numerical target remains the 1Zone dynamic bottleneck: mass "
+                "The next timing-quality improvement is to add runtime-internal subphase timers inside the dynamic "
+                "heat-balance solver itself. The next numerical target remains the 1Zone dynamic bottleneck: mass "
                 "floor CTF storage/history and zone surface-convection closure before promotion."
             ),
             build_artifact_paths(evidence),

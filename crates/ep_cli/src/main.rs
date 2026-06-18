@@ -7,7 +7,8 @@ mod static_model;
 mod time_weather_schedule;
 
 use conformance_artifacts::{
-    BaselineSummary, generate_conformance_baseline, generate_conformance_baseline_in_dir,
+    BaselineSummary, ReportTimingSummary, append_timing_to_json_object, elapsed_seconds_since,
+    generate_conformance_baseline, generate_conformance_baseline_in_dir,
     generate_conformance_report_skeleton,
 };
 use ep_compare::{
@@ -61,6 +62,7 @@ use internal_gains::{generate_internal_gains_report, run_compare_internal_convec
 use static_model::generate_static_model_report;
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
@@ -1345,6 +1347,7 @@ fn generate_conformance_heat_balance_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<HeatBalanceReportSummary, String> {
+    let total_start = Instant::now();
     let report_context = heat_balance_conformance_context_from_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
@@ -1357,6 +1360,7 @@ fn generate_conformance_heat_balance_report(
         .weather
         .as_ref()
         .ok_or_else(|| "heat-balance conformance requires input.weather".to_string())?;
+    let rust_context_start = Instant::now();
     let diagnostic = build_heat_balance_conformance_diagnostic(
         &baseline.epjson,
         weather,
@@ -1365,7 +1369,26 @@ fn generate_conformance_heat_balance_report(
         &report_context,
     )?;
     let conformance = evaluate_heat_balance_conformance(&diagnostic, &report_context);
-    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance)?;
+    let rust_context_wall_seconds = elapsed_seconds_since(rust_context_start);
+    let rust_artifact_start = Instant::now();
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds: 0.0,
+        rust_compare_report_wall_seconds: 0.0,
+        total_wall_seconds: 0.0,
+    };
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance, &timing)?;
+    let rust_artifact_write_wall_seconds = elapsed_seconds_since(rust_artifact_start);
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds,
+        rust_compare_report_wall_seconds: rust_context_wall_seconds
+            + rust_artifact_write_wall_seconds,
+        total_wall_seconds: elapsed_seconds_since(total_start),
+    };
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance, &timing)?;
 
     Ok(HeatBalanceReportSummary {
         baseline,
@@ -1401,6 +1424,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<HeatBalanceReportSummary, String> {
+    let total_start = Instant::now();
     let report_context = heat_balance_diagnostic_context_from_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
@@ -1413,6 +1437,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         .weather
         .as_ref()
         .ok_or_else(|| "heat-balance diagnostic requires input.weather".to_string())?;
+    let rust_context_start = Instant::now();
     let diagnostic = build_heat_balance_conformance_diagnostic(
         &baseline.epjson,
         weather,
@@ -1421,7 +1446,26 @@ fn generate_conformance_heat_balance_diagnostic_report(
         &report_context,
     )?;
     let conformance = evaluate_heat_balance_conformance(&diagnostic, &report_context);
-    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance)?;
+    let rust_context_wall_seconds = elapsed_seconds_since(rust_context_start);
+    let rust_artifact_start = Instant::now();
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds: 0.0,
+        rust_compare_report_wall_seconds: 0.0,
+        total_wall_seconds: 0.0,
+    };
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance, &timing)?;
+    let rust_artifact_write_wall_seconds = elapsed_seconds_since(rust_artifact_start);
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds,
+        rust_compare_report_wall_seconds: rust_context_wall_seconds
+            + rust_artifact_write_wall_seconds,
+        total_wall_seconds: elapsed_seconds_since(total_start),
+    };
+    write_heat_balance_conformance_report(&compare_dir, &diagnostic, &conformance, &timing)?;
 
     Ok(HeatBalanceReportSummary {
         baseline,
@@ -8678,6 +8722,7 @@ fn write_heat_balance_conformance_report(
     report_dir: &Path,
     diagnostic: &HeatBalanceConformanceDiagnostic,
     conformance: &HeatBalanceConformance<'_>,
+    timing: &ReportTimingSummary,
 ) -> Result<(), String> {
     std::fs::create_dir_all(report_dir)
         .map_err(|error| format!("failed to create report directory: {error}"))?;
@@ -8688,7 +8733,7 @@ fn write_heat_balance_conformance_report(
 
     std::fs::write(
         &summary_path,
-        render_heat_balance_conformance_summary_json(diagnostic, conformance),
+        render_heat_balance_conformance_summary_json(diagnostic, conformance, timing),
     )
     .map_err(|error| format!("failed to write heat-balance summary: {error}"))?;
     std::fs::write(
@@ -8708,8 +8753,12 @@ fn write_heat_balance_conformance_report(
 fn render_heat_balance_conformance_summary_json(
     diagnostic: &HeatBalanceConformanceDiagnostic,
     conformance: &HeatBalanceConformance<'_>,
+    timing: &ReportTimingSummary,
 ) -> String {
-    render_heat_balance_conformance_json(diagnostic, conformance, true)
+    append_timing_to_json_object(
+        render_heat_balance_conformance_json(diagnostic, conformance, true),
+        timing,
+    )
 }
 
 fn render_heat_balance_conformance_digest_json(
@@ -13647,7 +13696,11 @@ mod tests {
         };
         let conformance = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
-        let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &conformance);
+        let json = super::render_heat_balance_conformance_summary_json(
+            &diagnostic,
+            &conformance,
+            &super::ReportTimingSummary::default(),
+        );
         let digest = super::render_heat_balance_conformance_digest_json(&diagnostic, &conformance);
         let report = super::render_heat_balance_conformance_report(&diagnostic, &conformance);
 
@@ -13656,6 +13709,7 @@ mod tests {
         assert!(json.contains("\"comparison_class\": \"conformance\""));
         assert!(json.contains("\"conformance_claim\": true"));
         assert!(json.contains("\"status\": \"pass\""));
+        assert!(json.contains("\"timing\""));
         assert!(json.contains("\"ctf_seed\""));
         assert!(json.contains("\"policy\": \"disabled\""));
         assert!(json.contains("\"zone_air_algorithm\": \"simplified-analytical\""));
@@ -14390,13 +14444,18 @@ mod tests {
         };
         let comparison = super::evaluate_heat_balance_conformance(&diagnostic, &context);
 
-        let json = super::render_heat_balance_conformance_summary_json(&diagnostic, &comparison);
+        let json = super::render_heat_balance_conformance_summary_json(
+            &diagnostic,
+            &comparison,
+            &super::ReportTimingSummary::default(),
+        );
         let digest = super::render_heat_balance_conformance_digest_json(&diagnostic, &comparison);
         let report = super::render_heat_balance_conformance_report(&diagnostic, &comparison);
 
         assert_eq!(comparison.status, "fail");
         assert!(json.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(json.contains("\"conformance_claim\": false"));
+        assert!(json.contains("\"timing\""));
         assert!(json.contains("\"oracle_run_period_day_count\": 20"));
         assert!(json.contains("\"day_count_delta\": -14"));
         assert!(json.contains("\"policy\": \"steady-no-mass-only\""));

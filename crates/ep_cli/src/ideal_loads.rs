@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use ep_compare::{
     SeriesAlignment, SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
@@ -80,7 +81,10 @@ use ep_runtime::{
     validate_ideal_loads_zone_equipment_dispatch,
 };
 
-use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
+use crate::conformance_artifacts::{
+    BaselineSummary, ReportTimingSummary, append_timing_to_json_object, elapsed_seconds_since,
+    generate_conformance_baseline_in_dir,
+};
 use crate::{
     comparison_class_label, evidence_domain_label, json_number, json_string, markdown_cell,
     output_frequency_label, output_level_label, source_artifact_label, variable_class_label,
@@ -479,6 +483,7 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<IdealLoadsDiagnosticReportSummary, String> {
+    let total_start = Instant::now();
     validate_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
@@ -488,8 +493,28 @@ pub(crate) fn generate_ideal_loads_no_oa_sensible_report(
     let baseline =
         generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
     let (series_count, compared_samples, tolerance_failures_count, tolerance_policy, status) = {
+        let rust_context_start = Instant::now();
         let context = build_context(manifest, &baseline)?;
-        write_artifacts(&compare_dir, &context)?;
+        let rust_context_wall_seconds = elapsed_seconds_since(rust_context_start);
+        let rust_artifact_start = Instant::now();
+        let timing = ReportTimingSummary {
+            baseline: baseline.timing,
+            rust_context_wall_seconds,
+            rust_artifact_write_wall_seconds: 0.0,
+            rust_compare_report_wall_seconds: 0.0,
+            total_wall_seconds: 0.0,
+        };
+        write_artifacts(&compare_dir, &context, &timing)?;
+        let rust_artifact_write_wall_seconds = elapsed_seconds_since(rust_artifact_start);
+        let timing = ReportTimingSummary {
+            baseline: baseline.timing,
+            rust_context_wall_seconds,
+            rust_artifact_write_wall_seconds,
+            rust_compare_report_wall_seconds: rust_context_wall_seconds
+                + rust_artifact_write_wall_seconds,
+            total_wall_seconds: elapsed_seconds_since(total_start),
+        };
+        write_artifacts(&compare_dir, &context, &timing)?;
 
         let tolerance_failures_count = tolerance_failures_count(&context);
         let status = overall_status(&context);
@@ -4902,6 +4927,7 @@ fn mean_abs_delta(expected: &[SeriesSample], observed: &[SeriesSample]) -> f64 {
 fn write_artifacts(
     compare_dir: &Path,
     context: &IdealLoadsDiagnosticContext<'_>,
+    timing: &ReportTimingSummary,
 ) -> Result<(), String> {
     std::fs::create_dir_all(compare_dir)
         .map_err(|error| format!("failed to create IdealLoads report directory: {error}"))?;
@@ -4912,7 +4938,7 @@ fn write_artifacts(
     .map_err(|error| format!("failed to write IdealLoads compare report: {error}"))?;
     std::fs::write(
         compare_dir.join("compare-summary.json"),
-        render_summary_json(context),
+        append_timing_to_json_object(render_summary_json(context), timing),
     )
     .map_err(|error| format!("failed to write IdealLoads compare summary: {error}"))?;
     std::fs::write(

@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use ep_compare::{
     SeriesAlignment, SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
@@ -15,7 +16,10 @@ use ep_runtime::{
     TimeAxis, TimePoint, build_hourly_time_axis, simulate_zone_internal_convective_gains,
 };
 
-use crate::conformance_artifacts::{BaselineSummary, generate_conformance_baseline_in_dir};
+use crate::conformance_artifacts::{
+    BaselineSummary, ReportTimingSummary, append_timing_to_json_object, elapsed_seconds_since,
+    generate_conformance_baseline_in_dir,
+};
 use crate::{
     comparison_class_label, json_number, json_string, markdown_cell, output_frequency_label,
     print_compile_diagnostics, report_format_label, source_artifact_label, variable_class_label,
@@ -170,6 +174,7 @@ pub(crate) fn generate_internal_gains_report(
     oracle_root: &Path,
     output_root: &Path,
 ) -> Result<InternalGainsReportSummary, String> {
+    let total_start = Instant::now();
     validate_manifest(manifest)?;
 
     let case_output_dir = output_root.join(&manifest.id);
@@ -178,8 +183,28 @@ pub(crate) fn generate_internal_gains_report(
 
     let baseline =
         generate_conformance_baseline_in_dir(case_path, manifest, oracle_root, &oracle_output_dir)?;
+    let rust_context_start = Instant::now();
     let context = build_context(manifest, &baseline)?;
-    write_report(&compare_dir, &context)?;
+    let rust_context_wall_seconds = elapsed_seconds_since(rust_context_start);
+    let rust_artifact_start = Instant::now();
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds: 0.0,
+        rust_compare_report_wall_seconds: 0.0,
+        total_wall_seconds: 0.0,
+    };
+    write_report(&compare_dir, &context, &timing)?;
+    let rust_artifact_write_wall_seconds = elapsed_seconds_since(rust_artifact_start);
+    let timing = ReportTimingSummary {
+        baseline: baseline.timing,
+        rust_context_wall_seconds,
+        rust_artifact_write_wall_seconds,
+        rust_compare_report_wall_seconds: rust_context_wall_seconds
+            + rust_artifact_write_wall_seconds,
+        total_wall_seconds: elapsed_seconds_since(total_start),
+    };
+    write_report(&compare_dir, &context, &timing)?;
 
     let conformance_rows = context
         .rows
@@ -503,7 +528,11 @@ fn tolerance_label(tolerance: Tolerance) -> String {
     )
 }
 
-fn write_report(report_dir: &Path, context: &InternalGainContext<'_>) -> Result<(), String> {
+fn write_report(
+    report_dir: &Path,
+    context: &InternalGainContext<'_>,
+    timing: &ReportTimingSummary,
+) -> Result<(), String> {
     std::fs::create_dir_all(report_dir)
         .map_err(|error| format!("failed to create report directory: {error}"))?;
     std::fs::write(
@@ -513,7 +542,7 @@ fn write_report(report_dir: &Path, context: &InternalGainContext<'_>) -> Result<
     .map_err(|error| format!("failed to write internal-gains report: {error}"))?;
     std::fs::write(
         report_dir.join("compare-summary.json"),
-        render_json(context),
+        append_timing_to_json_object(render_json(context), timing),
     )
     .map_err(|error| format!("failed to write internal-gains summary: {error}"))?;
     Ok(())
