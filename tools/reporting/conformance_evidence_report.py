@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import platform
 import re
 import statistics
 import subprocess
@@ -32,6 +34,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+
+from conformance_index_report import build_conformance_index as build_conformance_index_snapshot
+from release_evidence_manifest import build_manifest as build_release_manifest_snapshot
+from support_coverage_report import build_support_coverage as build_support_coverage_snapshot
 
 
 ORACLE_VERSION = "26.1.0"
@@ -577,6 +583,65 @@ def build_ideal_loads_time_series(repo_root: Path) -> list[dict[str, Any]]:
     return records
 
 
+def load_optional_json(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def release_evidence_root(repo_root: Path, version: str) -> Path:
+    return repo_root / ".runtime" / "release-evidence" / f"v{version}"
+
+
+def build_coverage_snapshot(repo_root: Path, version: str, passed_series_count: int) -> dict[str, Any]:
+    support = build_support_coverage_snapshot(repo_root, version)
+    index = build_conformance_index_snapshot(repo_root, version)
+    handbook = load_optional_json(release_evidence_root(repo_root, version) / "user-coverage-handbook.json")
+    handbook_aggregate = handbook.get("aggregate") or {}
+    support_aggregate = support.get("aggregate") or {}
+    index_aggregate = index.get("aggregate") or {}
+    variable_counts = support.get("coverage_matrix", {}).get("output_variable_status_counts", {})
+    level_counts = index.get("coverage_matrix", {}).get("level_counts", {})
+    declared_numerical_series = handbook_aggregate.get("declared_numerical_series_count")
+    if declared_numerical_series is None:
+        declared_numerical_series = level_counts.get("conformance", 0)
+    return {
+        "source": "specs + conformance-index + support-coverage + user-coverage-handbook",
+        "input_object_count": support_aggregate.get("input_object_count", 0),
+        "typed_input_count": support_aggregate.get("typed_input_count", 0),
+        "tracked_output_variable_count": support_aggregate.get("tracked_output_variable_count", 0),
+        "conformance_output_variable_count": variable_counts.get("conformance", 0),
+        "diagnostic_output_variable_count": variable_counts.get("diagnostic", 0),
+        "baseline_output_variable_count": variable_counts.get("baseline", 0),
+        "algorithm_count": support_aggregate.get("algorithm_count", 0),
+        "conformance_algorithm_count": support_aggregate.get("conformance_algorithm_count", 0),
+        "diagnostic_algorithm_count": support_aggregate.get("diagnostic_algorithm_count", 0),
+        "case_count": index_aggregate.get("case_count", 0),
+        "conformance_case_count": index_aggregate.get("conformance_case_count", 0),
+        "diagnostic_or_baseline_case_count": index_aggregate.get("baseline_or_diagnostic_case_count", 0),
+        "index_output_request_count": index_aggregate.get("output_count", 0),
+        "index_meter_count": index_aggregate.get("meter_count", 0),
+        "level_counts": level_counts,
+        "declared_numerical_series_count": int(declared_numerical_series),
+        "passed_numerical_series_count": passed_series_count,
+        "coverage_note": (
+            "Coverage counters are scope counters from specs and manifests; they are not a full EnergyPlus "
+            "compatibility count."
+        ),
+        "support": support,
+        "index": index,
+    }
+
+
+def build_manifest_snapshot(repo_root: Path, version: str) -> dict[str, Any]:
+    manifest = build_release_manifest_snapshot(repo_root, version, "windows-x64")
+    manifest["snapshot_note"] = (
+        "This PDF embeds a manifest snapshot taken during evidence generation. Run "
+        ".\\scripts\\dev.cmd release-evidence-manifest after PDF generation for final artifact hashes."
+    )
+    return manifest
+
+
 def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
     requested = repo_path(repo_root, spec.digest_path)
     if requested.is_file():
@@ -604,6 +669,88 @@ def run_dev_command(repo_root: Path, command: str) -> float:
     start = time.perf_counter()
     subprocess.run(["cmd", "/c", str(repo_root / "scripts" / "dev.cmd"), command], cwd=repo_root, check=True)
     return time.perf_counter() - start
+
+
+def command_text(repo_root: Path, args: list[str]) -> str:
+    try:
+        completed = subprocess.run(args, cwd=repo_root, check=False, capture_output=True, text=True)
+    except OSError as error:
+        return f"unavailable: {error}"
+    text = (completed.stdout or completed.stderr or "").strip()
+    if completed.returncode != 0:
+        return f"unavailable: {text}" if text else "unavailable"
+    return text or "unavailable"
+
+
+def sha256_file(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def workspace_version(repo_root: Path) -> str:
+    cargo = read_toml(repo_root / "Cargo.toml")
+    return str((cargo.get("workspace") or {}).get("package", {}).get("version", ""))
+
+
+def evidence_generation_command(
+    version: str,
+    skip_gate_run: bool,
+    run_dynamic_diagnostic: bool,
+    timing_repeats: int,
+    dynamic_timing_repeats: int,
+) -> str:
+    parts = [
+        r".\scripts\dev.cmd",
+        "conformance-evidence-report",
+        "-Version",
+        version,
+        "-TimingRepeats",
+        str(timing_repeats),
+        "-DynamicTimingRepeats",
+        str(dynamic_timing_repeats),
+    ]
+    if skip_gate_run:
+        parts.append("-SkipGateRun")
+    if run_dynamic_diagnostic:
+        parts.append("-RunDynamicDiagnostic")
+    return " ".join(parts)
+
+
+def build_environment_metadata(
+    repo_root: Path,
+    version: str,
+    skip_gate_run: bool,
+    run_dynamic_diagnostic: bool,
+    timing_repeats: int,
+    dynamic_timing_repeats: int,
+) -> dict[str, Any]:
+    return {
+        "project_name": "rusted-energyplus",
+        "workspace_version": workspace_version(repo_root) or version,
+        "git_commit": command_text(repo_root, ["git", "rev-parse", "HEAD"]),
+        "git_commit_short": command_text(repo_root, ["git", "rev-parse", "--short", "HEAD"]),
+        "rustc_version": command_text(repo_root, ["rustc", "--version"]),
+        "cargo_version": command_text(repo_root, ["cargo", "--version"]),
+        "python_report_version": command_text(repo_root, ["python", "--version"]),
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "report_generation_command": evidence_generation_command(
+            version,
+            skip_gate_run,
+            run_dynamic_diagnostic,
+            timing_repeats,
+            dynamic_timing_repeats,
+        ),
+        "final_pdf_hash_note": (
+            "The final PDF SHA256 is recorded by release-evidence-manifest after this PDF is written; "
+            "a PDF cannot contain its own stable final hash."
+        ),
+    }
 
 
 def elapsed_seconds(path: Path) -> float | None:
@@ -1228,12 +1375,23 @@ def build_evidence(
     time_series_records.extend(build_ideal_loads_time_series(repo_root))
     for index, record in enumerate(time_series_records, start=1):
         record["id"] = f"TS{index:02d}"
+    environment = build_environment_metadata(
+        repo_root,
+        version,
+        skip_gate_run,
+        run_dynamic_diagnostic,
+        timing_repeats,
+        dynamic_timing_repeats,
+    )
+    coverage_snapshot = build_coverage_snapshot(repo_root, version, len(all_series))
+    manifest_snapshot = build_manifest_snapshot(repo_root, version)
     return {
         "schema_version": 1,
         "version": version,
         "oracle_version": ORACLE_VERSION,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "claim_boundary": CLAIM_BOUNDARY,
+        "environment": environment,
         "timing_repeats": 0 if skip_gate_run else max(timing_repeats, 1),
         "dynamic_timing_repeats": 0 if not run_dynamic_diagnostic else max(dynamic_timing_repeats, 1),
         "aggregate": {
@@ -1269,6 +1427,8 @@ def build_evidence(
         "porting_milestones": load_porting_rows(repo_root),
         "active_dynamic_diagnostic": dynamic_diagnostic,
         "time_series": time_series_records,
+        "coverage_snapshot": coverage_snapshot,
+        "manifest_snapshot": manifest_snapshot,
         "artifacts": {
             "html": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.html",
             "pdf": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.pdf",
@@ -1474,6 +1634,55 @@ def build_time_series_figure(record: dict[str, Any]) -> Any:
     return fig
 
 
+def build_coverage_status_figure(coverage: dict[str, Any]) -> Any:
+    labels = ["conformance", "diagnostic", "baseline"]
+    values = [
+        int(coverage.get("conformance_output_variable_count", 0)),
+        int(coverage.get("diagnostic_output_variable_count", 0)),
+        int(coverage.get("baseline_output_variable_count", 0)),
+    ]
+    colors = ["#2f6f9f", "#c77d1a", "#697789"]
+    fig, ax = plt.subplots(figsize=(6.6, 3.1), dpi=180)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    ax.bar(labels, values, color=colors, edgecolor="none", width=0.52)
+    max_value = max(values, default=1)
+    for index, value in enumerate(values):
+        ax.text(index, value + max_value * 0.025, str(value), ha="center", va="bottom", fontsize=8)
+    ax.set_ylim(0, max_value * 1.16)
+    ax.set_ylabel("Tracked output variables", fontsize=9, color="#5b6775")
+    ax.set_title("Variable Coverage Status", loc="left", fontsize=13, fontweight="bold", color="#17212b", pad=10)
+    style_axis(ax)
+    ax.grid(axis="y", color="#e3e7ed", linewidth=0.8)
+    ax.grid(axis="x", visible=False)
+    fig.tight_layout(pad=1.0)
+    return fig
+
+
+def build_declared_vs_passed_figure(coverage: dict[str, Any]) -> Any:
+    labels = ["declared numerical", "passed evidence"]
+    values = [
+        int(coverage.get("declared_numerical_series_count", 0)),
+        int(coverage.get("passed_numerical_series_count", 0)),
+    ]
+    colors = ["#c9d8e8", "#1f7a5a"]
+    fig, ax = plt.subplots(figsize=(6.6, 3.1), dpi=180)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    ax.bar(labels, values, color=colors, edgecolor="none", width=0.48)
+    max_value = max(values, default=1)
+    for index, value in enumerate(values):
+        ax.text(index, value + max_value * 0.025, str(value), ha="center", va="bottom", fontsize=8)
+    ax.set_ylim(0, max_value * 1.16)
+    ax.set_ylabel("Series count", fontsize=9, color="#5b6775")
+    ax.set_title("Declared Scope vs Passed Evidence", loc="left", fontsize=13, fontweight="bold", color="#17212b", pad=10)
+    style_axis(ax)
+    ax.grid(axis="y", color="#e3e7ed", linewidth=0.8)
+    ax.grid(axis="x", visible=False)
+    fig.tight_layout(pad=1.0)
+    return fig
+
+
 def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     accuracy_rows: list[dict[str, Any]] = []
     series_index = 1
@@ -1546,6 +1755,8 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         "accuracy": accuracy,
         "timing": timing,
         "dynamic_bottlenecks": dynamic_bottlenecks,
+        "coverage_status": build_coverage_status_figure(evidence.get("coverage_snapshot", {})),
+        "declared_vs_passed": build_declared_vs_passed_figure(evidence.get("coverage_snapshot", {})),
         "time_series": time_series,
     }
 
@@ -2493,6 +2704,199 @@ def build_artifact_paths(evidence: dict[str, Any]) -> Table:
     return table(["Artifact", "Path"], rows, "Generated release evidence artifacts.", [1.5, 5.6])
 
 
+def short_text(value: Any, max_chars: int = 110) -> str:
+    text = "" if value is None else str(value)
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
+
+
+def build_environment_table(evidence: dict[str, Any]) -> Table:
+    env = evidence.get("environment", {})
+    rows = [
+        ["Project", env.get("project_name")],
+        ["Version", env.get("workspace_version")],
+        ["Generated UTC", evidence.get("generated_at_utc")],
+        ["EnergyPlus oracle", evidence.get("oracle_version")],
+        ["Git commit", env.get("git_commit_short")],
+        ["Rust toolchain", env.get("rustc_version")],
+        ["Cargo", env.get("cargo_version")],
+        ["Platform", f"{env.get('platform')} / {env.get('machine')}"],
+        ["Report command", env.get("report_generation_command")],
+        ["PDF hash note", env.get("final_pdf_hash_note")],
+    ]
+    return table(["Field", "Value"], rows, "Evidence generation environment and command.", [1.35, 5.85])
+
+
+def build_executive_status_table(evidence: dict[str, Any]) -> Table:
+    dynamic = evidence.get("active_dynamic_diagnostic") or {}
+    ideal_case = next(
+        (case for case in evidence.get("cases", []) if case.get("case_id") == "ideal_loads_no_oa_sensible_conformance_001"),
+        {},
+    )
+    rows = [
+        ["1ZoneUncontrolled declared variables", "pass/fail by listed gates", "conformance + diagnostic context", "no"],
+        ["1ZoneUncontrolled broader heat balance", dynamic.get("status", "missing"), "diagnostic-only", "no"],
+        ["IdealLoads no-OA sensible", ideal_case.get("status", "missing"), "conformance", "no"],
+        ["IdealLoads OA/economizer/HR branches", "partly conformance-candidate / diagnostic", "branch-level evidence", "no"],
+        ["HVAC/Plant general", "not claimed", "none or diagnostic-only", "no"],
+        ["Facility meters", "limited", "declared candidates only", "no"],
+    ]
+    return table(
+        ["Area", "Status", "Evidence type", "Broad claim?"],
+        rows,
+        "Executive claim summary. No row is a full EnergyPlus compatibility claim.",
+        [1.8, 1.25, 2.1, 0.8],
+    )
+
+
+def build_claim_boundary_table(_evidence: dict[str, Any]) -> Table:
+    rows = [
+        ["Oracle", ORACLE_VERSION, "EnergyPlus oracle/reference baseline only."],
+        ["Compatibility mode", "declared cases/variables", "Tolerance-gated rows only for listed manifests and frequencies."],
+        ["Diagnostic mode", "diagnostic-only", "Evidence for gaps; not a compatibility claim."],
+        ["Fast/experimental modes", "not in claim", "Excluded from compatibility evidence unless a gate declares them."],
+        ["Broad EnergyPlus compatibility", "not claimed", "The report intentionally avoids full runtime/HVAC/plant claims."],
+    ]
+    return table(["Boundary", "Value", "Interpretation"], rows, "Compatibility claim boundary definitions.", [1.65, 1.45, 4.0])
+
+
+def build_not_claimed_table(_evidence: dict[str, Any]) -> Table:
+    domains = [
+        "general EnergyPlus heat-balance compatibility",
+        "broad CTF storage parity",
+        "broad warmup convergence parity",
+        "broad solar/radiation/fenestration parity",
+        "broad infiltration/ventilation parity",
+        "broad HVAC system compatibility",
+        "broad node compatibility",
+        "broad PlantLoop compatibility",
+        "broad meter compatibility",
+        "autosizing compatibility",
+        "EMS/PythonPlugin compatibility",
+        "full ExampleFiles compatibility",
+    ]
+    return table(["Not-Claimed Domain"], [[domain] for domain in domains], "Domains explicitly excluded from this evidence pack.", [6.8])
+
+
+def build_manifest_summary_table(evidence: dict[str, Any]) -> Table:
+    manifest = evidence.get("manifest_snapshot", {})
+    aggregate = manifest.get("aggregate", {})
+    rows = [
+        ["Required assets", aggregate.get("required_asset_count")],
+        ["Present assets", aggregate.get("present_required_asset_count")],
+        ["Missing assets", aggregate.get("missing_required_asset_count")],
+        ["Manifest status", aggregate.get("status")],
+        ["Snapshot note", manifest.get("snapshot_note")],
+    ]
+    return table(["Metric", "Value"], rows, "Release evidence manifest snapshot.", [1.35, 5.85])
+
+
+def build_manifest_asset_table(evidence: dict[str, Any]) -> Table:
+    manifest = evidence.get("manifest_snapshot", {})
+    rows: list[list[Any]] = []
+    for asset in manifest.get("assets", []):
+        rows.append(
+            [
+                asset.get("role"),
+                short_text(asset.get("path"), 70),
+                "yes" if asset.get("exists") else "missing",
+                short_text(asset.get("sha256"), 18),
+                short_text(asset.get("user_purpose"), 85),
+            ]
+        )
+    return table(
+        ["Role", "Path", "Exists", "SHA256", "Purpose"],
+        rows,
+        "Expected release artifacts and hashes. The final numeric PDF hash is produced by the manifest after PDF write.",
+        [1.55, 1.75, 0.55, 0.85, 2.5],
+    )
+
+
+def build_coverage_summary_table(evidence: dict[str, Any]) -> Table:
+    coverage = evidence.get("coverage_snapshot", {})
+    rows = [
+        ["Tracked output variables", coverage.get("tracked_output_variable_count")],
+        ["Conformance variables", coverage.get("conformance_output_variable_count")],
+        ["Diagnostic variables", coverage.get("diagnostic_output_variable_count")],
+        ["Baseline variables", coverage.get("baseline_output_variable_count")],
+        ["Declared numerical series", coverage.get("declared_numerical_series_count")],
+        ["Passed release-evidence series", coverage.get("passed_numerical_series_count")],
+        ["Tracked cases", coverage.get("case_count")],
+        ["Conformance cases", coverage.get("conformance_case_count")],
+        ["Algorithms", coverage.get("algorithm_count")],
+        ["Source", coverage.get("source")],
+    ]
+    return table(["Coverage Counter", "Value"], rows, "Current coverage snapshot. These are scope counters, not broad compatibility counters.", [2.35, 4.85])
+
+
+def build_case_coverage_matrix_table(evidence: dict[str, Any]) -> Table:
+    index = (evidence.get("coverage_snapshot", {}).get("index") or {})
+    rows: list[list[Any]] = []
+    for row in index.get("cases", [])[:38]:
+        outputs = row.get("outputs", [])
+        meters = row.get("meters", [])
+        conformance = sum(1 for output in outputs if output.get("level") == "conformance")
+        diagnostic = sum(1 for output in outputs if output.get("level") == "diagnostic")
+        baseline = sum(1 for output in outputs if output.get("level") == "baseline")
+        diagnostic += sum(1 for meter in meters if meter.get("level") == "diagnostic")
+        conformance += sum(1 for meter in meters if meter.get("level") == "conformance")
+        rows.append(
+            [
+                short_text(row.get("case_id"), 44),
+                row.get("source_kind"),
+                short_text(", ".join(row.get("domains", [])), 45),
+                row.get("comparison_class"),
+                str(row.get("conformance_claim")).lower(),
+                conformance,
+                diagnostic,
+                baseline,
+                short_text(row.get("report_path"), 48),
+            ]
+        )
+    return table(
+        ["Case", "Source", "Domains", "Class", "Claim", "Pass vars", "Diag vars", "Base vars", "Report"],
+        rows,
+        "Case coverage matrix excerpt. Full matrix is preserved in conformance-index-report.json.",
+        [1.35, 0.72, 0.95, 0.72, 0.48, 0.5, 0.5, 0.5, 1.15],
+    )
+
+
+def build_reproducibility_table(evidence: dict[str, Any]) -> Table:
+    version = evidence.get("version")
+    commands = [
+        r".\scripts\dev.cmd setup",
+        r".\scripts\dev.cmd check",
+        rf".\scripts\dev.cmd conformance-index-report -Version {version}",
+        rf".\scripts\dev.cmd support-coverage-report -Version {version}",
+        rf".\scripts\dev.cmd user-coverage-handbook -Version {version}",
+        rf".\scripts\dev.cmd conformance-evidence-report -Version {version} -TimingRepeats 3 -RunDynamicDiagnostic -DynamicTimingRepeats 1",
+        rf".\scripts\dev.cmd release-evidence-manifest -Version {version}",
+    ]
+    return table(
+        ["Step", "Command"],
+        [[index, command] for index, command in enumerate(commands, start=1)],
+        "Commands required to reproduce the evidence pack on a prepared Windows machine.",
+        [0.45, 6.65],
+    )
+
+
+def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
+    rows = [
+        ["Cover metadata", "done", "Project/version/date/oracle/toolchain/platform/git/command are in Executive Summary."],
+        ["Claim boundary", "done", "Diagnostic, compatibility, and not-claimed domains are explicit."],
+        ["Evidence manifest", "partial", "Manifest snapshot is embedded; final hashes require post-PDF release-evidence-manifest."],
+        ["Coverage charts", "done", "Variable status and declared-vs-passed charts are included."],
+        ["Case coverage matrix", "partial", "PDF includes excerpt; full matrix remains JSON."],
+        ["1Zone time-series plots", "partial", "MAT/convection/storage/conduction overlays included; heatmap/histogram still pending."],
+        ["IdealLoads time-series plots", "partial", "No-OA rates/node overlays included; branch heatmap/meter plot pending."],
+        ["Performance evidence", "partial", "3 repeat gate timings included; N=10 median/p90 summary pending."],
+        ["Stability evidence", "pending", "Typed failure fixture summary and repeated-hash evidence pending."],
+        ["Reproducibility", "done", "Command list and artifact paths are included."],
+    ]
+    return table(["TODO Area", "Status", "Evidence Pack Handling"], rows, "Current checklist status against the PDF evidence-pack TODO.", [1.45, 0.65, 5.1])
+
+
 def time_series_source_label(source: str | None) -> str:
     if source is None:
         return ""
@@ -2565,6 +2969,57 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
     return Document(
         f"eplus-rs {version} Conformance Gap Evidence",
         TableOfContents("Table of Contents", max_level=2),
+        Chapter(
+            "Executive Summary",
+            Box(
+                Paragraph(
+                    "This report does not claim full EnergyPlus compatibility. It evaluates declared compatibility "
+                    "for the official 1ZoneUncontrolled dynamic heat-balance variables and selected "
+                    "IdealLoadsAirSystem branch-level variables. All claims are limited to the listed cases, "
+                    "variables, tolerances, and EnergyPlus 26.1.0 oracle. Diagnostic-only evidence is included to "
+                    "show remaining gaps and is not a compatibility claim."
+                ),
+                title="Evidence Pack Reading Rule",
+                border_color="#2f6f9f",
+                background_color="#f4f8fb",
+                padding=0.12,
+            ),
+            build_environment_table(evidence),
+            build_executive_status_table(evidence),
+        ),
+        Chapter(
+            "Claim Boundary",
+            build_claim_boundary_table(evidence),
+            build_not_claimed_table(evidence),
+        ),
+        Chapter(
+            "Evidence Manifest",
+            Paragraph(
+                "The release evidence manifest is the artifact hash owner. This PDF embeds a snapshot so readers "
+                "can see which assets are expected; run the manifest command after PDF generation to hash the final "
+                "PDF bytes."
+            ),
+            build_manifest_summary_table(evidence),
+            build_manifest_asset_table(evidence),
+        ),
+        Chapter(
+            "Coverage Snapshot",
+            Paragraph(evidence.get("coverage_snapshot", {}).get("coverage_note", "")),
+            Figure(
+                charts["coverage_status"],
+                caption="Output variable coverage status from support coverage specs.",
+                width=6.4,
+                placement="H",
+            ),
+            Figure(
+                charts["declared_vs_passed"],
+                caption="Declared numerical scope versus passed release-evidence series.",
+                width=6.4,
+                placement="H",
+            ),
+            build_coverage_summary_table(evidence),
+            build_case_coverage_matrix_table(evidence),
+        ),
         Chapter(
             "Comparison Scope",
             Box(
@@ -2711,6 +3166,8 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 "rows only when each branch has its own source-order gate."
             ),
             build_artifact_paths(evidence),
+            build_reproducibility_table(evidence),
+            build_pdf_todo_status_table(evidence),
         ),
         settings=settings,
     )

@@ -424,7 +424,7 @@ def build_input_table(report: dict[str, Any]) -> Table:
             row["family"],
             row["user_status"],
             row["first_evidence"],
-            row["support_boundary"],
+            compact_text(row["support_boundary"], 110),
         ]
         for row in report["input_objects"]
     ]
@@ -446,7 +446,7 @@ def build_output_table(report: dict[str, Any]) -> Table:
             ", ".join(row["observed_sources"]),
             ", ".join(row["observed_levels"]),
             ", ".join(row["best_evidence_cases"][:3]),
-            row["support_boundary"],
+            compact_text(row["support_boundary"], 95),
         ]
         for row in report["output_variables"]
     ]
@@ -470,13 +470,13 @@ def build_output_table(report: dict[str, Any]) -> Table:
 def build_algorithm_table(report: dict[str, Any]) -> Table:
     rows = [
         [
-            row["id"],
+            compact_text(row["id"], 46),
             row["domain"],
             row["user_status"],
-            row["claim_level"],
+            compact_text(row["claim_level"], 52),
             row["first_evidence"],
-            compact_join(row["proof_variables"]),
-            compact_text(row["support_boundary"]),
+            compact_text(compact_join(row["proof_variables"], 2), 90),
+            compact_text(row["support_boundary"], 90),
         ]
         for row in report["algorithms"]
     ]
