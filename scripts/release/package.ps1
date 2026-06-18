@@ -73,6 +73,7 @@ if ($binaryVersion -ne $expectedVersion) {
 Copy-RepoItem -Source (Join-Path $RepoRoot "README.md") -Destination (Join-Path $stageRoot "README.md")
 Copy-RepoItem -Source (Join-Path $RepoRoot "CONTRIBUTING.md") -Destination (Join-Path $stageRoot "CONTRIBUTING.md")
 Copy-RepoItem -Source (Join-Path $RepoRoot "CHANGELOG.md") -Destination (Join-Path $stageRoot "CHANGELOG.md")
+Copy-RepoItem -Source (Join-Path $RepoRoot "eplus-rs-launch.cmd") -Destination (Join-Path $stageRoot "eplus-rs-launch.cmd")
 Copy-RepoItem -Source (Join-Path $RepoRoot "Cargo.toml") -Destination (Join-Path $stageRoot "Cargo.toml")
 Copy-RepoItem -Source (Join-Path $RepoRoot "Cargo.lock") -Destination (Join-Path $stageRoot "Cargo.lock")
 Copy-RepoItem -Source (Join-Path $RepoRoot "rust-toolchain.toml") -Destination (Join-Path $stageRoot "rust-toolchain.toml")

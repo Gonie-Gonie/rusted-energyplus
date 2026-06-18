@@ -10,6 +10,9 @@ is inside the declared boundary.
 eplus-rs run .\model.idf -w .\weather.epw -d .\out --oracle-baseline --compare-oracle
 ```
 
+On Windows, double-click `eplus-rs-launch.cmd` to open the small button-based
+launcher for the same pipeline.
+
 Important boundaries:
 
 - unsupported inputs do not fall back to EnergyPlus as the Rust result

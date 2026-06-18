@@ -30,6 +30,11 @@ $Commands = [ordered]@{
         Group = "setup"
         Help = "Verify portable Python and the report-generation venv."
     }
+    "launch-ui" = @{
+        Path = "gui\eplus-rs-launch.ps1"
+        Group = "gui"
+        Help = "Open the EPLaunch-style Windows UI for arbitrary IDF runs."
+    }
     "check" = @{
         Path = "quality\check.ps1"
         Group = "quality"

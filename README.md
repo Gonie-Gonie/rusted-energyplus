@@ -33,6 +33,8 @@ tolerance, and code organization.
 - arbitrary IDF/epJSON run pipeline with support assessment artifacts, optional
   bundled EnergyPlus oracle baseline, and diagnostic oracle comparison reports;
   ad-hoc runs keep `conformance_claim=false`
+- EPLaunch-style Windows launcher for choosing input, weather, output, and
+  oracle compare without typing CLI commands
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
@@ -310,6 +312,8 @@ Not claimed:
 .\scripts\dev.cmd setup -InstallRust -InstallDocsTools
 .\scripts\dev.cmd check
 ```
+
+Double-click `eplus-rs-launch.cmd` for a small EPLaunch-style UI.
 
 Useful focused checks:
 
