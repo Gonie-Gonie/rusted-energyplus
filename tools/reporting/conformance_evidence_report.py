@@ -1683,6 +1683,82 @@ def build_declared_vs_passed_figure(coverage: dict[str, Any]) -> Any:
     return fig
 
 
+def ideal_loads_branch_rows(evidence: dict[str, Any]) -> list[dict[str, Any]]:
+    index = (evidence.get("coverage_snapshot", {}).get("index") or {})
+    rows: list[dict[str, Any]] = []
+    for case in index.get("cases", []):
+        case_id = str(case.get("case_id", ""))
+        if not case_id.startswith("ideal_loads_"):
+            continue
+        outputs = case.get("outputs", [])
+        meters = case.get("meters", [])
+        conformance = sum(1 for output in outputs if output.get("level") == "conformance")
+        diagnostic = sum(1 for output in outputs if output.get("level") == "diagnostic")
+        baseline = sum(1 for output in outputs if output.get("level") == "baseline")
+        conformance += sum(1 for meter in meters if meter.get("level") == "conformance")
+        diagnostic += sum(1 for meter in meters if meter.get("level") == "diagnostic")
+        branch = case_id
+        for suffix in (
+            "_conformance_candidate_001",
+            "_conformance_001",
+            "_diagnostic_001",
+            "_candidate_001",
+            "_001",
+        ):
+            branch = branch.replace(suffix, "")
+        branch = branch.removeprefix("ideal_loads_").replace("_", " ")
+        rows.append(
+            {
+                "branch": branch,
+                "case_id": case_id,
+                "comparison_class": case.get("comparison_class"),
+                "conformance_claim": bool(case.get("conformance_claim")),
+                "source_kind": case.get("source_kind"),
+                "conformance": conformance,
+                "diagnostic": diagnostic,
+                "baseline": baseline,
+                "meters": len(meters),
+                "report_path": case.get("report_path"),
+            }
+        )
+    return rows
+
+
+def build_ideal_loads_branch_heatmap_figure(evidence: dict[str, Any]) -> Any:
+    rows = ideal_loads_branch_rows(evidence)
+    labels = [short_text(row["branch"], 34) for row in rows]
+    columns = ["claim", "conf", "diag", "base", "meter"]
+    matrix = [
+        [
+            1 if row["conformance_claim"] else 0,
+            row["conformance"],
+            row["diagnostic"],
+            row["baseline"],
+            row["meters"],
+        ]
+        for row in rows
+    ]
+    height = min(8.8, max(3.0, 0.34 * len(rows) + 1.1))
+    fig, ax = plt.subplots(figsize=(7.2, height), dpi=180)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    if not matrix:
+        matrix = [[0, 0, 0, 0, 0]]
+        labels = ["missing"]
+    image = ax.imshow(matrix, aspect="auto", cmap="YlGnBu")
+    ax.set_xticks(range(len(columns)), columns)
+    ax.set_yticks(range(len(labels)), labels)
+    ax.set_title("IdealLoads Branch Evidence Matrix", loc="left", fontsize=13, fontweight="bold", color="#17212b")
+    ax.tick_params(axis="x", labelsize=8, colors="#17212b")
+    ax.tick_params(axis="y", labelsize=6.2, colors="#17212b")
+    for y, row in enumerate(matrix):
+        for x, value in enumerate(row):
+            ax.text(x, y, str(value), ha="center", va="center", fontsize=6.2, color="#17212b")
+    fig.colorbar(image, ax=ax, fraction=0.026, pad=0.02)
+    fig.tight_layout(pad=0.8)
+    return fig
+
+
 def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
     accuracy_rows: list[dict[str, Any]] = []
     series_index = 1
@@ -1757,6 +1833,7 @@ def create_charts(evidence: dict[str, Any]) -> dict[str, Any]:
         "dynamic_bottlenecks": dynamic_bottlenecks,
         "coverage_status": build_coverage_status_figure(evidence.get("coverage_snapshot", {})),
         "declared_vs_passed": build_declared_vs_passed_figure(evidence.get("coverage_snapshot", {})),
+        "ideal_loads_branch_heatmap": build_ideal_loads_branch_heatmap_figure(evidence),
         "time_series": time_series,
     }
 
@@ -2560,6 +2637,29 @@ def build_ideal_loads_boundary_table(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_ideal_loads_branch_matrix_table(evidence: dict[str, Any]) -> Table:
+    rows = []
+    for row in ideal_loads_branch_rows(evidence):
+        rows.append(
+            [
+                short_text(row["branch"], 36),
+                row["comparison_class"],
+                "yes" if row["conformance_claim"] else "no",
+                row["conformance"],
+                row["diagnostic"],
+                row["baseline"],
+                row["meters"],
+                short_text(row["report_path"], 46),
+            ]
+        )
+    return table(
+        ["Branch", "Class", "Claim", "Passed", "Diag", "Base", "Meters", "Report"],
+        rows,
+        "IdealLoads branch-level case matrix. Counts are manifest-declared rows, not broad HVAC compatibility.",
+        [1.25, 0.78, 0.45, 0.45, 0.45, 0.45, 0.5, 2.35],
+    )
+
+
 def build_timing_statistics_table(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     for index, case in enumerate(evidence["cases"], start=1):
@@ -3087,6 +3187,13 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             ),
             build_ideal_loads_setup_table(evidence),
             build_ideal_loads_boundary_table(evidence),
+            Figure(
+                charts["ideal_loads_branch_heatmap"],
+                caption="IdealLoads branch-level manifest evidence matrix; counts are declared rows, not broad HVAC claims.",
+                width=6.4,
+                placement="H",
+            ),
+            build_ideal_loads_branch_matrix_table(evidence),
         ),
         Chapter(
             "Time Series Overlays",

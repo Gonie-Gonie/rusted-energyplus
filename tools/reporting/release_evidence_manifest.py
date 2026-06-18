@@ -199,6 +199,7 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
         ("one-zone-mat-plot", "1zone_zone_mean_air_temperature.png", "1Zone MAT Oracle/Rust time-series overlay."),
         ("ideal-loads-rates-plot", "ideal_loads_zone_total_rates.png", "IdealLoads no-OA heating/cooling rate overlay."),
         ("ideal-loads-node-state-plot", "ideal_loads_supply_node_state.png", "IdealLoads no-OA supply node state overlay."),
+        ("ideal-loads-branch-heatmap", "ideal_loads_branch_status_heatmap.png", "IdealLoads branch-level evidence status heatmap."),
         ("stage-timing-plot", "stage_timing_stacked_bar.png", "Compare stage timing stacked bar chart."),
         ("plot-evidence-summary-json", "plot-evidence-summary.json", "Machine-readable plot export manifest."),
     ]

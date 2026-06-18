@@ -196,6 +196,68 @@ def stage_timing_plot(evidence: dict[str, Any]) -> Any:
     return fig
 
 
+def ideal_loads_branch_rows(repo_root: Path, version: str) -> list[dict[str, Any]]:
+    index_path = evidence_root(repo_root, version) / "conformance-index-report.json"
+    if not index_path.is_file():
+        return []
+    index = load_json(index_path)
+    rows: list[dict[str, Any]] = []
+    for case in index.get("cases", []):
+        case_id = str(case.get("case_id", ""))
+        if not case_id.startswith("ideal_loads_"):
+            continue
+        outputs = case.get("outputs", [])
+        meters = case.get("meters", [])
+        conformance = sum(1 for output in outputs if output.get("level") == "conformance")
+        diagnostic = sum(1 for output in outputs if output.get("level") == "diagnostic")
+        baseline = sum(1 for output in outputs if output.get("level") == "baseline")
+        conformance += sum(1 for meter in meters if meter.get("level") == "conformance")
+        diagnostic += sum(1 for meter in meters if meter.get("level") == "diagnostic")
+        branch = case_id
+        for suffix in (
+            "_conformance_candidate_001",
+            "_conformance_001",
+            "_diagnostic_001",
+            "_candidate_001",
+            "_001",
+        ):
+            branch = branch.replace(suffix, "")
+        rows.append(
+            {
+                "branch": branch.removeprefix("ideal_loads_").replace("_", " "),
+                "claim": 1 if case.get("conformance_claim") else 0,
+                "conformance": conformance,
+                "diagnostic": diagnostic,
+                "baseline": baseline,
+                "meters": len(meters),
+            }
+        )
+    return rows
+
+
+def ideal_loads_branch_heatmap_plot(repo_root: Path, version: str) -> Any:
+    rows = ideal_loads_branch_rows(repo_root, version)
+    labels = [row["branch"][:34] for row in rows] or ["missing"]
+    columns = ["claim", "conf", "diag", "base", "meter"]
+    matrix = [
+        [row["claim"], row["conformance"], row["diagnostic"], row["baseline"], row["meters"]]
+        for row in rows
+    ] or [[0, 0, 0, 0, 0]]
+    height = min(10.0, max(3.2, 0.34 * len(labels) + 1.2))
+    fig, ax = plt.subplots(figsize=(8.2, height))
+    image = ax.imshow(matrix, aspect="auto", cmap="YlGnBu")
+    ax.set_xticks(range(len(columns)), columns)
+    ax.set_yticks(range(len(labels)), labels)
+    ax.set_title("IdealLoads Branch Status Heatmap", loc="left", fontweight="bold")
+    ax.tick_params(axis="y", labelsize=6.4)
+    for y, row in enumerate(matrix):
+        for x, value in enumerate(row):
+            ax.text(x, y, str(value), ha="center", va="center", fontsize=6.4, color="#17212b")
+    fig.colorbar(image, ax=ax, fraction=0.028, pad=0.02)
+    fig.tight_layout()
+    return fig
+
+
 def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Path) -> dict[str, Any]:
     ensure_dir(output_dir)
     ensure_dir(latest_dir)
@@ -214,6 +276,13 @@ def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Pat
         )
     save_figure(ideal_loads_rates_plot(evidence), output_dir, latest_dir, "ideal_loads_zone_total_rates.png", plots)
     save_figure(ideal_loads_node_state_plot(evidence), output_dir, latest_dir, "ideal_loads_supply_node_state.png", plots)
+    save_figure(
+        ideal_loads_branch_heatmap_plot(repo_root, version),
+        output_dir,
+        latest_dir,
+        "ideal_loads_branch_status_heatmap.png",
+        plots,
+    )
     save_figure(stage_timing_plot(evidence), output_dir, latest_dir, "stage_timing_stacked_bar.png", plots)
     summary = {
         "schema_version": 1,
