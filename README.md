@@ -30,6 +30,9 @@ tolerance, and code organization.
 - official ExampleFile static model EIO conformance report gate
 - runtime output registry, IdealLoads facility meter request handles, meter
   registry diagnostics, ResultStore duplicate checks, and profile scaffolding
+- arbitrary IDF/epJSON run pipeline with support assessment artifacts, optional
+  bundled EnergyPlus oracle baseline, and diagnostic oracle comparison reports;
+  ad-hoc runs keep `conformance_claim=false`
 - opaque no-mass heat-balance adiabatic/interzone boundary handling
 - internal convective gain conformance report gate for the declared
   `Zone Total Internal Convective Heating Rate` hourly series
@@ -323,6 +326,7 @@ Useful focused checks:
 .\scripts\dev.cmd compare-static-model-conformance
 .\scripts\dev.cmd compare-internal-convective-gain-conformance
 .\scripts\dev.cmd runtime-registry-smoke
+.\scripts\dev.cmd arbitrary-run-smoke
 .\scripts\dev.cmd heat-balance-generalization-smoke
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
 .\scripts\dev.cmd conformance-index-report -Version 0.32.0

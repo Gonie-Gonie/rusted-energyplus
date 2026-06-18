@@ -115,6 +115,11 @@ $Commands = [ordered]@{
         Group = "smoke"
         Help = "Run first-zone runtime plumbing diagnostics."
     }
+    "arbitrary-run-smoke" = @{
+        Path = "smoke\arbitrary-run-smoke.ps1"
+        Group = "smoke"
+        Help = "Gate arbitrary IDF support assessment, oracle baseline, compare reports, and exit codes."
+    }
     "runtime-registry-smoke" = @{
         Path = "smoke\runtime-registry-smoke.ps1"
         Group = "smoke"

@@ -29,6 +29,7 @@ use ep_model::{
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
+use ep_run::{RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, run_arbitrary_idf};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStep,
     FirstZoneSimulationOptions, HeatBalanceCtfHistorySlotFirstSample,
@@ -103,6 +104,7 @@ const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
     "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-no-oa-sensible-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_OUTDOOR_AIR_DESIGN_FLOW_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-outdoor-air-design-flow-report <case.toml> <oracle-root> <output-root>";
+const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--oracle-baseline] [--compare-oracle] [--dry-run]";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -273,6 +275,7 @@ fn print_help() {
     println!("  run first-zone <input.epJSON> <weather.epw> [--hours N]");
     println!("  run node-state-projection <input.epJSON> <output-dir> [--hours N]");
     println!("  run plant-state-projection <input.epJSON> <output-dir> [--hours N]");
+    println!("  {ARBITRARY_RUN_USAGE}");
     println!("  compile <input.epJSON>");
     println!("  compare schedule-value <input.epJSON> <eplusout.eso>");
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
@@ -2395,30 +2398,212 @@ fn report_format_label(format: ReportFormat) -> &'static str {
 
 fn run_run_command(args: &[String]) -> i32 {
     match args.first().map(String::as_str) {
+        Some("--help") | Some("-h") => {
+            print_run_help();
+            0
+        }
         Some("first-zone") => run_first_zone_command(&args[1..]),
         Some("node-state-projection") => run_node_state_projection_command(&args[1..]),
         Some("plant-state-projection") => run_plant_state_projection_command(&args[1..]),
-        Some(command) => {
-            eprintln!("unsupported run command: {command}");
-            eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
-            eprintln!(
-                "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
-            );
-            eprintln!(
-                "usage: eplus-rs run plant-state-projection <input.epJSON> <output-dir> [--hours N]"
-            );
-            2
-        }
+        Some(_) => run_arbitrary_run_command(args),
         None => {
             eprintln!("missing run command");
-            eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
-            eprintln!(
-                "usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]"
-            );
-            eprintln!(
-                "usage: eplus-rs run plant-state-projection <input.epJSON> <output-dir> [--hours N]"
-            );
-            2
+            print_run_help();
+            RunExitCode::Args.code()
+        }
+    }
+}
+
+fn print_run_help() {
+    eprintln!("{ARBITRARY_RUN_USAGE}");
+    eprintln!("usage: eplus-rs run first-zone <input.epJSON> <weather.epw> [--hours N]");
+    eprintln!("usage: eplus-rs run node-state-projection <input.epJSON> <output-dir> [--hours N]");
+    eprintln!("usage: eplus-rs run plant-state-projection <input.epJSON> <output-dir> [--hours N]");
+}
+
+fn run_arbitrary_run_command(args: &[String]) -> i32 {
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("{ARBITRARY_RUN_USAGE}");
+        return RunExitCode::Args.code();
+    };
+
+    let mut weather_path = None;
+    let mut output_dir = None;
+    let mut mode = RunMode::Compatibility;
+    let mut output_format = RunOutputFormat::RustNative;
+    let mut overwrite = false;
+    let mut keep_intermediate = false;
+    let mut trace_level = TraceLevel::Normal;
+    let mut fail_on_warning = false;
+    let mut dry_run = false;
+    let mut oracle_baseline = false;
+    let mut compare_oracle = false;
+    let mut json_stdout = false;
+    let mut oracle_root = None;
+    let mut hours = None;
+
+    let mut index = 1;
+    while index < args.len() {
+        match args[index].as_str() {
+            "--weather" | "-w" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for {}", args[index]);
+                    eprintln!("{ARBITRARY_RUN_USAGE}");
+                    return RunExitCode::Args.code();
+                };
+                weather_path = Some(PathBuf::from(value));
+                index += 2;
+            }
+            "--output-dir" | "-d" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for {}", args[index]);
+                    eprintln!("{ARBITRARY_RUN_USAGE}");
+                    return RunExitCode::Args.code();
+                };
+                output_dir = Some(PathBuf::from(value));
+                index += 2;
+            }
+            "--mode" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for --mode");
+                    return RunExitCode::Args.code();
+                };
+                let Some(parsed) = RunMode::parse(value) else {
+                    eprintln!("unsupported run mode: {value}");
+                    return RunExitCode::Args.code();
+                };
+                mode = parsed;
+                index += 2;
+            }
+            "--format" | "--output-format" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for {}", args[index]);
+                    return RunExitCode::Args.code();
+                };
+                let Some(parsed) = RunOutputFormat::parse(value) else {
+                    eprintln!("unsupported output format: {value}");
+                    return RunExitCode::Args.code();
+                };
+                output_format = parsed;
+                index += 2;
+            }
+            "--overwrite" => {
+                overwrite = true;
+                index += 1;
+            }
+            "--keep-intermediate" => {
+                keep_intermediate = true;
+                index += 1;
+            }
+            "--trace-level" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for --trace-level");
+                    return RunExitCode::Args.code();
+                };
+                let Some(parsed) = TraceLevel::parse(value) else {
+                    eprintln!("unsupported trace level: {value}");
+                    return RunExitCode::Args.code();
+                };
+                trace_level = parsed;
+                index += 2;
+            }
+            "--fail-on-warning" => {
+                fail_on_warning = true;
+                index += 1;
+            }
+            "--json" => {
+                json_stdout = true;
+                index += 1;
+            }
+            "--dry-run" => {
+                dry_run = true;
+                index += 1;
+            }
+            "--oracle-baseline" => {
+                oracle_baseline = true;
+                index += 1;
+            }
+            "--compare-oracle" => {
+                compare_oracle = true;
+                oracle_baseline = true;
+                output_format = RunOutputFormat::Both;
+                index += 1;
+            }
+            "--oracle-root" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for --oracle-root");
+                    return RunExitCode::Args.code();
+                };
+                oracle_root = Some(PathBuf::from(value));
+                index += 2;
+            }
+            "--hours" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for --hours");
+                    return RunExitCode::Args.code();
+                };
+                let Ok(parsed) = value.parse::<usize>() else {
+                    eprintln!("invalid --hours value: {value}");
+                    return RunExitCode::Args.code();
+                };
+                hours = Some(parsed);
+                index += 2;
+            }
+            unknown => {
+                eprintln!("unsupported run option: {unknown}");
+                eprintln!("{ARBITRARY_RUN_USAGE}");
+                return RunExitCode::Args.code();
+            }
+        }
+    }
+
+    let Some(output_dir) = output_dir else {
+        eprintln!("missing output directory");
+        eprintln!("{ARBITRARY_RUN_USAGE}");
+        return RunExitCode::Args.code();
+    };
+
+    let config = RunConfig {
+        input_path: PathBuf::from(input_path),
+        weather_path,
+        output_dir,
+        mode,
+        output_format,
+        overwrite,
+        keep_intermediate,
+        trace_level,
+        fail_on_warning,
+        dry_run,
+        oracle_baseline,
+        compare_oracle,
+        json_stdout,
+        oracle_root,
+        hours,
+    };
+
+    match run_arbitrary_idf(&config) {
+        Ok(outcome) => {
+            if config.json_stdout {
+                match std::fs::read_to_string(&outcome.run_summary_path) {
+                    Ok(summary) => print!("{summary}"),
+                    Err(error) => eprintln!(
+                        "failed to read run summary {}: {error}",
+                        outcome.run_summary_path.display()
+                    ),
+                }
+            } else {
+                println!("Arbitrary Run");
+                println!("  status: {}", outcome.exit_code.id());
+                println!("  support_status: {}", outcome.support_status.id());
+                println!("  output_dir: {}", outcome.output_dir.display());
+                println!("  run_summary: {}", outcome.run_summary_path.display());
+            }
+            outcome.exit_code.code()
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            error.exit_code.code()
         }
     }
 }

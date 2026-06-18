@@ -12,6 +12,7 @@ dependencies = [
  "ep_model",
  "ep_oracle",
  "ep_raw_model",
+ "ep_run",
  "ep_runtime",
 ]
 
@@ -47,6 +48,20 @@ version = "0.32.0"
 name = "ep_raw_model"
 version = "0.32.0"
 dependencies = [
+ "serde_json",
+]
+
+[[package]]
+name = "ep_run"
+version = "0.32.0"
+dependencies = [
+ "ep_compare",
+ "ep_compiler",
+ "ep_model",
+ "ep_oracle",
+ "ep_raw_model",
+ "ep_runtime",
+ "serde",
  "serde_json",
 ]
 

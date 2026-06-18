@@ -9,6 +9,7 @@ members = [
     "crates/ep_oracle",
     "crates/ep_compare",
     "crates/ep_conformance",
+    "crates/ep_run",
 ]
 
 [workspace.package]

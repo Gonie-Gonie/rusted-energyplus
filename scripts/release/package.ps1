@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [string]$Version = "0.1.0",
-    [string]$Target = "windows-x64"
+    [string]$Target = "windows-x64",
+    [string]$OracleRuntimeRoot = ".runtime\energyplus\26.1.0",
+    [switch]$SkipOracle
 )
 
 $ErrorActionPreference = "Stop"
@@ -84,6 +86,26 @@ Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_cases") -Destinatio
 Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_suites") -Destination (Join-Path $stageRoot "data\conformance_suites")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\src") -Destination (Join-Path $stageRoot "docs\src")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\book.toml") -Destination (Join-Path $stageRoot "docs\book.toml")
+
+if (-not $SkipOracle) {
+    $resolvedOracleRuntimeRoot = if ([System.IO.Path]::IsPathRooted($OracleRuntimeRoot)) {
+        $OracleRuntimeRoot
+    }
+    else {
+        Join-Path $RepoRoot $OracleRuntimeRoot
+    }
+    $energyPlus = Join-Path $resolvedOracleRuntimeRoot "energyplus.exe"
+    $converter = Join-Path $resolvedOracleRuntimeRoot "ConvertInputFormat.exe"
+    if (-not (Test-Path -LiteralPath $energyPlus -PathType Leaf)) {
+        throw "Missing bundled EnergyPlus oracle executable: $energyPlus. Run .\scripts\dev.cmd setup first, or pass -SkipOracle for a source-only package."
+    }
+    if (-not (Test-Path -LiteralPath $converter -PathType Leaf)) {
+        throw "Missing bundled EnergyPlus converter: $converter. Run .\scripts\dev.cmd setup first, or pass -SkipOracle for a source-only package."
+    }
+    Copy-RepoItem -Source $resolvedOracleRuntimeRoot -Destination (Join-Path $stageRoot "oracle\energyplus\26.1.0")
+    Copy-RepoItem -Source (Join-Path $RepoRoot "tools\oracle\NOTICE.md") -Destination (Join-Path $stageRoot "oracle\NOTICE.md")
+    Copy-RepoItem -Source (Join-Path $RepoRoot "tools\oracle\energyplus.lock.toml") -Destination (Join-Path $stageRoot "oracle\energyplus.lock.toml")
+}
 
 $packageItems = Get-ChildItem -LiteralPath $stageRoot
 Compress-Archive -LiteralPath $packageItems.FullName -DestinationPath $zipPath -Force

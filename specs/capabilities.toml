@@ -1,0 +1,85 @@
+schema = "rusted-energyplus.capabilities.v1"
+oracle_version = "26.1.0"
+
+[arbitrary_run]
+status = "initial"
+claim_boundary = "ad-hoc arbitrary runs never set conformance_claim=true automatically"
+default_mode = "compatibility"
+support_gate = "internal"
+
+[arbitrary_run.runtime.heat_balance_zone_air_diagnostic]
+status = "supported-compatibility"
+scope = "one-zone opaque-surface heat-balance diagnostic runtime with fixed Rust compatibility defaults"
+objects = [
+  "Version",
+  "Building",
+  "Timestep",
+  "SurfaceConvectionAlgorithm:Inside",
+  "SurfaceConvectionAlgorithm:Outside",
+  "RunPeriod",
+  "Site:Location",
+  "Material",
+  "Material:NoMass",
+  "Construction",
+  "ScheduleTypeLimits",
+  "Schedule:Constant",
+  "Schedule:Compact",
+  "OtherEquipment",
+  "People",
+  "Zone",
+  "BuildingSurface:Detailed",
+]
+
+[arbitrary_run.runtime.ideal_loads_node_state_projection]
+status = "supported-diagnostic-only"
+scope = "ZoneHVAC:IdealLoadsAirSystem no-OA sensible node-state projection; no broad HVAC conformance claim"
+objects = [
+  "ThermostatSetpoint:DualSetpoint",
+  "ZoneControl:Thermostat",
+  "NodeList",
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneHVAC:EquipmentList",
+  "ZoneHVAC:EquipmentConnections",
+]
+
+[arbitrary_run.ignored_raw_only_objects]
+reason = "preserved for diagnostics or handled by output/oracle staging rather than evaluated by the Rust runtime"
+objects = [
+  "SimulationControl",
+  "SizingPeriod:DesignDay",
+  "GlobalGeometryRules",
+  "HeatBalanceAlgorithm",
+  "ShadowCalculation",
+  "Exterior:Lights",
+  "Output:*",
+  "OutputControl:*",
+]
+
+[arbitrary_run.unsupported_families]
+ems = "EnergyManagementSystem:*"
+python_plugin = "PythonPlugin:*"
+airflow_network = "AirflowNetwork:*"
+hvac = "AirLoopHVAC*, Fan:*, Coil:*, Controller:*, SetpointManager:*, AirTerminal:*, broad ZoneHVAC:*"
+plant = "PlantLoop, Branch, BranchList, Connector:*, ConnectorList, Pump:*, Boiler:*, Chiller:*"
+sizing = "Sizing:* and ZoneSizing*"
+surface_boundary = "FenestrationSurface:*, Window*, Daylighting:*, Shading:*, Site:Ground*"
+
+[arbitrary_run.artifacts]
+eplusrs_err = "eplusrs.err"
+diagnostics_json = "diagnostics.json"
+run_summary_json = "run-summary.json"
+support_assessment_json = "support-assessment.json"
+support_report_md = "support-report.md"
+converted_epjson = "input/converted.epJSON"
+raw_model_summary_json = "model/raw-model-summary.json"
+typed_model_summary_json = "model/typed-model-summary.json"
+graph_summary_json = "model/graph-summary.json"
+execution_plan_json = "model/execution-plan.json"
+result_store_json = "results/result-store.json"
+selected_outputs_csv = "results/selected-outputs.csv"
+meters_csv = "results/meters.csv"
+run_report_md = "reports/run-report.md"
+compatibility_boundary_md = "reports/compatibility-boundary.md"
+oracle_dir = "oracle"
+compare_summary_json = "compare/compare-summary.json"
+compare_report_md = "compare/compare-report.md"
