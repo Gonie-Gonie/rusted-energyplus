@@ -60,7 +60,27 @@ function Remove-RepoDirectory {
 
 function Get-Sha256 {
     param([Parameter(Mandatory = $true)][string]$Path)
-    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+    if ($null -ne (Get-Command Get-FileHash -ErrorAction SilentlyContinue)) {
+        return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+    }
+
+    $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
+    $stream = [System.IO.File]::OpenRead($resolvedPath)
+    try {
+        $sha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $hashBytes = $sha256.ComputeHash($stream)
+            return -join ($hashBytes | ForEach-Object { $_.ToString("x2") })
+        }
+        finally {
+            if ($null -ne $sha256) {
+                $sha256.Dispose()
+            }
+        }
+    }
+    finally {
+        $stream.Dispose()
+    }
 }
 
 function Download-File {
