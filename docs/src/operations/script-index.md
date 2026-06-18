@@ -152,7 +152,8 @@ matplotlib for document layout and charts.
 | `support-coverage-report` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user-facing support coverage for inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `user-coverage-handbook` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user decision guide for supported inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `release-evidence-manifest` | release | generate oodocs PDF/HTML/JSON/Markdown release package and evidence asset manifest | yes for release coverage | `.runtime/release-evidence` |
-| `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
+| `select-release-assets.ps1` | release | select the public GitHub Release upload set from the package and generated evidence | yes for release publishing | zip plus curated PDFs |
+| `github-release` | release | publish a release with the curated public asset set | manual fallback | GitHub Release |
 | `v0.1-verify` | release | verify the v0.1.0 public limited-conformance release gate | yes | release package, launcher exe, oracle, conformance evidence, coverage reports, release manifest |
 
 Only the current release gate is retained as a runnable script. Historical

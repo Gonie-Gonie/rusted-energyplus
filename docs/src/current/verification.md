@@ -140,6 +140,7 @@ Numerical conformance requires a generated report plus a blocking gate. Smoke
 or diagnostic commands can support development, but they cannot support a
 compatibility claim.
 
-Frozen release evidence is published as GitHub Release assets. The local
-`.runtime/release-evidence` directory is a staging area, not the long-term
-evidence store.
+Frozen release evidence is generated under `.runtime/release-evidence`. The
+GitHub Release page publishes the binary package plus curated public evidence
+PDFs; local HTML, JSON, and Markdown files remain staging artifacts for
+inspection and debugging.

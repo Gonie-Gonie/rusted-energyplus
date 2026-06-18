@@ -18,7 +18,10 @@ Publishing:
 - push an annotated `vX.Y.Z` tag
 - `.github/workflows/release.yml` runs the matching current release gate
 - the workflow builds `dist/eplus-rs-vX.Y.Z-windows-x64.zip`
-- the workflow creates or updates the GitHub Release and uploads the zip asset
+- the workflow creates or updates the GitHub Release and uploads the zip plus
+  curated public evidence PDFs
+- HTML, JSON, and Markdown evidence files stay in `.runtime/release-evidence`
+  for local inspection unless a release explicitly publishes them
 
 `scripts/dev.cmd github-release` remains available only as a local manual fallback
 when a token is present.

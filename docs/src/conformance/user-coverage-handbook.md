@@ -53,4 +53,5 @@ conformance, full EnergyPlus compatibility, HVAC numerical conformance, plant
 numerical conformance, or meter conformance.
 
 Use the release evidence manifest to confirm that the handbook and its source
-coverage reports were uploaded as GitHub Release assets.
+coverage reports were generated. The GitHub Release page publishes the public
+PDFs; local HTML, JSON, and Markdown files remain evidence artifacts.

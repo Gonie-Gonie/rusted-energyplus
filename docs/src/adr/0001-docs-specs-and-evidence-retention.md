@@ -14,8 +14,9 @@ reference pages, and active ADRs. Old planning documents are not retained under
 `docs/src/archive`.
 
 Historical planning is recovered from Git history and release notes. Frozen
-release evidence is published as GitHub Release assets instead of being treated
-as ordinary mdBook content.
+release evidence is generated outside the mdBook source tree; curated public
+PDFs are published as GitHub Release assets instead of treating every evidence
+format as ordinary mdBook content.
 
 ## Rationale
 
@@ -33,8 +34,10 @@ they are not evidence.
   staleness.
 - ADRs record durable process or architecture decisions.
 - Old plan/readiness Markdown is removed from the tree.
-- Release evidence is generated under `.runtime/release-evidence/vX.Y.Z` and
-  uploaded to GitHub Releases as assets.
+- Release evidence is generated under `.runtime/release-evidence/vX.Y.Z`.
+- GitHub Releases upload only the binary package and curated public evidence
+  PDFs by default; local HTML, JSON, and Markdown evidence remains available for
+  auditing and debugging.
 
 ## Consequences
 

@@ -107,6 +107,27 @@ Assert-FileExists -Path ".runtime\release-evidence\$Tag\support-coverage-report.
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\user-coverage-handbook.pdf" -Description "user handbook PDF"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\release-evidence-manifest.json" -Description "release manifest JSON"
 
+$publicAssets = @(
+    & ".\scripts\release\select-release-assets.ps1" `
+        -Artifact $package `
+        -EvidenceRoot ".runtime\release-evidence\$Tag" `
+        -RequireEvidenceAssets |
+        ForEach-Object { Split-Path -Leaf $_ }
+)
+$expectedPublicAssets = @(
+    "eplus-rs-$Tag-windows-x64.zip",
+    "numeric-conformance-evidence.pdf",
+    "conformance-index-report.pdf",
+    "support-coverage-report.pdf",
+    "user-coverage-handbook.pdf"
+)
+$missingPublicAssets = @($expectedPublicAssets | Where-Object { $publicAssets -notcontains $_ })
+$unexpectedPublicAssets = @($publicAssets | Where-Object { $expectedPublicAssets -notcontains $_ })
+if ($missingPublicAssets.Count -gt 0 -or $unexpectedPublicAssets.Count -gt 0) {
+    throw "Unexpected public release asset set. Missing=[$($missingPublicAssets -join ', ')] Unexpected=[$($unexpectedPublicAssets -join ', ')]"
+}
+Write-Host "OK curated public release asset set: $($expectedPublicAssets -join ', ')"
+
 $numeric = Get-Content -LiteralPath ".runtime\release-evidence\$Tag\numeric-conformance-evidence.json" -Raw | ConvertFrom-Json
 if ($numeric.aggregate.status -ne "pass") {
     throw "Expected numeric conformance evidence status pass, found $($numeric.aggregate.status)"

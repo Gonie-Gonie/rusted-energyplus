@@ -61,8 +61,6 @@ function Get-AssetContentType {
     switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
         ".zip" { "application/zip"; break }
         ".pdf" { "application/pdf"; break }
-        ".html" { "text/html"; break }
-        ".json" { "application/json"; break }
         default { "application/octet-stream"; break }
     }
 }
@@ -83,12 +81,15 @@ function Upload-ReleaseAsset {
     Write-Host "Uploaded release asset: $assetName"
 }
 
-Upload-ReleaseAsset -Release $release -Path $artifactPath
+$assetSelector = Join-Path $PSScriptRoot "select-release-assets.ps1"
+$assets = @(
+    & $assetSelector `
+        -Artifact $artifactPath `
+        -EvidenceRoot $EvidenceRoot
+)
 
-if (Test-Path -LiteralPath $EvidenceRoot -PathType Container) {
-    Get-ChildItem -LiteralPath $EvidenceRoot -File |
-        Sort-Object Name |
-        ForEach-Object { Upload-ReleaseAsset -Release $release -Path $_.FullName }
+foreach ($asset in $assets) {
+    Upload-ReleaseAsset -Release $release -Path $asset
 }
 
 Write-Host "GitHub Release created: $($release.html_url)"

@@ -97,11 +97,48 @@ jobs:
           gh --version
 
           $releaseTitle = "eplus-rs $env:RELEASE_VERSION"
-          $assets = @((Resolve-Path -LiteralPath $env:RELEASE_ARTIFACT).Path)
-          if (Test-Path -LiteralPath $env:RELEASE_EVIDENCE_DIR -PathType Container) {
-              Get-ChildItem -LiteralPath $env:RELEASE_EVIDENCE_DIR -File |
-                  Sort-Object Name |
-                  ForEach-Object { $assets += $_.FullName }
+          $assets = @(
+              powershell -NoProfile -ExecutionPolicy Bypass `
+                  -File .\scripts\release\select-release-assets.ps1 `
+                  -Artifact $env:RELEASE_ARTIFACT `
+                  -EvidenceRoot $env:RELEASE_EVIDENCE_DIR `
+                  -RequireEvidenceAssets
+          )
+          if ($LASTEXITCODE -ne 0) {
+              throw "Failed to select public release assets."
+          }
+
+          Write-Host "Public release assets:"
+          foreach ($asset in $assets) {
+              Write-Host " - $([System.IO.Path]::GetFileName($asset))"
+          }
+
+          $publicAssetNames = @{}
+          foreach ($asset in $assets) {
+              $publicAssetNames[[System.IO.Path]::GetFileName($asset)] = $true
+          }
+
+          function Remove-NonPublicReleaseAssets {
+              $releaseJson = gh release view $env:RELEASE_TAG `
+                  --repo $env:GITHUB_REPOSITORY `
+                  --json assets 2>$null
+
+              if ($LASTEXITCODE -ne 0) {
+                  return
+              }
+
+              $release = $releaseJson | ConvertFrom-Json
+              foreach ($asset in $release.assets) {
+                  if (-not $publicAssetNames.ContainsKey($asset.name)) {
+                      Write-Host "Removing non-public release asset: $($asset.name)"
+                      gh release delete-asset $env:RELEASE_TAG $asset.name `
+                          --repo $env:GITHUB_REPOSITORY `
+                          -y
+                      if ($LASTEXITCODE -ne 0) {
+                          throw "Failed to remove non-public release asset: $($asset.name)"
+                      }
+                  }
+              }
           }
 
           if (gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY *> $null) {
@@ -110,6 +147,7 @@ jobs:
                   --title $releaseTitle `
                   --notes-file $env:RELEASE_NOTES `
                   --prerelease
+              Remove-NonPublicReleaseAssets
               gh release upload $env:RELEASE_TAG @assets `
                   --repo $env:GITHUB_REPOSITORY `
                   --clobber

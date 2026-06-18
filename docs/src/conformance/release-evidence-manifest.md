@@ -52,6 +52,7 @@ The manifest is release documentation infrastructure. It does not add new
 numerical conformance, full EnergyPlus compatibility, HVAC numerical
 conformance, plant numerical conformance, or meter conformance.
 
-The release workflow uploads the binary zip and every generated file under
-`.runtime/release-evidence/vX.Y.Z` as GitHub Release assets. The manifest makes
-that asset set explicit and machine-checkable.
+The release workflow uploads the binary zip and curated public evidence PDFs as
+GitHub Release assets. The full `.runtime/release-evidence/vX.Y.Z` directory
+remains the local manifest-backed evidence set, including HTML, JSON, and
+Markdown files used for auditing and debugging.
