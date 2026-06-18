@@ -18,13 +18,13 @@ For this repository, that means:
 Use the same scripts locally and in CI:
 
 ```powershell
-.\scripts\setup.cmd -InstallRust -InstallDocsTools
-.\scripts\check.cmd
-.\scripts\oracle-smoke.cmd
-.\scripts\v0.1-verify.cmd
-.\scripts\raw-model-smoke.cmd
-.\scripts\typed-model-smoke.cmd
-.\scripts\package.cmd
+.\scripts\dev.cmd setup -InstallRust -InstallDocsTools
+.\scripts\dev.cmd check
+.\scripts\dev.cmd oracle-smoke
+.\scripts\dev.cmd v0.32-verify
+.\scripts\dev.cmd raw-model-smoke
+.\scripts\dev.cmd typed-model-smoke
+.\scripts\dev.cmd package
 ```
 
 ## Commit Message Shape

@@ -1,6 +1,6 @@
 # Releases
 
-Release notes are written before tagging a version and should record:
+Current release notes record:
 
 - eplus-rs version
 - locked EnergyPlus oracle version
@@ -9,14 +9,14 @@ Release notes are written before tagging a version and should record:
 - supported scope
 - known limitations
 
-Public version tags start only when the repository can build a distributable
-artifact with at least one user-visible runnable command. Foundation setup
-checkpoints are documented separately and do not receive semver tags.
+Only the latest active release note is retained in the working tree. Older
+release notes remain available through git history and tags, which keeps the
+repository lighter while preserving auditability.
 
 Publishing:
 
 - push an annotated `vX.Y.Z` tag
-- `.github/workflows/release.yml` runs the matching `scripts/dev.cmd vX.Y-verify` command
+- `.github/workflows/release.yml` runs the matching current release gate
 - the workflow builds `dist/eplus-rs-vX.Y.Z-windows-x64.zip`
 - the workflow creates or updates the GitHub Release and uploads the zip asset
 
@@ -25,26 +25,4 @@ when a token is present.
 
 Release notes:
 
-- [v0.1.0](v0.1.0.md)
-- [v0.11.0](v0.11.0.md)
-- [v0.12.0](v0.12.0.md)
-- [v0.13.0](v0.13.0.md)
-- [v0.14.0](v0.14.0.md)
-- [v0.15.0](v0.15.0.md)
-- [v0.16.0](v0.16.0.md)
-- [v0.17.0](v0.17.0.md)
-- [v0.18.0](v0.18.0.md)
-- [v0.19.0](v0.19.0.md)
-- [v0.20.0](v0.20.0.md)
-- [v0.21.0](v0.21.0.md)
-- [v0.22.0](v0.22.0.md)
-- [v0.23.0](v0.23.0.md)
-- [v0.24.0](v0.24.0.md)
-- [v0.25.0](v0.25.0.md)
-- [v0.26.0](v0.26.0.md)
-- [v0.27.0](v0.27.0.md)
-- [v0.28.0](v0.28.0.md)
-- [v0.29.0](v0.29.0.md)
-- [v0.30.0](v0.30.0.md)
-- [v0.31.0](v0.31.0.md)
 - [v0.32.0](v0.32.0.md)

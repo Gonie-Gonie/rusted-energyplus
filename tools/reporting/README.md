@@ -13,6 +13,9 @@ supports release or conformance claims.
 
 Current generators:
 
+- `evidence_time_series.py` contains shared ESO/result-store readers,
+  downsampling, and Oracle-vs-Rust time-series record construction used by
+  evidence reports.
 - `conformance_evidence_report.py` builds the oodocs HTML/PDF/JSON numerical
   evidence report. The report keeps promoted tolerance-gated cases separate
   from the active official 1ZoneUncontrolled dynamic diagnostic chapter, which

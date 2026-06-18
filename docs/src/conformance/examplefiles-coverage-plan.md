@@ -93,14 +93,14 @@ Current v0.13 plant foundation evidence:
 Current v0.14 plant source-mapping evidence:
 
 - `docs/src/porting-map/plant-source-map.md`
-- `v0.14-verify`
+- historical release gate retained in git history
 
 Current v0.15 plant diagnostic evidence:
 
 - `data/conformance_cases/plant_loop_diagnostic_001/case.toml`
 - `data/conformance_cases/plant_loop_diagnostic_001/plant_loop_diagnostic.idf`
 - `plant-loop-diagnostic-smoke`
-- `v0.15-verify`
+- historical release gate retained in git history
 
 Current v0.18 official baseline evidence:
 
@@ -111,7 +111,7 @@ Current v0.18 official baseline evidence:
 - remains a baseline-only evidence case; the matching Rust hourly comparison is
   promoted separately by the v0.33 compatibility-candidate gate
 - `official-baseline-smoke`
-- `v0.18-verify`
+- historical release gate retained in git history
 
 Current v0.33 official dynamic heat-balance evidence:
 
@@ -151,7 +151,7 @@ Current v0.19 comparison infrastructure evidence:
 - max absolute delta, RMSE, max relative delta, status, and first divergence
   reason in `SeriesComparisonV2`
 - `compare-series-v2-smoke`
-- `v0.19-verify`
+- historical release gate retained in git history
 
 Current v0.20 reporting infrastructure evidence:
 
@@ -160,14 +160,14 @@ Current v0.20 reporting infrastructure evidence:
 - `.runtime/release-evidence/v0.20.0/conformance-index-report.pdf`
 - `.runtime/release-evidence/v0.20.0/conformance-index-report.html`
 - `.runtime/release-evidence/v0.20.0/conformance-index-report.json`
-- `v0.20-verify`
+- historical release gate retained in git history
 
 Current v0.21 source-map ledger evidence:
 
 - `specs/algorithm_ledger.toml`
 - `docs/src/generated/algorithm-ledger.md`
 - `algorithm-ledger-check`
-- `v0.21-verify`
+- historical release gate retained in git history
 
 Current v0.22 declared-variable conformance evidence:
 
@@ -175,7 +175,7 @@ Current v0.22 declared-variable conformance evidence:
 - `data/conformance_cases/weather_fields_001/case.toml`
 - `compare-schedule-conformance`
 - `compare-weather-conformance`
-- `v0.22-verify`
+- historical release gate retained in git history
 
 Current v0.23 static model evidence:
 
@@ -183,14 +183,14 @@ Current v0.23 static model evidence:
 - official EnergyPlus `ExampleFiles/1ZoneUncontrolled.idf`
 - staged `Output:Surfaces:List,Details` injection for surface EIO rows
 - `compare-static-model-conformance`
-- `v0.23-verify`
+- historical release gate retained in git history
 
 Post-v0.15 plant diagnostic addendum evidence:
 
 - `run plant-state-projection`
 - `plant-state-summary.md` and `plant-state-summary.json`
 - `plant-loop-projection-smoke`
-- `v0.16-verify` packaging and guard checks
+- historical release packaging and guard checks retained in git history
 
 Planned fields:
 

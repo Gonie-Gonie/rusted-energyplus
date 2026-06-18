@@ -151,37 +151,9 @@ matplotlib for document layout and charts.
 | `user-coverage-handbook` | release | generate oodocs/matplotlib PDF/HTML/JSON/Markdown user decision guide for supported inputs, outputs, and algorithms | yes for release coverage | `.runtime/release-evidence` |
 | `release-evidence-manifest` | release | generate oodocs PDF/HTML/JSON/Markdown release package and evidence asset manifest | yes for release coverage | `.runtime/release-evidence` |
 | `github-release` | release | publish a release with GitHub CLI | manual fallback | GitHub Release |
-| `v0.1-verify` | release | verify v0.1 foundation/model-intake release | yes | package inputs |
-| `v0.2-verify` | release | verify v0.2 conformance harness evidence | yes | `.runtime/conformance-*` |
-| `v0.3-verify` | release | verify v0.3 input interpretation evidence | yes | console output |
-| `v0.4-verify` | release | verify v0.4 time/weather/schedule evidence | yes | `.runtime/compare-*`, `.runtime/conformance-report` |
-| `v0.5-verify` | release | verify v0.5 geometry/internal-variable evidence | yes | `.runtime/compare-*` |
-| `v0.6-verify` | release | verify v0.6 output/trace/report diagnostic infrastructure | yes | `.runtime/compare-zone`, `.runtime/conformance-diagnostic`, `.runtime/compare-regression` |
-| `v0.7-verify` | release | verify v0.7 source mapping and algorithm readiness gate | yes | source-map docs |
-| `v0.8-verify` | release | verify v0.8 heat-balance conformance evidence | yes | `.runtime/heat-balance-conformance` |
-| `v0.9-verify` | release | verify v0.9 surface-temperature conformance evidence | yes | `.runtime/surface-temperature-conformance` |
-| `v0.10-verify` | release | verify v0.10 IdealLoads thermostat typed-graph evidence | yes | `.runtime/ideal-loads-thermostat` |
-| `v0.11-verify` | release | verify v0.11 air-side node diagnostic and projection evidence | yes | `.runtime/air-side-node-diagnostic` |
-| `v0.12-verify` | release | verify v0.12 node source mapping evidence and release evidence assets | yes | source-map docs, `.runtime/release-evidence` |
-| `v0.13-verify` | release | verify v0.13 PlantLoop typed graph skeleton and release evidence assets | yes | plant fixture, source-map docs, `.runtime/release-evidence` |
-| `v0.14-verify` | release | verify v0.14 plant source mapping and release evidence assets | yes | plant source-map docs, `.runtime/release-evidence` |
-| `v0.15-verify` | release | verify v0.15 plant-loop diagnostic baseline and release evidence assets | yes | plant diagnostic case, report skeleton, `.runtime/release-evidence` |
-| `v0.16-verify` | release | verify v0.16 versioning/evidence cleanup, diagnostic plant projection addendum, and release evidence assets | yes | roadmap docs, plant projection artifacts, `.runtime/release-evidence` |
-| `v0.17-verify` | release | verify v0.17 Case Manifest and Output Request Schema v2 gate | yes | v2 manifests, `.runtime/release-evidence` |
-| `v0.18-verify` | release | verify v0.18 output request injection and official baseline gate | yes | official baseline, `.runtime/release-evidence` |
-| `v0.19-verify` | release | verify v0.19 series reader and compare engine v2 gate | yes | compare-series-v2 smoke, `.runtime/release-evidence` |
-| `v0.20-verify` | release | verify v0.20 conformance report generator and coverage matrix gate | yes | conformance index report, `.runtime/release-evidence` |
-| `v0.21-verify` | release | verify v0.21 source-map and algorithm ledger validation gate | yes | algorithm ledger, generated docs, `.runtime/release-evidence` |
-| `v0.22-verify` | release | verify v0.22 declared time/weather/schedule conformance gates | yes | schedule/weather reports, `.runtime/release-evidence` |
-| `v0.23-verify` | release | verify v0.23 official ExampleFile static model evidence gate | yes | static model reports, `.runtime/release-evidence` |
-| `v0.24-verify` | release | verify v0.24 runtime state and output registry hardening gate | yes | runtime registry smoke, `.runtime/release-evidence` |
-| `v0.25-verify` | release | verify v0.25 opaque no-mass heat-balance generalization gate | yes | heat-balance generalization smoke, `.runtime/release-evidence` |
-| `v0.26-verify` | release | verify v0.26 internal convective gains conformance gate | yes | internal-gains conformance report, `.runtime/release-evidence` |
-| `v0.27-verify` | release | verify v0.27 user support coverage report gate | yes | support coverage PDF/HTML/JSON/Markdown, `.runtime/release-evidence` |
-| `v0.28-verify` | release | verify v0.28 input object coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated object coverage |
-| `v0.29-verify` | release | verify v0.29 output variable coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated variable coverage |
-| `v0.30-verify` | release | verify v0.30 algorithm coverage metadata gate | yes | support coverage PDF/HTML/JSON/Markdown, generated algorithm ledger |
-| `v0.31-verify` | release | verify v0.31 release evidence asset manifest gate | yes | release package, evidence manifest PDF/HTML/JSON/Markdown, `.runtime/release-evidence` |
 | `v0.32-verify` | release | verify v0.32 user coverage handbook gate | yes | user coverage handbook PDF/HTML/JSON/Markdown, release manifest |
+
+Only the current release gate is retained as a runnable script. Historical
+release gates and notes remain available through git history and tags.
 
 No diagnostic command should be listed as conformance evidence.
