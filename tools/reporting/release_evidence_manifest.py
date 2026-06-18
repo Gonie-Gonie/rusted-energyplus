@@ -89,6 +89,7 @@ def minor_version(version: str) -> int:
 
 def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dict[str, Any]]:
     package = repo_root / "dist" / f"eplus-rs-v{version}-{target}.zip"
+    plot_root = repo_root / ".runtime" / "release-evidence" / f"v{version}" / "plots"
     specs = [
         {
             "role": "binary-package",
@@ -192,6 +193,25 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
                 },
             ]
         )
+    plot_specs = [
+        ("coverage-status-plot", "coverage_status_bar.png", "Variable coverage status bar chart."),
+        ("declared-vs-passed-plot", "declared_vs_passed_series.png", "Declared numerical scope versus passed evidence chart."),
+        ("one-zone-mat-plot", "1zone_zone_mean_air_temperature.png", "1Zone MAT Oracle/Rust time-series overlay."),
+        ("ideal-loads-rates-plot", "ideal_loads_zone_total_rates.png", "IdealLoads no-OA heating/cooling rate overlay."),
+        ("ideal-loads-node-state-plot", "ideal_loads_supply_node_state.png", "IdealLoads no-OA supply node state overlay."),
+        ("stage-timing-plot", "stage_timing_stacked_bar.png", "Compare stage timing stacked bar chart."),
+        ("plot-evidence-summary-json", "plot-evidence-summary.json", "Machine-readable plot export manifest."),
+    ]
+    specs.extend(
+        {
+            "role": role,
+            "path": plot_root / filename,
+            "produced_by": f".\\scripts\\dev.cmd plot-evidence -Version {version}",
+            "user_purpose": purpose,
+            "required": False,
+        }
+        for role, filename, purpose in plot_specs
+    )
     return specs
 
 
@@ -202,7 +222,7 @@ def materialize_asset(repo_root: Path, spec: dict[str, Any]) -> dict[str, Any]:
         "role": spec["role"],
         "path": rel_path(repo_root, path) if path.is_absolute() else path.as_posix(),
         "github_release_asset": True,
-        "required": True,
+        "required": bool(spec.get("required", True)),
         "exists": exists,
         "size_bytes": path.stat().st_size if exists else 0,
         "sha256": sha256_file(path) if exists else "",
@@ -255,7 +275,9 @@ def build_report_summaries(repo_root: Path, version: str) -> dict[str, Any]:
 
 def build_manifest(repo_root: Path, version: str, target: str) -> dict[str, Any]:
     assets = [materialize_asset(repo_root, spec) for spec in expected_asset_specs(repo_root, version, target)]
-    missing = [asset for asset in assets if not asset["exists"]]
+    required_assets = [asset for asset in assets if asset["required"]]
+    optional_assets = [asset for asset in assets if not asset["required"]]
+    missing = [asset for asset in required_assets if not asset["exists"]]
     total_size = sum(asset["size_bytes"] for asset in assets)
     return {
         "schema_version": 1,
@@ -265,9 +287,12 @@ def build_manifest(repo_root: Path, version: str, target: str) -> dict[str, Any]
         "claim_boundary": CLAIM_BOUNDARY,
         "github_release_policy": GITHUB_RELEASE_POLICY,
         "aggregate": {
-            "required_asset_count": len(assets),
-            "present_required_asset_count": len(assets) - len(missing),
+            "required_asset_count": len(required_assets),
+            "present_required_asset_count": len(required_assets) - len(missing),
             "missing_required_asset_count": len(missing),
+            "optional_asset_count": len(optional_assets),
+            "present_optional_asset_count": sum(1 for asset in optional_assets if asset["exists"]),
+            "missing_optional_asset_count": sum(1 for asset in optional_assets if not asset["exists"]),
             "total_required_asset_size_bytes": total_size,
             "status": "pass" if not missing else "fail",
         },
@@ -309,6 +334,7 @@ def build_metric_table(manifest: dict[str, Any]) -> Table:
         ["Required release assets", aggregate["required_asset_count"]],
         ["Present assets", aggregate["present_required_asset_count"]],
         ["Missing assets", aggregate["missing_required_asset_count"]],
+        ["Optional plot assets", aggregate.get("present_optional_asset_count", 0)],
         ["Total required asset size", size_label(aggregate["total_required_asset_size_bytes"])],
         ["Manifest status", aggregate["status"]],
     ]

@@ -775,6 +775,16 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Generate oodocs PDF/HTML/JSON numerical conformance evidence."
     }
+    "plot-evidence" = @{
+        Path = "release\plot-evidence.ps1"
+        Group = "release"
+        Help = "Export evidence-pack plots as PNG assets."
+    }
+    "pdf-evidence-pack" = @{
+        Path = "release\pdf-evidence-pack.ps1"
+        Group = "release"
+        Help = "Generate the PDF evidence pack, plots, companion reports, and manifest."
+    }
     "conformance-index-report" = @{
         Path = "release\conformance-index-report.ps1"
         Group = "release"
