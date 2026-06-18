@@ -222,6 +222,7 @@ const IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
 const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE: &str = "EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
+const IDEAL_LOADS_OUTDOOR_AIR_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for outdoor-air mixed-air, economizer, and heat-recovery calculations";
 const IDEAL_LOADS_SOURCE_MAP_ANCHOR: &str = "docs/src/porting-map/ideal-loads-source-map.md";
 const IDEAL_LOADS_NODE_OUTPUT_TIMESTAMP_ALIGNMENT: &str = "timestamp";
 const IDEAL_LOADS_NO_OA_SOURCE_ORDER_WRAPPER: &str =
@@ -375,6 +376,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     outdoor_air_spec_name: String,
     outdoor_air_method: DesignSpecificationOutdoorAirMethod,
     outdoor_air_node_name: String,
+    recirculation_node_name: Option<String>,
     demand_controlled_ventilation_type: DemandControlledVentilationType,
     outdoor_air_economizer_type: OutdoorAirEconomizerType,
     heat_recovery_type: HeatRecoveryType,
@@ -1492,6 +1494,26 @@ fn build_outdoor_air_design_flow_context<'a>(
         &outdoor_air_node_name.0,
         SYSTEM_NODE_HUMIDITY_RATIO,
     )?;
+    let (
+        recirculation_node_temperature,
+        recirculation_node_humidity_ratio,
+        recirculation_node_name,
+    ) = match ideal_loads_recirculation_node_name(&model, zone.id, system)
+        .ok()
+        .and_then(|node_name| {
+            let node_temperature =
+                load_series(&baseline.eso, &node_name, SYSTEM_NODE_TEMPERATURE).ok()?;
+            let node_humidity_ratio =
+                load_series(&baseline.eso, &node_name, SYSTEM_NODE_HUMIDITY_RATIO).ok()?;
+            Some((node_temperature, node_humidity_ratio, Some(node_name)))
+        }) {
+        Some(recirculation_trace) => recirculation_trace,
+        None => (
+            zone_node_temperature.clone(),
+            zone_node_humidity_ratio.clone(),
+            None,
+        ),
+    };
     let heating_demand = load_series(
         &baseline.eso,
         &zone.name.0,
@@ -1520,6 +1542,8 @@ fn build_outdoor_air_design_flow_context<'a>(
             zone_air_humidity_ratio.samples.len(),
             zone_node_temperature.samples.len(),
             zone_node_humidity_ratio.samples.len(),
+            recirculation_node_temperature.samples.len(),
+            recirculation_node_humidity_ratio.samples.len(),
             outdoor_air_node_temperature.samples.len(),
             outdoor_air_node_humidity_ratio.samples.len(),
             heating_demand.samples.len(),
@@ -1640,9 +1664,17 @@ fn build_outdoor_air_design_flow_context<'a>(
             air_temperature_c: zone_node_temperature.samples[calc_zone_state_index].value,
             air_humidity_ratio: zone_air_humidity_ratio.samples[index].value,
         };
+        let recirculation_state_index = if recirculation_node_name.is_some() {
+            index
+        } else {
+            calc_zone_state_index
+        };
         let recirculation_state = IdealLoadsOutdoorAirNodeState {
-            air_temperature_c: zone_node_temperature.samples[calc_zone_state_index].value,
-            air_humidity_ratio: zone_node_humidity_ratio.samples[calc_zone_state_index].value,
+            air_temperature_c: recirculation_node_temperature.samples[recirculation_state_index]
+                .value,
+            air_humidity_ratio: recirculation_node_humidity_ratio.samples
+                [recirculation_state_index]
+                .value,
         };
         let outdoor_air_state = IdealLoadsOutdoorAirNodeState {
             air_temperature_c: outdoor_air_node_temperature.samples[index].value,
@@ -1746,6 +1778,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         outdoor_air_spec_name: outdoor_air_specification.name.0.clone(),
         outdoor_air_method: outdoor_air_specification.method,
         outdoor_air_node_name: outdoor_air_node_name.0.clone(),
+        recirculation_node_name,
         demand_controlled_ventilation_type: system.demand_controlled_ventilation_type,
         outdoor_air_economizer_type: system.outdoor_air_economizer_type,
         heat_recovery_type: system.heat_recovery_type,
@@ -5654,6 +5687,16 @@ fn render_outdoor_air_markdown(context: &IdealLoadsOutdoorAirDiagnosticContext<'
         "outdoor_air_node: {}\n",
         markdown_cell(&context.outdoor_air_node_name)
     ));
+    if let Some(recirculation_node_name) = &context.recirculation_node_name {
+        report.push_str(&format!(
+            "recirculation_node: {}\n",
+            markdown_cell(recirculation_node_name)
+        ));
+        report.push_str(&format!(
+            "recirculation_state_source: {}\n",
+            IDEAL_LOADS_OUTDOOR_AIR_RECIRCULATION_STATE_SOURCE
+        ));
+    }
     report.push_str(&format!(
         "standard_air_density_kg_per_m3: {:.15}\n",
         context.standard_air_density_kg_per_m3
@@ -6035,6 +6078,16 @@ fn render_outdoor_air_summary_json(context: &IdealLoadsOutdoorAirDiagnosticConte
         "  \"outdoor_air_node\": {},\n",
         json_string(&context.outdoor_air_node_name)
     ));
+    if let Some(recirculation_node_name) = &context.recirculation_node_name {
+        json.push_str(&format!(
+            "  \"recirculation_node\": {},\n",
+            json_string(recirculation_node_name)
+        ));
+        json.push_str(&format!(
+            "  \"recirculation_state_source\": {},\n",
+            json_string(IDEAL_LOADS_OUTDOOR_AIR_RECIRCULATION_STATE_SOURCE)
+        ));
+    }
     json.push_str(&format!(
         "  \"standard_air_density_kg_per_m3\": {},\n",
         json_number(context.standard_air_density_kg_per_m3)
@@ -6597,6 +6650,16 @@ fn render_outdoor_air_stage_summary_json(
         "  \"outdoor_air_node\": {},\n",
         json_string(&context.outdoor_air_node_name)
     ));
+    if let Some(recirculation_node_name) = &context.recirculation_node_name {
+        json.push_str(&format!(
+            "  \"recirculation_node\": {},\n",
+            json_string(recirculation_node_name)
+        ));
+        json.push_str(&format!(
+            "  \"recirculation_state_source\": {},\n",
+            json_string(IDEAL_LOADS_OUTDOOR_AIR_RECIRCULATION_STATE_SOURCE)
+        ));
+    }
     json.push_str(&format!(
         "  \"standard_air_density_kg_per_m3\": {},\n",
         json_number(context.standard_air_density_kg_per_m3)

@@ -319,6 +319,11 @@ Sensible/Enthalpy heat-recovery candidate rows. The current Rust surface is:
   mixed-air state evidence, including no-heat-recovery rows,
   DifferentialDryBulb and DifferentialEnthalpy economizer OA flow reset,
   and Sensible/Enthalpy heat-recovery OA tempering/rate reporting
+- `crates/ep_cli/src/ideal_loads.rs::build_outdoor_air_design_flow_context`
+  resolves the EnergyPlus return/exhaust recirculation node and, when the
+  diagnostic fixture requests its `System Node Temperature` and
+  `System Node Humidity Ratio`, feeds that same-call state into the Rust
+  outdoor-air mixed-air, economizer, and heat-recovery comparison lane
 - `manifest_allows_outdoor_air_flow_zone_conformance_manifest`,
   `manifest_allows_outdoor_air_flow_person_conformance_manifest`,
   `manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest`,
@@ -490,12 +495,12 @@ promotes the same Flow/Zone and `NoEconomizer` fixture shape with
 `HeatRecoveryType = Enthalpy`. The Rust lane follows the EnergyPlus enthalpy
 gate, applies sensible and latent heat-recovery effectiveness to the outdoor-air
 state before mixing, passes EPW barometric pressure into the heat-recovery
-saturation check, and reports 96 Detailed samples for active-time, sensible,
-latent, and total heat-recovery rows. The candidate keeps inactive economizer
-active-time diagnostic-only and covers the fixture's single cooling
-saturation-limit timestep only through declared humidity-ratio and
-latent/total-cooling tolerances; general saturation-limit heat-recovery branch
-parity is not promoted.
+saturation check, reads `ZONE ONE RETURN` as the EnergyPlus
+`ZoneRecircAirNodeNum` same-call recirculation state, and reports 96 Detailed
+samples for active-time, sensible, latent, and total heat-recovery rows. The
+candidate keeps inactive economizer active-time diagnostic-only; general
+saturation-limit heat-recovery branch parity beyond this declared fixture
+remains outside the promoted claim.
 
 Indoor air quality beyond the declared CO2Setpoint proof input,
 proportional-control, heat-recovery saturation-limit generality, outdoor-air

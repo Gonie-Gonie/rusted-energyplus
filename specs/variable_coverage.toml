@@ -340,7 +340,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads Sensible unchanged-humidity latent zero cooling and Enthalpy latent-effectiveness cooling report-rate conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001; the Enthalpy candidate uses a declared fixture tolerance for one saturation-limit timestep. Inactive no-heat-recovery parity remains diagnostic-only; DCV, humidity controls, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads Sensible unchanged-humidity latent zero cooling and Enthalpy latent-effectiveness cooling report-rate conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001; the Enthalpy candidate uses the EnergyPlus return/recirculation node same-call state for strict fixture tolerance. Inactive no-heat-recovery parity remains diagnostic-only; DCV, humidity controls, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Total Cooling Rate"
@@ -348,7 +348,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads Sensible/Enthalpy heat-recovery total cooling report-rate conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001; the Enthalpy candidate uses a declared fixture tolerance for one saturation-limit timestep. Inactive no-heat-recovery parity remains diagnostic-only; DCV, humidity controls, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads Sensible/Enthalpy heat-recovery total cooling report-rate conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001; the Enthalpy candidate uses the EnergyPlus return/recirculation node same-call state for strict fixture tolerance. Inactive no-heat-recovery parity remains diagnostic-only; DCV, humidity controls, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Economizer Active Time"

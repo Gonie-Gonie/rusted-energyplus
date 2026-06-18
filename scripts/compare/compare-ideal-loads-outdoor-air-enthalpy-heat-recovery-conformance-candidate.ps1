@@ -133,6 +133,12 @@ if ($summary.samples -ne 96) {
 if ($summary.design_volume_flow_rate_m3_per_s -ne 0.05) {
     throw "Unexpected outdoor-air design volume flow: $($summary.design_volume_flow_rate_m3_per_s)"
 }
+if ($summary.recirculation_node -ne "ZONE ONE RETURN") {
+    throw "Summary must record ZONE ONE RETURN recirculation node, got $($summary.recirculation_node)"
+}
+if ($summary.recirculation_state_source -ne "EnergyPlus return/exhaust recirculation node same-call state for outdoor-air mixed-air, economizer, and heat-recovery calculations") {
+    throw "Unexpected summary recirculation state source: $($summary.recirculation_state_source)"
+}
 
 $rows = @($summary.series)
 if ($rows.Count -ne 22) {
@@ -166,15 +172,15 @@ $expectedRows = @(
     @{ Variable = "Zone Ideal Loads Supply Air Mass Flow Rate"; Level = "conformance"; Units = "kg/s"; Source = "rust-ideal-loads-outdoor-air-supply-state"; MaxAbs = 0.000001; Rmse = 0.000001 },
     @{ Variable = "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate"; Level = "conformance"; Units = "m3/s"; Source = "rust-ideal-loads-outdoor-air-supply-state"; MaxAbs = 0.000001; Rmse = 0.000001 },
     @{ Variable = "Zone Ideal Loads Supply Air Temperature"; Level = "conformance"; Units = "C"; Source = "rust-ideal-loads-outdoor-air-supply-state"; MaxAbs = 0.02; Rmse = 0.02 },
-    @{ Variable = "Zone Ideal Loads Supply Air Humidity Ratio"; Level = "conformance"; Units = "kgWater/kgDryAir"; Source = "rust-ideal-loads-outdoor-air-supply-state"; MaxAbs = 0.00005; Rmse = 0.00001 },
+    @{ Variable = "Zone Ideal Loads Supply Air Humidity Ratio"; Level = "conformance"; Units = "kgWater/kgDryAir"; Source = "rust-ideal-loads-outdoor-air-supply-state"; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Mixed Air Temperature"; Level = "conformance"; Units = "C"; Source = "rust-ideal-loads-outdoor-air-mixed-air"; MaxAbs = 0.02; Rmse = 0.02 },
-    @{ Variable = "Zone Ideal Loads Mixed Air Humidity Ratio"; Level = "conformance"; Units = "kgWater/kgDryAir"; Source = "rust-ideal-loads-outdoor-air-mixed-air"; MaxAbs = 0.00005; Rmse = 0.00001 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Sensible Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 1.0; Rmse = 1.0 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Latent Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 1.0; Rmse = 1.0 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Total Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 1.0; Rmse = 1.0 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 1.0; Rmse = 1.0 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 6.0; Rmse = 1.0 },
-    @{ Variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 6.0; Rmse = 1.0 },
+    @{ Variable = "Zone Ideal Loads Mixed Air Humidity Ratio"; Level = "conformance"; Units = "kgWater/kgDryAir"; Source = "rust-ideal-loads-outdoor-air-mixed-air"; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Sensible Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Latent Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Total Heating Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Economizer Active Time"; Level = "diagnostic"; Units = "hr"; Source = "rust-ideal-loads-outdoor-air-inactive-economizer"; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Heat Recovery Active Time"; Level = "conformance"; Units = "hr"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 }
 )
@@ -247,6 +253,12 @@ if ($stageSummary.outdoor_air_method -ne "Flow/Zone") {
 if ($stageSummary.heat_recovery -ne "Enthalpy") {
     throw "Stage summary must record heat_recovery=Enthalpy, got $($stageSummary.heat_recovery)"
 }
+if ($stageSummary.recirculation_node -ne "ZONE ONE RETURN") {
+    throw "Stage summary must record ZONE ONE RETURN recirculation node, got $($stageSummary.recirculation_node)"
+}
+if ($stageSummary.recirculation_state_source -ne "EnergyPlus return/exhaust recirculation node same-call state for outdoor-air mixed-air, economizer, and heat-recovery calculations") {
+    throw "Unexpected stage-summary recirculation state source: $($stageSummary.recirculation_state_source)"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw -Encoding UTF8
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Enthalpy heat recovery branch for declared variables only; general heat-recovery saturation-limit branch parity remains outside the claim" -Description "markdown claim boundary"
@@ -277,6 +289,8 @@ Assert-Contains -Text $reportText -Pattern "inactive_branches:" -Description "ma
 Assert-Contains -Text $reportText -Pattern "source_map_anchor: docs/src/porting-map/ideal-loads-source-map.md" -Description "markdown source-map anchor"
 Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: timestamp" -Description "markdown node timestamp alignment"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_source: DesignSpecification:OutdoorAir Flow/Zone with blank OA schedule, EnergyPlus StdRhoAir from Site:Location, and source-order zone/OA/mixed-air state proof rows plus EnergyPlus Enthalpy heat recovery OA tempering when recirculation enthalpy can beneficially warm or cool outdoor air" -Description "markdown OA source"
+Assert-Contains -Text $reportText -Pattern "recirculation_node: ZONE ONE RETURN" -Description "markdown recirculation node"
+Assert-Contains -Text $reportText -Pattern "recirculation_state_source: EnergyPlus return/exhaust recirculation node same-call state for outdoor-air mixed-air, economizer, and heat-recovery calculations" -Description "markdown recirculation state source"
 Assert-Contains -Text $reportText -Pattern "outdoor_air_schedule: blank-always-1.0" -Description "markdown OA schedule guard"
 foreach ($expected in $expectedRows) {
     Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | $($expected.Variable) | $($expected.Level)" -Description "markdown row $($expected.Variable)"

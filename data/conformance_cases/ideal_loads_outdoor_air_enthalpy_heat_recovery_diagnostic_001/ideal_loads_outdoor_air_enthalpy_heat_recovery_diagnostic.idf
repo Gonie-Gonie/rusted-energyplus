@@ -339,5 +339,7 @@ Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Heating Setpoint
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,Detailed;
 Output:Variable,ZONE ONE AIR NODE,System Node Temperature,Detailed;
 Output:Variable,ZONE ONE AIR NODE,System Node Humidity Ratio,Detailed;
+Output:Variable,ZONE ONE RETURN,System Node Temperature,Detailed;
+Output:Variable,ZONE ONE RETURN,System Node Humidity Ratio,Detailed;
 Output:Variable,OUTDOOR AIR NODE,System Node Temperature,Detailed;
 Output:Variable,OUTDOOR AIR NODE,System Node Humidity Ratio,Detailed;

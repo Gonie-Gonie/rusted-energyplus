@@ -478,20 +478,20 @@ economizer is active. The Sensible heat-recovery diagnostic and conformance
 fixtures keep 96 samples with `NoEconomizer` and validate active heat-recovery
 time plus sensible/total rate rows; the promoted candidate also gates the
 unchanged-humidity latent zero rows. The Enthalpy heat-recovery fixture keeps
-96 samples with `NoEconomizer` and validates active heat-recovery time plus
-sensible, latent, and total rate rows as diagnostic-only evidence. The
-no-economizer flow rows are exact; the active economizer flow rows use narrow
-diagnostic tolerances. The sensible and total report rows are diagnostic or
-conformance according to each manifest's output levels with a 1 W source-order
-tolerance, except the Enthalpy cooling heat-recovery total/latent rows allow a
-single 6 W saturation-limit diagnostic timestep. The no-humidity latent report,
-supply-air state, and mixed-air state rows are diagnostic or conformance
-according to each manifest's output levels; supply-air temperature stays
-within 0.02 C, and the Enthalpy humidity-ratio rows allow 5e-5 kg/kg at that
-saturation-limit timestep. The inactive heat-recovery rows are exact zeros for
-the non-heat-recovery fixtures, and economizer active time is exact for the
-inactive, DifferentialDryBulb, DifferentialEnthalpy, and Sensible
-heat-recovery branches.
+96 samples with `NoEconomizer`, records `ZONE ONE RETURN` as the EnergyPlus
+return/recirculation node, and validates active heat-recovery time plus
+sensible, latent, and total rate rows. The no-economizer flow rows are exact;
+the active economizer flow rows use narrow diagnostic tolerances. The sensible
+and total outdoor-air report rows are diagnostic or conformance according to
+each manifest's output levels with a 1 W source-order tolerance. The no-humidity
+latent report, supply-air state, and mixed-air state rows are diagnostic or
+conformance according to each manifest's output levels; supply-air temperature
+stays within 0.02 C, while the Enthalpy heat-recovery humidity-ratio and
+heat-recovery rate rows now use strict fixture tolerances after the compare
+lane was aligned to EnergyPlus `ZoneRecircAirNodeNum` same-call state. The
+inactive heat-recovery rows are exact zeros for the non-heat-recovery fixtures,
+and economizer active time is exact for the inactive, DifferentialDryBulb,
+DifferentialEnthalpy, and Sensible heat-recovery branches.
 
 This evidence does not promote outdoor-air methods beyond the separate
 Flow/Zone, Flow/Person, Flow/Area, AirChanges/Hour, Sum, Maximum, and
