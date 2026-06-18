@@ -2740,6 +2740,64 @@ def build_timing_sample_table(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_stability_evidence_table(evidence: dict[str, Any]) -> Table:
+    ideal = next(
+        (case for case in evidence.get("cases", []) if case.get("case_id") == "ideal_loads_no_oa_sensible_conformance_001"),
+        {},
+    )
+    inactive = (ideal.get("raw_summary") or {}).get("inactive_branches", [])
+    rows = [
+        [
+            "repeated-run identical summary hash",
+            "1Zone + IdealLoads",
+            "identical compare-summary hash",
+            "not captured by current evidence generator",
+            "pending",
+        ],
+        [
+            "unsupported IdealLoads branches are not silently claimed",
+            ideal.get("case_id", "IdealLoads no-OA"),
+            "inactive branches outside no-OA claim",
+            short_text(", ".join(inactive), 120),
+            "documented" if inactive else "pending",
+        ],
+        [
+            "duplicate ResultStore handle guard",
+            "IdealLoads result store",
+            "ep_runtime::ResultStore::diagnostics",
+            "rust-result-store duplicate_guard metadata",
+            "pass",
+        ],
+        [
+            "missing node reference typed diagnostic",
+            "broken fixture",
+            "object/source diagnostic, no panic",
+            "fixture not generated in current evidence pack",
+            "pending",
+        ],
+        [
+            "unavailable output variable typed diagnostic",
+            "broken output request fixture",
+            "unavailable-output diagnostic, no panic",
+            "fixture not generated in current evidence pack",
+            "pending",
+        ],
+        [
+            "non-finite guard",
+            "runtime numeric guard fixture",
+            "typed diagnostic or guard failure",
+            "fixture not generated in current evidence pack",
+            "pending",
+        ],
+    ]
+    return table(
+        ["Test", "Case", "Expected", "Observed", "Status"],
+        rows,
+        "Stability evidence status. Pending rows are not claimed as passing evidence.",
+        [1.65, 1.15, 1.75, 2.0, 0.65],
+    )
+
+
 def build_series_detail(evidence: dict[str, Any]) -> Table:
     rows: list[list[Any]] = []
     series_index = 1
@@ -2991,7 +3049,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["1Zone time-series plots", "partial", "MAT/convection/storage/conduction overlays included; heatmap/histogram still pending."],
         ["IdealLoads time-series plots", "partial", "No-OA rates/node overlays included; branch heatmap/meter plot pending."],
         ["Performance evidence", "partial", "3 repeat gate timings included; N=10 median/p90 summary pending."],
-        ["Stability evidence", "pending", "Typed failure fixture summary and repeated-hash evidence pending."],
+        ["Stability evidence", "partial", "Stability summary/table added; intentional failure fixtures and repeated-hash proof pending."],
         ["Reproducibility", "done", "Command list and artifact paths are included."],
     ]
     return table(["TODO Area", "Status", "Evidence Pack Handling"], rows, "Current checklist status against the PDF evidence-pack TODO.", [1.45, 0.65, 5.1])
@@ -3247,6 +3305,15 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             build_timing_sample_table(evidence),
             build_timing_values(evidence),
             build_phase_timing_values(evidence),
+        ),
+        Chapter(
+            "Stability Evidence",
+            Paragraph(
+                "Stability rows are separated from compatibility claims. A pending row means the evidence pack still "
+                "needs an intentional fixture or repeated-run proof before it can be counted as passing stability "
+                "evidence."
+            ),
+            build_stability_evidence_table(evidence),
         ),
         Chapter(
             "Regression Gates",

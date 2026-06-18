@@ -780,6 +780,16 @@ $Commands = [ordered]@{
         Group = "release"
         Help = "Export evidence-pack plots as PNG assets."
     }
+    "performance-summary" = @{
+        Path = "release\performance-summary.ps1"
+        Group = "release"
+        Help = "Generate machine-readable performance timing summary."
+    }
+    "stability-summary" = @{
+        Path = "release\stability-summary.ps1"
+        Group = "release"
+        Help = "Generate machine-readable stability evidence summary."
+    }
     "pdf-evidence-pack" = @{
         Path = "release\pdf-evidence-pack.ps1"
         Group = "release"

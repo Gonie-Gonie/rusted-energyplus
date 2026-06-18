@@ -213,6 +213,24 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
         }
         for role, filename, purpose in plot_specs
     )
+    specs.extend(
+        [
+            {
+                "role": "performance-summary-json",
+                "path": evidence_path(repo_root, version, "performance-summary.json"),
+                "produced_by": f".\\scripts\\dev.cmd performance-summary -Version {version}",
+                "user_purpose": "Machine-readable repeated timing statistics and measurement definitions.",
+                "required": False,
+            },
+            {
+                "role": "stability-summary-json",
+                "path": evidence_path(repo_root, version, "stability-summary.json"),
+                "produced_by": f".\\scripts\\dev.cmd stability-summary -Version {version}",
+                "user_purpose": "Machine-readable stability and failure-diagnostic evidence status.",
+                "required": False,
+            },
+        ]
+    )
     return specs
 
 

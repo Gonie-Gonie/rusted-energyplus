@@ -37,5 +37,7 @@ if ($RunDynamicDiagnostic) {
     $numericArgs += "-RunDynamicDiagnostic"
 }
 Invoke-DevCommand -Command "conformance-evidence-report" -Arguments $numericArgs
+Invoke-DevCommand -Command "performance-summary" -Arguments @("-Version", $Version)
+Invoke-DevCommand -Command "stability-summary" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "plot-evidence" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "release-evidence-manifest" -Arguments @("-Version", $Version, "-Target", $Target)
