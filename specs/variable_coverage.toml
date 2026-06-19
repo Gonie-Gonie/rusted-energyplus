@@ -831,6 +831,54 @@ first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof absorbed solar heat gain per-area row only under surface-solar-flux-state tolerance; wall absorbed solar per-area rows, fenestration, detailed shadowing, and broad solar/radiation compatibility remain outside the claim."
 
 [[variable]]
+name = "Surface Inside Face Convection Heat Transfer Coefficient"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof/floor inside convection coefficient rows only under surface-coefficient-state tolerance; broad inside convection coefficient cadence and other cases remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Convection Heat Transfer Coefficient"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof outside convection coefficient rows only under surface-coefficient-state tolerance; outside convection heat-gain rate rows, wet-surface branch generality, and other cases remain outside the claim."
+
+[[variable]]
+name = "Surface Inside Face Convection Heat Gain Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof/floor inside convection heat gain rate rows only under surface-state tolerance; broad inside convection/source-order generality remains outside the claim."
+
+[[variable]]
+name = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof/floor inside net surface thermal radiation heat gain rows only under surface-state tolerance; broad interior radiation exchange generality remains outside the claim."
+
+[[variable]]
+name = "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic zone opaque outside-face conduction heat gain aggregate row only under surface-aggregate-state tolerance; broad aggregate reporting and non-declared gain/loss rows remain outside the claim."
+
+[[variable]]
+name = "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic zone opaque outside-face conduction heat loss aggregate row only under surface-aggregate-state tolerance; broad aggregate reporting and non-declared gain/loss rows remain outside the claim."
+
+[[variable]]
 name = "System Node Mass Flow Rate"
 domain = "hvac"
 status = "conformance"

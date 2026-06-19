@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 73) {
-    throw "Expected 73 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 98) {
+    throw "Expected 98 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -184,6 +184,8 @@ if ([double]$rainSeries.rmse_delta_c -gt 0.000001) {
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZONE ONE" -and $_.output.variable -eq "Zone Mean Air Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Zone Mean Air Temperature conformance series missing"
 }
+$allSurfaceKeys = @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004", "ZN001:FLR001", "ZN001:ROOF001")
+$wallRoofSurfaceKeys = @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004", "ZN001:ROOF001")
 $surfaceFluxSeries = @($summary.series | Where-Object { $_.output.class -eq "surface-flux-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })
 if ($surfaceFluxSeries.Count -ne 22) {
     throw "Expected 22 surface-flux-state conformance series, got $($surfaceFluxSeries.Count)"
@@ -196,13 +198,12 @@ foreach ($series in $surfaceFluxSeries) {
         throw "Surface flux-state rmse_delta_c exceeds 0.0015 W/m2 for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
     }
 }
-$incidentDiffuseSurfaceKeys = @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004", "ZN001:ROOF001")
 $incidentSolarVariables = @(
     "Surface Outside Face Incident Solar Radiation Rate per Area",
     "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
 )
 $incidentSolarSeries = @($summary.series | Where-Object {
-        $incidentDiffuseSurfaceKeys -contains $_.output.key `
+        $wallRoofSurfaceKeys -contains $_.output.key `
             -and $incidentSolarVariables -contains $_.output.variable `
             -and $_.output.class -eq "surface-solar-flux-state" `
             -and $_.output.level -eq "conformance" `
@@ -220,7 +221,7 @@ foreach ($series in $incidentSolarSeries) {
     }
 }
 $absorbedSolarRateSeries = @($summary.series | Where-Object {
-        $incidentDiffuseSurfaceKeys -contains $_.output.key `
+        $wallRoofSurfaceKeys -contains $_.output.key `
             -and $_.output.variable -eq "Surface Outside Face Solar Radiation Heat Gain Rate" `
             -and $_.output.class -eq "surface-solar-rate-state" `
             -and $_.output.level -eq "conformance" `
@@ -260,7 +261,7 @@ $incidentDiffuseVariables = @(
     "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 )
 $incidentDiffuseSeries = @($summary.series | Where-Object {
-        $incidentDiffuseSurfaceKeys -contains $_.output.key `
+        $wallRoofSurfaceKeys -contains $_.output.key `
             -and $incidentDiffuseVariables -contains $_.output.variable `
             -and $_.output.class -eq "surface-flux-state" `
             -and $_.output.level -eq "conformance" `
@@ -277,9 +278,51 @@ foreach ($series in $incidentDiffuseSeries) {
         throw "Incident sky/ground diffuse rmse_delta_c exceeds 1e-6 W/m2 for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
     }
 }
+$surfaceCoefficientSeries = @($summary.series | Where-Object {
+        (
+            ($allSurfaceKeys -contains $_.output.key -and $_.output.variable -eq "Surface Inside Face Convection Heat Transfer Coefficient") `
+                -or ($wallRoofSurfaceKeys -contains $_.output.key -and $_.output.variable -eq "Surface Outside Face Convection Heat Transfer Coefficient")
+        ) `
+            -and $_.output.class -eq "surface-coefficient-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($surfaceCoefficientSeries.Count -ne 11) {
+    throw "Expected 11 inside/outside convection coefficient conformance series, got $($surfaceCoefficientSeries.Count)"
+}
+foreach ($series in $surfaceCoefficientSeries) {
+    if ([double]$series.max_abs_delta_c -gt 0.05) {
+        throw "Surface convection coefficient max_abs_delta_c exceeds 0.05 W/m2-K for $($series.output.key) / $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.001) {
+        throw "Surface convection coefficient rmse_delta_c exceeds 0.001 W/m2-K for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
+$insideSourceVariables = @(
+    "Surface Inside Face Convection Heat Gain Rate",
+    "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+)
+$insideSourceSeries = @($summary.series | Where-Object {
+        $allSurfaceKeys -contains $_.output.key `
+            -and $insideSourceVariables -contains $_.output.variable `
+            -and $_.output.class -eq "surface-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($insideSourceSeries.Count -ne 12) {
+    throw "Expected 12 inside convection/radiation source conformance series, got $($insideSourceSeries.Count)"
+}
+foreach ($series in $insideSourceSeries) {
+    if ([double]$series.max_abs_delta_c -gt 1.0) {
+        throw "Inside convection/radiation source max_abs_delta_c exceeds 1.0 W for $($series.output.key) / $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.35) {
+        throw "Inside convection/radiation source rmse_delta_c exceeds 0.35 W for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
 $surfaceAggregateSeries = @($summary.series | Where-Object { $_.output.class -eq "surface-aggregate-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })
-if ($surfaceAggregateSeries.Count -ne 2) {
-    throw "Expected two surface-aggregate-state conformance series, got $($surfaceAggregateSeries.Count)"
+if ($surfaceAggregateSeries.Count -ne 4) {
+    throw "Expected four surface-aggregate-state conformance series, got $($surfaceAggregateSeries.Count)"
 }
 foreach ($series in $surfaceAggregateSeries) {
     if ([double]$series.max_abs_delta_c -gt 1.2) {
@@ -322,9 +365,15 @@ Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar 
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Beam Solar Radiation Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "incident beam solar conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate / hourly / surface-solar-rate-state / eso / conformance" -Description "absorbed solar heat gain rate conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "absorbed solar heat gain per-area conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "inside convection coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside convection coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside convection source conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside radiation source conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "incident sky diffuse conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "incident ground diffuse conformance output"
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate / hourly / surface-aggregate-state / eso / conformance" -Description "zone opaque aggregate conduction conformance output"
+Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate / hourly / surface-aggregate-state / eso / conformance" -Description "zone opaque aggregate outside gain conformance output"
+Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate / hourly / surface-aggregate-state / eso / conformance" -Description "zone opaque aggregate outside loss conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-storage-state / eso / conformance" -Description "surface storage conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area / hourly / surface-storage-flux-state / eso / conformance" -Description "surface storage per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "status: pass" -Description "markdown status"

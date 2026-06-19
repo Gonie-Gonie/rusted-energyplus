@@ -498,6 +498,10 @@ required_variables = [
   "Zone Air Heat Balance Internal Convective Heat Gain Rate",
   "Surface Inside Face Temperature",
   "Surface Outside Face Temperature",
+  "Surface Inside Face Convection Heat Transfer Coefficient",
+  "Surface Outside Face Convection Heat Transfer Coefficient",
+  "Surface Inside Face Convection Heat Gain Rate",
+  "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
   "Surface Inside Face Conduction Heat Transfer Rate",
   "Surface Inside Face Conduction Heat Transfer Rate per Area",
   "Surface Outside Face Conduction Heat Transfer Rate",
@@ -512,6 +516,8 @@ required_variables = [
   "Surface Heat Storage Rate per Area",
   "Zone Opaque Surface Inside Faces Conduction Rate",
   "Zone Opaque Surface Outside Faces Conduction Rate",
+  "Zone Opaque Surface Outside Faces Conduction Heat Gain Rate",
+  "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate",
   "Zone Air Heat Balance Surface Convection Rate",
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
@@ -519,8 +525,8 @@ not_claimed = [
   "broad ExampleFiles dynamic numerical conformance",
   "general warmup convergence parity outside the official 1ZoneUncontrolled dynamic candidate",
   "broad weather processor and wet-surface branch compatibility",
-  "storage rows outside the declared floor storage rows, absorbed/non-incident solar outside the declared absorbed rows, radiation, and convection coefficient variables",
-  "broad solar and exterior convection parity",
+  "storage rows outside the declared floor storage rows, absorbed/non-incident solar outside the declared absorbed rows, exterior radiation/convection heat gain rate rows, and non-declared aggregate rows",
+  "broad solar, interior/exterior radiation, and exterior convection parity",
   "full EnergyPlus compatibility",
 ]
 

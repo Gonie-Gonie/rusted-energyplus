@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 111 tracked variables, 92 conformance variables, 13
+  output-variable scope: 117 tracked variables, 98 conformance variables, 13
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -45,11 +45,12 @@ tolerance, and code organization.
   declared `surface_temperature_nomass_001` hourly series
 - official `1ZoneUncontrolled` dynamic heat-balance conformance gate for
   declared weather/wetbulb/rain-status, zone-air, surface temperature, surface
-  conduction, named wall/roof incident total/beam solar, exact-zero named
-  wall/roof sky/ground diffuse incident solar, named wall/roof absorbed solar
-  heat gain rate, and roof absorbed solar heat gain per-area,
-  zone opaque aggregate conduction, and floor storage hourly series in the
-  compatibility-candidate lane
+  conduction, inside convection/radiation source rows, inside/outside
+  convection coefficients, named wall/roof incident total/beam solar,
+  exact-zero named wall/roof sky/ground diffuse incident solar, named wall/roof
+  absorbed solar heat gain rate, roof absorbed solar heat gain per-area, zone
+  opaque aggregate conduction including outside gain/loss aggregates, and floor
+  storage hourly series in the compatibility-candidate lane
 - official `1ZoneUncontrolled` dynamic heat-balance diagnostic report for
   broader run-period-filtered zone temperature, surface conduction, and
   diagnostic decomposition deltas; this broad probe remains explicitly
@@ -328,13 +329,16 @@ tolerance, and code organization.
   `surface_temperature_nomass_001` series and named official
   `1ZoneUncontrolled` dynamic candidate surfaces, including the declared floor
   `Surface Heat Storage Rate` / `Surface Heat Storage Rate per Area` rows and
-  the declared zone opaque surface inside/outside conduction aggregate rows,
-  plus named wall/roof incident total/beam solar rows, exact-zero named
+  the declared zone opaque surface inside/outside conduction aggregate rows
+  plus outside-face gain/loss aggregate rows, declared inside
+  convection/radiation source rows, declared inside/outside convection
+  coefficient rows, plus named wall/roof incident total/beam solar rows, exact-zero named
   wall/roof sky/ground diffuse incident solar rows, named wall/roof absorbed
   solar heat gain rate rows, and the roof absorbed solar heat gain per-area
-  row under dedicated storage/flux/solar-rate/solar-flux tolerances; absorbed
-  solar outside those declared rows, radiation, and broad CTF diagnostics are
-  not promoted
+  row under dedicated storage/flux/solar-rate/solar-flux/coefficient
+  tolerances; absorbed solar outside those declared rows, exterior
+  radiation/convection heat-gain rate rows, and broad CTF diagnostics are not
+  promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation
