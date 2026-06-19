@@ -219,6 +219,38 @@ fn humidistat_dehumidification_mass_flow_can_exceed_sensible_cooling_flow() {
 }
 
 #[test]
+fn humidistat_dehumidification_can_coexist_with_sensible_heating() {
+    let mut system = test_system();
+    system.dehumidification_control_type = DehumidificationControlType::Humidistat;
+    system.minimum_cooling_supply_air_humidity_ratio = 0.0077;
+    let zone_state = IdealLoadsZoneState {
+        air_temperature_c: 20.0,
+        air_humidity_ratio: 0.011,
+    };
+    let mut demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 1000.0, 0.0);
+    demand.remaining_output_req_to_dehumid_sp_kg_per_s = -0.00033;
+
+    let result = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
+
+    let cp = energyplus_moist_air_specific_heat_j_per_kg_k(zone_state.air_humidity_ratio);
+    let sensible_mass_flow = 1000.0 / (cp * (50.0 - 20.0));
+    assert_eq!(result.mode, IdealLoadsSensibleMode::Heating);
+    assert!(result.supply_mass_flow_rate_kg_per_s > sensible_mass_flow);
+    assert_close(result.supply_mass_flow_rate_kg_per_s, 0.1, 1.0e-12);
+    assert_close(result.zone_sensible_heating_rate_w, 1000.0, 1.0e-9);
+    assert_close(
+        result.supply_humidity_ratio,
+        system.minimum_cooling_supply_air_humidity_ratio,
+        1.0e-12,
+    );
+    assert!(result.supply_air_sensible_heating_rate_w > 0.0);
+    assert!(result.supply_air_latent_cooling_rate_w > 0.0);
+    assert!(result.supply_air_total_heating_rate_w > 0.0);
+    assert!(result.supply_air_total_cooling_rate_w > 0.0);
+    assert!(result.zone_latent_cooling_rate_w > 0.0);
+}
+
+#[test]
 fn humidistat_humidification_mass_flow_can_exceed_sensible_heating_flow() {
     let mut system = test_system();
     system.humidification_control_type = HumidificationControlType::Humidistat;

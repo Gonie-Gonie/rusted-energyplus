@@ -64,7 +64,7 @@ pub(super) fn heating_supply_humidity_ratio(
     demand: ZoneSysEnergyDemand,
     context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
-    let supply_humidity_ratio = match system.humidification_control_type {
+    let mut supply_humidity_ratio = match system.humidification_control_type {
         HumidificationControlType::Humidistat if supply_mass_flow_rate_kg_per_s > 0.0 => {
             let supply_humidity_ratio_for_humidification =
                 (demand.remaining_output_req_to_humid_sp_kg_per_s / supply_mass_flow_rate_kg_per_s
@@ -79,6 +79,20 @@ pub(super) fn heating_supply_humidity_ratio(
         }
         _ => mixed_supply_humidity_ratio,
     };
+    if system.dehumidification_control_type == DehumidificationControlType::Humidistat
+        && supply_mass_flow_rate_kg_per_s > 0.0
+        && matches!(
+            system.humidification_control_type,
+            HumidificationControlType::Humidistat | HumidificationControlType::None
+        )
+    {
+        let supply_humidity_ratio_for_dehumidification =
+            (demand.remaining_output_req_to_dehumid_sp_kg_per_s / supply_mass_flow_rate_kg_per_s
+                + zone_state.air_humidity_ratio)
+                .max(system.minimum_cooling_supply_air_humidity_ratio);
+        supply_humidity_ratio =
+            supply_humidity_ratio.min(supply_humidity_ratio_for_dehumidification);
+    }
     let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
         supply_temperature_c,
         1.0,

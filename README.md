@@ -66,7 +66,7 @@ tolerance, and code organization.
   DistrictHeatingWater/DistrictCooling facility meters promoted only by the
   separate hourly meter candidate, the four humidity-control
   hourly/monthly/run-period meter candidates, and the
-  monthly/annual/run-period meter-only candidate, plus the three full-year
+  monthly/annual/run-period meter-only candidate, plus the four full-year
   humidity-control annual meter candidates, while tracked as oracle-MTR
   diagnostics in this sensible case with RuntimeMeterRegistry request
   resolution
@@ -167,9 +167,8 @@ tolerance, and code organization.
   `DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters in
   `ideal_loads_humidistat_dehumidification_conformance_candidate_001`, using
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
-  calculation, annual meter rows including the full-year dehumidification
-  annual meter probe, and broad humidity-control conformance remain outside
-  the claim
+  calculation, annual meter rows in this short-run candidate, and broad
+  humidity-control conformance remain outside the claim
 - limited IdealLoads no-OA Humidistat humidification conformance candidate
   gate for declared thermostat, heating/cooling total/sensible/latent rate,
   supply-air report-rate, ReportPurchasedAir energy/fuel, supply-node
@@ -179,6 +178,12 @@ tolerance, and code organization.
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
   calculation and annual meter rows in this short-run candidate remain outside
   the claim
+- limited IdealLoads no-OA full-year Humidistat dehumidification annual facility
+  meter conformance candidate for `DistrictHeatingWater:Facility` and
+  `DistrictCooling:Facility` in
+  `ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001`,
+  with Detailed humidity-control branch rows and humidistat moisture-demand
+  calculation kept diagnostic proof only
 - limited IdealLoads no-OA full-year Humidistat humidification annual facility
   meter conformance candidate for `DistrictHeatingWater:Facility` and
   `DistrictCooling:Facility` in

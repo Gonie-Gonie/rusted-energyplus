@@ -19,6 +19,7 @@ $CompareRoot = Join-Path $CaseOutputRoot "compare"
 $ExpectedBranches = @{
     "ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001" = "constant_supply_humidity_cooling"
     "ideal_loads_constant_supply_humidity_heating_annual_meter_conformance_candidate_001" = "constant_supply_humidity_heating"
+    "ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001" = "humidistat_dehumidification"
     "ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001" = "humidistat_humidification"
 }
 

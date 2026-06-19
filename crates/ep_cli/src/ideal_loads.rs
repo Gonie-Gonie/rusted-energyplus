@@ -145,9 +145,12 @@ const IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_HEATING_ANNUAL_METER_CONFORMANCE_CASE
     "ideal_loads_constant_supply_humidity_heating_annual_meter_conformance_candidate_001";
 const IDEAL_LOADS_HUMIDISTAT_HUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001";
+const IDEAL_LOADS_HUMIDISTAT_DEHUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001";
 const IDEAL_LOADS_HUMIDITY_ANNUAL_FACILITY_METER_CONFORMANCE_CASE_IDS: &[&str] = &[
     IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_COOLING_ANNUAL_METER_CONFORMANCE_CASE_ID,
     IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_HEATING_ANNUAL_METER_CONFORMANCE_CASE_ID,
+    IDEAL_LOADS_HUMIDISTAT_DEHUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID,
     IDEAL_LOADS_HUMIDISTAT_HUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID,
 ];
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_CASE_ID: &str =
@@ -2835,6 +2838,7 @@ fn build_context<'a>(
         )
         || manifest_allows_humidistat_dehumidification_diagnostic(manifest, system)
         || manifest_allows_humidistat_dehumidification_conformance(manifest, system)
+        || manifest_allows_humidistat_dehumidification_annual_meter_conformance(manifest, system)
     {
         boundary
             .unsupported_features
@@ -4563,6 +4567,16 @@ fn manifest_allows_humidistat_dehumidification_conformance(
         })
 }
 
+fn manifest_allows_humidistat_dehumidification_annual_meter_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest)
+        && manifest.id == IDEAL_LOADS_HUMIDISTAT_DEHUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID
+        && system.dehumidification_control_type == DehumidificationControlType::Humidistat
+        && system.humidification_control_type == HumidificationControlType::None
+}
+
 fn manifest_allows_humidistat_humidification_diagnostic(
     manifest: &ConformanceCase,
     system: &IdealLoadsAirSystem,
@@ -4639,6 +4653,7 @@ fn manifest_allows_humidity_annual_facility_meter_conformance(
         || manifest_allows_constant_supply_humidity_heating_annual_meter_conformance(
             manifest, system,
         )
+        || manifest_allows_humidistat_dehumidification_annual_meter_conformance(manifest, system)
         || manifest_allows_humidistat_humidification_annual_meter_conformance(manifest, system)
 }
 
