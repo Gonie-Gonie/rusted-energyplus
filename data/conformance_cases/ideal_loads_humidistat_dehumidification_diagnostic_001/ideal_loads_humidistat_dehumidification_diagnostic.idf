@@ -354,6 +354,9 @@ Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Heating Setpoint
 Output:Variable,ZONE ONE,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,Detailed;
 Output:Variable,ZONE ONE,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,Detailed;
+Output:Variable,ZONE ONE,Zone Air Humidity Ratio,Detailed;
+Output:Variable,ZONE ONE,Zone Other Equipment Latent Gain Rate,Detailed;
+Output:Variable,ZONE ONE,Zone Total Internal Latent Gain Rate,Detailed;
 Output:Variable,ZONE ONE INLET,System Node Temperature,Detailed;
 Output:Variable,ZONE ONE INLET,System Node Mass Flow Rate,Detailed;
 Output:Variable,ZONE ONE AIR NODE,System Node Temperature,Detailed;

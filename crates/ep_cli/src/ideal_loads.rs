@@ -78,10 +78,11 @@ use ep_runtime::{
     calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
     classify_no_oa_sensible_subset, correct_no_oa_third_order_humidity_ratio_compat,
-    design_outdoor_air_volume_flow_components_m3_per_s, ideal_loads_facility_meter_binding,
-    ideal_loads_zone_equipment_stages, load_epw_records, purchased_air_source_order_stages,
-    select_purchased_air_branch, sim_purchased_air_compat, sim_purchased_air_outdoor_air_compat,
-    surface_area_m2, validate_ideal_loads_zone_equipment_dispatch,
+    design_outdoor_air_volume_flow_components_m3_per_s, energyplus_moist_air_density_kg_per_m3,
+    ideal_loads_facility_meter_binding, ideal_loads_zone_equipment_stages, load_epw_records,
+    purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
+    sim_purchased_air_outdoor_air_compat, surface_area_m2,
+    validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{
@@ -97,6 +98,8 @@ const SYSTEM_NODE_TEMPERATURE: &str = "System Node Temperature";
 const SYSTEM_NODE_HUMIDITY_RATIO: &str = "System Node Humidity Ratio";
 const SYSTEM_NODE_MASS_FLOW_RATE: &str = "System Node Mass Flow Rate";
 const ZONE_AIR_HUMIDITY_RATIO: &str = "Zone Air Humidity Ratio";
+const ZONE_OTHER_EQUIPMENT_LATENT_GAIN_RATE: &str = "Zone Other Equipment Latent Gain Rate";
+const ZONE_TOTAL_INTERNAL_LATENT_GAIN_RATE: &str = "Zone Total Internal Latent Gain Rate";
 const ZONE_AIR_CO2_PREDICTED_LOAD_TO_SETPOINT_MASS_FLOW_RATE: &str =
     "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate";
 const ZONE_SYSTEM_PREDICTED_SETPOINT_LOAD: &str =
@@ -358,8 +361,12 @@ struct IdealLoadsMoisturePredictorSummary {
     history_source: &'static str,
     latent_gain_source: &'static str,
     closed_loop_state_source: &'static str,
+    history_residual_source: &'static str,
+    humidifying_equivalent_history_delta_max: f64,
+    dehumidifying_equivalent_history_delta_max: f64,
     zone_moisture_capacity_multiplier: f64,
     zone_multiplier: f64,
+    latent_gain: Vec<IdealLoadsMoisturePredictorComparison>,
     humidifying: IdealLoadsMoisturePredictorComparison,
     dehumidifying: IdealLoadsMoisturePredictorComparison,
     closed_loop: Vec<IdealLoadsMoisturePredictorComparison>,
@@ -478,6 +485,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
 struct IdealLoadsInputTrace {
     sample_count: usize,
     zone_node_temperature: LoadedSeries,
+    zone_air_humidity_ratio: LoadedSeries,
     zone_node_humidity_ratio: LoadedSeries,
     recirculation_node_temperature: LoadedSeries,
     recirculation_node_humidity_ratio: LoadedSeries,
@@ -2988,6 +2996,12 @@ fn load_input_trace(
     let zone_node_temperature = load_series(eso, zone_air_node_name, SYSTEM_NODE_TEMPERATURE)?;
     let zone_node_humidity_ratio =
         load_series(eso, zone_air_node_name, SYSTEM_NODE_HUMIDITY_RATIO)?;
+    let zone_air_humidity_ratio = load_optional_series_or_reference(
+        eso,
+        zone_name,
+        ZONE_AIR_HUMIDITY_RATIO,
+        &zone_node_humidity_ratio,
+    );
     let (recirculation_node_temperature, recirculation_node_humidity_ratio) =
         match recirculation_node_name {
             Some(recirculation_node_name) => (
@@ -3018,6 +3032,7 @@ fn load_input_trace(
     )?;
     let sample_count = [
         zone_node_temperature.samples.len(),
+        zone_air_humidity_ratio.samples.len(),
         zone_node_humidity_ratio.samples.len(),
         recirculation_node_temperature.samples.len(),
         recirculation_node_humidity_ratio.samples.len(),
@@ -3037,6 +3052,7 @@ fn load_input_trace(
     Ok(IdealLoadsInputTrace {
         sample_count,
         zone_node_temperature,
+        zone_air_humidity_ratio,
         zone_node_humidity_ratio,
         recirculation_node_temperature,
         recirculation_node_humidity_ratio,
@@ -3122,6 +3138,30 @@ fn load_optional_series_or_zero(
                 .collect(),
         }),
     }
+}
+
+fn load_optional_series_or_reference(
+    eso: &Path,
+    key: &str,
+    variable: &str,
+    reference: &LoadedSeries,
+) -> LoadedSeries {
+    match load_eso_time_series(eso, key, variable) {
+        Ok(series) => LoadedSeries {
+            units: series.metadata.units,
+            samples: run_period_samples(series.samples),
+        },
+        Err(_) => reference.clone(),
+    }
+}
+
+fn load_optional_series(eso: &Path, key: &str, variable: &str) -> Option<LoadedSeries> {
+    load_eso_time_series(eso, key, variable)
+        .ok()
+        .map(|series| LoadedSeries {
+            units: series.metadata.units,
+            samples: run_period_samples(series.samples),
+        })
 }
 
 fn run_period_samples(samples: Vec<SeriesSample>) -> Vec<SeriesSample> {
@@ -4962,6 +5002,22 @@ fn moisture_predictor_summary(
         input_trace.sample_count,
         &timestamps,
     )?;
+    let latent_gain_comparisons = [
+        ZONE_OTHER_EQUIPMENT_LATENT_GAIN_RATE,
+        ZONE_TOTAL_INTERNAL_LATENT_GAIN_RATE,
+    ]
+    .into_iter()
+    .filter_map(|variable| {
+        load_optional_series(eso, &zone.name.0, variable).map(|expected| {
+            moisture_predictor_comparison(
+                variable,
+                &expected,
+                &latent_gain,
+                input_trace.sample_count,
+            )
+        })
+    })
+    .collect::<Vec<_>>();
     let zone_volume_m3 = ideal_loads_zone_volume_m3(&model.typed, zone).ok_or_else(|| {
         format!(
             "IdealLoads Humidistat moisture predictor requires explicit zone volume for {}",
@@ -4979,7 +5035,7 @@ fn moisture_predictor_summary(
         })?;
         let zone_state = IdealLoadsZoneState {
             air_temperature_c: input_trace.zone_node_temperature.samples[index].value,
-            air_humidity_ratio: input_trace.zone_node_humidity_ratio.samples[index].value,
+            air_humidity_ratio: input_trace.zone_air_humidity_ratio.samples[index].value,
         };
         let demand =
             calc_no_oa_third_order_moisture_demand_compat(NoOaThirdOrderMoistureDemandInput {
@@ -5022,13 +5078,39 @@ fn moisture_predictor_summary(
         timestep_seconds,
         source_order_trace_uses_recirculation,
     })?;
+    let humidifying_equivalent_history_delta_max =
+        moisture_equivalent_history_delta_max(MoistureEquivalentHistoryDeltaInput {
+            input_trace,
+            expected: &input_trace.humidifying_moisture_demand,
+            observed: &humidifying,
+            barometric_pressure_trace,
+            zone_volume_m3,
+            zone_moisture_capacity_multiplier,
+            timestep_seconds,
+            zone_multiplier,
+        })?;
+    let dehumidifying_equivalent_history_delta_max =
+        moisture_equivalent_history_delta_max(MoistureEquivalentHistoryDeltaInput {
+            input_trace,
+            expected: &input_trace.dehumidifying_moisture_demand,
+            observed: &dehumidifying,
+            barometric_pressure_trace,
+            zone_volume_m3,
+            zone_moisture_capacity_multiplier,
+            timestep_seconds,
+            zone_multiplier,
+        })?;
 
     Ok(Some(IdealLoadsMoisturePredictorSummary {
         history_source: "oracle zone-air humidity row lag approximation; warmup/system-history state is not yet closed by Rust",
         latent_gain_source: "typed OtherEquipment design_level * fraction_latent * schedule; radiant-system, pool, people, infiltration, mixing, EMS, and fault latent terms are outside this diagnostic",
         closed_loop_state_source: "temperature and sensible demand still use EnergyPlus trace rows; humidity demand, PurchasedAir humidity branch, and correctHumRat update are Rust closed-loop after first-sample history seed",
+        history_residual_source: "predictor residual divided by EnergyPlus ThirdOrder C coefficient and zone multiplier; includes any latent-gain, schedule, psychrometric, or WPrevZoneTSTemp mismatch as an equivalent humidity-history delta",
+        humidifying_equivalent_history_delta_max,
+        dehumidifying_equivalent_history_delta_max,
         zone_moisture_capacity_multiplier,
         zone_multiplier,
+        latent_gain: latent_gain_comparisons,
         humidifying: moisture_predictor_comparison(
             ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD,
             &input_trace.humidifying_moisture_demand,
@@ -5065,6 +5147,58 @@ struct IdealLoadsHumidistatClosedLoopInput<'a> {
     source_order_trace_uses_recirculation: bool,
 }
 
+struct MoistureEquivalentHistoryDeltaInput<'a> {
+    input_trace: &'a IdealLoadsInputTrace,
+    expected: &'a LoadedSeries,
+    observed: &'a [f64],
+    barometric_pressure_trace: &'a [f64],
+    zone_volume_m3: f64,
+    zone_moisture_capacity_multiplier: f64,
+    timestep_seconds: f64,
+    zone_multiplier: f64,
+}
+
+fn moisture_equivalent_history_delta_max(
+    input: MoistureEquivalentHistoryDeltaInput<'_>,
+) -> Result<f64, String> {
+    let mut max_delta = 0.0_f64;
+    let zone_multiplier = input.zone_multiplier.max(1.0);
+    for index in 0..input.input_trace.sample_count {
+        let pressure = *input.barometric_pressure_trace.get(index).ok_or_else(|| {
+            format!("IdealLoads Humidistat history residual missing pressure sample {index}")
+        })?;
+        let zone_temperature = input.input_trace.zone_node_temperature.samples[index].value;
+        let zone_humidity = input.input_trace.zone_air_humidity_ratio.samples[index].value;
+        let density =
+            energyplus_moist_air_density_kg_per_m3(pressure, zone_temperature, zone_humidity)
+                .ok_or_else(|| {
+                    format!(
+                        "IdealLoads Humidistat history residual rejected density sample {index}"
+                    )
+                })?;
+        let c = density * input.zone_volume_m3 * input.zone_moisture_capacity_multiplier
+            / input.timestep_seconds;
+        let denominator = c * zone_multiplier;
+        if denominator == 0.0 || !denominator.is_finite() {
+            return Err(format!(
+                "IdealLoads Humidistat history residual has invalid C coefficient at sample {index}"
+            ));
+        }
+        let expected = input.expected.samples[index].value;
+        let observed = *input.observed.get(index).ok_or_else(|| {
+            format!("IdealLoads Humidistat history residual missing observed sample {index}")
+        })?;
+        let equivalent_history_delta = -(observed - expected) / denominator;
+        if !equivalent_history_delta.is_finite() {
+            return Err(format!(
+                "IdealLoads Humidistat history residual produced non-finite sample {index}"
+            ));
+        }
+        max_delta = max_delta.max(equivalent_history_delta.abs());
+    }
+    Ok(max_delta)
+}
+
 fn humidistat_closed_loop_comparisons(
     input: IdealLoadsHumidistatClosedLoopInput<'_>,
 ) -> Result<Vec<IdealLoadsMoisturePredictorComparison>, String> {
@@ -5080,7 +5214,7 @@ fn humidistat_closed_loop_comparisons(
     let mut supply_air_latent_cooling = Vec::with_capacity(sample_count);
     let initial_humidity = input
         .input_trace
-        .zone_node_humidity_ratio
+        .zone_air_humidity_ratio
         .samples
         .first()
         .map_or(0.0, |sample| sample.value);
@@ -5212,9 +5346,9 @@ fn humidistat_closed_loop_comparisons(
     comparisons.push(moisture_predictor_comparison(
         format!(
             "{} :: {} (closed-loop corrected)",
-            input.zone.name.0, SYSTEM_NODE_HUMIDITY_RATIO
+            input.zone.name.0, ZONE_AIR_HUMIDITY_RATIO
         ),
-        &input.input_trace.zone_node_humidity_ratio,
+        &input.input_trace.zone_air_humidity_ratio,
         &corrected_zone_humidity,
         sample_count,
     ));
@@ -5345,10 +5479,10 @@ fn oracle_zone_air_humidity_history_value(
     lag: usize,
 ) -> f64 {
     input_trace
-        .zone_node_humidity_ratio
+        .zone_air_humidity_ratio
         .samples
         .get(index.saturating_sub(lag))
-        .or_else(|| input_trace.zone_node_humidity_ratio.samples.first())
+        .or_else(|| input_trace.zone_air_humidity_ratio.samples.first())
         .map_or(0.0, |sample| sample.value)
 }
 
@@ -6132,6 +6266,18 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             markdown_cell(summary.closed_loop_state_source)
         ));
         report.push_str(&format!(
+            "history_residual_source: {}\n",
+            markdown_cell(summary.history_residual_source)
+        ));
+        report.push_str(&format!(
+            "humidifying_equivalent_history_delta_max: {:.12}\n",
+            summary.humidifying_equivalent_history_delta_max
+        ));
+        report.push_str(&format!(
+            "dehumidifying_equivalent_history_delta_max: {:.12}\n",
+            summary.dehumidifying_equivalent_history_delta_max
+        ));
+        report.push_str(&format!(
             "zone_moisture_capacity_multiplier: {:.12}\n",
             summary.zone_moisture_capacity_multiplier
         ));
@@ -6139,6 +6285,25 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
             "zone_multiplier: {:.12}\n\n",
             summary.zone_multiplier
         ));
+        if !summary.latent_gain.is_empty() {
+            report.push_str("### Latent Gain Input Check\n\n");
+            report.push_str("| variable | samples | max_abs_delta | rmse_delta | max_rel_delta | status | first_divergence |\n");
+            report.push_str("|---|---:|---:|---:|---:|---|---|\n");
+            for comparison in &summary.latent_gain {
+                report.push_str(&format!(
+                    "| {} | {} | {:.12} | {:.12} | {:.12} | {} | {} |\n",
+                    markdown_cell(&comparison.variable),
+                    comparison.samples,
+                    comparison.max_abs_delta,
+                    comparison.rmse_delta,
+                    comparison.max_rel_delta,
+                    status_label(comparison.status),
+                    first_divergence_label(comparison.first_divergence.as_ref())
+                ));
+            }
+            report.push('\n');
+        }
+        report.push_str("### Moisture Demand Predictor Check\n\n");
         report.push_str("| variable | samples | max_abs_delta | rmse_delta | max_rel_delta | status | first_divergence |\n");
         report.push_str("|---|---:|---:|---:|---:|---|---|\n");
         for comparison in [&summary.humidifying, &summary.dehumidifying] {
@@ -8115,15 +8280,27 @@ fn moisture_predictor_json(summary: Option<&IdealLoadsMoisturePredictorSummary>)
         concat!(
             "{{\"claim_status\": \"diagnostic-only\", ",
             "\"history_source\": {}, \"latent_gain_source\": {}, ",
-            "\"closed_loop_state_source\": {}, ",
+            "\"closed_loop_state_source\": {}, \"history_residual_source\": {}, ",
+            "\"humidifying_equivalent_history_delta_max\": {}, ",
+            "\"dehumidifying_equivalent_history_delta_max\": {}, ",
             "\"zone_moisture_capacity_multiplier\": {}, \"zone_multiplier\": {}, ",
-            "\"humidifying\": {}, \"dehumidifying\": {}, \"closed_loop\": [{}]}}"
+            "\"latent_gain\": [{}], \"humidifying\": {}, \"dehumidifying\": {}, ",
+            "\"closed_loop\": [{}]}}"
         ),
         json_string(summary.history_source),
         json_string(summary.latent_gain_source),
         json_string(summary.closed_loop_state_source),
+        json_string(summary.history_residual_source),
+        json_number(summary.humidifying_equivalent_history_delta_max),
+        json_number(summary.dehumidifying_equivalent_history_delta_max),
         json_number(summary.zone_moisture_capacity_multiplier),
         json_number(summary.zone_multiplier),
+        summary
+            .latent_gain
+            .iter()
+            .map(moisture_predictor_comparison_json)
+            .collect::<Vec<_>>()
+            .join(", "),
         moisture_predictor_comparison_json(&summary.humidifying),
         moisture_predictor_comparison_json(&summary.dehumidifying),
         summary
