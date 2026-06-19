@@ -119,34 +119,35 @@ to `7.547299 W`. Keep the convergence cutoff as a source-aligned surface
 cadence candidate, while the next zone-air work remains the explicit
 `SurfTempInTmp`/hconv report path and owned humidity/capacitance.
 
-On the promoted ScriptF-flat, 20-iteration lane, a surface-reference-air report
-probe separates the surface report snapshot from the zone-air `SumHADTsurfs`
-path. Using each surface's stored inside-solve reference air improves individual
-`Surface Inside Face Convection Heat Gain Rate` rows, but it worsens `Zone Air
-Heat Balance Surface Convection Rate` from `22.062956 W` to `91.956638 W` RMSE.
-This means the surface `SurfQdotConvInRep` reference-air snapshot is useful
-source evidence, but the zone AirRpt surface-convection row still needs the
-EnergyPlus `CalcZoneComponentLoadSums` timing mapped separately.
+On the promoted ScriptF-flat, 20-iteration lane, the compatibility-candidate
+alias now resolves to the execution variant before selecting surface convection
+report timing. This applies the ScriptF-flat surface reference-air snapshot only
+to the individual `Surface Inside Face Convection Heat Gain Rate` rows while
+leaving the zone-air `SumHADTsurfs` report path on its existing source. The
+official dynamic diagnostic now drops floor inside-convection RMSE from
+`20.828820 W` to `0.021677 W`, roof from `18.955600 W` to `0.044044 W`, and
+the wall rows below `0.018 W` RMSE. `Zone Air Heat Balance Surface Convection
+Rate`, MAT, floor storage, and surface conduction are unchanged, so the fix is
+report-scope only.
 
 A final-hconv report sibling then tested whether EnergyPlus' reported
 `SurfHConvInt` could be approximated by recomputing TARP from the final
 `SurfTempIn` and report reference air while keeping the solver frozen. It is
-also a rejected report path: zone surface convection RMSE worsens from
-`22.062956 W` to `24.513143 W`, and floor inside convection heat gain worsens
-from `13.602803 W` to `16.742712 W`. The remaining zone-air surface convection
-gap is therefore not solved by either surface-refair reporting or final
-hconv-only reporting.
+still a rejected report path: under the current all-EIO, EnergyPlus-surf-initial
+compatibility setup it worsens floor storage from `0.175929 W` to
+`7.535715 W` RMSE and zone surface convection from `0.063018 W` to
+`11.729318 W` RMSE. The remaining broad diagnostic gap is therefore not solved
+by final hconv-only reporting.
 
 A live-hconv solve sibling then refreshed TARP inside convection coefficients
-during every interleaved solve pass on the active ScriptF-flat lane. It lowers
-zone surface-convection RMSE from `22.062956 W` to `18.287879 W`, MAT RMSE from
-`0.037329 C` to `0.024905 C`, and air-storage RMSE from `9.127258 W` to
-`6.815102 W`, but it regresses the dominant floor solve: floor storage rises
-from `28.786920 W` to `35.419283 W`, floor inside conduction from
-`16.729618 W` to `20.807778 W`, and zone opaque inside conduction from
-`18.143612 W` to `23.106598 W`. Keep the active solve on frozen inside
-convection while the next zone-air work maps the EnergyPlus
-`InitIntConvCoeff` cadence and report timing more exactly.
+during interleaved solve passes on the active ScriptF-flat lane. A sparse
+30-pass re-evaluation improves the individual inside convection report rows
+but regresses the promoted zone/surface state: zone surface convection rises
+from `0.063018 W` to `4.500161 W` RMSE, floor storage from `0.175929 W` to
+`7.581421 W`, and floor outside conduction from `0.075458 W` to `3.321042 W`.
+Keep the active solve on frozen inside convection while future work maps the
+exact EnergyPlus `InitIntConvCoeff` cadence without perturbing the promoted
+state rows.
 
 An inside-CTF report sibling then tested whether the aggregate conduction rows
 should use the outside-temperature snapshot consumed by the last inside CTF
@@ -161,7 +162,7 @@ A zone surface-report aggregate sibling then summed per-surface conduction
 report helpers for the zone opaque aggregate rows, matching the EnergyPlus
 `UpdateThermalHistories` aggregate shape. It is neutral: MAT, surface
 convection, air storage, zone inside/outside aggregate conduction, and floor
-storage all retain the active ScriptF-flat RMSE values (`0.037329 C`,
+storage all retain the older pre-all-EIO ScriptF-flat RMSE values (`0.037329 C`,
 `22.062956 W`, `9.127258 W`, `18.143612 W`, `11.590547 W`, and `28.786920 W`).
 The next zone-air work therefore stays on `CalcZoneComponentLoadSums` timing,
 `SurfTempInTmp`/hconv ownership, and upstream surface/source/history parity
@@ -173,8 +174,9 @@ Temperature` remains `Zone/Average`. Rust therefore keeps hourly averaging as
 the default report contract and adds `zone_air_report_sampling=last-system-state`
 only as a diagnostic probe to isolate whether the remaining `SumHADTsurfs` gap
 comes from system-timestep sampling rather than surface/source state ownership.
-This probe is rejected as a promotion path: on the active ScriptF-flat lane it
-leaves MAT and floor storage unchanged (`0.037329 C` and `28.786920 W`) while
+This historical probe is rejected as a promotion path: on the pre-all-EIO
+ScriptF-flat lane it leaves MAT and floor storage unchanged (`0.037329 C` and
+`28.786920 W`) while
 worsening `Zone Air Heat Balance Surface Convection Rate` from `22.062956 W` to
 `28.645122 W` RMSE and `Zone Air Heat Balance Air Energy Storage Rate` from
 `9.127258 W` to `42.591381 W` RMSE.
@@ -184,7 +186,7 @@ adiabatic floor outside face after syncing it to the current inside face while
 still committing the pre-sync outside snapshot to CTF history. This is rejected:
 MAT, zone surface convection, and air storage stay unchanged, but floor outside
 conduction jumps from `12.216935 W` to `747.544527 W` RMSE and floor storage
-from `28.786920 W` to `732.801403 W`. The active ScriptF-flat lane should
+from `28.786920 W` to `732.801403 W`. The current ScriptF-flat lane should
 therefore keep the adiabatic outside report state on the pre-sync outside
 snapshot; the remaining floor storage gap is not a missing current-inside
 outside-face report sync.
@@ -192,13 +194,12 @@ outside-face report sync.
 The official dynamic diagnostic digest/report now tracks zone
 surface-convection report closure against the signed sum of individual
 `Surface Inside Face Convection Heat Gain Rate` rows (`zone + surface_sum`). On
-the active ScriptF-flat lane the six-surface closure has oracle RMSE
-`67.733212 W`, Rust RMSE `30.140119 W`, and residual-delta RMSE `47.307560 W`.
-Because EnergyPlus itself does not close this surface-report sum to zero, the
-remaining `SumHADTsurfs` work should stay on EnergyPlus
-`CalcZoneComponentLoadSums` timing, `SurfTempInTmp`, and
-`getInsideAirTemperature`/hconv ownership rather than directly summing surface
-report heat-gain rows.
+the active ScriptF-flat lane the surface report rows are now near oracle, while
+the zone row remains a separate report source. Because EnergyPlus does not make
+`SumHADTsurfs` a direct negative sum of `SurfQdotConvInRep`, the remaining
+`SumHADTsurfs` work should stay on EnergyPlus `CalcZoneComponentLoadSums`
+timing, `SurfTempInTmp`, and `getInsideAirTemperature`/hconv ownership rather
+than directly summing surface report heat-gain rows.
 
 The June 2026 EnergyPlus 26.1.0 source audit narrows this further:
 `ZoneHeatBalanceData::calcSumHAT` is the solver-coefficient path and
@@ -213,8 +214,9 @@ An inside-surface loop ordering probe then tested the EnergyPlus source-order
 fact that `CalcHeatBalanceInsideSurf*` converges surface temperatures before
 zone-air correction. Rust now exposes
 `surface_loop_zone_air_correction=after-surface-loop` for this diagnostic, but
-the active ScriptF-flat lane is neutral because its frozen-reference-air surface
-loop is already insensitive to intra-loop zone-air updates: MAT remains
+the historical pre-all-EIO ScriptF-flat lane is neutral because its
+frozen-reference-air surface loop is already insensitive to intra-loop zone-air
+updates: MAT remains
 `0.037329 C` RMSE, zone surface convection `22.062956 W`, air storage
 `9.127258 W`, inside-surface iteration count `10.643041`, floor storage
 `28.786920 W`, and roof outside convection `19.558304 W`. The remaining
@@ -224,10 +226,11 @@ inside hconv re-evaluation state, and the exact non-window convergence set.
 
 The EnergyPlus inside-hconv source cadence has now been split from compensating
 probe values. `DataHeatBalSurface.hh::ItersReevalConvCoeff` is `30`, and the
-new `hconv-reeval30-iter20` wrapper runs the active ScriptF-flat lane with that
-cadence plus the source-aligned `energyplus-surf-initial` CTF seed. Because the
-active lane caps each inside-surface solve at twenty passes, this cadence is
-neutral in the current 1Zone diagnostic: MAT remains `0.037329 C` RMSE, zone
+new `hconv-reeval30-iter20` wrapper was first checked on the older pre-all-EIO
+ScriptF-flat lane with that cadence plus the source-aligned
+`energyplus-surf-initial` CTF seed. Because that lane caps each inside-surface
+solve at twenty passes, this cadence is neutral in that historical 1Zone
+diagnostic: MAT remains `0.037329 C` RMSE, zone
 surface convection `22.062956 W`, air storage `9.127258 W`, inside-surface
 iteration count `10.643041`, and floor storage `28.786920 W`. Re-evaluating
 hconv every two passes is still useful as a sensitivity check but is not

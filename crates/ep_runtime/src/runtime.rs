@@ -4491,16 +4491,18 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut hourly_ctf_history_slots = Vec::new();
     let mut surface_first_sample_trace = Vec::new();
     let mut surface_iteration_first_sample_trace = Vec::new();
+    let report_zone_air_algorithm =
+        heat_balance_zone_air_algorithm_execution_variant(options.zone_air_algorithm);
     let use_surface_reference_air_zone_convection_report =
-        heat_balance_uses_surface_reference_air_convection_report(options.zone_air_algorithm);
+        heat_balance_uses_surface_reference_air_convection_report(report_zone_air_algorithm);
     let use_surface_reference_air_surface_convection_report =
         heat_balance_uses_surface_reference_air_surface_convection_report(
-            options.zone_air_algorithm,
+            report_zone_air_algorithm,
         );
     let use_final_inside_convection_report =
-        heat_balance_uses_final_inside_convection_report(options.zone_air_algorithm);
+        heat_balance_uses_final_inside_convection_report(report_zone_air_algorithm);
     let use_inside_ctf_outside_temperature_for_conduction_report = matches!(
-        options.zone_air_algorithm,
+        report_zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe
     );
     let use_surface_report_zone_conduction_rates = matches!(
@@ -13381,6 +13383,28 @@ DATA PERIODS
         assert!(surface_convection_series.values[0].is_finite());
 
         Ok(())
+    }
+
+    #[test]
+    fn compat_candidate_report_flags_follow_execution_variant() {
+        let report_algorithm = super::heat_balance_zone_air_algorithm_execution_variant(
+            HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate,
+        );
+
+        assert_eq!(
+            report_algorithm,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
+        );
+        assert!(
+            super::heat_balance_uses_surface_reference_air_surface_convection_report(
+                report_algorithm
+            )
+        );
+        assert!(
+            !super::heat_balance_uses_surface_reference_air_surface_convection_report(
+                HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+            )
+        );
     }
 
     #[test]
