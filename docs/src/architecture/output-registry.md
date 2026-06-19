@@ -20,8 +20,9 @@ handles before timestep execution.
 
 Missing variables become `OutputVariableUnavailable` diagnostics instead of
 empty successful-looking series. Meters are routed through
-`RuntimeMeterRegistry`. The no-OA IdealLoads DistrictHeatingWater and
-DistrictCooling facility meter requests resolve to diagnostic meter handles,
-but meter value series are still not produced; unsupported meter requests
-continue to become explicit `MeterUnavailable` diagnostics rather than empty
-result columns.
+`RuntimeMeterRegistry`. The declared no-OA IdealLoads
+`DistrictHeatingWater:Facility` and `DistrictCooling:Facility` requests now
+resolve to meter handles and produce compareable MTR-aligned series for the
+hourly, monthly, annual, and run-period rows covered by the narrow meter
+claims. Unsupported meter requests continue to become explicit
+`MeterUnavailable` diagnostics rather than empty result columns.

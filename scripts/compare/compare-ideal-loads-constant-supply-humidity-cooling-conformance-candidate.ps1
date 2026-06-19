@@ -133,6 +133,13 @@ if ($summary.tolerance_failures -ne 0) {
 if ($summary.meter_tolerance_failures -ne 0) {
     throw "Expected zero meter tolerance failures, found $($summary.meter_tolerance_failures)"
 }
+$meterRows = @($summary.meter_series)
+if ($meterRows.Count -ne 2) {
+    throw "Expected 2 hourly facility meter rows, found $($meterRows.Count)"
+}
+if (@($meterRows | Where-Object { $_.level -ne "conformance" -or $_.status -ne "pass" }).Count -ne 0) {
+    throw "All hourly facility meter rows must be conformance rows and pass"
+}
 if ($summary.series_count -ne 36) {
     throw "Unexpected IdealLoads constant-supply-humidity series count: $($summary.series_count)"
 }
@@ -259,7 +266,7 @@ if ($stageSummary.fuel_energy_output_level_policy -ne "conformance for declared 
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
 Assert-Contains -Text $reportText -Pattern "direct_calc_helper_invocation: false" -Description "markdown direct calc helper invocation"

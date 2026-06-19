@@ -28,7 +28,7 @@ conformance claim.
 | node | System Node Temperature; System Node Humidity Ratio; System Node Mass Flow Rate; System Node Setpoint Temperature | ESO | diagnostic-only for `air_side_node_diagnostic_001`; mapped in `node-state-source-map.md`; setpoint temperature remains future-gated; no node numerical conformance claim |
 | component | Fan Electricity Rate; Cooling Coil Total Cooling Rate; Heating Coil Heating Rate | ESO | diagnostic until component port |
 | plant loop and equipment | Plant Supply Side Cooling Demand Rate; Plant Supply Side Heating Demand Rate; Plant Supply Side Inlet Mass Flow Rate; Plant Supply Side Inlet Temperature; Plant Supply Side Outlet Temperature; Pump Electricity Rate; District Heating Water Rate; Plant Load Profile Heat Transfer Rate; Boiler Heating Rate; Chiller Electricity Rate; Chiller Evaporator Cooling Rate | ESO | diagnostic-only for `plant_loop_diagnostic_001`; the post-v0.15 projection addendum adds Rust artifacts with `algorithm_parity: false`; mapped in `plant-source-map.md`; no plant numerical conformance claim |
-| facility meter | Electricity:Facility; Gas:Facility; Heating:EnergyTransfer; Cooling:EnergyTransfer | MTR, SQL, CSV | diagnostic until meter contract |
+| facility meter | DistrictHeatingWater:Facility; DistrictCooling:Facility; Electricity:Facility; Gas:Facility; Heating:EnergyTransfer; Cooling:EnergyTransfer | MTR, SQL, CSV | narrow conformance for declared no-OA IdealLoads DistrictHeatingWater/DistrictCooling hourly rows in the dedicated meter and humidity-control candidates plus declared monthly/annual/run-period rows in the meter-only candidate; other meters remain diagnostic until separate contracts |
 
 ## Request Policy
 

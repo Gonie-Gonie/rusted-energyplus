@@ -743,6 +743,19 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             }
         }
     }
+    if manifest_is_humidity_report_purchased_air_conformance_candidate(manifest) {
+        for expected_meter in IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS {
+            if !manifest.meters.iter().any(|meter| {
+                meter.name.eq_ignore_ascii_case(expected_meter)
+                    && meter.frequency == OutputFrequency::Hourly
+                    && meter.level == OutputLevel::Conformance
+            }) {
+                return Err(format!(
+                    "IdealLoads humidity-control conformance candidate is missing hourly conformance meter {expected_meter}"
+                ));
+            }
+        }
+    }
     if manifest_is_non_constant_fuel_efficiency_conformance_candidate(manifest) {
         for output in manifest
             .outputs
@@ -834,7 +847,10 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         if meter.level == OutputLevel::Diagnostic {
             continue;
         }
-        if !manifest_is_declared_no_oa_facility_meter_conformance_candidate(manifest)
+        let manifest_allows_meter_conformance =
+            manifest_is_declared_no_oa_facility_meter_conformance_candidate(manifest)
+                || manifest_is_humidity_report_purchased_air_conformance_candidate(manifest);
+        if !manifest_allows_meter_conformance
             || !is_declared_no_oa_facility_meter_conformance_meter(&meter.name)
             || !facility_meter_frequency_allowed_for_manifest(manifest, meter.frequency)
             || meter.level != OutputLevel::Conformance
@@ -8158,13 +8174,13 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     } else if context.constant_shr_conformance_claim {
         "conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only"
     } else if context.constant_supply_humidity_cooling_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
+        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.constant_supply_humidity_heating_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
+        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.humidistat_dehumidification_conformance_claim {
-        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
+        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.humidistat_humidification_conformance_claim {
-        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
+        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
         context.manifest,
     ) {
