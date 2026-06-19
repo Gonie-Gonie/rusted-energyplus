@@ -139,6 +139,17 @@ const IDEAL_LOADS_HUMIDITY_FACILITY_METER_CONFORMANCE_FREQUENCIES: &[OutputFrequ
     OutputFrequency::Monthly,
     OutputFrequency::RunPeriod,
 ];
+const IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_COOLING_ANNUAL_METER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001";
+const IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_HEATING_ANNUAL_METER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_constant_supply_humidity_heating_annual_meter_conformance_candidate_001";
+const IDEAL_LOADS_HUMIDISTAT_HUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID: &str =
+    "ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001";
+const IDEAL_LOADS_HUMIDITY_ANNUAL_FACILITY_METER_CONFORMANCE_CASE_IDS: &[&str] = &[
+    IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_COOLING_ANNUAL_METER_CONFORMANCE_CASE_ID,
+    IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_HEATING_ANNUAL_METER_CONFORMANCE_CASE_ID,
+    IDEAL_LOADS_HUMIDISTAT_HUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID,
+];
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_no_oa_report_energy_conformance_candidate_001";
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS: &[&str] = &[
@@ -250,6 +261,8 @@ const IDEAL_LOADS_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
     "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FACILITY_METER_MONTHLY_RUN_PERIOD_CONFORMANCE_REPORT_SOURCE: &str = "EnergyPlus Output:Meter monthly/annual/run-period MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_HUMIDITY_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str = "EnergyPlus Output:Meter hourly/monthly/run-period MTR vs Rust aggregated fuel-energy conformance";
+const IDEAL_LOADS_HUMIDITY_ANNUAL_FACILITY_METER_CONFORMANCE_REPORT_SOURCE: &str =
+    "EnergyPlus Output:Meter annual full-year MTR vs Rust aggregated fuel-energy conformance";
 const IDEAL_LOADS_FINITE_LIMIT_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for finite-limit no-OA mixed-air and report calculations";
 const IDEAL_LOADS_HUMIDITY_CONTROL_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for no-OA humidity-control mixed-air calculations";
 const IDEAL_LOADS_OUTDOOR_AIR_RECIRCULATION_STATE_SOURCE: &str = "EnergyPlus return/exhaust recirculation node same-call state for outdoor-air mixed-air, economizer, and heat-recovery calculations";
@@ -317,6 +330,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     constant_supply_humidity_heating_conformance_claim: bool,
     humidistat_dehumidification_conformance_claim: bool,
     humidistat_humidification_conformance_claim: bool,
+    humidity_annual_facility_meter_conformance_claim: bool,
     zone_name: String,
     zone_air_node_name: String,
     recirculation_node_name: Option<String>,
@@ -789,6 +803,25 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             }
         }
     }
+    if manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest) {
+        if manifest_has_conformance_output(manifest) {
+            return Err(
+                "IdealLoads humidity-control annual facility meter candidate must keep ESO output rows diagnostic"
+                    .to_string(),
+            );
+        }
+        for expected_meter in IDEAL_LOADS_NO_OA_FACILITY_METER_CONFORMANCE_METERS {
+            if !manifest.meters.iter().any(|meter| {
+                meter.name.eq_ignore_ascii_case(expected_meter)
+                    && meter.frequency == OutputFrequency::Annual
+                    && meter.level == OutputLevel::Conformance
+            }) {
+                return Err(format!(
+                    "IdealLoads humidity-control annual facility meter candidate is missing annual conformance meter {expected_meter}"
+                ));
+            }
+        }
+    }
     if manifest_is_non_constant_fuel_efficiency_conformance_candidate(manifest) {
         for output in manifest
             .outputs
@@ -882,7 +915,8 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         }
         let manifest_allows_meter_conformance =
             manifest_is_declared_no_oa_facility_meter_conformance_candidate(manifest)
-                || manifest_is_humidity_report_purchased_air_conformance_candidate(manifest);
+                || manifest_is_humidity_report_purchased_air_conformance_candidate(manifest)
+                || manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest);
         if !manifest_allows_meter_conformance
             || !is_declared_no_oa_facility_meter_conformance_meter(&meter.name)
             || !facility_meter_frequency_allowed_for_manifest(manifest, meter.frequency)
@@ -1191,6 +1225,16 @@ fn manifest_is_humidity_report_purchased_air_conformance_candidate(
         && manifest.conformance_claim
 }
 
+fn manifest_is_humidity_annual_facility_meter_conformance_candidate(
+    manifest: &ConformanceCase,
+) -> bool {
+    IDEAL_LOADS_HUMIDITY_ANNUAL_FACILITY_METER_CONFORMANCE_CASE_IDS
+        .iter()
+        .any(|case_id| manifest.id == *case_id)
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
 fn manifest_is_blank_fuel_efficiency_conformance_candidate(manifest: &ConformanceCase) -> bool {
     manifest.id == IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID
         && manifest.comparison_class == ComparisonClass::Conformance
@@ -1250,6 +1294,8 @@ fn required_facility_meter_conformance_frequencies(
             OutputFrequency::Annual,
             OutputFrequency::RunPeriod,
         ]
+    } else if manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest) {
+        &[OutputFrequency::Annual]
     } else if manifest_is_humidity_report_purchased_air_conformance_candidate(manifest) {
         IDEAL_LOADS_HUMIDITY_FACILITY_METER_CONFORMANCE_FREQUENCIES
     } else {
@@ -2784,6 +2830,9 @@ fn build_context<'a>(
     };
     if manifest_allows_constant_supply_humidity_diagnostic(manifest, system)
         || manifest_allows_constant_supply_humidity_cooling_conformance(manifest, system)
+        || manifest_allows_constant_supply_humidity_cooling_annual_meter_conformance(
+            manifest, system,
+        )
         || manifest_allows_humidistat_dehumidification_diagnostic(manifest, system)
         || manifest_allows_humidistat_dehumidification_conformance(manifest, system)
     {
@@ -2793,8 +2842,12 @@ fn build_context<'a>(
     }
     if manifest_allows_constant_supply_humidity_humidification_diagnostic(manifest, system)
         || manifest_allows_constant_supply_humidity_heating_conformance(manifest, system)
+        || manifest_allows_constant_supply_humidity_heating_annual_meter_conformance(
+            manifest, system,
+        )
         || manifest_allows_humidistat_humidification_diagnostic(manifest, system)
         || manifest_allows_humidistat_humidification_conformance(manifest, system)
+        || manifest_allows_humidistat_humidification_annual_meter_conformance(manifest, system)
     {
         boundary
             .unsupported_features
@@ -2860,6 +2913,8 @@ fn build_context<'a>(
         manifest_allows_humidistat_dehumidification_conformance(manifest, system);
     let humidistat_humidification_conformance_claim =
         manifest_allows_humidistat_humidification_conformance(manifest, system);
+    let humidity_annual_facility_meter_conformance_claim =
+        manifest_allows_humidity_annual_facility_meter_conformance(manifest, system);
 
     Ok(IdealLoadsDiagnosticContext {
         manifest,
@@ -2875,6 +2930,7 @@ fn build_context<'a>(
         constant_supply_humidity_heating_conformance_claim,
         humidistat_dehumidification_conformance_claim,
         humidistat_humidification_conformance_claim,
+        humidity_annual_facility_meter_conformance_claim,
         zone_name,
         zone_air_node_name,
         recirculation_node_name,
@@ -4463,6 +4519,18 @@ fn manifest_allows_constant_supply_humidity_cooling_conformance(
         })
 }
 
+fn manifest_allows_constant_supply_humidity_cooling_annual_meter_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest)
+        && manifest.id
+            == IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_COOLING_ANNUAL_METER_CONFORMANCE_CASE_ID
+        && system.dehumidification_control_type
+            == DehumidificationControlType::ConstantSupplyHumidityRatio
+        && system.humidification_control_type == HumidificationControlType::None
+}
+
 fn manifest_allows_humidistat_dehumidification_diagnostic(
     manifest: &ConformanceCase,
     system: &IdealLoadsAirSystem,
@@ -4527,6 +4595,16 @@ fn manifest_allows_humidistat_humidification_conformance(
         })
 }
 
+fn manifest_allows_humidistat_humidification_annual_meter_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest)
+        && manifest.id == IDEAL_LOADS_HUMIDISTAT_HUMIDIFICATION_ANNUAL_METER_CONFORMANCE_CASE_ID
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type == HumidificationControlType::Humidistat
+}
+
 fn manifest_allows_constant_supply_humidity_humidification_diagnostic(
     manifest: &ConformanceCase,
     system: &IdealLoadsAirSystem,
@@ -4539,6 +4617,29 @@ fn manifest_allows_constant_supply_humidity_humidification_diagnostic(
             output.variable == ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE
                 || output.variable == ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE
         })
+}
+
+fn manifest_allows_constant_supply_humidity_heating_annual_meter_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest_is_humidity_annual_facility_meter_conformance_candidate(manifest)
+        && manifest.id
+            == IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_HEATING_ANNUAL_METER_CONFORMANCE_CASE_ID
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type
+            == HumidificationControlType::ConstantSupplyHumidityRatio
+}
+
+fn manifest_allows_humidity_annual_facility_meter_conformance(
+    manifest: &ConformanceCase,
+    system: &IdealLoadsAirSystem,
+) -> bool {
+    manifest_allows_constant_supply_humidity_cooling_annual_meter_conformance(manifest, system)
+        || manifest_allows_constant_supply_humidity_heating_annual_meter_conformance(
+            manifest, system,
+        )
+        || manifest_allows_humidistat_humidification_annual_meter_conformance(manifest, system)
 }
 
 fn manifest_allows_constant_supply_humidity_heating_conformance(
@@ -8137,7 +8238,9 @@ fn tolerance_failures_count(context: &IdealLoadsDiagnosticContext<'_>) -> usize 
 }
 
 fn facility_meter_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
-    if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest)
+    if manifest_is_humidity_annual_facility_meter_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_HUMIDITY_ANNUAL_FACILITY_METER_CONFORMANCE_REPORT_SOURCE
+    } else if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest)
         && context.meter_rows.iter().any(|row| {
             row.level == OutputLevel::Conformance && row.frequency != OutputFrequency::Hourly
         })
@@ -8219,6 +8322,8 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
         "conformance no-OA Humidistat dehumidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
     } else if context.humidistat_humidification_conformance_claim {
         "conformance no-OA Humidistat humidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
+    } else if context.humidity_annual_facility_meter_conformance_claim {
+        "conformance no-OA full-year humidity-control annual IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
         context.manifest,
     ) {

@@ -239,9 +239,10 @@ foreach ($caseFile in $caseFiles) {
             throw "$caseId gate script must use scripts/dev.cmd <command>"
         }
         $gateCommand = $gateMatch.Groups["command"].Value
-        $gateCommandPattern = '(?m)^\s*"' + [regex]::Escape($gateCommand) + '"\s*=\s*@\{'
-        Assert-TextMatches -Text $devText -Pattern $gateCommandPattern -Description "$caseId dev gate command $gateCommand"
-        $gateScriptPath = Get-DevCommandScriptPath -DevText $devText -Command $gateCommand
+        $gateCommandName = @($gateCommand -split '\s+' | Where-Object { $_ -ne "" })[0]
+        $gateCommandPattern = '(?m)^\s*"' + [regex]::Escape($gateCommandName) + '"\s*=\s*@\{'
+        Assert-TextMatches -Text $devText -Pattern $gateCommandPattern -Description "$caseId dev gate command $gateCommandName"
+        $gateScriptPath = Get-DevCommandScriptPath -DevText $devText -Command $gateCommandName
         Assert-ConformanceGateReportMetadataGuards -Path $gateScriptPath -CaseId $caseId
         $reportMetadataGuardCount += 1
 

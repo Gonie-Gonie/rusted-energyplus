@@ -1,0 +1,92 @@
+id = "ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001"
+title = "One-zone no-OA IdealLoads constant supply humidity cooling annual meter conformance candidate"
+milestone = "ideal-loads-humidity-annual-meter-conformance"
+purpose = "Claim narrow no-outdoor-air full-year IdealLoads ConstantSupplyHumidityRatio cooling annual facility meter conformance for DistrictHeatingWater:Facility and DistrictCooling:Facility only."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This full-year case claims only the declared annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter rows.",
+  "Detailed thermostat rows remain diagnostic proof evidence; Detailed humidity-control branch rows and annual meter rows in the short-run humidity-control candidate remain outside this claim.",
+  "The Rust annual meter series are aggregated from detailed ReportPurchasedAir fuel-energy rows through RuntimeMeterRegistry-resolved IdealLoads facility meter bindings and compared against EnergyPlus annual MTR rows.",
+  "The boundary excludes broad humidity-control conformance, outdoor air, economizer, heat recovery, humidistats, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, broad meter conformance, and multi-year annual grouping."
+]
+
+[trace]
+level = "default-conformance"
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001/ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance.idf"
+tier = "B"
+
+[scope]
+domains = ["zone", "hvac", "node"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001/ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+frequency = "detailed"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "diagnostic"
+abs_tol = 1e-9
+rmse_tol = 1e-9
+
+[[meters]]
+name = "DistrictHeatingWater:Facility"
+frequency = "annual"
+source = "mtr"
+domain = "meter"
+level = "conformance"
+abs_tol = 10000.0
+rmse_tol = 10000.0
+rel_tol = 1e-6
+
+[[meters]]
+name = "DistrictCooling:Facility"
+frequency = "annual"
+source = "mtr"
+domain = "meter"
+level = "conformance"
+abs_tol = 10000.0
+rmse_tol = 10000.0
+rel_tol = 1e-6
+
+[[tolerances]]
+variable_class = "zone-state"
+max_abs = 1e-9
+max_rmse = 1e-9
+
+[gate]
+script = "scripts/dev.cmd compare-ideal-loads-humidity-annual-meter-conformance-candidate -CaseId ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001"
+blocking = true
+
+[report]
+path = ".runtime/ideal-loads-humidity-annual-meter-conformance/26.1.0/ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001/compare/compare-report.md"
+format = "markdown"

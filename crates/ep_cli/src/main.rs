@@ -12576,6 +12576,7 @@ fn print_modes() {
 #[cfg(test)]
 mod tests {
     use super::run;
+    use ep_run::RunExitCode;
 
     fn disabled_heat_balance_warmup() -> super::HeatBalanceWarmupDiagnostic {
         super::HeatBalanceWarmupDiagnostic {
@@ -12648,10 +12649,10 @@ mod tests {
     }
 
     #[test]
-    fn unknown_command_fails() {
+    fn missing_run_command_fails_with_run_args_exit_code() {
         let args = vec!["run".to_string()];
 
-        assert_eq!(run(&args), 2);
+        assert_eq!(run(&args), RunExitCode::Args.code());
     }
 
     #[test]
