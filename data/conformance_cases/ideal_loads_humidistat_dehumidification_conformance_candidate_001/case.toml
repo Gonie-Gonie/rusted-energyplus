@@ -1,7 +1,7 @@
 id = "ideal_loads_humidistat_dehumidification_conformance_candidate_001"
 title = "One-zone no-OA IdealLoads humidistat dehumidification conformance candidate"
 milestone = "ideal-loads-humidity-control-conformance"
-purpose = "Claim narrow no-outdoor-air IdealLoads Humidistat dehumidification branch conformance for declared heating/cooling rate, ReportPurchasedAir energy/fuel, facility meter, moisture-demand, and supply-node rows using a trace-driven Rust moisture predictor."
+purpose = "Claim narrow no-outdoor-air IdealLoads Humidistat dehumidification branch conformance for declared heating/cooling rate, ReportPurchasedAir energy/fuel, facility meter, moisture-demand, and supply-node rows using a seeded closed-loop Rust moisture predictor/corrector."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
@@ -9,7 +9,7 @@ notes = [
   "This case claims only the declared no-OA Humidistat dehumidification fixture outputs, including heating/cooling rate rows, ReportPurchasedAir energy/fuel rows, moisture-demand rows, and hourly/monthly/run-period facility meters.",
   "The boundary activates Humidistat dehumidification while excluding outdoor air, economizer, heat recovery, humidification, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
   "The declared conformance rows are thermostat setpoints, heating/cooling total/sensible/latent IdealLoads rates, supply-air heating/cooling report rates, ReportPurchasedAir energy/fuel rows, the paired Humidistat moisture-demand rows, hourly/monthly/run-period facility meters, and the supply-node temperature, mass-flow, and humidity-ratio rows.",
-  "The paired Zone System Predicted Moisture Load rows are computed by the Rust trace-driven no-OA ThirdOrder moisture predictor and are conformance rows for this declared candidate; fully owned zone moisture history/state and broad humidistat schedule-to-demand conformance without EnergyPlus trace history remain outside the claim.",
+  "The paired Zone System Predicted Moisture Load rows are computed by the Rust seeded no-OA ThirdOrder moisture predictor/corrector using closed-loop humidity history after the EnergyPlus warmup-tail seed; broad humidistat schedule/history generalization remains outside the claim.",
   "IdealLoads rate, latent report, and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow and enthalpy formulas.",
   "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
   "Mass-flow and humidity comparison uses the EnergyPlus same-call return-node recirculation state for no-OA humidity-control mixed-air calculations; zone-air and return-node humidity rows remain diagnostic proof rows.",

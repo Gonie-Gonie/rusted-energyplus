@@ -373,12 +373,21 @@ struct IdealLoadsMoisturePredictorSummary {
     dehumidifying_history_term: IdealLoadsMoistureHistoryTermComparison,
     zone_moisture_capacity_multiplier: f64,
     zone_multiplier: f64,
-    humidifying_values: Vec<f64>,
-    dehumidifying_values: Vec<f64>,
+    closed_loop_humidifying_values: Vec<f64>,
+    closed_loop_dehumidifying_values: Vec<f64>,
+    closed_loop_results: Vec<IdealLoadsSensibleResult>,
     latent_gain: Vec<IdealLoadsMoisturePredictorComparison>,
     humidifying: IdealLoadsMoisturePredictorComparison,
     dehumidifying: IdealLoadsMoisturePredictorComparison,
     closed_loop: Vec<IdealLoadsMoisturePredictorComparison>,
+}
+
+#[derive(Clone)]
+struct IdealLoadsHumidistatClosedLoopSummary {
+    comparisons: Vec<IdealLoadsMoisturePredictorComparison>,
+    humidifying_values: Vec<f64>,
+    dehumidifying_values: Vec<f64>,
+    results: Vec<IdealLoadsSensibleResult>,
 }
 
 #[derive(Clone)]
@@ -3339,71 +3348,87 @@ fn evaluate_rows(
         && manifest_promotes_humidistat_moisture_predictor(manifest, system);
     let mut calc_results = Vec::with_capacity(input_trace.sample_count);
     let mut mode_counts = IdealLoadsModeCounts::default();
-    for index in 0..input_trace.sample_count {
-        let (zone_temperature, zone_humidity_ratio) = if source_order_trace_uses_recirculation {
-            (
-                input_trace.recirculation_node_temperature.samples[index].value,
-                input_trace.recirculation_node_humidity_ratio.samples[index].value,
-            )
-        } else {
-            // CalcPurchAirLoads sees the zone node before the same-timestamp node
-            // output row is updated, so no-limit transition samples use the previous row.
-            let calc_zone_state_index = index.saturating_sub(1);
-            (
-                input_trace.zone_node_temperature.samples[calc_zone_state_index].value,
-                input_trace.zone_node_humidity_ratio.samples[calc_zone_state_index].value,
-            )
-        };
-        let active_demand = input_trace.active_demand.samples[index].value;
-        let heating_demand = active_demand.max(0.0);
-        let cooling_demand = active_demand.min(0.0);
-        let zone_state = IdealLoadsZoneState {
-            air_temperature_c: zone_temperature,
-            air_humidity_ratio: zone_humidity_ratio,
-        };
-        let recirculation_state = if recirculation_node_name.is_some() {
-            IdealLoadsZoneState {
-                air_temperature_c: input_trace.recirculation_node_temperature.samples[index].value,
-                air_humidity_ratio: input_trace.recirculation_node_humidity_ratio.samples[index]
-                    .value,
-            }
-        } else {
-            zone_state
-        };
-        let mut demand =
-            ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
-        if promote_moisture_predictor {
-            let summary = moisture_predictor
-                .as_ref()
-                .expect("promoted moisture predictor requires summary");
-            demand.remaining_output_req_to_humid_sp_kg_per_s = summary.humidifying_values[index];
-            demand.remaining_output_req_to_dehumid_sp_kg_per_s =
-                summary.dehumidifying_values[index];
-        } else {
+    if promote_moisture_predictor {
+        let summary = moisture_predictor
+            .as_ref()
+            .expect("promoted moisture predictor requires summary");
+        if summary.closed_loop_results.len() < input_trace.sample_count {
+            return Err(format!(
+                "IdealLoads Humidistat closed-loop result count {} is shorter than sample count {}",
+                summary.closed_loop_results.len(),
+                input_trace.sample_count
+            ));
+        }
+        calc_results.extend(
+            summary
+                .closed_loop_results
+                .iter()
+                .copied()
+                .take(input_trace.sample_count),
+        );
+        for result in &calc_results {
+            record_mode(&mut mode_counts, result.mode);
+        }
+    } else {
+        for index in 0..input_trace.sample_count {
+            let (zone_temperature, zone_humidity_ratio) = if source_order_trace_uses_recirculation {
+                (
+                    input_trace.recirculation_node_temperature.samples[index].value,
+                    input_trace.recirculation_node_humidity_ratio.samples[index].value,
+                )
+            } else {
+                // CalcPurchAirLoads sees the zone node before the same-timestamp node
+                // output row is updated, so no-limit transition samples use the previous row.
+                let calc_zone_state_index = index.saturating_sub(1);
+                (
+                    input_trace.zone_node_temperature.samples[calc_zone_state_index].value,
+                    input_trace.zone_node_humidity_ratio.samples[calc_zone_state_index].value,
+                )
+            };
+            let active_demand = input_trace.active_demand.samples[index].value;
+            let heating_demand = active_demand.max(0.0);
+            let cooling_demand = active_demand.min(0.0);
+            let zone_state = IdealLoadsZoneState {
+                air_temperature_c: zone_temperature,
+                air_humidity_ratio: zone_humidity_ratio,
+            };
+            let recirculation_state = if recirculation_node_name.is_some() {
+                IdealLoadsZoneState {
+                    air_temperature_c: input_trace.recirculation_node_temperature.samples[index]
+                        .value,
+                    air_humidity_ratio: input_trace.recirculation_node_humidity_ratio.samples
+                        [index]
+                        .value,
+                }
+            } else {
+                zone_state
+            };
+            let mut demand =
+                ZoneSysEnergyDemand::sensible_only(zone.id, heating_demand, cooling_demand);
             demand.remaining_output_req_to_humid_sp_kg_per_s =
                 input_trace.humidifying_moisture_demand.samples[index].value;
             demand.remaining_output_req_to_dehumid_sp_kg_per_s =
                 input_trace.dehumidifying_moisture_demand.samples[index].value;
+            let purchased_air = sim_purchased_air_compat(SimPurchasedAirCompatInput {
+                system,
+                supply_node: supply_node.id,
+                zone_state,
+                recirculation_state,
+                demand,
+                unit_available: true,
+                limit_context: limit_context
+                    .with_barometric_pressure_pa(barometric_pressure_trace[index]),
+            })
+            .map_err(|error| {
+                format!(
+                    "IdealLoads SimPurchasedAir compatibility path rejected system {:?}: {:?}",
+                    error.system_id, error.unsupported_features
+                )
+            })?;
+            let result = purchased_air.calculation;
+            record_mode(&mut mode_counts, result.mode);
+            calc_results.push(result);
         }
-        let purchased_air = sim_purchased_air_compat(SimPurchasedAirCompatInput {
-            system,
-            supply_node: supply_node.id,
-            zone_state,
-            recirculation_state,
-            demand,
-            unit_available: true,
-            limit_context: limit_context
-                .with_barometric_pressure_pa(barometric_pressure_trace[index]),
-        })
-        .map_err(|error| {
-            format!(
-                "IdealLoads SimPurchasedAir compatibility path rejected system {:?}: {:?}",
-                error.system_id, error.unsupported_features
-            )
-        })?;
-        let result = purchased_air.calculation;
-        record_mode(&mut mode_counts, result.mode);
-        calc_results.push(result);
     }
 
     let result_source = rust_result_source(system);
@@ -3537,9 +3562,9 @@ fn evaluate_rows(
                 .as_ref()
                 .expect("promoted moisture predictor requires summary");
             ObservedSeries::new(
-                "rust-zone-system-moisture-demand-predictor",
+                "rust-zone-system-moisture-demand-closed-loop-predictor",
                 "kgWater/s",
-                summary.humidifying_values.clone(),
+                summary.closed_loop_humidifying_values.clone(),
             )
         } else {
             ObservedSeries::new(
@@ -3562,9 +3587,9 @@ fn evaluate_rows(
                 .as_ref()
                 .expect("promoted moisture predictor requires summary");
             ObservedSeries::new(
-                "rust-zone-system-moisture-demand-predictor",
+                "rust-zone-system-moisture-demand-closed-loop-predictor",
                 "kgWater/s",
-                summary.dehumidifying_values.clone(),
+                summary.closed_loop_dehumidifying_values.clone(),
             )
         } else {
             ObservedSeries::new(
@@ -5246,9 +5271,9 @@ fn moisture_predictor_summary(
 
     Ok(Some(IdealLoadsMoisturePredictorSummary {
         promoted_input: false,
-        history_source: "EnergyPlus Zone Mean Air Humidity Ratio row lag plus warmup tail for WPrevZoneTS; this evidence path remains trace-driven while the branch values are computed by Rust",
+        history_source: "EnergyPlus Zone Mean Air Humidity Ratio row lag plus warmup tail seeds WPrevZoneTS; promoted Humidistat branch values then use Rust closed-loop humidity history",
         latent_gain_source: "typed OtherEquipment design_level * fraction_latent * schedule; radiant-system, pool, people, infiltration, mixing, EMS, and fault latent terms are outside this diagnostic",
-        closed_loop_state_source: "closed-loop diagnostic recomputes humidity demand and correctHumRat update after the seeded history; promoted comparison still uses EnergyPlus temperature/sensible trace rows",
+        closed_loop_state_source: "promoted Humidistat branch and closed-loop diagnostic recompute humidity demand, source-order return humidity, and correctHumRat after the seeded history; EnergyPlus still supplies sensible demand, zone temperature trace, latent gain schedule, and pressure",
         history_residual_source: "predictor residual divided by EnergyPlus ThirdOrder C coefficient and zone multiplier; includes any latent-gain, schedule, psychrometric, or WPrevZoneTSTemp mismatch as an equivalent humidity-history delta",
         humidifying_equivalent_history_delta_max: humidifying_history_term
             .row_lag_minus_inferred_max_abs_delta,
@@ -5258,8 +5283,9 @@ fn moisture_predictor_summary(
         dehumidifying_history_term,
         zone_moisture_capacity_multiplier,
         zone_multiplier,
-        humidifying_values: humidifying.clone(),
-        dehumidifying_values: dehumidifying.clone(),
+        closed_loop_humidifying_values: closed_loop.humidifying_values,
+        closed_loop_dehumidifying_values: closed_loop.dehumidifying_values,
+        closed_loop_results: closed_loop.results,
         latent_gain: latent_gain_comparisons,
         humidifying: moisture_predictor_comparison(
             ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD,
@@ -5273,7 +5299,7 @@ fn moisture_predictor_summary(
             &dehumidifying,
             input_trace.sample_count,
         ),
-        closed_loop,
+        closed_loop: closed_loop.comparisons,
     }))
 }
 
@@ -5387,10 +5413,11 @@ fn moisture_history_term_comparison(
 
 fn humidistat_closed_loop_comparisons(
     input: IdealLoadsHumidistatClosedLoopInput<'_>,
-) -> Result<Vec<IdealLoadsMoisturePredictorComparison>, String> {
+) -> Result<IdealLoadsHumidistatClosedLoopSummary, String> {
     let sample_count = input.input_trace.sample_count;
     let mut humidifying = Vec::with_capacity(sample_count);
     let mut dehumidifying = Vec::with_capacity(sample_count);
+    let mut results = Vec::with_capacity(sample_count);
     let mut corrected_zone_humidity = Vec::with_capacity(sample_count);
     let mut supply_mass_flow = Vec::with_capacity(sample_count);
     let mut supply_humidity = Vec::with_capacity(sample_count);
@@ -5398,7 +5425,9 @@ fn humidistat_closed_loop_comparisons(
     let mut zone_latent_cooling = Vec::with_capacity(sample_count);
     let mut supply_air_latent_heating = Vec::with_capacity(sample_count);
     let mut supply_air_latent_cooling = Vec::with_capacity(sample_count);
-    let mut humidity_history = oracle_zone_air_humidity_history(input.input_trace, 0);
+    let mut zone_mean_humidity_history = oracle_zone_air_humidity_history(input.input_trace, 0);
+    let mut zone_air_humidity_history =
+        oracle_zone_air_humidity_ratio_history(input.input_trace, 0);
     let zone_multiplier = input.zone_multiplier.max(1.0);
 
     for index in 0..sample_count {
@@ -5408,12 +5437,12 @@ fn humidistat_closed_loop_comparisons(
         let predictor_state = oracle_zone_predictor_state(input.input_trace, index);
         let predictor_state = IdealLoadsZoneState {
             air_temperature_c: predictor_state.air_temperature_c,
-            air_humidity_ratio: humidity_history[0],
+            air_humidity_ratio: zone_air_humidity_history[0],
         };
         let predicted =
             calc_no_oa_third_order_moisture_demand_compat(NoOaThirdOrderMoistureDemandInput {
                 zone_state: predictor_state,
-                previous_zone_timestep_humidity_ratios: humidity_history,
+                previous_zone_timestep_humidity_ratios: zone_mean_humidity_history,
                 zone_volume_m3: input.zone_volume_m3,
                 zone_moisture_capacity_multiplier: input.zone_moisture_capacity_multiplier,
                 timestep_seconds: input.timestep_seconds,
@@ -5447,13 +5476,13 @@ fn humidistat_closed_loop_comparisons(
         };
         let calc_state = IdealLoadsZoneState {
             air_temperature_c: calc_temperature,
-            air_humidity_ratio: humidity_history[0],
+            air_humidity_ratio: zone_air_humidity_history[0],
         };
         let recirculation_state = if input.source_order_trace_uses_recirculation {
             IdealLoadsZoneState {
                 air_temperature_c: input.input_trace.recirculation_node_temperature.samples[index]
                     .value,
-                air_humidity_ratio: humidity_history[0],
+                air_humidity_ratio: zone_air_humidity_history[0],
             }
         } else {
             calc_state
@@ -5474,6 +5503,7 @@ fn humidistat_closed_loop_comparisons(
             )
         })?;
         let result = purchased_air.calculation;
+        results.push(result);
         supply_mass_flow.push(result.supply_mass_flow_rate_kg_per_s);
         supply_humidity.push(result.supply_humidity_ratio);
         zone_latent_heating.push(result.zone_latent_heating_rate_w);
@@ -5481,10 +5511,14 @@ fn humidistat_closed_loop_comparisons(
         supply_air_latent_heating.push(result.supply_air_latent_heating_rate_w);
         supply_air_latent_cooling.push(result.supply_air_latent_cooling_rate_w);
 
+        let corrector_state = IdealLoadsZoneState {
+            air_temperature_c: input.input_trace.zone_air_temperature.samples[index].value,
+            air_humidity_ratio: zone_air_humidity_history[0],
+        };
         let corrected =
             correct_no_oa_third_order_humidity_ratio_compat(NoOaThirdOrderHumidityCorrectorInput {
-                zone_state: predictor_state,
-                previous_zone_timestep_humidity_ratios: humidity_history,
+                zone_state: corrector_state,
+                previous_zone_timestep_humidity_ratios: zone_mean_humidity_history,
                 zone_volume_m3: input.zone_volume_m3,
                 zone_moisture_capacity_multiplier: input.zone_moisture_capacity_multiplier,
                 timestep_seconds: input.timestep_seconds,
@@ -5498,10 +5532,15 @@ fn humidistat_closed_loop_comparisons(
                 format!("IdealLoads Humidistat closed-loop correctHumRat rejected sample {index}")
             })?;
         corrected_zone_humidity.push(corrected.zone_air_humidity_ratio);
-        humidity_history = [
+        zone_air_humidity_history = [
             corrected.zone_air_humidity_ratio,
-            humidity_history[0],
-            humidity_history[1],
+            zone_air_humidity_history[0],
+            zone_air_humidity_history[1],
+        ];
+        zone_mean_humidity_history = [
+            corrected.zone_air_humidity_ratio,
+            zone_mean_humidity_history[0],
+            zone_mean_humidity_history[1],
         ];
     }
 
@@ -5598,7 +5637,12 @@ fn humidistat_closed_loop_comparisons(
         sample_count,
     );
 
-    Ok(comparisons)
+    Ok(IdealLoadsHumidistatClosedLoopSummary {
+        comparisons,
+        humidifying_values: humidifying,
+        dehumidifying_values: dehumidifying,
+        results,
+    })
 }
 
 fn push_optional_closed_loop_comparison(
@@ -5651,6 +5695,32 @@ fn oracle_zone_air_humidity_history(input_trace: &IdealLoadsInputTrace, index: u
         oracle_zone_air_humidity_history_value(input_trace, index, 1),
         oracle_zone_air_humidity_history_value(input_trace, index, 2),
         oracle_zone_air_humidity_history_value(input_trace, index, 3),
+    ]
+}
+
+fn oracle_zone_air_humidity_ratio_history(
+    input_trace: &IdealLoadsInputTrace,
+    index: usize,
+) -> [f64; 3] {
+    [
+        lagged_trace_value(
+            &input_trace.zone_air_humidity_ratio,
+            input_trace.zone_air_humidity_ratio_warmup_tail,
+            index,
+            1,
+        ),
+        lagged_trace_value(
+            &input_trace.zone_air_humidity_ratio,
+            input_trace.zone_air_humidity_ratio_warmup_tail,
+            index,
+            2,
+        ),
+        lagged_trace_value(
+            &input_trace.zone_air_humidity_ratio,
+            input_trace.zone_air_humidity_ratio_warmup_tail,
+            index,
+            3,
+        ),
     ]
 }
 
@@ -8566,7 +8636,7 @@ fn moisture_predictor_json(summary: Option<&IdealLoadsMoisturePredictorSummary>)
 
 fn moisture_predictor_claim_status(summary: &IdealLoadsMoisturePredictorSummary) -> &'static str {
     if summary.promoted_input {
-        "conformance-supporting trace-driven predictor; values feed the promoted Humidistat no-OA comparison branch for the declared candidate rows"
+        "conformance-supporting closed-loop no-OA ThirdOrder humidity predictor/corrector; values feed the promoted Humidistat no-OA comparison branch for the declared candidate rows after seeded history"
     } else {
         "diagnostic trace-driven predictor; this manifest keeps EnergyPlus moisture-demand proof rows as the promoted branch input"
     }

@@ -172,6 +172,26 @@ if ($conformanceRows.Count -ne 31) {
 if (@($conformanceRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All conformance-level humidistat-humidification rows must pass"
 }
+$moistureDemandRows = @($summary.series | Where-Object {
+        $_.variable -eq "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate" -or
+        $_.variable -eq "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate"
+    })
+if ($moistureDemandRows.Count -ne 2) {
+    throw "Expected the paired Humidistat moisture-demand rows, found $($moistureDemandRows.Count)"
+}
+if (@($moistureDemandRows | Where-Object { $_.rust_source -ne "rust-zone-system-moisture-demand-closed-loop-predictor" }).Count -ne 0) {
+    throw "Humidistat moisture-demand conformance rows must use the closed-loop predictor source"
+}
+if ($null -eq $summary.moisture_predictor) {
+    throw "Expected Humidistat moisture predictor summary"
+}
+$closedLoopRows = @($summary.moisture_predictor.closed_loop)
+if ($closedLoopRows.Count -lt 9) {
+    throw "Expected closed-loop Humidistat diagnostic rows, found $($closedLoopRows.Count)"
+}
+if (@($closedLoopRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
+    throw "All Humidistat closed-loop diagnostic rows must pass"
+}
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
 if ($diagnosticRows.Count -ne 7) {
     throw "Expected 7 diagnostic proof rows, found $($diagnosticRows.Count)"
