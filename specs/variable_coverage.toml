@@ -356,7 +356,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads DifferentialDryBulb and DifferentialEnthalpy economizer active-time conformance for ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001 and ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001. Inactive economizer active-time parity remains diagnostic-only; DCV/economizer combinations and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads inactive no-economizer zero active-time conformance for the declared no-economizer outdoor-air candidates, plus active DifferentialDryBulb and DifferentialEnthalpy economizer active-time conformance for ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001 and ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001. Diagnostic-only outdoor-air fixtures, DCV/economizer combinations, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Heat Recovery Active Time"
@@ -364,7 +364,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
 first_evidence = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001"
-support_boundary = "Tolerance-gated IdealLoads Sensible/Enthalpy heat-recovery active-time conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001. Inactive no-heat-recovery parity remains diagnostic-only; DCV, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
+support_boundary = "Tolerance-gated IdealLoads inactive no-heat-recovery zero active-time conformance for the declared no-heat-recovery outdoor-air candidates, plus active Sensible/Enthalpy heat-recovery active-time conformance for ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001 and ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001. Diagnostic-only outdoor-air fixtures, DCV, general heat-recovery saturation-limit branch parity, and broad OA conformance remain outside the claim."
 
 [[variable]]
 name = "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate"

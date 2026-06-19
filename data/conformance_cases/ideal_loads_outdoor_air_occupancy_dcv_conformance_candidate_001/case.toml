@@ -8,7 +8,7 @@ oracle_version = "26.1.0"
 notes = [
   "This case claims only the declared DesignSpecification:OutdoorAir Flow/Person rows with ZoneHVAC:IdealLoadsAirSystem Demand Controlled Ventilation Type = OccupancySchedule.",
   "The boundary covers OccupancySchedule DCV mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate rows with a blank outdoor-air schedule.",
-  "Inactive economizer and inactive heat-recovery active-time report rows remain diagnostic proof evidence.",
+  "Inactive economizer and inactive heat-recovery active-time rows are claimed only as declared inactive-zero report rows.",
   "The fixture declares five People design occupants with a non-constant all-days occupancy schedule, a zero activity schedule, and 0.01 m3/s-person outdoor air, so OccupancySchedule DCV varies the minimum outdoor-air volume from 0.0 to 0.05 m3/s without adding People heat gains.",
   "The outdoor-air sensible and total heating report-rate rows use a 4 W absolute tolerance for a single source-order timestep edge; mass/volume, latent, supply, mixed-air, and inactive proof rows keep the stricter existing tolerances.",
   "CO2Setpoint DCV, Sum/Maximum DCV combinations, active humidity-control latent behavior, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad outdoor-air conformance remain outside this claim.",
@@ -266,7 +266,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -277,7 +277,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 

@@ -139,18 +139,18 @@ if ($rows.Count -ne 22) {
     throw "Expected twenty-two outdoor-air rows, found $($rows.Count)"
 }
 $conformanceRows = @($rows | Where-Object { $_.level -eq "conformance" })
-if ($conformanceRows.Count -ne 21) {
-    throw "Expected twenty-one outdoor-air Sensible heat-recovery conformance rows, found $($conformanceRows.Count)"
+if ($conformanceRows.Count -ne 22) {
+    throw "Expected twenty-two outdoor-air Sensible heat-recovery conformance rows, found $($conformanceRows.Count)"
 }
 if (@($conformanceRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All outdoor-air Sensible heat-recovery conformance rows must pass"
 }
 $diagnosticRows = @($rows | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 1) {
-    throw "Expected one inactive economizer diagnostic row, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 0) {
+    throw "Expected zero outdoor-air diagnostic rows, found $($diagnosticRows.Count)"
 }
 if (@($diagnosticRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
-    throw "The inactive economizer diagnostic row must pass"
+    throw "Outdoor-air diagnostic rows should be fully promoted for this candidate"
 }
 foreach ($expected in @(
     @("Zone Ideal Loads Outdoor Air Mass Flow Rate", "conformance"),
@@ -173,7 +173,7 @@ foreach ($expected in @(
     @("Zone Ideal Loads Heat Recovery Sensible Cooling Rate", "conformance"),
     @("Zone Ideal Loads Heat Recovery Latent Cooling Rate", "conformance"),
     @("Zone Ideal Loads Heat Recovery Total Cooling Rate", "conformance"),
-    @("Zone Ideal Loads Economizer Active Time", "diagnostic"),
+    @("Zone Ideal Loads Economizer Active Time", "conformance"),
     @("Zone Ideal Loads Heat Recovery Active Time", "conformance")
 )) {
     $row = @($rows | Where-Object { $_.variable -eq $expected[0] })
@@ -299,7 +299,7 @@ foreach ($heatRecoveryVariable in @(
         throw "Missing W sensible heat-recovery latent row: $heatRecoveryVariable"
     }
     if ($heatRecoveryRow[0].max_abs_delta -gt 0.000000001 -or $heatRecoveryRow[0].rmse_delta -gt 0.000000001) {
-        throw "Sensible heat-recovery latent row exceeded zero diagnostic tolerance: variable=$heatRecoveryVariable max_abs=$($heatRecoveryRow[0].max_abs_delta) rmse=$($heatRecoveryRow[0].rmse_delta)"
+        throw "Sensible heat-recovery latent row exceeded zero conformance tolerance: variable=$heatRecoveryVariable max_abs=$($heatRecoveryRow[0].max_abs_delta) rmse=$($heatRecoveryRow[0].rmse_delta)"
     }
 }
 $economizerActiveRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Economizer Active Time" })
@@ -307,7 +307,7 @@ if ($economizerActiveRow.Count -ne 1 -or $economizerActiveRow[0].units -ne "hr" 
     throw "Missing hr inactive economizer active-time row"
 }
 if ($economizerActiveRow[0].max_abs_delta -gt 0.000000001 -or $economizerActiveRow[0].rmse_delta -gt 0.000000001) {
-    throw "Inactive economizer active-time row exceeded zero diagnostic tolerance: max_abs=$($economizerActiveRow[0].max_abs_delta) rmse=$($economizerActiveRow[0].rmse_delta)"
+    throw "Inactive economizer active-time row exceeded zero conformance tolerance: max_abs=$($economizerActiveRow[0].max_abs_delta) rmse=$($economizerActiveRow[0].rmse_delta)"
 }
 $heatRecoveryActiveRow = @($rows | Where-Object { $_.variable -eq "Zone Ideal Loads Heat Recovery Active Time" })
 if ($heatRecoveryActiveRow.Count -ne 1 -or $heatRecoveryActiveRow[0].units -ne "hr" -or $heatRecoveryActiveRow[0].rust_source -ne $heatRecoverySource) {
@@ -408,7 +408,7 @@ Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal 
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Mixed Air Humidity Ratio | conformance" -Description "markdown mixed-air humidity-ratio row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Sensible Heating Rate | conformance" -Description "markdown sensible heat-recovery sensible heating row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Total Cooling Rate | conformance" -Description "markdown sensible heat-recovery total cooling row"
-Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Economizer Active Time | diagnostic" -Description "markdown inactive economizer active-time row"
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Economizer Active Time | conformance" -Description "markdown inactive economizer active-time row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Heat Recovery Active Time | conformance" -Description "markdown sensible heat-recovery active-time row"
 
 Write-Host "IdealLoads outdoor-air Sensible heat-recovery conformance candidate comparison artifacts generated."

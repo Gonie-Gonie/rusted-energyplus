@@ -412,8 +412,8 @@ same Flow/Zone fixture shape for declared EnergyPlus report variables
 `Zone Ideal Loads Supply Air Temperature`,
 `Zone Ideal Loads Supply Air Humidity Ratio`, plus
 `Zone Ideal Loads Mixed Air Temperature` and
-`Zone Ideal Loads Mixed Air Humidity Ratio`. Inactive heat-recovery/economizer
-report variables remain diagnostic proof rows. The compare lane derives
+`Zone Ideal Loads Mixed Air Humidity Ratio`, the six inactive no-heat-recovery
+rate rows, and the inactive economizer/heat-recovery active-time rows. The compare lane derives
 EnergyPlus `StdRhoAir` from `Site:Location`, applies the blank OA schedule as
 always 1.0, and writes Rust `ResultStore` series for the 96 Detailed oracle
 samples. The outdoor-air mass/volume, no-humidity latent, supply-air
@@ -423,8 +423,9 @@ temperature uses 0.02 C because EnergyPlus sorts them from source-order zone/OA
 state and report-rate mode gates. The guard requires Flow/Zone, blank OA
 schedule, `NoEconomizer`, no heat recovery, no finite flow/capacity limits, no
 DCV, default `ConstantSensibleHeatRatio` dehumidification, and no
-humidification control. Inactive economizer/heat-recovery rows are exact zeros
-but are not promoted.
+humidification control. The inactive economizer/heat-recovery active-time rows
+and inactive heat-recovery rate rows are exact-zero conformance rows inside
+this declared candidate set.
 
 `ideal_loads_outdoor_air_design_flow_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Flow/Zone fixture shape.
@@ -433,9 +434,9 @@ predecessor artifact for the same Flow/Zone fixture shape.
 Flow/Area proof lane. The fixture uses a 1 m2 typed floor surface area and
 0.05 m3/s-m2 outdoor air, so the derived design volume is 0.05 m3/s before the
 same `StdRhoAir` mass-flow conversion. The compare path derives the zone floor
-area from typed floor surfaces, promotes the same 14 outdoor-air/supply/mixed
-rows as the Flow/Zone and Flow/Person candidates, and keeps inactive
-economizer/heat-recovery rows diagnostic-only.
+area from typed floor surfaces and promotes the same 22 outdoor-air,
+supply-air, mixed-air, inactive heat-recovery rate, and inactive active-time
+rows as the Flow/Zone and Flow/Person candidates.
 
 `ideal_loads_outdoor_air_flow_area_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Flow/Area fixture shape.
@@ -444,9 +445,9 @@ predecessor artifact for the same Flow/Area fixture shape.
 AirChanges/Hour proof lane. The fixture uses 180 ACH over the explicit 1 m3
 zone volume, so the derived design volume remains 0.05 m3/s before the same
 `StdRhoAir` mass-flow conversion. The compare path derives the typed zone
-volume, promotes the same 14 outdoor-air/supply/mixed rows as the Flow/Zone,
-Flow/Person, and Flow/Area candidates, and keeps inactive
-economizer/heat-recovery rows diagnostic-only.
+volume and promotes the same 22 outdoor-air, supply-air, mixed-air, inactive
+heat-recovery rate, and inactive active-time rows as the Flow/Zone,
+Flow/Person, and Flow/Area candidates.
 
 `ideal_loads_outdoor_air_air_changes_diagnostic_001` remains the diagnostic
 predecessor artifact for the same AirChanges/Hour fixture shape.
@@ -455,7 +456,8 @@ predecessor artifact for the same AirChanges/Hour fixture shape.
 lane. The fixture combines 0.015 m3/s Flow/Area, 0.025 m3/s Flow/Zone, and
 0.010 m3/s AirChanges/Hour component terms to 0.05 m3/s, and the compare gate
 checks each component term in `compare-summary.json`, `stage-summary.json`, and
-`compare-report.md` before claiming the same 14 outdoor-air/supply/mixed rows.
+`compare-report.md` before claiming the same 22 outdoor-air, supply-air,
+mixed-air, inactive heat-recovery rate, and inactive active-time rows.
 `ideal_loads_outdoor_air_sum_diagnostic_001` remains the diagnostic predecessor
 artifact for the same Sum fixture shape.
 
@@ -464,8 +466,9 @@ Maximum proof lane. The fixture combines 0.015 m3/s Flow/Area, 0.025 m3/s
 Flow/Zone, and 0.050 m3/s AirChanges/Hour component terms, then selects the
 AirChanges/Hour term as the governing 0.05 m3/s design outdoor-air volume. The
 compare gate checks each component term in `compare-summary.json`,
-`stage-summary.json`, and `compare-report.md` before claiming the same 14
-outdoor-air/supply/mixed rows.
+`stage-summary.json`, and `compare-report.md` before claiming the same 22
+outdoor-air, supply-air, mixed-air, inactive heat-recovery rate, and inactive
+active-time rows.
 `ideal_loads_outdoor_air_maximum_diagnostic_001` remains the diagnostic
 predecessor artifact for the same Maximum fixture shape.
 
@@ -474,10 +477,10 @@ promotes the Flow/Zone outdoor-air method with the minimum design flow lowered
 to 0.001 m3/s so the cooling branch can exercise the EnergyPlus
 `DifferentialDryBulb` economizer reset. The compare lane reports 110
 source-order Detailed samples, including system substep active-time rows,
-promotes the same 14 outdoor-air/supply/mixed rows plus
-`Zone Ideal Loads Economizer Active Time`, and checks that economizer active
-time is nonzero and outdoor-air mass flow rises above the design minimum. Its
-inactive heat-recovery rows remain diagnostic-only proof rows.
+promotes the same 22 outdoor-air, supply-air, mixed-air, economizer
+active-time, inactive heat-recovery rate, and inactive heat-recovery
+active-time rows, and checks that economizer active time is nonzero and
+outdoor-air mass flow rises above the design minimum.
 
 `ideal_loads_outdoor_air_differential_dry_bulb_economizer_diagnostic_001`
 remains the diagnostic predecessor artifact for the same DifferentialDryBulb
@@ -492,8 +495,8 @@ promotes the same Flow/Zone low-minimum fixture shape for the EnergyPlus
 `DifferentialEnthalpy` economizer reset. The Rust lane compares outdoor-air
 enthalpy against the recirculation enthalpy before applying the same source
 cooling-flow reset, reports 110 source-order Detailed samples, promotes the
-same 14 outdoor-air/supply/mixed rows plus `Zone Ideal Loads Economizer Active
-Time`, and keeps inactive heat-recovery rows diagnostic-only.
+same 22 outdoor-air, supply-air, mixed-air, economizer active-time, inactive
+heat-recovery rate, and inactive heat-recovery active-time rows.
 
 `ideal_loads_outdoor_air_sensible_heat_recovery_diagnostic_001` is the
 diagnostic predecessor for the same Flow/Zone outdoor-air method with
@@ -502,10 +505,10 @@ diagnostic predecessor for the same Flow/Zone outdoor-air method with
 `ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`
 promotes that Sensible heat-recovery fixture shape for declared outdoor-air
 mass/volume, no-humidity report-rate, supply-air state, mixed-air state,
-Sensible heat-recovery rate, and heat-recovery active-time rows. The Rust lane
-applies the EnergyPlus sensible heat-recovery outdoor-air tempering branch
-when recirculation air can beneficially warm or cool outdoor air, reports 96
-Detailed samples, keeps inactive economizer active-time diagnostic-only, and
+Sensible heat-recovery rate, heat-recovery active-time, and inactive
+economizer active-time rows. The Rust lane applies the EnergyPlus sensible
+heat-recovery outdoor-air tempering branch when recirculation air can
+beneficially warm or cool outdoor air, reports 96 Detailed samples, and
 requires heat-recovery active time to be nonzero. Humidity ratio is unchanged
 by Sensible heat recovery, so the latent heat-recovery rows are zero-valued
 conformance rows inside this narrow fixture.
@@ -518,7 +521,7 @@ state before mixing, passes EPW barometric pressure into the heat-recovery
 saturation check, reads `ZONE ONE RETURN` as the EnergyPlus
 `ZoneRecircAirNodeNum` same-call recirculation state, and reports 96 Detailed
 samples for active-time, sensible, latent, and total heat-recovery rows. The
-candidate keeps inactive economizer active-time diagnostic-only; general
+candidate also promotes the inactive economizer active-time zero row; general
 saturation-limit heat-recovery branch parity beyond this declared fixture
 remains outside the promoted claim.
 

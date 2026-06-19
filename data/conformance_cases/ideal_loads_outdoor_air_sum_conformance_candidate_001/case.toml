@@ -8,7 +8,7 @@ oracle_version = "26.1.0"
 notes = [
   "This case claims only the declared DesignSpecification:OutdoorAir Sum rows.",
   "The boundary covers Sum mass flow, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate rows with a blank outdoor-air schedule.",
-  "Inactive economizer and inactive heat-recovery active-time report rows remain diagnostic proof evidence.",
+  "Inactive economizer and inactive heat-recovery active-time rows are claimed only as declared inactive-zero report rows.",
   "Active humidity-control latent behavior, active DCV, economizer, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad outdoor-air conformance remain outside this claim.",
   "The fixture sums 0.015 m3/s from Flow/Area, 0.025 m3/s from Flow/Zone, and 36 ACH over the explicit 1 m3 zone volume to produce the same 0.05 m3/s design outdoor-air volume as the Flow/Zone diagnostic.",
   "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust conformance candidate derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
@@ -265,7 +265,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -276,7 +276,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 

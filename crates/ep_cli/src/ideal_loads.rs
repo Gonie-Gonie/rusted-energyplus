@@ -1034,27 +1034,23 @@ fn validate_outdoor_air_design_flow_manifest(manifest: &ConformanceCase) -> Resu
                 ));
             }
         }
-        if manifest_allows_outdoor_air_active_economizer_conformance_manifest(manifest)
-            && !manifest.outputs.iter().any(|output| {
-                output.variable == ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME
-                    && output.level == Some(OutputLevel::Conformance)
-            })
-        {
-            return Err(
-                "IdealLoads outdoor-air active economizer conformance is missing conformance row for Zone Ideal Loads Economizer Active Time"
-                    .to_string(),
-            );
+        for variable in OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable == *variable && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads outdoor-air conformance is missing heat-recovery rate conformance row for {variable}"
+                ));
+            }
         }
-        if manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(manifest)
-            && !manifest.outputs.iter().any(|output| {
-                output.variable == ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME
-                    && output.level == Some(OutputLevel::Conformance)
-            })
-        {
-            return Err(
-                "IdealLoads outdoor-air active heat-recovery conformance is missing conformance row for Zone Ideal Loads Heat Recovery Active Time"
-                    .to_string(),
-            );
+        for variable in OUTDOOR_AIR_ACTIVE_TIME_CONFORMANCE_VARIABLES {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable == *variable && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads outdoor-air conformance is missing active-time conformance row for {variable}"
+                ));
+            }
         }
     } else if manifest.comparison_class != ComparisonClass::DiagnosticOnly {
         return Err(format!(
@@ -1168,6 +1164,11 @@ const OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES: &[&str] = &[
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE,
 ];
 
+const OUTDOOR_AIR_ACTIVE_TIME_CONFORMANCE_VARIABLES: &[&str] = &[
+    ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
+];
+
 fn manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest: &ConformanceCase) -> bool {
     manifest.id == IDEAL_LOADS_OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_CASE_ID
         && manifest.comparison_class == ComparisonClass::Conformance
@@ -1252,15 +1253,6 @@ fn manifest_allows_outdoor_air_co2_dcv_conformance_manifest(manifest: &Conforman
     manifest.id == IDEAL_LOADS_OUTDOOR_AIR_CO2_DCV_CONFORMANCE_CASE_ID
         && manifest.comparison_class == ComparisonClass::Conformance
         && manifest.conformance_claim
-}
-
-fn manifest_allows_outdoor_air_active_economizer_conformance_manifest(
-    manifest: &ConformanceCase,
-) -> bool {
-    manifest_allows_outdoor_air_differential_dry_bulb_economizer_conformance_manifest(manifest)
-        || manifest_allows_outdoor_air_differential_enthalpy_economizer_conformance_manifest(
-            manifest,
-        )
 }
 
 fn manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(
@@ -1538,11 +1530,10 @@ fn outdoor_air_conformance_variable_for_manifest(
     variable: &str,
 ) -> bool {
     OUTDOOR_AIR_CONFORMANCE_VARIABLES.contains(&variable)
-        || (manifest_allows_outdoor_air_active_economizer_conformance_manifest(manifest)
-            && variable == ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME)
+        || (outdoor_air_conformance_expectations_for_manifest(manifest).is_some()
+            && OUTDOOR_AIR_ACTIVE_TIME_CONFORMANCE_VARIABLES.contains(&variable))
         || (manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(manifest)
-            && (OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable)
-                || variable == ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME))
+            && OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable))
         || (manifest_allows_outdoor_air_inactive_heat_recovery_rate_conformance_manifest(manifest)
             && OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable))
 }

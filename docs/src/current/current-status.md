@@ -84,47 +84,59 @@ variables:
   `DistrictHeatingWater:Facility` and `DistrictCooling:Facility` meters only
 - `ideal_loads_outdoor_air_flow_zone_conformance_candidate_001` declared
   outdoor-air Flow/Zone mass/volume, no-humidity report-rate, supply-air
-  state, and mixed-air state variables only
+  state, mixed-air state, inactive heat-recovery rate, economizer active-time,
+  and heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_flow_person_conformance_candidate_001` declared
   outdoor-air Flow/Person mass/volume, no-humidity report-rate, supply-air
-  state, and mixed-air state variables only
+  state, mixed-air state, inactive heat-recovery rate, economizer active-time,
+  and heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001` declared
   outdoor-air Flow/Person OccupancySchedule DCV mass/volume, no-humidity
-  report-rate, supply-air state, and mixed-air state variables only
+  report-rate, supply-air state, mixed-air state, inactive heat-recovery rate,
+  economizer active-time, and heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001` declared
   outdoor-air Flow/Person CO2Setpoint DCV mass/volume, no-humidity
-  report-rate, supply-air state, and mixed-air state variables only; CO2
+  report-rate, supply-air state, mixed-air state, inactive heat-recovery rate,
+  economizer active-time, and heat-recovery active-time variables only; CO2
   contaminant-balance/concentration conformance and broader DCV combinations
   remain outside the claim
 - `ideal_loads_outdoor_air_flow_area_conformance_candidate_001` declared
   outdoor-air Flow/Area mass/volume, no-humidity report-rate, supply-air
-  state, and mixed-air state variables only
+  state, mixed-air state, inactive heat-recovery rate, economizer active-time,
+  and heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_air_changes_conformance_candidate_001` declared
   outdoor-air AirChanges/Hour mass/volume, no-humidity report-rate,
-  supply-air state, and mixed-air state variables only
+  supply-air state, mixed-air state, inactive heat-recovery rate, economizer
+  active-time, and heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_sum_conformance_candidate_001` declared
-  outdoor-air Sum mass/volume, no-humidity report-rate, supply-air state, and
-  mixed-air state variables only
+  outdoor-air Sum mass/volume, no-humidity report-rate, supply-air state,
+  mixed-air state, inactive heat-recovery rate, economizer active-time, and
+  heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_maximum_conformance_candidate_001` declared
   outdoor-air Maximum mass/volume, no-humidity report-rate, supply-air state,
-  and mixed-air state variables only
+  mixed-air state, inactive heat-recovery rate, economizer active-time, and
+  heat-recovery active-time variables only
 - `ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001`
   declared outdoor-air Flow/Zone DifferentialDryBulb economizer mass/volume,
-  no-humidity report-rate, supply-air state, mixed-air state, and economizer
+  no-humidity report-rate, supply-air state, mixed-air state, economizer
+  active-time, inactive heat-recovery rate, and inactive heat-recovery
   active-time variables only
 - `ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001`
   declared outdoor-air Flow/Zone DifferentialEnthalpy economizer mass/volume,
-  no-humidity report-rate, supply-air state, mixed-air state, and economizer
+  no-humidity report-rate, supply-air state, mixed-air state, economizer
+  active-time, inactive heat-recovery rate, and inactive heat-recovery
   active-time variables only
 - `ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001`
   declared outdoor-air Flow/Zone Sensible heat-recovery mass/volume,
   no-humidity report-rate, supply-air state, mixed-air state, heat-recovery
-  rate, and heat-recovery active-time variables only
+  rate, heat-recovery active-time, and inactive economizer active-time
+  variables only
 - `ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001`
   declared outdoor-air Flow/Zone Enthalpy heat-recovery mass/volume,
   no-humidity report-rate, supply-air state, mixed-air state, heat-recovery
-  rate, and heat-recovery active-time variables only; general heat-recovery
-  saturation-limit branch parity remains outside the claim
+  rate, heat-recovery active-time, and inactive economizer active-time
+  variables only; general heat-recovery saturation-limit branch parity remains
+  outside the claim
 
 ## Current Evidence Boundary
 
@@ -312,73 +324,79 @@ The current public scope includes:
   calculation kept diagnostic proof only
 - limited IdealLoads outdoor-air `Flow/Zone` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive no-heat-recovery rate Detailed series, with inactive economizer and
-  inactive heat-recovery active-time rows kept diagnostic-only
+  sensible/latent/total report rates, supply-air state, mixed-air state,
+  inactive no-heat-recovery rate, and inactive economizer/heat-recovery
+  active-time Detailed series
 - limited IdealLoads outdoor-air `Flow/Person` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive no-heat-recovery rate Detailed series, using typed `People` design
+  sensible/latent/total report rates, supply-air state, mixed-air state,
+  inactive no-heat-recovery rate, and inactive economizer/heat-recovery
+  active-time Detailed series, using typed `People` design
   occupant count as a proof input while People heat-gain behavior remains
   outside the claim
 - limited IdealLoads outdoor-air `Flow/Person` `OccupancySchedule` DCV
   conformance for declared outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state, mixed-air
-  state, and inactive no-heat-recovery rate Detailed series, using traced
-  non-constant People occupancy schedule values to vary the minimum outdoor-air
-  flow while People heat-gain behavior and broader DCV combinations remain
+  state, inactive no-heat-recovery rate, and inactive economizer/heat-recovery
+  active-time Detailed series, using traced non-constant People occupancy
+  schedule values to vary the minimum outdoor-air flow while People heat-gain
+  behavior and broader DCV combinations remain
   outside the claim
 - limited IdealLoads outdoor-air `Flow/Person` `CO2Setpoint` DCV conformance
   for declared outdoor-air mass/standard-density volume flow, no-humidity
   sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive no-heat-recovery rate Detailed series, using the EnergyPlus `Zone
-  Air CO2 Predicted Load to Setpoint Mass Flow Rate` proof input to apply the
+  inactive no-heat-recovery rate plus inactive economizer/heat-recovery
+  active-time Detailed series, using the EnergyPlus `Zone Air CO2 Predicted
+  Load to Setpoint Mass Flow Rate` proof input to apply the
   source-order `max(minimum OA, CO2 demand)` adjustment while People heat-gain behavior, CO2
   contaminant-balance/concentration conformance, and broader DCV combinations
   remain outside the claim
 - limited IdealLoads outdoor-air `Flow/Area` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive no-heat-recovery rate Detailed series, using typed zone floor area
-  as a proof input
+  sensible/latent/total report rates, supply-air state, mixed-air state,
+  inactive no-heat-recovery rate, and inactive economizer/heat-recovery
+  active-time Detailed series, using typed zone floor area as a proof input
 - limited IdealLoads outdoor-air `AirChanges/Hour` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, mixed-air state, and
-  inactive no-heat-recovery rate Detailed series, using typed zone volume as a
-  proof input
+  sensible/latent/total report rates, supply-air state, mixed-air state,
+  inactive no-heat-recovery rate, and inactive economizer/heat-recovery
+  active-time Detailed series, using typed zone volume as a proof input
 - limited IdealLoads outdoor-air `Sum` conformance for declared outdoor-air
   mass/standard-density volume flow, no-humidity sensible/latent/total report
-  rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate
-  Detailed series, using typed Flow/Area, Flow/Zone, and AirChanges/Hour
+  rates, supply-air state, mixed-air state, inactive no-heat-recovery rate,
+  and inactive economizer/heat-recovery active-time Detailed series, using
+  typed Flow/Area, Flow/Zone, and AirChanges/Hour
   component flows as proof inputs
 - limited IdealLoads outdoor-air `Maximum` conformance for declared outdoor-air
   mass/standard-density volume flow, no-humidity sensible/latent/total report
-  rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate
-  Detailed series, using typed component flows with AirChanges/Hour selected as
-  the governing maximum
+  rates, supply-air state, mixed-air state, inactive no-heat-recovery rate,
+  and inactive economizer/heat-recovery active-time Detailed series, using
+  typed component flows with AirChanges/Hour selected as the governing maximum
 - limited IdealLoads outdoor-air `DifferentialDryBulb` economizer conformance
   for declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
-  Detailed series, using the source dry-bulb comparison to reset outdoor-air
+  mixed-air state, economizer active-time, inactive no-heat-recovery rate, and
+  inactive heat-recovery active-time Detailed series, using the source
+  dry-bulb comparison to reset outdoor-air
   flow above the low design minimum
 - limited IdealLoads outdoor-air `DifferentialEnthalpy` economizer conformance
   for declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
-  Detailed series, using the source enthalpy comparison to reset outdoor-air
+  mixed-air state, economizer active-time, inactive no-heat-recovery rate, and
+  inactive heat-recovery active-time Detailed series, using the source
+  enthalpy comparison to reset outdoor-air
   flow above the low design minimum
 - limited IdealLoads outdoor-air `Sensible` heat-recovery conformance for
   declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, Sensible heat-recovery rate, and heat-recovery active-time
-  Detailed series, with inactive economizer active-time kept diagnostic-only
+  mixed-air state, Sensible heat-recovery rate, heat-recovery active-time, and
+  inactive economizer active-time Detailed series
 - limited IdealLoads outdoor-air `Enthalpy` heat-recovery conformance for
   declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, Enthalpy heat-recovery rate, and heat-recovery active-time
-  Detailed series, with inactive economizer active-time kept diagnostic-only
-  and general heat-recovery saturation-limit branch parity outside the claim
+  mixed-air state, Enthalpy heat-recovery rate, heat-recovery active-time, and
+  inactive economizer active-time Detailed series, with general heat-recovery
+  saturation-limit branch parity outside the claim
 - official dynamic heat-balance diagnostic reports that retain the broader
   surface/radiation/solar/convection decomposition and probe lanes without
   promoting those diagnostic variables

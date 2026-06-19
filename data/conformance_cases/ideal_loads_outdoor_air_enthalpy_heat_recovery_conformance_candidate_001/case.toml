@@ -265,7 +265,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 

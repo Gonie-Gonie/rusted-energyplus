@@ -309,9 +309,6 @@ foreach ($case in $promotedCases) {
     if (($conformanceOutputRows.Count + $conformanceMeterRows.Count) -eq 0) {
         throw "$($case.Id) summary must include at least one conformance output or meter row"
     }
-    if (($diagnosticOutputRows.Count + $diagnosticMeterRows.Count) -eq 0) {
-        throw "$($case.Id) summary must include diagnostic rows separated from conformance rows"
-    }
 
     Assert-JsonPropertyEquals -Object $resultStore -PropertyName "duplicate_guard" -Expected "ep_runtime::ResultStore::diagnostics" -Description "$($case.Id) Rust result store"
     Assert-JsonPropertyEquals -Object $resultStore -PropertyName "diagnostic_count" -Expected 0 -Description "$($case.Id) Rust result store"

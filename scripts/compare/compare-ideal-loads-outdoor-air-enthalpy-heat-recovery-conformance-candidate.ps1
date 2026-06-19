@@ -145,18 +145,18 @@ if ($rows.Count -ne 22) {
     throw "Expected twenty-two outdoor-air rows, found $($rows.Count)"
 }
 $conformanceRows = @($rows | Where-Object { $_.level -eq "conformance" })
-if ($conformanceRows.Count -ne 21) {
-    throw "Expected twenty-one outdoor-air Enthalpy heat-recovery conformance rows, found $($conformanceRows.Count)"
+if ($conformanceRows.Count -ne 22) {
+    throw "Expected twenty-two outdoor-air Enthalpy heat-recovery conformance rows, found $($conformanceRows.Count)"
 }
 if (@($conformanceRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All outdoor-air Enthalpy heat-recovery conformance rows must pass"
 }
 $diagnosticRows = @($rows | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 1) {
-    throw "Expected one inactive economizer diagnostic row, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 0) {
+    throw "Expected zero outdoor-air diagnostic rows, found $($diagnosticRows.Count)"
 }
-if ($diagnosticRows[0].variable -ne "Zone Ideal Loads Economizer Active Time" -or $diagnosticRows[0].status -ne "pass") {
-    throw "The only diagnostic row must be the passing inactive economizer active-time row"
+if (@($diagnosticRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
+    throw "Outdoor-air diagnostic rows should be fully promoted for this candidate"
 }
 
 $heatRecoverySource = "rust-ideal-loads-outdoor-air-enthalpy-heat-recovery"
@@ -181,7 +181,7 @@ $expectedRows = @(
     @{ Variable = "Zone Ideal Loads Heat Recovery Sensible Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Heat Recovery Latent Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"; Level = "conformance"; Units = "W"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 },
-    @{ Variable = "Zone Ideal Loads Economizer Active Time"; Level = "diagnostic"; Units = "hr"; Source = "rust-ideal-loads-outdoor-air-inactive-economizer"; MaxAbs = 0.000000001; Rmse = 0.000000001 },
+    @{ Variable = "Zone Ideal Loads Economizer Active Time"; Level = "conformance"; Units = "hr"; Source = "rust-ideal-loads-outdoor-air-inactive-economizer"; MaxAbs = 0.000000001; Rmse = 0.000000001 },
     @{ Variable = "Zone Ideal Loads Heat Recovery Active Time"; Level = "conformance"; Units = "hr"; Source = $heatRecoverySource; MaxAbs = 0.000000001; Rmse = 0.000000001 }
 )
 
