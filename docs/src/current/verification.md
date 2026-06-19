@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: qa
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-20
 ---
 
 # Verification
@@ -92,6 +92,24 @@ also carrying Rust-only first-sample CTF component rows for inside/outside
 current-temperature and history-term isolation plus oracle-inferred first-sample
 CTF history deltas when EIO zero coefficients and matching oracle series are
 available. The full summary preserves hourly sample rows for deeper inspection:
+
+As of the 2026-06-20 regenerated compatibility-candidate diagnostic baseline,
+the broad diagnostic report still has `status = fail` and
+`conformance_claim = false`. The promoted candidate gate can support only the
+declared limited claim above. It cannot yet support a broad or "complete"
+EnergyPlus conformance statement because the broad diagnostic still shows:
+
+- `ZN001:ROOF001` outside convection heat-gain max absolute delta
+  `25.397397824985 W` at hourly sample `4213`.
+- `ZN001:ROOF001` outside net thermal radiation heat-gain max absolute delta
+  `25.044153522467 W` at hourly sample `4213`, largely offsetting the
+  convection split rather than indicating an uncancelled total exterior-balance
+  failure.
+- `ZONE ONE` mean air temperature max absolute delta `0.007135877197 C`.
+- `ZN001:FLR001` inside face temperature max absolute delta
+  `0.007056007286 C`; the active blocker is
+  `floor-inside-current-face-temperature-source-timing`, where a small
+  face-temperature offset is amplified by the floor CTF current/history terms.
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
