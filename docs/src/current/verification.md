@@ -81,8 +81,8 @@ variable set, all-EIO CTF seed, EnergyPlus initial CTF histories, 20-day
 minimum warmup, and 20 surface iterations. That candidate now carries
 `conformance_claim = true` with a blocking gate for the promoted weather,
 zone-air, surface-temperature, surface-conduction, and declared floor
-surface-heat-storage output while leaving storage-per-area and broad
-decomposition rows diagnostic-only.
+surface-heat-storage outputs while leaving broad decomposition rows
+diagnostic-only.
 Heat-balance diagnostic and conformance report writers also emit a compact
 `compare-digest.json` next to the full `compare-summary.json` and
 `compare-report.md`; active gates read the digest for metadata, bottlenecks, and

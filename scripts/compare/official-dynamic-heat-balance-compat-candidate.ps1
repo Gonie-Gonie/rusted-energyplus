@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 30) {
-    throw "Expected 30 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 31) {
+    throw "Expected 31 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -174,6 +174,16 @@ if ([double]$storageSeries.max_abs_delta_c -gt 1.2) {
 if ([double]$storageSeries.rmse_delta_c -gt 0.35) {
     throw "Floor storage rmse_delta_c exceeds 0.35 W: $($storageSeries.rmse_delta_c)"
 }
+$storageFluxSeries = $summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate per Area" -and $_.output.class -eq "surface-storage-flux-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+if (-not $storageFluxSeries) {
+    throw "Floor storage per-area conformance series missing"
+}
+if ([double]$storageFluxSeries.max_abs_delta_c -gt 0.005) {
+    throw "Floor storage per-area max_abs_delta_c exceeds 0.005 W/m2: $($storageFluxSeries.max_abs_delta_c)"
+}
+if ([double]$storageFluxSeries.rmse_delta_c -gt 0.001) {
+    throw "Floor storage per-area rmse_delta_c exceeds 0.001 W/m2: $($storageFluxSeries.rmse_delta_c)"
+}
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Conformance Report" -Description "markdown report header"
@@ -181,6 +191,7 @@ Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Desc
 Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Description "markdown conformance claim"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-storage-state / eso / conformance" -Description "surface storage conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area / hourly / surface-storage-flux-state / eso / conformance" -Description "surface storage per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "status: pass" -Description "markdown status"
 
 Write-Host "Official dynamic heat-balance conformance gate passed."

@@ -130,8 +130,8 @@ Current v0.33 official dynamic heat-balance evidence:
   lanes for structural bottleneck isolation
 - broad probe lanes remain `comparison_class=diagnostic-only` and
   `conformance_claim=false`; only the declared floor `Surface Heat Storage
-  Rate` row is promoted in the candidate report, while storage-per-area and
-  broad storage diagnostics remain outside the claim
+  Rate` and `Surface Heat Storage Rate per Area` rows are promoted in the
+  candidate report, while broad storage diagnostics remain outside the claim
 - `official-dynamic-heat-balance-compat-candidate`
 - `official-dynamic-heat-balance-diagnostic`
 - `official-dynamic-heat-balance-all-ctf-probe`

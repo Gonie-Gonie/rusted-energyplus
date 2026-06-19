@@ -310,9 +310,9 @@ tolerance, and code organization.
 - current surface conduction conformance covers the no-mass adiabatic
   `surface_temperature_nomass_001` series and named official
   `1ZoneUncontrolled` dynamic candidate surfaces, including the declared floor
-  `Surface Heat Storage Rate` row under its own storage tolerance;
-  storage-per-area, radiation, solar, and broad CTF diagnostics are not
-  promoted
+  `Surface Heat Storage Rate` and `Surface Heat Storage Rate per Area` rows
+  under dedicated storage tolerances; radiation, solar, and broad CTF
+  diagnostics are not promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation

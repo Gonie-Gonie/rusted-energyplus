@@ -740,7 +740,15 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the compatibility-candidate lane; storage per-area and broad CTF storage parity remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the compatibility-candidate lane; broad CTF storage parity remains outside the claim."
+
+[[variable]]
+name = "Surface Heat Storage Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage-flux conformance only for the declared Surface Heat Storage Rate per Area row under the compatibility-candidate lane; broad CTF storage parity and other storage rows remain outside the claim."
 
 [[variable]]
 name = "Site Outdoor Air Drybulb Temperature"

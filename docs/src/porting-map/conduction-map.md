@@ -22,7 +22,7 @@ conduction work.
 | `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
 | `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
 | `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | conformance for the declared floor row only | official dynamic compatibility candidate |
-| `Surface Heat Storage Rate per Area` | storage rate divided by surface area | diagnostic-only | official dynamic diagnostic candidate |
+| `Surface Heat Storage Rate per Area` | storage rate divided by surface area | conformance for the declared floor row only | official dynamic compatibility candidate |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |
 | `Zone Opaque Surface Outside Faces Conduction Rate` | sum of surface outside-face conduction rates | diagnostic-only | official dynamic diagnostic candidate |
 

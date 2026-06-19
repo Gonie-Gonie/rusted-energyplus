@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 30);
+    assert_eq!(manifest.outputs.len(), 31);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        30
+        31
     );
     assert_eq!(
         manifest
@@ -603,6 +603,12 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             && output.class == VariableClass::SurfaceStorageState
             && output.level == Some(OutputLevel::Conformance)
     }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:FLR001"
+            && output.variable == "Surface Heat Storage Rate per Area"
+            && output.class == VariableClass::SurfaceStorageFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
     assert!(manifest.tolerances.iter().any(|tolerance| {
         tolerance.variable_class == VariableClass::Weather
             && tolerance.max_abs == Some(0.00001)
@@ -622,6 +628,11 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         tolerance.variable_class == VariableClass::SurfaceStorageState
             && tolerance.max_abs == Some(1.2)
             && tolerance.max_rmse == Some(0.35)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceStorageFluxState
+            && tolerance.max_abs == Some(0.005)
+            && tolerance.max_rmse == Some(0.001)
     }));
     let gate = manifest
         .gate
