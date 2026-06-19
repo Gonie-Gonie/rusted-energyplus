@@ -1610,11 +1610,12 @@ fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Res
             VariableClass::Weather
                 | VariableClass::ZoneState
                 | VariableClass::SurfaceState
+                | VariableClass::SurfaceFluxState
                 | VariableClass::SurfaceStorageState
                 | VariableClass::SurfaceStorageFluxState
         ) {
             return Err(format!(
-                "heat-balance conformance requires weather, zone-state, surface-state, surface-storage-state, or surface-storage-flux-state class, got {} for {}",
+                "heat-balance conformance requires weather, zone-state, surface-state, surface-flux-state, surface-storage-state, or surface-storage-flux-state class, got {} for {}",
                 variable_class_label(output.class),
                 output.variable
             ));
@@ -1690,12 +1691,13 @@ fn validate_heat_balance_diagnostic_manifest(manifest: &ConformanceCase) -> Resu
             output.class,
             VariableClass::ZoneState
                 | VariableClass::SurfaceState
+                | VariableClass::SurfaceFluxState
                 | VariableClass::SurfaceStorageState
                 | VariableClass::SurfaceStorageFluxState
                 | VariableClass::Weather
         ) {
             return Err(format!(
-                "heat-balance diagnostic requires zone-state, surface-state, surface-storage-state, surface-storage-flux-state, or weather class, got {} for {}",
+                "heat-balance diagnostic requires zone-state, surface-state, surface-flux-state, surface-storage-state, surface-storage-flux-state, or weather class, got {} for {}",
                 variable_class_label(output.class),
                 output.variable
             ));
@@ -2377,6 +2379,7 @@ fn variable_class_label(class: VariableClass) -> &'static str {
         VariableClass::InternalGain => "internal-gain",
         VariableClass::ZoneState => "zone-state",
         VariableClass::SurfaceState => "surface-state",
+        VariableClass::SurfaceFluxState => "surface-flux-state",
         VariableClass::SurfaceStorageState => "surface-storage-state",
         VariableClass::SurfaceStorageFluxState => "surface-storage-flux-state",
         VariableClass::NodeState => "node-state",

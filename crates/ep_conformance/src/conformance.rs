@@ -725,6 +725,8 @@ pub enum VariableClass {
     ZoneState,
     /// Surface-level state variables.
     SurfaceState,
+    /// Surface-level heat flux variables with separate tolerance policy.
+    SurfaceFluxState,
     /// Surface-level heat storage variables with separate tolerance policy.
     SurfaceStorageState,
     /// Surface-level heat storage flux variables with separate tolerance policy.

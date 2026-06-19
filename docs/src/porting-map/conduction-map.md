@@ -18,9 +18,9 @@ conduction work.
 | Variable | Current Rust source | Current claim | Official ExampleFile status |
 |---|---|---|---|
 | `Surface Inside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF inside flux shell | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
-| `Surface Inside Face Conduction Heat Transfer Rate per Area` | rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
+| `Surface Inside Face Conduction Heat Transfer Rate per Area` | rate divided by surface area | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
 | `Surface Outside Face Conduction Heat Transfer Rate` | steady `SurfaceHeatBalanceState` CTF outside flux shell with EnergyPlus output sign | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
-| `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic conformance only | baseline candidate |
+| `Surface Outside Face Conduction Heat Transfer Rate per Area` | outside rate divided by surface area | no-mass adiabatic plus official dynamic candidate conformance | promoted for declared official dynamic candidate surfaces |
 | `Surface Heat Storage Rate` | EnergyPlus-style `-(inside + outside)` storage report derived from surface conduction rates | conformance for the declared floor row only | official dynamic compatibility candidate |
 | `Surface Heat Storage Rate per Area` | storage rate divided by surface area | conformance for the declared floor row only | official dynamic compatibility candidate |
 | `Zone Opaque Surface Inside Faces Conduction Rate` | sum of surface heat gain to zone | no-mass adiabatic conformance only | baseline + diagnostic candidate |

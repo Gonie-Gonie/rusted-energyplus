@@ -143,8 +143,9 @@ blocking gate.
 The v0.33 `official_1zone_uncontrolled_dynamic_conformance_candidate_001`
 report is a separate official ExampleFile dynamic conformance result for its
 declared conformance-level weather, zone-air, surface temperature, and
-inside/outside conduction variables. Diagnostic storage, radiation, solar,
-convection coefficient, and broader probe rows remain outside that claim.
+inside/outside conduction and conduction per-area variables, plus the declared
+floor storage/storage per-area rows. Radiation, solar, convection coefficient,
+other storage, and broader probe rows remain outside that claim.
 
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
 zone air heat-balance, weather, internal gain, and surface conduction hourly

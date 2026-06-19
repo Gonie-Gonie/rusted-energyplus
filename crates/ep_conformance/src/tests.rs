@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 31);
+    assert_eq!(manifest.outputs.len(), 43);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        31
+        43
     );
     assert_eq!(
         manifest
@@ -604,6 +604,24 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             && output.level == Some(OutputLevel::Conformance)
     }));
     assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:WALL001"
+            && output.variable == "Surface Inside Face Conduction Heat Transfer Rate per Area"
+            && output.class == VariableClass::SurfaceFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Outside Face Conduction Heat Transfer Rate per Area"
+            && output.class == VariableClass::SurfaceFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:FLR001"
+            && output.variable == "Surface Inside Face Conduction Heat Transfer Rate per Area"
+            && output.class == VariableClass::SurfaceFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:FLR001"
             && output.variable == "Surface Heat Storage Rate per Area"
             && output.class == VariableClass::SurfaceStorageFluxState
@@ -623,6 +641,11 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         tolerance.variable_class == VariableClass::SurfaceState
             && tolerance.max_abs == Some(1.0)
             && tolerance.max_rmse == Some(0.35)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceFluxState
+            && tolerance.max_abs == Some(0.005)
+            && tolerance.max_rmse == Some(0.0015)
     }));
     assert!(manifest.tolerances.iter().any(|tolerance| {
         tolerance.variable_class == VariableClass::SurfaceStorageState

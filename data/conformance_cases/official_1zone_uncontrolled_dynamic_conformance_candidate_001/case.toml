@@ -132,9 +132,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -168,9 +186,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL002"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -204,9 +240,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL003"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -240,9 +294,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL004"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -276,9 +348,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:ROOF001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -312,9 +402,27 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:FLR001"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:FLR001"
 variable = "Surface Outside Face Conduction Heat Transfer Rate"
 frequency = "hourly"
 class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -351,6 +459,11 @@ max_rmse = 0.1
 variable_class = "surface-state"
 max_abs = 1.0
 max_rmse = 0.35
+
+[[tolerances]]
+variable_class = "surface-flux-state"
+max_abs = 0.005
+max_rmse = 0.0015
 
 [[tolerances]]
 variable_class = "surface-storage-state"
