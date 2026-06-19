@@ -64,9 +64,11 @@ tolerance, and code organization.
   all-days Schedule:Compact fuel-efficiency rows promoted only in
   `ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001`,
   DistrictHeatingWater/DistrictCooling facility meters promoted only by the
-  separate hourly and monthly/annual/run-period facility meter candidates, and
-  tracked as oracle-MTR diagnostics in this sensible case with
-  RuntimeMeterRegistry request resolution
+  separate hourly meter candidate, the four humidity-control
+  hourly/monthly/run-period meter candidates, and the
+  monthly/annual/run-period meter-only candidate, while tracked as oracle-MTR
+  diagnostics in this sensible case with RuntimeMeterRegistry request
+  resolution
 - limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate for
   declared supply-air total heating/cooling energy and zone total
   heating/cooling energy rows in
@@ -130,29 +132,41 @@ tolerance, and code organization.
   `ideal_loads_constant_shr_conformance_001`, with return-node and zone-air
   humidity proof rows kept diagnostic-only
 - limited IdealLoads no-OA `ConstantSupplyHumidityRatio` cooling conformance
-  candidate gate for declared thermostat, cooling total/sensible/latent rate,
-  and supply-node temperature/flow/humidity Detailed series in
+  candidate gate for declared thermostat, heating/cooling total/sensible/latent
+  rate, supply-air report-rate, ReportPurchasedAir energy/fuel,
+  supply-node temperature/flow/humidity Detailed series, and
+  hourly/monthly/run-period `DistrictHeatingWater:Facility`/
+  `DistrictCooling:Facility` meters in
   `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`,
-  with heating rows, return-node and zone-air humidity proof rows,
-  ReportPurchasedAir energy/fuel rows, and meters kept diagnostic-only
+  with return-node and zone-air humidity proof rows plus annual meter rows kept
+  outside the claim
 - limited IdealLoads no-OA `ConstantSupplyHumidityRatio` heating conformance
-  candidate gate for declared thermostat, heating total/sensible/latent rate,
-  and supply-node temperature/flow/humidity Detailed series in
+  candidate gate for declared thermostat, heating/cooling total/sensible/latent
+  rate, supply-air report-rate, ReportPurchasedAir energy/fuel,
+  supply-node temperature/flow/humidity Detailed series, and
+  hourly/monthly/run-period `DistrictHeatingWater:Facility`/
+  `DistrictCooling:Facility` meters in
   `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`,
-  with cooling rows, return-node and zone-air humidity proof rows,
-  ReportPurchasedAir energy/fuel rows, and meters kept diagnostic-only
+  with return-node and zone-air humidity proof rows plus annual meter rows kept
+  outside the claim
 - limited IdealLoads no-OA Humidistat dehumidification conformance candidate
-  gate for declared thermostat, cooling total/sensible/latent rate, and
-  supply-node temperature/flow/humidity Detailed series in
+  gate for declared thermostat, heating/cooling total/sensible/latent rate,
+  supply-air report-rate, ReportPurchasedAir energy/fuel, supply-node
+  temperature/flow/humidity Detailed series, and hourly/monthly/run-period
+  `DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters in
   `ideal_loads_humidistat_dehumidification_conformance_candidate_001`, using
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
-  calculation and broad humidity-control conformance remain outside the claim
+  calculation, annual meter rows, and broad humidity-control conformance remain
+  outside the claim
 - limited IdealLoads no-OA Humidistat humidification conformance candidate
-  gate for declared thermostat, heating total/sensible/latent rate, and
-  supply-node temperature/flow/humidity Detailed series in
+  gate for declared thermostat, heating/cooling total/sensible/latent rate,
+  supply-air report-rate, ReportPurchasedAir energy/fuel, supply-node
+  temperature/flow/humidity Detailed series, and hourly/monthly/run-period
+  `DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters in
   `ideal_loads_humidistat_humidification_conformance_candidate_001`, using
   traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
-  calculation and broad humidity-control conformance remain outside the claim
+  calculation, annual meter rows, and broad humidity-control conformance remain
+  outside the claim
 - limited IdealLoads outdoor-air `Flow/Zone` conformance candidate gate for
   declared outdoor-air mass/standard-density volume flow, no-humidity
   outdoor-air report rates, supply-air state, and mixed-air state Detailed

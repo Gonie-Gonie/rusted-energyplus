@@ -149,6 +149,36 @@ function Assert-CaseMeterLevelFrequency {
     throw "Missing required meter level for $Description`: name=$Name frequency=$Frequency level=$Level"
 }
 
+function Assert-CaseMeterLevelFrequencyAbsent {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$Frequency,
+        [Parameter(Mandatory = $true)][string]$Level,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing file for case meter guard: $Path"
+    }
+
+    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $meterBlockPattern = '(?ms)^\[\[meters\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
+    $blocks = [regex]::Matches($text, $meterBlockPattern)
+    $namePattern = '(?m)^name\s*=\s*"' + [regex]::Escape($Name) + '"\s*$'
+    $frequencyPattern = '(?m)^frequency\s*=\s*"' + [regex]::Escape($Frequency) + '"\s*$'
+    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
+
+    foreach ($block in $blocks) {
+        $body = $block.Groups[1].Value
+        if ($body -match $namePattern -and $body -match $frequencyPattern -and $body -match $levelPattern) {
+            throw "Forbidden meter level for $Description`: name=$Name frequency=$Frequency level=$Level"
+        }
+    }
+
+    Write-Host "OK forbidden meter level absent for $Description`: $Name / $Frequency != $Level"
+}
+
 Assert-DoesNotContain -Path "README.md" -Pattern "first runtime path for an uncontrolled one-zone building subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "ResultStore output from the first uncontrolled one-zone simulation subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "zone temperature comparison passes" -Description "README scope"
@@ -311,6 +341,7 @@ Assert-Contains -Path "README.md" -Pattern 'limited IdealLoads no-OA `ConstantSu
 Assert-Contains -Path "README.md" -Pattern 'limited IdealLoads no-OA `ConstantSupplyHumidityRatio` heating conformance' -Description "IdealLoads constant-supply-humidity heating README claim"
 Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA Humidistat dehumidification conformance candidate" -Description "IdealLoads humidistat dehumidification README claim"
 Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA Humidistat humidification conformance candidate" -Description "IdealLoads humidistat humidification README claim"
+Assert-Contains -Path "README.md" -Pattern 'hourly/monthly/run-period `DistrictHeatingWater:Facility`/' -Description "IdealLoads humidity facility meter README claim"
 Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA ReportPurchasedAir energy conformance candidate" -Description "IdealLoads report-energy README claim"
 Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA blank fuel-efficiency conformance candidate" -Description "IdealLoads blank fuel-efficiency README claim"
 Assert-Contains -Path "README.md" -Pattern "limited IdealLoads no-OA constant Schedule:Constant fuel-efficiency" -Description "IdealLoads constant fuel-efficiency README claim"
@@ -332,7 +363,8 @@ Assert-Contains -Path "README.md" -Pattern 'limited IdealLoads outdoor-air `Enth
 Assert-Contains -Path "README.md" -Pattern "diagnostic-only IdealLoads remaining outdoor-air predecessor evidence" -Description "IdealLoads OA diagnostic README boundary"
 Assert-Contains -Path "README.md" -Pattern "IdealLoads economizer conformance beyond the declared DifferentialDryBulb" -Description "IdealLoads broad non-claim README boundary"
 Assert-Contains -Path "README.md" -Pattern "declared Sensible and Enthalpy candidates" -Description "IdealLoads heat-recovery broad non-claim README boundary"
-Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ReportPurchasedAir non-fuel energy conformance, no-OA blank fuel-efficiency conformance, no-OA constant Schedule:Constant fuel-efficiency conformance, no-OA all-days Schedule:Compact fuel-efficiency conformance, no-OA ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio cooling/heating, Humidistat dehumidification/humidification, no-OA hourly DistrictHeatingWater/DistrictCooling facility meter conformance in the dedicated meter and humidity-control candidates plus monthly/annual/run-period DistrictHeatingWater/DistrictCooling facility meter conformance, and outdoor-air Flow/Zone/Flow/Person/Flow/Person OccupancySchedule DCV/Flow/Person CO2Setpoint DCV/Flow/Area/AirChanges/Hour/Sum/Maximum/DifferentialDryBulb/DifferentialEnthalpy economizer and Sensible/Enthalpy heat-recovery conformance" -Description "IdealLoads current-status conformance boundary"
+Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ReportPurchasedAir non-fuel energy conformance, no-OA blank fuel-efficiency conformance, no-OA constant Schedule:Constant fuel-efficiency conformance, no-OA all-days Schedule:Compact fuel-efficiency conformance, no-OA ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio cooling/heating, Humidistat dehumidification/humidification, no-OA hourly DistrictHeatingWater/DistrictCooling facility meter conformance in the dedicated meter candidate, no-OA hourly/monthly/run-period DistrictHeatingWater/DistrictCooling facility meter conformance in the humidity-control candidates, plus monthly/annual/run-period DistrictHeatingWater/DistrictCooling facility meter conformance in the meter-only candidate, and outdoor-air Flow/Zone/Flow/Person/Flow/Person OccupancySchedule DCV/Flow/Person CO2Setpoint DCV/Flow/Area/AirChanges/Hour/Sum/Maximum/DifferentialDryBulb/DifferentialEnthalpy economizer and Sensible/Enthalpy heat-recovery conformance" -Description "IdealLoads current-status conformance boundary"
+Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "annual meter rows in the short-run humidity-control candidates" -Description "IdealLoads current-status humidity annual non-claim boundary"
 Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "outdoor-air methods beyond Flow/Zone/Flow/Person/Flow/Person OccupancySchedule DCV/Flow/Person CO2Setpoint DCV/Flow/Area/AirChanges/Hour/Sum/Maximum/DifferentialDryBulb/DifferentialEnthalpy economizer and declared Sensible/Enthalpy heat recovery" -Description "IdealLoads current-status broad non-claim boundary"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "ideal_loads_no_oa_sensible_conformance_001, no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance" -Description "IdealLoads variable coverage finite-limit boundary"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA ConstantSupplyHumidityRatio cooling/heating plus Humidistat dehumidification/humidification conformance for declared heating/cooling rate rows in the four no-OA humidity-control conformance candidates" -Description "IdealLoads humidity-control variable coverage rate claim"
@@ -453,8 +485,12 @@ foreach ($humidityMeterCase in @(
     "ideal_loads_humidistat_humidification_conformance_candidate_001"
 )) {
     $casePath = "data\conformance_cases\$humidityMeterCase\case.toml"
-    Assert-CaseMeterLevel -Path $casePath -Name "DistrictHeatingWater:Facility" -Level "conformance" -Description "$humidityMeterCase heating hourly facility meter conformance"
-    Assert-CaseMeterLevel -Path $casePath -Name "DistrictCooling:Facility" -Level "conformance" -Description "$humidityMeterCase cooling hourly facility meter conformance"
+    foreach ($meterName in @("DistrictHeatingWater:Facility", "DistrictCooling:Facility")) {
+        foreach ($meterFrequency in @("hourly", "monthly", "run-period")) {
+            Assert-CaseMeterLevelFrequency -Path $casePath -Name $meterName -Frequency $meterFrequency -Level "conformance" -Description "$humidityMeterCase $meterFrequency facility meter $meterName conformance"
+        }
+        Assert-CaseMeterLevelFrequencyAbsent -Path $casePath -Name $meterName -Frequency "annual" -Level "conformance" -Description "$humidityMeterCase annual facility meter $meterName conformance"
+    }
 }
 Assert-CaseMeterLevelFrequency -Path "data\conformance_cases\ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001\case.toml" -Name "DistrictHeatingWater:Facility" -Frequency "monthly" -Level "conformance" -Description "IdealLoads heating monthly facility meter conformance"
 Assert-CaseMeterLevelFrequency -Path "data\conformance_cases\ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001\case.toml" -Name "DistrictHeatingWater:Facility" -Frequency "annual" -Level "conformance" -Description "IdealLoads heating annual facility meter conformance"

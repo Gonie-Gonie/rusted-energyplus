@@ -134,11 +134,30 @@ if ($summary.meter_tolerance_failures -ne 0) {
     throw "Expected zero meter tolerance failures, found $($summary.meter_tolerance_failures)"
 }
 $meterRows = @($summary.meter_series)
-if ($meterRows.Count -ne 2) {
-    throw "Expected 2 hourly facility meter rows, found $($meterRows.Count)"
+if ($summary.requested_meter_count -ne 6 -or $summary.meter_series_count -ne 6 -or $meterRows.Count -ne 6) {
+    throw "Expected 6 declared facility meter rows, found requested=$($summary.requested_meter_count) series=$($summary.meter_series_count) rows=$($meterRows.Count)"
 }
 if (@($meterRows | Where-Object { $_.level -ne "conformance" -or $_.status -ne "pass" }).Count -ne 0) {
-    throw "All hourly facility meter rows must be conformance rows and pass"
+    throw "All declared facility meter rows must be conformance rows and pass"
+}
+foreach ($expectedMeter in @(
+    @("DistrictHeatingWater:Facility", "hourly", "rust-ideal-loads-hourly-facility-meter-from-fuel-energy"),
+    @("DistrictHeatingWater:Facility", "monthly", "rust-ideal-loads-monthly-facility-meter-from-fuel-energy"),
+    @("DistrictHeatingWater:Facility", "run-period", "rust-ideal-loads-run-period-facility-meter-from-fuel-energy"),
+    @("DistrictCooling:Facility", "hourly", "rust-ideal-loads-hourly-facility-meter-from-fuel-energy"),
+    @("DistrictCooling:Facility", "monthly", "rust-ideal-loads-monthly-facility-meter-from-fuel-energy"),
+    @("DistrictCooling:Facility", "run-period", "rust-ideal-loads-run-period-facility-meter-from-fuel-energy")
+)) {
+    $matches = @($meterRows | Where-Object {
+            $_.name -eq $expectedMeter[0] -and
+            $_.frequency -eq $expectedMeter[1] -and
+            $_.rust_source -eq $expectedMeter[2] -and
+            $_.source -eq "mtr" -and
+            $_.units -eq "J"
+        })
+    if ($matches.Count -ne 1) {
+        throw "Missing declared facility meter row $($expectedMeter[0])/$($expectedMeter[1]) from $($expectedMeter[2])"
+    }
 }
 if ($summary.series_count -ne 36) {
     throw "Unexpected IdealLoads constant-supply-humidity heating series count: $($summary.series_count)"
@@ -272,7 +291,7 @@ if ($stageSummary.fuel_energy_output_level_policy -ne "conformance for declared 
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
 Assert-Contains -Text $reportText -Pattern "direct_calc_helper_invocation: false" -Description "markdown direct calc helper invocation"
@@ -304,6 +323,11 @@ Assert-Contains -Text $reportText -Pattern "node_output_report_source: ReportPur
 Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedAir after UpdatePurchasedAir" -Description "markdown rate output source"
 Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: conformance for declared no-OA humidity-control ReportPurchasedAir energy rows only" -Description "markdown energy output level policy"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: conformance for declared no-OA humidity-control blank fuel-efficiency rows only" -Description "markdown fuel energy output level policy"
+Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly/monthly/run-period MTR vs Rust aggregated fuel-energy conformance; rust_meter_time_series_comparison=true requested_meters=6" -Description "markdown meter source"
+Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | conformance | meter | monthly | mtr | rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -Description "markdown monthly heating meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictHeatingWater:Facility | conformance | meter | run-period | mtr | rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -Description "markdown run-period heating meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | monthly | mtr | rust-ideal-loads-monthly-facility-meter-from-fuel-energy" -Description "markdown monthly cooling meter row"
+Assert-Contains -Text $reportText -Pattern "| DistrictCooling:Facility | conformance | meter | run-period | mtr | rust-ideal-loads-run-period-facility-meter-from-fuel-energy" -Description "markdown run-period cooling meter row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Latent Heating Rate | conformance" -Description "markdown zone latent heating row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Latent Heating Rate | conformance" -Description "markdown supply latent heating row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Humidity Ratio | conformance" -Description "markdown supply humidity row"
