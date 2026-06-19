@@ -2573,7 +2573,6 @@ fn advance_heat_balance_state_one_timestep_internal(
         surface.outside_face_temperature_c = boundary_balance.temperature_c;
         surface.outside_report_terms = boundary_balance.exterior_report_terms;
     }
-
     for zone in &mut state.zones {
         let previous_temperature_c = zone.mean_air_temperature_c;
         let previous_zone_history_temperature_c =
@@ -3072,7 +3071,6 @@ fn advance_heat_balance_state_one_timestep_internal(
             zone.system_timestep_average_air_storage_report_w = None;
         }
     }
-
     state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
         .as_ref()
         .map(|result| result.inside_surface_iteration_count)
@@ -4224,7 +4222,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
-        | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveHconvProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
@@ -6391,7 +6389,7 @@ fn energyplus_exterior_longwave_terms(
         ground_temperature_c,
     );
     let sky_temperature_k = sky_temperature_c + KELVIN_OFFSET;
-    let air_temperature_k = ground_temperature_c + KELVIN_OFFSET;
+    let air_temperature_k = air_reference_temperature_c + KELVIN_OFFSET;
     let ground_temperature_k = ground_temperature_c + KELVIN_OFFSET;
     let sky_view_factor = surface_sky_view_factor(typed_surface, tilt_rad);
     let ground_view_factor = surface_ground_view_factor(typed_surface, tilt_rad);
@@ -10335,8 +10333,8 @@ mod tests {
         simulate_heat_balance_zone_air_temperatures_internal,
         simulate_heat_balance_zone_air_temperatures_with_weather_records, simulate_schedule_values,
         simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
-        solar_weather_interpolation_weights, surface_area_m2, surface_azimuth_deg,
-        surface_ctf_history_slot_samples, surface_exterior_report_terms,
+        solar_weather_interpolation_weights, surface_air_sky_radiation_split, surface_area_m2,
+        surface_azimuth_deg, surface_ctf_history_slot_samples, surface_exterior_report_terms,
         surface_geometry_summaries, surface_heat_storage_rate_w,
         surface_incident_solar_components_hourly_average_w_per_m2,
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
@@ -10344,8 +10342,9 @@ mod tests {
         surface_inside_convection_heat_gain_rate_per_area_w_per_m2,
         surface_inside_convection_report_coefficient_w_per_m2_k,
         surface_inside_ctf_source_terms_w_per_m2, surface_outside_conduction_flux_w_per_m2,
-        surface_outside_conduction_rate_w, surface_steady_u_value_w_per_m2_k, surface_tilt_deg,
-        update_surface_ctf_history_constants, update_surface_inside_longwave_exchange_probe,
+        surface_outside_conduction_rate_w, surface_sky_view_factor,
+        surface_steady_u_value_w_per_m2_k, surface_tilt_deg, update_surface_ctf_history_constants,
+        update_surface_inside_longwave_exchange_probe,
         update_surface_inside_scriptf_longwave_exchange_probe,
         update_surface_radiant_internal_gain_source_terms,
         update_zone_air_heat_capacities_from_weather_context,
@@ -14449,6 +14448,51 @@ DATA PERIODS
         assert!(terms.air_coefficient_w_per_m2_k.abs() < 1.0e-12);
         assert!(terms.ground_coefficient_w_per_m2_k.abs() < 1.0e-12);
         assert!((terms.net_heat_gain_per_area_w_per_m2(60.0) - expected_gain).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
+    fn exterior_longwave_air_component_uses_air_reference_temperature()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let surface_state = state
+            .surfaces
+            .iter_mut()
+            .find(|surface| surface.surface_name == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing wall test surface"))?;
+        surface_state.outside_face_temperature_c = 30.0;
+        let typed_surface = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing typed wall test surface"))?;
+        let tilt_rad =
+            surface_tilt_deg(typed_surface.surface_type, &typed_surface.vertices).to_radians();
+
+        let terms = energyplus_exterior_longwave_terms(
+            surface_state,
+            typed_surface,
+            360.0,
+            30.0,
+            10.0,
+            20.0,
+            tilt_rad,
+        );
+        let air_split = surface_air_sky_radiation_split(tilt_rad);
+        let expected_air_coefficient = energyplus_linearized_radiation_coefficient_w_per_m2_k(
+            surface_state.thermal_absorptance
+                * surface_sky_view_factor(typed_surface, tilt_rad)
+                * (1.0 - air_split),
+            30.0 + KELVIN_OFFSET,
+            10.0 + KELVIN_OFFSET,
+        );
+
+        assert!((terms.air_coefficient_w_per_m2_k - expected_air_coefficient).abs() < 1.0e-12);
+        assert_eq!(terms.air_temperature_c, 10.0);
+        assert_eq!(terms.ground_temperature_c, 20.0);
 
         Ok(())
     }
