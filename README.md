@@ -162,22 +162,22 @@ tolerance, and code organization.
   with Detailed humidity-control branch rows kept diagnostic proof only
 - limited IdealLoads no-OA Humidistat dehumidification conformance candidate
   gate for declared thermostat, heating/cooling total/sensible/latent rate,
-  supply-air report-rate, ReportPurchasedAir energy/fuel, supply-node
-  temperature/flow/humidity Detailed series, and hourly/monthly/run-period
+  supply-air report-rate, ReportPurchasedAir energy/fuel, paired trace-driven
+  moisture-demand rows, supply-node temperature/flow/humidity Detailed series,
+  and hourly/monthly/run-period
   `DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters in
-  `ideal_loads_humidistat_dehumidification_conformance_candidate_001`, using
-  traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
-  calculation, annual meter rows in this short-run candidate, and broad
-  humidity-control conformance remain outside the claim
+  `ideal_loads_humidistat_dehumidification_conformance_candidate_001`; fully
+  owned moisture-history closure, annual meter rows in this short-run
+  candidate, and broad humidity-control conformance remain outside the claim
 - limited IdealLoads no-OA Humidistat humidification conformance candidate
   gate for declared thermostat, heating/cooling total/sensible/latent rate,
-  supply-air report-rate, ReportPurchasedAir energy/fuel, supply-node
-  temperature/flow/humidity Detailed series, and hourly/monthly/run-period
+  supply-air report-rate, ReportPurchasedAir energy/fuel, paired trace-driven
+  moisture-demand rows, supply-node temperature/flow/humidity Detailed series,
+  and hourly/monthly/run-period
   `DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters in
-  `ideal_loads_humidistat_humidification_conformance_candidate_001`, using
-  traced EnergyPlus moisture-demand proof inputs; humidistat moisture-demand
-  calculation and annual meter rows in this short-run candidate remain outside
-  the claim
+  `ideal_loads_humidistat_humidification_conformance_candidate_001`; fully
+  owned moisture-history closure and annual meter rows in this short-run
+  candidate remain outside the claim
 - limited IdealLoads no-OA full-year Humidistat dehumidification annual facility
   meter conformance candidate for `DistrictHeatingWater:Facility` and
   `DistrictCooling:Facility` in

@@ -9463,9 +9463,9 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     } else if context.constant_supply_humidity_heating_conformance_claim {
         "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
     } else if context.humidistat_dehumidification_conformance_claim {
-        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
+        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, moisture-demand rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
     } else if context.humidistat_humidification_conformance_claim {
-        "conformance no-OA Humidistat humidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
+        "conformance no-OA Humidistat humidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, moisture-demand rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly/monthly/run-period facility meters only"
     } else if context.humidity_annual_facility_meter_conformance_claim {
         "conformance no-OA full-year humidity-control annual IdealLoads facility meter aggregation for declared facility meters only"
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(

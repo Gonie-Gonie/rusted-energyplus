@@ -52,7 +52,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; moisture-demand calculation and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Zone Latent Cooling Rate"
@@ -60,7 +60,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
-support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; moisture-demand calculation and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Sensible Heating Rate"
@@ -68,7 +68,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling sensible report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; broad humidity-control conformance remains outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling sensible report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Sensible Cooling Rate"
@@ -76,7 +76,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
-support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling sensible report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; broad humidity-control conformance remains outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling sensible report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Latent Heating Rate"
@@ -84,7 +84,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
-support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; moisture-demand calculation and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent rate rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Latent Cooling Rate"
@@ -92,7 +92,7 @@ domain = "hvac"
 status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
-support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using EnergyPlus ZoneSysMoistureDemand proof inputs; moisture-demand calculation and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 plus no-OA ConstantSupplyHumidityRatio cooling/heating and Humidistat dehumidification/humidification conformance for declared heating/cooling latent report rows in the four no-OA humidity-control conformance candidates, with Humidistat candidates using trace-driven Rust no-OA ThirdOrder moisture-demand conformance rows in the declared short candidates; fully owned moisture-history closure and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone Ideal Loads Supply Air Total Heating Energy"
@@ -393,18 +393,18 @@ support_boundary = "Diagnostic proof input for source-order zone demand in the n
 [[variable]]
 name = "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_humidistat_humidification_diagnostic_001"
-first_evidence = "ideal_loads_humidistat_humidification_diagnostic_001"
-support_boundary = "Diagnostic proof input for ZoneSysMoistureDemand in the no-OA Humidistat humidification conformance candidate ideal_loads_humidistat_humidification_conformance_candidate_001 and diagnostic fixture; dehumidification also records the paired moisture proof row, while moisture-demand calculation conformance remains outside the claim."
+status = "conformance"
+first_case = "ideal_loads_humidistat_humidification_conformance_candidate_001"
+first_evidence = "ideal_loads_humidistat_humidification_conformance_candidate_001"
+support_boundary = "Tolerance-gated trace-driven Rust no-OA ThirdOrder moisture-demand conformance for the declared short Humidistat humidification and dehumidification candidates; diagnostic fixtures and full-year annual-meter-only candidates retain the row as proof evidence, while fully owned zone moisture history/state and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate"
 domain = "hvac"
-status = "diagnostic"
-first_case = "ideal_loads_humidistat_dehumidification_diagnostic_001"
-first_evidence = "ideal_loads_humidistat_dehumidification_diagnostic_001"
-support_boundary = "Diagnostic proof input for ZoneSysMoistureDemand in the no-OA Humidistat dehumidification fixture; humidification also records the paired moisture proof row, while moisture-demand conformance and broad humidity-control conformance remain outside the claim."
+status = "conformance"
+first_case = "ideal_loads_humidistat_dehumidification_conformance_candidate_001"
+first_evidence = "ideal_loads_humidistat_dehumidification_conformance_candidate_001"
+support_boundary = "Tolerance-gated trace-driven Rust no-OA ThirdOrder moisture-demand conformance for the declared short Humidistat dehumidification and humidification candidates; diagnostic fixtures and full-year annual-meter-only candidates retain the row as proof evidence, while fully owned zone moisture history/state and broad humidity-control conformance remain outside the claim."
 
 [[variable]]
 name = "System Node Humidity Ratio"

@@ -825,33 +825,31 @@ heat-recovery, and broad HVAC behavior remain outside the claim.
 generates the Humidistat dehumidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-dehumidification-conformance/26.1.0/ideal_loads_humidistat_dehumidification_conformance_candidate_001/compare/`.
 That run compares 38 Detailed ESO series plus six MTR facility meter series:
-hourly, monthly, and run-period for both facility meters. The 29 declared ESO
+hourly, monthly, and run-period for both facility meters. The 31 declared ESO
 conformance rows and the six conformance meter rows pass their tolerances, the
-9 diagnostic proof ESO rows pass, and
+7 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
 dehumidification claim for declared heating/cooling rate outputs,
-ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility
-meters; EnergyPlus moisture-demand rows, humidistat schedule-to-moisture-demand
-output rows themselves, fully owned moisture-history closure without EnergyPlus
-trace state, return-node and zone-air-node humidity proof rows, annual meter
-rows, other broader meter frequencies, outdoor-air, economizer, heat-recovery,
-and broad HVAC behavior remain outside the claim.
+ReportPurchasedAir energy/fuel rows, paired trace-driven moisture-demand rows,
+and hourly/monthly/run-period facility meters; fully owned moisture-history
+closure without EnergyPlus trace state, return-node and zone-air-node humidity
+proof rows, annual meter rows, other broader meter frequencies, outdoor-air,
+economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 
 `scripts/dev.cmd compare-ideal-loads-humidistat-humidification-conformance-candidate`
 generates the Humidistat humidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-humidification-conformance/26.1.0/ideal_loads_humidistat_humidification_conformance_candidate_001/compare/`.
 That run compares 38 Detailed ESO series plus six MTR facility meter series:
-hourly, monthly, and run-period for both facility meters. The 29 declared ESO
+hourly, monthly, and run-period for both facility meters. The 31 declared ESO
 conformance rows and the six conformance meter rows pass their tolerances, the
-9 diagnostic proof ESO rows pass, and
+7 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
 humidification claim for declared heating/cooling rate outputs,
-ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility
-meters; EnergyPlus moisture-demand rows, humidistat schedule-to-moisture-demand
-output rows themselves, fully owned moisture-history closure without EnergyPlus
-trace state, return-node and zone-air-node humidity proof rows, annual meter
-rows, other broader meter frequencies, outdoor-air, economizer, heat-recovery,
-and broad HVAC behavior remain outside the claim.
+ReportPurchasedAir energy/fuel rows, paired trace-driven moisture-demand rows,
+and hourly/monthly/run-period facility meters; fully owned moisture-history
+closure without EnergyPlus trace state, return-node and zone-air-node humidity
+proof rows, annual meter rows, other broader meter frequencies, outdoor-air,
+economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 
 ## Claim Requirements
 
