@@ -154,6 +154,20 @@ const IDEAL_LOADS_HUMIDITY_REPORT_ENERGY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA humidity-control ReportPurchasedAir energy rows only";
 const IDEAL_LOADS_HUMIDITY_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA humidity-control blank fuel-efficiency rows only";
+const IDEAL_LOADS_HUMIDITY_RATE_CONFORMANCE_OUTPUTS: &[&str] = &[
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_HEATING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+];
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_constant_fuel_efficiency_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
@@ -722,6 +736,16 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         }
     }
     if manifest_is_humidity_report_purchased_air_conformance_candidate(manifest) {
+        for expected_output in IDEAL_LOADS_HUMIDITY_RATE_CONFORMANCE_OUTPUTS {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable.eq_ignore_ascii_case(expected_output)
+                    && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads humidity-control rate conformance candidate is missing conformance output {expected_output}"
+                ));
+            }
+        }
         for expected_output in IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS {
             if !manifest.outputs.iter().any(|output| {
                 output.variable.eq_ignore_ascii_case(expected_output)
@@ -8174,13 +8198,13 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     } else if context.constant_shr_conformance_claim {
         "conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only"
     } else if context.constant_supply_humidity_cooling_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
+        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.constant_supply_humidity_heating_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
+        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.humidistat_dehumidification_conformance_claim {
-        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
+        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if context.humidistat_humidification_conformance_claim {
-        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
+        "conformance no-OA Humidistat humidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only"
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
         context.manifest,
     ) {

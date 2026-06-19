@@ -228,12 +228,12 @@ rows.
 
 `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001` promotes
 the matching no-OA `ConstantSupplyHumidityRatio` cooling lane for declared
-thermostat, cooling total/sensible/latent rate, supply-air cooling report-rate,
+thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate,
 ReportPurchasedAir energy/fuel rows, supply-node temperature/mass-flow/humidity
 rows, and hourly `DistrictHeatingWater:Facility`/`DistrictCooling:Facility`
-meters. It uses the EnergyPlus minimum cooling supply humidity ratio, allows the
-source's small latent-heating diagnostic report rows when heating availability
-is on during cooling, and keeps the same return-node mixed-air and
+meters. It uses the EnergyPlus minimum cooling supply humidity ratio, preserves
+the source's small opposite-side latent-heating report rows when heating
+availability is on during cooling, and keeps the same return-node mixed-air and
 EPW barometric-pressure saturation proof path.
 The original `ideal_loads_constant_supply_humidity_diagnostic_001` remains
 available as non-claim regression/proof evidence for the broader diagnostic
@@ -241,7 +241,7 @@ output set.
 
 `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
 promotes the heating-side no-OA `ConstantSupplyHumidityRatio` lane for declared
-thermostat, heating total/sensible/latent rate, supply-air heating report-rate,
+thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate,
 ReportPurchasedAir energy/fuel rows, supply-node temperature/mass-flow/humidity
 rows, and hourly `DistrictHeatingWater:Facility`/`DistrictCooling:Facility`
 meters. It uses the EnergyPlus maximum heating supply humidity ratio in heating
@@ -252,9 +252,9 @@ as non-claim regression/proof evidence for the broader diagnostic output set.
 
 `ideal_loads_humidistat_dehumidification_conformance_candidate_001` promotes
 the no-OA Humidistat dehumidification lane for declared thermostat,
-cooling total/sensible/latent rate, supply-air cooling report-rate, and
-supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
-energy/fuel rows and hourly `DistrictHeatingWater:Facility`/
+heating/cooling total/sensible/latent rate, supply-air heating/cooling
+report-rate, and supply-node temperature/mass-flow/humidity rows, plus
+ReportPurchasedAir energy/fuel rows and hourly `DistrictHeatingWater:Facility`/
 `DistrictCooling:Facility` meters. The compare path reads
 EnergyPlus `ZoneSysMoistureDemand` proof rows for the humidifying and
 dehumidifying moisture transfer rates, uses the same-timestamp return node as
@@ -266,9 +266,9 @@ non-claim regression/proof evidence for the broader diagnostic output set.
 
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 matching no-OA Humidistat humidification lane for declared thermostat,
-heating total/sensible/latent rate, supply-air heating report-rate, and
-supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
-energy/fuel rows and hourly `DistrictHeatingWater:Facility`/
+heating/cooling total/sensible/latent rate, supply-air heating/cooling
+report-rate, and supply-node temperature/mass-flow/humidity rows, plus
+ReportPurchasedAir energy/fuel rows and hourly `DistrictHeatingWater:Facility`/
 `DistrictCooling:Facility` meters. It reads the EnergyPlus
 humidifying moisture proof row into `ZoneSysEnergyDemand`, lets the
 humidification mass-flow request exceed the sensible heating flow when needed,
@@ -612,17 +612,17 @@ outside those cases, facility meter rows remain diagnostic. The no-OA
 cooling total/sensible/latent rows and supply-node humidity ratio have narrow
 conformance evidence in `ideal_loads_constant_shr_conformance_001`; its
 return-node and zone-air-node humidity proof rows remain diagnostic. The no-OA
-`ConstantSupplyHumidityRatio` cooling zone/supply latent and sensible rows,
+`ConstantSupplyHumidityRatio` cooling fixture heating/cooling zone/supply latent and sensible rows,
 ReportPurchasedAir energy/fuel rows, supply-node humidity ratio, and hourly
 facility meter rows have narrow conformance evidence in
 `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`; its
-return-node humidity, zone-air humidity, opposite-side rate rows, broader meter
+return-node humidity, zone-air humidity, broader meter
 frequencies, and broad meter behavior remain diagnostic. The no-OA
-`ConstantSupplyHumidityRatio` heating zone/supply latent and sensible rows,
+`ConstantSupplyHumidityRatio` heating fixture heating/cooling zone/supply latent and sensible rows,
 ReportPurchasedAir energy/fuel rows, supply-node humidity ratio, and hourly
 facility meter rows have narrow conformance evidence in
 `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`; its
-cooling, return-node humidity, zone-air humidity, broader meter frequencies,
+return-node humidity, zone-air humidity, broader meter frequencies,
 and broad meter behavior remain diagnostic.
 The outdoor-air mass-flow, standard-density volume-flow, no-humidity
 outdoor-air report-rate, supply-air state, and mixed-air state rows have
@@ -782,11 +782,12 @@ behavior remain outside this claim.
 generates the ConstantSupplyHumidityRatio cooling conformance evidence set under
 `.runtime/ideal-loads-constant-supply-humidity-cooling-conformance/26.1.0/ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001/compare/`.
 That run compares 36 Detailed ESO series plus two hourly MTR facility meter
-series. The 23 declared ESO conformance rows and the two hourly conformance
-meter rows pass their tolerances, the 13 diagnostic proof ESO rows pass, and
+series. The 29 declared ESO conformance rows and the two hourly conformance
+meter rows pass their tolerances, the 7 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA
-ConstantSupplyHumidityRatio cooling claim for declared outputs including
-ReportPurchasedAir energy/fuel rows and hourly facility meters; Humidistat,
+ConstantSupplyHumidityRatio cooling claim for declared heating/cooling rate
+outputs, ReportPurchasedAir energy/fuel rows, and hourly facility meters;
+Humidistat,
 return-node and zone-air-node humidity proof rows, broader meter frequencies,
 outdoor-air, economizer, heat-recovery, and broad HVAC behavior remain outside
 the claim.
@@ -795,11 +796,12 @@ the claim.
 generates the ConstantSupplyHumidityRatio heating conformance evidence set under
 `.runtime/ideal-loads-constant-supply-humidity-heating-conformance/26.1.0/ideal_loads_constant_supply_humidity_heating_conformance_candidate_001/compare/`.
 That run compares 36 Detailed ESO series plus two hourly MTR facility meter
-series. The 23 declared ESO conformance rows and the two hourly conformance
-meter rows pass their tolerances, the 13 diagnostic proof ESO rows pass, and
+series. The 29 declared ESO conformance rows and the two hourly conformance
+meter rows pass their tolerances, the 7 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA
-ConstantSupplyHumidityRatio heating claim for declared outputs including
-ReportPurchasedAir energy/fuel rows and hourly facility meters; Humidistat,
+ConstantSupplyHumidityRatio heating claim for declared heating/cooling rate
+outputs, ReportPurchasedAir energy/fuel rows, and hourly facility meters;
+Humidistat,
 return-node and zone-air-node humidity proof rows, broader meter frequencies,
 outdoor-air, economizer, heat-recovery, and broad HVAC behavior remain outside
 the claim.
@@ -808,11 +810,12 @@ the claim.
 generates the Humidistat dehumidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-dehumidification-conformance/26.1.0/ideal_loads_humidistat_dehumidification_conformance_candidate_001/compare/`.
 That run compares 38 Detailed ESO series plus two hourly MTR facility meter
-series. The 23 declared ESO conformance rows and the two hourly conformance
-meter rows pass their tolerances, the 15 diagnostic proof ESO rows pass, and
+series. The 29 declared ESO conformance rows and the two hourly conformance
+meter rows pass their tolerances, the 9 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
-dehumidification claim for declared outputs including ReportPurchasedAir
-energy/fuel rows and hourly facility meters; EnergyPlus moisture-demand rows,
+dehumidification claim for declared heating/cooling rate outputs,
+ReportPurchasedAir energy/fuel rows, and hourly facility meters; EnergyPlus
+moisture-demand rows,
 humidistat schedule-to-moisture-demand calculation, return-node and
 zone-air-node humidity proof rows, broader meter frequencies, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
@@ -821,11 +824,12 @@ economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 generates the Humidistat humidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-humidification-conformance/26.1.0/ideal_loads_humidistat_humidification_conformance_candidate_001/compare/`.
 That run compares 38 Detailed ESO series plus two hourly MTR facility meter
-series. The 23 declared ESO conformance rows and the two hourly conformance
-meter rows pass their tolerances, the 15 diagnostic proof ESO rows pass, and
+series. The 29 declared ESO conformance rows and the two hourly conformance
+meter rows pass their tolerances, the 9 diagnostic proof ESO rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
-humidification claim for declared outputs including ReportPurchasedAir
-energy/fuel rows and hourly facility meters; EnergyPlus moisture-demand rows,
+humidification claim for declared heating/cooling rate outputs,
+ReportPurchasedAir energy/fuel rows, and hourly facility meters; EnergyPlus
+moisture-demand rows,
 humidistat schedule-to-moisture-demand calculation, return-node and
 zone-air-node humidity proof rows, broader meter frequencies, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.

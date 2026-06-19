@@ -335,11 +335,8 @@ Assert-Contains -Path "README.md" -Pattern "declared Sensible and Enthalpy candi
 Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "no-OA/no-limit and numeric finite-limit IdealLoads sensible conformance plus no-OA ReportPurchasedAir non-fuel energy conformance, no-OA blank fuel-efficiency conformance, no-OA constant Schedule:Constant fuel-efficiency conformance, no-OA all-days Schedule:Compact fuel-efficiency conformance, no-OA ConstantSensibleHeatRatio cooling, ConstantSupplyHumidityRatio cooling/heating, Humidistat dehumidification/humidification, no-OA hourly DistrictHeatingWater/DistrictCooling facility meter conformance in the dedicated meter and humidity-control candidates plus monthly/annual/run-period DistrictHeatingWater/DistrictCooling facility meter conformance, and outdoor-air Flow/Zone/Flow/Person/Flow/Person OccupancySchedule DCV/Flow/Person CO2Setpoint DCV/Flow/Area/AirChanges/Hour/Sum/Maximum/DifferentialDryBulb/DifferentialEnthalpy economizer and Sensible/Enthalpy heat-recovery conformance" -Description "IdealLoads current-status conformance boundary"
 Assert-Contains -Path "docs\src\current\current-status.md" -Pattern "outdoor-air methods beyond Flow/Zone/Flow/Person/Flow/Person OccupancySchedule DCV/Flow/Person CO2Setpoint DCV/Flow/Area/AirChanges/Hour/Sum/Maximum/DifferentialDryBulb/DifferentialEnthalpy economizer and declared Sensible/Enthalpy heat recovery" -Description "IdealLoads current-status broad non-claim boundary"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "ideal_loads_no_oa_sensible_conformance_001, no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance" -Description "IdealLoads variable coverage finite-limit boundary"
-Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA ConstantSupplyHumidityRatio cooling conformance for ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001" -Description "IdealLoads constant-supply-humidity variable coverage claim"
-Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA ConstantSupplyHumidityRatio heating conformance for ideal_loads_constant_supply_humidity_heating_conformance_candidate_001" -Description "IdealLoads constant-supply-humidity heating variable coverage claim"
-Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA Humidistat dehumidification conformance for ideal_loads_humidistat_dehumidification_conformance_candidate_001" -Description "IdealLoads humidistat dehumidification variable coverage claim"
+Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA ConstantSupplyHumidityRatio cooling/heating plus Humidistat dehumidification/humidification conformance for declared heating/cooling rate rows in the four no-OA humidity-control conformance candidates" -Description "IdealLoads humidity-control variable coverage rate claim"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "moisture-demand calculation and broad humidity-control conformance remain outside the claim" -Description "IdealLoads humidity variable coverage boundary"
-Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "no-OA Humidistat humidification conformance for ideal_loads_humidistat_humidification_conformance_candidate_001" -Description "IdealLoads humidistat humidification variable coverage claim"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "moisture-demand calculation conformance remains outside the claim" -Description "IdealLoads humidification moisture-demand boundary"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "Tolerance-gated no-OA ReportPurchasedAir rate-to-TimeStepSysSec plus OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001" -Description "IdealLoads report-energy variable coverage claim"
 Assert-Contains -Path "specs\variable_coverage.toml" -Pattern "all-days Schedule:Compact fuel-efficiency conformance in ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001" -Description "IdealLoads blank, constant, and non-constant fuel-efficiency variable coverage claim"
@@ -552,6 +549,30 @@ Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_humidistat_humi
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_humidistat_humidification_conformance_candidate_001\case.toml" -Key "ZONE ONE INLET" -Variable "System Node Humidity Ratio" -Level "conformance" -Description "IdealLoads humidistat humidification supply humidity"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_humidistat_humidification_conformance_candidate_001\case.toml" -Key "ZONE ONE" -Variable "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate" -Level "diagnostic" -Description "IdealLoads humidistat humidification moisture demand diagnostic"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_humidistat_humidification_conformance_candidate_001\case.toml" -Key "ZONE ONE RETURN" -Variable "System Node Humidity Ratio" -Level "diagnostic" -Description "IdealLoads humidistat humidification return humidity diagnostic"
+foreach ($humidityRateCase in @(
+    "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001",
+    "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001",
+    "ideal_loads_humidistat_dehumidification_conformance_candidate_001",
+    "ideal_loads_humidistat_humidification_conformance_candidate_001"
+)) {
+    $casePath = "data\conformance_cases\$humidityRateCase\case.toml"
+    foreach ($rateVariable in @(
+        "Zone Ideal Loads Zone Total Heating Rate",
+        "Zone Ideal Loads Zone Total Cooling Rate",
+        "Zone Ideal Loads Zone Sensible Heating Rate",
+        "Zone Ideal Loads Zone Sensible Cooling Rate",
+        "Zone Ideal Loads Zone Latent Heating Rate",
+        "Zone Ideal Loads Zone Latent Cooling Rate",
+        "Zone Ideal Loads Supply Air Sensible Heating Rate",
+        "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+        "Zone Ideal Loads Supply Air Latent Heating Rate",
+        "Zone Ideal Loads Supply Air Latent Cooling Rate",
+        "Zone Ideal Loads Supply Air Total Heating Rate",
+        "Zone Ideal Loads Supply Air Total Cooling Rate"
+    )) {
+        Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable $rateVariable -Level "conformance" -Description "$humidityRateCase declared rate row $rateVariable"
+    }
+}
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Outdoor Air Mass Flow Rate" -Level "conformance" -Description "IdealLoads OA Flow/Zone mass flow"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Mixed Air Humidity Ratio" -Level "conformance" -Description "IdealLoads OA Flow/Zone mixed humidity"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Active Time" -Level "diagnostic" -Description "IdealLoads OA Flow/Zone inactive heat recovery diagnostic"

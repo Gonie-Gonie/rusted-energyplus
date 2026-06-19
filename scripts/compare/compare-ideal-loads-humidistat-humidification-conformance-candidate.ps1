@@ -147,15 +147,15 @@ if ($summary.samples -le 0) {
     throw "Expected positive detailed sample count"
 }
 $conformanceRows = @($summary.series | Where-Object { $_.level -eq "conformance" })
-if ($conformanceRows.Count -ne 23) {
-    throw "Expected 23 conformance-level output rows, found $($conformanceRows.Count)"
+if ($conformanceRows.Count -ne 29) {
+    throw "Expected 29 conformance-level output rows, found $($conformanceRows.Count)"
 }
 if (@($conformanceRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All conformance-level humidistat-humidification rows must pass"
 }
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 15) {
-    throw "Expected 15 diagnostic proof rows, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 9) {
+    throw "Expected 9 diagnostic proof rows, found $($diagnosticRows.Count)"
 }
 if (@($diagnosticRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All diagnostic proof rows must pass"
@@ -299,7 +299,7 @@ if ($stageSummary.fuel_energy_output_level_policy -ne "conformance for declared 
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA Humidistat humidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA Humidistat humidification IdealLoads branch for declared heating/cooling rate rows, supply-node rows, ReportPurchasedAir energy rows, blank fuel-efficiency rows, and hourly facility meters only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
 Assert-Contains -Text $reportText -Pattern "direct_calc_helper_invocation: false" -Description "markdown direct calc helper invocation"

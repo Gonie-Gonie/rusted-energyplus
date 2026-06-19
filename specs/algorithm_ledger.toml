@@ -208,11 +208,17 @@ status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
 proof_variables = [
+  "Zone Ideal Loads Zone Total Heating Rate",
   "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Zone Sensible Heating Rate",
   "Zone Ideal Loads Zone Sensible Cooling Rate",
+  "Zone Ideal Loads Zone Latent Heating Rate",
   "Zone Ideal Loads Zone Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Sensible Heating Rate",
   "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+  "Zone Ideal Loads Supply Air Latent Heating Rate",
   "Zone Ideal Loads Supply Air Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Heating Rate",
   "Zone Ideal Loads Supply Air Total Cooling Rate",
   "System Node Temperature",
   "System Node Mass Flow Rate",
@@ -247,11 +253,17 @@ status = "conformance"
 first_case = "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001"
 first_evidence = "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001"
 proof_variables = [
+  "Zone Ideal Loads Zone Total Heating Rate",
   "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Zone Sensible Heating Rate",
   "Zone Ideal Loads Zone Sensible Cooling Rate",
+  "Zone Ideal Loads Zone Latent Heating Rate",
   "Zone Ideal Loads Zone Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Sensible Heating Rate",
   "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+  "Zone Ideal Loads Supply Air Latent Heating Rate",
   "Zone Ideal Loads Supply Air Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Heating Rate",
   "Zone Ideal Loads Supply Air Total Cooling Rate",
   "System Node Temperature",
   "System Node Mass Flow Rate",
@@ -270,7 +282,7 @@ proof_variables = [
   "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-constant-supply-humidity-cooling-conformance"
-support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling conformance for declared thermostat, cooling total/sensible/latent rate, supply-air cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001. Heating-side rate rows, return-node and zone-air-node proof rows, broader meter frequencies, humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio cooling conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001. Return-node and zone-air-node proof rows, broader meter frequencies, humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_constant_supply_humidity_heating_control"
@@ -296,11 +308,17 @@ first_case = "ideal_loads_constant_supply_humidity_heating_conformance_candidate
 first_evidence = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
 proof_variables = [
   "Zone Ideal Loads Zone Total Heating Rate",
+  "Zone Ideal Loads Zone Total Cooling Rate",
   "Zone Ideal Loads Zone Sensible Heating Rate",
+  "Zone Ideal Loads Zone Sensible Cooling Rate",
   "Zone Ideal Loads Zone Latent Heating Rate",
+  "Zone Ideal Loads Zone Latent Cooling Rate",
   "Zone Ideal Loads Supply Air Sensible Heating Rate",
+  "Zone Ideal Loads Supply Air Sensible Cooling Rate",
   "Zone Ideal Loads Supply Air Latent Heating Rate",
+  "Zone Ideal Loads Supply Air Latent Cooling Rate",
   "Zone Ideal Loads Supply Air Total Heating Rate",
+  "Zone Ideal Loads Supply Air Total Cooling Rate",
   "System Node Temperature",
   "System Node Humidity Ratio",
   "System Node Mass Flow Rate",
@@ -318,7 +336,7 @@ proof_variables = [
   "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-constant-supply-humidity-heating-conformance"
-support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio heating conformance for declared thermostat, heating total/sensible/latent rate, supply-air heating report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_constant_supply_humidity_heating_conformance_candidate_001. Cooling rate proof rows in the heating case, return-node and zone-air-node proof rows, broader meter frequencies, humidistat, moisture-demand branches, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidity behavior, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSupplyHumidityRatio heating conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_constant_supply_humidity_heating_conformance_candidate_001. Return-node and zone-air-node proof rows, broader meter frequencies, humidistat, moisture-demand branches, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidity behavior, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_humidistat_dehumidification_control"
@@ -350,11 +368,17 @@ energyplus_source = [
   proof_variables = [
     "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
     "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
+    "Zone Ideal Loads Zone Total Heating Rate",
     "Zone Ideal Loads Zone Total Cooling Rate",
+    "Zone Ideal Loads Zone Sensible Heating Rate",
     "Zone Ideal Loads Zone Sensible Cooling Rate",
+    "Zone Ideal Loads Zone Latent Heating Rate",
     "Zone Ideal Loads Zone Latent Cooling Rate",
+    "Zone Ideal Loads Supply Air Sensible Heating Rate",
     "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+    "Zone Ideal Loads Supply Air Latent Heating Rate",
     "Zone Ideal Loads Supply Air Latent Cooling Rate",
+    "Zone Ideal Loads Supply Air Total Heating Rate",
     "Zone Ideal Loads Supply Air Total Cooling Rate",
     "System Node Humidity Ratio",
     "System Node Mass Flow Rate",
@@ -372,7 +396,7 @@ energyplus_source = [
     "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
   ]
   claim_level = "limited-ideal-loads-no-oa-humidistat-dehumidification-conformance"
-  support_boundary = "Tolerance-gated no-OA Humidistat dehumidification conformance for declared thermostat, cooling total/sensible/latent rate, supply-air cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_humidistat_dehumidification_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are traced diagnostic proof inputs; humidistat schedule-to-moisture-demand calculation, humidistat humidification, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, broader meter frequencies, and broad humidity-control conformance remain outside the claim."
+  support_boundary = "Tolerance-gated no-OA Humidistat dehumidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_humidistat_dehumidification_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are traced diagnostic proof inputs; humidistat schedule-to-moisture-demand calculation, humidistat humidification, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, broader meter frequencies, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_humidistat_humidification_control"
@@ -404,11 +428,17 @@ rust_target = [
   proof_variables = [
     "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
     "Zone Ideal Loads Zone Total Heating Rate",
+    "Zone Ideal Loads Zone Total Cooling Rate",
     "Zone Ideal Loads Zone Sensible Heating Rate",
+    "Zone Ideal Loads Zone Sensible Cooling Rate",
     "Zone Ideal Loads Zone Latent Heating Rate",
+    "Zone Ideal Loads Zone Latent Cooling Rate",
     "Zone Ideal Loads Supply Air Sensible Heating Rate",
+    "Zone Ideal Loads Supply Air Sensible Cooling Rate",
     "Zone Ideal Loads Supply Air Latent Heating Rate",
+    "Zone Ideal Loads Supply Air Latent Cooling Rate",
     "Zone Ideal Loads Supply Air Total Heating Rate",
+    "Zone Ideal Loads Supply Air Total Cooling Rate",
     "System Node Humidity Ratio",
     "System Node Mass Flow Rate",
     "Zone Ideal Loads Supply Air Total Heating Energy",
@@ -425,7 +455,7 @@ rust_target = [
     "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
   ]
   claim_level = "limited-ideal-loads-no-oa-humidistat-humidification-conformance"
-  support_boundary = "Tolerance-gated no-OA Humidistat humidification conformance for declared thermostat, heating total/sensible/latent rate, supply-air heating report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_humidistat_humidification_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are traced diagnostic proof inputs; humidistat schedule-to-moisture-demand calculation, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, broader meter frequencies, and broad humidity-control conformance remain outside the claim."
+  support_boundary = "Tolerance-gated no-OA Humidistat humidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly facility meter rows in ideal_loads_humidistat_humidification_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are traced diagnostic proof inputs; humidistat schedule-to-moisture-demand calculation, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, broader meter frequencies, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"

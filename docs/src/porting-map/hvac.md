@@ -279,17 +279,17 @@ behavior, and broad humidity-control conformance remain outside this claim.
 
 `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`
 promotes the no-OA `ConstantSupplyHumidityRatio` cooling lane for declared
-thermostat setpoints, cooling total/sensible/latent rate rows, supply-air
-cooling report rows, ReportPurchasedAir energy/fuel rows, and supply-node
-temperature/mass-flow/humidity rows. It reuses the diagnostic fixture IDF and
-promotes only the hourly `DistrictHeatingWater:Facility` and
-`DistrictCooling:Facility` meters from the meter side. It keeps heating rate
-rows, return-node and zone-air-node humidity rows, broader meter frequencies,
-and broad meter behavior as diagnostic proof only.
+thermostat setpoints, heating/cooling total/sensible/latent rate rows,
+supply-air heating/cooling report rows, ReportPurchasedAir energy/fuel rows,
+and supply-node temperature/mass-flow/humidity rows. It reuses the diagnostic
+fixture IDF and promotes only the hourly `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` meters from the meter side. It keeps return-node and
+zone-air-node humidity rows, broader meter frequencies, and broad meter
+behavior as diagnostic proof only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-36 Detailed ESO series with 23 conformance rows and 13 diagnostic proof rows,
+36 Detailed ESO series with 29 conformance rows and 7 diagnostic proof rows,
 plus two hourly conformance meter rows.
 Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
 broad humidity-control conformance remain outside the claim.
@@ -298,17 +298,17 @@ broad humidity-control conformance remain outside the claim.
 
 `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
 promotes the no-OA `ConstantSupplyHumidityRatio` heating lane for declared
-thermostat setpoints, heating total/sensible/latent rate rows, supply-air
-heating report rows, ReportPurchasedAir energy/fuel rows, and supply-node
-temperature/mass-flow/humidity rows. It reuses the diagnostic fixture IDF and
-promotes only the hourly `DistrictHeatingWater:Facility` and
-`DistrictCooling:Facility` meters from the meter side. It keeps cooling rate
-rows, return-node and zone-air-node humidity rows, broader meter frequencies,
-and broad meter behavior as diagnostic proof only.
+thermostat setpoints, heating/cooling total/sensible/latent rate rows,
+supply-air heating/cooling report rows, ReportPurchasedAir energy/fuel rows,
+and supply-node temperature/mass-flow/humidity rows. It reuses the diagnostic
+fixture IDF and promotes only the hourly `DistrictHeatingWater:Facility` and
+`DistrictCooling:Facility` meters from the meter side. It keeps return-node and
+zone-air-node humidity rows, broader meter frequencies, and broad meter
+behavior as diagnostic proof only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-36 Detailed ESO series with 23 conformance rows and 13 diagnostic proof rows,
+36 Detailed ESO series with 29 conformance rows and 7 diagnostic proof rows,
 plus two hourly conformance meter rows.
 Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
 broad humidity-control conformance remain outside the claim.
@@ -317,17 +317,17 @@ broad humidity-control conformance remain outside the claim.
 
 `ideal_loads_humidistat_dehumidification_conformance_candidate_001` promotes
 the no-OA `Humidistat` dehumidification lane for declared thermostat setpoints,
-cooling total/sensible/latent rate rows, supply-air cooling report rows, and
-supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
-energy/fuel rows. It reuses the diagnostic fixture IDF and keeps EnergyPlus
-moisture-demand rows, heating rate rows, return-node and zone-air-node humidity
+heating/cooling total/sensible/latent rate rows, supply-air heating/cooling
+report rows, and supply-node temperature/mass-flow/humidity rows, plus
+ReportPurchasedAir energy/fuel rows. It reuses the diagnostic fixture IDF and
+keeps EnergyPlus moisture-demand rows, return-node and zone-air-node humidity
 rows, broader meter frequencies, and broad meter behavior as diagnostic proof
 only; the hourly `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-38 Detailed ESO series with 23 conformance rows and 15 diagnostic proof rows,
+38 Detailed ESO series with 29 conformance rows and 9 diagnostic proof rows,
 plus two hourly conformance meter rows. Humidistat
 schedule-to-moisture-demand calculation, outdoor-air humidity, finite-limit
 humidity-control behavior, and broad humidity-control conformance remain
@@ -337,17 +337,17 @@ outside the claim.
 
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 no-OA `Humidistat` humidification lane for declared thermostat setpoints,
-heating total/sensible/latent rate rows, supply-air heating report rows, and
-supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
-energy/fuel rows. It reuses the diagnostic fixture IDF and keeps EnergyPlus
-moisture-demand rows, cooling rate rows, return-node and zone-air-node humidity
+heating/cooling total/sensible/latent rate rows, supply-air heating/cooling
+report rows, and supply-node temperature/mass-flow/humidity rows, plus
+ReportPurchasedAir energy/fuel rows. It reuses the diagnostic fixture IDF and
+keeps EnergyPlus moisture-demand rows, return-node and zone-air-node humidity
 rows, broader meter frequencies, and broad meter behavior as diagnostic proof
 only; the hourly `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-38 Detailed ESO series with 23 conformance rows and 15 diagnostic proof rows,
+38 Detailed ESO series with 29 conformance rows and 9 diagnostic proof rows,
 plus two hourly conformance meter rows. Humidistat
 schedule-to-moisture-demand calculation, outdoor-air humidity, finite-limit
 humidity-control behavior, and broad humidity-control conformance remain
