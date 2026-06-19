@@ -312,9 +312,9 @@ The current public scope includes:
   calculation kept diagnostic proof only
 - limited IdealLoads outdoor-air `Flow/Zone` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, and mixed-air state
-  Detailed series, with inactive economizer and inactive heat-recovery rows
-  kept diagnostic-only
+  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series, with inactive economizer and
+  inactive heat-recovery active-time rows kept diagnostic-only
 - limited IdealLoads outdoor-air `Flow/Person` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
   sensible/latent/total report rates, supply-air state, and mixed-air state

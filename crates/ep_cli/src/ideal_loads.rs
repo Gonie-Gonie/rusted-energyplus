@@ -1159,14 +1159,13 @@ const OUTDOOR_AIR_CONFORMANCE_VARIABLES: &[&str] = &[
     ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO,
 ];
 
-const OUTDOOR_AIR_HEAT_RECOVERY_CONFORMANCE_VARIABLES: &[&str] = &[
+const OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES: &[&str] = &[
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE,
-    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
 ];
 
 fn manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest: &ConformanceCase) -> bool {
@@ -1533,7 +1532,10 @@ fn outdoor_air_conformance_variable_for_manifest(
         || (manifest_allows_outdoor_air_active_economizer_conformance_manifest(manifest)
             && variable == ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME)
         || (manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(manifest)
-            && OUTDOOR_AIR_HEAT_RECOVERY_CONFORMANCE_VARIABLES.contains(&variable))
+            && (OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable)
+                || variable == ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME))
+        || (manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest)
+            && OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable))
 }
 
 fn build_outdoor_air_design_flow_context<'a>(
