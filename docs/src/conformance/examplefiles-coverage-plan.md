@@ -129,9 +129,11 @@ Current v0.33 official dynamic heat-balance evidence:
   all-CTF analytical surface-first, and third-order zone-air diagnostic probe
   lanes for structural bottleneck isolation
 - broad probe lanes remain `comparison_class=diagnostic-only` and
-  `conformance_claim=false`; only the declared floor `Surface Heat Storage
-  Rate` and `Surface Heat Storage Rate per Area` rows are promoted in the
-  candidate report, while broad storage diagnostics remain outside the claim
+  `conformance_claim=false`; the candidate report promotes declared
+  roof/wall/floor surface conduction, conduction per-area rows, and the
+  floor `Surface Heat Storage Rate` / `Surface Heat Storage Rate per Area`
+  rows, while aggregate conduction, radiation, solar, convection, and broad
+  storage diagnostics remain outside the claim
 - `official-dynamic-heat-balance-compat-candidate`
 - `official-dynamic-heat-balance-diagnostic`
 - `official-dynamic-heat-balance-all-ctf-probe`
