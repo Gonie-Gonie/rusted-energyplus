@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 103 tracked variables, 84 conformance variables, 13
+  output-variable scope: 106 tracked variables, 87 conformance variables, 13
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -44,9 +44,10 @@ tolerance, and code organization.
 - no-mass adiabatic surface conduction rate/per-area conformance for the
   declared `surface_temperature_nomass_001` hourly series
 - official `1ZoneUncontrolled` dynamic heat-balance conformance gate for
-  declared weather, zone-air, surface temperature, and surface conduction
-  hourly series in the compatibility-candidate lane, with floor storage kept as
-  diagnostic-only evidence
+  declared weather/rain-status, zone-air, surface temperature, surface
+  conduction, exact-zero named wall/roof sky/ground diffuse incident solar,
+  zone opaque aggregate conduction, and floor storage hourly series in the
+  compatibility-candidate lane
 - official `1ZoneUncontrolled` dynamic heat-balance diagnostic report for
   broader run-period-filtered zone temperature, surface conduction, and
   diagnostic decomposition deltas; this broad probe remains explicitly
@@ -325,8 +326,9 @@ tolerance, and code organization.
   `surface_temperature_nomass_001` series and named official
   `1ZoneUncontrolled` dynamic candidate surfaces, including the declared floor
   `Surface Heat Storage Rate` / `Surface Heat Storage Rate per Area` rows and
-  the declared zone opaque surface inside/outside conduction aggregate rows
-  under dedicated storage tolerances; radiation, solar, and broad CTF
+  the declared zone opaque surface inside/outside conduction aggregate rows,
+  plus exact-zero named wall/roof sky/ground diffuse incident solar rows under
+  dedicated storage/flux tolerances; nonzero solar, radiation, and broad CTF
   diagnostics are not promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance

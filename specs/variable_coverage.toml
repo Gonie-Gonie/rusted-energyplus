@@ -767,6 +767,30 @@ first_evidence = "weather_fields_001"
 support_boundary = "Tolerance-gated time-series conformance for the weather case and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate."
 
 [[variable]]
+name = "Site Rain Status"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic rain-status alignment for the declared Environment row only; broad precipitation, wet-surface convection, and weather processor compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero sky-diffuse incident solar per-area rows only; nonzero Perez sky diffuse, total/beam solar, fenestration, and broad solar/radiation compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero ground-diffuse incident solar per-area rows only; nonzero ground-reflected solar, total/beam solar, fenestration, and broad solar/radiation compatibility remain outside the claim."
+
+[[variable]]
 name = "System Node Mass Flow Rate"
 domain = "hvac"
 status = "conformance"

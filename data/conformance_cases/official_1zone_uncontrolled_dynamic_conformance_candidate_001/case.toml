@@ -7,10 +7,11 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "Expected status is pass for conformance-level variables in the compatibility-candidate lane.",
-  "This candidate gates the promotion variables, including the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated storage tolerances.",
+  "This candidate gates the promotion variables, including rain-status weather alignment, exact-zero named wall/roof sky and ground diffuse incident solar rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated storage tolerances.",
   "Diagnostic probe algorithms are not eligible for this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
   "The v0.26 planned official dynamic boundary is promoted here after static, weather, internal convective gain, warmup, and selected dynamic heat-balance evidence pass.",
   "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
+  "Broad nonzero solar, exterior radiation, exterior convection, and fenestration compatibility remain outside this conformance claim.",
 ]
 
 [manifest_v2]
@@ -61,6 +62,15 @@ top_rmse_sorted = true
 [[outputs]]
 key = "Environment"
 variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Rain Status"
 frequency = "hourly"
 class = "weather"
 source = "eso"
@@ -367,6 +377,96 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
 source = "eso"

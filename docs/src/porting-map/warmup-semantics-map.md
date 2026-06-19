@@ -45,11 +45,12 @@ convergence parity claim.
 Official `1ZoneUncontrolled` dynamic outputs are split between a broad
 diagnostic tracker and the promoted compatibility candidate.
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` now uses
-`conformance_claim=true` only for the declared weather, zone-air,
-face-temperature, conduction, floor Surface Heat Storage Rate, and floor
-Surface Heat Storage Rate per Area variables. The broad diagnostic case remains
-`conformance_claim=false`, and other storage/radiation/solar/convection
-diagnostics must not inherit the candidate claim.
+`conformance_claim=true` only for the declared weather/rain-status, zone-air,
+face-temperature, conduction, floor Surface Heat Storage Rate, floor Surface
+Heat Storage Rate per Area, and exact-zero named wall/roof sky and ground
+diffuse incident solar per-area variables. The broad diagnostic case remains
+`conformance_claim=false`, and other storage/radiation/nonzero
+solar/convection diagnostics must not inherit the candidate claim.
 
 Developers can run `scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe`
 to raise the Rust diagnostic warmup minimum to the EnergyPlus run-period warmup

@@ -492,20 +492,29 @@ required_cases = [
 ]
 required_variables = [
   "Site Outdoor Air Drybulb Temperature",
+  "Site Rain Status",
   "Zone Mean Air Temperature",
   "Zone Air Heat Balance Internal Convective Heat Gain Rate",
   "Surface Inside Face Temperature",
   "Surface Outside Face Temperature",
   "Surface Inside Face Conduction Heat Transfer Rate",
+  "Surface Inside Face Conduction Heat Transfer Rate per Area",
   "Surface Outside Face Conduction Heat Transfer Rate",
+  "Surface Outside Face Conduction Heat Transfer Rate per Area",
+  "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
+  "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
+  "Surface Heat Storage Rate",
+  "Surface Heat Storage Rate per Area",
+  "Zone Opaque Surface Inside Faces Conduction Rate",
+  "Zone Opaque Surface Outside Faces Conduction Rate",
   "Zone Air Heat Balance Surface Convection Rate",
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 not_claimed = [
   "broad ExampleFiles dynamic numerical conformance",
   "general warmup convergence parity outside the official 1ZoneUncontrolled dynamic candidate",
-  "diagnostic storage, radiation, solar, and convection coefficient variables",
-  "solar and exterior convection parity",
+  "storage rows outside the declared floor storage rows, radiation, nonzero solar, and convection coefficient variables",
+  "broad solar and exterior convection parity",
   "full EnergyPlus compatibility",
 ]
 
