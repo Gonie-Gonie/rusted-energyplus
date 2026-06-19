@@ -42,7 +42,8 @@ No-mass adiabatic surface temperatures and zero-conduction series are promoted.
 Official ExampleFile surface balances now also promote the named
 `1ZoneUncontrolled` roof, wall, and floor inside/outside face-temperature plus
 selected inside/outside conduction deltas in the compatibility-candidate
-report. Floor `Surface Heat Storage Rate`, radiation, solar, convection
+report. The floor `Surface Heat Storage Rate` row is promoted under a
+dedicated storage tolerance; storage-per-area, radiation, solar, convection
 coefficient, and broader decomposition rows remain diagnostic-only.
 Construction layer stacks are preserved for future native CTF work; the
 candidate uses EIO-seeded CTF coefficients to keep coefficient mismatch outside

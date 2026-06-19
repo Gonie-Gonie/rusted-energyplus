@@ -737,10 +737,10 @@ support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candida
 [[variable]]
 name = "Surface Heat Storage Rate"
 domain = "surface"
-status = "diagnostic"
+status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Floor CTF storage blocker diagnostic for the official 1Zone dynamic candidate; not a conformance claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the compatibility-candidate lane; storage per-area and broad CTF storage parity remain outside the claim."
 
 [[variable]]
 name = "Site Outdoor Air Drybulb Temperature"

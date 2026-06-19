@@ -309,8 +309,10 @@ tolerance, and code organization.
   `Zone Total Internal Convective Heating Rate`
 - current surface conduction conformance covers the no-mass adiabatic
   `surface_temperature_nomass_001` series and named official
-  `1ZoneUncontrolled` dynamic candidate surfaces; storage/radiation/solar
-  diagnostic variables are not promoted
+  `1ZoneUncontrolled` dynamic candidate surfaces, including the declared floor
+  `Surface Heat Storage Rate` row under its own storage tolerance;
+  storage-per-area, radiation, solar, and broad CTF diagnostics are not
+  promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation

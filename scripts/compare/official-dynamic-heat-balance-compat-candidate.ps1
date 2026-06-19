@@ -152,14 +152,11 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 29) {
-    throw "Expected 29 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 30) {
+    throw "Expected 30 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
-if ($diagnosticOutputs.Count -ne 1) {
-    throw "Expected exactly one diagnostic output, got $($diagnosticOutputs.Count)"
-}
-if (-not ($diagnosticOutputs | Where-Object { $_.key -eq "ZN001:FLR001" -and $_.variable -eq "Surface Heat Storage Rate" })) {
-    throw "Surface Heat Storage Rate must remain diagnostic-only"
+if ($diagnosticOutputs.Count -ne 0) {
+    throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq "Site Outdoor Air Drybulb Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Weather dry-bulb conformance series missing"
@@ -167,8 +164,15 @@ if (-not ($summary.series | Where-Object { $_.output.key -eq "Environment" -and 
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZONE ONE" -and $_.output.variable -eq "Zone Mean Air Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Zone Mean Air Temperature conformance series missing"
 }
-if (-not ($summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate" -and $_.output.level -eq "diagnostic" -and $_.status -eq "extracted" })) {
-    throw "Floor storage diagnostic series missing"
+$storageSeries = $summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate" -and $_.output.class -eq "surface-storage-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+if (-not $storageSeries) {
+    throw "Floor storage conformance series missing"
+}
+if ([double]$storageSeries.max_abs_delta_c -gt 1.2) {
+    throw "Floor storage max_abs_delta_c exceeds 1.2 W: $($storageSeries.max_abs_delta_c)"
+}
+if ([double]$storageSeries.rmse_delta_c -gt 0.35) {
+    throw "Floor storage rmse_delta_c exceeds 0.35 W: $($storageSeries.rmse_delta_c)"
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
@@ -176,7 +180,7 @@ Assert-Contains -Text $reportText -Pattern "Heat Balance Conformance Report" -De
 Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Description "markdown comparison class"
 Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Description "markdown conformance claim"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
-Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-state / eso / diagnostic" -Description "diagnostic storage output"
+Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-storage-state / eso / conformance" -Description "surface storage conformance output"
 Assert-Contains -Text $reportText -Pattern "status: pass" -Description "markdown status"
 
 Write-Host "Official dynamic heat-balance conformance gate passed."

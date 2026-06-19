@@ -7,7 +7,7 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "Expected status is pass for conformance-level variables in the compatibility-candidate lane.",
-  "This candidate gates the promotion variables and keeps Surface Heat Storage Rate as diagnostic-only blocker tracing.",
+  "This candidate gates the promotion variables, including the floor Surface Heat Storage Rate under a dedicated surface-storage-state tolerance.",
   "Diagnostic probe algorithms are not eligible for this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
   "The v0.26 planned official dynamic boundary is promoted here after static, weather, internal convective gain, warmup, and selected dynamic heat-balance evidence pass.",
   "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
@@ -323,10 +323,10 @@ level = "conformance"
 key = "ZN001:FLR001"
 variable = "Surface Heat Storage Rate"
 frequency = "hourly"
-class = "surface-state"
+class = "surface-storage-state"
 source = "eso"
 domain = "surface"
-level = "diagnostic"
+level = "conformance"
 
 [[tolerances]]
 variable_class = "weather"
@@ -341,6 +341,11 @@ max_rmse = 0.1
 [[tolerances]]
 variable_class = "surface-state"
 max_abs = 1.0
+max_rmse = 0.35
+
+[[tolerances]]
+variable_class = "surface-storage-state"
+max_abs = 1.2
 max_rmse = 0.35
 
 [report]
