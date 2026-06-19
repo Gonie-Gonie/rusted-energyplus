@@ -1524,6 +1524,15 @@ fn outdoor_air_conformance_method_for_manifest(
         .map(|(method, _economizer, _heat_recovery, _dcv)| method)
 }
 
+fn manifest_allows_outdoor_air_inactive_heat_recovery_rate_conformance_manifest(
+    manifest: &ConformanceCase,
+) -> bool {
+    matches!(
+        outdoor_air_conformance_expectations_for_manifest(manifest),
+        Some((_method, _economizer, HeatRecoveryType::None, _dcv))
+    )
+}
+
 fn outdoor_air_conformance_variable_for_manifest(
     manifest: &ConformanceCase,
     variable: &str,
@@ -1534,7 +1543,7 @@ fn outdoor_air_conformance_variable_for_manifest(
         || (manifest_allows_outdoor_air_active_heat_recovery_conformance_manifest(manifest)
             && (OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable)
                 || variable == ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME))
-        || (manifest_allows_outdoor_air_flow_zone_conformance_manifest(manifest)
+        || (manifest_allows_outdoor_air_inactive_heat_recovery_rate_conformance_manifest(manifest)
             && OUTDOOR_AIR_HEAT_RECOVERY_RATE_CONFORMANCE_VARIABLES.contains(&variable))
 }
 

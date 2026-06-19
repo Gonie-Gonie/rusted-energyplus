@@ -1,14 +1,14 @@
 id = "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001"
 title = "One-zone IdealLoads outdoor-air DifferentialEnthalpy economizer conformance candidate"
 milestone = "ideal-loads-outdoor-air-economizer-conformance"
-purpose = "Claim narrow IdealLoads DifferentialEnthalpy economizer conformance for declared outdoor-air mass/volume, no-humidity outdoor-air report rates, supply-air state, mixed-air state, and economizer active time rows."
+purpose = "Claim narrow IdealLoads DifferentialEnthalpy economizer conformance for declared outdoor-air mass/volume, no-humidity outdoor-air report rates, supply-air state, mixed-air state, economizer active time, and inactive no-heat-recovery rate rows."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "This case claims only the declared DesignSpecification:OutdoorAir Flow/Zone DifferentialEnthalpy economizer rows.",
-  "The boundary covers Flow/Zone mass flow under DifferentialEnthalpy economizer reset, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, and economizer active-time parity with a blank outdoor-air schedule.",
-  "Inactive heat-recovery report rows remain diagnostic proof evidence.",
+  "The boundary covers Flow/Zone mass flow under DifferentialEnthalpy economizer reset, standard-density volume flow, no-humidity outdoor-air sensible/latent/total report rates, supply-air state, mixed-air state, economizer active-time parity, and inactive no-heat-recovery rate rows with a blank outdoor-air schedule.",
+  "Inactive heat-recovery active-time report rows remain diagnostic proof evidence.",
   "Active humidity-control latent behavior, active DCV, other economizer modes outside this case, heat recovery, humidistats, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, PythonPlugin, and broad outdoor-air conformance remain outside this claim.",
   "EnergyPlus reports outdoor-air volume flow at StdRhoAir; the Rust conformance candidate derives StdRhoAir from Site:Location elevation before converting mass flow back to standard-density volume flow."
 ]
@@ -198,7 +198,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -209,7 +209,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -220,7 +220,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -231,7 +231,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -242,7 +242,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 
@@ -253,7 +253,7 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
+level = "conformance"
 abs_tol = 1e-9
 rmse_tol = 1e-9
 

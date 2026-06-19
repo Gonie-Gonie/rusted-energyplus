@@ -631,6 +631,23 @@ Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flo
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Mixed Air Humidity Ratio" -Level "conformance" -Description "IdealLoads OA Flow/Zone mixed humidity"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Sensible Heating Rate" -Level "conformance" -Description "IdealLoads OA Flow/Zone inactive heat recovery sensible heating"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_zone_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Active Time" -Level "diagnostic" -Description "IdealLoads OA Flow/Zone inactive heat recovery diagnostic"
+foreach ($outdoorAirNoHeatRecoveryCase in @(
+        "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001",
+        "ideal_loads_outdoor_air_flow_person_conformance_candidate_001",
+        "ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001",
+        "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001",
+        "ideal_loads_outdoor_air_flow_area_conformance_candidate_001",
+        "ideal_loads_outdoor_air_air_changes_conformance_candidate_001",
+        "ideal_loads_outdoor_air_sum_conformance_candidate_001",
+        "ideal_loads_outdoor_air_maximum_conformance_candidate_001",
+        "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001",
+        "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001"
+    )) {
+    $casePath = "data\conformance_cases\$outdoorAirNoHeatRecoveryCase\case.toml"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Sensible Heating Rate" -Level "conformance" -Description "$outdoorAirNoHeatRecoveryCase inactive heat recovery sensible heating"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Total Cooling Rate" -Level "conformance" -Description "$outdoorAirNoHeatRecoveryCase inactive heat recovery total cooling"
+    Assert-CaseOutputLevel -Path $casePath -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Active Time" -Level "diagnostic" -Description "$outdoorAirNoHeatRecoveryCase inactive heat recovery active time"
+}
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_person_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Outdoor Air Mass Flow Rate" -Level "conformance" -Description "IdealLoads OA Flow/Person mass flow"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_person_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Mixed Air Humidity Ratio" -Level "conformance" -Description "IdealLoads OA Flow/Person mixed humidity"
 Assert-CaseOutputLevel -Path "data\conformance_cases\ideal_loads_outdoor_air_flow_person_conformance_candidate_001\case.toml" -Key "ZONE ONE IDEAL LOADS" -Variable "Zone Ideal Loads Heat Recovery Active Time" -Level "diagnostic" -Description "IdealLoads OA Flow/Person inactive heat recovery diagnostic"

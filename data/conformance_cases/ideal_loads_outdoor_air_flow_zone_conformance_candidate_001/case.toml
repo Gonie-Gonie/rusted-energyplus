@@ -1,7 +1,7 @@
 id = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 title = "One-zone IdealLoads outdoor-air Flow/Zone conformance candidate"
 milestone = "ideal-loads-outdoor-air-conformance"
-purpose = "Claim narrow IdealLoads DesignSpecification:OutdoorAir Flow/Zone conformance for declared outdoor-air mass/volume, no-humidity outdoor-air report rates, supply-air state, and mixed-air state rows."
+purpose = "Claim narrow IdealLoads DesignSpecification:OutdoorAir Flow/Zone conformance for declared outdoor-air mass/volume, no-humidity outdoor-air report rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate rows."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"

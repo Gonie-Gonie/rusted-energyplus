@@ -317,51 +317,57 @@ The current public scope includes:
   inactive heat-recovery active-time rows kept diagnostic-only
 - limited IdealLoads outdoor-air `Flow/Person` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, and mixed-air state
-  Detailed series, using typed `People` design occupant count as a proof input
-  while People heat-gain behavior remains outside the claim
+  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series, using typed `People` design
+  occupant count as a proof input while People heat-gain behavior remains
+  outside the claim
 - limited IdealLoads outdoor-air `Flow/Person` `OccupancySchedule` DCV
   conformance for declared outdoor-air mass/standard-density volume flow,
-  no-humidity sensible/latent/total report rates, supply-air state, and
-  mixed-air state Detailed series, using traced non-constant People occupancy
-  schedule values to vary the minimum outdoor-air flow while People heat-gain
-  behavior and broader DCV combinations remain outside the claim
+  no-humidity sensible/latent/total report rates, supply-air state, mixed-air
+  state, and inactive no-heat-recovery rate Detailed series, using traced
+  non-constant People occupancy schedule values to vary the minimum outdoor-air
+  flow while People heat-gain behavior and broader DCV combinations remain
+  outside the claim
 - limited IdealLoads outdoor-air `Flow/Person` `CO2Setpoint` DCV conformance
   for declared outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, and mixed-air state
-  Detailed series, using the EnergyPlus `Zone Air CO2 Predicted Load to
-  Setpoint Mass Flow Rate` proof input to apply the source-order `max(minimum
-  OA, CO2 demand)` adjustment while People heat-gain behavior, CO2
+  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series, using the EnergyPlus `Zone
+  Air CO2 Predicted Load to Setpoint Mass Flow Rate` proof input to apply the
+  source-order `max(minimum OA, CO2 demand)` adjustment while People heat-gain behavior, CO2
   contaminant-balance/concentration conformance, and broader DCV combinations
   remain outside the claim
 - limited IdealLoads outdoor-air `Flow/Area` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, and mixed-air state
-  Detailed series, using typed zone floor area as a proof input
+  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series, using typed zone floor area
+  as a proof input
 - limited IdealLoads outdoor-air `AirChanges/Hour` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
-  sensible/latent/total report rates, supply-air state, and mixed-air state
-  Detailed series, using typed zone volume as a proof input
+  sensible/latent/total report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series, using typed zone volume as a
+  proof input
 - limited IdealLoads outdoor-air `Sum` conformance for declared outdoor-air
   mass/standard-density volume flow, no-humidity sensible/latent/total report
-  rates, supply-air state, and mixed-air state Detailed series, using typed
-  Flow/Area, Flow/Zone, and AirChanges/Hour component flows as proof inputs
+  rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate
+  Detailed series, using typed Flow/Area, Flow/Zone, and AirChanges/Hour
+  component flows as proof inputs
 - limited IdealLoads outdoor-air `Maximum` conformance for declared outdoor-air
   mass/standard-density volume flow, no-humidity sensible/latent/total report
-  rates, supply-air state, and mixed-air state Detailed series, using typed
-  component flows with AirChanges/Hour selected as the governing maximum
+  rates, supply-air state, mixed-air state, and inactive no-heat-recovery rate
+  Detailed series, using typed component flows with AirChanges/Hour selected as
+  the governing maximum
 - limited IdealLoads outdoor-air `DifferentialDryBulb` economizer conformance
   for declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, and economizer active-time Detailed series, using the
-  source dry-bulb comparison to reset outdoor-air flow above the low design
-  minimum
+  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
+  Detailed series, using the source dry-bulb comparison to reset outdoor-air
+  flow above the low design minimum
 - limited IdealLoads outdoor-air `DifferentialEnthalpy` economizer conformance
   for declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,
-  mixed-air state, and economizer active-time Detailed series, using the
-  source enthalpy comparison to reset outdoor-air flow above the low design
-  minimum
+  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
+  Detailed series, using the source enthalpy comparison to reset outdoor-air
+  flow above the low design minimum
 - limited IdealLoads outdoor-air `Sensible` heat-recovery conformance for
   declared Flow/Zone outdoor-air mass/standard-density volume flow,
   no-humidity sensible/latent/total report rates, supply-air state,

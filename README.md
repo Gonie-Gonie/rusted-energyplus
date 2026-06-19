@@ -198,21 +198,22 @@ tolerance, and code organization.
   economizer and inactive heat-recovery active-time rows kept diagnostic-only
 - limited IdealLoads outdoor-air `Flow/Person` conformance candidate gate for
   declared outdoor-air mass/standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, and mixed-air state Detailed
-  series in `ideal_loads_outdoor_air_flow_person_conformance_candidate_001`,
-  using traced five-person design-occupant proof input; People heat-gain
-  conformance is not claimed
+  outdoor-air report rates, supply-air state, mixed-air state, and inactive
+  no-heat-recovery rate Detailed series in
+  `ideal_loads_outdoor_air_flow_person_conformance_candidate_001`, using
+  traced five-person design-occupant proof input; People heat-gain conformance
+  is not claimed
 - limited IdealLoads outdoor-air `OccupancySchedule` DCV conformance candidate
   gate for declared Flow/Person outdoor-air mass/standard-density volume flow,
-  no-humidity outdoor-air report rates, supply-air state, and mixed-air state
-  Detailed series in
+  no-humidity outdoor-air report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series in
   `ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001`, using
   traced non-constant People occupancy schedule values; broader DCV
   combinations remain outside the claim
 - limited IdealLoads outdoor-air `CO2Setpoint` DCV conformance candidate gate
   for declared Flow/Person outdoor-air mass/standard-density volume flow,
-  no-humidity outdoor-air report rates, supply-air state, and mixed-air state
-  Detailed series in
+  no-humidity outdoor-air report rates, supply-air state, mixed-air state, and
+  inactive no-heat-recovery rate Detailed series in
   `ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001`, using the
   EnergyPlus `Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate` proof
   input to apply the source-order `max(minimum OA, CO2 demand)` adjustment;
@@ -220,36 +221,42 @@ tolerance, and code organization.
   conformance, and broader DCV combinations remain outside the claim
 - limited IdealLoads outdoor-air `Flow/Area` conformance candidate gate for
   declared outdoor-air mass/standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, and mixed-air state Detailed
-  series in `ideal_loads_outdoor_air_flow_area_conformance_candidate_001`,
-  using traced 1 m2 zone-floor-area proof input
+  outdoor-air report rates, supply-air state, mixed-air state, and inactive
+  no-heat-recovery rate Detailed series in
+  `ideal_loads_outdoor_air_flow_area_conformance_candidate_001`, using traced
+  1 m2 zone-floor-area proof input
 - limited IdealLoads outdoor-air `AirChanges/Hour` conformance candidate gate
   for declared outdoor-air mass/standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, and mixed-air state Detailed
-  series in `ideal_loads_outdoor_air_air_changes_conformance_candidate_001`,
-  using traced 1 m3 zone-volume proof input
+  outdoor-air report rates, supply-air state, mixed-air state, and inactive
+  no-heat-recovery rate Detailed series in
+  `ideal_loads_outdoor_air_air_changes_conformance_candidate_001`, using traced
+  1 m3 zone-volume proof input
 - limited IdealLoads outdoor-air `Sum` conformance candidate gate for declared
   outdoor-air mass/standard-density volume flow, no-humidity outdoor-air
-  report rates, supply-air state, and mixed-air state Detailed series in
+  report rates, supply-air state, mixed-air state, and inactive
+  no-heat-recovery rate Detailed series in
   `ideal_loads_outdoor_air_sum_conformance_candidate_001`, with traced
   Flow/Area, Flow/Zone, and AirChanges/Hour component-flow proof inputs
 - limited IdealLoads outdoor-air `Maximum` conformance candidate gate for
   declared outdoor-air mass/standard-density volume flow, no-humidity
-  outdoor-air report rates, supply-air state, and mixed-air state Detailed
-  series in `ideal_loads_outdoor_air_maximum_conformance_candidate_001`, with
-  traced component-flow proof inputs and AirChanges/Hour selected as the
-  governing maximum
+  outdoor-air report rates, supply-air state, mixed-air state, and inactive
+  no-heat-recovery rate Detailed series in
+  `ideal_loads_outdoor_air_maximum_conformance_candidate_001`, with traced
+  component-flow proof inputs and AirChanges/Hour selected as the governing
+  maximum
 - limited IdealLoads outdoor-air `DifferentialDryBulb` economizer conformance
   candidate gate for declared Flow/Zone outdoor-air mass/standard-density
   volume flow, no-humidity outdoor-air report rates, supply-air state,
-  mixed-air state, and economizer active-time Detailed series in
+  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
+  Detailed series in
   `ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001`,
   using a low minimum outdoor-air flow so the source dry-bulb comparison resets
   the cooling outdoor-air flow above the design minimum
 - limited IdealLoads outdoor-air `DifferentialEnthalpy` economizer conformance
   candidate gate for declared Flow/Zone outdoor-air mass/standard-density
   volume flow, no-humidity outdoor-air report rates, supply-air state,
-  mixed-air state, and economizer active-time Detailed series in
+  mixed-air state, economizer active-time, and inactive no-heat-recovery rate
+  Detailed series in
   `ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001`,
   using a low minimum outdoor-air flow so the source enthalpy comparison resets
   the cooling outdoor-air flow above the design minimum
