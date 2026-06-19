@@ -788,7 +788,7 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero sky-diffuse incident solar per-area rows only; nonzero Perez sky diffuse, total/beam solar, fenestration, and broad solar/radiation compatibility remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero sky-diffuse incident solar per-area rows only; nonzero Perez sky diffuse, absorbed solar heat gain, fenestration, and broad solar/radiation compatibility remain outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
@@ -796,7 +796,23 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero ground-diffuse incident solar per-area rows only; nonzero ground-reflected solar, total/beam solar, fenestration, and broad solar/radiation compatibility remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exact-zero ground-diffuse incident solar per-area rows only; nonzero ground-reflected solar, absorbed solar heat gain, fenestration, and broad solar/radiation compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Incident Solar Radiation Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof incident total solar per-area rows only under surface-solar-flux-state tolerance; absorbed solar heat gain, fenestration, detailed shadowing, and broad solar/radiation compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof incident beam solar per-area rows only under surface-solar-flux-state tolerance; detailed shadowing, absorbed solar heat gain, fenestration, and broad solar/radiation compatibility remain outside the claim."
 
 [[variable]]
 name = "System Node Mass Flow Rate"

@@ -47,6 +47,8 @@ proof_variables = [
   "Surface Inside Face Conduction Heat Transfer Rate per Area",
   "Surface Outside Face Conduction Heat Transfer Rate",
   "Surface Outside Face Conduction Heat Transfer Rate per Area",
+  "Surface Outside Face Incident Solar Radiation Rate per Area",
+  "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
   "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
   "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
   "Surface Heat Storage Rate",
@@ -57,7 +59,7 @@ proof_variables = [
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 claim_level = "limited-official-dynamic-conformance"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including wetbulb/rain-status weather alignment, named roof/wall/floor conduction per-area rows, exact-zero named wall/roof sky and ground diffuse incident solar rows, zone opaque conduction aggregate rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage tolerances; broad heat-balance compatibility, broad weather processor compatibility, other storage rows, nonzero solar, radiation, convection decomposition, and non-promoted probe lanes remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including wetbulb/rain-status weather alignment, named roof/wall/floor conduction per-area rows, named wall/roof incident total and beam solar per-area rows under surface-solar-flux-state tolerance, exact-zero named wall/roof sky and ground diffuse incident solar rows, zone opaque conduction aggregate rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage tolerances; broad heat-balance compatibility, broad weather processor compatibility, other storage rows, absorbed/non-incident solar, radiation, convection decomposition, and non-promoted probe lanes remain outside the claim."
 
 [[algorithm]]
 id = "surface_inside_temperature"

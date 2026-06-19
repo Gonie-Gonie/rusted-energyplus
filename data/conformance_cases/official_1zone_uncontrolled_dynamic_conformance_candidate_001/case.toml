@@ -11,7 +11,7 @@ notes = [
   "Diagnostic probe algorithms are not eligible for this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
   "The v0.26 planned official dynamic boundary is promoted here after static, weather, internal convective gain, warmup, and selected dynamic heat-balance evidence pass.",
   "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
-  "Broad nonzero solar, exterior radiation, exterior convection, and fenestration compatibility remain outside this conformance claim.",
+  "Broad solar compatibility beyond the declared named wall/roof incident beam, incident total, and exact-zero sky/ground diffuse rows remains outside this conformance claim, as do exterior radiation, exterior convection, and fenestration compatibility.",
 ]
 
 [manifest_v2]
@@ -394,6 +394,24 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
 variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
@@ -412,6 +430,24 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
 variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
@@ -430,6 +466,24 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
 variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
@@ -448,6 +502,24 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
 variable = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
@@ -460,6 +532,24 @@ key = "ZN001:WALL004"
 variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Incident Beam Solar Radiation Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -591,6 +681,11 @@ max_rmse = 0.35
 variable_class = "surface-flux-state"
 max_abs = 0.005
 max_rmse = 0.0015
+
+[[tolerances]]
+variable_class = "surface-solar-flux-state"
+max_abs = 0.02
+max_rmse = 0.003
 
 [[tolerances]]
 variable_class = "surface-aggregate-state"

@@ -47,10 +47,11 @@ diagnostic tracker and the promoted compatibility candidate.
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` now uses
 `conformance_claim=true` only for the declared weather/wetbulb/rain-status,
 zone-air, face-temperature, conduction, floor Surface Heat Storage Rate, floor
-Surface Heat Storage Rate per Area, and exact-zero named wall/roof sky and
-ground diffuse incident solar per-area variables. The broad diagnostic case
-remains `conformance_claim=false`, and broad weather-processor,
-storage/radiation/nonzero-solar/convection diagnostics must not inherit the
+Surface Heat Storage Rate per Area, named wall/roof incident total/beam solar
+per-area rows, and exact-zero named wall/roof sky and ground diffuse incident
+solar per-area variables. The broad diagnostic case remains
+`conformance_claim=false`, and broad weather-processor,
+storage/radiation/absorbed-solar/convection diagnostics must not inherit the
 candidate claim.
 
 Developers can run `scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe`
