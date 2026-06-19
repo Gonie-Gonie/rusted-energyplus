@@ -49,6 +49,40 @@ pub struct NoOaThirdOrderMoistureDemand {
     pub dehumidifying_setpoint_humidity_ratio: f64,
 }
 
+/// Inputs for the no-OA ThirdOrder `correctHumRat` subset.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NoOaThirdOrderHumidityCorrectorInput {
+    /// Zone state used by EnergyPlus as `ZT` and `airHumRat`.
+    pub zone_state: IdealLoadsZoneState,
+    /// `WPrevZoneTSTemp[0..2]` in EnergyPlus source order.
+    pub previous_zone_timestep_humidity_ratios: [f64; 3],
+    /// Zone volume in m3.
+    pub zone_volume_m3: f64,
+    /// `ZoneVolCapMultpMoist`; EnergyPlus default is 1.0.
+    pub zone_moisture_capacity_multiplier: f64,
+    /// System timestep seconds.
+    pub timestep_seconds: f64,
+    /// Barometric pressure in Pa.
+    pub barometric_pressure_pa: f64,
+    /// Internal latent gain in W.
+    pub latent_gain_w: f64,
+    /// Supply inlet dry-air mass flow in kgDryAir/s after zone multiplier division.
+    pub supply_mass_flow_rate_kg_per_s: f64,
+    /// Supply inlet humidity ratio in kgWater/kgDryAir.
+    pub supply_humidity_ratio: f64,
+}
+
+/// No-OA ThirdOrder zone humidity correction result.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NoOaThirdOrderHumidityCorrector {
+    /// Corrected EnergyPlus zone air humidity ratio.
+    pub zone_air_humidity_ratio: f64,
+    /// Moisture-independent coefficient in kgWater/s.
+    pub b_kg_water_per_s: f64,
+    /// Moisture-dependent coefficient in kgDryAir/s.
+    pub a_kg_dry_air_per_s: f64,
+}
+
 /// Calculates the no-OA ThirdOrder subset of EnergyPlus
 /// `ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio`.
 #[must_use]
@@ -135,5 +169,72 @@ pub fn calc_no_oa_third_order_moisture_demand_compat(
         total_output_required_kg_per_s: total_unmultiplied * input.zone_multiplier,
         humidifying_setpoint_humidity_ratio,
         dehumidifying_setpoint_humidity_ratio,
+    })
+}
+
+/// Calculates the no-OA ThirdOrder subset of EnergyPlus
+/// `ZoneSpaceHeatBalanceData::correctHumRat`.
+#[must_use]
+pub fn correct_no_oa_third_order_humidity_ratio_compat(
+    input: NoOaThirdOrderHumidityCorrectorInput,
+) -> Option<NoOaThirdOrderHumidityCorrector> {
+    if !input.zone_volume_m3.is_finite()
+        || input.zone_volume_m3 <= 0.0
+        || !input.zone_moisture_capacity_multiplier.is_finite()
+        || input.zone_moisture_capacity_multiplier <= 0.0
+        || !input.timestep_seconds.is_finite()
+        || input.timestep_seconds <= 0.0
+        || !input.latent_gain_w.is_finite()
+        || !input.supply_mass_flow_rate_kg_per_s.is_finite()
+        || input.supply_mass_flow_rate_kg_per_s < 0.0
+        || !input.supply_humidity_ratio.is_finite()
+        || input.supply_humidity_ratio < 0.0
+        || !input
+            .previous_zone_timestep_humidity_ratios
+            .iter()
+            .all(|value| value.is_finite())
+    {
+        return None;
+    }
+
+    let density_kg_per_m3 = energyplus_moist_air_density_kg_per_m3(
+        input.barometric_pressure_pa,
+        input.zone_state.air_temperature_c,
+        input.zone_state.air_humidity_ratio,
+    )?;
+    let vapor_enthalpy_j_per_kg =
+        energyplus_water_vapor_gas_enthalpy_j_per_kg(input.zone_state.air_temperature_c);
+    if vapor_enthalpy_j_per_kg <= 0.0 {
+        return None;
+    }
+
+    let c = density_kg_per_m3 * input.zone_volume_m3 * input.zone_moisture_capacity_multiplier
+        / input.timestep_seconds;
+    let b = input.latent_gain_w / vapor_enthalpy_j_per_kg
+        + input.supply_mass_flow_rate_kg_per_s * input.supply_humidity_ratio;
+    let a = input.supply_mass_flow_rate_kg_per_s;
+    let [w_prev_0, w_prev_1, w_prev_2] = input.previous_zone_timestep_humidity_ratios;
+    let third_order_history = 3.0 * w_prev_0 - 1.5 * w_prev_1 + (1.0 / 3.0) * w_prev_2;
+    let denominator = THIRD_ORDER_CURRENT_WEIGHT * c + a;
+    if denominator <= 0.0 {
+        return None;
+    }
+    let mut corrected = (b + c * third_order_history) / denominator;
+    if corrected < 0.0 {
+        corrected = 0.0;
+    }
+    let saturation_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
+        input.zone_state.air_temperature_c,
+        1.0,
+        input.barometric_pressure_pa,
+    )?;
+    if corrected > saturation_humidity_ratio {
+        corrected = saturation_humidity_ratio;
+    }
+
+    Some(NoOaThirdOrderHumidityCorrector {
+        zone_air_humidity_ratio: corrected,
+        b_kg_water_per_s: b,
+        a_kg_dry_air_per_s: a,
     })
 }

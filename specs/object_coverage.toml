@@ -108,7 +108,7 @@ name = "ZoneControl:Humidistat"
 family = "thermostat"
 status = "typed"
 first_evidence = "ideal_loads_humidistat_dehumidification_diagnostic_001"
-support_boundary = "Typed for no-OA Humidistat relative-humidity setpoint schedule references and the no-OA ThirdOrder moisture-demand predictor helper. Humidistat moisture-demand numerical conformance, finite-limit humidistat behavior, outdoor-air humidity control, EMS/fault offsets, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Typed for no-OA Humidistat relative-humidity setpoint schedule references and no-OA ThirdOrder moisture-demand predictor/corrector helpers. Humidistat moisture-demand numerical conformance, finite-limit humidistat behavior, outdoor-air humidity control, EMS/fault offsets, and broad humidity-control conformance remain outside the claim."
 
 [[object]]
 name = "ZoneHVAC:IdealLoadsAirSystem"

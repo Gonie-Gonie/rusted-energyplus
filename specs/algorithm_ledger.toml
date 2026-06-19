@@ -352,6 +352,7 @@ energyplus_source = [
 rust_target = [
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_with_recirculation_context_compat",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::calc_no_oa_third_order_moisture_demand_compat",
+    "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::correct_no_oa_third_order_humidity_ratio_compat",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::humidistat_dehumidification_mass_flow_rate_kg_per_s",
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::heating_section_dehumidification_mass_flow_rate_kg_per_s",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::heating_supply_humidity_ratio",
@@ -403,7 +404,7 @@ proof_variables = [
     "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-humidistat-dehumidification-conformance"
-support_boundary = "Tolerance-gated no-OA Humidistat dehumidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility meter rows in ideal_loads_humidistat_dehumidification_conformance_candidate_001, plus full-year annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter rows only in ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are still traced diagnostic proof inputs for the promoted branch; the no-OA ThirdOrder schedule-to-setpoint predictor formula is ported as a helper, but EnergyPlus WPrevZoneTSTemp/correctHumRat history reproduction, humidistat humidification, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, annual facility meter rows in the short-run candidate, other broader meter frequencies, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA Humidistat dehumidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility meter rows in ideal_loads_humidistat_dehumidification_conformance_candidate_001, plus full-year annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter rows only in ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are still traced diagnostic proof inputs for the promoted branch; the no-OA ThirdOrder schedule-to-setpoint predictor and correctHumRat formulas are ported as helpers with diagnostic residual reporting, but EnergyPlus WPrevZoneTSTemp/warmup/system-history closure, humidistat humidification, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, annual facility meter rows in the short-run candidate, other broader meter frequencies, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_humidistat_humidification_control"
@@ -419,6 +420,7 @@ energyplus_source = [
 rust_target = [
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_with_recirculation_context_compat",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::calc_no_oa_third_order_moisture_demand_compat",
+    "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::correct_no_oa_third_order_humidity_ratio_compat",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::humidistat_humidification_mass_flow_rate_kg_per_s",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::heating_supply_humidity_ratio",
     "crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand",
@@ -464,7 +466,7 @@ proof_variables = [
     "Zone Ideal Loads Zone Cooling Fuel Energy Rate",
 ]
 claim_level = "limited-ideal-loads-no-oa-humidistat-humidification-conformance"
-support_boundary = "Tolerance-gated no-OA Humidistat humidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility meter rows in ideal_loads_humidistat_humidification_conformance_candidate_001, plus full-year annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter rows only in ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are still traced diagnostic proof inputs for the promoted branch; the no-OA ThirdOrder schedule-to-setpoint predictor formula is ported as a helper, but EnergyPlus WPrevZoneTSTemp/correctHumRat history reproduction, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, annual facility meter rows in the short-run candidate, other broader meter frequencies, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA Humidistat humidification conformance for declared thermostat, heating/cooling total/sensible/latent rate, supply-air heating/cooling report-rate, supply-node temperature/mass-flow/humidity, ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility meter rows in ideal_loads_humidistat_humidification_conformance_candidate_001, plus full-year annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter rows only in ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001. EnergyPlus ZoneSysMoistureDemand rows are still traced diagnostic proof inputs for the promoted branch; the no-OA ThirdOrder schedule-to-setpoint predictor and correctHumRat formulas are ported as helpers with diagnostic residual reporting, but EnergyPlus WPrevZoneTSTemp/warmup/system-history closure, outdoor-air humidity control, active economizer/heat recovery, finite-limit humidistat behavior, annual facility meter rows in the short-run candidate, other broader meter frequencies, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_outdoor_air_design_flow"
