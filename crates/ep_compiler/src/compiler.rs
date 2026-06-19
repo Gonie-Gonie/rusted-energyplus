@@ -19,7 +19,8 @@ use ep_model::{
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
     ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -208,6 +209,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "People",
     "ThermostatSetpoint:DualSetpoint",
     "ZoneControl:Thermostat",
+    "ZoneControl:Humidistat",
     "NodeList",
     "DesignSpecification:OutdoorAir",
     "ZoneHVAC:IdealLoadsAirSystem",
@@ -260,6 +262,7 @@ impl<'a> Compiler<'a> {
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
+        self.parse_zone_humidistats(&mut model);
         self.parse_node_lists(&mut model);
         self.parse_design_specification_outdoor_air(&mut model);
         self.parse_ideal_loads_air_systems(&mut model);
@@ -945,6 +948,68 @@ impl<'a> Compiler<'a> {
                     "temperature_difference_between_cutout_and_setpoint",
                     0.0,
                 ),
+            });
+        }
+    }
+
+    fn parse_zone_humidistats(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("ZoneControl:Humidistat") {
+            let Some(zone_name) =
+                self.required_string("ZoneControl:Humidistat", &name, &object, "zone_name")
+            else {
+                continue;
+            };
+            let Some(zone) = self.resolve_name(
+                &model.zone_names,
+                "ZoneControl:Humidistat",
+                &name,
+                "zone_name",
+                &zone_name,
+                "Zone",
+            ) else {
+                continue;
+            };
+            let Some(humidifying_relative_humidity_setpoint_schedule) = self
+                .required_schedule_reference(
+                    model,
+                    "ZoneControl:Humidistat",
+                    &name,
+                    &object,
+                    "humidifying_relative_humidity_setpoint_schedule_name",
+                )
+            else {
+                continue;
+            };
+            let Some(dehumidifying_relative_humidity_setpoint_schedule) = self
+                .required_schedule_reference(
+                    model,
+                    "ZoneControl:Humidistat",
+                    &name,
+                    &object,
+                    "dehumidifying_relative_humidity_setpoint_schedule_name",
+                )
+            else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id(
+                "ZoneControl:Humidistat",
+                &name,
+                model.zone_humidistats.len(),
+            ) else {
+                continue;
+            };
+            let id = ZoneHumidistatId(id_value);
+            if model.zone_humidistat_names.insert(&name, id).is_some() {
+                self.duplicate_name("ZoneControl:Humidistat", &name);
+                continue;
+            }
+
+            model.zone_humidistats.push(ZoneHumidistat {
+                id,
+                name: NormalizedName::new(&name),
+                zone,
+                humidifying_relative_humidity_setpoint_schedule,
+                dehumidifying_relative_humidity_setpoint_schedule,
             });
         }
     }
@@ -4490,6 +4555,8 @@ mod tests {
                     "Control Type": {"hourly_value": 4},
                     "Heating Setpoint": {"hourly_value": 21},
                     "Cooling Setpoint": {"hourly_value": 24},
+                    "Humidifying RH": {"hourly_value": 10},
+                    "Dehumidifying RH": {"hourly_value": 45},
                     "OA Fraction": {"hourly_value": 0.5},
                     "OA Minimum": {"hourly_value": 0.2}
                 },
@@ -4507,6 +4574,13 @@ mod tests {
                         "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
                         "control_1_name": "Dual Setpoints",
                         "temperature_difference_between_cutout_and_setpoint": 0.5
+                    }
+                },
+                "ZoneControl:Humidistat": {
+                    "Zone Humidistat": {
+                        "zone_name": "Zone One",
+                        "humidifying_relative_humidity_setpoint_schedule_name": "Humidifying RH",
+                        "dehumidifying_relative_humidity_setpoint_schedule_name": "Dehumidifying RH"
                     }
                 },
                 "NodeList": {
@@ -4578,6 +4652,7 @@ mod tests {
         };
         assert_eq!(model.thermostat_dual_setpoints.len(), 1);
         assert_eq!(model.zone_thermostats.len(), 1);
+        assert_eq!(model.zone_humidistats.len(), 1);
         assert_eq!(model.design_specification_outdoor_air.len(), 1);
         assert_eq!(model.ideal_loads_air_systems.len(), 1);
         assert_eq!(model.zone_equipment_lists.len(), 1);
@@ -4590,6 +4665,23 @@ mod tests {
         assert_eq!(
             model.zone_thermostats[0].temperature_difference_between_cutout_and_setpoint_delta_c,
             0.5
+        );
+        assert_eq!(model.zone_humidistats[0].zone.0, 0);
+        let humidifying_schedule = model
+            .schedule_names
+            .resolve("Humidifying RH")
+            .expect("Humidifying RH schedule should resolve");
+        let dehumidifying_schedule = model
+            .schedule_names
+            .resolve("Dehumidifying RH")
+            .expect("Dehumidifying RH schedule should resolve");
+        assert_eq!(
+            model.zone_humidistats[0].humidifying_relative_humidity_setpoint_schedule,
+            humidifying_schedule
+        );
+        assert_eq!(
+            model.zone_humidistats[0].dehumidifying_relative_humidity_setpoint_schedule,
+            dehumidifying_schedule
         );
         assert_eq!(
             model.ideal_loads_air_systems[0].heating_limit,

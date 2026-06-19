@@ -4,8 +4,8 @@ use crate::{
     AutoOrNumber, AutosizeOrNumber, BranchId, BranchListId, ComponentId, ConnectorId,
     ConnectorListId, ConstructionId, IdealLoadsAirSystemId, InternalGainId, LoopId, MaterialId,
     NodeId, NodeListId, NormalizedName, Point3, RunPeriodId, ScheduleId, ScheduleTypeLimitId,
-    SurfaceId, ThermostatSetpointId, ZoneEquipmentConnectionId, ZoneEquipmentListId, ZoneId,
-    ZoneThermostatId,
+    SurfaceId, ThermostatSetpointId, ZoneEquipmentConnectionId, ZoneEquipmentListId,
+    ZoneHumidistatId, ZoneId, ZoneThermostatId,
 };
 
 /// EnergyPlus-compatible model version.
@@ -511,6 +511,21 @@ pub struct ZoneThermostat {
     pub controls: Vec<ZoneThermostatControl>,
     /// Temperature difference between cutout and setpoint in delta C.
     pub temperature_difference_between_cutout_and_setpoint_delta_c: f64,
+}
+
+/// Zone humidistat assignment.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneHumidistat {
+    /// Typed ID.
+    pub id: ZoneHumidistatId,
+    /// Object name.
+    pub name: NormalizedName,
+    /// Controlled zone.
+    pub zone: ZoneId,
+    /// Humidifying relative humidity setpoint schedule.
+    pub humidifying_relative_humidity_setpoint_schedule: ScheduleId,
+    /// Dehumidifying relative humidity setpoint schedule.
+    pub dehumidifying_relative_humidity_setpoint_schedule: ScheduleId,
 }
 
 /// `ZoneHVAC:IdealLoadsAirSystem` limit mode.

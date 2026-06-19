@@ -6891,6 +6891,12 @@ pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64
     1.004_84e3 + humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO) * 1.858_95e3
 }
 
+/// Returns EnergyPlus `PsyHgAirFnWTdb` water-vapor gas enthalpy in J/kg.
+#[must_use]
+pub fn energyplus_water_vapor_gas_enthalpy_j_per_kg(dry_bulb_c: f64) -> f64 {
+    2_500_940.0 + 1_858.95 * dry_bulb_c
+}
+
 /// Returns EnergyPlus `PsyWFnTdbRhPb`-style humidity ratio from dry-bulb,
 /// relative humidity, and barometric pressure.
 pub fn energyplus_psychrometric_humidity_ratio_from_rh(

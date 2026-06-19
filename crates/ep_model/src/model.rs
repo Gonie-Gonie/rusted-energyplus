@@ -10,7 +10,7 @@ use crate::{
     ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation, Surface,
     SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
     TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
-    ZoneId, ZoneThermostat, ZoneThermostatId,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -64,6 +64,10 @@ pub struct TypedModel {
     pub zone_thermostats: Vec<ZoneThermostat>,
     /// Zone thermostat names.
     pub zone_thermostat_names: NameMap<ZoneThermostatId>,
+    /// Zone humidistat controls.
+    pub zone_humidistats: Vec<ZoneHumidistat>,
+    /// Zone humidistat names.
+    pub zone_humidistat_names: NameMap<ZoneHumidistatId>,
     /// IdealLoads air systems.
     pub ideal_loads_air_systems: Vec<IdealLoadsAirSystem>,
     /// IdealLoads air system names.
@@ -155,6 +159,8 @@ impl Default for TypedModel {
             thermostat_dual_setpoint_names: NameMap::default(),
             zone_thermostats: Vec::new(),
             zone_thermostat_names: NameMap::default(),
+            zone_humidistats: Vec::new(),
+            zone_humidistat_names: NameMap::default(),
             ideal_loads_air_systems: Vec::new(),
             ideal_loads_air_system_names: NameMap::default(),
             design_specification_outdoor_air: Vec::new(),
@@ -209,6 +215,7 @@ impl TypedModel {
             + self.people.len()
             + self.thermostat_dual_setpoints.len()
             + self.zone_thermostats.len()
+            + self.zone_humidistats.len()
             + self.ideal_loads_air_systems.len()
             + self.design_specification_outdoor_air.len()
             + self.zone_equipment_lists.len()
