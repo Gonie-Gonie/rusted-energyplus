@@ -100,6 +100,7 @@ source files and Rust result locations before promoting conformance claims.
 | `System Node Mass Flow Rate` | detailed | `node-state-source-map.md`; `DataZoneEquipment.cc`; `PurchasedAirManager.cc` | `supply_node_update_from_result` using source-order pre-update zone state for no-limit IdealLoads and same-call recirculation state for finite-limit, Constant SHR, ConstantSupplyHumidityRatio, and Humidistat evidence | conformance for the IdealLoads supply node in `ideal_loads_no_oa_sensible_conformance_001`, `ideal_loads_capacity_limit_conformance_001`, `ideal_loads_flow_limit_conformance_001`, `ideal_loads_flow_capacity_limit_conformance_001`, `ideal_loads_constant_shr_conformance_001`, `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`, `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`, `ideal_loads_humidistat_dehumidification_conformance_candidate_001`, and `ideal_loads_humidistat_humidification_conformance_candidate_001` only |
 | `System Node Setpoint Temperature` | hourly | `node-state-source-map.md`; `NodeInputManager.cc`; `ZoneTempPredictorCorrector.cc` | future node-state result store | future-gated; sentinel handling required |
 | `Site Outdoor Air Drybulb Temperature` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW weather trace | conformance for `weather_fields_001` and as declared weather alignment in the official dynamic compatibility candidate |
+| `Site Outdoor Air Wetbulb Temperature` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW/weather-manager wet-bulb trace | conformance for the declared official dynamic wet-bulb weather alignment row only; broad weather processor and wet-surface branches remain outside |
 | `Site Rain Status` | hourly | `src/EnergyPlus/WeatherManager.cc` | EPW weather trace | conformance for the declared official dynamic rain-status alignment row only; broad precipitation and wet-surface branches remain outside |
 | `Schedule Value` | hourly | output processor plus schedule managers | schedule trace | smoke |
 
@@ -143,11 +144,12 @@ blocking gate.
 
 The v0.33 `official_1zone_uncontrolled_dynamic_conformance_candidate_001`
 report is a separate official ExampleFile dynamic conformance result for its
-declared conformance-level weather, zone-air, surface temperature,
+declared conformance-level weather/wetbulb/rain-status, zone-air, surface temperature,
 inside/outside conduction and conduction per-area variables, exact-zero named
 wall/roof sky and ground diffuse incident solar per-area rows, and the declared
-floor storage/storage per-area rows. Nonzero solar, radiation, convection
-coefficient, other storage, and broader probe rows remain outside that claim.
+floor storage/storage per-area rows. Broad weather processor compatibility,
+nonzero solar, radiation, convection coefficient, other storage, and broader
+probe rows remain outside that claim.
 
 The official `1ZoneUncontrolled` baseline case now requests zone temperature,
 zone air heat-balance, weather, internal gain, and surface conduction hourly

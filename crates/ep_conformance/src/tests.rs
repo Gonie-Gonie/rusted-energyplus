@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 56);
+    assert_eq!(manifest.outputs.len(), 57);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        56
+        57
     );
     assert_eq!(
         manifest
@@ -588,6 +588,12 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "Environment"
             && output.variable == "Site Outdoor Air Drybulb Temperature"
+            && output.class == VariableClass::Weather
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "Environment"
+            && output.variable == "Site Outdoor Air Wetbulb Temperature"
             && output.class == VariableClass::Weather
             && output.level == Some(OutputLevel::Conformance)
     }));

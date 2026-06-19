@@ -492,6 +492,7 @@ required_cases = [
 ]
 required_variables = [
   "Site Outdoor Air Drybulb Temperature",
+  "Site Outdoor Air Wetbulb Temperature",
   "Site Rain Status",
   "Zone Mean Air Temperature",
   "Zone Air Heat Balance Internal Convective Heat Gain Rate",
@@ -513,6 +514,7 @@ required_variables = [
 not_claimed = [
   "broad ExampleFiles dynamic numerical conformance",
   "general warmup convergence parity outside the official 1ZoneUncontrolled dynamic candidate",
+  "broad weather processor and wet-surface branch compatibility",
   "storage rows outside the declared floor storage rows, radiation, nonzero solar, and convection coefficient variables",
   "broad solar and exterior convection parity",
   "full EnergyPlus compatibility",

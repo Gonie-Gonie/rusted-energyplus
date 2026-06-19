@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 106 tracked variables, 87 conformance variables, 13
+  output-variable scope: 107 tracked variables, 88 conformance variables, 13
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -44,7 +44,7 @@ tolerance, and code organization.
 - no-mass adiabatic surface conduction rate/per-area conformance for the
   declared `surface_temperature_nomass_001` hourly series
 - official `1ZoneUncontrolled` dynamic heat-balance conformance gate for
-  declared weather/rain-status, zone-air, surface temperature, surface
+  declared weather/wetbulb/rain-status, zone-air, surface temperature, surface
   conduction, exact-zero named wall/roof sky/ground diffuse incident solar,
   zone opaque aggregate conduction, and floor storage hourly series in the
   compatibility-candidate lane

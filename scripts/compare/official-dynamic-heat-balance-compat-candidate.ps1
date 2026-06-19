@@ -152,14 +152,24 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 56) {
-    throw "Expected 56 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 57) {
+    throw "Expected 57 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq "Site Outdoor Air Drybulb Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Weather dry-bulb conformance series missing"
+}
+$wetbulbSeries = $summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq "Site Outdoor Air Wetbulb Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+if (-not $wetbulbSeries) {
+    throw "Weather wet-bulb conformance series missing"
+}
+if ([double]$wetbulbSeries.max_abs_delta_c -gt 0.00001) {
+    throw "Weather wet-bulb max_abs_delta_c exceeds 1e-5 C: $($wetbulbSeries.max_abs_delta_c)"
+}
+if ([double]$wetbulbSeries.rmse_delta_c -gt 0.00001) {
+    throw "Weather wet-bulb rmse_delta_c exceeds 1e-5 C: $($wetbulbSeries.rmse_delta_c)"
 }
 $rainSeries = $summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq "Site Rain Status" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
 if (-not $rainSeries) {
@@ -247,6 +257,7 @@ Assert-Contains -Text $reportText -Pattern "Heat Balance Conformance Report" -De
 Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Description "markdown comparison class"
 Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Description "markdown conformance claim"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
+Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature / hourly / weather / eso / conformance" -Description "wet-bulb weather conformance output"
 Assert-Contains -Text $reportText -Pattern "Site Rain Status / hourly / weather / eso / conformance" -Description "rain-status weather conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Conduction Heat Transfer Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "surface conduction per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "incident sky diffuse conformance output"

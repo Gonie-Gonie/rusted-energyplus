@@ -767,6 +767,14 @@ first_evidence = "weather_fields_001"
 support_boundary = "Tolerance-gated time-series conformance for the weather case and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate."
 
 [[variable]]
+name = "Site Outdoor Air Wetbulb Temperature"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic wet-bulb weather alignment for the declared Environment row only; broad weather processor, psychrometric preprocessing, and wet-surface branch compatibility remain outside the claim."
+
+[[variable]]
 name = "Site Rain Status"
 domain = "weather"
 status = "conformance"
