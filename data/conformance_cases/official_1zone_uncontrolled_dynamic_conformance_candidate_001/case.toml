@@ -445,6 +445,24 @@ source = "eso"
 domain = "surface"
 level = "conformance"
 
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Inside Faces Conduction Rate"
+frequency = "hourly"
+class = "surface-aggregate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Outside Faces Conduction Rate"
+frequency = "hourly"
+class = "surface-aggregate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
 [[tolerances]]
 variable_class = "weather"
 max_abs = 0.00001
@@ -464,6 +482,11 @@ max_rmse = 0.35
 variable_class = "surface-flux-state"
 max_abs = 0.005
 max_rmse = 0.0015
+
+[[tolerances]]
+variable_class = "surface-aggregate-state"
+max_abs = 1.2
+max_rmse = 0.2
 
 [[tolerances]]
 variable_class = "surface-storage-state"

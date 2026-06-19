@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 43) {
-    throw "Expected 43 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 45) {
+    throw "Expected 45 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -174,6 +174,18 @@ foreach ($series in $surfaceFluxSeries) {
     }
     if ([double]$series.rmse_delta_c -gt 0.0015) {
         throw "Surface conduction per-area rmse_delta_c exceeds 0.0015 W/m2 for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
+$surfaceAggregateSeries = @($summary.series | Where-Object { $_.output.class -eq "surface-aggregate-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })
+if ($surfaceAggregateSeries.Count -ne 2) {
+    throw "Expected two surface-aggregate-state conformance series, got $($surfaceAggregateSeries.Count)"
+}
+foreach ($series in $surfaceAggregateSeries) {
+    if ([double]$series.max_abs_delta_c -gt 1.2) {
+        throw "Zone opaque aggregate conduction max_abs_delta_c exceeds 1.2 W for $($series.output.key) / $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.2) {
+        throw "Zone opaque aggregate conduction rmse_delta_c exceeds 0.2 W for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
     }
 }
 $storageSeries = $summary.series | Where-Object { $_.output.key -eq "ZN001:FLR001" -and $_.output.variable -eq "Surface Heat Storage Rate" -and $_.output.class -eq "surface-storage-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
@@ -203,6 +215,7 @@ Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Desc
 Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Description "markdown conformance claim"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Conduction Heat Transfer Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "surface conduction per-area conformance output"
+Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate / hourly / surface-aggregate-state / eso / conformance" -Description "zone opaque aggregate conduction conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-storage-state / eso / conformance" -Description "surface storage conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area / hourly / surface-storage-flux-state / eso / conformance" -Description "surface storage per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "status: pass" -Description "markdown status"

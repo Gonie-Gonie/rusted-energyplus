@@ -47,11 +47,13 @@ proof_variables = [
   "Surface Outside Face Conduction Heat Transfer Rate per Area",
   "Surface Heat Storage Rate",
   "Surface Heat Storage Rate per Area",
+  "Zone Opaque Surface Inside Faces Conduction Rate",
+  "Zone Opaque Surface Outside Faces Conduction Rate",
   "Zone Air Heat Balance Surface Convection Rate",
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 claim_level = "limited-official-dynamic-conformance"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including named roof/wall/floor conduction per-area rows and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated flux/storage tolerances; broad heat-balance compatibility, other storage rows, radiation, solar, convection decomposition, and non-promoted probe lanes remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including named roof/wall/floor conduction per-area rows, zone opaque conduction aggregate rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage tolerances; broad heat-balance compatibility, other storage rows, radiation, solar, convection decomposition, and non-promoted probe lanes remain outside the claim."
 
 [[algorithm]]
 id = "surface_inside_temperature"

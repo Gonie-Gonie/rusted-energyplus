@@ -264,11 +264,12 @@ Minimum first variables:
   `surface_temperature_nomass_001` and the official dynamic compatibility
   candidate's declared whole-surface rows
 - surface conduction per-area rows and zone opaque conduction aggregates:
-  diagnostic-only for official dynamic heat-balance work
-- `Zone Opaque Surface Inside Faces Conduction Rate`: conformance only for
-  no-mass adiabatic `surface_temperature_nomass_001`
-- `Zone Opaque Surface Outside Faces Conduction Rate`: diagnostic-only for
-  official dynamic heat-balance work
+  conformance for declared official dynamic compatibility-candidate rows
+- `Zone Opaque Surface Inside Faces Conduction Rate`: conformance for
+  no-mass adiabatic `surface_temperature_nomass_001` and the declared
+  official dynamic aggregate row
+- `Zone Opaque Surface Outside Faces Conduction Rate`: conformance for the
+  declared official dynamic aggregate row
 - `Zone Total Internal Convective Heating Rate`: conformance only for
   `internal_gains_001`
 - `Site Outdoor Air Drybulb Temperature`

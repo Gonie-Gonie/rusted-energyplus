@@ -716,7 +716,15 @@ domain = "surface"
 status = "conformance"
 first_case = "surface_temperature_nomass_001"
 first_evidence = "surface_temperature_nomass_001"
-support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance only; official ExampleFile dynamic conduction remains a promotion candidate, not a claim."
+support_boundary = "Tolerance-gated no-mass adiabatic hourly conformance plus the official 1ZoneUncontrolled dynamic aggregate candidate row under surface-aggregate-state tolerance; broader aggregate and radiation/convection/solar decomposition remain outside the claim."
+
+[[variable]]
+name = "Zone Opaque Surface Outside Faces Conduction Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic aggregate candidate row under surface-aggregate-state tolerance only; broader aggregate and radiation/convection/solar decomposition remain outside the claim."
 
 [[variable]]
 name = "Zone Air Heat Balance Surface Convection Rate"
