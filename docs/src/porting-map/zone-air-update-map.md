@@ -212,17 +212,17 @@ the solver `SumHA/SumHATsurf/SumHATref` coefficients alone.
 
 An inside-surface loop ordering probe then tested the EnergyPlus source-order
 fact that `CalcHeatBalanceInsideSurf*` converges surface temperatures before
-zone-air correction. Rust now exposes
-`surface_loop_zone_air_correction=after-surface-loop` for this diagnostic, but
-the historical pre-all-EIO ScriptF-flat lane is neutral because its
-frozen-reference-air surface loop is already insensitive to intra-loop zone-air
-updates: MAT remains
-`0.037329 C` RMSE, zone surface convection `22.062956 W`, air storage
-`9.127258 W`, inside-surface iteration count `10.643041`, floor storage
-`28.786920 W`, and roof outside convection `19.558304 W`. The remaining
-iteration-count and zone-air gaps therefore stay on the inside-surface solve
-itself: `SurfTempInTmp` update parity, ScriptF/longwave source ownership,
-inside hconv re-evaluation state, and the exact non-window convergence set.
+zone-air correction. The broad `energyplus-heat-balance-compat-candidate`
+diagnostic wrapper now defaults to
+`surface_loop_zone_air_correction=after-surface-loop` for that source-order
+probe; `each-surface-iteration` remains available explicitly. This reduces
+zone-air report and aggregate conduction deltas in broad diagnostics, but the
+promoted official compatibility candidate remains on its current
+tolerance-passing path until the air-storage max-delta gap is closed. The
+remaining gaps therefore stay on `SurfTempInTmp` update parity,
+ScriptF/longwave source ownership, inside hconv re-evaluation state, exact
+non-window convergence set, and outside quick-balance current face temperature
+parity.
 
 The EnergyPlus inside-hconv source cadence has now been split from compensating
 probe values. `DataHeatBalSurface.hh::ItersReevalConvCoeff` is `30`, and the

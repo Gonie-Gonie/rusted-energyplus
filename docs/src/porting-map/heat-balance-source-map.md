@@ -130,10 +130,11 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
 - The same source order keeps zone-air correction outside the
   inside-surface convergence loop: `CalcHeatBalanceInsideSurf*` converges
   `SurfTempIn`/`SurfTempInTmp` first, then the caller proceeds to air heat
-  balance/reporting and final history update work. Rust exposes
-  `surface_loop_zone_air_correction=after-surface-loop` as a diagnostic probe
-  for this ordering while preserving the existing
-  `each-surface-iteration` default.
+  balance/reporting and final history update work. The broad
+  `energyplus-heat-balance-compat-candidate` diagnostic wrapper now defaults to
+  `surface_loop_zone_air_correction=after-surface-loop` for this source-order
+  probe; the promoted official compatibility candidate remains on its
+  tolerance-passing path until the air-storage max-delta gap is closed.
 
 ## Data Structure Map
 
