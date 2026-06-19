@@ -55,7 +55,8 @@ source = "eio"
 Each output request must define key, variable, frequency, variable class, and
 source artifact. Supported variable class values are `schedule`, `weather`,
 `construction-material`, `internal-gain`, `zone-state`, `surface-state`,
-`surface-flux-state`, `surface-solar-flux-state`, `surface-aggregate-state`,
+`surface-flux-state`, `surface-solar-flux-state`,
+`surface-solar-rate-state`, `surface-aggregate-state`,
 `surface-storage-state`, `surface-storage-flux-state`, `node-state`,
 `hvac-state`, `plant-state`, `plant-equipment`, `meter`,
 `internal-variable`, and `diagnostic`.

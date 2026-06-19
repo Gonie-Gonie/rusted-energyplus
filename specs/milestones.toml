@@ -506,6 +506,8 @@ required_variables = [
   "Surface Outside Face Incident Beam Solar Radiation Rate per Area",
   "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area",
   "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area",
+  "Surface Outside Face Solar Radiation Heat Gain Rate",
+  "Surface Outside Face Solar Radiation Heat Gain Rate per Area",
   "Surface Heat Storage Rate",
   "Surface Heat Storage Rate per Area",
   "Zone Opaque Surface Inside Faces Conduction Rate",
@@ -517,7 +519,7 @@ not_claimed = [
   "broad ExampleFiles dynamic numerical conformance",
   "general warmup convergence parity outside the official 1ZoneUncontrolled dynamic candidate",
   "broad weather processor and wet-surface branch compatibility",
-  "storage rows outside the declared floor storage rows, absorbed/non-incident solar, radiation, and convection coefficient variables",
+  "storage rows outside the declared floor storage rows, absorbed/non-incident solar outside the declared absorbed rows, radiation, and convection coefficient variables",
   "broad solar and exterior convection parity",
   "full EnergyPlus compatibility",
 ]

@@ -49,10 +49,11 @@ diagnostic tracker and the promoted compatibility candidate.
 zone-air, face-temperature, conduction, floor Surface Heat Storage Rate, floor
 Surface Heat Storage Rate per Area, named wall/roof incident total/beam solar
 per-area rows, and exact-zero named wall/roof sky and ground diffuse incident
-solar per-area variables. The broad diagnostic case remains
+solar per-area variables, named wall/roof absorbed solar heat gain rate rows,
+and the roof absorbed solar heat gain per-area row. The broad diagnostic case remains
 `conformance_claim=false`, and broad weather-processor,
-storage/radiation/absorbed-solar/convection diagnostics must not inherit the
-candidate claim.
+storage/radiation/absorbed-solar outside those declared rows/convection
+diagnostics must not inherit the candidate claim.
 
 Developers can run `scripts\dev.cmd official-dynamic-heat-balance-warmup-20-probe`
 to raise the Rust diagnostic warmup minimum to the EnergyPlus run-period warmup

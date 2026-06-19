@@ -1612,12 +1612,13 @@ fn validate_heat_balance_conformance_manifest(manifest: &ConformanceCase) -> Res
                 | VariableClass::SurfaceState
                 | VariableClass::SurfaceFluxState
                 | VariableClass::SurfaceSolarFluxState
+                | VariableClass::SurfaceSolarRateState
                 | VariableClass::SurfaceAggregateState
                 | VariableClass::SurfaceStorageState
                 | VariableClass::SurfaceStorageFluxState
         ) {
             return Err(format!(
-                "heat-balance conformance requires weather, zone-state, surface-state, surface-flux-state, surface-solar-flux-state, surface-aggregate-state, surface-storage-state, or surface-storage-flux-state class, got {} for {}",
+                "heat-balance conformance requires weather, zone-state, surface-state, surface-flux-state, surface-solar-flux-state, surface-solar-rate-state, surface-aggregate-state, surface-storage-state, or surface-storage-flux-state class, got {} for {}",
                 variable_class_label(output.class),
                 output.variable
             ));
@@ -1695,13 +1696,14 @@ fn validate_heat_balance_diagnostic_manifest(manifest: &ConformanceCase) -> Resu
                 | VariableClass::SurfaceState
                 | VariableClass::SurfaceFluxState
                 | VariableClass::SurfaceSolarFluxState
+                | VariableClass::SurfaceSolarRateState
                 | VariableClass::SurfaceAggregateState
                 | VariableClass::SurfaceStorageState
                 | VariableClass::SurfaceStorageFluxState
                 | VariableClass::Weather
         ) {
             return Err(format!(
-                "heat-balance diagnostic requires zone-state, surface-state, surface-flux-state, surface-solar-flux-state, surface-aggregate-state, surface-storage-state, surface-storage-flux-state, or weather class, got {} for {}",
+                "heat-balance diagnostic requires zone-state, surface-state, surface-flux-state, surface-solar-flux-state, surface-solar-rate-state, surface-aggregate-state, surface-storage-state, surface-storage-flux-state, or weather class, got {} for {}",
                 variable_class_label(output.class),
                 output.variable
             ));
@@ -2385,6 +2387,7 @@ fn variable_class_label(class: VariableClass) -> &'static str {
         VariableClass::SurfaceState => "surface-state",
         VariableClass::SurfaceFluxState => "surface-flux-state",
         VariableClass::SurfaceSolarFluxState => "surface-solar-flux-state",
+        VariableClass::SurfaceSolarRateState => "surface-solar-rate-state",
         VariableClass::SurfaceAggregateState => "surface-aggregate-state",
         VariableClass::SurfaceStorageState => "surface-storage-state",
         VariableClass::SurfaceStorageFluxState => "surface-storage-flux-state",

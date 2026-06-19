@@ -23,7 +23,7 @@ tolerance, and code organization.
 - user-facing support coverage report generation for inputs, outputs, and
   algorithm scope
 - support coverage metadata and manifests as the canonical current
-  output-variable scope: 109 tracked variables, 90 conformance variables, 13
+  output-variable scope: 111 tracked variables, 92 conformance variables, 13
   diagnostic variables, and 6 baseline variables
 - source-map and algorithm ledger validation gate
 - timestamp-aligned time/weather/schedule conformance report gate
@@ -46,7 +46,8 @@ tolerance, and code organization.
 - official `1ZoneUncontrolled` dynamic heat-balance conformance gate for
   declared weather/wetbulb/rain-status, zone-air, surface temperature, surface
   conduction, named wall/roof incident total/beam solar, exact-zero named
-  wall/roof sky/ground diffuse incident solar,
+  wall/roof sky/ground diffuse incident solar, named wall/roof absorbed solar
+  heat gain rate, and roof absorbed solar heat gain per-area,
   zone opaque aggregate conduction, and floor storage hourly series in the
   compatibility-candidate lane
 - official `1ZoneUncontrolled` dynamic heat-balance diagnostic report for
@@ -328,10 +329,12 @@ tolerance, and code organization.
   `1ZoneUncontrolled` dynamic candidate surfaces, including the declared floor
   `Surface Heat Storage Rate` / `Surface Heat Storage Rate per Area` rows and
   the declared zone opaque surface inside/outside conduction aggregate rows,
-  plus named wall/roof incident total/beam solar rows and exact-zero named
-  wall/roof sky/ground diffuse incident solar rows under dedicated
-  storage/flux/solar-flux tolerances; absorbed solar, radiation, and broad CTF
-  diagnostics are not promoted
+  plus named wall/roof incident total/beam solar rows, exact-zero named
+  wall/roof sky/ground diffuse incident solar rows, named wall/roof absorbed
+  solar heat gain rate rows, and the roof absorbed solar heat gain per-area
+  row under dedicated storage/flux/solar-rate/solar-flux tolerances; absorbed
+  solar outside those declared rows, radiation, and broad CTF diagnostics are
+  not promoted
 - v0.27 support coverage report only as release documentation infrastructure;
   it does not promote new numerical conformance
 - v0.28 input object coverage metadata only as user documentation

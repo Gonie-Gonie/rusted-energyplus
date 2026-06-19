@@ -7,11 +7,11 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "Expected status is pass for conformance-level variables in the compatibility-candidate lane.",
-  "This candidate gates the promotion variables, including wetbulb/rain-status weather alignment, exact-zero named wall/roof sky and ground diffuse incident solar rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated storage tolerances.",
+  "This candidate gates the promotion variables, including wetbulb/rain-status weather alignment, exact-zero named wall/roof sky and ground diffuse incident solar rows, declared named wall/roof absorbed solar heat gain rate rows, the roof absorbed solar heat gain per-area row, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated solar-rate, solar-flux, and storage tolerances.",
   "Diagnostic probe algorithms are not eligible for this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
   "The v0.26 planned official dynamic boundary is promoted here after static, weather, internal convective gain, warmup, and selected dynamic heat-balance evidence pass.",
   "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
-  "Broad solar compatibility beyond the declared named wall/roof incident beam, incident total, and exact-zero sky/ground diffuse rows remains outside this conformance claim, as do exterior radiation, exterior convection, and fenestration compatibility.",
+  "Broad solar compatibility beyond the declared named wall/roof incident beam, incident total, exact-zero sky/ground diffuse, named wall/roof absorbed solar heat gain rate, and roof absorbed solar heat gain per-area rows remains outside this conformance claim, as do exterior radiation, exterior convection, and fenestration compatibility.",
 ]
 
 [manifest_v2]
@@ -429,6 +429,15 @@ domain = "surface"
 level = "conformance"
 
 [[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-solar-rate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
 key = "ZN001:WALL002"
 variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
 frequency = "hourly"
@@ -460,6 +469,15 @@ key = "ZN001:WALL002"
 variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-solar-rate-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -501,6 +519,15 @@ domain = "surface"
 level = "conformance"
 
 [[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-solar-rate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
 frequency = "hourly"
@@ -537,6 +564,15 @@ domain = "surface"
 level = "conformance"
 
 [[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-solar-rate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Outside Face Incident Solar Radiation Rate per Area"
 frequency = "hourly"
@@ -568,6 +604,24 @@ key = "ZN001:ROOF001"
 variable = "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area"
 frequency = "hourly"
 class = "surface-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate"
+frequency = "hourly"
+class = "surface-solar-rate-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Solar Radiation Heat Gain Rate per Area"
+frequency = "hourly"
+class = "surface-solar-flux-state"
 source = "eso"
 domain = "surface"
 level = "conformance"
@@ -686,6 +740,11 @@ max_rmse = 0.0015
 variable_class = "surface-solar-flux-state"
 max_abs = 0.02
 max_rmse = 0.003
+
+[[tolerances]]
+variable_class = "surface-solar-rate-state"
+max_abs = 2.5
+max_rmse = 0.5
 
 [[tolerances]]
 variable_class = "surface-aggregate-state"
