@@ -263,6 +263,12 @@ Humidistat dehumidification supply mass flow, supply humidity ratio, and
 cooling report rows with zero tolerance failures. The original
 `ideal_loads_humidistat_dehumidification_diagnostic_001` remains available as
 non-claim regression/proof evidence for the broader diagnostic output set.
+The compare report also records a diagnostic Rust closed-loop humidity pass
+that feeds the ported no-OA ThirdOrder moisture-demand predictor into
+`SimPurchasedAir` and then into the ported `correctHumRat` subset. That table is
+evidence for the remaining warmup/history closure work only; the promoted
+conformance rows still use EnergyPlus `ZoneSysMoistureDemand` as the traced
+proof input.
 
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 matching no-OA Humidistat humidification lane for declared thermostat,
@@ -277,9 +283,14 @@ and matches the supply humidity and heating report rows with zero tolerance
 failures. The original `ideal_loads_humidistat_humidification_diagnostic_001`
 remains available as non-claim regression/proof evidence for the broader
 diagnostic output set.
+The compare report also records the same diagnostic Rust closed-loop humidity
+pass for the humidification fixture. It is not a promoted input until the
+`WPrevZoneTSTemp` warmup/system-history state is reproduced without oracle
+moisture-demand rows.
 
 These remain diagnostic-only: Humidistat schedule-to-moisture-demand
-calculation, annual facility meter rows in the short-run humidity-control
+calculation as a promoted input, `WPrevZoneTSTemp` warmup/system-history
+closure, annual facility meter rows in the short-run humidity-control
 candidates, outdoor-air humidity control,
 DifferentialEnthalpy economizer humidity interactions, heat-recovery humidity
 interactions, finite-limit humidity-control behavior, and broad humidity-control

@@ -324,14 +324,20 @@ keeps EnergyPlus moisture-demand rows, return-node and zone-air-node humidity
 rows, annual meter rows, and broad meter behavior as diagnostic proof only; the
 hourly, monthly, and run-period `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
+The report now includes a diagnostic Rust closed-loop humidity table that
+combines the ported no-OA ThirdOrder predictor, `SimPurchasedAir`, and the
+ported `correctHumRat` subset. That table is for isolating remaining
+`WPrevZoneTSTemp` warmup/system-history residuals and is not used as the
+promoted Humidistat input.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
 38 Detailed ESO series with 29 conformance rows and 9 diagnostic proof rows,
 plus six conformance meter rows: hourly, monthly, and run-period for both facility meters. Humidistat
-schedule-to-moisture-demand calculation, outdoor-air humidity, finite-limit
-humidity-control behavior, and broad humidity-control conformance remain
-outside the claim.
+schedule-to-moisture-demand calculation as a promoted input,
+`WPrevZoneTSTemp` warmup/system-history closure, outdoor-air humidity,
+finite-limit humidity-control behavior, and broad humidity-control conformance
+remain outside the claim.
 
 ## IdealLoads Humidistat Humidification Conformance
 
@@ -344,14 +350,18 @@ keeps EnergyPlus moisture-demand rows, return-node and zone-air-node humidity
 rows, annual meter rows, and broad meter behavior as diagnostic proof only; the
 hourly, monthly, and run-period `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
+The report includes the same diagnostic Rust closed-loop humidity table for
+humidification; promotion still waits on non-oracle warmup/system-history
+closure for `WPrevZoneTSTemp`.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
 38 Detailed ESO series with 29 conformance rows and 9 diagnostic proof rows,
 plus six conformance meter rows: hourly, monthly, and run-period for both facility meters. Humidistat
-schedule-to-moisture-demand calculation, outdoor-air humidity, finite-limit
-humidity-control behavior, and broad humidity-control conformance remain
-outside the claim.
+schedule-to-moisture-demand calculation as a promoted input,
+`WPrevZoneTSTemp` warmup/system-history closure, outdoor-air humidity,
+finite-limit humidity-control behavior, and broad humidity-control conformance
+remain outside the claim.
 
 ## IdealLoads Outdoor-Air Design Flow And Economizer Conformance
 
