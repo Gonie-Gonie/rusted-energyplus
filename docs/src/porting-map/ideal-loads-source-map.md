@@ -771,46 +771,46 @@ behavior remain outside this claim.
 `scripts/dev.cmd compare-ideal-loads-constant-supply-humidity-cooling-conformance-candidate`
 generates the ConstantSupplyHumidityRatio cooling conformance evidence set under
 `.runtime/ideal-loads-constant-supply-humidity-cooling-conformance/26.1.0/ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001/compare/`.
-That run compares 36 Detailed/hourly series. The 11 declared conformance rows
-pass their tolerances, the 25 diagnostic proof rows pass, and
+That run compares 36 Detailed/hourly series. The 23 declared conformance rows
+pass their tolerances, the 13 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA ConstantSupplyHumidityRatio
-cooling claim for declared outputs; Humidistat, return-node and zone-air-node
-humidity proof rows, ReportPurchasedAir energy/fuel rows, meters, outdoor-air,
+cooling claim for declared outputs including ReportPurchasedAir energy/fuel
+rows; Humidistat, return-node and zone-air-node humidity proof rows, meters, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 
 `scripts/dev.cmd compare-ideal-loads-constant-supply-humidity-heating-conformance-candidate`
 generates the ConstantSupplyHumidityRatio heating conformance evidence set under
 `.runtime/ideal-loads-constant-supply-humidity-heating-conformance/26.1.0/ideal_loads_constant_supply_humidity_heating_conformance_candidate_001/compare/`.
-That run compares 36 Detailed/hourly series. The 11 declared conformance rows
-pass their tolerances, the 25 diagnostic proof rows pass, and
+That run compares 36 Detailed/hourly series. The 23 declared conformance rows
+pass their tolerances, the 13 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA ConstantSupplyHumidityRatio
-heating claim for declared outputs; Humidistat, return-node and zone-air-node
-humidity proof rows, ReportPurchasedAir energy/fuel rows, meters, outdoor-air,
+heating claim for declared outputs including ReportPurchasedAir energy/fuel
+rows; Humidistat, return-node and zone-air-node humidity proof rows, meters, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
 
 `scripts/dev.cmd compare-ideal-loads-humidistat-dehumidification-conformance-candidate`
 generates the Humidistat dehumidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-dehumidification-conformance/26.1.0/ideal_loads_humidistat_dehumidification_conformance_candidate_001/compare/`.
-That run compares 38 Detailed/hourly series. The 11 declared conformance rows
-pass their tolerances, the 27 diagnostic proof rows pass, and
+That run compares 38 Detailed/hourly series. The 23 declared conformance rows
+pass their tolerances, the 15 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
-dehumidification claim for declared outputs; EnergyPlus moisture-demand rows,
+dehumidification claim for declared outputs including ReportPurchasedAir
+energy/fuel rows; EnergyPlus moisture-demand rows,
 humidistat schedule-to-moisture-demand calculation, return-node and
-zone-air-node humidity proof rows, ReportPurchasedAir energy/fuel rows, meters,
-outdoor-air, economizer, heat-recovery, and broad HVAC behavior remain outside
-the claim.
+zone-air-node humidity proof rows, meters, outdoor-air, economizer,
+heat-recovery, and broad HVAC behavior remain outside the claim.
 
 `scripts/dev.cmd compare-ideal-loads-humidistat-humidification-conformance-candidate`
 generates the Humidistat humidification conformance evidence set under
 `.runtime/ideal-loads-humidistat-humidification-conformance/26.1.0/ideal_loads_humidistat_humidification_conformance_candidate_001/compare/`.
-That run compares 38 Detailed/hourly series. The 11 declared conformance rows
-pass their tolerances, the 27 diagnostic proof rows pass, and
+That run compares 38 Detailed/hourly series. The 23 declared conformance rows
+pass their tolerances, the 15 diagnostic proof rows pass, and
 `tolerance-failures.csv` is empty. This adds only the no-OA Humidistat
-humidification claim for declared outputs; EnergyPlus moisture-demand rows,
+humidification claim for declared outputs including ReportPurchasedAir
+energy/fuel rows; EnergyPlus moisture-demand rows,
 humidistat schedule-to-moisture-demand calculation, return-node and
-zone-air-node humidity proof rows, ReportPurchasedAir energy/fuel rows, meters,
-outdoor-air, economizer, heat-recovery, and broad HVAC behavior remain outside
-the claim.
+zone-air-node humidity proof rows, meters, outdoor-air, economizer,
+heat-recovery, and broad HVAC behavior remain outside the claim.
 
 ## Claim Requirements
 

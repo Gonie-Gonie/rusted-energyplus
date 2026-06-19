@@ -178,8 +178,13 @@ rows are promoted only by
 `ideal_loads_no_oa_report_energy_conformance_candidate_001`, which gates the
 EnergyPlus `ReportPurchasedAir` rate-to-`TimeStepSysSec` and
 `OutputProcessor` Sum path for declared supply-air and zone total
-heating/cooling energy rows. Blank fuel-efficiency rows are promoted only by
-`ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, and constant
+heating/cooling energy rows, and the four no-OA humidity-control conformance
+candidates promote the same ReportPurchasedAir energy rows inside their
+declared ConstantSupplyHumidityRatio and Humidistat branches. Blank
+fuel-efficiency rows are promoted only by
+`ideal_loads_blank_fuel_efficiency_conformance_candidate_001`, and by the four
+no-OA humidity-control conformance candidates for their declared blank
+fuel-efficiency rows; constant
 Schedule:Constant fuel-efficiency rows are promoted only by
 `ideal_loads_constant_fuel_efficiency_conformance_candidate_001`; all-days
 Schedule:Compact fuel-efficiency rows are promoted only by

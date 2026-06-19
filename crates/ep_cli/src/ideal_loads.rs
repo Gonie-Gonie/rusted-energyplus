@@ -144,6 +144,16 @@ const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS: &[&str] = &[
 ];
 const IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_POLICY: &str =
     "conformance for declared no-OA non-fuel ReportPurchasedAir energy rows only";
+const IDEAL_LOADS_HUMIDITY_REPORT_PURCHASED_AIR_CONFORMANCE_CASE_IDS: &[&str] = &[
+    "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001",
+    "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001",
+    "ideal_loads_humidistat_dehumidification_conformance_candidate_001",
+    "ideal_loads_humidistat_humidification_conformance_candidate_001",
+];
+const IDEAL_LOADS_HUMIDITY_REPORT_ENERGY_CONFORMANCE_POLICY: &str =
+    "conformance for declared no-OA humidity-control ReportPurchasedAir energy rows only";
+const IDEAL_LOADS_HUMIDITY_FUEL_EFFICIENCY_CONFORMANCE_POLICY: &str =
+    "conformance for declared no-OA humidity-control blank fuel-efficiency rows only";
 const IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_constant_fuel_efficiency_conformance_candidate_001";
 const IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_CASE_ID: &str =
@@ -647,6 +657,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             && !manifest_is_blank_fuel_efficiency_conformance_candidate(manifest)
             && !manifest_is_constant_fuel_efficiency_conformance_candidate(manifest)
             && !manifest_is_non_constant_fuel_efficiency_conformance_candidate(manifest)
+            && !manifest_is_humidity_report_purchased_air_conformance_candidate(manifest)
         {
             return Err(format!(
                 "IdealLoads fuel-energy outputs remain diagnostic until fuel-efficiency path conformance is separately proven: {}",
@@ -656,6 +667,7 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
         if output.level == Some(OutputLevel::Conformance)
             && ideal_loads_report_energy_variable(&output.variable)
             && !manifest_is_no_oa_report_energy_conformance_candidate(manifest)
+            && !manifest_is_humidity_report_purchased_air_conformance_candidate(manifest)
         {
             return Err(format!(
                 "IdealLoads ReportPurchasedAir energy outputs can be conformance-level only in the declared report-energy candidate: {}",
@@ -705,6 +717,28 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             }) {
                 return Err(format!(
                     "IdealLoads report-energy conformance candidate is missing conformance output {expected_output}"
+                ));
+            }
+        }
+    }
+    if manifest_is_humidity_report_purchased_air_conformance_candidate(manifest) {
+        for expected_output in IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_OUTPUTS {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable.eq_ignore_ascii_case(expected_output)
+                    && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads humidity-control ReportPurchasedAir conformance candidate is missing conformance output {expected_output}"
+                ));
+            }
+        }
+        for expected_output in IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_OUTPUTS {
+            if !manifest.outputs.iter().any(|output| {
+                output.variable.eq_ignore_ascii_case(expected_output)
+                    && output.level == Some(OutputLevel::Conformance)
+            }) {
+                return Err(format!(
+                    "IdealLoads humidity-control blank fuel-efficiency conformance candidate is missing conformance output {expected_output}"
                 ));
             }
         }
@@ -1094,6 +1128,16 @@ fn manifest_is_declared_no_oa_facility_meter_conformance_candidate(
 
 fn manifest_is_no_oa_report_energy_conformance_candidate(manifest: &ConformanceCase) -> bool {
     manifest.id == IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_CASE_ID
+        && manifest.comparison_class == ComparisonClass::Conformance
+        && manifest.conformance_claim
+}
+
+fn manifest_is_humidity_report_purchased_air_conformance_candidate(
+    manifest: &ConformanceCase,
+) -> bool {
+    IDEAL_LOADS_HUMIDITY_REPORT_PURCHASED_AIR_CONFORMANCE_CASE_IDS
+        .iter()
+        .any(|case_id| manifest.id == *case_id)
         && manifest.comparison_class == ComparisonClass::Conformance
         && manifest.conformance_claim
 }
@@ -8063,6 +8107,8 @@ fn facility_meter_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'
 fn report_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {
         IDEAL_LOADS_NO_OA_REPORT_ENERGY_CONFORMANCE_POLICY
+    } else if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_HUMIDITY_REPORT_ENERGY_CONFORMANCE_POLICY
     } else {
         IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY
     }
@@ -8071,6 +8117,8 @@ fn report_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) 
 fn report_energy_source_policy(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     if manifest_is_no_oa_report_energy_conformance_candidate(context.manifest) {
         "declared non-fuel energy conformance"
+    } else if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest) {
+        "declared humidity-control non-fuel energy conformance"
     } else {
         "diagnostic-only"
     }
@@ -8083,6 +8131,8 @@ fn fuel_energy_output_level_policy(context: &IdealLoadsDiagnosticContext<'_>) ->
         IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_POLICY
     } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_POLICY
+    } else if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_HUMIDITY_FUEL_EFFICIENCY_CONFORMANCE_POLICY
     } else {
         IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY
     }
@@ -8095,6 +8145,8 @@ fn fuel_energy_report_source(context: &IdealLoadsDiagnosticContext<'_>) -> &'sta
         IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
     } else if manifest_is_constant_fuel_efficiency_conformance_candidate(context.manifest) {
         IDEAL_LOADS_CONSTANT_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
+    } else if manifest_is_humidity_report_purchased_air_conformance_candidate(context.manifest) {
+        IDEAL_LOADS_BLANK_FUEL_EFFICIENCY_CONFORMANCE_REPORT_SOURCE
     } else {
         context.fuel_efficiency.report_source
     }
@@ -8106,13 +8158,13 @@ fn claim_boundary(context: &IdealLoadsDiagnosticContext<'_>) -> &'static str {
     } else if context.constant_shr_conformance_claim {
         "conformance no-OA ConstantSensibleHeatRatio cooling IdealLoads branch for declared variables only"
     } else if context.constant_supply_humidity_cooling_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables only"
+        "conformance no-OA ConstantSupplyHumidityRatio cooling IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
     } else if context.constant_supply_humidity_heating_conformance_claim {
-        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables only"
+        "conformance no-OA ConstantSupplyHumidityRatio heating IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
     } else if context.humidistat_dehumidification_conformance_claim {
-        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables only"
+        "conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
     } else if context.humidistat_humidification_conformance_claim {
-        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables only"
+        "conformance no-OA Humidistat humidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only"
     } else if manifest_is_no_oa_facility_meter_monthly_run_period_conformance_candidate(
         context.manifest,
     ) {

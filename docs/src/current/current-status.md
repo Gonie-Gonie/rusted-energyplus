@@ -255,15 +255,16 @@ The current public scope includes:
   and zone-air humidity rows kept diagnostic-only
 - limited IdealLoads no-OA `ConstantSupplyHumidityRatio` cooling/heating
   conformance for declared thermostat setpoints, total/sensible/latent rate
-  rows, supply-air report rows, and supply-node temperature/mass-flow/humidity
-  Detailed series, with opposite-side rows, return-node/zone-air humidity
-  rows, ReportPurchasedAir energy/fuel rows, and meters kept diagnostic-only
+  rows, supply-air report rows, ReportPurchasedAir energy/fuel rows, and
+  supply-node temperature/mass-flow/humidity Detailed series, with
+  opposite-side rate rows, return-node/zone-air humidity rows, and meters kept
+  diagnostic-only
 - limited IdealLoads no-OA Humidistat dehumidification/humidification
   conformance for declared thermostat setpoints, total/sensible/latent rate
-  rows, supply-air report rows, and supply-node temperature/mass-flow/humidity
+  rows, supply-air report rows, ReportPurchasedAir energy/fuel rows, and
+  supply-node temperature/mass-flow/humidity
   Detailed series, with EnergyPlus moisture-demand rows, opposite-side rows,
-  return-node/zone-air humidity rows, ReportPurchasedAir energy/fuel rows, and
-  meters kept diagnostic-only
+  return-node/zone-air humidity rows, and meters kept diagnostic-only
 - limited IdealLoads outdoor-air `Flow/Zone` conformance for declared
   outdoor-air mass/standard-density volume flow, no-humidity
   sensible/latent/total report rates, supply-air state, and mixed-air state

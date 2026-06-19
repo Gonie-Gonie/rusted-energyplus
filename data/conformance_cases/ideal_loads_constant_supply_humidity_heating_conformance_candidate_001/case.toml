@@ -1,18 +1,18 @@
 id = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001"
 title = "One-zone no-OA IdealLoads constant supply humidity heating conformance candidate"
 milestone = "ideal-loads-humidity-control-conformance"
-purpose = "Claim narrow no-outdoor-air IdealLoads ConstantSupplyHumidityRatio heating numerical conformance for declared heating latent/sensible/total rate and supply-node rows."
+purpose = "Claim narrow no-outdoor-air IdealLoads ConstantSupplyHumidityRatio heating numerical conformance for declared heating latent/sensible/total rate, ReportPurchasedAir energy/fuel, and supply-node rows."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "This case claims only the declared no-OA ConstantSupplyHumidityRatio heating outputs.",
+  "This case claims only the declared no-OA ConstantSupplyHumidityRatio heating outputs, including ReportPurchasedAir energy/fuel rows.",
   "The boundary activates ConstantSupplyHumidityRatio heating/humidification while excluding outdoor air, economizer, heat recovery, humidistats, dehumidification, DCV, finite flow/capacity limits, autosizing, air loops, plant loops, EMS, and PythonPlugin.",
-  "The declared conformance rows are thermostat setpoints, heating total/sensible/latent IdealLoads rates, supply-air heating report rates, and the supply-node temperature, mass-flow, and humidity-ratio rows.",
+  "The declared conformance rows are thermostat setpoints, heating total/sensible/latent IdealLoads rates, supply-air heating report rates, ReportPurchasedAir energy/fuel rows, and the supply-node temperature, mass-flow, and humidity-ratio rows.",
   "IdealLoads rate, latent report, and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow and enthalpy formulas.",
   "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
   "Mass-flow and humidity comparison uses the EnergyPlus same-call return-node recirculation state for no-OA humidity-control mixed-air calculations; zone-air and return-node humidity rows remain diagnostic proof rows.",
-  "Saturation-limit behavior, ReportPurchasedAir energy/fuel rows, and facility meters remain diagnostic-only proof evidence; broad humidity-control and broad meter conformance remain outside the claim."
+  "Saturation-limit behavior and facility meters remain diagnostic-only proof evidence; broad humidity-control and broad meter conformance remain outside the claim."
 ]
 
 [trace]
@@ -200,9 +200,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -211,9 +211,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -222,9 +222,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -233,9 +233,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -244,9 +244,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -255,9 +255,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -266,9 +266,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -277,9 +277,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1.0
-rmse_tol = 1.0
+level = "conformance"
+abs_tol = 1e-4
+rmse_tol = 1e-4
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -288,9 +288,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1e-3
-rmse_tol = 1e-3
+level = "conformance"
+abs_tol = 1e-6
+rmse_tol = 1e-6
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -299,9 +299,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1e-3
-rmse_tol = 1e-3
+level = "conformance"
+abs_tol = 1e-6
+rmse_tol = 1e-6
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -310,9 +310,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1e-3
-rmse_tol = 1e-3
+level = "conformance"
+abs_tol = 1e-6
+rmse_tol = 1e-6
 
 [[outputs]]
 key = "ZONE ONE IDEAL LOADS"
@@ -321,9 +321,9 @@ frequency = "detailed"
 class = "hvac-state"
 source = "eso"
 domain = "hvac"
-level = "diagnostic"
-abs_tol = 1e-3
-rmse_tol = 1e-3
+level = "conformance"
+abs_tol = 1e-6
+rmse_tol = 1e-6
 
 [[outputs]]
 key = "ZONE ONE"

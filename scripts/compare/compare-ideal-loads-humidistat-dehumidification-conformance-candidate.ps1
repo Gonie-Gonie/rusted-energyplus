@@ -140,15 +140,15 @@ if ($summary.samples -le 0) {
     throw "Expected positive detailed sample count"
 }
 $conformanceRows = @($summary.series | Where-Object { $_.level -eq "conformance" })
-if ($conformanceRows.Count -ne 11) {
-    throw "Expected 11 conformance-level output rows, found $($conformanceRows.Count)"
+if ($conformanceRows.Count -ne 23) {
+    throw "Expected 23 conformance-level output rows, found $($conformanceRows.Count)"
 }
 if (@($conformanceRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All conformance-level humidistat-dehumidification rows must pass"
 }
 $diagnosticRows = @($summary.series | Where-Object { $_.level -eq "diagnostic" })
-if ($diagnosticRows.Count -ne 27) {
-    throw "Expected 27 diagnostic proof rows, found $($diagnosticRows.Count)"
+if ($diagnosticRows.Count -ne 15) {
+    throw "Expected 15 diagnostic proof rows, found $($diagnosticRows.Count)"
 }
 if (@($diagnosticRows | Where-Object { $_.status -ne "pass" }).Count -ne 0) {
     throw "All diagnostic proof rows must pass"
@@ -273,15 +273,15 @@ if ($stageSummary.node_output_report_source -ne "ReportPurchasedAir") {
 if ($stageSummary.rate_output_source -ne "ReportPurchasedAir after UpdatePurchasedAir") {
     throw "Unexpected rate output source: $($stageSummary.rate_output_source)"
 }
-if ($stageSummary.energy_output_level_policy -ne "diagnostic-only until rate-to-energy parity is separately proven") {
+if ($stageSummary.energy_output_level_policy -ne "conformance for declared no-OA humidity-control ReportPurchasedAir energy rows only") {
     throw "Unexpected energy output level policy: $($stageSummary.energy_output_level_policy)"
 }
-if ($stageSummary.fuel_energy_output_level_policy -ne "diagnostic-only until fuel-efficiency path is separately proven") {
+if ($stageSummary.fuel_energy_output_level_policy -ne "conformance for declared no-OA humidity-control blank fuel-efficiency rows only") {
     throw "Unexpected fuel energy output level policy: $($stageSummary.fuel_energy_output_level_policy)"
 }
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
-Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance no-OA Humidistat dehumidification IdealLoads branch for declared variables, ReportPurchasedAir energy rows, and blank fuel-efficiency rows only" -Description "markdown claim boundary"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
 Assert-Contains -Text $reportText -Pattern "direct_calc_helper_invocation: false" -Description "markdown direct calc helper invocation"
@@ -311,8 +311,8 @@ Assert-Contains -Text $reportText -Pattern "node_output_timestamp_alignment: tim
 Assert-Contains -Text $reportText -Pattern "node_output_update_source: UpdatePurchasedAir" -Description "markdown node output update source"
 Assert-Contains -Text $reportText -Pattern "node_output_report_source: ReportPurchasedAir" -Description "markdown node output report source"
 Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedAir after UpdatePurchasedAir" -Description "markdown rate output source"
-Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: diagnostic-only until rate-to-energy parity is separately proven" -Description "markdown energy output level policy"
-Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: diagnostic-only until fuel-efficiency path is separately proven" -Description "markdown fuel energy output level policy"
+Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: conformance for declared no-OA humidity-control ReportPurchasedAir energy rows only" -Description "markdown energy output level policy"
+Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: conformance for declared no-OA humidity-control blank fuel-efficiency rows only" -Description "markdown fuel energy output level policy"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Zone Latent Cooling Rate | conformance" -Description "markdown zone latent cooling row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE IDEAL LOADS | Zone Ideal Loads Supply Air Latent Cooling Rate | conformance" -Description "markdown supply latent cooling row"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE INLET | System Node Humidity Ratio | conformance" -Description "markdown supply humidity row"

@@ -280,14 +280,14 @@ behavior, and broad humidity-control conformance remain outside this claim.
 `ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001`
 promotes the no-OA `ConstantSupplyHumidityRatio` cooling lane for declared
 thermostat setpoints, cooling total/sensible/latent rate rows, supply-air
-cooling report rows, and supply-node temperature/mass-flow/humidity rows. It
-reuses the diagnostic fixture IDF and keeps heating rows, return-node and
-zone-air-node humidity rows, ReportPurchasedAir energy/fuel rows, and facility
-meters as proof rows only.
+cooling report rows, ReportPurchasedAir energy/fuel rows, and supply-node
+temperature/mass-flow/humidity rows. It reuses the diagnostic fixture IDF and
+keeps heating rate rows, return-node and zone-air-node humidity rows, and
+facility meters as proof rows only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-36 Detailed/hourly series with 11 conformance rows and 25 diagnostic proof rows.
+36 Detailed/hourly series with 23 conformance rows and 13 diagnostic proof rows.
 Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
 broad humidity-control conformance remain outside the claim.
 
@@ -296,14 +296,14 @@ broad humidity-control conformance remain outside the claim.
 `ideal_loads_constant_supply_humidity_heating_conformance_candidate_001`
 promotes the no-OA `ConstantSupplyHumidityRatio` heating lane for declared
 thermostat setpoints, heating total/sensible/latent rate rows, supply-air
-heating report rows, and supply-node temperature/mass-flow/humidity rows. It
-reuses the diagnostic fixture IDF and keeps cooling rows, return-node and
-zone-air-node humidity rows, ReportPurchasedAir energy/fuel rows, and facility
-meters as proof rows only.
+heating report rows, ReportPurchasedAir energy/fuel rows, and supply-node
+temperature/mass-flow/humidity rows. It reuses the diagnostic fixture IDF and
+keeps cooling rate rows, return-node and zone-air-node humidity rows, and
+facility meters as proof rows only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-36 Detailed/hourly series with 11 conformance rows and 25 diagnostic proof rows.
+36 Detailed/hourly series with 23 conformance rows and 13 diagnostic proof rows.
 Humidistat, outdoor-air humidity, finite-limit humidity-control behavior, and
 broad humidity-control conformance remain outside the claim.
 
@@ -312,14 +312,14 @@ broad humidity-control conformance remain outside the claim.
 `ideal_loads_humidistat_dehumidification_conformance_candidate_001` promotes
 the no-OA `Humidistat` dehumidification lane for declared thermostat setpoints,
 cooling total/sensible/latent rate rows, supply-air cooling report rows, and
-supply-node temperature/mass-flow/humidity rows. It reuses the diagnostic
-fixture IDF and keeps EnergyPlus moisture-demand rows, heating rows,
-return-node and zone-air-node humidity rows, ReportPurchasedAir energy/fuel
+supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
+energy/fuel rows. It reuses the diagnostic fixture IDF and keeps EnergyPlus
+moisture-demand rows, heating rate rows, return-node and zone-air-node humidity
 rows, and facility meters as proof rows only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-38 Detailed/hourly series with 11 conformance rows and 27 diagnostic proof
+38 Detailed/hourly series with 23 conformance rows and 15 diagnostic proof
 rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
@@ -329,14 +329,14 @@ remain outside the claim.
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 no-OA `Humidistat` humidification lane for declared thermostat setpoints,
 heating total/sensible/latent rate rows, supply-air heating report rows, and
-supply-node temperature/mass-flow/humidity rows. It reuses the diagnostic
-fixture IDF and keeps EnergyPlus moisture-demand rows, cooling rows,
-return-node and zone-air-node humidity rows, ReportPurchasedAir energy/fuel
+supply-node temperature/mass-flow/humidity rows, plus ReportPurchasedAir
+energy/fuel rows. It reuses the diagnostic fixture IDF and keeps EnergyPlus
+moisture-demand rows, cooling rate rows, return-node and zone-air-node humidity
 rows, and facility meters as proof rows only.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
-38 Detailed/hourly series with 11 conformance rows and 27 diagnostic proof
+38 Detailed/hourly series with 23 conformance rows and 15 diagnostic proof
 rows. Humidistat schedule-to-moisture-demand calculation, outdoor-air humidity,
 finite-limit humidity-control behavior, and broad humidity-control conformance
 remain outside the claim.
