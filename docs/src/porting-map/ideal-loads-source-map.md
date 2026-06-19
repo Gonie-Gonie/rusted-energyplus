@@ -120,10 +120,10 @@ IdealLoads system, zone, node, and availability schedule references are typed
 before the simulation loop.
 Psychrometric evidence metadata is intentionally conservative:
 `ideal_loads_psychrometric_evaluation_policy` says the compatibility reports use
-source-order direct evaluation with no cross-timestep cache or reordering, and
-`ideal_loads_psychrometric_cache_policy` requires any future cache to use the
-exact temperature, humidity ratio, and pressure tuple while preserving
-EnergyPlus evaluation order.
+source-order direct evaluation with EnergyPlus `PsyPsatFnTemp` cache-temperature
+quantization and no reordering, and `ideal_loads_psychrometric_cache_policy`
+records that saturation-pressure evaluation mirrors the default EnergyPlus
+temperature-key truncation before the raw polynomial.
 Output-handle evidence now resolves each manifest-declared IdealLoads output to
 a stable `OutputHandle` before comparison rows are evaluated. Rate and node
 series are exported through `ResultStore` with those handles, meter rows are
@@ -255,43 +255,44 @@ the no-OA Humidistat dehumidification lane for declared thermostat,
 heating/cooling total/sensible/latent rate, supply-air heating/cooling
 report-rate, and supply-node temperature/mass-flow/humidity rows, plus
 ReportPurchasedAir energy/fuel rows and hourly/monthly/run-period
-`DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters. The compare path reads
-EnergyPlus `ZoneSysMoistureDemand` proof rows for the humidifying and
-dehumidifying moisture transfer rates, uses the same-timestamp return node as
-the source-order zone state for the first run-period sample, and matches the
-Humidistat dehumidification supply mass flow, supply humidity ratio, and
-cooling report rows with zero tolerance failures. The original
+`DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters. The compare
+path computes the humidifying and dehumidifying moisture transfer rates with the
+Rust no-OA ThirdOrder moisture-demand predictor, using EnergyPlus trace
+temperature, barometric pressure, and `Zone Mean Air Humidity Ratio` row-lag
+history plus warmup tail as the declared evidence inputs. Those Rust-computed
+values feed the promoted Humidistat branch and match the Humidistat
+dehumidification supply mass flow, supply humidity ratio, and cooling report
+rows with zero tolerance failures. The original
 `ideal_loads_humidistat_dehumidification_diagnostic_001` remains available as
 non-claim regression/proof evidence for the broader diagnostic output set.
 The compare report also records a diagnostic Rust closed-loop humidity pass
-that feeds the ported no-OA ThirdOrder moisture-demand predictor into
-`SimPurchasedAir` and then into the ported `correctHumRat` subset. That table is
-evidence for the remaining warmup/history closure work only; the promoted
-conformance rows still use EnergyPlus `ZoneSysMoistureDemand` as the traced
-proof input.
+through the ported no-OA ThirdOrder moisture-demand predictor, `SimPurchasedAir`,
+and the ported `correctHumRat` subset. That table remains diagnostic evidence
+for fully owned zone-moisture history closure; the promoted comparison is still
+trace-driven, not a broad standalone Humidistat simulation claim.
 
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 matching no-OA Humidistat humidification lane for declared thermostat,
 heating/cooling total/sensible/latent rate, supply-air heating/cooling
 report-rate, and supply-node temperature/mass-flow/humidity rows, plus
 ReportPurchasedAir energy/fuel rows and hourly/monthly/run-period
-`DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters. It reads the EnergyPlus
-humidifying moisture proof row into `ZoneSysEnergyDemand`, lets the
-humidification mass-flow request exceed the sensible heating flow when needed,
-uses the maximum heating supply humidity ratio with the same saturation clamp,
-and matches the supply humidity and heating report rows with zero tolerance
-failures. The original `ideal_loads_humidistat_humidification_diagnostic_001`
-remains available as non-claim regression/proof evidence for the broader
-diagnostic output set.
+`DistrictHeatingWater:Facility`/`DistrictCooling:Facility` meters. It computes
+the humidifying moisture request with the same trace-driven Rust predictor,
+lets the humidification mass-flow request exceed the sensible heating flow when
+needed, uses the maximum heating supply humidity ratio with the same saturation
+clamp, and matches the supply humidity and heating report rows with zero
+tolerance failures. The original
+`ideal_loads_humidistat_humidification_diagnostic_001` remains available as
+non-claim regression/proof evidence for the broader diagnostic output set.
 The compare report also records the same diagnostic Rust closed-loop humidity
-pass for the humidification fixture. It is not a promoted input until the
-`WPrevZoneTSTemp` warmup/system-history state is reproduced without oracle
-moisture-demand rows.
+pass for the humidification fixture; that diagnostic table is not the promoted
+claim until the zone-moisture history is reproduced without EnergyPlus trace
+state.
 
-These remain diagnostic-only: Humidistat schedule-to-moisture-demand
-calculation as a promoted input, `WPrevZoneTSTemp` warmup/system-history
-closure, annual facility meter rows in the short-run humidity-control
-candidates, outdoor-air humidity control,
+These remain diagnostic-only: fully owned Humidistat schedule-to-moisture-demand
+calculation without EnergyPlus trace state/history, `WPrevZoneTSTemp`
+warmup/system-history closure, annual facility meter rows in the short-run
+humidity-control candidates, outdoor-air humidity control,
 DifferentialEnthalpy economizer humidity interactions, heat-recovery humidity
 interactions, finite-limit humidity-control behavior, and broad humidity-control
 conformance.
@@ -831,7 +832,8 @@ conformance rows and the six conformance meter rows pass their tolerances, the
 dehumidification claim for declared heating/cooling rate outputs,
 ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility
 meters; EnergyPlus moisture-demand rows, humidistat schedule-to-moisture-demand
-calculation, return-node and zone-air-node humidity proof rows, annual meter
+output rows themselves, fully owned moisture-history closure without EnergyPlus
+trace state, return-node and zone-air-node humidity proof rows, annual meter
 rows, other broader meter frequencies, outdoor-air, economizer, heat-recovery,
 and broad HVAC behavior remain outside the claim.
 
@@ -846,7 +848,8 @@ conformance rows and the six conformance meter rows pass their tolerances, the
 humidification claim for declared heating/cooling rate outputs,
 ReportPurchasedAir energy/fuel rows, and hourly/monthly/run-period facility
 meters; EnergyPlus moisture-demand rows, humidistat schedule-to-moisture-demand
-calculation, return-node and zone-air-node humidity proof rows, annual meter
+output rows themselves, fully owned moisture-history closure without EnergyPlus
+trace state, return-node and zone-air-node humidity proof rows, annual meter
 rows, other broader meter frequencies, outdoor-air, economizer, heat-recovery,
 and broad HVAC behavior remain outside the claim.
 

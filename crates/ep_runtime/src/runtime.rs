@@ -44,6 +44,8 @@ const ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K: f64 = 0.01;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 const ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE: f64 = 0.0001;
 const ENERGYPLUS_WET_BULB_MAX_ITERATIONS: u32 = 100;
+const ENERGYPLUS_PSAT_CACHE_PRECISION_BITS: u32 = 24;
+const ENERGYPLUS_PSAT_CACHE_GRID_SHIFT: u32 = 64 - 12 - ENERGYPLUS_PSAT_CACHE_PRECISION_BITS;
 
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
 pub const SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE: &str =
@@ -6942,6 +6944,9 @@ fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option
     if !temperature_c.is_finite() {
         return None;
     }
+    // EnergyPlus' default PsyPsatFnTemp path keys a cache by truncating the dry-bulb
+    // temperature bits before evaluating the raw saturation-pressure polynomial.
+    let temperature_c = energyplus_psychrometric_psat_cache_temperature_c(temperature_c);
     let temperature_k = temperature_c + KELVIN_OFFSET;
     if temperature_k < 173.15 {
         return Some(0.001405102123874164);
@@ -6972,6 +6977,15 @@ fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option
         );
     }
     Some(1_555_073.745_636_215)
+}
+
+fn energyplus_psychrometric_psat_cache_temperature_c(temperature_c: f64) -> f64 {
+    if !temperature_c.is_finite() {
+        return temperature_c;
+    }
+    let mut tag = (temperature_c.to_bits() as i64) >> ENERGYPLUS_PSAT_CACHE_GRID_SHIFT;
+    tag <<= ENERGYPLUS_PSAT_CACHE_GRID_SHIFT;
+    f64::from_bits(tag as u64)
 }
 
 fn heat_balance_uses_doe2_outside_convection(
