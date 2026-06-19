@@ -47,7 +47,17 @@ use ep_runtime::{
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
-    SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE, SimulationMode, SurfaceGeometrySummary,
+    SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE,
+    SURFACE_OUTSIDE_BALANCE_COEFFICIENT_TEMPERATURE_VARIABLE,
+    SURFACE_OUTSIDE_BALANCE_CONVECTION_REFERENCE_TEMPERATURE_VARIABLE,
+    SURFACE_OUTSIDE_BALANCE_EQUIVALENT_RADIANT_TEMPERATURE_VARIABLE,
+    SURFACE_OUTSIDE_BALANCE_RADIATION_COEFFICIENT_VARIABLE,
+    SURFACE_OUTSIDE_BALANCE_REPORT_TEMPERATURE_VARIABLE,
+    SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE,
+    SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE,
+    SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_BALANCE_TERM_VARIABLE,
+    SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_SOURCE_TERM_VARIABLE,
+    SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE, SimulationMode, SurfaceGeometrySummary,
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
     build_hourly_time_axis, energyplus_heat_balance_compatibility_stages, load_epw_dry_bulb_series,
     load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
@@ -3791,8 +3801,17 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
+    rust_outside_balance_debug_series: Vec<HeatBalanceRustDebugSeries>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceRustDebugSeries {
+    key: String,
+    variable: String,
+    units: String,
+    values: Vec<f64>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -4699,9 +4718,40 @@ fn build_heat_balance_conformance_diagnostic(
         surface_iteration_first_sample_trace: simulation
             .summary
             .surface_iteration_first_sample_trace,
+        rust_outside_balance_debug_series: heat_balance_outside_balance_debug_series(
+            &simulation.results,
+        ),
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
+}
+
+fn heat_balance_outside_balance_debug_series(
+    results: &ResultStore,
+) -> Vec<HeatBalanceRustDebugSeries> {
+    let variables = BTreeSet::from([
+        SURFACE_OUTSIDE_BALANCE_REPORT_TEMPERATURE_VARIABLE,
+        SURFACE_OUTSIDE_BALANCE_COEFFICIENT_TEMPERATURE_VARIABLE,
+        SURFACE_OUTSIDE_BALANCE_CONVECTION_REFERENCE_TEMPERATURE_VARIABLE,
+        SURFACE_OUTSIDE_BALANCE_EQUIVALENT_RADIANT_TEMPERATURE_VARIABLE,
+        SURFACE_OUTSIDE_BALANCE_RADIATION_COEFFICIENT_VARIABLE,
+        SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_SOURCE_TERM_VARIABLE,
+        SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_BALANCE_TERM_VARIABLE,
+        SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE,
+        SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE,
+        SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE,
+    ]);
+    results
+        .series
+        .iter()
+        .filter(|series| variables.contains(series.variable_name.as_str()))
+        .map(|series| HeatBalanceRustDebugSeries {
+            key: series.key.clone(),
+            variable: series.variable_name.clone(),
+            units: series.units.clone(),
+            values: series.values.clone(),
+        })
+        .collect()
 }
 
 fn heat_balance_ctf_component_first_samples(
@@ -8940,6 +8990,7 @@ fn write_heat_balance_conformance_report(
     let summary_path = report_dir.join("compare-summary.json");
     let digest_path = report_dir.join("compare-digest.json");
     let report_path = report_dir.join("compare-report.md");
+    let outside_balance_debug_path = report_dir.join("rust-outside-balance-diagnostics.json");
 
     std::fs::write(
         &summary_path,
@@ -8956,6 +9007,11 @@ fn write_heat_balance_conformance_report(
         render_heat_balance_conformance_report(diagnostic, conformance),
     )
     .map_err(|error| format!("failed to write heat-balance report: {error}"))?;
+    std::fs::write(
+        &outside_balance_debug_path,
+        render_heat_balance_rust_outside_balance_debug_json(diagnostic),
+    )
+    .map_err(|error| format!("failed to write heat-balance outside-balance debug: {error}"))?;
 
     Ok(())
 }
@@ -8976,6 +9032,48 @@ fn render_heat_balance_conformance_digest_json(
     conformance: &HeatBalanceConformance<'_>,
 ) -> String {
     render_heat_balance_conformance_json(diagnostic, conformance, false)
+}
+
+fn render_heat_balance_rust_outside_balance_debug_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str("  \"runtime_class\": \"heat-balance-rust-outside-balance-diagnostics\",\n");
+    json.push_str("  \"comparison_class\": \"diagnostic-only\",\n");
+    json.push_str("  \"conformance_claim\": false,\n");
+    json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
+    json.push_str(&format!(
+        "  \"zone_air_algorithm_lane\": {},\n",
+        json_string(heat_balance_zone_air_algorithm_lane_label(
+            diagnostic.zone_air_algorithm
+        ))
+    ));
+    json.push_str("  \"series\": [");
+    for (index, series) in diagnostic
+        .rust_outside_balance_debug_series
+        .iter()
+        .enumerate()
+    {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, \"variable\": {}, \"units\": {}, ",
+                "\"samples\": {}, \"values\": {} }}"
+            ),
+            json_string(&series.key),
+            json_string(&series.variable),
+            json_string(&series.units),
+            series.values.len(),
+            json_number_array(&series.values)
+        ));
+    }
+    json.push_str("]\n");
+    json.push_str("}\n");
+    json
 }
 
 fn render_heat_balance_conformance_json(
@@ -9240,7 +9338,10 @@ fn render_heat_balance_conformance_json(
     json.push_str("  \"artifacts\": {\n");
     json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
     json.push_str("    \"compare_summary_json\": \"compare-summary.json\",\n");
-    json.push_str("    \"compare_digest_json\": \"compare-digest.json\"\n");
+    json.push_str("    \"compare_digest_json\": \"compare-digest.json\",\n");
+    json.push_str(
+        "    \"rust_outside_balance_diagnostics_json\": \"rust-outside-balance-diagnostics.json\"\n",
+    );
     json.push_str("  }\n");
     json.push_str("}\n");
     json
@@ -12332,6 +12433,18 @@ fn json_number(value: f64) -> String {
     }
 }
 
+fn json_number_array(values: &[f64]) -> String {
+    let mut json = String::from("[");
+    for (index, value) in values.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&json_number(*value));
+    }
+    json.push(']');
+    json
+}
+
 fn json_string(value: &str) -> String {
     let mut output = String::from("\"");
     for character in value.chars() {
@@ -13832,6 +13945,7 @@ mod tests {
                     max_delta_surface_name: Some("FLOOR".to_string()),
                 },
             ],
+            rust_outside_balance_debug_series: vec![],
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -14614,6 +14728,7 @@ mod tests {
                     max_delta_surface_name: Some("FLOOR".to_string()),
                 },
             ],
+            rust_outside_balance_debug_series: vec![],
             series: vec![super::HeatBalanceSeriesDiagnostic {
                 output: super::ZoneTemperatureReportOutput {
                     key: "ZONE ONE".to_string(),

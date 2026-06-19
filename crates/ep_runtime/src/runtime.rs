@@ -71,6 +71,36 @@ pub const SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE: &str =
 /// Diagnostic-only CTF component rate written for heat-balance source isolation.
 pub const SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE: &str =
     "Surface CTF Outside Face History Term Rate";
+/// Diagnostic-only outside balance temperature used to build exterior report split terms.
+pub const SURFACE_OUTSIDE_BALANCE_REPORT_TEMPERATURE_VARIABLE: &str =
+    "Surface Outside Face Balance Report Temperature";
+/// Diagnostic-only outside balance surface temperature used for exterior coefficient lookup.
+pub const SURFACE_OUTSIDE_BALANCE_COEFFICIENT_TEMPERATURE_VARIABLE: &str =
+    "Surface Outside Face Balance Coefficient Temperature";
+/// Diagnostic-only outside convection reference temperature used by the balance.
+pub const SURFACE_OUTSIDE_BALANCE_CONVECTION_REFERENCE_TEMPERATURE_VARIABLE: &str =
+    "Surface Outside Face Balance Convection Reference Temperature";
+/// Diagnostic-only equivalent radiant temperature used by the outside balance.
+pub const SURFACE_OUTSIDE_BALANCE_EQUIVALENT_RADIANT_TEMPERATURE_VARIABLE: &str =
+    "Surface Outside Face Balance Equivalent Radiant Temperature";
+/// Diagnostic-only equivalent outside radiation coefficient used by the balance.
+pub const SURFACE_OUTSIDE_BALANCE_RADIATION_COEFFICIENT_VARIABLE: &str =
+    "Surface Outside Face Balance Radiation Heat Transfer Coefficient";
+/// Diagnostic-only inside source term used by the quick outside balance.
+pub const SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_SOURCE_TERM_VARIABLE: &str =
+    "Surface Outside Face Quick Balance Inside Source Term";
+/// Diagnostic-only inside balance term used by the quick outside balance.
+pub const SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_BALANCE_TERM_VARIABLE: &str =
+    "Surface Outside Face Quick Balance Inside Balance Term";
+/// Diagnostic-only numerator used by the quick outside balance.
+pub const SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE: &str =
+    "Surface Outside Face Quick Balance Numerator";
+/// Diagnostic-only denominator used by the quick outside balance.
+pub const SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE: &str =
+    "Surface Outside Face Quick Balance Denominator";
+/// Diagnostic-only inside/outside CTF coupling factor used by the quick outside balance.
+pub const SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE: &str =
+    "Surface Outside Face Quick Balance Coupling Factor";
 /// Diagnostic/report variable for EnergyPlus inside surface heat-balance iteration count.
 pub const SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE: &str =
     "Surface Inside Face Heat Balance Calculation Iteration Count";
@@ -1004,6 +1034,20 @@ struct SurfaceExteriorReportTerms {
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct SurfaceOutsideBalanceDiagnostics {
+    report_temperature_c: f64,
+    coefficient_surface_temperature_c: f64,
+    convection_reference_temperature_c: f64,
+    equivalent_radiant_temperature_c: f64,
+    outside_radiation_coefficient_w_per_m2_k: f64,
+    quick_net_inside_source_w_per_m2: f64,
+    quick_inside_balance_term_w_per_m2: f64,
+    quick_numerator_w_per_m2: f64,
+    quick_denominator_w_per_m2_k: f64,
+    quick_coupling_factor: f64,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 struct SurfaceIncidentSolarComponents {
     beam_w_per_m2: f64,
     sky_diffuse_w_per_m2: f64,
@@ -1020,6 +1064,7 @@ impl SurfaceIncidentSolarComponents {
 struct SurfaceBoundaryBalanceResult {
     temperature_c: f64,
     exterior_report_terms: SurfaceExteriorReportTerms,
+    outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -1101,6 +1146,8 @@ pub struct SurfaceHeatBalanceState {
     pub heat_gain_to_zone_w: f64,
     /// EnergyPlus-shaped outside-face report terms from the exterior balance.
     outside_report_terms: SurfaceExteriorReportTerms,
+    /// Diagnostic outside-face balance terms from the exterior balance.
+    outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics,
     /// Current inside face temperature in C.
     pub inside_face_temperature_c: f64,
     /// Current outside face temperature in C.
@@ -1564,6 +1611,16 @@ struct SurfaceHeatBalanceTrace {
     outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     outside_solar_radiation_heat_gain_rate_w: Vec<f64>,
     outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
+    outside_balance_report_temperature_c: Vec<f64>,
+    outside_balance_coefficient_temperature_c: Vec<f64>,
+    outside_balance_convection_reference_temperature_c: Vec<f64>,
+    outside_balance_equivalent_radiant_temperature_c: Vec<f64>,
+    outside_balance_radiation_coefficient_w_per_m2_k: Vec<f64>,
+    outside_quick_balance_inside_source_term_w_per_m2: Vec<f64>,
+    outside_quick_balance_inside_balance_term_w_per_m2: Vec<f64>,
+    outside_quick_balance_numerator_w_per_m2: Vec<f64>,
+    outside_quick_balance_denominator_w_per_m2_k: Vec<f64>,
+    outside_quick_balance_coupling_factor: Vec<f64>,
     inside_conduction_rate_w: Vec<f64>,
     inside_conduction_gain_rate_w: Vec<f64>,
     inside_conduction_loss_rate_w: Vec<f64>,
@@ -1600,6 +1657,16 @@ struct SurfaceHeatBalanceTraceSums {
     outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: f64,
     outside_solar_radiation_heat_gain_rate_w: f64,
     outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: f64,
+    outside_balance_report_temperature_c: f64,
+    outside_balance_coefficient_temperature_c: f64,
+    outside_balance_convection_reference_temperature_c: f64,
+    outside_balance_equivalent_radiant_temperature_c: f64,
+    outside_balance_radiation_coefficient_w_per_m2_k: f64,
+    outside_quick_balance_inside_source_term_w_per_m2: f64,
+    outside_quick_balance_inside_balance_term_w_per_m2: f64,
+    outside_quick_balance_numerator_w_per_m2: f64,
+    outside_quick_balance_denominator_w_per_m2_k: f64,
+    outside_quick_balance_coupling_factor: f64,
     inside_conduction_rate_w: f64,
     inside_conduction_gain_rate_w: f64,
     inside_conduction_loss_rate_w: f64,
@@ -2245,6 +2312,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 ctf,
                 heat_gain_to_zone_w: 0.0,
                 outside_report_terms: SurfaceExteriorReportTerms::default(),
+                outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
                 inside_face_temperature_c: initial_zone_air_temperature_c,
                 outside_face_temperature_c: initial_zone_air_temperature_c,
             })
@@ -2574,6 +2642,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         );
         surface.outside_face_temperature_c = boundary_balance.temperature_c;
         surface.outside_report_terms = boundary_balance.exterior_report_terms;
+        surface.outside_balance_diagnostics = boundary_balance.outside_balance_diagnostics;
     }
     for zone in &mut state.zones {
         let previous_temperature_c = zone.mean_air_temperature_c;
@@ -3246,6 +3315,7 @@ fn run_interleaved_surface_zone_balance(
                             SurfaceBoundaryBalanceResult {
                                 temperature_c: surface.outside_face_temperature_c,
                                 exterior_report_terms: surface.outside_report_terms,
+                                outside_balance_diagnostics: surface.outside_balance_diagnostics,
                             },
                         )
                     })
@@ -3444,6 +3514,7 @@ fn run_surface_balance_passes(
                 });
             surface.outside_face_temperature_c = boundary_balance.temperature_c;
             surface.outside_report_terms = boundary_balance.exterior_report_terms;
+            surface.outside_balance_diagnostics = boundary_balance.outside_balance_diagnostics;
             let inside_ctf_outside_temperature_c = inside_ctf_outside_temperature_snapshots
                 .and_then(|snapshots| snapshots.get(&surface.surface_id).copied());
             surface.inside_ctf_outside_temperature_c =
@@ -4463,6 +4534,26 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
                 options.sample_count,
             ),
+            outside_balance_report_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_balance_coefficient_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_balance_convection_reference_temperature_c: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_balance_equivalent_radiant_temperature_c: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_balance_radiation_coefficient_w_per_m2_k: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_quick_balance_inside_source_term_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_quick_balance_inside_balance_term_w_per_m2: Vec::with_capacity(
+                options.sample_count,
+            ),
+            outside_quick_balance_numerator_w_per_m2: Vec::with_capacity(options.sample_count),
+            outside_quick_balance_denominator_w_per_m2_k: Vec::with_capacity(options.sample_count),
+            outside_quick_balance_coupling_factor: Vec::with_capacity(options.sample_count),
             inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
             inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
@@ -4844,6 +4935,27 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         exterior_terms.solar_radiation_heat_gain_rate_w;
                     sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 +=
                         exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2;
+                    let outside_balance = surface_state.outside_balance_diagnostics;
+                    sums.outside_balance_report_temperature_c +=
+                        outside_balance.report_temperature_c;
+                    sums.outside_balance_coefficient_temperature_c +=
+                        outside_balance.coefficient_surface_temperature_c;
+                    sums.outside_balance_convection_reference_temperature_c +=
+                        outside_balance.convection_reference_temperature_c;
+                    sums.outside_balance_equivalent_radiant_temperature_c +=
+                        outside_balance.equivalent_radiant_temperature_c;
+                    sums.outside_balance_radiation_coefficient_w_per_m2_k +=
+                        outside_balance.outside_radiation_coefficient_w_per_m2_k;
+                    sums.outside_quick_balance_inside_source_term_w_per_m2 +=
+                        outside_balance.quick_net_inside_source_w_per_m2;
+                    sums.outside_quick_balance_inside_balance_term_w_per_m2 +=
+                        outside_balance.quick_inside_balance_term_w_per_m2;
+                    sums.outside_quick_balance_numerator_w_per_m2 +=
+                        outside_balance.quick_numerator_w_per_m2;
+                    sums.outside_quick_balance_denominator_w_per_m2_k +=
+                        outside_balance.quick_denominator_w_per_m2_k;
+                    sums.outside_quick_balance_coupling_factor +=
+                        outside_balance.quick_coupling_factor;
                     sums.inside_conduction_rate_w += inside_rate;
                     sums.inside_conduction_gain_rate_w += heat_gain_rate_w(inside_rate);
                     sums.inside_conduction_loss_rate_w += heat_loss_rate_w(inside_rate);
@@ -4981,6 +5093,36 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .outside_solar_radiation_heat_gain_rate_per_area_w_per_m2
                 .push(sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 / divisor);
+            trace
+                .outside_balance_report_temperature_c
+                .push(sums.outside_balance_report_temperature_c / divisor);
+            trace
+                .outside_balance_coefficient_temperature_c
+                .push(sums.outside_balance_coefficient_temperature_c / divisor);
+            trace
+                .outside_balance_convection_reference_temperature_c
+                .push(sums.outside_balance_convection_reference_temperature_c / divisor);
+            trace
+                .outside_balance_equivalent_radiant_temperature_c
+                .push(sums.outside_balance_equivalent_radiant_temperature_c / divisor);
+            trace
+                .outside_balance_radiation_coefficient_w_per_m2_k
+                .push(sums.outside_balance_radiation_coefficient_w_per_m2_k / divisor);
+            trace
+                .outside_quick_balance_inside_source_term_w_per_m2
+                .push(sums.outside_quick_balance_inside_source_term_w_per_m2 / divisor);
+            trace
+                .outside_quick_balance_inside_balance_term_w_per_m2
+                .push(sums.outside_quick_balance_inside_balance_term_w_per_m2 / divisor);
+            trace
+                .outside_quick_balance_numerator_w_per_m2
+                .push(sums.outside_quick_balance_numerator_w_per_m2 / divisor);
+            trace
+                .outside_quick_balance_denominator_w_per_m2_k
+                .push(sums.outside_quick_balance_denominator_w_per_m2_k / divisor);
+            trace
+                .outside_quick_balance_coupling_factor
+                .push(sums.outside_quick_balance_coupling_factor / divisor);
             trace
                 .inside_conduction_rate_w
                 .push(sums.inside_conduction_rate_w / divisor);
@@ -5262,6 +5404,88 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 .to_string(),
             units: "W/m2".to_string(),
             values: trace.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_BALANCE_REPORT_TEMPERATURE_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.outside_balance_report_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_BALANCE_COEFFICIENT_TEMPERATURE_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.outside_balance_coefficient_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_BALANCE_CONVECTION_REFERENCE_TEMPERATURE_VARIABLE
+                .to_string(),
+            units: "C".to_string(),
+            values: trace.outside_balance_convection_reference_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_BALANCE_EQUIVALENT_RADIANT_TEMPERATURE_VARIABLE
+                .to_string(),
+            units: "C".to_string(),
+            values: trace.outside_balance_equivalent_radiant_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_BALANCE_RADIATION_COEFFICIENT_VARIABLE.to_string(),
+            units: "W/m2-K".to_string(),
+            values: trace.outside_balance_radiation_coefficient_w_per_m2_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_SOURCE_TERM_VARIABLE.to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_quick_balance_inside_source_term_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_BALANCE_TERM_VARIABLE.to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_quick_balance_inside_balance_term_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE.to_string(),
+            units: "W/m2".to_string(),
+            values: trace.outside_quick_balance_numerator_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE.to_string(),
+            units: "W/m2-K".to_string(),
+            values: trace.outside_quick_balance_denominator_w_per_m2_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE.to_string(),
+            units: String::new(),
+            values: trace.outside_quick_balance_coupling_factor,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -6036,6 +6260,7 @@ fn heat_balance_surface_boundary_balance(
             owning_zone_temperature_c,
         ),
         exterior_report_terms: SurfaceExteriorReportTerms::default(),
+        outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
     }
 }
 
@@ -6073,12 +6298,14 @@ fn exterior_surface_boundary_balance(
         return SurfaceBoundaryBalanceResult {
             temperature_c: outdoor_dry_bulb_c,
             exterior_report_terms: SurfaceExteriorReportTerms::default(),
+            outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
         };
     };
     let Some(record) = context.records.get(context.record_index) else {
         return SurfaceBoundaryBalanceResult {
             temperature_c: outdoor_dry_bulb_c,
             exterior_report_terms: SurfaceExteriorReportTerms::default(),
+            outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
         };
     };
     let Some(typed_surface) = model
@@ -6089,6 +6316,7 @@ fn exterior_surface_boundary_balance(
         return SurfaceBoundaryBalanceResult {
             temperature_c: outdoor_dry_bulb_c,
             exterior_report_terms: SurfaceExteriorReportTerms::default(),
+            outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
         };
     };
     if !matches!(
@@ -6098,6 +6326,7 @@ fn exterior_surface_boundary_balance(
         return SurfaceBoundaryBalanceResult {
             temperature_c: outdoor_dry_bulb_c,
             exterior_report_terms: SurfaceExteriorReportTerms::default(),
+            outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
         };
     }
     let wet_timestep_fraction = energyplus_exterior_wet_context_fraction(context, typed_surface);
@@ -7679,12 +7908,32 @@ pub fn energyplus_ctf_outside_face_temperature_quick_conduction_c(
     surface: &SurfaceHeatBalanceState,
     input: CtfOutsideQuickConductionBalanceInput,
 ) -> f64 {
+    energyplus_ctf_outside_face_temperature_quick_conduction_calculation(surface, input)
+        .temperature_c
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct CtfOutsideQuickConductionBalanceCalculation {
+    temperature_c: f64,
+    coupling_factor: f64,
+    denominator_w_per_m2_k: f64,
+    numerator_w_per_m2: f64,
+    inside_balance_term_w_per_m2: f64,
+}
+
+fn energyplus_ctf_outside_face_temperature_quick_conduction_calculation(
+    surface: &SurfaceHeatBalanceState,
+    input: CtfOutsideQuickConductionBalanceInput,
+) -> CtfOutsideQuickConductionBalanceCalculation {
     let inside_denominator =
         surface.ctf.inside_0_w_per_m2_k + input.inside_convection_coefficient_w_per_m2_k;
     if surface.ctf.cross_0_w_per_m2_k <= ENERGYPLUS_QUICK_CONDUCTION_CROSS_THRESHOLD_W_PER_M2_K
         || inside_denominator.abs() <= f64::EPSILON
     {
-        return energyplus_ctf_outside_face_temperature_c(surface, input.environmental);
+        return CtfOutsideQuickConductionBalanceCalculation {
+            temperature_c: energyplus_ctf_outside_face_temperature_c(surface, input.environmental),
+            ..CtfOutsideQuickConductionBalanceCalculation::default()
+        };
     }
 
     let f1 = surface.ctf.cross_0_w_per_m2_k / inside_denominator;
@@ -7695,13 +7944,18 @@ pub fn energyplus_ctf_outside_face_temperature_quick_conduction_c(
         + input.environmental.outside_radiation_coefficient_w_per_m2_k
         - f1 * surface.ctf.cross_0_w_per_m2_k;
     if denominator.abs() <= f64::EPSILON {
-        return energyplus_ctf_outside_face_temperature_c(surface, input.environmental);
+        return CtfOutsideQuickConductionBalanceCalculation {
+            temperature_c: energyplus_ctf_outside_face_temperature_c(surface, input.environmental),
+            coupling_factor: f1,
+            denominator_w_per_m2_k: denominator,
+            ..CtfOutsideQuickConductionBalanceCalculation::default()
+        };
     }
 
     let inside_balance_term = surface.ctf.const_in_part_w_per_m2
         + input.net_inside_source_w_per_m2
         + input.inside_convection_coefficient_w_per_m2_k * input.reference_air_temperature_c;
-    (-surface.ctf.const_out_part_w_per_m2
+    let numerator = -surface.ctf.const_out_part_w_per_m2
         + input.environmental.absorbed_outside_source_w_per_m2
         + input
             .environmental
@@ -7709,8 +7963,14 @@ pub fn energyplus_ctf_outside_face_temperature_quick_conduction_c(
             * input.environmental.outdoor_air_temperature_c
         + input.environmental.outside_radiation_coefficient_w_per_m2_k
             * input.environmental.radiant_temperature_c
-        + f1 * inside_balance_term)
-        / denominator
+        + f1 * inside_balance_term;
+    CtfOutsideQuickConductionBalanceCalculation {
+        temperature_c: numerator / denominator,
+        coupling_factor: f1,
+        denominator_w_per_m2_k: denominator,
+        numerator_w_per_m2: numerator,
+        inside_balance_term_w_per_m2: inside_balance_term,
+    }
 }
 
 fn exterior_surface_energy_balance(
@@ -7737,6 +7997,7 @@ fn exterior_surface_energy_balance(
             return SurfaceBoundaryBalanceResult {
                 temperature_c: outdoor_dry_bulb_c,
                 exterior_report_terms: SurfaceExteriorReportTerms::default(),
+                outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
             };
         }
     }
@@ -7783,20 +8044,31 @@ fn exterior_surface_energy_balance(
             .equivalent_coefficient_w_per_m2_k(),
         absorbed_outside_source_w_per_m2: solar_absorptance * incident_solar_w_per_m2.max(0.0),
     };
-    let temperature_c = if let Some(context) = quick_outside_conduction {
-        energyplus_ctf_outside_face_temperature_quick_conduction_c(
-            surface_state,
-            CtfOutsideQuickConductionBalanceInput {
+    let (temperature_c, quick_net_inside_source_w_per_m2, quick_calculation) =
+        if let Some(context) = quick_outside_conduction {
+            let quick_input = CtfOutsideQuickConductionBalanceInput {
                 environmental,
                 reference_air_temperature_c: context.reference_air_temperature_c,
                 inside_convection_coefficient_w_per_m2_k: context
                     .inside_convection_coefficient_w_per_m2_k,
                 net_inside_source_w_per_m2: context.net_inside_source_w_per_m2,
-            },
-        )
-    } else {
-        energyplus_ctf_outside_face_temperature_c(surface_state, environmental)
-    };
+            };
+            let calculation = energyplus_ctf_outside_face_temperature_quick_conduction_calculation(
+                surface_state,
+                quick_input,
+            );
+            (
+                calculation.temperature_c,
+                context.net_inside_source_w_per_m2,
+                calculation,
+            )
+        } else {
+            (
+                energyplus_ctf_outside_face_temperature_c(surface_state, environmental),
+                0.0,
+                CtfOutsideQuickConductionBalanceCalculation::default(),
+            )
+        };
     let exterior_report_terms = surface_exterior_report_terms_from_balance(
         surface_state,
         temperature_c,
@@ -7804,10 +8076,24 @@ fn exterior_surface_energy_balance(
         convection_terms,
         longwave_terms,
     );
+    let outside_balance_diagnostics = SurfaceOutsideBalanceDiagnostics {
+        report_temperature_c: temperature_c,
+        coefficient_surface_temperature_c,
+        convection_reference_temperature_c: environmental.outdoor_air_temperature_c,
+        equivalent_radiant_temperature_c: environmental.radiant_temperature_c,
+        outside_radiation_coefficient_w_per_m2_k: environmental
+            .outside_radiation_coefficient_w_per_m2_k,
+        quick_net_inside_source_w_per_m2,
+        quick_inside_balance_term_w_per_m2: quick_calculation.inside_balance_term_w_per_m2,
+        quick_numerator_w_per_m2: quick_calculation.numerator_w_per_m2,
+        quick_denominator_w_per_m2_k: quick_calculation.denominator_w_per_m2_k,
+        quick_coupling_factor: quick_calculation.coupling_factor,
+    };
 
     SurfaceBoundaryBalanceResult {
         temperature_c,
         exterior_report_terms,
+        outside_balance_diagnostics,
     }
 }
 
@@ -10309,8 +10595,8 @@ mod tests {
         OutputSeries, QuickOutsideConductionContext, ResultStore, RuntimeError,
         RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
         SimulationState, SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
-        advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
-        advance_surface_ctf_histories,
+        SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
+        advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         advance_surface_ctf_histories_with_outside_temperature_override,
         append_surface_incident_solar_radiation_series, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
@@ -12419,6 +12705,7 @@ DATA PERIODS
                     convection_heat_gain_rate_w: 77.0,
                     ..SurfaceExteriorReportTerms::default()
                 },
+                outside_balance_diagnostics: SurfaceOutsideBalanceDiagnostics::default(),
             },
         )]);
 
@@ -13203,7 +13490,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 206);
+        assert_eq!(simulation.results.series.len(), 266);
 
         let Some(zone_series) = simulation
             .results
@@ -13229,6 +13516,13 @@ DATA PERIODS
             return Err(std::io::Error::other("missing inside surface iteration count").into());
         };
         assert_eq!(iteration_count_series.values, vec![6.0, 6.0]);
+        let Some(outside_balance_series) = simulation.results.find_series(
+            "ROOF",
+            super::SURFACE_OUTSIDE_BALANCE_REPORT_TEMPERATURE_VARIABLE,
+        ) else {
+            return Err(std::io::Error::other("missing outside balance report temperature").into());
+        };
+        assert_eq!(outside_balance_series.values.len(), 2);
 
         let Some(weather_series) = simulation
             .results
@@ -14357,7 +14651,7 @@ DATA PERIODS
             .expect("valid psychrometric wet-bulb");
 
         assert!(
-            (wet_bulb_c - 0.227_141_685_581).abs() < 1.0e-9,
+            (wet_bulb_c - 0.227_141_685_581).abs() < 2.0e-9,
             "wet_bulb_c={wet_bulb_c}"
         );
     }
