@@ -339,10 +339,12 @@ Assert-Contains -Text $text -Pattern "status: fail" -Description "current diagno
 $summaryPath = Join-Path $CompareRoot "compare-summary.json"
 $digestPath = Join-Path $CompareRoot "compare-digest.json"
 $reportPath = Join-Path $CompareRoot "compare-report.md"
+$zoneAirDebugPath = Join-Path $CompareRoot "rust-zone-air-diagnostics.json"
 $isCompatibilityCandidateCase = $CaseId -eq "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 Assert-FileExists -Path $summaryPath -Description "official dynamic diagnostic summary"
 Assert-FileExists -Path $digestPath -Description "official dynamic diagnostic digest"
 Assert-FileExists -Path $reportPath -Description "official dynamic diagnostic report"
+Assert-FileExists -Path $zoneAirDebugPath -Description "official dynamic Rust zone-air diagnostics"
 
 $digestText = Get-Content -LiteralPath $digestPath -Raw
 Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "compact digest sample row payload"
@@ -375,6 +377,9 @@ if ($summary.artifacts.compare_summary_json -ne "compare-summary.json") {
 }
 if ($summary.artifacts.compare_digest_json -ne "compare-digest.json") {
     throw "Unexpected digest artifact pointer: $($summary.artifacts.compare_digest_json)"
+}
+if ($summary.artifacts.rust_zone_air_diagnostics_json -ne "rust-zone-air-diagnostics.json") {
+    throw "Unexpected Rust zone-air diagnostic artifact pointer: $($summary.artifacts.rust_zone_air_diagnostics_json)"
 }
 if ($summary.status -ne "fail") {
     throw "Official dynamic diagnostic should remain fail until the case is promoted intentionally: $($summary.status)"
@@ -518,7 +523,7 @@ if ($isCompatibilityCandidateCase) {
     return
 }
 
-$ExpectedSeriesCount = 103
+$ExpectedSeriesCount = 104
 if ($summary.series_count -ne $ExpectedSeriesCount) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
@@ -1110,6 +1115,9 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Opaque S
 if (-not ($summary.series | Where-Object { $_.output.key -eq "Simulation" -and $_.output.variable -eq "Surface Inside Face Heat Balance Calculation Iteration Count" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Heat Balance Calculation Iteration Count series"
 }
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air Humidity Ratio" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Zone Mean Air Humidity Ratio series"
+}
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Air Heat Balance Internal Convective Heat Gain Rate" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Zone Air Heat Balance Internal Convective Heat Gain Rate series"
 }
@@ -1263,6 +1271,7 @@ Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "mar
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Drybulb Temperature" -Description "markdown weather drybulb variable"
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature" -Description "markdown weather wetbulb variable"
 Assert-Contains -Text $reportText -Pattern "Site Rain Status" -Description "markdown weather rain variable"
+Assert-Contains -Text $reportText -Pattern "Zone Mean Air Humidity Ratio" -Description "markdown zone humidity variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate" -Description "markdown inside convection source variable"

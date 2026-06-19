@@ -101,6 +101,39 @@ pub const SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE: &str =
 /// Diagnostic-only inside/outside CTF coupling factor used by the quick outside balance.
 pub const SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE: &str =
     "Surface Outside Face Quick Balance Coupling Factor";
+/// Diagnostic-only Rust zone-air current MAT at the reported timestep.
+pub const RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE: &str = "Rust Zone Air Current Temperature";
+/// Diagnostic-only Rust zone-timestep averaged MAT.
+pub const RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_TEMPERATURE_VARIABLE: &str =
+    "Rust Zone Air Zone Timestep Average Temperature";
+/// Diagnostic-only Rust previous zone-timestep MAT history slot 1.
+pub const RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE: &str =
+    "Rust Zone Air Previous Temperature 1";
+/// Diagnostic-only Rust previous zone-timestep MAT history slot 2.
+pub const RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE: &str =
+    "Rust Zone Air Previous Temperature 2";
+/// Diagnostic-only Rust previous zone-timestep MAT history slot 3.
+pub const RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE: &str =
+    "Rust Zone Air Previous Temperature 3";
+/// Diagnostic-only Rust previous adaptive system-timestep MAT history slot 1.
+pub const RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE: &str =
+    "Rust Zone Air Previous System Temperature 1";
+/// Diagnostic-only Rust adaptive system timestep count selected for the zone timestep.
+pub const RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE: &str =
+    "Rust Zone Air System Timestep Count";
+/// Diagnostic-only Rust current zone air humidity ratio.
+pub const RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE: &str = "Rust Zone Air Humidity Ratio";
+/// Diagnostic-only Rust zone-timestep averaged zone air humidity ratio.
+pub const RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_HUMIDITY_RATIO_VARIABLE: &str =
+    "Rust Zone Air Zone Timestep Average Humidity Ratio";
+/// Diagnostic-only Rust zone air heat capacity.
+pub const RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE: &str = "Rust Zone Air Heat Capacity";
+/// Diagnostic-only Rust zone-timestep air power capacity.
+pub const RUST_ZONE_AIR_ZONE_TIMESTEP_AIR_POWER_CAP_VARIABLE: &str =
+    "Rust Zone Air Zone Timestep AirPowerCap";
+/// Diagnostic-only Rust last zone-air correction air power capacity.
+pub const RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE: &str =
+    "Rust Zone Air Last Correction AirPowerCap";
 /// Diagnostic/report variable for EnergyPlus inside surface heat-balance iteration count.
 pub const SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE: &str =
     "Surface Inside Face Heat Balance Calculation Iteration Count";
@@ -841,6 +874,37 @@ pub struct HeatBalanceSurfaceIterationFirstSampleTrace {
     pub max_delta_surface_name: Option<String>,
 }
 
+/// Per-zone zone-air state captured at a diagnostic boundary.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceZoneAirStateSample {
+    /// Zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// Current mean air temperature in C.
+    pub mean_air_temperature_c: f64,
+    /// Last zone-timestep average mean air temperature in C.
+    pub zone_timestep_average_air_temperature_c: f64,
+    /// Previous zone-timestep mean-air-temperature history in C.
+    pub previous_mean_air_temperatures_c: [f64; 3],
+    /// Previous system-timestep mean-air-temperature history in C.
+    pub previous_system_mean_air_temperatures_c: [f64; 3],
+    /// Adaptive system timestep count used in the previous zone timestep.
+    pub previous_system_timestep_count: u32,
+    /// Current zone air humidity ratio in kgWater/kgDryAir.
+    pub air_humidity_ratio: f64,
+    /// Last zone-timestep average humidity ratio in kgWater/kgDryAir.
+    pub zone_timestep_average_air_humidity_ratio: f64,
+    /// Previous zone-timestep humidity-ratio history in kgWater/kgDryAir.
+    pub previous_air_humidity_ratios: [f64; 3],
+    /// Previous system-timestep humidity-ratio history in kgWater/kgDryAir.
+    pub previous_system_air_humidity_ratios: [f64; 3],
+    /// Zone air heat capacity in J/K.
+    pub air_heat_capacity_j_per_k: f64,
+    /// Latest zone-air coefficient snapshot.
+    pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
+}
+
 /// Per-zone heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ZoneHeatBalanceState {
@@ -1571,6 +1635,8 @@ pub struct HeatBalanceSimulationSummary {
     pub zone_air_report_sampling: HeatBalanceZoneAirReportSampling,
     /// Timing for zone-air correction during interleaved surface-balance probes.
     pub surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+    /// Per-zone zone-air state after warmup and before the run period starts.
+    pub run_period_initial_zone_air_states: Vec<HeatBalanceZoneAirStateSample>,
     /// Per-slot CTF history terms after optional warmup, before the run period starts.
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
@@ -1810,6 +1876,59 @@ struct ZoneConductionTrace {
     outside_conduction_rate_w: Vec<f64>,
     outside_conduction_gain_rate_w: Vec<f64>,
     outside_conduction_loss_rate_w: Vec<f64>,
+}
+
+struct ZoneAirDebugTrace {
+    zone_id: ZoneId,
+    zone_name: String,
+    current_temperature_c: Vec<f64>,
+    zone_timestep_average_temperature_c: Vec<f64>,
+    previous_temperature_1_c: Vec<f64>,
+    previous_temperature_2_c: Vec<f64>,
+    previous_temperature_3_c: Vec<f64>,
+    previous_system_temperature_1_c: Vec<f64>,
+    system_timestep_count: Vec<f64>,
+    humidity_ratio: Vec<f64>,
+    zone_timestep_average_humidity_ratio: Vec<f64>,
+    air_heat_capacity_j_per_k: Vec<f64>,
+    zone_timestep_air_power_cap_w_per_k: Vec<f64>,
+    last_correction_air_power_cap_w_per_k: Vec<f64>,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct ZoneAirDebugTraceSums {
+    current_temperature_c: f64,
+    zone_timestep_average_temperature_c: f64,
+    previous_temperature_1_c: f64,
+    previous_temperature_2_c: f64,
+    previous_temperature_3_c: f64,
+    previous_system_temperature_1_c: f64,
+    system_timestep_count: f64,
+    humidity_ratio: f64,
+    zone_timestep_average_humidity_ratio: f64,
+    air_heat_capacity_j_per_k: f64,
+    zone_timestep_air_power_cap_w_per_k: f64,
+    last_correction_air_power_cap_w_per_k: f64,
+}
+
+fn heat_balance_zone_air_state_sample(
+    zone: &ZoneHeatBalanceState,
+) -> HeatBalanceZoneAirStateSample {
+    HeatBalanceZoneAirStateSample {
+        zone_id: zone.zone_id,
+        zone_name: zone.zone_name.clone(),
+        mean_air_temperature_c: zone.mean_air_temperature_c,
+        zone_timestep_average_air_temperature_c: zone.zone_timestep_average_air_temperature_c,
+        previous_mean_air_temperatures_c: zone.previous_mean_air_temperatures_c,
+        previous_system_mean_air_temperatures_c: zone.previous_system_mean_air_temperatures_c,
+        previous_system_timestep_count: zone.previous_system_timestep_count,
+        air_humidity_ratio: zone.air_humidity_ratio,
+        zone_timestep_average_air_humidity_ratio: zone.zone_timestep_average_air_humidity_ratio,
+        previous_air_humidity_ratios: zone.previous_air_humidity_ratios,
+        previous_system_air_humidity_ratios: zone.previous_system_air_humidity_ratios,
+        air_heat_capacity_j_per_k: zone.air_heat_capacity_j_per_k,
+        zone_air_temperature_coefficients: zone.zone_air_temperature_coefficients,
+    }
 }
 
 /// Appends diagnostic surface incident solar radiation series for sun-exposed
@@ -4459,10 +4578,26 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.surface_loop_zone_air_correction,
         first_hour_interpolation_starting_values,
     );
+    let run_period_initial_zone_air_states = state
+        .zones
+        .iter()
+        .map(heat_balance_zone_air_state_sample)
+        .collect::<Vec<_>>();
     let run_period_initial_ctf_history_slots =
         heat_balance_ctf_history_slot_samples(&state.surfaces);
     let run_period_timestep_start = state.timestep_index;
     let mut zone_temperatures = state
+        .zones
+        .iter()
+        .map(|zone| {
+            (
+                zone.zone_id,
+                zone.zone_name.clone(),
+                Vec::with_capacity(options.sample_count),
+            )
+        })
+        .collect::<Vec<_>>();
+    let mut zone_humidity_ratios = state
         .zones
         .iter()
         .map(|zone| {
@@ -4499,6 +4634,26 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 Vec::with_capacity(options.sample_count),
                 Vec::with_capacity(options.sample_count),
             )
+        })
+        .collect::<Vec<_>>();
+    let mut zone_air_debug_traces = state
+        .zones
+        .iter()
+        .map(|zone| ZoneAirDebugTrace {
+            zone_id: zone.zone_id,
+            zone_name: zone.zone_name.clone(),
+            current_temperature_c: Vec::with_capacity(options.sample_count),
+            zone_timestep_average_temperature_c: Vec::with_capacity(options.sample_count),
+            previous_temperature_1_c: Vec::with_capacity(options.sample_count),
+            previous_temperature_2_c: Vec::with_capacity(options.sample_count),
+            previous_temperature_3_c: Vec::with_capacity(options.sample_count),
+            previous_system_temperature_1_c: Vec::with_capacity(options.sample_count),
+            system_timestep_count: Vec::with_capacity(options.sample_count),
+            humidity_ratio: Vec::with_capacity(options.sample_count),
+            zone_timestep_average_humidity_ratio: Vec::with_capacity(options.sample_count),
+            air_heat_capacity_j_per_k: Vec::with_capacity(options.sample_count),
+            zone_timestep_air_power_cap_w_per_k: Vec::with_capacity(options.sample_count),
+            last_correction_air_power_cap_w_per_k: Vec::with_capacity(options.sample_count),
         })
         .collect::<Vec<_>>();
     let mut surface_temperatures = state
@@ -4610,6 +4765,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
         let steps = zone_steps_per_hour.max(1);
         let mut zone_temperature_sums = vec![0.0; zone_temperatures.len()];
+        let mut zone_humidity_ratio_sums = vec![0.0; zone_humidity_ratios.len()];
         let mut zone_conduction_sums =
             vec![(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); zone_conduction_rates.len()];
         let mut inside_surface_iteration_count_sum = 0.0;
@@ -4617,6 +4773,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
         let mut zone_air_heat_balance_last =
             vec![(0.0, 0.0, 0.0); zone_air_heat_balance_rates.len()];
+        let mut zone_air_debug_sums =
+            vec![ZoneAirDebugTraceSums::default(); zone_air_debug_traces.len()];
         let mut surface_sums =
             vec![SurfaceHeatBalanceTraceSums::default(); surface_temperatures.len()];
         let mut outdoor_temperature_sum = 0.0;
@@ -4714,6 +4872,56 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         zone_state.mean_air_temperature_c
                     };
                     zone_temperature_sums[index] += reported_zone_temperature_c;
+                }
+            }
+            for (index, (zone_id, _zone_name, _values)) in zone_humidity_ratios.iter().enumerate() {
+                if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
+                    let reported_zone_humidity_ratio = if matches!(
+                        options.zone_air_algorithm,
+                        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                    ) {
+                        zone_state.zone_timestep_average_air_humidity_ratio
+                    } else {
+                        zone_state.air_humidity_ratio
+                    };
+                    zone_humidity_ratio_sums[index] += reported_zone_humidity_ratio;
+                }
+            }
+            for (index, trace) in zone_air_debug_traces.iter().enumerate() {
+                if let Some(zone_state) = state
+                    .zones
+                    .iter()
+                    .find(|zone| zone.zone_id == trace.zone_id)
+                {
+                    let zone_timestep_air_power_cap_w_per_k = if seconds_per_timestep > 0.0 {
+                        zone_state.air_heat_capacity_j_per_k / seconds_per_timestep
+                    } else {
+                        0.0
+                    };
+                    zone_air_debug_sums[index].current_temperature_c +=
+                        zone_state.mean_air_temperature_c;
+                    zone_air_debug_sums[index].zone_timestep_average_temperature_c +=
+                        zone_state.zone_timestep_average_air_temperature_c;
+                    zone_air_debug_sums[index].previous_temperature_1_c +=
+                        zone_state.previous_mean_air_temperatures_c[0];
+                    zone_air_debug_sums[index].previous_temperature_2_c +=
+                        zone_state.previous_mean_air_temperatures_c[1];
+                    zone_air_debug_sums[index].previous_temperature_3_c +=
+                        zone_state.previous_mean_air_temperatures_c[2];
+                    zone_air_debug_sums[index].previous_system_temperature_1_c +=
+                        zone_state.previous_system_mean_air_temperatures_c[0];
+                    zone_air_debug_sums[index].system_timestep_count +=
+                        f64::from(zone_state.previous_system_timestep_count);
+                    zone_air_debug_sums[index].humidity_ratio += zone_state.air_humidity_ratio;
+                    zone_air_debug_sums[index].zone_timestep_average_humidity_ratio +=
+                        zone_state.zone_timestep_average_air_humidity_ratio;
+                    zone_air_debug_sums[index].air_heat_capacity_j_per_k +=
+                        zone_state.air_heat_capacity_j_per_k;
+                    zone_air_debug_sums[index].zone_timestep_air_power_cap_w_per_k +=
+                        zone_timestep_air_power_cap_w_per_k;
+                    zone_air_debug_sums[index].last_correction_air_power_cap_w_per_k += zone_state
+                        .zone_air_temperature_coefficients
+                        .air_power_cap_w_per_k;
                 }
             }
             for (index, trace) in zone_conduction_rates.iter().enumerate() {
@@ -5010,6 +5218,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         for (index, (_zone_id, _zone_name, values)) in zone_temperatures.iter_mut().enumerate() {
             values.push(zone_temperature_sums[index] / divisor);
         }
+        for (index, (_zone_id, _zone_name, values)) in zone_humidity_ratios.iter_mut().enumerate() {
+            values.push(zone_humidity_ratio_sums[index] / divisor);
+        }
         for (index, trace) in zone_conduction_rates.iter_mut().enumerate() {
             let sums = zone_conduction_sums[index];
             trace.inside_conduction_rate_w.push(sums.0 / divisor);
@@ -5043,6 +5254,43 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             internal_gain_values.push(values.0);
             surface_convection_values.push(values.1);
             air_storage_values.push(values.2);
+        }
+        for (index, trace) in zone_air_debug_traces.iter_mut().enumerate() {
+            let sums = zone_air_debug_sums[index];
+            trace
+                .current_temperature_c
+                .push(sums.current_temperature_c / divisor);
+            trace
+                .zone_timestep_average_temperature_c
+                .push(sums.zone_timestep_average_temperature_c / divisor);
+            trace
+                .previous_temperature_1_c
+                .push(sums.previous_temperature_1_c / divisor);
+            trace
+                .previous_temperature_2_c
+                .push(sums.previous_temperature_2_c / divisor);
+            trace
+                .previous_temperature_3_c
+                .push(sums.previous_temperature_3_c / divisor);
+            trace
+                .previous_system_temperature_1_c
+                .push(sums.previous_system_temperature_1_c / divisor);
+            trace
+                .system_timestep_count
+                .push(sums.system_timestep_count / divisor);
+            trace.humidity_ratio.push(sums.humidity_ratio / divisor);
+            trace
+                .zone_timestep_average_humidity_ratio
+                .push(sums.zone_timestep_average_humidity_ratio / divisor);
+            trace
+                .air_heat_capacity_j_per_k
+                .push(sums.air_heat_capacity_j_per_k / divisor);
+            trace
+                .zone_timestep_air_power_cap_w_per_k
+                .push(sums.zone_timestep_air_power_cap_w_per_k / divisor);
+            trace
+                .last_correction_air_power_cap_w_per_k
+                .push(sums.last_correction_air_power_cap_w_per_k / divisor);
         }
         for (index, trace) in surface_temperatures.iter_mut().enumerate() {
             let sums = surface_sums[index];
@@ -5195,6 +5443,16 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         });
         handle_index += 1;
     }
+    for (_zone_id, zone_name, values) in zone_humidity_ratios {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name,
+            variable_name: "Zone Mean Air Humidity Ratio".to_string(),
+            units: "kgWater/kgDryAir".to_string(),
+            values,
+        });
+        handle_index += 1;
+    }
     for trace in zone_conduction_rates {
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
@@ -5285,6 +5543,104 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Zone Air Heat Balance Air Energy Storage Rate".to_string(),
             units: "W".to_string(),
             values: air_storage_values,
+        });
+        handle_index += 1;
+    }
+    for trace in zone_air_debug_traces {
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.current_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_TEMPERATURE_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.zone_timestep_average_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.previous_temperature_1_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.previous_temperature_2_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.previous_temperature_3_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE.to_string(),
+            units: "C".to_string(),
+            values: trace.previous_system_temperature_1_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE.to_string(),
+            units: String::new(),
+            values: trace.system_timestep_count,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE.to_string(),
+            units: "kgWater/kgDryAir".to_string(),
+            values: trace.humidity_ratio,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_HUMIDITY_RATIO_VARIABLE.to_string(),
+            units: "kgWater/kgDryAir".to_string(),
+            values: trace.zone_timestep_average_humidity_ratio,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE.to_string(),
+            units: "J/K".to_string(),
+            values: trace.air_heat_capacity_j_per_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name.clone(),
+            variable_name: RUST_ZONE_AIR_ZONE_TIMESTEP_AIR_POWER_CAP_VARIABLE.to_string(),
+            units: "W/K".to_string(),
+            values: trace.zone_timestep_air_power_cap_w_per_k,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.zone_name,
+            variable_name: RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE.to_string(),
+            units: "W/K".to_string(),
+            values: trace.last_correction_air_power_cap_w_per_k,
         });
         handle_index += 1;
     }
@@ -5671,6 +6027,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_conduction_report_source: options.zone_conduction_report_source,
         zone_air_report_sampling: options.zone_air_report_sampling,
         surface_loop_zone_air_correction: options.surface_loop_zone_air_correction,
+        run_period_initial_zone_air_states,
         run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
@@ -13490,7 +13847,11 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 266);
+        assert_eq!(simulation.results.series.len(), 279);
+        assert_eq!(
+            simulation.summary.run_period_initial_zone_air_states.len(),
+            1
+        );
 
         let Some(zone_series) = simulation
             .results
@@ -13501,6 +13862,22 @@ DATA PERIODS
         assert!(zone_series.values[0] > 11.9);
         assert!(zone_series.values[0] < 20.0);
         assert!(zone_series.values[1] > zone_series.values[0]);
+
+        let Some(zone_humidity_series) = simulation
+            .results
+            .find_series("ZONE ONE", "Zone Mean Air Humidity Ratio")
+        else {
+            return Err(std::io::Error::other("missing zone humidity series").into());
+        };
+        assert_eq!(zone_humidity_series.values.len(), 2);
+
+        let Some(zone_air_capacity_series) = simulation
+            .results
+            .find_series("ZONE ONE", super::RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE)
+        else {
+            return Err(std::io::Error::other("missing zone-air debug series").into());
+        };
+        assert_eq!(zone_air_capacity_series.values.len(), 2);
 
         let Some(inside_convection_series) = simulation.results.find_series(
             "FLOOR",

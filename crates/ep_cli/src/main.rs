@@ -37,8 +37,17 @@ use ep_runtime::{
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
     HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-    HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource, NodeStateProjection,
-    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions, ResultStore,
+    HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
+    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
+    PlantStateProjection, PlantStateProjectionOptions, RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
+    RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE, RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE,
+    RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
+    RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE,
+    RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE, RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE,
+    RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE, RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE,
+    RUST_ZONE_AIR_ZONE_TIMESTEP_AIR_POWER_CAP_VARIABLE,
+    RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_HUMIDITY_RATIO_VARIABLE,
+    RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_TEMPERATURE_VARIABLE, ResultStore,
     SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_INSIDE_HISTORY_FLUX_TERM_RATE_VARIABLE,
@@ -3799,8 +3808,10 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
+    rust_zone_air_run_period_initial_states: Vec<HeatBalanceZoneAirStateSample>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
+    rust_zone_air_debug_series: Vec<HeatBalanceRustDebugSeries>,
     rust_outside_balance_debug_series: Vec<HeatBalanceRustDebugSeries>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
@@ -4313,6 +4324,7 @@ fn heat_balance_variable_classes(manifest: &ConformanceCase) -> Vec<VariableClas
 
 fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
     variable.eq_ignore_ascii_case("Zone Mean Air Temperature")
+        || variable.eq_ignore_ascii_case("Zone Mean Air Humidity Ratio")
         || variable.eq_ignore_ascii_case("Site Outdoor Air Drybulb Temperature")
         || variable.eq_ignore_ascii_case("Site Outdoor Air Wetbulb Temperature")
         || variable.eq_ignore_ascii_case("Site Rain Status")
@@ -4714,10 +4726,14 @@ fn build_heat_balance_conformance_diagnostic(
             .run_period_initial_ctf_history_slots,
         ctf_history_first_sample_slots: simulation.summary.first_sample_ctf_history_slots,
         ctf_history_max_sample_slots,
+        rust_zone_air_run_period_initial_states: simulation
+            .summary
+            .run_period_initial_zone_air_states,
         surface_first_sample_trace: simulation.summary.surface_first_sample_trace,
         surface_iteration_first_sample_trace: simulation
             .summary
             .surface_iteration_first_sample_trace,
+        rust_zone_air_debug_series: heat_balance_zone_air_debug_series(&simulation.results),
         rust_outside_balance_debug_series: heat_balance_outside_balance_debug_series(
             &simulation.results,
         ),
@@ -4740,6 +4756,34 @@ fn heat_balance_outside_balance_debug_series(
         SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE,
         SURFACE_OUTSIDE_QUICK_BALANCE_DENOMINATOR_VARIABLE,
         SURFACE_OUTSIDE_QUICK_BALANCE_COUPLING_FACTOR_VARIABLE,
+    ]);
+    results
+        .series
+        .iter()
+        .filter(|series| variables.contains(series.variable_name.as_str()))
+        .map(|series| HeatBalanceRustDebugSeries {
+            key: series.key.clone(),
+            variable: series.variable_name.clone(),
+            units: series.units.clone(),
+            values: series.values.clone(),
+        })
+        .collect()
+}
+
+fn heat_balance_zone_air_debug_series(results: &ResultStore) -> Vec<HeatBalanceRustDebugSeries> {
+    let variables = BTreeSet::from([
+        RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
+        RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_TEMPERATURE_VARIABLE,
+        RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE,
+        RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE,
+        RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE,
+        RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE,
+        RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE,
+        RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE,
+        RUST_ZONE_AIR_ZONE_TIMESTEP_AVERAGE_HUMIDITY_RATIO_VARIABLE,
+        RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE,
+        RUST_ZONE_AIR_ZONE_TIMESTEP_AIR_POWER_CAP_VARIABLE,
+        RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
     ]);
     results
         .series
@@ -8991,6 +9035,7 @@ fn write_heat_balance_conformance_report(
     let digest_path = report_dir.join("compare-digest.json");
     let report_path = report_dir.join("compare-report.md");
     let outside_balance_debug_path = report_dir.join("rust-outside-balance-diagnostics.json");
+    let zone_air_debug_path = report_dir.join("rust-zone-air-diagnostics.json");
 
     std::fs::write(
         &summary_path,
@@ -9012,6 +9057,11 @@ fn write_heat_balance_conformance_report(
         render_heat_balance_rust_outside_balance_debug_json(diagnostic),
     )
     .map_err(|error| format!("failed to write heat-balance outside-balance debug: {error}"))?;
+    std::fs::write(
+        &zone_air_debug_path,
+        render_heat_balance_rust_zone_air_debug_json(diagnostic),
+    )
+    .map_err(|error| format!("failed to write heat-balance zone-air debug: {error}"))?;
 
     Ok(())
 }
@@ -9073,6 +9123,112 @@ fn render_heat_balance_rust_outside_balance_debug_json(
     }
     json.push_str("]\n");
     json.push_str("}\n");
+    json
+}
+
+fn render_heat_balance_rust_zone_air_debug_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str("  \"runtime_class\": \"heat-balance-rust-zone-air-diagnostics\",\n");
+    json.push_str("  \"comparison_class\": \"diagnostic-only\",\n");
+    json.push_str("  \"conformance_claim\": false,\n");
+    json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
+    json.push_str(&format!(
+        "  \"zone_air_algorithm_lane\": {},\n",
+        json_string(heat_balance_zone_air_algorithm_lane_label(
+            diagnostic.zone_air_algorithm
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"run_period_initial_states\": {},\n",
+        heat_balance_zone_air_initial_states_json(
+            &diagnostic.rust_zone_air_run_period_initial_states
+        )
+    ));
+    json.push_str(&format!(
+        "  \"series\": {}\n",
+        heat_balance_rust_debug_series_json(&diagnostic.rust_zone_air_debug_series)
+    ));
+    json.push_str("}\n");
+    json
+}
+
+fn heat_balance_rust_debug_series_json(series: &[HeatBalanceRustDebugSeries]) -> String {
+    let mut json = String::new();
+    json.push('[');
+    for (index, series) in series.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, \"variable\": {}, \"units\": {}, ",
+                "\"samples\": {}, \"values\": {} }}"
+            ),
+            json_string(&series.key),
+            json_string(&series.variable),
+            json_string(&series.units),
+            series.values.len(),
+            json_number_array(&series.values)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_zone_air_initial_states_json(states: &[HeatBalanceZoneAirStateSample]) -> String {
+    let mut json = String::new();
+    json.push('[');
+    for (index, state) in states.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        let coefficients = state.zone_air_temperature_coefficients;
+        json.push_str(&format!(
+            concat!(
+                "{{ \"zone_id\": {}, \"zone_name\": {}, ",
+                "\"mean_air_temperature_c\": {}, ",
+                "\"zone_timestep_average_air_temperature_c\": {}, ",
+                "\"previous_mean_air_temperatures_c\": {}, ",
+                "\"previous_system_mean_air_temperatures_c\": {}, ",
+                "\"previous_system_timestep_count\": {}, ",
+                "\"air_humidity_ratio\": {}, ",
+                "\"zone_timestep_average_air_humidity_ratio\": {}, ",
+                "\"previous_air_humidity_ratios\": {}, ",
+                "\"previous_system_air_humidity_ratios\": {}, ",
+                "\"air_heat_capacity_j_per_k\": {}, ",
+                "\"zone_air_temperature_coefficients\": {{ ",
+                "\"temp_dependent_coefficient_w_per_k\": {}, ",
+                "\"temp_independent_coefficient_w\": {}, ",
+                "\"air_power_cap_w_per_k\": {}, ",
+                "\"third_order_history_term_w\": {}, ",
+                "\"third_order_temp_dependent_load_w_per_k\": {}, ",
+                "\"third_order_temp_independent_load_w\": {} }} }}"
+            ),
+            state.zone_id.0,
+            json_string(&state.zone_name),
+            json_number(state.mean_air_temperature_c),
+            json_number(state.zone_timestep_average_air_temperature_c),
+            json_number_array(&state.previous_mean_air_temperatures_c),
+            json_number_array(&state.previous_system_mean_air_temperatures_c),
+            state.previous_system_timestep_count,
+            json_number(state.air_humidity_ratio),
+            json_number(state.zone_timestep_average_air_humidity_ratio),
+            json_number_array(&state.previous_air_humidity_ratios),
+            json_number_array(&state.previous_system_air_humidity_ratios),
+            json_number(state.air_heat_capacity_j_per_k),
+            json_number(coefficients.temp_dependent_coefficient_w_per_k),
+            json_number(coefficients.temp_independent_coefficient_w),
+            json_number(coefficients.air_power_cap_w_per_k),
+            json_number(coefficients.third_order_history_term_w),
+            json_number(coefficients.third_order_temp_dependent_load_w_per_k),
+            json_number(coefficients.third_order_temp_independent_load_w)
+        ));
+    }
+    json.push(']');
     json
 }
 
@@ -9340,8 +9496,9 @@ fn render_heat_balance_conformance_json(
     json.push_str("    \"compare_summary_json\": \"compare-summary.json\",\n");
     json.push_str("    \"compare_digest_json\": \"compare-digest.json\",\n");
     json.push_str(
-        "    \"rust_outside_balance_diagnostics_json\": \"rust-outside-balance-diagnostics.json\"\n",
+        "    \"rust_outside_balance_diagnostics_json\": \"rust-outside-balance-diagnostics.json\",\n",
     );
+    json.push_str("    \"rust_zone_air_diagnostics_json\": \"rust-zone-air-diagnostics.json\"\n");
     json.push_str("  }\n");
     json.push_str("}\n");
     json
@@ -13918,6 +14075,7 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            rust_zone_air_run_period_initial_states: vec![],
             surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -13945,6 +14103,7 @@ mod tests {
                     max_delta_surface_name: Some("FLOOR".to_string()),
                 },
             ],
+            rust_zone_air_debug_series: vec![],
             rust_outside_balance_debug_series: vec![],
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
@@ -14701,6 +14860,7 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            rust_zone_air_run_period_initial_states: vec![],
             surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -14728,6 +14888,7 @@ mod tests {
                     max_delta_surface_name: Some("FLOOR".to_string()),
                 },
             ],
+            rust_zone_air_debug_series: vec![],
             rust_outside_balance_debug_series: vec![],
             series: vec![super::HeatBalanceSeriesDiagnostic {
                 output: super::ZoneTemperatureReportOutput {

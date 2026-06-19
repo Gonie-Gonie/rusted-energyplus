@@ -559,6 +559,14 @@ first_evidence = "heat_balance_nomass_001"
 support_boundary = "Tolerance-gated for declared no-mass heat-balance cases and the official 1ZoneUncontrolled dynamic compatibility-candidate lane; no general heat-balance or HVAC claim."
 
 [[variable]]
+name = "Zone Mean Air Humidity Ratio"
+domain = "heat_balance"
+status = "diagnostic"
+first_case = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+support_boundary = "Diagnostic-only oracle/Rust humidity-ratio comparison for official 1ZoneUncontrolled heat-balance source isolation; not part of the promoted compatibility-candidate conformance claim."
+
+[[variable]]
 name = "OtherEquipment Internal Gains Nominal Equipment Level"
 domain = "internal-gain"
 status = "conformance"

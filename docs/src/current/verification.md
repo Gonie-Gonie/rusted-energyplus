@@ -91,7 +91,11 @@ plus first reported sample bottlenecks for run-period handoff diagnosis, while
 also carrying Rust-only first-sample CTF component rows for inside/outside
 current-temperature and history-term isolation plus oracle-inferred first-sample
 CTF history deltas when EIO zero coefficients and matching oracle series are
-available. The full summary preserves hourly sample rows for deeper inspection:
+available. The full summary preserves hourly sample rows for deeper inspection.
+The diagnostic artifacts now also include `rust-zone-air-diagnostics.json`,
+which captures the Rust run-period initial zone-air state and hourly Rust-only
+zone-air current/average/history, humidity, air-capacity, and system-timestep
+count series:
 
 As of the 2026-06-20 regenerated compatibility-candidate diagnostic baseline,
 the broad diagnostic report still has `status = fail` and
@@ -110,6 +114,17 @@ EnergyPlus conformance statement because the broad diagnostic still shows:
   `0.007056007286 C`; the active blocker is
   `floor-inside-current-face-temperature-source-timing`, where a small
   face-temperature offset is amplified by the floor CTF current/history terms.
+- `ZONE ONE` mean air humidity ratio was added as a diagnostic-only row. In
+  the regenerated candidate baseline it matches exactly through the first
+  run-period day and differs by about `1.2e-6 kgWater/kgDryAir` at representative
+  later samples (`4213`, `6567`, `8426`, `8759`), so the remaining
+  `~0.0065 C` mean-air-temperature offset is not currently explained by a large
+  humidity or air-capacity mismatch.
+- The Rust zone-air diagnostics show the compatibility-candidate lane staying
+  at a zone/system timestep count of `1` at the representative blocker samples,
+  which narrows the next implementation target away from adaptive system
+  subdivision and toward run-period zone-temperature history/handoff or the
+  floor CTF current/history split.
 
 ```powershell
 .\scripts\dev.cmd official-dynamic-heat-balance-diagnostic
