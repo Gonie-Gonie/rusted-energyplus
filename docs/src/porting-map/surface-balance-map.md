@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-12
+last_reviewed: 2026-06-20
 ---
 
 # Surface Inside and Outside Balance Map
@@ -112,3 +112,22 @@ current `SurfTempIn`, writes the conduction report variables, and then shifts
 the CTF histories. The active floor-storage work should therefore keep report,
 inside-CTF, and committed-history snapshots separate instead of replacing all
 adiabatic or interzone outside states with the current inside face.
+
+As of the 2026-06-20 compatibility-candidate diagnostic, broad dynamic
+conformance is still not claimable. The active
+`energyplus-heat-balance-compat-candidate` run remains
+`conformance_claim=false`: `ZN001:ROOF001` outside-face convection and net
+thermal radiation heat-gain rates are the largest user-visible misses
+(`25.397397824985 W` and `25.044153522467 W` max absolute deltas), with the
+floor storage row still exposing a smaller CTF timing residual
+(`1.461946819083 W` max absolute delta). Increasing surface iterations from
+20 to 40 produced identical roof, floor, and zone metrics, so the remaining
+error is not an unconverged surface-iteration loop. Running the same ScriptF
+flat execution variant directly with `after-surface-loop` but without the
+compat-candidate adaptive system-timestep correction regressed floor storage
+from `1.461946819083 W` to `189.705108454913 W`, confirming that the active
+compat lane is the best current execution path for floor/zone coupling. The
+roof blocker is now isolated to the outside environmental balance: weather
+dry-bulb, rain, sky temperature, horizontal infrared, and exterior DOE-2
+coefficient paths are already near-oracle, while a small outside-face
+temperature offset is amplified by convection and longwave reporting.
