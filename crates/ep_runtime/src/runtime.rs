@@ -37,6 +37,8 @@ const ENERGYPLUS_MIN_SYSTEM_TIMESTEP_SECONDS: f64 = 60.0;
 const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M: f64 = 10.0;
 const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;
 const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;
+const ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M: f64 = 1.5;
+const ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
@@ -1723,6 +1725,10 @@ struct SurfaceHeatBalanceTrace {
     inside_face_temperature_c: Vec<f64>,
     inside_adjacent_air_temperature_c: Vec<f64>,
     outside_face_temperature_c: Vec<f64>,
+    outside_outdoor_air_dry_bulb_temperature_c: Vec<f64>,
+    outside_outdoor_air_wet_bulb_temperature_c: Vec<f64>,
+    outside_outdoor_air_wind_speed_m_per_s: Vec<f64>,
+    outside_outdoor_air_wind_direction_deg: Vec<f64>,
     inside_convection_heat_gain_rate_w: Vec<f64>,
     inside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     inside_convection_coefficient_w_per_m2_k: Vec<f64>,
@@ -1773,6 +1779,10 @@ struct SurfaceHeatBalanceTraceSums {
     inside_face_temperature_c: f64,
     inside_adjacent_air_temperature_c: f64,
     outside_face_temperature_c: f64,
+    outside_outdoor_air_dry_bulb_temperature_c: f64,
+    outside_outdoor_air_wet_bulb_temperature_c: f64,
+    outside_outdoor_air_wind_speed_m_per_s: f64,
+    outside_outdoor_air_wind_direction_deg: f64,
     inside_convection_heat_gain_rate_w: f64,
     inside_convection_heat_gain_rate_per_area_w_per_m2: f64,
     inside_convection_coefficient_w_per_m2_k: f64,
@@ -4745,6 +4755,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             inside_face_temperature_c: Vec::with_capacity(options.sample_count),
             inside_adjacent_air_temperature_c: Vec::with_capacity(options.sample_count),
             outside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_outdoor_air_dry_bulb_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_outdoor_air_wet_bulb_temperature_c: Vec::with_capacity(options.sample_count),
+            outside_outdoor_air_wind_speed_m_per_s: Vec::with_capacity(options.sample_count),
+            outside_outdoor_air_wind_direction_deg: Vec::with_capacity(options.sample_count),
             inside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
             inside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
                 options.sample_count,
@@ -5234,6 +5248,53 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                         weather_context,
                         options.zone_air_algorithm,
                     );
+                    let typed_surface = model
+                        .typed
+                        .surfaces
+                        .iter()
+                        .find(|surface| surface.id == surface_state.surface_id);
+                    let surface_outdoor_air_dry_bulb_temperature_c = typed_surface
+                        .map(|surface| {
+                            energyplus_surface_outdoor_air_temperature_c(
+                                surface,
+                                timestep_outdoor_dry_bulb_c,
+                            )
+                        })
+                        .unwrap_or(timestep_outdoor_dry_bulb_c);
+                    let surface_outdoor_air_wet_bulb_temperature_c = typed_surface
+                        .map(|surface| {
+                            energyplus_surface_outdoor_air_temperature_c(
+                                surface,
+                                timestep_outdoor_wet_bulb_c,
+                            )
+                        })
+                        .unwrap_or(timestep_outdoor_wet_bulb_c);
+                    let (weather_file_wind_speed_m_per_s, surface_outdoor_air_wind_direction_deg) =
+                        weather_context
+                            .and_then(|context| {
+                                context.records.get(context.record_index).map(|record| {
+                                    (
+                                        energyplus_weather_wind_speed_for_context(
+                                            context,
+                                            record.wind_speed_m_per_s,
+                                        ),
+                                        energyplus_weather_wind_direction_for_context(
+                                            context,
+                                            record.wind_direction_deg,
+                                        ),
+                                    )
+                                })
+                            })
+                            .unwrap_or((0.0, 0.0));
+                    let surface_outdoor_air_wind_speed_m_per_s = typed_surface
+                        .map(|surface| {
+                            energyplus_surface_outside_wind_speed_m_per_s(
+                                surface,
+                                energyplus_building_terrain(&model.typed),
+                                weather_file_wind_speed_m_per_s,
+                            )
+                        })
+                        .unwrap_or(weather_file_wind_speed_m_per_s);
                     if hour_index == 0 {
                         let zone_mean_air_temperature_c = state
                             .zones
@@ -5272,6 +5333,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     sums.inside_adjacent_air_temperature_c +=
                         surface_state.inside_reference_air_temperature_c;
                     sums.outside_face_temperature_c += outside_face_temperature_c;
+                    sums.outside_outdoor_air_dry_bulb_temperature_c +=
+                        surface_outdoor_air_dry_bulb_temperature_c;
+                    sums.outside_outdoor_air_wet_bulb_temperature_c +=
+                        surface_outdoor_air_wet_bulb_temperature_c;
+                    sums.outside_outdoor_air_wind_speed_m_per_s +=
+                        surface_outdoor_air_wind_speed_m_per_s;
+                    sums.outside_outdoor_air_wind_direction_deg +=
+                        surface_outdoor_air_wind_direction_deg;
                     sums.inside_convection_heat_gain_rate_w += inside_convection_heat_gain_rate;
                     sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
                         inside_convection_heat_gain_rate_per_area;
@@ -5461,6 +5530,18 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .outside_face_temperature_c
                 .push(sums.outside_face_temperature_c / divisor);
+            trace
+                .outside_outdoor_air_dry_bulb_temperature_c
+                .push(sums.outside_outdoor_air_dry_bulb_temperature_c / divisor);
+            trace
+                .outside_outdoor_air_wet_bulb_temperature_c
+                .push(sums.outside_outdoor_air_wet_bulb_temperature_c / divisor);
+            trace
+                .outside_outdoor_air_wind_speed_m_per_s
+                .push(sums.outside_outdoor_air_wind_speed_m_per_s / divisor);
+            trace
+                .outside_outdoor_air_wind_direction_deg
+                .push(sums.outside_outdoor_air_wind_direction_deg / divisor);
             trace
                 .inside_convection_heat_gain_rate_w
                 .push(sums.inside_convection_heat_gain_rate_w / divisor);
@@ -5839,6 +5920,38 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Surface Outside Face Temperature".to_string(),
             units: "C".to_string(),
             values: trace.outside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Outdoor Air Drybulb Temperature".to_string(),
+            units: "C".to_string(),
+            values: trace.outside_outdoor_air_dry_bulb_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Outdoor Air Wetbulb Temperature".to_string(),
+            units: "C".to_string(),
+            values: trace.outside_outdoor_air_wet_bulb_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Outdoor Air Wind Speed".to_string(),
+            units: "m/s".to_string(),
+            values: trace.outside_outdoor_air_wind_speed_m_per_s,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Outside Face Outdoor Air Wind Direction".to_string(),
+            units: "deg".to_string(),
+            values: trace.outside_outdoor_air_wind_direction_deg,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -6930,8 +7043,12 @@ fn exterior_surface_boundary_balance(
         context,
         record.horizontal_infrared_radiation_wh_per_m2,
     );
-    let wet_reference_temperature_c =
-        energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c);
+    let surface_outdoor_dry_bulb_c =
+        energyplus_surface_outdoor_air_temperature_c(typed_surface, outdoor_dry_bulb_c);
+    let wet_reference_temperature_c = energyplus_surface_outdoor_air_temperature_c(
+        typed_surface,
+        energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
+    );
 
     let incident_solar_w_per_m2 = if typed_surface.sun_exposure == SunExposure::SunExposed {
         let Some(site) = model.site.as_ref() else {
@@ -6939,7 +7056,7 @@ fn exterior_surface_boundary_balance(
                 surface_state,
                 typed_surface,
                 record,
-                outdoor_dry_bulb_c,
+                surface_outdoor_dry_bulb_c,
                 owning_zone_temperature_c,
                 0.0,
                 energyplus_building_terrain(model),
@@ -6970,7 +7087,7 @@ fn exterior_surface_boundary_balance(
         surface_state,
         typed_surface,
         record,
-        outdoor_dry_bulb_c,
+        surface_outdoor_dry_bulb_c,
         owning_zone_temperature_c,
         incident_solar_w_per_m2,
         energyplus_building_terrain(model),
@@ -7103,13 +7220,17 @@ fn surface_exterior_report_terms(
         context,
         record.horizontal_infrared_radiation_wh_per_m2,
     );
-    let wet_reference_temperature_c =
-        energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c);
+    let surface_outdoor_dry_bulb_c =
+        energyplus_surface_outdoor_air_temperature_c(typed_surface, outdoor_dry_bulb_c);
+    let wet_reference_temperature_c = energyplus_surface_outdoor_air_temperature_c(
+        typed_surface,
+        energyplus_exterior_wet_reference_temperature_c(context, outdoor_dry_bulb_c),
+    );
     let convection_terms = energyplus_exterior_convection_terms(
         surface_state,
         typed_surface,
         reported_outside_face_temperature_c,
-        outdoor_dry_bulb_c,
+        surface_outdoor_dry_bulb_c,
         tilt_rad,
         energyplus_building_terrain(model),
         weather_file_wind_speed_m_per_s,
@@ -7124,7 +7245,7 @@ fn surface_exterior_report_terms(
         horizontal_infrared_radiation_w_per_m2,
         reported_outside_face_temperature_c,
         convection_terms.reference_temperature_c,
-        outdoor_dry_bulb_c,
+        surface_outdoor_dry_bulb_c,
         tilt_rad,
     );
 
@@ -7401,6 +7522,22 @@ fn energyplus_site_wind_profile(terrain: Terrain) -> (f64, f64) {
         Terrain::City => (0.33, 460.0),
         Terrain::Ocean => (0.10, 210.0),
     }
+}
+
+fn energyplus_surface_outdoor_air_temperature_c(
+    surface: &Surface,
+    weather_file_temperature_c: f64,
+) -> f64 {
+    energyplus_air_temperature_at_height_c(
+        weather_file_temperature_c,
+        surface_centroid_z_m(&surface.vertices),
+    )
+}
+
+fn energyplus_air_temperature_at_height_c(weather_file_temperature_c: f64, height_m: f64) -> f64 {
+    weather_file_temperature_c
+        - ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M
+            * (height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M)
 }
 
 fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
@@ -12758,6 +12895,16 @@ DATA PERIODS
         let roof_height_m =
             roof.vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / roof.vertices.len() as f64;
         let expected_roof_wind = 4.0 * expected_weather_mod * (roof_height_m / 370.0).powf(0.22);
+
+        let expected_roof_air_temperature = 20.0
+            - 0.0065
+                * (roof_height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M);
+        assert!(
+            (energyplus_surface_outdoor_air_temperature_c(roof, 20.0)
+                - expected_roof_air_temperature)
+                .abs()
+                < 1.0e-12
+        );
 
         assert!(
             (energyplus_surface_outside_wind_speed_m_per_s(roof, Terrain::Suburbs, 4.0)

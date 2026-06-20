@@ -482,11 +482,11 @@ if ($isCompatibilityCandidateCase) {
     if ($summary.conformance_promotion_allowed -ne $true) {
         throw "Candidate case must mark conformance_promotion_allowed=true"
     }
-    if ($summary.active_blocker_summary -notmatch "ZN001:ROOF001") {
-        throw "Expected candidate active blocker summary to reference ZN001:ROOF001, got $($summary.active_blocker_summary)"
+    if ($summary.active_blocker_summary -notmatch "ZN001:FLR001") {
+        throw "Expected candidate active blocker summary to reference ZN001:FLR001, got $($summary.active_blocker_summary)"
     }
-    if ($summary.next_pr_target -ne "roof-exterior-environmental-balance-temperature-offset") {
-        throw "Expected candidate next_pr_target to focus roof exterior balance, got $($summary.next_pr_target)"
+    if ($summary.next_pr_target -ne "outside-ctf-history-handoff") {
+        throw "Expected candidate next_pr_target to focus outside CTF history handoff, got $($summary.next_pr_target)"
     }
     foreach ($requiredVariable in @(
             "Site Outdoor Air Drybulb Temperature",
@@ -508,27 +508,27 @@ if ($isCompatibilityCandidateCase) {
     if ($null -eq $floorStorageMaxSampleDelta) {
         throw "Expected candidate ctf_storage_max_sample_deltas to include ZN001:FLR001"
     }
-    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
-        throw "Expected candidate dominant mismatch source face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "outside-history-total") {
+        throw "Expected candidate dominant mismatch source outside-history-total, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
     }
 
     $reportText = Get-Content -LiteralPath $reportPath -Raw
     Assert-Contains -Text $reportText -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "candidate markdown algorithm lane"
     Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
     Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
-    Assert-Contains -Text $reportText -Pattern "next_pr_target: roof-exterior-environmental-balance-temperature-offset" -Description "candidate next PR target"
+    Assert-Contains -Text $reportText -Pattern "next_pr_target: outside-ctf-history-handoff" -Description "candidate next PR target"
     Assert-Contains -Text $reportText -Pattern "status: fail" -Description "candidate diagnostic status"
 
     Write-Host "Official dynamic heat-balance compatibility candidate passed structural checks."
     return
 }
 
-$ExpectedSeriesCount = 115
+$ExpectedSeriesCount = 119
 if ($summary.series_count -ne $ExpectedSeriesCount) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
 if ($summary.max_abs_delta_c -le 1.0) {
-    throw "Expected current official dynamic diagnostic delta to remain visible, got $($summary.max_abs_delta_c)"
+    throw "Expected current official dynamic diagnostic delta to remain visible above 1.0, got $($summary.max_abs_delta_c)"
 }
 $topBottleneck = @($summary.bottlenecks)[0]
 if ($null -eq $topBottleneck) {
@@ -745,14 +745,14 @@ if ($CtfSeedPolicy -eq "all-eio") {
             throw "Expected FLOOR CTF history series row to include $propertyName"
         }
     }
-    if ([double]$floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c -le 10.0) {
-        throw "Expected active FLOOR inside current-inside series delta to remain visible, got $($floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c)"
+    if ([double]$floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c -le 8.0) {
+        throw "Expected active FLOOR inside current-inside series delta to remain visible above 8 W RMSE, got $($floorHistorySeriesDelta.inside_current_inside_term_delta.rmse_delta_c)"
     }
-    if ([double]$floorHistorySeriesDelta.inside_history_delta.rmse_delta_c -le 10.0) {
-        throw "Expected active FLOOR inside history series delta to remain visible, got $($floorHistorySeriesDelta.inside_history_delta.rmse_delta_c)"
+    if ([double]$floorHistorySeriesDelta.inside_history_delta.rmse_delta_c -le 8.0) {
+        throw "Expected active FLOOR inside history series delta to remain visible above 8 W RMSE, got $($floorHistorySeriesDelta.inside_history_delta.rmse_delta_c)"
     }
-    if ([double]$floorHistorySeriesDelta.outside_history_delta.rmse_delta_c -le 10.0) {
-        throw "Expected active FLOOR outside history series delta to remain visible, got $($floorHistorySeriesDelta.outside_history_delta.rmse_delta_c)"
+    if ([double]$floorHistorySeriesDelta.outside_history_delta.rmse_delta_c -le 8.0) {
+        throw "Expected active FLOOR outside history series delta to remain visible above 8 W RMSE, got $($floorHistorySeriesDelta.outside_history_delta.rmse_delta_c)"
     }
     $floorStorageMaxSampleDelta = @($summary.ctf_storage_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorStorageMaxSampleDelta) {
@@ -787,8 +787,8 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if (-not [bool]$floorStorageMaxSampleDelta.dominant_storage_surface) {
         throw "Expected FLOOR storage max-sample row to be marked dominant"
     }
-    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
-        throw "Expected FLOOR storage max-sample dominant mismatch source to target face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "outside-history-total") {
+        throw "Expected FLOOR storage max-sample dominant mismatch source to target outside-history-total, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
     }
     $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideBalanceMaxSampleDelta) {

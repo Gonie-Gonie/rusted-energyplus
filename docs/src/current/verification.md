@@ -100,26 +100,28 @@ count series. The markdown report mirrors the first-sample and warmup day-end
 zone-air traces so the first four 15-minute substeps and the repeated-day
 warmup fixed point can be inspected without opening the full JSON:
 
-As of the 2026-06-20 regenerated compatibility-candidate diagnostic baseline,
+As of the 2026-06-20 height-corrected compatibility-candidate diagnostic baseline,
 the broad diagnostic report still has `status = fail` and
 `conformance_claim = false`. The promoted candidate gate can support only the
 declared limited claim above. It cannot yet support a broad or "complete"
 EnergyPlus conformance statement because the broad diagnostic still shows:
 
-- `ZN001:ROOF001` outside convection heat-gain max absolute delta
-  `25.397397824985 W` at hourly sample `4213`.
-- `ZN001:ROOF001` outside net thermal radiation heat-gain max absolute delta
-  `25.044153522467 W` at hourly sample `4213`, largely offsetting the
-  convection split rather than indicating an uncancelled total exterior-balance
-  failure.
-- `ZONE ONE` mean air temperature max absolute delta `0.007135877197 C`.
-- The active report-level target is
-  `roof-exterior-environmental-balance-temperature-offset`, because the largest
-  remaining user-visible output deltas are the `ZN001:ROOF001` outside
-  convection/radiation heat-gain splits. The smaller `ZN001:FLR001` secondary
-  residual remains visible in inside face temperature (`0.007056007286 C`) and
-  floor storage (`1.461946819083 W`), where a small face-temperature offset is
-  amplified by the floor CTF current/history terms.
+- The roof outdoor-air reference path is now aligned: `ZN001:ROOF001` surface
+  outdoor dry-bulb max absolute delta is `0.000000019076 C`, wet-bulb is
+  `0.000009907934 C`, and wind speed/direction remain exact against the oracle.
+- `ZN001:ROOF001` outside face temperature max absolute delta fell from
+  `0.019893003133 C` to `0.000944839218 C`.
+- `ZN001:ROOF001` outside convection heat-gain max absolute delta fell from
+  `25.397397824985 W` to `1.902520148418 W`; outside net thermal radiation
+  heat-gain fell from `25.044153522467 W` to `1.242262187458 W`.
+- `ZN001:ROOF001` solar radiation heat-gain remains a separate residual at
+  `2.429489654271 W` max absolute delta.
+- `ZONE ONE` mean air temperature max absolute delta is now
+  `0.000798369301 C`, and `ZN001:FLR001` floor storage max absolute delta is
+  `0.663522464624 W`.
+- The active report-level target is `outside-ctf-history-handoff`: the floor
+  CTF diagnostic now reports dominant source `outside-history-total` at sample
+  `1156`, while roof exterior splits are much smaller secondary residuals.
 - First-run-period-substep evidence rules out hourly averaging as the source of
   the current offset. In the compatibility-candidate lane, Rust records
   `ZONE ONE` MAT `-0.620477202798 C` and a stored third-order solution

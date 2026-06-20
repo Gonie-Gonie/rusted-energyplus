@@ -66,18 +66,17 @@ diagnostic split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`,
 including `SurfAirSkyRadSplit`, and both the outside-face balance equivalent
 radiation term and the net thermal radiation report row share that helper.
 The 2026-06-20 diagnostic expansion exposes `Site Sky Temperature`,
-`Site Horizontal Infrared Radiation Rate per Area`, and the roof
-air/sky/ground exterior longwave coefficients. In the active
-compatibility-candidate lane, dry-bulb, sky temperature, horizontal infrared,
-and rain status are bit-for-bit against the oracle, wet-bulb is within
-`0.000009927010 C`, and the roof air/ground exterior radiation coefficients
-are exact while the sky coefficient RMSE is `0.000329165799 W/m2-K`. The
-remaining roof exterior heat-gain-rate deltas are therefore downstream of the
-roof outside-face temperature offset, not a weather/sky forcing mismatch.
-Exterior convection now uses the EnergyPlus `SetSurfaceWindSpeedAt` terrain and
-surface-centroid profile before DOE-2/MoWITT forced-convection terms, so
-diagnostic coefficients use timestep `SurfOutWindSpeed`-shaped local wind
-instead of raw hourly EPW wind speed.
+`Site Horizontal Infrared Radiation Rate per Area`, roof air/sky/ground
+exterior longwave coefficients, and roof surface-local outdoor dry-bulb,
+wet-bulb, wind speed, and wind direction. The active compatibility-candidate
+lane now applies EnergyPlus' default outdoor-air temperature measurement height
+(`1.5 m`) and temperature gradient (`0.0065 K/m`) to the surface centroid,
+matching `SurfOutDryBulbTemp`/`SurfOutWetBulbTemp` for the roof. Roof dry-bulb
+max absolute delta is `0.000000019076 C`, wet-bulb is `0.000009907934 C`, and
+wind speed/direction are exact. Exterior convection uses the EnergyPlus
+`SetSurfaceWindSpeedAt` terrain and surface-centroid profile before DOE-2/MoWITT
+forced-convection terms, so diagnostic coefficients use timestep
+`SurfOutWindSpeed`-shaped local wind instead of raw hourly EPW wind speed.
 Inside-surface radiant/source terms now have explicit runtime slots matching
 EnergyPlus `SurfTempTerm` inputs, and the OtherEquipment radiant fraction is
 distributed to inside surfaces with EnergyPlus inside-layer area-absorptance
@@ -113,21 +112,15 @@ the CTF histories. The active floor-storage work should therefore keep report,
 inside-CTF, and committed-history snapshots separate instead of replacing all
 adiabatic or interzone outside states with the current inside face.
 
-As of the 2026-06-20 compatibility-candidate diagnostic, broad dynamic
-conformance is still not claimable. The active
+As of the 2026-06-20 height-corrected compatibility-candidate diagnostic,
+broad dynamic conformance is still not claimable. The active
 `energyplus-heat-balance-compat-candidate` run remains
-`conformance_claim=false`: `ZN001:ROOF001` outside-face convection and net
-thermal radiation heat-gain rates are the largest user-visible misses
-(`25.397397824985 W` and `25.044153522467 W` max absolute deltas), with the
-floor storage row still exposing a smaller CTF timing residual
-(`1.461946819083 W` max absolute delta). Increasing surface iterations from
-20 to 40 produced identical roof, floor, and zone metrics, so the remaining
-error is not an unconverged surface-iteration loop. Running the same ScriptF
-flat execution variant directly with `after-surface-loop` but without the
-compat-candidate adaptive system-timestep correction regressed floor storage
-from `1.461946819083 W` to `189.705108454913 W`, confirming that the active
-compat lane is the best current execution path for floor/zone coupling. The
-roof blocker is now isolated to the outside environmental balance: weather
-dry-bulb, rain, sky temperature, horizontal infrared, and exterior DOE-2
-coefficient paths are already near-oracle, while a small outside-face
-temperature offset is amplified by convection and longwave reporting.
+`conformance_claim=false`, but the old roof exterior reference-air blocker is
+largely resolved: roof outside-face temperature max absolute delta dropped from
+`0.019893003133 C` to `0.000944839218 C`, outside-face convection heat-gain from
+`25.397397824985 W` to `1.902520148418 W`, and outside-face net thermal
+radiation heat-gain from `25.044153522467 W` to `1.242262187458 W`. The next
+active target is `outside-ctf-history-handoff`: floor storage is now
+`0.663522464624 W` max absolute delta and the diagnostic names
+`outside-history-total` as the dominant source at sample `1156`. Roof solar
+radiation heat-gain remains a separate `2.429489654271 W` max residual.
