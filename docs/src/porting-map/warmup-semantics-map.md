@@ -75,17 +75,22 @@ warmup, so the next warmup-facing work is the repeated-day history evolution
 and source-order handoff into the run period, not the pre-warmup seed values
 alone.
 
-The 2026-06-20 first-substep diagnostics narrow that boundary further. The
-Rust `zone_air_first_sample_trace` reconstructs the first run-period
-third-order zone-air solution from its stored coefficients to within
+The 2026-06-20 first-substep and warmup day-end diagnostics narrow that
+boundary further. The Rust `zone_air_first_sample_trace` reconstructs the first
+run-period third-order zone-air solution from its stored coefficients to within
 approximately `2.5e-7 C`, but a timestep-frequency EnergyPlus oracle probe
 still shows the first run-period MAT about `0.0065655 C` lower and the floor
-inside face about `0.0064920 C` lower. A manual warmup-only Hour1 interpolation
-seed experiment moved the Rust run-period initial MAT by only about `0.0013 C`
-and left the active floor-storage blocker essentially unchanged. The remaining
-claim blocker is therefore not a simple warmup-day-count or first-hour weather
-seed issue; it should be treated as a post-warmup history/source-order handoff
-problem spanning zone air state and floor CTF current/history terms.
+inside face about `0.0064920 C` lower. The new
+`warmup_day_end_states` trace then shows that the offset is already present at
+the end of `Warmup {20} RUN PERIOD 1`: EnergyPlus ends at `ZONE ONE` MAT
+`-0.606928229693 C`, while Rust day 20 ends at `-0.600360486247 C`, with the
+same `~0.00656 C` offset in the three previous-MAT history slots. A manual
+warmup-only Hour1 interpolation seed experiment moved the Rust run-period
+initial MAT by only about `0.0013 C` and left the active floor-storage blocker
+essentially unchanged. The remaining claim blocker is therefore not a simple
+warmup-day-count, first-hour weather seed, hourly reporting, or run-period
+handoff copy issue; it is the repeated-day surface/zone source model fixed
+point that feeds the zone-air and floor CTF current/history terms.
 
 EnergyPlus 26.1.0 `HeatBalanceManager.cc::ManageHeatBalance` checks warmup
 convergence only after `ManageSurfaceHeatBalance`, end-zone-timestep EMS,

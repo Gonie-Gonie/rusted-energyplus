@@ -94,10 +94,11 @@ CTF history deltas when EIO zero coefficients and matching oracle series are
 available. The full summary preserves hourly sample rows for deeper inspection.
 The diagnostic artifacts now also include `rust-zone-air-diagnostics.json`,
 which captures the Rust run-period initial zone-air state, a first-reported-hour
-`zone_air_first_sample_trace`, and hourly Rust-only zone-air
-current/average/history, humidity, air-capacity, and system-timestep count
-series. The markdown report mirrors the first-sample zone-air trace so the
-first four 15-minute substeps can be inspected without opening the full JSON:
+`zone_air_first_sample_trace`, `warmup_day_end_states`, and hourly Rust-only
+zone-air current/average/history, humidity, air-capacity, and system-timestep
+count series. The markdown report mirrors the first-sample and warmup day-end
+zone-air traces so the first four 15-minute substeps and the repeated-day
+warmup fixed point can be inspected without opening the full JSON:
 
 As of the 2026-06-20 regenerated compatibility-candidate diagnostic baseline,
 the broad diagnostic report still has `status = fail` and
@@ -122,9 +123,16 @@ EnergyPlus conformance statement because the broad diagnostic still shows:
   `-0.620476954864 C` for timestep 1, while a timestep-frequency EnergyPlus
   oracle probe reports `-0.627042747070 C`. The corresponding floor inside-face
   temperatures are `-0.065350444313 C` (Rust) and `-0.071842487381 C`
-  (EnergyPlus). The remaining delta is therefore already present inside the
-  first 15-minute step and should be chased in run-period history/source-order
-  handoff, not in hourly reporting.
+  (EnergyPlus).
+- Warmup day-end evidence now shows that the delta is already present at the
+  end of the repeated run-period warmup, before the first reported timestep.
+  EnergyPlus `Warmup {20} RUN PERIOD 1` ends at `ZONE ONE` MAT
+  `-0.606928229693 C`; Rust day 20 ends and run-period initial state both
+  record `-0.600360486247 C`, a `+0.006567743446 C` Rust-minus-oracle offset.
+  The previous MAT history slots show the same offset (`+0.0065626`,
+  `+0.0065561`, `+0.0065467 C`). The remaining blocker is therefore the
+  repeated-day surface/zone source model fixed point, not the handoff copy
+  itself, hourly reporting, warmup day count, or first-hour weather seed.
 - `ZONE ONE` mean air humidity ratio was added as a diagnostic-only row. In
   the regenerated candidate baseline it matches exactly through the first
   run-period day and differs by about `1.2e-6 kgWater/kgDryAir` at representative

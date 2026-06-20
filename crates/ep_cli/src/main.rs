@@ -36,12 +36,13 @@ use ep_runtime::{
     HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
-    HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-    HeatBalanceZoneAirFirstSampleTrace, HeatBalanceZoneAirReportSampling,
-    HeatBalanceZoneAirStateSample, HeatBalanceZoneConductionReportSource, NodeStateProjection,
-    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions,
-    RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE, RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE,
-    RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE, RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
+    HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupDayEndZoneAirStateSample,
+    HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirFirstSampleTrace,
+    HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
+    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
+    PlantStateProjection, PlantStateProjectionOptions, RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
+    RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE, RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE,
+    RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE, RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE, RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE,
@@ -3809,6 +3810,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     rust_zone_air_run_period_initial_states: Vec<HeatBalanceZoneAirStateSample>,
+    rust_zone_air_warmup_day_end_states: Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
     zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
@@ -4730,6 +4732,7 @@ fn build_heat_balance_conformance_diagnostic(
         rust_zone_air_run_period_initial_states: simulation
             .summary
             .run_period_initial_zone_air_states,
+        rust_zone_air_warmup_day_end_states: simulation.summary.warmup_day_end_zone_air_states,
         zone_air_first_sample_trace: simulation.summary.zone_air_first_sample_trace,
         surface_first_sample_trace: simulation.summary.surface_first_sample_trace,
         surface_iteration_first_sample_trace: simulation
@@ -9151,6 +9154,12 @@ fn render_heat_balance_rust_zone_air_debug_json(
         )
     ));
     json.push_str(&format!(
+        "  \"warmup_day_end_states\": {},\n",
+        heat_balance_zone_air_warmup_day_end_states_json(
+            &diagnostic.rust_zone_air_warmup_day_end_states
+        )
+    ));
+    json.push_str(&format!(
         "  \"zone_air_first_sample_trace\": {},\n",
         heat_balance_zone_air_first_sample_trace_json(&diagnostic.zone_air_first_sample_trace)
     ));
@@ -9192,46 +9201,69 @@ fn heat_balance_zone_air_initial_states_json(states: &[HeatBalanceZoneAirStateSa
         if index > 0 {
             json.push_str(", ");
         }
-        let coefficients = state.zone_air_temperature_coefficients;
+        json.push_str(&heat_balance_zone_air_state_json(state));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_zone_air_state_json(state: &HeatBalanceZoneAirStateSample) -> String {
+    let coefficients = state.zone_air_temperature_coefficients;
+    format!(
+        concat!(
+            "{{ \"zone_id\": {}, \"zone_name\": {}, ",
+            "\"mean_air_temperature_c\": {}, ",
+            "\"zone_timestep_average_air_temperature_c\": {}, ",
+            "\"previous_mean_air_temperatures_c\": {}, ",
+            "\"previous_system_mean_air_temperatures_c\": {}, ",
+            "\"previous_system_timestep_count\": {}, ",
+            "\"air_humidity_ratio\": {}, ",
+            "\"zone_timestep_average_air_humidity_ratio\": {}, ",
+            "\"previous_air_humidity_ratios\": {}, ",
+            "\"previous_system_air_humidity_ratios\": {}, ",
+            "\"air_heat_capacity_j_per_k\": {}, ",
+            "\"zone_air_temperature_coefficients\": {{ ",
+            "\"temp_dependent_coefficient_w_per_k\": {}, ",
+            "\"temp_independent_coefficient_w\": {}, ",
+            "\"air_power_cap_w_per_k\": {}, ",
+            "\"third_order_history_term_w\": {}, ",
+            "\"third_order_temp_dependent_load_w_per_k\": {}, ",
+            "\"third_order_temp_independent_load_w\": {} }} }}"
+        ),
+        state.zone_id.0,
+        json_string(&state.zone_name),
+        json_number(state.mean_air_temperature_c),
+        json_number(state.zone_timestep_average_air_temperature_c),
+        json_number_array(&state.previous_mean_air_temperatures_c),
+        json_number_array(&state.previous_system_mean_air_temperatures_c),
+        state.previous_system_timestep_count,
+        json_number(state.air_humidity_ratio),
+        json_number(state.zone_timestep_average_air_humidity_ratio),
+        json_number_array(&state.previous_air_humidity_ratios),
+        json_number_array(&state.previous_system_air_humidity_ratios),
+        json_number(state.air_heat_capacity_j_per_k),
+        json_number(coefficients.temp_dependent_coefficient_w_per_k),
+        json_number(coefficients.temp_independent_coefficient_w),
+        json_number(coefficients.air_power_cap_w_per_k),
+        json_number(coefficients.third_order_history_term_w),
+        json_number(coefficients.third_order_temp_dependent_load_w_per_k),
+        json_number(coefficients.third_order_temp_independent_load_w)
+    )
+}
+
+fn heat_balance_zone_air_warmup_day_end_states_json(
+    states: &[HeatBalanceWarmupDayEndZoneAirStateSample],
+) -> String {
+    let mut json = String::new();
+    json.push('[');
+    for (index, state) in states.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
         json.push_str(&format!(
-            concat!(
-                "{{ \"zone_id\": {}, \"zone_name\": {}, ",
-                "\"mean_air_temperature_c\": {}, ",
-                "\"zone_timestep_average_air_temperature_c\": {}, ",
-                "\"previous_mean_air_temperatures_c\": {}, ",
-                "\"previous_system_mean_air_temperatures_c\": {}, ",
-                "\"previous_system_timestep_count\": {}, ",
-                "\"air_humidity_ratio\": {}, ",
-                "\"zone_timestep_average_air_humidity_ratio\": {}, ",
-                "\"previous_air_humidity_ratios\": {}, ",
-                "\"previous_system_air_humidity_ratios\": {}, ",
-                "\"air_heat_capacity_j_per_k\": {}, ",
-                "\"zone_air_temperature_coefficients\": {{ ",
-                "\"temp_dependent_coefficient_w_per_k\": {}, ",
-                "\"temp_independent_coefficient_w\": {}, ",
-                "\"air_power_cap_w_per_k\": {}, ",
-                "\"third_order_history_term_w\": {}, ",
-                "\"third_order_temp_dependent_load_w_per_k\": {}, ",
-                "\"third_order_temp_independent_load_w\": {} }} }}"
-            ),
-            state.zone_id.0,
-            json_string(&state.zone_name),
-            json_number(state.mean_air_temperature_c),
-            json_number(state.zone_timestep_average_air_temperature_c),
-            json_number_array(&state.previous_mean_air_temperatures_c),
-            json_number_array(&state.previous_system_mean_air_temperatures_c),
-            state.previous_system_timestep_count,
-            json_number(state.air_humidity_ratio),
-            json_number(state.zone_timestep_average_air_humidity_ratio),
-            json_number_array(&state.previous_air_humidity_ratios),
-            json_number_array(&state.previous_system_air_humidity_ratios),
-            json_number(state.air_heat_capacity_j_per_k),
-            json_number(coefficients.temp_dependent_coefficient_w_per_k),
-            json_number(coefficients.temp_independent_coefficient_w),
-            json_number(coefficients.air_power_cap_w_per_k),
-            json_number(coefficients.third_order_history_term_w),
-            json_number(coefficients.third_order_temp_dependent_load_w_per_k),
-            json_number(coefficients.third_order_temp_independent_load_w)
+            "{{ \"day_index\": {}, \"state\": {} }}",
+            state.day_index,
+            heat_balance_zone_air_state_json(&state.state)
         ));
     }
     json.push(']');
@@ -9479,6 +9511,12 @@ fn render_heat_balance_conformance_json(
     json.push_str(&format!(
         "  \"zone_air_first_sample_trace\": {},\n",
         heat_balance_zone_air_first_sample_trace_json(&diagnostic.zone_air_first_sample_trace)
+    ));
+    json.push_str(&format!(
+        "  \"zone_air_warmup_day_end_states\": {},\n",
+        heat_balance_zone_air_warmup_day_end_states_json(
+            &diagnostic.rust_zone_air_warmup_day_end_states
+        )
     ));
     json.push_str(&format!(
         "  \"surface_first_sample_trace\": {},\n",
@@ -9801,6 +9839,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_zone_air_first_sample_trace_rows(
         &mut report,
         &diagnostic.zone_air_first_sample_trace,
+    );
+    report.push('\n');
+
+    report.push_str("## Rust Warmup Day-End Zone-Air Trace\n\n");
+    heat_balance_report_zone_air_warmup_day_end_trace_rows(
+        &mut report,
+        &diagnostic.rust_zone_air_warmup_day_end_states,
     );
     report.push('\n');
 
@@ -11704,6 +11749,34 @@ fn heat_balance_report_zone_air_first_sample_trace_rows(
             coefficients.third_order_history_term_w,
             row.third_order_solution_denominator_w_per_k,
             row.third_order_solution_temperature_c
+        ));
+    }
+}
+
+fn heat_balance_report_zone_air_warmup_day_end_trace_rows(
+    report: &mut String,
+    rows: &[HeatBalanceWarmupDayEndZoneAirStateSample],
+) {
+    report.push_str(
+        "| warmup_day | key | mat_c | timestep_avg_mat_c | prev1_c | prev2_c | prev3_c | air_cap_j_per_k | temp_dep_w_per_k | temp_ind_w | history_w |\n",
+    );
+    report.push_str("|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        let state = &row.state;
+        let coefficients = state.zone_air_temperature_coefficients;
+        report.push_str(&format!(
+            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            row.day_index,
+            markdown_cell(&state.zone_name),
+            state.mean_air_temperature_c,
+            state.zone_timestep_average_air_temperature_c,
+            state.previous_mean_air_temperatures_c[0],
+            state.previous_mean_air_temperatures_c[1],
+            state.previous_mean_air_temperatures_c[2],
+            state.air_heat_capacity_j_per_k,
+            coefficients.temp_dependent_coefficient_w_per_k,
+            coefficients.temp_independent_coefficient_w,
+            coefficients.third_order_history_term_w
         ));
     }
 }
@@ -14188,6 +14261,7 @@ mod tests {
                 outside_total_term_w: 3050.0,
             }],
             rust_zone_air_run_period_initial_states: vec![],
+            rust_zone_air_warmup_day_end_states: vec![],
             zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
                 zone_id: ep_model::ZoneId(1),
                 zone_name: "ZONE ONE".to_string(),
@@ -15004,6 +15078,7 @@ mod tests {
                 outside_total_term_w: 3050.0,
             }],
             rust_zone_air_run_period_initial_states: vec![],
+            rust_zone_air_warmup_day_end_states: vec![],
             zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
                 zone_id: ep_model::ZoneId(1),
                 zone_name: "ZONE ONE".to_string(),

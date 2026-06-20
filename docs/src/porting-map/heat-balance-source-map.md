@@ -975,11 +975,13 @@ Current Rust boundary:
   the next hconv target; it does not justify thawing the surface reference-air
   or live-updating hconv through every interleaved solve pass.
   Adding the EnergyPlus advanced
-  `Surface Inside Face Heat Balance Calculation Iteration Count` row confirms
-  that this cadence is not yet matched: on the active ScriptF-flat lane the
-  hourly count RMSE is `10.643041`, with first-hour oracle/Rust counts
-  `18`/`35` and last-hour counts `28`/`22`. Keep the next solver work on the
-  inside-surface convergence loop and sparse hconv reinitialization timing.
+  `Surface Inside Face Heat Balance Calculation Iteration Count` row now shows
+  the first-hour cadence is aligned on the active compatibility-candidate lane:
+  the first ten hourly counts are `18/18`, `15/15`, `24/24`, `21/21`, `11/11`,
+  `17/17`, `18/18`, `31/31`, `34/34`, and `37/37` for oracle/Rust. The broad
+  annual row still shows occasional one-iteration differences, but this no
+  longer explains the first-substep MAT/floor offset. Keep the next solver work
+  on repeated-day surface/zone source fixed-point alignment.
   An inside-CTF report probe then tests whether EnergyPlus report/source
   conduction should use the outside temperature snapshot consumed by the last
   inside CTF solve (`SurfOutsideTempHist(1)` shape) rather than the reported
@@ -1011,6 +1013,13 @@ Current Rust boundary:
   `CalcZoneComponentLoadSums`/`SumHADTsurfs` cannot be approximated as a direct
   negative of the individual surface report rows. Keep the remaining work on
   `SurfTempInTmp`, reference-air timing, and hconv/source ownership. A
+  2026-06-20 warmup day-end trace adds the decisive boundary evidence:
+  EnergyPlus `Warmup {20} RUN PERIOD 1` ends at `ZONE ONE` MAT
+  `-0.606928229693 C`, while Rust day 20 and the Rust run-period initial state
+  end at `-0.600360486247 C`. The same `~0.00656 C` offset appears in the three
+  previous-MAT history slots, so the current blocker is not the copy into the
+  run period or hourly reporting; it is the warmup fixed point produced by the
+  repeated-day surface/zone source model.
   ScriptF-flat adiabatic report/history split probe also rejects syncing
   adiabatic outside faces to current inside faces for
   report-only state: it preserves MAT (`0.037329 C` RMSE), zone surface

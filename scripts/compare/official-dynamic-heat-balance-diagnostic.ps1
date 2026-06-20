@@ -564,6 +564,10 @@ $zoneAirFirstSampleTrace = @($summary.zone_air_first_sample_trace)
 if ($zoneAirFirstSampleTrace.Count -lt 4) {
     throw "Expected zone_air_first_sample_trace to include first-hour per-zone timestep rows, got $($zoneAirFirstSampleTrace.Count)"
 }
+$zoneAirWarmupDayEndStates = @($summary.zone_air_warmup_day_end_states)
+if ($zoneAirWarmupDayEndStates.Count -lt 20) {
+    throw "Expected zone_air_warmup_day_end_states to include at least 20 warmup day-end rows, got $($zoneAirWarmupDayEndStates.Count)"
+}
 $zoneAirFirstTrace = @($zoneAirFirstSampleTrace | Where-Object { $_.key -eq "ZONE ONE" -and [int]$_.timestep_index -eq 1 })[0]
 if ($null -eq $zoneAirFirstTrace) {
     throw "Expected zone_air_first_sample_trace to include ZONE ONE timestep 1"
@@ -595,6 +599,10 @@ $zoneAirDebug = (Get-Content -LiteralPath $zoneAirDebugPath -Raw -Encoding UTF8)
 $zoneAirDebugFirstSampleTrace = @($zoneAirDebug.zone_air_first_sample_trace)
 if ($zoneAirDebugFirstSampleTrace.Count -lt 4) {
     throw "Expected rust-zone-air-diagnostics.json to include first-hour zone-air timestep rows, got $($zoneAirDebugFirstSampleTrace.Count)"
+}
+$zoneAirDebugWarmupDayEndStates = @($zoneAirDebug.warmup_day_end_states)
+if ($zoneAirDebugWarmupDayEndStates.Count -lt 20) {
+    throw "Expected rust-zone-air-diagnostics.json to include at least 20 warmup day-end rows, got $($zoneAirDebugWarmupDayEndStates.Count)"
 }
 $floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
 if ($null -eq $floorCtfComponent) {
@@ -1228,6 +1236,8 @@ Assert-Contains -Text $reportText -Pattern "trigger_rank" -Description "markdown
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Rust Zone-Air First-Sample Trace" -Description "markdown zone-air first-sample trace section"
 Assert-Contains -Text $reportText -Pattern "solution_c" -Description "markdown zone-air first-sample solution column"
+Assert-Contains -Text $reportText -Pattern "## Rust Warmup Day-End Zone-Air Trace" -Description "markdown warmup day-end zone-air trace section"
+Assert-Contains -Text $reportText -Pattern "warmup_day" -Description "markdown warmup day-end day column"
 Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
 Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
 Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"

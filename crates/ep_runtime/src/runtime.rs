@@ -905,6 +905,15 @@ pub struct HeatBalanceZoneAirStateSample {
     pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
 }
 
+/// Per-zone zone-air state captured at the end of one warmup day.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceWarmupDayEndZoneAirStateSample {
+    /// One-based warmup day index.
+    pub day_index: u32,
+    /// Per-zone state at the end of the warmup day.
+    pub state: HeatBalanceZoneAirStateSample,
+}
+
 /// Per-zone zone-air state captured for one timestep in the first reported hour.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeatBalanceZoneAirFirstSampleTrace {
@@ -1678,6 +1687,8 @@ pub struct HeatBalanceSimulationSummary {
     pub surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     /// Per-zone zone-air state after warmup and before the run period starts.
     pub run_period_initial_zone_air_states: Vec<HeatBalanceZoneAirStateSample>,
+    /// Per-zone day-end state captured during run-period warmup.
+    pub warmup_day_end_zone_air_states: Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
     /// Per-slot CTF history terms after optional warmup, before the run period starts.
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
@@ -4607,6 +4618,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             );
         }
     }
+    let mut warmup_day_end_zone_air_states = Vec::new();
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,
         &mut state,
@@ -4620,6 +4632,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         options.inside_hconv_reevaluation_interval,
         options.surface_loop_zone_air_correction,
         first_hour_interpolation_starting_values,
+        &mut warmup_day_end_zone_air_states,
     );
     let run_period_initial_zone_air_states = state
         .zones
@@ -6111,6 +6124,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_air_report_sampling: options.zone_air_report_sampling,
         surface_loop_zone_air_correction: options.surface_loop_zone_air_correction,
         run_period_initial_zone_air_states,
+        warmup_day_end_zone_air_states,
         run_period_initial_ctf_history_slots,
         first_sample_ctf_history_slots: first_sample_ctf_history_slot_accumulators
             .into_values()
@@ -6142,6 +6156,7 @@ fn run_heat_balance_run_period_warmup(
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    day_end_zone_air_states: &mut Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
 ) -> HeatBalanceWarmupSummary {
     if !options.enabled || options.maximum_days == 0 || weather_dry_bulb_c.is_empty() {
         return HeatBalanceWarmupSummary::disabled();
@@ -6198,6 +6213,12 @@ fn run_heat_balance_run_period_warmup(
         }
 
         let day_end_temperatures = heat_balance_zone_temperature_snapshot(state);
+        day_end_zone_air_states.extend(state.zones.iter().map(|zone| {
+            HeatBalanceWarmupDayEndZoneAirStateSample {
+                day_index: day,
+                state: heat_balance_zone_air_state_sample(zone),
+            }
+        }));
         if let Some(previous_temperatures) = &previous_day_end_temperatures {
             final_delta = max_abs_pair_delta(
                 previous_temperatures.as_slice(),
@@ -15330,6 +15351,8 @@ DATA PERIODS
         };
         let mut dry_only_state = initialize_heat_balance_state(&model, 20.0)?;
         let mut weather_context_state = initialize_heat_balance_state(&model, 20.0)?;
+        let mut dry_only_warmup_day_end_states = Vec::new();
+        let mut weather_context_warmup_day_end_states = Vec::new();
 
         let dry_only_summary = run_heat_balance_run_period_warmup(
             &typed,
@@ -15344,6 +15367,7 @@ DATA PERIODS
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
             FirstHourInterpolationStartingValues::Hour24,
+            &mut dry_only_warmup_day_end_states,
         );
         let weather_context_summary = run_heat_balance_run_period_warmup(
             &typed,
@@ -15358,10 +15382,13 @@ DATA PERIODS
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
             FirstHourInterpolationStartingValues::Hour24,
+            &mut weather_context_warmup_day_end_states,
         );
 
         assert_eq!(dry_only_summary.day_count, 1);
         assert_eq!(weather_context_summary.day_count, 1);
+        assert_eq!(dry_only_warmup_day_end_states.len(), 1);
+        assert_eq!(weather_context_warmup_day_end_states.len(), 1);
         let dry_only_roof = dry_only_state
             .surfaces
             .iter()
