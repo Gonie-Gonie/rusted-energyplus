@@ -1721,6 +1721,7 @@ struct SurfaceHeatBalanceTrace {
     surface_id: SurfaceId,
     surface_name: String,
     inside_face_temperature_c: Vec<f64>,
+    inside_adjacent_air_temperature_c: Vec<f64>,
     outside_face_temperature_c: Vec<f64>,
     inside_convection_heat_gain_rate_w: Vec<f64>,
     inside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
@@ -1770,6 +1771,7 @@ struct SurfaceHeatBalanceTrace {
 #[derive(Clone, Copy, Debug, Default)]
 struct SurfaceHeatBalanceTraceSums {
     inside_face_temperature_c: f64,
+    inside_adjacent_air_temperature_c: f64,
     outside_face_temperature_c: f64,
     inside_convection_heat_gain_rate_w: f64,
     inside_convection_heat_gain_rate_per_area_w_per_m2: f64,
@@ -4728,6 +4730,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             surface_id: surface.surface_id,
             surface_name: surface.surface_name.clone(),
             inside_face_temperature_c: Vec::with_capacity(options.sample_count),
+            inside_adjacent_air_temperature_c: Vec::with_capacity(options.sample_count),
             outside_face_temperature_c: Vec::with_capacity(options.sample_count),
             inside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
             inside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
@@ -5253,6 +5256,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     }
                     let sums = &mut surface_sums[index];
                     sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
+                    sums.inside_adjacent_air_temperature_c +=
+                        surface_state.inside_reference_air_temperature_c;
                     sums.outside_face_temperature_c += outside_face_temperature_c;
                     sums.inside_convection_heat_gain_rate_w += inside_convection_heat_gain_rate;
                     sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
@@ -5437,6 +5442,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             trace
                 .inside_face_temperature_c
                 .push(sums.inside_face_temperature_c / divisor);
+            trace
+                .inside_adjacent_air_temperature_c
+                .push(sums.inside_adjacent_air_temperature_c / divisor);
             trace
                 .outside_face_temperature_c
                 .push(sums.outside_face_temperature_c / divisor);
@@ -5802,6 +5810,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             variable_name: "Surface Inside Face Temperature".to_string(),
             units: "C".to_string(),
             values: trace.inside_face_temperature_c,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: "Surface Inside Face Adjacent Air Temperature".to_string(),
+            units: "C".to_string(),
+            values: trace.inside_adjacent_air_temperature_c,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
@@ -14057,7 +14073,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 299);
+        assert_eq!(simulation.results.series.len(), 305);
         assert_eq!(
             simulation.summary.run_period_initial_zone_air_states.len(),
             1
@@ -14112,6 +14128,13 @@ DATA PERIODS
             return Err(std::io::Error::other("missing inside convection series").into());
         };
         assert_eq!(inside_convection_series.values.len(), 2);
+        let Some(adjacent_air_series) = simulation
+            .results
+            .find_series("FLOOR", "Surface Inside Face Adjacent Air Temperature")
+        else {
+            return Err(std::io::Error::other("missing adjacent air series").into());
+        };
+        assert_eq!(adjacent_air_series.values.len(), 2);
         let Some(iteration_count_series) = simulation.results.find_series(
             "Simulation",
             super::SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE,
@@ -16286,12 +16309,13 @@ DATA PERIODS
         let model = SimulationModel::from_typed(cube_model());
         let registry = RuntimeOutputRegistry::from_model(&model);
 
-        assert_eq!(registry.len(), 151);
+        assert_eq!(registry.len(), 157);
         assert!(registry.meter_registry().is_empty());
 
         let resolution = registry.resolve_output_requests(&[
             RuntimeOutputRequest::hourly("zone one", "Zone Mean Air Temperature"),
             RuntimeOutputRequest::hourly("floor", "Surface Inside Face Temperature"),
+            RuntimeOutputRequest::hourly("floor", "Surface Inside Face Adjacent Air Temperature"),
             RuntimeOutputRequest::hourly(
                 "floor",
                 "Surface Inside Face Conduction Heat Transfer Rate",
@@ -16320,7 +16344,7 @@ DATA PERIODS
         ]);
 
         assert!(resolution.diagnostics.is_empty());
-        assert_eq!(resolution.resolved.len(), 12);
+        assert_eq!(resolution.resolved.len(), 13);
         assert_eq!(resolution.resolved[0].definition.handle, OutputHandle(0));
         assert_eq!(resolution.resolved[1].definition.key, "FLOOR");
     }

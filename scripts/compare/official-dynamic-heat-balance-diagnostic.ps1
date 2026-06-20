@@ -523,7 +523,7 @@ if ($isCompatibilityCandidateCase) {
     return
 }
 
-$ExpectedSeriesCount = 109
+$ExpectedSeriesCount = 115
 if ($summary.series_count -ne $ExpectedSeriesCount) {
     throw "Unexpected series_count: $($summary.series_count)"
 }
@@ -1079,6 +1079,9 @@ if (-not ($summary.series | Where-Object { $_.output.variable -eq "Zone Mean Air
 if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Temperature" -and $_.status -eq "extracted" })) {
     throw "Missing extracted Surface Inside Face Temperature series"
 }
+if (-not ($summary.series | Where-Object { $_.output.variable -eq "Surface Inside Face Adjacent Air Temperature" -and $_.status -eq "extracted" })) {
+    throw "Missing extracted Surface Inside Face Adjacent Air Temperature series"
+}
 foreach ($insideVariable in @(
         "Surface Inside Face Convection Heat Transfer Coefficient",
         "Surface Inside Face Convection Heat Gain Rate",
@@ -1323,6 +1326,7 @@ Assert-Contains -Text $reportText -Pattern "Site Horizontal Infrared Radiation R
 Assert-Contains -Text $reportText -Pattern "Site Rain Status" -Description "markdown weather rain variable"
 Assert-Contains -Text $reportText -Pattern "Zone Mean Air Humidity Ratio" -Description "markdown zone humidity variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Adjacent Air Temperature" -Description "markdown adjacent air temperature variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate" -Description "markdown inside convection source variable"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate" -Description "markdown inside radiation source variable"

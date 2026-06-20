@@ -430,6 +430,13 @@ impl RuntimeOutputRegistry {
             );
             self.push_output(
                 &surface.name.0,
+                "Surface Inside Face Adjacent Air Temperature",
+                "C",
+                RuntimeOutputFrequency::Hourly,
+                RuntimeOutputSource::RuntimeState,
+            );
+            self.push_output(
+                &surface.name.0,
                 "Surface Outside Face Temperature",
                 "C",
                 RuntimeOutputFrequency::Hourly,

@@ -158,6 +158,15 @@ level = "diagnostic"
 
 [[outputs]]
 key = "ZN001:WALL001"
+variable = "Surface Inside Face Adjacent Air Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL001"
 variable = "Surface Inside Face Convection Heat Transfer Coefficient"
 frequency = "hourly"
 class = "surface-state"
@@ -285,6 +294,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL002"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -420,6 +438,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL003"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -555,6 +582,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -690,6 +726,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:FLR001"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:FLR001"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -789,6 +834,15 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"

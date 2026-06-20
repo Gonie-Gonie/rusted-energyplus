@@ -4334,6 +4334,7 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case("Site Horizontal Infrared Radiation Rate per Area")
         || variable.eq_ignore_ascii_case("Site Rain Status")
         || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
+        || variable.eq_ignore_ascii_case("Surface Inside Face Adjacent Air Temperature")
         || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Transfer Coefficient")
         || variable.eq_ignore_ascii_case("Surface Inside Face Convection Heat Gain Rate")

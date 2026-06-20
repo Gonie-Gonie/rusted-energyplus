@@ -1033,6 +1033,19 @@ Current Rust boundary:
   next target on the coupled warmup fixed point, `SurfTempIn`/`SurfTempInTmp`
   source ownership, and CTF history state, rather than weather forcing,
   exterior longwave coefficients, or the 30-pass hconv cadence.
+  A 2026-06-20 adjacent-air diagnostic now exposes EnergyPlus
+  `SurfTempEffBulkAir` as `Surface Inside Face Adjacent Air Temperature` and
+  compares it directly with Rust's inside-solve reference-air snapshot. All six
+  official `1ZoneUncontrolled` surfaces carry the same annual adjacent-air
+  delta shape: floor first sample oracle `-0.621792349810 C`, Rust
+  `-0.615242190505 C`, first delta `0.006550159304 C`, RMSE
+  `0.006201912249 C`, and max `0.007134902342 C`. The zone-air surface
+  coefficient decomposition reports the same floor reference-air-temperature
+  RMSE (`0.006202000197 C`) and floor inside-face-temperature RMSE
+  (`0.006212567326 C`). This rejects a separate surface-reference-air reporting
+  bug as the current blocker; the reference air is following the same warmup
+  MAT fixed-point offset that later amplifies through `SumHATref`, inside face
+  temperatures, and CTF storage.
   ScriptF-flat adiabatic report/history split probe also rejects syncing
   adiabatic outside faces to current inside faces for
   report-only state: it preserves MAT (`0.037329 C` RMSE), zone surface
