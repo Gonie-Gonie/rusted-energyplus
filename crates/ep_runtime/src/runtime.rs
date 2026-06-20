@@ -4012,13 +4012,13 @@ fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
                 system_humidity_history,
                 weather_context,
             );
-            let air_storage_rate_w = if system_timestep_seconds > 0.0 {
-                zone.air_heat_capacity_j_per_k
-                    * (zone.mean_air_temperature_c - system_temperature_history[0])
-                    / system_timestep_seconds
-            } else {
-                0.0
-            };
+            let air_storage_rate_w = zone_air_system_timestep_storage_report_rate_w(
+                zone,
+                system_temperature_history[0],
+                system_timestep_seconds,
+                weather_context,
+                fallback_dry_bulb_c,
+            );
             let surface_convection_rate_w = zone_air_heat_balance_surface_convection_rate_w(zone);
             zone_temperature_average_c += zone.mean_air_temperature_c * system_timestep_fraction;
             zone_humidity_average += zone.air_humidity_ratio * system_timestep_fraction;
@@ -4046,6 +4046,24 @@ fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
             Some(surface_convection_report_average_w);
         zone.system_timestep_average_air_storage_report_w = Some(air_storage_report_average_w);
     }
+}
+
+fn zone_air_system_timestep_storage_report_rate_w(
+    zone: &ZoneHeatBalanceState,
+    previous_system_temperature_c: f64,
+    system_timestep_seconds: f64,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    fallback_dry_bulb_c: f64,
+) -> f64 {
+    if system_timestep_seconds <= 0.0 {
+        return 0.0;
+    }
+
+    let report_air_heat_capacity_j_per_k =
+        weather_proxy_zone_air_heat_capacity_j_per_k(zone, weather_context, fallback_dry_bulb_c)
+            .unwrap_or(zone.air_heat_capacity_j_per_k);
+    report_air_heat_capacity_j_per_k * (zone.mean_air_temperature_c - previous_system_temperature_c)
+        / system_timestep_seconds
 }
 
 fn correct_single_zone_air_temperature_from_current_surfaces(
@@ -11318,6 +11336,7 @@ mod tests {
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
         CtfOutsideQuickConductionBalanceInput, Date,
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
+        ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
         ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
@@ -11347,6 +11366,7 @@ mod tests {
         energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
         energyplus_outdoor_wet_bulb_c, energyplus_scriptf_from_view_factors,
         energyplus_shadowing_period_solar_coefficients,
+        energyplus_surface_outdoor_air_temperature_c,
         energyplus_surface_outside_wind_speed_m_per_s,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
@@ -11392,7 +11412,8 @@ mod tests {
         zone_air_heat_balance_surface_convection_rate_at_air_temperature_w,
         zone_air_heat_balance_surface_convection_rate_from_balance_w,
         zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
-        zone_air_heat_balance_surface_convection_rate_w, zone_geometry_summaries,
+        zone_air_heat_balance_surface_convection_rate_w,
+        zone_air_system_timestep_storage_report_rate_w, zone_geometry_summaries,
         zone_surface_report_conduction_rates_w,
     };
     use crate::node::{
@@ -14029,6 +14050,69 @@ DATA PERIODS
     }
 
     #[test]
+    fn system_timestep_air_storage_report_uses_weather_proxy_capacity()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let zone = &mut state.zones[0];
+        zone.mean_air_temperature_c = 21.0;
+        zone.air_humidity_ratio = 0.012;
+        zone.air_heat_capacity_j_per_k = 1200.0;
+        let previous_system_temperature_c = 20.0;
+        let system_timestep_seconds = 60.0;
+        let records = [EpwRecord {
+            year: 2026,
+            month: 1,
+            day: 1,
+            hour: 1,
+            minute: 60,
+            dry_bulb_c: 5.0,
+            dew_point_c: 0.0,
+            relative_humidity_percent: 50.0,
+            atmospheric_pressure_pa: 82_000.0,
+            horizontal_infrared_radiation_wh_per_m2: 300.0,
+            global_horizontal_radiation_wh_per_m2: 0.0,
+            direct_normal_radiation_wh_per_m2: 0.0,
+            diffuse_horizontal_radiation_wh_per_m2: 0.0,
+            wind_direction_deg: 0.0,
+            wind_speed_m_per_s: 0.0,
+            liquid_precipitation_depth_mm: 0.0,
+        }];
+        let context = HeatBalanceWeatherContext {
+            records: &records,
+            record_index: 0,
+            zone_steps_per_hour: 4,
+            zone_timestep: Some(1),
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+        };
+        let expected_capacity = energyplus_zone_air_heat_capacity_j_per_k(
+            zone.volume_m3,
+            82_000.0,
+            zone.mean_air_temperature_c,
+            zone.air_humidity_ratio,
+        )
+        .ok_or_else(|| std::io::Error::other("missing expected air capacity"))?;
+
+        let storage_rate = zone_air_system_timestep_storage_report_rate_w(
+            zone,
+            previous_system_temperature_c,
+            system_timestep_seconds,
+            Some(context),
+            records[0].dry_bulb_c,
+        );
+        let stale_capacity_rate = zone.air_heat_capacity_j_per_k
+            * (zone.mean_air_temperature_c - previous_system_temperature_c)
+            / system_timestep_seconds;
+        let expected_rate = expected_capacity
+            * (zone.mean_air_temperature_c - previous_system_temperature_c)
+            / system_timestep_seconds;
+
+        assert!((storage_rate - expected_rate).abs() < 1.0e-9);
+        assert!((storage_rate - stale_capacity_rate).abs() > 1.0e-3);
+
+        Ok(())
+    }
+    #[test]
     fn zone_air_heat_balance_surface_convection_can_use_report_air_temperature()
     -> Result<(), Box<dyn std::error::Error>> {
         let model = SimulationModel::from_typed(cube_model());
@@ -14277,7 +14361,7 @@ DATA PERIODS
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 305);
+        assert_eq!(simulation.results.series.len(), 329);
         assert_eq!(
             simulation.summary.run_period_initial_zone_air_states.len(),
             1
@@ -15509,6 +15593,13 @@ DATA PERIODS
             records[0].atmospheric_pressure_pa,
         )
         .unwrap_or(8.0);
+        let typed_roof = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "ROOF")
+            .ok_or_else(|| std::io::Error::other("missing typed roof test surface"))?;
+        let expected_reference_temperature_c =
+            energyplus_surface_outdoor_air_temperature_c(typed_roof, reference_temperature_c);
 
         let terms = surface_exterior_report_terms(
             &typed,
@@ -15531,12 +15622,13 @@ DATA PERIODS
             ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
         );
         assert!(
-            reference_temperature_c < 8.0,
+            expected_reference_temperature_c < 8.0,
             "rain path should use wet-bulb reference below dry-bulb"
         );
         assert!(
             (terms.convection_heat_gain_rate_per_area_w_per_m2
-                - -ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K * (10.0 - reference_temperature_c))
+                - -ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
+                    * (10.0 - expected_reference_temperature_c))
                 .abs()
                 < 1.0e-9
         );

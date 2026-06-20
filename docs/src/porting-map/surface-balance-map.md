@@ -112,9 +112,10 @@ the CTF histories. The active floor-storage work should therefore keep report,
 inside-CTF, and committed-history snapshots separate instead of replacing all
 adiabatic or interzone outside states with the current inside face.
 
-As of the 2026-06-20 height-corrected compatibility-candidate diagnostic,
-broad dynamic conformance is still not claimable. The active
-`energyplus-heat-balance-compat-candidate` run remains
+As of the 2026-06-20 adaptive storage-report fix, the separate declared
+`official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate now passes
+with `conformance_claim=true` for its 98 promoted rows. Broad dynamic
+conformance is still not claimable: the diagnostic-only boundary remains
 `conformance_claim=false`, but the old roof exterior reference-air blocker is
 largely resolved: roof outside-face temperature max absolute delta dropped from
 `0.019893003133 C` to `0.000944839218 C`, outside-face convection heat-gain from

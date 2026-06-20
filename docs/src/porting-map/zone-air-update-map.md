@@ -50,6 +50,14 @@ the timestep-interpolated weather pressure/RH as a temporary `airHumRat` proxy.
 Porting owned `ZoneAirHumRat` remains necessary before widening the claim
 beyond the declared official dynamic candidate variables.
 
+The 2026-06-20 adaptive system-timestep report fix aligns the subdivided
+system-timestep `Zone Air Heat Balance Air Energy Storage Rate` average with
+the same weather-proxy air heat capacity used by the single-timestep report
+path, after the substep temperature and humidity update. That lowered the
+official dynamic candidate's air-storage max absolute delta from
+`0.533385790012 W` to `0.182078359183 W` and moved the blocking gate to
+`status = pass` without changing the claim boundary.
+
 The current third-order coupled probe is a useful candidate, not a promotion.
 On the frozen-hconv interleaved grey-longwave surface lane it lowers MAT RMSE
 to `0.069817 C` and floor heat-storage RMSE to `54.593582 W`, but the latent

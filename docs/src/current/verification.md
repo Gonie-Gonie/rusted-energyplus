@@ -100,11 +100,16 @@ count series. The markdown report mirrors the first-sample and warmup day-end
 zone-air traces so the first four 15-minute substeps and the repeated-day
 warmup fixed point can be inspected without opening the full JSON:
 
-As of the 2026-06-20 height-corrected compatibility-candidate diagnostic baseline,
-the broad diagnostic report still has `status = fail` and
-`conformance_claim = false`. The promoted candidate gate can support only the
-declared limited claim above. It cannot yet support a broad or "complete"
-EnergyPlus conformance statement because the broad diagnostic still shows:
+As of the 2026-06-20 adaptive system-timestep storage-report fix, the promoted
+`official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate passes with
+`status = pass`, `conformance_claim = true`, 98 declared conformance series, and
+20 EnergyPlus/Rust warmup days. The previously blocking `ZONE ONE` `Zone Air
+Heat Balance Air Energy Storage Rate` max absolute delta dropped from
+`0.533385790012 W` to `0.182078359183 W` against the `0.5 W` zone-state
+max-absolute tolerance; RMSE is `0.023340057930 W` against the `0.1 W`
+zone-state RMSE tolerance. This supports only the declared limited claim above.
+It still cannot support a broad or "complete" EnergyPlus conformance statement
+because the broad diagnostic boundary remains diagnostic-only and still shows:
 
 - The roof outdoor-air reference path is now aligned: `ZN001:ROOF001` surface
   outdoor dry-bulb max absolute delta is `0.000000019076 C`, wet-bulb is
