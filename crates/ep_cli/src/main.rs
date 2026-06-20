@@ -10233,6 +10233,21 @@ fn heat_balance_bottleneck_rows(
 }
 
 fn heat_balance_active_blocker_summary(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
+    if let Some(row) = heat_balance_roof_exterior_output_blocker(diagnostic) {
+        let sample = row
+            .delta
+            .max_delta_sample
+            .map_or_else(|| "none".to_string(), |point| point.index.to_string());
+        return format!(
+            "{}/{} sample={} dominant=roof-exterior-environmental-balance rmse={:.12} max_abs={:.12}",
+            row.output.key,
+            row.output.variable,
+            sample,
+            row.delta.rmse_delta_c,
+            row.delta.max_abs_delta_c
+        );
+    }
+
     if let Some(row) = diagnostic.ctf_storage_max_sample_deltas.first() {
         return format!(
             "{}/{} sample={} dominant={} dominant_delta_w={:.12} storage_delta_w={:.12}",
@@ -10256,6 +10271,10 @@ fn heat_balance_active_blocker_summary(diagnostic: &HeatBalanceConformanceDiagno
 }
 
 fn heat_balance_next_pr_target(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
+    if heat_balance_roof_exterior_output_blocker(diagnostic).is_some() {
+        return "roof-exterior-environmental-balance-temperature-offset".to_string();
+    }
+
     if let Some(row) = diagnostic.ctf_storage_max_sample_deltas.first() {
         return match row.dominant_mismatch_source.as_str() {
             "face-temperature-current-inside" => {
@@ -10283,6 +10302,43 @@ fn heat_balance_next_pr_target(diagnostic: &HeatBalanceConformanceDiagnostic) ->
     }
 
     "none".to_string()
+}
+
+fn heat_balance_roof_exterior_output_blocker(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+) -> Option<&HeatBalanceSeriesDiagnostic> {
+    let row = heat_balance_bottleneck_rows(&diagnostic.series)
+        .into_iter()
+        .find(|row| heat_balance_is_roof_exterior_output(row))?;
+    let ctf_storage_output_delta_w = diagnostic
+        .ctf_storage_max_sample_deltas
+        .first()
+        .map_or(0.0, |row| row.storage_delta_w);
+    if row.delta.max_abs_delta_c > ctf_storage_output_delta_w {
+        Some(row)
+    } else {
+        None
+    }
+}
+
+fn heat_balance_is_roof_exterior_output(row: &HeatBalanceSeriesDiagnostic) -> bool {
+    let key = row.output.key.to_ascii_uppercase();
+    if !key.contains("ROOF") {
+        return false;
+    }
+
+    matches!(
+        row.output.variable.as_str(),
+        "Surface Outside Face Temperature"
+            | "Surface Outside Face Convection Heat Gain Rate"
+            | "Surface Outside Face Convection Heat Gain Rate per Area"
+            | "Surface Outside Face Convection Heat Transfer Coefficient"
+            | "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+            | "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+            | "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
+            | "Surface Outside Face Solar Radiation Heat Gain Rate"
+            | "Surface Outside Face Solar Radiation Heat Gain Rate per Area"
+    )
 }
 
 fn sanitize_target_slug(value: &str) -> String {
@@ -15147,24 +15203,44 @@ mod tests {
             ],
             rust_zone_air_debug_series: vec![],
             rust_outside_balance_debug_series: vec![],
-            series: vec![super::HeatBalanceSeriesDiagnostic {
-                output: super::ZoneTemperatureReportOutput {
-                    key: "ZONE ONE".to_string(),
-                    variable: "Zone Mean Air Temperature".to_string(),
-                    frequency: "hourly",
-                    class: "zone-state",
-                    source: "eso",
-                    level: Some("diagnostic"),
+            series: vec![
+                super::HeatBalanceSeriesDiagnostic {
+                    output: super::ZoneTemperatureReportOutput {
+                        key: "ZONE ONE".to_string(),
+                        variable: "Zone Mean Air Temperature".to_string(),
+                        frequency: "hourly",
+                        class: "zone-state",
+                        source: "eso",
+                        level: Some("diagnostic"),
+                    },
+                    samples: 1,
+                    oracle_first_c: 1.0,
+                    rust_first_c: 2.0,
+                    oracle_last_c: 1.0,
+                    rust_last_c: 2.0,
+                    delta: super::delta_summary(&[1.0], &[2.0]),
+                    sample_rows: super::delta_points(&[1.0], &[2.0]),
+                    status: "extracted",
                 },
-                samples: 1,
-                oracle_first_c: 1.0,
-                rust_first_c: 2.0,
-                oracle_last_c: 1.0,
-                rust_last_c: 2.0,
-                delta: super::delta_summary(&[1.0], &[2.0]),
-                sample_rows: super::delta_points(&[1.0], &[2.0]),
-                status: "extracted",
-            }],
+                super::HeatBalanceSeriesDiagnostic {
+                    output: super::ZoneTemperatureReportOutput {
+                        key: "ZN001:ROOF001".to_string(),
+                        variable: "Surface Outside Face Convection Heat Gain Rate".to_string(),
+                        frequency: "hourly",
+                        class: "surface-state",
+                        source: "eso",
+                        level: Some("diagnostic"),
+                    },
+                    samples: 1,
+                    oracle_first_c: -85131.0,
+                    rust_first_c: -85105.0,
+                    oracle_last_c: -85131.0,
+                    rust_last_c: -85105.0,
+                    delta: super::delta_summary(&[-85131.0], &[-85105.0]),
+                    sample_rows: super::delta_points(&[-85131.0], &[-85105.0]),
+                    status: "extracted",
+                },
+            ],
             status: "extracted",
         };
         let context = super::HeatBalanceConformanceContext {
@@ -15213,6 +15289,10 @@ mod tests {
         assert!(json.contains("\"zone_conduction_report_source\": \"surface-report\""));
         assert!(json.contains("\"zone_air_report_sampling\": \"last-system-state\""));
         assert!(json.contains("\"surface_loop_zone_air_correction\": \"after-surface-loop\""));
+        assert!(json.contains("\"active_blocker_summary\": \"ZN001:ROOF001/Surface Outside Face Convection Heat Gain Rate"));
+        assert!(json.contains(
+            "\"next_pr_target\": \"roof-exterior-environmental-balance-temperature-offset\""
+        ));
         assert!(json.contains("\"compatibility_stages\""));
         assert!(json.contains("\"source_routine\": \"ManageAirHeatBalance\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
@@ -15292,6 +15372,10 @@ mod tests {
         assert!(json.contains("\"trigger_output\""));
         assert!(digest.contains("\"comparison_class\": \"diagnostic-only\""));
         assert!(digest.contains("\"compatibility_stages\""));
+        assert!(digest.contains("\"active_blocker_summary\": \"ZN001:ROOF001/Surface Outside Face Convection Heat Gain Rate"));
+        assert!(digest.contains(
+            "\"next_pr_target\": \"roof-exterior-environmental-balance-temperature-offset\""
+        ));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
@@ -15380,6 +15464,11 @@ mod tests {
         assert!(report.contains("zone_conduction_report_source: surface-report"));
         assert!(report.contains("zone_air_report_sampling: last-system-state"));
         assert!(report.contains("surface_loop_zone_air_correction: after-surface-loop"));
+        assert!(report.contains("ZN001:ROOF001/Surface Outside Face Convection Heat Gain Rate"));
+        assert!(
+            report
+                .contains("next_pr_target: roof-exterior-environmental-balance-temperature-offset")
+        );
         assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
         assert!(report.contains("ManageAirHeatBalance"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));

@@ -482,11 +482,11 @@ if ($isCompatibilityCandidateCase) {
     if ($summary.conformance_promotion_allowed -ne $true) {
         throw "Candidate case must mark conformance_promotion_allowed=true"
     }
-    if ($summary.active_blocker_summary -notmatch "ZN001:FLR001") {
-        throw "Expected candidate active blocker summary to reference ZN001:FLR001, got $($summary.active_blocker_summary)"
+    if ($summary.active_blocker_summary -notmatch "ZN001:ROOF001") {
+        throw "Expected candidate active blocker summary to reference ZN001:ROOF001, got $($summary.active_blocker_summary)"
     }
-    if ($summary.next_pr_target -ne "floor-inside-current-face-temperature-source-timing") {
-        throw "Expected candidate next_pr_target to focus floor inside-current timing, got $($summary.next_pr_target)"
+    if ($summary.next_pr_target -ne "roof-exterior-environmental-balance-temperature-offset") {
+        throw "Expected candidate next_pr_target to focus roof exterior balance, got $($summary.next_pr_target)"
     }
     foreach ($requiredVariable in @(
             "Site Outdoor Air Drybulb Temperature",
@@ -516,7 +516,7 @@ if ($isCompatibilityCandidateCase) {
     Assert-Contains -Text $reportText -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "candidate markdown algorithm lane"
     Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
     Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
-    Assert-Contains -Text $reportText -Pattern "next_pr_target: floor-inside-current-face-temperature-source-timing" -Description "candidate next PR target"
+    Assert-Contains -Text $reportText -Pattern "next_pr_target: roof-exterior-environmental-balance-temperature-offset" -Description "candidate next PR target"
     Assert-Contains -Text $reportText -Pattern "status: fail" -Description "candidate diagnostic status"
 
     Write-Host "Official dynamic heat-balance compatibility candidate passed structural checks."

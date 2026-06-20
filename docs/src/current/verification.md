@@ -113,10 +113,13 @@ EnergyPlus conformance statement because the broad diagnostic still shows:
   convection split rather than indicating an uncancelled total exterior-balance
   failure.
 - `ZONE ONE` mean air temperature max absolute delta `0.007135877197 C`.
-- `ZN001:FLR001` inside face temperature max absolute delta
-  `0.007056007286 C`; the active blocker is
-  `floor-inside-current-face-temperature-source-timing`, where a small
-  face-temperature offset is amplified by the floor CTF current/history terms.
+- The active report-level target is
+  `roof-exterior-environmental-balance-temperature-offset`, because the largest
+  remaining user-visible output deltas are the `ZN001:ROOF001` outside
+  convection/radiation heat-gain splits. The smaller `ZN001:FLR001` secondary
+  residual remains visible in inside face temperature (`0.007056007286 C`) and
+  floor storage (`1.461946819083 W`), where a small face-temperature offset is
+  amplified by the floor CTF current/history terms.
 - First-run-period-substep evidence rules out hourly averaging as the source of
   the current offset. In the compatibility-candidate lane, Rust records
   `ZONE ONE` MAT `-0.620477202798 C` and a stored third-order solution
