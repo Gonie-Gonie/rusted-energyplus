@@ -37,11 +37,11 @@ use ep_runtime::{
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
     HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm,
-    HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
-    HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
-    PlantStateProjection, PlantStateProjectionOptions, RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
-    RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE, RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE,
-    RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
+    HeatBalanceZoneAirFirstSampleTrace, HeatBalanceZoneAirReportSampling,
+    HeatBalanceZoneAirStateSample, HeatBalanceZoneConductionReportSource, NodeStateProjection,
+    NodeStateProjectionOptions, PlantStateProjection, PlantStateProjectionOptions,
+    RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE, RUST_ZONE_AIR_HEAT_CAPACITY_VARIABLE,
+    RUST_ZONE_AIR_HUMIDITY_RATIO_VARIABLE, RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_SYSTEM_TEMPERATURE_1_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_1_VARIABLE, RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_2_VARIABLE,
     RUST_ZONE_AIR_PREVIOUS_TEMPERATURE_3_VARIABLE, RUST_ZONE_AIR_SYSTEM_TIMESTEP_COUNT_VARIABLE,
@@ -3809,6 +3809,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     rust_zone_air_run_period_initial_states: Vec<HeatBalanceZoneAirStateSample>,
+    zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
     rust_zone_air_debug_series: Vec<HeatBalanceRustDebugSeries>,
@@ -4729,6 +4730,7 @@ fn build_heat_balance_conformance_diagnostic(
         rust_zone_air_run_period_initial_states: simulation
             .summary
             .run_period_initial_zone_air_states,
+        zone_air_first_sample_trace: simulation.summary.zone_air_first_sample_trace,
         surface_first_sample_trace: simulation.summary.surface_first_sample_trace,
         surface_iteration_first_sample_trace: simulation
             .summary
@@ -9149,6 +9151,10 @@ fn render_heat_balance_rust_zone_air_debug_json(
         )
     ));
     json.push_str(&format!(
+        "  \"zone_air_first_sample_trace\": {},\n",
+        heat_balance_zone_air_first_sample_trace_json(&diagnostic.zone_air_first_sample_trace)
+    ));
+    json.push_str(&format!(
         "  \"series\": {}\n",
         heat_balance_rust_debug_series_json(&diagnostic.rust_zone_air_debug_series)
     ));
@@ -9226,6 +9232,71 @@ fn heat_balance_zone_air_initial_states_json(states: &[HeatBalanceZoneAirStateSa
             json_number(coefficients.third_order_history_term_w),
             json_number(coefficients.third_order_temp_dependent_load_w_per_k),
             json_number(coefficients.third_order_temp_independent_load_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_zone_air_first_sample_trace_json(
+    rows: &[HeatBalanceZoneAirFirstSampleTrace],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        let coefficients = row.zone_air_temperature_coefficients;
+        json.push_str(&format!(
+            concat!(
+                "{{ \"zone_id\": {}, ",
+                "\"key\": {}, ",
+                "\"timestep_index\": {}, ",
+                "\"outdoor_dry_bulb_c\": {}, ",
+                "\"timestep_seconds\": {}, ",
+                "\"mean_air_temperature_c\": {}, ",
+                "\"zone_timestep_average_air_temperature_c\": {}, ",
+                "\"previous_mean_air_temperatures_c\": {}, ",
+                "\"previous_system_mean_air_temperatures_c\": {}, ",
+                "\"previous_system_timestep_count\": {}, ",
+                "\"air_humidity_ratio\": {}, ",
+                "\"zone_timestep_average_air_humidity_ratio\": {}, ",
+                "\"air_heat_capacity_j_per_k\": {}, ",
+                "\"zone_timestep_air_power_cap_w_per_k\": {}, ",
+                "\"zone_air_temperature_coefficients\": {{ ",
+                "\"temp_dependent_coefficient_w_per_k\": {}, ",
+                "\"temp_independent_coefficient_w\": {}, ",
+                "\"air_power_cap_w_per_k\": {}, ",
+                "\"third_order_history_term_w\": {}, ",
+                "\"third_order_temp_dependent_load_w_per_k\": {}, ",
+                "\"third_order_temp_independent_load_w\": {} }}, ",
+                "\"third_order_solution_numerator_w\": {}, ",
+                "\"third_order_solution_denominator_w_per_k\": {}, ",
+                "\"third_order_solution_temperature_c\": {} }}"
+            ),
+            row.zone_id.0,
+            json_string(&row.zone_name),
+            row.timestep_index,
+            json_number(row.outdoor_dry_bulb_c),
+            json_number(row.timestep_seconds),
+            json_number(row.mean_air_temperature_c),
+            json_number(row.zone_timestep_average_air_temperature_c),
+            json_number_array(&row.previous_mean_air_temperatures_c),
+            json_number_array(&row.previous_system_mean_air_temperatures_c),
+            row.previous_system_timestep_count,
+            json_number(row.air_humidity_ratio),
+            json_number(row.zone_timestep_average_air_humidity_ratio),
+            json_number(row.air_heat_capacity_j_per_k),
+            json_number(row.zone_timestep_air_power_cap_w_per_k),
+            json_number(coefficients.temp_dependent_coefficient_w_per_k),
+            json_number(coefficients.temp_independent_coefficient_w),
+            json_number(coefficients.air_power_cap_w_per_k),
+            json_number(coefficients.third_order_history_term_w),
+            json_number(coefficients.third_order_temp_dependent_load_w_per_k),
+            json_number(coefficients.third_order_temp_independent_load_w),
+            json_number(row.third_order_solution_numerator_w),
+            json_number(row.third_order_solution_denominator_w_per_k),
+            json_number(row.third_order_solution_temperature_c)
         ));
     }
     json.push(']');
@@ -9404,6 +9475,10 @@ fn render_heat_balance_conformance_json(
     json.push_str(&format!(
         "  \"first_sample_bottlenecks\": {},\n",
         heat_balance_first_sample_bottlenecks_json(&diagnostic.series)
+    ));
+    json.push_str(&format!(
+        "  \"zone_air_first_sample_trace\": {},\n",
+        heat_balance_zone_air_first_sample_trace_json(&diagnostic.zone_air_first_sample_trace)
     ));
     json.push_str(&format!(
         "  \"surface_first_sample_trace\": {},\n",
@@ -9720,6 +9795,13 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## First-Sample Bottlenecks\n\n");
     heat_balance_report_first_sample_bottleneck_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Rust Zone-Air First-Sample Trace\n\n");
+    heat_balance_report_zone_air_first_sample_trace_rows(
+        &mut report,
+        &diagnostic.zone_air_first_sample_trace,
+    );
     report.push('\n');
 
     report.push_str("## Rust Surface First-Sample Trace\n\n");
@@ -11592,6 +11674,36 @@ fn heat_balance_report_surface_first_sample_trace_rows(
             row.outside_convection_heat_gain_rate_w,
             row.outside_net_thermal_radiation_heat_gain_rate_w,
             row.outside_solar_radiation_heat_gain_rate_w
+        ));
+    }
+}
+
+fn heat_balance_report_zone_air_first_sample_trace_rows(
+    report: &mut String,
+    rows: &[HeatBalanceZoneAirFirstSampleTrace],
+) {
+    report.push_str(
+        "| key | timestep | outdoor_db_c | mat_c | timestep_avg_mat_c | prev1_c | prev2_c | prev3_c | air_cap_w_per_k | temp_dep_w_per_k | temp_ind_w | history_w | denominator_w_per_k | solution_c |\n",
+    );
+    report.push_str("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        let coefficients = row.zone_air_temperature_coefficients;
+        report.push_str(&format!(
+            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.zone_name),
+            row.timestep_index,
+            row.outdoor_dry_bulb_c,
+            row.mean_air_temperature_c,
+            row.zone_timestep_average_air_temperature_c,
+            row.previous_mean_air_temperatures_c[0],
+            row.previous_mean_air_temperatures_c[1],
+            row.previous_mean_air_temperatures_c[2],
+            row.zone_timestep_air_power_cap_w_per_k,
+            coefficients.temp_dependent_coefficient_w_per_k,
+            coefficients.temp_independent_coefficient_w,
+            coefficients.third_order_history_term_w,
+            row.third_order_solution_denominator_w_per_k,
+            row.third_order_solution_temperature_c
         ));
     }
 }
@@ -14076,6 +14188,33 @@ mod tests {
                 outside_total_term_w: 3050.0,
             }],
             rust_zone_air_run_period_initial_states: vec![],
+            zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
+                zone_id: ep_model::ZoneId(1),
+                zone_name: "ZONE ONE".to_string(),
+                timestep_index: 1,
+                outdoor_dry_bulb_c: 10.0,
+                timestep_seconds: 900.0,
+                mean_air_temperature_c: 23.0,
+                zone_timestep_average_air_temperature_c: 23.0,
+                previous_mean_air_temperatures_c: [22.0, 21.0, 20.0],
+                previous_system_mean_air_temperatures_c: [22.0, 21.0, 20.0],
+                previous_system_timestep_count: 1,
+                air_humidity_ratio: 0.004,
+                zone_timestep_average_air_humidity_ratio: 0.004,
+                air_heat_capacity_j_per_k: 1200.0,
+                zone_timestep_air_power_cap_w_per_k: 1.333333333333,
+                zone_air_temperature_coefficients: ep_runtime::ZoneAirTemperatureCoefficients {
+                    temp_dependent_coefficient_w_per_k: 10.0,
+                    temp_independent_coefficient_w: 20.0,
+                    air_power_cap_w_per_k: 1.333333333333,
+                    third_order_history_term_w: 30.0,
+                    third_order_temp_dependent_load_w_per_k: 12.444444444444,
+                    third_order_temp_independent_load_w: 50.0,
+                },
+                third_order_solution_numerator_w: 50.0,
+                third_order_solution_denominator_w_per_k: 12.444444444444,
+                third_order_solution_temperature_c: 4.017857142857,
+            }],
             surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -14207,6 +14346,8 @@ mod tests {
         assert!(json.contains("\"source_routine\": \"UpdateThermalHistories\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"zone_air_first_sample_trace\""));
+        assert!(json.contains("\"third_order_solution_temperature_c\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
         assert!(json.contains("\"outside_face_temperature_c\": 11.000000000000"));
         assert!(json.contains("\"ctf_component_first_samples\""));
@@ -14393,6 +14534,8 @@ mod tests {
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));
+        assert!(report.contains("## Rust Zone-Air First-Sample Trace"));
+        assert!(report.contains("solution_c"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(
             report.contains("| FLOOR | -10.000000000000 | 30.000000000000 | -40.000000000000 |")
@@ -14861,6 +15004,33 @@ mod tests {
                 outside_total_term_w: 3050.0,
             }],
             rust_zone_air_run_period_initial_states: vec![],
+            zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
+                zone_id: ep_model::ZoneId(1),
+                zone_name: "ZONE ONE".to_string(),
+                timestep_index: 1,
+                outdoor_dry_bulb_c: 10.0,
+                timestep_seconds: 900.0,
+                mean_air_temperature_c: 2.0,
+                zone_timestep_average_air_temperature_c: 2.0,
+                previous_mean_air_temperatures_c: [1.0, 1.0, 1.0],
+                previous_system_mean_air_temperatures_c: [1.0, 1.0, 1.0],
+                previous_system_timestep_count: 1,
+                air_humidity_ratio: 0.004,
+                zone_timestep_average_air_humidity_ratio: 0.004,
+                air_heat_capacity_j_per_k: 1200.0,
+                zone_timestep_air_power_cap_w_per_k: 1.333333333333,
+                zone_air_temperature_coefficients: ep_runtime::ZoneAirTemperatureCoefficients {
+                    temp_dependent_coefficient_w_per_k: 10.0,
+                    temp_independent_coefficient_w: 20.0,
+                    air_power_cap_w_per_k: 1.333333333333,
+                    third_order_history_term_w: 2.444444444444,
+                    third_order_temp_dependent_load_w_per_k: 12.444444444444,
+                    third_order_temp_independent_load_w: 22.444444444444,
+                },
+                third_order_solution_numerator_w: 22.444444444444,
+                third_order_solution_denominator_w_per_k: 12.444444444444,
+                third_order_solution_temperature_c: 1.803571428571,
+            }],
             surface_first_sample_trace: vec![super::HeatBalanceSurfaceFirstSampleTrace {
                 surface_name: "FLOOR".to_string(),
                 construction_name: "FLOOR".to_string(),
@@ -14961,6 +15131,8 @@ mod tests {
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
+        assert!(json.contains("\"zone_air_first_sample_trace\""));
+        assert!(json.contains("\"third_order_solution_temperature_c\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"zone_air_coefficient_deltas\""));
@@ -15131,6 +15303,8 @@ mod tests {
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));
+        assert!(report.contains("## Rust Zone-Air First-Sample Trace"));
+        assert!(report.contains("solution_c"));
         assert!(report.contains("## Rust CTF First-Sample Components"));
         assert!(report.contains("## Zone-Air Coefficient Deltas"));
         assert!(report.contains("first_divergence_source"));

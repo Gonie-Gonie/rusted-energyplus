@@ -698,11 +698,19 @@ Current Rust boundary:
   warmup, CTF seed, bottleneck, and series-level delta metadata but omits full
   hourly `sample_rows`, so diagnostic gates can validate large official dynamic
   lanes without repeatedly parsing the full trace payload.
-- The compact digest and markdown report also carry a Rust-only
-  `surface_first_sample_trace` table for the first reported hour. In the active
-  all-CTF, ScriptF-flat, 20-iteration lane this exposes the timestep dry-bulb
-  sequence and the matching per-surface outside balance terms before hourly
-  averaging. EnergyPlus `WeatherManager` seeds the first weather-day
+- The compact digest and markdown report also carry Rust-only
+  `zone_air_first_sample_trace` and `surface_first_sample_trace` tables for the
+  first reported hour. The zone-air table records MAT, previous MAT history,
+  EnergyPlus-style third-order coefficients, denominator, and reconstructed
+  solution for each first-hour substep. In the active all-CTF, ScriptF-flat,
+  20-iteration lane this proves the Rust third-order solution is internally
+  consistent to about `2.5e-7 C` on the first substep, while a
+  timestep-frequency EnergyPlus oracle probe still places the first-substep
+  MAT about `0.0065655 C` lower; the remaining blocker is therefore upstream of
+  hourly averaging and downstream of the basic third-order formula. The surface
+  table exposes the timestep dry-bulb sequence and the matching per-surface
+  outside balance terms before hourly averaging. EnergyPlus `WeatherManager`
+  seeds the first weather-day
   interpolation from either Hour 1 or Hour 24 of the first run-period weather
   day via `firstHrInterpUseHr1` in `ReadWeatherForDay`, with the RunPeriod field
   `First Hour Interpolation Starting Values` parsed in `GetRunPeriodData`.

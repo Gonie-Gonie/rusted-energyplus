@@ -93,9 +93,11 @@ current-temperature and history-term isolation plus oracle-inferred first-sample
 CTF history deltas when EIO zero coefficients and matching oracle series are
 available. The full summary preserves hourly sample rows for deeper inspection.
 The diagnostic artifacts now also include `rust-zone-air-diagnostics.json`,
-which captures the Rust run-period initial zone-air state and hourly Rust-only
-zone-air current/average/history, humidity, air-capacity, and system-timestep
-count series:
+which captures the Rust run-period initial zone-air state, a first-reported-hour
+`zone_air_first_sample_trace`, and hourly Rust-only zone-air
+current/average/history, humidity, air-capacity, and system-timestep count
+series. The markdown report mirrors the first-sample zone-air trace so the
+first four 15-minute substeps can be inspected without opening the full JSON:
 
 As of the 2026-06-20 regenerated compatibility-candidate diagnostic baseline,
 the broad diagnostic report still has `status = fail` and
@@ -114,6 +116,15 @@ EnergyPlus conformance statement because the broad diagnostic still shows:
   `0.007056007286 C`; the active blocker is
   `floor-inside-current-face-temperature-source-timing`, where a small
   face-temperature offset is amplified by the floor CTF current/history terms.
+- First-run-period-substep evidence rules out hourly averaging as the source of
+  the current offset. In the compatibility-candidate lane, Rust records
+  `ZONE ONE` MAT `-0.620477202798 C` and a stored third-order solution
+  `-0.620476954864 C` for timestep 1, while a timestep-frequency EnergyPlus
+  oracle probe reports `-0.627042747070 C`. The corresponding floor inside-face
+  temperatures are `-0.065350444313 C` (Rust) and `-0.071842487381 C`
+  (EnergyPlus). The remaining delta is therefore already present inside the
+  first 15-minute step and should be chased in run-period history/source-order
+  handoff, not in hourly reporting.
 - `ZONE ONE` mean air humidity ratio was added as a diagnostic-only row. In
   the regenerated candidate baseline it matches exactly through the first
   run-period day and differs by about `1.2e-6 kgWater/kgDryAir` at representative

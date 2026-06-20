@@ -905,6 +905,47 @@ pub struct HeatBalanceZoneAirStateSample {
     pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
 }
 
+/// Per-zone zone-air state captured for one timestep in the first reported hour.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceZoneAirFirstSampleTrace {
+    /// Zone ID.
+    pub zone_id: ZoneId,
+    /// EnergyPlus-normalized zone name.
+    pub zone_name: String,
+    /// One-based zone timestep within the first reported hourly sample.
+    pub timestep_index: u32,
+    /// Interpolated outdoor dry-bulb temperature in C used for the timestep.
+    pub outdoor_dry_bulb_c: f64,
+    /// Zone-timestep length in seconds.
+    pub timestep_seconds: f64,
+    /// Current mean air temperature in C.
+    pub mean_air_temperature_c: f64,
+    /// Zone-timestep average mean air temperature in C.
+    pub zone_timestep_average_air_temperature_c: f64,
+    /// Previous zone-timestep mean-air-temperature history in C.
+    pub previous_mean_air_temperatures_c: [f64; 3],
+    /// Previous system-timestep mean-air-temperature history in C.
+    pub previous_system_mean_air_temperatures_c: [f64; 3],
+    /// Adaptive system timestep count used in the previous zone timestep.
+    pub previous_system_timestep_count: u32,
+    /// Current zone air humidity ratio in kgWater/kgDryAir.
+    pub air_humidity_ratio: f64,
+    /// Zone-timestep average humidity ratio in kgWater/kgDryAir.
+    pub zone_timestep_average_air_humidity_ratio: f64,
+    /// Zone air heat capacity in J/K.
+    pub air_heat_capacity_j_per_k: f64,
+    /// Zone air power capacity recomputed from the active zone timestep.
+    pub zone_timestep_air_power_cap_w_per_k: f64,
+    /// Latest zone-air coefficient snapshot.
+    pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
+    /// Third-order temperature solution numerator in W.
+    pub third_order_solution_numerator_w: f64,
+    /// Third-order temperature solution denominator in W/K.
+    pub third_order_solution_denominator_w_per_k: f64,
+    /// Third-order temperature solution in C from the stored coefficients.
+    pub third_order_solution_temperature_c: f64,
+}
+
 /// Per-zone heat-balance state shell.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ZoneHeatBalanceState {
@@ -1645,6 +1686,8 @@ pub struct HeatBalanceSimulationSummary {
     pub hourly_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     /// Per-surface timestep states captured across the first reported hourly sample.
     pub surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
+    /// Per-zone timestep states captured across the first reported hourly sample.
+    pub zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
     /// Per-timestep inside-surface iteration summary for the first reported hourly sample.
     pub surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
 }
@@ -4736,6 +4779,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
     let mut hourly_ctf_history_slots = Vec::new();
     let mut surface_first_sample_trace = Vec::new();
+    let mut zone_air_first_sample_trace = Vec::new();
     let mut surface_iteration_first_sample_trace = Vec::new();
     let report_zone_air_algorithm =
         heat_balance_zone_air_algorithm_execution_variant(options.zone_air_algorithm);
@@ -4898,6 +4942,45 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     } else {
                         0.0
                     };
+                    if hour_index == 0 {
+                        let coefficients = zone_state.zone_air_temperature_coefficients;
+                        let third_order_solution_temperature_c =
+                            if coefficients.third_order_temp_dependent_load_w_per_k.abs()
+                                <= f64::EPSILON
+                            {
+                                zone_state.mean_air_temperature_c
+                            } else {
+                                coefficients.third_order_temp_independent_load_w
+                                    / coefficients.third_order_temp_dependent_load_w_per_k
+                            };
+                        zone_air_first_sample_trace.push(HeatBalanceZoneAirFirstSampleTrace {
+                            zone_id: zone_state.zone_id,
+                            zone_name: zone_state.zone_name.clone(),
+                            timestep_index: substep,
+                            outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
+                            timestep_seconds: seconds_per_timestep,
+                            mean_air_temperature_c: zone_state.mean_air_temperature_c,
+                            zone_timestep_average_air_temperature_c: zone_state
+                                .zone_timestep_average_air_temperature_c,
+                            previous_mean_air_temperatures_c: zone_state
+                                .previous_mean_air_temperatures_c,
+                            previous_system_mean_air_temperatures_c: zone_state
+                                .previous_system_mean_air_temperatures_c,
+                            previous_system_timestep_count: zone_state
+                                .previous_system_timestep_count,
+                            air_humidity_ratio: zone_state.air_humidity_ratio,
+                            zone_timestep_average_air_humidity_ratio: zone_state
+                                .zone_timestep_average_air_humidity_ratio,
+                            air_heat_capacity_j_per_k: zone_state.air_heat_capacity_j_per_k,
+                            zone_timestep_air_power_cap_w_per_k,
+                            zone_air_temperature_coefficients: coefficients,
+                            third_order_solution_numerator_w: coefficients
+                                .third_order_temp_independent_load_w,
+                            third_order_solution_denominator_w_per_k: coefficients
+                                .third_order_temp_dependent_load_w_per_k,
+                            third_order_solution_temperature_c,
+                        });
+                    }
                     zone_air_debug_sums[index].current_temperature_c +=
                         zone_state.mean_air_temperature_c;
                     zone_air_debug_sums[index].zone_timestep_average_temperature_c +=
@@ -6035,6 +6118,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             .collect(),
         hourly_ctf_history_slots,
         surface_first_sample_trace,
+        zone_air_first_sample_trace,
         surface_iteration_first_sample_trace,
     };
 

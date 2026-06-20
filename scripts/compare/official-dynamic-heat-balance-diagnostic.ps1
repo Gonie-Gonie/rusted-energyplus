@@ -560,6 +560,20 @@ if ($null -eq $topFirstSampleBottleneck.first_sample_delta) {
 if ([int]$topFirstSampleBottleneck.first_sample_delta.index -ne 0) {
     throw "Expected first-sample bottleneck index 0, got $($topFirstSampleBottleneck.first_sample_delta.index)"
 }
+$zoneAirFirstSampleTrace = @($summary.zone_air_first_sample_trace)
+if ($zoneAirFirstSampleTrace.Count -lt 4) {
+    throw "Expected zone_air_first_sample_trace to include first-hour per-zone timestep rows, got $($zoneAirFirstSampleTrace.Count)"
+}
+$zoneAirFirstTrace = @($zoneAirFirstSampleTrace | Where-Object { $_.key -eq "ZONE ONE" -and [int]$_.timestep_index -eq 1 })[0]
+if ($null -eq $zoneAirFirstTrace) {
+    throw "Expected zone_air_first_sample_trace to include ZONE ONE timestep 1"
+}
+if ($null -eq $zoneAirFirstTrace.zone_air_temperature_coefficients) {
+    throw "Expected zone_air_first_sample_trace rows to include zone_air_temperature_coefficients"
+}
+if ($null -eq $zoneAirFirstTrace.third_order_solution_temperature_c) {
+    throw "Expected zone_air_first_sample_trace rows to include third_order_solution_temperature_c"
+}
 $surfaceFirstSampleTrace = @($summary.surface_first_sample_trace)
 if ($surfaceFirstSampleTrace.Count -lt 6) {
     throw "Expected surface_first_sample_trace to include first-hour per-surface rows, got $($surfaceFirstSampleTrace.Count)"
@@ -576,6 +590,11 @@ if ([Math]::Abs([double]$floorSurfaceFirstTrace.outdoor_dry_bulb_c - -6.0) -gt 1
 }
 if ($null -eq $floorSurfaceFirstTrace.outside_face_temperature_c) {
     throw "Expected surface_first_sample_trace rows to include outside_face_temperature_c"
+}
+$zoneAirDebug = (Get-Content -LiteralPath $zoneAirDebugPath -Raw -Encoding UTF8) | ConvertFrom-Json
+$zoneAirDebugFirstSampleTrace = @($zoneAirDebug.zone_air_first_sample_trace)
+if ($zoneAirDebugFirstSampleTrace.Count -lt 4) {
+    throw "Expected rust-zone-air-diagnostics.json to include first-hour zone-air timestep rows, got $($zoneAirDebugFirstSampleTrace.Count)"
 }
 $floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
 if ($null -eq $floorCtfComponent) {
@@ -1207,6 +1226,8 @@ Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdo
 Assert-Contains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "markdown max-sample context section"
 Assert-Contains -Text $reportText -Pattern "trigger_rank" -Description "markdown max-sample context trigger column"
 Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
+Assert-Contains -Text $reportText -Pattern "## Rust Zone-Air First-Sample Trace" -Description "markdown zone-air first-sample trace section"
+Assert-Contains -Text $reportText -Pattern "solution_c" -Description "markdown zone-air first-sample solution column"
 Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
 Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
 Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"
