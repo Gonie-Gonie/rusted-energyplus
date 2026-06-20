@@ -65,6 +65,15 @@ Exterior longwave follows the EnergyPlus
 diagnostic split into `SurfHSkyExt`, `SurfHAirExt`, and `SurfHGrdExt`,
 including `SurfAirSkyRadSplit`, and both the outside-face balance equivalent
 radiation term and the net thermal radiation report row share that helper.
+The 2026-06-20 diagnostic expansion exposes `Site Sky Temperature`,
+`Site Horizontal Infrared Radiation Rate per Area`, and the roof
+air/sky/ground exterior longwave coefficients. In the active
+compatibility-candidate lane, dry-bulb, sky temperature, horizontal infrared,
+and rain status are bit-for-bit against the oracle, wet-bulb is within
+`0.000009927010 C`, and the roof air/ground exterior radiation coefficients
+are exact while the sky coefficient RMSE is `0.000329165799 W/m2-K`. The
+remaining roof exterior heat-gain-rate deltas are therefore downstream of the
+roof outside-face temperature offset, not a weather/sky forcing mismatch.
 Exterior convection now uses the EnergyPlus `SetSurfaceWindSpeedAt` terrain and
 surface-centroid profile before DOE-2/MoWITT forced-convection terms, so
 diagnostic coefficients use timestep `SurfOutWindSpeed`-shaped local wind

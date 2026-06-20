@@ -77,6 +77,24 @@ level = "diagnostic"
 
 [[outputs]]
 key = "Environment"
+variable = "Site Sky Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Horizontal Infrared Radiation Rate per Area"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "diagnostic"
+
+[[outputs]]
+key = "Environment"
 variable = "Site Rain Status"
 frequency = "hourly"
 class = "weather"
@@ -888,6 +906,33 @@ level = "diagnostic"
 [[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"

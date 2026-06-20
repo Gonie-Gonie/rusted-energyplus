@@ -4330,6 +4330,8 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case("Zone Mean Air Humidity Ratio")
         || variable.eq_ignore_ascii_case("Site Outdoor Air Drybulb Temperature")
         || variable.eq_ignore_ascii_case("Site Outdoor Air Wetbulb Temperature")
+        || variable.eq_ignore_ascii_case("Site Sky Temperature")
+        || variable.eq_ignore_ascii_case("Site Horizontal Infrared Radiation Rate per Area")
         || variable.eq_ignore_ascii_case("Site Rain Status")
         || variable.eq_ignore_ascii_case("Surface Inside Face Temperature")
         || variable.eq_ignore_ascii_case("Surface Outside Face Temperature")
@@ -4373,6 +4375,15 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
             .eq_ignore_ascii_case("Surface Outside Face Net Thermal Radiation Heat Gain Rate")
         || variable.eq_ignore_ascii_case(
             "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
+        )
+        || variable.eq_ignore_ascii_case(
+            "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
+        )
+        || variable.eq_ignore_ascii_case(
+            "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
+        )
+        || variable.eq_ignore_ascii_case(
+            "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
         )
         || variable.eq_ignore_ascii_case("Surface Outside Face Solar Radiation Heat Gain Rate")
         || variable

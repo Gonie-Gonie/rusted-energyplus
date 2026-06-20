@@ -465,6 +465,18 @@ impl RuntimeOutputRegistry {
                         "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
                         "W/m2",
                     ),
+                    (
+                        "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
+                        "W/m2-K",
+                    ),
+                    (
+                        "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
+                        "W/m2-K",
+                    ),
+                    (
+                        "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
+                        "W/m2-K",
+                    ),
                     ("Surface Outside Face Solar Radiation Heat Gain Rate", "W"),
                     (
                         "Surface Outside Face Solar Radiation Heat Gain Rate per Area",
@@ -511,6 +523,8 @@ impl RuntimeOutputRegistry {
         for (variable_name, units) in [
             ("Site Outdoor Air Drybulb Temperature", "C"),
             ("Site Outdoor Air Wetbulb Temperature", "C"),
+            ("Site Sky Temperature", "C"),
+            ("Site Horizontal Infrared Radiation Rate per Area", "W/m2"),
             ("Site Rain Status", ""),
         ] {
             self.push_output(

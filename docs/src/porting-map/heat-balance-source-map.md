@@ -1020,6 +1020,19 @@ Current Rust boundary:
   previous-MAT history slots, so the current blocker is not the copy into the
   run period or hourly reporting; it is the warmup fixed point produced by the
   repeated-day surface/zone source model.
+  The 2026-06-20 weather/sky and exterior-radiation split probe then removes
+  another candidate cause: dry-bulb, sky temperature, horizontal infrared, and
+  rain status are exact; wet-bulb max delta is `0.000009927010 C`; roof
+  exterior radiation-to-air and radiation-to-ground coefficients are exact; and
+  the roof radiation-to-sky coefficient RMSE is only `0.000329165799 W/m2-K`.
+  Re-running the same active lane with EnergyPlus' documented 30-iteration
+  inside-convection re-evaluation cadence is also a no-op: MAT, floor
+  inside-face temperature, floor storage, roof outside-face temperature, roof
+  net exterior radiation, and the advanced inside-surface iteration count all
+  remain bit-for-bit identical to the no-reevaluation diagnostic. This keeps the
+  next target on the coupled warmup fixed point, `SurfTempIn`/`SurfTempInTmp`
+  source ownership, and CTF history state, rather than weather forcing,
+  exterior longwave coefficients, or the 30-pass hconv cadence.
   ScriptF-flat adiabatic report/history split probe also rejects syncing
   adiabatic outside faces to current inside faces for
   report-only state: it preserves MAT (`0.037329 C` RMSE), zone surface
