@@ -3321,7 +3321,7 @@ fn advance_heat_balance_state_one_timestep_internal(
         for zone in &mut state.zones {
             zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
             zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-            zone.previous_system_timestep_count = 1;
+            synchronize_single_system_timestep_history(zone);
             zone.system_timestep_average_surface_convection_report_w = None;
             zone.system_timestep_average_air_storage_report_w = None;
         }
@@ -3903,6 +3903,19 @@ fn correct_zone_air_humidity_ratios_from_current_state(
     }
 }
 
+fn synchronize_single_system_timestep_history(zone: &mut ZoneHeatBalanceState) {
+    zone.previous_system_mean_air_temperatures_c = [
+        zone.mean_air_temperature_c,
+        zone.previous_mean_air_temperatures_c[0],
+        zone.previous_mean_air_temperatures_c[1],
+    ];
+    zone.previous_system_air_humidity_ratios = [
+        zone.air_humidity_ratio,
+        zone.previous_air_humidity_ratios[0],
+        zone.previous_air_humidity_ratios[1],
+    ];
+    zone.previous_system_timestep_count = 1;
+}
 fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
     surfaces: &[SurfaceHeatBalanceState],
     zones: &mut [ZoneHeatBalanceState],
@@ -3933,7 +3946,7 @@ fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
         if system_timestep_count <= 1 {
             zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
             zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-            zone.previous_system_timestep_count = 1;
+            synchronize_single_system_timestep_history(zone);
             zone.system_timestep_average_surface_convection_report_w = None;
             zone.system_timestep_average_air_storage_report_w = None;
             continue;
@@ -11181,7 +11194,8 @@ mod tests {
         SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         advance_surface_ctf_histories_with_outside_temperature_override,
-        append_surface_incident_solar_radiation_series, build_execution_plan,
+        append_surface_incident_solar_radiation_series,
+        apply_energyplus_adaptive_system_timestep_zone_air_correction, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
         energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
@@ -12358,6 +12372,49 @@ DATA PERIODS
         Ok(())
     }
 
+    #[test]
+    fn single_system_timestep_syncs_adaptive_history() -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let zone = &mut state.zones[0];
+        zone.mean_air_temperature_c = 20.1;
+        zone.air_humidity_ratio = 0.004;
+        zone.previous_mean_air_temperatures_c = [20.0, 19.0, 18.0];
+        zone.previous_air_humidity_ratios = [0.003, 0.002, 0.001];
+        zone.previous_system_mean_air_temperatures_c = [9.0, 8.0, 7.0];
+        zone.previous_system_air_humidity_ratios = [0.009, 0.008, 0.007];
+        zone.previous_system_timestep_count = 4;
+
+        apply_energyplus_adaptive_system_timestep_zone_air_correction(
+            &state.surfaces,
+            &mut state.zones,
+            900.0,
+            None,
+            20.0,
+            false,
+        );
+
+        let zone = &state.zones[0];
+        assert_eq!(zone.previous_system_timestep_count, 1);
+        assert_eq!(
+            zone.previous_system_mean_air_temperatures_c,
+            [zone.mean_air_temperature_c, 20.0, 19.0]
+        );
+        assert_eq!(
+            zone.previous_system_air_humidity_ratios,
+            [zone.air_humidity_ratio, 0.003, 0.002]
+        );
+        assert_eq!(
+            zone.zone_timestep_average_air_temperature_c,
+            zone.mean_air_temperature_c
+        );
+        assert_eq!(
+            zone.zone_timestep_average_air_humidity_ratio,
+            zone.air_humidity_ratio
+        );
+
+        Ok(())
+    }
     #[test]
     fn heat_balance_state_shell_initializes_cube_metrics() -> Result<(), Box<dyn std::error::Error>>
     {
