@@ -51,6 +51,10 @@ proof_variables = [
   "Surface Outside Face Outdoor Air Wind Direction",
   "Surface Inside Face Convection Heat Transfer Coefficient",
   "Surface Outside Face Convection Heat Transfer Coefficient",
+  "Surface Outside Face Convection Heat Gain Rate",
+  "Surface Outside Face Convection Heat Gain Rate per Area",
+  "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
+  "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
   "Surface Inside Face Convection Heat Gain Rate",
   "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
   "Surface Inside Face Conduction Heat Transfer Rate",
@@ -73,7 +77,7 @@ proof_variables = [
   "Zone Air Heat Balance Air Energy Storage Rate",
 ]
 claim_level = "limited-official-dynamic-conformance"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including wetbulb/rain-status/sky/horizontal-infrared weather alignment, roof surface-local outdoor-air drybulb/wetbulb/wind rows, named roof/wall/floor conduction per-area rows, declared inside convection/radiation source rows, declared inside/outside convection coefficient rows under surface-coefficient-state tolerance, named wall/roof incident total and beam solar per-area rows under surface-solar-flux-state tolerance, exact-zero named wall/roof sky and ground diffuse incident solar rows, named wall/roof absorbed solar heat gain rate rows under surface-solar-rate-state tolerance, the roof absorbed solar heat gain per-area row under surface-solar-flux-state tolerance, zone opaque conduction aggregate rows including outside-face gain/loss aggregates, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage/solar-rate/solar-flux/coefficient tolerances; broad heat-balance compatibility, broad weather processor compatibility, other storage rows, absorbed/non-incident solar outside the declared rows, exterior radiation/convection heat gain rate rows, fenestration, and non-promoted probe lanes remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the compatibility-candidate lane, including wetbulb/rain-status/sky/horizontal-infrared weather alignment, roof surface-local outdoor-air drybulb/wetbulb/wind rows, named roof/wall/floor conduction per-area rows, declared inside convection/radiation source rows, declared inside/outside convection coefficient rows under surface-coefficient-state tolerance, declared wall/roof exterior convection/net-radiation heat-gain rate rows under surface-exterior-rate-state tolerance, roof exterior convection/net-radiation per-area rows under surface-exterior-flux-state tolerance, named wall/roof incident total and beam solar per-area rows under surface-solar-flux-state tolerance, exact-zero named wall/roof sky and ground diffuse incident solar rows, named wall/roof absorbed solar heat gain rate rows under surface-solar-rate-state tolerance, the roof absorbed solar heat gain per-area row under surface-solar-flux-state tolerance, zone opaque conduction aggregate rows including outside-face gain/loss aggregates, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage/solar-rate/solar-flux/exterior-rate/exterior-flux/coefficient tolerances; broad heat-balance compatibility, broad weather processor compatibility, other storage rows, exterior source rows outside the declared wall/roof and roof per-area rows, absorbed/non-incident solar outside the declared rows, fenestration, and non-promoted probe lanes remain outside the claim."
 
 [[algorithm]]
 id = "surface_inside_temperature"

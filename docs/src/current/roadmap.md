@@ -54,9 +54,8 @@ heat-balance compatibility candidate for the IDFs used through v0.26 evidence:
 `heat_balance_nomass_001`, `surface_temperature_nomass_001`,
 `internal_gains_001`, and the official `1ZoneUncontrolled` ExampleFile tracker.
 The v0.33 compatibility-candidate gate now passes for the declared weather,
-zone-air, surface-temperature, and surface-conduction variables. Broader
-ExampleFiles dynamic compatibility remains future work because floor storage,
-exterior source decomposition, HVAC, plant, fenestration, and full warmup
+zone-air, surface-temperature, surface-conduction, and declared exterior source variables. Broader
+ExampleFiles dynamic compatibility remains future work because floor storage fixed-point generality, exterior source rows outside the declared wall/roof rate and roof per-area rows, HVAC, plant, fenestration, and full warmup
 convergence semantics are still outside the promoted claim. The planning
 inventory command `scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the
 IDF-backed case list and remaining dynamic gaps explicit while that runtime

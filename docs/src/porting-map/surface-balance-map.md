@@ -43,9 +43,7 @@ Official ExampleFile surface balances now also promote the named
 `1ZoneUncontrolled` roof, wall, and floor inside/outside face-temperature plus
 selected inside/outside conduction deltas in the compatibility-candidate
 report. The floor `Surface Heat Storage Rate` and `Surface Heat Storage Rate
-per Area` rows are promoted under dedicated storage tolerances; radiation,
-solar, convection coefficient, and broader decomposition rows remain
-diagnostic-only.
+per Area` rows are promoted under dedicated storage tolerances; declared wall/roof exterior convection/net-radiation source rows, roof exterior convection/net-radiation per-area rows, solar, convection coefficient, and floor storage rows now have narrow candidate coverage; broader decomposition rows remain diagnostic-only.
 Construction layer stacks are preserved for future native CTF work; the
 candidate uses EIO-seeded CTF coefficients to keep coefficient mismatch outside
 the promoted claim.
@@ -114,7 +112,7 @@ adiabatic or interzone outside states with the current inside face.
 
 As of the 2026-06-20 adaptive storage-report fix, the separate declared
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate now passes
-with `conformance_claim=true` for its 104 promoted rows. Broad dynamic
+with `conformance_claim=true` for its 116 promoted rows. Broad dynamic
 conformance is still not claimable: the diagnostic-only boundary remains
 `conformance_claim=false`, but the old roof exterior reference-air blocker is
 largely resolved: roof outside-face temperature max absolute delta dropped from
@@ -123,5 +121,4 @@ largely resolved: roof outside-face temperature max absolute delta dropped from
 radiation heat-gain from `25.044153522467 W` to `1.242262187458 W`. The next
 active target is `outside-ctf-history-handoff`: floor storage is now
 `0.663522464624 W` max absolute delta and the diagnostic names
-`outside-history-total` as the dominant source at sample `1156`. Roof solar
-radiation heat-gain remains a separate `2.429489654271 W` max residual.
+`outside-history-total` as the dominant source at sample `1156`. The roof solar radiation heat-gain `2.429489654271 W` max residual and the wall/roof exterior convection/net-radiation residuals are now covered only inside the declared exterior/solar tolerances; they remain broad-diagnostic residuals outside that named candidate boundary.

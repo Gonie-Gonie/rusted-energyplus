@@ -81,7 +81,7 @@ variable set, all-EIO CTF seed, EnergyPlus initial CTF histories, 20-day
 minimum warmup, and 20 surface iterations. That candidate now carries
 `conformance_claim = true` with a blocking gate for the promoted weather,
 zone-air, surface-temperature, surface-conduction, and declared floor
-surface-heat-storage outputs while leaving broad decomposition rows
+surface-heat-storage and declared wall/roof exterior convection/net-radiation outputs while leaving broad decomposition rows
 diagnostic-only.
 Heat-balance diagnostic and conformance report writers also emit a compact
 `compare-digest.json` next to the full `compare-summary.json` and
@@ -102,12 +102,12 @@ warmup fixed point can be inspected without opening the full JSON:
 
 As of the 2026-06-20 adaptive system-timestep storage-report and weather-boundary promotion fixes, the promoted
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate passes with
-`status = pass`, `conformance_claim = true`, 104 declared conformance series, and
+`status = pass`, `conformance_claim = true`, 116 declared conformance series, and
 20 EnergyPlus/Rust warmup days. The previously blocking `ZONE ONE` `Zone Air
 Heat Balance Air Energy Storage Rate` max absolute delta dropped from
 `0.533385790012 W` to `0.182078359183 W` against the `0.5 W` zone-state
 max-absolute tolerance; RMSE is `0.023340057930 W` against the `0.1 W`
-zone-state RMSE tolerance. The newly promoted weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. This supports only the declared limited claim above.
+zone-state RMSE tolerance. The newly promoted weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. The newly promoted exterior source rows are the named wall/roof outside convection and net thermal radiation heat-gain rates plus the roof per-area versions; the broad diagnostic still keeps other decomposition rows outside the claim. This supports only the declared limited claim above.
 It still cannot support a broad or "complete" EnergyPlus conformance statement
 because the broad diagnostic boundary remains diagnostic-only and still shows:
 
@@ -116,6 +116,7 @@ because the broad diagnostic boundary remains diagnostic-only and still shows:
   `0.000009907934 C`, and wind speed/direction remain exact against the oracle.
 - `ZN001:ROOF001` outside face temperature max absolute delta fell from
   `0.019893003133 C` to `0.000944839218 C`.
+- The newly promoted exterior source rows now fit dedicated exterior tolerances: named wall/roof outside convection/net-radiation total-rate rows are under `2.5 W` max absolute and `0.6 W` RMSE, and roof exterior per-area rows are under `0.011 W/m2` max absolute and `0.002 W/m2` RMSE. the promoted exterior set tops out at `1.893813807998 W` max absolute delta and `0.579970374604 W` RMSE, so it is claimable only under the dedicated exterior-rate tolerance, not as a broad exact-parity statement.
 - `ZN001:ROOF001` outside convection heat-gain max absolute delta fell from
   `25.397397824985 W` to `1.902520148418 W`; outside net thermal radiation
   heat-gain fell from `25.044153522467 W` to `1.242262187458 W`.

@@ -733,6 +733,10 @@ pub enum VariableClass {
     SurfaceSolarFluxState,
     /// Surface-level absorbed solar heat-gain rate variables with separate tolerance policy.
     SurfaceSolarRateState,
+    /// Surface-level exterior environmental heat-gain rate variables with separate tolerance policy.
+    SurfaceExteriorRateState,
+    /// Surface-level exterior environmental heat-gain flux variables with separate tolerance policy.
+    SurfaceExteriorFluxState,
     /// Zone-level opaque surface aggregate variables with separate tolerance policy.
     SurfaceAggregateState,
     /// Surface-level heat storage variables with separate tolerance policy.

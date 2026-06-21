@@ -900,8 +900,39 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof outside convection coefficient rows only under surface-coefficient-state tolerance; outside convection heat-gain rate rows, wet-surface branch generality, and other cases remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof outside convection coefficient rows only under surface-coefficient-state tolerance; exterior convection heat-gain rate rows are claimed only for declared wall/roof rate rows and the roof per-area row under dedicated exterior tolerances; wet-surface branch generality and other cases remain outside the claim."
 
+[[variable]]
+name = "Surface Outside Face Convection Heat Gain Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exterior convection heat-gain rate rows only under surface-exterior-rate-state tolerance; floor/non-declared surfaces, broad wet-surface branch generality, and other cases remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Convection Heat Gain Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof exterior convection heat-gain per-area row only under surface-exterior-flux-state tolerance; wall per-area rows, floor/non-declared surfaces, broad wet-surface branch generality, and other cases remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic named wall/roof exterior net thermal radiation heat-gain rate rows only under surface-exterior-rate-state tolerance; floor/non-declared surfaces, broad exterior longwave generality, and other cases remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+domain = "surface"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof exterior net thermal radiation heat-gain per-area row only under surface-exterior-flux-state tolerance; wall per-area rows, floor/non-declared surfaces, broad exterior longwave generality, and other cases remain outside the claim."
 [[variable]]
 name = "Surface Inside Face Convection Heat Gain Rate"
 domain = "surface"

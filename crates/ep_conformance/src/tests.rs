@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 104);
+    assert_eq!(manifest.outputs.len(), 116);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        104
+        116
     );
     assert_eq!(
         manifest
@@ -706,6 +706,31 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             && output.level == Some(OutputLevel::Conformance)
     }));
     assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:WALL001"
+            && output.variable == "Surface Outside Face Convection Heat Gain Rate"
+            && output.class == VariableClass::SurfaceExteriorRateState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+            && output.class == VariableClass::SurfaceExteriorRateState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable == "Surface Outside Face Convection Heat Gain Rate per Area"
+            && output.class == VariableClass::SurfaceExteriorFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZN001:ROOF001"
+            && output.variable
+                == "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+            && output.class == VariableClass::SurfaceExteriorFluxState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:FLR001"
             && output.variable == "Surface Inside Face Convection Heat Gain Rate"
             && output.class == VariableClass::SurfaceState
@@ -801,6 +826,16 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         tolerance.variable_class == VariableClass::SurfaceSolarRateState
             && tolerance.max_abs == Some(2.5)
             && tolerance.max_rmse == Some(0.5)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceExteriorRateState
+            && tolerance.max_abs == Some(2.5)
+            && tolerance.max_rmse == Some(0.6)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceExteriorFluxState
+            && tolerance.max_abs == Some(0.011)
+            && tolerance.max_rmse == Some(0.002)
     }));
     assert!(manifest.tolerances.iter().any(|tolerance| {
         tolerance.variable_class == VariableClass::SurfaceAggregateState

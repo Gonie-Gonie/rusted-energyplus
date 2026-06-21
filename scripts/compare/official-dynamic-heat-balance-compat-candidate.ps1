@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 104) {
-    throw "Expected 104 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 116) {
+    throw "Expected 116 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -327,6 +327,50 @@ foreach ($series in $surfaceCoefficientSeries) {
         throw "Surface convection coefficient rmse_delta_c exceeds 0.001 W/m2-K for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
     }
 }
+$exteriorSourceVariables = @(
+    "Surface Outside Face Convection Heat Gain Rate",
+    "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+)
+$exteriorSourceFluxVariables = @(
+    "Surface Outside Face Convection Heat Gain Rate per Area",
+    "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
+)
+$surfaceExteriorRateSeries = @($summary.series | Where-Object {
+        $wallRoofSurfaceKeys -contains $_.output.key `
+            -and $exteriorSourceVariables -contains $_.output.variable `
+            -and $_.output.class -eq "surface-exterior-rate-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($surfaceExteriorRateSeries.Count -ne 10) {
+    throw "Expected 10 wall/roof exterior convection/radiation rate conformance series, got $($surfaceExteriorRateSeries.Count)"
+}
+foreach ($series in $surfaceExteriorRateSeries) {
+    if ([double]$series.max_abs_delta_c -gt 2.5) {
+        throw "Exterior convection/radiation rate max_abs_delta_c exceeds 2.5 W for $($series.output.key) / $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.6) {
+        throw "Exterior convection/radiation rate rmse_delta_c exceeds 0.6 W for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
+$surfaceExteriorFluxSeries = @($summary.series | Where-Object {
+        $_.output.key -eq "ZN001:ROOF001" `
+            -and $exteriorSourceFluxVariables -contains $_.output.variable `
+            -and $_.output.class -eq "surface-exterior-flux-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($surfaceExteriorFluxSeries.Count -ne 2) {
+    throw "Expected two roof exterior convection/radiation per-area conformance series, got $($surfaceExteriorFluxSeries.Count)"
+}
+foreach ($series in $surfaceExteriorFluxSeries) {
+    if ([double]$series.max_abs_delta_c -gt 0.011) {
+        throw "Roof exterior convection/radiation per-area max_abs_delta_c exceeds 0.011 W/m2 for $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.002) {
+        throw "Roof exterior convection/radiation per-area rmse_delta_c exceeds 0.002 W/m2 for $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
 $insideSourceVariables = @(
     "Surface Inside Face Convection Heat Gain Rate",
     "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
@@ -402,6 +446,10 @@ Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "absorbed solar heat gain per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "inside convection coefficient conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside convection coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate / hourly / surface-exterior-rate-state / eso / conformance" -Description "outside convection heat-gain rate conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate / hourly / surface-exterior-rate-state / eso / conformance" -Description "outside net thermal radiation heat-gain rate conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate per Area / hourly / surface-exterior-flux-state / eso / conformance" -Description "outside convection heat-gain per-area conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area / hourly / surface-exterior-flux-state / eso / conformance" -Description "outside net thermal radiation heat-gain per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside convection source conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside radiation source conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "incident sky diffuse conformance output"
