@@ -791,6 +791,54 @@ first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic rain-status alignment for the declared Environment row only; broad precipitation, wet-surface convection, and weather processor compatibility remain outside the claim."
 
 [[variable]]
+name = "Site Sky Temperature"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic sky-temperature weather alignment for the declared Environment row only; broad exterior longwave, weather processor, and wet-surface branch compatibility remain outside the claim."
+
+[[variable]]
+name = "Site Horizontal Infrared Radiation Rate per Area"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic horizontal-infrared weather alignment for the declared Environment row only; broad exterior longwave and weather processor compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Outdoor Air Drybulb Temperature"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof surface-local outdoor-air dry-bulb row only; broad terrain, weather processor, and wet-surface branch compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Outdoor Air Wetbulb Temperature"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof surface-local outdoor-air wet-bulb row only; broad psychrometric preprocessing, weather processor, and wet-surface branch compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Outdoor Air Wind Speed"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof surface-local outdoor-air wind-speed row only; broad terrain, exterior convection, and weather processor compatibility remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Outdoor Air Wind Direction"
+domain = "weather"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic roof surface-local outdoor-air wind-direction row only; broad terrain, exterior convection, and weather processor compatibility remain outside the claim."
+
+[[variable]]
 name = "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area"
 domain = "surface"
 status = "conformance"

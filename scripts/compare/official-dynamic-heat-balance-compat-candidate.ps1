@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 98) {
-    throw "Expected 98 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 104) {
+    throw "Expected 104 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -171,6 +171,18 @@ if ([double]$wetbulbSeries.max_abs_delta_c -gt 0.00001) {
 if ([double]$wetbulbSeries.rmse_delta_c -gt 0.00001) {
     throw "Weather wet-bulb rmse_delta_c exceeds 1e-5 C: $($wetbulbSeries.rmse_delta_c)"
 }
+foreach ($weatherVariable in @("Site Sky Temperature", "Site Horizontal Infrared Radiation Rate per Area")) {
+    $weatherSeries = $summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq $weatherVariable -and $_.output.class -eq "weather" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+    if (-not $weatherSeries) {
+        throw "Weather conformance series missing: $weatherVariable"
+    }
+    if ([double]$weatherSeries.max_abs_delta_c -gt 0.00001) {
+        throw "Weather max_abs_delta_c exceeds 1e-5 for ${weatherVariable}: $($weatherSeries.max_abs_delta_c)"
+    }
+    if ([double]$weatherSeries.rmse_delta_c -gt 0.00001) {
+        throw "Weather rmse_delta_c exceeds 1e-5 for ${weatherVariable}: $($weatherSeries.rmse_delta_c)"
+    }
+}
 $rainSeries = $summary.series | Where-Object { $_.output.key -eq "Environment" -and $_.output.variable -eq "Site Rain Status" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
 if (-not $rainSeries) {
     throw "Weather rain-status conformance series missing"
@@ -180,6 +192,23 @@ if ([double]$rainSeries.max_abs_delta_c -gt 0.000001) {
 }
 if ([double]$rainSeries.rmse_delta_c -gt 0.000001) {
     throw "Weather rain-status rmse_delta_c exceeds 1e-6: $($rainSeries.rmse_delta_c)"
+}
+foreach ($surfaceWeatherVariable in @(
+    "Surface Outside Face Outdoor Air Drybulb Temperature",
+    "Surface Outside Face Outdoor Air Wetbulb Temperature",
+    "Surface Outside Face Outdoor Air Wind Speed",
+    "Surface Outside Face Outdoor Air Wind Direction"
+)) {
+    $surfaceWeatherSeries = $summary.series | Where-Object { $_.output.key -eq "ZN001:ROOF001" -and $_.output.variable -eq $surfaceWeatherVariable -and $_.output.class -eq "weather" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+    if (-not $surfaceWeatherSeries) {
+        throw "Roof surface-local weather conformance series missing: $surfaceWeatherVariable"
+    }
+    if ([double]$surfaceWeatherSeries.max_abs_delta_c -gt 0.00001) {
+        throw "Roof surface-local weather max_abs_delta_c exceeds 1e-5 for ${surfaceWeatherVariable}: $($surfaceWeatherSeries.max_abs_delta_c)"
+    }
+    if ([double]$surfaceWeatherSeries.rmse_delta_c -gt 0.00001) {
+        throw "Roof surface-local weather rmse_delta_c exceeds 1e-5 for ${surfaceWeatherVariable}: $($surfaceWeatherSeries.rmse_delta_c)"
+    }
 }
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZONE ONE" -and $_.output.variable -eq "Zone Mean Air Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Zone Mean Air Temperature conformance series missing"
@@ -360,6 +389,12 @@ Assert-Contains -Text $reportText -Pattern "conformance_claim: true" -Descriptio
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature / hourly / weather / eso / conformance" -Description "wet-bulb weather conformance output"
 Assert-Contains -Text $reportText -Pattern "Site Rain Status / hourly / weather / eso / conformance" -Description "rain-status weather conformance output"
+Assert-Contains -Text $reportText -Pattern "Site Sky Temperature / hourly / weather / eso / conformance" -Description "sky temperature weather conformance output"
+Assert-Contains -Text $reportText -Pattern "Site Horizontal Infrared Radiation Rate per Area / hourly / weather / eso / conformance" -Description "horizontal infrared weather conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Drybulb Temperature / hourly / weather / eso / conformance" -Description "roof local dry-bulb conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Wetbulb Temperature / hourly / weather / eso / conformance" -Description "roof local wet-bulb conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Wind Speed / hourly / weather / eso / conformance" -Description "roof local wind-speed conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Wind Direction / hourly / weather / eso / conformance" -Description "roof local wind-direction conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Conduction Heat Transfer Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "surface conduction per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "incident total solar conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Beam Solar Radiation Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "incident beam solar conformance output"

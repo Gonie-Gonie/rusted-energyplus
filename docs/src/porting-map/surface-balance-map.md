@@ -114,7 +114,7 @@ adiabatic or interzone outside states with the current inside face.
 
 As of the 2026-06-20 adaptive storage-report fix, the separate declared
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate now passes
-with `conformance_claim=true` for its 98 promoted rows. Broad dynamic
+with `conformance_claim=true` for its 104 promoted rows. Broad dynamic
 conformance is still not claimable: the diagnostic-only boundary remains
 `conformance_claim=false`, but the old roof exterior reference-air blocker is
 largely resolved: roof outside-face temperature max absolute delta dropped from
