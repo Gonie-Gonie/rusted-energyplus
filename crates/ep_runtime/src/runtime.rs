@@ -876,6 +876,21 @@ pub struct HeatBalanceSurfaceIterationFirstSampleTrace {
     pub max_delta_surface_name: Option<String>,
 }
 
+/// One inside-surface iteration sample captured after a zone timestep.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceSurfaceIterationSampleTrace {
+    /// Zero-based hourly output sample index.
+    pub sample_index: usize,
+    /// One-based zone timestep within the hourly sample.
+    pub timestep_index: u32,
+    /// Number of inside-surface heat-balance iterations executed in this timestep.
+    pub inside_surface_iteration_count: u32,
+    /// Final max inside-surface temperature change in C.
+    pub max_inside_surface_delta_c: f64,
+    /// Surface that controlled the final max inside-surface temperature change.
+    pub max_delta_surface_name: Option<String>,
+}
+
 /// Per-zone zone-air state captured at a diagnostic boundary.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeatBalanceZoneAirStateSample {
@@ -1706,6 +1721,8 @@ pub struct HeatBalanceSimulationSummary {
     pub zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
     /// Per-timestep inside-surface iteration summary for the first reported hourly sample.
     pub surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
+    /// Per-timestep inside-surface iteration summary for every reported hourly sample.
+    pub surface_iteration_sample_trace: Vec<HeatBalanceSurfaceIterationSampleTrace>,
 }
 
 /// Result of the heat-balance zone-air diagnostic trace.
@@ -4862,6 +4879,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut surface_first_sample_trace = Vec::new();
     let mut zone_air_first_sample_trace = Vec::new();
     let mut surface_iteration_first_sample_trace = Vec::new();
+    let mut surface_iteration_sample_trace = Vec::new();
     let report_zone_air_algorithm =
         heat_balance_zone_air_algorithm_execution_variant(options.zone_air_algorithm);
     let use_surface_reference_air_zone_convection_report =
@@ -5136,6 +5154,15 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             }
             inside_surface_iteration_count_sum +=
                 f64::from(state.last_inside_surface_iteration_count);
+            surface_iteration_sample_trace.push(HeatBalanceSurfaceIterationSampleTrace {
+                sample_index: hour_index,
+                timestep_index: substep,
+                inside_surface_iteration_count: state.last_inside_surface_iteration_count,
+                max_inside_surface_delta_c: state.last_inside_surface_iteration_max_delta_c,
+                max_delta_surface_name: state
+                    .last_inside_surface_iteration_max_delta_surface_name
+                    .clone(),
+            });
             if hour_index == 0 {
                 surface_iteration_first_sample_trace.push(
                     HeatBalanceSurfaceIterationFirstSampleTrace {
@@ -6395,6 +6422,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         surface_first_sample_trace,
         zone_air_first_sample_trace,
         surface_iteration_first_sample_trace,
+        surface_iteration_sample_trace,
     };
 
     Ok(HeatBalanceSimulation {

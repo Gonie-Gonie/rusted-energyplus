@@ -349,6 +349,7 @@ Assert-FileExists -Path $zoneAirDebugPath -Description "official dynamic Rust zo
 $digestText = Get-Content -LiteralPath $digestPath -Raw
 Assert-NotContains -Text $digestText -Pattern '"sample_rows"' -Description "compact digest sample row payload"
 Assert-Contains -Text $digestText -Pattern '"compatibility_stages"' -Description "compact digest compatibility stage order"
+Assert-Contains -Text $digestText -Pattern '"surface_iteration_max_sample_trace"' -Description "compact digest surface-iteration max-sample trace"
 Assert-Contains -Text $digestText -Pattern '"source_routine": "UpdateThermalHistories"' -Description "compact digest UpdateThermalHistories stage"
 Assert-Contains -Text $digestText -Pattern '"zone_air_coefficient_deltas"' -Description "compact digest zone-air coefficient diagnostics"
 Assert-Contains -Text $digestText -Pattern '"zone_air_surface_convection_closure_deltas"' -Description "compact digest zone-air surface convection closure diagnostics"
@@ -1261,6 +1262,7 @@ Assert-Contains -Text $reportText -Pattern "warmup_day" -Description "markdown w
 Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
 Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
 Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"
+Assert-Contains -Text $reportText -Pattern "## Rust Surface Iteration Max-Sample Trace" -Description "markdown surface iteration max-sample trace section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
 Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
 Assert-Contains -Text $reportText -Pattern "## Zone-Air Coefficient Deltas" -Description "markdown zone-air coefficient delta section"

@@ -286,4 +286,14 @@ floor storage/inside/outside conduction remain `28.786920`/`16.729618`/
 zone-state fields after the current active solver path; continue on the
 surface/source/history values feeding those report terms.
 `official_1zone_uncontrolled_dynamic_diagnostic_001` is the current failing
-diagnostic gate for that promotion path.
+diagnostic gate for that promotion path. The diagnostic now records a compact
+surface-iteration max-sample trace for the active CTF storage blocker. In the
+current compatibility-candidate lane the top floor blocker occurs at sample
+`1156`, where the four Rust zone timesteps execute `4/3/3/4` inside-surface
+iterations and the third timestep stops at `0.001999119 C`, just below
+EnergyPlus' `0.002 C` cutoff. A one-off experiment tightening the cutoff to
+`0.001999 C` moved the blocker to sample `5494` and worsened floor storage max
+absolute delta to about `1.041780 W`, so the next promotion step should not be a
+blanket stricter convergence tolerance. The remaining target is the face
+source/history handoff that leaves the floor face temperatures about
+`0.0007 C` low and then amplifies through the FLOOR CTF coefficients.

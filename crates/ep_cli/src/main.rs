@@ -36,8 +36,9 @@ use ep_runtime::{
     HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
-    HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupDayEndZoneAirStateSample,
-    HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirFirstSampleTrace,
+    HeatBalanceSurfaceIterationSampleTrace, HeatBalanceSurfaceLoopZoneAirCorrection,
+    HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupSummary,
+    HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirFirstSampleTrace,
     HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
     HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
     PlantStateProjection, PlantStateProjectionOptions, RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
@@ -3820,6 +3821,7 @@ struct HeatBalanceConformanceDiagnostic {
     zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
     surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     surface_iteration_first_sample_trace: Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
+    surface_iteration_max_sample_trace: Vec<HeatBalanceSurfaceIterationSampleTrace>,
     rust_zone_air_debug_series: Vec<HeatBalanceRustDebugSeries>,
     rust_outside_balance_debug_series: Vec<HeatBalanceRustDebugSeries>,
     series: Vec<HeatBalanceSeriesDiagnostic>,
@@ -4711,6 +4713,10 @@ fn build_heat_balance_conformance_diagnostic(
         &series,
         &simulation.summary.hourly_ctf_history_slots,
     );
+    let surface_iteration_max_sample_trace = heat_balance_surface_iteration_max_sample_trace(
+        &simulation.summary.surface_iteration_sample_trace,
+        &ctf_storage_max_sample_deltas,
+    );
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
@@ -4760,6 +4766,7 @@ fn build_heat_balance_conformance_diagnostic(
         surface_iteration_first_sample_trace: simulation
             .summary
             .surface_iteration_first_sample_trace,
+        surface_iteration_max_sample_trace,
         rust_zone_air_debug_series: heat_balance_zone_air_debug_series(&simulation.results),
         rust_outside_balance_debug_series: heat_balance_outside_balance_debug_series(
             &simulation.results,
@@ -5789,6 +5796,18 @@ fn heat_balance_ctf_history_series_deltas(
         .collect()
 }
 
+fn heat_balance_surface_iteration_max_sample_trace(
+    rows: &[HeatBalanceSurfaceIterationSampleTrace],
+    storage_deltas: &[HeatBalanceCtfStorageMaxSampleDelta],
+) -> Vec<HeatBalanceSurfaceIterationSampleTrace> {
+    let Some(sample_index) = storage_deltas.first().map(|row| row.sample_index) else {
+        return Vec::new();
+    };
+    rows.iter()
+        .filter(|row| row.sample_index == sample_index)
+        .cloned()
+        .collect()
+}
 fn heat_balance_ctf_storage_max_sample_deltas(
     model: &SimulationModel,
     series: &[HeatBalanceSeriesDiagnostic],
@@ -9551,6 +9570,12 @@ fn render_heat_balance_conformance_json(
         )
     ));
     json.push_str(&format!(
+        "  \"surface_iteration_max_sample_trace\": {},\n",
+        heat_balance_surface_iteration_sample_trace_json(
+            &diagnostic.surface_iteration_max_sample_trace
+        )
+    ));
+    json.push_str(&format!(
         "  \"ctf_component_first_samples\": {},\n",
         heat_balance_ctf_component_first_samples_json(&diagnostic.ctf_component_first_samples)
     ));
@@ -9882,6 +9907,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_surface_iteration_first_sample_trace_rows(
         &mut report,
         &diagnostic.surface_iteration_first_sample_trace,
+    );
+    report.push('\n');
+
+    report.push_str("## Rust Surface Iteration Max-Sample Trace\n\n");
+    heat_balance_report_surface_iteration_sample_trace_rows(
+        &mut report,
+        &diagnostic.surface_iteration_max_sample_trace,
     );
     report.push('\n');
 
@@ -10646,6 +10678,35 @@ fn heat_balance_compatibility_stages_json(rows: &[EnergyPlusCompatibilityStage])
     json
 }
 
+fn heat_balance_surface_iteration_sample_trace_json(
+    rows: &[HeatBalanceSurfaceIterationSampleTrace],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"sample_index\": {}, ",
+                "\"timestep_index\": {}, ",
+                "\"inside_surface_iteration_count\": {}, ",
+                "\"max_inside_surface_delta_c\": {}, ",
+                "\"max_delta_surface_name\": {} }}"
+            ),
+            row.sample_index,
+            row.timestep_index,
+            row.inside_surface_iteration_count,
+            json_number(row.max_inside_surface_delta_c),
+            row.max_delta_surface_name
+                .as_deref()
+                .map(json_string)
+                .unwrap_or_else(|| "null".to_string())
+        ));
+    }
+    json.push(']');
+    json
+}
 fn heat_balance_surface_iteration_first_sample_trace_json(
     rows: &[HeatBalanceSurfaceIterationFirstSampleTrace],
 ) -> String {
@@ -11859,6 +11920,25 @@ fn heat_balance_report_zone_air_warmup_day_end_trace_rows(
     }
 }
 
+fn heat_balance_report_surface_iteration_sample_trace_rows(
+    report: &mut String,
+    rows: &[HeatBalanceSurfaceIterationSampleTrace],
+) {
+    report.push_str(
+        "| sample | timestep | inside_surface_iterations | final_max_delta_c | controlling_surface |\n",
+    );
+    report.push_str("|---:|---:|---:|---:|---|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {} |\n",
+            row.sample_index,
+            row.timestep_index,
+            row.inside_surface_iteration_count,
+            row.max_inside_surface_delta_c,
+            markdown_cell(row.max_delta_surface_name.as_deref().unwrap_or(""))
+        ));
+    }
+}
 fn heat_balance_report_surface_iteration_first_sample_trace_rows(
     report: &mut String,
     rows: &[HeatBalanceSurfaceIterationFirstSampleTrace],
@@ -14386,6 +14466,7 @@ mod tests {
                 outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
                 outside_solar_radiation_heat_gain_rate_w: 5.0,
             }],
+            surface_iteration_max_sample_trace: vec![],
             surface_iteration_first_sample_trace: vec![
                 super::HeatBalanceSurfaceIterationFirstSampleTrace {
                     timestep_index: 1,
@@ -14501,6 +14582,7 @@ mod tests {
         assert!(json.contains("\"zone_air_first_sample_trace\""));
         assert!(json.contains("\"third_order_solution_temperature_c\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
+        assert!(json.contains("\"surface_iteration_max_sample_trace\""));
         assert!(json.contains("\"outside_face_temperature_c\": 11.000000000000"));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"inside_current_outside_term_w\""));
@@ -14590,6 +14672,7 @@ mod tests {
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
+        assert!(digest.contains("\"surface_iteration_max_sample_trace\""));
         assert!(digest.contains("\"outdoor_dry_bulb_c\": 10.000000000000"));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"inside_current_outside_term_w\""));
@@ -15203,6 +15286,7 @@ mod tests {
                 outside_net_thermal_radiation_heat_gain_rate_w: -4.0,
                 outside_solar_radiation_heat_gain_rate_w: 5.0,
             }],
+            surface_iteration_max_sample_trace: vec![],
             surface_iteration_first_sample_trace: vec![
                 super::HeatBalanceSurfaceIterationFirstSampleTrace {
                     timestep_index: 1,
@@ -15311,6 +15395,7 @@ mod tests {
         assert!(json.contains("\"zone_air_first_sample_trace\""));
         assert!(json.contains("\"third_order_solution_temperature_c\""));
         assert!(json.contains("\"surface_first_sample_trace\""));
+        assert!(json.contains("\"surface_iteration_max_sample_trace\""));
         assert!(json.contains("\"ctf_component_first_samples\""));
         assert!(json.contains("\"zone_air_coefficient_deltas\""));
         assert!(json.contains("\"first_divergence_source\": \"TempDepCoef\""));
@@ -15392,6 +15477,7 @@ mod tests {
         assert!(digest.contains("\"max_sample_contexts\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
+        assert!(digest.contains("\"surface_iteration_max_sample_trace\""));
         assert!(digest.contains("\"ctf_component_first_samples\""));
         assert!(digest.contains("\"zone_air_coefficient_deltas\""));
         assert!(digest.contains("\"first_divergence_source\": \"TempDepCoef\""));
