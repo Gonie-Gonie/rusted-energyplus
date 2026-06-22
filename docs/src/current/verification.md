@@ -108,6 +108,19 @@ Heat Balance Air Energy Storage Rate` max absolute delta dropped from
 `0.533385790012 W` to `0.182078359183 W` against the `0.5 W` zone-state
 max-absolute tolerance; RMSE is `0.023340057930 W` against the `0.1 W`
 zone-state RMSE tolerance. The newly promoted weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. The newly promoted exterior source rows are the named wall/roof outside convection and net thermal radiation heat-gain rates plus the roof per-area versions; the broad diagnostic still keeps other decomposition rows outside the claim. This supports only the declared limited claim above.
+The 2026-06-21 current broad-diagnostic rerun confirms that this is not yet a
+complete conformance claim: the compatibility-candidate diagnostic still has
+`status = fail`, `conformance_claim = false`, 119 diagnostic series, and
+`active_blocker_summary = ZN001:FLR001/FLOOR sample=1156
+dominant=outside-history-total dominant_delta_w=9.527199725017
+storage_delta_w=0.663522464624`. Raising the same lane from 20 to 50 surface
+iterations produced identical floor storage/history deltas, so this is not an
+inside-surface iteration-count limit. Two adiabatic handoff probes were also
+rejected as fixes: the ScriptF-flat adiabatic-report probe regressed floor
+storage to `2195.200776475414 W`, and the adiabatic-history-commit probe
+regressed floor storage to `1454.593723095763 W`. The remaining blocker is a
+small surface/zone fixed-point temperature offset that is amplified by the mass
+floor CTF history coefficients, not a simple adiabatic outside-face sync switch.
 It still cannot support a broad or "complete" EnergyPlus conformance statement
 because the broad diagnostic boundary remains diagnostic-only and still shows:
 

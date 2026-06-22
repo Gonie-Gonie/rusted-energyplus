@@ -122,3 +122,12 @@ radiation heat-gain from `25.044153522467 W` to `1.242262187458 W`. The next
 active target is `outside-ctf-history-handoff`: floor storage is now
 `0.663522464624 W` max absolute delta and the diagnostic names
 `outside-history-total` as the dominant source at sample `1156`. The roof solar radiation heat-gain `2.429489654271 W` max residual and the wall/roof exterior convection/net-radiation residuals are now covered only inside the declared exterior/solar tolerances; they remain broad-diagnostic residuals outside that named candidate boundary.
+The 2026-06-21 claim audit reran that compatibility-candidate diagnostic and
+confirmed the same `outside-ctf-history-handoff` blocker. Increasing the surface
+iteration count from 20 to 50 did not change the floor history or storage
+deltas, while the existing adiabatic-report and adiabatic-history-commit probes
+made the floor storage residual much worse (`2195.200776475414 W` and
+`1454.593723095763 W`, respectively). Those probes therefore stay outside the
+promoted lane; the next implementation target is the small repeated-day
+surface/zone fixed-point temperature offset that the floor CTF history terms
+amplify into 8-10 W raw current/history-term deltas.
