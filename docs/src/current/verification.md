@@ -100,14 +100,14 @@ count series. The markdown report mirrors the first-sample and warmup day-end
 zone-air traces so the first four 15-minute substeps and the repeated-day
 warmup fixed point can be inspected without opening the full JSON:
 
-As of the 2026-06-20 adaptive system-timestep storage-report and weather-boundary promotion fixes, the promoted
+As of the 2026-06-22 humidity, adjacent-air, and outside-longwave coefficient promotion, the promoted
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate passes with
-`status = pass`, `conformance_claim = true`, 116 declared conformance series, and
+`status = pass`, `conformance_claim = true`, 126 declared conformance series, and
 20 EnergyPlus/Rust warmup days. The previously blocking `ZONE ONE` `Zone Air
 Heat Balance Air Energy Storage Rate` max absolute delta dropped from
 `0.533385790012 W` to `0.182078359183 W` against the `0.5 W` zone-state
 max-absolute tolerance; RMSE is `0.023340057930 W` against the `0.1 W`
-zone-state RMSE tolerance. The newly promoted weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. The newly promoted exterior source rows are the named wall/roof outside convection and net thermal radiation heat-gain rates plus the roof per-area versions; the broad diagnostic still keeps other decomposition rows outside the claim. This supports only the declared limited claim above.
+zone-state RMSE tolerance. The promoted set now also includes `Zone Mean Air Humidity Ratio` (max absolute delta `0.000000094494`), all six `Surface Inside Face Adjacent Air Temperature` rows (worst max absolute delta `0.000648652782 C`), and the roof outside longwave air/sky/ground split coefficient rows (sky coefficient max absolute delta `0.000023095019 W/m2-K`; air and ground split coefficients exact-zero). Weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. The promoted exterior source rows are the named wall/roof outside convection and net thermal radiation heat-gain rates plus the roof per-area versions; the broad diagnostic still keeps surface iteration-count parity and the remaining floor CTF history handoff outside the claim. This supports only the declared limited claim above.
 The 2026-06-21 current broad-diagnostic rerun confirms that this is not yet a
 complete conformance claim: the compatibility-candidate diagnostic still has
 `status = fail`, `conformance_claim = false`, 119 diagnostic series, and

@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 116);
+    assert_eq!(manifest.outputs.len(), 126);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        116
+        126
     );
     assert_eq!(
         manifest
@@ -621,6 +621,42 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             && output.class == VariableClass::ZoneState
             && output.level == Some(OutputLevel::Conformance)
     }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "ZONE ONE"
+            && output.variable == "Zone Mean Air Humidity Ratio"
+            && output.class == VariableClass::ZoneState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| {
+                output.variable == "Surface Inside Face Adjacent Air Temperature"
+                    && output.class == VariableClass::SurfaceState
+                    && output.level == Some(OutputLevel::Conformance)
+            })
+            .count(),
+        6
+    );
+    assert_eq!(
+        manifest
+            .outputs
+            .iter()
+            .filter(|output| {
+                output.key == "ZN001:ROOF001"
+                    && matches!(
+                        output.variable.as_str(),
+                        "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient"
+                            | "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
+                            | "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
+                    )
+                    && output.class == VariableClass::SurfaceCoefficientState
+                    && output.level == Some(OutputLevel::Conformance)
+            })
+            .count(),
+        3
+    );
     assert!(manifest.outputs.iter().any(|output| {
         output.key == "ZN001:FLR001"
             && output.variable == "Surface Heat Storage Rate"

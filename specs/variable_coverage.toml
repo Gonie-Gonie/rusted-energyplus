@@ -561,10 +561,42 @@ support_boundary = "Tolerance-gated for declared no-mass heat-balance cases and 
 [[variable]]
 name = "Zone Mean Air Humidity Ratio"
 domain = "heat_balance"
-status = "diagnostic"
-first_case = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-first_evidence = "official_1zone_uncontrolled_dynamic_diagnostic_001"
-support_boundary = "Diagnostic-only oracle/Rust humidity-ratio comparison for official 1ZoneUncontrolled heat-balance source isolation; not part of the promoted compatibility-candidate conformance claim."
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the declared official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad humidity-control or HVAC moisture-history conformance remains outside this heat-balance claim."
+
+[[variable]]
+name = "Surface Inside Face Adjacent Air Temperature"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the six declared official 1ZoneUncontrolled dynamic roof/wall/floor surface rows; broad warmup fixed-point closure and surface iteration-count parity remain outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the declared roof outside longwave air split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the declared roof outside longwave sky split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
+
+[[variable]]
+name = "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the declared roof outside longwave ground split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
 
 [[variable]]
 name = "OtherEquipment Internal Gains Nominal Equipment Level"

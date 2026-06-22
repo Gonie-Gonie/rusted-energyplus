@@ -7,7 +7,7 @@ conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
   "Expected status is pass for conformance-level variables in the compatibility-candidate lane.",
-  "This candidate gates the promotion variables, including wetbulb/rain-status/sky/horizontal-infrared weather alignment, roof surface-local outdoor-air drybulb/wetbulb/wind rows, exact-zero named wall/roof sky and ground diffuse incident solar rows, declared named wall/roof absorbed solar heat gain rate rows, the roof absorbed solar heat gain per-area row, declared inside convection/radiation source rows, declared inside/outside convection coefficient rows, declared wall/roof exterior convection/net-radiation heat-gain rate rows, roof exterior convection/net-radiation per-area rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated solar-rate, solar-flux, exterior-rate, exterior-flux, coefficient, and storage tolerances.",
+  "This candidate gates the promotion variables, including zone mean air humidity ratio, wetbulb/rain-status/sky/horizontal-infrared weather alignment, roof surface-local outdoor-air drybulb/wetbulb/wind rows, declared inside adjacent-air temperature rows, exact-zero named wall/roof sky and ground diffuse incident solar rows, declared named wall/roof absorbed solar heat gain rate rows, the roof absorbed solar heat gain per-area row, declared inside convection/radiation source rows, declared inside/outside convection coefficient rows, roof outside longwave air/sky/ground coefficient rows, declared wall/roof exterior convection/net-radiation heat-gain rate rows, roof exterior convection/net-radiation per-area rows, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated solar-rate, solar-flux, exterior-rate, exterior-flux, coefficient, and storage tolerances.",
   "Diagnostic probe algorithms are not eligible for this case; the report must show zone_air_algorithm_lane=compatibility-candidate.",
   "The v0.26 planned official dynamic boundary is promoted here after static, weather, internal convective gain, warmup, and selected dynamic heat-balance evidence pass.",
   "Schedule Value is not declared as a candidate output because the official target fixture does not currently expose a candidate schedule series in the dynamic diagnostic manifest.",
@@ -115,6 +115,15 @@ level = "conformance"
 
 [[outputs]]
 key = "ZONE ONE"
+variable = "Zone Mean Air Humidity Ratio"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "conformance"
+
+[[outputs]]
+key = "ZONE ONE"
 variable = "Zone Air Heat Balance Internal Convective Heat Gain Rate"
 frequency = "hourly"
 class = "zone-state"
@@ -143,6 +152,15 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:WALL001"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL001"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -197,6 +215,15 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:WALL002"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL002"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -251,6 +278,15 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:WALL003"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL003"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -305,6 +341,15 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:WALL004"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:WALL004"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -359,6 +404,15 @@ level = "conformance"
 [[outputs]]
 key = "ZN001:ROOF001"
 variable = "Surface Inside Face Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Inside Face Adjacent Air Temperature"
 frequency = "hourly"
 class = "surface-state"
 source = "eso"
@@ -691,6 +745,15 @@ level = "conformance"
 
 [[outputs]]
 key = "ZN001:FLR001"
+variable = "Surface Inside Face Adjacent Air Temperature"
+frequency = "hourly"
+class = "surface-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:FLR001"
 variable = "Surface Outside Face Temperature"
 frequency = "hourly"
 class = "surface-state"
@@ -973,6 +1036,33 @@ key = "ZN001:ROOF001"
 variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area"
 frequency = "hourly"
 class = "surface-exterior-flux-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-coefficient-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-coefficient-state"
+source = "eso"
+domain = "surface"
+level = "conformance"
+
+[[outputs]]
+key = "ZN001:ROOF001"
+variable = "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
+frequency = "hourly"
+class = "surface-coefficient-state"
 source = "eso"
 domain = "surface"
 level = "conformance"

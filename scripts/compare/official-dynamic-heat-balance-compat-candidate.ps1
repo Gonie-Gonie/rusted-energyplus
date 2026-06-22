@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 116) {
-    throw "Expected 116 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 126) {
+    throw "Expected 126 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -213,8 +213,36 @@ foreach ($surfaceWeatherVariable in @(
 if (-not ($summary.series | Where-Object { $_.output.key -eq "ZONE ONE" -and $_.output.variable -eq "Zone Mean Air Temperature" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })) {
     throw "Zone Mean Air Temperature conformance series missing"
 }
+$humiditySeries = $summary.series | Where-Object { $_.output.key -eq "ZONE ONE" -and $_.output.variable -eq "Zone Mean Air Humidity Ratio" -and $_.output.class -eq "zone-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+if (-not $humiditySeries) {
+    throw "Zone Mean Air Humidity Ratio conformance series missing"
+}
+if ([double]$humiditySeries.max_abs_delta_c -gt 0.000001) {
+    throw "Zone humidity ratio max_abs_delta exceeds 1e-6 kgWater/kgDryAir: $($humiditySeries.max_abs_delta_c)"
+}
+if ([double]$humiditySeries.rmse_delta_c -gt 0.000001) {
+    throw "Zone humidity ratio rmse_delta exceeds 1e-6 kgWater/kgDryAir: $($humiditySeries.rmse_delta_c)"
+}
 $allSurfaceKeys = @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004", "ZN001:FLR001", "ZN001:ROOF001")
 $wallRoofSurfaceKeys = @("ZN001:WALL001", "ZN001:WALL002", "ZN001:WALL003", "ZN001:WALL004", "ZN001:ROOF001")
+$adjacentAirSeries = @($summary.series | Where-Object {
+        $allSurfaceKeys -contains $_.output.key `
+            -and $_.output.variable -eq "Surface Inside Face Adjacent Air Temperature" `
+            -and $_.output.class -eq "surface-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($adjacentAirSeries.Count -ne 6) {
+    throw "Expected six inside adjacent-air temperature conformance series, got $($adjacentAirSeries.Count)"
+}
+foreach ($series in $adjacentAirSeries) {
+    if ([double]$series.max_abs_delta_c -gt 0.01) {
+        throw "Adjacent-air temperature max_abs_delta_c exceeds 0.01 C for $($series.output.key): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.01) {
+        throw "Adjacent-air temperature rmse_delta_c exceeds 0.01 C for $($series.output.key): $($series.rmse_delta_c)"
+    }
+}
 $surfaceFluxSeries = @($summary.series | Where-Object { $_.output.class -eq "surface-flux-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" })
 if ($surfaceFluxSeries.Count -ne 22) {
     throw "Expected 22 surface-flux-state conformance series, got $($surfaceFluxSeries.Count)"
@@ -327,6 +355,29 @@ foreach ($series in $surfaceCoefficientSeries) {
         throw "Surface convection coefficient rmse_delta_c exceeds 0.001 W/m2-K for $($series.output.key) / $($series.output.variable): $($series.rmse_delta_c)"
     }
 }
+$longwaveCoefficientVariables = @(
+    "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
+    "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
+    "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
+)
+$longwaveCoefficientSeries = @($summary.series | Where-Object {
+        $_.output.key -eq "ZN001:ROOF001" `
+            -and $longwaveCoefficientVariables -contains $_.output.variable `
+            -and $_.output.class -eq "surface-coefficient-state" `
+            -and $_.output.level -eq "conformance" `
+            -and $_.status -eq "extracted"
+    })
+if ($longwaveCoefficientSeries.Count -ne 3) {
+    throw "Expected three roof outside longwave coefficient conformance series, got $($longwaveCoefficientSeries.Count)"
+}
+foreach ($series in $longwaveCoefficientSeries) {
+    if ([double]$series.max_abs_delta_c -gt 0.0001) {
+        throw "Roof longwave coefficient max_abs_delta_c exceeds 1e-4 W/m2-K for $($series.output.variable): $($series.max_abs_delta_c)"
+    }
+    if ([double]$series.rmse_delta_c -gt 0.00001) {
+        throw "Roof longwave coefficient rmse_delta_c exceeds 1e-5 W/m2-K for $($series.output.variable): $($series.rmse_delta_c)"
+    }
+}
 $exteriorSourceVariables = @(
     "Surface Outside Face Convection Heat Gain Rate",
     "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
@@ -435,6 +486,7 @@ Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature
 Assert-Contains -Text $reportText -Pattern "Site Rain Status / hourly / weather / eso / conformance" -Description "rain-status weather conformance output"
 Assert-Contains -Text $reportText -Pattern "Site Sky Temperature / hourly / weather / eso / conformance" -Description "sky temperature weather conformance output"
 Assert-Contains -Text $reportText -Pattern "Site Horizontal Infrared Radiation Rate per Area / hourly / weather / eso / conformance" -Description "horizontal infrared weather conformance output"
+Assert-Contains -Text $reportText -Pattern "Zone Mean Air Humidity Ratio / hourly / zone-state / eso / conformance" -Description "zone humidity ratio conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Drybulb Temperature / hourly / weather / eso / conformance" -Description "roof local dry-bulb conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Wetbulb Temperature / hourly / weather / eso / conformance" -Description "roof local wet-bulb conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Outdoor Air Wind Speed / hourly / weather / eso / conformance" -Description "roof local wind-speed conformance output"
@@ -446,10 +498,14 @@ Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate per Area / hourly / surface-solar-flux-state / eso / conformance" -Description "absorbed solar heat gain per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "inside convection coefficient conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside convection coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside longwave air coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside longwave sky coefficient conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient / hourly / surface-coefficient-state / eso / conformance" -Description "outside longwave ground coefficient conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate / hourly / surface-exterior-rate-state / eso / conformance" -Description "outside convection heat-gain rate conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate / hourly / surface-exterior-rate-state / eso / conformance" -Description "outside net thermal radiation heat-gain rate conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate per Area / hourly / surface-exterior-flux-state / eso / conformance" -Description "outside convection heat-gain per-area conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area / hourly / surface-exterior-flux-state / eso / conformance" -Description "outside net thermal radiation heat-gain per-area conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Adjacent Air Temperature / hourly / surface-state / eso / conformance" -Description "inside adjacent-air temperature conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside convection source conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate / hourly / surface-state / eso / conformance" -Description "inside radiation source conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area / hourly / surface-flux-state / eso / conformance" -Description "incident sky diffuse conformance output"
