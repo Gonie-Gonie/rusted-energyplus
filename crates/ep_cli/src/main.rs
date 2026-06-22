@@ -4589,6 +4589,9 @@ fn build_heat_balance_conformance_diagnostic(
         )
         .with_warmup_minimum_days(warmup_days)
         .with_surface_iteration_count(20)
+        .with_surface_loop_zone_air_correction(
+            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop,
+        )
         .with_ctf_initial_history_policy(HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial)
     } else {
         let options = HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(

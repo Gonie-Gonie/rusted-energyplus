@@ -130,11 +130,12 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
 - The same source order keeps zone-air correction outside the
   inside-surface convergence loop: `CalcHeatBalanceInsideSurf*` converges
   `SurfTempIn`/`SurfTempInTmp` first, then the caller proceeds to air heat
-  balance/reporting and final history update work. The broad
-  `energyplus-heat-balance-compat-candidate` diagnostic wrapper now defaults to
+  balance/reporting and final history update work. Both the broad
+  `energyplus-heat-balance-compat-candidate` diagnostic wrapper and the
+  promoted official compatibility candidate now pin
   `surface_loop_zone_air_correction=after-surface-loop` for this source-order
-  probe; the promoted official compatibility candidate remains on its
-  tolerance-passing path until the air-storage max-delta gap is closed.
+  parity point; `each-surface-iteration` remains available only as an explicit
+  comparison probe.
 
 ## Data Structure Map
 

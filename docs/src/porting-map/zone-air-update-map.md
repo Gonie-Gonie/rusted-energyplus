@@ -56,7 +56,11 @@ the same weather-proxy air heat capacity used by the single-timestep report
 path, after the substep temperature and humidity update. That lowered the
 official dynamic candidate's air-storage max absolute delta from
 `0.533385790012 W` to `0.182078359183 W` and moved the blocking gate to
-`status = pass` without changing the claim boundary.
+`status = pass` without changing the claim boundary. The 2026-06-22
+source-order promotion now pins the official candidate's zone-air correction to
+`after-surface-loop`, lowering the same row further to `0.076879349871 W` max
+absolute delta and `0.005076386180 W` RMSE while keeping the declared gate at
+`status = pass`.
 
 The current third-order coupled probe is a useful candidate, not a promotion.
 On the frozen-hconv interleaved grey-longwave surface lane it lowers MAT RMSE
@@ -221,16 +225,16 @@ the solver `SumHA/SumHATsurf/SumHATref` coefficients alone.
 An inside-surface loop ordering probe then tested the EnergyPlus source-order
 fact that `CalcHeatBalanceInsideSurf*` converges surface temperatures before
 zone-air correction. The broad `energyplus-heat-balance-compat-candidate`
-diagnostic wrapper now defaults to
-`surface_loop_zone_air_correction=after-surface-loop` for that source-order
-probe; `each-surface-iteration` remains available explicitly. This reduces
-zone-air report and aggregate conduction deltas in broad diagnostics, but the
-promoted official compatibility candidate remains on its current
-tolerance-passing path until the air-storage max-delta gap is closed. The
-remaining gaps therefore stay on `SurfTempInTmp` update parity,
-ScriptF/longwave source ownership, inside hconv re-evaluation state, exact
-non-window convergence set, and outside quick-balance current face temperature
-parity.
+diagnostic wrapper and the promoted official compatibility candidate now pin
+`surface_loop_zone_air_correction=after-surface-loop`; `each-surface-iteration`
+remains available explicitly as a comparison probe. This reduces the official
+candidate's zone surface-convection max absolute delta from `0.320300753509 W`
+to `0.085845581243 W`, air-storage max absolute delta from `0.182078359183 W`
+to `0.076879349871 W`, and floor storage max absolute delta from
+`0.909524480086 W` to `0.663522464624 W`. The remaining broad-diagnostic gaps
+therefore stay on `SurfTempInTmp` update parity, ScriptF/longwave source
+ownership, inside hconv re-evaluation state, exact non-window convergence set,
+and outside quick-balance current face temperature parity.
 
 The EnergyPlus inside-hconv source cadence has now been split from compensating
 probe values. `DataHeatBalSurface.hh::ItersReevalConvCoeff` is `30`, and the

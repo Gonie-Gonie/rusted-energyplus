@@ -90,6 +90,7 @@ Assert-Contains -Text $text -Pattern "conformance_claim: true" -Description "con
 Assert-Contains -Text $text -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "compatibility lane"
 Assert-Contains -Text $text -Pattern "conformance_promotion_allowed: true" -Description "promotion eligibility"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: 20" -Description "surface iteration count"
+Assert-Contains -Text $text -Pattern "surface_loop_zone_air_correction: after-surface-loop" -Description "surface loop zone-air correction"
 Assert-Contains -Text $text -Pattern "ctf_initial_history_policy: energyplus-surf-initial" -Description "CTF history policy"
 Assert-Contains -Text $text -Pattern "status: pass" -Description "gate status"
 
@@ -145,6 +146,9 @@ if ($summary.heat_balance_warmup.day_count_delta -ne 0) {
 }
 if ($summary.surface_iteration_count -ne 20) {
     throw "Unexpected surface_iteration_count: $($summary.surface_iteration_count)"
+}
+if ($summary.surface_loop_zone_air_correction -ne "after-surface-loop") {
+    throw "Unexpected surface_loop_zone_air_correction: $($summary.surface_loop_zone_air_correction)"
 }
 if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
     throw "Unexpected CTF history policy: $($summary.ctf_initial_history_policy)"
