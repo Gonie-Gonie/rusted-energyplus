@@ -565,7 +565,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
     assert_eq!(boundary.declared_surface_keys.floor, ["ZN001:FLR001"]);
     assert!(!boundary.declared_surface_keys.wildcard_comparison);
     assert!(boundary.declared_surface_keys.named_key_comparison);
-    assert_eq!(manifest.outputs.len(), 126);
+    assert_eq!(manifest.outputs.len(), 127);
     assert!(manifest.outputs.iter().all(|output| {
         output.frequency == OutputFrequency::Hourly && output.source == SourceArtifact::Eso
     }));
@@ -575,7 +575,7 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
             .iter()
             .filter(|output| output.level == Some(OutputLevel::Conformance))
             .count(),
-        126
+        127
     );
     assert_eq!(
         manifest
@@ -625,6 +625,12 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         output.key == "ZONE ONE"
             && output.variable == "Zone Mean Air Humidity Ratio"
             && output.class == VariableClass::ZoneState
+            && output.level == Some(OutputLevel::Conformance)
+    }));
+    assert!(manifest.outputs.iter().any(|output| {
+        output.key == "Simulation"
+            && output.variable == "Surface Inside Face Heat Balance Calculation Iteration Count"
+            && output.class == VariableClass::SurfaceIterationCountState
             && output.level == Some(OutputLevel::Conformance)
     }));
     assert_eq!(
@@ -887,6 +893,11 @@ fn loads_official_dynamic_heat_balance_candidate_case_fixture()
         tolerance.variable_class == VariableClass::SurfaceStorageFluxState
             && tolerance.max_abs == Some(0.005)
             && tolerance.max_rmse == Some(0.001)
+    }));
+    assert!(manifest.tolerances.iter().any(|tolerance| {
+        tolerance.variable_class == VariableClass::SurfaceIterationCountState
+            && tolerance.max_abs == Some(1.0)
+            && tolerance.max_rmse == Some(0.2)
     }));
     let gate = manifest
         .gate

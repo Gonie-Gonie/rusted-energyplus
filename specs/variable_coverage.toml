@@ -572,7 +572,15 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated for the six declared official 1ZoneUncontrolled dynamic roof/wall/floor surface rows; broad warmup fixed-point closure and surface iteration-count parity remain outside the claim."
+support_boundary = "Tolerance-gated for the six declared official 1ZoneUncontrolled dynamic roof/wall/floor surface rows; broad warmup fixed-point closure remains outside the claim."
+
+[[variable]]
+name = "Surface Inside Face Heat Balance Calculation Iteration Count"
+domain = "heat_balance"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated for the declared official 1ZoneUncontrolled dynamic Simulation hourly row under surface-iteration-count-state max_abs 1 count / max_rmse 0.2 count tolerance; exact iteration-count parity and broad heat-balance convergence generality remain outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient"

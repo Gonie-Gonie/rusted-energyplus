@@ -152,8 +152,8 @@ if ($summary.ctf_initial_history_policy -ne "energyplus-surf-initial") {
 
 $conformanceOutputs = @($summary.outputs | Where-Object { $_.level -eq "conformance" })
 $diagnosticOutputs = @($summary.outputs | Where-Object { $_.level -eq "diagnostic" })
-if ($conformanceOutputs.Count -ne 126) {
-    throw "Expected 126 conformance-level outputs, got $($conformanceOutputs.Count)"
+if ($conformanceOutputs.Count -ne 127) {
+    throw "Expected 127 conformance-level outputs, got $($conformanceOutputs.Count)"
 }
 if ($diagnosticOutputs.Count -ne 0) {
     throw "Expected zero diagnostic outputs, got $($diagnosticOutputs.Count)"
@@ -477,6 +477,17 @@ if ([double]$storageFluxSeries.rmse_delta_c -gt 0.001) {
     throw "Floor storage per-area rmse_delta_c exceeds 0.001 W/m2: $($storageFluxSeries.rmse_delta_c)"
 }
 
+$iterationCountSeries = $summary.series | Where-Object { $_.output.key -eq "Simulation" -and $_.output.variable -eq "Surface Inside Face Heat Balance Calculation Iteration Count" -and $_.output.class -eq "surface-iteration-count-state" -and $_.output.level -eq "conformance" -and $_.status -eq "extracted" } | Select-Object -First 1
+if (-not $iterationCountSeries) {
+    throw "Surface iteration count conformance series missing"
+}
+if ([double]$iterationCountSeries.max_abs_delta_c -gt 1.0) {
+    throw "Surface iteration count max_abs_delta exceeds 1 count: $($iterationCountSeries.max_abs_delta_c)"
+}
+if ([double]$iterationCountSeries.rmse_delta_c -gt 0.2) {
+    throw "Surface iteration count rmse_delta exceeds 0.2 count: $($iterationCountSeries.rmse_delta_c)"
+}
+
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Heat Balance Conformance Report" -Description "markdown report header"
 Assert-Contains -Text $reportText -Pattern "comparison_class: conformance" -Description "markdown comparison class"
@@ -515,6 +526,7 @@ Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Co
 Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Heat Loss Rate / hourly / surface-aggregate-state / eso / conformance" -Description "zone opaque aggregate outside loss conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate / hourly / surface-storage-state / eso / conformance" -Description "surface storage conformance output"
 Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area / hourly / surface-storage-flux-state / eso / conformance" -Description "surface storage per-area conformance output"
+Assert-Contains -Text $reportText -Pattern "Surface Inside Face Heat Balance Calculation Iteration Count / hourly / surface-iteration-count-state / eso / conformance" -Description "surface iteration count conformance output"
 Assert-Contains -Text $reportText -Pattern "status: pass" -Description "markdown status"
 
 Write-Host "Official dynamic heat-balance conformance gate passed."

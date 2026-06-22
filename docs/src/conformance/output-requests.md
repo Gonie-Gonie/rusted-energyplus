@@ -57,7 +57,7 @@ source artifact. Supported variable class values are `schedule`, `weather`,
 `construction-material`, `internal-gain`, `zone-state`, `surface-state`,
 `surface-coefficient-state`, `surface-flux-state`,
 `surface-solar-flux-state`, `surface-solar-rate-state`, `surface-aggregate-state`,
-`surface-storage-state`, `surface-storage-flux-state`, `node-state`,
+`surface-storage-state`, `surface-storage-flux-state`, `surface-iteration-count-state`, `node-state`,
 `hvac-state`, `plant-state`, `plant-equipment`, `meter`,
 `internal-variable`, and `diagnostic`.
 Supported source values are `eso`, `eio`, `mtr`, `sql`, and `csv`.

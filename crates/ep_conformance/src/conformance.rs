@@ -743,6 +743,8 @@ pub enum VariableClass {
     SurfaceStorageState,
     /// Surface-level heat storage flux variables with separate tolerance policy.
     SurfaceStorageFluxState,
+    /// Surface-level iteration count variables with separate tolerance policy.
+    SurfaceIterationCountState,
     /// Air-side node state variables.
     NodeState,
     /// HVAC control or component state variables.
