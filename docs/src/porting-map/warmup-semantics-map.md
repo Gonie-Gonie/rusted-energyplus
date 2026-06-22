@@ -91,6 +91,13 @@ essentially unchanged. The remaining claim blocker is therefore not a simple
 warmup-day-count, first-hour weather seed, hourly reporting, or run-period
 handoff copy issue; it is the repeated-day surface/zone source model fixed
 point that feeds the zone-air and floor CTF current/history terms.
+The 2026-06-22 post-advance CTF snapshot confirms that conclusion at the active
+floor max-sample blocker: switching from the pre-advance to post-advance Rust
+history vector moves the inside/outside floor history sums by
+`383.678050387485 W` and `392.737680572047 W`, respectively, much larger than
+the `9.527199725017 W` outside-history-total mismatch. The remaining issue is
+therefore within the active repeated-day source/history values, not a warmup
+handoff phase selection.
 
 EnergyPlus 26.1.0 `HeatBalanceManager.cc::ManageHeatBalance` checks warmup
 convergence only after `ManageSurfaceHeatBalance`, end-zone-timestep EMS,

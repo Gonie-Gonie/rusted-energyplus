@@ -566,8 +566,9 @@ if ($zoneAirFirstSampleTrace.Count -lt 4) {
     throw "Expected zone_air_first_sample_trace to include first-hour per-zone timestep rows, got $($zoneAirFirstSampleTrace.Count)"
 }
 $zoneAirWarmupDayEndStates = @($summary.zone_air_warmup_day_end_states)
-if ($zoneAirWarmupDayEndStates.Count -lt 20) {
-    throw "Expected zone_air_warmup_day_end_states to include at least 20 warmup day-end rows, got $($zoneAirWarmupDayEndStates.Count)"
+$expectedWarmupDayEndRows = [Math]::Max([int]$summary.heat_balance_warmup.day_count, $WarmupMinimumDays)
+if ($zoneAirWarmupDayEndStates.Count -lt $expectedWarmupDayEndRows) {
+    throw "Expected zone_air_warmup_day_end_states to include at least $expectedWarmupDayEndRows warmup day-end rows, got $($zoneAirWarmupDayEndStates.Count)"
 }
 $zoneAirFirstTrace = @($zoneAirFirstSampleTrace | Where-Object { $_.key -eq "ZONE ONE" -and [int]$_.timestep_index -eq 1 })[0]
 if ($null -eq $zoneAirFirstTrace) {
@@ -602,8 +603,8 @@ if ($zoneAirDebugFirstSampleTrace.Count -lt 4) {
     throw "Expected rust-zone-air-diagnostics.json to include first-hour zone-air timestep rows, got $($zoneAirDebugFirstSampleTrace.Count)"
 }
 $zoneAirDebugWarmupDayEndStates = @($zoneAirDebug.warmup_day_end_states)
-if ($zoneAirDebugWarmupDayEndStates.Count -lt 20) {
-    throw "Expected rust-zone-air-diagnostics.json to include at least 20 warmup day-end rows, got $($zoneAirDebugWarmupDayEndStates.Count)"
+if ($zoneAirDebugWarmupDayEndStates.Count -lt $expectedWarmupDayEndRows) {
+    throw "Expected rust-zone-air-diagnostics.json to include at least $expectedWarmupDayEndRows warmup day-end rows, got $($zoneAirDebugWarmupDayEndStates.Count)"
 }
 $floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
 if ($null -eq $floorCtfComponent) {
@@ -923,9 +924,18 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($floorMaxSampleHistorySlots.Count -lt 5) {
         throw "Expected ctf_history_max_sample_slots to include FLOOR #CTFs=5 rows, got $($floorMaxSampleHistorySlots.Count)"
     }
+    $floorMaxSampleHistorySlotsAfterAdvance = @($summary.ctf_history_max_sample_slots_after_advance | Where-Object { $_.key -eq "ZN001:FLR001" })
+    if ($floorMaxSampleHistorySlotsAfterAdvance.Count -lt 5) {
+        throw "Expected ctf_history_max_sample_slots_after_advance to include FLOOR #CTFs=5 rows, got $($floorMaxSampleHistorySlotsAfterAdvance.Count)"
+    }
     foreach ($slot in $floorMaxSampleHistorySlots) {
         if ([int]$slot.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
             throw "Expected FLOOR max-sample CTF history slot to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($slot.sample_index)"
+        }
+    }
+    foreach ($slot in $floorMaxSampleHistorySlotsAfterAdvance) {
+        if ([int]$slot.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
+            throw "Expected FLOOR post-advance max-sample CTF history slot to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($slot.sample_index)"
         }
     }
     $maxSampleInsideSlotSum = 0.0
@@ -1320,6 +1330,7 @@ Assert-Contains -Text $reportText -Pattern "out_minus_in_delta_c" -Description "
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots" -Description "markdown CTF max-sample slot section"
+Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots After Advance" -Description "markdown post-advance CTF max-sample slot section"
 Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Drybulb Temperature" -Description "markdown weather drybulb variable"
 Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature" -Description "markdown weather wetbulb variable"

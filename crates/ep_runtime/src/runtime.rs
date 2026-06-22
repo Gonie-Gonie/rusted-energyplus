@@ -687,6 +687,8 @@ pub struct HeatBalanceState {
     pub surfaces: Vec<SurfaceHeatBalanceState>,
     /// Most recent per-slot CTF history terms, captured before CTF histories advance.
     pub last_ctf_history_slot_terms: Vec<HeatBalanceCtfHistorySlotSample>,
+    /// Most recent per-slot CTF history terms, captured after CTF histories advance.
+    pub last_ctf_history_slot_terms_after_advance: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Most recent inside surface heat-balance iteration count.
     pub last_inside_surface_iteration_count: u32,
     /// Final max inside-surface temperature change from the most recent iteration loop.
@@ -1713,8 +1715,10 @@ pub struct HeatBalanceSimulationSummary {
     pub run_period_initial_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Per-slot CTF history terms averaged over the first reported hourly sample.
     pub first_sample_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
-    /// Per-slot CTF history terms averaged for each reported hourly sample.
+    /// Per-slot CTF history terms averaged for each reported hourly sample before history advance.
     pub hourly_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
+    /// Per-slot CTF history terms averaged for each reported hourly sample after history advance.
+    pub hourly_ctf_history_slots_after_advance: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     /// Per-surface timestep states captured across the first reported hourly sample.
     pub surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
     /// Per-zone timestep states captured across the first reported hourly sample.
@@ -2560,6 +2564,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         zones,
         surfaces,
         last_ctf_history_slot_terms: Vec::new(),
+        last_ctf_history_slot_terms_after_advance: Vec::new(),
         last_inside_surface_iteration_count: 0,
         last_inside_surface_iteration_max_delta_c: f64::NAN,
         last_inside_surface_iteration_max_delta_surface_name: None,
@@ -3318,6 +3323,8 @@ fn advance_heat_balance_state_one_timestep_internal(
             advance_surface_ctf_histories(surface);
         }
     }
+    state.last_ctf_history_slot_terms_after_advance =
+        heat_balance_ctf_history_slot_samples(&state.surfaces);
 
     correct_zone_air_temperatures_from_current_surfaces(
         &state.surfaces,
@@ -4876,6 +4883,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let mut first_sample_ctf_history_slot_accumulators =
         BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
     let mut hourly_ctf_history_slots = Vec::new();
+    let mut hourly_ctf_history_slots_after_advance = Vec::new();
     let mut surface_first_sample_trace = Vec::new();
     let mut zone_air_first_sample_trace = Vec::new();
     let mut surface_iteration_first_sample_trace = Vec::new();
@@ -4926,6 +4934,8 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         let mut horizontal_infrared_radiation_sum = 0.0;
         let mut rain_status_sum = 0.0;
         let mut hourly_ctf_history_slot_accumulators =
+            BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
+        let mut hourly_ctf_history_slot_after_advance_accumulators =
             BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
         for substep in 1..=steps {
@@ -4999,6 +5009,14 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
 
             for sample in &state.last_ctf_history_slot_terms {
                 hourly_ctf_history_slot_accumulators
+                    .entry((sample.surface_name.clone(), sample.slot_index))
+                    .or_insert_with(|| {
+                        HeatBalanceCtfHistorySlotFirstSampleAccumulator::from_sample(sample)
+                    })
+                    .push(sample);
+            }
+            for sample in &state.last_ctf_history_slot_terms_after_advance {
+                hourly_ctf_history_slot_after_advance_accumulators
                     .entry((sample.surface_name.clone(), sample.slot_index))
                     .or_insert_with(|| {
                         HeatBalanceCtfHistorySlotFirstSampleAccumulator::from_sample(sample)
@@ -5482,6 +5500,11 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
 
         hourly_ctf_history_slots.extend(
             hourly_ctf_history_slot_accumulators
+                .into_values()
+                .map(|accumulator| accumulator.finalize_hourly(hour_index)),
+        );
+        hourly_ctf_history_slots_after_advance.extend(
+            hourly_ctf_history_slot_after_advance_accumulators
                 .into_values()
                 .map(|accumulator| accumulator.finalize_hourly(hour_index)),
         );
@@ -6419,6 +6442,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             .map(HeatBalanceCtfHistorySlotFirstSampleAccumulator::finalize)
             .collect(),
         hourly_ctf_history_slots,
+        hourly_ctf_history_slots_after_advance,
         surface_first_sample_trace,
         zone_air_first_sample_trace,
         surface_iteration_first_sample_trace,

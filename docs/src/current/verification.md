@@ -108,7 +108,7 @@ Heat Balance Air Energy Storage Rate` max absolute delta dropped from
 `0.533385790012 W` to `0.182078359183 W` against the `0.5 W` zone-state
 max-absolute tolerance; RMSE is `0.023340057930 W` against the `0.1 W`
 zone-state RMSE tolerance. The promoted set now also includes `Zone Mean Air Humidity Ratio` (max absolute delta `0.000000094494`), all six `Surface Inside Face Adjacent Air Temperature` rows (worst max absolute delta `0.000648652782 C`), and the roof outside longwave air/sky/ground split coefficient rows (sky coefficient max absolute delta `0.000023095019 W/m2-K`; air and ground split coefficients exact-zero). Weather rows are exact for `Site Sky Temperature`, `Site Horizontal Infrared Radiation Rate per Area`, roof wind speed, and roof wind direction; roof surface-local dry-bulb max absolute delta is `0.000000019076 C`, and roof surface-local wet-bulb max absolute delta is `0.000009907934 C` against the `0.00001` weather tolerance. The promoted exterior source rows are the named wall/roof outside convection and net thermal radiation heat-gain rates plus the roof per-area versions; the hourly `Surface Inside Face Heat Balance Calculation Iteration Count` row is now declared under `surface-iteration-count-state` tolerance (`max_abs = 1 count`, `max_rmse = 0.2 count`) and passes with measured `max_abs = 1.000000000000 count`, `RMSE = 0.033786868920 count` over 8760 samples. Exact iteration-count parity beyond that tolerance and the remaining floor CTF history handoff stay outside the broad diagnostic claim. This supports only the declared limited claim above.
-The 2026-06-21 current broad-diagnostic rerun confirms that this is not yet a
+The 2026-06-22 current broad-diagnostic rerun confirms that this is not yet a
 complete conformance claim: the compatibility-candidate diagnostic still has
 `status = fail`, `conformance_claim = false`, 119 diagnostic series, and
 `active_blocker_summary = ZN001:FLR001/FLOOR sample=1156
@@ -121,6 +121,14 @@ storage to `2195.200776475414 W`, and the adiabatic-history-commit probe
 regressed floor storage to `1454.593723095763 W`. The remaining blocker is a
 small surface/zone fixed-point temperature offset that is amplified by the mass
 floor CTF history coefficients, not a simple adiabatic outside-face sync switch.
+The post-advance CTF history snapshot now captured at the same sample also
+rules out a one-step reporting phase explanation: the floor pre-advance Rust
+history sums are `13317.757005136818 W` inside and `13486.839425012820 W`
+outside, while the post-advance sums are `12934.078954749333 W` inside and
+`13094.101744440773 W` outside. That 383-393 W phase movement is far larger
+than the active `9.527199725017 W` outside-history-total mismatch, so the
+remaining blocker is a small source/history value mismatch inside the active
+solve phase rather than selecting the wrong post-advance history vector.
 It still cannot support a broad or "complete" EnergyPlus conformance statement
 because the broad diagnostic boundary remains diagnostic-only and still shows:
 
@@ -141,6 +149,12 @@ because the broad diagnostic boundary remains diagnostic-only and still shows:
 - The active report-level target is `outside-ctf-history-handoff`: the floor
   CTF diagnostic now reports dominant source `outside-history-total` at sample
   `1156`, while roof exterior splits are much smaller secondary residuals.
+- The same floor max-sample diagnostic now records both pre-advance and
+  post-advance CTF history slots. The pre-advance slot sum matches the Rust
+  history term used in the solve (`13317.757005136818 W` inside,
+  `13486.839425012820 W` outside); the post-advance snapshot shifts the sums by
+  `383.678050387485 W` inside and `392.737680572047 W` outside, confirming that
+  the broad blocker is not a simple post-report history phase swap.
 - First-run-period-substep evidence rules out hourly averaging as the source of
   the current offset. In the compatibility-candidate lane, Rust records
   `ZONE ONE` MAT `-0.620477202798 C` and a stored third-order solution

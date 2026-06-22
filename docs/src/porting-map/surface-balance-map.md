@@ -110,9 +110,9 @@ the CTF histories. The active floor-storage work should therefore keep report,
 inside-CTF, and committed-history snapshots separate instead of replacing all
 adiabatic or interzone outside states with the current inside face.
 
-As of the 2026-06-20 adaptive storage-report fix, the separate declared
+As of the 2026-06-22 adaptive storage-report and diagnostic-snapshot fixes, the separate declared
 `official_1zone_uncontrolled_dynamic_conformance_candidate_001` gate now passes
-with `conformance_claim=true` for its 126 promoted rows, including zone humidity ratio, the six inside adjacent-air temperature rows, and the roof outside longwave air/sky/ground split coefficients. Broad dynamic
+with `conformance_claim=true` for its 127 promoted rows, including zone humidity ratio, the six inside adjacent-air temperature rows, the roof outside longwave air/sky/ground split coefficients, and the declared inside-surface iteration-count row. Broad dynamic
 conformance is still not claimable: the diagnostic-only boundary remains
 `conformance_claim=false`, but the old roof exterior reference-air blocker is
 largely resolved: roof outside-face temperature max absolute delta dropped from
@@ -128,6 +128,10 @@ iteration count from 20 to 50 did not change the floor history or storage
 deltas, while the existing adiabatic-report and adiabatic-history-commit probes
 made the floor storage residual much worse (`2195.200776475414 W` and
 `1454.593723095763 W`, respectively). Those probes therefore stay outside the
-promoted lane; the next implementation target is the small repeated-day
-surface/zone fixed-point temperature offset that the floor CTF history terms
-amplify into 8-10 W raw current/history-term deltas.
+promoted lane. The 2026-06-22 post-advance CTF slot diagnostic also shows this
+is not a one-step history reporting phase issue: at sample `1156`, pre-advance
+floor history sums are `13317.757005136818 W` inside and `13486.839425012820 W`
+outside, while the post-advance sums are `12934.078954749333 W` inside and
+`13094.101744440773 W` outside. The next implementation target is the small
+repeated-day surface/zone fixed-point temperature offset that the floor CTF
+history terms amplify into 8-10 W raw current/history-term deltas.

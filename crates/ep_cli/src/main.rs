@@ -3819,6 +3819,7 @@ struct HeatBalanceConformanceDiagnostic {
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
     ctf_history_max_sample_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
+    ctf_history_max_sample_slots_after_advance: Vec<HeatBalanceCtfHistorySlotHourlySample>,
     rust_zone_air_run_period_initial_states: Vec<HeatBalanceZoneAirStateSample>,
     rust_zone_air_warmup_day_end_states: Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
     zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
@@ -4716,6 +4717,11 @@ fn build_heat_balance_conformance_diagnostic(
         &series,
         &simulation.summary.hourly_ctf_history_slots,
     );
+    let ctf_history_max_sample_slots_after_advance = heat_balance_ctf_history_max_sample_slots(
+        &simulation_model,
+        &series,
+        &simulation.summary.hourly_ctf_history_slots_after_advance,
+    );
     let surface_iteration_max_sample_trace = heat_balance_surface_iteration_max_sample_trace(
         &simulation.summary.surface_iteration_sample_trace,
         &ctf_storage_max_sample_deltas,
@@ -4760,6 +4766,7 @@ fn build_heat_balance_conformance_diagnostic(
             .run_period_initial_ctf_history_slots,
         ctf_history_first_sample_slots: simulation.summary.first_sample_ctf_history_slots,
         ctf_history_max_sample_slots,
+        ctf_history_max_sample_slots_after_advance,
         rust_zone_air_run_period_initial_states: simulation
             .summary
             .run_period_initial_zone_air_states,
@@ -9648,6 +9655,12 @@ fn render_heat_balance_conformance_json(
         "  \"ctf_history_max_sample_slots\": {},\n",
         heat_balance_ctf_history_hourly_slots_json(&diagnostic.ctf_history_max_sample_slots)
     ));
+    json.push_str(&format!(
+        "  \"ctf_history_max_sample_slots_after_advance\": {},\n",
+        heat_balance_ctf_history_hourly_slots_json(
+            &diagnostic.ctf_history_max_sample_slots_after_advance
+        )
+    ));
     let series_json = if include_sample_rows {
         heat_balance_series_json(&diagnostic.series)
     } else {
@@ -10015,6 +10028,13 @@ fn render_heat_balance_conformance_report(
     heat_balance_report_ctf_history_hourly_slot_rows(
         &mut report,
         &diagnostic.ctf_history_max_sample_slots,
+    );
+    report.push('\n');
+
+    report.push_str("## Rust CTF History Max-Sample Slots After Advance\n\n");
+    heat_balance_report_ctf_history_hourly_slot_rows(
+        &mut report,
+        &diagnostic.ctf_history_max_sample_slots_after_advance,
     );
     report.push('\n');
 
@@ -14421,6 +14441,30 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            ctf_history_max_sample_slots_after_advance: vec![
+                super::HeatBalanceCtfHistorySlotHourlySample {
+                    sample_index: 1,
+                    surface_name: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    slot_index: 1,
+                    area_m2: 100.0,
+                    timestep_count: 4,
+                    outside_history_coefficient_w_per_m2_k: 1.0,
+                    cross_history_coefficient_w_per_m2_k: 2.0,
+                    inside_history_coefficient_w_per_m2_k: 3.0,
+                    flux_history_coefficient: 0.5,
+                    outside_temperature_history_c: 11.0,
+                    inside_temperature_history_c: 21.0,
+                    outside_flux_history_w_per_m2: -1.5,
+                    inside_flux_history_w_per_m2: 1.5,
+                    inside_temperature_term_w: -4100.0,
+                    inside_flux_term_w: 75.0,
+                    inside_total_term_w: -4025.0,
+                    outside_temperature_term_w: 3100.0,
+                    outside_flux_term_w: 75.0,
+                    outside_total_term_w: 3175.0,
+                },
+            ],
             rust_zone_air_run_period_initial_states: vec![],
             rust_zone_air_warmup_day_end_states: vec![],
             zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
@@ -14656,6 +14700,7 @@ mod tests {
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"ctf_history_max_sample_slots\""));
+        assert!(json.contains("\"ctf_history_max_sample_slots_after_advance\""));
         assert!(json.contains("\"inside_total_term_w\""));
         assert!(json.contains("\"rank\": 1"));
         assert!(json.contains("\"first_delta_sample\""));
@@ -14745,6 +14790,7 @@ mod tests {
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"ctf_history_max_sample_slots\""));
+        assert!(digest.contains("\"ctf_history_max_sample_slots_after_advance\""));
         assert!(digest.contains("\"inside_total_term_w\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
@@ -14828,6 +14874,7 @@ mod tests {
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("## Rust CTF History Max-Sample Slots"));
+        assert!(report.contains("## Rust CTF History Max-Sample Slots After Advance"));
         assert!(report.contains("| FLOOR | FLOOR | 1 | 4 |"));
         assert!(report.contains("gate_blocking: true"));
         assert!(report.contains("Surface Inside Face Temperature"));
@@ -15241,6 +15288,30 @@ mod tests {
                 outside_flux_term_w: 50.0,
                 outside_total_term_w: 3050.0,
             }],
+            ctf_history_max_sample_slots_after_advance: vec![
+                super::HeatBalanceCtfHistorySlotHourlySample {
+                    sample_index: 1,
+                    surface_name: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    slot_index: 1,
+                    area_m2: 100.0,
+                    timestep_count: 4,
+                    outside_history_coefficient_w_per_m2_k: 1.0,
+                    cross_history_coefficient_w_per_m2_k: 2.0,
+                    inside_history_coefficient_w_per_m2_k: 3.0,
+                    flux_history_coefficient: 0.5,
+                    outside_temperature_history_c: 11.0,
+                    inside_temperature_history_c: 21.0,
+                    outside_flux_history_w_per_m2: -1.5,
+                    inside_flux_history_w_per_m2: 1.5,
+                    inside_temperature_term_w: -4100.0,
+                    inside_flux_term_w: 75.0,
+                    inside_total_term_w: -4025.0,
+                    outside_temperature_term_w: 3100.0,
+                    outside_flux_term_w: 75.0,
+                    outside_total_term_w: 3175.0,
+                },
+            ],
             rust_zone_air_run_period_initial_states: vec![],
             rust_zone_air_warmup_day_end_states: vec![],
             zone_air_first_sample_trace: vec![super::HeatBalanceZoneAirFirstSampleTrace {
@@ -15464,6 +15535,7 @@ mod tests {
         assert!(json.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(json.contains("\"ctf_history_first_sample_slots\""));
         assert!(json.contains("\"ctf_history_max_sample_slots\""));
+        assert!(json.contains("\"ctf_history_max_sample_slots_after_advance\""));
         assert!(json.contains("\"first_sample_delta\""));
         assert!(json.contains("\"max_delta_sample\""));
         assert!(json.contains("\"max_sample_contexts\""));
@@ -15544,6 +15616,7 @@ mod tests {
         assert!(digest.contains("\"ctf_history_run_period_initial_slots\""));
         assert!(digest.contains("\"ctf_history_first_sample_slots\""));
         assert!(digest.contains("\"ctf_history_max_sample_slots\""));
+        assert!(digest.contains("\"ctf_history_max_sample_slots_after_advance\""));
         assert!(digest.contains("\"first_sample_delta\""));
         assert!(digest.contains("\"first_delta_sample\""));
         assert!(digest.contains("\"max_delta_sample\""));
@@ -15628,6 +15701,7 @@ mod tests {
         assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
         assert!(report.contains("## Rust CTF History First-Sample Slots"));
         assert!(report.contains("## Rust CTF History Max-Sample Slots"));
+        assert!(report.contains("## Rust CTF History Max-Sample Slots After Advance"));
         assert!(report.contains("status: fail"));
     }
 
