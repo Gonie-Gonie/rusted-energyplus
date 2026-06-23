@@ -84,6 +84,10 @@ claim boundary visible and do not become release conformance evidence unless
 promoted later through manifests, reports, and blocking gates.
 Unsupported AirLoop, PlantLoop, EMS, invalid epJSON, and missing heat-balance
 weather inputs are covered by integration tests as pre-runtime failures.
+When `--oracle-baseline` is requested for a `run_blocked` input, the
+EnergyPlus baseline can still be generated under `out/oracle`, but
+`rust_runtime` stays null, oracle comparison is skipped, and no oracle artifact
+is counted as a Rust result.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared IdealLoads

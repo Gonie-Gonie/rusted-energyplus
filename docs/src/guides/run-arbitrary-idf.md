@@ -24,6 +24,9 @@ Important boundaries:
 - heat-balance compatibility runs require a weather EPW; a missing weather path
   exits with `args` before Rust runtime execution
 - `--oracle-baseline` writes an EnergyPlus run under `out/oracle`
+- `--oracle-baseline` can still generate `out/oracle` for a `run_blocked`
+  input; `rust_runtime` remains null and no EnergyPlus output is reported as a
+  Rust result
 - `--compare-oracle` writes `out/compare/compare-summary.json` and
   `out/compare/compare-report.md`
 - every run writes `eplusrs.err`, `diagnostics.json`,

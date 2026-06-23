@@ -181,4 +181,76 @@ Assert-Equal -Actual $blockedSupport.run_result_state -Expected "run_blocked" -D
 Assert-Equal -Actual $blockedSupport.unsupported_objects[0].object_type -Expected "PlantLoop/PlantEquipment" -Description "blocked unsupported object"
 Assert-Equal -Actual $blockedSupport.claim_boundary.conformance_claim -Expected $false -Description "blocked support conformance claim"
 
+$blockedOracleOutputDir = ".runtime\arbitrary-run-blocked-oracle-smoke-script"
+$blockedOracleInput = ".runtime\arbitrary-run-blocked-oracle-smoke.idf"
+if (Test-Path -LiteralPath $blockedOracleOutputDir) {
+    Remove-Item -Recurse -Force -LiteralPath $blockedOracleOutputDir
+}
+$blockedOracleInputText = Get-Content -Encoding UTF8 -Raw -LiteralPath $idf
+$blockedOracleInputText += @"
+
+EnergyManagementSystem:Program,
+  BlockedOracleSmokeProgram,  !- Name
+  SET BlockedOracleSmokeValue = 1;  !- Program Line 1
+"@
+Set-Content -Encoding UTF8 -LiteralPath $blockedOracleInput -Value $blockedOracleInputText
+
+Write-Host "Running blocked arbitrary IDF smoke with oracle baseline: $blockedOracleInput"
+$blockedOracleOutput = & $exe run $blockedOracleInput -w $weather -d $blockedOracleOutputDir --overwrite --oracle-baseline --compare-oracle --oracle-root $oracleRoot 2>&1
+$blockedOracleExitCode = $LASTEXITCODE
+if ($blockedOracleExitCode -ne 4) {
+    $blockedOracleOutput | ForEach-Object { Write-Host $_ }
+    throw "Expected unsupported exit code 4 from blocked oracle eplus-rs run, got $blockedOracleExitCode."
+}
+
+foreach ($relative in @(
+    "eplusrs.err",
+    "diagnostics.json",
+    "run-summary.json",
+    "support-assessment.json",
+    "support-report.md",
+    "input\original.idf",
+    "input\converted.epJSON",
+    "model\raw-model-summary.json",
+    "model\typed-model-summary.json",
+    "model\graph-summary.json",
+    "model\execution-plan.json",
+    "reports\run-report.md",
+    "reports\compatibility-boundary.md",
+    "oracle\eplusout.eso",
+    "oracle\eplusout.eio",
+    "oracle\eplusout.err",
+    "compare\compare-summary.json",
+    "compare\compare-report.md"
+)) {
+    Assert-File -Path (Join-Path $blockedOracleOutputDir $relative)
+}
+
+$blockedOracleSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOracleOutputDir "run-summary.json") | ConvertFrom-Json
+Assert-Equal -Actual $blockedOracleSummary.status -Expected "unsupported" -Description "blocked oracle run summary status"
+Assert-Equal -Actual $blockedOracleSummary.exit_code -Expected 4 -Description "blocked oracle run summary exit code"
+Assert-Equal -Actual $blockedOracleSummary.oracle_status -Expected "generated" -Description "blocked oracle status"
+Assert-Equal -Actual $blockedOracleSummary.compare_status -Expected "skipped-rust-unsupported-or-oracle-missing" -Description "blocked oracle compare status"
+Assert-Equal -Actual $blockedOracleSummary.support.status -Expected "unsupported" -Description "blocked oracle support status"
+Assert-Equal -Actual $blockedOracleSummary.support.run_result_state -Expected "run_blocked" -Description "blocked oracle run result state"
+Assert-Equal -Actual $blockedOracleSummary.support.runtime_class -Expected "none" -Description "blocked oracle runtime class"
+if ($null -eq $blockedOracleSummary.oracle) {
+    throw "Blocked run with --oracle-baseline must still write an oracle summary."
+}
+if ($null -ne $blockedOracleSummary.rust_runtime) {
+    throw "Blocked run with --oracle-baseline must not write a rust_runtime summary."
+}
+if (Test-Path -LiteralPath (Join-Path $blockedOracleOutputDir "results\result-store.json")) {
+    throw "Blocked run with --oracle-baseline must not write result-store.json."
+}
+
+$blockedOracleSupport = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOracleOutputDir "support-assessment.json") | ConvertFrom-Json
+Assert-Equal -Actual $blockedOracleSupport.run_result_state -Expected "run_blocked" -Description "blocked oracle support run result state"
+Assert-Equal -Actual $blockedOracleSupport.unsupported_objects[0].object_type -Expected "EnergyManagementSystem:Program" -Description "blocked oracle unsupported object"
+Assert-Equal -Actual $blockedOracleSupport.claim_boundary.conformance_claim -Expected $false -Description "blocked oracle support conformance claim"
+
+$blockedOracleCompare = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOracleOutputDir "compare\compare-summary.json") | ConvertFrom-Json
+Assert-Equal -Actual $blockedOracleCompare.status -Expected "skipped-rust-unsupported-or-oracle-missing" -Description "blocked oracle comparison status"
+Assert-Equal -Actual $blockedOracleCompare.conformance_claim -Expected $false -Description "blocked oracle comparison conformance claim"
+
 Write-Host "Arbitrary IDF run smoke passed. Artifacts: $outputDir"
