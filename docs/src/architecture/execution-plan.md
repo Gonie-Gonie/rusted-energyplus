@@ -7,8 +7,9 @@ last_reviewed: 2026-06-07
 
 # Execution Plan
 
-`ExecutionPlan` records coarse runtime stages and graph-derived work ordering.
-It is currently an architecture boundary and diagnostic summary.
+`ExecutionPlan` records EnergyPlus source-order runtime barriers and the
+graph-derived work assigned to each barrier. It is currently an architecture
+boundary, a diagnostic summary, and the compatibility-mode ordering contract.
 
 The plan is useful for:
 
@@ -23,22 +24,29 @@ ported.
 explicit. The default compatibility path must preserve EnergyPlus-aligned
 barriers before fast or experimental scheduling is considered.
 
-v0.10 adds thermostat and IdealLoads ordering placeholders:
+The plan assigns typed graph work to source-order stages:
 
 - `EvaluateZoneThermostat`
+- `SolveZone`
+- `ManageZoneEquipment`
+- `SimZoneEquipment`
+- `InitIdealLoadsAirSystem`
 - `EvaluateIdealLoadsAirSystem`
+- `UpdateIdealLoadsAirSystem`
+- `ReportIdealLoadsAirSystem`
+- `WriteOutput`
 
-They are typed-graph readiness markers for `ideal_loads_thermostat_001`, not
-HVAC load-conformance markers.
+They are ordering markers, not broad HVAC load-conformance markers by
+themselves.
 
-Future execution stages should represent environment, warmup, zone, system,
-plant, reporting, callback, and output barriers. EMS, PythonPlugin, API
-actuators, and other callbacks must become explicit invalidation points before
-dependent caches can be reused across them.
+EMS, PythonPlugin, API actuators, and other callbacks must remain explicit
+barriers or invalidation points before dependent caches can be reused across
+them.
 
 For the official `1ZoneUncontrolled` dynamic heat-balance work,
-`ExecutionPlan.compatibility_stages` now records the EnergyPlus source routine
-contract separately from the coarse Rust work stages. The initial contract is:
+`ExecutionPlan.stages` follows the EnergyPlus heat-balance source routine order
+and `ExecutionPlan.compatibility_stages` stores the same heat-balance contract
+for reports. The initial contract is:
 
 1. `HeatBalanceManager.cc::GetHeatBalanceInput`
 2. `HeatBalanceManager.cc::EMS BeginZoneTimestepBeforeInitHeatBalance`
@@ -57,6 +65,15 @@ contract separately from the coarse Rust work stages. The initial contract is:
 15. `HeatBalanceManager.cc::ReportHeatBalance`
 16. `HeatBalanceManager.cc::EMS EndZoneTimestepAfterZoneReporting`
 17. `HeatBalanceManager.cc::CheckWarmupConvergence`
+
+If IdealLoads equipment is active, `ExecutionPlan.stages` appends the
+source-order `ZoneEquipmentManager` and `PurchasedAirManager` stages:
+
+1. `ZoneEquipmentManager.cc::ManageZoneEquipment`
+2. `PurchasedAirManager.cc::InitPurchasedAir`
+3. `PurchasedAirManager.cc::CalcPurchAirLoads`
+4. `PurchasedAirManager.cc::UpdatePurchasedAir`
+5. `PurchasedAirManager.cc::ReportPurchasedAir`
 
 The entries are an ordering contract and trace/report scaffold. They do not
 claim that every routine has full EnergyPlus numerical parity yet.

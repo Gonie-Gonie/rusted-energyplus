@@ -104,8 +104,9 @@ and no-silent-oracle-fallback tests.
   behavior.
 - compatibility candidate lanes and diagnostic probe lanes are still too easy
   to confuse in code and reports.
-- `ExecutionPlan` needs actual EnergyPlus source-order stages as runtime
-  barriers, not only broad planning metadata.
+- `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
+  source-order barriers, but those barriers still need deeper stage-level
+  dispatch, snapshots, and mismatch gates.
 - `SupportAssessment` exists but is not yet driven centrally by
   `specs/capabilities.toml`.
 - arbitrary-run IdealLoads support needs to distinguish declared compatibility

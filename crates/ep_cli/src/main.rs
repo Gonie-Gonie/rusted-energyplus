@@ -470,8 +470,17 @@ fn execution_step_label(step: &ExecutionStep) -> String {
             format!("ManageZoneEquipment({})", id.0)
         }
         ExecutionStep::SimZoneEquipment(id) => format!("SimZoneEquipment({})", id.0),
+        ExecutionStep::InitIdealLoadsAirSystem(id) => {
+            format!("InitIdealLoadsAirSystem({})", id.0)
+        }
         ExecutionStep::EvaluateIdealLoadsAirSystem(id) => {
             format!("EvaluateIdealLoadsAirSystem({})", id.0)
+        }
+        ExecutionStep::UpdateIdealLoadsAirSystem(id) => {
+            format!("UpdateIdealLoadsAirSystem({})", id.0)
+        }
+        ExecutionStep::ReportIdealLoadsAirSystem(id) => {
+            format!("ReportIdealLoadsAirSystem({})", id.0)
         }
         ExecutionStep::WriteOutput(id) => format!("WriteOutput({})", id.0),
     }

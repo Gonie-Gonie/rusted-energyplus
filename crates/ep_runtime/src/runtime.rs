@@ -10859,8 +10859,8 @@ mod tests {
     };
     use crate::time_axis::{Date, next_day};
     use crate::{
-        ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry, build_execution_plan,
-        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
+        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_heat_balance_compatibility_stages,
     };
     use crate::{
@@ -11336,8 +11336,15 @@ mod tests {
         Ok(())
     }
 
+    fn stage_with_kind(stages: &[ExecutionStage], kind: ExecutionStageKind) -> &ExecutionStage {
+        stages
+            .iter()
+            .find(|stage| stage.kind == kind)
+            .expect("execution stage kind should exist")
+    }
+
     #[test]
-    fn execution_plan_orders_weather_schedule_zone_and_output() {
+    fn execution_plan_uses_heat_balance_source_order_stages() {
         let mut typed = TypedModel::default();
         typed.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -11363,35 +11370,51 @@ mod tests {
 
         let plan = build_execution_plan(&model);
 
-        assert_eq!(plan.stages.len(), 4);
+        assert_eq!(plan.stages.len(), 17);
         assert_eq!(plan.step_count(), 16);
-        assert_eq!(plan.stages[0].kind, ExecutionStageKind::Environment);
-        assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
+        assert!(
+            plan.stages
+                .iter()
+                .all(|stage| stage.kind.is_source_order_barrier())
+        );
         assert_eq!(
-            plan.stages[0].steps[1],
+            plan.stages
+                .iter()
+                .map(|stage| stage.kind)
+                .collect::<Vec<_>>(),
+            plan.compatibility_stages
+                .iter()
+                .map(|stage| stage.kind)
+                .collect::<Vec<_>>()
+        );
+
+        let init_heat_balance = stage_with_kind(&plan.stages, ExecutionStageKind::InitHeatBalance);
+        assert_eq!(init_heat_balance.steps[0], ExecutionStep::UpdateWeather);
+        assert_eq!(
+            init_heat_balance.steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
-        assert_eq!(plan.stages[1].kind, ExecutionStageKind::Zone);
-        assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].kind, ExecutionStageKind::ZoneEquipment);
-        assert_eq!(plan.stages[2].name, "zone-equipment");
-        assert!(plan.stages[2].steps.is_empty());
-        assert_eq!(plan.stages[3].kind, ExecutionStageKind::Output);
-        assert_eq!(plan.stages[3].steps.len(), 13);
+
+        let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
+        assert_eq!(manage_air.steps[0], ExecutionStep::SolveZone(ZoneId(0)));
+
+        let report_heat_balance =
+            stage_with_kind(&plan.stages, ExecutionStageKind::ReportHeatBalance);
+        assert_eq!(report_heat_balance.steps.len(), 13);
         assert_eq!(
-            plan.stages[3].steps[0],
+            report_heat_balance.steps[0],
             ExecutionStep::WriteOutput(OutputHandle(0))
         );
         assert_eq!(
-            plan.stages[3].steps[1],
+            report_heat_balance.steps[1],
             ExecutionStep::WriteOutput(OutputHandle(1))
         );
         assert_eq!(
-            plan.stages[3].steps[2],
+            report_heat_balance.steps[2],
             ExecutionStep::WriteOutput(OutputHandle(2))
         );
         assert_eq!(
-            plan.stages[3].steps[10],
+            report_heat_balance.steps[10],
             ExecutionStep::WriteOutput(OutputHandle(10))
         );
         assert_eq!(
@@ -11573,25 +11596,55 @@ mod tests {
 
         assert_eq!(model.graph.zone_thermostats.len(), 1);
         assert_eq!(model.graph.zone_ideal_loads.len(), 1);
-        assert_eq!(plan.stages[1].steps.len(), 2);
+        assert_eq!(plan.stages.len(), 22);
+
+        let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
+        assert_eq!(manage_air.steps.len(), 2);
         assert_eq!(
-            plan.stages[1].steps[0],
+            manage_air.steps[0],
             ExecutionStep::EvaluateZoneThermostat(ZoneThermostatId(0))
         );
-        assert_eq!(plan.stages[1].steps[1], ExecutionStep::SolveZone(ZoneId(0)));
-        assert_eq!(plan.stages[2].name, "zone-equipment");
-        assert_eq!(plan.stages[2].steps.len(), 3);
+        assert_eq!(manage_air.steps[1], ExecutionStep::SolveZone(ZoneId(0)));
+
+        let zone_equipment =
+            stage_with_kind(&plan.stages, ExecutionStageKind::ZoneEquipmentManager);
+        assert_eq!(zone_equipment.name, "zone-equipment-manager");
+        assert_eq!(zone_equipment.steps.len(), 2);
         assert_eq!(
-            plan.stages[2].steps[0],
+            zone_equipment.steps[0],
             ExecutionStep::ManageZoneEquipment(ZoneId(0))
         );
         assert_eq!(
-            plan.stages[2].steps[1],
+            zone_equipment.steps[1],
             ExecutionStep::SimZoneEquipment(ZoneEquipmentListId(0))
         );
+
+        let purchased_air_init =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerInit);
         assert_eq!(
-            plan.stages[2].steps[2],
+            purchased_air_init.steps[0],
+            ExecutionStep::InitIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
+        );
+
+        let purchased_air_calc =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerCalc);
+        assert_eq!(
+            purchased_air_calc.steps[0],
             ExecutionStep::EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
+        );
+
+        let purchased_air_update =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerUpdate);
+        assert_eq!(
+            purchased_air_update.steps[0],
+            ExecutionStep::UpdateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
+        );
+
+        let purchased_air_report =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerReport);
+        assert_eq!(
+            purchased_air_report.steps[0],
+            ExecutionStep::ReportIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
     }
 

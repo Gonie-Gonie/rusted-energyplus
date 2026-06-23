@@ -130,8 +130,14 @@ pub enum ExecutionStep {
     ManageZoneEquipment(ZoneId),
     /// Dispatch one `ZoneHVAC:EquipmentList` through `SimZoneEquipment`.
     SimZoneEquipment(ZoneEquipmentListId),
+    /// Initialize one `ZoneHVAC:IdealLoadsAirSystem` through `InitPurchasedAir`.
+    InitIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Evaluate one IdealLoads air system assigned to a zone.
     EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId),
+    /// Update one `ZoneHVAC:IdealLoadsAirSystem` through `UpdatePurchasedAir`.
+    UpdateIdealLoadsAirSystem(IdealLoadsAirSystemId),
+    /// Report one `ZoneHVAC:IdealLoadsAirSystem` through `ReportPurchasedAir`.
+    ReportIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Write one output handle.
     WriteOutput(OutputHandle),
 }
@@ -145,6 +151,16 @@ pub struct ExecutionStage {
     pub name: String,
     /// Ordered execution steps in this stage.
     pub steps: Vec<ExecutionStep>,
+}
+
+impl ExecutionStage {
+    fn from_compatibility_stage(stage: EnergyPlusCompatibilityStage) -> Self {
+        Self {
+            kind: stage.kind,
+            name: stage.stage_name.to_string(),
+            steps: Vec::new(),
+        }
+    }
 }
 
 /// EnergyPlus source routine that owns one compatibility-mode ordering barrier.
@@ -286,6 +302,43 @@ pub fn energyplus_heat_balance_compatibility_stages() -> Vec<EnergyPlusCompatibi
     ]
 }
 
+/// EnergyPlus IdealLoads source order used when an IdealLoads system is active.
+#[must_use]
+pub fn energyplus_ideal_loads_compatibility_stages() -> Vec<EnergyPlusCompatibilityStage> {
+    vec![
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::ZoneEquipmentManager,
+            stage_name: "zone-equipment-manager",
+            source_file: "src/EnergyPlus/ZoneEquipmentManager.cc",
+            source_routine: "ManageZoneEquipment",
+        },
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerInit,
+            stage_name: "purchased-air-manager-init",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "InitPurchasedAir",
+        },
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerCalc,
+            stage_name: "purchased-air-manager-calc",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "CalcPurchAirLoads",
+        },
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerUpdate,
+            stage_name: "purchased-air-manager-update",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "UpdatePurchasedAir",
+        },
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerReport,
+            stage_name: "purchased-air-manager-report",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "ReportPurchasedAir",
+        },
+    ]
+}
+
 /// Builds the first deterministic execution plan for the typed subset.
 #[must_use]
 pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
@@ -293,7 +346,11 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     setup_steps.extend(schedule_ids(model).map(ExecutionStep::EvaluateSchedule));
 
     let mut zone_steps = Vec::new();
-    let mut zone_equipment_steps = Vec::new();
+    let mut zone_equipment_manager_steps = Vec::new();
+    let mut purchased_air_init_steps = Vec::new();
+    let mut purchased_air_calc_steps = Vec::new();
+    let mut purchased_air_update_steps = Vec::new();
+    let mut purchased_air_report_steps = Vec::new();
     for zone in &model.typed.zones {
         zone_steps.extend(
             model
@@ -311,45 +368,105 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
             .filter(|edge| edge.zone == zone.id)
             .collect::<Vec<_>>();
         if !zone_ideal_loads.is_empty() {
-            zone_equipment_steps.push(ExecutionStep::ManageZoneEquipment(zone.id));
+            zone_equipment_manager_steps.push(ExecutionStep::ManageZoneEquipment(zone.id));
         }
         for edge in zone_ideal_loads {
-            zone_equipment_steps.push(ExecutionStep::SimZoneEquipment(edge.equipment_list));
-            zone_equipment_steps.push(ExecutionStep::EvaluateIdealLoadsAirSystem(
+            zone_equipment_manager_steps.push(ExecutionStep::SimZoneEquipment(edge.equipment_list));
+            purchased_air_init_steps.push(ExecutionStep::InitIdealLoadsAirSystem(
+                edge.ideal_loads_air_system,
+            ));
+            purchased_air_calc_steps.push(ExecutionStep::EvaluateIdealLoadsAirSystem(
+                edge.ideal_loads_air_system,
+            ));
+            purchased_air_update_steps.push(ExecutionStep::UpdateIdealLoadsAirSystem(
+                edge.ideal_loads_air_system,
+            ));
+            purchased_air_report_steps.push(ExecutionStep::ReportIdealLoadsAirSystem(
                 edge.ideal_loads_air_system,
             ));
         }
     }
 
-    ExecutionPlan {
-        stages: vec![
-            ExecutionStage {
-                kind: ExecutionStageKind::Environment,
-                name: "environment".to_string(),
-                steps: setup_steps,
-            },
-            ExecutionStage {
-                kind: ExecutionStageKind::Zone,
-                name: "zone".to_string(),
-                steps: zone_steps,
-            },
-            ExecutionStage {
-                kind: ExecutionStageKind::ZoneEquipment,
-                name: "zone-equipment".to_string(),
-                steps: zone_equipment_steps,
-            },
-            ExecutionStage {
-                kind: ExecutionStageKind::Output,
-                name: "output".to_string(),
-                steps: RuntimeOutputRegistry::from_model(model)
-                    .outputs()
-                    .iter()
-                    .map(|output| ExecutionStep::WriteOutput(output.handle))
-                    .collect(),
-            },
-        ],
-        compatibility_stages: energyplus_heat_balance_compatibility_stages(),
+    let compatibility_stages = energyplus_heat_balance_compatibility_stages();
+    let mut stages = compatibility_stages
+        .iter()
+        .copied()
+        .map(ExecutionStage::from_compatibility_stage)
+        .collect::<Vec<_>>();
+    push_steps_to_stage(
+        &mut stages,
+        ExecutionStageKind::InitHeatBalance,
+        setup_steps,
+    );
+    push_steps_to_stage(
+        &mut stages,
+        ExecutionStageKind::ManageAirHeatBalance,
+        zone_steps,
+    );
+    push_steps_to_stage(
+        &mut stages,
+        ExecutionStageKind::ReportHeatBalance,
+        RuntimeOutputRegistry::from_model(model)
+            .outputs()
+            .iter()
+            .map(|output| ExecutionStep::WriteOutput(output.handle))
+            .collect(),
+    );
+
+    if !zone_equipment_manager_steps.is_empty() {
+        stages.extend(
+            energyplus_ideal_loads_compatibility_stages()
+                .iter()
+                .copied()
+                .map(ExecutionStage::from_compatibility_stage),
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::ZoneEquipmentManager,
+            zone_equipment_manager_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerInit,
+            purchased_air_init_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerCalc,
+            purchased_air_calc_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerUpdate,
+            purchased_air_update_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerReport,
+            purchased_air_report_steps,
+        );
     }
+
+    ExecutionPlan {
+        stages,
+        compatibility_stages,
+    }
+}
+
+fn push_steps_to_stage(
+    stages: &mut [ExecutionStage],
+    kind: ExecutionStageKind,
+    steps: Vec<ExecutionStep>,
+) {
+    if steps.is_empty() {
+        return;
+    }
+
+    let stage = stages
+        .iter_mut()
+        .find(|stage| stage.kind == kind)
+        .expect("source-order stage must exist before adding execution steps");
+    stage.steps.extend(steps);
 }
 
 fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '_ {
