@@ -11582,8 +11582,8 @@ mod tests {
 
         assert_eq!(model.graph.zone_thermostats.len(), 1);
         assert_eq!(model.graph.zone_ideal_loads.len(), 1);
-        assert_eq!(plan.stages.len(), 22);
-        assert_eq!(plan.compatibility_stages.len(), 22);
+        assert_eq!(plan.stages.len(), 24);
+        assert_eq!(plan.compatibility_stages.len(), 24);
         assert!(plan.source_order_stages_match());
         assert_eq!(
             plan.expected_source_order_stage_ids(),
@@ -11591,7 +11591,15 @@ mod tests {
         );
         assert!(
             plan.expected_source_order_stage_ids()
-                .contains(&"purchased-air-manager-calc")
+                .contains(&"sim-purchased-air")
+        );
+        assert!(
+            plan.expected_source_order_stage_ids()
+                .contains(&"get-purchased-air")
+        );
+        assert!(
+            plan.expected_source_order_stage_ids()
+                .contains(&"calc-purch-air-loads")
         );
 
         let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
@@ -11613,6 +11621,20 @@ mod tests {
         assert_eq!(
             zone_equipment.steps[1],
             ExecutionStep::SimZoneEquipment(ZoneEquipmentListId(0))
+        );
+
+        let purchased_air_sim =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerSim);
+        assert_eq!(
+            purchased_air_sim.steps[0],
+            ExecutionStep::SimPurchasedAir(IdealLoadsAirSystemId(0))
+        );
+
+        let purchased_air_get =
+            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerGet);
+        assert_eq!(
+            purchased_air_get.steps[0],
+            ExecutionStep::GetIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
 
         let purchased_air_init =

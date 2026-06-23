@@ -53,6 +53,10 @@ pub enum ExecutionStageKind {
     CheckWarmupConvergence,
     /// EnergyPlus `ZoneEquipmentManager::ManageZoneEquipment`.
     ZoneEquipmentManager,
+    /// EnergyPlus `PurchasedAirManager::SimPurchasedAir`.
+    PurchasedAirManagerSim,
+    /// EnergyPlus `PurchasedAirManager::GetPurchasedAir`.
+    PurchasedAirManagerGet,
     /// EnergyPlus `PurchasedAirManager::InitPurchasedAir`.
     PurchasedAirManagerInit,
     /// EnergyPlus `PurchasedAirManager::CalcPurchAirLoads`.
@@ -98,6 +102,8 @@ impl ExecutionStageKind {
             }
             Self::CheckWarmupConvergence => "check_warmup_convergence",
             Self::ZoneEquipmentManager => "zone_equipment_manager",
+            Self::PurchasedAirManagerSim => "purchased_air_manager_sim",
+            Self::PurchasedAirManagerGet => "purchased_air_manager_get",
             Self::PurchasedAirManagerInit => "purchased_air_manager_init",
             Self::PurchasedAirManagerCalc => "purchased_air_manager_calc",
             Self::PurchasedAirManagerUpdate => "purchased_air_manager_update",
@@ -130,6 +136,10 @@ pub enum ExecutionStep {
     ManageZoneEquipment(ZoneId),
     /// Dispatch one `ZoneHVAC:EquipmentList` through `SimZoneEquipment`.
     SimZoneEquipment(ZoneEquipmentListId),
+    /// Enter `PurchasedAirManager::SimPurchasedAir` for one IdealLoads system.
+    SimPurchasedAir(IdealLoadsAirSystemId),
+    /// Resolve one `ZoneHVAC:IdealLoadsAirSystem` through `GetPurchasedAir`.
+    GetIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Initialize one `ZoneHVAC:IdealLoadsAirSystem` through `InitPurchasedAir`.
     InitIdealLoadsAirSystem(IdealLoadsAirSystemId),
     /// Evaluate one IdealLoads air system assigned to a zone.
@@ -341,26 +351,38 @@ pub fn energyplus_ideal_loads_compatibility_stages() -> Vec<EnergyPlusCompatibil
             source_routine: "ManageZoneEquipment",
         },
         EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerSim,
+            stage_name: "sim-purchased-air",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "SimPurchasedAir",
+        },
+        EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::PurchasedAirManagerGet,
+            stage_name: "get-purchased-air",
+            source_file: "src/EnergyPlus/PurchasedAirManager.cc",
+            source_routine: "GetPurchasedAir",
+        },
+        EnergyPlusCompatibilityStage {
             kind: ExecutionStageKind::PurchasedAirManagerInit,
-            stage_name: "purchased-air-manager-init",
+            stage_name: "init-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "InitPurchasedAir",
         },
         EnergyPlusCompatibilityStage {
             kind: ExecutionStageKind::PurchasedAirManagerCalc,
-            stage_name: "purchased-air-manager-calc",
+            stage_name: "calc-purch-air-loads",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "CalcPurchAirLoads",
         },
         EnergyPlusCompatibilityStage {
             kind: ExecutionStageKind::PurchasedAirManagerUpdate,
-            stage_name: "purchased-air-manager-update",
+            stage_name: "update-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "UpdatePurchasedAir",
         },
         EnergyPlusCompatibilityStage {
             kind: ExecutionStageKind::PurchasedAirManagerReport,
-            stage_name: "purchased-air-manager-report",
+            stage_name: "report-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "ReportPurchasedAir",
         },
@@ -375,6 +397,8 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
 
     let mut zone_steps = Vec::new();
     let mut zone_equipment_manager_steps = Vec::new();
+    let mut purchased_air_sim_steps = Vec::new();
+    let mut purchased_air_get_steps = Vec::new();
     let mut purchased_air_init_steps = Vec::new();
     let mut purchased_air_calc_steps = Vec::new();
     let mut purchased_air_update_steps = Vec::new();
@@ -400,6 +424,11 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
         }
         for edge in zone_ideal_loads {
             zone_equipment_manager_steps.push(ExecutionStep::SimZoneEquipment(edge.equipment_list));
+            purchased_air_sim_steps
+                .push(ExecutionStep::SimPurchasedAir(edge.ideal_loads_air_system));
+            purchased_air_get_steps.push(ExecutionStep::GetIdealLoadsAirSystem(
+                edge.ideal_loads_air_system,
+            ));
             purchased_air_init_steps.push(ExecutionStep::InitIdealLoadsAirSystem(
                 edge.ideal_loads_air_system,
             ));
@@ -454,6 +483,16 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
             &mut stages,
             ExecutionStageKind::ZoneEquipmentManager,
             zone_equipment_manager_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerSim,
+            purchased_air_sim_steps,
+        );
+        push_steps_to_stage(
+            &mut stages,
+            ExecutionStageKind::PurchasedAirManagerGet,
+            purchased_air_get_steps,
         );
         push_steps_to_stage(
             &mut stages,

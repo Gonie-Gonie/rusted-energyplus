@@ -1068,6 +1068,10 @@ fn execution_step_label(step: &ExecutionStep) -> String {
             format!("ManageZoneEquipment({})", id.0)
         }
         ExecutionStep::SimZoneEquipment(id) => format!("SimZoneEquipment({})", id.0),
+        ExecutionStep::SimPurchasedAir(id) => format!("SimPurchasedAir({})", id.0),
+        ExecutionStep::GetIdealLoadsAirSystem(id) => {
+            format!("GetIdealLoadsAirSystem({})", id.0)
+        }
         ExecutionStep::InitIdealLoadsAirSystem(id) => {
             format!("InitIdealLoadsAirSystem({})", id.0)
         }

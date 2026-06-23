@@ -115,9 +115,12 @@ timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
   compatibility execution variant. The execution body itself is still inside
   the legacy `runtime.rs` during the module split.
 - `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
-  source-order barriers, writes expected/actual source-order stage IDs to
-  `execution-plan.json` and `run-summary.json`, and blocks runtime execution
-  with a Plan exit if the lists diverge. Deeper stage-level dispatch and
-  snapshots still need to move out of the legacy runtime body.
+  source-order barriers, including `SimPurchasedAir`, `GetPurchasedAir`,
+  `InitPurchasedAir`, `CalcPurchAirLoads`, `UpdatePurchasedAir`, and
+  `ReportPurchasedAir` for the arbitrary-run IdealLoads lane. It writes
+  expected/actual source-order stage IDs to `execution-plan.json` and
+  `run-summary.json`, and blocks runtime execution with a Plan exit if the
+  lists diverge. Deeper stage-level dispatch and snapshots still need to move
+  out of the legacy runtime body.
 - old plan/readiness content is still present outside current navigation and
   must be shrunk, moved to specs/ADR, or removed.

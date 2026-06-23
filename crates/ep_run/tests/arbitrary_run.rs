@@ -286,7 +286,7 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
             .as_array()
             .expect("source order stages should be an array")
             .iter()
-            .any(|stage| stage == "purchased-air-manager-calc")
+            .any(|stage| stage == "calc-purch-air-loads")
     );
     let plan = read_json(&output_dir.join("model").join("execution-plan.json"))?;
     assert_eq!(plan["source_order_gate"]["matches"], true);

@@ -39,9 +39,12 @@ heat-balance runs and declared IdealLoads no-OA sensible, numeric finite-limit,
 and ConstantSensibleHeatRatio PurchasedAir branches are the current
 `supported_compatibility_run` arbitrary-run paths. The IdealLoads path executes
 through the typed ZoneEquipmentManager -> PurchasedAirManager source-order
-wrapper, writes IdealLoads output variables and supply-node output variables,
-and still keeps `conformance_claim=false` for ad-hoc runs. Broad HVAC, plant,
-EMS, PythonPlugin, AirflowNetwork, sizing workflows,
+wrapper; its plan records `SimPurchasedAir`, `GetPurchasedAir`,
+`InitPurchasedAir`, `CalcPurchAirLoads`, `UpdatePurchasedAir`, and
+`ReportPurchasedAir` barriers before runtime output export. It writes
+IdealLoads output variables and supply-node output variables, and still keeps
+`conformance_claim=false` for ad-hoc runs. Broad HVAC, plant, EMS,
+PythonPlugin, AirflowNetwork, sizing workflows,
 fenestration/daylighting/shading, IdealLoads humidity/OA/economizer/heat
 recovery branches, and broad surface-boundary families remain outside the
 arbitrary runtime.
