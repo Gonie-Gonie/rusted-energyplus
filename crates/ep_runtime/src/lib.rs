@@ -14,6 +14,7 @@ pub mod plant;
 mod runtime;
 pub mod simulation_state;
 pub mod time_axis;
+pub mod weather;
 pub mod zone_equipment;
 
 pub use diagnostic_probes::*;
