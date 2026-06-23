@@ -91,6 +91,9 @@ is counted as a Rust result.
 Dry-run execution is also covered as a support-assessment-only path: even if
 oracle baseline and compare are requested, runtime, oracle, and compare remain
 skipped.
+`partial_supported_run` is covered as an explicit diagnostic/ad-hoc path: it
+requires diagnostic mode with partial execution allowed, uses a diagnostic-only
+runtime class, and keeps `conformance_claim=false`.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared IdealLoads

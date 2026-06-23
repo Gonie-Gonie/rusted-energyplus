@@ -23,6 +23,8 @@ Important boundaries:
 - unsupported inputs do not fall back to EnergyPlus as the Rust result
 - heat-balance compatibility runs require a weather EPW; a missing weather path
   exits with `args` before Rust runtime execution
+- `partial_supported_run` requires `--mode diagnostic --partial allow`; it is
+  diagnostic/ad-hoc output and never release conformance evidence
 - `--oracle-baseline` writes an EnergyPlus run under `out/oracle`
 - `--oracle-baseline` can still generate `out/oracle` for a `run_blocked`
   input; `rust_runtime` remains null and no EnergyPlus output is reported as a

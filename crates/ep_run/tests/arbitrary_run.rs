@@ -435,6 +435,62 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
 }
 
 #[test]
+fn diagnostic_allow_runs_partial_supported_projection() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("partial-supported-projection")?;
+    let input_path = case_dir.join("mixed-ideal-loads.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, IDEAL_LOADS_MIXED_BRANCH_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Diagnostic,
+        partial_policy: PartialRunPolicy::Allow,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
+    assert_eq!(outcome.support_status, SupportStatus::SupportedDiagnosticOnly);
+    assert_eq!(outcome.run_result_state, RunResultState::PartialSupportedRun);
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "success");
+    assert_eq!(summary["config"]["mode"], "diagnostic");
+    assert_eq!(summary["config"]["partial_policy"], "allow");
+    assert_eq!(
+        summary["support"]["status"],
+        "supported-diagnostic-only"
+    );
+    assert_eq!(
+        summary["support"]["run_result_state"],
+        "partial_supported_run"
+    );
+    assert_eq!(
+        summary["support"]["runtime_class"],
+        "ideal-loads-node-state-projection"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["runtime_class"],
+        "ideal-loads-node-state-projection"
+    );
+    assert_eq!(summary["support"]["conformance_claim"], false);
+    assert_eq!(summary["source_order_gate"]["matches"], true);
+    assert_output_layout(&output_dir, true)?;
+    Ok(())
+}
+
+#[test]
 fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-diagnostic")?;
@@ -846,6 +902,84 @@ const IDEAL_LOADS_EPJSON: &str = r#"{
           "zone_equipment_name": "Zone Ideal Loads",
           "zone_equipment_cooling_sequence": 1,
           "zone_equipment_heating_or_no_load_sequence": 1
+        }
+      ]
+    }
+  },
+  "ZoneHVAC:EquipmentConnections": {
+    "Zone One": {
+      "zone_name": "Zone One",
+      "zone_conditioning_equipment_list_name": "Zone Equipment",
+      "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
+      "zone_air_node_name": "Zone One Air Node",
+      "zone_return_air_node_or_nodelist_name": "Zone One Return"
+    }
+  }
+}"#;
+
+const IDEAL_LOADS_MIXED_BRANCH_EPJSON: &str = r#"{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "Schedule:Constant": {
+    "Control Type": {"hourly_value": 4},
+    "Heating Setpoint": {"hourly_value": 21},
+    "Cooling Setpoint": {"hourly_value": 24}
+  },
+  "ThermostatSetpoint:DualSetpoint": {
+    "Dual Setpoints": {
+      "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+      "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+    }
+  },
+  "ZoneControl:Thermostat": {
+    "Zone Thermostat": {
+      "zone_or_zonelist_name": "Zone One",
+      "control_type_schedule_name": "Control Type",
+      "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+      "control_1_name": "Dual Setpoints"
+    }
+  },
+  "NodeList": {
+    "Zone Inlets": {
+      "nodes": [
+        {"node_name": "Zone One Inlet"},
+        {"node_name": "Zone One Limited Inlet"}
+      ]
+    },
+    "Zone Limited Inlets": {
+      "nodes": [{"node_name": "Zone One Limited Inlet"}]
+    }
+  },
+  "ZoneHVAC:IdealLoadsAirSystem": {
+    "Zone Ideal Loads": {
+      "zone_supply_air_node_name": "Zone Inlets",
+      "dehumidification_control_type": "None",
+      "humidification_control_type": "None"
+    },
+    "Zone Ideal Loads Limited": {
+      "zone_supply_air_node_name": "Zone Limited Inlets",
+      "heating_limit": "LimitCapacity",
+      "maximum_sensible_heating_capacity": 500.0,
+      "cooling_limit": "LimitCapacity",
+      "maximum_total_cooling_capacity": 500.0,
+      "dehumidification_control_type": "None",
+      "humidification_control_type": "None"
+    }
+  },
+  "ZoneHVAC:EquipmentList": {
+    "Zone Equipment": {
+      "equipment": [
+        {
+          "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+          "zone_equipment_name": "Zone Ideal Loads",
+          "zone_equipment_cooling_sequence": 1,
+          "zone_equipment_heating_or_no_load_sequence": 1
+        },
+        {
+          "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+          "zone_equipment_name": "Zone Ideal Loads Limited",
+          "zone_equipment_cooling_sequence": 2,
+          "zone_equipment_heating_or_no_load_sequence": 2
         }
       ]
     }
