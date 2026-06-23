@@ -11,12 +11,28 @@ broad_heat_balance_compatibility = false
 hvac_compatibility = false
 plant_compatibility = false
 full_runtime_compatibility = false
+arbitrary_runs_are_release_evidence = false
+
+requirements = [
+  "case_manifest",
+  "declared_variables_or_meters",
+  "tolerance_rules",
+  "energyplus_oracle_baseline",
+  "rust_result_artifact",
+  "compare_summary_json",
+  "compare_report_md",
+  "blocking_gate",
+]
 
 [optimization]
 allowed = [
+  "typed_ids",
   "data_structures",
   "execution_plan",
+  "precompute",
   "cache",
+  "output_handles",
+  "trace_throttling",
   "diagnostics",
   "result_store",
   "numerical_implementation_within_tolerance",
@@ -24,9 +40,58 @@ allowed = [
 ]
 forbidden_without_experimental_mode = [
   "engineering_algorithm_change",
+  "algorithm_variant_delta_tuning",
+  "diagnostic_probe_as_compatibility_candidate",
   "timestep_semantics_change",
   "setpoint_manager_timing_change",
   "plant_dispatch_semantics_change",
+]
+
+[[mode]]
+id = "compatibility"
+claim_eligible = true
+description = "EnergyPlus source-order algorithm path."
+
+[[mode]]
+id = "diagnostic"
+claim_eligible = false
+description = "Compatibility functions plus extra instrumentation or probes."
+
+[[mode]]
+id = "partial"
+claim_eligible = false
+description = "Explicit supported-subset run; diagnostic/ad-hoc only."
+
+[[mode]]
+id = "fast"
+claim_eligible = false
+description = "Performance-oriented experiment; not compatibility evidence."
+
+[[mode]]
+id = "experimental"
+claim_eligible = false
+description = "Algorithm or semantic experiment; not compatibility evidence."
+
+[run_states]
+spec = "specs/run_result_states.toml"
+
+[diagnostic_only]
+can_call_compatibility_path = true
+can_be_counted_as_conformance = false
+rules = [
+  "diagnostic_rows_do_not_increment_conformance_counts",
+  "diagnostic_reports_do_not_create_claims",
+  "conformance_case_selecting_diagnostic_algorithm_must_fail",
+]
+
+[partial_runs]
+opt_in_required = true
+conformance_claim = false
+rules = [
+  "ignored_objects_are_listed",
+  "inactive_or_ignorable_objects_require_explicit_rule",
+  "active_ignored_objects_require_approximation_mode",
+  "partial_results_are_labeled_diagnostic",
 ]
 
 [documentation]

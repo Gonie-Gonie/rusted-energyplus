@@ -2,73 +2,58 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-23
 ---
 
 # Roadmap
 
-The roadmap is spec-led. The canonical milestone list is maintained in
-`specs/milestones.toml`, and the readable index is generated at
-`docs/src/generated/milestone-map.md`.
+The roadmap is phase-led. Historical milestones remain in
+`specs/milestones.toml` and generated docs, but new work should be planned
+around source-order porting stages rather than version-number accumulation.
 
-Current direction:
+## P0: Current-State Judgment Correction
 
-- v0.16 reset the evidence and versioning contract for Road to v1.0.
-- v0.17 made manifest schema v2 a blocking validation gate.
-- v0.18 connected manifest-owned output-request injection to the oracle
-  baseline pipeline.
-- v0.19 hardened selected series readers and comparison metrics.
-- v0.20 promoted release conformance index generation and coverage matrices.
-- v0.21 made the algorithm ledger a source-map validation gate.
-- v0.22 promoted declared `Schedule Value` and dry-bulb hourly conformance
-  using timestamp-aligned ESO comparisons.
-- v0.23 promoted official `1ZoneUncontrolled` static EIO model evidence for
-  declared surface, construction/material, and OtherEquipment nominal fields
-  without claiming dynamic heat-balance compatibility.
-- v0.24 hardened runtime state, output registry, meter registry, result
-  storage, diagnostics, and profiling scaffolds without adding new numerical
-  conformance.
-- v0.25 generalized opaque no-mass heat-balance boundary handling for declared
-  variables only.
-- v0.26 promoted the declared `Zone Total Internal Convective Heating Rate`
-  hourly series for `internal_gains_001`, without claiming zone temperature
-  response, radiant/latent coupling, HVAC, plant, meter, or broad heat-balance
-  compatibility.
-- v0.27 added a user-facing support coverage report generated with `oodocs`
-  from specs and case manifests, without adding new numerical conformance.
-- v0.28 enriched input object coverage with first evidence and support-boundary
-  metadata for user-facing report generation.
-- v0.29 enriched output variable coverage with strongest-evidence first
-  references and support-boundary metadata.
-- v0.30 enriched algorithm coverage with first evidence and support-boundary
-  metadata for the user-facing report.
-- v0.31 added a release evidence asset manifest so package, numerical
-  evidence, conformance index, and support coverage assets are checked and
-  documented together.
-- v0.32 added a user coverage handbook generated from support coverage and
-  conformance index JSON, keeping current input, output, algorithm, promoted
-  case, and gap boundaries user-readable.
+Treat existing surfaces as implementation to audit and harden, not as completed
+checklist items. `ep_run`, support assessment, launcher scripts, PDF/evidence
+scripts, and IdealLoads branch candidates already exist, so the next work is
+classification, source-order alignment, capability integration, and evidence
+hardening.
 
-Current post-v0.32 development has promoted the narrow official dynamic
-heat-balance compatibility candidate for the IDFs used through v0.26 evidence:
-`heat_balance_nomass_001`, `surface_temperature_nomass_001`,
-`internal_gains_001`, and the official `1ZoneUncontrolled` ExampleFile tracker.
-The v0.33 compatibility-candidate gate now passes for the declared weather,
-zone-air, surface-temperature, surface-conduction, and declared exterior source variables. Broader
-ExampleFiles dynamic compatibility remains future work because floor storage fixed-point generality, exterior source rows outside the declared wall/roof rate and roof per-area rows, HVAC, plant, fenestration, and full warmup
-convergence semantics are still outside the promoted claim. The planning
-inventory command `scripts\dev.cmd v0.26-dynamic-idf-inventory` keeps the
-IDF-backed case list and remaining dynamic gaps explicit while that runtime
-work proceeds.
+## Phase 1: Source-Order Runtime Reset
 
-The long-term targets remain:
+Tighten the contract, docs, specs, and runtime boundaries. Split diagnostic
+probes away from compatibility paths, make `ExecutionPlan` an actual runtime
+barrier, and keep unsupported features typed and explicit.
 
-- v1.0: substantial declared compatibility draft
-- v2.0: EnergyPlus 26.1 full compatibility mode with evidence
-- v3.0: faster modernized successor while preserving compatibility mode
+## Phase 2: 1ZoneUncontrolled Clean Conformance
 
-Plans after v0.16 should be added to `specs/milestones.toml` first. Markdown
-planning pages are allowed only when a human explanation is needed.
+Port the heat-balance path around EnergyPlus routines: `ManageHeatBalance`,
+`ManageSurfaceHeatBalance`, `ManageAirHeatBalance`,
+`ZoneTempPredictorCorrector`, and the CTF history handoff. Promote only
+declared official `1ZoneUncontrolled` variables with reports and blocking
+gates.
 
-Old milestone planning pages are not retained in the docs tree. Use
-`specs/milestones.toml`, release notes, and Git history for historical context.
+## Phase 3: IdealLoads Clean Conformance
+
+Port `ZoneEquipmentManager` dispatch and `PurchasedAirManager` source-order
+paths. Start with no-OA/no-limit sensible, finite limits, and
+ConstantSensibleHeatRatio before expanding humidity, outdoor-air, economizer,
+heat-recovery, and meter branches.
+
+## Phase 4: Arbitrary IDF Run Framework
+
+Harden the existing `ep_run` crate as the only CLI-independent orchestration
+layer. Keep `ep_cli` as command dispatch, connect `SupportAssessment` to the
+capability registry, add branch-specific runtime classes, and verify output
+layout, run states, exit codes, oracle baseline, and oracle compare.
+
+## Phase 5: ExampleFiles Coverage Expansion
+
+Add ExampleFiles only when their active object graph maps to supported
+capabilities or produces a clean blocked/partial support report.
+
+## Phase 6: HVAC/Plant Expansion
+
+Expand beyond IdealLoads and heat balance only after source maps, algorithm
+ledger entries, support rules, runtime ownership, and evidence gates exist for
+the target subsystem.

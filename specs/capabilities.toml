@@ -6,6 +6,206 @@ status = "initial"
 claim_boundary = "ad-hoc arbitrary runs never set conformance_claim=true automatically"
 default_mode = "compatibility"
 support_gate = "internal"
+run_result_states = "specs/run_result_states.toml"
+
+[[capability]]
+id = "official_1zone_uncontrolled_declared_heat_balance"
+domain = "heat_balance"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "Zone",
+  "BuildingSurface:Detailed",
+  "Construction",
+  "Material",
+  "Material:NoMass",
+  "RunPeriod",
+  "Timestep",
+]
+forbidden_active_features = [
+  "AirLoopHVAC",
+  "PlantLoop",
+  "EMS",
+  "PythonPlugin",
+  "AirflowNetwork",
+  "Daylighting",
+  "FenestrationSurface",
+  "Autosizing",
+]
+algorithms = [
+  "manage_heat_balance",
+  "manage_surface_heat_balance",
+  "manage_air_heat_balance",
+  "zone_air_updates",
+  "ctf_conduction_path",
+]
+claim_boundary = "Official 1ZoneUncontrolled compatibility only for declared variables and tolerances."
+
+[[capability]]
+id = "ideal_loads_no_oa_sensible"
+domain = "ideal_loads"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneHVAC:EquipmentConnections",
+  "ZoneHVAC:EquipmentList",
+  "ZoneControl:Thermostat",
+  "ThermostatSetpoint:DualSetpoint",
+]
+forbidden_active_features = [
+  "OutdoorAir",
+  "Economizer",
+  "HeatRecovery",
+  "Autosizing",
+  "EMS",
+  "PythonPlugin",
+]
+algorithms = [
+  "zone_equipment_manager",
+  "sim_purchased_air",
+  "calc_no_oa_sensible",
+  "update_purchased_air",
+  "report_purchased_air",
+]
+claim_boundary = "No-OA/no-limit sensible branch only for declared case variables."
+
+[[capability]]
+id = "ideal_loads_finite_limits"
+domain = "ideal_loads"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneHVAC:EquipmentConnections",
+  "ZoneHVAC:EquipmentList",
+  "ZoneControl:Thermostat",
+  "ThermostatSetpoint:DualSetpoint",
+]
+forbidden_active_features = [
+  "OutdoorAir",
+  "Economizer",
+  "HeatRecovery",
+  "Autosizing",
+  "EMS",
+  "PythonPlugin",
+]
+algorithms = [
+  "calc_no_oa_sensible_with_capacity_limit",
+  "calc_no_oa_sensible_with_flow_limit",
+  "calc_no_oa_sensible_with_flow_and_capacity_limit",
+]
+claim_boundary = "Numeric capacity, flow, and flow+capacity limits only for declared IdealLoads finite-limit cases."
+
+[[capability]]
+id = "ideal_loads_constant_shr"
+domain = "ideal_loads"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneHVAC:EquipmentConnections",
+  "ZoneHVAC:EquipmentList",
+  "ZoneControl:Thermostat",
+  "ThermostatSetpoint:DualSetpoint",
+]
+forbidden_active_features = [
+  "OutdoorAir",
+  "Economizer",
+  "HeatRecovery",
+  "Autosizing",
+  "EMS",
+  "PythonPlugin",
+]
+algorithms = [
+  "calc_constant_sensible_heat_ratio",
+]
+claim_boundary = "ConstantSensibleHeatRatio branch only where declared and gated."
+
+[[capability]]
+id = "ideal_loads_humidity_selected_branches"
+domain = "ideal_loads"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneControl:Thermostat",
+  "ZoneControl:Humidistat",
+]
+forbidden_active_features = [
+  "OutdoorAir",
+  "Economizer",
+  "HeatRecovery",
+  "Autosizing",
+  "EMS",
+  "PythonPlugin",
+]
+algorithms = [
+  "constant_supply_humidity_ratio",
+  "humidistat_dehumidification",
+  "humidistat_humidification",
+]
+claim_boundary = "Only declared humidity-control candidate branches; broad humidity control remains outside the claim."
+
+[[capability]]
+id = "ideal_loads_outdoor_air_selected_branches"
+domain = "ideal_loads"
+support_level = "compatibility"
+run_state = "supported_compatibility_run"
+required_objects = [
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "DesignSpecification:OutdoorAir",
+]
+forbidden_active_features = [
+  "Autosizing",
+  "EMS",
+  "PythonPlugin",
+  "AirLoopHVAC",
+  "PlantLoop",
+]
+algorithms = [
+  "outdoor_air_flow_zone",
+  "outdoor_air_flow_person",
+  "outdoor_air_flow_area",
+  "outdoor_air_air_changes",
+  "outdoor_air_sum",
+  "outdoor_air_maximum",
+  "differential_dry_bulb_economizer",
+  "differential_enthalpy_economizer",
+  "sensible_heat_recovery",
+  "enthalpy_heat_recovery",
+]
+claim_boundary = "Only declared IdealLoads outdoor-air/economizer/heat-recovery branch candidates."
+
+[[unsupported_rule]]
+id = "unsupported_hvac_air_loop"
+object_patterns = ["AirLoopHVAC*", "Fan:*", "Coil:*", "Controller:*", "SetpointManager:*", "AirTerminal:*"]
+severity = "run_blocked"
+reason = "Broad HVAC air-loop semantics are not ported."
+
+[[unsupported_rule]]
+id = "unsupported_plant"
+object_patterns = ["PlantLoop", "Branch", "BranchList", "Connector:*", "ConnectorList", "Pump:*", "Boiler:*", "Chiller:*"]
+severity = "run_blocked"
+reason = "Plant loop semantics are not ported."
+
+[[unsupported_rule]]
+id = "unsupported_ems_python_airflow"
+object_patterns = ["EnergyManagementSystem:*", "PythonPlugin:*", "AirflowNetwork:*"]
+severity = "run_blocked"
+reason = "Runtime-modifying plugin/network features are not ported."
+
+[[partial_rule]]
+id = "ignored_reporting_objects"
+object_patterns = ["Output:*", "OutputControl:*"]
+eligible_state = "partial_supported_run"
+reason = "Reporting requests can be exported or reported unsupported without changing simulation semantics."
+
+[[partial_rule]]
+id = "inactive_or_unused_raw_objects"
+object_patterns = ["SimulationControl", "SizingPeriod:DesignDay", "GlobalGeometryRules", "ShadowCalculation"]
+eligible_state = "partial_supported_run"
+reason = "Preserved for diagnostics or staging when inactive for the current runtime subset."
 
 [arbitrary_run.runtime.heat_balance_zone_air_diagnostic]
 status = "supported-compatibility"

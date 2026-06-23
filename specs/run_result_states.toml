@@ -1,0 +1,22 @@
+schema = "rusted-energyplus.run-result-states.v1"
+
+[[state]]
+id = "run_blocked"
+label = "Cannot run"
+description = "Unsupported active object or calculation affects required simulation semantics."
+runtime_executed = false
+conformance_claim = false
+
+[[state]]
+id = "partial_supported_run"
+label = "Partial supported run"
+description = "Unsupported objects were ignored or excluded by explicit rule; result is diagnostic/ad-hoc only."
+runtime_executed = true
+conformance_claim = false
+
+[[state]]
+id = "supported_compatibility_run"
+label = "Supported compatibility run"
+description = "All active required features match supported capabilities."
+runtime_executed = true
+conformance_claim = false

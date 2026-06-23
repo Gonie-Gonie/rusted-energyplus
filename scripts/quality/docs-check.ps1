@@ -18,6 +18,7 @@ $required = @(
     "src\current\roadmap.md",
     "src\current\verification.md",
     "src\current\architecture-overview.md",
+    "src\current\launcher-and-run-framework.md",
     "src\guides\setup.md",
     "src\guides\developer-workflow.md",
     "src\guides\release-process.md",
