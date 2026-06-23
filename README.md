@@ -22,8 +22,8 @@ Rust artifacts, generated compare reports, and a blocking gate.
 ## Current Public Scope Summary
 
 - Rust workspace with pinned toolchain and repo-local EnergyPlus 26.1.0 oracle
-- RawModel, TypedModel, SimulationModel, and existing arbitrary IDF/epJSON
-  `ep_run` pipeline that still needs hardening
+- RawModel, TypedModel, SimulationModel, and the arbitrary IDF/epJSON `ep_run`
+  pipeline with support assessment, run states, and stable artifacts
 - generated support assessment, diagnostics, run summary, compatibility
   boundary, and optional oracle compare artifacts
 - declared conformance infrastructure for output requests, tolerances,

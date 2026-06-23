@@ -96,8 +96,10 @@ foreach ($relative in $expectedArtifacts) {
 $executionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "model\execution-plan.json") | ConvertFrom-Json
 Assert-Equal -Actual @($executionPlan.stages)[0].kind -Expected "get_heat_balance_input" -Description "execution plan first source-order kind"
 Assert-Equal -Actual @($executionPlan.stages)[4].kind -Expected "manage_surface_heat_balance" -Description "execution plan source-order surface manager kind"
+Assert-Equal -Actual @($executionPlan.stages)[9].kind -Expected "manage_zone_air_updates" -Description "execution plan source-order zone air update kind"
 Assert-Equal -Actual @($executionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "execution plan source-order first kind"
 Assert-Equal -Actual @($executionPlan.compatibility_stages)[4].kind -Expected "manage_surface_heat_balance" -Description "execution plan source-order surface manager kind"
+Assert-Equal -Actual @($executionPlan.compatibility_stages)[9].kind -Expected "manage_zone_air_updates" -Description "execution plan source-order zone air update compatibility kind"
 
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
@@ -158,6 +160,7 @@ foreach ($relative in @(
 
 $blockedExecutionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "model\execution-plan.json") | ConvertFrom-Json
 Assert-Equal -Actual @($blockedExecutionPlan.stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan first source-order kind"
+Assert-Equal -Actual @($blockedExecutionPlan.stages)[9].kind -Expected "manage_zone_air_updates" -Description "blocked execution plan zone air update kind"
 Assert-Equal -Actual @($blockedExecutionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan source-order first kind"
 
 $blockedSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "run-summary.json") | ConvertFrom-Json

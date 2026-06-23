@@ -68,6 +68,13 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
         summary["source_order_gate"]["expected_source_order_stages"][0],
         "get-heat-balance-input"
     );
+    assert!(
+        summary["source_order_gate"]["expected_source_order_stages"]
+            .as_array()
+            .expect("source-order stages should be an array")
+            .iter()
+            .any(|stage| stage == "manage-zone-air-updates")
+    );
     assert_eq!(
         summary["source_order_gate"]["actual_executed_source_order_stages"],
         summary["source_order_gate"]["expected_source_order_stages"]
@@ -434,6 +441,13 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
     assert_eq!(
         plan["source_order_gate"]["actual_executed_source_order_stages"],
         plan["source_order_gate"]["expected_source_order_stages"]
+    );
+    assert!(
+        plan["source_order_gate"]["expected_source_order_stages"]
+            .as_array()
+            .expect("source-order stages should be an array")
+            .iter()
+            .any(|stage| stage == "manage-zone-air-updates")
     );
     let results = std::fs::read_to_string(output_dir.join("results").join("result-store.json"))?;
     assert!(results.contains("Zone Ideal Loads Zone Total Heating Rate"));

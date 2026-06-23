@@ -44,6 +44,13 @@ ZoneEquipmentManager dispatch and PurchasedAirManager `SimPurchasedAir`,
 `UpdatePurchasedAir`, and `ReportPurchasedAir` barriers. A conformance case
 that selects a diagnostic algorithm must hard fail.
 
+Heat-balance source-order stage definitions live under `ep_runtime::heat_balance`
+instead of in the legacy runtime root. The current plan includes
+`ManageAirHeatBalance` and the separate
+`ZoneTempPredictorCorrector::ManageZoneAirUpdates` barrier before
+`UpdateFinalSurfaceHeatBalance`, so zone-air solve steps are attached to the
+zone predictor/corrector stage rather than a broad air-manager bucket.
+
 Source files should stay small enough for review and LLM-assisted development:
 400 LOC is preferred, 800 LOC needs attention, and 1200 LOC needs an explicit
 temporary waiver.

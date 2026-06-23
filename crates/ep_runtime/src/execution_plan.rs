@@ -1,6 +1,6 @@
 //! Runtime execution plan and EnergyPlus source-order stage metadata.
 
-use crate::RuntimeOutputRegistry;
+use crate::{RuntimeOutputRegistry, manage_heat_balance_source_order_stages};
 use ep_model::{
     IdealLoadsAirSystemId, OutputHandle, ScheduleId, SimulationModel, ZoneEquipmentListId, ZoneId,
     ZoneThermostatId,
@@ -35,6 +35,8 @@ pub enum ExecutionStageKind {
     CalcHeatBalanceInsideSurf,
     /// EnergyPlus `HeatBalanceAirManager::ManageAirHeatBalance`.
     ManageAirHeatBalance,
+    /// EnergyPlus `ZoneTempPredictorCorrector::ManageZoneAirUpdates`.
+    ManageZoneAirUpdates,
     /// EnergyPlus `HeatBalanceSurfaceManager::UpdateFinalSurfaceHeatBalance`.
     UpdateFinalSurfaceHeatBalance,
     /// EnergyPlus `HeatBalanceSurfaceManager::UpdateThermalHistories`.
@@ -89,6 +91,7 @@ impl ExecutionStageKind {
             Self::CalcHeatBalanceOutsideSurf => "calc_heat_balance_outside_surf",
             Self::CalcHeatBalanceInsideSurf => "calc_heat_balance_inside_surf",
             Self::ManageAirHeatBalance => "manage_air_heat_balance",
+            Self::ManageZoneAirUpdates => "manage_zone_air_updates",
             Self::UpdateFinalSurfaceHeatBalance => "update_final_surface_heat_balance",
             Self::UpdateThermalHistories => "update_thermal_histories",
             Self::ReportSurfaceHeatBalance => "report_surface_heat_balance",
@@ -234,110 +237,7 @@ impl ExecutionPlan {
 /// EnergyPlus heat-balance source order used as the compatibility-mode contract.
 #[must_use]
 pub fn energyplus_heat_balance_compatibility_stages() -> Vec<EnergyPlusCompatibilityStage> {
-    vec![
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::GetHeatBalanceInput,
-            stage_name: "get-heat-balance-input",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "GetHeatBalanceInput",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::EmsBeginZoneTimestepBeforeInitHeatBalance,
-            stage_name: "ems-begin-zone-timestep-before-init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS BeginZoneTimestepBeforeInitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::InitHeatBalance,
-            stage_name: "init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "InitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::EmsBeginZoneTimestepAfterInitHeatBalance,
-            stage_name: "ems-begin-zone-timestep-after-init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS BeginZoneTimestepAfterInitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::ManageSurfaceHeatBalance,
-            stage_name: "manage-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "ManageSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::InitSurfaceHeatBalance,
-            stage_name: "init-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "InitSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::CalcHeatBalanceOutsideSurf,
-            stage_name: "calc-heat-balance-outside-surf",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "CalcHeatBalanceOutsideSurf",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::CalcHeatBalanceInsideSurf,
-            stage_name: "calc-heat-balance-inside-surf",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "CalcHeatBalanceInsideSurf",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::ManageAirHeatBalance,
-            stage_name: "manage-air-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceAirManager.cc",
-            source_routine: "ManageAirHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::UpdateFinalSurfaceHeatBalance,
-            stage_name: "update-final-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "UpdateFinalSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::UpdateThermalHistories,
-            stage_name: "update-thermal-histories",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "UpdateThermalHistories",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::ReportSurfaceHeatBalance,
-            stage_name: "report-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "ReportSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::EmsEndZoneTimestepBeforeZoneReporting,
-            stage_name: "ems-end-zone-timestep-before-zone-reporting",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS EndZoneTimestepBeforeZoneReporting",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::RecKeepHeatBalance,
-            stage_name: "rec-keep-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "RecKeepHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::ReportHeatBalance,
-            stage_name: "report-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "ReportHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::EmsEndZoneTimestepAfterZoneReporting,
-            stage_name: "ems-end-zone-timestep-after-zone-reporting",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS EndZoneTimestepAfterZoneReporting",
-        },
-        EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::CheckWarmupConvergence,
-            stage_name: "check-warmup-convergence",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "CheckWarmupConvergence",
-        },
-    ]
+    manage_heat_balance_source_order_stages()
 }
 
 /// EnergyPlus IdealLoads source order used when an IdealLoads system is active.
@@ -457,7 +357,7 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     );
     push_steps_to_stage(
         &mut stages,
-        ExecutionStageKind::ManageAirHeatBalance,
+        ExecutionStageKind::ManageZoneAirUpdates,
         zone_steps,
     );
     push_steps_to_stage(

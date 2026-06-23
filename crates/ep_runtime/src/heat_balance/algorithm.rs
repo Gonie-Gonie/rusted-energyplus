@@ -8,9 +8,6 @@ pub enum HeatBalanceZoneAirAlgorithm {
     /// Existing simplified analytical diagnostic shell.
     SimplifiedAnalytical,
     /// Named official dynamic source-order compatibility lane.
-    ///
-    /// This currently executes the closest source-order diagnostic path while
-    /// keeping report metadata separate from ad-hoc probe variants.
     EnergyPlusHeatBalanceCompatCandidate,
     /// Concrete source-order execution variant for the official opaque 1Zone compatibility lane.
     EnergyPlusSourceOrder1ZoneOpaqueCompatibility,
@@ -117,7 +114,7 @@ impl CompatibilityHeatBalanceAlgorithm {
     pub const fn zone_air_algorithm(self) -> HeatBalanceZoneAirAlgorithm {
         match self {
             Self::SourceOrder1ZoneOpaqueCompat => {
-                HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
             }
         }
     }
@@ -265,7 +262,7 @@ mod tests {
         assert_eq!(compatibility.id(), "source-order-1zone-opaque-compat");
         assert_eq!(
             compatibility.zone_air_algorithm(),
-            HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+            HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
         );
         assert_eq!(
             compatibility.zone_air_algorithm().compatibility_algorithm(),

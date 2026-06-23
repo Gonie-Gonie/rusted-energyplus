@@ -124,6 +124,50 @@ function Test-ContainerPath {
         (Test-Path -LiteralPath $Path -PathType Container)
 }
 
+function Get-LauncherSettingsPath {
+    $settingsRoot = Join-Path ([Environment]::GetFolderPath("ApplicationData")) "RustedEnergyPlus"
+    return Join-Path $settingsRoot "launcher-settings.json"
+}
+
+function Read-LauncherSettings {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+    try {
+        return Get-Content -Encoding UTF8 -Raw -LiteralPath $Path | ConvertFrom-Json
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-SettingValue {
+    param(
+        [object]$Settings,
+        [string]$Name,
+        [string]$Fallback
+    )
+    $value = Get-ObjectPropertyValue -Object $Settings -Name $Name -Default $null
+    if ([string]::IsNullOrWhiteSpace([string]$value)) {
+        return $Fallback
+    }
+    return [string]$value
+}
+
+function Get-SettingBool {
+    param(
+        [object]$Settings,
+        [string]$Name,
+        [bool]$Fallback
+    )
+    $value = Get-ObjectPropertyValue -Object $Settings -Name $Name -Default $null
+    if ($null -eq $value) {
+        return $Fallback
+    }
+    return [bool]$value
+}
+
 function Quote-ProcessArgument {
     param([string]$Value)
     if ($Value.Length -eq 0) {
@@ -329,6 +373,33 @@ function Format-PhaseTimingLine {
     return "$name [$engine] $secondsText - $scope"
 }
 
+function Save-LauncherSettings {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return
+    }
+    $settingsDir = Split-Path -Parent $Path
+    if (-not [string]::IsNullOrWhiteSpace($settingsDir)) {
+        New-Item -ItemType Directory -Force -Path $settingsDir | Out-Null
+    }
+    [pscustomobject]@{
+        schema_version = 1
+        input_path = $script:InputPath
+        weather_path = $script:WeatherPath
+        output_dir = $script:OutputDir
+        oracle_root = $script:OracleRoot
+        eplus_rs_exe = if ($null -ne $script:EplusRsExe) { $script:EplusRsExe } else { "" }
+        mode = $script:Mode
+        partial_policy = $script:PartialPolicy
+        output_format = $script:OutputFormat
+        trace_level = $script:TraceLevel
+        fail_on_warning = $script:FailOnWarning
+        oracle_baseline = $script:OracleBaseline
+        compare_oracle = $script:CompareOracle
+        overwrite = $script:Overwrite
+    } | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 -LiteralPath $Path
+}
+
 $DefaultOracleRoot = Resolve-OracleRoot
 $DefaultIdf = if (-not [string]::IsNullOrWhiteSpace($DefaultOracleRoot)) {
     Resolve-FirstFile -Candidates @(
@@ -454,6 +525,35 @@ if ($SelfTest) {
             throw "launcher self-test missed phase timing token $required"
         }
     }
+    $settingsPath = Join-Path ([System.IO.Path]::GetTempPath()) ("eplus-rs-launch-settings-{0}.json" -f ([guid]::NewGuid()))
+    $script:InputPath = "remembered-input.idf"
+    $script:WeatherPath = "remembered-weather.epw"
+    $script:OutputDir = "remembered-output"
+    $script:OracleRoot = "remembered-oracle"
+    $script:EplusRsExe = "remembered-eplus-rs.exe"
+    $script:Mode = "diagnostic"
+    $script:PartialPolicy = "allow"
+    $script:OutputFormat = "both"
+    $script:TraceLevel = "debug"
+    $script:FailOnWarning = $true
+    $script:OracleBaseline = $true
+    $script:CompareOracle = $true
+    $script:Overwrite = $false
+    Save-LauncherSettings -Path $settingsPath
+    $settings = Read-LauncherSettings -Path $settingsPath
+    if ((Get-SettingValue -Settings $settings -Name "input_path" -Fallback "") -ne "remembered-input.idf") {
+        throw "launcher self-test failed to save input path"
+    }
+    if (-not (Get-SettingBool -Settings $settings -Name "compare_oracle" -Fallback $false)) {
+        throw "launcher self-test failed to save oracle compare option"
+    }
+    Remove-Item -LiteralPath $settingsPath -Force
+    $scriptText = Get-Content -Encoding UTF8 -Raw -LiteralPath $PSCommandPath
+    foreach ($required in @("Open Diagnostics", "not a drop-in replacement")) {
+        if ($scriptText -notmatch [regex]::Escape($required)) {
+            throw "launcher self-test missed UI boundary token $required"
+        }
+    }
 
     [pscustomobject]@{
         self_test = "passed"
@@ -495,6 +595,27 @@ $script:StdoutTask = $null
 $script:StderrTask = $null
 $script:StdoutPath = ""
 $script:StderrPath = ""
+$script:LauncherSettingsPath = Get-LauncherSettingsPath
+
+$settings = Read-LauncherSettings -Path $script:LauncherSettingsPath
+if ($null -ne $settings) {
+    $script:InputPath = Get-SettingValue -Settings $settings -Name "input_path" -Fallback $script:InputPath
+    $script:WeatherPath = Get-SettingValue -Settings $settings -Name "weather_path" -Fallback $script:WeatherPath
+    $script:OutputDir = Get-SettingValue -Settings $settings -Name "output_dir" -Fallback $script:OutputDir
+    $script:OracleRoot = Get-SettingValue -Settings $settings -Name "oracle_root" -Fallback $script:OracleRoot
+    $savedExe = Get-SettingValue -Settings $settings -Name "eplus_rs_exe" -Fallback ""
+    if (-not [string]::IsNullOrWhiteSpace($savedExe)) {
+        $script:EplusRsExe = $savedExe
+    }
+    $script:Mode = Get-SettingValue -Settings $settings -Name "mode" -Fallback $script:Mode
+    $script:PartialPolicy = Get-SettingValue -Settings $settings -Name "partial_policy" -Fallback $script:PartialPolicy
+    $script:OutputFormat = Get-SettingValue -Settings $settings -Name "output_format" -Fallback $script:OutputFormat
+    $script:TraceLevel = Get-SettingValue -Settings $settings -Name "trace_level" -Fallback $script:TraceLevel
+    $script:FailOnWarning = Get-SettingBool -Settings $settings -Name "fail_on_warning" -Fallback $script:FailOnWarning
+    $script:OracleBaseline = Get-SettingBool -Settings $settings -Name "oracle_baseline" -Fallback $script:OracleBaseline
+    $script:CompareOracle = Get-SettingBool -Settings $settings -Name "compare_oracle" -Fallback $script:CompareOracle
+    $script:Overwrite = Get-SettingBool -Settings $settings -Name "overwrite" -Fallback $script:Overwrite
+}
 
 function Show-Error {
     param([string]$Message)
@@ -618,6 +739,7 @@ function Refresh-Ui {
         $overwriteButton.Enabled = -not $isRunning
         $openOutputButton.Enabled = Test-ContainerPath -Path $script:OutputDir
         $openRunReportButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "reports\run-report.md")
+        $openDiagnosticsButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "diagnostics.json")
         $openSupportReportButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "support-report.md")
         $openCompareButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "compare\compare-report.md")
     }
@@ -739,6 +861,7 @@ function Start-Run {
         $script:OracleBaseline = $true
         $script:OutputFormat = "both"
     }
+    Save-LauncherSettings -Path $script:LauncherSettingsPath
     New-Item -ItemType Directory -Force -Path $script:OutputDir | Out-Null
     $arguments = New-LauncherRunArguments `
         -InputPath $script:InputPath `
@@ -842,10 +965,11 @@ $openOutputButton = New-Button "Open Output" 708 342 120 34
 $form.Controls.AddRange(@($oracleBaselineButton, $compareButton, $overwriteButton, $runButton, $openOutputButton))
 
 $openRunReportButton = New-Button "Open Run Report" 18 390 170 34
-$openSupportReportButton = New-Button "Open Support Report" 204 390 190 34
-$openCompareButton = New-Button "Open Compare Report" 410 390 190 34
-$exitButton = New-Button "Exit" 728 390 100 34
-$form.Controls.AddRange(@($openRunReportButton, $openSupportReportButton, $openCompareButton, $exitButton))
+$openDiagnosticsButton = New-Button "Open Diagnostics" 204 390 170 34
+$openSupportReportButton = New-Button "Open Support Report" 390 390 178 34
+$openCompareButton = New-Button "Open Compare Report" 584 390 170 34
+$exitButton = New-Button "Exit" 766 390 62 34
+$form.Controls.AddRange(@($openRunReportButton, $openDiagnosticsButton, $openSupportReportButton, $openCompareButton, $exitButton))
 
 $phaseLabel = New-Label "Stages" 18 432 390 22
 $diagnosticsLabel = New-Label "Diagnostics" 438 432 390 22
@@ -865,6 +989,13 @@ $diagnosticsList.HorizontalScrollbar = $true
 [void]$diagnosticsList.Items.Add("No diagnostics.")
 $form.Controls.Add($diagnosticsList)
 
+$footerLabel = New-Object System.Windows.Forms.Label
+$footerLabel.Text = "Rusted EnergyPlus is not a drop-in replacement for EnergyPlus; SupportAssessment controls Rust execution, and oracle output is never shown as Rust success."
+$footerLabel.Location = New-Object System.Drawing.Point(18, 558)
+$footerLabel.Size = New-Object System.Drawing.Size(810, 30)
+$footerLabel.ForeColor = [System.Drawing.Color]::DimGray
+$form.Controls.Add($footerLabel)
+
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 500
 $timer.Add_Tick({
@@ -878,6 +1009,7 @@ $inputButton.Add_Click({
     $dialog.Filter = "EnergyPlus Inputs (*.idf;*.epJSON)|*.idf;*.epJSON|All files (*.*)|*.*"
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $script:InputPath = $dialog.FileName
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -887,6 +1019,7 @@ $weatherButton.Add_Click({
     $dialog.Filter = "Weather files (*.epw)|*.epw|All files (*.*)|*.*"
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $script:WeatherPath = $dialog.FileName
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -896,6 +1029,7 @@ $outputButton.Add_Click({
     $dialog.SelectedPath = $script:OutputDir
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $script:OutputDir = $dialog.SelectedPath
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -908,6 +1042,7 @@ $oracleButton.Add_Click({
         if (Test-OracleRoot -Path $script:OracleRoot) {
             $script:OracleBaseline = $true
         }
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -917,6 +1052,7 @@ $exeButton.Add_Click({
     $dialog.Filter = "eplus-rs.exe|eplus-rs.exe|Executables (*.exe)|*.exe|All files (*.*)|*.*"
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $script:EplusRsExe = $dialog.FileName
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -927,6 +1063,7 @@ $compareButton.Add_Click({
         $script:OracleBaseline = $true
         $script:OutputFormat = "both"
     }
+    Save-LauncherSettings -Path $script:LauncherSettingsPath
     Refresh-Ui
 })
 
@@ -938,16 +1075,19 @@ $oracleBaselineButton.Add_Click({
     else {
         $script:OracleBaseline = -not $script:OracleBaseline
     }
+    Save-LauncherSettings -Path $script:LauncherSettingsPath
     Refresh-Ui
 })
 
 $overwriteButton.Add_Click({
     $script:Overwrite = -not $script:Overwrite
+    Save-LauncherSettings -Path $script:LauncherSettingsPath
     Refresh-Ui
 })
 
 $failOnWarningButton.Add_Click({
     $script:FailOnWarning = -not $script:FailOnWarning
+    Save-LauncherSettings -Path $script:LauncherSettingsPath
     Refresh-Ui
 })
 
@@ -957,6 +1097,7 @@ $modeCombo.Add_SelectedIndexChanged({
     }
     if ($null -ne $modeCombo.SelectedItem) {
         $script:Mode = [string]$modeCombo.SelectedItem
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -967,6 +1108,7 @@ $partialCombo.Add_SelectedIndexChanged({
     }
     if ($null -ne $partialCombo.SelectedItem) {
         $script:PartialPolicy = [string]$partialCombo.SelectedItem
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -977,6 +1119,7 @@ $formatCombo.Add_SelectedIndexChanged({
     }
     if ($null -ne $formatCombo.SelectedItem) {
         $script:OutputFormat = [string]$formatCombo.SelectedItem
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -987,6 +1130,7 @@ $traceCombo.Add_SelectedIndexChanged({
     }
     if ($null -ne $traceCombo.SelectedItem) {
         $script:TraceLevel = [string]$traceCombo.SelectedItem
+        Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }
 })
@@ -994,6 +1138,7 @@ $traceCombo.Add_SelectedIndexChanged({
 $runButton.Add_Click({ Start-Run })
 $openOutputButton.Add_Click({ Open-Path -Path $script:OutputDir })
 $openRunReportButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "reports\run-report.md") })
+$openDiagnosticsButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "diagnostics.json") })
 $openSupportReportButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "support-report.md") })
 $openCompareButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "compare\compare-report.md") })
 $exitButton.Add_Click({ $form.Close() })

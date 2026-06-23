@@ -14,10 +14,10 @@ EPW and output directory:
 eplus-rs run input.idf -w weather.epw -d output
 ```
 
-The current CLI already has `RunConfig`, run modes, trace levels, dry-run,
-oracle baseline, oracle compare, JSON stdout, and exit codes. The target
-contract still needs explicit partial-run policy, strict-output policy,
-capability-driven run states, and golden artifact tests.
+The current CLI has `RunConfig`, run modes, partial-run policy, trace levels,
+dry-run, oracle baseline, oracle compare, JSON stdout, exit codes,
+capability-driven run states, and golden artifact tests for the supported and
+blocked arbitrary-run layouts.
 
 ## Workflow
 
@@ -81,6 +81,10 @@ arguments.
 
 The launcher displays the final run state, claim boundary, stage timing
 summary from `run-summary.json`, top diagnostics from `diagnostics.json`, and
-artifact links for the output folder, run report, support report, and compare
-report. Oracle compare enables oracle baseline explicitly; the GUI does not
-silently fall back to oracle or contain independent simulation logic.
+artifact links for the output folder, diagnostics, run report, support report,
+and compare report. It saves the last input, weather, output, oracle, CLI, mode,
+partial, format, trace, warning, oracle, compare, and overwrite selections in
+the user's application-data settings. Oracle compare enables oracle baseline
+explicitly; the GUI does not silently fall back to oracle or contain independent
+simulation logic, and it shows that Rusted EnergyPlus is not a drop-in
+replacement for EnergyPlus.

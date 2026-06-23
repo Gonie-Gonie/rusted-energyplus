@@ -96,33 +96,32 @@ the release conformance manifests.
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It
-can choose input, weather, output folder, oracle folder, and CLI binary; map
-mode, partial policy, output format, trace level, strict warning failure,
-oracle baseline, oracle compare, and overwrite controls to CLI arguments; show
-the three run-result states; display exit-code-aware status details, stage
-timing, top diagnostics, and the `conformance_claim=false` boundary; and open
-output, run report, support report, and compare report artifacts.
+can choose and remember input, weather, output folder, oracle folder, and CLI
+binary; map mode, partial policy, output format, trace level, strict warning
+failure, oracle baseline, oracle compare, and overwrite controls to CLI
+arguments; show the three run-result states; display exit-code-aware status
+details, stage timing, top diagnostics, and the `conformance_claim=false`
+boundary; open output, diagnostics, run report, support report, and compare
+report artifacts; and show that Rusted EnergyPlus is not a drop-in replacement.
 
 The launcher self-test covers command construction for diagnostic, oracle
 baseline, and oracle compare runs; the three run-state presentations; phase
 timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
 
-## Current Known Blockers
+## Current Structure Gates
 
-- `runtime.rs` still owns too much source-order, compatibility, and diagnostic
-  behavior.
 - heat-balance compatibility and diagnostic selections have separate typed
   APIs, the diagnostic probe enum lives under `diagnostic_probes`, and the
-  official 1Zone compatibility selector now resolves to an explicit
-  compatibility execution variant. The execution body itself is still inside
-  the legacy `runtime.rs` during the module split.
-- `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
-  source-order barriers, including `SimPurchasedAir`, `GetPurchasedAir`,
-  `InitPurchasedAir`, `CalcPurchAirLoads`, `UpdatePurchasedAir`, and
-  `ReportPurchasedAir` for the arbitrary-run IdealLoads lane. It writes
-  expected/actual source-order stage IDs to `execution-plan.json` and
-  `run-summary.json`, and blocks runtime execution with a Plan exit if the
-  lists diverge. Deeper stage-level dispatch and snapshots still need to move
-  out of the legacy runtime body.
-- old plan/readiness content is still present outside current navigation and
-  must be shrunk, moved to specs/ADR, or removed.
+  official 1Zone compatibility selector resolves to an explicit compatibility
+  execution variant.
+- heat-balance source-order stage definitions live under
+  `heat_balance::{manager,surface_manager,air_manager,zone_predictor_corrector,
+  ctf,convection,radiation,reports}` and are guarded by
+  `scripts/quality/heat-balance-structure-audit.ps1`.
+- `ExecutionPlan` records EnergyPlus heat-balance and IdealLoads source-order
+  barriers, including `ManageZoneAirUpdates` for heat balance and
+  `SimPurchasedAir`, `GetPurchasedAir`, `InitPurchasedAir`,
+  `CalcPurchAirLoads`, `UpdatePurchasedAir`, and `ReportPurchasedAir` for the
+  arbitrary-run IdealLoads lane. It writes expected/actual source-order stage
+  IDs to `execution-plan.json` and `run-summary.json`, and blocks runtime
+  execution with a Plan exit if the lists diverge.

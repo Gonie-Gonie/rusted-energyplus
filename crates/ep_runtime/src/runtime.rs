@@ -11351,7 +11351,7 @@ mod tests {
 
         let plan = build_execution_plan(&model);
 
-        assert_eq!(plan.stages.len(), 17);
+        assert_eq!(plan.stages.len(), 18);
         assert_eq!(plan.step_count(), 16);
         assert!(
             plan.stages
@@ -11381,8 +11381,12 @@ mod tests {
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
 
-        let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
-        assert_eq!(manage_air.steps[0], ExecutionStep::SolveZone(ZoneId(0)));
+        let manage_zone_air_updates =
+            stage_with_kind(&plan.stages, ExecutionStageKind::ManageZoneAirUpdates);
+        assert_eq!(
+            manage_zone_air_updates.steps[0],
+            ExecutionStep::SolveZone(ZoneId(0))
+        );
 
         let report_heat_balance =
             stage_with_kind(&plan.stages, ExecutionStageKind::ReportHeatBalance);
@@ -11413,7 +11417,7 @@ mod tests {
     fn heat_balance_compatibility_stages_follow_energyplus_source_order() {
         let stages = energyplus_heat_balance_compatibility_stages();
 
-        assert_eq!(stages.len(), 17);
+        assert_eq!(stages.len(), 18);
         assert!(
             stages
                 .iter()
@@ -11428,10 +11432,11 @@ mod tests {
         assert_eq!(stages[6].source_routine, "CalcHeatBalanceOutsideSurf");
         assert_eq!(stages[7].source_routine, "CalcHeatBalanceInsideSurf");
         assert_eq!(stages[8].source_routine, "ManageAirHeatBalance");
-        assert_eq!(stages[10].source_routine, "UpdateThermalHistories");
-        assert_eq!(stages[11].source_routine, "ReportSurfaceHeatBalance");
-        assert_eq!(stages[14].source_routine, "ReportHeatBalance");
-        assert_eq!(stages[16].source_routine, "CheckWarmupConvergence");
+        assert_eq!(stages[9].source_routine, "ManageZoneAirUpdates");
+        assert_eq!(stages[11].source_routine, "UpdateThermalHistories");
+        assert_eq!(stages[12].source_routine, "ReportSurfaceHeatBalance");
+        assert_eq!(stages[15].source_routine, "ReportHeatBalance");
+        assert_eq!(stages[17].source_routine, "CheckWarmupConvergence");
     }
 
     #[test]
@@ -11582,8 +11587,8 @@ mod tests {
 
         assert_eq!(model.graph.zone_thermostats.len(), 1);
         assert_eq!(model.graph.zone_ideal_loads.len(), 1);
-        assert_eq!(plan.stages.len(), 24);
-        assert_eq!(plan.compatibility_stages.len(), 24);
+        assert_eq!(plan.stages.len(), 25);
+        assert_eq!(plan.compatibility_stages.len(), 25);
         assert!(plan.source_order_stages_match());
         assert_eq!(
             plan.expected_source_order_stage_ids(),
@@ -11602,13 +11607,17 @@ mod tests {
                 .contains(&"calc-purch-air-loads")
         );
 
-        let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
-        assert_eq!(manage_air.steps.len(), 2);
+        let manage_zone_air_updates =
+            stage_with_kind(&plan.stages, ExecutionStageKind::ManageZoneAirUpdates);
+        assert_eq!(manage_zone_air_updates.steps.len(), 2);
         assert_eq!(
-            manage_air.steps[0],
+            manage_zone_air_updates.steps[0],
             ExecutionStep::EvaluateZoneThermostat(ZoneThermostatId(0))
         );
-        assert_eq!(manage_air.steps[1], ExecutionStep::SolveZone(ZoneId(0)));
+        assert_eq!(
+            manage_zone_air_updates.steps[1],
+            ExecutionStep::SolveZone(ZoneId(0))
+        );
 
         let zone_equipment =
             stage_with_kind(&plan.stages, ExecutionStageKind::ZoneEquipmentManager);
