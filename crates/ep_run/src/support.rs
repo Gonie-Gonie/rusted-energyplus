@@ -48,6 +48,61 @@ impl SupportStatus {
     }
 }
 
+/// User-facing run result state emitted by support assessment and run summaries.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RunResultState {
+    /// Unsupported active semantics prevent Rust execution.
+    RunBlocked,
+    /// The Rust runtime may execute only as a diagnostic/ad-hoc partial run.
+    PartialSupportedRun,
+    /// The Rust runtime may execute inside the declared compatibility subset.
+    SupportedCompatibilityRun,
+}
+
+impl RunResultState {
+    /// Stable lower-case identifier for JSON, reports, and launcher wiring.
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::RunBlocked => "run_blocked",
+            Self::PartialSupportedRun => "partial_supported_run",
+            Self::SupportedCompatibilityRun => "supported_compatibility_run",
+        }
+    }
+
+    /// Human-readable label matching `specs/run_result_states.toml`.
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::RunBlocked => "Cannot run",
+            Self::PartialSupportedRun => "Partial supported run",
+            Self::SupportedCompatibilityRun => "Supported compatibility run",
+        }
+    }
+
+    /// Returns true when the Rust runtime is allowed to execute.
+    #[must_use]
+    pub const fn allows_rust_runtime(self) -> bool {
+        matches!(
+            self,
+            Self::PartialSupportedRun | Self::SupportedCompatibilityRun
+        )
+    }
+
+    /// Maps internal support status to the public run state for a requested mode.
+    #[must_use]
+    pub const fn from_support_status(status: SupportStatus, mode: RunMode) -> Self {
+        match status {
+            SupportStatus::SupportedCompatibility => Self::SupportedCompatibilityRun,
+            SupportStatus::SupportedDiagnosticOnly if matches!(mode, RunMode::Diagnostic) => {
+                Self::PartialSupportedRun
+            }
+            SupportStatus::SupportedDiagnosticOnly | SupportStatus::Unsupported => Self::RunBlocked,
+        }
+    }
+}
+
 /// Runtime class selected by support assessment.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -103,8 +158,12 @@ pub struct SupportAssessment {
     pub schema_version: u32,
     /// Assessment status.
     pub status: SupportStatus,
+    /// User-facing run result state.
+    pub run_result_state: RunResultState,
     /// Selected runtime class.
     pub runtime_class: RuntimeClass,
+    /// Matched capability identifiers from the current support boundary.
+    pub matched_capability_ids: Vec<String>,
     /// Requested mode.
     pub mode: String,
     /// Requested output format.
@@ -123,6 +182,14 @@ pub struct SupportAssessment {
     pub unsupported_objects: Vec<SupportObjectEntry>,
     /// Diagnostics emitted by support assessment.
     pub diagnostics: RunDiagnostics,
+}
+
+impl SupportAssessment {
+    /// Returns true when this assessment permits Rust runtime execution.
+    #[must_use]
+    pub const fn allows_rust_runtime(&self) -> bool {
+        self.run_result_state.allows_rust_runtime()
+    }
 }
 
 /// Assesses whether a compiled model can use the arbitrary-run runtime.
@@ -225,11 +292,23 @@ pub fn assess_support(
     } else {
         runtime_status_for_typed_model(typed_model)
     };
+    let run_result_state = RunResultState::from_support_status(status, mode);
+    if status == SupportStatus::SupportedDiagnosticOnly
+        && run_result_state == RunResultState::RunBlocked
+    {
+        diagnostics.error(
+            "DiagnosticOnlyRuntimeBlocked",
+            "support",
+            "diagnostic-only runtime classes require --mode diagnostic and cannot execute as compatibility evidence",
+        );
+    }
 
     SupportAssessment {
         schema_version: 1,
         status,
+        run_result_state,
         runtime_class,
+        matched_capability_ids: matched_capability_ids(status, runtime_class),
         mode: mode.id().to_string(),
         output_format: output_format.id().to_string(),
         trace_level: trace_level.id().to_string(),
@@ -243,6 +322,18 @@ pub fn assess_support(
         ignored_raw_only_objects,
         unsupported_objects,
         diagnostics,
+    }
+}
+
+fn matched_capability_ids(status: SupportStatus, runtime_class: RuntimeClass) -> Vec<String> {
+    match (status, runtime_class) {
+        (SupportStatus::SupportedCompatibility, RuntimeClass::HeatBalanceZoneAirDiagnostic) => {
+            vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()]
+        }
+        (SupportStatus::SupportedDiagnosticOnly, RuntimeClass::IdealLoadsNodeStateProjection) => {
+            vec!["ideal_loads_no_oa_sensible".to_string()]
+        }
+        _ => Vec::new(),
     }
 }
 
@@ -512,7 +603,7 @@ fn is_surface_boundary_object(object_type: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{SupportStatus, assess_support};
+    use super::{RunResultState, SupportStatus, assess_support};
     use crate::{RunMode, RunOutputFormat, TraceLevel};
     use ep_compiler::compile_raw_model;
     use ep_raw_model::parse_epjson_str;
@@ -552,6 +643,32 @@ mod tests {
         );
 
         assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
+        assert_eq!(
+            assessment.run_result_state,
+            RunResultState::SupportedCompatibilityRun
+        );
+        assert_eq!(
+            assessment.matched_capability_ids,
+            vec!["official_1zone_uncontrolled_declared_heat_balance"]
+        );
         Ok(())
+    }
+
+    #[test]
+    fn diagnostic_only_support_is_blocked_outside_diagnostic_mode() {
+        assert_eq!(
+            RunResultState::from_support_status(
+                SupportStatus::SupportedDiagnosticOnly,
+                RunMode::Compatibility
+            ),
+            RunResultState::RunBlocked
+        );
+        assert_eq!(
+            RunResultState::from_support_status(
+                SupportStatus::SupportedDiagnosticOnly,
+                RunMode::Diagnostic
+            ),
+            RunResultState::PartialSupportedRun
+        );
     }
 }

@@ -32,8 +32,8 @@ use crate::outputs::{
     result_store_json, write_empty_meters_csv, write_json, write_selected_outputs_csv, write_text,
 };
 use crate::{
-    RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RuntimeClass,
-    SupportAssessment, SupportStatus, assess_support,
+    RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RunResultState,
+    RuntimeClass, SupportAssessment, SupportStatus, assess_support,
 };
 
 /// Completed arbitrary-run outcome.
@@ -47,6 +47,8 @@ pub struct RunOutcome {
     pub run_summary_path: PathBuf,
     /// Support assessment status.
     pub support_status: SupportStatus,
+    /// User-facing run result state.
+    pub run_result_state: RunResultState,
     /// Optional message for CLI display.
     pub message: String,
 }
@@ -175,6 +177,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
                 timing,
                 RunExitCode::ImportParse,
                 SupportStatus::Unsupported,
+                RunResultState::RunBlocked,
                 "input import failed",
             );
         }
@@ -201,6 +204,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
                 timing,
                 RunExitCode::ImportParse,
                 SupportStatus::Unsupported,
+                RunResultState::RunBlocked,
                 "raw model parse failed",
             );
         }
@@ -275,7 +279,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
             None,
             if compile_result.model.is_none() {
                 RunExitCode::CompileReference
-            } else if assessment.status.is_runnable() {
+            } else if assessment.allows_rust_runtime() {
                 RunExitCode::Success
             } else {
                 RunExitCode::Unsupported
@@ -285,7 +289,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     }
 
     let mut rust_runtime_result = None;
-    if assessment.status.is_runnable() {
+    if assessment.allows_rust_runtime() {
         let runtime_start = Instant::now();
         match execute_rust_runtime(config, simulation_model.as_ref(), assessment.runtime_class) {
             Ok(result) => {
@@ -351,7 +355,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
             Err(error) => {
                 diagnostics.error("OracleBaselineFailed", "oracle", error.to_string());
                 oracle_status = "failed".to_string();
-                if assessment.status.is_runnable() {
+                if assessment.allows_rust_runtime() {
                     return finish_successful_summary(
                         config,
                         &prepared_input,
@@ -413,7 +417,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
 
     let mut exit_code = if compile_result.model.is_none() {
         RunExitCode::CompileReference
-    } else if assessment.status.is_runnable() {
+    } else if assessment.allows_rust_runtime() {
         RunExitCode::Success
     } else {
         RunExitCode::Unsupported
@@ -451,6 +455,7 @@ fn finish_early(
     mut timing: PipelineTiming,
     exit_code: RunExitCode,
     support_status: SupportStatus,
+    run_result_state: RunResultState,
     message: &str,
 ) -> Result<RunOutcome, RunError> {
     timing.total_wall_seconds = timing.phases.iter().map(|phase| phase.wall_seconds).sum();
@@ -467,6 +472,7 @@ fn finish_early(
         "exit_code": exit_code.code(),
         "message": message,
         "support_status": support_status.id(),
+        "run_result_state": run_result_state.id(),
         "conformance_claim": false,
         "diagnostics": diagnostic_counts(&diagnostics),
         "timing": timing,
@@ -479,6 +485,7 @@ fn finish_early(
         output_dir: config.output_dir.clone(),
         run_summary_path,
         support_status,
+        run_result_state,
         message: message.to_string(),
     })
 }
@@ -557,7 +564,9 @@ fn finish_successful_summary(
         },
         "support": {
             "status": assessment.status.id(),
+            "run_result_state": assessment.run_result_state.id(),
             "runtime_class": assessment.runtime_class.id(),
+            "matched_capability_ids": assessment.matched_capability_ids.clone(),
             "conformance_claim": false,
         },
         "rust_runtime": rust_runtime_result.map(|result| json!({
@@ -581,6 +590,7 @@ fn finish_successful_summary(
         output_dir: config.output_dir.clone(),
         run_summary_path,
         support_status: assessment.status,
+        run_result_state: assessment.run_result_state,
         message: message.to_string(),
     })
 }

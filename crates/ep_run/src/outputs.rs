@@ -6,7 +6,7 @@ use ep_runtime::ResultStore;
 use serde::Serialize;
 use serde_json::{Number, Value, json};
 
-use crate::{RunDiagnostics, RunExitCode, SupportAssessment, SupportStatus};
+use crate::{RunDiagnostics, RunExitCode, RunResultState, SupportAssessment};
 
 pub(crate) fn write_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
     if let Some(parent) = path.parent() {
@@ -118,6 +118,14 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
     report.push_str("# Support Assessment\n\n");
     report.push_str(&format!("status: {}\n", assessment.status.id()));
     report.push_str(&format!(
+        "run_result_state: {}\n",
+        assessment.run_result_state.id()
+    ));
+    report.push_str(&format!(
+        "run_result_label: {}\n",
+        assessment.run_result_state.label()
+    ));
+    report.push_str(&format!(
         "runtime_class: {}\n",
         assessment.runtime_class.id()
     ));
@@ -130,6 +138,14 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         "conformance_claim: {}\n\n",
         assessment.claim_boundary.conformance_claim
     ));
+
+    if !assessment.matched_capability_ids.is_empty() {
+        report.push_str("## Matched Capabilities\n\n");
+        for capability_id in &assessment.matched_capability_ids {
+            report.push_str(&format!("- `{}`\n", markdown_cell(capability_id)));
+        }
+        report.push('\n');
+    }
 
     if !assessment.unsupported_objects.is_empty() {
         report.push_str("## Unsupported Objects\n\n");
@@ -182,6 +198,7 @@ pub(crate) fn render_compatibility_boundary(assessment: &SupportAssessment) -> S
         concat!(
             "# Compatibility Boundary\n\n",
             "status: {}\n",
+            "run_result_state: {}\n",
             "runtime_class: {}\n",
             "conformance_claim: false\n",
             "release_evidence: false\n\n",
@@ -191,6 +208,7 @@ pub(crate) fn render_compatibility_boundary(assessment: &SupportAssessment) -> S
             "are present.\n"
         ),
         assessment.status.id(),
+        assessment.run_result_state.id(),
         assessment.runtime_class.id(),
         assessment.claim_boundary.statement
     )
@@ -206,6 +224,10 @@ pub(crate) fn render_run_report(
     report.push_str("# Arbitrary Run Report\n\n");
     report.push_str(&format!("support_status: {}\n", assessment.status.id()));
     report.push_str(&format!(
+        "run_result_state: {}\n",
+        assessment.run_result_state.id()
+    ));
+    report.push_str(&format!(
         "runtime_class: {}\n",
         assessment.runtime_class.id()
     ));
@@ -213,16 +235,16 @@ pub(crate) fn render_run_report(
     report.push_str(&format!("oracle_status: {oracle_status}\n"));
     report.push_str(&format!("compare_status: {compare_status}\n"));
     report.push_str("conformance_claim: false\n\n");
-    match assessment.status {
-        SupportStatus::SupportedCompatibility => {
+    match assessment.run_result_state {
+        RunResultState::SupportedCompatibilityRun => {
             report.push_str(
                 "The input ran inside the current compatibility-mode arbitrary runtime boundary.\n",
             );
         }
-        SupportStatus::SupportedDiagnosticOnly => {
+        RunResultState::PartialSupportedRun => {
             report.push_str("The input ran only in a diagnostic runtime path and does not make a conformance claim.\n");
         }
-        SupportStatus::Unsupported => {
+        RunResultState::RunBlocked => {
             report.push_str("The Rust runtime did not execute because support assessment found blocking diagnostics.\n");
         }
     }

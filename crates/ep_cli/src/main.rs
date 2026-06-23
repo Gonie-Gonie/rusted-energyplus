@@ -2651,6 +2651,7 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
                 println!("Arbitrary Run");
                 println!("  status: {}", outcome.exit_code.id());
                 println!("  support_status: {}", outcome.support_status.id());
+                println!("  run_result_state: {}", outcome.run_result_state.id());
                 println!("  output_dir: {}", outcome.output_dir.display());
                 println!("  run_summary: {}", outcome.run_summary_path.display());
             }

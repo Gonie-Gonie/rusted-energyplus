@@ -97,11 +97,13 @@ $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
 Assert-Equal -Actual $runSummary.exit_code -Expected 8 -Description "run summary exit code"
 Assert-Equal -Actual $runSummary.support.status -Expected "supported-compatibility" -Description "support status"
+Assert-Equal -Actual $runSummary.support.run_result_state -Expected "supported_compatibility_run" -Description "run result state"
 Assert-Equal -Actual $runSummary.support.conformance_claim -Expected $false -Description "run conformance claim"
 Assert-Equal -Actual $runSummary.oracle_status -Expected "generated" -Description "oracle status"
 Assert-Equal -Actual $runSummary.compare_status -Expected "fail" -Description "compare status"
 
 $support = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "support-assessment.json") | ConvertFrom-Json
+Assert-Equal -Actual $support.run_result_state -Expected "supported_compatibility_run" -Description "support run result state"
 Assert-Equal -Actual $support.capability_registry -Expected "specs/capabilities.toml" -Description "capability registry"
 Assert-Equal -Actual $support.claim_boundary.conformance_claim -Expected $false -Description "support conformance claim"
 
