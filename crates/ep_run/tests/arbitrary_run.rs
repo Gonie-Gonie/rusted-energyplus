@@ -377,6 +377,64 @@ fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::
 }
 
 #[test]
+fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("dry-run")?;
+    let input_path = case_dir.join("one-zone.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, ONE_ZONE_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: true,
+        oracle_baseline: true,
+        compare_oracle: true,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(2),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedCompatibility
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "success");
+    assert_eq!(summary["message"], "dry run completed");
+    assert_eq!(summary["config"]["dry_run"], true);
+    assert_eq!(summary["config"]["oracle_baseline"], true);
+    assert_eq!(summary["config"]["compare_oracle"], true);
+    assert_eq!(summary["oracle_status"], "skipped-dry-run");
+    assert_eq!(summary["compare_status"], "skipped-dry-run");
+    assert!(summary["rust_runtime"].is_null());
+    assert!(summary["oracle"].is_null());
+    assert!(summary["comparison"].is_null());
+    assert!(!output_dir.join("results").join("result-store.json").exists());
+    assert!(!output_dir.join("oracle").join("eplusout.eso").exists());
+    assert!(
+        !output_dir
+            .join("compare")
+            .join("compare-summary.json")
+            .exists()
+    );
+    Ok(())
+}
+
+#[test]
 fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-diagnostic")?;

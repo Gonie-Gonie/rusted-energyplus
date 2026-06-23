@@ -29,6 +29,8 @@ Important boundaries:
   Rust result
 - `--compare-oracle` writes `out/compare/compare-summary.json` and
   `out/compare/compare-report.md`
+- `--dry-run` stops after support assessment and plan artifacts; runtime,
+  oracle, and compare are reported as skipped
 - every run writes `eplusrs.err`, `diagnostics.json`,
   `support-assessment.json`, `support-report.md`, `run-summary.json`, and
   `reports/compatibility-boundary.md`

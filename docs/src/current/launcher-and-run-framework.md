@@ -79,12 +79,12 @@ mode, partial policy, output format, trace level, strict warning failure,
 oracle baseline, oracle compare, and overwrite controls directly to CLI
 arguments.
 
-The launcher displays the final run state, claim boundary, stage timing
-summary from `run-summary.json`, top diagnostics from `diagnostics.json`, and
-artifact links for the output folder, diagnostics, run report, support report,
-and compare report. It saves the last input, weather, output, oracle, CLI, mode,
-partial, format, trace, warning, oracle, compare, and overwrite selections in
-the user's application-data settings. Oracle compare enables oracle baseline
-explicitly; the GUI does not silently fall back to oracle or contain independent
-simulation logic, and it shows that Rusted EnergyPlus is not a drop-in
-replacement for EnergyPlus.
+The launcher displays the final run state, claim boundary, oracle status,
+compare status, stage timing summary from `run-summary.json`, top diagnostics
+from `diagnostics.json`, and artifact links for the output folder, diagnostics,
+run report, support report, and compare report. It saves the last input,
+weather, output, oracle, CLI, mode, partial, format, trace, warning, oracle,
+compare, and overwrite selections in the user's application-data settings.
+Oracle compare enables oracle baseline explicitly; the GUI does not silently
+fall back to oracle or contain independent simulation logic, and it shows that
+Rusted EnergyPlus is not a drop-in replacement for EnergyPlus.

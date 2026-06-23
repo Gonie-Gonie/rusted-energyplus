@@ -300,6 +300,7 @@ function New-LauncherRunArguments {
 function Get-RunResultPresentation {
     param([object]$Summary)
     $status = Get-ObjectPropertyValue -Object $Summary -Name "status" -Default "unknown"
+    $oracleStatus = Get-ObjectPropertyValue -Object $Summary -Name "oracle_status" -Default "not-run"
     $compareStatus = Get-ObjectPropertyValue -Object $Summary -Name "compare_status" -Default "not-run"
     $runState = Get-SummarySupportValue -Summary $Summary -Name "run_result_state" -Default "unknown"
     $supportStatus = Get-SummarySupportValue -Summary $Summary -Name "status" -Default "unknown"
@@ -333,7 +334,7 @@ function Get-RunResultPresentation {
         state_id = $runState
         title = $title
         color = $color
-        detail = "status=$status; support=$supportStatus; runtime=$runtimeClass; compare=$compareStatus; capabilities=$capabilityText; conformance_claim=false"
+        detail = "status=$status; support=$supportStatus; runtime=$runtimeClass; oracle=$oracleStatus; compare=$compareStatus; capabilities=$capabilityText; conformance_claim=false"
     }
 }
 
@@ -484,6 +485,7 @@ if ($SelfTest) {
                 matched_capability_ids = @()
             }
             status = "unsupported"
+            oracle_status = "not-requested"
             compare_status = "not-requested"
         },
         [pscustomobject]@{
@@ -494,6 +496,7 @@ if ($SelfTest) {
                 matched_capability_ids = @("ideal_loads_no_oa_sensible")
             }
             status = "success"
+            oracle_status = "not-requested"
             compare_status = "not-requested"
         },
         [pscustomobject]@{
@@ -504,15 +507,35 @@ if ($SelfTest) {
                 matched_capability_ids = @("official_1zone_uncontrolled_declared_heat_balance")
             }
             status = "success"
+            oracle_status = "generated"
             compare_status = "not-requested"
+        },
+        [pscustomobject]@{
+            support = [pscustomobject]@{
+                run_result_state = "run_blocked"
+                status = "unsupported"
+                runtime_class = "none"
+                matched_capability_ids = @()
+            }
+            status = "unsupported"
+            oracle_status = "generated"
+            compare_status = "skipped-rust-unsupported-or-oracle-missing"
         }
     )
     $presentations = @($stateSamples | ForEach-Object { Get-RunResultPresentation -Summary $_ })
     $expectedStates = @("run_blocked", "partial_supported_run", "supported_compatibility_run")
     foreach ($expected in $expectedStates) {
-        if (@($presentations | Where-Object { $_.state_id -eq $expected }).Count -ne 1) {
+        if (@($presentations | Where-Object { $_.state_id -eq $expected }).Count -lt 1) {
             throw "launcher self-test missed state presentation $expected"
         }
+    }
+    $blockedOraclePresentation = @($presentations | Where-Object {
+            $_.state_id -eq "run_blocked" -and
+            $_.detail -match "oracle=generated" -and
+            $_.detail -match "compare=skipped-rust-unsupported-or-oracle-missing"
+        })
+    if ($blockedOraclePresentation.Count -ne 1) {
+        throw "launcher self-test missed blocked run oracle/compare presentation"
     }
     $phaseLine = Format-PhaseTimingLine -Phase ([pscustomobject]@{
             name = "support_assessment"

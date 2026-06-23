@@ -88,6 +88,9 @@ When `--oracle-baseline` is requested for a `run_blocked` input, the
 EnergyPlus baseline can still be generated under `out/oracle`, but
 `rust_runtime` stays null, oracle comparison is skipped, and no oracle artifact
 is counted as a Rust result.
+Dry-run execution is also covered as a support-assessment-only path: even if
+oracle baseline and compare are requested, runtime, oracle, and compare remain
+skipped.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared IdealLoads
@@ -104,13 +107,16 @@ can choose and remember input, weather, output folder, oracle folder, and CLI
 binary; map mode, partial policy, output format, trace level, strict warning
 failure, oracle baseline, oracle compare, and overwrite controls to CLI
 arguments; show the three run-result states; display exit-code-aware status
-details, stage timing, top diagnostics, and the `conformance_claim=false`
-boundary; open output, diagnostics, run report, support report, and compare
-report artifacts; and show that Rusted EnergyPlus is not a drop-in replacement.
+details including oracle and compare status, stage timing, top diagnostics, and
+the `conformance_claim=false` boundary; open output, diagnostics, run report,
+support report, and compare report artifacts; and show that Rusted EnergyPlus
+is not a drop-in replacement.
 
 The launcher self-test covers command construction for diagnostic, oracle
-baseline, and oracle compare runs; the three run-state presentations; phase
-timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
+baseline, and oracle compare runs; the three run-state presentations including
+a `run_blocked` case where oracle generation is shown separately from Rust
+runtime success; phase timing formatting; and wrapper invocation through
+`scripts/dev.cmd launch-ui`.
 
 ## Current Structure Gates
 
