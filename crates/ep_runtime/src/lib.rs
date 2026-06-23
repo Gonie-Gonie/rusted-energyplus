@@ -12,6 +12,7 @@ pub mod mode;
 pub mod node;
 mod output;
 pub mod plant;
+pub mod psychrometrics;
 mod runtime;
 pub mod schedules;
 pub mod simulation_state;
