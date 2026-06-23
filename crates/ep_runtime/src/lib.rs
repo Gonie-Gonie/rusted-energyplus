@@ -2,6 +2,7 @@
 
 pub mod diagnostic_probes;
 pub mod diagnostics;
+pub mod error;
 pub mod execution_plan;
 pub mod first_zone;
 pub mod heat_balance;
