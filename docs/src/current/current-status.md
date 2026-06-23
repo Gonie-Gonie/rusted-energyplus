@@ -82,6 +82,8 @@ each input as `run_blocked`, `partial_supported_run`, or
 `supported_compatibility_run`. Ad-hoc runs and launcher runs always keep their
 claim boundary visible and do not become release conformance evidence unless
 promoted later through manifests, reports, and blocking gates.
+Unsupported AirLoop, PlantLoop, EMS, invalid epJSON, and missing heat-balance
+weather inputs are covered by integration tests as pre-runtime failures.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared IdealLoads

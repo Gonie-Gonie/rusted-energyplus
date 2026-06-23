@@ -168,6 +168,147 @@ fn unsupported_plant_loop_blocks_before_runtime() -> Result<(), Box<dyn std::err
 }
 
 #[test]
+fn unsupported_ems_blocks_before_runtime() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("unsupported-ems")?;
+    let input_path = case_dir.join("ems.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, EMS_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(outcome.support_status, SupportStatus::Unsupported);
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
+
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("UnsupportedEMS"));
+    let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
+    assert!(support_report.contains("Runtime-modifying plugin/network features are not ported."));
+    Ok(())
+}
+
+#[test]
+fn missing_weather_blocks_heat_balance_before_runtime() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("missing-weather")?;
+    let input_path = case_dir.join("one-zone.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, ONE_ZONE_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Args);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedCompatibility
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "args");
+    assert_eq!(
+        summary["support"]["runtime_class"],
+        "one-zone-heat-balance-compatibility"
+    );
+    assert!(summary["rust_runtime"].is_null());
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("MissingWeatherFile"));
+    Ok(())
+}
+
+#[test]
+fn invalid_epjson_returns_import_parse_failure() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("invalid-epjson")?;
+    let input_path = case_dir.join("invalid.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, "{ not valid epjson")?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::ImportParse);
+    assert_eq!(outcome.support_status, SupportStatus::Unsupported);
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "import-parse");
+    assert!(!output_dir.join("support-assessment.json").exists());
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("RawModelParseFailed"));
+    Ok(())
+}
+
+#[test]
 fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("fail-on-warning")?;
     let input_path = case_dir.join("one-zone-output-request.epJSON");
@@ -475,6 +616,16 @@ const AIR_LOOP_EPJSON: &str = r#"{
   "Version": {"Version 1": {"version_identifier": "26.1"}},
   "Zone": {"Zone One": {"volume": 100}},
   "AirLoopHVAC": {"Main Air Loop": {}}
+}"#;
+
+const EMS_EPJSON: &str = r#"{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "EnergyManagementSystem:Program": {
+    "Override Program": {
+      "lines": [{"program_line": "SET X = 1"}]
+    }
+  }
 }"#;
 
 const PLANT_LOOP_EPJSON: &str = r#"{

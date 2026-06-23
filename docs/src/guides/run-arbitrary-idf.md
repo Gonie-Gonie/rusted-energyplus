@@ -21,6 +21,8 @@ small button-based launcher for the same pipeline. From a source checkout, use
 Important boundaries:
 
 - unsupported inputs do not fall back to EnergyPlus as the Rust result
+- heat-balance compatibility runs require a weather EPW; a missing weather path
+  exits with `args` before Rust runtime execution
 - `--oracle-baseline` writes an EnergyPlus run under `out/oracle`
 - `--compare-oracle` writes `out/compare/compare-summary.json` and
   `out/compare/compare-report.md`

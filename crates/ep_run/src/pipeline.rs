@@ -269,6 +269,33 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         "classify object, topology, and algorithm support before Rust execution",
     );
     diagnostics = merge_diagnostics(diagnostics, assessment.diagnostics.clone());
+    if !config.dry_run
+        && assessment.allows_rust_runtime()
+        && runtime_class_requires_weather(assessment.runtime_class)
+        && config.weather_path.is_none()
+    {
+        diagnostics.error(
+            "MissingWeatherFile",
+            "input",
+            "weather EPW path is required for heat-balance compatibility runtime",
+        );
+        write_support_artifacts(&config.output_dir, &assessment, &diagnostics)
+            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        return finish_successful_summary(
+            config,
+            &prepared_input,
+            &assessment,
+            diagnostics,
+            timing,
+            None,
+            None,
+            oracle_status,
+            compare_status,
+            None,
+            RunExitCode::Args,
+            "missing weather file",
+        );
+    }
     write_support_artifacts(&config.output_dir, &assessment, &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
 
@@ -1162,6 +1189,13 @@ fn execute_rust_runtime(
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
     }
+}
+
+fn runtime_class_requires_weather(runtime_class: RuntimeClass) -> bool {
+    matches!(
+        runtime_class,
+        RuntimeClass::OneZoneHeatBalanceCompatibility | RuntimeClass::HeatBalanceZoneAirDiagnostic
+    )
 }
 
 fn runtime_sample_count(config: &RunConfig, model: &SimulationModel) -> Result<usize, String> {
