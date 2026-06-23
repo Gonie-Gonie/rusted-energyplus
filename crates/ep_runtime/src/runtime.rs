@@ -1,12 +1,15 @@
 //! Runtime state, heat-balance execution, weather, and trace helpers.
 
+use crate::time_axis::{
+    DEFAULT_RUN_PERIOD_YEAR, day_of_year, run_period_first_hour_interpolation_starting_values,
+};
 use crate::{OutputSeries, ResultStore, SimulationMode};
 use ep_model::{
     AutoOrNumber, ConstructionId, FirstHourInterpolationStartingValues, MaterialId,
     MaterialSurfaceRoughness, NormalizedName, OtherEquipment, OutputHandle,
-    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, RunPeriod, RunPeriodId,
-    ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface,
-    SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure, Zone, ZoneId,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, ScheduleCompactSegment,
+    ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType,
+    Terrain, TypedModel, WindExposure, Zone, ZoneId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -19,7 +22,6 @@ const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
 const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
-const DEFAULT_RUN_PERIOD_YEAR: u32 = 2013;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
 const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
 const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
@@ -138,181 +140,6 @@ pub const RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE: &str =
 /// Diagnostic/report variable for EnergyPlus inside surface heat-balance iteration count.
 pub const SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE: &str =
     "Surface Inside Face Heat Balance Calculation Iteration Count";
-
-/// One hourly timestamp aligned to EnergyPlus run-period reporting.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct TimePoint {
-    /// Zero-based sample index.
-    pub sample_index: usize,
-    /// Calendar year used for date arithmetic.
-    pub year: u32,
-    /// Month number, 1-12.
-    pub month: u32,
-    /// Day of month.
-    pub day_of_month: u32,
-    /// EnergyPlus-style hour ending, 1-24.
-    pub hour: u32,
-}
-
-/// Hourly time axis for one run period.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct TimeAxis {
-    /// Run period name.
-    pub run_period_name: String,
-    /// Hourly samples in output order.
-    pub points: Vec<TimePoint>,
-}
-
-impl TimeAxis {
-    /// Returns the number of hourly samples.
-    #[must_use]
-    pub fn sample_count(&self) -> usize {
-        self.points.len()
-    }
-}
-
-/// Error returned while building a run-period time axis.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum TimeAxisError {
-    /// A run-period date was invalid.
-    InvalidDate {
-        /// Run period name.
-        run_period_name: String,
-        /// Field group, such as begin or end.
-        field: &'static str,
-        /// Calendar year.
-        year: u32,
-        /// Month number.
-        month: u32,
-        /// Day of month.
-        day_of_month: u32,
-    },
-    /// The end date came before the begin date.
-    InvalidRange {
-        /// Run period name.
-        run_period_name: String,
-    },
-}
-
-impl Display for TimeAxisError {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidDate {
-                run_period_name,
-                field,
-                year,
-                month,
-                day_of_month,
-            } => write!(
-                formatter,
-                "run period {run_period_name} has invalid {field} date {year:04}-{month:02}-{day_of_month:02}"
-            ),
-            Self::InvalidRange { run_period_name } => {
-                write!(
-                    formatter,
-                    "run period {run_period_name} ends before it begins"
-                )
-            }
-        }
-    }
-}
-
-impl std::error::Error for TimeAxisError {}
-
-/// Builds the first hourly time axis from the model `RunPeriod` list.
-///
-/// If no `RunPeriod` is present, a one-day default axis is returned so early
-/// diagnostic runtime paths remain explicit and deterministic.
-pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisError> {
-    let fallback;
-    let run_period = if let Some(run_period) = model.run_periods.first() {
-        run_period
-    } else {
-        fallback = default_run_period();
-        &fallback
-    };
-
-    build_hourly_time_axis_for_run_period(run_period)
-}
-
-fn run_period_first_hour_interpolation_starting_values(
-    model: &TypedModel,
-) -> FirstHourInterpolationStartingValues {
-    model
-        .run_periods
-        .first()
-        .map(|run_period| run_period.first_hour_interpolation_starting_values)
-        .unwrap_or_default()
-}
-
-/// Builds an hourly time axis for one run period.
-pub fn build_hourly_time_axis_for_run_period(
-    run_period: &RunPeriod,
-) -> Result<TimeAxis, TimeAxisError> {
-    let begin_year = run_period
-        .begin_year
-        .or(run_period.end_year)
-        .unwrap_or(DEFAULT_RUN_PERIOD_YEAR);
-    let end_year = run_period
-        .end_year
-        .or(run_period.begin_year)
-        .unwrap_or(begin_year);
-    let begin = Date {
-        year: begin_year,
-        month: run_period.begin_month,
-        day_of_month: run_period.begin_day_of_month,
-    };
-    let end = Date {
-        year: end_year,
-        month: run_period.end_month,
-        day_of_month: run_period.end_day_of_month,
-    };
-
-    let begin_ordinal = date_ordinal(begin).ok_or_else(|| TimeAxisError::InvalidDate {
-        run_period_name: run_period.name.0.clone(),
-        field: "begin",
-        year: begin.year,
-        month: begin.month,
-        day_of_month: begin.day_of_month,
-    })?;
-    let end_ordinal = date_ordinal(end).ok_or_else(|| TimeAxisError::InvalidDate {
-        run_period_name: run_period.name.0.clone(),
-        field: "end",
-        year: end.year,
-        month: end.month,
-        day_of_month: end.day_of_month,
-    })?;
-    if end_ordinal < begin_ordinal {
-        return Err(TimeAxisError::InvalidRange {
-            run_period_name: run_period.name.0.clone(),
-        });
-    }
-
-    let mut points = Vec::new();
-    let mut date = begin;
-    let mut ordinal = begin_ordinal;
-    while ordinal <= end_ordinal {
-        for hour in 1..=24 {
-            points.push(TimePoint {
-                sample_index: points.len(),
-                year: date.year,
-                month: date.month,
-                day_of_month: date.day_of_month,
-                hour,
-            });
-        }
-        if ordinal == end_ordinal {
-            break;
-        }
-        date = next_day(date);
-        ordinal += 1;
-    }
-
-    Ok(TimeAxis {
-        run_period_name: run_period.name.0.clone(),
-        points,
-    })
-}
 
 /// Weather state for the current simulation timestep.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -10742,88 +10569,6 @@ fn cross(left: Vector3, right: Vector3) -> Vector3 {
     }
 }
 
-#[derive(Clone, Copy)]
-struct Date {
-    year: u32,
-    month: u32,
-    day_of_month: u32,
-}
-
-fn default_run_period() -> RunPeriod {
-    RunPeriod {
-        id: RunPeriodId(0),
-        name: ep_model::NormalizedName::new("Default Run Period"),
-        begin_month: 1,
-        begin_day_of_month: 1,
-        begin_year: Some(DEFAULT_RUN_PERIOD_YEAR),
-        end_month: 1,
-        end_day_of_month: 1,
-        end_year: Some(DEFAULT_RUN_PERIOD_YEAR),
-        day_of_week_for_start_day: None,
-        first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
-    }
-}
-
-fn date_ordinal(date: Date) -> Option<i64> {
-    let day_of_year = day_of_year(date.year, date.month, date.day_of_month)?;
-    Some(days_before_year(date.year) + i64::from(day_of_year - 1))
-}
-
-fn days_before_year(year: u32) -> i64 {
-    let previous = i64::from(year.saturating_sub(1));
-    365 * previous + previous / 4 - previous / 100 + previous / 400
-}
-
-fn day_of_year(year: u32, month: u32, day_of_month: u32) -> Option<u32> {
-    if !(1..=12).contains(&month) {
-        return None;
-    }
-    let month_days = days_in_month(year, month);
-    if day_of_month == 0 || day_of_month > month_days {
-        return None;
-    }
-    let before_month = (1..month)
-        .map(|value| days_in_month(year, value))
-        .sum::<u32>();
-    Some(before_month + day_of_month)
-}
-
-fn days_in_month(year: u32, month: u32) -> u32 {
-    match month {
-        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
-        4 | 6 | 9 | 11 => 30,
-        2 if is_leap_year(year) => 29,
-        2 => 28,
-        _ => 0,
-    }
-}
-
-fn is_leap_year(year: u32) -> bool {
-    year.is_multiple_of(4) && (!year.is_multiple_of(100) || year.is_multiple_of(400))
-}
-
-fn next_day(date: Date) -> Date {
-    let month_days = days_in_month(date.year, date.month);
-    if date.day_of_month < month_days {
-        return Date {
-            day_of_month: date.day_of_month + 1,
-            ..date
-        };
-    }
-    if date.month < 12 {
-        return Date {
-            month: date.month + 1,
-            day_of_month: 1,
-            ..date
-        };
-    }
-    Date {
-        year: date.year + 1,
-        month: 1,
-        day_of_month: 1,
-    }
-}
-
 /// One sampled schedule output series.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleTrace {
@@ -11159,7 +10904,7 @@ fn epw_field<'a>(
 mod tests {
     use super::{
         ConstructionCtfCoefficientOverride, CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput,
-        CtfOutsideQuickConductionBalanceInput, Date,
+        CtfOutsideQuickConductionBalanceInput,
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
@@ -11176,10 +10921,9 @@ mod tests {
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         advance_surface_ctf_histories_with_outside_temperature_override,
         append_surface_incident_solar_radiation_series,
-        apply_energyplus_adaptive_system_timestep_zone_air_correction, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, energyplus_analytical_zone_air_temperature_c,
-        energyplus_anisotropic_sky_multiplier, energyplus_approximate_view_factors,
-        energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
+        apply_energyplus_adaptive_system_timestep_zone_air_correction,
+        energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
+        energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
@@ -11210,11 +10954,11 @@ mod tests {
         heat_balance_uses_surface_reference_air_surface_convection_report,
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients,
-        inside_ctf_outside_temperature_history_commit_override_c, next_day,
-        parse_epw_dry_bulb_series, parse_epw_records, run_heat_balance_run_period_warmup,
-        run_surface_balance_passes, seed_energyplus_initial_surface_ctf_histories,
-        seed_initial_surface_ctf_boundary_histories, simulate_constant_schedules,
-        simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+        inside_ctf_outside_temperature_history_commit_override_c, parse_epw_dry_bulb_series,
+        parse_epw_records, run_heat_balance_run_period_warmup, run_surface_balance_passes,
+        seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
+        simulate_constant_schedules, simulate_first_zone_uncontrolled,
+        simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_internal,
         simulate_heat_balance_zone_air_temperatures_with_weather_records, simulate_schedule_values,
         simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
@@ -11247,8 +10991,10 @@ mod tests {
         NodeStateStore, node_temperature_setpoint_from_energyplus,
         simulate_ideal_loads_node_state_projection,
     };
+    use crate::time_axis::{Date, next_day};
     use crate::{
         ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry, build_execution_plan,
+        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         energyplus_heat_balance_compatibility_stages,
     };
     use crate::{
