@@ -479,12 +479,11 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   convection coefficients and surface temperatures, snapshots
   `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` in
   `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
-  and third-order zone-air temperature helpers. `HeatBalanceZoneAirAlgorithm`
-  keeps the default trace on the existing simplified analytical shell while
-  allowing explicit analytical, analytical surface-first, coupled rebalance,
-  previous-inside outdoor boundary, previous-inside quick outside-conduction
-  boundary, previous-inside outdoor/adiabatic boundary, and third-order
-  diagnostic probes. The
+  and third-order zone-air temperature helpers. Heat-balance runtime selection
+  now exposes `CompatibilityHeatBalanceAlgorithm`, `DiagnosticHeatBalanceProbe`,
+  and `HeatBalanceZoneAirSelection` so compatibility and probe lanes have
+  separate typed APIs while the CLI/runtime split still bridges through the
+  legacy `HeatBalanceZoneAirAlgorithm` selector. The
   default predictor equation itself remains the simplified diagnostic shell
   until all coefficient inputs are wired from source-mapped runtime state.
   Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance
