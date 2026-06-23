@@ -954,10 +954,12 @@ fn write_graph_and_plan(
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
         "stages": plan.stages.iter().map(|stage| json!({
+            "kind": stage.kind.id(),
             "name": stage.name,
             "steps": stage.steps.iter().map(execution_step_label).collect::<Vec<_>>(),
         })).collect::<Vec<_>>(),
         "compatibility_stages": plan.compatibility_stages.iter().map(|stage| json!({
+            "kind": stage.kind.id(),
             "stage_name": stage.stage_name,
             "source_file": stage.source_file,
             "source_routine": stage.source_routine,

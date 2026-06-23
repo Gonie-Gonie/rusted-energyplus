@@ -93,6 +93,12 @@ foreach ($relative in $expectedArtifacts) {
     Assert-File -Path (Join-Path $outputDir $relative)
 }
 
+$executionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "model\execution-plan.json") | ConvertFrom-Json
+Assert-Equal -Actual @($executionPlan.stages)[0].kind -Expected "environment" -Description "execution plan environment kind"
+Assert-Equal -Actual @($executionPlan.stages)[1].kind -Expected "zone" -Description "execution plan zone kind"
+Assert-Equal -Actual @($executionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "execution plan source-order first kind"
+Assert-Equal -Actual @($executionPlan.compatibility_stages)[4].kind -Expected "manage_surface_heat_balance" -Description "execution plan source-order surface manager kind"
+
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
 Assert-Equal -Actual $runSummary.exit_code -Expected 8 -Description "run summary exit code"
@@ -149,6 +155,10 @@ foreach ($relative in @(
 )) {
     Assert-File -Path (Join-Path $blockedOutputDir $relative)
 }
+
+$blockedExecutionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "model\execution-plan.json") | ConvertFrom-Json
+Assert-Equal -Actual @($blockedExecutionPlan.stages)[0].kind -Expected "environment" -Description "blocked execution plan environment kind"
+Assert-Equal -Actual @($blockedExecutionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan source-order first kind"
 
 $blockedSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $blockedSummary.status -Expected "unsupported" -Description "blocked run summary status"

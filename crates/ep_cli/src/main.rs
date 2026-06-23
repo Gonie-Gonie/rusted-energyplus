@@ -433,7 +433,12 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  stages: {}", plan.stages.len());
     println!("  steps: {}", plan.step_count());
     for stage in &plan.stages {
-        println!("    {}: {}", stage.name, stage.steps.len());
+        println!(
+            "    {} ({}): {}",
+            stage.name,
+            stage.kind.id(),
+            stage.steps.len()
+        );
         for (index, step) in stage.steps.iter().enumerate() {
             println!("      {index}: {}", execution_step_label(step));
         }
@@ -444,8 +449,11 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     );
     for (index, stage) in plan.compatibility_stages.iter().enumerate() {
         println!(
-            "    {index}: {} -> {}::{}",
-            stage.stage_name, stage.source_file, stage.source_routine
+            "    {index}: {} ({}) -> {}::{}",
+            stage.stage_name,
+            stage.kind.id(),
+            stage.source_file,
+            stage.source_routine
         );
     }
 }
@@ -10717,11 +10725,13 @@ fn heat_balance_compatibility_stages_json(rows: &[EnergyPlusCompatibilityStage])
         json.push_str(&format!(
             concat!(
                 "{{ \"index\": {}, ",
+                "\"kind\": {}, ",
                 "\"stage_name\": {}, ",
                 "\"source_file\": {}, ",
                 "\"source_routine\": {} }}"
             ),
             index,
+            json_string(row.kind.id()),
             json_string(row.stage_name),
             json_string(row.source_file),
             json_string(row.source_routine)
@@ -12015,12 +12025,16 @@ fn heat_balance_report_compatibility_stage_rows(
     report: &mut String,
     rows: &[EnergyPlusCompatibilityStage],
 ) {
-    report.push_str("| index | stage | source file | source routine |\n");
-    report.push_str("|---:|---|---|---|\n");
+    report.push_str("| index | kind | stage | source file | source routine |\n");
+    report.push_str("|---:|---|---|---|---|\n");
     for (index, row) in rows.iter().enumerate() {
         report.push_str(&format!(
-            "| {} | {} | {} | {} |\n",
-            index, row.stage_name, row.source_file, row.source_routine
+            "| {} | {} | {} | {} | {} |\n",
+            index,
+            row.kind.id(),
+            row.stage_name,
+            row.source_file,
+            row.source_routine
         ));
     }
 }

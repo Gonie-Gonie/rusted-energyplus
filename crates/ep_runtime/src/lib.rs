@@ -1,5 +1,6 @@
 //! Public facade for runtime execution and trace helpers.
 
+pub mod execution_plan;
 pub mod ideal_loads;
 pub mod node;
 mod output;
@@ -7,6 +8,7 @@ pub mod plant;
 mod runtime;
 pub mod zone_equipment;
 
+pub use execution_plan::*;
 pub use ideal_loads::*;
 pub use node::*;
 pub use output::*;

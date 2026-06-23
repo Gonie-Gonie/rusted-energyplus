@@ -1,13 +1,12 @@
-//! Runtime state, execution-plan shells, and first trace helpers.
+//! Runtime state, heat-balance execution, weather, and trace helpers.
 
-use crate::{OutputSeries, ResultStore, RuntimeOutputRegistry};
+use crate::{OutputSeries, ResultStore};
 use ep_model::{
-    AutoOrNumber, ConstructionId, FirstHourInterpolationStartingValues, IdealLoadsAirSystemId,
-    MaterialId, MaterialSurfaceRoughness, NormalizedName, OtherEquipment, OutputHandle,
+    AutoOrNumber, ConstructionId, FirstHourInterpolationStartingValues, MaterialId,
+    MaterialSurfaceRoughness, NormalizedName, OtherEquipment, OutputHandle,
     OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, RunPeriod, RunPeriodId,
     ScheduleCompactSegment, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface,
-    SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure, Zone, ZoneEquipmentListId, ZoneId,
-    ZoneThermostatId,
+    SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure, Zone, ZoneId,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
@@ -152,218 +151,6 @@ pub enum SimulationMode {
     Fast,
     /// Future isolated algorithm experiments.
     Experimental,
-}
-
-/// Minimal execution step set for v0.1 architecture boundaries.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum ExecutionStep {
-    /// Update weather-derived state.
-    UpdateWeather,
-    /// Evaluate one schedule.
-    EvaluateSchedule(ScheduleId),
-    /// Evaluate one zone thermostat control.
-    EvaluateZoneThermostat(ZoneThermostatId),
-    /// Solve one zone.
-    SolveZone(ZoneId),
-    /// Enter EnergyPlus `ZoneEquipmentManager::ManageZoneEquipment` for one zone.
-    ManageZoneEquipment(ZoneId),
-    /// Dispatch one `ZoneHVAC:EquipmentList` through `SimZoneEquipment`.
-    SimZoneEquipment(ZoneEquipmentListId),
-    /// Evaluate one IdealLoads air system assigned to a zone.
-    EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId),
-    /// Write one output handle.
-    WriteOutput(OutputHandle),
-}
-
-/// Named runtime execution stage.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ExecutionStage {
-    /// Stage name.
-    pub name: String,
-    /// Ordered execution steps in this stage.
-    pub steps: Vec<ExecutionStep>,
-}
-
-/// EnergyPlus source routine that owns one compatibility-mode ordering barrier.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct EnergyPlusCompatibilityStage {
-    /// Stable stage name used in Rust reports and traces.
-    pub stage_name: &'static str,
-    /// EnergyPlus source file that owns the stage.
-    pub source_file: &'static str,
-    /// EnergyPlus routine or callback barrier name.
-    pub source_routine: &'static str,
-}
-
-/// Minimal deterministic execution plan.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ExecutionPlan {
-    /// Ordered stages.
-    pub stages: Vec<ExecutionStage>,
-    /// EnergyPlus heat-balance routine order that compatibility mode must preserve.
-    pub compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
-}
-
-impl ExecutionPlan {
-    /// Returns the total step count across all stages.
-    #[must_use]
-    pub fn step_count(&self) -> usize {
-        self.stages.iter().map(|stage| stage.steps.len()).sum()
-    }
-}
-
-/// EnergyPlus heat-balance source order used as the compatibility-mode contract.
-#[must_use]
-pub fn energyplus_heat_balance_compatibility_stages() -> Vec<EnergyPlusCompatibilityStage> {
-    vec![
-        EnergyPlusCompatibilityStage {
-            stage_name: "get-heat-balance-input",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "GetHeatBalanceInput",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "ems-begin-zone-timestep-before-init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS BeginZoneTimestepBeforeInitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "InitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "ems-begin-zone-timestep-after-init-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS BeginZoneTimestepAfterInitHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "manage-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "ManageSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "init-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "InitSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "calc-heat-balance-outside-surf",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "CalcHeatBalanceOutsideSurf",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "calc-heat-balance-inside-surf",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "CalcHeatBalanceInsideSurf",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "manage-air-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceAirManager.cc",
-            source_routine: "ManageAirHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "update-final-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "UpdateFinalSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "update-thermal-histories",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "UpdateThermalHistories",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "report-surface-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
-            source_routine: "ReportSurfaceHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "ems-end-zone-timestep-before-zone-reporting",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS EndZoneTimestepBeforeZoneReporting",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "rec-keep-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "RecKeepHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "report-heat-balance",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "ReportHeatBalance",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "ems-end-zone-timestep-after-zone-reporting",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "EMS EndZoneTimestepAfterZoneReporting",
-        },
-        EnergyPlusCompatibilityStage {
-            stage_name: "check-warmup-convergence",
-            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
-            source_routine: "CheckWarmupConvergence",
-        },
-    ]
-}
-
-/// Builds the first deterministic execution plan for the typed subset.
-#[must_use]
-pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
-    let mut setup_steps = vec![ExecutionStep::UpdateWeather];
-    setup_steps.extend(schedule_ids(&model.typed).map(ExecutionStep::EvaluateSchedule));
-
-    let mut zone_steps = Vec::new();
-    let mut zone_equipment_steps = Vec::new();
-    for zone in &model.typed.zones {
-        zone_steps.extend(
-            model
-                .graph
-                .zone_thermostats
-                .iter()
-                .filter(|edge| edge.zone == zone.id)
-                .map(|edge| ExecutionStep::EvaluateZoneThermostat(edge.thermostat)),
-        );
-        zone_steps.push(ExecutionStep::SolveZone(zone.id));
-        let zone_ideal_loads = model
-            .graph
-            .zone_ideal_loads
-            .iter()
-            .filter(|edge| edge.zone == zone.id)
-            .collect::<Vec<_>>();
-        if !zone_ideal_loads.is_empty() {
-            zone_equipment_steps.push(ExecutionStep::ManageZoneEquipment(zone.id));
-        }
-        for edge in zone_ideal_loads {
-            zone_equipment_steps.push(ExecutionStep::SimZoneEquipment(edge.equipment_list));
-            zone_equipment_steps.push(ExecutionStep::EvaluateIdealLoadsAirSystem(
-                edge.ideal_loads_air_system,
-            ));
-        }
-    }
-
-    ExecutionPlan {
-        stages: vec![
-            ExecutionStage {
-                name: "environment".to_string(),
-                steps: setup_steps,
-            },
-            ExecutionStage {
-                name: "zone".to_string(),
-                steps: zone_steps,
-            },
-            ExecutionStage {
-                name: "zone-equipment".to_string(),
-                steps: zone_equipment_steps,
-            },
-            ExecutionStage {
-                name: "output".to_string(),
-                steps: RuntimeOutputRegistry::from_model(model)
-                    .outputs()
-                    .iter()
-                    .map(|output| ExecutionStep::WriteOutput(output.handle))
-                    .collect(),
-            },
-        ],
-        compatibility_stages: energyplus_heat_balance_compatibility_stages(),
-    }
 }
 
 /// One hourly timestamp aligned to EnergyPlus run-period reporting.
@@ -11390,30 +11177,30 @@ mod tests {
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        ExecutionStep, FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
+        FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
         HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource,
         InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
-        OutputSeries, QuickOutsideConductionContext, ResultStore, RuntimeError,
-        RuntimeOutputRegistry, SECONDS_PER_HOUR, STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode,
-        SimulationState, SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
+        OutputSeries, QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
         advance_surface_ctf_histories_with_outside_temperature_override,
         append_surface_incident_solar_radiation_series,
-        apply_energyplus_adaptive_system_timestep_zone_air_correction, build_execution_plan,
-        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
-        energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
+        apply_energyplus_adaptive_system_timestep_zone_air_correction, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, energyplus_analytical_zone_air_temperature_c,
+        energyplus_anisotropic_sky_multiplier, energyplus_approximate_view_factors,
+        energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
         energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
         energyplus_exterior_longwave_terms, energyplus_exterior_wet_context_fraction,
-        energyplus_exterior_wet_timestep_fraction, energyplus_heat_balance_compatibility_stages,
+        energyplus_exterior_wet_timestep_fraction,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
         energyplus_outdoor_wet_bulb_c, energyplus_scriptf_from_view_factors,
@@ -11473,6 +11260,10 @@ mod tests {
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         NodeStateStore, node_temperature_setpoint_from_energyplus,
         simulate_ideal_loads_node_state_projection,
+    };
+    use crate::{
+        ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry, build_execution_plan,
+        energyplus_heat_balance_compatibility_stages,
     };
     use crate::{
         RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRequest,
@@ -11976,14 +11767,18 @@ mod tests {
 
         assert_eq!(plan.stages.len(), 4);
         assert_eq!(plan.step_count(), 16);
+        assert_eq!(plan.stages[0].kind, ExecutionStageKind::Environment);
         assert_eq!(plan.stages[0].steps[0], ExecutionStep::UpdateWeather);
         assert_eq!(
             plan.stages[0].steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
+        assert_eq!(plan.stages[1].kind, ExecutionStageKind::Zone);
         assert_eq!(plan.stages[1].steps[0], ExecutionStep::SolveZone(ZoneId(0)));
+        assert_eq!(plan.stages[2].kind, ExecutionStageKind::ZoneEquipment);
         assert_eq!(plan.stages[2].name, "zone-equipment");
         assert!(plan.stages[2].steps.is_empty());
+        assert_eq!(plan.stages[3].kind, ExecutionStageKind::Output);
         assert_eq!(plan.stages[3].steps.len(), 13);
         assert_eq!(
             plan.stages[3].steps[0],
@@ -12012,8 +11807,15 @@ mod tests {
         let stages = energyplus_heat_balance_compatibility_stages();
 
         assert_eq!(stages.len(), 17);
+        assert!(
+            stages
+                .iter()
+                .all(|stage| stage.kind.is_source_order_barrier())
+        );
+        assert_eq!(stages[0].kind, ExecutionStageKind::GetHeatBalanceInput);
         assert_eq!(stages[0].stage_name, "get-heat-balance-input");
         assert_eq!(stages[0].source_routine, "GetHeatBalanceInput");
+        assert_eq!(stages[4].kind, ExecutionStageKind::ManageSurfaceHeatBalance);
         assert_eq!(stages[4].source_routine, "ManageSurfaceHeatBalance");
         assert_eq!(stages[5].source_routine, "InitSurfaceHeatBalance");
         assert_eq!(stages[6].source_routine, "CalcHeatBalanceOutsideSurf");
