@@ -5,6 +5,7 @@ pub mod diagnostics;
 pub mod error;
 pub mod execution_plan;
 pub mod first_zone;
+pub mod geometry;
 pub mod heat_balance;
 pub mod ideal_loads;
 pub mod mode;
