@@ -1,0 +1,43 @@
+# Copy this template into the relevant design note, issue, or PR body before
+# porting an EnergyPlus source routine into compatibility-mode Rust code.
+
+[algorithm_port_ticket]
+algorithm_id = ""
+domain = ""
+port_type = "compatibility" # compatibility | diagnostic_probe | refactor_only
+
+[energyplus]
+version = "26.1.0"
+source_file = ""
+routine = ""
+source_order_stage = ""
+
+[rust]
+target_module = ""
+target_function = ""
+execution_stage_kind = ""
+compatibility_path = true
+diagnostic_probe_used = false
+
+[state_mapping]
+input_state = []
+output_state = []
+history_state_ownership = []
+unsupported_state = []
+
+[outputs]
+affected_variables = []
+affected_meters = []
+diagnostic_only_variables = []
+
+[evidence]
+first_target_case = ""
+proof_variables = []
+tolerance_candidate = ""
+report_path = ""
+blocking_gate = ""
+
+[claim_boundary]
+conformance_claim = false
+not_claimed_branches = []
+partial_run_allowed = false

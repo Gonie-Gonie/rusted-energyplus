@@ -9,6 +9,24 @@
 - [ ] Conformance claim
 - [ ] Performance work
 
+## Algorithm Port Ticket
+
+- [ ] Not an algorithm/source-order change
+- [ ] Compatibility port ticket completed
+- [ ] Diagnostic probe only; no conformance claim
+- Ticket path or PR section:
+- Algorithm ID:
+- EnergyPlus source file:
+- EnergyPlus routine:
+- Rust target module/function:
+- ExecutionStageKind:
+- Read state:
+- Write state:
+- History/state ownership:
+- Proof variables:
+- First target case:
+- Not-claimed branches:
+
 ## Claim Boundary
 
 - Conformance claim: yes / no

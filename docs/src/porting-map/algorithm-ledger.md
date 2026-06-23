@@ -28,6 +28,18 @@ An algorithm entry can support a compatibility claim only when it has:
 
 No source map, no algorithm port.
 
+Before a source-order compatibility algorithm is implemented or promoted, the
+PR must include an Algorithm Port Ticket or link to one. The ticket records the
+EnergyPlus source file, routine, Rust target module/function, read/write state,
+history ownership, proof variables, first target case, not-claimed branches,
+tolerance/report/gate, and whether any diagnostic probe is involved. Use
+`specs/algorithm_port_ticket_template.toml` as the field contract.
+
+Diagnostic probes must be identified as diagnostic in the ticket and cannot
+support conformance promotion. Refactor-only PRs may mark the ticket as not
+applicable only when they do not change source-order behavior or claim
+boundaries.
+
 v0.21 makes this rule executable through `algorithm-ledger-check`. The gate
 loads `specs/algorithm_ledger.toml`, checks each `source_map`, verifies
 EnergyPlus source files against `.reference/energyplus-src/26.1.0`, verifies
