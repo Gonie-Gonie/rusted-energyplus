@@ -86,6 +86,83 @@ claim_level = "limited-official-dynamic-conformance"
 support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance only for conformance-level variables in the source-order compatibility lane, including zone mean air humidity ratio, wetbulb/rain-status/sky/horizontal-infrared weather alignment, roof surface-local outdoor-air drybulb/wetbulb/wind rows, declared inside adjacent-air temperature rows, the hourly Surface Inside Face Heat Balance Calculation Iteration Count row under surface-iteration-count-state tolerance, named roof/wall/floor conduction per-area rows, declared inside convection/radiation source rows, declared inside/outside convection coefficient rows and roof outside longwave air/sky/ground coefficient rows under surface-coefficient-state tolerance, declared wall/roof exterior convection/net-radiation heat-gain rate rows under surface-exterior-rate-state tolerance, roof exterior convection/net-radiation per-area rows under surface-exterior-flux-state tolerance, named wall/roof incident total and beam solar per-area rows under surface-solar-flux-state tolerance, exact-zero named wall/roof sky and ground diffuse incident solar rows, named wall/roof absorbed solar heat gain rate rows under surface-solar-rate-state tolerance, the roof absorbed solar heat gain per-area row under surface-solar-flux-state tolerance, zone opaque conduction aggregate rows including outside-face gain/loss aggregates, and the floor Surface Heat Storage Rate and Surface Heat Storage Rate per Area under dedicated aggregate/flux/storage/solar-rate/solar-flux/exterior-rate/exterior-flux/coefficient/count tolerances; broad heat-balance compatibility, broad weather processor compatibility, other storage rows, exterior source rows outside the declared wall/roof and roof per-area rows, absorbed/non-incident solar outside the declared rows, exact iteration-count parity beyond the declared count tolerance, fenestration, and non-promoted probe lanes remain outside the claim."
 
 [[algorithm]]
+id = "heat_balance_manager_source_order"
+domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceManager.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/manager.rs::manage_heat_balance_source_order_stages",
+]
+status = "scaffold"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Zone Mean Air Temperature",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold only for HeatBalanceManager stage barriers: GetHeatBalanceInput, InitHeatBalance, RecKeepHeatBalance, ReportHeatBalance, CheckWarmupConvergence, and EMS callback placeholders. This entry does not add a numerical conformance claim."
+
+[[algorithm]]
+id = "heat_balance_surface_manager_source_order"
+domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::manage_surface_heat_balance_stage",
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::calc_heat_balance_outside_surf_stage",
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::calc_heat_balance_inside_surf_stage",
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::update_thermal_histories_stage",
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::report_surface_heat_balance_stage",
+]
+status = "scaffold"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold only for HeatBalanceSurfaceManager barriers. Numerical surface-temperature and heat-flux claims remain limited to promoted conformance entries and their declared variables."
+
+[[algorithm]]
+id = "heat_balance_air_manager_source_order"
+domain = "heat_balance"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceAirManager.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/air_manager.rs::manage_air_heat_balance_stage",
+]
+status = "scaffold"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Zone Air Heat Balance Surface Convection Rate",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold only for the ManageAirHeatBalance barrier. Zone-air numerical claims remain bounded by promoted cases and do not imply broad HVAC or air-balance compatibility."
+
+[[algorithm]]
+id = "zone_temp_predictor_corrector_source_order"
+domain = "heat_balance"
+source_map = "docs/src/porting-map/zone-air-update-map.md"
+energyplus_source = [
+  "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/heat_balance/zone_predictor_corrector.rs::manage_zone_air_updates_stage",
+]
+status = "scaffold"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Zone Mean Air Temperature",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold only for ManageZoneAirUpdates and its MAT history/output-timing ownership. It records the barrier without expanding zone-air conformance beyond promoted variables."
+
+[[algorithm]]
 id = "surface_inside_temperature"
 domain = "heat_balance"
 source_map = "docs/src/porting-map/heat-balance-source-map.md"
@@ -219,6 +296,29 @@ claim_level = "limited-ideal-loads-no-oa-sensible-finite-limit-report-energy-bla
 support_boundary = "Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for declared conformance-level outputs in ideal_loads_no_oa_sensible_conformance_001, plus no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for declared thermostat, IdealLoads rate, and supply-node temperature/mass-flow outputs in ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA ReportPurchasedAir rate-to-TimeStepSysSec and OutputProcessor Sum conformance for declared non-fuel energy rows in ideal_loads_no_oa_report_energy_conformance_candidate_001, plus no-OA blank fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_blank_fuel_efficiency_conformance_candidate_001, plus no-OA constant Schedule:Constant fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_constant_fuel_efficiency_conformance_candidate_001, plus no-OA all-days Schedule:Compact fuel-efficiency conformance for declared fuel-energy rows in ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001, plus no-OA hourly DistrictHeatingWater:Facility and DistrictCooling:Facility meter conformance in ideal_loads_no_oa_facility_meter_conformance_candidate_001, no-OA hourly/monthly/run-period DistrictHeatingWater:Facility and DistrictCooling:Facility meter conformance in the four no-OA humidity-control conformance candidates, full-year annual DistrictHeatingWater:Facility and DistrictCooling:Facility meter conformance in ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001, ideal_loads_constant_supply_humidity_heating_annual_meter_conformance_candidate_001, ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001, and ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001, plus no-OA monthly/annual/run-period DistrictHeatingWater:Facility and DistrictCooling:Facility meter conformance in ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001. Dedicated ledger entries below bound selected no-OA humidity-control, outdoor-air design-flow, economizer, and heat-recovery conformance; sizing, adaptive system timestep, fuel-efficiency schedules beyond the declared blank/constant/all-days Schedule:Compact candidates, broad meter conformance beyond the declared no-OA hourly facility meter rows, humidity-control hourly/monthly/run-period facility meter rows, the four full-year humidity-control annual facility meter candidates, and monthly/annual/run-period facility meter candidate, multi-year annual grouping, and broad HVAC compatibility remain outside the claim."
 
 [[algorithm]]
+id = "ideal_loads_zone_equipment_purchased_air_source_order"
+domain = "hvac"
+source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/ZoneEquipmentManager.cc",
+  "src/EnergyPlus/PurchasedAirManager.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages",
+  "crates/ep_runtime/src/zone_equipment/dispatch.rs::validate_ideal_loads_zone_equipment_dispatch",
+  "crates/ep_runtime/src/ideal_loads/dispatch.rs::purchased_air_source_order_stages",
+  "crates/ep_runtime/src/ideal_loads/dispatch.rs::sim_purchased_air_compat",
+]
+status = "scaffold"
+first_case = "ideal_loads_no_oa_sensible_conformance_001"
+proof_variables = [
+  "Zone Ideal Loads Zone Total Heating Rate",
+  "System Node Temperature",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold for ZoneEquipmentManager dispatch into PurchasedAirManager. It records ManageZoneEquipment, SimZoneEquipment, SimPurchasedAir, GetPurchasedAir, InitPurchasedAir, CalcPurchAirLoads, UpdatePurchasedAir, and ReportPurchasedAir barriers without broadening IdealLoads or HVAC conformance."
+
+[[algorithm]]
 id = "ideal_loads_constant_shr_humidity_control"
 domain = "hvac"
 source_map = "docs/src/porting-map/ideal-loads-source-map.md"
@@ -244,24 +344,18 @@ status = "conformance"
 first_case = "ideal_loads_constant_shr_conformance_001"
 first_evidence = "ideal_loads_constant_shr_conformance_001"
 proof_variables = [
-  "Zone Ideal Loads Zone Total Heating Rate",
   "Zone Ideal Loads Zone Total Cooling Rate",
-  "Zone Ideal Loads Zone Sensible Heating Rate",
   "Zone Ideal Loads Zone Sensible Cooling Rate",
-  "Zone Ideal Loads Zone Latent Heating Rate",
   "Zone Ideal Loads Zone Latent Cooling Rate",
-  "Zone Ideal Loads Supply Air Sensible Heating Rate",
   "Zone Ideal Loads Supply Air Sensible Cooling Rate",
-  "Zone Ideal Loads Supply Air Latent Heating Rate",
   "Zone Ideal Loads Supply Air Latent Cooling Rate",
-  "Zone Ideal Loads Supply Air Total Heating Rate",
   "Zone Ideal Loads Supply Air Total Cooling Rate",
   "System Node Temperature",
   "System Node Mass Flow Rate",
   "System Node Humidity Ratio",
 ]
 claim_level = "limited-ideal-loads-no-oa-constant-shr-cooling-conformance"
-support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for declared cooling total/sensible/latent rate rows and supply-node temperature/mass-flow/humidity rows in ideal_loads_constant_shr_conformance_001. Heating latent rows, return-node and zone-air-node proof rows, ReportPurchasedAir energy/fuel rows, ConstantSupplyHumidityRatio, Humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
+support_boundary = "Tolerance-gated no-OA ConstantSensibleHeatRatio cooling conformance for declared cooling total/sensible/latent rate rows and supply-node temperature/mass-flow/humidity rows in ideal_loads_constant_shr_conformance_001. Heating rate rows, return-node and zone-air-node proof rows, ReportPurchasedAir energy/fuel rows, ConstantSupplyHumidityRatio, Humidistat, moisture-demand branches, outdoor-air humidity control, and broad humidity-control conformance remain outside the claim."
 
 [[algorithm]]
 id = "ideal_loads_constant_supply_humidity_control"
