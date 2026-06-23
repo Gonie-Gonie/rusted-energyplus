@@ -29,7 +29,10 @@ use ep_model::{
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
-use ep_run::{RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, run_arbitrary_idf};
+use ep_run::{
+    PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel,
+    run_arbitrary_idf,
+};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStep,
     FirstZoneSimulationOptions, HeatBalanceCtfHistorySlotFirstSample,
@@ -125,7 +128,7 @@ const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
     "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-no-oa-sensible-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_OUTDOOR_AIR_DESIGN_FLOW_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-outdoor-air-design-flow-report <case.toml> <oracle-root> <output-root>";
-const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--oracle-baseline] [--compare-oracle] [--dry-run]";
+const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--mode compatibility|diagnostic] [--partial deny|allow] [--oracle-baseline] [--compare-oracle] [--dry-run]";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -2486,6 +2489,7 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
     let mut weather_path = None;
     let mut output_dir = None;
     let mut mode = RunMode::Compatibility;
+    let mut partial_policy = PartialRunPolicy::Deny;
     let mut output_format = RunOutputFormat::RustNative;
     let mut overwrite = false;
     let mut keep_intermediate = false;
@@ -2530,6 +2534,27 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
                 };
                 mode = parsed;
                 index += 2;
+            }
+            "--partial" | "--partial-run" => {
+                let Some(value) = args.get(index + 1) else {
+                    eprintln!("missing value for {}", args[index]);
+                    eprintln!("{ARBITRARY_RUN_USAGE}");
+                    return RunExitCode::Args.code();
+                };
+                let Some(parsed) = PartialRunPolicy::parse(value) else {
+                    eprintln!("unsupported partial run policy: {value}");
+                    return RunExitCode::Args.code();
+                };
+                partial_policy = parsed;
+                index += 2;
+            }
+            "--allow-partial" => {
+                partial_policy = PartialRunPolicy::Allow;
+                index += 1;
+            }
+            "--deny-partial" => {
+                partial_policy = PartialRunPolicy::Deny;
+                index += 1;
             }
             "--format" | "--output-format" => {
                 let Some(value) = args.get(index + 1) else {
@@ -2624,6 +2649,7 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
         weather_path,
         output_dir,
         mode,
+        partial_policy,
         output_format,
         overwrite,
         keep_intermediate,

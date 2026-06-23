@@ -9,7 +9,8 @@ use ep_runtime::classify_no_oa_sensible_subset;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunMode, RunOutputFormat, TraceLevel,
+    PartialRunPolicy, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunMode,
+    RunOutputFormat, TraceLevel,
 };
 
 /// Capability registry path bundled with the repository and release package.
@@ -93,10 +94,16 @@ impl RunResultState {
 
     /// Maps internal support status to the public run state for a requested mode.
     #[must_use]
-    pub const fn from_support_status(status: SupportStatus, mode: RunMode) -> Self {
+    pub const fn from_support_status(
+        status: SupportStatus,
+        mode: RunMode,
+        partial_policy: PartialRunPolicy,
+    ) -> Self {
         match status {
             SupportStatus::SupportedCompatibility => Self::SupportedCompatibilityRun,
-            SupportStatus::SupportedDiagnosticOnly if matches!(mode, RunMode::Diagnostic) => {
+            SupportStatus::SupportedDiagnosticOnly
+                if matches!(mode, RunMode::Diagnostic) && partial_policy.allows_partial() =>
+            {
                 Self::PartialSupportedRun
             }
             SupportStatus::SupportedDiagnosticOnly | SupportStatus::Unsupported => Self::RunBlocked,
@@ -167,6 +174,8 @@ pub struct SupportAssessment {
     pub matched_capability_ids: Vec<String>,
     /// Requested mode.
     pub mode: String,
+    /// Requested partial-run policy.
+    pub partial_policy: String,
     /// Requested output format.
     pub output_format: String,
     /// Requested trace level.
@@ -220,6 +229,7 @@ pub fn assess_support(
     compile_report: &CompileReport,
     typed_model: Option<&TypedModel>,
     mode: RunMode,
+    partial_policy: PartialRunPolicy,
     output_format: RunOutputFormat,
     trace_level: TraceLevel,
 ) -> SupportAssessment {
@@ -321,14 +331,14 @@ pub fn assess_support(
     } else {
         runtime_status_for_typed_model(typed_model)
     };
-    let run_result_state = RunResultState::from_support_status(status, mode);
+    let run_result_state = RunResultState::from_support_status(status, mode, partial_policy);
     if status == SupportStatus::SupportedDiagnosticOnly
         && run_result_state == RunResultState::RunBlocked
     {
         diagnostics.error(
             "DiagnosticOnlyRuntimeBlocked",
             "support",
-            "diagnostic-only runtime classes require --mode diagnostic and cannot execute as compatibility evidence",
+            "diagnostic-only runtime classes require --mode diagnostic --partial allowed and cannot execute as compatibility evidence",
         );
     }
 
@@ -343,6 +353,7 @@ pub fn assess_support(
             &capability_registry.spec,
         ),
         mode: mode.id().to_string(),
+        partial_policy: partial_policy.id().to_string(),
         output_format: output_format.id().to_string(),
         trace_level: trace_level.id().to_string(),
         capability_registry: CAPABILITY_REGISTRY_PATH.to_string(),
@@ -664,7 +675,7 @@ fn is_surface_boundary_object(object_type: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{RunResultState, SupportStatus, assess_support};
-    use crate::{RunMode, RunOutputFormat, TraceLevel};
+    use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
     use ep_compiler::compile_raw_model;
     use ep_raw_model::parse_epjson_str;
 
@@ -698,6 +709,7 @@ mod tests {
             &result.report,
             result.model.as_ref(),
             RunMode::Compatibility,
+            PartialRunPolicy::Deny,
             RunOutputFormat::RustNative,
             TraceLevel::Normal,
         );
@@ -720,16 +732,26 @@ mod tests {
         assert_eq!(
             RunResultState::from_support_status(
                 SupportStatus::SupportedDiagnosticOnly,
-                RunMode::Compatibility
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny
             ),
             RunResultState::RunBlocked
         );
         assert_eq!(
             RunResultState::from_support_status(
                 SupportStatus::SupportedDiagnosticOnly,
-                RunMode::Diagnostic
+                RunMode::Diagnostic,
+                PartialRunPolicy::Allow
             ),
             RunResultState::PartialSupportedRun
+        );
+        assert_eq!(
+            RunResultState::from_support_status(
+                SupportStatus::SupportedDiagnosticOnly,
+                RunMode::Diagnostic,
+                PartialRunPolicy::Deny
+            ),
+            RunResultState::RunBlocked
         );
     }
 }

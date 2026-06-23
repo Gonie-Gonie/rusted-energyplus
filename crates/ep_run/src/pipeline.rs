@@ -250,6 +250,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         &compile_result.report,
         typed_model,
         config.mode,
+        config.partial_policy,
         config.output_format,
         config.trace_level,
     );
@@ -553,6 +554,7 @@ fn finish_successful_summary(
         },
         "config": {
             "mode": config.mode.id(),
+            "partial_policy": config.partial_policy.id(),
             "output_format": config.output_format.id(),
             "keep_intermediate": config.keep_intermediate,
             "trace_level": config.trace_level.id(),

@@ -96,6 +96,7 @@ foreach ($relative in $expectedArtifacts) {
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
 Assert-Equal -Actual $runSummary.exit_code -Expected 8 -Description "run summary exit code"
+Assert-Equal -Actual $runSummary.config.partial_policy -Expected "deny" -Description "partial policy"
 Assert-Equal -Actual $runSummary.support.status -Expected "supported-compatibility" -Description "support status"
 Assert-Equal -Actual $runSummary.support.run_result_state -Expected "supported_compatibility_run" -Description "run result state"
 Assert-Equal -Actual $runSummary.support.capability_registry_loaded -Expected $true -Description "run summary capability registry loaded"
@@ -105,6 +106,7 @@ Assert-Equal -Actual $runSummary.compare_status -Expected "fail" -Description "c
 
 $support = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "support-assessment.json") | ConvertFrom-Json
 Assert-Equal -Actual $support.run_result_state -Expected "supported_compatibility_run" -Description "support run result state"
+Assert-Equal -Actual $support.partial_policy -Expected "deny" -Description "support partial policy"
 Assert-Equal -Actual $support.capability_registry -Expected "specs/capabilities.toml" -Description "capability registry"
 Assert-Equal -Actual $support.capability_registry_loaded -Expected $true -Description "support capability registry loaded"
 Assert-Equal -Actual $support.claim_boundary.conformance_claim -Expected $false -Description "support conformance claim"

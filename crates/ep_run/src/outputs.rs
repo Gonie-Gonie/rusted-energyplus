@@ -130,6 +130,7 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         assessment.runtime_class.id()
     ));
     report.push_str(&format!("mode: {}\n", assessment.mode));
+    report.push_str(&format!("partial_policy: {}\n", assessment.partial_policy));
     report.push_str(&format!(
         "capability_registry: {}\n",
         assessment.capability_registry
@@ -231,6 +232,7 @@ pub(crate) fn render_run_report(
         "run_result_state: {}\n",
         assessment.run_result_state.id()
     ));
+    report.push_str(&format!("partial_policy: {}\n", assessment.partial_policy));
     report.push_str(&format!(
         "runtime_class: {}\n",
         assessment.runtime_class.id()

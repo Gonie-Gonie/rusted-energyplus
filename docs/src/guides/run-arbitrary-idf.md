@@ -5,7 +5,7 @@ It stages the input, converts IDF through the locked EnergyPlus 26.1.0
 `ConvertInputFormat.exe`, compiles the RawModel/TypedModel subset, writes a
 support assessment, maps the result to `run_blocked`,
 `partial_supported_run`, or `supported_compatibility_run`, and only then runs
-Rust when the selected mode permits it.
+Rust when the selected mode and partial policy permit it.
 
 ```powershell
 eplus-rs run .\model.idf -w .\weather.epw -d .\out --oracle-baseline --compare-oracle
@@ -34,9 +34,9 @@ Exit codes follow the arbitrary-run contract: `0` success, `1` arguments,
 The initial Rust runtime boundary is intentionally narrow. One-zone
 heat-balance runs are the current supported compatibility arbitrary-run path.
 Diagnostic-only IdealLoads node-state projection is blocked in compatibility
-mode and can run only when `--mode diagnostic` is selected; it remains
-ad-hoc/partial evidence with `conformance_claim=false`. Broad HVAC, plant,
-EMS, PythonPlugin, AirflowNetwork, sizing workflows,
+mode and can run only when `--mode diagnostic --partial allowed` is selected;
+it remains ad-hoc/partial evidence with `conformance_claim=false`. Broad HVAC,
+plant, EMS, PythonPlugin, AirflowNetwork, sizing workflows,
 fenestration/daylighting/shading, and broad surface-boundary families remain
 outside the arbitrary runtime.
 

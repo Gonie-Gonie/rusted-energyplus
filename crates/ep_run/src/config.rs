@@ -40,6 +40,42 @@ impl RunMode {
     }
 }
 
+/// Policy for diagnostic/ad-hoc partial runtime execution.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PartialRunPolicy {
+    /// Do not execute diagnostic-only partial runtime paths.
+    Deny,
+    /// Allow diagnostic-only partial runtime paths when the requested mode permits them.
+    Allow,
+}
+
+impl PartialRunPolicy {
+    /// Parses a CLI partial-run policy token.
+    #[must_use]
+    pub fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "deny" | "denied" | "false" => Some(Self::Deny),
+            "allow" | "allowed" | "true" => Some(Self::Allow),
+            _ => None,
+        }
+    }
+
+    /// Stable lower-case identifier.
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::Deny => "deny",
+            Self::Allow => "allow",
+        }
+    }
+
+    /// Returns true when partial diagnostic runtime execution is allowed.
+    #[must_use]
+    pub const fn allows_partial(self) -> bool {
+        matches!(self, Self::Allow)
+    }
+}
+
 /// Output serialization format requested for Rust-native results.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum RunOutputFormat {
@@ -115,6 +151,8 @@ pub struct RunConfig {
     pub output_dir: PathBuf,
     /// Requested run mode.
     pub mode: RunMode,
+    /// Diagnostic/ad-hoc partial runtime policy.
+    pub partial_policy: PartialRunPolicy,
     /// Requested output format.
     pub output_format: RunOutputFormat,
     /// Replace an existing non-empty output directory.
