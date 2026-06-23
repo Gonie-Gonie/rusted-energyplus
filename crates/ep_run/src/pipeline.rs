@@ -15,10 +15,10 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, NodeStateProjectionOptions,
-    ResultStore, build_execution_plan, build_hourly_time_axis, load_epw_records,
-    simulate_heat_balance_zone_air_temperatures_with_weather_records,
-    simulate_ideal_loads_node_state_projection,
+    ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
+    NodeStateProjectionOptions, ResultStore, build_execution_plan, build_hourly_time_axis,
+    load_epw_records, simulate_heat_balance_zone_air_temperatures_with_weather_records,
+    simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -1128,10 +1128,22 @@ fn execute_rust_runtime(
                 source_order_gate,
             })
         }
-        RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
-        | RuntimeClass::IdealLoadsFiniteLimitDiagnosticProjection
-        | RuntimeClass::IdealLoadsConstantShrDiagnosticProjection
-        | RuntimeClass::IdealLoadsNodeStateProjection => {
+        RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+        | RuntimeClass::IdealLoadsFiniteLimitCompatibility
+        | RuntimeClass::IdealLoadsConstantShrCompatibility => {
+            let simulation = simulate_ideal_loads_purchased_air_compat(
+                model,
+                IdealLoadsCompatibilityOptions::hourly_samples(sample_count),
+            )
+            .map_err(|error| error.to_string())?;
+            Ok(RustRuntimeResult {
+                results: simulation.results,
+                runtime_class,
+                sample_count,
+                source_order_gate,
+            })
+        }
+        RuntimeClass::IdealLoadsNodeStateProjection => {
             let projection = simulate_ideal_loads_node_state_projection(
                 model,
                 NodeStateProjectionOptions::hourly_samples(sample_count),

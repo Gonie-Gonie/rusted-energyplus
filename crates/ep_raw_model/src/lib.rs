@@ -193,6 +193,7 @@ pub fn load_epjson_file(path: impl AsRef<Path>) -> Result<RawModel, EpJsonError>
 
 /// Parses epJSON text into a RawModel.
 pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
+    let contents = contents.trim_start_matches('\u{feff}');
     let value: serde_json::Value = serde_json::from_str(contents)?;
     let root = value.as_object().ok_or(EpJsonError::TopLevelNotObject)?;
     let mut model = RawModel::default();
@@ -342,6 +343,17 @@ mod tests {
         let summary = model.summary();
         assert_eq!(summary.object_type_counts.get("Unknown:Object"), Some(&1));
 
+        Ok(())
+    }
+
+    #[test]
+    fn parses_utf8_bom_epjson() -> Result<(), Box<dyn std::error::Error>> {
+        let model = parse_epjson_str(
+            "\u{feff}{\"Version\":{\"Version 1\":{\"version_identifier\":\"26.1\"}}}",
+        )?;
+
+        assert_eq!(model.version, Some("26.1".to_string()));
+        assert_eq!(model.object_type_count(), 1);
         Ok(())
     }
 }

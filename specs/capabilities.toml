@@ -230,12 +230,22 @@ objects = [
   "BuildingSurface:Detailed",
 ]
 
-[arbitrary_run.runtime.ideal_loads_node_state_projection]
-status = "supported-diagnostic-only"
-scope = "ZoneHVAC:IdealLoadsAirSystem no-OA sensible node-state projection; no broad HVAC conformance claim"
+[arbitrary_run.runtime.ideal_loads_purchased_air_compat]
+status = "supported-compatibility"
+scope = "ZoneEquipmentManager -> PurchasedAirManager source-order compatibility for declared no-OA sensible, finite-limit, and ConstantSensibleHeatRatio branches; no broad HVAC conformance claim"
 objects = [
   "ThermostatSetpoint:DualSetpoint",
   "ZoneControl:Thermostat",
+  "NodeList",
+  "ZoneHVAC:IdealLoadsAirSystem",
+  "ZoneHVAC:EquipmentList",
+  "ZoneHVAC:EquipmentConnections",
+]
+
+[arbitrary_run.runtime.ideal_loads_node_state_projection]
+status = "legacy-diagnostic-only"
+scope = "Air-side node-state projection retained for diagnostics; not selected for declared compatibility IdealLoads branches"
+objects = [
   "NodeList",
   "ZoneHVAC:IdealLoadsAirSystem",
   "ZoneHVAC:EquipmentList",

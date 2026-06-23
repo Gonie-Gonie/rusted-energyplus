@@ -35,13 +35,16 @@ Exit codes follow the arbitrary-run contract: `0` success, `1` arguments,
 `6` runtime, `7` output export, and `8` oracle compare.
 
 The initial Rust runtime boundary is intentionally narrow. One-zone
-heat-balance runs are the current supported compatibility arbitrary-run path.
-Diagnostic-only IdealLoads node-state projection is blocked in compatibility
-mode and can run only when `--mode diagnostic --partial allowed` is selected;
-it remains ad-hoc/partial evidence with `conformance_claim=false`. Broad HVAC,
-plant, EMS, PythonPlugin, AirflowNetwork, sizing workflows,
-fenestration/daylighting/shading, and broad surface-boundary families remain
-outside the arbitrary runtime.
+heat-balance runs and declared IdealLoads no-OA sensible, numeric finite-limit,
+and ConstantSensibleHeatRatio PurchasedAir branches are the current
+`supported_compatibility_run` arbitrary-run paths. The IdealLoads path executes
+through the typed ZoneEquipmentManager -> PurchasedAirManager source-order
+wrapper, writes IdealLoads output variables and supply-node output variables,
+and still keeps `conformance_claim=false` for ad-hoc runs. Broad HVAC, plant,
+EMS, PythonPlugin, AirflowNetwork, sizing workflows,
+fenestration/daylighting/shading, IdealLoads humidity/OA/economizer/heat
+recovery branches, and broad surface-boundary families remain outside the
+arbitrary runtime.
 
 For a local end-to-end gate that exercises support assessment, Rust execution,
 EnergyPlus oracle generation, compare reports, and the oracle-compare exit-code

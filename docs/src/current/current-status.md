@@ -83,9 +83,13 @@ each input as `run_blocked`, `partial_supported_run`, or
 claim boundary visible and do not become release conformance evidence unless
 promoted later through manifests, reports, and blocking gates.
 
-Current hardening targets are capability-registry matching, branch-specific
-runtime classes, compatibility-mode rejection of diagnostic-only runtime
-classes, explicit partial-run policy, and golden artifact/exit-code tests.
+The current compatibility-mode arbitrary runtime covers the official
+`1ZoneUncontrolled` heat-balance path and the declared IdealLoads
+ZoneEquipmentManager -> PurchasedAirManager no-OA sensible, numeric
+finite-limit, and ConstantSensibleHeatRatio branches. Other IdealLoads
+humidity, outdoor-air, economizer, heat-recovery, and broad HVAC branches
+remain outside arbitrary-run compatibility unless separately promoted through
+the release conformance manifests.
 
 ## Current Launcher State
 
@@ -114,9 +118,5 @@ timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
   `execution-plan.json` and `run-summary.json`, and blocks runtime execution
   with a Plan exit if the lists diverge. Deeper stage-level dispatch and
   snapshots still need to move out of the legacy runtime body.
-- `SupportAssessment` exists but is not yet driven centrally by
-  `specs/capabilities.toml`.
-- arbitrary-run IdealLoads support needs to distinguish declared compatibility
-  branches from diagnostic node-state projection.
 - old plan/readiness content is still present outside current navigation and
-  must be shrunk, moved to specs/ADR, or removed in later cleanup commits.
+  must be shrunk, moved to specs/ADR, or removed.

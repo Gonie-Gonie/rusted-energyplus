@@ -229,8 +229,8 @@ fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::
 }
 
 #[test]
-fn ideal_loads_diagnostic_run_uses_branch_runtime_class() -> Result<(), Box<dyn std::error::Error>>
-{
+fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
+-> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-diagnostic")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
     let output_dir = case_dir.join("out");
@@ -258,18 +258,18 @@ fn ideal_loads_diagnostic_run_uses_branch_runtime_class() -> Result<(), Box<dyn 
     assert_eq!(outcome.exit_code, RunExitCode::Success);
     assert_eq!(
         outcome.support_status,
-        SupportStatus::SupportedDiagnosticOnly
+        SupportStatus::SupportedCompatibility
     );
     assert_eq!(
         outcome.run_result_state,
-        RunResultState::PartialSupportedRun
+        RunResultState::SupportedCompatibilityRun
     );
     assert_output_layout(&output_dir, true)?;
 
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(
         summary["support"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-diagnostic-projection"
+        "ideal-loads-no-oa-sensible-compatibility"
     );
     assert_eq!(
         summary["support"]["matched_capability_ids"][0],
@@ -277,7 +277,7 @@ fn ideal_loads_diagnostic_run_uses_branch_runtime_class() -> Result<(), Box<dyn 
     );
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-diagnostic-projection"
+        "ideal-loads-no-oa-sensible-compatibility"
     );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
     assert_eq!(summary["source_order_gate"]["matches"], true);
@@ -294,13 +294,16 @@ fn ideal_loads_diagnostic_run_uses_branch_runtime_class() -> Result<(), Box<dyn 
         plan["source_order_gate"]["actual_executed_source_order_stages"],
         plan["source_order_gate"]["expected_source_order_stages"]
     );
+    let results = std::fs::read_to_string(output_dir.join("results").join("result-store.json"))?;
+    assert!(results.contains("Zone Ideal Loads Zone Total Heating Rate"));
+    assert!(results.contains("System Node Temperature"));
     Ok(())
 }
 
 #[test]
-fn ideal_loads_compatibility_mode_blocks_diagnostic_runtime(
-) -> Result<(), Box<dyn std::error::Error>> {
-    let case_dir = unique_case_dir("ideal-loads-compatibility-blocked")?;
+fn ideal_loads_compatibility_mode_runs_declared_branch_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("ideal-loads-compatibility")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
     let output_dir = case_dir.join("out");
     write_text(&input_path, IDEAL_LOADS_EPJSON)?;
@@ -324,24 +327,28 @@ fn ideal_loads_compatibility_mode_blocks_diagnostic_runtime(
         hours: Some(1),
     })?;
 
-    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
     assert_eq!(
         outcome.support_status,
-        SupportStatus::SupportedDiagnosticOnly
+        SupportStatus::SupportedCompatibility
     );
-    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
 
     let summary = read_json(&output_dir.join("run-summary.json"))?;
-    assert_eq!(summary["status"], "unsupported");
+    assert_eq!(summary["status"], "success");
     assert_eq!(
         summary["support"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-diagnostic-projection"
+        "ideal-loads-no-oa-sensible-compatibility"
     );
-    assert!(summary["rust_runtime"].is_null());
-    assert!(summary["source_order_gate"].is_null());
-
-    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
-    assert!(diagnostics.contains("DiagnosticOnlyRuntimeBlocked"));
+    assert_eq!(
+        summary["rust_runtime"]["runtime_class"],
+        "ideal-loads-no-oa-sensible-compatibility"
+    );
+    assert_eq!(summary["source_order_gate"]["matches"], true);
+    assert_output_layout(&output_dir, true)?;
     Ok(())
 }
 
@@ -577,6 +584,25 @@ const PLANT_LOOP_EPJSON: &str = r#"{
 const IDEAL_LOADS_EPJSON: &str = r#"{
   "Version": {"Version 1": {"version_identifier": "26.1"}},
   "Zone": {"Zone One": {"volume": 100}},
+  "Schedule:Constant": {
+    "Control Type": {"hourly_value": 4},
+    "Heating Setpoint": {"hourly_value": 21},
+    "Cooling Setpoint": {"hourly_value": 24}
+  },
+  "ThermostatSetpoint:DualSetpoint": {
+    "Dual Setpoints": {
+      "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+      "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+    }
+  },
+  "ZoneControl:Thermostat": {
+    "Zone Thermostat": {
+      "zone_or_zonelist_name": "Zone One",
+      "control_type_schedule_name": "Control Type",
+      "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+      "control_1_name": "Dual Setpoints"
+    }
+  },
   "NodeList": {
     "Zone Inlets": {
       "nodes": [{"node_name": "Zone One Inlet"}]

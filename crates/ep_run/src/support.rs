@@ -7,6 +7,7 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_raw_model::RawModel;
 use ep_runtime::{
     IdealLoadsPurchasedAirBranch, classify_no_oa_sensible_subset, select_purchased_air_branch,
+    validate_ideal_loads_zone_equipment_dispatch,
 };
 use serde::{Deserialize, Serialize};
 
@@ -123,12 +124,12 @@ pub enum RuntimeClass {
     OneZoneHeatBalanceCompatibility,
     /// Legacy heat-balance zone-air diagnostic runtime.
     HeatBalanceZoneAirDiagnostic,
-    /// IdealLoads no-OA/no-limit sensible diagnostic projection runtime.
-    IdealLoadsNoOaSensibleDiagnosticProjection,
-    /// IdealLoads no-OA numeric finite-limit diagnostic projection runtime.
-    IdealLoadsFiniteLimitDiagnosticProjection,
-    /// IdealLoads no-OA ConstantSensibleHeatRatio diagnostic projection runtime.
-    IdealLoadsConstantShrDiagnosticProjection,
+    /// IdealLoads no-OA/no-limit sensible compatibility runtime.
+    IdealLoadsNoOaSensibleCompatibility,
+    /// IdealLoads no-OA numeric finite-limit compatibility runtime.
+    IdealLoadsFiniteLimitCompatibility,
+    /// IdealLoads no-OA ConstantSensibleHeatRatio compatibility runtime.
+    IdealLoadsConstantShrCompatibility,
     /// Legacy broad IdealLoads node-state diagnostic projection runtime.
     IdealLoadsNodeStateProjection,
 }
@@ -141,15 +142,9 @@ impl RuntimeClass {
             Self::None => "none",
             Self::OneZoneHeatBalanceCompatibility => "one-zone-heat-balance-compatibility",
             Self::HeatBalanceZoneAirDiagnostic => "heat-balance-zone-air-diagnostic",
-            Self::IdealLoadsNoOaSensibleDiagnosticProjection => {
-                "ideal-loads-no-oa-sensible-diagnostic-projection"
-            }
-            Self::IdealLoadsFiniteLimitDiagnosticProjection => {
-                "ideal-loads-finite-limit-diagnostic-projection"
-            }
-            Self::IdealLoadsConstantShrDiagnosticProjection => {
-                "ideal-loads-constant-shr-diagnostic-projection"
-            }
+            Self::IdealLoadsNoOaSensibleCompatibility => "ideal-loads-no-oa-sensible-compatibility",
+            Self::IdealLoadsFiniteLimitCompatibility => "ideal-loads-finite-limit-compatibility",
+            Self::IdealLoadsConstantShrCompatibility => "ideal-loads-constant-shr-compatibility",
             Self::IdealLoadsNodeStateProjection => "ideal-loads-node-state-projection",
         }
     }
@@ -517,9 +512,16 @@ fn runtime_status_for_typed_model(
             });
         }
 
+        let runtime_class =
+            selected_runtime_class.unwrap_or(RuntimeClass::IdealLoadsNodeStateProjection);
+        let status = if runtime_class == RuntimeClass::IdealLoadsNodeStateProjection {
+            SupportStatus::SupportedDiagnosticOnly
+        } else {
+            SupportStatus::SupportedCompatibility
+        };
         return (
-            SupportStatus::SupportedDiagnosticOnly,
-            selected_runtime_class.unwrap_or(RuntimeClass::IdealLoadsNodeStateProjection),
+            status,
+            runtime_class,
             registry_capability_ids_or_fallback(
                 registry,
                 capability_ids.into_iter().collect::<Vec<_>>(),
@@ -588,15 +590,15 @@ const fn ideal_loads_runtime_class_for_branch(
 ) -> RuntimeClass {
     match branch {
         IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible => {
-            RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
+            RuntimeClass::IdealLoadsNoOaSensibleCompatibility
         }
         IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
         | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
         | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity => {
-            RuntimeClass::IdealLoadsFiniteLimitDiagnosticProjection
+            RuntimeClass::IdealLoadsFiniteLimitCompatibility
         }
         IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => {
-            RuntimeClass::IdealLoadsConstantShrDiagnosticProjection
+            RuntimeClass::IdealLoadsConstantShrCompatibility
         }
         IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
         | IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
@@ -669,6 +671,24 @@ fn assess_typed_runtime_boundaries(
         }
 
         for system in &typed_model.ideal_loads_air_systems {
+            let validation =
+                validate_ideal_loads_zone_equipment_dispatch(&simulation_model, system.id);
+            if !validation.is_dispatchable() {
+                diagnostics.push(
+                    RunDiagnostic::new(
+                        RunDiagnosticSeverity::Error,
+                        "UnsupportedTopology",
+                        "support",
+                        format!(
+                            "IdealLoads system '{}' is not dispatchable through ZoneEquipmentManager: {:?}",
+                            system.name.0,
+                            validation.issue_codes()
+                        ),
+                    )
+                    .with_object("ZoneHVAC:IdealLoadsAirSystem", Some(system.name.0.clone())),
+                );
+            }
+
             let boundary = classify_no_oa_sensible_subset(system);
             if !boundary.is_supported() {
                 diagnostics.push(
@@ -1087,6 +1107,25 @@ mod tests {
             r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
                 "Zone": {"Zone One": {"volume": 100}},
+                "Schedule:Constant": {
+                    "Control Type": {"hourly_value": 4},
+                    "Heating Setpoint": {"hourly_value": 21},
+                    "Cooling Setpoint": {"hourly_value": 24}
+                },
+                "ThermostatSetpoint:DualSetpoint": {
+                    "Dual Setpoints": {
+                        "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+                        "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+                    }
+                },
+                "ZoneControl:Thermostat": {
+                    "Zone Thermostat": {
+                        "zone_or_zonelist_name": "Zone One",
+                        "control_type_schedule_name": "Control Type",
+                        "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+                        "control_1_name": "Dual Setpoints"
+                    }
+                },
                 "NodeList": {
                     "Zone Inlets": {
                         "nodes": [{"node_name": "Zone One Inlet"}]
@@ -1133,14 +1172,14 @@ mod tests {
             TraceLevel::Normal,
         );
 
-        assert_eq!(assessment.status, SupportStatus::SupportedDiagnosticOnly);
+        assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
         assert_eq!(
             assessment.run_result_state,
-            RunResultState::PartialSupportedRun
+            RunResultState::SupportedCompatibilityRun
         );
         assert_eq!(
             assessment.runtime_class,
-            RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
+            RuntimeClass::IdealLoadsNoOaSensibleCompatibility
         );
         assert_eq!(
             assessment.matched_capability_ids,

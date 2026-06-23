@@ -7,6 +7,7 @@ mod input;
 mod meters;
 mod outdoor_air;
 mod report;
+mod runtime;
 mod update;
 
 pub use calc::*;
@@ -16,4 +17,5 @@ pub use input::*;
 pub use meters::*;
 pub use outdoor_air::*;
 pub use report::*;
+pub use runtime::*;
 pub use update::*;

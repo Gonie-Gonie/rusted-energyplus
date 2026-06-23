@@ -39,7 +39,7 @@ numerical conformance claim is promoted. This map is a planning guard.
 | node list/name lookup | `GetNodeNums`; `GetOnlySingleNode` | typed NodeList and node registry exist |
 | node allocation | `AssignNodeNumber` | compiler-side node names exist; runtime state not ported |
 | report variable registration | `SetupOutputVariable` in `NodeInputManager.cc` | manifest output class exists; diagnostic Rust projection writes requested node samples |
-| node scalar storage | `Node::NodeData::Temp`, `MassFlowRate`, `HumRat`, `TempSetPoint` | diagnostic `NodeStateStore` tracks `Temp`, `MassFlowRate`, and `HumRat`; `TempSetPoint` remains future work |
+| node scalar storage | `Node::NodeData::Temp`, `MassFlowRate`, `HumRat`, `TempSetPoint` | diagnostic `NodeStateStore` tracks `Temp`, `MassFlowRate`, and `HumRat`; `TempSetPoint` is not represented |
 | derived node reporting | `CalcMoreNodeInfo` | not ported |
 | zone equipment connections | `EquipConfiguration::ZoneNode`, `InletNode`, `ReturnNode` | graph edges exist for v0.10/v0.11 fixture |
 | zone node number | `ZoneData::SystemZoneNodeNumber` | represented through zone air node graph edge only |
@@ -47,8 +47,8 @@ numerical conformance claim is promoted. This map is a planning guard.
 | zone node temperature | `ZoneHeatBalanceData::correctZoneAirTemp` updates `thisSystemNode.Temp` | diagnostic projection uses current zone-air fallback; EnergyPlus predictor/corrector write path not ported |
 | zone node humidity | `ZoneHeatBalanceData::correctHumRat` updates `Node(ZoneNodeNum).HumRat` | diagnostic projection uses current zone-air fallback; EnergyPlus humidity write path not ported |
 | zone node setpoint | thermostat load path writes `Node(zoneNodeNum).TempSetPoint` | not ported |
-| IdealLoads supply node state | `CalcPurchAirLoads` writes `Node(InNodeNum).Temp`, `HumRat`, and `MassFlowRate` | diagnostic projection uses IdealLoads supply temperature, humidity, and numeric design flow/fallback; `CalcPurchAirLoads` not ported |
-| IdealLoads return node flow | `CalcPurchAirLoads` writes `Node(RecircNodeNum).MassFlowRate` | diagnostic projection mirrors resolved supply flow/fallback; `CalcPurchAirLoads` not ported |
+| IdealLoads supply node state | `CalcPurchAirLoads` writes `Node(InNodeNum).Temp`, `HumRat`, and `MassFlowRate` | declared arbitrary-run IdealLoads branches use the source-order PurchasedAir compatibility runtime; the diagnostic projection remains a node-registration artifact only |
+| IdealLoads return node flow | `CalcPurchAirLoads` writes `Node(RecircNodeNum).MassFlowRate` | declared arbitrary-run IdealLoads branches use the source-order PurchasedAir compatibility runtime; the diagnostic projection mirrors resolved supply flow/fallback only |
 | return node temperature and humidity | `CalcZoneLeavingConditions` writes return node `Temp`, `HumRat`, and `Enthalpy` | diagnostic projection uses current zone-air fallback; leaving-condition routine not ported |
 
 ## Output Registration Boundary
