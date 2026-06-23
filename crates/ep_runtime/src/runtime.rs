@@ -1,6 +1,6 @@
 //! Runtime state, heat-balance execution, weather, and trace helpers.
 
-use crate::{OutputSeries, ResultStore};
+use crate::{OutputSeries, ResultStore, SimulationMode};
 use ep_model::{
     AutoOrNumber, ConstructionId, FirstHourInterpolationStartingValues, MaterialId,
     MaterialSurfaceRoughness, NormalizedName, OtherEquipment, OutputHandle,
@@ -138,20 +138,6 @@ pub const RUST_ZONE_AIR_LAST_CORRECTION_AIR_POWER_CAP_VARIABLE: &str =
 /// Diagnostic/report variable for EnergyPlus inside surface heat-balance iteration count.
 pub const SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE: &str =
     "Surface Inside Face Heat Balance Calculation Iteration Count";
-
-/// Runtime execution mode.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub enum SimulationMode {
-    /// EnergyPlus compatibility-first deterministic scalar path.
-    #[default]
-    Compatibility,
-    /// Trace-heavy diagnostics mode.
-    Diagnostic,
-    /// Future Rust-only optimized mode.
-    Fast,
-    /// Future isolated algorithm experiments.
-    Experimental,
-}
 
 /// One hourly timestamp aligned to EnergyPlus run-period reporting.
 #[derive(Clone, Debug, Eq, PartialEq)]

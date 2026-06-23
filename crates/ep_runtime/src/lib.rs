@@ -2,6 +2,7 @@
 
 pub mod execution_plan;
 pub mod ideal_loads;
+pub mod mode;
 pub mod node;
 mod output;
 pub mod plant;
@@ -10,6 +11,7 @@ pub mod zone_equipment;
 
 pub use execution_plan::*;
 pub use ideal_loads::*;
+pub use mode::*;
 pub use node::*;
 pub use output::*;
 pub use plant::*;
