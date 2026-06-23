@@ -109,7 +109,7 @@ Current v0.18 official baseline evidence:
 - official dynamic conformance candidate output requests for zone temperature,
   weather, internal gain, and surface conduction hourly baselines
 - remains a baseline-only evidence case; the matching Rust hourly comparison is
-  promoted separately by the v0.33 compatibility-candidate gate
+  promoted separately by the v0.33 source-order compatibility gate
 - `official-baseline-smoke`
 - historical release gate retained in git history
 

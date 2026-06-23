@@ -26,7 +26,7 @@ variables/meters. The active promoted groups are:
 
 - static intake, schedule, dry-bulb weather, no-mass heat balance, no-mass
   surface temperature, and internal convective gain seed cases
-- official `1ZoneUncontrolled` dynamic compatibility-candidate rows for the
+- official `1ZoneUncontrolled` dynamic source-order compatibility rows for the
   declared weather, zone-air, surface temperature, surface conduction,
   convection/radiation source, convection coefficient, solar, aggregate
   conduction, floor storage, humidity-ratio, adjacent-air, longwave coefficient,

@@ -949,6 +949,70 @@ pub enum HeatBalanceZoneAirAlgorithm {
     EnergyPlusThirdOrderProbe,
 }
 
+/// Classification for heat-balance zone-air algorithms in reports and gates.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HeatBalanceAlgorithmLane {
+    /// Source-order compatibility candidate lane.
+    CompatibilitySourceOrder,
+    /// Diagnostic-only baseline shell, not a probe and not conformance-safe.
+    DiagnosticOnly,
+    /// Diagnostic probe or experimental variant.
+    DiagnosticProbe,
+}
+
+impl HeatBalanceAlgorithmLane {
+    /// Stable report identifier.
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::CompatibilitySourceOrder => "compatibility-source-order",
+            Self::DiagnosticOnly => "diagnostic-only",
+            Self::DiagnosticProbe => "diagnostic-probe",
+        }
+    }
+
+    /// Returns whether the lane can be used for a conformance promotion.
+    #[must_use]
+    pub const fn allows_conformance_promotion(self) -> bool {
+        matches!(self, Self::CompatibilitySourceOrder)
+    }
+}
+
+impl HeatBalanceZoneAirAlgorithm {
+    /// Returns the source-order/diagnostic lane for this algorithm.
+    #[must_use]
+    pub const fn lane(self) -> HeatBalanceAlgorithmLane {
+        match self {
+            Self::EnergyPlusHeatBalanceCompatCandidate => {
+                HeatBalanceAlgorithmLane::CompatibilitySourceOrder
+            }
+            Self::SimplifiedAnalytical => HeatBalanceAlgorithmLane::DiagnosticOnly,
+            _ => HeatBalanceAlgorithmLane::DiagnosticProbe,
+        }
+    }
+
+    /// Returns whether the algorithm represents a source-order compatibility lane.
+    #[must_use]
+    pub const fn is_compatibility_source_order(self) -> bool {
+        matches!(
+            self.lane(),
+            HeatBalanceAlgorithmLane::CompatibilitySourceOrder
+        )
+    }
+
+    /// Returns whether the algorithm is a diagnostic probe or diagnostic-only shell.
+    #[must_use]
+    pub const fn is_diagnostic_lane(self) -> bool {
+        !self.is_compatibility_source_order()
+    }
+
+    /// Returns whether this algorithm is allowed for a conformance promotion.
+    #[must_use]
+    pub const fn allows_conformance_promotion(self) -> bool {
+        self.lane().allows_conformance_promotion()
+    }
+}
+
 fn heat_balance_zone_air_algorithm_feature_base(
     zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
 ) -> HeatBalanceZoneAirAlgorithm {
@@ -10864,7 +10928,7 @@ mod tests {
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
+        FirstZoneSimulationOptions, HeatBalanceAlgorithmLane, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
@@ -11513,6 +11577,33 @@ mod tests {
         assert_eq!(stages[11].source_routine, "ReportSurfaceHeatBalance");
         assert_eq!(stages[14].source_routine, "ReportHeatBalance");
         assert_eq!(stages[16].source_routine, "CheckWarmupConvergence");
+    }
+
+    #[test]
+    fn heat_balance_zone_air_algorithm_lanes_separate_compatibility_and_diagnostics() {
+        let candidate = HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate;
+        assert_eq!(
+            candidate.lane(),
+            HeatBalanceAlgorithmLane::CompatibilitySourceOrder
+        );
+        assert_eq!(candidate.lane().id(), "compatibility-source-order");
+        assert!(candidate.is_compatibility_source_order());
+        assert!(candidate.allows_conformance_promotion());
+
+        let diagnostic_only = HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical;
+        assert_eq!(
+            diagnostic_only.lane(),
+            HeatBalanceAlgorithmLane::DiagnosticOnly
+        );
+        assert_eq!(diagnostic_only.lane().id(), "diagnostic-only");
+        assert!(diagnostic_only.is_diagnostic_lane());
+        assert!(!diagnostic_only.allows_conformance_promotion());
+
+        let probe = HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe;
+        assert_eq!(probe.lane(), HeatBalanceAlgorithmLane::DiagnosticProbe);
+        assert_eq!(probe.lane().id(), "diagnostic-probe");
+        assert!(probe.is_diagnostic_lane());
+        assert!(!probe.allows_conformance_promotion());
     }
 
     #[test]

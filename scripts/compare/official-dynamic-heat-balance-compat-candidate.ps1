@@ -87,7 +87,9 @@ Assert-Contains -Text $text -Pattern "Conformance Heat Balance Report" -Descript
 Assert-Contains -Text $text -Pattern "id: $CaseId" -Description "case id"
 Assert-Contains -Text $text -Pattern "comparison_class: conformance" -Description "comparison class"
 Assert-Contains -Text $text -Pattern "conformance_claim: true" -Description "conformance claim"
-Assert-Contains -Text $text -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "compatibility lane"
+Assert-Contains -Text $text -Pattern "zone_air_algorithm_lane: compatibility-source-order" -Description "compatibility lane"
+Assert-Contains -Text $text -Pattern "compatibility_source_order: true" -Description "source-order compatibility flag"
+Assert-Contains -Text $text -Pattern "diagnostic_probe_used: false" -Description "diagnostic probe flag"
 Assert-Contains -Text $text -Pattern "conformance_promotion_allowed: true" -Description "promotion eligibility"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: 20" -Description "surface iteration count"
 Assert-Contains -Text $text -Pattern "surface_loop_zone_air_correction: after-surface-loop" -Description "surface loop zone-air correction"
@@ -123,8 +125,14 @@ if (@($summary.failure_reasons).Count -ne 0) {
 if ($summary.zone_air_algorithm -ne "energyplus-heat-balance-compat-candidate") {
     throw "Unexpected zone_air_algorithm: $($summary.zone_air_algorithm)"
 }
-if ($summary.zone_air_algorithm_lane -ne "compatibility-candidate") {
+if ($summary.zone_air_algorithm_lane -ne "compatibility-source-order") {
     throw "Unexpected algorithm lane: $($summary.zone_air_algorithm_lane)"
+}
+if ($summary.compatibility_source_order -ne $true) {
+    throw "Compatibility candidate must mark compatibility_source_order=true"
+}
+if ($summary.diagnostic_probe_used -ne $false) {
+    throw "Compatibility candidate must mark diagnostic_probe_used=false"
 }
 if ($summary.conformance_promotion_allowed -ne $true) {
     throw "Compatibility candidate must be promotion-eligible"

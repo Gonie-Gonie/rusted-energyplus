@@ -35,7 +35,7 @@ use ep_run::{
 };
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStep,
-    FirstZoneSimulationOptions, HeatBalanceCtfHistorySlotFirstSample,
+    FirstZoneSimulationOptions, HeatBalanceAlgorithmLane, HeatBalanceCtfHistorySlotFirstSample,
     HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
     HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
     HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
@@ -846,6 +846,11 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
                 summary.zone_air_algorithm_lane
             );
             println!(
+                "  compatibility_source_order: {}",
+                summary.compatibility_source_order
+            );
+            println!("  diagnostic_probe_used: {}", summary.diagnostic_probe_used);
+            println!(
                 "  conformance_promotion_allowed: {}",
                 summary.conformance_promotion_allowed
             );
@@ -946,6 +951,11 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
                 "  zone_air_algorithm_lane: {}",
                 summary.zone_air_algorithm_lane
             );
+            println!(
+                "  compatibility_source_order: {}",
+                summary.compatibility_source_order
+            );
+            println!("  diagnostic_probe_used: {}", summary.diagnostic_probe_used);
             println!(
                 "  conformance_promotion_allowed: {}",
                 summary.conformance_promotion_allowed
@@ -1335,6 +1345,8 @@ struct HeatBalanceReportSummary {
     tolerance_policy: String,
     zone_air_algorithm: &'static str,
     zone_air_algorithm_lane: &'static str,
+    compatibility_source_order: bool,
+    diagnostic_probe_used: bool,
     conformance_promotion_allowed: bool,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
@@ -1437,12 +1449,10 @@ fn generate_conformance_heat_balance_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
-        zone_air_algorithm_lane: heat_balance_zone_air_algorithm_lane_label(
-            diagnostic.zone_air_algorithm,
-        ),
-        conformance_promotion_allowed: heat_balance_zone_air_algorithm_promotion_allowed(
-            diagnostic.zone_air_algorithm,
-        ),
+        zone_air_algorithm_lane: diagnostic.zone_air_algorithm_lane,
+        compatibility_source_order: diagnostic.compatibility_source_order,
+        diagnostic_probe_used: diagnostic.diagnostic_probe_used,
+        conformance_promotion_allowed: diagnostic.conformance_promotion_allowed,
         surface_iteration_count: diagnostic.surface_iteration_count,
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
@@ -1514,12 +1524,10 @@ fn generate_conformance_heat_balance_diagnostic_report(
         heat_balance_warmup: diagnostic.heat_balance_warmup.clone(),
         tolerance_policy: report_context.tolerance_label(),
         zone_air_algorithm: diagnostic.zone_air_algorithm,
-        zone_air_algorithm_lane: heat_balance_zone_air_algorithm_lane_label(
-            diagnostic.zone_air_algorithm,
-        ),
-        conformance_promotion_allowed: heat_balance_zone_air_algorithm_promotion_allowed(
-            diagnostic.zone_air_algorithm,
-        ),
+        zone_air_algorithm_lane: diagnostic.zone_air_algorithm_lane,
+        compatibility_source_order: diagnostic.compatibility_source_order,
+        diagnostic_probe_used: diagnostic.diagnostic_probe_used,
+        conformance_promotion_allowed: diagnostic.conformance_promotion_allowed,
         surface_iteration_count: diagnostic.surface_iteration_count,
         inside_hconv_reevaluation_interval: diagnostic.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: diagnostic.ctf_initial_history_policy,
@@ -3830,6 +3838,10 @@ struct HeatBalanceConformanceDiagnostic {
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     ctf_seed: HeatBalanceCtfSeedDiagnostic,
     zone_air_algorithm: &'static str,
+    zone_air_algorithm_lane: &'static str,
+    compatibility_source_order: bool,
+    diagnostic_probe_used: bool,
+    conformance_promotion_allowed: bool,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     ctf_initial_history_policy: &'static str,
@@ -4462,12 +4474,11 @@ fn evaluate_heat_balance_conformance<'a>(
 ) -> HeatBalanceConformance<'a> {
     let mut failure_reasons = Vec::new();
     if heat_balance_context_requires_compatibility_candidate(context)
-        && !heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+        && !diagnostic.conformance_promotion_allowed
     {
         failure_reasons.push(format!(
-            "official dynamic conformance candidate requires compatibility-candidate lane, got {} ({})",
-            diagnostic.zone_air_algorithm,
-            heat_balance_zone_air_algorithm_lane_label(diagnostic.zone_air_algorithm)
+            "official dynamic conformance candidate requires source-order compatibility lane, got {} ({})",
+            diagnostic.zone_air_algorithm, diagnostic.zone_air_algorithm_lane
         ));
     }
     if diagnostic.status != "extracted" {
@@ -4771,6 +4782,13 @@ fn build_heat_balance_conformance_diagnostic(
         heat_balance_warmup,
         ctf_seed,
         zone_air_algorithm: heat_balance_zone_air_algorithm_label(zone_air_algorithm),
+        zone_air_algorithm_lane: zone_air_algorithm.lane().id(),
+        compatibility_source_order: zone_air_algorithm.is_compatibility_source_order(),
+        diagnostic_probe_used: matches!(
+            zone_air_algorithm.lane(),
+            HeatBalanceAlgorithmLane::DiagnosticProbe
+        ),
+        conformance_promotion_allowed: zone_air_algorithm.allows_conformance_promotion(),
         surface_iteration_count: simulation.summary.surface_iteration_count,
         inside_hconv_reevaluation_interval: simulation.summary.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: heat_balance_ctf_initial_history_policy_label(
@@ -7725,22 +7743,6 @@ fn heat_balance_zone_air_algorithm_label(
     }
 }
 
-fn heat_balance_zone_air_algorithm_lane_label(zone_air_algorithm: &str) -> &'static str {
-    if zone_air_algorithm == "energyplus-heat-balance-compat-candidate" {
-        "compatibility-candidate"
-    } else if zone_air_algorithm == "simplified-analytical" {
-        "diagnostic-only"
-    } else if zone_air_algorithm.ends_with("-probe") {
-        "diagnostic-probe"
-    } else {
-        "unknown"
-    }
-}
-
-fn heat_balance_zone_air_algorithm_promotion_allowed(zone_air_algorithm: &str) -> bool {
-    heat_balance_zone_air_algorithm_lane_label(zone_air_algorithm) == "compatibility-candidate"
-}
-
 fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
     let run_period_values = series
         .samples
@@ -9190,9 +9192,15 @@ fn render_heat_balance_rust_outside_balance_debug_json(
     json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
     json.push_str(&format!(
         "  \"zone_air_algorithm_lane\": {},\n",
-        json_string(heat_balance_zone_air_algorithm_lane_label(
-            diagnostic.zone_air_algorithm
-        ))
+        json_string(diagnostic.zone_air_algorithm_lane)
+    ));
+    json.push_str(&format!(
+        "  \"compatibility_source_order\": {},\n",
+        diagnostic.compatibility_source_order
+    ));
+    json.push_str(&format!(
+        "  \"diagnostic_probe_used\": {},\n",
+        diagnostic.diagnostic_probe_used
     ));
     json.push_str("  \"series\": [");
     for (index, series) in diagnostic
@@ -9232,9 +9240,15 @@ fn render_heat_balance_rust_zone_air_debug_json(
     json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
     json.push_str(&format!(
         "  \"zone_air_algorithm_lane\": {},\n",
-        json_string(heat_balance_zone_air_algorithm_lane_label(
-            diagnostic.zone_air_algorithm
-        ))
+        json_string(diagnostic.zone_air_algorithm_lane)
+    ));
+    json.push_str(&format!(
+        "  \"compatibility_source_order\": {},\n",
+        diagnostic.compatibility_source_order
+    ));
+    json.push_str(&format!(
+        "  \"diagnostic_probe_used\": {},\n",
+        diagnostic.diagnostic_probe_used
     ));
     json.push_str(&format!(
         "  \"run_period_initial_states\": {},\n",
@@ -9508,13 +9522,19 @@ fn render_heat_balance_conformance_json(
     ));
     json.push_str(&format!(
         "  \"zone_air_algorithm_lane\": {},\n",
-        json_string(heat_balance_zone_air_algorithm_lane_label(
-            diagnostic.zone_air_algorithm
-        ))
+        json_string(diagnostic.zone_air_algorithm_lane)
+    ));
+    json.push_str(&format!(
+        "  \"compatibility_source_order\": {},\n",
+        diagnostic.compatibility_source_order
+    ));
+    json.push_str(&format!(
+        "  \"diagnostic_probe_used\": {},\n",
+        diagnostic.diagnostic_probe_used
     ));
     json.push_str(&format!(
         "  \"conformance_promotion_allowed\": {},\n",
-        heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+        diagnostic.conformance_promotion_allowed
     ));
     json.push_str(&format!(
         "  \"surface_iteration_count\": {},\n",
@@ -9853,11 +9873,19 @@ fn render_heat_balance_conformance_report(
     ));
     report.push_str(&format!(
         "zone_air_algorithm_lane: {}\n",
-        heat_balance_zone_air_algorithm_lane_label(diagnostic.zone_air_algorithm)
+        diagnostic.zone_air_algorithm_lane
+    ));
+    report.push_str(&format!(
+        "compatibility_source_order: {}\n",
+        diagnostic.compatibility_source_order
+    ));
+    report.push_str(&format!(
+        "diagnostic_probe_used: {}\n",
+        diagnostic.diagnostic_probe_used
     ));
     report.push_str(&format!(
         "conformance_promotion_allowed: {}\n",
-        heat_balance_zone_air_algorithm_promotion_allowed(diagnostic.zone_air_algorithm)
+        diagnostic.conformance_promotion_allowed
     ));
     report.push_str(&format!(
         "surface_iteration_count: {}\n",
@@ -13927,29 +13955,31 @@ mod tests {
 
     #[test]
     fn heat_balance_zone_air_algorithm_lane_marks_only_candidate_promotable() {
+        use ep_runtime::{HeatBalanceAlgorithmLane, HeatBalanceZoneAirAlgorithm};
+
+        let candidate = HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate;
         assert_eq!(
-            super::heat_balance_zone_air_algorithm_lane_label(
-                "energyplus-heat-balance-compat-candidate"
-            ),
-            "compatibility-candidate"
+            candidate.lane(),
+            HeatBalanceAlgorithmLane::CompatibilitySourceOrder
         );
-        assert!(super::heat_balance_zone_air_algorithm_promotion_allowed(
-            "energyplus-heat-balance-compat-candidate"
-        ));
+        assert_eq!(candidate.lane().id(), "compatibility-source-order");
+        assert!(candidate.is_compatibility_source_order());
+        assert!(candidate.allows_conformance_promotion());
+
+        let diagnostic_only = HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical;
         assert_eq!(
-            super::heat_balance_zone_air_algorithm_lane_label("simplified-analytical"),
-            "diagnostic-only"
+            diagnostic_only.lane(),
+            HeatBalanceAlgorithmLane::DiagnosticOnly
         );
-        assert!(!super::heat_balance_zone_air_algorithm_promotion_allowed(
-            "simplified-analytical"
-        ));
-        assert_eq!(
-            super::heat_balance_zone_air_algorithm_lane_label("energyplus-analytical-probe"),
-            "diagnostic-probe"
-        );
-        assert!(!super::heat_balance_zone_air_algorithm_promotion_allowed(
-            "energyplus-analytical-probe"
-        ));
+        assert_eq!(diagnostic_only.lane().id(), "diagnostic-only");
+        assert!(diagnostic_only.is_diagnostic_lane());
+        assert!(!diagnostic_only.allows_conformance_promotion());
+
+        let probe = HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe;
+        assert_eq!(probe.lane(), HeatBalanceAlgorithmLane::DiagnosticProbe);
+        assert_eq!(probe.lane().id(), "diagnostic-probe");
+        assert!(probe.is_diagnostic_lane());
+        assert!(!probe.allows_conformance_promotion());
     }
 
     #[test]
@@ -14126,6 +14156,10 @@ mod tests {
             heat_balance_warmup: disabled_heat_balance_warmup(),
             ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
             zone_air_algorithm: "simplified-analytical",
+            zone_air_algorithm_lane: "diagnostic-only",
+            compatibility_source_order: false,
+            diagnostic_probe_used: false,
+            conformance_promotion_allowed: false,
             surface_iteration_count: 1,
             inside_hconv_reevaluation_interval: None,
             ctf_initial_history_policy: "boundary-u-value",
@@ -14973,6 +15007,10 @@ mod tests {
                 skipped_coefficients: 6,
             },
             zone_air_algorithm: "energyplus-third-order-probe",
+            zone_air_algorithm_lane: "diagnostic-probe",
+            compatibility_source_order: false,
+            diagnostic_probe_used: true,
+            conformance_promotion_allowed: false,
             surface_iteration_count: 3,
             inside_hconv_reevaluation_interval: Some(2),
             ctf_initial_history_policy: "energyplus-surf-initial",

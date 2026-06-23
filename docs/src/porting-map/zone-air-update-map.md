@@ -131,7 +131,7 @@ to `7.547299 W`. Keep the convergence cutoff as a source-aligned surface
 cadence candidate, while the next zone-air work remains the explicit
 `SurfTempInTmp`/hconv report path and owned humidity/capacitance.
 
-On the promoted ScriptF-flat, 20-iteration lane, the compatibility-candidate
+On the promoted ScriptF-flat, 20-iteration source-order compatibility lane, the
 alias now resolves to the execution variant before selecting surface convection
 report timing. This applies the ScriptF-flat surface reference-air snapshot only
 to the individual `Surface Inside Face Convection Heat Gain Rate` rows while

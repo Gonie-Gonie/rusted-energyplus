@@ -556,7 +556,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "heat_balance_nomass_001"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Tolerance-gated for declared no-mass heat-balance cases and the official 1ZoneUncontrolled dynamic compatibility-candidate lane; no general heat-balance or HVAC claim."
+support_boundary = "Tolerance-gated for declared no-mass heat-balance cases and the official 1ZoneUncontrolled dynamic source-order compatibility lane; no general heat-balance or HVAC claim."
 
 [[variable]]
 name = "Zone Mean Air Humidity Ratio"
@@ -564,7 +564,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated for the declared official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad humidity-control or HVAC moisture-history conformance remains outside this heat-balance claim."
+support_boundary = "Tolerance-gated for the declared official 1ZoneUncontrolled dynamic source-order compatibility lane; broad humidity-control or HVAC moisture-history conformance remains outside this heat-balance claim."
 
 [[variable]]
 name = "Surface Inside Face Adjacent Air Temperature"
@@ -588,7 +588,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated for the declared roof outside longwave air split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
+support_boundary = "Tolerance-gated for the declared roof outside longwave air split coefficient in the official 1ZoneUncontrolled dynamic source-order compatibility lane; broad exterior longwave/fenestration compatibility remains outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient"
@@ -596,7 +596,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated for the declared roof outside longwave sky split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
+support_boundary = "Tolerance-gated for the declared roof outside longwave sky split coefficient in the official 1ZoneUncontrolled dynamic source-order compatibility lane; broad exterior longwave/fenestration compatibility remains outside the claim."
 
 [[variable]]
 name = "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient"
@@ -604,7 +604,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated for the declared roof outside longwave ground split coefficient in the official 1ZoneUncontrolled dynamic compatibility-candidate lane; broad exterior longwave/fenestration compatibility remains outside the claim."
+support_boundary = "Tolerance-gated for the declared roof outside longwave ground split coefficient in the official 1ZoneUncontrolled dynamic source-order compatibility lane; broad exterior longwave/fenestration compatibility remains outside the claim."
 
 [[variable]]
 name = "OtherEquipment Internal Gains Nominal Equipment Level"
@@ -676,7 +676,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
+support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
 
 [[variable]]
 name = "Schedule Value"
@@ -780,7 +780,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broad heat-balance compatibility remains outside the claim."
+support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Zone Air Heat Balance Air Energy Storage Rate"
@@ -788,7 +788,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic compatibility-candidate evidence only; broad heat-balance compatibility remains outside the claim."
+support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Surface Heat Storage Rate"
@@ -796,7 +796,7 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the compatibility-candidate lane; broad CTF storage parity remains outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the source-order compatibility lane; broad CTF storage parity remains outside the claim."
 
 [[variable]]
 name = "Surface Heat Storage Rate per Area"
@@ -804,7 +804,7 @@ domain = "surface"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage-flux conformance only for the declared Surface Heat Storage Rate per Area row under the compatibility-candidate lane; broad CTF storage parity and other storage rows remain outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage-flux conformance only for the declared Surface Heat Storage Rate per Area row under the source-order compatibility lane; broad CTF storage parity and other storage rows remain outside the claim."
 
 [[variable]]
 name = "Site Outdoor Air Drybulb Temperature"

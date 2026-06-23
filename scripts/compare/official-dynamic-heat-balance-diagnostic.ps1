@@ -315,7 +315,7 @@ Assert-Contains -Text $text -Pattern "warmup_enabled: true" -Description "warmup
 Assert-Contains -Text $text -Pattern "oracle_run_period_warmup_days: 20" -Description "oracle run-period warmup days"
 Assert-Contains -Text $text -Pattern "zone_air_algorithm: $ZoneAirAlgorithm" -Description "zone-air algorithm metadata"
 $expectedAlgorithmLane = if ($ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate") {
-    "compatibility-candidate"
+    "compatibility-source-order"
 }
 elseif ($ZoneAirAlgorithm -eq "simplified-analytical") {
     "diagnostic-only"
@@ -324,7 +324,11 @@ else {
     "diagnostic-probe"
 }
 $expectedPromotionAllowed = if ($ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate") { "true" } else { "false" }
+$expectedCompatibilitySourceOrder = if ($ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate") { "true" } else { "false" }
+$expectedDiagnosticProbeUsed = if ($expectedAlgorithmLane -eq "diagnostic-probe") { "true" } else { "false" }
 Assert-Contains -Text $text -Pattern "zone_air_algorithm_lane: $expectedAlgorithmLane" -Description "zone-air algorithm lane metadata"
+Assert-Contains -Text $text -Pattern "compatibility_source_order: $expectedCompatibilitySourceOrder" -Description "source-order compatibility metadata"
+Assert-Contains -Text $text -Pattern "diagnostic_probe_used: $expectedDiagnosticProbeUsed" -Description "diagnostic probe metadata"
 Assert-Contains -Text $text -Pattern "conformance_promotion_allowed: $expectedPromotionAllowed" -Description "conformance promotion lane metadata"
 Assert-Contains -Text $text -Pattern "surface_iteration_count: $SurfaceIterations" -Description "surface iteration metadata"
 $expectedInsideHconvReevaluationIntervalLabel = if ($InsideHconvReevaluationInterval -gt 0) { [string]$InsideHconvReevaluationInterval } else { "none" }
@@ -416,8 +420,16 @@ if ($summary.zone_air_algorithm_lane -ne $expectedAlgorithmLane) {
     throw "Expected zone_air_algorithm_lane $expectedAlgorithmLane, got $($summary.zone_air_algorithm_lane)"
 }
 $expectedPromotionAllowedBoolean = $ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate"
+$expectedCompatibilitySourceOrderBoolean = $ZoneAirAlgorithm -eq "energyplus-heat-balance-compat-candidate"
+$expectedDiagnosticProbeUsedBoolean = $expectedAlgorithmLane -eq "diagnostic-probe"
 if ($summary.conformance_promotion_allowed -ne $expectedPromotionAllowedBoolean) {
     throw "Expected conformance_promotion_allowed $expectedPromotionAllowed, got $($summary.conformance_promotion_allowed)"
+}
+if ($summary.compatibility_source_order -ne $expectedCompatibilitySourceOrderBoolean) {
+    throw "Expected compatibility_source_order $expectedCompatibilitySourceOrder, got $($summary.compatibility_source_order)"
+}
+if ($summary.diagnostic_probe_used -ne $expectedDiagnosticProbeUsedBoolean) {
+    throw "Expected diagnostic_probe_used $expectedDiagnosticProbeUsed, got $($summary.diagnostic_probe_used)"
 }
 if ($summary.surface_iteration_count -ne $SurfaceIterations) {
     throw "Expected surface_iteration_count $SurfaceIterations, got $($summary.surface_iteration_count)"
@@ -477,8 +489,14 @@ if ($isCompatibilityCandidateCase) {
     if ($summary.series_count -ne 30) {
         throw "Unexpected candidate series_count: $($summary.series_count)"
     }
-    if ($summary.zone_air_algorithm_lane -ne "compatibility-candidate") {
-        throw "Candidate case must run the compatibility-candidate lane, got $($summary.zone_air_algorithm_lane)"
+    if ($summary.zone_air_algorithm_lane -ne "compatibility-source-order") {
+        throw "Candidate case must run the compatibility-source-order lane, got $($summary.zone_air_algorithm_lane)"
+    }
+    if ($summary.compatibility_source_order -ne $true) {
+        throw "Candidate case must mark compatibility_source_order=true"
+    }
+    if ($summary.diagnostic_probe_used -ne $false) {
+        throw "Candidate case must mark diagnostic_probe_used=false"
     }
     if ($summary.conformance_promotion_allowed -ne $true) {
         throw "Candidate case must mark conformance_promotion_allowed=true"
@@ -514,7 +532,9 @@ if ($isCompatibilityCandidateCase) {
     }
 
     $reportText = Get-Content -LiteralPath $reportPath -Raw
-    Assert-Contains -Text $reportText -Pattern "zone_air_algorithm_lane: compatibility-candidate" -Description "candidate markdown algorithm lane"
+    Assert-Contains -Text $reportText -Pattern "zone_air_algorithm_lane: compatibility-source-order" -Description "candidate markdown algorithm lane"
+    Assert-Contains -Text $reportText -Pattern "compatibility_source_order: true" -Description "candidate markdown source-order compatibility flag"
+    Assert-Contains -Text $reportText -Pattern "diagnostic_probe_used: false" -Description "candidate markdown diagnostic probe flag"
     Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
     Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
     Assert-Contains -Text $reportText -Pattern "next_pr_target: outside-ctf-history-handoff" -Description "candidate next PR target"

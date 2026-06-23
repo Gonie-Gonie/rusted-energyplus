@@ -263,7 +263,7 @@ Minimum first variables:
   `surface_temperature_nomass_001` and the official dynamic compatibility
   candidate's declared whole-surface rows
 - surface conduction per-area rows and zone opaque conduction aggregates:
-  conformance for declared official dynamic compatibility-candidate rows
+  conformance for declared official dynamic source-order compatibility rows
 - `Zone Opaque Surface Inside Faces Conduction Rate`: conformance for
   no-mass adiabatic `surface_temperature_nomass_001` and the declared
   official dynamic aggregate row

@@ -977,7 +977,7 @@ Current Rust boundary:
   or live-updating hconv through every interleaved solve pass.
   Adding the EnergyPlus advanced
   `Surface Inside Face Heat Balance Calculation Iteration Count` row now shows
-  the first-hour cadence is aligned on the active compatibility-candidate lane:
+  the first-hour cadence is aligned on the active source-order compatibility lane:
   the first ten hourly counts are `18/18`, `15/15`, `24/24`, `21/21`, `11/11`,
   `17/17`, `18/18`, `31/31`, `34/34`, and `37/37` for oracle/Rust. The broad
   annual row still shows occasional one-iteration differences, but this no

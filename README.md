@@ -28,8 +28,8 @@ Rust artifacts, generated compare reports, and a blocking gate.
   boundary, and optional oracle compare artifacts
 - declared conformance infrastructure for output requests, tolerances,
   reports, and blocking gates
-- limited official `1ZoneUncontrolled` heat-balance compatibility-candidate
-  evidence for declared variables only
+- limited official `1ZoneUncontrolled` source-order heat-balance evidence for
+  declared variables only
 - limited IdealLoadsAirSystem evidence for declared no-OA, finite-limit,
   ConstantSHR, selected humidity, outdoor-air, economizer, heat-recovery, and
   meter candidate branches only

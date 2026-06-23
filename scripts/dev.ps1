@@ -478,7 +478,7 @@ $Commands = [ordered]@{
     "official-dynamic-heat-balance-compat-candidate" = @{
         Path = "compare\official-dynamic-heat-balance-compat-candidate.ps1"
         Group = "compare"
-        Help = "Run the official dynamic blocking conformance gate in the compatibility-candidate lane."
+        Help = "Run the official dynamic blocking conformance gate in the source-order compatibility lane."
     }
     "official-dynamic-heat-balance-all-ctf-probe" = @{
         Path = "compare\official-dynamic-heat-balance-all-ctf-probe.ps1"
