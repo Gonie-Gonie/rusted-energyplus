@@ -1,5 +1,6 @@
 //! Public facade for runtime execution and trace helpers.
 
+pub mod diagnostic_probes;
 pub mod execution_plan;
 pub mod heat_balance;
 pub mod ideal_loads;
@@ -12,6 +13,7 @@ pub mod simulation_state;
 pub mod time_axis;
 pub mod zone_equipment;
 
+pub use diagnostic_probes::*;
 pub use execution_plan::*;
 pub use heat_balance::*;
 pub use ideal_loads::*;

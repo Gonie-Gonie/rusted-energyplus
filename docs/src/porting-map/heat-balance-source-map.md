@@ -482,8 +482,9 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   and third-order zone-air temperature helpers. Heat-balance runtime selection
   now exposes `CompatibilityHeatBalanceAlgorithm`, `DiagnosticHeatBalanceProbe`,
   and `HeatBalanceZoneAirSelection` so compatibility and probe lanes have
-  separate typed APIs while the CLI/runtime split still bridges through the
-  legacy `HeatBalanceZoneAirAlgorithm` selector. The
+  separate typed APIs. `DiagnosticHeatBalanceProbe` lives under the
+  `diagnostic_probes` module boundary while the CLI/runtime split still bridges
+  through the legacy `HeatBalanceZoneAirAlgorithm` selector. The
   default predictor equation itself remains the simplified diagnostic shell
   until all coefficient inputs are wired from source-mapped runtime state.
   Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance

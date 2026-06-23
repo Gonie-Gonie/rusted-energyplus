@@ -103,7 +103,8 @@ and no-silent-oracle-fallback tests.
 - `runtime.rs` still owns too much source-order, compatibility, and diagnostic
   behavior.
 - heat-balance compatibility and diagnostic selections now have separate typed
-  APIs, but `HeatBalanceSimulationOptions` and the CLI still use the legacy
+  APIs and the diagnostic probe enum lives under `diagnostic_probes`, but
+  `HeatBalanceSimulationOptions` and the CLI still use the legacy
   `HeatBalanceZoneAirAlgorithm` selector during the module split.
 - `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
   source-order barriers, but those barriers still need deeper stage-level
