@@ -144,7 +144,22 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         assessment.claim_boundary.conformance_claim
     ));
 
-    if !assessment.matched_capability_ids.is_empty() {
+    if !assessment.matched_capabilities.is_empty() {
+        report.push_str("## Matched Capabilities\n\n");
+        report.push_str("| id | domain | support_level | run_state | claim_boundary |\n");
+        report.push_str("| --- | --- | --- | --- | --- |\n");
+        for capability in &assessment.matched_capabilities {
+            report.push_str(&format!(
+                "| {} | {} | {} | {} | {} |\n",
+                markdown_cell(&capability.id),
+                markdown_cell(&capability.domain),
+                markdown_cell(&capability.support_level),
+                markdown_cell(&capability.run_state),
+                markdown_cell(&capability.claim_boundary)
+            ));
+        }
+        report.push('\n');
+    } else if !assessment.matched_capability_ids.is_empty() {
         report.push_str("## Matched Capabilities\n\n");
         for capability_id in &assessment.matched_capability_ids {
             report.push_str(&format!("- `{}`\n", markdown_cell(capability_id)));

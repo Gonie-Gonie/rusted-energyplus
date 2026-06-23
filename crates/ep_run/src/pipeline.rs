@@ -570,6 +570,7 @@ fn finish_successful_summary(
             "runtime_class": assessment.runtime_class.id(),
             "capability_registry_loaded": assessment.capability_registry_loaded,
             "matched_capability_ids": assessment.matched_capability_ids.clone(),
+            "matched_capabilities": assessment.matched_capabilities.clone(),
             "conformance_claim": false,
         },
         "rust_runtime": rust_runtime_result.map(|result| json!({
@@ -1020,7 +1021,8 @@ fn execute_rust_runtime(
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_sample_count(config, model)?;
     match runtime_class {
-        RuntimeClass::HeatBalanceZoneAirDiagnostic => {
+        RuntimeClass::OneZoneHeatBalanceCompatibility
+        | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
             let weather_path = config
                 .weather_path
                 .as_ref()
@@ -1040,7 +1042,10 @@ fn execute_rust_runtime(
                 sample_count,
             })
         }
-        RuntimeClass::IdealLoadsNodeStateProjection => {
+        RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
+        | RuntimeClass::IdealLoadsFiniteLimitDiagnosticProjection
+        | RuntimeClass::IdealLoadsConstantShrDiagnosticProjection
+        | RuntimeClass::IdealLoadsNodeStateProjection => {
             let projection = simulate_ideal_loads_node_state_projection(
                 model,
                 NodeStateProjectionOptions::hourly_samples(sample_count),

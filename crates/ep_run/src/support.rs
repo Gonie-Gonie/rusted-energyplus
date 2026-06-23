@@ -5,7 +5,9 @@ use std::collections::BTreeSet;
 use ep_compiler::{CompileReport, DiagnosticSeverity, ObjectCoverageStatus};
 use ep_model::{SimulationModel, TypedModel};
 use ep_raw_model::RawModel;
-use ep_runtime::classify_no_oa_sensible_subset;
+use ep_runtime::{
+    IdealLoadsPurchasedAirBranch, classify_no_oa_sensible_subset, select_purchased_air_branch,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -117,9 +119,17 @@ impl RunResultState {
 pub enum RuntimeClass {
     /// No Rust runtime can execute the input.
     None,
-    /// Heat-balance zone-air diagnostic runtime.
+    /// One-zone opaque heat-balance compatibility runtime.
+    OneZoneHeatBalanceCompatibility,
+    /// Legacy heat-balance zone-air diagnostic runtime.
     HeatBalanceZoneAirDiagnostic,
-    /// IdealLoads node-state diagnostic projection runtime.
+    /// IdealLoads no-OA/no-limit sensible diagnostic projection runtime.
+    IdealLoadsNoOaSensibleDiagnosticProjection,
+    /// IdealLoads no-OA numeric finite-limit diagnostic projection runtime.
+    IdealLoadsFiniteLimitDiagnosticProjection,
+    /// IdealLoads no-OA ConstantSensibleHeatRatio diagnostic projection runtime.
+    IdealLoadsConstantShrDiagnosticProjection,
+    /// Legacy broad IdealLoads node-state diagnostic projection runtime.
     IdealLoadsNodeStateProjection,
 }
 
@@ -129,7 +139,17 @@ impl RuntimeClass {
     pub const fn id(self) -> &'static str {
         match self {
             Self::None => "none",
+            Self::OneZoneHeatBalanceCompatibility => "one-zone-heat-balance-compatibility",
             Self::HeatBalanceZoneAirDiagnostic => "heat-balance-zone-air-diagnostic",
+            Self::IdealLoadsNoOaSensibleDiagnosticProjection => {
+                "ideal-loads-no-oa-sensible-diagnostic-projection"
+            }
+            Self::IdealLoadsFiniteLimitDiagnosticProjection => {
+                "ideal-loads-finite-limit-diagnostic-projection"
+            }
+            Self::IdealLoadsConstantShrDiagnosticProjection => {
+                "ideal-loads-constant-shr-diagnostic-projection"
+            }
             Self::IdealLoadsNodeStateProjection => "ideal-loads-node-state-projection",
         }
     }
@@ -159,6 +179,27 @@ pub struct ClaimBoundary {
     pub statement: String,
 }
 
+/// Capability metadata matched by support assessment.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct MatchedCapabilityEntry {
+    /// Capability identifier.
+    pub id: String,
+    /// Runtime domain declared by the registry.
+    pub domain: String,
+    /// Support level declared by the registry.
+    pub support_level: String,
+    /// Run state declared by the registry.
+    pub run_state: String,
+    /// Required object families declared by the registry.
+    pub required_objects: Vec<String>,
+    /// Active features forbidden by the registry.
+    pub forbidden_active_features: Vec<String>,
+    /// Algorithm identifiers backing the capability.
+    pub algorithms: Vec<String>,
+    /// Capability-specific claim boundary.
+    pub claim_boundary: String,
+}
+
 /// Support assessment artifact.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct SupportAssessment {
@@ -172,6 +213,8 @@ pub struct SupportAssessment {
     pub runtime_class: RuntimeClass,
     /// Matched capability identifiers from the current support boundary.
     pub matched_capability_ids: Vec<String>,
+    /// Matched capability metadata from the capability registry.
+    pub matched_capabilities: Vec<MatchedCapabilityEntry>,
     /// Requested mode.
     pub mode: String,
     /// Requested partial-run policy.
@@ -200,11 +243,35 @@ pub struct SupportAssessment {
 struct CapabilityRegistrySpec {
     #[serde(default)]
     capability: Vec<CapabilitySpec>,
+    #[serde(default)]
+    unsupported_rule: Vec<SupportRuleSpec>,
+    #[serde(default)]
+    partial_rule: Vec<SupportRuleSpec>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
 struct CapabilitySpec {
     id: String,
+    domain: String,
+    support_level: String,
+    run_state: String,
+    #[serde(default)]
+    required_objects: Vec<String>,
+    #[serde(default)]
+    forbidden_active_features: Vec<String>,
+    #[serde(default)]
+    algorithms: Vec<String>,
+    #[serde(default)]
+    claim_boundary: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct SupportRuleSpec {
+    id: String,
+    #[serde(default)]
+    object_patterns: Vec<String>,
+    #[serde(default)]
+    reason: String,
 }
 
 #[derive(Debug)]
@@ -237,6 +304,14 @@ pub fn assess_support(
     let mut typed_objects = Vec::new();
     let mut ignored_raw_only_objects = Vec::new();
     let mut unsupported_objects = Vec::new();
+    let capability_registry = load_embedded_capability_registry();
+    if let Some(error) = capability_registry.error.as_ref() {
+        diagnostics.warning(
+            "CapabilityRegistryParseFailed",
+            "support",
+            format!("failed to parse embedded {CAPABILITY_REGISTRY_PATH}: {error}"),
+        );
+    }
 
     for diagnostic in &compile_report.diagnostics {
         let severity = match diagnostic.severity {
@@ -266,46 +341,69 @@ pub fn assess_support(
                 status: "typed".to_string(),
                 note: "compiled into the current TypedModel subset".to_string(),
             }),
-            ObjectCoverageStatus::RawOnly if ignored_raw_only_object(&coverage.object_type) => {
-                ignored_raw_only_objects.push(SupportObjectEntry {
-                    object_type: coverage.object_type.clone(),
-                    count: coverage.object_count,
-                    status: "ignored-runtime-control-or-reporting".to_string(),
-                    note: ignored_raw_only_note(&coverage.object_type).to_string(),
-                });
-                diagnostics.push(
-                    RunDiagnostic::new(
-                        RunDiagnosticSeverity::Warning,
-                        "UnsupportedObjectIgnored",
-                        "support",
-                        format!(
-                            "{} is preserved in RawModel but ignored by the current Rust runtime",
-                            coverage.object_type
-                        ),
-                    )
-                    .with_object(coverage.object_type.clone(), None),
-                );
-            }
             ObjectCoverageStatus::RawOnly => {
-                let (code, note) = unsupported_object_reason(&coverage.object_type);
-                unsupported_objects.push(SupportObjectEntry {
-                    object_type: coverage.object_type.clone(),
-                    count: coverage.object_count,
-                    status: "unsupported".to_string(),
-                    note: note.to_string(),
-                });
-                diagnostics.push(
-                    RunDiagnostic::new(
-                        RunDiagnosticSeverity::Error,
-                        code,
-                        "support",
-                        format!(
-                            "{} is outside the current arbitrary-run runtime subset",
-                            coverage.object_type
-                        ),
-                    )
-                    .with_object(coverage.object_type.clone(), None),
-                );
+                if let Some(rule) =
+                    partial_rule_for_object(&capability_registry.spec, &coverage.object_type)
+                {
+                    ignored_raw_only_objects.push(SupportObjectEntry {
+                        object_type: coverage.object_type.clone(),
+                        count: coverage.object_count,
+                        status: rule.id.clone(),
+                        note: rule.reason.clone(),
+                    });
+                    diagnostics.push(
+                        RunDiagnostic::new(
+                            RunDiagnosticSeverity::Warning,
+                            "UnsupportedObjectIgnored",
+                            "support",
+                            format!(
+                                "{} is preserved in RawModel and ignored by partial rule {}",
+                                coverage.object_type, rule.id
+                            ),
+                        )
+                        .with_object(coverage.object_type.clone(), None),
+                    );
+                } else if ignored_raw_only_object(&coverage.object_type) {
+                    ignored_raw_only_objects.push(SupportObjectEntry {
+                        object_type: coverage.object_type.clone(),
+                        count: coverage.object_count,
+                        status: "ignored-runtime-control-or-reporting".to_string(),
+                        note: ignored_raw_only_note(&coverage.object_type).to_string(),
+                    });
+                    diagnostics.push(
+                        RunDiagnostic::new(
+                            RunDiagnosticSeverity::Warning,
+                            "UnsupportedObjectIgnored",
+                            "support",
+                            format!(
+                                "{} is preserved in RawModel but ignored by the current Rust runtime",
+                                coverage.object_type
+                            ),
+                        )
+                        .with_object(coverage.object_type.clone(), None),
+                    );
+                } else {
+                    let (code, note) =
+                        unsupported_object_reason(&capability_registry.spec, &coverage.object_type);
+                    unsupported_objects.push(SupportObjectEntry {
+                        object_type: coverage.object_type.clone(),
+                        count: coverage.object_count,
+                        status: "unsupported".to_string(),
+                        note,
+                    });
+                    diagnostics.push(
+                        RunDiagnostic::new(
+                            RunDiagnosticSeverity::Error,
+                            code,
+                            "support",
+                            format!(
+                                "{} is outside the current arbitrary-run runtime subset",
+                                coverage.object_type
+                            ),
+                        )
+                        .with_object(coverage.object_type.clone(), None),
+                    );
+                }
             }
         }
     }
@@ -317,20 +415,14 @@ pub fn assess_support(
         &mut unsupported_objects,
         &mut diagnostics,
     );
-    let capability_registry = load_embedded_capability_registry();
-    if let Some(error) = capability_registry.error.as_ref() {
-        diagnostics.warning(
-            "CapabilityRegistryParseFailed",
-            "support",
-            format!("failed to parse embedded {CAPABILITY_REGISTRY_PATH}: {error}"),
-        );
-    }
-
-    let (status, runtime_class) = if diagnostics.has_errors() || typed_model.is_none() {
-        (SupportStatus::Unsupported, RuntimeClass::None)
-    } else {
-        runtime_status_for_typed_model(typed_model)
-    };
+    let (status, runtime_class, matched_capability_ids) =
+        if diagnostics.has_errors() || typed_model.is_none() {
+            (SupportStatus::Unsupported, RuntimeClass::None, Vec::new())
+        } else {
+            runtime_status_for_typed_model(typed_model, &capability_registry.spec)
+        };
+    let matched_capabilities =
+        matched_capabilities(&matched_capability_ids, &capability_registry.spec);
     let run_result_state = RunResultState::from_support_status(status, mode, partial_policy);
     if status == SupportStatus::SupportedDiagnosticOnly
         && run_result_state == RunResultState::RunBlocked
@@ -347,11 +439,8 @@ pub fn assess_support(
         status,
         run_result_state,
         runtime_class,
-        matched_capability_ids: matched_capability_ids(
-            status,
-            runtime_class,
-            &capability_registry.spec,
-        ),
+        matched_capability_ids,
+        matched_capabilities,
         mode: mode.id().to_string(),
         partial_policy: partial_policy.id().to_string(),
         output_format: output_format.id().to_string(),
@@ -385,47 +474,137 @@ fn load_embedded_capability_registry() -> LoadedCapabilityRegistry {
     }
 }
 
-fn matched_capability_ids(
-    status: SupportStatus,
-    runtime_class: RuntimeClass,
+fn matched_capabilities(
+    ids: &[String],
     registry: &CapabilityRegistrySpec,
-) -> Vec<String> {
-    let target_id = match (status, runtime_class) {
-        (SupportStatus::SupportedCompatibility, RuntimeClass::HeatBalanceZoneAirDiagnostic) => {
-            "official_1zone_uncontrolled_declared_heat_balance"
-        }
-        (SupportStatus::SupportedDiagnosticOnly, RuntimeClass::IdealLoadsNodeStateProjection) => {
-            "ideal_loads_no_oa_sensible"
-        }
-        _ => return Vec::new(),
-    };
-
-    registry
-        .capability
-        .iter()
-        .find(|capability| capability.id == target_id)
-        .map(|capability| vec![capability.id.clone()])
-        .unwrap_or_else(|| vec![target_id.to_string()])
+) -> Vec<MatchedCapabilityEntry> {
+    ids.iter()
+        .filter_map(|id| registry_capability(registry, id))
+        .map(|capability| MatchedCapabilityEntry {
+            id: capability.id.clone(),
+            domain: capability.domain.clone(),
+            support_level: capability.support_level.clone(),
+            run_state: capability.run_state.clone(),
+            required_objects: capability.required_objects.clone(),
+            forbidden_active_features: capability.forbidden_active_features.clone(),
+            algorithms: capability.algorithms.clone(),
+            claim_boundary: capability.claim_boundary.clone(),
+        })
+        .collect()
 }
 
 fn runtime_status_for_typed_model(
     typed_model: Option<&TypedModel>,
-) -> (SupportStatus, RuntimeClass) {
+    registry: &CapabilityRegistrySpec,
+) -> (SupportStatus, RuntimeClass, Vec<String>) {
     let Some(typed_model) = typed_model else {
-        return (SupportStatus::Unsupported, RuntimeClass::None);
+        return (SupportStatus::Unsupported, RuntimeClass::None, Vec::new());
     };
 
     if !typed_model.ideal_loads_air_systems.is_empty() {
+        let mut capability_ids = BTreeSet::new();
+        let mut selected_runtime_class = None;
+        for system in &typed_model.ideal_loads_air_systems {
+            let branch = select_purchased_air_branch(system);
+            capability_ids.insert(ideal_loads_capability_id_for_branch(branch).to_string());
+            let branch_runtime_class = ideal_loads_runtime_class_for_branch(branch);
+            selected_runtime_class = Some(match selected_runtime_class {
+                Some(existing) if existing != branch_runtime_class => {
+                    RuntimeClass::IdealLoadsNodeStateProjection
+                }
+                Some(existing) => existing,
+                None => branch_runtime_class,
+            });
+        }
+
         return (
             SupportStatus::SupportedDiagnosticOnly,
-            RuntimeClass::IdealLoadsNodeStateProjection,
+            selected_runtime_class.unwrap_or(RuntimeClass::IdealLoadsNodeStateProjection),
+            registry_capability_ids_or_fallback(
+                registry,
+                capability_ids.into_iter().collect::<Vec<_>>(),
+            ),
         );
     }
 
     (
         SupportStatus::SupportedCompatibility,
-        RuntimeClass::HeatBalanceZoneAirDiagnostic,
+        RuntimeClass::OneZoneHeatBalanceCompatibility,
+        registry_capability_ids_or_fallback(
+            registry,
+            vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()],
+        ),
     )
+}
+
+fn registry_capability<'a>(
+    registry: &'a CapabilityRegistrySpec,
+    id: &str,
+) -> Option<&'a CapabilitySpec> {
+    registry
+        .capability
+        .iter()
+        .find(|capability| capability.id == id)
+}
+
+fn registry_capability_ids_or_fallback(
+    registry: &CapabilityRegistrySpec,
+    ids: Vec<String>,
+) -> Vec<String> {
+    if registry.capability.is_empty() {
+        return ids;
+    }
+
+    let filtered = ids
+        .iter()
+        .filter(|id| registry_capability(registry, id).is_some())
+        .cloned()
+        .collect::<Vec<_>>();
+    if filtered.is_empty() { ids } else { filtered }
+}
+
+const fn ideal_loads_capability_id_for_branch(
+    branch: IdealLoadsPurchasedAirBranch,
+) -> &'static str {
+    match branch {
+        IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible => "ideal_loads_no_oa_sensible",
+        IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity => "ideal_loads_finite_limits",
+        IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => {
+            "ideal_loads_constant_shr"
+        }
+        IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
+        | IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
+            "ideal_loads_humidity_selected_branches"
+        }
+    }
+}
+
+const fn ideal_loads_runtime_class_for_branch(
+    branch: IdealLoadsPurchasedAirBranch,
+) -> RuntimeClass {
+    match branch {
+        IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible => {
+            RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
+        }
+        IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity => {
+            RuntimeClass::IdealLoadsFiniteLimitDiagnosticProjection
+        }
+        IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => {
+            RuntimeClass::IdealLoadsConstantShrDiagnosticProjection
+        }
+        IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
+        | IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
+            RuntimeClass::IdealLoadsNodeStateProjection
+        }
+    }
 }
 
 fn assess_typed_runtime_boundaries(
@@ -565,6 +744,68 @@ fn warn_for_ignored_semantic_objects(raw_model: &RawModel, diagnostics: &mut Run
     }
 }
 
+fn partial_rule_for_object<'a>(
+    registry: &'a CapabilityRegistrySpec,
+    object_type: &str,
+) -> Option<&'a SupportRuleSpec> {
+    support_rule_for_object(&registry.partial_rule, object_type)
+}
+
+fn unsupported_rule_for_object<'a>(
+    registry: &'a CapabilityRegistrySpec,
+    object_type: &str,
+) -> Option<&'a SupportRuleSpec> {
+    support_rule_for_object(&registry.unsupported_rule, object_type)
+}
+
+fn support_rule_for_object<'a>(
+    rules: &'a [SupportRuleSpec],
+    object_type: &str,
+) -> Option<&'a SupportRuleSpec> {
+    rules.iter().find(|rule| {
+        rule.object_patterns
+            .iter()
+            .any(|pattern| object_pattern_matches(pattern, object_type))
+    })
+}
+
+fn object_pattern_matches(pattern: &str, object_type: &str) -> bool {
+    if pattern.contains('*') {
+        return wildcard_match(pattern, object_type);
+    }
+    pattern == object_type
+}
+
+fn wildcard_match(pattern: &str, value: &str) -> bool {
+    if pattern == "*" {
+        return true;
+    }
+
+    let parts = pattern
+        .split('*')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>();
+    if parts.is_empty() {
+        return true;
+    }
+
+    let mut search_start = 0;
+    for (index, part) in parts.iter().enumerate() {
+        let Some(position) = value[search_start..].find(part) else {
+            return false;
+        };
+        if index == 0 && !pattern.starts_with('*') && position != 0 {
+            return false;
+        }
+        search_start += position + part.len();
+    }
+
+    pattern.ends_with('*')
+        || parts
+            .last()
+            .is_some_and(|last_part| value.ends_with(last_part))
+}
+
 fn ignored_raw_only_object(object_type: &str) -> bool {
     object_type.starts_with("Output:")
         || object_type.starts_with("OutputControl:")
@@ -587,51 +828,85 @@ fn ignored_raw_only_note(object_type: &str) -> &'static str {
     }
 }
 
-fn unsupported_object_reason(object_type: &str) -> (&'static str, &'static str) {
+fn unsupported_object_reason(
+    registry: &CapabilityRegistrySpec,
+    object_type: &str,
+) -> (String, String) {
+    if let Some(rule) = unsupported_rule_for_object(registry, object_type) {
+        return (
+            unsupported_rule_code(rule.id.as_str(), object_type),
+            rule.reason.clone(),
+        );
+    }
+
     if object_type.starts_with("EnergyManagementSystem:") {
         return (
-            "UnsupportedEMS",
-            "EnergyManagementSystem objects are not ported",
+            "UnsupportedEMS".to_string(),
+            "EnergyManagementSystem objects are not ported".to_string(),
         );
     }
     if object_type.starts_with("PythonPlugin:") {
         return (
-            "UnsupportedPythonPlugin",
-            "PythonPlugin objects are not ported",
+            "UnsupportedPythonPlugin".to_string(),
+            "PythonPlugin objects are not ported".to_string(),
         );
     }
     if object_type.starts_with("AirflowNetwork:") {
         return (
-            "UnsupportedAirflowNetwork",
-            "AirflowNetwork objects are not ported",
+            "UnsupportedAirflowNetwork".to_string(),
+            "AirflowNetwork objects are not ported".to_string(),
         );
     }
     if object_type.starts_with("Sizing:") || object_type.starts_with("ZoneSizing") {
-        return ("UnsupportedSizing", "sizing workflows are not ported");
+        return (
+            "UnsupportedSizing".to_string(),
+            "sizing workflows are not ported".to_string(),
+        );
     }
     if is_hvac_object(object_type) {
         return (
-            "UnsupportedHVACObject",
-            "broad HVAC object families are outside the current arbitrary runtime",
+            "UnsupportedHVACObject".to_string(),
+            "broad HVAC object families are outside the current arbitrary runtime".to_string(),
         );
     }
     if is_plant_object(object_type) {
         return (
-            "UnsupportedPlantObject",
-            "plant objects are outside the current arbitrary runtime",
+            "UnsupportedPlantObject".to_string(),
+            "plant objects are outside the current arbitrary runtime".to_string(),
         );
     }
     if is_surface_boundary_object(object_type) {
         return (
-            "UnsupportedSurfaceBoundary",
-            "fenestration, daylighting, shading, and advanced surface boundary objects are not ported",
+            "UnsupportedSurfaceBoundary".to_string(),
+            "fenestration, daylighting, shading, and advanced surface boundary objects are not ported"
+                .to_string(),
         );
     }
 
     (
-        "UnsupportedObject",
-        "object type is preserved in RawModel but lacks a runtime support declaration",
+        "UnsupportedObject".to_string(),
+        "object type is preserved in RawModel but lacks a runtime support declaration".to_string(),
     )
+}
+
+fn unsupported_rule_code(rule_id: &str, object_type: &str) -> String {
+    if object_type.starts_with("EnergyManagementSystem:") {
+        return "UnsupportedEMS".to_string();
+    }
+    if object_type.starts_with("PythonPlugin:") {
+        return "UnsupportedPythonPlugin".to_string();
+    }
+    if object_type.starts_with("AirflowNetwork:") {
+        return "UnsupportedAirflowNetwork".to_string();
+    }
+
+    match rule_id {
+        "unsupported_hvac_air_loop" => "UnsupportedHVACObject",
+        "unsupported_plant" => "UnsupportedPlantObject",
+        "unsupported_ems_python_airflow" => "UnsupportedRuntimeModifier",
+        _ => "UnsupportedObject",
+    }
+    .to_string()
 }
 
 fn is_hvac_object(object_type: &str) -> bool {
@@ -674,7 +949,7 @@ fn is_surface_boundary_object(object_type: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{RunResultState, SupportStatus, assess_support};
+    use super::{RunResultState, RuntimeClass, SupportStatus, assess_support};
     use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
     use ep_compiler::compile_raw_model;
     use ep_raw_model::parse_epjson_str;
@@ -716,6 +991,10 @@ mod tests {
 
         assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
         assert_eq!(
+            assessment.runtime_class,
+            RuntimeClass::OneZoneHeatBalanceCompatibility
+        );
+        assert_eq!(
             assessment.run_result_state,
             RunResultState::SupportedCompatibilityRun
         );
@@ -723,7 +1002,151 @@ mod tests {
             assessment.matched_capability_ids,
             vec!["official_1zone_uncontrolled_declared_heat_balance"]
         );
+        assert_eq!(assessment.matched_capabilities.len(), 1);
+        assert_eq!(assessment.matched_capabilities[0].domain, "heat_balance");
         assert!(assessment.capability_registry_loaded);
+        Ok(())
+    }
+
+    #[test]
+    fn output_objects_use_partial_rule_from_registry() -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "Output:Variable": {
+                    "Zone Mean Air Temperature": {
+                        "key_value": "*",
+                        "variable_name": "Zone Mean Air Temperature",
+                        "reporting_frequency": "Hourly"
+                    }
+                }
+            }"#,
+        )?;
+        let result = compile_raw_model(&raw);
+        let assessment = assess_support(
+            &raw,
+            &result.report,
+            result.model.as_ref(),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+        );
+
+        assert!(
+            assessment
+                .ignored_raw_only_objects
+                .iter()
+                .any(|entry| entry.object_type == "Output:Variable"
+                    && entry.status == "ignored_reporting_objects")
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn hvac_air_loop_uses_unsupported_rule_from_registry() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let raw = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "AirLoopHVAC": {"Main Air Loop": {}}
+            }"#,
+        )?;
+        let result = compile_raw_model(&raw);
+        let assessment = assess_support(
+            &raw,
+            &result.report,
+            result.model.as_ref(),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+        );
+
+        assert_eq!(assessment.status, SupportStatus::Unsupported);
+        assert!(
+            assessment
+                .unsupported_objects
+                .iter()
+                .any(|entry| entry.object_type == "AirLoopHVAC"
+                    && entry.note == "Broad HVAC air-loop semantics are not ported.")
+        );
+        assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == "UnsupportedHVACObject"
+                && diagnostic.object_type.as_deref() == Some("AirLoopHVAC")
+        }));
+        Ok(())
+    }
+
+    #[test]
+    fn ideal_loads_no_oa_branch_matches_registry_capability()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "NodeList": {
+                    "Zone Inlets": {
+                        "nodes": [{"node_name": "Zone One Inlet"}]
+                    }
+                },
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads": {
+                        "zone_supply_air_node_name": "Zone Inlets",
+                        "dehumidification_control_type": "None",
+                        "humidification_control_type": "None"
+                    }
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone One": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
+                        "zone_air_node_name": "Zone One Air Node",
+                        "zone_return_air_node_or_nodelist_name": "Zone One Return"
+                    }
+                }
+            }"#,
+        )?;
+        let result = compile_raw_model(&raw);
+        let assessment = assess_support(
+            &raw,
+            &result.report,
+            result.model.as_ref(),
+            RunMode::Diagnostic,
+            PartialRunPolicy::Allow,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+        );
+
+        assert_eq!(assessment.status, SupportStatus::SupportedDiagnosticOnly);
+        assert_eq!(
+            assessment.run_result_state,
+            RunResultState::PartialSupportedRun
+        );
+        assert_eq!(
+            assessment.runtime_class,
+            RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
+        );
+        assert_eq!(
+            assessment.matched_capability_ids,
+            vec!["ideal_loads_no_oa_sensible"]
+        );
+        assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
         Ok(())
     }
 
