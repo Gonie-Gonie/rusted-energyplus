@@ -12,6 +12,7 @@ pub mod node;
 mod output;
 pub mod plant;
 mod runtime;
+pub mod schedules;
 pub mod simulation_state;
 pub mod time_axis;
 pub mod weather;
