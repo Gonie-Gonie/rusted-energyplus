@@ -64,6 +64,19 @@ use crate::schedules::{
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
 pub use crate::weather::*;
+pub(crate) use crate::weather::{
+    HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
+    energyplus_weather_dry_bulb_at_timestep_with_starting_values,
+    energyplus_weather_interpolation_weight, energyplus_weather_relative_humidity_for_context,
+    energyplus_weather_scalar_at_timestep, heat_balance_weather_context_for_timestep,
+    next_weather_record, previous_weather_record,
+    previous_weather_record_with_first_hour_starting_values,
+};
+#[cfg(test)]
+use crate::weather::{
+    energyplus_weather_atmospheric_pressure_at_timestep, energyplus_weather_dry_bulb_at_timestep,
+    energyplus_weather_relative_humidity_at_timestep,
+};
 use crate::{OutputSeries, ResultStore};
 #[cfg(test)]
 use crate::{SimulationMode, SimulationState};
@@ -4400,15 +4413,6 @@ fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
         .fold(0.0, f64::max)
 }
 
-#[derive(Clone, Copy)]
-struct HeatBalanceWeatherContext<'a> {
-    records: &'a [EpwRecord],
-    record_index: usize,
-    zone_steps_per_hour: u32,
-    zone_timestep: Option<u32>,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct ExteriorConvectionTerms {
     coefficient_w_per_m2_k: f64,
@@ -6917,228 +6921,6 @@ fn surface_incident_solar_components_at_local_hour_w_per_m2(
     }
 }
 
-fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
-    previous_weather_record_with_first_hour_starting_values(
-        records,
-        record_index,
-        FirstHourInterpolationStartingValues::Hour24,
-    )
-}
-
-fn previous_weather_record_with_first_hour_starting_values(
-    records: &[EpwRecord],
-    record_index: usize,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> &EpwRecord {
-    if record_index == 0 {
-        let first_day_record_index = match first_hour_interpolation_starting_values {
-            FirstHourInterpolationStartingValues::Hour1 => 0,
-            FirstHourInterpolationStartingValues::Hour24 => records.len().min(24) - 1,
-        };
-        &records[first_day_record_index]
-    } else {
-        &records[record_index - 1]
-    }
-}
-
-fn next_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
-    let next_index = if record_index + 1 >= records.len() {
-        0
-    } else {
-        record_index + 1
-    };
-    &records[next_index]
-}
-
-fn heat_balance_weather_context_for_timestep(
-    weather_records: Option<&[EpwRecord]>,
-    record_index: usize,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> Option<HeatBalanceWeatherContext<'_>> {
-    weather_records.map(|records| HeatBalanceWeatherContext {
-        records,
-        record_index,
-        zone_steps_per_hour,
-        zone_timestep: Some(zone_timestep),
-        first_hour_interpolation_starting_values,
-    })
-}
-
-#[cfg(test)]
-fn energyplus_weather_dry_bulb_at_timestep(
-    weather_records: Option<&[EpwRecord]>,
-    record_index: usize,
-    fallback_hourly_dry_bulb_c: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-) -> f64 {
-    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-        weather_records,
-        record_index,
-        fallback_hourly_dry_bulb_c,
-        zone_steps_per_hour,
-        zone_timestep,
-        FirstHourInterpolationStartingValues::Hour24,
-    )
-}
-
-fn energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-    weather_records: Option<&[EpwRecord]>,
-    record_index: usize,
-    fallback_hourly_dry_bulb_c: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> f64 {
-    let Some(records) = weather_records else {
-        return fallback_hourly_dry_bulb_c;
-    };
-    energyplus_weather_scalar_at_timestep(
-        records,
-        record_index,
-        fallback_hourly_dry_bulb_c,
-        zone_steps_per_hour,
-        zone_timestep,
-        first_hour_interpolation_starting_values,
-        |record| record.dry_bulb_c,
-    )
-}
-
-fn energyplus_weather_scalar_at_timestep(
-    records: &[EpwRecord],
-    record_index: usize,
-    fallback_hourly_value: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-    value: impl Fn(&EpwRecord) -> f64,
-) -> f64 {
-    let Some(record) = records.get(record_index) else {
-        return fallback_hourly_value;
-    };
-    let previous = previous_weather_record_with_first_hour_starting_values(
-        records,
-        record_index,
-        first_hour_interpolation_starting_values,
-    );
-    let interpolation_weight =
-        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
-
-    value(previous) * (1.0 - interpolation_weight) + value(record) * interpolation_weight
-}
-
-fn energyplus_weather_relative_humidity_for_context(
-    context: HeatBalanceWeatherContext<'_>,
-    fallback_relative_humidity_percent: f64,
-) -> f64 {
-    let Some(timestep) = context.zone_timestep else {
-        return fallback_relative_humidity_percent;
-    };
-
-    energyplus_weather_relative_humidity_at_timestep_with_starting_values(
-        context.records,
-        context.record_index,
-        fallback_relative_humidity_percent,
-        context.zone_steps_per_hour,
-        timestep,
-        context.first_hour_interpolation_starting_values,
-    )
-}
-
-#[cfg(test)]
-fn energyplus_weather_relative_humidity_at_timestep(
-    records: &[EpwRecord],
-    record_index: usize,
-    fallback_relative_humidity_percent: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-) -> f64 {
-    energyplus_weather_relative_humidity_at_timestep_with_starting_values(
-        records,
-        record_index,
-        fallback_relative_humidity_percent,
-        zone_steps_per_hour,
-        zone_timestep,
-        FirstHourInterpolationStartingValues::Hour24,
-    )
-}
-
-fn energyplus_weather_relative_humidity_at_timestep_with_starting_values(
-    records: &[EpwRecord],
-    record_index: usize,
-    fallback_relative_humidity_percent: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> f64 {
-    energyplus_weather_scalar_at_timestep(
-        records,
-        record_index,
-        fallback_relative_humidity_percent,
-        zone_steps_per_hour,
-        zone_timestep,
-        first_hour_interpolation_starting_values,
-        |record| record.relative_humidity_percent,
-    )
-}
-
-fn energyplus_weather_atmospheric_pressure_for_context(
-    context: HeatBalanceWeatherContext<'_>,
-    fallback_atmospheric_pressure_pa: f64,
-) -> f64 {
-    let Some(timestep) = context.zone_timestep else {
-        return fallback_atmospheric_pressure_pa;
-    };
-
-    energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
-        context.records,
-        context.record_index,
-        fallback_atmospheric_pressure_pa,
-        context.zone_steps_per_hour,
-        timestep,
-        context.first_hour_interpolation_starting_values,
-    )
-}
-
-#[cfg(test)]
-fn energyplus_weather_atmospheric_pressure_at_timestep(
-    records: &[EpwRecord],
-    record_index: usize,
-    fallback_atmospheric_pressure_pa: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-) -> f64 {
-    energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
-        records,
-        record_index,
-        fallback_atmospheric_pressure_pa,
-        zone_steps_per_hour,
-        zone_timestep,
-        FirstHourInterpolationStartingValues::Hour24,
-    )
-}
-
-fn energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
-    records: &[EpwRecord],
-    record_index: usize,
-    fallback_atmospheric_pressure_pa: f64,
-    zone_steps_per_hour: u32,
-    zone_timestep: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> f64 {
-    energyplus_weather_scalar_at_timestep(
-        records,
-        record_index,
-        fallback_atmospheric_pressure_pa,
-        zone_steps_per_hour,
-        zone_timestep,
-        first_hour_interpolation_starting_values,
-        |record| record.atmospheric_pressure_pa,
-    )
-}
-
 fn weather_proxy_zone_air_heat_capacity_j_per_k(
     zone: &ZoneHeatBalanceState,
     context: Option<HeatBalanceWeatherContext<'_>>,
@@ -7386,15 +7168,6 @@ fn energyplus_interpolate_wind_direction_deg(
     }
 
     (previous + (current - previous) * current_hour_weight).rem_euclid(360.0)
-}
-
-fn energyplus_weather_interpolation_weight(zone_steps_per_hour: u32, zone_timestep: u32) -> f64 {
-    let steps = zone_steps_per_hour.max(1);
-    if steps == 1 {
-        return 1.0;
-    }
-
-    (f64::from(zone_timestep.clamp(1, steps)) / f64::from(steps)).min(1.0)
 }
 
 fn heat_gain_rate_w(rate_w: f64) -> f64 {
