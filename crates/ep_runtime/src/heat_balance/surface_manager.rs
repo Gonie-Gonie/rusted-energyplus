@@ -1,8 +1,104 @@
 //! HeatBalanceSurfaceManager source-order stage contract.
 
+use crate::RuntimeError;
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
+use ep_model::{ConstructionId, MaterialId, MaterialSurfaceRoughness, Surface, TypedModel};
 
 const SOURCE_FILE: &str = "src/EnergyPlus/HeatBalanceSurfaceManager.cc";
+const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
+const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SurfaceThermalProperties {
+    pub(crate) construction_id: ConstructionId,
+    pub(crate) construction_name: String,
+    pub(crate) outside_layer_material_id: MaterialId,
+    pub(crate) outside_layer_material_name: String,
+    pub(crate) outside_layer_roughness: MaterialSurfaceRoughness,
+    pub(crate) thermal_resistance_m2_k_per_w: f64,
+    pub(crate) heat_capacity_j_per_m2_k: Option<f64>,
+    pub(crate) thermal_absorptance: f64,
+    pub(crate) inside_thermal_absorptance: f64,
+    pub(crate) solar_absorptance: f64,
+}
+
+pub(crate) fn surface_thermal_properties(
+    model: &TypedModel,
+    surface: &Surface,
+) -> Result<SurfaceThermalProperties, RuntimeError> {
+    let construction = model
+        .constructions
+        .iter()
+        .find(|construction| construction.id == surface.construction)
+        .ok_or_else(|| RuntimeError::MissingConstruction {
+            surface_name: surface.name.0.clone(),
+        })?;
+    let layer_ids = if construction.layers.is_empty() {
+        std::slice::from_ref(&construction.outside_layer)
+    } else {
+        construction.layers.as_slice()
+    };
+    let mut layer_materials = Vec::with_capacity(layer_ids.len());
+    for layer_id in layer_ids {
+        let material = model
+            .materials
+            .iter()
+            .find(|material| material.id == *layer_id)
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
+        layer_materials.push(material);
+    }
+    let outside_material =
+        layer_materials
+            .first()
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
+    let inside_material = layer_materials
+        .last()
+        .ok_or_else(|| RuntimeError::MissingMaterial {
+            construction_name: construction.name.0.clone(),
+        })?;
+    let mut thermal_resistance_m2_k_per_w = 0.0;
+    for material in &layer_materials {
+        thermal_resistance_m2_k_per_w += material.thermal_resistance().ok_or_else(|| {
+            RuntimeError::MissingThermalResistance {
+                material_name: material.name.0.clone(),
+            }
+        })?;
+    }
+    let heat_capacity_j_per_m2_k = layer_materials
+        .iter()
+        .filter_map(|material| material.heat_capacity_per_area())
+        .sum::<f64>();
+    let heat_capacity_j_per_m2_k = if heat_capacity_j_per_m2_k > 0.0 {
+        Some(heat_capacity_j_per_m2_k)
+    } else {
+        None
+    };
+
+    Ok(SurfaceThermalProperties {
+        construction_id: construction.id,
+        construction_name: construction.name.0.clone(),
+        outside_layer_material_id: outside_material.id,
+        outside_layer_material_name: outside_material.name.0.clone(),
+        outside_layer_roughness: outside_material
+            .roughness
+            .unwrap_or(MaterialSurfaceRoughness::MediumRough),
+        thermal_resistance_m2_k_per_w,
+        heat_capacity_j_per_m2_k,
+        thermal_absorptance: outside_material
+            .thermal_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
+        inside_thermal_absorptance: inside_material
+            .thermal_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
+        solar_absorptance: outside_material
+            .solar_absorptance
+            .unwrap_or(DEFAULT_MATERIAL_SOLAR_ABSORPTANCE),
+    })
+}
 
 const fn stage(
     kind: ExecutionStageKind,

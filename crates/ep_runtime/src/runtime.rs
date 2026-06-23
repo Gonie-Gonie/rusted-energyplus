@@ -1,7 +1,5 @@
 //! Runtime state, heat-balance execution, weather, and trace helpers.
 
-#[cfg(test)]
-use crate::SimulationMode;
 pub use crate::diagnostics::*;
 pub use crate::error::*;
 pub use crate::first_zone::*;
@@ -26,6 +24,7 @@ pub(crate) use crate::heat_balance::state::{
     InsideConvectionCoefficientInputState, SurfaceBoundaryBalanceResult,
     SurfaceExteriorReportTerms, SurfaceIncidentSolarComponents, SurfaceOutsideBalanceDiagnostics,
 };
+pub(crate) use crate::heat_balance::surface_thermal_properties;
 pub(crate) use crate::heat_balance::trace::*;
 use crate::heat_balance::{
     HeatBalanceZoneAirAlgorithm, energyplus_analytical_zone_air_temperature_c,
@@ -58,16 +57,18 @@ pub use crate::schedules::{
     simulate_zone_internal_convective_gains,
 };
 use crate::schedules::{
-    convective_internal_gain_w, internal_gain_w, update_surface_radiant_internal_gain_source_terms,
+    convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
 pub use crate::weather::*;
-use crate::{OutputSeries, ResultStore, SimulationState, ZoneState};
+use crate::{OutputSeries, ResultStore};
+#[cfg(test)]
+use crate::{SimulationMode, SimulationState};
 use ep_model::{
-    ConstructionId, FirstHourInterpolationStartingValues, MaterialId, MaterialSurfaceRoughness,
-    NormalizedName, OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
-    Point3, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    TypedModel, WindExposure, Zone, ZoneId,
+    FirstHourInterpolationStartingValues, MaterialSurfaceRoughness, NormalizedName, OutputHandle,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, SimulationModel,
+    SiteLocation, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, WindExposure,
+    ZoneId,
 };
 use std::collections::BTreeMap;
 
@@ -80,8 +81,6 @@ const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
 const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
 const DEFAULT_SOLAR_GROUND_REFLECTANCE: f64 = 0.2;
-const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
-const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
 const ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM: f64 = 0.8;
 const STEFAN_BOLTZMANN_W_PER_M2_K4: f64 = 5.6697e-8;
@@ -234,140 +233,6 @@ pub fn append_surface_incident_solar_radiation_series(
     }
 
     added
-}
-
-/// Executes the first uncontrolled one-zone thermal simulation subset.
-pub fn simulate_first_zone_uncontrolled(
-    model: &SimulationModel,
-    weather_dry_bulb_c: &[f64],
-    options: FirstZoneSimulationOptions,
-) -> Result<FirstZoneSimulation, RuntimeError> {
-    if weather_dry_bulb_c.is_empty() {
-        return Err(RuntimeError::NoWeatherData);
-    }
-    if options.sample_count > weather_dry_bulb_c.len() {
-        return Err(RuntimeError::SampleCountExceedsWeather {
-            requested: options.sample_count,
-            available: weather_dry_bulb_c.len(),
-        });
-    }
-
-    let zone = model.typed.zones.first().ok_or(RuntimeError::NoZones)?;
-    let characteristics = derive_first_zone_characteristics(model, zone, options.sample_count)?;
-    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
-    let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
-
-    let mut state = SimulationState::new(options.mode);
-    let mut zone_air_temperature_c = options.initial_zone_air_temperature_c;
-    state.zones.push(ZoneState {
-        zone_id: zone.id,
-        air_temperature_c: zone_air_temperature_c,
-    });
-
-    let mut zone_temperatures = Vec::with_capacity(options.sample_count);
-    let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
-
-    for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
-        .iter()
-        .copied()
-        .take(options.sample_count)
-        .enumerate()
-    {
-        state.weather.outdoor_dry_bulb_c = outdoor_dry_bulb_c;
-        let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
-        let internal_gain_w = internal_gain_w(&model.typed, zone.id, hour_ending);
-        for _substep in 0..zone_steps_per_hour {
-            zone_air_temperature_c = step_zone_air_temperature(
-                zone_air_temperature_c,
-                outdoor_dry_bulb_c,
-                internal_gain_w,
-                characteristics.conductance_w_per_k,
-                characteristics.air_heat_capacity_j_per_k,
-                seconds_per_timestep,
-            );
-            state.timestep_index += 1;
-        }
-        zone_temperatures.push(zone_air_temperature_c);
-        outdoor_temperatures.push(outdoor_dry_bulb_c);
-    }
-
-    if let Some(zone_state) = state.zones.first_mut() {
-        zone_state.air_temperature_c = zone_air_temperature_c;
-    }
-
-    let mut results = ResultStore::new();
-    results.add_series(OutputSeries {
-        handle: OutputHandle(0),
-        key: zone.name.0.clone(),
-        variable_name: "Zone Mean Air Temperature".to_string(),
-        units: "C".to_string(),
-        values: zone_temperatures,
-    });
-    results.add_series(OutputSeries {
-        handle: OutputHandle(1),
-        key: "Environment".to_string(),
-        variable_name: "Site Outdoor Air Drybulb Temperature".to_string(),
-        units: "C".to_string(),
-        values: outdoor_temperatures,
-    });
-
-    Ok(FirstZoneSimulation {
-        state,
-        results,
-        summary: characteristics,
-    })
-}
-
-fn derive_first_zone_characteristics(
-    model: &SimulationModel,
-    zone: &Zone,
-    sample_count: usize,
-) -> Result<FirstZoneSimulationSummary, RuntimeError> {
-    let volume_m3 =
-        zone_volume_m3(&model.typed, zone).ok_or_else(|| RuntimeError::MissingZoneVolume {
-            zone_name: zone.name.0.clone(),
-        })?;
-    let (exterior_area_m2, conductance_w_per_k) = exterior_zone_conductance(model, zone)?;
-    let multiplier = f64::from(zone.multiplier.max(1));
-    let air_heat_capacity_j_per_k =
-        volume_m3 * multiplier * AIR_DENSITY_KG_PER_M3 * AIR_SPECIFIC_HEAT_J_PER_KG_K;
-    let internal_gain_w = internal_gain_w(&model.typed, zone.id, 1);
-
-    Ok(FirstZoneSimulationSummary {
-        zone_id: zone.id,
-        zone_name: zone.name.0.clone(),
-        samples: sample_count,
-        volume_m3,
-        exterior_area_m2,
-        conductance_w_per_k,
-        air_heat_capacity_j_per_k,
-        internal_gain_w,
-    })
-}
-
-fn exterior_zone_conductance(
-    model: &SimulationModel,
-    zone: &Zone,
-) -> Result<(f64, f64), RuntimeError> {
-    let mut exterior_area_m2 = 0.0;
-    let mut conductance_w_per_k = 0.0;
-
-    for surface in model.typed.surfaces.iter().filter(|surface| {
-        surface.zone == zone.id
-            && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors
-    }) {
-        let area_m2 = surface_area_m2(&surface.vertices);
-        if area_m2 <= 0.0 {
-            continue;
-        }
-
-        let thermal = surface_thermal_properties(&model.typed, surface)?;
-
-        exterior_area_m2 += area_m2;
-        conductance_w_per_k += area_m2 / thermal.thermal_resistance_m2_k_per_w;
-    }
-
-    Ok((exterior_area_m2, conductance_w_per_k))
 }
 
 /// Initializes the heat-balance state shell without advancing the solver.
@@ -4549,20 +4414,6 @@ fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
         .fold(0.0, f64::max)
 }
 
-#[derive(Clone, Debug, PartialEq)]
-struct SurfaceThermalProperties {
-    construction_id: ConstructionId,
-    construction_name: String,
-    outside_layer_material_id: MaterialId,
-    outside_layer_material_name: String,
-    outside_layer_roughness: MaterialSurfaceRoughness,
-    thermal_resistance_m2_k_per_w: f64,
-    heat_capacity_j_per_m2_k: Option<f64>,
-    thermal_absorptance: f64,
-    inside_thermal_absorptance: f64,
-    solar_absorptance: f64,
-}
-
 #[derive(Clone, Copy)]
 struct HeatBalanceWeatherContext<'a> {
     records: &'a [EpwRecord],
@@ -4619,84 +4470,6 @@ impl ExteriorLongwaveTerms {
 struct SurfaceBoundaryTarget {
     surface_id: Option<SurfaceId>,
     zone_id: Option<ZoneId>,
-}
-
-fn surface_thermal_properties(
-    model: &TypedModel,
-    surface: &Surface,
-) -> Result<SurfaceThermalProperties, RuntimeError> {
-    let construction = model
-        .constructions
-        .iter()
-        .find(|construction| construction.id == surface.construction)
-        .ok_or_else(|| RuntimeError::MissingConstruction {
-            surface_name: surface.name.0.clone(),
-        })?;
-    let layer_ids = if construction.layers.is_empty() {
-        std::slice::from_ref(&construction.outside_layer)
-    } else {
-        construction.layers.as_slice()
-    };
-    let mut layer_materials = Vec::with_capacity(layer_ids.len());
-    for layer_id in layer_ids {
-        let material = model
-            .materials
-            .iter()
-            .find(|material| material.id == *layer_id)
-            .ok_or_else(|| RuntimeError::MissingMaterial {
-                construction_name: construction.name.0.clone(),
-            })?;
-        layer_materials.push(material);
-    }
-    let outside_material =
-        layer_materials
-            .first()
-            .ok_or_else(|| RuntimeError::MissingMaterial {
-                construction_name: construction.name.0.clone(),
-            })?;
-    let inside_material = layer_materials
-        .last()
-        .ok_or_else(|| RuntimeError::MissingMaterial {
-            construction_name: construction.name.0.clone(),
-        })?;
-    let mut thermal_resistance_m2_k_per_w = 0.0;
-    for material in &layer_materials {
-        thermal_resistance_m2_k_per_w += material.thermal_resistance().ok_or_else(|| {
-            RuntimeError::MissingThermalResistance {
-                material_name: material.name.0.clone(),
-            }
-        })?;
-    }
-    let heat_capacity_j_per_m2_k = layer_materials
-        .iter()
-        .filter_map(|material| material.heat_capacity_per_area())
-        .sum::<f64>();
-    let heat_capacity_j_per_m2_k = if heat_capacity_j_per_m2_k > 0.0 {
-        Some(heat_capacity_j_per_m2_k)
-    } else {
-        None
-    };
-
-    Ok(SurfaceThermalProperties {
-        construction_id: construction.id,
-        construction_name: construction.name.0.clone(),
-        outside_layer_material_id: outside_material.id,
-        outside_layer_material_name: outside_material.name.0.clone(),
-        outside_layer_roughness: outside_material
-            .roughness
-            .unwrap_or(MaterialSurfaceRoughness::MediumRough),
-        thermal_resistance_m2_k_per_w,
-        heat_capacity_j_per_m2_k,
-        thermal_absorptance: outside_material
-            .thermal_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
-        inside_thermal_absorptance: inside_material
-            .thermal_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
-        solar_absorptance: outside_material
-            .solar_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_SOLAR_ABSORPTANCE),
-    })
 }
 
 fn steady_ctf_coefficient_w_per_m2_k(area_m2: f64, thermal_resistance_m2_k_per_w: f64) -> f64 {
