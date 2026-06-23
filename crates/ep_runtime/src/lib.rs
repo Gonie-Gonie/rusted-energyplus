@@ -3,6 +3,7 @@
 pub mod diagnostic_probes;
 pub mod diagnostics;
 pub mod execution_plan;
+pub mod first_zone;
 pub mod heat_balance;
 pub mod ideal_loads;
 pub mod mode;
