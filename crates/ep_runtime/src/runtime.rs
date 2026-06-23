@@ -1,5 +1,6 @@
 //! Runtime state, heat-balance execution, weather, and trace helpers.
 
+use crate::heat_balance::HeatBalanceZoneAirAlgorithm;
 use crate::time_axis::{
     DEFAULT_RUN_PERIOD_YEAR, day_of_year, run_period_first_hour_interpolation_starting_values,
 };
@@ -855,162 +856,6 @@ pub struct HeatBalanceStepInput {
     pub hour_ending: u32,
     /// Timestep duration in seconds.
     pub timestep_seconds: f64,
-}
-
-/// Zone-air temperature algorithm used by diagnostic heat-balance traces.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum HeatBalanceZoneAirAlgorithm {
-    /// Existing simplified analytical diagnostic shell.
-    SimplifiedAnalytical,
-    /// Named official dynamic compatibility candidate lane.
-    ///
-    /// This currently executes the closest source-order diagnostic path while
-    /// keeping report metadata separate from ad-hoc probe variants.
-    EnergyPlusHeatBalanceCompatCandidate,
-    /// Experimental EnergyPlus analytical predictor path for diagnostics.
-    EnergyPlusAnalyticalProbe,
-    /// Experimental EnergyPlus analytical correction after the surface pass.
-    EnergyPlusAnalyticalSurfaceFirstProbe,
-    /// Experimental analytical correction with a same-timestep surface rebalance.
-    EnergyPlusAnalyticalCoupledProbe,
-    /// Experimental coupled analytical path using previous inside surface temperature for outdoor CTF boundary solves.
-    EnergyPlusAnalyticalCoupledPreviousInsideProbe,
-    /// Experimental previous-inside path using EnergyPlus DOE-2 exterior convection without quick outside conduction.
-    EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe,
-    /// Experimental previous-inside coupled path using EnergyPlus quick-conduction outside face solves.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe,
-    /// Experimental quick-outside path that interleaves zone-air correction between surface passes.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe,
-    /// Experimental interleaved quick-outside path with grey interior longwave exchange and EnergyPlus-style adiabatic CTF outside reporting order.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
-    /// Experimental interleaved grey longwave path that freezes inside convection coefficients for the timestep.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe,
-    /// Experimental frozen-hconv path that samples interior longwave from current pass temperatures.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvCurrentLongwaveProbe,
-    /// Experimental frozen-hconv path that lets adiabatic outside CTF history follow the current inside solve.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvCurrentAdiabaticProbe,
-    /// Experimental interleaved grey longwave path with EnergyPlus third-order zone-air correction.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
-    /// Experimental frozen-hconv path with EnergyPlus third-order zone-air correction.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe,
-    /// Experimental frozen-hconv third-order path with EnergyPlus moist-air storage reporting.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageProbe,
-    /// Experimental weather-storage third-order path reporting surface convection against previous MAT.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStoragePreviousMatSurfaceConvectionProbe,
-    /// Experimental weather-storage third-order path reporting surface convection from air-balance closure.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionProbe,
-    /// Experimental balance-surface-convection path with timestep-start reference air for surface solves.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirProbe,
-    /// Experimental frozen-reference-air path that samples interior longwave from current pass temperatures.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveProbe,
-    /// Experimental current-longwave path with EnergyPlus inside-surface convergence cutoff.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe,
-    /// Experimental converged-surface path freezing outside-face balance snapshots through inside-surface iterations.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceFrozenOutsideProbe,
-    /// Experimental converged-surface path freezing only inside CTF outside-temperature history snapshots.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryProbe,
-    /// Experimental inside-CTF outside-history path also committing the frozen snapshot into CTF histories.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe,
-    /// Experimental inside-CTF outside-history path with EnergyPlus ScriptF interior longwave exchange.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFProbe,
-    /// Experimental inside-CTF outside-history path with EnergyPlus ScriptF longwave using the EnergyPlus flat lSR access order.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe,
-    /// Experimental ScriptF-flat path that keeps the surface reference air current during interleaved solves.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe,
-    /// Experimental ScriptF-flat path that refreshes inside convection coefficients during interleaved solves.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveHconvProbe,
-    /// Experimental ScriptF-flat path reporting surface convection from the surface reference-air snapshot.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe,
-    /// Experimental ScriptF-flat path reporting inside convection from final surface temperatures.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe,
-    /// Experimental ScriptF-flat path reporting conduction from the inside-CTF outside snapshot.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe,
-    /// Experimental ScriptF-flat path syncing adiabatic outside faces for reports while preserving the pre-sync CTF history commit.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatAdiabaticReportProbe,
-    /// Experimental converged-surface path committing adiabatic CTF history from current inside face without mutating report state.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceAdiabaticHistoryCommitProbe,
-    /// Experimental balance-surface-convection path syncing adiabatic outside history after the inside solve.
-    EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionCurrentAdiabaticHistoryProbe,
-    /// Experimental interleaved quick-outside path with EnergyPlus ScriptF interior longwave exchange.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe,
-    /// Experimental quick-outside path using EnergyPlus DOE-2 exterior convection.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe,
-    /// Experimental quick-outside path with a grey interior longwave exchange probe.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe,
-    /// Experimental quick-outside path combining DOE-2 exterior convection and grey interior longwave exchange.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe,
-    /// Experimental quick-outside path with EnergyPlus ScriptF interior longwave exchange.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe,
-    /// Experimental quick-outside path combining DOE-2 exterior convection and ScriptF interior longwave exchange.
-    EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe,
-    /// Experimental coupled analytical path using previous inside surface temperature for outdoor and adiabatic boundary solves.
-    EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
-    /// Experimental EnergyPlus third-order predictor path for diagnostics.
-    EnergyPlusThirdOrderProbe,
-}
-
-/// Classification for heat-balance zone-air algorithms in reports and gates.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum HeatBalanceAlgorithmLane {
-    /// Source-order compatibility candidate lane.
-    CompatibilitySourceOrder,
-    /// Diagnostic-only baseline shell, not a probe and not conformance-safe.
-    DiagnosticOnly,
-    /// Diagnostic probe or experimental variant.
-    DiagnosticProbe,
-}
-
-impl HeatBalanceAlgorithmLane {
-    /// Stable report identifier.
-    #[must_use]
-    pub const fn id(self) -> &'static str {
-        match self {
-            Self::CompatibilitySourceOrder => "compatibility-source-order",
-            Self::DiagnosticOnly => "diagnostic-only",
-            Self::DiagnosticProbe => "diagnostic-probe",
-        }
-    }
-
-    /// Returns whether the lane can be used for a conformance promotion.
-    #[must_use]
-    pub const fn allows_conformance_promotion(self) -> bool {
-        matches!(self, Self::CompatibilitySourceOrder)
-    }
-}
-
-impl HeatBalanceZoneAirAlgorithm {
-    /// Returns the source-order/diagnostic lane for this algorithm.
-    #[must_use]
-    pub const fn lane(self) -> HeatBalanceAlgorithmLane {
-        match self {
-            Self::EnergyPlusHeatBalanceCompatCandidate => {
-                HeatBalanceAlgorithmLane::CompatibilitySourceOrder
-            }
-            Self::SimplifiedAnalytical => HeatBalanceAlgorithmLane::DiagnosticOnly,
-            _ => HeatBalanceAlgorithmLane::DiagnosticProbe,
-        }
-    }
-
-    /// Returns whether the algorithm represents a source-order compatibility lane.
-    #[must_use]
-    pub const fn is_compatibility_source_order(self) -> bool {
-        matches!(
-            self.lane(),
-            HeatBalanceAlgorithmLane::CompatibilitySourceOrder
-        )
-    }
-
-    /// Returns whether the algorithm is a diagnostic probe or diagnostic-only shell.
-    #[must_use]
-    pub const fn is_diagnostic_lane(self) -> bool {
-        !self.is_compatibility_source_order()
-    }
-
-    /// Returns whether this algorithm is allowed for a conformance promotion.
-    #[must_use]
-    pub const fn allows_conformance_promotion(self) -> bool {
-        self.lane().allows_conformance_promotion()
-    }
 }
 
 fn heat_balance_zone_air_algorithm_feature_base(
@@ -10928,13 +10773,13 @@ mod tests {
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        FirstZoneSimulationOptions, HeatBalanceAlgorithmLane, HeatBalanceCtfInitialHistoryPolicy,
+        FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
-        HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirAlgorithm,
-        HeatBalanceZoneAirReportSampling, HeatBalanceZoneConductionReportSource,
-        InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
-        OutputSeries, QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
+        HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirReportSampling,
+        HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
+        InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, OutputSeries,
+        QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
         STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
@@ -11005,6 +10850,7 @@ mod tests {
         zone_air_system_timestep_storage_report_rate_w, zone_geometry_summaries,
         zone_surface_report_conduction_rates_w,
     };
+    use crate::heat_balance::{HeatBalanceAlgorithmLane, HeatBalanceZoneAirAlgorithm};
     use crate::node::{
         NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
