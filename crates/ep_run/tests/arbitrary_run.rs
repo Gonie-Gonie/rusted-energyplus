@@ -63,6 +63,19 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
         summary["rust_runtime"]["runtime_class"],
         "one-zone-heat-balance-compatibility"
     );
+    assert_eq!(summary["source_order_gate"]["matches"], true);
+    assert_eq!(
+        summary["source_order_gate"]["expected_source_order_stages"][0],
+        "get-heat-balance-input"
+    );
+    assert_eq!(
+        summary["source_order_gate"]["actual_executed_source_order_stages"],
+        summary["source_order_gate"]["expected_source_order_stages"]
+    );
+    assert_eq!(
+        summary["rust_runtime"]["source_order_stages"][0],
+        "get-heat-balance-input"
+    );
     Ok(())
 }
 
@@ -110,6 +123,108 @@ fn unsupported_air_loop_blocks_before_runtime() -> Result<(), Box<dyn std::error
 
     let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
     assert!(support_report.contains("Broad HVAC air-loop semantics are not ported."));
+    Ok(())
+}
+
+#[test]
+fn unsupported_plant_loop_blocks_before_runtime() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("unsupported-plant-loop")?;
+    let input_path = case_dir.join("plant-loop.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, PLANT_LOOP_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(outcome.support_status, SupportStatus::Unsupported);
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "unsupported");
+    assert!(summary["rust_runtime"].is_null());
+
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("UnsupportedPlantObject"));
+    let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
+    assert!(support_report.contains("Plant objects are typed for graph diagnostics"));
+    Ok(())
+}
+
+#[test]
+fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("fail-on-warning")?;
+    let input_path = case_dir.join("one-zone-output-request.epJSON");
+    let weather_path = case_dir.join("weather.epw");
+    let output_dir = case_dir.join("out");
+    let mut input_text = ONE_ZONE_EPJSON.trim_end().trim_end_matches('}').to_string();
+    input_text.push_str(
+        r#",
+  "Output:Variable": {
+    "Zone Air Temperature Request": {
+      "key_value": "*",
+      "variable_name": "Zone Mean Air Temperature",
+      "reporting_frequency": "Hourly"
+    }
+  }
+}"#,
+    );
+    write_text(&input_path, &input_text)?;
+    write_text(&weather_path, TWO_HOUR_EPW)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: Some(weather_path),
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: true,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(2),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedCompatibility
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
+    assert_output_layout(&output_dir, true)?;
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "unsupported");
+    assert!(!summary["rust_runtime"].is_null());
+    assert_eq!(summary["config"]["fail_on_warning"], true);
+
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("UnsupportedObjectIgnored"));
     Ok(())
 }
 
@@ -165,6 +280,68 @@ fn ideal_loads_diagnostic_run_uses_branch_runtime_class() -> Result<(), Box<dyn 
         "ideal-loads-no-oa-sensible-diagnostic-projection"
     );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
+    assert_eq!(summary["source_order_gate"]["matches"], true);
+    assert!(
+        summary["rust_runtime"]["source_order_stages"]
+            .as_array()
+            .expect("source order stages should be an array")
+            .iter()
+            .any(|stage| stage == "purchased-air-manager-calc")
+    );
+    let plan = read_json(&output_dir.join("model").join("execution-plan.json"))?;
+    assert_eq!(plan["source_order_gate"]["matches"], true);
+    assert_eq!(
+        plan["source_order_gate"]["actual_executed_source_order_stages"],
+        plan["source_order_gate"]["expected_source_order_stages"]
+    );
+    Ok(())
+}
+
+#[test]
+fn ideal_loads_compatibility_mode_blocks_diagnostic_runtime(
+) -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("ideal-loads-compatibility-blocked")?;
+    let input_path = case_dir.join("ideal-loads.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, IDEAL_LOADS_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedDiagnosticOnly
+    );
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "unsupported");
+    assert_eq!(
+        summary["support"]["runtime_class"],
+        "ideal-loads-no-oa-sensible-diagnostic-projection"
+    );
+    assert!(summary["rust_runtime"].is_null());
+    assert!(summary["source_order_gate"].is_null());
+
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("DiagnosticOnlyRuntimeBlocked"));
     Ok(())
 }
 
@@ -291,6 +468,110 @@ const AIR_LOOP_EPJSON: &str = r#"{
   "Version": {"Version 1": {"version_identifier": "26.1"}},
   "Zone": {"Zone One": {"volume": 100}},
   "AirLoopHVAC": {"Main Air Loop": {}}
+}"#;
+
+const PLANT_LOOP_EPJSON: &str = r#"{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Pump:ConstantSpeed": {
+    "HW Pump": {
+      "inlet_node_name": "HW Supply Inlet",
+      "outlet_node_name": "HW Pump Outlet",
+      "design_flow_rate": 0.001,
+      "design_pump_head": 179352,
+      "pump_control_type": "Intermittent"
+    }
+  },
+  "Boiler:HotWater": {
+    "HW Boiler": {
+      "fuel_type": "NaturalGas",
+      "nominal_capacity": 10000,
+      "design_water_flow_rate": 0.001,
+      "boiler_water_inlet_node_name": "HW Pump Outlet",
+      "boiler_water_outlet_node_name": "HW Supply Outlet"
+    }
+  },
+  "Branch": {
+    "HW Supply Inlet Branch": {
+      "components": [
+        {
+          "component_object_type": "Pump:ConstantSpeed",
+          "component_name": "HW Pump",
+          "component_inlet_node_name": "HW Supply Inlet",
+          "component_outlet_node_name": "HW Pump Outlet"
+        }
+      ]
+    },
+    "HW Boiler Branch": {
+      "components": [
+        {
+          "component_object_type": "Boiler:HotWater",
+          "component_name": "HW Boiler",
+          "component_inlet_node_name": "HW Pump Outlet",
+          "component_outlet_node_name": "HW Supply Outlet"
+        }
+      ]
+    },
+    "HW Demand Branch": {
+      "components": [
+        {
+          "component_object_type": "Pipe:Adiabatic",
+          "component_name": "HW Demand Pipe",
+          "component_inlet_node_name": "HW Demand Inlet",
+          "component_outlet_node_name": "HW Demand Outlet"
+        }
+      ]
+    }
+  },
+  "BranchList": {
+    "HW Supply Branches": {
+      "branches": [
+        {"branch_name": "HW Supply Inlet Branch"},
+        {"branch_name": "HW Boiler Branch"}
+      ]
+    },
+    "HW Demand Branches": {
+      "branches": [
+        {"branch_name": "HW Demand Branch"}
+      ]
+    }
+  },
+  "Connector:Splitter": {
+    "HW Supply Splitter": {
+      "inlet_branch_name": "HW Supply Inlet Branch",
+      "branches": [
+        {"outlet_branch_name": "HW Boiler Branch"}
+      ]
+    }
+  },
+  "Connector:Mixer": {
+    "HW Supply Mixer": {
+      "outlet_branch_name": "HW Boiler Branch",
+      "branches": [
+        {"inlet_branch_name": "HW Supply Inlet Branch"}
+      ]
+    }
+  },
+  "ConnectorList": {
+    "HW Supply Connectors": {
+      "connector_1_object_type": "Connector:Splitter",
+      "connector_1_name": "HW Supply Splitter",
+      "connector_2_object_type": "Connector:Mixer",
+      "connector_2_name": "HW Supply Mixer"
+    }
+  },
+  "PlantLoop": {
+    "Hot Water Loop": {
+      "fluid_type": "Water",
+      "plant_side_inlet_node_name": "HW Supply Inlet",
+      "plant_side_outlet_node_name": "HW Supply Outlet",
+      "plant_side_branch_list_name": "HW Supply Branches",
+      "plant_side_connector_list_name": "HW Supply Connectors",
+      "demand_side_inlet_node_name": "HW Demand Inlet",
+      "demand_side_outlet_node_name": "HW Demand Outlet",
+      "demand_side_branch_list_name": "HW Demand Branches",
+      "load_distribution_scheme": "SequentialLoad"
+    }
+  }
 }"#;
 
 const IDEAL_LOADS_EPJSON: &str = r#"{

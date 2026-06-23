@@ -6,6 +6,9 @@ It stages the input, converts IDF through the locked EnergyPlus 26.1.0
 support assessment, maps the result to `run_blocked`,
 `partial_supported_run`, or `supported_compatibility_run`, and only then runs
 Rust when the selected mode and partial policy permit it.
+Runtime execution also passes the `ExecutionPlan` source-order gate: expected
+and actual source-order stages are written to `model/execution-plan.json` and
+`run-summary.json`, and a mismatch exits with code `5` before the runtime runs.
 
 ```powershell
 eplus-rs run .\model.idf -w .\weather.epw -d .\out --oracle-baseline --compare-oracle

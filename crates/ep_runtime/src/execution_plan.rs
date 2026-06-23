@@ -191,6 +191,34 @@ impl ExecutionPlan {
     pub fn step_count(&self) -> usize {
         self.stages.iter().map(|stage| stage.steps.len()).sum()
     }
+
+    /// Returns the expected EnergyPlus source-order stage identifiers.
+    #[must_use]
+    pub fn expected_source_order_stage_ids(&self) -> Vec<&'static str> {
+        self.compatibility_stages
+            .iter()
+            .map(|stage| stage.stage_name)
+            .collect()
+    }
+
+    /// Returns the source-order stage identifiers represented by the execution plan.
+    #[must_use]
+    pub fn actual_source_order_stage_ids(&self) -> Vec<&str> {
+        self.stages
+            .iter()
+            .filter(|stage| stage.kind.is_source_order_barrier())
+            .map(|stage| stage.name.as_str())
+            .collect()
+    }
+
+    /// Returns whether expected source-order stages match the executable plan.
+    #[must_use]
+    pub fn source_order_stages_match(&self) -> bool {
+        self.expected_source_order_stage_ids()
+            .iter()
+            .copied()
+            .eq(self.actual_source_order_stage_ids())
+    }
 }
 
 /// EnergyPlus heat-balance source order used as the compatibility-mode contract.
@@ -387,7 +415,7 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
         }
     }
 
-    let compatibility_stages = energyplus_heat_balance_compatibility_stages();
+    let mut compatibility_stages = energyplus_heat_balance_compatibility_stages();
     let mut stages = compatibility_stages
         .iter()
         .copied()
@@ -414,12 +442,14 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     );
 
     if !zone_equipment_manager_steps.is_empty() {
+        let ideal_loads_stages = energyplus_ideal_loads_compatibility_stages();
         stages.extend(
-            energyplus_ideal_loads_compatibility_stages()
+            ideal_loads_stages
                 .iter()
                 .copied()
                 .map(ExecutionStage::from_compatibility_stage),
         );
+        compatibility_stages.extend(ideal_loads_stages);
         push_steps_to_stage(
             &mut stages,
             ExecutionStageKind::ZoneEquipmentManager,

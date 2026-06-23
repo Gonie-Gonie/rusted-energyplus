@@ -110,8 +110,10 @@ timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
   `HeatBalanceSimulationOptions` and the CLI still use the legacy
   `HeatBalanceZoneAirAlgorithm` selector during the module split.
 - `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
-  source-order barriers, but those barriers still need deeper stage-level
-  dispatch, snapshots, and mismatch gates.
+  source-order barriers, writes expected/actual source-order stage IDs to
+  `execution-plan.json` and `run-summary.json`, and blocks runtime execution
+  with a Plan exit if the lists diverge. Deeper stage-level dispatch and
+  snapshots still need to move out of the legacy runtime body.
 - `SupportAssessment` exists but is not yet driven centrally by
   `specs/capabilities.toml`.
 - arbitrary-run IdealLoads support needs to distinguish declared compatibility

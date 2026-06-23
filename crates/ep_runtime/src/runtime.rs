@@ -11358,6 +11358,11 @@ mod tests {
                 .map(|stage| stage.kind)
                 .collect::<Vec<_>>()
         );
+        assert!(plan.source_order_stages_match());
+        assert_eq!(
+            plan.expected_source_order_stage_ids(),
+            plan.actual_source_order_stage_ids()
+        );
 
         let init_heat_balance = stage_with_kind(&plan.stages, ExecutionStageKind::InitHeatBalance);
         assert_eq!(init_heat_balance.steps[0], ExecutionStep::UpdateWeather);
@@ -11568,6 +11573,16 @@ mod tests {
         assert_eq!(model.graph.zone_thermostats.len(), 1);
         assert_eq!(model.graph.zone_ideal_loads.len(), 1);
         assert_eq!(plan.stages.len(), 22);
+        assert_eq!(plan.compatibility_stages.len(), 22);
+        assert!(plan.source_order_stages_match());
+        assert_eq!(
+            plan.expected_source_order_stage_ids(),
+            plan.actual_source_order_stage_ids()
+        );
+        assert!(
+            plan.expected_source_order_stage_ids()
+                .contains(&"purchased-air-manager-calc")
+        );
 
         let manage_air = stage_with_kind(&plan.stages, ExecutionStageKind::ManageAirHeatBalance);
         assert_eq!(manage_air.steps.len(), 2);

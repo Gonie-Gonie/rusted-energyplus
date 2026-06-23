@@ -36,8 +36,10 @@ modules may call compatibility functions and add instrumentation, but
 compatibility modules must not call diagnostic probes.
 
 `ExecutionPlan` is the source-order barrier between support assessment and
-runtime execution. A conformance case that selects a diagnostic algorithm must
-hard fail.
+runtime execution. Arbitrary runs write expected and actual source-order stage
+IDs to `model/execution-plan.json` and `run-summary.json`; a mismatch exits at
+the plan stage before Rust runtime execution. A conformance case that selects a
+diagnostic algorithm must hard fail.
 
 Source files should stay small enough for review and LLM-assisted development:
 400 LOC is preferred, 800 LOC needs attention, and 1200 LOC needs an explicit

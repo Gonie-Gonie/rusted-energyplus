@@ -125,6 +125,14 @@ struct RustRuntimeResult {
     results: ResultStore,
     runtime_class: RuntimeClass,
     sample_count: usize,
+    source_order_gate: SourceOrderGateSummary,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+struct SourceOrderGateSummary {
+    expected_source_order_stages: Vec<String>,
+    actual_executed_source_order_stages: Vec<String>,
+    matches: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -232,8 +240,8 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
 
     let plan_start = Instant::now();
     let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
-    if let Some(model) = simulation_model.as_ref() {
-        let plan = build_execution_plan(model);
+    let execution_plan = simulation_model.as_ref().map(build_execution_plan);
+    if let (Some(model), Some(plan)) = (simulation_model.as_ref(), execution_plan.as_ref()) {
         write_graph_and_plan(&config.output_dir, model, &plan)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     }
@@ -291,8 +299,61 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
 
     let mut rust_runtime_result = None;
     if assessment.allows_rust_runtime() {
+        let source_order_gate = match execution_plan.as_ref().map(source_order_gate_summary) {
+            Some(gate) if gate.matches => gate,
+            Some(gate) => {
+                diagnostics.error(
+                    "ExecutionPlanSourceOrderMismatch",
+                    "execution_plan",
+                    format!(
+                        "expected source-order stages {:?} but actual execution plan stages {:?}",
+                        gate.expected_source_order_stages, gate.actual_executed_source_order_stages
+                    ),
+                );
+                return finish_successful_summary(
+                    config,
+                    &prepared_input,
+                    &assessment,
+                    diagnostics,
+                    timing,
+                    None,
+                    None,
+                    oracle_status,
+                    compare_status,
+                    None,
+                    RunExitCode::Plan,
+                    "execution plan source-order gate failed",
+                );
+            }
+            None => {
+                diagnostics.error(
+                    "ExecutionPlanMissing",
+                    "execution_plan",
+                    "Rust runtime was allowed but no execution plan was available",
+                );
+                return finish_successful_summary(
+                    config,
+                    &prepared_input,
+                    &assessment,
+                    diagnostics,
+                    timing,
+                    None,
+                    None,
+                    oracle_status,
+                    compare_status,
+                    None,
+                    RunExitCode::Plan,
+                    "execution plan was missing",
+                );
+            }
+        };
         let runtime_start = Instant::now();
-        match execute_rust_runtime(config, simulation_model.as_ref(), assessment.runtime_class) {
+        match execute_rust_runtime(
+            config,
+            simulation_model.as_ref(),
+            assessment.runtime_class,
+            source_order_gate,
+        ) {
             Ok(result) => {
                 timing.push(
                     "rust_runtime",
@@ -573,11 +634,13 @@ fn finish_successful_summary(
             "matched_capabilities": assessment.matched_capabilities.clone(),
             "conformance_claim": false,
         },
-        "rust_runtime": rust_runtime_result.map(|result| json!({
+        "rust_runtime": rust_runtime_result.as_ref().map(|result| json!({
             "runtime_class": result.runtime_class.id(),
             "samples": result.sample_count,
             "series": result.results.series.len(),
+            "source_order_stages": result.source_order_gate.actual_executed_source_order_stages.clone(),
         })),
+        "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
         "comparison": comparison_summary,
         "oracle_status": oracle_status,
@@ -950,10 +1013,12 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("graph-summary.json"),
         &graph_summary,
     )?;
+    let source_order_gate = source_order_gate_summary(plan);
     let plan_json = json!({
         "schema_version": 1,
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
+        "source_order_gate": source_order_gate,
         "stages": plan.stages.iter().map(|stage| json!({
             "kind": stage.kind.id(),
             "name": stage.name,
@@ -970,6 +1035,25 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
     )
+}
+
+fn source_order_gate_summary(plan: &ExecutionPlan) -> SourceOrderGateSummary {
+    let expected_source_order_stages = plan
+        .expected_source_order_stage_ids()
+        .into_iter()
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    let actual_executed_source_order_stages = plan
+        .actual_source_order_stage_ids()
+        .into_iter()
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    let matches = expected_source_order_stages == actual_executed_source_order_stages;
+    SourceOrderGateSummary {
+        expected_source_order_stages,
+        actual_executed_source_order_stages,
+        matches,
+    }
 }
 
 fn execution_step_label(step: &ExecutionStep) -> String {
@@ -1017,6 +1101,7 @@ fn execute_rust_runtime(
     config: &RunConfig,
     simulation_model: Option<&SimulationModel>,
     runtime_class: RuntimeClass,
+    source_order_gate: SourceOrderGateSummary,
 ) -> Result<RustRuntimeResult, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_sample_count(config, model)?;
@@ -1040,6 +1125,7 @@ fn execute_rust_runtime(
                 results: simulation.results,
                 runtime_class,
                 sample_count,
+                source_order_gate,
             })
         }
         RuntimeClass::IdealLoadsNoOaSensibleDiagnosticProjection
@@ -1055,6 +1141,7 @@ fn execute_rust_runtime(
                 results: projection.results,
                 runtime_class,
                 sample_count,
+                source_order_gate,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
