@@ -6,7 +6,7 @@ use ep_compiler::{CompileReport, DiagnosticSeverity, ObjectCoverageStatus};
 use ep_model::{SimulationModel, TypedModel};
 use ep_raw_model::RawModel;
 use ep_runtime::classify_no_oa_sensible_subset;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunMode, RunOutputFormat, TraceLevel,
@@ -14,6 +14,7 @@ use crate::{
 
 /// Capability registry path bundled with the repository and release package.
 pub const CAPABILITY_REGISTRY_PATH: &str = "specs/capabilities.toml";
+const CAPABILITY_REGISTRY_TOML: &str = include_str!("../../../specs/capabilities.toml");
 
 /// Support status produced by the arbitrary-run gate.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
@@ -172,6 +173,8 @@ pub struct SupportAssessment {
     pub trace_level: String,
     /// Capability registry source.
     pub capability_registry: String,
+    /// Whether the embedded capability registry parsed successfully.
+    pub capability_registry_loaded: bool,
     /// Claim boundary.
     pub claim_boundary: ClaimBoundary,
     /// Typed object entries.
@@ -182,6 +185,24 @@ pub struct SupportAssessment {
     pub unsupported_objects: Vec<SupportObjectEntry>,
     /// Diagnostics emitted by support assessment.
     pub diagnostics: RunDiagnostics,
+}
+
+#[derive(Debug, Default, Deserialize)]
+struct CapabilityRegistrySpec {
+    #[serde(default)]
+    capability: Vec<CapabilitySpec>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct CapabilitySpec {
+    id: String,
+}
+
+#[derive(Debug)]
+struct LoadedCapabilityRegistry {
+    spec: CapabilityRegistrySpec,
+    loaded: bool,
+    error: Option<String>,
 }
 
 impl SupportAssessment {
@@ -286,6 +307,14 @@ pub fn assess_support(
         &mut unsupported_objects,
         &mut diagnostics,
     );
+    let capability_registry = load_embedded_capability_registry();
+    if let Some(error) = capability_registry.error.as_ref() {
+        diagnostics.warning(
+            "CapabilityRegistryParseFailed",
+            "support",
+            format!("failed to parse embedded {CAPABILITY_REGISTRY_PATH}: {error}"),
+        );
+    }
 
     let (status, runtime_class) = if diagnostics.has_errors() || typed_model.is_none() {
         (SupportStatus::Unsupported, RuntimeClass::None)
@@ -308,11 +337,16 @@ pub fn assess_support(
         status,
         run_result_state,
         runtime_class,
-        matched_capability_ids: matched_capability_ids(status, runtime_class),
+        matched_capability_ids: matched_capability_ids(
+            status,
+            runtime_class,
+            &capability_registry.spec,
+        ),
         mode: mode.id().to_string(),
         output_format: output_format.id().to_string(),
         trace_level: trace_level.id().to_string(),
         capability_registry: CAPABILITY_REGISTRY_PATH.to_string(),
+        capability_registry_loaded: capability_registry.loaded,
         claim_boundary: ClaimBoundary {
             conformance_claim: false,
             release_evidence: false,
@@ -325,16 +359,42 @@ pub fn assess_support(
     }
 }
 
-fn matched_capability_ids(status: SupportStatus, runtime_class: RuntimeClass) -> Vec<String> {
-    match (status, runtime_class) {
+fn load_embedded_capability_registry() -> LoadedCapabilityRegistry {
+    match toml::from_str::<CapabilityRegistrySpec>(CAPABILITY_REGISTRY_TOML) {
+        Ok(spec) => LoadedCapabilityRegistry {
+            spec,
+            loaded: true,
+            error: None,
+        },
+        Err(error) => LoadedCapabilityRegistry {
+            spec: CapabilityRegistrySpec::default(),
+            loaded: false,
+            error: Some(error.to_string()),
+        },
+    }
+}
+
+fn matched_capability_ids(
+    status: SupportStatus,
+    runtime_class: RuntimeClass,
+    registry: &CapabilityRegistrySpec,
+) -> Vec<String> {
+    let target_id = match (status, runtime_class) {
         (SupportStatus::SupportedCompatibility, RuntimeClass::HeatBalanceZoneAirDiagnostic) => {
-            vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()]
+            "official_1zone_uncontrolled_declared_heat_balance"
         }
         (SupportStatus::SupportedDiagnosticOnly, RuntimeClass::IdealLoadsNodeStateProjection) => {
-            vec!["ideal_loads_no_oa_sensible".to_string()]
+            "ideal_loads_no_oa_sensible"
         }
-        _ => Vec::new(),
-    }
+        _ => return Vec::new(),
+    };
+
+    registry
+        .capability
+        .iter()
+        .find(|capability| capability.id == target_id)
+        .map(|capability| vec![capability.id.clone()])
+        .unwrap_or_else(|| vec![target_id.to_string()])
 }
 
 fn runtime_status_for_typed_model(
@@ -651,6 +711,7 @@ mod tests {
             assessment.matched_capability_ids,
             vec!["official_1zone_uncontrolled_declared_heat_balance"]
         );
+        assert!(assessment.capability_registry_loaded);
         Ok(())
     }
 

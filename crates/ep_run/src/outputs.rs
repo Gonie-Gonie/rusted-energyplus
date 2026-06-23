@@ -135,6 +135,10 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         assessment.capability_registry
     ));
     report.push_str(&format!(
+        "capability_registry_loaded: {}\n",
+        assessment.capability_registry_loaded
+    ));
+    report.push_str(&format!(
         "conformance_claim: {}\n\n",
         assessment.claim_boundary.conformance_claim
     ));
