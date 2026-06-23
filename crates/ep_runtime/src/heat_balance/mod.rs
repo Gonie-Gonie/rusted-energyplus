@@ -9,6 +9,7 @@ pub mod radiation;
 pub mod reports;
 pub mod state;
 pub mod surface_manager;
+pub(crate) mod trace;
 pub mod zone_predictor_corrector;
 
 pub use air_manager::*;
