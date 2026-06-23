@@ -122,4 +122,50 @@ foreach ($series in $matchedSeries) {
     Assert-Equal -Actual $series.oracle_samples -Expected $series.rust_samples -Description "sample count for $($series.key) / $($series.variable_name)"
 }
 
+$blockedOutputDir = ".runtime\arbitrary-run-blocked-smoke-script"
+$blockedInput = "data\testcases\minimal\plant-loop-skeleton.epJSON"
+Write-Host "Running blocked arbitrary IDF smoke: $blockedInput"
+$blockedOutput = & $exe run $blockedInput -d $blockedOutputDir --overwrite 2>&1
+$blockedExitCode = $LASTEXITCODE
+if ($blockedExitCode -ne 4) {
+    $blockedOutput | ForEach-Object { Write-Host $_ }
+    throw "Expected unsupported exit code 4 from blocked eplus-rs run, got $blockedExitCode."
+}
+
+foreach ($relative in @(
+    "eplusrs.err",
+    "diagnostics.json",
+    "run-summary.json",
+    "support-assessment.json",
+    "support-report.md",
+    "input\original.epJSON",
+    "input\converted.epJSON",
+    "model\raw-model-summary.json",
+    "model\typed-model-summary.json",
+    "model\graph-summary.json",
+    "model\execution-plan.json",
+    "reports\run-report.md",
+    "reports\compatibility-boundary.md"
+)) {
+    Assert-File -Path (Join-Path $blockedOutputDir $relative)
+}
+
+$blockedSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "run-summary.json") | ConvertFrom-Json
+Assert-Equal -Actual $blockedSummary.status -Expected "unsupported" -Description "blocked run summary status"
+Assert-Equal -Actual $blockedSummary.exit_code -Expected 4 -Description "blocked run summary exit code"
+Assert-Equal -Actual $blockedSummary.support.status -Expected "unsupported" -Description "blocked support status"
+Assert-Equal -Actual $blockedSummary.support.run_result_state -Expected "run_blocked" -Description "blocked run result state"
+Assert-Equal -Actual $blockedSummary.support.runtime_class -Expected "none" -Description "blocked runtime class"
+if ($null -ne $blockedSummary.rust_runtime) {
+    throw "Blocked run must not write a rust_runtime summary."
+}
+if (Test-Path -LiteralPath (Join-Path $blockedOutputDir "results\result-store.json")) {
+    throw "Blocked run must not write result-store.json."
+}
+
+$blockedSupport = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "support-assessment.json") | ConvertFrom-Json
+Assert-Equal -Actual $blockedSupport.run_result_state -Expected "run_blocked" -Description "blocked support run result state"
+Assert-Equal -Actual $blockedSupport.unsupported_objects[0].object_type -Expected "PlantLoop/PlantEquipment" -Description "blocked unsupported object"
+Assert-Equal -Actual $blockedSupport.claim_boundary.conformance_claim -Expected $false -Description "blocked support conformance claim"
+
 Write-Host "Arbitrary IDF run smoke passed. Artifacts: $outputDir"
