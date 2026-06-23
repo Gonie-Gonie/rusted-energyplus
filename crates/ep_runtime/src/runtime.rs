@@ -5,14 +5,17 @@ pub use crate::error::*;
 pub use crate::first_zone::*;
 pub use crate::geometry::{surface_area_m2, surface_geometry_summaries, zone_geometry_summaries};
 pub(crate) use crate::geometry::{surface_azimuth_deg, surface_tilt_deg, zone_volume_m3};
+pub use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
 use crate::heat_balance::ctf::{
     CtfInsideFaceBalanceInput, CtfOutsideFaceBalanceInput, CtfOutsideQuickConductionBalanceInput,
     energyplus_ctf_outside_face_temperature_c,
 };
 pub(crate) use crate::heat_balance::ctf::{
-    CtfOutsideQuickConductionBalanceCalculation,
+    CtfOutsideQuickConductionBalanceCalculation, construction_ctf_coefficients_by_name,
     energyplus_ctf_inside_face_temperature_c_with_outside_temperature,
     energyplus_ctf_outside_face_temperature_quick_conduction_calculation,
+    steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
+    surface_ctf_state_from_coefficients,
 };
 #[cfg(test)]
 use crate::heat_balance::ctf::{
@@ -98,23 +101,6 @@ const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
 const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
-
-/// Per-construction CTF coefficient row used to seed diagnostic surface histories.
-#[derive(Clone, Debug, PartialEq)]
-pub struct ConstructionCtfCoefficientOverride {
-    /// EnergyPlus-normalized construction name.
-    pub construction_name: String,
-    /// EnergyPlus CTF time/history index. Time zero is the current coefficient row.
-    pub time_index: usize,
-    /// CTF outside/X coefficient in W/m2-K.
-    pub outside_w_per_m2_k: f64,
-    /// CTF cross/Y coefficient in W/m2-K.
-    pub cross_w_per_m2_k: f64,
-    /// CTF inside/Z coefficient in W/m2-K.
-    pub inside_w_per_m2_k: f64,
-    /// CTF flux coefficient for history rows.
-    pub flux: Option<f64>,
-}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct QuickOutsideConductionContext {
@@ -4470,97 +4456,6 @@ impl ExteriorLongwaveTerms {
 struct SurfaceBoundaryTarget {
     surface_id: Option<SurfaceId>,
     zone_id: Option<ZoneId>,
-}
-
-fn steady_ctf_coefficient_w_per_m2_k(area_m2: f64, thermal_resistance_m2_k_per_w: f64) -> f64 {
-    if area_m2 > 0.0 && thermal_resistance_m2_k_per_w > 0.0 {
-        1.0 / thermal_resistance_m2_k_per_w
-    } else {
-        0.0
-    }
-}
-
-fn steady_surface_ctf_state(
-    coefficient_w_per_m2_k: f64,
-    initial_temperature_c: f64,
-) -> SurfaceCtfState {
-    SurfaceCtfState {
-        outside_0_w_per_m2_k: coefficient_w_per_m2_k,
-        cross_0_w_per_m2_k: coefficient_w_per_m2_k,
-        inside_0_w_per_m2_k: coefficient_w_per_m2_k,
-        const_in_part_w_per_m2: 0.0,
-        const_out_part_w_per_m2: 0.0,
-        outside_history_w_per_m2_k: Vec::new(),
-        cross_history_w_per_m2_k: Vec::new(),
-        inside_history_w_per_m2_k: Vec::new(),
-        flux_history: Vec::new(),
-        outside_temperature_history_c: vec![initial_temperature_c],
-        inside_temperature_history_c: vec![initial_temperature_c],
-        outside_flux_history_w_per_m2: vec![0.0],
-        inside_flux_history_w_per_m2: vec![0.0],
-    }
-}
-
-fn construction_ctf_coefficients_by_name(
-    coefficients: &[ConstructionCtfCoefficientOverride],
-) -> BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>> {
-    let mut by_construction = BTreeMap::new();
-    for coefficient in coefficients {
-        by_construction
-            .entry(NormalizedName::new(&coefficient.construction_name).0)
-            .or_insert_with(Vec::new)
-            .push(coefficient);
-    }
-    for coefficients in by_construction.values_mut() {
-        // EnergyPlus writes EIO CTF rows in descending array index, but the
-        // surface balance consumes history terms as Term=1..NumCTFTerms.
-        coefficients.sort_by_key(|coefficient| coefficient.time_index);
-    }
-    by_construction
-}
-
-fn surface_ctf_state_from_coefficients(
-    coefficients: &[&ConstructionCtfCoefficientOverride],
-    initial_temperature_c: f64,
-) -> Option<SurfaceCtfState> {
-    let zero = coefficients
-        .iter()
-        .copied()
-        .find(|coefficient| coefficient.time_index == 0)?;
-    let history = coefficients
-        .iter()
-        .copied()
-        .filter(|coefficient| coefficient.time_index > 0)
-        .collect::<Vec<_>>();
-    let history_terms = history.len();
-
-    Some(SurfaceCtfState {
-        outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
-        cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
-        inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
-        const_in_part_w_per_m2: 0.0,
-        const_out_part_w_per_m2: 0.0,
-        outside_history_w_per_m2_k: history
-            .iter()
-            .map(|coefficient| coefficient.outside_w_per_m2_k)
-            .collect(),
-        cross_history_w_per_m2_k: history
-            .iter()
-            .map(|coefficient| coefficient.cross_w_per_m2_k)
-            .collect(),
-        inside_history_w_per_m2_k: history
-            .iter()
-            .map(|coefficient| coefficient.inside_w_per_m2_k)
-            .collect(),
-        flux_history: history
-            .iter()
-            .map(|coefficient| coefficient.flux.unwrap_or(0.0))
-            .collect(),
-        outside_temperature_history_c: vec![initial_temperature_c; history_terms],
-        inside_temperature_history_c: vec![initial_temperature_c; history_terms],
-        outside_flux_history_w_per_m2: vec![0.0; history_terms],
-        inside_flux_history_w_per_m2: vec![0.0; history_terms],
-    })
 }
 
 fn seed_initial_surface_ctf_boundary_histories(
