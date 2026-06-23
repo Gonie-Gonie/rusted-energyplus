@@ -423,7 +423,12 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
     assert!(summary["rust_runtime"].is_null());
     assert!(summary["oracle"].is_null());
     assert!(summary["comparison"].is_null());
-    assert!(!output_dir.join("results").join("result-store.json").exists());
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
     assert!(!output_dir.join("oracle").join("eplusout.eso").exists());
     assert!(
         !output_dir
@@ -461,17 +466,20 @@ fn diagnostic_allow_runs_partial_supported_projection() -> Result<(), Box<dyn st
     })?;
 
     assert_eq!(outcome.exit_code, RunExitCode::Success);
-    assert_eq!(outcome.support_status, SupportStatus::SupportedDiagnosticOnly);
-    assert_eq!(outcome.run_result_state, RunResultState::PartialSupportedRun);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedDiagnosticOnly
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::PartialSupportedRun
+    );
 
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(summary["status"], "success");
     assert_eq!(summary["config"]["mode"], "diagnostic");
     assert_eq!(summary["config"]["partial_policy"], "allow");
-    assert_eq!(
-        summary["support"]["status"],
-        "supported-diagnostic-only"
-    );
+    assert_eq!(summary["support"]["status"], "supported-diagnostic-only");
     assert_eq!(
         summary["support"]["run_result_state"],
         "partial_supported_run"
