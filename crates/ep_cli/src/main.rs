@@ -7289,6 +7289,9 @@ fn parse_heat_balance_zone_air_algorithm(
         "energyplus-heat-balance-compat-candidate" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate)
         }
+        "energyplus-source-order-1zone-opaque-compatibility" => Ok(
+            HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility,
+        ),
         "energyplus-analytical-probe" => Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe),
         "energyplus-analytical-surface-first-probe" => {
             Ok(HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe)
@@ -7632,6 +7635,9 @@ fn heat_balance_zone_air_algorithm_label(
         HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => "simplified-analytical",
         HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate => {
             "energyplus-heat-balance-compat-candidate"
+        }
+        HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility => {
+            "energyplus-source-order-1zone-opaque-compatibility"
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => "energyplus-analytical-probe",
         HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalSurfaceFirstProbe => {

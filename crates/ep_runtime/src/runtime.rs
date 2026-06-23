@@ -2063,6 +2063,7 @@ fn advance_heat_balance_state_one_timestep_internal(
     let use_energyplus_adaptive_system_timestep_zone_air_correction = matches!(
         requested_zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
     );
     let correct_zone_air_after_surface_pass = matches!(
         feature_zone_air_algorithm,
@@ -2352,6 +2353,9 @@ fn advance_heat_balance_state_one_timestep_internal(
                 zone.air_heat_capacity_j_per_k,
                 input.timestep_seconds,
             ),
+            HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility => {
+                previous_temperature_c
+            }
             HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate => {
                 previous_temperature_c
             }
@@ -2528,11 +2532,13 @@ fn advance_heat_balance_state_one_timestep_internal(
     let freeze_outside_balance_for_surface_iterations = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceFrozenOutsideProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
     );
     let freeze_inside_ctf_outside_temperature_for_surface_iterations = matches!(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
@@ -3794,7 +3800,8 @@ fn heat_balance_uses_surface_reference_air_surface_convection_report(
 ) -> bool {
     matches!(
         zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
+        HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe
     )
 }
@@ -3966,6 +3973,7 @@ fn zone_air_heat_balance_air_storage_rate_w(
                     * zone_state.mean_air_temperature_c
         }
         HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+        | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
         | HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe
@@ -4481,6 +4489,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     let reported_zone_temperature_c = if matches!(
                         options.zone_air_algorithm,
                         HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
                     ) {
                         zone_state.zone_timestep_average_air_temperature_c
                     } else {
@@ -4494,6 +4503,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                     let reported_zone_humidity_ratio = if matches!(
                         options.zone_air_algorithm,
                         HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
                     ) {
                         zone_state.zone_timestep_average_air_humidity_ratio
                     } else {
@@ -14138,7 +14148,7 @@ DATA PERIODS
 
         assert_eq!(
             report_algorithm,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe
+            HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
         );
         assert!(
             super::heat_balance_uses_surface_reference_air_surface_convection_report(

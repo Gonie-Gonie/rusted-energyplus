@@ -109,10 +109,11 @@ timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
 
 - `runtime.rs` still owns too much source-order, compatibility, and diagnostic
   behavior.
-- heat-balance compatibility and diagnostic selections now have separate typed
-  APIs and the diagnostic probe enum lives under `diagnostic_probes`, but
-  `HeatBalanceSimulationOptions` and the CLI still use the legacy
-  `HeatBalanceZoneAirAlgorithm` selector during the module split.
+- heat-balance compatibility and diagnostic selections have separate typed
+  APIs, the diagnostic probe enum lives under `diagnostic_probes`, and the
+  official 1Zone compatibility selector now resolves to an explicit
+  compatibility execution variant. The execution body itself is still inside
+  the legacy `runtime.rs` during the module split.
 - `ExecutionPlan` now records EnergyPlus heat-balance and IdealLoads
   source-order barriers, writes expected/actual source-order stage IDs to
   `execution-plan.json` and `run-summary.json`, and blocks runtime execution

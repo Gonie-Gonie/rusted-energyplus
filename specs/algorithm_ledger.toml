@@ -29,7 +29,7 @@ energyplus_source = [
   "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate",
+  "crates/ep_runtime/src/heat_balance/algorithm.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility",
   "scripts/compare/official-dynamic-heat-balance-compat-candidate.ps1",
 ]
 status = "conformance"

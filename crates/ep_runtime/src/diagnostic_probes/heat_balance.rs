@@ -29,7 +29,8 @@ macro_rules! diagnostic_heat_balance_probes {
             pub const fn diagnostic_probe(self) -> Option<DiagnosticHeatBalanceProbe> {
                 match self {
                     $(Self::$variant => Some(DiagnosticHeatBalanceProbe::$variant),)+
-                    Self::EnergyPlusHeatBalanceCompatCandidate => None,
+                    Self::EnergyPlusHeatBalanceCompatCandidate
+                    | Self::EnergyPlusSourceOrder1ZoneOpaqueCompatibility => None,
                 }
             }
 
@@ -37,7 +38,8 @@ macro_rules! diagnostic_heat_balance_probes {
             #[must_use]
             pub const fn selection(self) -> HeatBalanceZoneAirSelection {
                 match self {
-                    Self::EnergyPlusHeatBalanceCompatCandidate => {
+                    Self::EnergyPlusHeatBalanceCompatCandidate
+                    | Self::EnergyPlusSourceOrder1ZoneOpaqueCompatibility => {
                         HeatBalanceZoneAirSelection::Compatibility(
                             CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat,
                         )
