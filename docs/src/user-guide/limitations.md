@@ -40,4 +40,5 @@ boundaries. v0.31 adds the release evidence asset manifest. v0.32 adds the
 user coverage handbook. These reporting updates do not promote new numerical
 conformance.
 
-For the formal non-goals list, see `project-scope/non-goals.md`.
+For the current non-goals and claim boundary, see
+`current/project-contract.md` and `current/current-status.md`.

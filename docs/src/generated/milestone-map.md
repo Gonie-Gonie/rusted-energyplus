@@ -43,8 +43,8 @@ Milestones are maintained in `specs/milestones.toml`.
 
 ## Long-Term Targets
 
-| Version | Title | Claim level |
-|---|---|---|
-| 1.0 | Substantial Compatibility Draft | declared-subset |
-| 2.0 | EnergyPlus 26.1 Full Compatibility | full-compatibility-mode-with-evidence |
-| 3.0 | Fast Modernized Successor | mode-specific |
+| Version | Title | Claim level | Boundary | Evidence | Not claimed |
+|---|---|---|---|---|---|
+| 1.0 | Substantial Compatibility Draft | declared-subset | v1.0 is a declared subset, not a full EnergyPlus replacement. | locked EnergyPlus 26.1.0 oracle and source reference, Tier A conformance cases, Tier B diagnostic or baseline cases, object, variable, meter, and case coverage matrices, release-level conformance index, performance and stability reports, known gaps | v1.0 must not claim full EnergyPlus compatibility, all IDF or epJSON compatibility, all HVAC compatibility, all plant compatibility, autosizing compatibility unless explicitly declared |
+| 2.0 | EnergyPlus 26.1 Full Compatibility | full-compatibility-mode-with-evidence | Compatibility mode governs v2.0; deviations still need case, variable list, tolerance, report, gate, and known-gap entry. | major object-family coverage, major HVAC and plant system coverage, output, meter, SQL, and report coverage at declared scope, large official testfile and ExampleFiles dashboard, repeated-run stability, robust diagnostics | unreported deviations hidden behind structural changes |
+| 3.0 | Fast Modernized Successor | mode-specific | Fast-mode claims must not be mixed with compatibility-mode conformance claims. | compatibility mode remains available, mode-specific validation cases, speedup report, deviation or error-bound report, user-facing mode selection | compatibility-mode conformance from fast or experimental mode evidence |

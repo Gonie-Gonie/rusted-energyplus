@@ -17,10 +17,9 @@ v0.7 splits the blocking source-map gate into companion maps:
 
 - [Heat Balance Source Map](heat-balance-source-map.md)
 - [Output Variable Source Map](output-variable-source-map.md)
-- [Algorithm Porting Readiness](algorithm-porting-readiness.md)
 
-Those documents are required before v0.8 heat-balance algorithm work can be
-promoted toward conformance.
+Those maps plus `specs/algorithm_ledger.toml` are required before
+heat-balance algorithm work can be promoted toward conformance.
 
 ## Current Evidence
 

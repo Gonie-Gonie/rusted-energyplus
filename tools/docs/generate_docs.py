@@ -88,6 +88,9 @@ def milestone_map(repo_root: Path) -> str:
                 str(item.get("version", "")),
                 str(item.get("title", "")),
                 str(item.get("claim_level", "")),
+                str(item.get("compatibility_boundary", "")),
+                list_value(item.get("evidence", [])),
+                list_value(item.get("not_claimed", [])),
             ]
         )
 
@@ -100,7 +103,10 @@ def milestone_map(repo_root: Path) -> str:
             rows,
         )
         + "\n## Long-Term Targets\n\n"
-        + table(["Version", "Title", "Claim level"], targets)
+        + table(
+            ["Version", "Title", "Claim level", "Boundary", "Evidence", "Not claimed"],
+            targets,
+        )
     )
 
 

@@ -42,6 +42,21 @@ if (Test-Path -LiteralPath $archiveRoot) {
     throw "docs/src/archive is not retained. Move current material into current docs, specs, or ADRs."
 }
 
+$projectScopeRoot = Join-Path $DocsRoot "src\project-scope"
+if (Test-Path -LiteralPath $projectScopeRoot) {
+    throw "docs/src/project-scope is not retained. Move current material into current docs, specs, generated docs, or ADRs."
+}
+
+foreach ($relative in @(
+    "src\operations\full-compatibility-reset.md",
+    "src\porting-map\algorithm-porting-readiness.md"
+)) {
+    $path = Join-Path $DocsRoot $relative
+    if (Test-Path -LiteralPath $path) {
+        throw "Old planning/readiness documentation is not retained: $path"
+    }
+}
+
 $summaryPath = Join-Path $DocsRoot "src\SUMMARY.md"
 $summary = Get-Content -Raw -LiteralPath $summaryPath
 foreach ($forbidden in @("# Archive", "archive/")) {

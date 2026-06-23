@@ -1,3 +1,24 @@
+[series.historical_pre_alpha]
+name = "Historical Pre-Alpha Evidence Series"
+versions = [
+  "0.1",
+  "0.2",
+  "0.3",
+  "0.4",
+  "0.5",
+  "0.6",
+  "0.7",
+  "0.8",
+  "0.9",
+  "0.10",
+  "0.11",
+  "0.12",
+  "0.13",
+  "0.14",
+  "0.15",
+]
+boundary = "Historical entries are evidence artifacts, not compatibility maturity levels."
+
 [[milestone]]
 version = "0.1"
 title = "Model Intake"
@@ -534,13 +555,53 @@ not_claimed = [
 version = "1.0"
 title = "Substantial Compatibility Draft"
 claim_level = "declared-subset"
+evidence = [
+  "locked EnergyPlus 26.1.0 oracle and source reference",
+  "Tier A conformance cases",
+  "Tier B diagnostic or baseline cases",
+  "object, variable, meter, and case coverage matrices",
+  "release-level conformance index",
+  "performance and stability reports",
+  "known gaps",
+]
+not_claimed = [
+  "v1.0 must not claim full EnergyPlus compatibility",
+  "all IDF or epJSON compatibility",
+  "all HVAC compatibility",
+  "all plant compatibility",
+  "autosizing compatibility unless explicitly declared",
+]
+compatibility_boundary = "v1.0 is a declared subset, not a full EnergyPlus replacement."
 
 [[target]]
 version = "2.0"
 title = "EnergyPlus 26.1 Full Compatibility"
 claim_level = "full-compatibility-mode-with-evidence"
+evidence = [
+  "major object-family coverage",
+  "major HVAC and plant system coverage",
+  "output, meter, SQL, and report coverage at declared scope",
+  "large official testfile and ExampleFiles dashboard",
+  "repeated-run stability",
+  "robust diagnostics",
+]
+not_claimed = [
+  "unreported deviations hidden behind structural changes",
+]
+compatibility_boundary = "Compatibility mode governs v2.0; deviations still need case, variable list, tolerance, report, gate, and known-gap entry."
 
 [[target]]
 version = "3.0"
 title = "Fast Modernized Successor"
 claim_level = "mode-specific"
+evidence = [
+  "compatibility mode remains available",
+  "mode-specific validation cases",
+  "speedup report",
+  "deviation or error-bound report",
+  "user-facing mode selection",
+]
+not_claimed = [
+  "compatibility-mode conformance from fast or experimental mode evidence",
+]
+compatibility_boundary = "Fast-mode claims must not be mixed with compatibility-mode conformance claims."

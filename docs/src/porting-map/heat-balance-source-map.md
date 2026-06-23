@@ -1125,5 +1125,6 @@ blocking gates.
 
 No heat-balance algorithm change may be promoted as conformance work unless the
 changed behavior has a source-map entry in this document, an output-variable
-entry in `output-variable-source-map.md`, and a readiness note in
-`algorithm-porting-readiness.md`.
+entry in `output-variable-source-map.md`, an algorithm entry in
+`specs/algorithm_ledger.toml`, and the port-ticket fields required by
+`docs/src/current/project-contract.md`.
