@@ -179,9 +179,15 @@ claim_boundary = "Only declared IdealLoads outdoor-air/economizer/heat-recovery 
 
 [[unsupported_rule]]
 id = "unsupported_hvac_air_loop"
-object_patterns = ["AirLoopHVAC*", "Fan:*", "Coil:*", "Controller:*", "SetpointManager:*", "AirTerminal:*"]
+object_patterns = ["AirLoopHVAC*", "Fan:*", "Coil:*", "Controller:*", "SetpointManager:*", "AirTerminal:*", "OutdoorAir:*"]
 severity = "run_blocked"
 reason = "Broad HVAC air-loop semantics are not ported."
+
+[[unsupported_rule]]
+id = "unsupported_hvac_zone_equipment"
+object_patterns = ["ZoneHVAC:*"]
+severity = "run_blocked"
+reason = "Broad ZoneHVAC equipment semantics outside declared IdealLoads branches are not ported."
 
 [[unsupported_rule]]
 id = "unsupported_plant"
@@ -195,6 +201,18 @@ object_patterns = ["EnergyManagementSystem:*", "PythonPlugin:*", "AirflowNetwork
 severity = "run_blocked"
 reason = "Runtime-modifying plugin/network features are not ported."
 
+[[unsupported_rule]]
+id = "unsupported_sizing"
+object_patterns = ["Sizing:*", "ZoneSizing*"]
+severity = "run_blocked"
+reason = "Sizing workflows are not ported."
+
+[[unsupported_rule]]
+id = "unsupported_surface_boundary"
+object_patterns = ["FenestrationSurface:*", "Window*", "Daylighting:*", "Shading:*", "Site:Ground*"]
+severity = "run_blocked"
+reason = "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+
 [[partial_rule]]
 id = "ignored_reporting_objects"
 object_patterns = ["Output:*", "OutputControl:*"]
@@ -203,7 +221,7 @@ reason = "Reporting requests can be exported or reported unsupported without cha
 
 [[partial_rule]]
 id = "inactive_or_unused_raw_objects"
-object_patterns = ["SimulationControl", "SizingPeriod:DesignDay", "GlobalGeometryRules", "ShadowCalculation"]
+object_patterns = ["SimulationControl", "SizingPeriod:DesignDay", "GlobalGeometryRules", "HeatBalanceAlgorithm", "ShadowCalculation", "Exterior:Lights"]
 eligible_state = "partial_supported_run"
 reason = "Preserved for diagnostics or staging when inactive for the current runtime subset."
 

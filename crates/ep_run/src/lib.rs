@@ -11,6 +11,7 @@ mod oracle;
 mod outputs;
 mod pipeline;
 mod support;
+mod support_registry;
 
 pub use config::*;
 pub use diagnostics::*;
