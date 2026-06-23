@@ -89,14 +89,17 @@ classes, explicit partial-run policy, and golden artifact/exit-code tests.
 
 ## Current Launcher State
 
-The current Windows launcher script exists and invokes `eplus-rs run` as a CLI
-process. It can choose input, weather, output folder, oracle folder, compare
-toggle, overwrite behavior, and report links.
+The current Windows launcher script invokes `eplus-rs run` as a CLI process. It
+can choose input, weather, output folder, oracle folder, and CLI binary; map
+mode, partial policy, output format, trace level, strict warning failure,
+oracle baseline, oracle compare, and overwrite controls to CLI arguments; show
+the three run-result states; display exit-code-aware status details, stage
+timing, top diagnostics, and the `conformance_claim=false` boundary; and open
+output, run report, support report, and compare report artifacts.
 
-It is not yet complete against the target launcher contract. Remaining
-hardening includes mode selection, partial-run policy controls, three-state
-status display, exit-code-specific messages, diagnostics/support report tabs,
-and no-silent-oracle-fallback tests.
+The launcher self-test covers command construction for diagnostic, oracle
+baseline, and oracle compare runs; the three run-state presentations; phase
+timing formatting; and wrapper invocation through `scripts/dev.cmd launch-ui`.
 
 ## Current Known Blockers
 

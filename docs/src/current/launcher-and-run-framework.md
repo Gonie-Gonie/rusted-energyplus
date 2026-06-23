@@ -72,15 +72,15 @@ Oracle and compare artifacts are written only when their options are enabled.
 
 ## Launcher
 
-The launcher is a thin UI over the CLI. The current script already invokes
-`eplus-rs run`, lets the user select input/weather/output/oracle paths, toggles
-oracle compare, toggles overwrite, and opens output/report artifacts.
+The Windows launcher is a thin UI over the CLI. The script invokes
+`eplus-rs run` as a child process and keeps simulation behavior in `ep_run`.
+It lets the user select input, weather, output, oracle, and CLI paths, then maps
+mode, partial policy, output format, trace level, strict warning failure,
+oracle baseline, oracle compare, and overwrite controls directly to CLI
+arguments.
 
-The target launcher should also collect mode, partial policy, oracle baseline,
-trace level, and strict-output policy, then map those controls directly to
-`RunConfig`.
-
-The launcher must display stage progress, final run state, top diagnostics,
-claim boundary, timing summary, and artifact links. It must not place
-simulation logic in the GUI, silently fall back to oracle, or hide that the
-project is not a drop-in EnergyPlus replacement.
+The launcher displays the final run state, claim boundary, stage timing
+summary from `run-summary.json`, top diagnostics from `diagnostics.json`, and
+artifact links for the output folder, run report, support report, and compare
+report. Oracle compare enables oracle baseline explicitly; the GUI does not
+silently fall back to oracle or contain independent simulation logic.
