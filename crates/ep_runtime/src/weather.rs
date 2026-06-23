@@ -1,5 +1,6 @@
 //! EPW weather parsing helpers.
 
+use crate::psychrometrics::energyplus_psychrometric_humidity_ratio_from_rh;
 use ep_model::FirstHourInterpolationStartingValues;
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -325,6 +326,228 @@ pub(crate) fn energyplus_weather_atmospheric_pressure_at_timestep_with_starting_
         first_hour_interpolation_starting_values,
         |record| record.atmospheric_pressure_pa,
     )
+}
+
+pub(crate) fn weather_context_outdoor_humidity_ratio(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_dry_bulb_c: f64,
+) -> Option<f64> {
+    let record = context.records.get(context.record_index)?;
+    let dry_bulb_c = context
+        .zone_timestep
+        .map(|timestep| {
+            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                Some(context.records),
+                context.record_index,
+                fallback_dry_bulb_c,
+                context.zone_steps_per_hour,
+                timestep,
+                context.first_hour_interpolation_starting_values,
+            )
+        })
+        .unwrap_or(fallback_dry_bulb_c);
+    let relative_humidity_percent =
+        energyplus_weather_relative_humidity_for_context(context, record.relative_humidity_percent);
+    let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
+        context,
+        record.atmospheric_pressure_pa,
+    );
+
+    energyplus_psychrometric_humidity_ratio_from_rh(
+        dry_bulb_c,
+        (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
+        atmospheric_pressure_pa,
+    )
+}
+
+pub(crate) fn energyplus_weather_horizontal_infrared_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_horizontal_infrared_w_per_m2;
+    };
+
+    energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+        context.records,
+        context.record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        context.zone_steps_per_hour,
+        timestep,
+        context.first_hour_interpolation_starting_values,
+    )
+}
+
+#[cfg(test)]
+pub(crate) fn energyplus_weather_horizontal_infrared_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+pub(crate) fn energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_horizontal_infrared_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_horizontal_infrared_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.horizontal_infrared_radiation_wh_per_m2,
+    )
+}
+
+pub(crate) fn energyplus_weather_wind_speed_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_wind_speed_m_per_s: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_wind_speed_m_per_s;
+    };
+
+    energyplus_weather_wind_speed_at_timestep_with_starting_values(
+        context.records,
+        context.record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        context.zone_steps_per_hour,
+        timestep,
+        context.first_hour_interpolation_starting_values,
+    )
+}
+
+#[cfg(test)]
+pub(crate) fn energyplus_weather_wind_speed_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_speed_m_per_s: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    energyplus_weather_wind_speed_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+pub(crate) fn energyplus_weather_wind_speed_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_speed_m_per_s: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_wind_speed_m_per_s,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.wind_speed_m_per_s,
+    )
+}
+
+pub(crate) fn energyplus_weather_wind_direction_for_context(
+    context: HeatBalanceWeatherContext<'_>,
+    fallback_hourly_wind_direction_deg: f64,
+) -> f64 {
+    let Some(timestep) = context.zone_timestep else {
+        return fallback_hourly_wind_direction_deg;
+    };
+
+    energyplus_weather_wind_direction_at_timestep_with_starting_values(
+        context.records,
+        context.record_index,
+        fallback_hourly_wind_direction_deg,
+        context.zone_steps_per_hour,
+        timestep,
+        context.first_hour_interpolation_starting_values,
+    )
+}
+
+#[cfg(test)]
+pub(crate) fn energyplus_weather_wind_direction_at_timestep(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_direction_deg: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+) -> f64 {
+    energyplus_weather_wind_direction_at_timestep_with_starting_values(
+        records,
+        record_index,
+        fallback_hourly_wind_direction_deg,
+        zone_steps_per_hour,
+        zone_timestep,
+        FirstHourInterpolationStartingValues::Hour24,
+    )
+}
+
+pub(crate) fn energyplus_weather_wind_direction_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_wind_direction_deg: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    let Some(record) = records.get(record_index) else {
+        return fallback_hourly_wind_direction_deg;
+    };
+    let previous = previous_weather_record_with_first_hour_starting_values(
+        records,
+        record_index,
+        first_hour_interpolation_starting_values,
+    );
+    let interpolation_weight =
+        energyplus_weather_interpolation_weight(zone_steps_per_hour, zone_timestep);
+
+    energyplus_interpolate_wind_direction_deg(
+        previous.wind_direction_deg,
+        record.wind_direction_deg,
+        interpolation_weight,
+    )
+}
+
+fn energyplus_interpolate_wind_direction_deg(
+    previous_wind_direction_deg: f64,
+    current_wind_direction_deg: f64,
+    current_hour_weight: f64,
+) -> f64 {
+    let mut current = current_wind_direction_deg;
+    let mut previous = previous_wind_direction_deg;
+    if (current - previous).abs() > 180.0 {
+        if current > previous {
+            previous += 360.0;
+        } else {
+            current += 360.0;
+        }
+    }
+
+    (previous + (current - previous) * current_hour_weight).rem_euclid(360.0)
 }
 
 pub(crate) fn energyplus_weather_interpolation_weight(
