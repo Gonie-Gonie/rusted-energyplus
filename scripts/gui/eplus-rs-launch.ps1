@@ -300,6 +300,7 @@ function New-LauncherRunArguments {
 function Get-RunResultPresentation {
     param([object]$Summary)
     $status = Get-ObjectPropertyValue -Object $Summary -Name "status" -Default "unknown"
+    $exitCode = Get-ObjectPropertyValue -Object $Summary -Name "exit_code" -Default "unknown"
     $oracleStatus = Get-ObjectPropertyValue -Object $Summary -Name "oracle_status" -Default "not-run"
     $compareStatus = Get-ObjectPropertyValue -Object $Summary -Name "compare_status" -Default "not-run"
     $runState = Get-SummarySupportValue -Summary $Summary -Name "run_result_state" -Default "unknown"
@@ -334,7 +335,7 @@ function Get-RunResultPresentation {
         state_id = $runState
         title = $title
         color = $color
-        detail = "status=$status; support=$supportStatus; runtime=$runtimeClass; oracle=$oracleStatus; compare=$compareStatus; capabilities=$capabilityText; conformance_claim=false"
+        detail = "status=$status; exit_code=$exitCode; support=$supportStatus; runtime=$runtimeClass; oracle=$oracleStatus; compare=$compareStatus; capabilities=$capabilityText; conformance_claim=false"
     }
 }
 
@@ -485,6 +486,7 @@ if ($SelfTest) {
                 matched_capability_ids = @()
             }
             status = "unsupported"
+            exit_code = 4
             oracle_status = "not-requested"
             compare_status = "not-requested"
         },
@@ -492,10 +494,11 @@ if ($SelfTest) {
             support = [pscustomobject]@{
                 run_result_state = "partial_supported_run"
                 status = "supported-diagnostic-only"
-                runtime_class = "ideal-loads-no-oa-sensible-diagnostic-projection"
+                runtime_class = "ideal-loads-node-state-projection"
                 matched_capability_ids = @("ideal_loads_no_oa_sensible")
             }
             status = "success"
+            exit_code = 0
             oracle_status = "not-requested"
             compare_status = "not-requested"
         },
@@ -507,6 +510,7 @@ if ($SelfTest) {
                 matched_capability_ids = @("official_1zone_uncontrolled_declared_heat_balance")
             }
             status = "success"
+            exit_code = 0
             oracle_status = "generated"
             compare_status = "not-requested"
         },
@@ -518,6 +522,7 @@ if ($SelfTest) {
                 matched_capability_ids = @()
             }
             status = "unsupported"
+            exit_code = 4
             oracle_status = "generated"
             compare_status = "skipped-rust-unsupported-or-oracle-missing"
         }
@@ -536,6 +541,11 @@ if ($SelfTest) {
         })
     if ($blockedOraclePresentation.Count -ne 1) {
         throw "launcher self-test missed blocked run oracle/compare presentation"
+    }
+    foreach ($presentation in $presentations) {
+        if ($presentation.detail -notmatch "exit_code=") {
+            throw "launcher self-test missed exit code presentation for $($presentation.state_id)"
+        }
     }
     $phaseLine = Format-PhaseTimingLine -Phase ([pscustomobject]@{
             name = "support_assessment"
