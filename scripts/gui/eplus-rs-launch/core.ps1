@@ -417,4 +417,3 @@ function Save-LauncherSettings {
         overwrite = $script:Overwrite
     } | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 -LiteralPath $Path
 }
-
