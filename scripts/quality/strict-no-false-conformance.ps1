@@ -8,176 +8,7 @@ $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
 $RepoRoot = Get-RepoRoot
 Set-Location $RepoRoot
-
-function Assert-DoesNotContain {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Pattern,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for false-conformance guard: $Path"
-    }
-
-    $match = Select-String -LiteralPath $Path -SimpleMatch -Pattern $Pattern -ErrorAction SilentlyContinue
-    if ($null -ne $match) {
-        $match | ForEach-Object { Write-Host "$($_.Path):$($_.LineNumber): $($_.Line)" }
-        throw "Forbidden false-conformance wording found for $Description`: $Pattern"
-    }
-    Write-Host "OK no false-conformance wording for $Description"
-}
-
-function Assert-Contains {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Pattern,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for false-conformance guard: $Path"
-    }
-
-    $match = Select-String -LiteralPath $Path -SimpleMatch -Pattern $Pattern -ErrorAction SilentlyContinue
-    if ($null -eq $match) {
-        throw "Missing required compatibility boundary for $Description`: $Pattern"
-    }
-    Write-Host "OK compatibility boundary for $Description`: $Pattern"
-}
-
-function Assert-PathMissing {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (Test-Path -LiteralPath $Path) {
-        throw "Forbidden retained documentation path for $Description`: $Path"
-    }
-    Write-Host "OK retained path absent for $Description`: $Path"
-}
-
-function Assert-CaseOutputLevel {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Key,
-        [Parameter(Mandatory = $true)][string]$Variable,
-        [Parameter(Mandatory = $true)][string]$Level,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for case output guard: $Path"
-    }
-
-    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $outputBlockPattern = '(?ms)^\[\[outputs\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
-    $blocks = [regex]::Matches($text, $outputBlockPattern)
-    $keyPattern = '(?m)^key\s*=\s*"' + [regex]::Escape($Key) + '"\s*$'
-    $variablePattern = '(?m)^variable\s*=\s*"' + [regex]::Escape($Variable) + '"\s*$'
-    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
-
-    foreach ($block in $blocks) {
-        $body = $block.Groups[1].Value
-        if ($body -match $keyPattern -and $body -match $variablePattern -and $body -match $levelPattern) {
-            Write-Host "OK output level for $Description`: $Key / $Variable = $Level"
-            return
-        }
-    }
-
-    throw "Missing required output level for $Description`: key=$Key variable=$Variable level=$Level"
-}
-
-function Assert-CaseMeterLevel {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Name,
-        [Parameter(Mandatory = $true)][string]$Level,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for case meter guard: $Path"
-    }
-
-    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $meterBlockPattern = '(?ms)^\[\[meters\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
-    $blocks = [regex]::Matches($text, $meterBlockPattern)
-    $namePattern = '(?m)^name\s*=\s*"' + [regex]::Escape($Name) + '"\s*$'
-    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
-
-    foreach ($block in $blocks) {
-        $body = $block.Groups[1].Value
-        if ($body -match $namePattern -and $body -match $levelPattern) {
-            Write-Host "OK meter level for $Description`: $Name = $Level"
-            return
-        }
-    }
-
-    throw "Missing required meter level for $Description`: name=$Name level=$Level"
-}
-
-function Assert-CaseMeterLevelFrequency {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Name,
-        [Parameter(Mandatory = $true)][string]$Frequency,
-        [Parameter(Mandatory = $true)][string]$Level,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for case meter guard: $Path"
-    }
-
-    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $meterBlockPattern = '(?ms)^\[\[meters\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
-    $blocks = [regex]::Matches($text, $meterBlockPattern)
-    $namePattern = '(?m)^name\s*=\s*"' + [regex]::Escape($Name) + '"\s*$'
-    $frequencyPattern = '(?m)^frequency\s*=\s*"' + [regex]::Escape($Frequency) + '"\s*$'
-    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
-
-    foreach ($block in $blocks) {
-        $body = $block.Groups[1].Value
-        if ($body -match $namePattern -and $body -match $frequencyPattern -and $body -match $levelPattern) {
-            Write-Host "OK meter level for $Description`: $Name / $Frequency = $Level"
-            return
-        }
-    }
-
-    throw "Missing required meter level for $Description`: name=$Name frequency=$Frequency level=$Level"
-}
-
-function Assert-CaseMeterLevelFrequencyAbsent {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Name,
-        [Parameter(Mandatory = $true)][string]$Frequency,
-        [Parameter(Mandatory = $true)][string]$Level,
-        [Parameter(Mandatory = $true)][string]$Description
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing file for case meter guard: $Path"
-    }
-
-    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $meterBlockPattern = '(?ms)^\[\[meters\]\]\s*(.*?)(?=^\[\[|\n\[|\z)'
-    $blocks = [regex]::Matches($text, $meterBlockPattern)
-    $namePattern = '(?m)^name\s*=\s*"' + [regex]::Escape($Name) + '"\s*$'
-    $frequencyPattern = '(?m)^frequency\s*=\s*"' + [regex]::Escape($Frequency) + '"\s*$'
-    $levelPattern = '(?m)^level\s*=\s*"' + [regex]::Escape($Level) + '"\s*$'
-
-    foreach ($block in $blocks) {
-        $body = $block.Groups[1].Value
-        if ($body -match $namePattern -and $body -match $frequencyPattern -and $body -match $levelPattern) {
-            throw "Forbidden meter level for $Description`: name=$Name frequency=$Frequency level=$Level"
-        }
-    }
-
-    Write-Host "OK forbidden meter level absent for $Description`: $Name / $Frequency != $Level"
-}
+. (Join-Path $PSScriptRoot "strict-no-false-conformance\assertions.ps1")
 
 Assert-DoesNotContain -Path "README.md" -Pattern "first runtime path for an uncontrolled one-zone building subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "ResultStore output from the first uncontrolled one-zone simulation subset" -Description "README scope"
@@ -818,20 +649,20 @@ Assert-Contains -Path "crates\ep_cli\src\time_weather_schedule.rs" -Pattern "max
 Assert-Contains -Path "tools\reporting\conformance_evidence_report.py" -Pattern "compare-schedule-conformance" -Description "v0.22 evidence schedule gate"
 Assert-Contains -Path "tools\reporting\conformance_evidence_report.py" -Pattern "compare-weather-conformance" -Description "v0.22 evidence weather gate"
 Assert-Contains -Path "crates\ep_cli\src\static_model.rs" -Pattern "static EIO model evidence only" -Description "v0.23 static report claim boundary"
-Assert-Contains -Path "crates\ep_cli\src\static_model.rs" -Pattern "surface_details_injected" -Description "v0.23 static surface detail marker"
-Assert-Contains -Path "crates\ep_cli\src\conformance_artifacts.rs" -Pattern "Output:Surfaces:List,Details" -Description "v0.23 static surface detail injection"
+Assert-Contains -Path "crates\ep_cli\src\static_model\render.rs" -Pattern "surface_details_injected" -Description "v0.23 static surface detail marker"
+Assert-Contains -Path "crates\ep_cli\src\conformance_artifacts\output_injection.rs" -Pattern "Output:Surfaces:List,Details" -Description "v0.23 static surface detail injection"
 Assert-Contains -Path "crates\ep_runtime\src\output.rs" -Pattern "RuntimeOutputRegistry" -Description "v0.24 runtime output registry"
-Assert-Contains -Path "crates\ep_runtime\src\output.rs" -Pattern "RuntimeMeterRegistry" -Description "v0.24 runtime meter registry"
+Assert-Contains -Path "crates\ep_runtime\src\output\meter_registry.rs" -Pattern "RuntimeMeterRegistry" -Description "v0.24 runtime meter registry"
 Assert-Contains -Path "crates\ep_runtime\src\output.rs" -Pattern "OutputVariableUnavailable" -Description "v0.24 unavailable output diagnostic"
-Assert-Contains -Path "crates\ep_runtime\src\output.rs" -Pattern "MeterUnavailable" -Description "v0.24 unavailable meter diagnostic"
-Assert-Contains -Path "crates\ep_runtime\src\output.rs" -Pattern "ResultStoreProfile" -Description "v0.24 result profile scaffold"
+Assert-Contains -Path "crates\ep_runtime\src\output\meter_registry.rs" -Pattern "MeterUnavailable" -Description "v0.24 unavailable meter diagnostic"
+Assert-Contains -Path "crates\ep_runtime\src\output\result_store.rs" -Pattern "ResultStoreProfile" -Description "v0.24 result profile scaffold"
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "RuntimeOutputRegistry::from_model" -Description "v0.24 execution-plan output registry"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "outside_boundary_target_surface_id" -Description "v0.25 interzone surface target state"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "surface_boundary_temperature_c" -Description "v0.25 boundary temperature resolver"
-Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "MissingSurfaceBoundaryTarget" -Description "v0.25 missing surface target diagnostic"
+Assert-Contains -Path "crates\ep_runtime\src\heat_balance\state.rs" -Pattern "outside_boundary_target_surface_id" -Description "v0.25 interzone surface target state"
+Assert-Contains -Path "crates\ep_runtime\src\heat_balance\surface_boundary.rs" -Pattern "surface_boundary_temperature_c" -Description "v0.25 boundary temperature resolver"
+Assert-Contains -Path "crates\ep_runtime\src\error.rs" -Pattern "MissingSurfaceBoundaryTarget" -Description "v0.25 missing surface target diagnostic"
 Assert-Contains -Path "crates\ep_runtime\src\runtime.rs" -Pattern "heat_balance_adiabatic_surfaces_do_not_create_artificial_losses" -Description "v0.25 adiabatic boundary test"
-Assert-Contains -Path "crates\ep_cli\src\internal_gains.rs" -Pattern "Internal Gains Conformance Report" -Description "v0.26 internal-gains report"
-Assert-Contains -Path "crates\ep_cli\src\internal_gains.rs" -Pattern "claim_boundary" -Description "v0.26 internal-gains report claim boundary"
+Assert-Contains -Path "crates\ep_cli\src\internal_gains\render.rs" -Pattern "Internal Gains Conformance Report" -Description "v0.26 internal-gains report"
+Assert-Contains -Path "crates\ep_cli\src\internal_gains\render.rs" -Pattern "claim_boundary" -Description "v0.26 internal-gains report claim boundary"
 Assert-Contains -Path "tools\reporting\support_coverage_report.py" -Pattern "It is not a full EnergyPlus compatibility claim." -Description "v0.27 support coverage claim boundary"
 Assert-Contains -Path "tools\reporting\support_coverage_report.py" -Pattern "Supported Inputs" -Description "v0.27 support coverage inputs"
 Assert-Contains -Path "tools\reporting\support_coverage_report.py" -Pattern "Supported Outputs" -Description "v0.27 support coverage outputs"
