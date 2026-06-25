@@ -1,9 +1,16 @@
 //! Runtime output, meter, diagnostic, and result-store primitives.
 
+mod diagnostics;
+mod meter_registry;
+mod result_store;
+
+pub use diagnostics::*;
 use ep_model::{
     BranchListId, NormalizedName, OutputHandle, OutsideBoundaryCondition, PlantBranchComponent,
     ScheduleId, SimulationModel, SunExposure, TypedModel,
 };
+pub use meter_registry::*;
+pub use result_store::*;
 use std::collections::BTreeSet;
 
 use crate::ideal_loads::{
@@ -116,135 +123,6 @@ impl RuntimeMeterRequest {
     fn identity(&self) -> MeterIdentity {
         MeterIdentity::new(&self.name, self.frequency)
     }
-}
-
-/// One output series stored by the runtime.
-#[derive(Clone, Debug, PartialEq)]
-pub struct OutputSeries {
-    /// Stable output handle for the current run.
-    pub handle: OutputHandle,
-    /// EnergyPlus-style output key.
-    pub key: String,
-    /// Output variable name.
-    pub variable_name: String,
-    /// Display units.
-    pub units: String,
-    /// Sampled output values.
-    pub values: Vec<f64>,
-}
-
-/// Structured output store for runtime-native results.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct ResultStore {
-    /// Output series in handle order.
-    pub series: Vec<OutputSeries>,
-}
-
-impl ResultStore {
-    /// Creates an empty result store.
-    #[must_use]
-    pub fn new() -> Self {
-        Self { series: Vec::new() }
-    }
-
-    /// Adds a complete output series.
-    pub fn add_series(&mut self, series: OutputSeries) {
-        self.series.push(series);
-    }
-
-    /// Returns the maximum sample count across all output series.
-    #[must_use]
-    pub fn sample_count(&self) -> usize {
-        self.series
-            .iter()
-            .map(|series| series.values.len())
-            .max()
-            .unwrap_or(0)
-    }
-
-    /// Finds one output series by EnergyPlus-style key and variable name.
-    #[must_use]
-    pub fn find_series(&self, key: &str, variable_name: &str) -> Option<&OutputSeries> {
-        self.series.iter().find(|series| {
-            series.key.eq_ignore_ascii_case(key)
-                && series.variable_name.eq_ignore_ascii_case(variable_name)
-        })
-    }
-
-    /// Finds one output series by runtime output handle.
-    #[must_use]
-    pub fn find_handle(&self, handle: OutputHandle) -> Option<&OutputSeries> {
-        self.series.iter().find(|series| series.handle == handle)
-    }
-
-    /// Returns result-store diagnostics for duplicate handles or identities.
-    #[must_use]
-    pub fn diagnostics(&self) -> RuntimeDiagnosticStore {
-        let mut diagnostics = RuntimeDiagnosticStore::new();
-        let mut handles = BTreeSet::new();
-        let mut identities = BTreeSet::new();
-
-        for series in &self.series {
-            if !handles.insert(series.handle.0) {
-                diagnostics.push(RuntimeDiagnostic {
-                    severity: RuntimeDiagnosticSeverity::Error,
-                    code: RuntimeDiagnosticCode::DuplicateOutputHandle,
-                    message: format!("duplicate runtime output handle {}", series.handle.0),
-                    key: Some(series.key.clone()),
-                    variable_name: Some(series.variable_name.clone()),
-                    meter_name: None,
-                    handle: Some(series.handle),
-                });
-            }
-
-            let identity = OutputIdentity::new(
-                &series.key,
-                &series.variable_name,
-                RuntimeOutputFrequency::Hourly,
-            );
-            if !identities.insert(identity) {
-                diagnostics.push(RuntimeDiagnostic {
-                    severity: RuntimeDiagnosticSeverity::Error,
-                    code: RuntimeDiagnosticCode::DuplicateOutputSeries,
-                    message: format!(
-                        "duplicate runtime output series {} / {}",
-                        series.key, series.variable_name
-                    ),
-                    key: Some(series.key.clone()),
-                    variable_name: Some(series.variable_name.clone()),
-                    meter_name: None,
-                    handle: Some(series.handle),
-                });
-            }
-        }
-
-        diagnostics
-    }
-
-    /// Returns a compact profile snapshot for reports and release evidence.
-    #[must_use]
-    pub fn profile(&self) -> ResultStoreProfile {
-        ResultStoreProfile {
-            series_count: self.series.len(),
-            sample_count: self.sample_count(),
-            empty_series_count: self
-                .series
-                .iter()
-                .filter(|series| series.values.is_empty())
-                .count(),
-        }
-    }
-}
-
-/// Compact result-store profile.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct ResultStoreProfile {
-    /// Number of output series.
-    pub series_count: usize,
-    /// Maximum sample count across series.
-    pub sample_count: usize,
-    /// Number of output series without samples.
-    pub empty_series_count: usize,
 }
 
 /// One output variable the runtime knows how to produce.
@@ -692,125 +570,6 @@ impl RuntimeOutputRegistry {
     }
 }
 
-/// Runtime meter registry.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
-pub struct RuntimeMeterRegistry {
-    meters: Vec<RuntimeMeterDefinition>,
-}
-
-impl RuntimeMeterRegistry {
-    /// Creates an empty meter registry.
-    #[must_use]
-    pub fn new() -> Self {
-        Self { meters: Vec::new() }
-    }
-
-    /// Returns meter definitions in handle order.
-    #[must_use]
-    pub fn meters(&self) -> &[RuntimeMeterDefinition] {
-        &self.meters
-    }
-
-    /// Returns the number of registered meters.
-    #[must_use]
-    pub fn len(&self) -> usize {
-        self.meters.len()
-    }
-
-    /// Returns true when the registry contains no meters.
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.meters.is_empty()
-    }
-
-    fn push_meter(
-        &mut self,
-        name: &str,
-        units: &str,
-        frequency: RuntimeOutputFrequency,
-        source: RuntimeOutputSource,
-    ) {
-        let identity = MeterIdentity::new(name, frequency);
-        if self
-            .meters
-            .iter()
-            .any(|definition| definition.identity() == identity)
-        {
-            return;
-        }
-
-        self.meters.push(RuntimeMeterDefinition {
-            handle: OutputHandle(self.meters.len() as u32),
-            name: name.to_string(),
-            units: units.to_string(),
-            frequency,
-            source,
-        });
-    }
-
-    /// Resolves meter requests. v0.24 intentionally records unsupported meters
-    /// as diagnostics rather than silently creating empty series.
-    #[must_use]
-    pub fn resolve_meter_requests(
-        &self,
-        requests: &[RuntimeMeterRequest],
-    ) -> RuntimeMeterResolution {
-        let mut seen = BTreeSet::new();
-        let mut resolved = Vec::new();
-        let mut diagnostics = RuntimeDiagnosticStore::new();
-
-        for request in requests {
-            let identity = request.identity();
-            if !seen.insert(identity) {
-                diagnostics.push(RuntimeDiagnostic {
-                    severity: RuntimeDiagnosticSeverity::Error,
-                    code: RuntimeDiagnosticCode::DuplicateMeterRequest,
-                    message: format!(
-                        "duplicate runtime meter request {} ({})",
-                        request.name,
-                        request.frequency.id()
-                    ),
-                    key: None,
-                    variable_name: None,
-                    meter_name: Some(request.name.clone()),
-                    handle: None,
-                });
-                continue;
-            }
-
-            if let Some(definition) = self
-                .meters
-                .iter()
-                .find(|definition| definition.identity() == request.identity())
-            {
-                resolved.push(RuntimeResolvedMeter {
-                    request: request.clone(),
-                    definition: definition.clone(),
-                });
-            } else {
-                diagnostics.push(RuntimeDiagnostic {
-                    severity: RuntimeDiagnosticSeverity::Error,
-                    code: RuntimeDiagnosticCode::MeterUnavailable,
-                    message: format!(
-                        "runtime meter unavailable: {} ({})",
-                        request.name,
-                        request.frequency.id()
-                    ),
-                    key: None,
-                    variable_name: None,
-                    meter_name: Some(request.name.clone()),
-                    handle: None,
-                });
-            }
-        }
-
-        RuntimeMeterResolution {
-            resolved,
-            diagnostics,
-        }
-    }
-}
-
 /// Resolved output request.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RuntimeResolvedOutput {
@@ -845,95 +604,6 @@ pub struct RuntimeMeterResolution {
     pub resolved: Vec<RuntimeResolvedMeter>,
     /// Resolution diagnostics.
     pub diagnostics: RuntimeDiagnosticStore,
-}
-
-/// Runtime diagnostic severity.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum RuntimeDiagnosticSeverity {
-    /// Informational note.
-    Info,
-    /// Warning that does not block execution.
-    Warning,
-    /// Error that should block the requested output path.
-    Error,
-}
-
-/// Runtime diagnostic code.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum RuntimeDiagnosticCode {
-    /// Requested output variable is not registered for the current model.
-    OutputVariableUnavailable,
-    /// Requested meter is not registered for the current model.
-    MeterUnavailable,
-    /// Duplicate output request.
-    DuplicateOutputRequest,
-    /// Duplicate meter request.
-    DuplicateMeterRequest,
-    /// Duplicate output handle in a result store.
-    DuplicateOutputHandle,
-    /// Duplicate output key/variable identity in a result store.
-    DuplicateOutputSeries,
-}
-
-/// One runtime diagnostic.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct RuntimeDiagnostic {
-    /// Severity.
-    pub severity: RuntimeDiagnosticSeverity,
-    /// Stable diagnostic code.
-    pub code: RuntimeDiagnosticCode,
-    /// Human-readable message.
-    pub message: String,
-    /// Output key, when applicable.
-    pub key: Option<String>,
-    /// Output variable name, when applicable.
-    pub variable_name: Option<String>,
-    /// Meter name, when applicable.
-    pub meter_name: Option<String>,
-    /// Output handle, when applicable.
-    pub handle: Option<OutputHandle>,
-}
-
-/// Runtime diagnostic collection.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
-pub struct RuntimeDiagnosticStore {
-    /// Stored diagnostics in encounter order.
-    pub diagnostics: Vec<RuntimeDiagnostic>,
-}
-
-impl RuntimeDiagnosticStore {
-    /// Creates an empty diagnostic store.
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            diagnostics: Vec::new(),
-        }
-    }
-
-    /// Adds one diagnostic.
-    pub fn push(&mut self, diagnostic: RuntimeDiagnostic) {
-        self.diagnostics.push(diagnostic);
-    }
-
-    /// Returns true when any error-level diagnostic is present.
-    #[must_use]
-    pub fn has_errors(&self) -> bool {
-        self.diagnostics
-            .iter()
-            .any(|diagnostic| diagnostic.severity == RuntimeDiagnosticSeverity::Error)
-    }
-
-    /// Returns the number of stored diagnostics.
-    #[must_use]
-    pub fn len(&self) -> usize {
-        self.diagnostics.len()
-    }
-
-    /// Returns true when no diagnostics are stored.
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.diagnostics.is_empty()
-    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
