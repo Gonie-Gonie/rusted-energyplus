@@ -385,7 +385,7 @@ pub fn assess_support(
         &mut unsupported_objects,
         &mut diagnostics,
     );
-    let (status, runtime_class, matched_capability_ids, missing_capability_ids) =
+    let (mut status, runtime_class, matched_capability_ids, missing_capability_ids) =
         if diagnostics.has_errors() || typed_model.is_none() {
             (
                 SupportStatus::Unsupported,
@@ -405,6 +405,14 @@ pub fn assess_support(
             ),
         );
     }
+    if status == SupportStatus::SupportedCompatibility
+        && !ignored_raw_only_objects.is_empty()
+        && mode == RunMode::Diagnostic
+        && partial_policy.allows_partial()
+    {
+        status = SupportStatus::SupportedDiagnosticOnly;
+    }
+
     let matched_capabilities =
         matched_capabilities(&matched_capability_ids, &capability_registry.spec);
     let run_result_state = RunResultState::from_support_status(status, mode, partial_policy);

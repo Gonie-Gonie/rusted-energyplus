@@ -45,18 +45,18 @@ Exit codes follow the arbitrary-run contract: `0` success, `1` arguments,
 
 The initial Rust runtime boundary is intentionally narrow. One-zone
 heat-balance runs and declared IdealLoads no-OA sensible, numeric finite-limit,
-and ConstantSensibleHeatRatio PurchasedAir branches are the current
-`supported_compatibility_run` arbitrary-run paths. The IdealLoads path executes
-through the typed ZoneEquipmentManager -> PurchasedAirManager source-order
-wrapper; its plan records `SimPurchasedAir`, `GetPurchasedAir`,
-`InitPurchasedAir`, `CalcPurchAirLoads`, `UpdatePurchasedAir`, and
-`ReportPurchasedAir` barriers before runtime output export. It writes
-IdealLoads output variables and supply-node output variables, and still keeps
-`conformance_claim=false` for ad-hoc runs. Broad HVAC, plant, EMS,
-PythonPlugin, AirflowNetwork, sizing workflows,
-fenestration/daylighting/shading, IdealLoads humidity/OA/economizer/heat
-recovery branches, and broad surface-boundary families remain outside the
-arbitrary runtime.
+ConstantSensibleHeatRatio, selected no-OA humidity-control, and mixed declared
+no-OA PurchasedAir branches are the current `supported_compatibility_run`
+arbitrary-run paths. The IdealLoads path executes through the typed
+ZoneEquipmentManager -> PurchasedAirManager source-order wrapper; its plan
+records `SimPurchasedAir`, `GetPurchasedAir`, `InitPurchasedAir`,
+`CalcPurchAirLoads`, `UpdatePurchasedAir`, and `ReportPurchasedAir` barriers
+before runtime output export. It writes IdealLoads output variables and
+supply-node output variables, and still keeps `conformance_claim=false` for
+ad-hoc runs. Broad HVAC, plant, EMS, PythonPlugin, AirflowNetwork, sizing
+workflows, fenestration/daylighting/shading, broad IdealLoads humidity,
+outdoor-air/economizer/heat-recovery branches, and broad surface-boundary
+families remain outside the arbitrary runtime.
 
 For a local end-to-end gate that exercises support assessment, Rust execution,
 EnergyPlus oracle generation, compare reports, and the oracle-compare exit-code

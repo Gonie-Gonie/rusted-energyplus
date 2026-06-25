@@ -473,6 +473,83 @@ fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::
 }
 
 #[test]
+fn partial_output_request_runs_when_allowed() -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("partial-output-request")?;
+    let input_path = case_dir.join("one-zone-output-request.epJSON");
+    let weather_path = case_dir.join("weather.epw");
+    let output_dir = case_dir.join("out");
+    let mut input_text = ONE_ZONE_EPJSON.trim_end().trim_end_matches('}').to_string();
+    input_text.push_str(
+        r#",
+  "Output:Variable": {
+    "Zone Air Temperature Request": {
+      "key_value": "*",
+      "variable_name": "Zone Mean Air Temperature",
+      "reporting_frequency": "Hourly"
+    }
+  }
+}"#,
+    );
+    write_text(&input_path, &input_text)?;
+    write_text(&weather_path, TWO_HOUR_EPW)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: Some(weather_path),
+        output_dir: output_dir.clone(),
+        mode: RunMode::Diagnostic,
+        partial_policy: PartialRunPolicy::Allow,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(2),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedDiagnosticOnly
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::PartialSupportedRun
+    );
+    assert_output_layout(&output_dir, true)?;
+    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "success");
+    assert_eq!(summary["support"]["status"], "supported-diagnostic-only");
+    assert_eq!(
+        summary["support"]["run_result_state"],
+        "partial_supported_run"
+    );
+    assert_eq!(summary["support"]["conformance_claim"], false);
+    assert_eq!(summary["config"]["partial_policy"], "allow");
+
+    let support = read_json(&output_dir.join("support-assessment.json"))?;
+    assert_eq!(support["run_result_state"], "partial_supported_run");
+    assert_eq!(
+        support["ignored_raw_only_objects"][0]["object_type"],
+        "Output:Variable"
+    );
+    assert_eq!(
+        support["ignored_raw_only_objects"][0]["status"],
+        "ignored_reporting_objects"
+    );
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains("UnsupportedObjectIgnored"));
+    Ok(())
+}
+
+#[test]
 fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("dry-run")?;
     let input_path = case_dir.join("one-zone.epJSON");
