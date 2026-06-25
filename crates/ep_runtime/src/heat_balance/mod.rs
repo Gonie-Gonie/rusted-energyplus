@@ -4,6 +4,7 @@ pub mod air_manager;
 pub mod algorithm;
 pub mod convection;
 pub mod ctf;
+pub mod initialization;
 pub mod inside_convection;
 pub mod longwave;
 pub mod manager;
@@ -27,6 +28,7 @@ pub(crate) use algorithm::{
 };
 pub use convection::*;
 pub use ctf::*;
+pub use initialization::*;
 pub use inside_convection::*;
 pub use longwave::*;
 pub use manager::*;

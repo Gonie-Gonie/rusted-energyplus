@@ -78,6 +78,7 @@ $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_cor
 $zoneAirCorrection = "crates\ep_runtime\src\heat_balance\zone_air_correction.rs"
 $ctf = "crates\ep_runtime\src\heat_balance\ctf.rs"
 $insideConvection = "crates\ep_runtime\src\heat_balance\inside_convection.rs"
+$initialization = "crates\ep_runtime\src\heat_balance\initialization.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
@@ -101,6 +102,7 @@ foreach ($entry in @(
         @($zoneAirCorrection, "zone-air correction ownership module"),
         @($ctf, "CTF ownership module"),
         @($insideConvection, "inside convection ownership module"),
+        @($initialization, "heat-balance initialization ownership module"),
         @($convection, "convection ownership module"),
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
@@ -123,6 +125,7 @@ Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTemp
 Assert-LineLimit -Path $zoneAirCorrection -Limit 520 -Description "zone-air correction ownership module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
 Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convection ownership module"
+Assert-LineLimit -Path $initialization -Limit 220 -Description "heat-balance initialization ownership module"
 Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership module"
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
@@ -141,6 +144,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_air_correction;' -Description "zone-air correction module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod ctf;' -Description "CTF module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod inside_convection;' -Description "inside convection module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod initialization;' -Description "heat-balance initialization module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Description "convection module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description "longwave module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
