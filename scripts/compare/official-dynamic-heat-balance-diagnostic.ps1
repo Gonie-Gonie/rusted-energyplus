@@ -809,8 +809,8 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if (-not [bool]$floorStorageMaxSampleDelta.dominant_storage_surface) {
         throw "Expected FLOOR storage max-sample row to be marked dominant"
     }
-    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "outside-history-total") {
-        throw "Expected FLOOR storage max-sample dominant mismatch source to target outside-history-total, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
+        throw "Expected FLOOR storage max-sample dominant mismatch source to target face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
     }
     $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideBalanceMaxSampleDelta) {

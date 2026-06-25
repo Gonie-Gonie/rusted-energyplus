@@ -5,6 +5,8 @@ param(
     [switch]$SkipPackage,
     [switch]$SkipGateRun,
     [switch]$RunDynamicDiagnostic,
+    [switch]$SkipDynamicDiagnostic,
+    [switch]$SkipArbitraryRunSmoke,
     [int]$TimingRepeats = 3,
     [int]$DynamicTimingRepeats = 1
 )
@@ -21,6 +23,10 @@ if (-not $SkipPackage) {
     Invoke-DevCommand -Command "package" -Arguments @("-Version", $Version, "-Target", $Target)
 }
 
+if (-not $SkipArbitraryRunSmoke) {
+    Invoke-DevCommand -Command "arbitrary-run-smoke"
+}
+
 Invoke-DevCommand -Command "conformance-index-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "support-coverage-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "user-coverage-handbook" -Arguments @("-Version", $Version)
@@ -33,7 +39,11 @@ $numericArgs = @(
 if ($SkipGateRun) {
     $numericArgs += "-SkipGateRun"
 }
+$includeDynamicDiagnostic = -not $SkipDynamicDiagnostic
 if ($RunDynamicDiagnostic) {
+    $includeDynamicDiagnostic = $true
+}
+if ($includeDynamicDiagnostic) {
     $numericArgs += "-RunDynamicDiagnostic"
 }
 Invoke-DevCommand -Command "conformance-evidence-report" -Arguments $numericArgs

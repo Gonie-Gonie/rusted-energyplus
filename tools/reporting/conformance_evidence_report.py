@@ -205,6 +205,24 @@ DYNAMIC_DIAGNOSTIC_SPEC = DynamicDiagnosticSpec(
     case_manifest_path=r"data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml",
 )
 
+ARBITRARY_RUN_SUMMARY_SPECS = (
+    {
+        "label": "supported ad-hoc oracle compare",
+        "path": r".runtime\arbitrary-run-smoke-script\run-summary.json",
+        "reader_note": "Ad-hoc arbitrary run; compare output is diagnostic and conformance_claim=false.",
+    },
+    {
+        "label": "blocked unsupported model",
+        "path": r".runtime\arbitrary-run-blocked-smoke-script\run-summary.json",
+        "reader_note": "Support assessment blocks Rust runtime before execution.",
+    },
+    {
+        "label": "blocked with oracle baseline",
+        "path": r".runtime\arbitrary-run-blocked-oracle-smoke-script\run-summary.json",
+        "reader_note": "Oracle baseline may be generated while Rust remains blocked and compare is skipped.",
+    },
+)
+
 PORTING_FOCUS_MILESTONES = {"0.8", "0.9", "0.22", "0.26", "0.33"}
 
 ONE_ZONE_FOCUS_SERIES = (
@@ -471,6 +489,62 @@ def build_manifest_snapshot(repo_root: Path, version: str) -> dict[str, Any]:
         ".\\scripts\\dev.cmd release-evidence-manifest after PDF generation for final artifact hashes."
     )
     return manifest
+
+
+def load_arbitrary_run_summaries(repo_root: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for spec in ARBITRARY_RUN_SUMMARY_SPECS:
+        summary_path = repo_path(repo_root, spec["path"])
+        summary = load_optional_json(summary_path)
+        if not summary:
+            rows.append(
+                {
+                    "label": spec["label"],
+                    "summary_path": relative_repo_path(repo_root, summary_path),
+                    "available": False,
+                    "run_result_state": "missing",
+                    "support_status": "missing",
+                    "runtime_class": "missing",
+                    "oracle_status": "missing",
+                    "compare_status": "missing",
+                    "conformance_claim": False,
+                    "exit_code": None,
+                    "diagnostic_errors": None,
+                    "diagnostic_warnings": None,
+                    "artifact_count": 0,
+                    "reader_note": spec["reader_note"],
+                }
+            )
+            continue
+        support = summary.get("support") or {}
+        diagnostics = summary.get("diagnostics") or {}
+        artifacts = summary.get("artifacts") or {}
+        artifact_count = 0
+        for artifact_path in artifacts.values():
+            if isinstance(artifact_path, str) and repo_path(repo_root, artifact_path).exists():
+                artifact_count += 1
+        rows.append(
+            {
+                "label": spec["label"],
+                "summary_path": relative_repo_path(repo_root, summary_path),
+                "available": True,
+                "input_kind": (summary.get("input") or {}).get("kind"),
+                "mode": (summary.get("config") or {}).get("mode"),
+                "partial_policy": (summary.get("config") or {}).get("partial_policy"),
+                "run_result_state": support.get("run_result_state"),
+                "support_status": support.get("status"),
+                "runtime_class": support.get("runtime_class"),
+                "oracle_status": summary.get("oracle_status"),
+                "compare_status": summary.get("compare_status"),
+                "conformance_claim": bool(support.get("conformance_claim")),
+                "exit_code": summary.get("exit_code"),
+                "diagnostic_errors": diagnostics.get("error"),
+                "diagnostic_warnings": diagnostics.get("warning"),
+                "artifact_count": artifact_count,
+                "reader_note": spec["reader_note"],
+            }
+        )
+    return rows
 
 
 def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
@@ -1216,6 +1290,7 @@ def build_evidence(
     )
     coverage_snapshot = build_coverage_snapshot(repo_root, version, len(all_series))
     manifest_snapshot = build_manifest_snapshot(repo_root, version)
+    arbitrary_runs = load_arbitrary_run_summaries(repo_root)
     return {
         "schema_version": 1,
         "version": version,
@@ -1258,6 +1333,7 @@ def build_evidence(
         "porting_milestones": load_porting_rows(repo_root),
         "active_dynamic_diagnostic": dynamic_diagnostic,
         "time_series": time_series_records,
+        "arbitrary_runs": arbitrary_runs,
         "coverage_snapshot": coverage_snapshot,
         "manifest_snapshot": manifest_snapshot,
         "artifacts": {
@@ -2803,6 +2879,32 @@ def build_manifest_asset_table(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_arbitrary_run_summary_table(evidence: dict[str, Any]) -> Table:
+    rows: list[list[Any]] = []
+    for run in evidence.get("arbitrary_runs", []):
+        rows.append(
+            [
+                short_text(run.get("label"), 34),
+                run.get("run_result_state"),
+                run.get("runtime_class"),
+                run.get("oracle_status"),
+                run.get("compare_status"),
+                str(bool(run.get("conformance_claim"))).lower(),
+                run.get("exit_code"),
+                run.get("artifact_count"),
+                short_text(run.get("reader_note"), 95),
+            ]
+        )
+    if not rows:
+        rows.append(["missing", "missing", "missing", "missing", "missing", "false", "", 0, "arbitrary-run-smoke has not produced run-summary artifacts"])
+    return table(
+        ["Run", "State", "Runtime", "Oracle", "Compare", "Claim", "Exit", "Artifacts", "Reader note"],
+        rows,
+        "Arbitrary IDF run summaries from smoke artifacts. These runs are ad-hoc operational evidence, not release conformance evidence.",
+        [1.15, 1.0, 1.0, 0.72, 0.92, 0.42, 0.38, 0.5, 1.75],
+    )
+
+
 def build_coverage_summary_table(evidence: dict[str, Any]) -> Table:
     coverage = evidence.get("coverage_snapshot", {})
     rows = [
@@ -2878,6 +2980,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["Evidence manifest", "done", "Manifest snapshot is embedded and final hashes are owned by release-evidence-manifest after PDF write."],
         ["Coverage charts", "done", "Variable status and declared-vs-passed charts are included."],
         ["Case coverage matrix", "done", "PDF includes an excerpt and the full matrix is preserved in JSON."],
+        ["Arbitrary-run summary", "done", "PDF reads run-summary.json smoke artifacts and marks them ad-hoc/non-conformance."],
         ["1Zone time-series plots", "done", "MAT/convection/storage/conduction overlays are in the PDF and surface plot assets are exported."],
         ["IdealLoads time-series plots", "done", "No-OA rates/node overlays, branch heatmap, and aggregate meter plot assets are exported."],
         ["Performance evidence", "done", "Repeated timing samples and performance-summary.json define the current measurement policy."],
@@ -2986,6 +3089,15 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             "Claim Boundary",
             build_claim_boundary_table(evidence),
             build_not_claimed_table(evidence),
+        ),
+        Chapter(
+            "Arbitrary IDF Runs",
+            Paragraph(
+                "Arbitrary runs are operational smoke evidence, not release conformance evidence. The table reads "
+                "the same run-summary.json artifacts produced by arbitrary-run-smoke so users can see which paths "
+                "execute, block, or generate an oracle baseline without promoting broad compatibility."
+            ),
+            build_arbitrary_run_summary_table(evidence),
         ),
         Chapter(
             "Evidence Manifest",

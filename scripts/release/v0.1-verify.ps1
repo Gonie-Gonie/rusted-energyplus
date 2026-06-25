@@ -83,12 +83,8 @@ Invoke-DevCommand -Command "docs-generate"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 
-Invoke-DevCommand -Command "conformance-evidence-report" -Arguments @("-Version", $Version)
-Invoke-DevCommand -Command "conformance-index-report" -Arguments @("-Version", $Version)
-Invoke-DevCommand -Command "support-coverage-report" -Arguments @("-Version", $Version)
-Invoke-DevCommand -Command "user-coverage-handbook" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "package" -Arguments @("-Version", $Version)
-Invoke-DevCommand -Command "release-evidence-manifest" -Arguments @("-Version", $Version)
+Invoke-DevCommand -Command "pdf-evidence-pack" -Arguments @("-Version", $Version, "-Target", "windows-x64", "-SkipPackage")
 
 $package = Join-Path $RepoRoot "dist\eplus-rs-$Tag-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.1.0 release package"
@@ -105,6 +101,11 @@ Assert-FileExists -Path ".runtime\release-evidence\$Tag\numeric-conformance-evid
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\conformance-index-report.pdf" -Description "conformance index PDF"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\support-coverage-report.pdf" -Description "support coverage PDF"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\user-coverage-handbook.pdf" -Description "user handbook PDF"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\performance-summary.json" -Description "performance summary JSON"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\stability-summary.json" -Description "stability summary JSON"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\plot-evidence-summary.json" -Description "plot evidence manifest"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\1zone_surface_inside_face_temperature.png" -Description "1Zone surface plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\ideal_loads_branch_status_heatmap.png" -Description "IdealLoads branch plot"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\release-evidence-manifest.json" -Description "release manifest JSON"
 
 $publicAssets = @(
@@ -135,6 +136,9 @@ if ($numeric.aggregate.status -ne "pass") {
 if ($numeric.aggregate.case_count -lt 1) {
     throw "Expected at least one promoted conformance case"
 }
+if (@($numeric.arbitrary_runs).Count -lt 3) {
+    throw "Expected arbitrary-run smoke summaries in numeric evidence"
+}
 
 $manifest = Get-Content -LiteralPath ".runtime\release-evidence\$Tag\release-evidence-manifest.json" -Raw | ConvertFrom-Json
 if ($manifest.aggregate.missing_required_asset_count -ne 0) {
@@ -142,6 +146,14 @@ if ($manifest.aggregate.missing_required_asset_count -ne 0) {
 }
 if ($manifest.aggregate.present_required_asset_count -lt 1) {
     throw "Expected release manifest to record present assets"
+}
+if ($manifest.aggregate.required_asset_count -lt 30) {
+    throw "Expected release manifest to require PDF, plot, performance, and stability assets, found $($manifest.aggregate.required_asset_count)"
+}
+foreach ($role in @("performance-summary-json", "stability-summary-json", "one-zone-surface-temperature-plot", "ideal-loads-branch-heatmap", "user-coverage-handbook-pdf")) {
+    if (@($manifest.assets | Where-Object { $_.role -eq $role -and $_.exists }).Count -ne 1) {
+        throw "Expected present manifest asset role: $role"
+    }
 }
 
 Write-Host "result: pass"

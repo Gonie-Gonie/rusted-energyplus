@@ -75,17 +75,13 @@ Write-Host "milestone: v0.32.0"
 Write-Host "scope: user coverage handbook"
 Write-Host "claim: reporting infrastructure only"
 
-Invoke-DevCommand -Command "support-coverage-report" -Arguments @("-Version", "0.32.0")
-Invoke-DevCommand -Command "conformance-index-report" -Arguments @("-Version", "0.32.0")
-Invoke-DevCommand -Command "conformance-evidence-report" -Arguments @("-Version", "0.32.0")
-Invoke-DevCommand -Command "user-coverage-handbook" -Arguments @("-Version", "0.32.0")
 Invoke-DevCommand -Command "manifest-validate-all"
 Invoke-DevCommand -Command "docs-generate"
 Assert-Contains -Path "docs\src\generated\milestone-map.md" -Pattern "| 0.32 | User Coverage Handbook | complete" -Description "generated milestone status"
 Invoke-DevCommand -Command "docs-check"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "package" -Arguments @("-Version", "0.32.0")
-Invoke-DevCommand -Command "release-evidence-manifest" -Arguments @("-Version", "0.32.0")
+Invoke-DevCommand -Command "pdf-evidence-pack" -Arguments @("-Version", "0.32.0", "-Target", "windows-x64", "-SkipPackage")
 
 $package = Join-Path $RepoRoot "dist\eplus-rs-v0.32.0-windows-x64.zip"
 Assert-FileExists -Path $package -Description "v0.32 release package"
@@ -139,17 +135,19 @@ if (@($handbook.user_decision_rules).Count -lt 4) {
 
 Assert-FileExists -Path ".runtime\release-evidence\v0.32.0\release-evidence-manifest.json" -Description "release manifest JSON"
 $manifest = Get-Content -LiteralPath ".runtime\release-evidence\v0.32.0\release-evidence-manifest.json" -Raw | ConvertFrom-Json
-if ($manifest.aggregate.required_asset_count -ne 16) {
-    throw "Expected 16 required release assets, found $($manifest.aggregate.required_asset_count)"
+if ($manifest.aggregate.required_asset_count -lt 30) {
+    throw "Expected PDF, plot, performance, and stability assets in release manifest, found $($manifest.aggregate.required_asset_count)"
 }
-if ($manifest.aggregate.present_required_asset_count -ne 16) {
-    throw "Expected all required release assets to be present, found $($manifest.aggregate.present_required_asset_count)"
+if ($manifest.aggregate.present_required_asset_count -ne $manifest.aggregate.required_asset_count) {
+    throw "Expected all required release assets to be present, found $($manifest.aggregate.present_required_asset_count) of $($manifest.aggregate.required_asset_count)"
 }
 if ($manifest.aggregate.missing_required_asset_count -ne 0) {
     throw "Expected no missing release assets, found $($manifest.aggregate.missing_required_asset_count)"
 }
-if (@($manifest.assets | Where-Object { $_.role -eq "user-coverage-handbook-pdf" -and $_.exists }).Count -ne 1) {
-    throw "Expected user coverage handbook PDF in release manifest"
+foreach ($role in @("user-coverage-handbook-pdf", "performance-summary-json", "stability-summary-json", "one-zone-surface-temperature-plot", "ideal-loads-branch-heatmap")) {
+    if (@($manifest.assets | Where-Object { $_.role -eq $role -and $_.exists }).Count -ne 1) {
+        throw "Expected present release manifest asset: $role"
+    }
 }
 if ($manifest.report_summaries.user_coverage_handbook.typed_inputs -ne 15) {
     throw "Expected user coverage handbook summary in release manifest"

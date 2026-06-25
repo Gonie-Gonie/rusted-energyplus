@@ -77,15 +77,6 @@ def evidence_path(repo_root: Path, version: str, name: str) -> Path:
     return repo_root / ".runtime" / "release-evidence" / f"v{version}" / name
 
 
-def minor_version(version: str) -> int:
-    parts = version.split(".")
-    if len(parts) < 2:
-        return 0
-    try:
-        return int(parts[1])
-    except ValueError:
-        return 0
-
 
 def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dict[str, Any]]:
     package = repo_root / "dist" / f"eplus-rs-v{version}-{target}.zip"
@@ -164,35 +155,34 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "Lightweight text copy of the user support coverage report.",
         },
     ]
-    if minor_version(version) >= 32:
-        specs.extend(
-            [
-                {
-                    "role": "user-coverage-handbook-pdf",
-                    "path": evidence_path(repo_root, version, "user-coverage-handbook.pdf"),
-                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
-                    "user_purpose": "Readable user guide to currently supported inputs, outputs, and algorithms.",
-                },
-                {
-                    "role": "user-coverage-handbook-html",
-                    "path": evidence_path(repo_root, version, "user-coverage-handbook.html"),
-                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
-                    "user_purpose": "Browser-readable user coverage handbook.",
-                },
-                {
-                    "role": "user-coverage-handbook-json",
-                    "path": evidence_path(repo_root, version, "user-coverage-handbook.json"),
-                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
-                    "user_purpose": "Machine-readable user coverage decision rules and scope slices.",
-                },
-                {
-                    "role": "user-coverage-handbook-markdown",
-                    "path": evidence_path(repo_root, version, "user-coverage-handbook.md"),
-                    "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
-                    "user_purpose": "Lightweight text copy of the user coverage handbook.",
-                },
-            ]
-        )
+    specs.extend(
+        [
+            {
+                "role": "user-coverage-handbook-pdf",
+                "path": evidence_path(repo_root, version, "user-coverage-handbook.pdf"),
+                "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                "user_purpose": "Readable user guide to currently supported inputs, outputs, and algorithms.",
+            },
+            {
+                "role": "user-coverage-handbook-html",
+                "path": evidence_path(repo_root, version, "user-coverage-handbook.html"),
+                "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                "user_purpose": "Browser-readable user coverage handbook.",
+            },
+            {
+                "role": "user-coverage-handbook-json",
+                "path": evidence_path(repo_root, version, "user-coverage-handbook.json"),
+                "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                "user_purpose": "Machine-readable user coverage decision rules and scope slices.",
+            },
+            {
+                "role": "user-coverage-handbook-markdown",
+                "path": evidence_path(repo_root, version, "user-coverage-handbook.md"),
+                "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
+                "user_purpose": "Lightweight text copy of the user coverage handbook.",
+            },
+        ]
+    )
     plot_specs = [
         ("coverage-status-plot", "coverage_status_bar.png", "Variable coverage status bar chart."),
         ("declared-vs-passed-plot", "declared_vs_passed_series.png", "Declared numerical scope versus passed evidence chart."),
@@ -213,7 +203,6 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": plot_root / filename,
             "produced_by": f".\\scripts\\dev.cmd plot-evidence -Version {version}",
             "user_purpose": purpose,
-            "required": False,
         }
         for role, filename, purpose in plot_specs
     )
@@ -224,14 +213,12 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
                 "path": evidence_path(repo_root, version, "performance-summary.json"),
                 "produced_by": f".\\scripts\\dev.cmd performance-summary -Version {version}",
                 "user_purpose": "Machine-readable repeated timing statistics and measurement definitions.",
-                "required": False,
             },
             {
                 "role": "stability-summary-json",
                 "path": evidence_path(repo_root, version, "stability-summary.json"),
                 "produced_by": f".\\scripts\\dev.cmd stability-summary -Version {version}",
                 "user_purpose": "Machine-readable stability and failure-diagnostic evidence status.",
-                "required": False,
             },
         ]
     )
