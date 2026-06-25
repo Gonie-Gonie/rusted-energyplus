@@ -250,7 +250,7 @@ objects = [
 
 [arbitrary_run.runtime.ideal_loads_purchased_air_compat]
 status = "supported-compatibility"
-scope = "ZoneEquipmentManager -> PurchasedAirManager source-order compatibility for declared no-OA sensible, finite-limit, and ConstantSensibleHeatRatio branches; no broad HVAC conformance claim"
+scope = "ZoneEquipmentManager -> PurchasedAirManager source-order compatibility for declared no-OA sensible, finite-limit, ConstantSensibleHeatRatio, and selected no-OA humidity-control branches; no broad HVAC conformance claim"
 objects = [
   "ThermostatSetpoint:DualSetpoint",
   "ZoneControl:Thermostat",

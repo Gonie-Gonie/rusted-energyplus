@@ -91,17 +91,18 @@ is counted as a Rust result.
 Dry-run execution is also covered as a support-assessment-only path: even if
 oracle baseline and compare are requested, runtime, oracle, and compare remain
 skipped.
-`partial_supported_run` is covered as an explicit diagnostic/ad-hoc path: it
+`partial_supported_run` remains defined for explicit diagnostic/ad-hoc paths: it
 requires diagnostic mode with partial execution allowed, uses a diagnostic-only
 runtime class, and keeps `conformance_claim=false`.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared IdealLoads
 ZoneEquipmentManager -> PurchasedAirManager no-OA sensible, numeric
-finite-limit, and ConstantSensibleHeatRatio branches. Other IdealLoads
-humidity, outdoor-air, economizer, heat-recovery, and broad HVAC branches
-remain outside arbitrary-run compatibility unless separately promoted through
-the release conformance manifests.
+finite-limit, ConstantSensibleHeatRatio, and selected no-OA humidity-control
+branches. IdealLoads outdoor-air, economizer, heat-recovery, finite-limit
+humidity combinations, simultaneous humidification/dehumidification, and broad
+HVAC branches remain outside arbitrary-run compatibility unless separately
+promoted through the release conformance manifests.
 
 ## Current Launcher State
 

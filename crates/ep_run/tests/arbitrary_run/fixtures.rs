@@ -238,6 +238,63 @@ pub(crate) const IDEAL_LOADS_EPJSON: &str = r#"{
     }
   }
 }"#;
+pub(crate) const IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_EPJSON: &str = r#"{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "Schedule:Constant": {
+    "Control Type": {"hourly_value": 4},
+    "Heating Setpoint": {"hourly_value": 21},
+    "Cooling Setpoint": {"hourly_value": 24}
+  },
+  "ThermostatSetpoint:DualSetpoint": {
+    "Dual Setpoints": {
+      "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+      "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+    }
+  },
+  "ZoneControl:Thermostat": {
+    "Zone Thermostat": {
+      "zone_or_zonelist_name": "Zone One",
+      "control_type_schedule_name": "Control Type",
+      "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+      "control_1_name": "Dual Setpoints"
+    }
+  },
+  "NodeList": {
+    "Zone Inlets": {
+      "nodes": [{"node_name": "Zone One Inlet"}]
+    }
+  },
+  "ZoneHVAC:IdealLoadsAirSystem": {
+    "Zone Ideal Loads": {
+      "zone_supply_air_node_name": "Zone Inlets",
+      "dehumidification_control_type": "ConstantSupplyHumidityRatio",
+      "minimum_cooling_supply_air_humidity_ratio": 0.0077,
+      "humidification_control_type": "None"
+    }
+  },
+  "ZoneHVAC:EquipmentList": {
+    "Zone Equipment": {
+      "equipment": [
+        {
+          "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+          "zone_equipment_name": "Zone Ideal Loads",
+          "zone_equipment_cooling_sequence": 1,
+          "zone_equipment_heating_or_no_load_sequence": 1
+        }
+      ]
+    }
+  },
+  "ZoneHVAC:EquipmentConnections": {
+    "Zone One": {
+      "zone_name": "Zone One",
+      "zone_conditioning_equipment_list_name": "Zone Equipment",
+      "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
+      "zone_air_node_name": "Zone One Air Node",
+      "zone_return_air_node_or_nodelist_name": "Zone One Return"
+    }
+  }
+}"#;
 
 pub(crate) const IDEAL_LOADS_MIXED_BRANCH_EPJSON: &str = r#"{
   "Version": {"Version 1": {"version_identifier": "26.1"}},

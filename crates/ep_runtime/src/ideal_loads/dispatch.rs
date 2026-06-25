@@ -281,7 +281,7 @@ fn classify_purchased_air_compat_subset(
     system: &IdealLoadsAirSystem,
 ) -> crate::ideal_loads::IdealLoadsSubsetBoundary {
     let mut boundary = classify_no_oa_sensible_subset(system);
-    if supports_no_oa_humidity_diagnostic_branch(system) {
+    if supports_no_oa_humidity_selected_branch(system) {
         boundary.unsupported_features.retain(|feature| {
             !matches!(
                 feature,
@@ -293,7 +293,7 @@ fn classify_purchased_air_compat_subset(
     boundary
 }
 
-fn supports_no_oa_humidity_diagnostic_branch(system: &IdealLoadsAirSystem) -> bool {
+fn supports_no_oa_humidity_selected_branch(system: &IdealLoadsAirSystem) -> bool {
     let feature_flags = IdealLoadsFeatureFlags::from_system(system);
     if feature_flags.has_flow_limit || feature_flags.has_capacity_limit {
         return false;
@@ -463,7 +463,7 @@ mod tests {
     }
 
     #[test]
-    fn sim_purchased_air_wrapper_labels_constant_supply_humidity_diagnostic_branch() {
+    fn sim_purchased_air_wrapper_labels_constant_supply_humidity_selected_branch() {
         let mut system = test_system();
         system.dehumidification_control_type =
             DehumidificationControlType::ConstantSupplyHumidityRatio;
@@ -481,7 +481,7 @@ mod tests {
             unit_available: true,
             limit_context: IdealLoadsSensibleLimitContext::default(),
         })
-        .expect("supported no-OA ConstantSupplyHumidityRatio diagnostic branch");
+        .expect("supported no-OA ConstantSupplyHumidityRatio selected branch");
 
         assert_eq!(
             output.branch,

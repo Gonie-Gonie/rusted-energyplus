@@ -1162,7 +1162,9 @@ fn execute_rust_runtime(
         }
         RuntimeClass::IdealLoadsNoOaSensibleCompatibility
         | RuntimeClass::IdealLoadsFiniteLimitCompatibility
-        | RuntimeClass::IdealLoadsConstantShrCompatibility => {
+        | RuntimeClass::IdealLoadsConstantShrCompatibility
+        | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
+        | RuntimeClass::IdealLoadsMixedDeclaredCompatibility => {
             let simulation = simulate_ideal_loads_purchased_air_compat(
                 model,
                 IdealLoadsCompatibilityOptions::hourly_samples(sample_count),

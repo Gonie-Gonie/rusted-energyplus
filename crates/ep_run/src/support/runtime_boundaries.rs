@@ -1,10 +1,12 @@
 use std::collections::BTreeSet;
 
-use ep_model::{SimulationModel, TypedModel};
+use ep_model::{
+    DehumidificationControlType, HumidificationControlType, SimulationModel, TypedModel,
+};
 use ep_raw_model::RawModel;
 use ep_runtime::{
-    IdealLoadsPurchasedAirBranch, classify_no_oa_sensible_subset, select_purchased_air_branch,
-    validate_ideal_loads_zone_equipment_dispatch,
+    IdealLoadsPurchasedAirBranch, IdealLoadsUnsupportedFeature, classify_no_oa_sensible_subset,
+    select_purchased_air_branch, validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::{
@@ -57,10 +59,7 @@ pub(super) fn runtime_status_for_typed_model(
             capability_ids.insert(ideal_loads_capability_id_for_branch(branch).to_string());
             let branch_runtime_class = ideal_loads_runtime_class_for_branch(branch);
             selected_runtime_class = Some(match selected_runtime_class {
-                Some(existing) if existing != branch_runtime_class => {
-                    RuntimeClass::IdealLoadsNodeStateProjection
-                }
-                Some(existing) => existing,
+                Some(existing) => merge_ideal_loads_runtime_class(existing, branch_runtime_class),
                 None => branch_runtime_class,
             });
         }
@@ -151,11 +150,72 @@ const fn ideal_loads_runtime_class_for_branch(
         | IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
         | IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification
         | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
-            RuntimeClass::IdealLoadsNodeStateProjection
+            RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
         }
     }
 }
 
+fn merge_ideal_loads_runtime_class(existing: RuntimeClass, next: RuntimeClass) -> RuntimeClass {
+    if existing == next {
+        return existing;
+    }
+    if is_declared_ideal_loads_compatibility(existing)
+        && is_declared_ideal_loads_compatibility(next)
+    {
+        RuntimeClass::IdealLoadsMixedDeclaredCompatibility
+    } else {
+        RuntimeClass::IdealLoadsNodeStateProjection
+    }
+}
+
+fn is_declared_ideal_loads_compatibility(runtime_class: RuntimeClass) -> bool {
+    matches!(
+        runtime_class,
+        RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+            | RuntimeClass::IdealLoadsFiniteLimitCompatibility
+            | RuntimeClass::IdealLoadsConstantShrCompatibility
+            | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
+            | RuntimeClass::IdealLoadsMixedDeclaredCompatibility
+    )
+}
+
+fn unsupported_features_for_selected_branch(
+    system: &ep_model::IdealLoadsAirSystem,
+) -> Vec<IdealLoadsUnsupportedFeature> {
+    let branch = select_purchased_air_branch(system);
+    let mut unsupported_features = classify_no_oa_sensible_subset(system).unsupported_features;
+    if supports_no_oa_humidity_selected_branch(system, branch) {
+        unsupported_features.retain(|feature| {
+            !matches!(
+                feature,
+                IdealLoadsUnsupportedFeature::Dehumidification
+                    | IdealLoadsUnsupportedFeature::Humidification
+            )
+        });
+    }
+    unsupported_features
+}
+
+fn supports_no_oa_humidity_selected_branch(
+    system: &ep_model::IdealLoadsAirSystem,
+    branch: IdealLoadsPurchasedAirBranch,
+) -> bool {
+    match branch {
+        IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification => {
+            system.humidification_control_type == HumidificationControlType::None
+        }
+        IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
+        | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
+            system.dehumidification_control_type == DehumidificationControlType::None
+        }
+        IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
+        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity
+        | IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => false,
+    }
+}
 pub(super) fn assess_typed_runtime_boundaries(
     typed_model: Option<&TypedModel>,
     raw_model: &RawModel,
@@ -236,8 +296,8 @@ pub(super) fn assess_typed_runtime_boundaries(
                 );
             }
 
-            let boundary = classify_no_oa_sensible_subset(system);
-            if !boundary.is_supported() {
+            let unsupported_features = unsupported_features_for_selected_branch(system);
+            if !unsupported_features.is_empty() {
                 diagnostics.push(
                     RunDiagnostic::new(
                         RunDiagnosticSeverity::Error,
@@ -245,7 +305,7 @@ pub(super) fn assess_typed_runtime_boundaries(
                         "support",
                         format!(
                             "IdealLoads system '{}' uses unsupported feature flags: {:?}",
-                            system.name.0, boundary.unsupported_features
+                            system.name.0, unsupported_features
                         ),
                     )
                     .with_object("ZoneHVAC:IdealLoadsAirSystem", Some(system.name.0.clone())),

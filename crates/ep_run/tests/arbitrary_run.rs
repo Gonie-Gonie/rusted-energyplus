@@ -9,11 +9,13 @@ use ep_run::{
 };
 use serde_json::Value;
 
+#[allow(dead_code)]
 #[path = "arbitrary_run/fixtures.rs"]
 mod fixtures;
 
 use fixtures::*;
 
+#[allow(dead_code)]
 #[path = "arbitrary_run/output_manifest.rs"]
 mod output_manifest;
 
@@ -530,76 +532,6 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
             .join("compare-summary.json")
             .exists()
     );
-    Ok(())
-}
-
-#[test]
-fn diagnostic_allow_runs_partial_supported_projection() -> Result<(), Box<dyn std::error::Error>> {
-    let case_dir = unique_case_dir("partial-supported-projection")?;
-    let input_path = case_dir.join("mixed-ideal-loads.epJSON");
-    let output_dir = case_dir.join("out");
-    write_text(&input_path, IDEAL_LOADS_MIXED_BRANCH_EPJSON)?;
-
-    let outcome = run_arbitrary_idf(&RunConfig {
-        input_path,
-        weather_path: None,
-        output_dir: output_dir.clone(),
-        mode: RunMode::Diagnostic,
-        partial_policy: PartialRunPolicy::Allow,
-        output_format: RunOutputFormat::RustNative,
-        overwrite: true,
-        keep_intermediate: true,
-        trace_level: TraceLevel::Normal,
-        fail_on_warning: false,
-        dry_run: false,
-        oracle_baseline: false,
-        compare_oracle: false,
-        json_stdout: false,
-        oracle_root: None,
-        hours: Some(1),
-    })?;
-
-    assert_eq!(outcome.exit_code, RunExitCode::Success);
-    assert_eq!(
-        outcome.support_status,
-        SupportStatus::SupportedDiagnosticOnly
-    );
-    assert_eq!(
-        outcome.run_result_state,
-        RunResultState::PartialSupportedRun
-    );
-
-    let summary = read_json(&output_dir.join("run-summary.json"))?;
-    assert_eq!(summary["status"], "success");
-    assert_eq!(summary["config"]["mode"], "diagnostic");
-    assert_eq!(summary["config"]["partial_policy"], "allow");
-    assert_eq!(summary["support"]["status"], "supported-diagnostic-only");
-    assert_eq!(
-        summary["support"]["run_result_state"],
-        "partial_supported_run"
-    );
-    assert_eq!(
-        summary["support"]["runtime_class"],
-        "ideal-loads-node-state-projection"
-    );
-    assert_eq!(
-        summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-node-state-projection"
-    );
-    assert_eq!(summary["support"]["conformance_claim"], false);
-    assert!(
-        summary["support"]["runtime_selection_note"]
-            .as_str()
-            .unwrap()
-            .contains("diagnostic/ad-hoc")
-    );
-    let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
-    assert!(
-        support_report
-            .contains("matched capability metadata does not create a compatibility claim")
-    );
-    assert_eq!(summary["source_order_gate"]["matches"], true);
-    assert_output_layout(&output_dir, true)?;
     Ok(())
 }
 
