@@ -52,6 +52,16 @@ pub(crate) use crate::heat_balance::ctf::{
     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
     surface_ctf_state_from_coefficients,
 };
+use crate::heat_balance::inside_convection::{
+    heat_balance_inside_convection_coefficient_inputs, heat_balance_inside_convection_coefficients,
+    surface_inside_convection_heat_gain_rate_per_area_w_per_m2,
+    surface_inside_convection_report_coefficient_w_per_m2_k,
+    zone_air_heat_balance_surface_convection_rate_at_air_temperature_w,
+    zone_air_heat_balance_surface_convection_rate_from_balance_w,
+    zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w,
+    zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
+    zone_air_heat_balance_surface_convection_rate_w, zone_surface_convection_sums,
+};
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
 #[cfg(test)]
 use crate::heat_balance::longwave::{
@@ -1540,59 +1550,6 @@ fn heat_balance_zone_temperature_map(zones: &[ZoneHeatBalanceState]) -> BTreeMap
         .collect()
 }
 
-fn heat_balance_inside_convection_coefficients(
-    surfaces: &[SurfaceHeatBalanceState],
-    zone_temperatures: &BTreeMap<ZoneId, f64>,
-    inside_surface_temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
-) -> BTreeMap<SurfaceId, f64> {
-    surfaces
-        .iter()
-        .map(|surface| {
-            let inside_face_temperature_c = inside_surface_temperature_overrides
-                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
-                .unwrap_or(surface.inside_face_temperature_c);
-            let zone_temperature_c = zone_temperatures
-                .get(&surface.zone_id)
-                .copied()
-                .unwrap_or(surface.inside_face_temperature_c);
-            (
-                surface.surface_id,
-                energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
-                    surface,
-                    inside_face_temperature_c,
-                    zone_temperature_c,
-                ),
-            )
-        })
-        .collect()
-}
-
-fn heat_balance_inside_convection_coefficient_inputs(
-    surfaces: &[SurfaceHeatBalanceState],
-    zone_temperatures: &BTreeMap<ZoneId, f64>,
-    inside_surface_temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
-) -> BTreeMap<SurfaceId, InsideConvectionCoefficientInputState> {
-    surfaces
-        .iter()
-        .map(|surface| {
-            let inside_face_temperature_c = inside_surface_temperature_overrides
-                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
-                .unwrap_or(surface.inside_face_temperature_c);
-            let reference_air_temperature_c = zone_temperatures
-                .get(&surface.zone_id)
-                .copied()
-                .unwrap_or(surface.inside_face_temperature_c);
-            (
-                surface.surface_id,
-                InsideConvectionCoefficientInputState {
-                    inside_face_temperature_c,
-                    reference_air_temperature_c,
-                },
-            )
-        })
-        .collect()
-}
-
 fn correct_zone_air_temperatures_from_current_surfaces(
     surfaces: &[SurfaceHeatBalanceState],
     zones: &mut [ZoneHeatBalanceState],
@@ -2130,151 +2087,6 @@ fn heat_balance_uses_final_inside_convection_report(
         zone_air_algorithm,
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe
     )
-}
-
-fn zone_surface_convection_sums(
-    surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
-) -> (f64, f64, f64) {
-    let (sum_ha_w_per_k, sum_hat_surf_w) = surfaces
-        .iter()
-        .filter(|surface| surface.zone_id == zone_id)
-        .map(|surface| {
-            let surface_ha_w_per_k =
-                surface.inside_convection_coefficient_w_per_m2_k * surface.area_m2;
-            (
-                surface_ha_w_per_k,
-                surface_ha_w_per_k * surface.inside_face_temperature_c,
-            )
-        })
-        .fold((0.0, 0.0), |(sum_ha, sum_hat), (ha, hat)| {
-            (sum_ha + ha, sum_hat + hat)
-        });
-
-    (sum_ha_w_per_k, sum_hat_surf_w, 0.0)
-}
-
-fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
-    surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
-) -> f64 {
-    surfaces
-        .iter()
-        .filter(|surface| surface.zone_id == zone_id)
-        .map(|surface| {
-            surface.inside_convection_coefficient_w_per_m2_k
-                * surface.area_m2
-                * (surface.inside_face_temperature_c - surface.inside_reference_air_temperature_c)
-        })
-        .sum()
-}
-
-fn surface_inside_convection_reference_air_temperature_c(
-    surface: &SurfaceHeatBalanceState,
-    zones: &[ZoneHeatBalanceState],
-    use_surface_reference_air_report: bool,
-) -> f64 {
-    if use_surface_reference_air_report {
-        surface.inside_reference_air_temperature_c
-    } else {
-        zones
-            .iter()
-            .find(|zone| zone.zone_id == surface.zone_id)
-            .map(|zone| zone.mean_air_temperature_c)
-            .unwrap_or(surface.inside_face_temperature_c)
-    }
-}
-
-fn surface_inside_convection_report_coefficient_w_per_m2_k(
-    surface: &SurfaceHeatBalanceState,
-    zones: &[ZoneHeatBalanceState],
-    use_surface_reference_air_report: bool,
-    use_final_inside_convection_report: bool,
-) -> f64 {
-    if use_final_inside_convection_report {
-        let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
-            surface,
-            zones,
-            use_surface_reference_air_report,
-        );
-        energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
-            surface,
-            surface.inside_face_temperature_c,
-            reference_air_temperature_c,
-        )
-    } else {
-        surface.inside_convection_coefficient_w_per_m2_k
-    }
-}
-
-fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
-    surface: &SurfaceHeatBalanceState,
-    zones: &[ZoneHeatBalanceState],
-    use_surface_reference_air_report: bool,
-    use_final_inside_convection_report: bool,
-) -> f64 {
-    let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
-        surface,
-        zones,
-        use_surface_reference_air_report,
-    );
-    surface_inside_convection_report_coefficient_w_per_m2_k(
-        surface,
-        zones,
-        use_surface_reference_air_report,
-        use_final_inside_convection_report,
-    ) * (reference_air_temperature_c - surface.inside_face_temperature_c)
-}
-
-fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
-    surfaces: &[SurfaceHeatBalanceState],
-    zones: &[ZoneHeatBalanceState],
-    zone_id: ZoneId,
-    use_surface_reference_air_report: bool,
-) -> f64 {
-    surfaces
-        .iter()
-        .filter(|surface| surface.zone_id == zone_id)
-        .map(|surface| {
-            let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
-                surface,
-                zones,
-                use_surface_reference_air_report,
-            );
-            let coefficient_w_per_m2_k = surface_inside_convection_report_coefficient_w_per_m2_k(
-                surface,
-                zones,
-                use_surface_reference_air_report,
-                true,
-            );
-            coefficient_w_per_m2_k
-                * surface.area_m2
-                * (surface.inside_face_temperature_c - reference_air_temperature_c)
-        })
-        .sum()
-}
-
-fn zone_air_heat_balance_surface_convection_rate_w(zone_state: &ZoneHeatBalanceState) -> f64 {
-    zone_air_heat_balance_surface_convection_rate_at_air_temperature_w(
-        zone_state,
-        zone_state.mean_air_temperature_c,
-    )
-}
-
-fn zone_air_heat_balance_surface_convection_rate_at_air_temperature_w(
-    zone_state: &ZoneHeatBalanceState,
-    reference_air_temperature_c: f64,
-) -> f64 {
-    zone_state.sum_hat_surf_w
-        - zone_state.sum_hat_ref_w
-        - zone_state.sum_ha_w_per_k * reference_air_temperature_c
-}
-
-fn zone_air_heat_balance_surface_convection_rate_from_balance_w(
-    zone_state: &ZoneHeatBalanceState,
-    air_storage_rate_w: f64,
-) -> f64 {
-    air_storage_rate_w - zone_state.convective_internal_gain_w
 }
 
 /// Simulates hourly zone mean air temperatures through the heat-balance state

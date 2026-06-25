@@ -74,6 +74,7 @@ $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
 $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
 $ctf = "crates\ep_runtime\src\heat_balance\ctf.rs"
+$insideConvection = "crates\ep_runtime\src\heat_balance\inside_convection.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
@@ -93,6 +94,7 @@ foreach ($entry in @(
         @($airManager, "HeatBalanceAirManager source-order module"),
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
         @($ctf, "CTF ownership module"),
+        @($insideConvection, "inside convection ownership module"),
         @($convection, "convection ownership module"),
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
@@ -112,6 +114,7 @@ Assert-LineLimit -Path $surfaceBoundary -Limit 220 -Description "surface boundar
 Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
+Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convection ownership module"
 Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership module"
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
@@ -125,6 +128,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_boundary;' -Desc
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Description "HeatBalanceAirManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod ctf;' -Description "CTF module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod inside_convection;' -Description "inside convection module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Description "convection module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description "longwave module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
@@ -197,6 +201,24 @@ Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_analytical_zo
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_zone_air_temperature_coefficients\s*\(' -Description "runtime-owned zone-air coefficient implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_third_order_zone_air_temperature_c\s*\(' -Description "runtime-owned third-order zone-air implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_analytical_zone_air_temperature_c\s*\(' -Description "runtime-owned analytical zone-air implementation"
+Assert-Contains -Path $insideConvection -Pattern 'CalcHeatBalanceInsideSurf' -Description "inside convection source owner"
+Assert-Contains -Path $insideConvection -Pattern 'heat_balance_inside_convection_coefficients' -Description "inside convection coefficient owner"
+Assert-Contains -Path $insideConvection -Pattern 'heat_balance_inside_convection_coefficient_inputs' -Description "inside convection coefficient input owner"
+Assert-Contains -Path $insideConvection -Pattern 'zone_surface_convection_sums' -Description "zone surface convection sum owner"
+Assert-Contains -Path $insideConvection -Pattern 'surface_inside_convection_report_coefficient_w_per_m2_k' -Description "inside convection report coefficient owner"
+Assert-Contains -Path $insideConvection -Pattern 'surface_inside_convection_heat_gain_rate_per_area_w_per_m2' -Description "inside convection heat gain report owner"
+Assert-Contains -Path $insideConvection -Pattern 'zone_air_heat_balance_surface_convection_rate_w' -Description "zone-air surface convection report owner"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_inside_convection_coefficients\s*\(' -Description "runtime-owned inside convection coefficients"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_inside_convection_coefficient_inputs\s*\(' -Description "runtime-owned inside convection coefficient inputs"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_surface_convection_sums\s*\(' -Description "runtime-owned zone surface convection sums"
+Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_reference_air_temperature_c\s*\(' -Description "runtime-owned inside convection reference air report"
+Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_report_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned inside convection report coefficient"
+Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2\s*\(' -Description "runtime-owned inside convection heat gain report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w\s*\(' -Description "runtime-owned surface reference air convection report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w\s*\(' -Description "runtime-owned final hconv convection report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_w\s*\(' -Description "runtime-owned zone-air surface convection report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_at_air_temperature_w\s*\(' -Description "runtime-owned zone-air convection at air temperature report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_balance_w\s*\(' -Description "runtime-owned balance surface convection report"
 Assert-Contains -Path $ctf -Pattern 'UpdateThermalHistories' -Description "CTF history owner stage"
 Assert-Contains -Path $ctf -Pattern 'surface_inside_conduction_rate_w_for_report' -Description "CTF inside conduction report owner"
 Assert-Contains -Path $ctf -Pattern 'surface_outside_conduction_rate_w_for_report' -Description "CTF outside conduction report owner"
