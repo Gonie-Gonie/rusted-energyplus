@@ -78,6 +78,9 @@ def compact_text(value: Any, max_chars: int = 180) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
+def pdf_boundary_text(row: dict[str, Any], max_chars: int = 240) -> str:
+    return compact_text(boundary_text(row), max_chars)
+
 def compact_join(values: list[str], max_items: int = 4) -> str:
     if len(values) <= max_items:
         return ", ".join(values)
@@ -270,7 +273,7 @@ def input_table(rows: list[dict[str, Any]], caption: str) -> Table:
                 row.get("name", ""),
                 row.get("family", ""),
                 row.get("first_evidence", ""),
-                boundary_text(row),
+                pdf_boundary_text(row),
             ]
             for row in rows
         ],
@@ -287,7 +290,7 @@ def output_table(rows: list[dict[str, Any]], caption: str) -> Table:
                 row.get("domain", ""),
                 row.get("first_evidence", ""),
                 ", ".join(row.get("observed_frequencies", [])),
-                boundary_text(row),
+                pdf_boundary_text(row),
             ]
             for row in rows
         ],
@@ -501,7 +504,7 @@ def build_document(handbook: dict[str, Any], chart: Any) -> Document:
         Chapter("Promoted Cases", case_table(handbook["promoted_cases"])),
         Chapter(
             "Known Gaps",
-            doc_table(["Gap"], [[gap] for gap in handbook["known_gaps"]], "Explicit non-claims carried from support coverage."),
+            doc_table(["Gap"], [[compact_text(gap, 300)] for gap in handbook["known_gaps"]], "Explicit non-claims carried from support coverage."),
         ),
         Chapter(
             "Artifact Paths",
