@@ -37,6 +37,14 @@ Support assessment is the internal gate for arbitrary IDF/epJSON runs. It
 loads capability rules, checks active objects and algorithms, classifies the
 run state, and writes `support-assessment.json` plus `support-report.md`.
 
+Launcher smoke verifies that the Windows launcher builds `eplus-rs run`
+commands, maps `run-summary.json` states and exit codes, preserves the
+claim-boundary presentation, and can build the no-console executable wrapper:
+
+```powershell
+.\scripts\dev.cmd launcher-smoke
+```
+
 Oracle baseline and compare are optional for arbitrary runs. When enabled, the
 pipeline writes `oracle/`, `compare/compare-summary.json`, and
 `compare/compare-report.md`; these artifacts remain ad-hoc unless promoted by

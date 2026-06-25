@@ -61,6 +61,7 @@ Focused checks:
 .\scripts\dev.cmd strict-no-false-conformance
 .\scripts\dev.cmd algorithm-ledger-check
 .\scripts\dev.cmd arbitrary-run-smoke
+.\scripts\dev.cmd launcher-smoke
 ```
 
 Current docs:

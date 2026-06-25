@@ -166,6 +166,12 @@
                          "help":  "Gate arbitrary IDF support assessment, oracle baseline, compare reports, and exit codes."
                      },
                      {
+                         "name":  "launcher-smoke",
+                         "path":  "smoke\\launcher-smoke.ps1",
+                         "group":  "smoke",
+                         "help":  "Gate launcher command building, run-state presentation, settings, and executable wrapper self-tests."
+                     },
+                     {
                          "name":  "runtime-registry-smoke",
                          "path":  "smoke\\runtime-registry-smoke.ps1",
                          "group":  "smoke",
