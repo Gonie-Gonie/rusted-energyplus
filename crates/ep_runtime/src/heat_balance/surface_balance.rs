@@ -14,7 +14,7 @@ use crate::heat_balance::ctf::{
     energyplus_ctf_outside_face_temperature_quick_conduction_calculation,
 };
 use crate::heat_balance::longwave::{ExteriorLongwaveTerms, energyplus_exterior_longwave_terms};
-use crate::heat_balance::radiation::surface_incident_solar_radiation_for_weather_context_w_per_m2;
+use crate::heat_balance::solar::surface_incident_solar_radiation_for_weather_context_w_per_m2;
 use crate::heat_balance::state::{
     SurfaceBoundaryBalanceResult, SurfaceExteriorReportTerms, SurfaceHeatBalanceState,
     SurfaceOutsideBalanceDiagnostics,

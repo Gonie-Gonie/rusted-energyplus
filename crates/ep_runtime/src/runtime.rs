@@ -52,14 +52,10 @@ use crate::heat_balance::longwave::{
     horizontal_infrared_sky_temperature_c,
 };
 #[cfg(test)]
-pub(crate) use crate::heat_balance::radiation::surface_incident_solar_radiation_for_weather_context_w_per_m2;
-#[cfg(test)]
 use crate::heat_balance::radiation::{
     InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
-    STEFAN_BOLTZMANN_W_PER_M2_K4, append_surface_incident_solar_radiation_series,
-    energyplus_approximate_view_factors, energyplus_scriptf_from_view_factors,
-    fix_energyplus_approximate_view_factors,
-    surface_incident_solar_components_hourly_average_w_per_m2,
+    STEFAN_BOLTZMANN_W_PER_M2_K4, energyplus_approximate_view_factors,
+    energyplus_scriptf_from_view_factors, fix_energyplus_approximate_view_factors,
     update_surface_inside_longwave_exchange_probe,
     update_surface_inside_scriptf_longwave_exchange_probe,
 };
@@ -69,6 +65,13 @@ use crate::heat_balance::reports::{
     HeatBalanceResultSeriesTraces, heat_balance_result_store_from_traces,
 };
 use crate::heat_balance::run_period::sample_heat_balance_run_period;
+#[cfg(test)]
+pub(crate) use crate::heat_balance::solar::surface_incident_solar_radiation_for_weather_context_w_per_m2;
+#[cfg(test)]
+use crate::heat_balance::solar::{
+    append_surface_incident_solar_radiation_series,
+    surface_incident_solar_components_hourly_average_w_per_m2,
+};
 pub use crate::heat_balance::state::*;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::state::{

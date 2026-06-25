@@ -1,8 +1,8 @@
 //! Exterior longwave exchange helpers for CalcHeatBalanceOutsideSurf.
 
-use crate::heat_balance::radiation::{
-    KELVIN_OFFSET, STEFAN_BOLTZMANN_W_PER_M2_K4, surface_air_sky_radiation_split,
-    surface_ground_view_factor, surface_sky_view_factor,
+use crate::heat_balance::radiation::{KELVIN_OFFSET, STEFAN_BOLTZMANN_W_PER_M2_K4};
+use crate::heat_balance::solar::{
+    surface_air_sky_radiation_split, surface_ground_view_factor, surface_sky_view_factor,
 };
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::Surface;

@@ -82,6 +82,7 @@ $initialization = "crates\ep_runtime\src\heat_balance\initialization.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
+$solar = "crates\ep_runtime\src\heat_balance\solar.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
 $state = "crates\ep_runtime\src\heat_balance\state.rs"
 $runPeriod = "crates\ep_runtime\src\heat_balance\run_period.rs"
@@ -111,6 +112,7 @@ foreach ($entry in @(
         @($convection, "convection ownership module"),
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
+        @($solar, "solar radiation ownership module"),
         @($reports, "report ownership module"),
         @($state, "heat-balance state ownership module"),
         @($runPeriod, "run-period sampling ownership module"),
@@ -139,7 +141,8 @@ Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convect
 Assert-LineLimit -Path $initialization -Limit 220 -Description "heat-balance initialization ownership module"
 Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership module"
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
-Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
+Assert-LineLimit -Path $radiation -Limit 800 -Description "radiation ownership module"
+Assert-LineLimit -Path $solar -Limit 760 -Description "solar radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 820 -Description "report ownership module"
 Assert-LineLimit -Path $state -Limit 800 -Description "heat-balance state ownership module"
 Assert-LineLimit -Path $runPeriod -Limit 800 -Description "run-period sampling ownership module"
@@ -164,6 +167,8 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod initialization;' -Descri
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Description "convection module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description "longwave module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod solar;' -Description "solar radiation module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub use solar::\*;' -Description "solar radiation module facade export"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod reports;' -Description "reports module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub\(crate\) mod run_period;' -Description "run-period sampling module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_weather;' -Description "surface weather module declaration"
@@ -319,8 +324,8 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_linearized_radiation_c
 Assert-NotContains -Path $runtime -Pattern 'fn horizontal_infrared_sky_temperature_c\s*\(' -Description "runtime-owned horizontal infrared sky temperature"
 Assert-Contains -Path $radiation -Pattern 'CalcHeatBalanceOutsideSurf' -Description "exterior radiation source owner"
 Assert-Contains -Path $radiation -Pattern 'CalcHeatBalanceInsideSurf' -Description "interior radiation source owner"
-Assert-Contains -Path $radiation -Pattern 'append_surface_incident_solar_radiation_series' -Description "surface incident solar diagnostic owner"
-Assert-Contains -Path $radiation -Pattern 'surface_incident_solar_components_hourly_average_w_per_m2' -Description "surface incident solar component owner"
+Assert-Contains -Path $solar -Pattern 'append_surface_incident_solar_radiation_series' -Description "surface incident solar diagnostic owner"
+Assert-Contains -Path $solar -Pattern 'surface_incident_solar_components_hourly_average_w_per_m2' -Description "surface incident solar component owner"
 Assert-Contains -Path $radiation -Pattern 'pub\(crate\) enum InteriorLongwaveExchangeProbe' -Description "interior longwave probe selector owner"
 Assert-Contains -Path $radiation -Pattern 'update_surface_inside_longwave_exchange_probe' -Description "grey interior longwave probe owner"
 Assert-Contains -Path $radiation -Pattern 'update_surface_inside_scriptf_longwave_exchange_probe' -Description "ScriptF interior longwave probe owner"
