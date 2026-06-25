@@ -68,9 +68,7 @@ use crate::heat_balance::reports::zone_surface_report_conduction_rates_w;
 use crate::heat_balance::reports::{
     HeatBalanceResultSeriesTraces, heat_balance_result_store_from_traces,
 };
-use crate::heat_balance::run_period::{
-    HeatBalanceRunPeriodSamples, sample_heat_balance_run_period,
-};
+use crate::heat_balance::run_period::sample_heat_balance_run_period;
 pub use crate::heat_balance::state::*;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::state::{

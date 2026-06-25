@@ -32,10 +32,9 @@ use crate::heat_balance::reports::{
     heat_gain_rate_w, heat_loss_rate_w, zone_surface_report_conduction_rates_w,
 };
 use crate::heat_balance::state::{
-    HeatBalanceCtfHistorySlotHourlySample, HeatBalanceSimulationOptions, HeatBalanceState,
-    HeatBalanceStepInput, HeatBalanceSurfaceFirstSampleTrace,
-    HeatBalanceSurfaceIterationFirstSampleTrace, HeatBalanceSurfaceIterationSampleTrace,
-    HeatBalanceZoneAirFirstSampleTrace, HeatBalanceZoneAirReportSampling,
+    HeatBalanceSimulationOptions, HeatBalanceState, HeatBalanceStepInput,
+    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
+    HeatBalanceSurfaceIterationSampleTrace, HeatBalanceZoneAirFirstSampleTrace,
     HeatBalanceZoneConductionReportSource,
 };
 use crate::heat_balance::surface_balance::{
@@ -47,8 +46,13 @@ use crate::heat_balance::surface_weather::{
 };
 use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal;
 use crate::heat_balance::trace::{
-    HeatBalanceCtfHistorySlotFirstSampleAccumulator, SurfaceHeatBalanceTrace,
-    SurfaceHeatBalanceTraceSums, ZoneAirDebugTrace, ZoneAirDebugTraceSums, ZoneConductionTrace,
+    HeatBalanceCtfHistorySlotFirstSampleAccumulator, HeatBalanceRunPeriodSamples,
+    SurfaceHeatBalanceTraceSums, ZoneAirDebugTraceSums, push_surface_heat_balance_trace_averages,
+    push_zone_air_debug_trace_averages, push_zone_air_heat_balance_trace_values,
+    push_zone_conduction_trace_averages, push_zone_scalar_trace_averages,
+    surface_heat_balance_traces_from_state, zone_air_debug_traces_from_state,
+    zone_air_heat_balance_trace_series_from_state, zone_conduction_traces_from_state,
+    zone_scalar_trace_series_from_state,
 };
 use crate::heat_balance::{
     HeatBalanceZoneAirAlgorithm, heat_balance_uses_balance_surface_convection_report,
@@ -68,31 +72,6 @@ use crate::weather::{
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel};
 use std::collections::BTreeMap;
 
-pub(crate) struct HeatBalanceRunPeriodSamples {
-    pub(crate) zone_temperatures: Vec<(ep_model::ZoneId, String, Vec<f64>)>,
-    pub(crate) zone_humidity_ratios: Vec<(ep_model::ZoneId, String, Vec<f64>)>,
-    pub(crate) zone_conduction_rates: Vec<ZoneConductionTrace>,
-    pub(crate) inside_surface_iteration_counts: Vec<f64>,
-    pub(crate) zone_air_heat_balance_rates:
-        Vec<(ep_model::ZoneId, String, Vec<f64>, Vec<f64>, Vec<f64>)>,
-    pub(crate) zone_air_debug_traces: Vec<ZoneAirDebugTrace>,
-    pub(crate) surface_temperatures: Vec<SurfaceHeatBalanceTrace>,
-    pub(crate) outdoor_temperatures: Vec<f64>,
-    pub(crate) outdoor_wet_bulb_temperatures: Vec<f64>,
-    pub(crate) sky_temperatures: Vec<f64>,
-    pub(crate) horizontal_infrared_radiation_rates: Vec<f64>,
-    pub(crate) rain_statuses: Vec<f64>,
-    pub(crate) first_sample_ctf_history_slot_accumulators:
-        BTreeMap<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>,
-    pub(crate) hourly_ctf_history_slots: Vec<HeatBalanceCtfHistorySlotHourlySample>,
-    pub(crate) hourly_ctf_history_slots_after_advance: Vec<HeatBalanceCtfHistorySlotHourlySample>,
-    pub(crate) surface_first_sample_trace: Vec<HeatBalanceSurfaceFirstSampleTrace>,
-    pub(crate) zone_air_first_sample_trace: Vec<HeatBalanceZoneAirFirstSampleTrace>,
-    pub(crate) surface_iteration_first_sample_trace:
-        Vec<HeatBalanceSurfaceIterationFirstSampleTrace>,
-    pub(crate) surface_iteration_sample_trace: Vec<HeatBalanceSurfaceIterationSampleTrace>,
-}
-
 pub(crate) fn sample_heat_balance_run_period(
     model: &SimulationModel,
     state: &mut HeatBalanceState,
@@ -103,163 +82,15 @@ pub(crate) fn sample_heat_balance_run_period(
     seconds_per_timestep: f64,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> HeatBalanceRunPeriodSamples {
-    let mut zone_temperatures = state
-        .zones
-        .iter()
-        .map(|zone| {
-            (
-                zone.zone_id,
-                zone.zone_name.clone(),
-                Vec::with_capacity(options.sample_count),
-            )
-        })
-        .collect::<Vec<_>>();
-    let mut zone_humidity_ratios = state
-        .zones
-        .iter()
-        .map(|zone| {
-            (
-                zone.zone_id,
-                zone.zone_name.clone(),
-                Vec::with_capacity(options.sample_count),
-            )
-        })
-        .collect::<Vec<_>>();
-    let mut zone_conduction_rates = state
-        .zones
-        .iter()
-        .map(|zone| ZoneConductionTrace {
-            zone_id: zone.zone_id,
-            zone_name: zone.zone_name.clone(),
-            inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
-            inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
-            inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
-        })
-        .collect::<Vec<_>>();
+    let mut zone_temperatures = zone_scalar_trace_series_from_state(state, options.sample_count);
+    let mut zone_humidity_ratios = zone_scalar_trace_series_from_state(state, options.sample_count);
+    let mut zone_conduction_rates = zone_conduction_traces_from_state(state, options.sample_count);
     let mut inside_surface_iteration_counts = Vec::with_capacity(options.sample_count);
-    let mut zone_air_heat_balance_rates = state
-        .zones
-        .iter()
-        .map(|zone| {
-            (
-                zone.zone_id,
-                zone.zone_name.clone(),
-                Vec::with_capacity(options.sample_count),
-                Vec::with_capacity(options.sample_count),
-                Vec::with_capacity(options.sample_count),
-            )
-        })
-        .collect::<Vec<_>>();
-    let mut zone_air_debug_traces = state
-        .zones
-        .iter()
-        .map(|zone| ZoneAirDebugTrace {
-            zone_id: zone.zone_id,
-            zone_name: zone.zone_name.clone(),
-            current_temperature_c: Vec::with_capacity(options.sample_count),
-            zone_timestep_average_temperature_c: Vec::with_capacity(options.sample_count),
-            previous_temperature_1_c: Vec::with_capacity(options.sample_count),
-            previous_temperature_2_c: Vec::with_capacity(options.sample_count),
-            previous_temperature_3_c: Vec::with_capacity(options.sample_count),
-            previous_system_temperature_1_c: Vec::with_capacity(options.sample_count),
-            system_timestep_count: Vec::with_capacity(options.sample_count),
-            humidity_ratio: Vec::with_capacity(options.sample_count),
-            zone_timestep_average_humidity_ratio: Vec::with_capacity(options.sample_count),
-            air_heat_capacity_j_per_k: Vec::with_capacity(options.sample_count),
-            zone_timestep_air_power_cap_w_per_k: Vec::with_capacity(options.sample_count),
-            last_correction_air_power_cap_w_per_k: Vec::with_capacity(options.sample_count),
-        })
-        .collect::<Vec<_>>();
-    let mut surface_temperatures = state
-        .surfaces
-        .iter()
-        .map(|surface| SurfaceHeatBalanceTrace {
-            surface_id: surface.surface_id,
-            surface_name: surface.surface_name.clone(),
-            inside_face_temperature_c: Vec::with_capacity(options.sample_count),
-            inside_adjacent_air_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_face_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_outdoor_air_dry_bulb_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_outdoor_air_wet_bulb_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_outdoor_air_wind_speed_m_per_s: Vec::with_capacity(options.sample_count),
-            outside_outdoor_air_wind_direction_deg: Vec::with_capacity(options.sample_count),
-            inside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
-            inside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            inside_convection_coefficient_w_per_m2_k: Vec::with_capacity(options.sample_count),
-            inside_net_surface_thermal_radiation_heat_gain_rate_w: Vec::with_capacity(
-                options.sample_count,
-            ),
-            inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
-                Vec::with_capacity(options.sample_count),
-            outside_convection_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
-            outside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_convection_coefficient_w_per_m2_k: Vec::with_capacity(options.sample_count),
-            outside_net_thermal_radiation_heat_gain_rate_w: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_thermal_radiation_to_air_coefficient_w_per_m2_k: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_thermal_radiation_to_sky_coefficient_w_per_m2_k: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_thermal_radiation_to_ground_coefficient_w_per_m2_k: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_solar_radiation_heat_gain_rate_w: Vec::with_capacity(options.sample_count),
-            outside_solar_radiation_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_balance_report_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_balance_coefficient_temperature_c: Vec::with_capacity(options.sample_count),
-            outside_balance_convection_reference_temperature_c: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_balance_equivalent_radiant_temperature_c: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_balance_radiation_coefficient_w_per_m2_k: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_quick_balance_inside_source_term_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_quick_balance_inside_balance_term_w_per_m2: Vec::with_capacity(
-                options.sample_count,
-            ),
-            outside_quick_balance_numerator_w_per_m2: Vec::with_capacity(options.sample_count),
-            outside_quick_balance_denominator_w_per_m2_k: Vec::with_capacity(options.sample_count),
-            outside_quick_balance_coupling_factor: Vec::with_capacity(options.sample_count),
-            inside_conduction_rate_w: Vec::with_capacity(options.sample_count),
-            inside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
-            inside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
-            inside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
-            ctf_inside_current_outside_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_inside_current_inside_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_inside_history_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_inside_history_temperature_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_inside_history_flux_term_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_gain_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_loss_rate_w: Vec::with_capacity(options.sample_count),
-            outside_conduction_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
-            ctf_outside_current_outside_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_outside_current_inside_term_rate_w: Vec::with_capacity(options.sample_count),
-            ctf_outside_history_term_rate_w: Vec::with_capacity(options.sample_count),
-            heat_storage_rate_w: Vec::with_capacity(options.sample_count),
-            heat_storage_rate_per_area_w_per_m2: Vec::with_capacity(options.sample_count),
-        })
-        .collect::<Vec<_>>();
+    let mut zone_air_heat_balance_rates =
+        zone_air_heat_balance_trace_series_from_state(state, options.sample_count);
+    let mut zone_air_debug_traces = zone_air_debug_traces_from_state(state, options.sample_count);
+    let mut surface_temperatures =
+        surface_heat_balance_traces_from_state(state, options.sample_count);
     let mut outdoor_temperatures = Vec::with_capacity(options.sample_count);
     let mut outdoor_wet_bulb_temperatures = Vec::with_capacity(options.sample_count);
     let mut sky_temperatures = Vec::with_capacity(options.sample_count);
@@ -897,241 +728,31 @@ pub(crate) fn sample_heat_balance_run_period(
         );
 
         let divisor = f64::from(steps);
-        for (index, (_zone_id, _zone_name, values)) in zone_temperatures.iter_mut().enumerate() {
-            values.push(zone_temperature_sums[index] / divisor);
-        }
-        for (index, (_zone_id, _zone_name, values)) in zone_humidity_ratios.iter_mut().enumerate() {
-            values.push(zone_humidity_ratio_sums[index] / divisor);
-        }
-        for (index, trace) in zone_conduction_rates.iter_mut().enumerate() {
-            let sums = zone_conduction_sums[index];
-            trace.inside_conduction_rate_w.push(sums.0 / divisor);
-            trace.inside_conduction_gain_rate_w.push(sums.1 / divisor);
-            trace.inside_conduction_loss_rate_w.push(sums.2 / divisor);
-            trace.outside_conduction_rate_w.push(sums.3 / divisor);
-            trace.outside_conduction_gain_rate_w.push(sums.4 / divisor);
-            trace.outside_conduction_loss_rate_w.push(sums.5 / divisor);
-        }
+        push_zone_scalar_trace_averages(&mut zone_temperatures, &zone_temperature_sums, divisor);
+        push_zone_scalar_trace_averages(
+            &mut zone_humidity_ratios,
+            &zone_humidity_ratio_sums,
+            divisor,
+        );
+        push_zone_conduction_trace_averages(
+            &mut zone_conduction_rates,
+            &zone_conduction_sums,
+            divisor,
+        );
         inside_surface_iteration_counts.push(inside_surface_iteration_count_sum);
-        for (
-            index,
-            (
-                _zone_id,
-                _zone_name,
-                internal_gain_values,
-                surface_convection_values,
-                air_storage_values,
-            ),
-        ) in zone_air_heat_balance_rates.iter_mut().enumerate()
-        {
-            let values = match options.zone_air_report_sampling {
-                HeatBalanceZoneAirReportSampling::Average => {
-                    let sums = zone_air_heat_balance_sums[index];
-                    (sums.0 / divisor, sums.1 / divisor, sums.2 / divisor)
-                }
-                HeatBalanceZoneAirReportSampling::LastSystemState => {
-                    zone_air_heat_balance_last[index]
-                }
-            };
-            internal_gain_values.push(values.0);
-            surface_convection_values.push(values.1);
-            air_storage_values.push(values.2);
-        }
-        for (index, trace) in zone_air_debug_traces.iter_mut().enumerate() {
-            let sums = zone_air_debug_sums[index];
-            trace
-                .current_temperature_c
-                .push(sums.current_temperature_c / divisor);
-            trace
-                .zone_timestep_average_temperature_c
-                .push(sums.zone_timestep_average_temperature_c / divisor);
-            trace
-                .previous_temperature_1_c
-                .push(sums.previous_temperature_1_c / divisor);
-            trace
-                .previous_temperature_2_c
-                .push(sums.previous_temperature_2_c / divisor);
-            trace
-                .previous_temperature_3_c
-                .push(sums.previous_temperature_3_c / divisor);
-            trace
-                .previous_system_temperature_1_c
-                .push(sums.previous_system_temperature_1_c / divisor);
-            trace
-                .system_timestep_count
-                .push(sums.system_timestep_count / divisor);
-            trace.humidity_ratio.push(sums.humidity_ratio / divisor);
-            trace
-                .zone_timestep_average_humidity_ratio
-                .push(sums.zone_timestep_average_humidity_ratio / divisor);
-            trace
-                .air_heat_capacity_j_per_k
-                .push(sums.air_heat_capacity_j_per_k / divisor);
-            trace
-                .zone_timestep_air_power_cap_w_per_k
-                .push(sums.zone_timestep_air_power_cap_w_per_k / divisor);
-            trace
-                .last_correction_air_power_cap_w_per_k
-                .push(sums.last_correction_air_power_cap_w_per_k / divisor);
-        }
-        for (index, trace) in surface_temperatures.iter_mut().enumerate() {
-            let sums = surface_sums[index];
-            trace
-                .inside_face_temperature_c
-                .push(sums.inside_face_temperature_c / divisor);
-            trace
-                .inside_adjacent_air_temperature_c
-                .push(sums.inside_adjacent_air_temperature_c / divisor);
-            trace
-                .outside_face_temperature_c
-                .push(sums.outside_face_temperature_c / divisor);
-            trace
-                .outside_outdoor_air_dry_bulb_temperature_c
-                .push(sums.outside_outdoor_air_dry_bulb_temperature_c / divisor);
-            trace
-                .outside_outdoor_air_wet_bulb_temperature_c
-                .push(sums.outside_outdoor_air_wet_bulb_temperature_c / divisor);
-            trace
-                .outside_outdoor_air_wind_speed_m_per_s
-                .push(sums.outside_outdoor_air_wind_speed_m_per_s / divisor);
-            trace
-                .outside_outdoor_air_wind_direction_deg
-                .push(sums.outside_outdoor_air_wind_direction_deg / divisor);
-            trace
-                .inside_convection_heat_gain_rate_w
-                .push(sums.inside_convection_heat_gain_rate_w / divisor);
-            trace
-                .inside_convection_heat_gain_rate_per_area_w_per_m2
-                .push(sums.inside_convection_heat_gain_rate_per_area_w_per_m2 / divisor);
-            trace
-                .inside_convection_coefficient_w_per_m2_k
-                .push(sums.inside_convection_coefficient_w_per_m2_k / divisor);
-            trace
-                .inside_net_surface_thermal_radiation_heat_gain_rate_w
-                .push(sums.inside_net_surface_thermal_radiation_heat_gain_rate_w / divisor);
-            trace
-                .inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2
-                .push(
-                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2
-                        / divisor,
-                );
-            trace
-                .outside_convection_heat_gain_rate_w
-                .push(sums.outside_convection_heat_gain_rate_w / divisor);
-            trace
-                .outside_convection_heat_gain_rate_per_area_w_per_m2
-                .push(sums.outside_convection_heat_gain_rate_per_area_w_per_m2 / divisor);
-            trace
-                .outside_convection_coefficient_w_per_m2_k
-                .push(sums.outside_convection_coefficient_w_per_m2_k / divisor);
-            trace
-                .outside_net_thermal_radiation_heat_gain_rate_w
-                .push(sums.outside_net_thermal_radiation_heat_gain_rate_w / divisor);
-            trace
-                .outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2
-                .push(
-                    sums.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2 / divisor,
-                );
-            trace
-                .outside_thermal_radiation_to_air_coefficient_w_per_m2_k
-                .push(sums.outside_thermal_radiation_to_air_coefficient_w_per_m2_k / divisor);
-            trace
-                .outside_thermal_radiation_to_sky_coefficient_w_per_m2_k
-                .push(sums.outside_thermal_radiation_to_sky_coefficient_w_per_m2_k / divisor);
-            trace
-                .outside_thermal_radiation_to_ground_coefficient_w_per_m2_k
-                .push(sums.outside_thermal_radiation_to_ground_coefficient_w_per_m2_k / divisor);
-            trace
-                .outside_solar_radiation_heat_gain_rate_w
-                .push(sums.outside_solar_radiation_heat_gain_rate_w / divisor);
-            trace
-                .outside_solar_radiation_heat_gain_rate_per_area_w_per_m2
-                .push(sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 / divisor);
-            trace
-                .outside_balance_report_temperature_c
-                .push(sums.outside_balance_report_temperature_c / divisor);
-            trace
-                .outside_balance_coefficient_temperature_c
-                .push(sums.outside_balance_coefficient_temperature_c / divisor);
-            trace
-                .outside_balance_convection_reference_temperature_c
-                .push(sums.outside_balance_convection_reference_temperature_c / divisor);
-            trace
-                .outside_balance_equivalent_radiant_temperature_c
-                .push(sums.outside_balance_equivalent_radiant_temperature_c / divisor);
-            trace
-                .outside_balance_radiation_coefficient_w_per_m2_k
-                .push(sums.outside_balance_radiation_coefficient_w_per_m2_k / divisor);
-            trace
-                .outside_quick_balance_inside_source_term_w_per_m2
-                .push(sums.outside_quick_balance_inside_source_term_w_per_m2 / divisor);
-            trace
-                .outside_quick_balance_inside_balance_term_w_per_m2
-                .push(sums.outside_quick_balance_inside_balance_term_w_per_m2 / divisor);
-            trace
-                .outside_quick_balance_numerator_w_per_m2
-                .push(sums.outside_quick_balance_numerator_w_per_m2 / divisor);
-            trace
-                .outside_quick_balance_denominator_w_per_m2_k
-                .push(sums.outside_quick_balance_denominator_w_per_m2_k / divisor);
-            trace
-                .outside_quick_balance_coupling_factor
-                .push(sums.outside_quick_balance_coupling_factor / divisor);
-            trace
-                .inside_conduction_rate_w
-                .push(sums.inside_conduction_rate_w / divisor);
-            trace
-                .inside_conduction_gain_rate_w
-                .push(sums.inside_conduction_gain_rate_w / divisor);
-            trace
-                .inside_conduction_loss_rate_w
-                .push(sums.inside_conduction_loss_rate_w / divisor);
-            trace
-                .inside_conduction_rate_per_area_w_per_m2
-                .push(sums.inside_conduction_rate_per_area_w_per_m2 / divisor);
-            trace
-                .ctf_inside_current_outside_term_rate_w
-                .push(sums.ctf_inside_current_outside_term_rate_w / divisor);
-            trace
-                .ctf_inside_current_inside_term_rate_w
-                .push(sums.ctf_inside_current_inside_term_rate_w / divisor);
-            trace
-                .ctf_inside_history_term_rate_w
-                .push(sums.ctf_inside_history_term_rate_w / divisor);
-            trace
-                .ctf_inside_history_temperature_term_rate_w
-                .push(sums.ctf_inside_history_temperature_term_rate_w / divisor);
-            trace
-                .ctf_inside_history_flux_term_rate_w
-                .push(sums.ctf_inside_history_flux_term_rate_w / divisor);
-            trace
-                .outside_conduction_rate_w
-                .push(sums.outside_conduction_rate_w / divisor);
-            trace
-                .outside_conduction_gain_rate_w
-                .push(sums.outside_conduction_gain_rate_w / divisor);
-            trace
-                .outside_conduction_loss_rate_w
-                .push(sums.outside_conduction_loss_rate_w / divisor);
-            trace
-                .outside_conduction_rate_per_area_w_per_m2
-                .push(sums.outside_conduction_rate_per_area_w_per_m2 / divisor);
-            trace
-                .ctf_outside_current_outside_term_rate_w
-                .push(sums.ctf_outside_current_outside_term_rate_w / divisor);
-            trace
-                .ctf_outside_current_inside_term_rate_w
-                .push(sums.ctf_outside_current_inside_term_rate_w / divisor);
-            trace
-                .ctf_outside_history_term_rate_w
-                .push(sums.ctf_outside_history_term_rate_w / divisor);
-            trace
-                .heat_storage_rate_w
-                .push(sums.heat_storage_rate_w / divisor);
-            trace
-                .heat_storage_rate_per_area_w_per_m2
-                .push(sums.heat_storage_rate_per_area_w_per_m2 / divisor);
-        }
+        push_zone_air_heat_balance_trace_values(
+            &mut zone_air_heat_balance_rates,
+            &zone_air_heat_balance_sums,
+            &zone_air_heat_balance_last,
+            options.zone_air_report_sampling,
+            divisor,
+        );
+        push_zone_air_debug_trace_averages(
+            &mut zone_air_debug_traces,
+            &zone_air_debug_sums,
+            divisor,
+        );
+        push_surface_heat_balance_trace_averages(&mut surface_temperatures, &surface_sums, divisor);
         outdoor_temperatures.push(outdoor_temperature_sum / divisor);
         outdoor_wet_bulb_temperatures.push(outdoor_wet_bulb_temperature_sum / divisor);
         sky_temperatures.push(sky_temperature_sum / divisor);

@@ -84,6 +84,7 @@ $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
 $runPeriod = "crates\ep_runtime\src\heat_balance\run_period.rs"
+$trace = "crates\ep_runtime\src\heat_balance\trace.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
@@ -110,6 +111,7 @@ foreach ($entry in @(
         @($radiation, "radiation ownership module"),
         @($reports, "report ownership module"),
         @($runPeriod, "run-period sampling ownership module"),
+        @($trace, "heat-balance trace ownership module"),
         @($surfaceWeather, "surface weather ownership module"),
         @($timestep, "heat-balance timestep ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
@@ -134,7 +136,8 @@ Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 820 -Description "report ownership module"
-Assert-LineLimit -Path $runPeriod -Limit 1180 -Description "run-period sampling ownership module"
+Assert-LineLimit -Path $runPeriod -Limit 800 -Description "run-period sampling ownership module"
+Assert-LineLimit -Path $trace -Limit 780 -Description "heat-balance trace ownership module"
 Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 Assert-LineLimit -Path $timestep -Limit 900 -Description "heat-balance timestep ownership module"
@@ -326,7 +329,11 @@ Assert-Contains -Path $reports -Pattern 'ReportHeatBalance' -Description "zone r
 Assert-Contains -Path $reports -Pattern 'HeatBalanceResultSeriesTraces' -Description "heat-balance result trace bundle owner"
 Assert-Contains -Path $reports -Pattern 'heat_balance_result_store_from_traces' -Description "heat-balance ResultStore materialization owner"
 Assert-Contains -Path $reports -Pattern 'ResultStore::new' -Description "heat-balance ResultStore writer owner"
-Assert-Contains -Path $runPeriod -Pattern 'HeatBalanceRunPeriodSamples' -Description "run-period sample bundle owner"
+Assert-Contains -Path $trace -Pattern 'HeatBalanceRunPeriodSamples' -Description "run-period sample bundle owner"
+Assert-Contains -Path $trace -Pattern 'zone_scalar_trace_series_from_state' -Description "zone scalar trace factory owner"
+Assert-Contains -Path $trace -Pattern 'push_zone_scalar_trace_averages' -Description "zone scalar trace average owner"
+Assert-Contains -Path $trace -Pattern 'push_zone_air_heat_balance_trace_values' -Description "zone-air heat-balance trace push owner"
+Assert-Contains -Path $trace -Pattern 'push_surface_heat_balance_trace_averages' -Description "surface trace average push owner"
 Assert-Contains -Path $runPeriod -Pattern 'sample_heat_balance_run_period' -Description "run-period sampler owner"
 Assert-Contains -Path $runtime -Pattern 'sample_heat_balance_run_period' -Description "runtime delegates run-period sampling"
 Assert-Contains -Path $surfaceWeather -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface weather source owner"
