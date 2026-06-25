@@ -16,16 +16,15 @@ pub mod surface_boundary;
 pub(crate) mod surface_loop;
 pub mod surface_manager;
 pub mod surface_weather;
+pub mod timestep;
 pub(crate) mod trace;
 pub(crate) mod warmup;
 pub mod zone_air_correction;
 pub mod zone_predictor_corrector;
 
 pub use air_manager::*;
+pub(crate) use algorithm::heat_balance_zone_air_algorithm_execution_variant;
 pub use algorithm::*;
-pub(crate) use algorithm::{
-    heat_balance_zone_air_algorithm_execution_variant, heat_balance_zone_air_algorithm_feature_base,
-};
 pub use convection::*;
 pub use ctf::*;
 pub use initialization::*;
@@ -39,5 +38,6 @@ pub use surface_balance::*;
 pub use surface_boundary::*;
 pub use surface_manager::*;
 pub use surface_weather::*;
+pub use timestep::*;
 pub use zone_air_correction::*;
 pub use zone_predictor_corrector::*;

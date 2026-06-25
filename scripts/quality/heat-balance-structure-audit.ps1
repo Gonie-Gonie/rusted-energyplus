@@ -84,6 +84,7 @@ $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
+$timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
@@ -108,6 +109,7 @@ foreach ($entry in @(
         @($radiation, "radiation ownership module"),
         @($reports, "report ownership module"),
         @($surfaceWeather, "surface weather ownership module"),
+        @($timestep, "heat-balance timestep ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
         @($runtime, "legacy runtime root")
@@ -132,6 +134,7 @@ Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership 
 Assert-LineLimit -Path $reports -Limit 160 -Description "report ownership module"
 Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
+Assert-LineLimit -Path $timestep -Limit 900 -Description "heat-balance timestep ownership module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
@@ -150,6 +153,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod reports;' -Description "reports module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_weather;' -Description "surface weather module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod timestep;' -Description "heat-balance timestep module declaration"
 
 Assert-Contains -Path $manager -Pattern 'pub fn manage_heat_balance_source_order_stages\s*\(' -Description "HeatBalanceManager source-order list"
 foreach ($routine in @(
@@ -324,6 +328,10 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_timestep_
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_context_fraction\s*\(' -Description "runtime-owned exterior wet context fraction"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain_at_timestep\s*\(' -Description "runtime-owned rain interpolation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
+Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep' -Description "heat-balance timestep advance owner"
+Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep_internal' -Description "heat-balance internal timestep advance owner"
+Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep\s*\(' -Description "runtime-owned heat-balance timestep advance"
+Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep_internal\s*\(' -Description "runtime-owned internal heat-balance timestep advance"
 Assert-Contains -Path $warmup -Pattern 'CheckWarmupConvergence' -Description "warmup source owner"
 Assert-Contains -Path $warmup -Pattern 'run_heat_balance_run_period_warmup' -Description "run-period warmup loop owner"
 Assert-Contains -Path $warmup -Pattern 'heat_balance_zone_temperature_snapshot' -Description "warmup zone-temperature snapshot owner"
