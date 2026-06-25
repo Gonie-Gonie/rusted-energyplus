@@ -321,6 +321,86 @@ fn invalid_epjson_returns_import_parse_failure() -> Result<(), Box<dyn std::erro
 }
 
 #[test]
+fn unresolved_model_reference_returns_compile_reference_failure()
+-> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("compile-reference")?;
+    let input_path = case_dir.join("missing-zone-reference.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, MISSING_SURFACE_ZONE_EPJSON)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::CompileReference);
+    assert_eq!(outcome.support_status, SupportStatus::Unsupported);
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+    for file in [
+        "run-summary.json",
+        "diagnostics.json",
+        "support-assessment.json",
+        "support-report.md",
+        "model/raw-model-summary.json",
+        "model/typed-model-summary.json",
+        "reports/run-report.md",
+        "reports/compatibility-boundary.md",
+    ] {
+        assert!(
+            output_dir.join(file).is_file(),
+            "missing output artifact {file}"
+        );
+    }
+    assert!(!output_dir.join("model").join("graph-summary.json").exists());
+    assert!(
+        !output_dir
+            .join("model")
+            .join("execution-plan.json")
+            .exists()
+    );
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "compile-reference");
+    assert_eq!(summary["exit_code"], 3);
+    assert_eq!(summary["support"]["status"], "unsupported");
+    assert!(summary["rust_runtime"].is_null());
+
+    let diagnostics = read_json(&output_dir.join("diagnostics.json"))?;
+    let diagnostics = diagnostics["diagnostics"]
+        .as_array()
+        .expect("diagnostics should be an array");
+    assert!(diagnostics.iter().any(|diagnostic| {
+        diagnostic["severity"] == "error"
+            && diagnostic["code"] == "MissingReference"
+            && diagnostic["stage"] == "compile"
+            && diagnostic["object_type"] == "BuildingSurface:Detailed"
+            && diagnostic["object_name"] == "Wall One"
+            && diagnostic["field"] == "zone_name"
+    }));
+    Ok(())
+}
+
+#[test]
 fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("fail-on-warning")?;
     let input_path = case_dir.join("one-zone-output-request.epJSON");

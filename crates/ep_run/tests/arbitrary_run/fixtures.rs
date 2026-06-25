@@ -46,6 +46,22 @@ pub(crate) const ONE_ZONE_EPJSON: &str = r#"{
   }
 }"#;
 
+pub(crate) const MISSING_SURFACE_ZONE_EPJSON: &str = r#"{
+  "Material:NoMass": {"R13": {}},
+  "Construction": {"Wall Construction": {"outside_layer": "R13"}},
+  "BuildingSurface:Detailed": {
+    "Wall One": {
+      "surface_type": "Wall",
+      "construction_name": "Wall Construction",
+      "zone_name": "Missing Zone",
+      "outside_boundary_condition": "Outdoors",
+      "vertices": [
+        {"vertex_x_coordinate": 0, "vertex_y_coordinate": 0, "vertex_z_coordinate": 0}
+      ]
+    }
+  }
+}"#;
+
 pub(crate) const AIR_LOOP_EPJSON: &str = r#"{
   "Version": {"Version 1": {"version_identifier": "26.1"}},
   "Zone": {"Zone One": {"volume": 100}},
