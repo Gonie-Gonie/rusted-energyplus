@@ -69,6 +69,7 @@ $heatBalanceMod = "crates\ep_runtime\src\heat_balance\mod.rs"
 $algorithm = "crates\ep_runtime\src\heat_balance\algorithm.rs"
 $manager = "crates\ep_runtime\src\heat_balance\manager.rs"
 $surfaceManager = "crates\ep_runtime\src\heat_balance\surface_manager.rs"
+$surfaceBalance = "crates\ep_runtime\src\heat_balance\surface_balance.rs"
 $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
 $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
@@ -87,6 +88,7 @@ foreach ($entry in @(
         @($algorithm, "heat-balance algorithm selector module"),
         @($manager, "HeatBalanceManager source-order module"),
         @($surfaceManager, "HeatBalanceSurfaceManager source-order module"),
+        @($surfaceBalance, "surface balance ownership module"),
         @($surfaceBoundary, "surface boundary ownership module"),
         @($airManager, "HeatBalanceAirManager source-order module"),
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
@@ -105,6 +107,7 @@ foreach ($entry in @(
 
 Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager source-order module"
 Assert-LineLimit -Path $surfaceManager -Limit 240 -Description "HeatBalanceSurfaceManager source-order module"
+Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance ownership module"
 Assert-LineLimit -Path $surfaceBoundary -Limit 220 -Description "surface boundary ownership module"
 Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
@@ -117,6 +120,7 @@ Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather 
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_balance;' -Description "surface balance module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_boundary;' -Description "surface boundary module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Description "HeatBalanceAirManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
@@ -150,6 +154,21 @@ foreach ($routine in @(
     Assert-Contains -Path $surfaceManager -Pattern $routine -Description "HeatBalanceSurfaceManager routine $routine"
 }
 
+Assert-Contains -Path $surfaceBalance -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface balance source owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'pub\(crate\) struct QuickOutsideConductionContext' -Description "quick outside conduction context owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'heat_balance_surface_boundary_balance' -Description "surface boundary balance owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'exterior_surface_boundary_balance' -Description "exterior surface boundary balance owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'reported_surface_outside_face_temperature_c' -Description "reported outside face temperature owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'surface_exterior_report_terms' -Description "surface exterior report terms owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'surface_inside_ctf_source_terms_w_per_m2' -Description "inside CTF source term owner"
+Assert-Contains -Path $surfaceBalance -Pattern 'exterior_surface_energy_balance' -Description "exterior surface energy balance owner"
+Assert-NotContains -Path $runtime -Pattern 'struct QuickOutsideConductionContext' -Description "runtime-owned quick outside conduction context"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_surface_boundary_balance\s*\(' -Description "runtime-owned surface boundary balance"
+Assert-NotContains -Path $runtime -Pattern 'fn exterior_surface_boundary_balance\s*\(' -Description "runtime-owned exterior surface boundary balance"
+Assert-NotContains -Path $runtime -Pattern 'fn reported_surface_outside_face_temperature_c\s*\(' -Description "runtime-owned reported outside face temperature"
+Assert-NotContains -Path $runtime -Pattern 'fn surface_exterior_report_terms\s*\(' -Description "runtime-owned surface exterior report terms"
+Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_ctf_source_terms_w_per_m2\s*\(' -Description "runtime-owned inside CTF source term"
+Assert-NotContains -Path $runtime -Pattern 'fn exterior_surface_energy_balance\s*\(' -Description "runtime-owned exterior surface energy balance"
 Assert-Contains -Path $surfaceBoundary -Pattern 'pub\(crate\) struct SurfaceBoundaryTarget' -Description "surface boundary target owner"
 Assert-Contains -Path $surfaceBoundary -Pattern 'resolve_surface_boundary_target' -Description "surface boundary target resolver owner"
 Assert-Contains -Path $surfaceBoundary -Pattern 'seed_initial_surface_ctf_boundary_histories' -Description "initial CTF boundary seeding owner"
