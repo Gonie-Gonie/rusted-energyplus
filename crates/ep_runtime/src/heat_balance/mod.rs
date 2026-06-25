@@ -12,6 +12,7 @@ pub mod reports;
 pub mod state;
 pub mod surface_balance;
 pub mod surface_boundary;
+pub(crate) mod surface_loop;
 pub mod surface_manager;
 pub mod surface_weather;
 pub(crate) mod trace;

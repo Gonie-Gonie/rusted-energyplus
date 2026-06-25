@@ -71,6 +71,7 @@ $manager = "crates\ep_runtime\src\heat_balance\manager.rs"
 $surfaceManager = "crates\ep_runtime\src\heat_balance\surface_manager.rs"
 $surfaceBalance = "crates\ep_runtime\src\heat_balance\surface_balance.rs"
 $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
+$surfaceLoop = "crates\ep_runtime\src\heat_balance\surface_loop.rs"
 $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
 $zoneAirCorrection = "crates\ep_runtime\src\heat_balance\zone_air_correction.rs"
@@ -92,6 +93,7 @@ foreach ($entry in @(
         @($surfaceManager, "HeatBalanceSurfaceManager source-order module"),
         @($surfaceBalance, "surface balance ownership module"),
         @($surfaceBoundary, "surface boundary ownership module"),
+        @($surfaceLoop, "surface loop ownership module"),
         @($airManager, "HeatBalanceAirManager source-order module"),
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
         @($zoneAirCorrection, "zone-air correction ownership module"),
@@ -113,6 +115,7 @@ Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager sour
 Assert-LineLimit -Path $surfaceManager -Limit 240 -Description "HeatBalanceSurfaceManager source-order module"
 Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance ownership module"
 Assert-LineLimit -Path $surfaceBoundary -Limit 280 -Description "surface boundary ownership module"
+Assert-LineLimit -Path $surfaceLoop -Limit 420 -Description "surface loop ownership module"
 Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
 Assert-LineLimit -Path $zoneAirCorrection -Limit 520 -Description "zone-air correction ownership module"
@@ -128,6 +131,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_balance;' -Description "surface balance module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_boundary;' -Description "surface boundary module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub\(crate\) mod surface_loop;' -Description "surface loop module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Description "HeatBalanceAirManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_air_correction;' -Description "zone-air correction module declaration"
@@ -177,6 +181,15 @@ Assert-NotContains -Path $runtime -Pattern 'fn reported_surface_outside_face_tem
 Assert-NotContains -Path $runtime -Pattern 'fn surface_exterior_report_terms\s*\(' -Description "runtime-owned surface exterior report terms"
 Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_ctf_source_terms_w_per_m2\s*\(' -Description "runtime-owned inside CTF source term"
 Assert-NotContains -Path $runtime -Pattern 'fn exterior_surface_energy_balance\s*\(' -Description "runtime-owned exterior surface energy balance"
+Assert-Contains -Path $surfaceLoop -Pattern 'CalcHeatBalanceInsideSurf' -Description "surface loop source owner"
+Assert-Contains -Path $surfaceLoop -Pattern 'InterleavedSurfaceZoneBalanceResult' -Description "interleaved surface-zone loop result owner"
+Assert-Contains -Path $surfaceLoop -Pattern 'run_interleaved_surface_zone_balance' -Description "interleaved surface-zone loop owner"
+Assert-Contains -Path $surfaceLoop -Pattern 'run_surface_balance_passes' -Description "surface balance pass loop owner"
+Assert-Contains -Path $surfaceLoop -Pattern 'ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C' -Description "surface convergence tolerance owner"
+Assert-NotContains -Path $runtime -Pattern 'struct InterleavedSurfaceZoneBalanceResult' -Description "runtime-owned interleaved surface-zone loop result"
+Assert-NotContains -Path $runtime -Pattern 'fn run_interleaved_surface_zone_balance\s*\(' -Description "runtime-owned interleaved surface-zone loop"
+Assert-NotContains -Path $runtime -Pattern 'fn run_surface_balance_passes\s*\(' -Description "runtime-owned surface balance pass loop"
+Assert-NotContains -Path $runtime -Pattern 'ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C' -Description "runtime-owned surface convergence tolerance"
 Assert-Contains -Path $surfaceBoundary -Pattern 'pub\(crate\) struct SurfaceBoundaryTarget' -Description "surface boundary target owner"
 Assert-Contains -Path $surfaceBoundary -Pattern 'resolve_surface_boundary_target' -Description "surface boundary target resolver owner"
 Assert-Contains -Path $surfaceBoundary -Pattern 'seed_initial_surface_ctf_boundary_histories' -Description "initial CTF boundary seeding owner"
