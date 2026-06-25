@@ -10,6 +10,7 @@ pub mod longwave;
 pub mod manager;
 pub mod radiation;
 pub mod reports;
+pub(crate) mod run_period;
 pub mod state;
 pub mod surface_balance;
 pub mod surface_boundary;
