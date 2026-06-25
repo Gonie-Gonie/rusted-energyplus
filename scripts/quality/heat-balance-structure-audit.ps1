@@ -101,7 +101,7 @@ foreach ($entry in @(
 
 Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager source-order module"
 Assert-LineLimit -Path $surfaceManager -Limit 240 -Description "HeatBalanceSurfaceManager source-order module"
-Assert-LineLimit -Path $airManager -Limit 60 -Description "HeatBalanceAirManager source-order module"
+Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
 Assert-LineLimit -Path $convection -Limit 260 -Description "convection ownership module"
@@ -143,6 +143,14 @@ foreach ($routine in @(
 }
 
 Assert-Contains -Path $airManager -Pattern 'ManageAirHeatBalance' -Description "HeatBalanceAirManager routine"
+Assert-Contains -Path $airManager -Pattern 'weather_context_zone_air_heat_capacity_j_per_k' -Description "weather-driven zone-air heat capacity owner"
+Assert-Contains -Path $airManager -Pattern 'update_zone_air_heat_capacities_from_weather_context' -Description "zone-air weather capacity updater owner"
+Assert-Contains -Path $airManager -Pattern 'seed_zone_air_humidity_ratios_from_weather_records' -Description "zone-air weather humidity seeding owner"
+Assert-Contains -Path $airManager -Pattern 'zone_air_heat_balance_air_storage_rate_w' -Description "zone-air storage report owner"
+Assert-NotContains -Path $runtime -Pattern 'fn weather_context_zone_air_heat_capacity_j_per_k\s*\(' -Description "runtime-owned zone-air weather capacity implementation"
+Assert-NotContains -Path $runtime -Pattern 'fn update_zone_air_heat_capacities_from_weather_context\s*\(' -Description "runtime-owned zone-air weather capacity updater"
+Assert-NotContains -Path $runtime -Pattern 'fn seed_zone_air_humidity_ratios_from_weather_records\s*\(' -Description "runtime-owned weather humidity seeding"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_air_storage_rate_w\s*\(' -Description "runtime-owned zone-air storage report implementation"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ManageZoneAirUpdates' -Description "ZoneTempPredictorCorrector routine"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_zone_air_temperature_coefficients' -Description "ZoneTempPredictorCorrector coefficient owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_third_order_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector third-order solver owner"
