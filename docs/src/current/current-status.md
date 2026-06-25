@@ -44,13 +44,16 @@ coverage boundaries are generated from `specs/algorithm_ledger.toml`,
 
 Passed release-evidence series and tracked output variables are intentionally
 separate counts. Current public documentation tracks 22 passed release-evidence
-series and 117 output-variable coverage rows, including conformance,
+series and 135 tracked output variables, including conformance,
 diagnostic, and baseline variables.
 
 The official `1ZoneUncontrolled` target is currently declared-variable
 compatibility only. Broad CTF storage parity, broad solar/radiation parity,
 fenestration, infiltration, and general heat-balance compatibility remain
-outside the claim.
+outside the claim. The active all-CTF diagnostic probe currently keeps the
+mass-floor storage blocker at sample 2435 with `face-temperature-current-inside`
+as the dominant mismatch source; this is diagnostic evidence, not a promoted
+claim.
 
 IdealLoadsAirSystem evidence is branch-scoped and variable-scoped. No-OA
 sensible, finite-limit, ConstantSensibleHeatRatio, selected humidity,
