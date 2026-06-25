@@ -72,6 +72,7 @@ $surfaceManager = "crates\ep_runtime\src\heat_balance\surface_manager.rs"
 $surfaceBalance = "crates\ep_runtime\src\heat_balance\surface_balance.rs"
 $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
 $surfaceLoop = "crates\ep_runtime\src\heat_balance\surface_loop.rs"
+$warmup = "crates\ep_runtime\src\heat_balance\warmup.rs"
 $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
 $zoneAirCorrection = "crates\ep_runtime\src\heat_balance\zone_air_correction.rs"
@@ -94,6 +95,7 @@ foreach ($entry in @(
         @($surfaceBalance, "surface balance ownership module"),
         @($surfaceBoundary, "surface boundary ownership module"),
         @($surfaceLoop, "surface loop ownership module"),
+        @($warmup, "warmup ownership module"),
         @($airManager, "HeatBalanceAirManager source-order module"),
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
         @($zoneAirCorrection, "zone-air correction ownership module"),
@@ -125,6 +127,7 @@ Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 160 -Description "report ownership module"
+Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
@@ -132,6 +135,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Descr
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_balance;' -Description "surface balance module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_boundary;' -Description "surface boundary module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub\(crate\) mod surface_loop;' -Description "surface loop module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub\(crate\) mod warmup;' -Description "warmup module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Description "HeatBalanceAirManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_air_correction;' -Description "zone-air correction module declaration"
@@ -316,6 +320,13 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_timestep_
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_context_fraction\s*\(' -Description "runtime-owned exterior wet context fraction"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain_at_timestep\s*\(' -Description "runtime-owned rain interpolation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
+Assert-Contains -Path $warmup -Pattern 'CheckWarmupConvergence' -Description "warmup source owner"
+Assert-Contains -Path $warmup -Pattern 'run_heat_balance_run_period_warmup' -Description "run-period warmup loop owner"
+Assert-Contains -Path $warmup -Pattern 'heat_balance_zone_temperature_snapshot' -Description "warmup zone-temperature snapshot owner"
+Assert-Contains -Path $warmup -Pattern 'max_abs_pair_delta' -Description "warmup convergence delta owner"
+Assert-NotContains -Path $runtime -Pattern 'fn run_heat_balance_run_period_warmup\s*\(' -Description "runtime-owned run-period warmup loop"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_zone_temperature_snapshot\s*\(' -Description "runtime-owned warmup zone-temperature snapshot"
+Assert-NotContains -Path $runtime -Pattern 'fn max_abs_pair_delta\s*\(' -Description "runtime-owned warmup convergence delta"
 Assert-Contains -Path $reports -Pattern 'zone_surface_report_conduction_rates_w' -Description "zone surface conduction report owner"
 Assert-Contains -Path $reports -Pattern 'heat_gain_rate_w' -Description "positive heat-gain report helper owner"
 Assert-Contains -Path $reports -Pattern 'heat_loss_rate_w' -Description "positive heat-loss report helper owner"

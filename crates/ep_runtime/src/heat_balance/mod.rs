@@ -16,6 +16,7 @@ pub(crate) mod surface_loop;
 pub mod surface_manager;
 pub mod surface_weather;
 pub(crate) mod trace;
+pub(crate) mod warmup;
 pub mod zone_air_correction;
 pub mod zone_predictor_corrector;
 
