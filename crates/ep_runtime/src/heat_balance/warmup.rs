@@ -3,8 +3,9 @@
 use crate::heat_balance::algorithm::HeatBalanceZoneAirAlgorithm;
 use crate::heat_balance::state::{
     HeatBalanceState, HeatBalanceStepInput, HeatBalanceSurfaceLoopZoneAirCorrection,
-    HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupOptions, HeatBalanceWarmupSummary,
+    HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupOptions,
 };
+use crate::heat_balance::summary::HeatBalanceWarmupSummary;
 use crate::heat_balance::trace::heat_balance_zone_air_state_sample;
 use crate::weather::{
     EpwRecord, HeatBalanceWeatherContext,

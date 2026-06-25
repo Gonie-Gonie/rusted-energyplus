@@ -74,6 +74,7 @@ pub use crate::heat_balance::state::*;
 pub(crate) use crate::heat_balance::state::{
     SurfaceExteriorReportTerms, SurfaceOutsideBalanceDiagnostics,
 };
+pub use crate::heat_balance::summary::*;
 #[cfg(test)]
 use crate::heat_balance::surface_balance::{
     QuickOutsideConductionContext, exterior_surface_energy_balance, surface_exterior_report_terms,

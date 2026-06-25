@@ -83,8 +83,10 @@ $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
+$state = "crates\ep_runtime\src\heat_balance\state.rs"
 $runPeriod = "crates\ep_runtime\src\heat_balance\run_period.rs"
 $trace = "crates\ep_runtime\src\heat_balance\trace.rs"
+$summary = "crates\ep_runtime\src\heat_balance\summary.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
@@ -110,8 +112,10 @@ foreach ($entry in @(
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
         @($reports, "report ownership module"),
+        @($state, "heat-balance state ownership module"),
         @($runPeriod, "run-period sampling ownership module"),
         @($trace, "heat-balance trace ownership module"),
+        @($summary, "heat-balance summary ownership module"),
         @($surfaceWeather, "surface weather ownership module"),
         @($timestep, "heat-balance timestep ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
@@ -137,8 +141,10 @@ Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 820 -Description "report ownership module"
+Assert-LineLimit -Path $state -Limit 800 -Description "heat-balance state ownership module"
 Assert-LineLimit -Path $runPeriod -Limit 800 -Description "run-period sampling ownership module"
 Assert-LineLimit -Path $trace -Limit 780 -Description "heat-balance trace ownership module"
+Assert-LineLimit -Path $summary -Limit 140 -Description "heat-balance summary ownership module"
 Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 Assert-LineLimit -Path $timestep -Limit 800 -Description "heat-balance timestep ownership module"
@@ -335,6 +341,13 @@ Assert-Contains -Path $trace -Pattern 'zone_scalar_trace_series_from_state' -Des
 Assert-Contains -Path $trace -Pattern 'push_zone_scalar_trace_averages' -Description "zone scalar trace average owner"
 Assert-Contains -Path $trace -Pattern 'push_zone_air_heat_balance_trace_values' -Description "zone-air heat-balance trace push owner"
 Assert-Contains -Path $trace -Pattern 'push_surface_heat_balance_trace_averages' -Description "surface trace average push owner"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod summary;' -Description "summary module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub use summary::\*;' -Description "summary module facade export"
+Assert-Contains -Path $state -Pattern 'HeatBalanceSimulationOptions' -Description "heat-balance simulation options owner"
+Assert-Contains -Path $summary -Pattern 'HeatBalanceWarmupSummary' -Description "warmup summary owner"
+Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulationSummary' -Description "heat-balance simulation summary owner"
+Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulation' -Description "heat-balance simulation result owner"
+Assert-NotContains -Path $state -Pattern 'pub struct HeatBalanceSimulationSummary' -Description "state-owned simulation summary"
 Assert-Contains -Path $runPeriod -Pattern 'sample_heat_balance_run_period' -Description "run-period sampler owner"
 Assert-Contains -Path $runtime -Pattern 'sample_heat_balance_run_period' -Description "runtime delegates run-period sampling"
 Assert-Contains -Path $surfaceWeather -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface weather source owner"
