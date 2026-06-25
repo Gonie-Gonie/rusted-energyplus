@@ -14,6 +14,13 @@ mod fixtures;
 
 use fixtures::*;
 
+#[path = "arbitrary_run/output_manifest.rs"]
+mod output_manifest;
+
+use output_manifest::{
+    BLOCKED_AFTER_SUPPORT_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest,
+};
+
 #[test]
 fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("one-zone-runtime")?;
@@ -53,6 +60,7 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     );
 
     assert_output_layout(&output_dir, true)?;
+    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(summary["status"], "success");
     assert_eq!(
@@ -121,6 +129,7 @@ fn unsupported_air_loop_blocks_before_runtime() -> Result<(), Box<dyn std::error
     assert_eq!(outcome.support_status, SupportStatus::Unsupported);
     assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
     assert_output_layout(&output_dir, false)?;
+    assert_output_manifest(&output_dir, BLOCKED_AFTER_SUPPORT_MANIFEST)?;
     assert!(
         !output_dir
             .join("results")
@@ -758,6 +767,7 @@ fn assert_output_layout(
         "eplusrs.err",
         "input/original.epJSON",
         "input/converted.epJSON",
+        "input/input-hashes.json",
         "model/raw-model-summary.json",
         "model/typed-model-summary.json",
         "model/graph-summary.json",
