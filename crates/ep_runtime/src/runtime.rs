@@ -79,6 +79,14 @@ pub(crate) use crate::heat_balance::state::{
     InsideConvectionCoefficientInputState, SurfaceBoundaryBalanceResult,
     SurfaceExteriorReportTerms, SurfaceOutsideBalanceDiagnostics,
 };
+#[cfg(test)]
+use crate::heat_balance::surface_boundary::{
+    ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C, surface_steady_u_value_w_per_m2_k,
+};
+use crate::heat_balance::surface_boundary::{
+    resolve_surface_boundary_target, seed_energyplus_initial_surface_ctf_histories,
+    seed_initial_surface_ctf_boundary_histories, surface_boundary_temperature_c,
+};
 pub(crate) use crate::heat_balance::surface_thermal_properties;
 use crate::heat_balance::surface_weather::{
     energyplus_exterior_wet_context_fraction, energyplus_exterior_wet_reference_temperature_c,
@@ -141,8 +149,8 @@ use crate::{OutputSeries, ResultStore};
 #[cfg(test)]
 use crate::{SimulationMode, SimulationState};
 use ep_model::{
-    FirstHourInterpolationStartingValues, NormalizedName, OutputHandle, OutsideBoundaryCondition,
-    SimulationModel, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, ZoneId,
+    FirstHourInterpolationStartingValues, OutputHandle, OutsideBoundaryCondition, SimulationModel,
+    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, ZoneId,
 };
 use std::collections::BTreeMap;
 
@@ -153,7 +161,6 @@ const SECONDS_PER_HOUR: f64 = 3600.0;
 const ENERGYPLUS_ZONE_INITIAL_TEMP_C: f64 = 23.0;
 const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
 const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
-const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
 const ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C: f64 = 0.002;
 const ENERGYPLUS_MAX_ZONE_TEMP_DIFF_C: f64 = 0.3;
@@ -4263,200 +4270,6 @@ fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
         .zip(right.iter())
         .map(|(left, right)| (left - right).abs())
         .fold(0.0, f64::max)
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-struct SurfaceBoundaryTarget {
-    surface_id: Option<SurfaceId>,
-    zone_id: Option<ZoneId>,
-}
-
-fn seed_initial_surface_ctf_boundary_histories(
-    state: &mut HeatBalanceState,
-    initial_outdoor_dry_bulb_c: f64,
-) {
-    let zone_temperatures = state
-        .zones
-        .iter()
-        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-        .collect::<BTreeMap<_, _>>();
-
-    for surface in &mut state.surfaces {
-        let inside_temperature_c = zone_temperatures
-            .get(&surface.zone_id)
-            .copied()
-            .unwrap_or(surface.inside_face_temperature_c);
-        let outside_temperature_c = initial_surface_ctf_boundary_temperature_c(
-            surface,
-            &zone_temperatures,
-            initial_outdoor_dry_bulb_c,
-            inside_temperature_c,
-        );
-        let initial_flux_w_per_m2 = surface_steady_u_value_w_per_m2_k(surface)
-            * (outside_temperature_c - inside_temperature_c);
-
-        surface.inside_face_temperature_c = inside_temperature_c;
-        surface.outside_face_temperature_c = outside_temperature_c;
-        surface
-            .ctf
-            .inside_temperature_history_c
-            .fill(inside_temperature_c);
-        surface
-            .ctf
-            .outside_temperature_history_c
-            .fill(outside_temperature_c);
-        surface
-            .ctf
-            .inside_flux_history_w_per_m2
-            .fill(initial_flux_w_per_m2);
-        surface
-            .ctf
-            .outside_flux_history_w_per_m2
-            .fill(initial_flux_w_per_m2);
-    }
-}
-
-fn seed_energyplus_initial_surface_ctf_histories(
-    state: &mut HeatBalanceState,
-    initial_surface_temperature_c: f64,
-    initial_outdoor_dry_bulb_c: f64,
-) {
-    let zone_temperatures = state
-        .zones
-        .iter()
-        .map(|zone| (zone.zone_id, initial_surface_temperature_c))
-        .collect::<BTreeMap<_, _>>();
-
-    for surface in &mut state.surfaces {
-        let outside_temperature_c = initial_surface_ctf_boundary_temperature_c(
-            surface,
-            &zone_temperatures,
-            initial_outdoor_dry_bulb_c,
-            initial_surface_temperature_c,
-        );
-        let initial_flux_w_per_m2 = surface_steady_u_value_w_per_m2_k(surface)
-            * (outside_temperature_c - initial_surface_temperature_c);
-
-        surface.inside_face_temperature_c = initial_surface_temperature_c;
-        surface.outside_face_temperature_c = outside_temperature_c;
-        surface
-            .ctf
-            .inside_temperature_history_c
-            .fill(initial_surface_temperature_c);
-        surface
-            .ctf
-            .outside_temperature_history_c
-            .fill(outside_temperature_c);
-        surface
-            .ctf
-            .inside_flux_history_w_per_m2
-            .fill(initial_flux_w_per_m2);
-        surface
-            .ctf
-            .outside_flux_history_w_per_m2
-            .fill(initial_flux_w_per_m2);
-    }
-}
-
-fn initial_surface_ctf_boundary_temperature_c(
-    surface: &SurfaceHeatBalanceState,
-    zone_temperatures: &BTreeMap<ZoneId, f64>,
-    initial_outdoor_dry_bulb_c: f64,
-    owning_zone_temperature_c: f64,
-) -> f64 {
-    match surface.outside_boundary_condition {
-        OutsideBoundaryCondition::Outdoors => initial_outdoor_dry_bulb_c,
-        OutsideBoundaryCondition::Adiabatic => owning_zone_temperature_c,
-        _ => surface_boundary_temperature_c(
-            surface,
-            zone_temperatures,
-            initial_outdoor_dry_bulb_c,
-            owning_zone_temperature_c,
-        ),
-    }
-}
-
-fn surface_steady_u_value_w_per_m2_k(surface: &SurfaceHeatBalanceState) -> f64 {
-    if surface.thermal_resistance_m2_k_per_w > 0.0 {
-        1.0 / surface.thermal_resistance_m2_k_per_w
-    } else {
-        0.0
-    }
-}
-
-fn resolve_surface_boundary_target(
-    model: &TypedModel,
-    surface: &Surface,
-) -> Result<SurfaceBoundaryTarget, RuntimeError> {
-    match surface.outside_boundary_condition {
-        OutsideBoundaryCondition::Surface => {
-            let target_name = boundary_object_name(surface);
-            let target_surface = model
-                .surfaces
-                .iter()
-                .find(|candidate| candidate.name == NormalizedName::new(&target_name))
-                .ok_or_else(|| RuntimeError::MissingSurfaceBoundaryTarget {
-                    surface_name: surface.name.0.clone(),
-                    target_name: target_name.clone(),
-                })?;
-            Ok(SurfaceBoundaryTarget {
-                surface_id: Some(target_surface.id),
-                zone_id: Some(target_surface.zone),
-            })
-        }
-        OutsideBoundaryCondition::Zone | OutsideBoundaryCondition::Space => {
-            let target_name = boundary_object_name(surface);
-            let target_zone = model
-                .zones
-                .iter()
-                .find(|zone| zone.name == NormalizedName::new(&target_name))
-                .ok_or_else(|| RuntimeError::MissingZoneBoundaryTarget {
-                    surface_name: surface.name.0.clone(),
-                    target_name: target_name.clone(),
-                })?;
-            Ok(SurfaceBoundaryTarget {
-                surface_id: None,
-                zone_id: Some(target_zone.id),
-            })
-        }
-        OutsideBoundaryCondition::Adiabatic
-        | OutsideBoundaryCondition::Foundation
-        | OutsideBoundaryCondition::Ground
-        | OutsideBoundaryCondition::Outdoors
-        | OutsideBoundaryCondition::Other => Ok(SurfaceBoundaryTarget::default()),
-    }
-}
-
-fn boundary_object_name(surface: &Surface) -> String {
-    surface
-        .outside_boundary_condition_object
-        .as_ref()
-        .map(|name| name.0.clone())
-        .unwrap_or_default()
-}
-
-fn surface_boundary_temperature_c(
-    surface: &SurfaceHeatBalanceState,
-    previous_zone_temperatures: &BTreeMap<ZoneId, f64>,
-    outdoor_dry_bulb_c: f64,
-    owning_zone_temperature_c: f64,
-) -> f64 {
-    match surface.outside_boundary_condition {
-        OutsideBoundaryCondition::Outdoors => outdoor_dry_bulb_c,
-        OutsideBoundaryCondition::Adiabatic => owning_zone_temperature_c,
-        OutsideBoundaryCondition::Surface
-        | OutsideBoundaryCondition::Zone
-        | OutsideBoundaryCondition::Space => surface
-            .outside_boundary_target_zone_id
-            .and_then(|target_zone_id| previous_zone_temperatures.get(&target_zone_id).copied())
-            .unwrap_or(owning_zone_temperature_c),
-        OutsideBoundaryCondition::Ground => {
-            ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C
-        }
-        OutsideBoundaryCondition::Foundation | OutsideBoundaryCondition::Other => {
-            surface.outside_face_temperature_c
-        }
-    }
 }
 
 fn heat_balance_surface_boundary_balance(
