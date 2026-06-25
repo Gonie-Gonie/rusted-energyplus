@@ -10,6 +10,7 @@
 - [Verification](current/verification.md)
 - [Architecture Overview](current/architecture-overview.md)
 - [Launcher And Run Framework](current/launcher-and-run-framework.md)
+- [P1-P4 Checklist Closure](current/p1-p4-checklist-closure.md)
 
 # Guides
 

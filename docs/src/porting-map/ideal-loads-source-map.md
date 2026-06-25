@@ -1,4 +1,4 @@
-﻿---
+---
 status: active
 claim_level: limited-ideal-loads-no-oa-sensible-conformance
 owner: runtime
@@ -36,9 +36,9 @@ source anchors:
   and standard-density psychrometric helpers.
 - `src/EnergyPlus/OutputProcessor.cc`: `SetupOutputVariable`, detailed
   timestep reporting, and OutputProcessor sum/meter aggregation semantics.
-- `src/EnergyPlus/HVACSizingSimulationManager.cc`: deferred autosizing
-  extension anchor only; autosized IdealLoads flow/capacity conformance remains
-  outside the current claim.
+- `src/EnergyPlus/HVACSizingSimulationManager.cc`: autosizing source anchor for
+  out-of-claim IdealLoads sizing semantics; autosized IdealLoads flow/capacity
+  conformance remains outside the current claim.
 
 ## Initial Claim Boundary
 

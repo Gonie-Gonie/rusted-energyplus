@@ -54,8 +54,8 @@ and maintenance notes; keep row-level algorithm state in the spec.
 
 | Domain | EnergyPlus source anchor | Rust target | Evidence state | Claim boundary |
 |---|---|---|---|---|
-| Schedule constant and compact subset | Schedule manager routines, source map pending expansion | typed schedules and schedule traces | smoke and input-evidence gates | schedule parsing/value evidence only |
-| Weather dry-bulb input | weather data manager routines, source map pending expansion | EPW records and weather traces | weather-field smoke gate | selected weather field evidence only |
+| Schedule constant and compact subset | Schedule manager routines, source-map scope outside current claim | typed schedules and schedule traces | smoke and input-evidence gates | schedule parsing/value evidence only |
+| Weather dry-bulb input | weather data manager routines, source-map scope outside current claim | EPW records and weather traces | weather-field smoke gate | selected weather field evidence only |
 | Geometry and constructions | heat-balance input managers | typed geometry/material/construction summaries | EIO smoke gates | input interpretation evidence only |
 | Internal convective gains | `HeatBalanceInternalHeatGains.cc`, `InternalHeatGains.cc` | runtime internal-gain trace | ESO smoke comparison | not zone air compatibility by itself |
 | No-mass zone mean air temperature | `ManageHeatBalance`, `ManageZoneAirUpdates`, `correctZoneAirTemps` | heat-balance state and zone MAT trace | v0.8 promoted conformance case | only `heat_balance_nomass_001` MAT |
@@ -64,7 +64,7 @@ and maintenance notes; keep row-level algorithm state in the spec.
 | IdealLoads no-OA ConstantSensibleHeatRatio cooling branch | `PurchasedAirManager.cc`, `Psychrometrics.hh`, `OutputProcessor.cc`, and node/source maps | `ep_runtime::ideal_loads` latent/sensible split helpers and supply-node humidity update | `ideal_loads_constant_shr_conformance_001` promoted conformance gate | declared no-OA Constant SHR cooling total/sensible/latent and supply-node humidity rows only |
 | Air-side node state | node and HVAC manager source map | `NodeStateStore` projection plumbing | v0.11 diagnostic-only baseline/projection | not node or HVAC numerical conformance |
 | Node source mapping policy | node state source map | planning guard | v0.12 policy/readiness | no new numerical claim |
-| PlantLoop typed graph | plant manager source map pending at v0.13 | typed PlantLoop graph edges | v0.13 smoke gate | no plant loop simulation |
+| PlantLoop typed graph | plant manager source-map scope outside current claim | typed PlantLoop graph edges | v0.13 smoke gate | no plant loop simulation |
 | Plant manager and flow source map | `ManagePlantLoops`, `SetComponentFlowRate` | plant source-map planning guard | v0.14 planning-ready evidence | no plant numerical claim |
 | PlantLoadProfile baseline | plant loop and component reporting anchors | plant diagnostic output classes | v0.15 baseline-only diagnostic | not plant, equipment, meter, or flow conformance |
 | PlantLoadProfile projection addendum | same source-map anchors, algorithms not ported | `simulate_plant_state_projection` and `run plant-state-projection` | post-v0.15 projected diagnostic artifact | `algorithm_parity: false`; not plant numerical conformance |

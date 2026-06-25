@@ -89,7 +89,7 @@ plant, meter, or broad heat-balance compatibility.
 | Opaque conduction | CTF setup and surface balance reporting | surface and zone conduction result series | no-mass adiabatic conduction series in `surface_temperature_nomass_001`; selected whole-surface conduction rows in `official_1zone_uncontrolled_dynamic_conformance_candidate_001`; broader diagnostic deltas in `official_1zone_uncontrolled_dynamic_diagnostic_001` | see `conduction-map.md`; no broad official ExampleFile CTF parity |
 | Internal convective gains | `zoneSumAllInternalConvectionGains`, `spaceSumAllInternalConvectionGains` | internal-gain trace | `internal_gains_001` tolerance gate | conformance only for declared convective trace; not zone air parity alone |
 | Warmup and reporting semantics | warmup convergence and ESO reporting filters | Rust warmup loop plus report metadata; full parity future | the official dynamic compatibility candidate pins the oracle run-period warmup count for its promoted variables, while diagnostic reports retain broader warmup evidence | see `warmup-semantics-map.md`; no broad warmup-convergence claim |
-| Weather and schedules | weather/schedule managers, source map pending expansion | typed weather and schedule traces | smoke comparisons | input evidence only |
+| Weather and schedules | weather/schedule managers, source-map scope outside current claim | typed weather and schedule traces | smoke comparisons | input evidence only |
 | Dynamic envelope behavior | multiple surface and material managers | not fully ported | none | no claim |
 | Solar, fenestration, infiltration, HVAC coupling | multiple domain managers | not ported for heat-balance conformance | none | no claim |
 
