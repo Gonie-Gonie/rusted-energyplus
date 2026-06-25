@@ -12,12 +12,17 @@ use crate::heat_balance::air_manager::{
     weather_proxy_zone_air_heat_capacity_j_per_k, zone_air_heat_balance_air_storage_rate_w,
 };
 #[cfg(test)]
-use crate::heat_balance::convection::energyplus_ashrae_tarp_natural_convection_w_per_m2_k;
 use crate::heat_balance::convection::{
+    ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
     ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
+    energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
     energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
+};
+use crate::heat_balance::convection::{
+    ExteriorConvectionTerms, energyplus_building_terrain, energyplus_exterior_convection_terms,
+    energyplus_surface_outdoor_air_temperature_c, energyplus_surface_outside_wind_speed_m_per_s,
     energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
-    exterior_convection_coefficient_w_per_m2_k, heat_balance_uses_doe2_outside_convection,
+    heat_balance_uses_doe2_outside_convection,
 };
 pub use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
 use crate::heat_balance::ctf::{
@@ -137,8 +142,7 @@ use crate::{OutputSeries, ResultStore};
 use crate::{SimulationMode, SimulationState};
 use ep_model::{
     FirstHourInterpolationStartingValues, NormalizedName, OutputHandle, OutsideBoundaryCondition,
-    Point3, SimulationModel, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel,
-    WindExposure, ZoneId,
+    SimulationModel, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel, ZoneId,
 };
 use std::collections::BTreeMap;
 
@@ -154,11 +158,6 @@ const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
 const ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C: f64 = 0.002;
 const ENERGYPLUS_MAX_ZONE_TEMP_DIFF_C: f64 = 0.3;
 const ENERGYPLUS_MIN_SYSTEM_TIMESTEP_SECONDS: f64 = 60.0;
-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M: f64 = 10.0;
-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;
-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;
-const ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M: f64 = 1.5;
-const ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 
@@ -4266,12 +4265,6 @@ fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
         .fold(0.0, f64::max)
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-struct ExteriorConvectionTerms {
-    coefficient_w_per_m2_k: f64,
-    reference_temperature_c: f64,
-}
-
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 struct SurfaceBoundaryTarget {
     surface_id: Option<SurfaceId>,
@@ -4850,167 +4843,6 @@ fn heat_balance_uses_cached_exterior_report_terms(
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe
             | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     )
-}
-
-fn energyplus_exterior_convection_terms(
-    surface_state: &SurfaceHeatBalanceState,
-    typed_surface: &Surface,
-    surface_temperature_c: f64,
-    outdoor_dry_bulb_c: f64,
-    tilt_rad: f64,
-    terrain: Terrain,
-    weather_file_wind_speed_m_per_s: f64,
-    wind_direction_deg: f64,
-    use_doe2_outside_convection: bool,
-    wet_reference_temperature_c: f64,
-    wet_timestep_fraction: f64,
-) -> ExteriorConvectionTerms {
-    let dry_coefficient_w_per_m2_k = energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
-        surface_state,
-        typed_surface,
-        surface_temperature_c,
-        outdoor_dry_bulb_c,
-        tilt_rad,
-        terrain,
-        weather_file_wind_speed_m_per_s,
-        wind_direction_deg,
-        use_doe2_outside_convection,
-    );
-    let wet_timestep_fraction = wet_timestep_fraction.clamp(0.0, 1.0);
-    if wet_timestep_fraction <= f64::EPSILON {
-        return ExteriorConvectionTerms {
-            coefficient_w_per_m2_k: dry_coefficient_w_per_m2_k,
-            reference_temperature_c: outdoor_dry_bulb_c,
-        };
-    }
-
-    let coefficient_w_per_m2_k = wet_timestep_fraction
-        * ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
-        + (1.0 - wet_timestep_fraction) * dry_coefficient_w_per_m2_k;
-    let reference_temperature_c = if coefficient_w_per_m2_k.abs() <= f64::EPSILON {
-        outdoor_dry_bulb_c
-    } else {
-        (wet_timestep_fraction
-            * ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K
-            * wet_reference_temperature_c
-            + (1.0 - wet_timestep_fraction) * dry_coefficient_w_per_m2_k * outdoor_dry_bulb_c)
-            / coefficient_w_per_m2_k
-    };
-
-    ExteriorConvectionTerms {
-        coefficient_w_per_m2_k,
-        reference_temperature_c,
-    }
-}
-
-fn energyplus_dry_exterior_convection_coefficient_w_per_m2_k(
-    surface_state: &SurfaceHeatBalanceState,
-    typed_surface: &Surface,
-    surface_temperature_c: f64,
-    outdoor_dry_bulb_c: f64,
-    tilt_rad: f64,
-    terrain: Terrain,
-    weather_file_wind_speed_m_per_s: f64,
-    wind_direction_deg: f64,
-    use_doe2_outside_convection: bool,
-) -> f64 {
-    let wind_speed_m_per_s = energyplus_surface_outside_wind_speed_m_per_s(
-        typed_surface,
-        terrain,
-        weather_file_wind_speed_m_per_s,
-    );
-    if use_doe2_outside_convection {
-        energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
-            surface_temperature_c,
-            outdoor_dry_bulb_c,
-            tilt_rad.cos(),
-            surface_azimuth_deg(&typed_surface.vertices),
-            wind_direction_deg,
-            wind_speed_m_per_s,
-            surface_state.outside_layer_roughness,
-        )
-    } else {
-        exterior_convection_coefficient_w_per_m2_k(wind_speed_m_per_s)
-    }
-}
-
-fn energyplus_building_terrain(model: &TypedModel) -> Terrain {
-    model
-        .building
-        .as_ref()
-        .map(|building| building.terrain)
-        .unwrap_or(Terrain::Suburbs)
-}
-
-fn energyplus_surface_outside_wind_speed_m_per_s(
-    surface: &Surface,
-    terrain: Terrain,
-    weather_file_wind_speed_m_per_s: f64,
-) -> f64 {
-    if surface.wind_exposure != WindExposure::WindExposed {
-        return 0.0;
-    }
-
-    energyplus_wind_speed_at_height_m_per_s(
-        terrain,
-        weather_file_wind_speed_m_per_s,
-        surface_centroid_z_m(&surface.vertices),
-    )
-}
-
-fn energyplus_wind_speed_at_height_m_per_s(
-    terrain: Terrain,
-    weather_file_wind_speed_m_per_s: f64,
-    height_m: f64,
-) -> f64 {
-    if height_m <= 0.0 || weather_file_wind_speed_m_per_s <= 0.0 {
-        return 0.0;
-    }
-
-    let (site_wind_exp, site_wind_boundary_layer_height_m) = energyplus_site_wind_profile(terrain);
-    if site_wind_exp == 0.0 {
-        return weather_file_wind_speed_m_per_s;
-    }
-
-    let weather_file_wind_mod_coeff = (ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M
-        / ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M)
-        .powf(ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT);
-    weather_file_wind_speed_m_per_s
-        * weather_file_wind_mod_coeff
-        * (height_m / site_wind_boundary_layer_height_m).powf(site_wind_exp)
-}
-
-fn energyplus_site_wind_profile(terrain: Terrain) -> (f64, f64) {
-    match terrain {
-        Terrain::Country => (0.14, 270.0),
-        Terrain::Suburbs | Terrain::Urban => (0.22, 370.0),
-        Terrain::City => (0.33, 460.0),
-        Terrain::Ocean => (0.10, 210.0),
-    }
-}
-
-fn energyplus_surface_outdoor_air_temperature_c(
-    surface: &Surface,
-    weather_file_temperature_c: f64,
-) -> f64 {
-    energyplus_air_temperature_at_height_c(
-        weather_file_temperature_c,
-        surface_centroid_z_m(&surface.vertices),
-    )
-}
-
-fn energyplus_air_temperature_at_height_c(weather_file_temperature_c: f64, height_m: f64) -> f64 {
-    weather_file_temperature_c
-        - ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M
-            * (height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M)
-}
-
-fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
-    if vertices.is_empty() {
-        return 0.0;
-    }
-
-    vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / vertices.len() as f64
 }
 
 fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
