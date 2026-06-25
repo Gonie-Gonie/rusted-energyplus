@@ -15,7 +15,11 @@ surface.
 
 Use `specs/algorithm_port_ticket_template.toml` as the field contract. The
 ticket can live in an issue, design note, or PR body, but the PR must link to
-it or embed it when it changes source-order compatibility behavior. The
+it or embed it when it changes source-order compatibility behavior. Pull
+requests may use the default template, the compatibility algorithm-port
+template, or the diagnostic-probe template under `.github/PULL_REQUEST_TEMPLATE/`.
+The pull-request workflow runs `pr-port-ticket-check` and rejects algorithm or
+source-order PR bodies that omit the completed ticket fields. The
 `algorithm-ledger-check` gate validates that the template, PR prompt, and this
 review policy stay aligned.
 
@@ -53,7 +57,7 @@ review policy stay aligned.
 
 ## Review Rules
 
-- A compatibility port must reference an EnergyPlus 26.1.0 source file and
+- A source-order PR must either check `Not an algorithm/source-order change` or pass `pr-port-ticket-check` with completed compatibility, diagnostic, or refactor-only ticket fields.`r`n- A compatibility port must reference an EnergyPlus 26.1.0 source file and
   routine before code is moved into `heat_balance`, `ideal_loads`,
   `zone_equipment`, or `node` compatibility modules.
 - A diagnostic probe must set `port_type = "diagnostic_probe"` and

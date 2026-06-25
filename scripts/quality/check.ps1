@@ -60,6 +60,7 @@ Invoke-DevCommand -Command "ideal-loads-claim-inventory-audit"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "algorithm-ledger-check"
+Invoke-DevCommand -Command "pr-port-ticket-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "python-smoke"
 Invoke-DevCommand -Command "conformance-index-report"
 Invoke-DevCommand -Command "support-coverage-report"

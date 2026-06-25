@@ -11,6 +11,8 @@
 
 ## Algorithm Port Ticket
 
+For source-order work, prefer the dedicated compatibility or diagnostic probe PR template in `.github/PULL_REQUEST_TEMPLATE/`. The PR gate rejects algorithm/source-order changes without a completed ticket.
+
 - [ ] Not an algorithm/source-order change
 - [ ] Compatibility port ticket completed
 - [ ] Diagnostic probe only; no conformance claim

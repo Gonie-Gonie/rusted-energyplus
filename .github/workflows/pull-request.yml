@@ -1,0 +1,30 @@
+name: Pull Request Gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  algorithm-port-ticket:
+    name: Algorithm Port Ticket
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Validate Algorithm Port Ticket
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          $bodyPath = Join-Path $env:RUNNER_TEMP "pull-request-body.md"
+          Set-Content -Encoding UTF8 -LiteralPath $bodyPath -Value $env:PR_BODY
+          .\scripts\dev.cmd pr-port-ticket-check -BodyPath $bodyPath
