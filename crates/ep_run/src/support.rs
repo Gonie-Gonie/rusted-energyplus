@@ -206,6 +206,8 @@ pub struct SupportAssessment {
     pub run_result_state: RunResultState,
     /// Selected runtime class.
     pub runtime_class: RuntimeClass,
+    /// Human-readable reason tying matched capabilities to the selected runtime and run state.
+    pub runtime_selection_note: String,
     /// Matched capability identifiers from the current support boundary.
     pub matched_capability_ids: Vec<String>,
     /// Matched capability metadata from the capability registry.
@@ -239,6 +241,30 @@ impl SupportAssessment {
     #[must_use]
     pub const fn allows_rust_runtime(&self) -> bool {
         self.run_result_state.allows_rust_runtime()
+    }
+}
+
+fn runtime_selection_note(
+    status: SupportStatus,
+    runtime_class: RuntimeClass,
+    run_result_state: RunResultState,
+) -> String {
+    match run_result_state {
+        RunResultState::SupportedCompatibilityRun => format!(
+            "selected runtime '{}' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
+            runtime_class.id()
+        ),
+        RunResultState::PartialSupportedRun => format!(
+            "matched capabilities require diagnostic/ad-hoc execution through '{}'; matched capability metadata does not create a compatibility claim for this run",
+            runtime_class.id()
+        ),
+        RunResultState::RunBlocked if status == SupportStatus::SupportedDiagnosticOnly => format!(
+            "diagnostic-only runtime '{}' is blocked unless mode=diagnostic and partial_policy=allow are both selected",
+            runtime_class.id()
+        ),
+        RunResultState::RunBlocked => {
+            "support assessment blocked Rust execution before runtime".to_string()
+        }
     }
 }
 
@@ -387,6 +413,7 @@ pub fn assess_support(
         status,
         run_result_state,
         runtime_class,
+        runtime_selection_note: runtime_selection_note(status, runtime_class, run_result_state),
         matched_capability_ids,
         matched_capabilities,
         mode: mode.id().to_string(),

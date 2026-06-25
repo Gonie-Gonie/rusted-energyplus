@@ -129,6 +129,10 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         "runtime_class: {}\n",
         assessment.runtime_class.id()
     ));
+    report.push_str(&format!(
+        "runtime_selection_note: {}\n",
+        assessment.runtime_selection_note
+    ));
     report.push_str(&format!("mode: {}\n", assessment.mode));
     report.push_str(&format!("partial_policy: {}\n", assessment.partial_policy));
     report.push_str(&format!(
@@ -220,6 +224,7 @@ pub(crate) fn render_compatibility_boundary(assessment: &SupportAssessment) -> S
             "status: {}\n",
             "run_result_state: {}\n",
             "runtime_class: {}\n",
+            "runtime_selection_note: {}\n",
             "conformance_claim: false\n",
             "release_evidence: false\n\n",
             "{}\n\n",
@@ -230,6 +235,7 @@ pub(crate) fn render_compatibility_boundary(assessment: &SupportAssessment) -> S
         assessment.status.id(),
         assessment.run_result_state.id(),
         assessment.runtime_class.id(),
+        assessment.runtime_selection_note,
         assessment.claim_boundary.statement
     )
 }
@@ -251,6 +257,10 @@ pub(crate) fn render_run_report(
     report.push_str(&format!(
         "runtime_class: {}\n",
         assessment.runtime_class.id()
+    ));
+    report.push_str(&format!(
+        "runtime_selection_note: {}\n",
+        assessment.runtime_selection_note
     ));
     report.push_str(&format!("rust_results_written: {rust_results_written}\n"));
     report.push_str(&format!("oracle_status: {oracle_status}\n"));

@@ -656,6 +656,7 @@ fn finish_successful_summary(
             "status": assessment.status.id(),
             "run_result_state": assessment.run_result_state.id(),
             "runtime_class": assessment.runtime_class.id(),
+            "runtime_selection_note": assessment.runtime_selection_note,
             "capability_registry_loaded": assessment.capability_registry_loaded,
             "matched_capability_ids": assessment.matched_capability_ids.clone(),
             "matched_capabilities": assessment.matched_capabilities.clone(),

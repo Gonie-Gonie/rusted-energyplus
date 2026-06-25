@@ -587,6 +587,17 @@ fn diagnostic_allow_runs_partial_supported_projection() -> Result<(), Box<dyn st
         "ideal-loads-node-state-projection"
     );
     assert_eq!(summary["support"]["conformance_claim"], false);
+    assert!(
+        summary["support"]["runtime_selection_note"]
+            .as_str()
+            .unwrap()
+            .contains("diagnostic/ad-hoc")
+    );
+    let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
+    assert!(
+        support_report
+            .contains("matched capability metadata does not create a compatibility claim")
+    );
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_layout(&output_dir, true)?;
     Ok(())
