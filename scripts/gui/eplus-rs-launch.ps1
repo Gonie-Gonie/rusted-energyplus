@@ -11,6 +11,7 @@ $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $ScriptRoot "..")).Path
 $AppRoot = (Resolve-Path -LiteralPath (Join-Path $ScriptsRoot "..")).Path
 
 . (Join-Path $ScriptRoot "eplus-rs-launch\core.ps1")
+. (Join-Path $ScriptRoot "eplus-rs-launch\ui.ps1")
 
 $LauncherDefaults = Get-LauncherDefaultPaths
 $DefaultOracleRoot = $LauncherDefaults.OracleRoot
@@ -179,7 +180,7 @@ if ($SelfTest) {
     }
     Remove-Item -LiteralPath $settingsPath -Force
     $scriptText = Get-Content -Encoding UTF8 -Raw -LiteralPath $PSCommandPath
-    foreach ($required in @("Open Diagnostics", "not a drop-in replacement")) {
+    foreach ($required in @("Summary", "Diagnostics", "Support Report", "Results", "Oracle Compare", "Logs", "Open Diagnostics", "not a drop-in replacement")) {
         if ($scriptText -notmatch [regex]::Escape($required)) {
             throw "launcher self-test missed UI boundary token $required"
         }
@@ -405,6 +406,27 @@ function Read-RunDiagnostics {
     }
 }
 
+function Read-ArtifactPreview {
+    param(
+        [string]$Path,
+        [string]$MissingText,
+        [int]$MaxCharacters = 12000
+    )
+    if (-not (Test-LeafPath -Path $Path)) {
+        return $MissingText
+    }
+    try {
+        $text = Get-Content -Encoding UTF8 -Raw -LiteralPath $Path
+        if ($text.Length -le $MaxCharacters) {
+            return $text
+        }
+        return $text.Substring(0, $MaxCharacters) + "`r`n... truncated in launcher preview; open the artifact for the full file."
+    }
+    catch {
+        return "Failed to read artifact: $Path"
+    }
+}
+
 function Finish-Run {
     $timer.Stop()
     $exitCode = $script:CurrentProcess.ExitCode
@@ -447,6 +469,20 @@ function Finish-Run {
             [void]$diagnosticsList.Items.Add((Format-DiagnosticLine -Diagnostic $diagnostic))
         }
     }
+
+    $supportTextBox.Text = Read-ArtifactPreview `
+        -Path (Join-Path $script:OutputDir "support-report.md") `
+        -MissingText "Support report is not available for this run."
+    $selectedOutputsPath = Join-Path $script:OutputDir "results\selected-outputs.csv"
+    $resultStorePath = Join-Path $script:OutputDir "results\result-store.json"
+    $resultPreviewPath = if (Test-LeafPath -Path $selectedOutputsPath) { $selectedOutputsPath } else { $resultStorePath }
+    $resultsTextBox.Text = Read-ArtifactPreview `
+        -Path $resultPreviewPath `
+        -MissingText "Rust result artifacts are not available for this run."
+    $compareTextBox.Text = Read-ArtifactPreview `
+        -Path (Join-Path $script:OutputDir "compare\compare-report.md") `
+        -MissingText "Oracle compare report is not available for this run."
+    $logsTextBox.Text = "exit_code=$exitCode`r`n`r`nstdout:`r`n$stdout`r`n`r`nstderr:`r`n$stderr"
 
     if ($null -ne $summary) {
         $presentation = Get-RunResultPresentation -Summary $summary
@@ -538,8 +574,8 @@ function Start-Run {
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Rusted EnergyPlus Launch"
 $form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
-$form.Size = New-Object System.Drawing.Size(880, 620)
-$form.MinimumSize = New-Object System.Drawing.Size(880, 620)
+$form.Size = New-Object System.Drawing.Size(880, 700)
+$form.MinimumSize = New-Object System.Drawing.Size(880, 700)
 
 $statusLabel = New-Object System.Windows.Forms.Label
 $statusLabel.Text = "Ready."
@@ -601,27 +637,60 @@ $openCompareButton = New-Button "Open Compare Report" 584 390 170 34
 $exitButton = New-Button "Exit" 766 390 62 34
 $form.Controls.AddRange(@($openRunReportButton, $openDiagnosticsButton, $openSupportReportButton, $openCompareButton, $exitButton))
 
-$phaseLabel = New-Label "Stages" 18 432 390 22
-$diagnosticsLabel = New-Label "Diagnostics" 438 432 390 22
-$form.Controls.AddRange(@($phaseLabel, $diagnosticsLabel))
+$resultTabs = New-Object System.Windows.Forms.TabControl
+$resultTabs.Location = New-Object System.Drawing.Point(18, 432)
+$resultTabs.Size = New-Object System.Drawing.Size(810, 188)
+$resultTabs.Anchor = [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Top
+
+$summaryTab = New-Object System.Windows.Forms.TabPage
+$summaryTab.Text = "Summary"
+$diagnosticsTab = New-Object System.Windows.Forms.TabPage
+$diagnosticsTab.Text = "Diagnostics"
+$supportTab = New-Object System.Windows.Forms.TabPage
+$supportTab.Text = "Support Report"
+$resultsTab = New-Object System.Windows.Forms.TabPage
+$resultsTab.Text = "Results"
+$compareTab = New-Object System.Windows.Forms.TabPage
+$compareTab.Text = "Oracle Compare"
+$logsTab = New-Object System.Windows.Forms.TabPage
+$logsTab.Text = "Logs"
 
 $phaseList = New-Object System.Windows.Forms.ListBox
-$phaseList.Location = New-Object System.Drawing.Point(18, 456)
-$phaseList.Size = New-Object System.Drawing.Size(392, 94)
+$phaseList.Dock = [System.Windows.Forms.DockStyle]::Fill
 $phaseList.HorizontalScrollbar = $true
 [void]$phaseList.Items.Add("No phase timing.")
-$form.Controls.Add($phaseList)
+$summaryTab.Controls.Add($phaseList)
 
 $diagnosticsList = New-Object System.Windows.Forms.ListBox
-$diagnosticsList.Location = New-Object System.Drawing.Point(438, 456)
-$diagnosticsList.Size = New-Object System.Drawing.Size(390, 94)
+$diagnosticsList.Dock = [System.Windows.Forms.DockStyle]::Fill
 $diagnosticsList.HorizontalScrollbar = $true
 [void]$diagnosticsList.Items.Add("No diagnostics.")
-$form.Controls.Add($diagnosticsList)
+$diagnosticsTab.Controls.Add($diagnosticsList)
+
+$supportTextBox = New-ReadOnlyMultilineBox
+$supportTextBox.Text = "Support report will appear after a run."
+$supportTab.Controls.Add($supportTextBox)
+
+$resultsTextBox = New-ReadOnlyMultilineBox
+$resultsTextBox.Text = "Result artifacts will appear after a supported Rust run."
+$resultsTab.Controls.Add($resultsTextBox)
+
+$compareTextBox = New-ReadOnlyMultilineBox
+$compareTextBox.Text = "Oracle comparison artifacts will appear when compare is enabled."
+$compareTab.Controls.Add($compareTextBox)
+
+$logsTextBox = New-ReadOnlyMultilineBox
+$logsTextBox.Text = "Launcher stdout/stderr logs will appear after a run."
+$logsTab.Controls.Add($logsTextBox)
+
+foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $logsTab)) {
+    [void]$resultTabs.TabPages.Add($tab)
+}
+$form.Controls.Add($resultTabs)
 
 $footerLabel = New-Object System.Windows.Forms.Label
 $footerLabel.Text = "Rusted EnergyPlus is not a drop-in replacement for EnergyPlus; SupportAssessment controls Rust execution, and oracle output is never shown as Rust success."
-$footerLabel.Location = New-Object System.Drawing.Point(18, 558)
+$footerLabel.Location = New-Object System.Drawing.Point(18, 632)
 $footerLabel.Size = New-Object System.Drawing.Size(810, 30)
 $footerLabel.ForeColor = [System.Drawing.Color]::DimGray
 $form.Controls.Add($footerLabel)
