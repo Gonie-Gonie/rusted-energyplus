@@ -73,6 +73,7 @@ $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
 $ctf = "crates\ep_runtime\src\heat_balance\ctf.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
+$longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
@@ -88,6 +89,7 @@ foreach ($entry in @(
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
         @($ctf, "CTF ownership module"),
         @($convection, "convection ownership module"),
+        @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
         @($reports, "report ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
@@ -103,6 +105,7 @@ Assert-LineLimit -Path $airManager -Limit 60 -Description "HeatBalanceAirManager
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
 Assert-LineLimit -Path $convection -Limit 260 -Description "convection ownership module"
+Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 60 -Description "report ownership module"
 
@@ -112,6 +115,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Descripti
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod ctf;' -Description "CTF module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Description "convection module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description "longwave module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod reports;' -Description "reports module declaration"
 
@@ -164,6 +168,15 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_tarp_inside_convection
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_ashrae_tarp_natural_convection_w_per_m2_k\s*\(' -Description "runtime-owned ASHRAE TARP helper implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_doe2_outside_convection_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned DOE-2 outside convection implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn exterior_convection_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned fallback exterior convection implementation"
+Assert-Contains -Path $longwave -Pattern 'CalcHeatBalanceOutsideSurf' -Description "exterior longwave source owner"
+Assert-Contains -Path $longwave -Pattern 'pub\(crate\) struct ExteriorLongwaveTerms' -Description "exterior longwave terms owner"
+Assert-Contains -Path $longwave -Pattern 'energyplus_exterior_longwave_terms' -Description "exterior longwave term calculation owner"
+Assert-Contains -Path $longwave -Pattern 'energyplus_linearized_radiation_coefficient_w_per_m2_k' -Description "linearized exterior radiation coefficient owner"
+Assert-Contains -Path $longwave -Pattern 'horizontal_infrared_sky_temperature_c' -Description "horizontal infrared sky temperature owner"
+Assert-NotContains -Path $runtime -Pattern 'struct ExteriorLongwaveTerms' -Description "runtime-owned exterior longwave terms"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_longwave_terms\s*\(' -Description "runtime-owned exterior longwave implementation"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_linearized_radiation_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned linearized exterior radiation coefficient"
+Assert-NotContains -Path $runtime -Pattern 'fn horizontal_infrared_sky_temperature_c\s*\(' -Description "runtime-owned horizontal infrared sky temperature"
 Assert-Contains -Path $radiation -Pattern 'CalcHeatBalanceOutsideSurf' -Description "exterior radiation source owner"
 Assert-Contains -Path $radiation -Pattern 'CalcHeatBalanceInsideSurf' -Description "interior radiation source owner"
 Assert-Contains -Path $radiation -Pattern 'append_surface_incident_solar_radiation_series' -Description "surface incident solar diagnostic owner"
