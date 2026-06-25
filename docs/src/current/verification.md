@@ -36,6 +36,13 @@ not support compatibility claims.
 Support assessment is the internal gate for arbitrary IDF/epJSON runs. It
 loads capability rules, checks active objects and algorithms, classifies the
 run state, and writes `support-assessment.json` plus `support-report.md`.
+The run-framework smoke is part of the standard local gate because it verifies
+supported, blocked, oracle-baseline, compare, exit-code, and output-layout
+contracts end to end:
+
+```powershell
+.\scripts\dev.cmd arbitrary-run-smoke
+```
 
 Launcher smoke verifies that the Windows launcher builds `eplus-rs run`
 commands, maps `run-summary.json` states and exit codes, preserves the
