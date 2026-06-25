@@ -349,12 +349,26 @@ pub fn assess_support(
         &mut unsupported_objects,
         &mut diagnostics,
     );
-    let (status, runtime_class, matched_capability_ids) =
+    let (status, runtime_class, matched_capability_ids, missing_capability_ids) =
         if diagnostics.has_errors() || typed_model.is_none() {
-            (SupportStatus::Unsupported, RuntimeClass::None, Vec::new())
+            (
+                SupportStatus::Unsupported,
+                RuntimeClass::None,
+                Vec::new(),
+                Vec::new(),
+            )
         } else {
             runtime_status_for_typed_model(typed_model, &capability_registry.spec)
         };
+    for capability_id in &missing_capability_ids {
+        diagnostics.error(
+            "CapabilityRegistryCapabilityMissing",
+            "support",
+            format!(
+                "selected runtime capability '{capability_id}' is not declared in {CAPABILITY_REGISTRY_PATH}"
+            ),
+        );
+    }
     let matched_capabilities =
         matched_capabilities(&matched_capability_ids, &capability_registry.spec);
     let run_result_state = RunResultState::from_support_status(status, mode, partial_policy);
@@ -454,6 +468,31 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn missing_registry_capability_blocks_runtime_selection()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}}
+            }"#,
+        )?;
+        let result = compile_raw_model(&raw);
+        let (status, runtime_class, matched_capability_ids, missing_capability_ids) =
+            super::runtime_boundaries::runtime_status_for_typed_model(
+                result.model.as_ref(),
+                &crate::support_registry::CapabilityRegistrySpec::default(),
+            );
+
+        assert_eq!(status, SupportStatus::Unsupported);
+        assert_eq!(runtime_class, RuntimeClass::None);
+        assert!(matched_capability_ids.is_empty());
+        assert_eq!(
+            missing_capability_ids,
+            vec!["official_1zone_uncontrolled_declared_heat_balance"]
+        );
+        Ok(())
+    }
     #[test]
     fn output_objects_use_partial_rule_from_registry() -> Result<(), Box<dyn std::error::Error>> {
         let raw = parse_epjson_str(

@@ -10,7 +10,7 @@ use ep_runtime::{
 use crate::{
     RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunMode,
     support_registry::{
-        CapabilityRegistrySpec, registry_capability, registry_capability_ids_or_fallback,
+        CapabilityRegistrySpec, registry_capability, registry_capability_ids_and_missing,
         unsupported_rule_for_object,
     },
 };
@@ -39,9 +39,14 @@ pub(super) fn matched_capabilities(
 pub(super) fn runtime_status_for_typed_model(
     typed_model: Option<&TypedModel>,
     registry: &CapabilityRegistrySpec,
-) -> (SupportStatus, RuntimeClass, Vec<String>) {
+) -> (SupportStatus, RuntimeClass, Vec<String>, Vec<String>) {
     let Some(typed_model) = typed_model else {
-        return (SupportStatus::Unsupported, RuntimeClass::None, Vec::new());
+        return (
+            SupportStatus::Unsupported,
+            RuntimeClass::None,
+            Vec::new(),
+            Vec::new(),
+        );
     };
 
     if !typed_model.ideal_loads_air_systems.is_empty() {
@@ -67,26 +72,46 @@ pub(super) fn runtime_status_for_typed_model(
         } else {
             SupportStatus::SupportedCompatibility
         };
-        return (
+        return runtime_selection_from_registry(
             status,
             runtime_class,
-            registry_capability_ids_or_fallback(
-                registry,
-                capability_ids.into_iter().collect::<Vec<_>>(),
-            ),
+            registry,
+            capability_ids.into_iter().collect::<Vec<_>>(),
         );
     }
 
-    (
+    runtime_selection_from_registry(
         SupportStatus::SupportedCompatibility,
         RuntimeClass::OneZoneHeatBalanceCompatibility,
-        registry_capability_ids_or_fallback(
-            registry,
-            vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()],
-        ),
+        registry,
+        vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()],
     )
 }
 
+fn runtime_selection_from_registry(
+    status: SupportStatus,
+    runtime_class: RuntimeClass,
+    registry: &CapabilityRegistrySpec,
+    capability_ids: Vec<String>,
+) -> (SupportStatus, RuntimeClass, Vec<String>, Vec<String>) {
+    let (matched_capability_ids, missing_capability_ids) =
+        registry_capability_ids_and_missing(registry, capability_ids);
+    if missing_capability_ids.is_empty() {
+        (
+            status,
+            runtime_class,
+            matched_capability_ids,
+            missing_capability_ids,
+        )
+    } else {
+        (
+            SupportStatus::Unsupported,
+            RuntimeClass::None,
+            matched_capability_ids,
+            missing_capability_ids,
+        )
+    }
+}
 const fn ideal_loads_capability_id_for_branch(
     branch: IdealLoadsPurchasedAirBranch,
 ) -> &'static str {

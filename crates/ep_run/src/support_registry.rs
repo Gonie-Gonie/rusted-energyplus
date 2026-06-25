@@ -73,20 +73,12 @@ pub(crate) fn registry_capability<'a>(
         .find(|capability| capability.id == id)
 }
 
-pub(crate) fn registry_capability_ids_or_fallback(
+pub(crate) fn registry_capability_ids_and_missing(
     registry: &CapabilityRegistrySpec,
     ids: Vec<String>,
-) -> Vec<String> {
-    if registry.capability.is_empty() {
-        return ids;
-    }
-
-    let filtered = ids
-        .iter()
-        .filter(|id| registry_capability(registry, id).is_some())
-        .cloned()
-        .collect::<Vec<_>>();
-    if filtered.is_empty() { ids } else { filtered }
+) -> (Vec<String>, Vec<String>) {
+    ids.into_iter()
+        .partition(|id| registry_capability(registry, id).is_some())
 }
 
 pub(crate) fn partial_rule_for_object<'a>(
