@@ -101,8 +101,9 @@ use crate::heat_balance::surface_boundary::{
     ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C, surface_steady_u_value_w_per_m2_k,
 };
 use crate::heat_balance::surface_boundary::{
-    resolve_surface_boundary_target, seed_energyplus_initial_surface_ctf_histories,
-    seed_initial_surface_ctf_boundary_histories,
+    inside_ctf_outside_temperature_history_commit_override_c, resolve_surface_boundary_target,
+    seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
+    sync_adiabatic_outside_faces_to_inside_faces,
 };
 pub(crate) use crate::heat_balance::surface_thermal_properties;
 #[cfg(test)]
@@ -1558,28 +1559,6 @@ fn run_surface_balance_passes(
             );
         }
     }
-}
-
-fn sync_adiabatic_outside_faces_to_inside_faces(surfaces: &mut [SurfaceHeatBalanceState]) {
-    for surface in surfaces {
-        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
-            surface.outside_face_temperature_c = surface.inside_face_temperature_c;
-        }
-    }
-}
-
-fn inside_ctf_outside_temperature_history_commit_override_c(
-    surface: &SurfaceHeatBalanceState,
-    commit_inside_ctf_outside_temperature_to_history: bool,
-    snapshots: Option<&BTreeMap<SurfaceId, f64>>,
-) -> Option<f64> {
-    if !commit_inside_ctf_outside_temperature_to_history
-        || surface.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
-    {
-        return None;
-    }
-
-    snapshots.and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
 }
 
 /// Simulates hourly zone mean air temperatures through the heat-balance state

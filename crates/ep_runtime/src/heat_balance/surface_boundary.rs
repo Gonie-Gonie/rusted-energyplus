@@ -204,3 +204,27 @@ pub(crate) fn surface_boundary_temperature_c(
         }
     }
 }
+
+pub(crate) fn sync_adiabatic_outside_faces_to_inside_faces(
+    surfaces: &mut [SurfaceHeatBalanceState],
+) {
+    for surface in surfaces {
+        if surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic {
+            surface.outside_face_temperature_c = surface.inside_face_temperature_c;
+        }
+    }
+}
+
+pub(crate) fn inside_ctf_outside_temperature_history_commit_override_c(
+    surface: &SurfaceHeatBalanceState,
+    commit_inside_ctf_outside_temperature_to_history: bool,
+    snapshots: Option<&BTreeMap<SurfaceId, f64>>,
+) -> Option<f64> {
+    if !commit_inside_ctf_outside_temperature_to_history
+        || surface.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
+    {
+        return None;
+    }
+
+    snapshots.and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
+}
