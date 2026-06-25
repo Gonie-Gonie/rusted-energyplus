@@ -30,6 +30,8 @@ Assert-Contains -Path ".github\pull_request_template.md" -Pattern "Algorithm Por
 Assert-Contains -Path ".github\pull_request_template.md" -Pattern "Diagnostic probe only; no conformance claim" -Description "diagnostic probe PR boundary"
 Assert-Contains -Path "docs\src\porting-map\algorithm-port-ticket.md" -Pattern "Every compatibility-mode algorithm port starts with an Algorithm Port Ticket." -Description "algorithm port ticket policy"
 Assert-Contains -Path "specs\algorithm_port_ticket_template.toml" -Pattern "[algorithm_port_ticket]" -Description "algorithm port ticket spec template"
+Assert-Contains -Path "tools\docs\validate_algorithm_ledger.py" -Pattern "validate_port_ticket_contract" -Description "algorithm port ticket contract validator"
+Assert-Contains -Path ".github\pull_request_template.md" -Pattern "Diagnostic-only variables:" -Description "algorithm port ticket diagnostic variable field"
 Assert-Contains -Path "specs\milestones.toml" -Pattern 'version = "0.6"' -Description "v0.6 milestone boundary"
 Assert-Contains -Path "specs\milestones.toml" -Pattern 'claim_level = "diagnostic-only"' -Description "diagnostic-only milestone boundary"
 Assert-Contains -Path "specs\milestones.toml" -Pattern "first executable building simulation subset" -Description "v0.6 non-claim boundary"

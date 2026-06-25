@@ -121,7 +121,7 @@
                          "name":  "algorithm-ledger-check",
                          "path":  "quality\\algorithm-ledger-check.ps1",
                          "group":  "quality",
-                         "help":  "Validate source-map, EnergyPlus source, Rust target, and case evidence links."
+                         "help":  "Validate source-map, EnergyPlus source, Rust target, case evidence, and port-ticket review contract."
                      },
                      {
                          "name":  "raw-model-smoke",
