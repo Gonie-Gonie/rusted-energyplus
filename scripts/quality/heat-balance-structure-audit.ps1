@@ -73,6 +73,7 @@ $surfaceBalance = "crates\ep_runtime\src\heat_balance\surface_balance.rs"
 $surfaceBoundary = "crates\ep_runtime\src\heat_balance\surface_boundary.rs"
 $airManager = "crates\ep_runtime\src\heat_balance\air_manager.rs"
 $zonePredictorCorrector = "crates\ep_runtime\src\heat_balance\zone_predictor_corrector.rs"
+$zoneAirCorrection = "crates\ep_runtime\src\heat_balance\zone_air_correction.rs"
 $ctf = "crates\ep_runtime\src\heat_balance\ctf.rs"
 $insideConvection = "crates\ep_runtime\src\heat_balance\inside_convection.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
@@ -93,6 +94,7 @@ foreach ($entry in @(
         @($surfaceBoundary, "surface boundary ownership module"),
         @($airManager, "HeatBalanceAirManager source-order module"),
         @($zonePredictorCorrector, "ZoneTempPredictorCorrector source-order module"),
+        @($zoneAirCorrection, "zone-air correction ownership module"),
         @($ctf, "CTF ownership module"),
         @($insideConvection, "inside convection ownership module"),
         @($convection, "convection ownership module"),
@@ -113,6 +115,7 @@ Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance 
 Assert-LineLimit -Path $surfaceBoundary -Limit 220 -Description "surface boundary ownership module"
 Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
 Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
+Assert-LineLimit -Path $zoneAirCorrection -Limit 520 -Description "zone-air correction ownership module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
 Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convection ownership module"
 Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership module"
@@ -127,6 +130,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_balance;' -Descr
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_boundary;' -Description "surface boundary module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod air_manager;' -Description "HeatBalanceAirManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_predictor_corrector;' -Description "ZoneTempPredictorCorrector module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod zone_air_correction;' -Description "zone-air correction module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod ctf;' -Description "CTF module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod inside_convection;' -Description "inside convection module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Description "convection module declaration"
@@ -201,6 +205,20 @@ Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_analytical_zo
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_zone_air_temperature_coefficients\s*\(' -Description "runtime-owned zone-air coefficient implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_third_order_zone_air_temperature_c\s*\(' -Description "runtime-owned third-order zone-air implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_analytical_zone_air_temperature_c\s*\(' -Description "runtime-owned analytical zone-air implementation"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'ManageZoneAirUpdates' -Description "zone-air correction source owner"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'correct_zone_air_temperatures_from_current_surfaces' -Description "zone-air temperature correction owner"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'correct_zone_air_humidity_ratios_from_current_state' -Description "zone-air humidity correction owner"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'apply_energyplus_adaptive_system_timestep_zone_air_correction' -Description "adaptive system timestep correction owner"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'energyplus_down_interpolate_three_history_values' -Description "system timestep history interpolation owner"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'zone_air_system_timestep_storage_report_rate_w' -Description "system timestep air storage report owner"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_zone_temperature_map\s*\(' -Description "runtime-owned zone temperature map"
+Assert-NotContains -Path $runtime -Pattern 'fn correct_zone_air_temperatures_from_current_surfaces\s*\(' -Description "runtime-owned zone-air temperature correction"
+Assert-NotContains -Path $runtime -Pattern 'fn correct_zone_air_humidity_ratios_from_current_state\s*\(' -Description "runtime-owned zone-air humidity correction"
+Assert-NotContains -Path $runtime -Pattern 'fn apply_energyplus_adaptive_system_timestep_zone_air_correction\s*\(' -Description "runtime-owned adaptive system timestep correction"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_system_timestep_storage_report_rate_w\s*\(' -Description "runtime-owned system timestep air storage report"
+Assert-NotContains -Path $runtime -Pattern 'fn correct_single_zone_air_temperature_from_current_surfaces\s*\(' -Description "runtime-owned single-zone temperature correction"
+Assert-NotContains -Path $runtime -Pattern 'fn correct_single_zone_air_humidity_ratio_from_history\s*\(' -Description "runtime-owned single-zone humidity correction"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_down_interpolate_three_history_values\s*\(' -Description "runtime-owned down interpolation"
 Assert-Contains -Path $insideConvection -Pattern 'CalcHeatBalanceInsideSurf' -Description "inside convection source owner"
 Assert-Contains -Path $insideConvection -Pattern 'heat_balance_inside_convection_coefficients' -Description "inside convection coefficient owner"
 Assert-Contains -Path $insideConvection -Pattern 'heat_balance_inside_convection_coefficient_inputs' -Description "inside convection coefficient input owner"
