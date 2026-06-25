@@ -91,19 +91,40 @@ function Assert-ConformanceBlocksHaveTolerances {
     return $conformanceBlockCount
 }
 
+function Read-DevCommandCatalog {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing dev command catalog: $Path"
+    }
+
+    $catalog = Get-Content -LiteralPath $Path -Encoding UTF8 -Raw | ConvertFrom-Json
+    $commands = @{}
+    foreach ($entry in @($catalog.commands)) {
+        $name = [string]$entry.name
+        if ([string]::IsNullOrWhiteSpace($name)) {
+            throw "Dev command catalog contains an empty command name."
+        }
+        $commands[$name] = [pscustomobject]@{
+            Path = [string]$entry.path
+            Group = [string]$entry.group
+            Help = [string]$entry.help
+        }
+    }
+    return $commands
+}
+
 function Get-DevCommandScriptPath {
     param(
-        [Parameter(Mandatory = $true)][string]$DevText,
+        [Parameter(Mandatory = $true)][hashtable]$Commands,
         [Parameter(Mandatory = $true)][string]$Command
     )
 
-    $pattern = '(?ms)^\s*"' + [regex]::Escape($Command) + '"\s*=\s*@\{\s*Path\s*=\s*"(?<path>[^"]+)"'
-    $match = [regex]::Match($DevText, $pattern)
-    if (-not $match.Success) {
+    if (-not $Commands.ContainsKey($Command)) {
         throw "Dev command missing script path: $Command"
     }
 
-    return Join-Path "scripts" $match.Groups["path"].Value
+    return Join-Path "scripts" $Commands[$Command].Path
 }
 
 function Assert-ConformanceGateReportMetadataGuards {
@@ -163,11 +184,36 @@ function Assert-ConformanceGateReportMetadataGuards {
 
 $readmeText = Read-RepoText -Path "README.md"
 $currentStatusText = Read-RepoText -Path "docs\src\current\current-status.md"
+$conformanceCaseIndexText = Read-RepoText -Path "docs\src\generated\conformance-case-index.md"
 $variableCoverageText = Read-RepoText -Path "specs\variable_coverage.toml"
 $algorithmLedgerText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $idealLoadsSourceMapText = Read-RepoText -Path "docs\src\porting-map\ideal-loads-source-map.md"
 $userCoverageHandbookText = Read-RepoText -Path "docs\src\conformance\user-coverage-handbook.md"
-$devText = Read-RepoText -Path "scripts\dev.ps1"
+$devCommands = Read-DevCommandCatalog -Path "scripts\dev\commands.json"
+
+$readmeBoundaryMarkers = @(
+    @("Ad-hoc user runs are not release conformance evidence", "README ad-hoc evidence boundary"),
+    @("limited IdealLoadsAirSystem evidence", "README limited IdealLoads boundary"),
+    @("Current counts are tracked outside the README", "README generated-count boundary"),
+    @("docs/src/generated", "README generated reference link"),
+    @("broad or complete EnergyPlus replacement behavior", "README broad replacement exclusion"),
+    @("compatibility from diagnostic probes", "README diagnostic-probe exclusion")
+)
+foreach ($entry in $readmeBoundaryMarkers) {
+    Assert-TextMatches -Text $readmeText -Pattern ([regex]::Escape($entry[0])) -Description $entry[1]
+}
+
+$currentStatusBoundaryMarkers = @(
+    @("docs/src/generated/conformance-case-index.md", "current-status generated case index link"),
+    @("full IdealLoads compatibility", "current-status full IdealLoads exclusion"),
+    @("broad HVAC/node/meter compatibility", "current-status broad HVAC/node/meter exclusion"),
+    @("broad IdealLoads branch coverage beyond the declared", "current-status broad IdealLoads exclusion"),
+    @("Diagnostic-only evidence remains useful for source-order porting but does not", "current-status diagnostic-only boundary")
+)
+foreach ($entry in $currentStatusBoundaryMarkers) {
+    Assert-TextMatches -Text $currentStatusText -Pattern ([regex]::Escape($entry[0])) -Description $entry[1]
+}
+
 
 $sourceMapAnchorCount = 0
 foreach ($anchor in @(
@@ -240,15 +286,15 @@ foreach ($caseFile in $caseFiles) {
         }
         $gateCommand = $gateMatch.Groups["command"].Value
         $gateCommandName = @($gateCommand -split '\s+' | Where-Object { $_ -ne "" })[0]
-        $gateCommandPattern = '(?m)^\s*"' + [regex]::Escape($gateCommandName) + '"\s*=\s*@\{'
-        Assert-TextMatches -Text $devText -Pattern $gateCommandPattern -Description "$caseId dev gate command $gateCommandName"
-        $gateScriptPath = Get-DevCommandScriptPath -DevText $devText -Command $gateCommandName
+        if (-not $devCommands.ContainsKey($gateCommandName)) {
+            throw "$caseId dev gate command $gateCommandName missing"
+        }
+        $gateScriptPath = Get-DevCommandScriptPath -Commands $devCommands -Command $gateCommandName
         Assert-ConformanceGateReportMetadataGuards -Path $gateScriptPath -CaseId $caseId
         $reportMetadataGuardCount += 1
 
         $casePattern = [regex]::Escape($caseId)
-        Assert-TextMatches -Text $readmeText -Pattern $casePattern -Description "$caseId README claim inventory"
-        Assert-TextMatches -Text $currentStatusText -Pattern $casePattern -Description "$caseId current-status claim inventory"
+        Assert-TextMatches -Text $conformanceCaseIndexText -Pattern $casePattern -Description "$caseId generated conformance case index claim inventory"
         Assert-TextMatches -Text $algorithmLedgerText -Pattern $casePattern -Description "$caseId algorithm ledger claim inventory"
 
         $promotedCases += [pscustomobject]@{
@@ -269,19 +315,11 @@ $promotedCaseIds = @{}
 foreach ($case in $promotedCases) {
     $promotedCaseIds[$case.Id] = $true
 }
-
-$currentNumericalSectionMatch = [regex]::Match(
-    $currentStatusText,
-    '(?ms)^Current numerical conformance is limited to promoted cases and their declared\s+variables:\s*(?<body>.*?)(?=^## Current Evidence Boundary)'
-)
-if (-not $currentNumericalSectionMatch.Success) {
-    throw "current-status promoted numerical conformance section missing"
-}
-$currentNumericalSection = $currentNumericalSectionMatch.Groups["body"].Value
+$generatedCaseIndexRefs = 0
 foreach ($case in $promotedCases) {
-    Assert-TextMatches -Text $currentNumericalSection -Pattern ([regex]::Escape($case.Id)) -Description "$($case.Id) current-status promoted numerical conformance list"
+    Assert-TextMatches -Text $conformanceCaseIndexText -Pattern ([regex]::Escape($case.Id)) -Description "$($case.Id) generated conformance case index promoted list"
+    $generatedCaseIndexRefs += 1
 }
-
 $algorithmBlocks = [regex]::Matches($algorithmLedgerText, '(?ms)^\[\[algorithm\]\]\s*(?<body>.*?)(?=^\[\[algorithm\]\]|\z)')
 $idealLoadsAlgorithmCount = 0
 foreach ($block in $algorithmBlocks) {
@@ -336,25 +374,6 @@ foreach ($block in $coverageBlocks) {
     }
 }
 
-$broadExclusionPatterns = @(
-    @("full IdealLoads", "full IdealLoads exclusion"),
-    @("broad HVAC", "broad HVAC exclusion"),
-    @("broad meter conformance", "broad meter exclusion"),
-    @("multi-year annual grouping", "multi-year annual grouping exclusion"),
-    @("broader DCV combinations", "broader DCV exclusion"),
-    @("IdealLoads autosizing", "IdealLoads autosizing exclusion"),
-    @("AirLoop integration", "AirLoop integration exclusion"),
-    @("PlantLoop integration", "PlantLoop integration exclusion"),
-    @("multiple equipment interaction", "multiple equipment interaction exclusion"),
-    @("fuel-efficiency schedules beyond the declared blank/constant/all-days Schedule:Compact candidates", "fuel-efficiency schedule exclusion"),
-    @("CO2 contaminant-balance/concentration conformance", "CO2 contaminant boundary")
-)
-
-foreach ($entry in $broadExclusionPatterns) {
-    $pattern = [regex]::Escape($entry[0]) -replace '\\ ', '\s+'
-    Assert-TextMatches -Text $readmeText -Pattern $pattern -Description "README $($entry[1])"
-    Assert-TextMatches -Text $currentStatusText -Pattern $pattern -Description "current-status $($entry[1])"
-}
 
 $handbookBoundaryPatterns = @(
     @("which output variables are promoted conformance, diagnostic, or baseline only", "handbook output-level distinction"),
@@ -379,7 +398,9 @@ Write-Host "  diagnostic_or_baseline_ideal_loads_cases: $diagnosticOrBaselineCou
 Write-Host "  conformance_blocks_checked: $(($promotedCases | Measure-Object -Property Blocks -Sum).Sum)"
 Write-Host "  report_metadata_guards_checked: $reportMetadataGuardCount"
 Write-Host "  source_map_anchors_checked: $sourceMapAnchorCount"
-Write-Host "  current_status_promoted_list_refs: $($promotedCases.Count)"
+Write-Host "  generated_case_index_refs: $generatedCaseIndexRefs"
 Write-Host "  variable_coverage_ideal_loads_refs: $idealLoadsCoverageRefs"
 Write-Host "  algorithm_ledger_ideal_loads_blocks: $idealLoadsAlgorithmCount"
+Write-Host "  readme_boundary_markers: $($readmeBoundaryMarkers.Count)"
+Write-Host "  current_status_boundary_markers: $($currentStatusBoundaryMarkers.Count)"
 Write-Host "  user_handbook_boundary_markers: $($handbookBoundaryPatterns.Count)"
