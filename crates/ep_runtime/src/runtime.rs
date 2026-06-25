@@ -81,6 +81,9 @@ use crate::heat_balance::radiation::{
     energyplus_scriptf_from_view_factors, fix_energyplus_approximate_view_factors,
     surface_incident_solar_components_hourly_average_w_per_m2,
 };
+use crate::heat_balance::reports::{
+    heat_gain_rate_w, heat_loss_rate_w, zone_surface_report_conduction_rates_w,
+};
 pub use crate::heat_balance::state::*;
 pub(crate) use crate::heat_balance::state::{
     InsideConvectionCoefficientInputState, SurfaceBoundaryBalanceResult,
@@ -1547,34 +1550,6 @@ fn run_surface_balance_passes(
             );
         }
     }
-}
-
-fn zone_surface_report_conduction_rates_w(
-    surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
-    use_inside_ctf_outside_temperature_for_conduction_report: bool,
-) -> (f64, f64) {
-    surfaces
-        .iter()
-        .filter(|surface| surface.zone_id == zone_id)
-        .map(|surface| {
-            (
-                surface_inside_conduction_rate_w_for_report(
-                    surface,
-                    use_inside_ctf_outside_temperature_for_conduction_report,
-                ),
-                surface_outside_conduction_rate_w_for_report(
-                    surface,
-                    use_inside_ctf_outside_temperature_for_conduction_report,
-                ),
-            )
-        })
-        .fold(
-            (0.0, 0.0),
-            |(inside_sum, outside_sum), (inside, outside)| {
-                (inside_sum + inside, outside_sum + outside)
-            },
-        )
 }
 
 fn sync_adiabatic_outside_faces_to_inside_faces(surfaces: &mut [SurfaceHeatBalanceState]) {
@@ -3695,14 +3670,6 @@ fn max_abs_pair_delta(left: &[f64], right: &[f64]) -> f64 {
         .zip(right.iter())
         .map(|(left, right)| (left - right).abs())
         .fold(0.0, f64::max)
-}
-
-fn heat_gain_rate_w(rate_w: f64) -> f64 {
-    rate_w.max(0.0)
-}
-
-fn heat_loss_rate_w(rate_w: f64) -> f64 {
-    (-rate_w).max(0.0)
 }
 
 #[cfg(test)]

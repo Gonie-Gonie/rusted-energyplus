@@ -121,7 +121,7 @@ Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convect
 Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership module"
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
-Assert-LineLimit -Path $reports -Limit 60 -Description "report ownership module"
+Assert-LineLimit -Path $reports -Limit 160 -Description "report ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
@@ -299,6 +299,12 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_timestep_
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_context_fraction\s*\(' -Description "runtime-owned exterior wet context fraction"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain_at_timestep\s*\(' -Description "runtime-owned rain interpolation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
+Assert-Contains -Path $reports -Pattern 'zone_surface_report_conduction_rates_w' -Description "zone surface conduction report owner"
+Assert-Contains -Path $reports -Pattern 'heat_gain_rate_w' -Description "positive heat-gain report helper owner"
+Assert-Contains -Path $reports -Pattern 'heat_loss_rate_w' -Description "positive heat-loss report helper owner"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_surface_report_conduction_rates_w\s*\(' -Description "runtime-owned zone surface conduction report"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_gain_rate_w\s*\(' -Description "runtime-owned heat gain report helper"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_loss_rate_w\s*\(' -Description "runtime-owned heat loss report helper"
 Assert-Contains -Path $reports -Pattern 'ReportSurfaceHeatBalance' -Description "surface report owner"
 
 Assert-Contains -Path $executionPlan -Pattern 'ManageZoneAirUpdates' -Description "ManageZoneAirUpdates execution stage kind"
