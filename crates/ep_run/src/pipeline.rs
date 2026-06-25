@@ -1464,3 +1464,42 @@ fn artifact_map(output_dir: &Path) -> Value {
 fn markdown_cell(value: &str) -> String {
     value.replace('|', "\\|").replace('\n', " ")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::source_order_gate_summary;
+    use ep_runtime::{
+        EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
+    };
+
+    #[test]
+    fn source_order_gate_summary_detects_stage_mismatch() {
+        let expected = EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::GetHeatBalanceInput,
+            stage_name: "get-heat-balance-input",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "GetHeatBalanceInput",
+        };
+        let actual = ExecutionStage {
+            kind: ExecutionStageKind::InitHeatBalance,
+            name: "init-heat-balance".to_string(),
+            steps: Vec::new(),
+        };
+        let plan = ExecutionPlan {
+            stages: vec![actual],
+            compatibility_stages: vec![expected],
+        };
+
+        let gate = source_order_gate_summary(&plan);
+
+        assert!(!gate.matches);
+        assert_eq!(
+            gate.expected_source_order_stages,
+            vec!["get-heat-balance-input"]
+        );
+        assert_eq!(
+            gate.actual_executed_source_order_stages,
+            vec!["init-heat-balance"]
+        );
+    }
+}
