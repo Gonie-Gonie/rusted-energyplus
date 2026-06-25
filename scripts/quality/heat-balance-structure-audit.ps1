@@ -93,6 +93,8 @@ $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
+$runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
+$runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -122,7 +124,9 @@ foreach ($entry in @(
         @($timestep, "heat-balance timestep ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
-        @($runtime, "legacy runtime root")
+        @($runtime, "runtime orchestration root"),
+        @($runtimeTestSourceOrder, "runtime source-order tests"),
+        @($runtimeTestDynamic, "runtime dynamic heat-balance tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -386,7 +390,7 @@ Assert-Contains -Path $reports -Pattern 'ReportSurfaceHeatBalance' -Description 
 Assert-Contains -Path $executionPlan -Pattern 'ManageZoneAirUpdates' -Description "ManageZoneAirUpdates execution stage kind"
 Assert-Contains -Path $executionPlan -Pattern 'manage_heat_balance_source_order_stages' -Description "execution plan consumes heat-balance source-order module"
 Assert-Contains -Path $executionPlan -Pattern 'ExecutionStageKind::ManageZoneAirUpdates' -Description "zone-air steps bind to ManageZoneAirUpdates"
-Assert-Contains -Path $runtime -Pattern 'ExecutionStageKind::ManageZoneAirUpdates' -Description "runtime tests assert ManageZoneAirUpdates barrier"
+Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'ExecutionStageKind::ManageZoneAirUpdates' -Description "runtime tests assert ManageZoneAirUpdates barrier"
 
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_third_order_zone_air_correction' -Description "third-order zone-air flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_preserves_surface_inside_temperature_for_first_longwave' -Description "first-longwave inside-temperature preservation flag owner"

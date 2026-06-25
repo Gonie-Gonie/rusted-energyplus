@@ -19,7 +19,6 @@ $waived = @(
     "crates\ep_compiler\src\compiler.rs",
     "crates\ep_conformance\src\tests.rs",
     "crates\ep_run\src\pipeline.rs",
-    "crates\ep_runtime\src\runtime.rs",
     "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1",
     "tools\reporting\conformance_evidence_report.py",
     "tools\reporting\dynamic_heat_balance_probe_summary.py"
