@@ -121,6 +121,7 @@ foreach ($entry in @(
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
 
+Assert-LineLimit -Path $algorithm -Limit 650 -Description "heat-balance algorithm selector module"
 Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager source-order module"
 Assert-LineLimit -Path $surfaceManager -Limit 240 -Description "HeatBalanceSurfaceManager source-order module"
 Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance ownership module"
@@ -140,7 +141,7 @@ Assert-LineLimit -Path $runPeriod -Limit 800 -Description "run-period sampling o
 Assert-LineLimit -Path $trace -Limit 780 -Description "heat-balance trace ownership module"
 Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
-Assert-LineLimit -Path $timestep -Limit 900 -Description "heat-balance timestep ownership module"
+Assert-LineLimit -Path $timestep -Limit 800 -Description "heat-balance timestep ownership module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
@@ -371,6 +372,8 @@ Assert-Contains -Path $runtime -Pattern 'ExecutionStageKind::ManageZoneAirUpdate
 
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_third_order_zone_air_correction' -Description "third-order zone-air flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_preserves_surface_inside_temperature_for_first_longwave' -Description "first-longwave inside-temperature preservation flag owner"
+Assert-Contains -Path $algorithm -Pattern 'HeatBalanceTimestepAlgorithmFlags' -Description "timestep algorithm flag bundle owner"
+Assert-Contains -Path $algorithm -Pattern 'heat_balance_timestep_algorithm_flags' -Description "timestep algorithm flag selector owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_weather_air_storage_report' -Description "weather air-storage report flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_balance_surface_convection_report' -Description "balance surface convection report flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_surface_reference_air_surface_convection_report' -Description "surface reference-air convection report flag owner"
