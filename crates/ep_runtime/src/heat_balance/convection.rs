@@ -1,7 +1,8 @@
 //! Heat-balance convection source-order ownership notes.
 
+use crate::heat_balance::algorithm::HeatBalanceZoneAirAlgorithm;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
-use ep_model::MaterialSurfaceRoughness;
+use ep_model::{MaterialSurfaceRoughness, OutsideSurfaceConvectionAlgorithm, TypedModel};
 
 /// Current inside convection routine family used by the compatibility lane.
 pub const INSIDE_CONVECTION_SOURCE: &str =
@@ -144,4 +145,31 @@ fn energyplus_roughness_multiplier(roughness: MaterialSurfaceRoughness) -> f64 {
         MaterialSurfaceRoughness::Smooth => 1.11,
         MaterialSurfaceRoughness::VerySmooth => 1.0,
     }
+}
+
+pub(crate) fn heat_balance_uses_doe2_outside_convection(
+    model: &TypedModel,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> bool {
+    model_uses_doe2_outside_convection(model)
+        || zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm)
+}
+
+pub(crate) fn model_uses_doe2_outside_convection(model: &TypedModel) -> bool {
+    matches!(
+        model.surface_convection_algorithms.outside,
+        Some(OutsideSurfaceConvectionAlgorithm::Doe2)
+    )
+}
+
+pub(crate) fn zone_air_algorithm_uses_doe2_outside_convection(
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+) -> bool {
+    matches!(
+        zone_air_algorithm,
+        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
+            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
+    )
 }

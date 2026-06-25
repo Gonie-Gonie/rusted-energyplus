@@ -17,7 +17,7 @@ use crate::heat_balance::convection::{
     ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
     energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
     energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
-    exterior_convection_coefficient_w_per_m2_k,
+    exterior_convection_coefficient_w_per_m2_k, heat_balance_uses_doe2_outside_convection,
 };
 pub use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
 use crate::heat_balance::ctf::{
@@ -75,6 +75,14 @@ pub(crate) use crate::heat_balance::state::{
     SurfaceExteriorReportTerms, SurfaceOutsideBalanceDiagnostics,
 };
 pub(crate) use crate::heat_balance::surface_thermal_properties;
+use crate::heat_balance::surface_weather::{
+    energyplus_exterior_wet_context_fraction, energyplus_exterior_wet_reference_temperature_c,
+    energyplus_weather_record_is_rain_at_timestep_with_starting_values,
+};
+#[cfg(test)]
+use crate::heat_balance::surface_weather::{
+    energyplus_exterior_wet_timestep_fraction, energyplus_weather_record_is_rain_at_timestep,
+};
 pub(crate) use crate::heat_balance::trace::*;
 use crate::heat_balance::{
     HeatBalanceZoneAirAlgorithm, energyplus_analytical_zone_air_temperature_c,
@@ -94,6 +102,7 @@ pub(crate) use crate::heat_balance::{
 };
 #[cfg(test)]
 pub(crate) use crate::heat_balance::{surface_air_sky_radiation_split, surface_sky_view_factor};
+#[cfg(test)]
 pub(crate) use crate::psychrometrics::energyplus_outdoor_wet_bulb_c;
 pub use crate::psychrometrics::{
     energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
@@ -112,11 +121,9 @@ pub use crate::weather::*;
 pub(crate) use crate::weather::{
     HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
-    energyplus_weather_horizontal_infrared_for_context, energyplus_weather_interpolation_weight,
-    energyplus_weather_relative_humidity_for_context,
+    energyplus_weather_horizontal_infrared_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
-    heat_balance_weather_context_for_timestep, previous_weather_record,
-    previous_weather_record_with_first_hour_starting_values,
+    heat_balance_weather_context_for_timestep,
 };
 #[cfg(test)]
 use crate::weather::{
@@ -130,8 +137,8 @@ use crate::{OutputSeries, ResultStore};
 use crate::{SimulationMode, SimulationState};
 use ep_model::{
     FirstHourInterpolationStartingValues, NormalizedName, OutputHandle, OutsideBoundaryCondition,
-    OutsideSurfaceConvectionAlgorithm, Point3, SimulationModel, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, TypedModel, WindExposure, ZoneId,
+    Point3, SimulationModel, SunExposure, Surface, SurfaceId, SurfaceType, Terrain, TypedModel,
+    WindExposure, ZoneId,
 };
 use std::collections::BTreeMap;
 
@@ -144,7 +151,6 @@ const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
 const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 const ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C: f64 = 18.0;
 const EXTERIOR_SOLAR_FORCING_THRESHOLD_W_PER_M2: f64 = 300.0;
-const ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM: f64 = 0.8;
 const ENERGYPLUS_MAX_ALLOWED_INSIDE_SURFACE_DELTA_C: f64 = 0.002;
 const ENERGYPLUS_MAX_ZONE_TEMP_DIFF_C: f64 = 0.3;
 const ENERGYPLUS_MIN_SYSTEM_TIMESTEP_SECONDS: f64 = 60.0;
@@ -5005,161 +5011,6 @@ fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
     }
 
     vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / vertices.len() as f64
-}
-
-fn energyplus_exterior_wet_timestep_fraction(
-    records: &[EpwRecord],
-    record_index: usize,
-    zone_steps_per_hour: u32,
-    typed_surface: &Surface,
-) -> f64 {
-    if typed_surface.wind_exposure != WindExposure::WindExposed {
-        return 0.0;
-    }
-
-    let steps = zone_steps_per_hour.max(1);
-    let wet_steps = (1..=steps)
-        .filter(|timestep| {
-            energyplus_weather_record_is_rain_at_timestep(records, record_index, *timestep, steps)
-        })
-        .count();
-    wet_steps as f64 / f64::from(steps)
-}
-
-fn energyplus_exterior_wet_context_fraction(
-    context: HeatBalanceWeatherContext<'_>,
-    typed_surface: &Surface,
-) -> f64 {
-    if typed_surface.wind_exposure != WindExposure::WindExposed {
-        return 0.0;
-    }
-
-    let steps = context.zone_steps_per_hour.max(1);
-    if let Some(timestep) = context.zone_timestep {
-        return if energyplus_weather_record_is_rain_at_timestep_with_starting_values(
-            context.records,
-            context.record_index,
-            timestep,
-            steps,
-            context.first_hour_interpolation_starting_values,
-        ) {
-            1.0
-        } else {
-            0.0
-        };
-    }
-
-    energyplus_exterior_wet_timestep_fraction(
-        context.records,
-        context.record_index,
-        steps,
-        typed_surface,
-    )
-}
-
-fn energyplus_weather_record_is_rain_at_timestep(
-    records: &[EpwRecord],
-    record_index: usize,
-    timestep: u32,
-    zone_steps_per_hour: u32,
-) -> bool {
-    let Some(record) = records.get(record_index) else {
-        return false;
-    };
-    let previous = previous_weather_record(records, record_index);
-    let steps = zone_steps_per_hour.max(1);
-    let interpolation_weight = energyplus_weather_interpolation_weight(steps, timestep);
-    let interpolated_precipitation_depth_mm = previous.liquid_precipitation_depth_mm
-        * (1.0 - interpolation_weight)
-        + record.liquid_precipitation_depth_mm * interpolation_weight;
-
-    interpolated_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM
-}
-
-fn energyplus_weather_record_is_rain_at_timestep_with_starting_values(
-    records: &[EpwRecord],
-    record_index: usize,
-    timestep: u32,
-    zone_steps_per_hour: u32,
-    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
-) -> bool {
-    let Some(record) = records.get(record_index) else {
-        return false;
-    };
-    let previous = previous_weather_record_with_first_hour_starting_values(
-        records,
-        record_index,
-        first_hour_interpolation_starting_values,
-    );
-    let steps = zone_steps_per_hour.max(1);
-    let interpolation_weight = energyplus_weather_interpolation_weight(steps, timestep);
-    let interpolated_precipitation_depth_mm = previous.liquid_precipitation_depth_mm
-        * (1.0 - interpolation_weight)
-        + record.liquid_precipitation_depth_mm * interpolation_weight;
-
-    interpolated_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM
-}
-
-fn energyplus_exterior_wet_reference_temperature_c(
-    context: HeatBalanceWeatherContext<'_>,
-    fallback_dry_bulb_c: f64,
-) -> f64 {
-    let Some(record) = context.records.get(context.record_index) else {
-        return fallback_dry_bulb_c;
-    };
-    let dry_bulb_c = context
-        .zone_timestep
-        .map(|timestep| {
-            energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                Some(context.records),
-                context.record_index,
-                fallback_dry_bulb_c,
-                context.zone_steps_per_hour,
-                timestep,
-                context.first_hour_interpolation_starting_values,
-            )
-        })
-        .unwrap_or(fallback_dry_bulb_c);
-    let relative_humidity_percent =
-        energyplus_weather_relative_humidity_for_context(context, record.relative_humidity_percent);
-    let atmospheric_pressure_pa = energyplus_weather_atmospheric_pressure_for_context(
-        context,
-        record.atmospheric_pressure_pa,
-    );
-
-    energyplus_outdoor_wet_bulb_c(
-        dry_bulb_c,
-        relative_humidity_percent,
-        atmospheric_pressure_pa,
-    )
-    .unwrap_or(dry_bulb_c)
-}
-
-fn heat_balance_uses_doe2_outside_convection(
-    model: &TypedModel,
-    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
-) -> bool {
-    model_uses_doe2_outside_convection(model)
-        || zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm)
-}
-
-fn model_uses_doe2_outside_convection(model: &TypedModel) -> bool {
-    matches!(
-        model.surface_convection_algorithms.outside,
-        Some(OutsideSurfaceConvectionAlgorithm::Doe2)
-    )
-}
-
-fn zone_air_algorithm_uses_doe2_outside_convection(
-    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
-) -> bool {
-    matches!(
-        zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
-    )
 }
 
 fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {

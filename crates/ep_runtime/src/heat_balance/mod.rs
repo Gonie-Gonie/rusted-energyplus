@@ -10,6 +10,7 @@ pub mod radiation;
 pub mod reports;
 pub mod state;
 pub mod surface_manager;
+pub mod surface_weather;
 pub(crate) mod trace;
 pub mod zone_predictor_corrector;
 
@@ -26,4 +27,5 @@ pub use radiation::*;
 pub use reports::*;
 pub use state::*;
 pub use surface_manager::*;
+pub use surface_weather::*;
 pub use zone_predictor_corrector::*;

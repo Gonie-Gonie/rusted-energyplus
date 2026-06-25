@@ -76,6 +76,7 @@ $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
 $reports = "crates\ep_runtime\src\heat_balance\reports.rs"
+$surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
@@ -92,6 +93,7 @@ foreach ($entry in @(
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
         @($reports, "report ownership module"),
+        @($surfaceWeather, "surface weather ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
         @($runtime, "legacy runtime root")
@@ -108,6 +110,7 @@ Assert-LineLimit -Path $convection -Limit 260 -Description "convection ownership
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 1200 -Description "radiation ownership module"
 Assert-LineLimit -Path $reports -Limit 60 -Description "report ownership module"
+Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod manager;' -Description "HeatBalanceManager module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_manager;' -Description "HeatBalanceSurfaceManager module declaration"
@@ -118,6 +121,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod convection;' -Descriptio
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod longwave;' -Description "longwave module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod radiation;' -Description "radiation module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod reports;' -Description "reports module declaration"
+Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_weather;' -Description "surface weather module declaration"
 
 Assert-Contains -Path $manager -Pattern 'pub fn manage_heat_balance_source_order_stages\s*\(' -Description "HeatBalanceManager source-order list"
 foreach ($routine in @(
@@ -172,10 +176,12 @@ Assert-Contains -Path $convection -Pattern 'CalcHeatBalanceOutsideSurf' -Descrip
 Assert-Contains -Path $convection -Pattern 'energyplus_tarp_inside_convection_coefficient_w_per_m2_k' -Description "inside TARP convection owner"
 Assert-Contains -Path $convection -Pattern 'energyplus_doe2_outside_convection_coefficient_w_per_m2_k' -Description "DOE-2 outside convection owner"
 Assert-Contains -Path $convection -Pattern 'exterior_convection_coefficient_w_per_m2_k' -Description "fallback exterior convection owner"
+Assert-Contains -Path $convection -Pattern 'heat_balance_uses_doe2_outside_convection' -Description "DOE-2 outside convection selector owner"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_tarp_inside_convection_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned TARP inside convection implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_ashrae_tarp_natural_convection_w_per_m2_k\s*\(' -Description "runtime-owned ASHRAE TARP helper implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_doe2_outside_convection_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned DOE-2 outside convection implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn exterior_convection_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned fallback exterior convection implementation"
+Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_doe2_outside_convection\s*\(' -Description "runtime-owned DOE-2 outside convection selector"
 Assert-Contains -Path $longwave -Pattern 'CalcHeatBalanceOutsideSurf' -Description "exterior longwave source owner"
 Assert-Contains -Path $longwave -Pattern 'pub\(crate\) struct ExteriorLongwaveTerms' -Description "exterior longwave terms owner"
 Assert-Contains -Path $longwave -Pattern 'energyplus_exterior_longwave_terms' -Description "exterior longwave term calculation owner"
@@ -201,6 +207,15 @@ Assert-NotContains -Path $runtime -Pattern 'fn update_surface_inside_scriptf_lon
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_scriptf_from_view_factors\s*\(' -Description "runtime-owned ScriptF matrix implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_approximate_view_factors\s*\(' -Description "runtime-owned approximate view-factor implementation"
 Assert-Contains -Path $reports -Pattern 'ReportHeatBalance' -Description "zone report owner"
+Assert-Contains -Path $surfaceWeather -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface weather source owner"
+Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_exterior_wet_timestep_fraction' -Description "exterior wet timestep fraction owner"
+Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_exterior_wet_context_fraction' -Description "exterior wet context fraction owner"
+Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_weather_record_is_rain_at_timestep' -Description "rain interpolation owner"
+Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_exterior_wet_reference_temperature_c' -Description "wet exterior reference temperature owner"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_timestep_fraction\s*\(' -Description "runtime-owned exterior wet timestep fraction"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_context_fraction\s*\(' -Description "runtime-owned exterior wet context fraction"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain_at_timestep\s*\(' -Description "runtime-owned rain interpolation"
+Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
 Assert-Contains -Path $reports -Pattern 'ReportSurfaceHeatBalance' -Description "surface report owner"
 
 Assert-Contains -Path $executionPlan -Pattern 'ManageZoneAirUpdates' -Description "ManageZoneAirUpdates execution stage kind"
