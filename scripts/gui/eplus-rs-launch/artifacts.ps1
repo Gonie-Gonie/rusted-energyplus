@@ -47,3 +47,69 @@ function Read-PlotArtifactPreview {
     }
     return ($lines -join "`r`n")
 }
+function Get-EvidenceArtifactPaths {
+    param([string]$OutputDir)
+    $reportsDir = Join-Path $OutputDir "reports"
+    $candidatePaths = @(
+        (Join-Path $reportsDir "evidence-summary.md"),
+        (Join-Path $reportsDir "evidence-summary.pdf"),
+        (Join-Path $reportsDir "numeric-conformance-evidence.pdf"),
+        (Join-Path $reportsDir "release-evidence-manifest.pdf"),
+        (Join-Path $reportsDir "user-coverage-handbook.pdf")
+    )
+    if (Test-Path -LiteralPath $reportsDir -PathType Container) {
+        $candidatePaths += @(Get-ChildItem -LiteralPath $reportsDir -File -Recurse | Where-Object {
+                @(".pdf", ".html", ".json", ".md") -contains $_.Extension.ToLowerInvariant() -and
+                ($_.Name -match "evidence|manifest|handbook|summary")
+            } | Sort-Object FullName | ForEach-Object { $_.FullName })
+    }
+
+    $paths = @()
+    foreach ($candidate in $candidatePaths) {
+        if (-not (Test-LeafPath -Path $candidate)) {
+            continue
+        }
+        $resolved = (Resolve-Path -LiteralPath $candidate).Path
+        if ($paths -notcontains $resolved) {
+            $paths += $resolved
+        }
+    }
+    return $paths
+}
+
+function Find-EvidenceArtifactPath {
+    param([string]$OutputDir)
+    $paths = @(Get-EvidenceArtifactPaths -OutputDir $OutputDir)
+    if ($paths.Count -eq 0) {
+        return $null
+    }
+    return $paths[0]
+}
+
+function Read-EvidenceArtifactPreview {
+    param([string]$OutputDir)
+    $paths = @(Get-EvidenceArtifactPaths -OutputDir $OutputDir)
+    if ($paths.Count -eq 0) {
+        return "Evidence summary/PDF artifacts are not available for this run."
+    }
+
+    $lines = @("Evidence artifacts:")
+    foreach ($path in $paths) {
+        $lines += $path
+    }
+
+    $previewPath = @($paths | Where-Object {
+            @(".md", ".txt", ".json", ".html") -contains ([System.IO.Path]::GetExtension($_).ToLowerInvariant())
+        } | Select-Object -First 1)
+    if ($previewPath.Count -eq 0) {
+        return ($lines -join "`r`n")
+    }
+
+    $lines += ""
+    $lines += "Preview: $($previewPath[0])"
+    $lines += ""
+    $lines += Read-ArtifactPreview `
+        -Path $previewPath[0] `
+        -MissingText "Evidence summary preview is not available."
+    return ($lines -join "`r`n")
+}

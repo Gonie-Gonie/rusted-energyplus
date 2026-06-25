@@ -168,13 +168,31 @@ function Invoke-LauncherSelfTest {
         throw "launcher self-test failed to save oracle compare option"
     }
     Remove-Item -LiteralPath $settingsPath -Force
+    $evidenceRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("eplus-rs-launch-evidence-{0}" -f ([guid]::NewGuid()))
+    $evidenceReports = Join-Path $evidenceRoot "reports"
+    New-Item -ItemType Directory -Force -Path $evidenceReports | Out-Null
+    $evidenceSummaryPath = Join-Path $evidenceReports "evidence-summary.md"
+    $evidencePdfPath = Join-Path $evidenceReports "numeric-conformance-evidence.pdf"
+    Set-Content -Encoding UTF8 -LiteralPath $evidenceSummaryPath -Value "# Evidence Summary`n`nAd-hoc launcher evidence preview."
+    Set-Content -Encoding UTF8 -LiteralPath $evidencePdfPath -Value "fake pdf bytes"
+    $foundEvidencePath = Find-EvidenceArtifactPath -OutputDir $evidenceRoot
+    if ($foundEvidencePath -ne (Resolve-Path -LiteralPath $evidenceSummaryPath).Path) {
+        throw "launcher self-test failed to select evidence summary artifact"
+    }
+    $evidencePreview = Read-EvidenceArtifactPreview -OutputDir $evidenceRoot
+    foreach ($required in @("Evidence artifacts", "evidence-summary.md", "numeric-conformance-evidence.pdf", "Ad-hoc launcher evidence preview")) {
+        if ($evidencePreview -notmatch [regex]::Escape($required)) {
+            throw "launcher self-test missed evidence preview token $required"
+        }
+    }
+    Remove-Item -LiteralPath $evidenceRoot -Recurse -Force
     $scriptText = Get-Content -Encoding UTF8 -Raw -LiteralPath $LauncherScriptPath
-    foreach ($required in @("Summary", "Diagnostics", "Support Report", "Results", "Oracle Compare", "Plots", "Logs", "Open Diagnostics", "Plot artifacts", "not a drop-in replacement")) {
+    foreach ($required in @("Summary", "Diagnostics", "Support Report", "Results", "Oracle Compare", "Plots", "Evidence", "Logs", "Open Diagnostics", "Open Evidence", "Plot artifacts", "evidence-summary.md", "not a drop-in replacement")) {
         if ($scriptText -notmatch [regex]::Escape($required)) {
             throw "launcher self-test missed UI boundary token $required"
         }
     }
-    foreach ($helper in @("Read-ArtifactPreview", "Read-PlotArtifactPreview")) {
+    foreach ($helper in @("Read-ArtifactPreview", "Read-PlotArtifactPreview", "Read-EvidenceArtifactPreview", "Find-EvidenceArtifactPath")) {
         if ($null -eq (Get-Command $helper -ErrorAction SilentlyContinue)) {
             throw "launcher self-test missed artifact helper $helper"
         }

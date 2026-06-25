@@ -82,9 +82,10 @@ arguments.
 The launcher displays the final run state, claim boundary, oracle status,
 compare status, stage timing summary from `run-summary.json`, top diagnostics
 from `diagnostics.json`, and result tabs for summary, diagnostics, support
-report, selected results, oracle compare, plot artifacts, and logs. It also provides artifact
-links for the output folder, diagnostics, run report, support report, and
-compare report. It saves the last input,
+report, selected results, oracle compare, plot artifacts, evidence artifacts,
+and logs. It also provides artifact links for the output folder, diagnostics,
+run report, support report, compare report, and evidence summary/PDF. It saves
+the last input,
 weather, output, oracle, CLI, mode, partial, format, trace, warning, oracle,
 compare, and overwrite selections in the user's application-data settings.
 Oracle compare enables oracle baseline explicitly; the GUI does not silently

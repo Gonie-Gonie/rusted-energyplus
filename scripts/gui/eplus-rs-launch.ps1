@@ -201,6 +201,7 @@ function Refresh-Ui {
         $openDiagnosticsButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "diagnostics.json")
         $openSupportReportButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "support-report.md")
         $openCompareButton.Enabled = Test-LeafPath -Path (Join-Path $script:OutputDir "compare\compare-report.md")
+        $openEvidenceButton.Enabled = Test-LeafPath -Path (Find-EvidenceArtifactPath -OutputDir $script:OutputDir)
     }
     finally {
         $script:RefreshingUi = $false
@@ -291,6 +292,7 @@ function Finish-Run {
         -Path (Join-Path $script:OutputDir "compare\compare-report.md") `
         -MissingText "Oracle compare report is not available for this run."
     $plotsTextBox.Text = Read-PlotArtifactPreview -OutputDir $script:OutputDir
+    $evidenceTextBox.Text = Read-EvidenceArtifactPreview -OutputDir $script:OutputDir
     $logsTextBox.Text = "exit_code=$exitCode`r`n`r`nstdout:`r`n$stdout`r`n`r`nstderr:`r`n$stderr"
 
     if ($null -ne $summary) {
@@ -439,12 +441,12 @@ $runButton = New-Button "Run" 570 342 120 34
 $openOutputButton = New-Button "Open Output" 708 342 120 34
 $form.Controls.AddRange(@($oracleBaselineButton, $compareButton, $overwriteButton, $runButton, $openOutputButton))
 
-$openRunReportButton = New-Button "Open Run Report" 18 390 170 34
-$openDiagnosticsButton = New-Button "Open Diagnostics" 204 390 170 34
-$openSupportReportButton = New-Button "Open Support Report" 390 390 178 34
-$openCompareButton = New-Button "Open Compare Report" 584 390 170 34
-$exitButton = New-Button "Exit" 766 390 62 34
-$form.Controls.AddRange(@($openRunReportButton, $openDiagnosticsButton, $openSupportReportButton, $openCompareButton, $exitButton))
+$openRunReportButton = New-Button "Open Run Report" 18 390 150 34
+$openDiagnosticsButton = New-Button "Open Diagnostics" 180 390 150 34
+$openSupportReportButton = New-Button "Open Support Report" 342 390 166 34
+$openCompareButton = New-Button "Open Compare Report" 520 390 160 34
+$openEvidenceButton = New-Button "Open Evidence" 692 390 136 34
+$form.Controls.AddRange(@($openRunReportButton, $openDiagnosticsButton, $openSupportReportButton, $openCompareButton, $openEvidenceButton))
 
 $resultTabs = New-Object System.Windows.Forms.TabControl
 $resultTabs.Location = New-Object System.Drawing.Point(18, 432)
@@ -463,6 +465,8 @@ $compareTab = New-Object System.Windows.Forms.TabPage
 $compareTab.Text = "Oracle Compare"
 $plotsTab = New-Object System.Windows.Forms.TabPage
 $plotsTab.Text = "Plots"
+$evidenceTab = New-Object System.Windows.Forms.TabPage
+$evidenceTab.Text = "Evidence"
 $logsTab = New-Object System.Windows.Forms.TabPage
 $logsTab.Text = "Logs"
 
@@ -494,11 +498,15 @@ $plotsTextBox = New-ReadOnlyMultilineBox
 $plotsTextBox.Text = "Plot artifacts will appear after a run writes reports\plots, plots, or compare\plots."
 $plotsTab.Controls.Add($plotsTextBox)
 
+$evidenceTextBox = New-ReadOnlyMultilineBox
+$evidenceTextBox.Text = "Evidence summary/PDF artifacts will appear after a run writes reports\evidence-summary.md or evidence PDFs."
+$evidenceTab.Controls.Add($evidenceTextBox)
+
 $logsTextBox = New-ReadOnlyMultilineBox
 $logsTextBox.Text = "Launcher stdout/stderr logs will appear after a run."
 $logsTab.Controls.Add($logsTextBox)
 
-foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $plotsTab, $logsTab)) {
+foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $plotsTab, $evidenceTab, $logsTab)) {
     [void]$resultTabs.TabPages.Add($tab)
 }
 $form.Controls.Add($resultTabs)
@@ -655,7 +663,7 @@ $openRunReportButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "r
 $openDiagnosticsButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "diagnostics.json") })
 $openSupportReportButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "support-report.md") })
 $openCompareButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "compare\compare-report.md") })
-$exitButton.Add_Click({ $form.Close() })
+$openEvidenceButton.Add_Click({ Open-Path -Path (Find-EvidenceArtifactPath -OutputDir $script:OutputDir) })
 
 $form.Add_FormClosing({
     param($Sender, $EventArgs)
