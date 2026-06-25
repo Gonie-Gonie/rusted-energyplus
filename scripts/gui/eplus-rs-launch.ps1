@@ -11,6 +11,7 @@ $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $ScriptRoot "..")).Path
 $AppRoot = (Resolve-Path -LiteralPath (Join-Path $ScriptsRoot "..")).Path
 
 . (Join-Path $ScriptRoot "eplus-rs-launch\core.ps1")
+. (Join-Path $ScriptRoot "eplus-rs-launch\artifacts.ps1")
 . (Join-Path $ScriptRoot "eplus-rs-launch\ui.ps1")
 
 $LauncherDefaults = Get-LauncherDefaultPaths
@@ -180,9 +181,14 @@ if ($SelfTest) {
     }
     Remove-Item -LiteralPath $settingsPath -Force
     $scriptText = Get-Content -Encoding UTF8 -Raw -LiteralPath $PSCommandPath
-    foreach ($required in @("Summary", "Diagnostics", "Support Report", "Results", "Oracle Compare", "Logs", "Open Diagnostics", "not a drop-in replacement")) {
+    foreach ($required in @("Summary", "Diagnostics", "Support Report", "Results", "Oracle Compare", "Plots", "Logs", "Open Diagnostics", "Plot artifacts", "not a drop-in replacement")) {
         if ($scriptText -notmatch [regex]::Escape($required)) {
             throw "launcher self-test missed UI boundary token $required"
+        }
+    }
+    foreach ($helper in @("Read-ArtifactPreview", "Read-PlotArtifactPreview")) {
+        if ($null -eq (Get-Command $helper -ErrorAction SilentlyContinue)) {
+            throw "launcher self-test missed artifact helper $helper"
         }
     }
 
@@ -406,26 +412,6 @@ function Read-RunDiagnostics {
     }
 }
 
-function Read-ArtifactPreview {
-    param(
-        [string]$Path,
-        [string]$MissingText,
-        [int]$MaxCharacters = 12000
-    )
-    if (-not (Test-LeafPath -Path $Path)) {
-        return $MissingText
-    }
-    try {
-        $text = Get-Content -Encoding UTF8 -Raw -LiteralPath $Path
-        if ($text.Length -le $MaxCharacters) {
-            return $text
-        }
-        return $text.Substring(0, $MaxCharacters) + "`r`n... truncated in launcher preview; open the artifact for the full file."
-    }
-    catch {
-        return "Failed to read artifact: $Path"
-    }
-}
 
 function Finish-Run {
     $timer.Stop()
@@ -482,6 +468,7 @@ function Finish-Run {
     $compareTextBox.Text = Read-ArtifactPreview `
         -Path (Join-Path $script:OutputDir "compare\compare-report.md") `
         -MissingText "Oracle compare report is not available for this run."
+    $plotsTextBox.Text = Read-PlotArtifactPreview -OutputDir $script:OutputDir
     $logsTextBox.Text = "exit_code=$exitCode`r`n`r`nstdout:`r`n$stdout`r`n`r`nstderr:`r`n$stderr"
 
     if ($null -ne $summary) {
@@ -652,6 +639,8 @@ $resultsTab = New-Object System.Windows.Forms.TabPage
 $resultsTab.Text = "Results"
 $compareTab = New-Object System.Windows.Forms.TabPage
 $compareTab.Text = "Oracle Compare"
+$plotsTab = New-Object System.Windows.Forms.TabPage
+$plotsTab.Text = "Plots"
 $logsTab = New-Object System.Windows.Forms.TabPage
 $logsTab.Text = "Logs"
 
@@ -679,11 +668,15 @@ $compareTextBox = New-ReadOnlyMultilineBox
 $compareTextBox.Text = "Oracle comparison artifacts will appear when compare is enabled."
 $compareTab.Controls.Add($compareTextBox)
 
+$plotsTextBox = New-ReadOnlyMultilineBox
+$plotsTextBox.Text = "Plot artifacts will appear after a run writes reports\plots, plots, or compare\plots."
+$plotsTab.Controls.Add($plotsTextBox)
+
 $logsTextBox = New-ReadOnlyMultilineBox
 $logsTextBox.Text = "Launcher stdout/stderr logs will appear after a run."
 $logsTab.Controls.Add($logsTextBox)
 
-foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $logsTab)) {
+foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $plotsTab, $logsTab)) {
     [void]$resultTabs.TabPages.Add($tab)
 }
 $form.Controls.Add($resultTabs)

@@ -82,7 +82,7 @@ arguments.
 The launcher displays the final run state, claim boundary, oracle status,
 compare status, stage timing summary from `run-summary.json`, top diagnostics
 from `diagnostics.json`, and result tabs for summary, diagnostics, support
-report, selected results, oracle compare, and logs. It also provides artifact
+report, selected results, oracle compare, plot artifacts, and logs. It also provides artifact
 links for the output folder, diagnostics, run report, support report, and
 compare report. It saves the last input,
 weather, output, oracle, CLI, mode, partial, format, trace, warning, oracle,
