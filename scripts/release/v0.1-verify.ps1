@@ -150,6 +150,32 @@ if ($manifest.aggregate.present_required_asset_count -lt 1) {
 if ($manifest.aggregate.required_asset_count -lt 30) {
     throw "Expected release manifest to require PDF, plot, performance, and stability assets, found $($manifest.aggregate.required_asset_count)"
 }
+$expectedGithubReleaseAssetRoles = @(
+    "binary-package",
+    "numeric-conformance-pdf",
+    "conformance-index-pdf",
+    "support-coverage-pdf",
+    "user-coverage-handbook-pdf"
+)
+$actualGithubReleaseAssetRoles = @(
+    $manifest.assets |
+        Where-Object { $_.github_release_asset } |
+        ForEach-Object { $_.role } |
+        Sort-Object
+)
+$missingGithubReleaseAssetRoles = @($expectedGithubReleaseAssetRoles | Where-Object { $actualGithubReleaseAssetRoles -notcontains $_ })
+$unexpectedGithubReleaseAssetRoles = @($actualGithubReleaseAssetRoles | Where-Object { $expectedGithubReleaseAssetRoles -notcontains $_ })
+if ($missingGithubReleaseAssetRoles.Count -gt 0 -or $unexpectedGithubReleaseAssetRoles.Count -gt 0) {
+    throw "Unexpected manifest GitHub Release asset roles. Missing=[$($missingGithubReleaseAssetRoles -join ', ')] Unexpected=[$($unexpectedGithubReleaseAssetRoles -join ', ')]"
+}
+$missingAssetHashes = @(
+    $manifest.assets |
+        Where-Object { $_.exists -and [string]::IsNullOrWhiteSpace([string]$_.sha256) } |
+        ForEach-Object { $_.role }
+)
+if ($missingAssetHashes.Count -gt 0) {
+    throw "Expected every present release asset to record a SHA256 hash. Missing=[$($missingAssetHashes -join ', ')]"
+}
 foreach ($role in @("performance-summary-json", "stability-summary-json", "one-zone-surface-temperature-plot", "ideal-loads-branch-heatmap", "user-coverage-handbook-pdf")) {
     if (@($manifest.assets | Where-Object { $_.role -eq $role -and $_.exists }).Count -ne 1) {
         throw "Expected present manifest asset role: $role"

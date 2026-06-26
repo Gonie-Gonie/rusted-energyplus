@@ -26,8 +26,9 @@ CLAIM_BOUNDARY = (
     "add or promote numerical conformance by itself."
 )
 GITHUB_RELEASE_POLICY = (
-    "The release zip and every generated file under "
-    ".runtime/release-evidence/vX.Y.Z are intended to be GitHub Release assets."
+    "GitHub Releases upload the binary zip plus curated public evidence PDFs. "
+    "HTML, JSON, Markdown, plots, and summaries remain local manifest-backed "
+    "release evidence unless the release selector explicitly includes them."
 )
 
 
@@ -87,12 +88,14 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": package,
             "produced_by": f".\\scripts\\dev.cmd package -Version {version}",
             "user_purpose": "Runnable CLI package with docs, specs, scripts, and test data.",
+            "github_release_asset": True,
         },
         {
             "role": "numeric-conformance-pdf",
             "path": evidence_path(repo_root, version, "numeric-conformance-evidence.pdf"),
             "produced_by": f".\\scripts\\dev.cmd conformance-evidence-report -Version {version}",
             "user_purpose": "Readable numerical conformance evidence for promoted tolerance-gated cases.",
+            "github_release_asset": True,
         },
         {
             "role": "numeric-conformance-html",
@@ -111,6 +114,7 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": evidence_path(repo_root, version, "conformance-index-report.pdf"),
             "produced_by": f".\\scripts\\dev.cmd conformance-index-report -Version {version}",
             "user_purpose": "Readable manifest, case, and output-request coverage index.",
+            "github_release_asset": True,
         },
         {
             "role": "conformance-index-html",
@@ -135,6 +139,7 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": evidence_path(repo_root, version, "support-coverage-report.pdf"),
             "produced_by": f".\\scripts\\dev.cmd support-coverage-report -Version {version}",
             "user_purpose": "Readable user coverage for supported inputs, outputs, and algorithms.",
+            "github_release_asset": True,
         },
         {
             "role": "support-coverage-html",
@@ -162,6 +167,7 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
                 "path": evidence_path(repo_root, version, "user-coverage-handbook.pdf"),
                 "produced_by": f".\\scripts\\dev.cmd user-coverage-handbook -Version {version}",
                 "user_purpose": "Readable user guide to currently supported inputs, outputs, and algorithms.",
+                "github_release_asset": True,
             },
             {
                 "role": "user-coverage-handbook-html",
@@ -231,7 +237,7 @@ def materialize_asset(repo_root: Path, spec: dict[str, Any]) -> dict[str, Any]:
     return {
         "role": spec["role"],
         "path": rel_path(repo_root, path) if path.is_absolute() else path.as_posix(),
-        "github_release_asset": True,
+        "github_release_asset": bool(spec.get("github_release_asset", False)),
         "required": bool(spec.get("required", True)),
         "exists": exists,
         "size_bytes": path.stat().st_size if exists else 0,
@@ -356,6 +362,7 @@ def build_asset_table(manifest: dict[str, Any]) -> Table:
         [
             asset["role"],
             asset["path"],
+            "yes" if asset["github_release_asset"] else "local",
             "yes" if asset["exists"] else "missing",
             size_label(asset["size_bytes"]),
             asset["sha256"][:16] if asset["sha256"] else "",
@@ -364,7 +371,7 @@ def build_asset_table(manifest: dict[str, Any]) -> Table:
         for asset in manifest["assets"]
     ]
     return doc_table(
-        ["Role", "Path", "Exists", "Size", "SHA256 prefix", "User purpose"],
+        ["Role", "Path", "GitHub Release", "Exists", "Size", "SHA256 prefix", "User purpose"],
         rows,
         "Expected release package and GitHub Release evidence assets.",
     )
@@ -507,6 +514,7 @@ def render_markdown(manifest: dict[str, Any]) -> str:
         [
             asset["role"],
             asset["path"],
+            "yes" if asset["github_release_asset"] else "local",
             "yes" if asset["exists"] else "missing",
             asset["size_bytes"],
             asset["sha256"],
@@ -526,7 +534,7 @@ def render_markdown(manifest: dict[str, Any]) -> str:
         f"- missing_assets: {aggregate['missing_required_asset_count']}\n"
         f"- status: {aggregate['status']}\n\n"
         "## Asset Checklist\n\n"
-        + markdown_table(["Role", "Path", "Exists", "Size bytes", "SHA256", "Purpose"], asset_rows)
+        + markdown_table(["Role", "Path", "GitHub Release", "Exists", "Size bytes", "SHA256", "Purpose"], asset_rows)
     )
 
 
