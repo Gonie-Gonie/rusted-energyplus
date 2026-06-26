@@ -118,6 +118,114 @@ foreach ($forbidden in @("# Archive", "archive/")) {
     }
 }
 
+function Normalize-SummaryTarget {
+    param([string]$Target)
+
+    return ($Target -replace "\\", "/").Trim("`"'`,);")
+}
+
+function Get-DocsCategory {
+    param([string]$RelativePath)
+
+    $relative = $RelativePath -replace "\\", "/"
+    if ($relative.StartsWith("docs/src/current/")) { return "current" }
+    if (
+        $relative.StartsWith("docs/src/guides/") -or
+        $relative.StartsWith("docs/src/user-guide/") -or
+        $relative -eq "docs/src/quick-start.md"
+    ) {
+        return "guide"
+    }
+    if ($relative.StartsWith("docs/src/generated/")) { return "generated" }
+    if ($relative.StartsWith("docs/src/releases/")) { return "release-note" }
+    if ($relative.StartsWith("docs/src/porting-map/")) { return "source-map" }
+    if (
+        $relative.StartsWith("docs/src/architecture/") -or
+        $relative.StartsWith("docs/src/conformance/") -or
+        $relative.StartsWith("docs/src/operations/") -or
+        $relative.StartsWith("docs/src/adr/") -or
+        $relative -eq "docs/src/introduction.md" -or
+        $relative -eq "docs/src/SUMMARY.md"
+    ) {
+        return "spec-explanation"
+    }
+    return "removable"
+}
+
+function Get-MarkdownStatus {
+    param([string]$Path)
+
+    $text = Get-Content -Raw -LiteralPath $Path
+    if ($text -notmatch '(?s)^---\r?\n(.*?)\r?\n---') {
+        return ""
+    }
+    foreach ($line in ($Matches[1] -split "\r?\n")) {
+        if ($line -match '^\s*status\s*:\s*(.*?)\s*$') {
+            return $Matches[1].Trim().ToLowerInvariant()
+        }
+    }
+    return ""
+}
+
+function Test-SummaryScope {
+    param(
+        [string]$Section,
+        [string]$RelativePath,
+        [string]$Category
+    )
+
+    switch ($Section) {
+        "Summary" { return $RelativePath -eq "docs/src/introduction.md" }
+        "Current" { return $Category -eq "current" }
+        "Guides" { return $Category -eq "guide" }
+        "Generated References" { return $Category -eq "generated" }
+        default { return $false }
+    }
+}
+
+$allowedSummarySections = @("Summary", "Current", "Guides", "Generated References")
+$summaryLinks = @()
+$summarySection = ""
+foreach ($line in $summaryLines) {
+    if ($line.StartsWith("# ")) {
+        $summarySection = $line.Substring(2).Trim()
+        if ($summarySection -notin $allowedSummarySections) {
+            throw "SUMMARY.md must stay limited to Summary, Current, Guides, and Generated References; found section: $summarySection"
+        }
+        continue
+    }
+    if ($line -match '^\s*(?:-\s*)?\[[^\]]+\]\(([^)]+)\)') {
+        $target = Normalize-SummaryTarget -Target $Matches[1]
+        if ($target.StartsWith("http://") -or $target.StartsWith("https://") -or $target.StartsWith("#")) {
+            continue
+        }
+        $summaryLinks += [pscustomobject]@{
+            RelativePath = "docs/src/$target"
+            Section = $summarySection
+        }
+    }
+}
+foreach ($link in $summaryLinks) {
+    $relative = $link.RelativePath
+    $section = $link.Section
+    $category = Get-DocsCategory -RelativePath $relative
+    if (-not (Test-SummaryScope -Section $section -RelativePath $relative -Category $category)) {
+        throw "SUMMARY.md section '$section' must not expose $category documentation: $relative"
+    }
+    if ($category -eq "removable") {
+        throw "SUMMARY.md must not expose removable documentation: $relative"
+    }
+
+    $path = Join-Path $RepoRoot ($relative -replace "/", "\")
+    if (-not (Test-Path -LiteralPath $path)) {
+        throw "SUMMARY.md points to missing documentation: $relative"
+    }
+    $status = Get-MarkdownStatus -Path $path
+    if ($status -in @("obsolete", "removable")) {
+        throw "SUMMARY.md must not expose $status documentation: $relative"
+    }
+}
+
 $docsSourceFiles = Get-ChildItem -LiteralPath (Join-Path $DocsRoot "src") -Recurse -File -Filter "*.md" |
     Where-Object {
         $_.FullName -notlike "*\src\adr\0001-docs-specs-and-evidence-retention.md" -and

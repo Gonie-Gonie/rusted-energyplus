@@ -16,24 +16,7 @@
 - [Setup](guides/setup.md)
 - [Developer Workflow](guides/developer-workflow.md)
 - [Run Arbitrary IDF](guides/run-arbitrary-idf.md)
-- [Script Index](operations/script-index.md)
 - [Release Process](guides/release-process.md)
-
-# User Coverage
-
-- [Support Coverage Report](conformance/support-coverage-report.md)
-- [User Coverage Handbook](conformance/user-coverage-handbook.md)
-- [Release Evidence Manifest](conformance/release-evidence-manifest.md)
-
-# Porting Maps
-
-- [Algorithm Port Ticket](porting-map/algorithm-port-ticket.md)
-- [Output Variable Source Map](porting-map/output-variable-source-map.md)
-- [IdealLoads Source Map](porting-map/ideal-loads-source-map.md)
-- [Zone Air Update Map](porting-map/zone-air-update-map.md)
-- [Surface Balance Map](porting-map/surface-balance-map.md)
-- [Conduction Map](porting-map/conduction-map.md)
-- [Warmup Semantics Map](porting-map/warmup-semantics-map.md)
 
 # Generated References
 
@@ -45,7 +28,3 @@
 - [Variable Coverage](generated/variable-coverage.md)
 - [Script Inventory](generated/script-index.md)
 - [Docs Inventory](generated/docs-inventory.md)
-
-# ADR
-
-- [Docs, Specs, and Evidence Retention](adr/0001-docs-specs-and-evidence-retention.md)

@@ -10,7 +10,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Check | Result |
 |---|---|
 | docs files | 81 |
-| SUMMARY links | 30 |
+| SUMMARY links | 19 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
 | Current nav expected | 6 |
@@ -20,8 +20,12 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | README current docs missing | 0 |
 | README current docs unexpected | 0 |
 | Generated docs missing notice | 0 |
+| Removable docs in SUMMARY | 0 |
+| Obsolete docs in SUMMARY | 0 |
+| Non-core SUMMARY sections | 0 |
+| SUMMARY section scope violations | 0 |
 | Release notes in Current nav | 0 |
-| Non-generated docs not in SUMMARY | 51 |
+| Non-generated docs not in SUMMARY | 62 |
 
 ## Current Navigation Check
 
@@ -46,6 +50,22 @@ none
 
 none
 
+**Removable docs in SUMMARY**
+
+none
+
+**Obsolete docs in SUMMARY**
+
+none
+
+**Non-core SUMMARY sections**
+
+none
+
+**SUMMARY section scope violations**
+
+none
+
 **Release notes in Current navigation**
 
 none
@@ -55,7 +75,7 @@ none
 | Path | Category | SUMMARY section | Generated notice | Front matter | Status | Owner | Last reviewed |
 |---|---|---|---|---|---|---|---|
 | docs/src/SUMMARY.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
-| docs/src/adr/0001-docs-specs-and-evidence-retention.md | spec-explanation | ADR | n/a | present | active | docs | 2026-06-07 |
+| docs/src/adr/0001-docs-specs-and-evidence-retention.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
 | docs/src/architecture/data-architecture.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/architecture/diagnostics-trace.md | spec-explanation | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/architecture/execution-plan.md | spec-explanation | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
@@ -77,13 +97,13 @@ none
 | docs/src/conformance/output-requests.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/conformance/output-variable-matrix.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/conformance/overview.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
-| docs/src/conformance/release-evidence-manifest.md | spec-explanation | User Coverage | n/a | present | active | release | 2026-06-08 |
+| docs/src/conformance/release-evidence-manifest.md | spec-explanation | not in SUMMARY | n/a | present | active | release | 2026-06-08 |
 | docs/src/conformance/release-gates.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/report-format.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
-| docs/src/conformance/support-coverage-report.md | spec-explanation | User Coverage | n/a | present | active | conformance | 2026-06-08 |
+| docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/conformance/supported-object-matrix.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/tolerance-policy.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
-| docs/src/conformance/user-coverage-handbook.md | spec-explanation | User Coverage | n/a | present | active | conformance | 2026-06-08 |
+| docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
@@ -102,30 +122,30 @@ none
 | docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
 | docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | none |  |  |  |
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-06-07 |
-| docs/src/introduction.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-05 |
+| docs/src/introduction.md | spec-explanation | Summary | n/a | present | active | docs | 2026-06-05 |
 | docs/src/operations/documentation-framework.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
-| docs/src/operations/script-index.md | spec-explanation | Guides | n/a | present | active | docs | 2026-06-08 |
+| docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
 | docs/src/operations/setup-checklist.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-08 |
 | docs/src/operations/supported-object-coverage.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-15 |
-| docs/src/porting-map/algorithm-port-ticket.md | source-map | Porting Maps | n/a | present | active | core | 2026-06-25 |
-| docs/src/porting-map/conduction-map.md | source-map | Porting Maps | n/a | present | active | runtime | 2026-06-10 |
+| docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
+| docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
 | docs/src/porting-map/heat-balance.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
-| docs/src/porting-map/ideal-loads-source-map.md | source-map | Porting Maps | n/a | present | active | runtime | 2026-06-15 |
+| docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
 | docs/src/porting-map/input-and-schema.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-05 |
 | docs/src/porting-map/node-state-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/output-reporting.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
-| docs/src/porting-map/output-variable-source-map.md | source-map | Porting Maps | n/a | present | active | conformance | 2026-06-08 |
+| docs/src/porting-map/output-variable-source-map.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/porting-map/overview.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-05 |
 | docs/src/porting-map/plant-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/plant.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/porting-map/surface-balance-map.md | source-map | Porting Maps | n/a | present | active | runtime | 2026-06-20 |
+| docs/src/porting-map/surface-balance-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-20 |
 | docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/porting-map/warmup-semantics-map.md | source-map | Porting Maps | n/a | present | active | runtime | 2026-06-12 |
-| docs/src/porting-map/zone-air-update-map.md | source-map | Porting Maps | n/a | present | active | runtime | 2026-06-12 |
+| docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
+| docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
 | docs/src/quick-start.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
 | docs/src/releases/README.md | release-note | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/releases/v0.1.0.md | release-note | not in SUMMARY | n/a | present | ready | release | 2026-06-18 |

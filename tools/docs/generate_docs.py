@@ -361,9 +361,15 @@ PYTHON_SCRIPT_RE = re.compile(r"tools[\\/](?:docs|reporting)[\\/][A-Za-z0-9_.-]+
 DEV_COMMAND_RE = re.compile(r"Invoke-DevCommand\s+-Command\s+['\"]([^'\"]+)['\"]")
 CARGO_COMMAND_RE = re.compile(r"cargo\s+(?:build|clippy|fmt|run|test)[^\r\n`|&;]*")
 README_DEV_COMMAND_RE = re.compile(r"\.\\scripts\\dev\.(?:cmd|ps1)\s+([A-Za-z0-9_.-]+)")
-SUMMARY_LINK_RE = re.compile(r"^- \[[^\]]+\]\(([^)]+)\)")
+SUMMARY_LINK_RE = re.compile(r"^\s*(?:-\s*)?\[[^\]]+\]\(([^)]+)\)")
 FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
 README_CURRENT_DOC_RE = re.compile(r"`(docs/src/current/[^`]+\.md)`")
+CORE_SUMMARY_SECTIONS = {"Summary", "Current", "Guides", "Generated References"}
+SUMMARY_SECTION_CATEGORIES = {
+    "Current": {"current"},
+    "Guides": {"guide"},
+    "Generated References": {"generated"},
+}
 
 CURRENT_DOCS = [
     "docs/src/current/project-contract.md",
@@ -584,6 +590,14 @@ def parse_summary_links(repo_root: Path) -> dict[str, str]:
     return links
 
 
+def parse_summary_sections(repo_root: Path) -> list[str]:
+    return [
+        line[2:].strip()
+        for line in read_text(repo_root / "docs" / "src" / "SUMMARY.md").splitlines()
+        if line.startswith("# ")
+    ]
+
+
 def markdown_front_matter(text: str) -> dict[str, str]:
     match = FRONT_MATTER_RE.match(text)
     if not match:
@@ -626,6 +640,7 @@ def docs_category(relative_path: str) -> str:
 
 def docs_inventory(repo_root: Path) -> str:
     summary_links = parse_summary_links(repo_root)
+    summary_sections = parse_summary_sections(repo_root)
     summary_current = [
         path for path, section in summary_links.items() if section == "Current"
     ]
@@ -639,17 +654,25 @@ def docs_inventory(repo_root: Path) -> str:
 
     rows = []
     generated_missing_notice: list[str] = []
+    summary_removable_docs: list[str] = []
+    summary_obsolete_docs: list[str] = []
     for relative in sorted(markdown_files):
         path = markdown_files[relative]
         text = read_text(path) if path.exists() else ""
         front_matter = markdown_front_matter(text)
         category = docs_category(relative)
         summary_section = summary_links.get(relative, "")
+        front_matter_status = front_matter.get("status", "")
+        normalized_status = front_matter_status.strip().lower()
         generated_notice = "n/a"
         if category == "generated":
             generated_notice = "present" if text.startswith(GENERATED_NOTICE) else "missing"
             if generated_notice == "missing":
                 generated_missing_notice.append(relative)
+        if summary_section and category == "removable":
+            summary_removable_docs.append(relative)
+        if summary_section and normalized_status in {"obsolete", "removable"}:
+            summary_obsolete_docs.append(relative)
 
         rows.append(
             [
@@ -658,7 +681,7 @@ def docs_inventory(repo_root: Path) -> str:
                 summary_section or "not in SUMMARY",
                 generated_notice,
                 "present" if front_matter else "none",
-                front_matter.get("status", ""),
+                front_matter_status,
                 front_matter.get("owner", ""),
                 front_matter.get("last_reviewed", ""),
             ]
@@ -674,6 +697,18 @@ def docs_inventory(repo_root: Path) -> str:
     release_notes_in_current = [
         path for path in summary_current if path.startswith("docs/src/releases/")
     ]
+    summary_non_core_sections = [
+        section for section in summary_sections if section not in CORE_SUMMARY_SECTIONS
+    ]
+    summary_scope_violations = []
+    for relative, section in sorted(summary_links.items()):
+        category = docs_category(relative)
+        if section == "Summary":
+            if relative != "docs/src/introduction.md":
+                summary_scope_violations.append(f"{section}: {relative} ({category})")
+            continue
+        if category not in SUMMARY_SECTION_CATEGORIES.get(section, set()):
+            summary_scope_violations.append(f"{section}: {relative} ({category})")
     unlinked_docs = [
         relative
         for relative in sorted(markdown_files)
@@ -692,6 +727,10 @@ def docs_inventory(repo_root: Path) -> str:
         ["README current docs missing", str(len(readme_missing))],
         ["README current docs unexpected", str(len(readme_unexpected))],
         ["Generated docs missing notice", str(len(generated_missing_notice))],
+        ["Removable docs in SUMMARY", str(len(summary_removable_docs))],
+        ["Obsolete docs in SUMMARY", str(len(summary_obsolete_docs))],
+        ["Non-core SUMMARY sections", str(len(summary_non_core_sections))],
+        ["SUMMARY section scope violations", str(len(summary_scope_violations))],
         ["Release notes in Current nav", str(len(release_notes_in_current))],
         ["Non-generated docs not in SUMMARY", str(len(unlinked_docs))],
     ]
@@ -720,6 +759,14 @@ def docs_inventory(repo_root: Path) -> str:
         + bullet_list(readme_unexpected)
         + "\n\n**Generated docs missing notice**\n\n"
         + bullet_list(generated_missing_notice)
+        + "\n\n**Removable docs in SUMMARY**\n\n"
+        + bullet_list(summary_removable_docs)
+        + "\n\n**Obsolete docs in SUMMARY**\n\n"
+        + bullet_list(summary_obsolete_docs)
+        + "\n\n**Non-core SUMMARY sections**\n\n"
+        + bullet_list(summary_non_core_sections)
+        + "\n\n**SUMMARY section scope violations**\n\n"
+        + bullet_list(summary_scope_violations)
         + "\n\n**Release notes in Current navigation**\n\n"
         + bullet_list(release_notes_in_current)
         + "\n\n## Inventory\n\n"
