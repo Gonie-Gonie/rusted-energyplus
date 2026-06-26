@@ -5,6 +5,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+. (Join-Path $ScriptsRoot "lib\python.ps1")
 Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
@@ -13,6 +14,21 @@ Set-Location $RepoRoot
 $cargo = Get-Command cargo -ErrorAction SilentlyContinue
 if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
+}
+
+$python = $null
+$portablePython = Get-PortablePythonExe
+if (Test-Path -LiteralPath $portablePython -PathType Leaf) {
+    $python = $portablePython
+}
+else {
+    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    if ($null -ne $pythonCommand) {
+        $python = $pythonCommand.Source
+    }
+}
+if ($null -eq $python) {
+    throw "Python 3.11+ was not found. Run .\scripts\dev.cmd setup first."
 }
 
 $caseFiles = @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot "data\conformance_cases") -Recurse -Filter "case.toml" | Sort-Object FullName)
@@ -82,3 +98,13 @@ Write-Host "  conformance_cases: $conformanceCount"
 Write-Host "  baseline_or_diagnostic_cases: $diagnosticOrBaselineCount"
 Write-Host "  schema: rusted-energyplus.case-manifest.v2"
 Write-Host "  status: valid"
+
+$claimSourceScript = Join-Path $RepoRoot "tools\docs\validate_claim_sources.py"
+if (-not (Test-Path -LiteralPath $claimSourceScript -PathType Leaf)) {
+    throw "Missing claim source validator: $claimSourceScript"
+}
+
+& $python $claimSourceScript --repo-root $RepoRoot
+if ($LASTEXITCODE -ne 0) {
+    throw "Claim source validation failed with exit code $LASTEXITCODE"
+}
