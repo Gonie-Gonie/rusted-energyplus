@@ -634,6 +634,7 @@ DATA PERIODS
 
         apply_energyplus_adaptive_system_timestep_zone_air_correction(
             &state.surfaces,
+            &state.surface_indexes,
             &mut state.zones,
             900.0,
             None,

@@ -14,7 +14,7 @@ use crate::heat_balance::radiation::{
     update_surface_inside_scriptf_longwave_exchange_probe,
 };
 use crate::heat_balance::state::{
-    HeatBalanceStepInput, HeatBalanceSurfaceLoopZoneAirCorrection,
+    HeatBalanceStepInput, HeatBalanceSurfaceIndexes, HeatBalanceSurfaceLoopZoneAirCorrection,
     InsideConvectionCoefficientInputState, SurfaceBoundaryBalanceResult, SurfaceHeatBalanceState,
     ZoneHeatBalanceState,
 };
@@ -41,6 +41,7 @@ pub(crate) struct InterleavedSurfaceZoneBalanceResult {
 pub(crate) fn run_interleaved_surface_zone_balance(
     model: &TypedModel,
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     zones: &mut [ZoneHeatBalanceState],
     first_pass_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     input: HeatBalanceStepInput,
@@ -150,6 +151,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
         run_surface_balance_passes(
             model,
             surfaces,
+            surface_indexes,
             first_pass_temperatures,
             first_pass_longwave_temperatures,
             // EnergyPlus sets regular adiabatic/partition outside-face CTF state
@@ -229,6 +231,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
         ) {
             correct_zone_air_temperatures_from_current_surfaces(
                 surfaces,
+                surface_indexes,
                 zones,
                 input.timestep_seconds,
                 weather_context,
@@ -256,6 +259,7 @@ pub(crate) fn run_interleaved_surface_zone_balance(
 pub(crate) fn run_surface_balance_passes(
     model: &TypedModel,
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     first_pass_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     first_pass_longwave_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
     adiabatic_boundary_inside_temperatures: Option<&BTreeMap<SurfaceId, f64>>,
@@ -286,17 +290,23 @@ pub(crate) fn run_surface_balance_passes(
         match interior_longwave_exchange_probe {
             InteriorLongwaveExchangeProbe::None => {}
             InteriorLongwaveExchangeProbe::GreyEnergyPlusDirectViewFactor => {
-                update_surface_inside_longwave_exchange_probe(surfaces, temperature_overrides);
+                update_surface_inside_longwave_exchange_probe(
+                    surfaces,
+                    surface_indexes,
+                    temperature_overrides,
+                );
             }
             InteriorLongwaveExchangeProbe::EnergyPlusScriptF => {
                 update_surface_inside_scriptf_longwave_exchange_probe(
                     surfaces,
+                    surface_indexes,
                     temperature_overrides,
                 );
             }
             InteriorLongwaveExchangeProbe::EnergyPlusScriptFFlatAccess => {
                 update_surface_inside_scriptf_flat_access_longwave_exchange_probe(
                     surfaces,
+                    surface_indexes,
                     temperature_overrides,
                 );
             }

@@ -49,6 +49,7 @@ pub struct HeatBalanceState {
     pub zones: Vec<ZoneHeatBalanceState>,
     /// Per-surface heat-balance state.
     pub surfaces: Vec<SurfaceHeatBalanceState>,
+    pub(crate) surface_indexes: HeatBalanceSurfaceIndexes,
     /// Most recent per-slot CTF history terms, captured before CTF histories advance.
     pub last_ctf_history_slot_terms: Vec<HeatBalanceCtfHistorySlotSample>,
     /// Most recent per-slot CTF history terms, captured after CTF histories advance.
@@ -59,6 +60,61 @@ pub struct HeatBalanceState {
     pub last_inside_surface_iteration_max_delta_c: f64,
     /// Surface that controlled the final max inside-surface temperature change.
     pub last_inside_surface_iteration_max_delta_surface_name: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct HeatBalanceSurfaceIndexes {
+    pub(crate) surfaces_by_zone: Vec<Vec<usize>>,
+    pub(crate) surfaces_by_construction: Vec<Vec<usize>>,
+    pub(crate) opaque_surfaces: Vec<usize>,
+    pub(crate) fenestration_surfaces: Vec<usize>,
+    pub(crate) ctf_surfaces: Vec<usize>,
+    pub(crate) no_mass_surfaces: Vec<usize>,
+}
+
+impl HeatBalanceSurfaceIndexes {
+    pub(crate) fn from_model_surfaces(
+        model: &SimulationModel,
+        surfaces: &[SurfaceHeatBalanceState],
+    ) -> Self {
+        let mut surfaces_by_zone = vec![Vec::new(); model.typed.zones.len()];
+        let mut surfaces_by_construction = vec![Vec::new(); model.typed.constructions.len()];
+        let mut opaque_surfaces = Vec::new();
+        let mut ctf_surfaces = Vec::new();
+        let mut no_mass_surfaces = Vec::new();
+
+        for (surface_index, surface) in surfaces.iter().enumerate() {
+            if let Some(zone_surfaces) = surfaces_by_zone.get_mut(surface.zone_id.0 as usize) {
+                zone_surfaces.push(surface_index);
+            }
+            if let Some(construction_surfaces) =
+                surfaces_by_construction.get_mut(surface.construction_id.0 as usize)
+            {
+                construction_surfaces.push(surface_index);
+            }
+            opaque_surfaces.push(surface_index);
+            ctf_surfaces.push(surface_index);
+            if surface.heat_capacity_j_per_m2_k.is_none() {
+                no_mass_surfaces.push(surface_index);
+            }
+        }
+
+        Self {
+            surfaces_by_zone,
+            surfaces_by_construction,
+            opaque_surfaces,
+            fenestration_surfaces: Vec::new(),
+            ctf_surfaces,
+            no_mass_surfaces,
+        }
+    }
+
+    pub(crate) fn surfaces_for_zone(&self, zone_id: ZoneId) -> &[usize] {
+        self.surfaces_by_zone
+            .get(zone_id.0 as usize)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
+    }
 }
 
 /// Per-zone heat-balance state shell.

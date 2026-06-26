@@ -90,6 +90,7 @@ $trace = "crates\ep_runtime\src\heat_balance\trace.rs"
 $summary = "crates\ep_runtime\src\heat_balance\summary.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
+$typedIds = "crates\ep_model\src\ids.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $pipeline = "crates\ep_run\src\pipeline.rs"
@@ -125,6 +126,7 @@ foreach ($entry in @(
         @($summary, "heat-balance summary ownership module"),
         @($surfaceWeather, "surface weather ownership module"),
         @($timestep, "heat-balance timestep ownership module"),
+        @($typedIds, "typed compact ID module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
         @($pipeline, "arbitrary-run pipeline"),
@@ -183,6 +185,17 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod reports;' -Description "
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub\(crate\) mod run_period;' -Description "run-period sampling module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod surface_weather;' -Description "surface weather module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod timestep;' -Description "heat-balance timestep module declaration"
+
+foreach ($compactId in @(
+        "SurfaceId",
+        "ZoneId",
+        "NodeId",
+        "MaterialId",
+        "ConstructionId",
+        "ScheduleId"
+    )) {
+    Assert-Contains -Path $typedIds -Pattern "typed_id!\($compactId\);" -Description "compact typed ID $compactId"
+}
 
 Assert-Contains -Path $manager -Pattern 'pub fn manage_heat_balance_source_order_stages\s*\(' -Description "HeatBalanceManager source-order list"
 foreach ($routine in @(
@@ -334,7 +347,7 @@ Assert-NotContains -Path $runtime -Pattern 'fn zone_surface_convection_sums\s*\(
 Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_reference_air_temperature_c\s*\(' -Description "runtime-owned inside convection reference air report"
 Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_report_coefficient_w_per_m2_k\s*\(' -Description "runtime-owned inside convection report coefficient"
 Assert-NotContains -Path $runtime -Pattern 'fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2\s*\(' -Description "runtime-owned inside convection heat gain report"
-Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w\s*\(' -Description "runtime-owned surface reference air convection report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w\s*\(' -Description "runtime-owned surface reference air convection report"
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w\s*\(' -Description "runtime-owned final hconv convection report"
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_w\s*\(' -Description "runtime-owned zone-air surface convection report"
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_surface_convection_rate_at_air_temperature_w\s*\(' -Description "runtime-owned zone-air convection at air temperature report"
@@ -403,6 +416,23 @@ Assert-Contains -Path $trace -Pattern 'push_surface_heat_balance_trace_averages'
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod summary;' -Description "summary module declaration"
 Assert-Contains -Path $heatBalanceMod -Pattern 'pub use summary::\*;' -Description "summary module facade export"
 Assert-Contains -Path $state -Pattern 'HeatBalanceSimulationOptions' -Description "heat-balance simulation options owner"
+Assert-Contains -Path $state -Pattern 'pub\(crate\) struct HeatBalanceSurfaceIndexes' -Description "precomputed heat-balance surface index owner"
+foreach ($surfaceIndex in @(
+        "surfaces_by_zone",
+        "surfaces_by_construction",
+        "opaque_surfaces",
+        "fenestration_surfaces",
+        "ctf_surfaces",
+        "no_mass_surfaces"
+    )) {
+    Assert-Contains -Path $state -Pattern $surfaceIndex -Description "precomputed heat-balance surface index $surfaceIndex"
+}
+Assert-Contains -Path $initialization -Pattern 'HeatBalanceSurfaceIndexes::from_model_surfaces' -Description "heat-balance surface indexes initialized once"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'HeatBalanceSurfaceIndexes' -Description "zone-air correction consumes precomputed surface indexes"
+Assert-Contains -Path $timestep -Pattern 'state\.surface_indexes\.surfaces_for_zone' -Description "timestep hot path uses precomputed zone surface indexes"
+Assert-Contains -Path $reports -Pattern 'zone_surface_report_conduction_rates_for_indices_w' -Description "zone conduction report uses precomputed surface indexes"
+Assert-Contains -Path $radiation -Pattern 'HeatBalanceSurfaceIndexes' -Description "radiation loop consumes precomputed surface indexes"
+Assert-NotContains -Path $radiation -Pattern 'BTreeMap::<ZoneId, Vec<usize>>::new' -Description "radiation-owned per-call zone surface grouping"
 Assert-Contains -Path $summary -Pattern 'HeatBalanceWarmupSummary' -Description "warmup summary owner"
 Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulationSummary' -Description "heat-balance simulation summary owner"
 Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulation' -Description "heat-balance simulation result owner"
@@ -444,10 +474,10 @@ Assert-Contains -Path $warmup -Pattern 'max_abs_pair_delta' -Description "warmup
 Assert-NotContains -Path $runtime -Pattern 'fn run_heat_balance_run_period_warmup\s*\(' -Description "runtime-owned run-period warmup loop"
 Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_zone_temperature_snapshot\s*\(' -Description "runtime-owned warmup zone-temperature snapshot"
 Assert-NotContains -Path $runtime -Pattern 'fn max_abs_pair_delta\s*\(' -Description "runtime-owned warmup convergence delta"
-Assert-Contains -Path $reports -Pattern 'zone_surface_report_conduction_rates_w' -Description "zone surface conduction report owner"
+Assert-Contains -Path $reports -Pattern 'zone_surface_report_conduction_rates_for_indices_w' -Description "zone surface conduction report owner"
 Assert-Contains -Path $reports -Pattern 'heat_gain_rate_w' -Description "positive heat-gain report helper owner"
 Assert-Contains -Path $reports -Pattern 'heat_loss_rate_w' -Description "positive heat-loss report helper owner"
-Assert-NotContains -Path $runtime -Pattern 'fn zone_surface_report_conduction_rates_w\s*\(' -Description "runtime-owned zone surface conduction report"
+Assert-NotContains -Path $runtime -Pattern 'fn zone_surface_report_conduction_rates_for_indices_w\s*\(' -Description "runtime-owned zone surface conduction report"
 Assert-NotContains -Path $runtime -Pattern 'fn heat_gain_rate_w\s*\(' -Description "runtime-owned heat gain report helper"
 Assert-NotContains -Path $runtime -Pattern 'fn heat_loss_rate_w\s*\(' -Description "runtime-owned heat loss report helper"
 Assert-Contains -Path $reports -Pattern 'ReportSurfaceHeatBalance' -Description "surface report owner"

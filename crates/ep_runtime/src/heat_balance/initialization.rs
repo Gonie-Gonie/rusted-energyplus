@@ -7,10 +7,11 @@ use crate::heat_balance::ctf::{
     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
     surface_ctf_state_from_coefficients,
 };
-use crate::heat_balance::inside_convection::zone_surface_convection_sums;
+use crate::heat_balance::inside_convection::zone_surface_convection_sums_for_indices;
 use crate::heat_balance::state::{
-    HeatBalanceState, SurfaceExteriorReportTerms, SurfaceHeatBalanceState,
-    SurfaceOutsideBalanceDiagnostics, ZoneAirTemperatureCoefficients, ZoneHeatBalanceState,
+    HeatBalanceState, HeatBalanceSurfaceIndexes, SurfaceExteriorReportTerms,
+    SurfaceHeatBalanceState, SurfaceOutsideBalanceDiagnostics, ZoneAirTemperatureCoefficients,
+    ZoneHeatBalanceState,
 };
 use crate::heat_balance::surface_boundary::resolve_surface_boundary_target;
 use crate::heat_balance::surface_thermal_properties;
@@ -151,15 +152,17 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
     update_surface_radiant_internal_gain_source_terms(&model.typed, &mut surfaces, 1);
+    let surface_indexes = HeatBalanceSurfaceIndexes::from_model_surfaces(model, &surfaces);
 
     for zone in &mut zones {
-        zone.opaque_surface_conductance_w_per_k = surfaces
+        let zone_surface_indexes = surface_indexes.surfaces_for_zone(zone.zone_id);
+        zone.opaque_surface_conductance_w_per_k = zone_surface_indexes
             .iter()
-            .filter(|surface| surface.zone_id == zone.zone_id)
+            .filter_map(|surface_index| surfaces.get(*surface_index))
             .map(|surface| surface.conductance_w_per_k)
             .sum();
         let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-            zone_surface_convection_sums(&surfaces, zone.zone_id);
+            zone_surface_convection_sums_for_indices(&surfaces, zone_surface_indexes);
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
@@ -180,6 +183,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         timestep_index: 0,
         zones,
         surfaces,
+        surface_indexes,
         last_ctf_history_slot_terms: Vec::new(),
         last_ctf_history_slot_terms_after_advance: Vec::new(),
         last_inside_surface_iteration_count: 0,

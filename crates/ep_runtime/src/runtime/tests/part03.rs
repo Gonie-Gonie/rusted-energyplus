@@ -47,6 +47,25 @@
             0.0
         );
         assert_eq!(state.surfaces.len(), 6);
+        let surface_slots = (0..state.surfaces.len()).collect::<Vec<_>>();
+        assert_eq!(
+            state.surface_indexes.surfaces_by_zone,
+            vec![surface_slots.clone()]
+        );
+        assert_eq!(
+            state.surface_indexes.surfaces_by_construction,
+            vec![surface_slots.clone()]
+        );
+        assert_eq!(state.surface_indexes.opaque_surfaces, surface_slots);
+        assert!(state.surface_indexes.fenestration_surfaces.is_empty());
+        assert_eq!(
+            state.surface_indexes.ctf_surfaces,
+            state.surface_indexes.opaque_surfaces
+        );
+        assert_eq!(
+            state.surface_indexes.no_mass_surfaces,
+            state.surface_indexes.opaque_surfaces
+        );
         let floor = state
             .surfaces
             .iter()

@@ -7,9 +7,11 @@ use crate::heat_balance::air_manager::{
 };
 use crate::heat_balance::ctf::surface_outside_conduction_rate_w_for_report;
 use crate::heat_balance::inside_convection::{
-    zone_air_heat_balance_surface_convection_rate_w, zone_surface_convection_sums,
+    zone_air_heat_balance_surface_convection_rate_w, zone_surface_convection_sums_for_indices,
 };
-use crate::heat_balance::state::{SurfaceHeatBalanceState, ZoneHeatBalanceState};
+use crate::heat_balance::state::{
+    HeatBalanceSurfaceIndexes, SurfaceHeatBalanceState, ZoneHeatBalanceState,
+};
 use crate::heat_balance::zone_predictor_corrector::{
     correct_step_source_order_path, energyplus_analytical_zone_air_temperature_c,
     energyplus_third_order_zone_air_temperature_from_coefficients,
@@ -43,6 +45,7 @@ pub(crate) fn heat_balance_zone_temperature_map(
 
 pub(crate) fn correct_zone_air_temperatures_from_current_surfaces(
     surfaces: &[SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     zones: &mut [ZoneHeatBalanceState],
     timestep_seconds: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
@@ -58,14 +61,15 @@ pub(crate) fn correct_zone_air_temperatures_from_current_surfaces(
     );
 
     for zone in zones {
-        zone.opaque_surface_heat_gain_w = surfaces
+        let zone_surface_indexes = surface_indexes.surfaces_for_zone(zone.zone_id);
+        zone.opaque_surface_heat_gain_w = zone_surface_indexes
             .iter()
-            .filter(|surface| surface.zone_id == zone.zone_id)
+            .filter_map(|surface_index| surfaces.get(*surface_index))
             .map(|surface| surface.heat_gain_to_zone_w)
             .sum();
-        zone.opaque_surface_outside_conduction_w = surfaces
+        zone.opaque_surface_outside_conduction_w = zone_surface_indexes
             .iter()
-            .filter(|surface| surface.zone_id == zone.zone_id)
+            .filter_map(|surface_index| surfaces.get(*surface_index))
             .map(|surface| {
                 surface_outside_conduction_rate_w_for_report(
                     surface,
@@ -74,7 +78,7 @@ pub(crate) fn correct_zone_air_temperatures_from_current_surfaces(
             })
             .sum();
         let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-            zone_surface_convection_sums(surfaces, zone.zone_id);
+            zone_surface_convection_sums_for_indices(surfaces, zone_surface_indexes);
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
@@ -171,6 +175,7 @@ pub(crate) fn synchronize_single_system_timestep_history(zone: &mut ZoneHeatBala
 }
 pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
     surfaces: &[SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     zones: &mut [ZoneHeatBalanceState],
     zone_timestep_seconds: f64,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
@@ -247,6 +252,7 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
             correct_step_source_order_path(|| {
                 correct_single_zone_air_temperature_from_current_surfaces(
                     surfaces,
+                    surface_indexes.surfaces_for_zone(zone.zone_id),
                     zone,
                     system_timestep_seconds,
                     system_temperature_history,
@@ -319,6 +325,7 @@ pub(crate) fn zone_air_system_timestep_storage_report_rate_w(
 
 pub(crate) fn correct_single_zone_air_temperature_from_current_surfaces(
     surfaces: &[SurfaceHeatBalanceState],
+    surface_indices: &[usize],
     zone: &mut ZoneHeatBalanceState,
     timestep_seconds: f64,
     previous_mean_air_temperatures_c: [f64; 3],
@@ -331,14 +338,14 @@ pub(crate) fn correct_single_zone_air_temperature_from_current_surfaces(
         weather_context,
         fallback_dry_bulb_c,
     );
-    zone.opaque_surface_heat_gain_w = surfaces
+    zone.opaque_surface_heat_gain_w = surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone.zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| surface.heat_gain_to_zone_w)
         .sum();
-    zone.opaque_surface_outside_conduction_w = surfaces
+    zone.opaque_surface_outside_conduction_w = surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone.zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
             surface_outside_conduction_rate_w_for_report(
                 surface,
@@ -347,7 +354,7 @@ pub(crate) fn correct_single_zone_air_temperature_from_current_surfaces(
         })
         .sum();
     let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-        zone_surface_convection_sums(surfaces, zone.zone_id);
+        zone_surface_convection_sums_for_indices(surfaces, surface_indices);
     zone.sum_ha_w_per_k = sum_ha_w_per_k;
     zone.sum_hat_surf_w = sum_hat_surf_w;
     zone.sum_hat_ref_w = sum_hat_ref_w;

@@ -1,5 +1,6 @@
 //! Heat-balance radiation source-order ownership notes.
 
+use crate::heat_balance::HeatBalanceSurfaceIndexes;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{SurfaceId, SurfaceType, ZoneId};
 use std::collections::BTreeMap;
@@ -34,6 +35,7 @@ pub(crate) struct InteriorLongwaveSurfaceSnapshot {
 
 pub(crate) fn update_surface_inside_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
 ) {
     let snapshots = surfaces
@@ -54,16 +56,9 @@ pub(crate) fn update_surface_inside_longwave_exchange_probe(
             }
         })
         .collect::<Vec<_>>();
-    let mut surfaces_by_zone = BTreeMap::<ZoneId, Vec<usize>>::new();
-    for (surface_index, snapshot) in snapshots.iter().enumerate() {
-        surfaces_by_zone
-            .entry(snapshot.zone_id)
-            .or_default()
-            .push(surface_index);
-    }
 
     let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
-    for surface_indices in surfaces_by_zone.values() {
+    for surface_indices in &surface_indexes.surfaces_by_zone {
         if surface_indices.len() <= 1 {
             continue;
         }
@@ -113,10 +108,12 @@ pub(crate) fn update_surface_inside_longwave_exchange_probe(
 
 pub(crate) fn update_surface_inside_scriptf_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
 ) {
     update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         surfaces,
+        surface_indexes,
         temperature_overrides,
         false,
     );
@@ -124,10 +121,12 @@ pub(crate) fn update_surface_inside_scriptf_longwave_exchange_probe(
 
 pub(crate) fn update_surface_inside_scriptf_flat_access_longwave_exchange_probe(
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
 ) {
     update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         surfaces,
+        surface_indexes,
         temperature_overrides,
         true,
     );
@@ -135,6 +134,7 @@ pub(crate) fn update_surface_inside_scriptf_flat_access_longwave_exchange_probe(
 
 fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
     surfaces: &mut [SurfaceHeatBalanceState],
+    surface_indexes: &HeatBalanceSurfaceIndexes,
     temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
     use_energyplus_flat_lsr_access: bool,
 ) {
@@ -157,16 +157,8 @@ fn update_surface_inside_scriptf_longwave_exchange_probe_with_access(
         })
         .collect::<Vec<_>>();
 
-    let mut surfaces_by_zone = BTreeMap::<ZoneId, Vec<usize>>::new();
-    for (surface_index, snapshot) in snapshots.iter().enumerate() {
-        surfaces_by_zone
-            .entry(snapshot.zone_id)
-            .or_default()
-            .push(surface_index);
-    }
-
     let mut longwave_terms_w_per_m2 = vec![0.0; surfaces.len()];
-    for surface_indices in surfaces_by_zone.values() {
+    for surface_indices in &surface_indexes.surfaces_by_zone {
         if surface_indices.len() <= 1 {
             continue;
         }

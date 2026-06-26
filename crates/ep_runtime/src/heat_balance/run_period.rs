@@ -23,13 +23,13 @@ use crate::heat_balance::inside_convection::{
     surface_inside_convection_report_coefficient_w_per_m2_k,
     zone_air_heat_balance_surface_convection_rate_at_air_temperature_w,
     zone_air_heat_balance_surface_convection_rate_from_balance_w,
-    zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w,
-    zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
+    zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_for_indices_w,
+    zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w,
     zone_air_heat_balance_surface_convection_rate_w,
 };
 use crate::heat_balance::longwave::horizontal_infrared_sky_temperature_c;
 use crate::heat_balance::reports::{
-    heat_gain_rate_w, heat_loss_rate_w, zone_surface_report_conduction_rates_w,
+    heat_gain_rate_w, heat_loss_rate_w, zone_surface_report_conduction_rates_for_indices_w,
 };
 use crate::heat_balance::state::{
     HeatBalanceSimulationOptions, HeatBalanceState, HeatBalanceStepInput,
@@ -363,11 +363,14 @@ pub(crate) fn sample_heat_balance_run_period(
             }
             for (index, trace) in zone_conduction_rates.iter().enumerate() {
                 if use_surface_report_zone_conduction_rates {
-                    let (inside_rate, outside_rate) = zone_surface_report_conduction_rates_w(
-                        &state.surfaces,
-                        trace.zone_id,
-                        use_inside_ctf_outside_temperature_for_conduction_report,
-                    );
+                    let zone_surface_indexes =
+                        state.surface_indexes.surfaces_for_zone(trace.zone_id);
+                    let (inside_rate, outside_rate) =
+                        zone_surface_report_conduction_rates_for_indices_w(
+                            &state.surfaces,
+                            zone_surface_indexes,
+                            use_inside_ctf_outside_temperature_for_conduction_report,
+                        );
                     zone_conduction_sums[index].0 += inside_rate;
                     zone_conduction_sums[index].1 += heat_gain_rate_w(inside_rate);
                     zone_conduction_sums[index].2 += heat_loss_rate_w(inside_rate);
@@ -437,16 +440,20 @@ pub(crate) fn sample_heat_balance_run_period(
                         .system_timestep_average_air_storage_report_w
                         .unwrap_or(air_storage_rate_w);
                     let surface_convection_rate_w = if use_final_inside_convection_report {
-                        zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
+                        let zone_surface_indexes =
+                            state.surface_indexes.surfaces_for_zone(*zone_id);
+                        zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_for_indices_w(
                                 &state.surfaces,
                                 &state.zones,
-                                *zone_id,
+                                zone_surface_indexes,
                                 use_surface_reference_air_zone_convection_report,
                             )
                     } else if use_surface_reference_air_zone_convection_report {
-                        zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
+                        let zone_surface_indexes =
+                            state.surface_indexes.surfaces_for_zone(*zone_id);
+                        zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w(
                             &state.surfaces,
-                            *zone_id,
+                            zone_surface_indexes,
                         )
                     } else if heat_balance_uses_balance_surface_convection_report(
                         options.zone_air_algorithm,

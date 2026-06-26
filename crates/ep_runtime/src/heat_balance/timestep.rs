@@ -12,7 +12,7 @@ use crate::heat_balance::ctf::{
     advance_surface_ctf_histories, advance_surface_ctf_histories_with_outside_temperature_override,
     heat_balance_ctf_history_slot_samples,
 };
-use crate::heat_balance::inside_convection::zone_surface_convection_sums;
+use crate::heat_balance::inside_convection::zone_surface_convection_sums_for_indices;
 use crate::heat_balance::radiation::InteriorLongwaveExchangeProbe;
 use crate::heat_balance::state::{
     HeatBalanceState, HeatBalanceStepInput, HeatBalanceSurfaceLoopZoneAirCorrection,
@@ -260,16 +260,16 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                         zone.convective_internal_gain_w =
                             convective_internal_gain_w(model, zone.zone_id, hour_ending);
 
-                        let conductance_w_per_k = state
-                            .surfaces
+                        let zone_surface_indexes =
+                            state.surface_indexes.surfaces_for_zone(zone.zone_id);
+                        let conductance_w_per_k = zone_surface_indexes
                             .iter()
-                            .filter(|surface| surface.zone_id == zone.zone_id)
+                            .filter_map(|surface_index| state.surfaces.get(*surface_index))
                             .map(|surface| surface.conductance_w_per_k)
                             .sum::<f64>();
-                        let conductance_weighted_outside_temperature = state
-                            .surfaces
+                        let conductance_weighted_outside_temperature = zone_surface_indexes
                             .iter()
-                            .filter(|surface| surface.zone_id == zone.zone_id)
+                            .filter_map(|surface_index| state.surfaces.get(*surface_index))
                             .map(|surface| {
                                 surface.conductance_w_per_k * surface.outside_face_temperature_c
                             })
@@ -410,7 +410,10 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-                    zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+                    zone_surface_convection_sums_for_indices(
+                        &state.surfaces,
+                        state.surface_indexes.surfaces_for_zone(zone.zone_id),
+                    );
                 let coefficients = energyplus_zone_air_temperature_coefficients(
                     sum_ha_w_per_k,
                     sum_hat_surf_w,
@@ -432,7 +435,10 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             }
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe => {
                 let (sum_ha_w_per_k, sum_hat_surf_w, sum_hat_ref_w) =
-                    zone_surface_convection_sums(&state.surfaces, zone.zone_id);
+                    zone_surface_convection_sums_for_indices(
+                        &state.surfaces,
+                        state.surface_indexes.surfaces_for_zone(zone.zone_id),
+                    );
                 let coefficients = energyplus_zone_air_temperature_coefficients(
                     sum_ha_w_per_k,
                     sum_hat_surf_w,
@@ -505,6 +511,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                 Some(run_interleaved_surface_zone_balance(
             model,
             &mut state.surfaces,
+            &state.surface_indexes,
             &mut state.zones,
             Some(&previous_surface_inside_temperatures),
             input,
@@ -564,6 +571,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                 run_surface_balance_passes(
                     model,
                     &mut state.surfaces,
+                    &state.surface_indexes,
                     Some(&previous_surface_inside_temperatures),
                     Some(&previous_surface_inside_temperatures),
                     None,
@@ -592,6 +600,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                     zone_predictor_corrector::correct_step_source_order_path(|| {
                         correct_zone_air_temperatures_from_current_surfaces(
                             &state.surfaces,
+                            &state.surface_indexes,
                             &mut state.zones,
                             input.timestep_seconds,
                             weather_context,
@@ -611,6 +620,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                     run_surface_balance_passes(
                         model,
                         &mut state.surfaces,
+                        &state.surface_indexes,
                         None,
                         None,
                         None,
@@ -648,6 +658,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
         zone_predictor_corrector::correct_step_source_order_path(|| {
             correct_zone_air_temperatures_from_current_surfaces(
                 &state.surfaces,
+                &state.surface_indexes,
                 &mut state.zones,
                 input.timestep_seconds,
                 weather_context,
@@ -725,6 +736,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
     zone_predictor_corrector::correct_step_source_order_path(|| {
         correct_zone_air_temperatures_from_current_surfaces(
             &state.surfaces,
+            &state.surface_indexes,
             &mut state.zones,
             input.timestep_seconds,
             weather_context,
@@ -743,6 +755,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
         if use_energyplus_adaptive_system_timestep_zone_air_correction {
             apply_energyplus_adaptive_system_timestep_zone_air_correction(
                 &state.surfaces,
+                &state.surface_indexes,
                 &mut state.zones,
                 input.timestep_seconds,
                 weather_context,

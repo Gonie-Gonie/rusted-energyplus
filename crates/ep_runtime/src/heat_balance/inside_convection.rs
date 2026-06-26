@@ -63,13 +63,13 @@ pub(crate) fn heat_balance_inside_convection_coefficient_inputs(
         .collect()
 }
 
-pub(crate) fn zone_surface_convection_sums(
+pub(crate) fn zone_surface_convection_sums_for_indices(
     surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
+    surface_indices: &[usize],
 ) -> (f64, f64, f64) {
-    let (sum_ha_w_per_k, sum_hat_surf_w) = surfaces
+    let (sum_ha_w_per_k, sum_hat_surf_w) = surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
             let surface_ha_w_per_k =
                 surface.inside_convection_coefficient_w_per_m2_k * surface.area_m2;
@@ -85,13 +85,13 @@ pub(crate) fn zone_surface_convection_sums(
     (sum_ha_w_per_k, sum_hat_surf_w, 0.0)
 }
 
-pub(crate) fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
+pub(crate) fn zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w(
     surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
+    surface_indices: &[usize],
 ) -> f64 {
-    surfaces
+    surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
             surface.inside_convection_coefficient_w_per_m2_k
                 * surface.area_m2
@@ -157,15 +157,15 @@ pub(crate) fn surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
     ) * (reference_air_temperature_c - surface.inside_face_temperature_c)
 }
 
-pub(crate) fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_w(
+pub(crate) fn zone_air_heat_balance_surface_convection_rate_from_final_inside_hconv_report_for_indices_w(
     surfaces: &[SurfaceHeatBalanceState],
     zones: &[ZoneHeatBalanceState],
-    zone_id: ZoneId,
+    surface_indices: &[usize],
     use_surface_reference_air_report: bool,
 ) -> f64 {
-    surfaces
+    surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
             let reference_air_temperature_c = surface_inside_convection_reference_air_temperature_c(
                 surface,

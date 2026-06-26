@@ -33,10 +33,11 @@
         state.surfaces[0].area_m2 = 3.0;
         state.surfaces[0].inside_face_temperature_c = 22.0;
         state.surfaces[0].inside_reference_air_temperature_c = 20.0;
+        let zone_surface_indexes = state.surface_indexes.surfaces_for_zone(zone_id);
         assert!(
-            (zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w(
+            (zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w(
                 &state.surfaces,
-                zone_id
+                zone_surface_indexes
             ) - 12.0)
                 .abs()
                 < 1.0e-12
@@ -647,8 +648,12 @@
         second.ctf.const_in_part_w_per_m2 = -1.0;
         second.ctf.const_out_part_w_per_m2 = 0.5;
 
-        let (inside, outside) =
-            zone_surface_report_conduction_rates_w(&state.surfaces, zone_id, false);
+        let zone_surface_indexes = state.surface_indexes.surfaces_for_zone(zone_id);
+        let (inside, outside) = zone_surface_report_conduction_rates_for_indices_w(
+            &state.surfaces,
+            zone_surface_indexes,
+            false,
+        );
         assert!((inside - 41.0).abs() < 1.0e-12);
         assert!((outside - 74.5).abs() < 1.0e-12);
 

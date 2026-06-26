@@ -33,14 +33,14 @@ pub(crate) struct HeatBalanceResultSeriesTraces {
     pub(crate) rain_statuses: Vec<f64>,
 }
 
-pub(crate) fn zone_surface_report_conduction_rates_w(
+pub(crate) fn zone_surface_report_conduction_rates_for_indices_w(
     surfaces: &[SurfaceHeatBalanceState],
-    zone_id: ZoneId,
+    surface_indices: &[usize],
     use_inside_ctf_outside_temperature_for_conduction_report: bool,
 ) -> (f64, f64) {
-    surfaces
+    surface_indices
         .iter()
-        .filter(|surface| surface.zone_id == zone_id)
+        .filter_map(|surface_index| surfaces.get(*surface_index))
         .map(|surface| {
             (
                 surface_inside_conduction_rate_w_for_report(

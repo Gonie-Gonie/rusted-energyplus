@@ -43,7 +43,7 @@ use crate::heat_balance::inside_convection::{
     surface_inside_convection_report_coefficient_w_per_m2_k,
     zone_air_heat_balance_surface_convection_rate_at_air_temperature_w,
     zone_air_heat_balance_surface_convection_rate_from_balance_w,
-    zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
+    zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w,
     zone_air_heat_balance_surface_convection_rate_w,
 };
 #[cfg(test)]
@@ -61,7 +61,7 @@ use crate::heat_balance::radiation::{
     update_surface_inside_scriptf_longwave_exchange_probe,
 };
 #[cfg(test)]
-use crate::heat_balance::reports::zone_surface_report_conduction_rates_w;
+use crate::heat_balance::reports::zone_surface_report_conduction_rates_for_indices_w;
 use crate::heat_balance::reports::{
     HeatBalanceResultSeriesTraces, heat_balance_result_store_from_traces,
 };

@@ -76,10 +76,10 @@
         zone_air_heat_balance_air_storage_rate_w,
         zone_air_heat_balance_surface_convection_rate_at_air_temperature_w,
         zone_air_heat_balance_surface_convection_rate_from_balance_w,
-        zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_w,
+        zone_air_heat_balance_surface_convection_rate_from_surface_reference_air_for_indices_w,
         zone_air_heat_balance_surface_convection_rate_w,
         zone_air_system_timestep_storage_report_rate_w, zone_geometry_summaries,
-        zone_surface_report_conduction_rates_w,
+        zone_surface_report_conduction_rates_for_indices_w,
     };
     use crate::heat_balance::{HeatBalanceAlgorithmLane, HeatBalanceZoneAirAlgorithm};
     use crate::node::{

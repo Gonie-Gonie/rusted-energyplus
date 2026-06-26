@@ -200,6 +200,7 @@
         run_surface_balance_passes(
             &model.typed,
             &mut state.surfaces,
+            &state.surface_indexes,
             Some(&first_pass_inside_temperatures),
             None,
             None,
@@ -275,6 +276,7 @@
         run_surface_balance_passes(
             &model.typed,
             &mut state.surfaces,
+            &state.surface_indexes,
             Some(&first_pass_inside_temperatures),
             None,
             None,
@@ -380,7 +382,11 @@
             surface.inside_net_longwave_w_per_m2 = 12.0;
         }
 
-        update_surface_inside_longwave_exchange_probe(&mut state.surfaces, None);
+        update_surface_inside_longwave_exchange_probe(
+            &mut state.surfaces,
+            &state.surface_indexes,
+            None,
+        );
 
         for surface in &state.surfaces {
             assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-12);
@@ -399,7 +405,11 @@
         }
         state.surfaces[0].inside_face_temperature_c = 30.0;
 
-        update_surface_inside_longwave_exchange_probe(&mut state.surfaces, None);
+        update_surface_inside_longwave_exchange_probe(
+            &mut state.surfaces,
+            &state.surface_indexes,
+            None,
+        );
 
         assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
         for surface in state.surfaces.iter().skip(1) {
@@ -425,7 +435,11 @@
             surface.inside_net_longwave_w_per_m2 = 12.0;
         }
 
-        update_surface_inside_scriptf_longwave_exchange_probe(&mut state.surfaces, None);
+        update_surface_inside_scriptf_longwave_exchange_probe(
+            &mut state.surfaces,
+            &state.surface_indexes,
+            None,
+        );
 
         for surface in &state.surfaces {
             assert!(surface.inside_net_longwave_w_per_m2.abs() < 1.0e-9);
@@ -444,7 +458,11 @@
         }
         state.surfaces[0].inside_face_temperature_c = 30.0;
 
-        update_surface_inside_scriptf_longwave_exchange_probe(&mut state.surfaces, None);
+        update_surface_inside_scriptf_longwave_exchange_probe(
+            &mut state.surfaces,
+            &state.surface_indexes,
+            None,
+        );
 
         assert!(state.surfaces[0].inside_net_longwave_w_per_m2 < 0.0);
         let zone_exchange_w = state
