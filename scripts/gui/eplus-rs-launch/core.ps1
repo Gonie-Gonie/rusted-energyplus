@@ -319,6 +319,13 @@ function Get-RunResultPresentation {
     $exitCode = Get-ObjectPropertyValue -Object $Summary -Name "exit_code" -Default "unknown"
     $oracleStatus = Get-ObjectPropertyValue -Object $Summary -Name "oracle_status" -Default "not-run"
     $compareStatus = Get-ObjectPropertyValue -Object $Summary -Name "compare_status" -Default "not-run"
+    $config = Get-ObjectPropertyValue -Object $Summary -Name "config" -Default $null
+    $mode = Get-ObjectPropertyValue -Object $config -Name "mode" -Default "unknown"
+    $artifacts = Get-ObjectPropertyValue -Object $Summary -Name "artifacts" -Default $null
+    $supportReportPath = Get-ObjectPropertyValue -Object $artifacts -Name "support_report_md" -Default "support-report.md"
+    $selectedOutputsPath = Get-ObjectPropertyValue -Object $artifacts -Name "selected_outputs_csv" -Default ""
+    $resultStorePath = Get-ObjectPropertyValue -Object $artifacts -Name "result_store_json" -Default ""
+    $compareReportPath = Get-ObjectPropertyValue -Object $artifacts -Name "compare_report_md" -Default ""
     $runState = Get-SummarySupportValue -Summary $Summary -Name "run_result_state" -Default "unknown"
     $supportStatus = Get-SummarySupportValue -Summary $Summary -Name "status" -Default "unknown"
     $runtimeClass = Get-SummarySupportValue -Summary $Summary -Name "runtime_class" -Default "unknown"
@@ -332,26 +339,57 @@ function Get-RunResultPresentation {
 
     $title = "Run status unknown"
     $color = "DimGray"
+    $stateMessage = "Run status could not be classified."
     switch ($runState) {
         "run_blocked" {
-            $title = "Cannot run"
+            $title = "Simulation was not run"
             $color = "Firebrick"
+            $stateMessage = "Simulation was not run; top unsupported reasons are in support-report.md."
         }
         "partial_supported_run" {
-            $title = "Partial supported run"
+            $title = "Simulation ran with partial supported subset"
             $color = "DarkGoldenrod"
+            $stateMessage = "Simulation ran with partial supported subset; ignored or inactive objects are listed in support-report.md."
         }
         "supported_compatibility_run" {
             $title = "Supported compatibility run"
             $color = "ForestGreen"
+            $stateMessage = "Matched capabilities selected the supported compatibility runtime; arbitrary runs still keep conformance_claim=false."
         }
+    }
+    if ($mode -eq "diagnostic" -and $runState -eq "partial_supported_run") {
+        $stateMessage += " Diagnostic-only execution is explicit."
+    }
+    elseif ($mode -in @("fast", "experimental")) {
+        $stateMessage += " This mode is not conformance evidence."
+    }
+    $resultPath = if (-not [string]::IsNullOrWhiteSpace([string]$selectedOutputsPath)) {
+        [string]$selectedOutputsPath
+    }
+    else {
+        [string]$resultStorePath
     }
 
     [pscustomobject]@{
         state_id = $runState
         title = $title
         color = $color
-        detail = "status=$status; exit_code=$exitCode; support=$supportStatus; runtime=$runtimeClass; oracle=$oracleStatus; compare=$compareStatus; capabilities=$capabilityText; conformance_claim=false"
+        detail = @(
+            $stateMessage,
+            "status=$status",
+            "exit_code=$exitCode",
+            "mode=$mode",
+            "support=$supportStatus",
+            "runtime=$runtimeClass",
+            "oracle=$oracleStatus",
+            "compare=$compareStatus",
+            "matched_capabilities=$capabilityText",
+            "claim_boundary=ad-hoc arbitrary run",
+            "conformance_claim=false",
+            "support_report=$supportReportPath",
+            "results=$resultPath",
+            "compare_report=$compareReportPath"
+        ) -join "; "
     }
 }
 

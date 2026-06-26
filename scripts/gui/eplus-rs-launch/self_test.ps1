@@ -74,8 +74,15 @@ function Invoke-LauncherSelfTest {
             }
             status = "unsupported"
             exit_code = 4
+            config = [pscustomobject]@{ mode = "compatibility" }
             oracle_status = "not-requested"
             compare_status = "not-requested"
+            artifacts = [pscustomobject]@{
+                support_report_md = "out/support-report.md"
+                selected_outputs_csv = ""
+                result_store_json = ""
+                compare_report_md = ""
+            }
         },
         [pscustomobject]@{
             support = [pscustomobject]@{
@@ -86,8 +93,15 @@ function Invoke-LauncherSelfTest {
             }
             status = "success"
             exit_code = 0
+            config = [pscustomobject]@{ mode = "diagnostic" }
             oracle_status = "not-requested"
             compare_status = "not-requested"
+            artifacts = [pscustomobject]@{
+                support_report_md = "out/support-report.md"
+                selected_outputs_csv = "out/results/selected-outputs.csv"
+                result_store_json = "out/results/result-store.json"
+                compare_report_md = ""
+            }
         },
         [pscustomobject]@{
             support = [pscustomobject]@{
@@ -98,8 +112,15 @@ function Invoke-LauncherSelfTest {
             }
             status = "success"
             exit_code = 0
+            config = [pscustomobject]@{ mode = "compatibility" }
             oracle_status = "generated"
             compare_status = "not-requested"
+            artifacts = [pscustomobject]@{
+                support_report_md = "out/support-report.md"
+                selected_outputs_csv = "out/results/selected-outputs.csv"
+                result_store_json = "out/results/result-store.json"
+                compare_report_md = "out/compare/compare-report.md"
+            }
         },
         [pscustomobject]@{
             support = [pscustomobject]@{
@@ -110,8 +131,15 @@ function Invoke-LauncherSelfTest {
             }
             status = "unsupported"
             exit_code = 4
+            config = [pscustomobject]@{ mode = "compatibility" }
             oracle_status = "generated"
             compare_status = "skipped-rust-unsupported-or-oracle-missing"
+            artifacts = [pscustomobject]@{
+                support_report_md = "out/support-report.md"
+                selected_outputs_csv = ""
+                result_store_json = ""
+                compare_report_md = "out/compare/compare-report.md"
+            }
         }
     )
     $presentations = @($stateSamples | ForEach-Object { Get-RunResultPresentation -Summary $_ })
@@ -133,6 +161,26 @@ function Invoke-LauncherSelfTest {
         if ($presentation.detail -notmatch "exit_code=") {
             throw "launcher self-test missed exit code presentation for $($presentation.state_id)"
         }
+        foreach ($required in @("conformance_claim=false", "support_report=", "claim_boundary=ad-hoc arbitrary run")) {
+            if ($presentation.detail -notmatch [regex]::Escape($required)) {
+                throw "launcher self-test missed $required presentation for $($presentation.state_id)"
+            }
+        }
+        if ($presentation.detail -match "fully compatible") {
+            throw "launcher self-test used forbidden fully compatible wording"
+        }
+    }
+    $blockedPresentation = @($presentations | Where-Object { $_.state_id -eq "run_blocked" -and $_.title -eq "Simulation was not run" -and $_.detail -match "top unsupported reasons" })
+    if ($blockedPresentation.Count -lt 1) {
+        throw "launcher self-test missed run_blocked user wording"
+    }
+    $partialPresentation = @($presentations | Where-Object { $_.state_id -eq "partial_supported_run" -and $_.title -eq "Simulation ran with partial supported subset" -and $_.detail -match "Diagnostic-only execution is explicit" })
+    if ($partialPresentation.Count -ne 1) {
+        throw "launcher self-test missed partial supported diagnostic wording"
+    }
+    $compatPresentation = @($presentations | Where-Object { $_.state_id -eq "supported_compatibility_run" -and $_.detail -match "matched_capabilities=official_1zone_uncontrolled_declared_heat_balance" -and $_.detail -match "compare_report=out/compare/compare-report.md" })
+    if ($compatPresentation.Count -ne 1) {
+        throw "launcher self-test missed supported compatibility detail"
     }
     $phaseLine = Format-PhaseTimingLine -Phase ([pscustomobject]@{
             name = "support_assessment"
