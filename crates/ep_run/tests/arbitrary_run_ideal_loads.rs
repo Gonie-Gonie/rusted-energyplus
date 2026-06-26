@@ -229,6 +229,23 @@ fn ideal_loads_humidity_selected_branch_runs_declared_compatibility_runtime()
     Ok(())
 }
 
+#[test]
+fn ideal_loads_outdoor_air_selected_branch_runs_declared_compatibility_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    let summary = assert_ideal_loads_fixture_runs(
+        "ideal-loads-outdoor-air-selected",
+        IDEAL_LOADS_OUTDOOR_AIR_EPJSON,
+        "ideal-loads-outdoor-air-selected-branches-compatibility",
+        "ideal_loads_outdoor_air_selected_branches",
+    )?;
+
+    assert_eq!(
+        summary["support"]["matched_capabilities"][0]["required_objects"][1],
+        "DesignSpecification:OutdoorAir"
+    );
+    Ok(())
+}
+
 fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
     let path = std::env::temp_dir().join(format!(

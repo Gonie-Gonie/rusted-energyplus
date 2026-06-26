@@ -30,6 +30,18 @@ function Assert-Equal {
     Write-Host "OK $Description`: $Actual"
 }
 
+function Assert-Matches {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if ($Text -notmatch $Pattern) {
+        throw "Expected $Description to match pattern: $Pattern"
+    }
+    Write-Host "OK $Description"
+}
+
 function Assert-SnapshotPresent {
     param(
         [Parameter(Mandatory = $true)][object[]]$Snapshots,
@@ -230,20 +242,11 @@ foreach ($relative in @(
     "input\converted.epJSON",
     "model\raw-model-summary.json",
     "model\typed-model-summary.json",
-    "model\graph-summary.json",
-    "model\execution-plan.json",
     "reports\run-report.md",
     "reports\compatibility-boundary.md"
 )) {
     Assert-File -Path (Join-Path $blockedOutputDir $relative)
 }
-
-$blockedExecutionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "model\execution-plan.json") | ConvertFrom-Json
-Assert-Equal -Actual @($blockedExecutionPlan.stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan first source-order kind"
-Assert-Equal -Actual @($blockedExecutionPlan.stages)[9].kind -Expected "manage_zone_air_updates" -Description "blocked execution plan zone air update kind"
-Assert-Equal -Actual @($blockedExecutionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan source-order first kind"
-Assert-Equal -Actual @($blockedExecutionPlan.expected_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "blocked execution plan expected source-order first stage"
-Assert-Equal -Actual @($blockedExecutionPlan.actual_executed_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "blocked execution plan actual source-order first stage"
 
 $blockedSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $blockedSummary.status -Expected "unsupported" -Description "blocked run summary status"
@@ -295,8 +298,6 @@ foreach ($relative in @(
     "input\converted.epJSON",
     "model\raw-model-summary.json",
     "model\typed-model-summary.json",
-    "model\graph-summary.json",
-    "model\execution-plan.json",
     "reports\run-report.md",
     "reports\compatibility-boundary.md",
     "oracle\eplusout.eso",
@@ -334,5 +335,41 @@ Assert-Equal -Actual $blockedOracleSupport.claim_boundary.conformance_claim -Exp
 $blockedOracleCompare = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOracleOutputDir "compare\compare-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $blockedOracleCompare.status -Expected "skipped-rust-unsupported-or-oracle-missing" -Description "blocked oracle comparison status"
 Assert-Equal -Actual $blockedOracleCompare.conformance_claim -Expected $false -Description "blocked oracle comparison conformance claim"
+
+$invalidIdfOutputDir = ".runtime\arbitrary-run-invalid-idf-smoke-script"
+$invalidIdfInput = ".runtime\arbitrary-run-invalid-idf-smoke.idf"
+if (Test-Path -LiteralPath $invalidIdfOutputDir) {
+    Remove-Item -Recurse -Force -LiteralPath $invalidIdfOutputDir
+}
+Set-Content -Encoding UTF8 -LiteralPath $invalidIdfInput -Value @"
+Version,
+  26.1;
+
+Building,
+"@
+
+Write-Host "Running invalid IDF conversion smoke: $invalidIdfInput"
+$invalidIdfOutput = & $exe run $invalidIdfInput -d $invalidIdfOutputDir --overwrite --oracle-root $oracleRoot 2>&1
+$invalidIdfExitCode = $LASTEXITCODE
+if ($invalidIdfExitCode -ne 2) {
+    $invalidIdfOutput | ForEach-Object { Write-Host $_ }
+    throw "Expected import-parse exit code 2 from invalid IDF conversion, got $invalidIdfExitCode."
+}
+
+foreach ($relative in @(
+    "eplusrs.err",
+    "diagnostics.json",
+    "run-summary.json",
+    "input\original.idf"
+)) {
+    Assert-File -Path (Join-Path $invalidIdfOutputDir $relative)
+}
+
+$invalidIdfSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $invalidIdfOutputDir "run-summary.json") | ConvertFrom-Json
+Assert-Equal -Actual $invalidIdfSummary.status -Expected "import-parse" -Description "invalid IDF run summary status"
+Assert-Equal -Actual $invalidIdfSummary.exit_code -Expected 2 -Description "invalid IDF run summary exit code"
+Assert-Equal -Actual $invalidIdfSummary.run_result_state -Expected "run_blocked" -Description "invalid IDF run result state"
+Assert-Equal -Actual $invalidIdfSummary.support_status -Expected "unsupported" -Description "invalid IDF support status"
+Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $invalidIdfOutputDir "diagnostics.json")) -Pattern "ConvertInputFormatFailed" -Description "invalid IDF conversion diagnostic"
 
 Write-Host "Arbitrary IDF run smoke passed. Artifacts: $outputDir"

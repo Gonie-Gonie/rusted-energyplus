@@ -190,12 +190,15 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     let prepared_input = match prepare_input(config, &mut diagnostics) {
         Ok(input) => input,
         Err(error) => {
-            diagnostics.error("RawModelParseFailed", "input", error.to_string());
+            let message = error.to_string();
+            let diagnostic_code = input_error_diagnostic_code(&message);
+            let exit_code = error.exit_code;
+            diagnostics.error(diagnostic_code, "input", message);
             return finish_early(
                 config,
                 diagnostics,
                 timing,
-                RunExitCode::ImportParse,
+                exit_code,
                 SupportStatus::Unsupported,
                 RunResultState::RunBlocked,
                 "input import failed",
@@ -250,43 +253,6 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     write_compile_artifacts(&config.output_dir, &compile_result.report, typed_model)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
 
-    let graph_start = Instant::now();
-    let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
-    timing.push(
-        "graph_build",
-        "ep_model",
-        graph_start.elapsed().as_secs_f64(),
-        "build SimulationModel and ModelGraph from typed model",
-    );
-
-    let plan_start = Instant::now();
-    let runtime_precomputed = simulation_model.as_ref().map(precompute_runtime_data);
-    let mut graph_and_plan_export = GraphAndPlanExportSummary::default();
-    if let (Some(model), Some(precomputed)) =
-        (simulation_model.as_ref(), runtime_precomputed.as_ref())
-    {
-        graph_and_plan_export = write_graph_and_plan(
-            &config.output_dir,
-            model,
-            precomputed,
-            config.trace_level,
-            &config.trace_selection,
-        )
-        .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-    }
-    timing.push(
-        "execution_plan",
-        "ep_runtime",
-        plan_start.elapsed().as_secs_f64(),
-        "precompute ExecutionPlan and OutputRegistry for supported typed subset, then write plan artifacts",
-    );
-    timing.push(
-        "trace_overhead",
-        "ep_run",
-        graph_and_plan_export.trace_wall_seconds,
-        "generate trace metadata and optional source-order stage snapshot artifacts",
-    );
-
     let support_start = Instant::now();
     let assessment = assess_support(
         &raw_model,
@@ -333,6 +299,47 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     }
     write_support_artifacts(&config.output_dir, &assessment, &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+
+    let mut simulation_model: Option<SimulationModel> = None;
+    let mut runtime_precomputed: Option<RuntimePrecomputedData> = None;
+    if assessment.allows_rust_runtime() {
+        let graph_start = Instant::now();
+        simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
+        timing.push(
+            "graph_build",
+            "ep_model",
+            graph_start.elapsed().as_secs_f64(),
+            "build SimulationModel and ModelGraph after support assessment allows runtime execution",
+        );
+
+        let plan_start = Instant::now();
+        runtime_precomputed = simulation_model.as_ref().map(precompute_runtime_data);
+        let mut graph_and_plan_export = GraphAndPlanExportSummary::default();
+        if let (Some(model), Some(precomputed)) =
+            (simulation_model.as_ref(), runtime_precomputed.as_ref())
+        {
+            graph_and_plan_export = write_graph_and_plan(
+                &config.output_dir,
+                model,
+                precomputed,
+                config.trace_level,
+                &config.trace_selection,
+            )
+            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        }
+        timing.push(
+            "execution_plan",
+            "ep_runtime",
+            plan_start.elapsed().as_secs_f64(),
+            "precompute ExecutionPlan and OutputRegistry for supported typed subset, then write plan artifacts",
+        );
+        timing.push(
+            "trace_overhead",
+            "ep_run",
+            graph_and_plan_export.trace_wall_seconds,
+            "generate trace metadata and optional source-order stage snapshot artifacts",
+        );
+    }
 
     if config.dry_run {
         oracle_status = "skipped-dry-run".to_string();
@@ -772,6 +779,20 @@ fn finish_successful_summary(
         run_result_state: assessment.run_result_state,
         message: message.to_string(),
     })
+}
+
+fn input_error_diagnostic_code(message: &str) -> &'static str {
+    if message.starts_with("ConvertInputFormatFailed") {
+        "ConvertInputFormatFailed"
+    } else if message.starts_with("UnsupportedInputFormat") {
+        "UnsupportedInputFormat"
+    } else if message.starts_with("missing weather file") {
+        "MissingWeatherFile"
+    } else if message.starts_with("missing input file") {
+        "MissingInputFile"
+    } else {
+        "RawModelParseFailed"
+    }
 }
 
 fn prepare_output_dir(output_dir: &Path, overwrite: bool) -> Result<(), RunError> {
@@ -1429,6 +1450,7 @@ fn execute_rust_runtime(
         | RuntimeClass::IdealLoadsFiniteLimitCompatibility
         | RuntimeClass::IdealLoadsConstantShrCompatibility
         | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
+        | RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
         | RuntimeClass::IdealLoadsMixedDeclaredCompatibility => {
             let simulation = simulate_ideal_loads_purchased_air_compat(
                 model,
@@ -1744,8 +1766,9 @@ mod tests {
     use std::path::Path;
 
     use super::{
-        artifact_map, execution_stage_snapshots, selected_trace_enabled, source_order_gate_summary,
-        source_order_stage_state_snapshots, trace_level_enables_stage_snapshots,
+        artifact_map, execution_stage_snapshots, input_error_diagnostic_code,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
+        trace_level_enables_stage_snapshots,
     };
     use ep_runtime::{
         EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
@@ -1753,6 +1776,26 @@ mod tests {
     };
 
     use crate::{TraceLevel, TraceSelection};
+
+    #[test]
+    fn input_error_diagnostic_code_preserves_converter_failures() {
+        assert_eq!(
+            input_error_diagnostic_code("ConvertInputFormatFailed: IDF conversion failed"),
+            "ConvertInputFormatFailed"
+        );
+        assert_eq!(
+            input_error_diagnostic_code("UnsupportedInputFormat: input must be .idf or .epJSON"),
+            "UnsupportedInputFormat"
+        );
+        assert_eq!(
+            input_error_diagnostic_code("missing weather file: weather.epw"),
+            "MissingWeatherFile"
+        );
+        assert_eq!(
+            input_error_diagnostic_code("failed to stage epJSON input: denied"),
+            "RawModelParseFailed"
+        );
+    }
 
     #[test]
     fn source_order_gate_summary_detects_stage_mismatch() {

@@ -9,8 +9,6 @@ pub(crate) const BLOCKED_AFTER_SUPPORT_MANIFEST: &[&str] = &[
     "input/input-hashes.json",
     "input/original.epJSON",
     "logs/command.log",
-    "model/execution-plan.json",
-    "model/graph-summary.json",
     "model/raw-model-summary.json",
     "model/typed-model-summary.json",
     "reports/compatibility-boundary.md",

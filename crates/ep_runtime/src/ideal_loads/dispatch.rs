@@ -34,6 +34,8 @@ pub enum IdealLoadsPurchasedAirBranch {
     NoOaHumidistatDehumidification,
     /// No outdoor air humidistat humidification branch.
     NoOaHumidistatHumidification,
+    /// Outdoor-air selected PurchasedAir branch.
+    OutdoorAirSelected,
 }
 
 impl IdealLoadsPurchasedAirBranch {
@@ -50,6 +52,7 @@ impl IdealLoadsPurchasedAirBranch {
             Self::NoOaConstantSupplyHumidityHeating => "constant_supply_humidity_heating",
             Self::NoOaHumidistatDehumidification => "humidistat_dehumidification",
             Self::NoOaHumidistatHumidification => "humidistat_humidification",
+            Self::OutdoorAirSelected => "outdoor_air",
         }
     }
 
@@ -279,6 +282,10 @@ fn select_purchased_air_branch_from_flags(
     system: &IdealLoadsAirSystem,
     feature_flags: IdealLoadsFeatureFlags,
 ) -> IdealLoadsPurchasedAirBranch {
+    if feature_flags.has_outdoor_air {
+        return IdealLoadsPurchasedAirBranch::OutdoorAirSelected;
+    }
+
     match (
         feature_flags.has_flow_limit,
         feature_flags.has_capacity_limit,

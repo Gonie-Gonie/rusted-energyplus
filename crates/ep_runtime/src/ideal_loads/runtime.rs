@@ -2,14 +2,34 @@
 
 use std::fmt::{Display, Formatter};
 
-use ep_model::{IdealLoadsAirSystem, NodeId, OutputHandle, SimulationModel};
+use ep_model::{
+    AutoOrNumber, DesignSpecificationOutdoorAir, IdealLoadsAirSystem, NodeId, OutputHandle,
+    PeopleNumberCalculationMethod, SimulationModel, ZoneId,
+};
 
 use crate::{
     OutputSeries, ResultStore,
     ideal_loads::{
-        IdealLoadsCompiledBranchFlags, IdealLoadsPurchasedAirBranch,
-        IdealLoadsSensibleLimitContext, IdealLoadsZoneState, SimPurchasedAirCompatError,
-        SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
+        IdealLoadsCompiledBranchFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
+        IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, IdealLoadsZoneState,
+        SimPurchasedAirCompatError, SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
+        SimPurchasedAirOutdoorAirCompatInput, SimPurchasedAirOutdoorAirCompatOutput,
+        ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE,
+        ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE,
@@ -24,7 +44,9 @@ use crate::{
         ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
         ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, sim_purchased_air_compat_with_branch_flags,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s,
+        sim_purchased_air_compat_with_branch_flags, sim_purchased_air_outdoor_air_compat,
     },
     zone_equipment::{
         IdealLoadsZoneEquipmentDispatchIssue, ZoneSysEnergyDemand,
@@ -34,6 +56,8 @@ use crate::{
 
 const DEFAULT_ZONE_AIR_TEMPERATURE_C: f64 = 23.0;
 const DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
+const DEFAULT_OUTDOOR_AIR_TEMPERATURE_C: f64 = 10.0;
+const DEFAULT_OUTDOOR_AIR_HUMIDITY_RATIO: f64 = 0.004;
 const DEFAULT_HEATING_DEMAND_W: f64 = 0.0;
 const DEFAULT_COOLING_DEMAND_W: f64 = 0.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
@@ -47,6 +71,10 @@ pub struct IdealLoadsCompatibilityOptions {
     pub default_zone_air_temperature_c: f64,
     /// Zone air humidity ratio passed to `CalcPurchAirLoads`.
     pub default_zone_air_humidity_ratio: f64,
+    /// Outdoor-air dry-bulb temperature passed to selected OA branches.
+    pub default_outdoor_air_temperature_c: f64,
+    /// Outdoor-air humidity ratio passed to selected OA branches.
+    pub default_outdoor_air_humidity_ratio: f64,
     /// Source-order heating demand snapshot in W.
     pub default_heating_demand_w: f64,
     /// Source-order cooling demand snapshot in W.
@@ -63,6 +91,8 @@ impl IdealLoadsCompatibilityOptions {
             sample_count,
             default_zone_air_temperature_c: DEFAULT_ZONE_AIR_TEMPERATURE_C,
             default_zone_air_humidity_ratio: DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+            default_outdoor_air_temperature_c: DEFAULT_OUTDOOR_AIR_TEMPERATURE_C,
+            default_outdoor_air_humidity_ratio: DEFAULT_OUTDOOR_AIR_HUMIDITY_RATIO,
             default_heating_demand_w: DEFAULT_HEATING_DEMAND_W,
             default_cooling_demand_w: DEFAULT_COOLING_DEMAND_W,
             unit_available: true,
@@ -128,6 +158,16 @@ pub enum IdealLoadsCompatibilityRuntimeError {
         /// IdealLoads object name.
         system_name: String,
     },
+    /// Selected OA branch had no resolved DesignSpecification:OutdoorAir edge.
+    MissingOutdoorAirSpecification {
+        /// IdealLoads object name.
+        system_name: String,
+    },
+    /// The selected OA branch uses an unsupported or unresolved design-flow method.
+    UnsupportedOutdoorAirDesignFlow {
+        /// IdealLoads object name.
+        system_name: String,
+    },
     /// The selected PurchasedAir branch is not inside the compatibility subset.
     UnsupportedPurchasedAirBranch {
         /// Error returned by `sim_purchased_air_compat`.
@@ -156,6 +196,14 @@ impl Display for IdealLoadsCompatibilityRuntimeError {
             Self::MissingZone { system_name } => write!(
                 formatter,
                 "IdealLoads system {system_name} has no resolved controlled zone"
+            ),
+            Self::MissingOutdoorAirSpecification { system_name } => write!(
+                formatter,
+                "IdealLoads system {system_name} has no resolved DesignSpecification:OutdoorAir"
+            ),
+            Self::UnsupportedOutdoorAirDesignFlow { system_name } => write!(
+                formatter,
+                "IdealLoads system {system_name} has an unsupported outdoor-air design-flow method"
             ),
             Self::UnsupportedPurchasedAirBranch { error } => write!(
                 formatter,
@@ -228,6 +276,36 @@ pub fn simulate_ideal_loads_purchased_air_compat(
             options.default_heating_demand_w,
             options.default_cooling_demand_w,
         );
+        if compiled_system.branch_flags.purchased_air_branch
+            == IdealLoadsPurchasedAirBranch::OutdoorAirSelected
+        {
+            let output = simulate_outdoor_air_purchased_air_system(
+                model,
+                system,
+                supply_node,
+                zone,
+                demand,
+                limit_context,
+                options,
+            )?;
+            write_purchased_air_outdoor_air_output_series(
+                &mut results,
+                &mut handle_index,
+                system,
+                supply_node,
+                &node_name(model, supply_node),
+                output,
+                limit_context,
+                options.sample_count,
+            );
+            systems.push(IdealLoadsCompatibilitySystemSummary {
+                system_name: system.name.0.clone(),
+                branch: IdealLoadsPurchasedAirBranch::OutdoorAirSelected,
+                supply_node_name: node_name(model, supply_node),
+            });
+            continue;
+        }
+
         let output = sim_purchased_air_compat_with_branch_flags(
             SimPurchasedAirCompatInput {
                 system,
@@ -269,6 +347,350 @@ pub fn simulate_ideal_loads_purchased_air_compat(
         },
         results,
     })
+}
+
+fn simulate_outdoor_air_purchased_air_system(
+    model: &SimulationModel,
+    system: &IdealLoadsAirSystem,
+    supply_node: NodeId,
+    zone: ZoneId,
+    demand: ZoneSysEnergyDemand,
+    limit_context: IdealLoadsSensibleLimitContext,
+    options: IdealLoadsCompatibilityOptions,
+) -> Result<SimPurchasedAirOutdoorAirCompatOutput, IdealLoadsCompatibilityRuntimeError> {
+    let specification = outdoor_air_specification(model, system).ok_or_else(|| {
+        IdealLoadsCompatibilityRuntimeError::MissingOutdoorAirSpecification {
+            system_name: system.name.0.clone(),
+        }
+    })?;
+    let context = outdoor_air_context(model, zone);
+    let minimum_outdoor_air_mass_flow_rate_kg_per_s =
+        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
+            specification,
+            context,
+            None,
+            limit_context.standard_air_density_kg_per_m3,
+        )
+        .ok_or_else(|| {
+            IdealLoadsCompatibilityRuntimeError::UnsupportedOutdoorAirDesignFlow {
+                system_name: system.name.0.clone(),
+            }
+        })?;
+    let zone_state = IdealLoadsOutdoorAirNodeState {
+        air_temperature_c: options.default_zone_air_temperature_c,
+        air_humidity_ratio: options.default_zone_air_humidity_ratio,
+    };
+    let outdoor_air_state = IdealLoadsOutdoorAirNodeState {
+        air_temperature_c: options.default_outdoor_air_temperature_c,
+        air_humidity_ratio: options.default_outdoor_air_humidity_ratio,
+    };
+
+    Ok(sim_purchased_air_outdoor_air_compat(
+        SimPurchasedAirOutdoorAirCompatInput {
+            system,
+            supply_node,
+            zone_state,
+            recirculation_state: zone_state,
+            outdoor_air_state,
+            demand,
+            minimum_outdoor_air_mass_flow_rate_kg_per_s,
+            system_timestep_hours: 1.0,
+            barometric_pressure_pa: limit_context.barometric_pressure_pa,
+            unit_available: options.unit_available,
+        },
+    ))
+}
+
+fn outdoor_air_specification<'a>(
+    model: &'a SimulationModel,
+    system: &IdealLoadsAirSystem,
+) -> Option<&'a DesignSpecificationOutdoorAir> {
+    let edge = model
+        .graph
+        .ideal_loads_outdoor_air_specs
+        .iter()
+        .find(|edge| edge.ideal_loads_air_system == system.id)?;
+    model
+        .typed
+        .design_specification_outdoor_air
+        .iter()
+        .find(|specification| specification.id == edge.design_specification_outdoor_air)
+}
+
+fn outdoor_air_context(model: &SimulationModel, zone_id: ZoneId) -> IdealLoadsOutdoorAirContext {
+    let zone_volume_m3 = model
+        .typed
+        .zones
+        .iter()
+        .find(|zone| zone.id == zone_id)
+        .and_then(|zone| match zone.volume {
+            AutoOrNumber::Value(value) if value.is_finite() => Some(value.max(0.0)),
+            AutoOrNumber::Value(_) | AutoOrNumber::AutoCalculate => None,
+        })
+        .unwrap_or(0.0);
+    let design_people_count = model
+        .typed
+        .people
+        .iter()
+        .filter(|people| people.zone == zone_id)
+        .filter_map(|people| match people.number_of_people_calculation_method {
+            PeopleNumberCalculationMethod::People if people.number_of_people.is_finite() => {
+                Some(people.number_of_people.max(0.0))
+            }
+            PeopleNumberCalculationMethod::People
+            | PeopleNumberCalculationMethod::PeoplePerArea
+            | PeopleNumberCalculationMethod::AreaPerPerson => None,
+        })
+        .sum();
+
+    IdealLoadsOutdoorAirContext {
+        design_people_count,
+        zone_floor_area_m2: 0.0,
+        zone_volume_m3,
+    }
+}
+
+fn write_purchased_air_outdoor_air_output_series(
+    results: &mut ResultStore,
+    handle_index: &mut u32,
+    system: &IdealLoadsAirSystem,
+    supply_node: NodeId,
+    supply_node_name: &str,
+    output: SimPurchasedAirOutdoorAirCompatOutput,
+    limit_context: IdealLoadsSensibleLimitContext,
+    sample_count: usize,
+) {
+    let key = system.name.0.as_str();
+    let calculation = output.calculation;
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_MASS_FLOW_RATE,
+        "kg/s",
+        calculation.outdoor_air_mass_flow_rate_kg_per_s,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+        "m3/s",
+        calculation.outdoor_air_mass_flow_rate_kg_per_s
+            / limit_context.standard_air_density_kg_per_m3,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_HEATING_RATE,
+        "W",
+        calculation.outdoor_air_sensible_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_SENSIBLE_COOLING_RATE,
+        "W",
+        calculation.outdoor_air_sensible_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_HEATING_RATE,
+        "W",
+        calculation.outdoor_air_latent_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_LATENT_COOLING_RATE,
+        "W",
+        calculation.outdoor_air_latent_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_HEATING_RATE,
+        "W",
+        calculation.outdoor_air_total_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_OUTDOOR_AIR_TOTAL_COOLING_RATE,
+        "W",
+        calculation.outdoor_air_total_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_MIXED_AIR_TEMPERATURE,
+        "C",
+        calculation.mixed_air_temperature_c,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_MIXED_AIR_HUMIDITY_RATIO,
+        "kgWater/kgDryAir",
+        calculation.mixed_air_humidity_ratio,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
+        "W",
+        calculation.heat_recovery_sensible_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
+        "W",
+        calculation.heat_recovery_latent_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_HEATING_RATE,
+        "W",
+        calculation.heat_recovery_total_heating_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
+        "W",
+        calculation.heat_recovery_sensible_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+        "W",
+        calculation.heat_recovery_latent_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE,
+        "W",
+        calculation.heat_recovery_total_cooling_rate_w,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+        "hr",
+        calculation.economizer_active_time_hr,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
+        "hr",
+        calculation.heat_recovery_active_time_hr,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
+        "kg/s",
+        output.supply_node_update.mass_flow_rate_kg_per_s,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
+        "m3/s",
+        output.supply_node_update.mass_flow_rate_kg_per_s
+            / limit_context.standard_air_density_kg_per_m3,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+        "C",
+        output.supply_node_update.temperature_c,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        key,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+        "kgWater/kgDryAir",
+        output.supply_node_update.humidity_ratio,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        supply_node_name,
+        "System Node Temperature",
+        "C",
+        output.supply_node_update.temperature_c,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        supply_node_name,
+        "System Node Humidity Ratio",
+        "kgWater/kgDryAir",
+        output.supply_node_update.humidity_ratio,
+        sample_count,
+    );
+    add_constant_output_series(
+        results,
+        handle_index,
+        supply_node_name,
+        "System Node Mass Flow Rate",
+        "kg/s",
+        output.supply_node_update.mass_flow_rate_kg_per_s,
+        sample_count,
+    );
+
+    debug_assert_eq!(output.supply_node_update.node, supply_node);
 }
 
 fn write_purchased_air_output_series(

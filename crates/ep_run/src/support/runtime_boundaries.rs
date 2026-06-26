@@ -129,6 +129,9 @@ const fn ideal_loads_capability_id_for_branch(
         | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
             "ideal_loads_humidity_selected_branches"
         }
+        IdealLoadsPurchasedAirBranch::OutdoorAirSelected => {
+            "ideal_loads_outdoor_air_selected_branches"
+        }
     }
 }
 
@@ -153,6 +156,9 @@ const fn ideal_loads_runtime_class_for_branch(
         | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
             RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
         }
+        IdealLoadsPurchasedAirBranch::OutdoorAirSelected => {
+            RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
+        }
     }
 }
 
@@ -176,6 +182,7 @@ fn is_declared_ideal_loads_compatibility(runtime_class: RuntimeClass) -> bool {
             | RuntimeClass::IdealLoadsFiniteLimitCompatibility
             | RuntimeClass::IdealLoadsConstantShrCompatibility
             | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
+            | RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
             | RuntimeClass::IdealLoadsMixedDeclaredCompatibility
     )
 }
@@ -193,6 +200,10 @@ fn unsupported_features_for_selected_branch(
                     | IdealLoadsUnsupportedFeature::Humidification
             )
         });
+    }
+    if supports_outdoor_air_selected_branch(system, branch) {
+        unsupported_features
+            .retain(|feature| !matches!(feature, IdealLoadsUnsupportedFeature::OutdoorAir));
     }
     unsupported_features
 }
@@ -214,8 +225,19 @@ fn supports_no_oa_humidity_selected_branch(
         | IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
         | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
         | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity
-        | IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => false,
+        | IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling
+        | IdealLoadsPurchasedAirBranch::OutdoorAirSelected => false,
     }
+}
+
+fn supports_outdoor_air_selected_branch(
+    system: &ep_model::IdealLoadsAirSystem,
+    branch: IdealLoadsPurchasedAirBranch,
+) -> bool {
+    matches!(branch, IdealLoadsPurchasedAirBranch::OutdoorAirSelected)
+        && system
+            .design_specification_outdoor_air_object_name
+            .is_some()
 }
 pub(super) fn assess_typed_runtime_boundaries(
     typed_model: Option<&TypedModel>,

@@ -913,8 +913,6 @@ fn assert_output_layout(
         "input/input-hashes.json",
         "model/raw-model-summary.json",
         "model/typed-model-summary.json",
-        "model/graph-summary.json",
-        "model/execution-plan.json",
         "reports/run-report.md",
         "reports/compatibility-boundary.md",
         "logs/command.log",
@@ -927,6 +925,8 @@ fn assert_output_layout(
 
     if expects_runtime_artifacts {
         for file in [
+            "model/graph-summary.json",
+            "model/execution-plan.json",
             "results/result-store.json",
             "results/selected-outputs.csv",
             "results/meters.csv",

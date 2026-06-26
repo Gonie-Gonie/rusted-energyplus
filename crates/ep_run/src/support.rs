@@ -134,6 +134,8 @@ pub enum RuntimeClass {
     IdealLoadsConstantShrCompatibility,
     /// IdealLoads no-OA selected humidity-control compatibility runtime.
     IdealLoadsHumiditySelectedBranchesCompatibility,
+    /// IdealLoads selected outdoor-air branch compatibility runtime.
+    IdealLoadsOutdoorAirSelectedBranchesCompatibility,
     /// Mixed declared IdealLoads PurchasedAir compatibility runtime.
     IdealLoadsMixedDeclaredCompatibility,
     /// Legacy broad IdealLoads node-state diagnostic projection runtime.
@@ -154,6 +156,9 @@ impl RuntimeClass {
             Self::IdealLoadsHumiditySelectedBranchesCompatibility => {
                 "ideal-loads-humidity-selected-branches-compatibility"
             }
+            Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility => {
+                "ideal-loads-outdoor-air-selected-branches-compatibility"
+            }
             Self::IdealLoadsMixedDeclaredCompatibility => {
                 "ideal-loads-mixed-declared-compatibility"
             }
@@ -170,6 +175,7 @@ impl RuntimeClass {
             | Self::IdealLoadsFiniteLimitCompatibility
             | Self::IdealLoadsConstantShrCompatibility
             | Self::IdealLoadsHumiditySelectedBranchesCompatibility
+            | Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility
             | Self::IdealLoadsMixedDeclaredCompatibility => "compatibility-source-order",
             Self::HeatBalanceZoneAirDiagnostic | Self::IdealLoadsNodeStateProjection => {
                 "diagnostic-probe"
@@ -197,6 +203,7 @@ impl RuntimeClass {
                 | Self::IdealLoadsFiniteLimitCompatibility
                 | Self::IdealLoadsConstantShrCompatibility
                 | Self::IdealLoadsHumiditySelectedBranchesCompatibility
+                | Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility
                 | Self::IdealLoadsMixedDeclaredCompatibility
         )
     }
