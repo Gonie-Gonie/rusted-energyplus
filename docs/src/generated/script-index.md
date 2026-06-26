@@ -11,7 +11,7 @@ Status values distinguish public user commands, developer commands, release comm
 
 | Check | Count |
 |---|---|
-| script files | 197 |
+| script files | 198 |
 | dev commands | 178 |
 | aliases | 4 |
 | missing command targets | 0 |
@@ -177,6 +177,7 @@ none
 | scripts/gui/eplus-rs-launch/self_test.ps1 | launcher | internal helper |  |  |  |  | nonzero via PowerShell throw |
 | scripts/gui/eplus-rs-launch/ui.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/gui/eplus-rs-launch.ps1 | launcher | public user command | launch-ui | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime/ep-launch-output` | explicit exit: exit 0 |
+| scripts/gui/eplus-rs-launcher.cs | launcher | internal helper |  | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime`<br>`target` | compiled helper; exit code set by compiled process |
 | scripts/internal/probes/official-hb-flat-adhist-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-final-hconv-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-inside-ctf-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |

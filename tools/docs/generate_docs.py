@@ -411,6 +411,8 @@ def exit_contract(path: Path, text: str) -> str:
     suffix = path.suffix.lower()
     if suffix in {".json", ".md"}:
         return "n/a"
+    if suffix == ".cs":
+        return "compiled helper; exit code set by compiled process"
     if path.name.lower() == "dev.cmd":
         return "propagates PowerShell ERRORLEVEL"
     explicit_exits = sorted(

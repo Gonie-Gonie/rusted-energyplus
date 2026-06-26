@@ -27,144 +27,25 @@ if (Test-Path -LiteralPath $OutputPath -PathType Leaf) {
     Remove-Item -LiteralPath $OutputPath -Force
 }
 
-$source = @'
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
-
-internal static class Program
-{
-    [STAThread]
-    private static int Main(string[] args)
-    {
-        string executablePath = Application.ExecutablePath;
-        string appRoot = Path.GetDirectoryName(executablePath) ?? Environment.CurrentDirectory;
-        string scriptPath = Path.Combine(appRoot, "scripts", "gui", "eplus-rs-launch.ps1");
-        if (!File.Exists(scriptPath))
-        {
-            MessageBox.Show(
-                "Missing launcher script:\n" + scriptPath,
-                "Rusted EnergyPlus Launch",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
-            return 2;
-        }
-
-        string powershellPath = FindPowerShell();
-        if (String.IsNullOrWhiteSpace(powershellPath))
-        {
-            MessageBox.Show(
-                "PowerShell was not found.",
-                "Rusted EnergyPlus Launch",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
-            return 3;
-        }
-
-        string argumentText = "-NoProfile -ExecutionPolicy Bypass -STA -File " + Quote(scriptPath);
-        foreach (string argument in args)
-        {
-            argumentText += " " + Quote(argument);
-        }
-
-        ProcessStartInfo startInfo = new ProcessStartInfo();
-        startInfo.FileName = powershellPath;
-        startInfo.Arguments = argumentText;
-        startInfo.UseShellExecute = false;
-        startInfo.CreateNoWindow = true;
-        startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-        try
-        {
-            Process.Start(startInfo);
-            return 0;
-        }
-        catch (Exception error)
-        {
-            MessageBox.Show(
-                "Failed to open the launcher:\n" + error.Message,
-                "Rusted EnergyPlus Launch",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
-            return 4;
-        }
-    }
-
-    private static string FindPowerShell()
-    {
-        string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-        string systemPowerShell = Path.Combine(windows, "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
-        if (File.Exists(systemPowerShell))
-        {
-            return systemPowerShell;
-        }
-        return "powershell.exe";
-    }
-
-    private static string Quote(string value)
-    {
-        if (value == null)
-        {
-            return "\"\"";
-        }
-        if (value.Length == 0)
-        {
-            return "\"\"";
-        }
-        bool needsQuotes = false;
-        foreach (char character in value)
-        {
-            if (Char.IsWhiteSpace(character) || character == '"')
-            {
-                needsQuotes = true;
-                break;
-            }
-        }
-        if (!needsQuotes)
-        {
-            return value;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        builder.Append('"');
-        int backslashes = 0;
-        foreach (char character in value)
-        {
-            if (character == '\\')
-            {
-                backslashes += 1;
-                continue;
-            }
-            if (character == '"')
-            {
-                builder.Append('\\', (backslashes * 2) + 1);
-                builder.Append('"');
-                backslashes = 0;
-                continue;
-            }
-            if (backslashes > 0)
-            {
-                builder.Append('\\', backslashes);
-                backslashes = 0;
-            }
-            builder.Append(character);
-        }
-        if (backslashes > 0)
-        {
-            builder.Append('\\', backslashes * 2);
-        }
-        builder.Append('"');
-        return builder.ToString();
-    }
+$sourcePath = Join-Path $PSScriptRoot "eplus-rs-launcher.cs"
+if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+    throw "Missing launcher source: $sourcePath"
 }
-'@
+
+$sourceText = Get-Content -Raw -Encoding UTF8 -LiteralPath $sourcePath
+if ($sourceText -match 'powershell(\.exe)?') {
+    throw "Direct launcher source must not start PowerShell at runtime: $sourcePath"
+}
 
 Add-Type `
-    -TypeDefinition $source `
-    -Language CSharp `
-    -ReferencedAssemblies @("System.dll", "System.Windows.Forms.dll", "System.Drawing.dll") `
+    -Path $sourcePath `
+    -ReferencedAssemblies @(
+        "System.dll",
+        "System.Core.dll",
+        "System.Drawing.dll",
+        "System.Web.Extensions.dll",
+        "System.Windows.Forms.dll"
+    ) `
     -OutputAssembly $OutputPath `
     -OutputType WindowsApplication
 
@@ -178,7 +59,10 @@ if ($SelfTest) {
         output_path = $item.FullName
         bytes = $item.Length
         output_type = "WindowsApplication"
-        script_path = "scripts\gui\eplus-rs-launch.ps1"
+        runtime = "direct-winforms"
+        starts_powershell = $false
+        source_path = "scripts\gui\eplus-rs-launcher.cs"
+        script_path = "not-used-at-runtime"
     } | ConvertTo-Json -Depth 3
 }
 else {
