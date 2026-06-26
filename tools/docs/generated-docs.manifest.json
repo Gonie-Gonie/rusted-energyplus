@@ -5,7 +5,8 @@
     "docs/src/generated/conformance-case-index.md",
     "docs/src/generated/object-coverage.md",
     "docs/src/generated/variable-coverage.md",
-    "docs/src/generated/script-index.md"
+    "docs/src/generated/script-index.md",
+    "docs/src/generated/docs-inventory.md"
   ],
   "sources": [
     "specs/milestones.toml",
@@ -15,6 +16,8 @@
     "data/conformance_cases/*/case.toml",
     "scripts/**/*",
     "scripts/dev/commands.json",
-    "README.md"
+    "README.md",
+    "docs/src/**/*.md",
+    "docs/src/SUMMARY.md"
   ]
 }

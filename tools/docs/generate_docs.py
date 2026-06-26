@@ -282,6 +282,27 @@ PYTHON_SCRIPT_RE = re.compile(r"tools[\\/](?:docs|reporting)[\\/][A-Za-z0-9_.-]+
 DEV_COMMAND_RE = re.compile(r"Invoke-DevCommand\s+-Command\s+['\"]([^'\"]+)['\"]")
 CARGO_COMMAND_RE = re.compile(r"cargo\s+(?:build|clippy|fmt|run|test)[^\r\n`|&;]*")
 README_DEV_COMMAND_RE = re.compile(r"\.\\scripts\\dev\.(?:cmd|ps1)\s+([A-Za-z0-9_.-]+)")
+SUMMARY_LINK_RE = re.compile(r"^- \[[^\]]+\]\(([^)]+)\)")
+FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
+README_CURRENT_DOC_RE = re.compile(r"`(docs/src/current/[^`]+\.md)`")
+
+CURRENT_DOCS = [
+    "docs/src/current/project-contract.md",
+    "docs/src/current/current-status.md",
+    "docs/src/current/roadmap.md",
+    "docs/src/current/verification.md",
+    "docs/src/current/architecture-overview.md",
+    "docs/src/current/launcher-and-run-framework.md",
+]
+GENERATED_DOC_OUTPUTS = [
+    "docs/src/generated/milestone-map.md",
+    "docs/src/generated/algorithm-ledger.md",
+    "docs/src/generated/conformance-case-index.md",
+    "docs/src/generated/object-coverage.md",
+    "docs/src/generated/variable-coverage.md",
+    "docs/src/generated/script-index.md",
+    "docs/src/generated/docs-inventory.md",
+]
 
 
 def extract_path_hints(pattern: re.Pattern[str], text: str) -> list[str]:
@@ -468,6 +489,174 @@ def script_inventory(repo_root: Path) -> str:
     )
 
 
+def parse_summary_links(repo_root: Path) -> dict[str, str]:
+    links: dict[str, str] = {}
+    section = ""
+    for line in read_text(repo_root / "docs" / "src" / "SUMMARY.md").splitlines():
+        if line.startswith("# "):
+            section = line[2:].strip()
+            continue
+        match = SUMMARY_LINK_RE.match(line)
+        if match:
+            links["docs/src/" + normalized_path(match.group(1))] = section
+    return links
+
+
+def markdown_front_matter(text: str) -> dict[str, str]:
+    match = FRONT_MATTER_RE.match(text)
+    if not match:
+        return {}
+
+    values: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        values[key.strip()] = value.strip()
+    return values
+
+
+def docs_category(relative_path: str) -> str:
+    if relative_path.startswith("docs/src/current/"):
+        return "current"
+    if (
+        relative_path.startswith("docs/src/guides/")
+        or relative_path.startswith("docs/src/user-guide/")
+        or relative_path == "docs/src/quick-start.md"
+    ):
+        return "guide"
+    if relative_path.startswith("docs/src/generated/"):
+        return "generated"
+    if relative_path.startswith("docs/src/releases/"):
+        return "release-note"
+    if relative_path.startswith("docs/src/porting-map/"):
+        return "source-map"
+    if (
+        relative_path.startswith("docs/src/architecture/")
+        or relative_path.startswith("docs/src/conformance/")
+        or relative_path.startswith("docs/src/operations/")
+        or relative_path.startswith("docs/src/adr/")
+        or relative_path in {"docs/src/introduction.md", "docs/src/SUMMARY.md"}
+    ):
+        return "spec-explanation"
+    return "removable"
+
+
+def docs_inventory(repo_root: Path) -> str:
+    summary_links = parse_summary_links(repo_root)
+    summary_current = [
+        path for path, section in summary_links.items() if section == "Current"
+    ]
+    readme = read_text(repo_root / "README.md")
+    readme_current = sorted({normalized_path(match.group(1)) for match in README_CURRENT_DOC_RE.finditer(readme)})
+    readme_sections = len(re.findall(r"^## ", readme, flags=re.MULTILINE))
+
+    markdown_files = {repo_path(path, repo_root): path for path in (repo_root / "docs" / "src").rglob("*.md")}
+    for expected in GENERATED_DOC_OUTPUTS:
+        markdown_files.setdefault(expected, repo_root / expected)
+
+    rows = []
+    generated_missing_notice: list[str] = []
+    for relative in sorted(markdown_files):
+        path = markdown_files[relative]
+        text = read_text(path) if path.exists() else ""
+        front_matter = markdown_front_matter(text)
+        category = docs_category(relative)
+        summary_section = summary_links.get(relative, "")
+        generated_notice = "n/a"
+        if category == "generated":
+            generated_notice = "present" if text.startswith(GENERATED_NOTICE) else "missing"
+            if generated_notice == "missing":
+                generated_missing_notice.append(relative)
+
+        rows.append(
+            [
+                relative,
+                category,
+                summary_section or "not in SUMMARY",
+                generated_notice,
+                "present" if front_matter else "none",
+                front_matter.get("status", ""),
+                front_matter.get("owner", ""),
+                front_matter.get("last_reviewed", ""),
+            ]
+        )
+
+    expected_current_set = set(CURRENT_DOCS)
+    summary_current_set = set(summary_current)
+    readme_current_set = set(readme_current)
+    current_missing = [path for path in CURRENT_DOCS if path not in summary_current_set]
+    current_unexpected = [path for path in summary_current if path not in expected_current_set]
+    readme_missing = [path for path in CURRENT_DOCS if path not in readme_current_set]
+    readme_unexpected = [path for path in readme_current if path not in expected_current_set]
+    release_notes_in_current = [
+        path for path in summary_current if path.startswith("docs/src/releases/")
+    ]
+    unlinked_docs = [
+        relative
+        for relative in sorted(markdown_files)
+        if relative not in summary_links and not relative.startswith("docs/src/generated/")
+    ]
+
+    summary_rows = [
+        ["docs files", str(len(markdown_files))],
+        ["SUMMARY links", str(len(summary_links))],
+        ["README h2 sections", str(readme_sections)],
+        ["README h2 section limit", "pass" if readme_sections <= 7 else "fail"],
+        ["Current nav expected", str(len(CURRENT_DOCS))],
+        ["Current nav actual", str(len(summary_current))],
+        ["Current nav missing", str(len(current_missing))],
+        ["Current nav unexpected", str(len(current_unexpected))],
+        ["README current docs missing", str(len(readme_missing))],
+        ["README current docs unexpected", str(len(readme_unexpected))],
+        ["Generated docs missing notice", str(len(generated_missing_notice))],
+        ["Release notes in Current nav", str(len(release_notes_in_current))],
+        ["Non-generated docs not in SUMMARY", str(len(unlinked_docs))],
+    ]
+
+    current_rows = [
+        [
+            str(index + 1),
+            CURRENT_DOCS[index],
+            summary_current[index] if index < len(summary_current) else "",
+            "pass" if index < len(summary_current) and CURRENT_DOCS[index] == summary_current[index] else "fail",
+        ]
+        for index in range(max(len(CURRENT_DOCS), len(summary_current)))
+    ]
+
+    return (
+        GENERATED_NOTICE
+        + "# Docs Inventory\n\n"
+        + "Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and README current-doc references.\n\n"
+        + "## Summary\n\n"
+        + table(["Check", "Result"], summary_rows)
+        + "\n## Current Navigation Check\n\n"
+        + table(["Order", "Expected", "Actual", "Result"], current_rows)
+        + "\n**README current docs missing**\n\n"
+        + bullet_list(readme_missing)
+        + "\n\n**README current docs unexpected**\n\n"
+        + bullet_list(readme_unexpected)
+        + "\n\n**Generated docs missing notice**\n\n"
+        + bullet_list(generated_missing_notice)
+        + "\n\n**Release notes in Current navigation**\n\n"
+        + bullet_list(release_notes_in_current)
+        + "\n\n## Inventory\n\n"
+        + table(
+            [
+                "Path",
+                "Category",
+                "SUMMARY section",
+                "Generated notice",
+                "Front matter",
+                "Status",
+                "Owner",
+                "Last reviewed",
+            ],
+            rows,
+        )
+    )
+
+
 def generated_manifest(repo_root: Path) -> str:
     payload = {
         "sources": [
@@ -479,14 +668,11 @@ def generated_manifest(repo_root: Path) -> str:
             "scripts/**/*",
             "scripts/dev/commands.json",
             "README.md",
+            "docs/src/**/*.md",
+            "docs/src/SUMMARY.md",
         ],
         "outputs": [
-            "docs/src/generated/milestone-map.md",
-            "docs/src/generated/algorithm-ledger.md",
-            "docs/src/generated/conformance-case-index.md",
-            "docs/src/generated/object-coverage.md",
-            "docs/src/generated/variable-coverage.md",
-            "docs/src/generated/script-index.md",
+            *GENERATED_DOC_OUTPUTS,
         ],
     }
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
@@ -506,6 +692,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "object-coverage.md": object_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "script-index.md": script_inventory(repo_root),
+        repo_root / "docs" / "src" / "generated" / "docs-inventory.md": docs_inventory(repo_root),
         repo_root / "tools" / "docs" / "generated-docs.manifest.json": generated_manifest(repo_root),
     }
 

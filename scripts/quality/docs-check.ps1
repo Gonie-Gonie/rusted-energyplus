@@ -28,7 +28,8 @@ $required = @(
     "src\generated\conformance-case-index.md",
     "src\generated\object-coverage.md",
     "src\generated\variable-coverage.md",
-    "src\generated\script-index.md"
+    "src\generated\script-index.md",
+    "src\generated\docs-inventory.md"
 )
 
 foreach ($relative in $required) {
@@ -60,6 +61,56 @@ foreach ($relative in @(
 
 $summaryPath = Join-Path $DocsRoot "src\SUMMARY.md"
 $summary = Get-Content -Raw -LiteralPath $summaryPath
+$summaryLines = Get-Content -LiteralPath $summaryPath
+$expectedCurrentLinks = @(
+    "current/project-contract.md",
+    "current/current-status.md",
+    "current/roadmap.md",
+    "current/verification.md",
+    "current/architecture-overview.md",
+    "current/launcher-and-run-framework.md"
+)
+$actualCurrentLinks = @()
+$inCurrentSection = $false
+foreach ($line in $summaryLines) {
+    if ($line -eq "# Current") {
+        $inCurrentSection = $true
+        continue
+    }
+    if ($line.StartsWith("# ") -and $line -ne "# Current") {
+        $inCurrentSection = $false
+    }
+    if ($inCurrentSection -and $line -match '\]\(([^)]+)\)') {
+        $actualCurrentLinks += $Matches[1]
+    }
+}
+if (@($actualCurrentLinks).Count -ne $expectedCurrentLinks.Count) {
+    throw "SUMMARY.md Current navigation must contain exactly $($expectedCurrentLinks.Count) docs."
+}
+for ($index = 0; $index -lt $expectedCurrentLinks.Count; $index += 1) {
+    if ($actualCurrentLinks[$index] -ne $expectedCurrentLinks[$index]) {
+        throw "SUMMARY.md Current navigation mismatch at index $index`: expected $($expectedCurrentLinks[$index]), found $($actualCurrentLinks[$index])"
+    }
+}
+$readmePath = Join-Path $RepoRoot "README.md"
+$readme = Get-Content -Raw -LiteralPath $readmePath
+$readmeH2Count = ([regex]::Matches($readme, '(?m)^## ')).Count
+if ($readmeH2Count -gt 7) {
+    throw "README.md must stay at 7 or fewer h2 sections; found $readmeH2Count."
+}
+$expectedReadmeCurrentLinks = @($expectedCurrentLinks | ForEach-Object { "docs/src/$_" })
+$readmeCurrentLinks = @(
+    [regex]::Matches($readme, '`(docs/src/current/[^`]+\.md)`') |
+        ForEach-Object { $_.Groups[1].Value }
+)
+if (@($readmeCurrentLinks).Count -ne $expectedReadmeCurrentLinks.Count) {
+    throw "README.md current docs list must contain exactly $($expectedReadmeCurrentLinks.Count) docs."
+}
+for ($index = 0; $index -lt $expectedReadmeCurrentLinks.Count; $index += 1) {
+    if ($readmeCurrentLinks[$index] -ne $expectedReadmeCurrentLinks[$index]) {
+        throw "README.md current docs mismatch at index $index`: expected $($expectedReadmeCurrentLinks[$index]), found $($readmeCurrentLinks[$index])"
+    }
+}
 foreach ($forbidden in @("# Archive", "archive/")) {
     if ($summary.Contains($forbidden)) {
         throw "SUMMARY.md must not reference archive documentation: $forbidden"
