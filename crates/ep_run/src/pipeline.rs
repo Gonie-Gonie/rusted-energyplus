@@ -33,7 +33,7 @@ use crate::outputs::{
 };
 use crate::{
     RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RunResultState,
-    RuntimeClass, SupportAssessment, SupportStatus, assess_support,
+    RuntimeClass, SupportAssessment, SupportStatus, TraceLevel, assess_support,
 };
 
 /// Completed arbitrary-run outcome.
@@ -242,7 +242,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
     let execution_plan = simulation_model.as_ref().map(build_execution_plan);
     if let (Some(model), Some(plan)) = (simulation_model.as_ref(), execution_plan.as_ref()) {
-        write_graph_and_plan(&config.output_dir, model, &plan)
+        write_graph_and_plan(&config.output_dir, model, &plan, config.trace_level)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     }
     timing.push(
@@ -1020,6 +1020,7 @@ fn write_graph_and_plan(
     output_dir: &Path,
     model: &SimulationModel,
     plan: &ExecutionPlan,
+    trace_level: TraceLevel,
 ) -> Result<(), String> {
     let graph = &model.graph;
     let graph_summary = json!({
@@ -1043,11 +1044,16 @@ fn write_graph_and_plan(
         &graph_summary,
     )?;
     let source_order_gate = source_order_gate_summary(plan);
+    let stage_snapshots = execution_stage_snapshots(plan, trace_level);
     let plan_json = json!({
         "schema_version": 1,
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
         "source_order_gate": source_order_gate,
+        "trace_level": trace_level.id(),
+        "stage_snapshots_enabled": trace_level_enables_stage_snapshots(trace_level),
+        "stage_snapshot_policy": "metadata-only source-order snapshots generated from ExecutionPlan; no simulation values are read or mutated",
+        "stage_snapshots": stage_snapshots,
         "stages": plan.stages.iter().map(|stage| json!({
             "kind": stage.kind.id(),
             "name": stage.name,
@@ -1064,6 +1070,31 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
     )
+}
+
+fn trace_level_enables_stage_snapshots(trace_level: TraceLevel) -> bool {
+    matches!(trace_level, TraceLevel::Detailed | TraceLevel::Debug)
+}
+
+fn execution_stage_snapshots(plan: &ExecutionPlan, trace_level: TraceLevel) -> Vec<Value> {
+    if !trace_level_enables_stage_snapshots(trace_level) {
+        return Vec::new();
+    }
+
+    plan.stages
+        .iter()
+        .enumerate()
+        .map(|(index, stage)| {
+            json!({
+                "index": index,
+                "kind": stage.kind.id(),
+                "name": stage.name,
+                "source_order_barrier": stage.kind.is_source_order_barrier(),
+                "step_count": stage.steps.len(),
+                "steps": stage.steps.iter().map(execution_step_label).collect::<Vec<_>>(),
+            })
+        })
+        .collect()
 }
 
 fn source_order_gate_summary(plan: &ExecutionPlan) -> SourceOrderGateSummary {
@@ -1478,10 +1509,16 @@ fn markdown_cell(value: &str) -> String {
 mod tests {
     use std::path::Path;
 
-    use super::{artifact_map, source_order_gate_summary};
+    use super::{
+        artifact_map, execution_stage_snapshots, source_order_gate_summary,
+        trace_level_enables_stage_snapshots,
+    };
     use ep_runtime::{
         EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
+        ExecutionStep,
     };
+
+    use crate::TraceLevel;
 
     #[test]
     fn source_order_gate_summary_detects_stage_mismatch() {
@@ -1512,6 +1549,44 @@ mod tests {
             gate.actual_executed_source_order_stages,
             vec!["init-heat-balance"]
         );
+    }
+
+    #[test]
+    fn trace_level_controls_metadata_only_stage_snapshots() {
+        let expected = EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::GetHeatBalanceInput,
+            stage_name: "get-heat-balance-input",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "GetHeatBalanceInput",
+        };
+        let stage = ExecutionStage {
+            kind: ExecutionStageKind::GetHeatBalanceInput,
+            name: "get-heat-balance-input".to_string(),
+            steps: vec![ExecutionStep::UpdateWeather],
+        };
+        let plan = ExecutionPlan {
+            stages: vec![stage],
+            compatibility_stages: vec![expected],
+        };
+
+        assert!(!trace_level_enables_stage_snapshots(TraceLevel::Normal));
+        assert!(trace_level_enables_stage_snapshots(TraceLevel::Detailed));
+        assert!(trace_level_enables_stage_snapshots(TraceLevel::Debug));
+        assert!(execution_stage_snapshots(&plan, TraceLevel::Normal).is_empty());
+
+        let snapshots = execution_stage_snapshots(&plan, TraceLevel::Detailed);
+        assert_eq!(snapshots.len(), 1);
+        assert_eq!(
+            snapshots[0]["kind"].as_str(),
+            Some("get_heat_balance_input")
+        );
+        assert_eq!(
+            snapshots[0]["name"].as_str(),
+            Some("get-heat-balance-input")
+        );
+        assert_eq!(snapshots[0]["source_order_barrier"].as_bool(), Some(true));
+        assert_eq!(snapshots[0]["step_count"].as_u64(), Some(1));
+        assert_eq!(snapshots[0]["steps"][0].as_str(), Some("UpdateWeather"));
     }
 
     #[test]

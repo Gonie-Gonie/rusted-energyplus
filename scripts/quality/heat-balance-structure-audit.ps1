@@ -92,6 +92,7 @@ $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
+$pipeline = "crates\ep_run\src\pipeline.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
 $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
 $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
@@ -124,6 +125,7 @@ foreach ($entry in @(
         @($timestep, "heat-balance timestep ownership module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
+        @($pipeline, "arbitrary-run pipeline"),
         @($runtime, "runtime orchestration root"),
         @($runtimeTestSourceOrder, "runtime source-order tests"),
         @($runtimeTestDynamic, "runtime dynamic heat-balance tests")
@@ -399,9 +401,17 @@ Assert-NotContains -Path $runtime -Pattern 'fn heat_loss_rate_w\s*\(' -Descripti
 Assert-Contains -Path $reports -Pattern 'ReportSurfaceHeatBalance' -Description "surface report owner"
 
 Assert-Contains -Path $executionPlan -Pattern 'ManageZoneAirUpdates' -Description "ManageZoneAirUpdates execution stage kind"
+Assert-Contains -Path $executionPlan -Pattern 'pub const fn is_source_order_barrier' -Description "source-order capable execution stage kind"
 Assert-Contains -Path $executionPlan -Pattern 'manage_heat_balance_source_order_stages' -Description "execution plan consumes heat-balance source-order module"
 Assert-Contains -Path $executionPlan -Pattern 'ExecutionStageKind::ManageZoneAirUpdates' -Description "zone-air steps bind to ManageZoneAirUpdates"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'ExecutionStageKind::ManageZoneAirUpdates' -Description "runtime tests assert ManageZoneAirUpdates barrier"
+Assert-Contains -Path $pipeline -Pattern 'ExecutionPlanSourceOrderMismatch' -Description "stage order mismatch blocks compatibility runtime"
+Assert-Contains -Path $pipeline -Pattern '"source_order_gate": source_order_gate' -Description "execution-plan.json stores source-order gate"
+Assert-Contains -Path $pipeline -Pattern '"compatibility_stages": plan\.compatibility_stages' -Description "execution-plan.json stores expected EnergyPlus stage list"
+Assert-Contains -Path $pipeline -Pattern '"stages": plan\.stages' -Description "execution-plan.json stores executable stage list"
+Assert-Contains -Path $pipeline -Pattern 'trace_level_enables_stage_snapshots' -Description "trace-level stage snapshot switch"
+Assert-Contains -Path $pipeline -Pattern 'stage_snapshot_policy' -Description "stage snapshot non-mutating policy"
+Assert-Contains -Path $pipeline -Pattern 'metadata-only source-order snapshots' -Description "stage snapshots exclude simulation values"
 
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_third_order_zone_air_correction' -Description "third-order zone-air flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_preserves_surface_inside_temperature_for_first_longwave' -Description "first-longwave inside-temperature preservation flag owner"
@@ -423,7 +433,19 @@ Assert-Contains -Path $algorithm -Pattern 'pub enum CompatibilityHeatBalanceAlgo
 Assert-Contains -Path $algorithm -Pattern 'pub enum HeatBalanceZoneAirSelection' -Description "typed heat-balance selection enum"
 Assert-Contains -Path $algorithm -Pattern 'EnergyPlusSourceOrder1ZoneOpaqueCompatibility' -Description "explicit source-order selector"
 Assert-NotContains -Path $algorithm -Pattern 'CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat =>\s*\{\s*HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate' -Description "compatibility selector mapped to legacy candidate alias"
+Assert-NotContains -Path $algorithm -Pattern 'pub enum DiagnosticHeatBalanceProbe' -Description "diagnostic probe enum in compatibility algorithm module"
 Assert-Contains -Path $diagnosticProbe -Pattern 'pub enum DiagnosticHeatBalanceProbe' -Description "diagnostic probe enum"
+Assert-NotContains -Path $diagnosticProbe -Pattern 'pub enum CompatibilityHeatBalanceAlgorithm' -Description "compatibility algorithm enum in diagnostic probe module"
 Assert-Contains -Path $diagnosticProbe -Pattern 'HeatBalanceZoneAirSelection::Diagnostic' -Description "diagnostic selectors remain diagnostic"
+Assert-Contains -Path $diagnosticProbe -Pattern 'Diagnostic-only heat-balance probes and non-claim baselines' -Description "diagnostic probe non-claim boundary"
+Assert-Contains -Path $diagnosticProbe -Pattern 'EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe' -Description "diagnostic probe name includes purpose"
+Assert-Contains -Path $algorithm -Pattern 'allows_conformance_promotion' -Description "diagnostic probes cannot promote conformance"
+Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'assert!\(!probe\.allows_conformance_promotion\(\)\)' -Description "probe alias not accepted as compatibility algorithm"
+Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'comparison_class = "diagnostic-only"' -Description "diagnostic probe manifest class"
+Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'conformance_claim = false' -Description "diagnostic probe manifest claim boundary"
+Assert-Contains -Path "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1" -Pattern 'comparison_class: diagnostic-only' -Description "diagnostic probe report class"
+Assert-Contains -Path "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1" -Pattern 'conformance_claim: false' -Description "diagnostic probe report claim boundary"
+Assert-Contains -Path "crates\ep_conformance\src\tests.rs" -Pattern 'rejects_diagnostic_case_with_true_conformance_claim' -Description "diagnostic probe outputs cannot become conformance claims"
+Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_conformance_candidate_001\case.toml" -Pattern 'conformance_claim = true' -Description "probe removal keeps conformance evidence separate"
 
 Write-Host "Heat-balance structure audit complete."

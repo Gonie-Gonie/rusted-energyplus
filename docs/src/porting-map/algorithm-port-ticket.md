@@ -57,7 +57,8 @@ review policy stay aligned.
 
 ## Review Rules
 
-- A source-order PR must either check `Not an algorithm/source-order change` or pass `pr-port-ticket-check` with completed compatibility, diagnostic, or refactor-only ticket fields.`r`n- A compatibility port must reference an EnergyPlus 26.1.0 source file and
+- A source-order PR must either check `Not an algorithm/source-order change` or pass `pr-port-ticket-check` with completed compatibility, diagnostic, or refactor-only ticket fields.
+- A compatibility port must reference an EnergyPlus 26.1.0 source file and
   routine before code is moved into `heat_balance`, `ideal_loads`,
   `zone_equipment`, or `node` compatibility modules.
 - A diagnostic probe must set `port_type = "diagnostic_probe"` and

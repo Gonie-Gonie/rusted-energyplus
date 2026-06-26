@@ -320,6 +320,15 @@ Assert-NotContains -Path $outdoorAir -Pattern 'energyplus_psychrometric_humidity
 
 Assert-Contains -Path $dispatch -Pattern 'pub fn sim_purchased_air_compat\s*\(' -Description "SimPurchasedAir source-order wrapper"
 Assert-Contains -Path $dispatch -Pattern 'purchased_air_source_order_stages\s*\(' -Description "PurchasedAir source-order stage summary"
+foreach ($routine in @(
+        "GetPurchasedAir",
+        "InitPurchasedAir",
+        "CalcPurchAirLoads",
+        "UpdatePurchasedAir",
+        "ReportPurchasedAir"
+    )) {
+    Assert-Contains -Path $dispatch -Pattern "source_routine: `"$routine`"" -Description "PurchasedAirManager routine $routine"
+}
 Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_RUNTIME_BINDING_SOURCE' -Description "IdealLoads runtime typed-ID binding metadata"
 Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY' -Description "IdealLoads runtime string lookup policy metadata"
 Assert-Contains -Path $dispatch -Pattern 'IdealLoadsFeatureFlags::from_system' -Description "PurchasedAir branch dispatch uses compile feature flags"

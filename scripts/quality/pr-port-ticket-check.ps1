@@ -112,10 +112,17 @@ function Test-AlgorithmPortTicketBody {
         "Write state",
         "History/state ownership",
         "Unsupported state",
+        "Affected variables",
+        "Affected meters",
+        "Diagnostic-only variables",
         "First target case",
+        "Proof variables",
+        "Tolerance candidate",
+        "Report path",
         "Blocking gate",
         "Conformance claim",
-        "Not-claimed branches"
+        "Not-claimed branches",
+        "Partial run allowed"
     )
     $values = @{}
     foreach ($field in $commonFields) {
@@ -138,7 +145,6 @@ function Test-AlgorithmPortTicketBody {
             Assert-FieldEquals -Actual $values["Compatibility path"] -Expected "false" -Name "Compatibility path"
             Assert-FieldEquals -Actual $values["Diagnostic probe used"] -Expected "true" -Name "Diagnostic probe used"
             Assert-FieldEquals -Actual $values["Conformance claim"] -Expected "no" -Name "Conformance claim"
-            [void](Assert-FieldValue -Text $Text -Name "Diagnostic-only variables")
         }
         "refactor_only" {
             Assert-FieldEquals -Actual $values["Diagnostic probe used"] -Expected "false" -Name "Diagnostic probe used"
