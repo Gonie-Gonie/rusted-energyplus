@@ -218,6 +218,7 @@ energyplus_source = [
   "src/EnergyPlus/ScheduleManager.hh",
   "src/EnergyPlus/Psychrometrics.hh",
   "src/EnergyPlus/OutputProcessor.cc",
+  "src/EnergyPlus/HVACSizingSimulationManager.cc",
 ]
 rust_target = [
   "crates/ep_runtime/src/ideal_loads/input.rs::classify_no_oa_no_limit_sensible_subset",

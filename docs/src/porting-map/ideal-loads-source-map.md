@@ -170,6 +170,10 @@ load shortcut:
   node state. Same-timestamp zone air node outputs are retained as diagnostic
   proof rows because they show the post-update node state.
 
+Future official ExampleFile IdealLoads conformance must feed this wrapper from
+the source-order zone heat-balance candidate lane instead of the current
+oracle-demand fixture injection.
+
 The helper uses the EnergyPlus formula order for:
 
 - zone remaining load to heat and cool setpoints

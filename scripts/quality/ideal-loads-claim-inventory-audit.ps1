@@ -229,6 +229,7 @@ foreach ($anchor in @(
     "src/EnergyPlus/HVACSizingSimulationManager.cc",
     "compile-stage typed IdealLoadsAirSystemId, ZoneId, and NodeId binding",
     "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs",
+    "source-order zone heat-balance candidate lane instead of the current",
     "autosized IdealLoads flow/capacity conformance remains"
 )) {
     Assert-TextMatches -Text $idealLoadsSourceMapText -Pattern ([regex]::Escape($anchor)) -Description "IdealLoads source-map anchor: $anchor"
@@ -243,7 +244,8 @@ foreach ($anchor in @(
     "src/EnergyPlus/DataLoopNode.hh",
     "src/EnergyPlus/ScheduleManager.hh",
     "src/EnergyPlus/Psychrometrics.hh",
-    "src/EnergyPlus/OutputProcessor.cc"
+    "src/EnergyPlus/OutputProcessor.cc",
+    "src/EnergyPlus/HVACSizingSimulationManager.cc"
 )) {
     Assert-TextMatches -Text $algorithmLedgerText -Pattern ([regex]::Escape($anchor)) -Description "IdealLoads algorithm ledger source anchor: $anchor"
     $sourceMapAnchorCount += 1

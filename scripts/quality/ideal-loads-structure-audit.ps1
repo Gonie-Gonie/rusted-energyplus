@@ -375,6 +375,8 @@ Assert-Contains -Path $nodeState -Pattern 'pub struct AirNodeState' -Description
 Assert-Contains -Path $nodeState -Pattern 'pub enum NodeStateRole' -Description "NodeStateRole implementation"
 Assert-Contains -Path $nodeState -Pattern 'pub const NODE_STATE_SOURCE_MAP_PATH' -Description "node-state source-map metadata"
 Assert-Contains -Path $nodeState -Pattern 'pub fn node_temperature_setpoint_from_energyplus\s*\(' -Description "EnergyPlus node setpoint sentinel adapter"
+Assert-NotContains -Path $nodeState -Pattern 'IdealLoadsSupplyNodeUpdate' -Description "IdealLoads supply-node transfer struct in generic NodeStateStore"
+Assert-NotContains -Path $nodeState -Pattern 'ideal_loads::' -Description "IdealLoads module dependency in generic NodeStateStore"
 Assert-NotContains -Path $runtime -Pattern 'pub struct NodeStateProjectionOptions' -Description "node projection options in runtime root"
 Assert-NotContains -Path $runtime -Pattern 'pub struct NodeStateProjectionEvidencePolicy' -Description "node projection evidence policy in runtime root"
 Assert-NotContains -Path $runtime -Pattern 'pub fn simulate_ideal_loads_node_state_projection\s*\(' -Description "node projection runtime function in runtime root"
