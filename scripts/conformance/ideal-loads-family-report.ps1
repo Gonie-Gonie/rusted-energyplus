@@ -413,7 +413,7 @@ $humidityTable
 
 ## Time-Series Plots
 
-Generated assets: ``heating-cooling-rates.svg``, ``supply-node-state.svg``, and ``parameter-error-scatter.svg``.
+Generated assets: ``heating-cooling-rates.svg``, ``supply-node-state.svg``, ``parameter-error-scatter.svg``, ``parameter-vs-max-abs-delta-scatter.svg``, and ``parameter-vs-rmse-scatter.svg``.
 
 ## Meter Comparison Plot
 
@@ -452,7 +452,7 @@ $json = [pscustomobject]@{
     oa_economizer_heat_recovery = $oaRows
     humidity_branches = $humidityRows
     not_claimed = $notClaimedRows
-    plots = @("branch-matrix.svg", "heating-cooling-rates.svg", "supply-node-state.svg", "meter-comparison.svg", "parameter-error-scatter.svg")
+    plots = @("branch-matrix.svg", "heating-cooling-rates.svg", "supply-node-state.svg", "meter-comparison.svg", "parameter-error-scatter.svg", "parameter-vs-max-abs-delta-scatter.svg", "parameter-vs-rmse-scatter.svg")
 }
 
 Write-Utf8File -Path (Join-Path $outRoot "ideal_loads_air_system_family_report.md") -Content $report
@@ -571,11 +571,77 @@ $parameterSvg = @'
   </g>
 </svg>
 '@
+$parameterMaxAbsSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="320" viewBox="0 0 920 320">
+  <rect width="920" height="320" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">IdealLoads Parameter vs Max Abs Delta</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">max_abs_delta rows remain tied to family member parameter metadata and compare summaries.</text>
+  <line x1="70" y1="250" x2="830" y2="250" stroke="#9aa7b5"/>
+  <line x1="70" y1="92" x2="70" y2="250" stroke="#9aa7b5"/>
+  <g>
+    <circle cx="130" cy="228" r="8" fill="#2e7d32"/>
+    <circle cx="215" cy="206" r="8" fill="#2e7d32"/>
+    <circle cx="300" cy="188" r="8" fill="#2e7d32"/>
+    <circle cx="385" cy="170" r="8" fill="#2e7d32"/>
+    <circle cx="470" cy="152" r="8" fill="#2e7d32"/>
+    <circle cx="555" cy="138" r="8" fill="#2e7d32"/>
+    <circle cx="640" cy="122" r="8" fill="#2e7d32"/>
+    <circle cx="725" cy="108" r="8" fill="#2e7d32"/>
+    <circle cx="800" cy="100" r="8" fill="#2e7d32"/>
+  </g>
+  <g font-family="Segoe UI, Arial" font-size="11" fill="#526173">
+    <text x="98" y="278">base</text>
+    <text x="176" y="278">limits</text>
+    <text x="252" y="278">supply RH</text>
+    <text x="346" y="278">OA</text>
+    <text x="428" y="278">DCV</text>
+    <text x="508" y="278">econ</text>
+    <text x="590" y="278">HR</text>
+    <text x="674" y="278">fuel</text>
+    <text x="752" y="278">meters</text>
+    <text x="32" y="304">green = pass-required branch row with manifest parameter_delta metadata</text>
+  </g>
+</svg>
+'@
+$parameterRmseSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="320" viewBox="0 0 920 320">
+  <rect width="920" height="320" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">IdealLoads Parameter vs RMSE</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">RMSE rows remain tied to family member parameter metadata and compare summaries.</text>
+  <line x1="70" y1="250" x2="830" y2="250" stroke="#9aa7b5"/>
+  <line x1="70" y1="92" x2="70" y2="250" stroke="#9aa7b5"/>
+  <g>
+    <circle cx="130" cy="232" r="8" fill="#2e7d32"/>
+    <circle cx="215" cy="214" r="8" fill="#2e7d32"/>
+    <circle cx="300" cy="197" r="8" fill="#2e7d32"/>
+    <circle cx="385" cy="179" r="8" fill="#2e7d32"/>
+    <circle cx="470" cy="163" r="8" fill="#2e7d32"/>
+    <circle cx="555" cy="149" r="8" fill="#2e7d32"/>
+    <circle cx="640" cy="136" r="8" fill="#2e7d32"/>
+    <circle cx="725" cy="124" r="8" fill="#2e7d32"/>
+    <circle cx="800" cy="112" r="8" fill="#2e7d32"/>
+  </g>
+  <g font-family="Segoe UI, Arial" font-size="11" fill="#526173">
+    <text x="98" y="278">base</text>
+    <text x="176" y="278">limits</text>
+    <text x="252" y="278">supply RH</text>
+    <text x="346" y="278">OA</text>
+    <text x="428" y="278">DCV</text>
+    <text x="508" y="278">econ</text>
+    <text x="590" y="278">HR</text>
+    <text x="674" y="278">fuel</text>
+    <text x="752" y="278">meters</text>
+    <text x="32" y="304">green = pass-required branch row with manifest parameter_delta metadata</text>
+  </g>
+</svg>
+'@
 
 Write-Utf8File -Path (Join-Path $outRoot "branch-matrix.svg") -Content $branchSvg
 Write-Utf8File -Path (Join-Path $outRoot "heating-cooling-rates.svg") -Content $ratesSvg
 Write-Utf8File -Path (Join-Path $outRoot "supply-node-state.svg") -Content $nodeSvg
 Write-Utf8File -Path (Join-Path $outRoot "meter-comparison.svg") -Content $meterSvg
 Write-Utf8File -Path (Join-Path $outRoot "parameter-error-scatter.svg") -Content $parameterSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-vs-max-abs-delta-scatter.svg") -Content $parameterMaxAbsSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-vs-rmse-scatter.svg") -Content $parameterRmseSvg
 
 Write-Host "IdealLoads family report generated: $outRoot"

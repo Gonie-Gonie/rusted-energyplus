@@ -30,6 +30,25 @@ function Assert-Equal {
     Write-Host "OK $Description`: $Actual"
 }
 
+function Assert-SnapshotPresent {
+    param(
+        [Parameter(Mandatory = $true)][object[]]$Snapshots,
+        [Parameter(Mandatory = $true)][string]$StageName,
+        [Parameter(Mandatory = $true)][string]$Point,
+        [string]$Substage = "",
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $matches = @(
+        $Snapshots | Where-Object {
+            $_.stage_name -eq $StageName -and
+            $_.point -eq $Point -and
+            ([string]::IsNullOrWhiteSpace($Substage) -or $_.substage -eq $Substage)
+        }
+    )
+    Assert-Equal -Actual $matches.Count -Expected 1 -Description $Description
+}
+
 $cargo = Get-Command cargo -ErrorAction SilentlyContinue
 if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
@@ -116,8 +135,44 @@ Assert-File -Path (Join-Path $traceOutputDir "logs\source-order-stage-state-snap
 $stageStateSnapshots = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $traceOutputDir "logs\source-order-stage-state-snapshots.json") | ConvertFrom-Json
 Assert-Equal -Actual $stageStateSnapshots.schema_version -Expected 1 -Description "stage state snapshot schema version"
 Assert-Equal -Actual $stageStateSnapshots.artifact_class -Expected "diagnostic-trace" -Description "stage state snapshot artifact class"
-Assert-Equal -Actual @($stageStateSnapshots.snapshots | Where-Object { $_.stage_name -eq "init-heat-balance" -and $_.point -eq "before" }).Count -Expected 1 -Description "InitHeatBalance before snapshot"
-Assert-Equal -Actual @($stageStateSnapshots.snapshots | Where-Object { $_.stage_name -eq "init-heat-balance" -and $_.point -eq "after" }).Count -Expected 1 -Description "InitHeatBalance after snapshot"
+foreach ($stage in @(
+    "init-heat-balance",
+    "calc-heat-balance-outside-surf",
+    "calc-heat-balance-inside-surf",
+    "manage-air-heat-balance",
+    "update-thermal-histories",
+    "report-surface-heat-balance"
+)) {
+    Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName $stage -Point "before" -Description "$stage before snapshot"
+    Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName $stage -Point "after" -Description "$stage after snapshot"
+}
+Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "manage-zone-air-updates" -Point "before" -Substage "ZoneTempPredictorCorrector::PredictStep" -Description "PredictStep before snapshot"
+Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "manage-zone-air-updates" -Point "after" -Substage "ZoneTempPredictorCorrector::PredictStep" -Description "PredictStep after snapshot"
+Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "manage-zone-air-updates" -Point "before" -Substage "ZoneTempPredictorCorrector::CorrectStep" -Description "CorrectStep before snapshot"
+Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "manage-zone-air-updates" -Point "after" -Substage "ZoneTempPredictorCorrector::CorrectStep" -Description "CorrectStep after snapshot"
+
+$idealLoadsTraceOutputDir = ".runtime\arbitrary-run-ideal-loads-detailed-trace-smoke-script"
+$idealLoadsTraceInput = "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\ideal_loads_no_oa_sensible_conformance.idf"
+Write-Host "Running IdealLoads detailed trace dry-run smoke: $idealLoadsTraceInput"
+$idealLoadsTraceOutput = & $exe run $idealLoadsTraceInput -d $idealLoadsTraceOutputDir --mode compatibility --partial deny --format rust-native --trace-level detailed --dry-run --overwrite 2>&1
+$idealLoadsTraceExitCode = $LASTEXITCODE
+if ($idealLoadsTraceExitCode -ne 0) {
+    $idealLoadsTraceOutput | ForEach-Object { Write-Host $_ }
+    throw "Expected dry-run exit code 0 from IdealLoads detailed trace run, got $idealLoadsTraceExitCode."
+}
+Assert-File -Path (Join-Path $idealLoadsTraceOutputDir "logs\source-order-stage-state-snapshots.json")
+$idealLoadsStageStateSnapshots = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $idealLoadsTraceOutputDir "logs\source-order-stage-state-snapshots.json") | ConvertFrom-Json
+Assert-Equal -Actual $idealLoadsStageStateSnapshots.schema_version -Expected 1 -Description "IdealLoads stage state snapshot schema version"
+Assert-Equal -Actual $idealLoadsStageStateSnapshots.artifact_class -Expected "diagnostic-trace" -Description "IdealLoads stage state snapshot artifact class"
+foreach ($stage in @(
+    "sim-purchased-air",
+    "calc-purch-air-loads",
+    "update-purchased-air",
+    "report-purchased-air"
+)) {
+    Assert-SnapshotPresent -Snapshots @($idealLoadsStageStateSnapshots.snapshots) -StageName $stage -Point "before" -Description "$stage before snapshot"
+    Assert-SnapshotPresent -Snapshots @($idealLoadsStageStateSnapshots.snapshots) -StageName $stage -Point "after" -Description "$stage after snapshot"
+}
 
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"

@@ -994,6 +994,12 @@
                          "help":  "Generate and audit the official 1ZoneUncontrolled family report artifacts."
                      },
                      {
+                         "name":  "one-zone-family-run",
+                         "path":  "conformance\\one-zone-family-run.ps1",
+                         "group":  "conformance",
+                         "help":  "Run every official 1ZoneUncontrolled family member and verify compare summaries."
+                     },
+                     {
                          "name":  "ideal-loads-family-report",
                          "path":  "conformance\\ideal-loads-family-report.ps1",
                          "group":  "conformance",

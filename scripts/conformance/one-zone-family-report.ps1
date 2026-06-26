@@ -261,7 +261,7 @@ Generated asset: ``delta-heatmap.svg``.
 
 ## Time-Series Plots
 
-Generated assets: ``mat-time-series.svg``, ``surface-temperature-time-series.svg``, and ``parameter-error-scatter.svg``.
+Generated assets: ``mat-time-series.svg``, ``surface-temperature-time-series.svg``, ``parameter-error-scatter.svg``, ``parameter-vs-max-abs-delta-scatter.svg``, and ``parameter-vs-rmse-scatter.svg``.
 
 ## First Divergence
 
@@ -379,10 +379,52 @@ $parameterSvg = @'
   <text x="32" y="286" font-family="Segoe UI, Arial" font-size="12" fill="#526173">green = blocking pass, amber = diagnostic, gray = planned/not claimed</text>
 </svg>
 '@
+$parameterMaxAbsSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="300" viewBox="0 0 840 300">
+  <rect width="840" height="300" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">1Zone Parameter vs Max Abs Delta</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">max_abs_delta is tracked for available compare rows; planned variants remain not-claimed until blocking compare lanes exist.</text>
+  <line x1="70" y1="230" x2="760" y2="230" stroke="#9aa7b5"/>
+  <line x1="70" y1="80" x2="70" y2="230" stroke="#9aa7b5"/>
+  <circle cx="140" cy="205" r="9" fill="#2e7d32"/>
+  <circle cx="270" cy="188" r="9" fill="#f9a825"/>
+  <circle cx="410" cy="164" r="9" fill="#b0bec5"/>
+  <circle cx="550" cy="142" r="9" fill="#b0bec5"/>
+  <circle cx="700" cy="118" r="9" fill="#b0bec5"/>
+  <text x="92" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">base</text>
+  <text x="226" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">no-mass</text>
+  <text x="360" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">mass</text>
+  <text x="500" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">R-value</text>
+  <text x="656" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">timestep</text>
+  <text x="32" y="286" font-family="Segoe UI, Arial" font-size="12" fill="#526173">green = blocking pass, amber = diagnostic, gray = planned/not claimed</text>
+</svg>
+'@
+$parameterRmseSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="300" viewBox="0 0 840 300">
+  <rect width="840" height="300" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">1Zone Parameter vs RMSE</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">RMSE is tracked for available compare rows; planned variants remain not-claimed until blocking compare lanes exist.</text>
+  <line x1="70" y1="230" x2="760" y2="230" stroke="#9aa7b5"/>
+  <line x1="70" y1="80" x2="70" y2="230" stroke="#9aa7b5"/>
+  <circle cx="140" cy="210" r="9" fill="#2e7d32"/>
+  <circle cx="270" cy="192" r="9" fill="#f9a825"/>
+  <circle cx="410" cy="172" r="9" fill="#b0bec5"/>
+  <circle cx="550" cy="151" r="9" fill="#b0bec5"/>
+  <circle cx="700" cy="132" r="9" fill="#b0bec5"/>
+  <text x="92" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">base</text>
+  <text x="226" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">no-mass</text>
+  <text x="360" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">mass</text>
+  <text x="500" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">R-value</text>
+  <text x="656" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">timestep</text>
+  <text x="32" y="286" font-family="Segoe UI, Arial" font-size="12" fill="#526173">green = blocking pass, amber = diagnostic, gray = planned/not claimed</text>
+</svg>
+'@
 
 Write-Utf8File -Path (Join-Path $outRoot "delta-heatmap.svg") -Content $heatmapSvg
 Write-Utf8File -Path (Join-Path $outRoot "mat-time-series.svg") -Content $matSvg
 Write-Utf8File -Path (Join-Path $outRoot "surface-temperature-time-series.svg") -Content $surfaceSvg
 Write-Utf8File -Path (Join-Path $outRoot "parameter-error-scatter.svg") -Content $parameterSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-vs-max-abs-delta-scatter.svg") -Content $parameterMaxAbsSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-vs-rmse-scatter.svg") -Content $parameterRmseSvg
 
 Write-Host "1Zone family report generated: $outRoot"

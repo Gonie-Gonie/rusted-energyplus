@@ -183,6 +183,18 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "1Zone family parameter variation versus error scatter plot.",
         },
         {
+            "role": "one-zone-family-parameter-max-abs-delta-scatter",
+            "path": evidence_path(repo_root, version, "one-zone-family/parameter-vs-max-abs-delta-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "1Zone family parameter variation versus max_abs_delta scatter plot.",
+        },
+        {
+            "role": "one-zone-family-parameter-rmse-scatter",
+            "path": evidence_path(repo_root, version, "one-zone-family/parameter-vs-rmse-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "1Zone family parameter variation versus RMSE scatter plot.",
+        },
+        {
             "role": "ideal-loads-family-report-markdown",
             "path": evidence_path(repo_root, version, "ideal-loads-family/ideal_loads_air_system_family_report.md"),
             "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
@@ -223,6 +235,18 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": evidence_path(repo_root, version, "ideal-loads-family/parameter-error-scatter.svg"),
             "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
             "user_purpose": "IdealLoads family parameter variation versus error scatter plot.",
+        },
+        {
+            "role": "ideal-loads-family-parameter-max-abs-delta-scatter",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/parameter-vs-max-abs-delta-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family parameter variation versus max_abs_delta scatter plot.",
+        },
+        {
+            "role": "ideal-loads-family-parameter-rmse-scatter",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/parameter-vs-rmse-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family parameter variation versus RMSE scatter plot.",
         },
         {
             "role": "support-coverage-pdf",
