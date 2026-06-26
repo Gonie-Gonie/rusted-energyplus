@@ -5,9 +5,32 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $ScriptsRoot "lib\common.ps1")
+Add-CargoBinToPath
 
 $RepoRoot = Get-RepoRoot
 Set-Location $RepoRoot
+
+function Assert-File {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [string]$Description = "artifact"
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing expected $Description`: $Path"
+    }
+    Write-Host "OK $Description`: $Path"
+}
+
+function Assert-Directory {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [string]$Description = "directory"
+    )
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+        throw "Missing expected $Description`: $Path"
+    }
+    Write-Host "OK $Description`: $Path"
+}
 
 function Assert-Equal {
     param(
@@ -69,6 +92,64 @@ function Assert-NotMatches {
     Write-Host "OK absent $Description`: $Pattern"
 }
 
+function Read-JsonFile {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    return Get-Content -Encoding UTF8 -Raw -LiteralPath $Path | ConvertFrom-Json
+}
+
+function Write-Utf8NoBomFile {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Contents
+    )
+    $directory = Split-Path -Parent $Path
+    if (-not [string]::IsNullOrWhiteSpace($directory)) {
+        New-Item -ItemType Directory -Force -Path $directory | Out-Null
+    }
+    $encoding = New-Object System.Text.UTF8Encoding -ArgumentList $false
+    [System.IO.File]::WriteAllText($Path, $Contents, $encoding)
+}
+
+function Invoke-LauncherCliRun {
+    param(
+        [Parameter(Mandatory = $true)][string]$Description,
+        [Parameter(Mandatory = $true)][string[]]$Arguments,
+        [Parameter(Mandatory = $true)][int]$ExpectedExitCode,
+        [Parameter(Mandatory = $true)][string]$OutputDir
+    )
+
+    if (Test-Path -LiteralPath $OutputDir) {
+        Remove-Item -Recurse -Force -LiteralPath $OutputDir
+    }
+
+    Write-Host "Running launcher-equivalent CLI case: $Description"
+    $output = & $script:CliExe @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne $ExpectedExitCode) {
+        $output | ForEach-Object { Write-Host $_ }
+        throw "Unexpected $Description exit code: expected $ExpectedExitCode, got $exitCode"
+    }
+
+    $summaryPath = Join-Path $OutputDir "run-summary.json"
+    Assert-File -Path $summaryPath -Description "$Description run summary"
+    $summary = Read-JsonFile -Path $summaryPath
+    return $summary
+}
+
+function Assert-LauncherRunSummary {
+    param(
+        [Parameter(Mandatory = $true)]$Summary,
+        [Parameter(Mandatory = $true)][string]$ExpectedStatus,
+        [Parameter(Mandatory = $true)][int]$ExpectedExitCode,
+        [Parameter(Mandatory = $true)][string]$ExpectedRunResultState,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    Assert-Equal -Actual $Summary.status -Expected $ExpectedStatus -Description "$Description status"
+    Assert-Equal -Actual $Summary.exit_code -Expected $ExpectedExitCode -Description "$Description exit code"
+    Assert-Equal -Actual $Summary.support.run_result_state -Expected $ExpectedRunResultState -Description "$Description run result state"
+    Assert-Equal -Actual $Summary.support.conformance_claim -Expected $false -Description "$Description conformance claim"
+}
+
 $launcherScript = Join-Path $RepoRoot "scripts\gui\eplus-rs-launch.ps1"
 if (-not (Test-Path -LiteralPath $launcherScript -PathType Leaf)) {
     throw "Missing launcher script: $launcherScript"
@@ -88,6 +169,8 @@ Assert-Matches -Text $launcherText -Pattern "Cancel-Run" -Description "launcher 
 Assert-Matches -Text $launcherText -Pattern "Read-RunSummaryStatus" -Description "launcher run-summary reader"
 Assert-Matches -Text $launcherText -Pattern "Read-RunDiagnostics" -Description "launcher diagnostics reader"
 Assert-Matches -Text $launcherText -Pattern "support-report\.md" -Description "launcher support report link"
+Assert-Matches -Text $launcherText -Pattern ([regex]::Escape('Open-Path -Path $script:OutputDir')) -Description "launcher open output handler"
+Assert-Matches -Text $launcherText -Pattern "ScreenshotPath" -Description "launcher screenshot capture option"
 Assert-NotMatches -Text $launcherText -Pattern "support-assessment\s" -Description "launcher support pre-step command"
 foreach ($progressStage in @("Input", "Convert", "RawModel", "TypedModel", "Graph", "Support", "Plan", "Runtime", "Export", "Oracle", "Compare")) {
     Assert-Matches -Text $launcherText -Pattern ([regex]::Escape($progressStage)) -Description "launcher progress stage $progressStage"
@@ -104,6 +187,25 @@ if ($LASTEXITCODE -ne 0) {
 }
 $selfTest = ($selfTestOutput -join "`n") | ConvertFrom-Json
 Assert-Equal -Actual $selfTest.self_test -Expected "passed" -Description "launcher self-test status"
+
+$smokeRoot = Join-Path $RepoRoot ".runtime\launcher-smoke"
+New-Item -ItemType Directory -Force -Path $smokeRoot | Out-Null
+$screenshotPath = Join-Path $smokeRoot "launcher-ready.png"
+if (Test-Path -LiteralPath $screenshotPath) {
+    Remove-Item -Force -LiteralPath $screenshotPath
+}
+Write-Host "Capturing launcher screenshot evidence: $screenshotPath"
+$screenshotOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $launcherScript -ScreenshotPath $screenshotPath 2>&1
+if ($LASTEXITCODE -ne 0) {
+    $screenshotOutput | ForEach-Object { Write-Host $_ }
+    throw "Launcher screenshot capture failed with exit code $LASTEXITCODE"
+}
+Assert-File -Path $screenshotPath -Description "launcher screenshot evidence"
+$screenshotInfo = Get-Item -LiteralPath $screenshotPath
+if ($screenshotInfo.Length -le 1000) {
+    throw "Launcher screenshot evidence is unexpectedly small: $($screenshotInfo.Length) bytes"
+}
+Write-Host "OK launcher screenshot bytes: $($screenshotInfo.Length)"
 
 $diagnosticArgs = @($selfTest.diagnostic_arguments)
 foreach ($required in @("run", "--mode", "diagnostic", "--partial", "allow", "--format", "rust-native", "--trace-level", "debug", "--fail-on-warning", "--overwrite")) {
@@ -143,7 +245,7 @@ Assert-Equal -Actual $blockedOracle.Count -Expected 1 -Description "blocked run 
 Assert-Matches -Text ([string]$selfTest.phase_line) -Pattern "support_assessment" -Description "phase timing support assessment"
 Assert-Matches -Text ([string]$selfTest.phase_line) -Pattern "ep_run" -Description "phase timing engine"
 
-$launcherExe = Join-Path $RepoRoot ".runtime\launcher-smoke\eplus-rs-launch.exe"
+$launcherExe = Join-Path $smokeRoot "eplus-rs-launch.exe"
 Write-Host "Building launcher executable self-test: $launcherExe"
 $buildOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $launcherBuildScript -OutputPath $launcherExe -SelfTest 2>&1
 if ($LASTEXITCODE -ne 0) {
@@ -156,5 +258,214 @@ if ([int64]$build.bytes -le 0) {
     throw "Launcher executable was empty: $($build.output_path)"
 }
 Write-Host "OK launcher executable bytes: $($build.bytes)"
+
+$cargo = Get-Command cargo -ErrorAction SilentlyContinue
+if ($null -eq $cargo) {
+    throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
+}
+
+Write-Host "Building eplus-rs CLI for launcher run validation."
+& $cargo.Source build -p ep_cli --quiet
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to build ep_cli."
+}
+
+$script:CliExe = Join-Path $RepoRoot "target\debug\eplus-rs.exe"
+Assert-File -Path $script:CliExe -Description "launcher CLI binary"
+
+$fixtureRoot = Join-Path $smokeRoot "fixtures"
+New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
+
+$weatherPath = Join-Path $fixtureRoot "one-day.epw"
+$weatherLines = @(
+@'
+LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+'@
+)
+foreach ($hour in 1..24) {
+    $weatherLines += "1999,1,1,$hour,0,Source,-3.0,-4.0,50,82000,0,0,300,10,20,30,0,0,0,0,180,2.5"
+}
+Write-Utf8NoBomFile -Path $weatherPath -Contents (($weatherLines -join "`n") + "`n")
+
+$oneZonePath = Join-Path $fixtureRoot "one-zone.epJSON"
+Write-Utf8NoBomFile -Path $oneZonePath -Contents @'
+{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Building": {"Defaulted Building": {"terrain": "Suburbs"}},
+  "Timestep": {"Timestep 1": {}},
+  "Site:Location": {"Denver Site": {"latitude": 39.74, "longitude": -105.18}},
+  "Material:NoMass": {"R13": {"thermal_resistance": 2.29}},
+  "Construction": {"Wall Construction": {"outside_layer": "R13"}},
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "numeric_type": "Continuous",
+      "upper_limit_value": 1.0
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {"schedule_type_limits_name": "Fraction"}
+  },
+  "Zone": {"Zone One": {"volume": 100}},
+  "BuildingSurface:Detailed": {
+    "Wall One": {
+      "construction_name": "Wall Construction",
+      "outside_boundary_condition": "Outdoors",
+      "surface_type": "Wall",
+      "vertices": [
+        {"vertex_x_coordinate": 0.0, "vertex_y_coordinate": 0.0, "vertex_z_coordinate": 0.0},
+        {"vertex_x_coordinate": 1.0, "vertex_y_coordinate": 0.0, "vertex_z_coordinate": 0.0},
+        {"vertex_x_coordinate": 1.0, "vertex_y_coordinate": 1.0, "vertex_z_coordinate": 0.0},
+        {"vertex_x_coordinate": 0.0, "vertex_y_coordinate": 1.0, "vertex_z_coordinate": 0.0}
+      ],
+      "zone_name": "Zone One"
+    }
+  }
+}
+'@
+
+$idealLoadsPath = Join-Path $fixtureRoot "ideal-loads.epJSON"
+Write-Utf8NoBomFile -Path $idealLoadsPath -Contents @'
+{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "Schedule:Constant": {
+    "Control Type": {"hourly_value": 4},
+    "Heating Setpoint": {"hourly_value": 21},
+    "Cooling Setpoint": {"hourly_value": 24}
+  },
+  "ThermostatSetpoint:DualSetpoint": {
+    "Dual Setpoints": {
+      "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+      "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+    }
+  },
+  "ZoneControl:Thermostat": {
+    "Zone Thermostat": {
+      "zone_or_zonelist_name": "Zone One",
+      "control_type_schedule_name": "Control Type",
+      "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+      "control_1_name": "Dual Setpoints"
+    }
+  },
+  "NodeList": {
+    "Zone Inlets": {
+      "nodes": [{"node_name": "Zone One Inlet"}]
+    }
+  },
+  "ZoneHVAC:IdealLoadsAirSystem": {
+    "Zone Ideal Loads": {
+      "zone_supply_air_node_name": "Zone Inlets",
+      "dehumidification_control_type": "None",
+      "humidification_control_type": "None"
+    }
+  },
+  "ZoneHVAC:EquipmentList": {
+    "Zone Equipment": {
+      "equipment": [
+        {
+          "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+          "zone_equipment_name": "Zone Ideal Loads",
+          "zone_equipment_cooling_sequence": 1,
+          "zone_equipment_heating_or_no_load_sequence": 1
+        }
+      ]
+    }
+  },
+  "ZoneHVAC:EquipmentConnections": {
+    "Zone One": {
+      "zone_name": "Zone One",
+      "zone_conditioning_equipment_list_name": "Zone Equipment",
+      "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
+      "zone_air_node_name": "Zone One Air Node",
+      "zone_return_air_node_or_nodelist_name": "Zone One Return"
+    }
+  }
+}
+'@
+
+$airLoopPath = Join-Path $fixtureRoot "air-loop.epJSON"
+Write-Utf8NoBomFile -Path $airLoopPath -Contents @'
+{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "AirLoopHVAC": {"Main Air Loop": {}}
+}
+'@
+
+$oneZoneOutput = Join-Path $smokeRoot "one-zone-output"
+$oneZoneSummary = Invoke-LauncherCliRun `
+    -Description "supported 1Zone fixture" `
+    -Arguments @("run", $oneZonePath, "-w", $weatherPath, "-d", $oneZoneOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 0 `
+    -OutputDir $oneZoneOutput
+Assert-LauncherRunSummary -Summary $oneZoneSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "supported 1Zone"
+Assert-Directory -Path $oneZoneOutput -Description "launcher output folder"
+Assert-File -Path (Join-Path $oneZoneOutput "results\result-store.json") -Description "supported 1Zone result store"
+
+$idealLoadsOutput = Join-Path $smokeRoot "ideal-loads-output"
+$idealLoadsSummary = Invoke-LauncherCliRun `
+    -Description "supported IdealLoads fixture" `
+    -Arguments @("run", $idealLoadsPath, "-d", $idealLoadsOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 0 `
+    -OutputDir $idealLoadsOutput
+Assert-LauncherRunSummary -Summary $idealLoadsSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "supported IdealLoads"
+Assert-Equal -Actual $idealLoadsSummary.support.runtime_class -Expected "ideal-loads-no-oa-sensible-compatibility" -Description "supported IdealLoads runtime class"
+
+$airLoopOutput = Join-Path $smokeRoot "air-loop-output"
+$airLoopSummary = Invoke-LauncherCliRun `
+    -Description "AirLoop blocked fixture" `
+    -Arguments @("run", $airLoopPath, "-d", $airLoopOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 4 `
+    -OutputDir $airLoopOutput
+Assert-LauncherRunSummary -Summary $airLoopSummary -ExpectedStatus "unsupported" -ExpectedExitCode 4 -ExpectedRunResultState "run_blocked" -Description "AirLoop blocked"
+Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $airLoopOutput "diagnostics.json")) -Pattern "UnsupportedHVACObject" -Description "AirLoop blocked diagnostics"
+
+$plantLoopPath = Join-Path $RepoRoot "data\testcases\minimal\plant-loop-skeleton.epJSON"
+Assert-File -Path $plantLoopPath -Description "PlantLoop fixture"
+$plantLoopOutput = Join-Path $smokeRoot "plant-loop-output"
+$plantLoopSummary = Invoke-LauncherCliRun `
+    -Description "PlantLoop blocked fixture" `
+    -Arguments @("run", $plantLoopPath, "-d", $plantLoopOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 4 `
+    -OutputDir $plantLoopOutput
+Assert-LauncherRunSummary -Summary $plantLoopSummary -ExpectedStatus "unsupported" -ExpectedExitCode 4 -ExpectedRunResultState "run_blocked" -Description "PlantLoop blocked"
+Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $plantLoopOutput "diagnostics.json")) -Pattern "UnsupportedPlantObject" -Description "PlantLoop blocked diagnostics"
+
+$missingWeatherOutput = Join-Path $smokeRoot "missing-weather-output"
+$missingWeatherSummary = Invoke-LauncherCliRun `
+    -Description "missing weather diagnostic fixture" `
+    -Arguments @("run", $oneZonePath, "-d", $missingWeatherOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 1 `
+    -OutputDir $missingWeatherOutput
+Assert-LauncherRunSummary -Summary $missingWeatherSummary -ExpectedStatus "args" -ExpectedExitCode 1 -ExpectedRunResultState "supported_compatibility_run" -Description "missing weather"
+Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $missingWeatherOutput "diagnostics.json")) -Pattern "MissingWeatherFile" -Description "missing weather diagnostics"
+
+$oracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
+$oracleIdf = Join-Path $oracleRoot "ExampleFiles\1ZoneUncontrolled.idf"
+$oracleWeather = Join-Path $oracleRoot "WeatherData\USA_CO_Golden-NREL.724666_TMY3.epw"
+$energyplusExe = Join-Path $oracleRoot "energyplus.exe"
+$convertExe = Join-Path $oracleRoot "ConvertInputFormat.exe"
+foreach ($required in @($oracleIdf, $oracleWeather, $energyplusExe, $convertExe)) {
+    Assert-File -Path $required -Description "launcher oracle prerequisite"
+}
+
+$compareOutput = Join-Path $smokeRoot "compare-output"
+$compareSummary = Invoke-LauncherCliRun `
+    -Description "oracle compare fixture" `
+    -Arguments @("run", $oracleIdf, "-w", $oracleWeather, "-d", $compareOutput, "--mode", "compatibility", "--partial", "deny", "--format", "both", "--trace-level", "normal", "--overwrite", "--compare-oracle", "--oracle-root", $oracleRoot) `
+    -ExpectedExitCode 8 `
+    -OutputDir $compareOutput
+Assert-LauncherRunSummary -Summary $compareSummary -ExpectedStatus "oracle-compare" -ExpectedExitCode 8 -ExpectedRunResultState "supported_compatibility_run" -Description "oracle compare"
+Assert-Equal -Actual $compareSummary.oracle_status -Expected "generated" -Description "oracle compare oracle status"
+Assert-Equal -Actual $compareSummary.compare_status -Expected "fail" -Description "oracle compare status"
+Assert-File -Path (Join-Path $compareOutput "compare\compare-report.md") -Description "launcher compare report"
 
 Write-Host "Launcher smoke passed."

@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [switch]$SelfTest
+    [switch]$SelfTest,
+    [string]$ScreenshotPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -715,4 +716,24 @@ $form.Add_FormClosing({
 })
 
 Refresh-Ui
+
+if (-not [string]::IsNullOrWhiteSpace($ScreenshotPath)) {
+    $screenshotDirectory = Split-Path -Parent $ScreenshotPath
+    if (-not [string]::IsNullOrWhiteSpace($screenshotDirectory)) {
+        New-Item -ItemType Directory -Force -Path $screenshotDirectory | Out-Null
+    }
+    $form.CreateControl()
+    $bitmap = New-Object System.Drawing.Bitmap($form.Width, $form.Height)
+    try {
+        $bounds = New-Object System.Drawing.Rectangle(0, 0, $form.Width, $form.Height)
+        $form.DrawToBitmap($bitmap, $bounds)
+        $bitmap.Save($ScreenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
+    }
+    finally {
+        $bitmap.Dispose()
+        $form.Dispose()
+    }
+    exit 0
+}
+
 [void]$form.ShowDialog()
