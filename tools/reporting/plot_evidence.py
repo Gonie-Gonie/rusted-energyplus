@@ -514,7 +514,7 @@ def trace_overhead_plot(repo_root: Path, version: str) -> Any:
     labels = [str(case.get("case_id", f"C{index + 1}"))[:42] for index, case in enumerate(cases)]
     values = []
     for case in cases:
-        stat = case.get("release_gate_overhead", {})
+        stat = case.get("trace_overhead") or case.get("release_gate_overhead", {})
         values.append(float(stat.get("mean") or 0.0))
     if not values:
         labels = ["missing"]
@@ -528,7 +528,7 @@ def trace_overhead_plot(repo_root: Path, version: str) -> Any:
     ax.set_yticks(y_values, labels)
     ax.invert_yaxis()
     ax.set_xlabel("Mean seconds")
-    ax.set_title("Trace and Report Overhead", loc="left", fontweight="bold")
+    ax.set_title("Trace Overhead", loc="left", fontweight="bold")
     style_axis(ax, "x")
     fig.tight_layout()
     return fig

@@ -135,6 +135,11 @@ struct PreparedRuntimeInputs {
     weather_records: Option<Vec<EpwRecord>>,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct GraphAndPlanExportSummary {
+    trace_wall_seconds: f64,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize)]
 struct SourceOrderGateSummary {
     expected_source_order_stages: Vec<String>,
@@ -245,13 +250,22 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     write_compile_artifacts(&config.output_dir, &compile_result.report, typed_model)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
 
-    let plan_start = Instant::now();
+    let graph_start = Instant::now();
     let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
+    timing.push(
+        "graph_build",
+        "ep_model",
+        graph_start.elapsed().as_secs_f64(),
+        "build SimulationModel and ModelGraph from typed model",
+    );
+
+    let plan_start = Instant::now();
     let runtime_precomputed = simulation_model.as_ref().map(precompute_runtime_data);
+    let mut graph_and_plan_export = GraphAndPlanExportSummary::default();
     if let (Some(model), Some(precomputed)) =
         (simulation_model.as_ref(), runtime_precomputed.as_ref())
     {
-        write_graph_and_plan(
+        graph_and_plan_export = write_graph_and_plan(
             &config.output_dir,
             model,
             precomputed,
@@ -264,7 +278,13 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         "execution_plan",
         "ep_runtime",
         plan_start.elapsed().as_secs_f64(),
-        "precompute ModelGraph runtime data, ExecutionPlan, and OutputRegistry for supported typed subset",
+        "precompute ExecutionPlan and OutputRegistry for supported typed subset, then write plan artifacts",
+    );
+    timing.push(
+        "trace_overhead",
+        "ep_run",
+        graph_and_plan_export.trace_wall_seconds,
+        "generate trace metadata and optional source-order stage snapshot artifacts",
     );
 
     let support_start = Instant::now();
@@ -645,9 +665,6 @@ fn finish_successful_summary(
     exit_code: RunExitCode,
     message: &str,
 ) -> Result<RunOutcome, RunError> {
-    timing.total_wall_seconds = timing
-        .total_wall_seconds
-        .max(timing.phases.iter().map(|phase| phase.wall_seconds).sum());
     write_json(&config.output_dir.join("diagnostics.json"), &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     write_text(
@@ -655,6 +672,7 @@ fn finish_successful_summary(
         &render_eplusrs_err(&diagnostics, exit_code),
     )
     .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+    let report_start = Instant::now();
     let report = render_run_report(
         assessment,
         rust_runtime_result.is_some(),
@@ -679,6 +697,15 @@ fn finish_successful_summary(
         "command: eplus-rs run <input> --weather <epw> --output-dir <dir>\n",
     )
     .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+    timing.push(
+        "report_generation",
+        "ep_run",
+        report_start.elapsed().as_secs_f64(),
+        "render run report, compatibility boundary, and command log after runtime/oracle/compare phases",
+    );
+    timing.total_wall_seconds = timing
+        .total_wall_seconds
+        .max(timing.phases.iter().map(|phase| phase.wall_seconds).sum());
 
     let run_summary = json!({
         "schema_version": 1,
@@ -1078,7 +1105,7 @@ fn write_graph_and_plan(
     precomputed: &RuntimePrecomputedData,
     trace_level: TraceLevel,
     trace_selection: &TraceSelection,
-) -> Result<(), String> {
+) -> Result<GraphAndPlanExportSummary, String> {
     let plan = &precomputed.execution_plan;
     let graph = &model.graph;
     let graph_summary = json!({
@@ -1106,6 +1133,8 @@ fn write_graph_and_plan(
     let actual_executed_source_order_stages = source_order_gate
         .actual_executed_source_order_stages
         .clone();
+    let trace_enabled = trace_level_enables_stage_snapshots(trace_level);
+    let trace_start = Instant::now();
     let stage_snapshots = execution_stage_snapshots(plan, trace_level);
     let plan_json = json!({
         "schema_version": 1,
@@ -1139,7 +1168,14 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
     )?;
-    write_source_order_stage_state_snapshots(output_dir, plan, trace_level, trace_selection)
+    write_source_order_stage_state_snapshots(output_dir, plan, trace_level, trace_selection)?;
+    Ok(GraphAndPlanExportSummary {
+        trace_wall_seconds: if trace_enabled {
+            trace_start.elapsed().as_secs_f64()
+        } else {
+            0.0
+        },
+    })
 }
 
 fn trace_level_enables_stage_snapshots(trace_level: TraceLevel) -> bool {
