@@ -99,14 +99,31 @@ Assert-ZipEntry -ZipPath $package -Entry "oracle/energyplus/26.1.0/energyplus.ex
 Assert-ZipEntry -ZipPath $package -Entry "oracle/energyplus/26.1.0/ConvertInputFormat.exe" -Description "packaged EnergyPlus converter"
 
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\numeric-conformance-evidence.pdf" -Description "numeric evidence PDF"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\conformance-summary.json" -Description "conformance summary JSON"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\conformance-index-report.pdf" -Description "conformance index PDF"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\conformance-index.md" -Description "conformance index markdown"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\case-coverage-matrix.csv" -Description "case coverage matrix CSV"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\variable-coverage-matrix.csv" -Description "variable coverage matrix CSV"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\algorithm-coverage-matrix.csv" -Description "algorithm coverage matrix CSV"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\one-zone-family\official_1zone_uncontrolled_family_report.md" -Description "1Zone family report"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\ideal-loads-family\ideal_loads_air_system_family_report.md" -Description "IdealLoads family report"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\support-coverage-report.pdf" -Description "support coverage PDF"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\user-coverage-handbook.pdf" -Description "user handbook PDF"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\performance-summary.json" -Description "performance summary JSON"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\stability-summary.json" -Description "stability summary JSON"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\plot-evidence-summary.json" -Description "plot evidence manifest"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\coverage_status_bar.png" -Description "coverage status plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\declared_vs_passed_series.png" -Description "declared vs passed plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\1zone_zone_mean_air_temperature.png" -Description "1Zone MAT plot"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\1zone_surface_inside_face_temperature.png" -Description "1Zone surface plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\1zone_surface_conduction_delta_heatmap.png" -Description "1Zone conduction heatmap"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\1zone_family_pass_fail_heatmap.png" -Description "1Zone family heatmap"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\ideal_loads_zone_total_rates.png" -Description "IdealLoads rates plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\ideal_loads_supply_node_state.png" -Description "IdealLoads supply node plot"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\ideal_loads_branch_status_heatmap.png" -Description "IdealLoads branch plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\ideal_loads_meter_comparison.png" -Description "IdealLoads meter comparison plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\stage_timing_stacked_bar.png" -Description "stage timing plot"
+Assert-FileExists -Path ".runtime\release-evidence\$Tag\plots\trace_overhead.png" -Description "trace overhead plot"
 Assert-FileExists -Path ".runtime\release-evidence\$Tag\release-evidence-manifest.json" -Description "release manifest JSON"
 
 $publicAssets = @(
@@ -177,7 +194,7 @@ $missingAssetHashes = @(
 if ($missingAssetHashes.Count -gt 0) {
     throw "Expected every present release asset to record a SHA256 hash. Missing=[$($missingAssetHashes -join ', ')]"
 }
-foreach ($role in @("performance-summary-json", "stability-summary-json", "one-zone-surface-temperature-plot", "ideal-loads-branch-heatmap", "user-coverage-handbook-pdf")) {
+foreach ($role in @("case-coverage-matrix-csv", "variable-coverage-matrix-csv", "algorithm-coverage-matrix-csv", "performance-summary-json", "stability-summary-json", "one-zone-surface-temperature-plot", "ideal-loads-branch-heatmap", "user-coverage-handbook-pdf")) {
     if (@($manifest.assets | Where-Object { $_.role -eq $role -and $_.exists }).Count -ne 1) {
         throw "Expected present manifest asset role: $role"
     }

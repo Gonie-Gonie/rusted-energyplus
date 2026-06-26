@@ -1465,6 +1465,9 @@ def build_evidence(
             "pdf": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.pdf",
             "json": f".runtime/release-evidence/v{version}/numeric-conformance-evidence.json",
             "summary": f".runtime/release-evidence/v{version}/conformance-summary.json",
+            "case_coverage_matrix_csv": f".runtime/release-evidence/v{version}/case-coverage-matrix.csv",
+            "variable_coverage_matrix_csv": f".runtime/release-evidence/v{version}/variable-coverage-matrix.csv",
+            "algorithm_coverage_matrix_csv": f".runtime/release-evidence/v{version}/algorithm-coverage-matrix.csv",
         },
     }
 
@@ -3319,7 +3322,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["Claim boundary", "done", "Diagnostic, compatibility, and not-claimed domains are explicit."],
         ["Evidence manifest", "done", "Manifest snapshot is embedded and final hashes are owned by release-evidence-manifest after PDF write."],
         ["Coverage charts", "done", "Variable status and declared-vs-passed charts are included."],
-        ["Case coverage matrix", "done", "PDF includes an excerpt and the full matrix is preserved in JSON."],
+        ["Coverage matrices", "done", "PDF includes excerpts and the full case, variable, and algorithm matrices are exported as CSV assets."],
         ["Arbitrary-run summary", "done", "PDF reads run-summary.json smoke artifacts and marks them ad-hoc/non-conformance."],
         ["1Zone family report", "done", "Family summary, pass/fail tables, blockers, and not-claimed rows are generated before the evidence pack and tracked by the release manifest."],
         ["IdealLoads family report", "done", "Branch matrix, output-class coverage, layer separation, node proof, OA/economizer/heat-recovery, humidity, plots, and not-claimed rows are generated before the evidence pack."],

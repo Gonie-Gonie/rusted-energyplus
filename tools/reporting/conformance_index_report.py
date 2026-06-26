@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import tomllib
 from collections import Counter
@@ -191,10 +192,33 @@ def collect_meter_rows(case_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def collect_algorithm_rows(repo_root: Path) -> list[dict[str, Any]]:
+    spec = load_toml(repo_root / "specs" / "algorithm_ledger.toml")
+    rows: list[dict[str, Any]] = []
+    for algorithm in spec.get("algorithm", []):
+        rows.append(
+            {
+                "algorithm_id": str(algorithm.get("id", "")),
+                "domain": str(algorithm.get("domain", "")),
+                "status": str(algorithm.get("status", "")),
+                "claim_level": str(algorithm.get("claim_level", "")),
+                "first_case": str(algorithm.get("first_case", "")),
+                "first_evidence": str(algorithm.get("first_evidence", "")),
+                "energyplus_source": [str(value) for value in algorithm.get("energyplus_source", [])],
+                "rust_target": [str(value) for value in algorithm.get("rust_target", [])],
+                "proof_variables": [str(value) for value in algorithm.get("proof_variables", [])],
+                "source_map": str(algorithm.get("source_map", "")),
+                "support_boundary": str(algorithm.get("support_boundary", "")),
+            }
+        )
+    return rows
+
+
 def build_conformance_index(repo_root: Path, version: str) -> dict[str, Any]:
     case_rows = collect_case_rows(repo_root)
     output_rows = collect_output_rows(case_rows)
     meter_rows = collect_meter_rows(case_rows)
+    algorithm_rows = collect_algorithm_rows(repo_root)
     conformance_cases = [row for row in case_rows if row["conformance_claim"]]
     blocking_gates = [row for row in case_rows if row["gate_blocking"]]
     missing_report_contracts = [row["case_id"] for row in case_rows if not row["report_path"]]
@@ -221,6 +245,7 @@ def build_conformance_index(repo_root: Path, version: str) -> dict[str, Any]:
         "cases": case_rows,
         "outputs": output_rows,
         "meters": meter_rows,
+        "algorithms": algorithm_rows,
         "known_gaps": {
             "missing_report_contracts": missing_report_contracts,
             "missing_gate_contracts": missing_gate_contracts,
@@ -230,6 +255,9 @@ def build_conformance_index(repo_root: Path, version: str) -> dict[str, Any]:
             "html": f".runtime/release-evidence/v{version}/conformance-index-report.html",
             "pdf": f".runtime/release-evidence/v{version}/conformance-index-report.pdf",
             "json": f".runtime/release-evidence/v{version}/conformance-index-report.json",
+            "case_coverage_matrix_csv": f".runtime/release-evidence/v{version}/case-coverage-matrix.csv",
+            "variable_coverage_matrix_csv": f".runtime/release-evidence/v{version}/variable-coverage-matrix.csv",
+            "algorithm_coverage_matrix_csv": f".runtime/release-evidence/v{version}/algorithm-coverage-matrix.csv",
         },
     }
 
@@ -542,6 +570,86 @@ def render_markdown(index: dict[str, Any]) -> str:
     )
 
 
+def csv_cell(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return "; ".join(csv_cell(item) for item in value)
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
+def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({field: csv_cell(row.get(field)) for field in fieldnames})
+
+
+def case_matrix_rows(index: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            "case_id": row["case_id"],
+            "title": row["title"],
+            "milestone": row["milestone"],
+            "comparison_class": row["comparison_class"],
+            "conformance_claim": row["conformance_claim"],
+            "tier": row["tier"],
+            "source_kind": row["source_kind"],
+            "domains": row["domains"],
+            "output_levels": row["output_levels"],
+            "output_count": row["output_count"],
+            "meter_count": row["meter_count"],
+            "gate_blocking": row["gate_blocking"],
+            "report_path": row["report_path"],
+            "gate_script": row["gate_script"],
+            "manifest": row["manifest"],
+        }
+        for row in index["cases"]
+    ]
+
+
+def variable_matrix_rows(index: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in index["outputs"]:
+        rows.append(
+            {
+                "row_type": "output",
+                "case_id": row["case_id"],
+                "key": row["key"],
+                "variable_or_meter": row["variable"],
+                "frequency": row["frequency"],
+                "class": row["class"],
+                "source": row["source"],
+                "domain": row["domain"],
+                "level": row["level"],
+                "abs_tol": row["abs_tol"],
+                "rmse_tol": row["rmse_tol"],
+                "rel_tol": row["rel_tol"],
+            }
+        )
+    for row in index["meters"]:
+        rows.append(
+            {
+                "row_type": "meter",
+                "case_id": row["case_id"],
+                "key": row["name"],
+                "variable_or_meter": row["name"],
+                "frequency": row["frequency"],
+                "class": "meter",
+                "source": row["source"],
+                "domain": row["domain"],
+                "level": row["level"],
+                "abs_tol": row["abs_tol"],
+                "rmse_tol": row["rmse_tol"],
+                "rel_tol": row["rel_tol"],
+            }
+        )
+    return rows
+
+
 def write_outputs(repo_root: Path, version: str, index: dict[str, Any]) -> dict[str, Path]:
     evidence_root = repo_root / ".runtime" / "release-evidence" / f"v{version}"
     evidence_root.mkdir(parents=True, exist_ok=True)
@@ -553,9 +661,68 @@ def write_outputs(repo_root: Path, version: str, index: dict[str, Any]) -> dict[
         html_path = evidence_root / "conformance-index-report.html"
         pdf_path = evidence_root / "conformance-index-report.pdf"
         markdown_path = evidence_root / "conformance-index.md"
+        case_matrix_path = evidence_root / "case-coverage-matrix.csv"
+        variable_matrix_path = evidence_root / "variable-coverage-matrix.csv"
+        algorithm_matrix_path = evidence_root / "algorithm-coverage-matrix.csv"
 
         json_path.write_text(json.dumps(index, indent=2), encoding="utf-8")
         markdown_path.write_text(render_markdown(index), encoding="utf-8")
+        write_csv(
+            case_matrix_path,
+            [
+                "case_id",
+                "title",
+                "milestone",
+                "comparison_class",
+                "conformance_claim",
+                "tier",
+                "source_kind",
+                "domains",
+                "output_levels",
+                "output_count",
+                "meter_count",
+                "gate_blocking",
+                "report_path",
+                "gate_script",
+                "manifest",
+            ],
+            case_matrix_rows(index),
+        )
+        write_csv(
+            variable_matrix_path,
+            [
+                "row_type",
+                "case_id",
+                "key",
+                "variable_or_meter",
+                "frequency",
+                "class",
+                "source",
+                "domain",
+                "level",
+                "abs_tol",
+                "rmse_tol",
+                "rel_tol",
+            ],
+            variable_matrix_rows(index),
+        )
+        write_csv(
+            algorithm_matrix_path,
+            [
+                "algorithm_id",
+                "domain",
+                "status",
+                "claim_level",
+                "first_case",
+                "first_evidence",
+                "energyplus_source",
+                "rust_target",
+                "proof_variables",
+                "source_map",
+                "support_boundary",
+            ],
+            index["algorithms"],
+        )
         document.save_html(html_path)
         document.save_pdf(pdf_path)
     finally:
@@ -566,6 +733,9 @@ def write_outputs(repo_root: Path, version: str, index: dict[str, Any]) -> dict[
         "html": html_path,
         "pdf": pdf_path,
         "markdown": markdown_path,
+        "case_matrix": case_matrix_path,
+        "variable_matrix": variable_matrix_path,
+        "algorithm_matrix": algorithm_matrix_path,
     }
 
 
@@ -585,6 +755,9 @@ def main() -> int:
     print(f"  html: {outputs['html']}")
     print(f"  pdf: {outputs['pdf']}")
     print(f"  json: {outputs['json']}")
+    print(f"  case_matrix: {outputs['case_matrix']}")
+    print(f"  variable_matrix: {outputs['variable_matrix']}")
+    print(f"  algorithm_matrix: {outputs['algorithm_matrix']}")
     return 0
 
 

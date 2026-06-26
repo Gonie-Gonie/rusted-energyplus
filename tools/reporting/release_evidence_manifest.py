@@ -141,6 +141,24 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "Lightweight text copy of the conformance index.",
         },
         {
+            "role": "case-coverage-matrix-csv",
+            "path": evidence_path(repo_root, version, "case-coverage-matrix.csv"),
+            "produced_by": f".\\scripts\\dev.cmd conformance-index-report -Version {version}",
+            "user_purpose": "Spreadsheet-ready case coverage matrix used by the PDF evidence pack.",
+        },
+        {
+            "role": "variable-coverage-matrix-csv",
+            "path": evidence_path(repo_root, version, "variable-coverage-matrix.csv"),
+            "produced_by": f".\\scripts\\dev.cmd conformance-index-report -Version {version}",
+            "user_purpose": "Spreadsheet-ready output variable and meter coverage matrix used by the PDF evidence pack.",
+        },
+        {
+            "role": "algorithm-coverage-matrix-csv",
+            "path": evidence_path(repo_root, version, "algorithm-coverage-matrix.csv"),
+            "produced_by": f".\\scripts\\dev.cmd conformance-index-report -Version {version}",
+            "user_purpose": "Spreadsheet-ready algorithm source and proof-variable matrix used by the PDF evidence pack.",
+        },
+        {
             "role": "one-zone-family-report-markdown",
             "path": evidence_path(repo_root, version, "one-zone-family/official_1zone_uncontrolled_family_report.md"),
             "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
