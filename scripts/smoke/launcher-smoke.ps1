@@ -150,6 +150,88 @@ function Assert-LauncherRunSummary {
     Assert-Equal -Actual $Summary.support.conformance_claim -Expected $false -Description "$Description conformance claim"
 }
 
+function Assert-JsonFields {
+    param(
+        [Parameter(Mandatory = $true)]$Object,
+        [Parameter(Mandatory = $true)][string[]]$Fields,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if ($null -eq $Object) {
+        throw "Missing JSON object for $Description"
+    }
+    $names = @($Object.PSObject.Properties.Name)
+    foreach ($field in $Fields) {
+        if ($names -notcontains $field) {
+            throw "Missing $Description field: $field"
+        }
+    }
+    Write-Host "OK $Description fields: $($Fields -join ', ')"
+}
+
+function Assert-LauncherArtifactSchema {
+    param(
+        [Parameter(Mandatory = $true)]$Summary,
+        [Parameter(Mandatory = $true)][string]$OutputDir,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    Assert-Equal -Actual $Summary.schema_version -Expected 1 -Description "$Description run-summary schema version"
+    Assert-JsonFields -Object $Summary -Fields @(
+        "schema_version",
+        "status",
+        "exit_code",
+        "config",
+        "support",
+        "diagnostics",
+        "artifacts"
+    ) -Description "$Description run-summary schema"
+    Assert-JsonFields -Object $Summary.config -Fields @("mode", "partial_policy", "output_format", "trace_level") -Description "$Description run-summary config schema"
+    Assert-JsonFields -Object $Summary.support -Fields @(
+        "status",
+        "run_result_state",
+        "runtime_class",
+        "selected_algorithm_lane",
+        "matched_capability_ids",
+        "matched_capabilities",
+        "conformance_claim"
+    ) -Description "$Description run-summary support schema"
+    Assert-JsonFields -Object $Summary.artifacts -Fields @(
+        "diagnostics_json",
+        "run_summary_json",
+        "support_assessment_json",
+        "support_report_md"
+    ) -Description "$Description run-summary artifact schema"
+
+    $supportPath = Join-Path $OutputDir "support-assessment.json"
+    Assert-File -Path $supportPath -Description "$Description support assessment"
+    $support = Read-JsonFile -Path $supportPath
+    Assert-Equal -Actual $support.schema_version -Expected 1 -Description "$Description support-assessment schema version"
+    Assert-JsonFields -Object $support -Fields @(
+        "schema_version",
+        "status",
+        "run_result_state",
+        "runtime_class",
+        "selected_algorithm_lane",
+        "matched_capability_ids",
+        "matched_capabilities",
+        "mode",
+        "partial_policy",
+        "output_format",
+        "trace_level",
+        "capability_registry",
+        "capability_registry_loaded",
+        "claim_boundary",
+        "typed_objects",
+        "unsupported_objects",
+        "diagnostics"
+    ) -Description "$Description support-assessment schema"
+    Assert-JsonFields -Object $support.claim_boundary -Fields @(
+        "conformance_claim",
+        "release_evidence",
+        "statement"
+    ) -Description "$Description support-assessment claim boundary schema"
+}
+
 $launcherScript = Join-Path $RepoRoot "scripts\launcher\eplus-rs-launch.ps1"
 if (-not (Test-Path -LiteralPath $launcherScript -PathType Leaf)) {
     throw "Missing launcher script: $launcherScript"
@@ -459,6 +541,19 @@ Write-Utf8NoBomFile -Path $airLoopPath -Contents @'
 }
 '@
 
+$emsPath = Join-Path $fixtureRoot "ems.epJSON"
+Write-Utf8NoBomFile -Path $emsPath -Contents @'
+{
+  "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Zone": {"Zone One": {"volume": 100}},
+  "EnergyManagementSystem:Program": {
+    "Override Program": {
+      "lines": [{"program_line": "SET X = 1"}]
+    }
+  }
+}
+'@
+
 $oneZoneOutput = Join-Path $smokeRoot "one-zone-output"
 $oneZoneSummary = Invoke-LauncherCliRun `
     -Description "supported 1Zone fixture" `
@@ -466,6 +561,8 @@ $oneZoneSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 0 `
     -OutputDir $oneZoneOutput
 Assert-LauncherRunSummary -Summary $oneZoneSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "supported 1Zone"
+Assert-LauncherArtifactSchema -Summary $oneZoneSummary -OutputDir $oneZoneOutput -Description "supported 1Zone"
+Assert-ContainsValue -Values @($oneZoneSummary.support.matched_capability_ids) -Expected "official_1zone_uncontrolled_declared_heat_balance" -Description "supported 1Zone matched capability"
 Assert-Directory -Path $oneZoneOutput -Description "launcher output folder"
 Assert-File -Path (Join-Path $oneZoneOutput "results\result-store.json") -Description "supported 1Zone result store"
 
@@ -476,6 +573,8 @@ $idealLoadsSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 0 `
     -OutputDir $idealLoadsOutput
 Assert-LauncherRunSummary -Summary $idealLoadsSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "supported IdealLoads"
+Assert-LauncherArtifactSchema -Summary $idealLoadsSummary -OutputDir $idealLoadsOutput -Description "supported IdealLoads"
+Assert-ContainsValue -Values @($idealLoadsSummary.support.matched_capability_ids) -Expected "ideal_loads_no_oa_sensible" -Description "supported IdealLoads matched capability"
 Assert-Equal -Actual $idealLoadsSummary.support.runtime_class -Expected "ideal-loads-no-oa-sensible-compatibility" -Description "supported IdealLoads runtime class"
 
 $airLoopOutput = Join-Path $smokeRoot "air-loop-output"
@@ -485,6 +584,7 @@ $airLoopSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 4 `
     -OutputDir $airLoopOutput
 Assert-LauncherRunSummary -Summary $airLoopSummary -ExpectedStatus "unsupported" -ExpectedExitCode 4 -ExpectedRunResultState "run_blocked" -Description "AirLoop blocked"
+Assert-LauncherArtifactSchema -Summary $airLoopSummary -OutputDir $airLoopOutput -Description "AirLoop blocked"
 Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $airLoopOutput "diagnostics.json")) -Pattern "UnsupportedHVACObject" -Description "AirLoop blocked diagnostics"
 
 $plantLoopPath = Join-Path $RepoRoot "data\testcases\minimal\plant-loop-skeleton.epJSON"
@@ -496,7 +596,18 @@ $plantLoopSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 4 `
     -OutputDir $plantLoopOutput
 Assert-LauncherRunSummary -Summary $plantLoopSummary -ExpectedStatus "unsupported" -ExpectedExitCode 4 -ExpectedRunResultState "run_blocked" -Description "PlantLoop blocked"
+Assert-LauncherArtifactSchema -Summary $plantLoopSummary -OutputDir $plantLoopOutput -Description "PlantLoop blocked"
 Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $plantLoopOutput "diagnostics.json")) -Pattern "UnsupportedPlantObject" -Description "PlantLoop blocked diagnostics"
+
+$emsOutput = Join-Path $smokeRoot "ems-output"
+$emsSummary = Invoke-LauncherCliRun `
+    -Description "EMS blocked fixture" `
+    -Arguments @("run", $emsPath, "-d", $emsOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -ExpectedExitCode 4 `
+    -OutputDir $emsOutput
+Assert-LauncherRunSummary -Summary $emsSummary -ExpectedStatus "unsupported" -ExpectedExitCode 4 -ExpectedRunResultState "run_blocked" -Description "EMS blocked"
+Assert-LauncherArtifactSchema -Summary $emsSummary -OutputDir $emsOutput -Description "EMS blocked"
+Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $emsOutput "diagnostics.json")) -Pattern "UnsupportedEMS" -Description "EMS blocked diagnostics"
 
 $missingWeatherOutput = Join-Path $smokeRoot "missing-weather-output"
 $missingWeatherSummary = Invoke-LauncherCliRun `
@@ -505,6 +616,7 @@ $missingWeatherSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 1 `
     -OutputDir $missingWeatherOutput
 Assert-LauncherRunSummary -Summary $missingWeatherSummary -ExpectedStatus "args" -ExpectedExitCode 1 -ExpectedRunResultState "supported_compatibility_run" -Description "missing weather"
+Assert-LauncherArtifactSchema -Summary $missingWeatherSummary -OutputDir $missingWeatherOutput -Description "missing weather"
 Assert-Matches -Text (Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $missingWeatherOutput "diagnostics.json")) -Pattern "MissingWeatherFile" -Description "missing weather diagnostics"
 
 $oracleRoot = Join-Path $RepoRoot ".runtime\energyplus\26.1.0"
@@ -516,6 +628,17 @@ foreach ($required in @($oracleIdf, $oracleWeather, $energyplusExe, $convertExe)
     Assert-File -Path $required -Description "launcher oracle prerequisite"
 }
 
+$baselineOutput = Join-Path $smokeRoot "baseline-output"
+$baselineSummary = Invoke-LauncherCliRun `
+    -Description "oracle baseline fixture" `
+    -Arguments @("run", $oracleIdf, "-w", $oracleWeather, "-d", $baselineOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite", "--oracle-baseline", "--oracle-root", $oracleRoot) `
+    -ExpectedExitCode 0 `
+    -OutputDir $baselineOutput
+Assert-LauncherRunSummary -Summary $baselineSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "oracle baseline"
+Assert-LauncherArtifactSchema -Summary $baselineSummary -OutputDir $baselineOutput -Description "oracle baseline"
+Assert-Equal -Actual $baselineSummary.oracle_status -Expected "generated" -Description "oracle baseline oracle status"
+Assert-File -Path (Join-Path $baselineOutput "oracle\eplusout.eso") -Description "launcher oracle baseline output"
+
 $compareOutput = Join-Path $smokeRoot "compare-output"
 $compareSummary = Invoke-LauncherCliRun `
     -Description "oracle compare fixture" `
@@ -523,6 +646,7 @@ $compareSummary = Invoke-LauncherCliRun `
     -ExpectedExitCode 8 `
     -OutputDir $compareOutput
 Assert-LauncherRunSummary -Summary $compareSummary -ExpectedStatus "oracle-compare" -ExpectedExitCode 8 -ExpectedRunResultState "supported_compatibility_run" -Description "oracle compare"
+Assert-LauncherArtifactSchema -Summary $compareSummary -OutputDir $compareOutput -Description "oracle compare"
 Assert-Equal -Actual $compareSummary.oracle_status -Expected "generated" -Description "oracle compare oracle status"
 Assert-Equal -Actual $compareSummary.compare_status -Expected "fail" -Description "oracle compare status"
 Assert-File -Path (Join-Path $compareOutput "compare\compare-report.md") -Description "launcher compare report"
