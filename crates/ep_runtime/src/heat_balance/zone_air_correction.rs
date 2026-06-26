@@ -11,9 +11,10 @@ use crate::heat_balance::inside_convection::{
 };
 use crate::heat_balance::state::{SurfaceHeatBalanceState, ZoneHeatBalanceState};
 use crate::heat_balance::zone_predictor_corrector::{
-    energyplus_analytical_zone_air_temperature_c,
+    correct_step_source_order_path, energyplus_analytical_zone_air_temperature_c,
     energyplus_third_order_zone_air_temperature_from_coefficients,
-    energyplus_zone_air_temperature_coefficients,
+    energyplus_zone_air_temperature_coefficients, push_system_timestep_histories_source_order_path,
+    revert_zone_timestep_histories_source_order_path,
 };
 use crate::psychrometrics::energyplus_psychrometric_humidity_ratio_from_rh;
 use crate::weather::{
@@ -198,7 +199,9 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
         if system_timestep_count <= 1 {
             zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
             zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-            synchronize_single_system_timestep_history(zone);
+            push_system_timestep_histories_source_order_path(|| {
+                synchronize_single_system_timestep_history(zone);
+            });
             zone.system_timestep_average_surface_convection_report_w = None;
             zone.system_timestep_average_air_storage_report_w = None;
             continue;
@@ -228,10 +231,12 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
 
         let reset_zone_air_state_from_system_history =
             system_timestep_count != zone.previous_system_timestep_count;
-        if reset_zone_air_state_from_system_history {
-            zone.mean_air_temperature_c = system_temperature_history[0];
-            zone.air_humidity_ratio = system_humidity_history[0];
-        }
+        revert_zone_timestep_histories_source_order_path(|| {
+            if reset_zone_air_state_from_system_history {
+                zone.mean_air_temperature_c = system_temperature_history[0];
+                zone.air_humidity_ratio = system_humidity_history[0];
+            }
+        });
         let mut zone_temperature_average_c = 0.0;
         let mut zone_humidity_average = 0.0;
         let mut surface_convection_report_average_w = 0.0;
@@ -239,21 +244,23 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
         let system_timestep_fraction = 1.0 / f64::from(system_timestep_count);
 
         for _ in 0..system_timestep_count {
-            correct_single_zone_air_temperature_from_current_surfaces(
-                surfaces,
-                zone,
-                system_timestep_seconds,
-                system_temperature_history,
-                weather_context,
-                fallback_dry_bulb_c,
-                use_inside_ctf_outside_temperature_for_conduction_report,
-            );
-            correct_single_zone_air_humidity_ratio_from_history(
-                zone,
-                system_timestep_seconds,
-                system_humidity_history,
-                weather_context,
-            );
+            correct_step_source_order_path(|| {
+                correct_single_zone_air_temperature_from_current_surfaces(
+                    surfaces,
+                    zone,
+                    system_timestep_seconds,
+                    system_temperature_history,
+                    weather_context,
+                    fallback_dry_bulb_c,
+                    use_inside_ctf_outside_temperature_for_conduction_report,
+                );
+                correct_single_zone_air_humidity_ratio_from_history(
+                    zone,
+                    system_timestep_seconds,
+                    system_humidity_history,
+                    weather_context,
+                );
+            });
             let air_storage_rate_w = zone_air_system_timestep_storage_report_rate_w(
                 zone,
                 system_temperature_history[0],
@@ -279,14 +286,16 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
             ];
         }
 
-        zone.zone_timestep_average_air_temperature_c = zone_temperature_average_c;
-        zone.zone_timestep_average_air_humidity_ratio = zone_humidity_average;
-        zone.previous_system_mean_air_temperatures_c = system_temperature_history;
-        zone.previous_system_air_humidity_ratios = system_humidity_history;
-        zone.previous_system_timestep_count = system_timestep_count;
-        zone.system_timestep_average_surface_convection_report_w =
-            Some(surface_convection_report_average_w);
-        zone.system_timestep_average_air_storage_report_w = Some(air_storage_report_average_w);
+        push_system_timestep_histories_source_order_path(|| {
+            zone.zone_timestep_average_air_temperature_c = zone_temperature_average_c;
+            zone.zone_timestep_average_air_humidity_ratio = zone_humidity_average;
+            zone.previous_system_mean_air_temperatures_c = system_temperature_history;
+            zone.previous_system_air_humidity_ratios = system_humidity_history;
+            zone.previous_system_timestep_count = system_timestep_count;
+            zone.system_timestep_average_surface_convection_report_w =
+                Some(surface_convection_report_average_w);
+            zone.system_timestep_average_air_storage_report_w = Some(air_storage_report_average_w);
+        });
     }
 }
 

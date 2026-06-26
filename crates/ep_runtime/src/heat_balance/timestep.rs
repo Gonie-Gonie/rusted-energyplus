@@ -36,6 +36,7 @@ use crate::heat_balance::zone_predictor_corrector::{
     energyplus_third_order_zone_air_temperature_from_coefficients,
     energyplus_zone_air_temperature_coefficients, step_zone_air_temperature,
 };
+use crate::heat_balance::{air_manager, manager, surface_manager, zone_predictor_corrector};
 use crate::schedules::{
     convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
 };
@@ -66,6 +67,30 @@ pub fn advance_heat_balance_state_one_timestep(
 }
 
 pub(crate) fn advance_heat_balance_state_one_timestep_internal(
+    model: &TypedModel,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+) {
+    manager::manage_heat_balance_source_order_path(|| {
+        advance_heat_balance_state_one_timestep_source_order_path(
+            model,
+            state,
+            input,
+            weather_context,
+            zone_air_algorithm,
+            surface_iteration_count,
+            inside_hconv_reevaluation_interval,
+            surface_loop_zone_air_correction,
+        );
+    });
+}
+
+fn advance_heat_balance_state_one_timestep_source_order_path(
     model: &TypedModel,
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
@@ -166,84 +191,97 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
             feature_zone_air_algorithm,
         );
 
-    for surface in &mut state.surfaces {
-        let zone_temperature_c = previous_zone_temperatures
-            .get(&surface.zone_id)
-            .copied()
-            .unwrap_or(surface.inside_face_temperature_c);
+    surface_manager::manage_surface_heat_balance_source_order_path(|| {
+        surface_manager::init_surface_heat_balance_source_order_path(|| {
+            surface_manager::calc_heat_balance_outside_surf_source_order_path(|| {
+                for surface in &mut state.surfaces {
+                    let zone_temperature_c = previous_zone_temperatures
+                        .get(&surface.zone_id)
+                        .copied()
+                        .unwrap_or(surface.inside_face_temperature_c);
 
-        let initial_inside_face_temperature_c =
-            if preserve_surface_inside_temperature_for_first_longwave {
-                previous_surface_inside_temperatures
-                    .get(&surface.surface_id)
-                    .copied()
-                    .unwrap_or(zone_temperature_c)
-            } else {
-                zone_temperature_c
-            };
-        surface.inside_face_temperature_c = initial_inside_face_temperature_c;
-        let boundary_balance = heat_balance_surface_boundary_balance(
-            model,
-            surface,
-            &previous_zone_temperatures,
-            input.outdoor_dry_bulb_c,
-            initial_inside_face_temperature_c,
-            weather_context,
-            None,
-            use_doe2_outside_convection,
-        );
-        surface.outside_face_temperature_c = boundary_balance.temperature_c;
-        surface.outside_report_terms = boundary_balance.exterior_report_terms;
-        surface.outside_balance_diagnostics = boundary_balance.outside_balance_diagnostics;
-    }
-    for zone in &mut state.zones {
-        let previous_temperature_c = zone.mean_air_temperature_c;
-        let previous_zone_history_temperature_c =
-            if use_energyplus_adaptive_system_timestep_zone_air_correction {
-                zone.zone_timestep_average_air_temperature_c
-            } else {
-                previous_temperature_c
-            };
-        zone.previous_mean_air_temperatures_c = [
-            previous_zone_history_temperature_c,
-            zone.previous_mean_air_temperatures_c[0],
-            zone.previous_mean_air_temperatures_c[1],
-        ];
-        let previous_humidity_ratio = zone.air_humidity_ratio;
-        let previous_zone_history_humidity_ratio =
-            if use_energyplus_adaptive_system_timestep_zone_air_correction {
-                zone.zone_timestep_average_air_humidity_ratio
-            } else {
-                previous_humidity_ratio
-            };
-        zone.previous_air_humidity_ratios = [
-            previous_zone_history_humidity_ratio,
-            zone.previous_air_humidity_ratios[0],
-            zone.previous_air_humidity_ratios[1],
-        ];
-        zone.convective_internal_gain_w =
-            convective_internal_gain_w(model, zone.zone_id, hour_ending);
+                    let initial_inside_face_temperature_c =
+                        if preserve_surface_inside_temperature_for_first_longwave {
+                            previous_surface_inside_temperatures
+                                .get(&surface.surface_id)
+                                .copied()
+                                .unwrap_or(zone_temperature_c)
+                        } else {
+                            zone_temperature_c
+                        };
+                    surface.inside_face_temperature_c = initial_inside_face_temperature_c;
+                    let boundary_balance = heat_balance_surface_boundary_balance(
+                        model,
+                        surface,
+                        &previous_zone_temperatures,
+                        input.outdoor_dry_bulb_c,
+                        initial_inside_face_temperature_c,
+                        weather_context,
+                        None,
+                        use_doe2_outside_convection,
+                    );
+                    surface.outside_face_temperature_c = boundary_balance.temperature_c;
+                    surface.outside_report_terms = boundary_balance.exterior_report_terms;
+                    surface.outside_balance_diagnostics =
+                        boundary_balance.outside_balance_diagnostics;
+                }
+            });
+        });
+    });
+    air_manager::manage_air_heat_balance_source_order_path(|| {
+        zone_predictor_corrector::manage_zone_air_updates_source_order_path(|| {
+            zone_predictor_corrector::push_zone_timestep_histories_source_order_path(|| {
+                zone_predictor_corrector::predict_step_source_order_path(|| {
+                    for zone in &mut state.zones {
+                        let previous_temperature_c = zone.mean_air_temperature_c;
+                        let previous_zone_history_temperature_c =
+                            if use_energyplus_adaptive_system_timestep_zone_air_correction {
+                                zone.zone_timestep_average_air_temperature_c
+                            } else {
+                                previous_temperature_c
+                            };
+                        zone.previous_mean_air_temperatures_c = [
+                            previous_zone_history_temperature_c,
+                            zone.previous_mean_air_temperatures_c[0],
+                            zone.previous_mean_air_temperatures_c[1],
+                        ];
+                        let previous_humidity_ratio = zone.air_humidity_ratio;
+                        let previous_zone_history_humidity_ratio =
+                            if use_energyplus_adaptive_system_timestep_zone_air_correction {
+                                zone.zone_timestep_average_air_humidity_ratio
+                            } else {
+                                previous_humidity_ratio
+                            };
+                        zone.previous_air_humidity_ratios = [
+                            previous_zone_history_humidity_ratio,
+                            zone.previous_air_humidity_ratios[0],
+                            zone.previous_air_humidity_ratios[1],
+                        ];
+                        zone.convective_internal_gain_w =
+                            convective_internal_gain_w(model, zone.zone_id, hour_ending);
 
-        let conductance_w_per_k = state
-            .surfaces
-            .iter()
-            .filter(|surface| surface.zone_id == zone.zone_id)
-            .map(|surface| surface.conductance_w_per_k)
-            .sum::<f64>();
-        let conductance_weighted_outside_temperature = state
-            .surfaces
-            .iter()
-            .filter(|surface| surface.zone_id == zone.zone_id)
-            .map(|surface| surface.conductance_w_per_k * surface.outside_face_temperature_c)
-            .sum::<f64>();
-        let equivalent_outside_temperature_c = if conductance_w_per_k > 0.0 {
-            conductance_weighted_outside_temperature / conductance_w_per_k
-        } else {
-            previous_temperature_c
-        };
+                        let conductance_w_per_k = state
+                            .surfaces
+                            .iter()
+                            .filter(|surface| surface.zone_id == zone.zone_id)
+                            .map(|surface| surface.conductance_w_per_k)
+                            .sum::<f64>();
+                        let conductance_weighted_outside_temperature = state
+                            .surfaces
+                            .iter()
+                            .filter(|surface| surface.zone_id == zone.zone_id)
+                            .map(|surface| {
+                                surface.conductance_w_per_k * surface.outside_face_temperature_c
+                            })
+                            .sum::<f64>();
+                        let equivalent_outside_temperature_c = if conductance_w_per_k > 0.0 {
+                            conductance_weighted_outside_temperature / conductance_w_per_k
+                        } else {
+                            previous_temperature_c
+                        };
 
-        zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
-        zone.mean_air_temperature_c = match feature_zone_air_algorithm {
+                        zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
+                        zone.mean_air_temperature_c = match feature_zone_air_algorithm {
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => step_zone_air_temperature(
                 previous_temperature_c,
                 equivalent_outside_temperature_c,
@@ -412,7 +450,11 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
                 )
             }
         };
-    }
+                    }
+                });
+            });
+        });
+    });
     update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
     let use_current_inside_for_first_longwave = matches!(
         feature_zone_air_algorithm,
@@ -457,10 +499,10 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
         HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe
     );
 
-    let interleaved_surface_zone_balance_result = if algorithm_flags
-        .interleave_zone_air_surface_passes
-    {
-        Some(run_interleaved_surface_zone_balance(
+    let interleaved_surface_zone_balance_result =
+        surface_manager::calc_heat_balance_inside_surf_source_order_path(|| {
+            if algorithm_flags.interleave_zone_air_surface_passes {
+                Some(run_interleaved_surface_zone_balance(
             model,
             &mut state.surfaces,
             &mut state.zones,
@@ -512,41 +554,98 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
             use_inside_ctf_outside_temperature_for_conduction_report,
             inside_hconv_reevaluation_interval,
             surface_loop_zone_air_correction,
-        ))
-    } else {
-        let current_zone_temperatures = state
-            .zones
-            .iter()
-            .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-            .collect::<BTreeMap<_, _>>();
-        run_surface_balance_passes(
-            model,
-            &mut state.surfaces,
-            Some(&previous_surface_inside_temperatures),
-            Some(&previous_surface_inside_temperatures),
-            None,
-            &current_zone_temperatures,
-            input,
-            weather_context,
-            surface_iteration_count,
-            algorithm_flags.use_previous_inside_for_outdoor_boundary,
-            algorithm_flags.use_previous_inside_for_adiabatic_boundary,
-            algorithm_flags.use_quick_outside_conduction,
-            if algorithm_flags.use_quick_outside_conduction {
-                Some(&previous_surface_outside_temperatures)
+                ))
             } else {
-                None
-            },
-            use_doe2_outside_convection,
-            interior_longwave_exchange_probe,
-            None,
-            None,
-            None,
-            None,
-            false,
-        );
+                let current_zone_temperatures = state
+                    .zones
+                    .iter()
+                    .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+                    .collect::<BTreeMap<_, _>>();
+                run_surface_balance_passes(
+                    model,
+                    &mut state.surfaces,
+                    Some(&previous_surface_inside_temperatures),
+                    Some(&previous_surface_inside_temperatures),
+                    None,
+                    &current_zone_temperatures,
+                    input,
+                    weather_context,
+                    surface_iteration_count,
+                    algorithm_flags.use_previous_inside_for_outdoor_boundary,
+                    algorithm_flags.use_previous_inside_for_adiabatic_boundary,
+                    algorithm_flags.use_quick_outside_conduction,
+                    if algorithm_flags.use_quick_outside_conduction {
+                        Some(&previous_surface_outside_temperatures)
+                    } else {
+                        None
+                    },
+                    use_doe2_outside_convection,
+                    interior_longwave_exchange_probe,
+                    None,
+                    None,
+                    None,
+                    None,
+                    false,
+                );
 
-        if algorithm_flags.rebalance_surfaces_after_zone_air_correction {
+                if algorithm_flags.rebalance_surfaces_after_zone_air_correction {
+                    zone_predictor_corrector::correct_step_source_order_path(|| {
+                        correct_zone_air_temperatures_from_current_surfaces(
+                            &state.surfaces,
+                            &mut state.zones,
+                            input.timestep_seconds,
+                            weather_context,
+                            input.outdoor_dry_bulb_c,
+                            true,
+                            heat_balance_uses_third_order_zone_air_correction(
+                                feature_zone_air_algorithm,
+                            ),
+                            false,
+                        );
+                    });
+                    let corrected_zone_temperatures = state
+                        .zones
+                        .iter()
+                        .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
+                        .collect::<BTreeMap<_, _>>();
+                    run_surface_balance_passes(
+                        model,
+                        &mut state.surfaces,
+                        None,
+                        None,
+                        None,
+                        &corrected_zone_temperatures,
+                        input,
+                        weather_context,
+                        surface_iteration_count,
+                        algorithm_flags.use_previous_inside_for_outdoor_boundary,
+                        algorithm_flags.use_previous_inside_for_adiabatic_boundary,
+                        algorithm_flags.use_quick_outside_conduction,
+                        if algorithm_flags.use_quick_outside_conduction {
+                            Some(&previous_surface_outside_temperatures)
+                        } else {
+                            None
+                        },
+                        use_doe2_outside_convection,
+                        interior_longwave_exchange_probe,
+                        None,
+                        None,
+                        None,
+                        None,
+                        false,
+                    );
+                }
+                None
+            }
+        });
+
+    if algorithm_flags.interleave_zone_air_surface_passes
+        && matches!(
+            surface_loop_zone_air_correction,
+            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
+        )
+    {
+        zone_predictor_corrector::correct_step_source_order_path(|| {
             correct_zone_air_temperatures_from_current_surfaces(
                 &state.surfaces,
                 &mut state.zones,
@@ -555,155 +654,113 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
                 input.outdoor_dry_bulb_c,
                 true,
                 heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
-                false,
+                use_inside_ctf_outside_temperature_for_conduction_report,
             );
-            let corrected_zone_temperatures = state
-                .zones
-                .iter()
-                .map(|zone| (zone.zone_id, zone.mean_air_temperature_c))
-                .collect::<BTreeMap<_, _>>();
-            run_surface_balance_passes(
-                model,
-                &mut state.surfaces,
-                None,
-                None,
-                None,
-                &corrected_zone_temperatures,
-                input,
-                weather_context,
-                surface_iteration_count,
-                algorithm_flags.use_previous_inside_for_outdoor_boundary,
-                algorithm_flags.use_previous_inside_for_adiabatic_boundary,
-                algorithm_flags.use_quick_outside_conduction,
-                if algorithm_flags.use_quick_outside_conduction {
-                    Some(&previous_surface_outside_temperatures)
-                } else {
-                    None
-                },
-                use_doe2_outside_convection,
-                interior_longwave_exchange_probe,
-                None,
-                None,
-                None,
-                None,
-                false,
-            );
-        }
-        None
-    };
+        });
+    }
 
-    if algorithm_flags.interleave_zone_air_surface_passes
-        && matches!(
-            surface_loop_zone_air_correction,
-            HeatBalanceSurfaceLoopZoneAirCorrection::AfterSurfaceLoop
-        )
-    {
+    let adiabatic_report_history_outside_temperature_snapshots =
+        surface_manager::update_final_surface_heat_balance_source_order_path(|| {
+            if sync_adiabatic_outside_to_current_inside_before_history {
+                sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
+            }
+            if sync_adiabatic_outside_to_current_inside_for_report_only {
+                let snapshots = state
+                    .surfaces
+                    .iter()
+                    .filter(|surface| {
+                        surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+                    })
+                    .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
+                    .collect::<BTreeMap<_, _>>();
+                sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
+                Some(snapshots)
+            } else {
+                None
+            }
+        });
+
+    surface_manager::update_thermal_histories_source_order_path(|| {
+        state.last_ctf_history_slot_terms = heat_balance_ctf_history_slot_samples(&state.surfaces);
+        let inside_ctf_outside_temperature_history_commit_snapshots =
+            interleaved_surface_zone_balance_result
+                .as_ref()
+                .and_then(|result| result.inside_ctf_outside_temperature_snapshots.as_ref());
+        for surface in &mut state.surfaces {
+            if commit_adiabatic_current_inside_to_history_only
+                && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+            {
+                advance_surface_ctf_histories_with_outside_temperature_override(
+                    surface,
+                    Some(surface.inside_face_temperature_c),
+                );
+            } else if let Some(outside_temperature_c) =
+                adiabatic_report_history_outside_temperature_snapshots
+                    .as_ref()
+                    .and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
+            {
+                advance_surface_ctf_histories_with_outside_temperature_override(
+                    surface,
+                    Some(outside_temperature_c),
+                );
+            } else if let Some(outside_temperature_c) =
+                inside_ctf_outside_temperature_history_commit_override_c(
+                    surface,
+                    commit_inside_ctf_outside_temperature_to_history,
+                    inside_ctf_outside_temperature_history_commit_snapshots,
+                )
+            {
+                advance_surface_ctf_histories_with_outside_temperature_override(
+                    surface,
+                    Some(outside_temperature_c),
+                );
+            } else {
+                advance_surface_ctf_histories(surface);
+            }
+        }
+        state.last_ctf_history_slot_terms_after_advance =
+            heat_balance_ctf_history_slot_samples(&state.surfaces);
+    });
+
+    zone_predictor_corrector::correct_step_source_order_path(|| {
         correct_zone_air_temperatures_from_current_surfaces(
             &state.surfaces,
             &mut state.zones,
             input.timestep_seconds,
             weather_context,
             input.outdoor_dry_bulb_c,
-            true,
+            algorithm_flags.correct_zone_air_after_surface_pass
+                && !algorithm_flags.interleave_zone_air_surface_passes,
             heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
             use_inside_ctf_outside_temperature_for_conduction_report,
         );
-    }
-
-    if sync_adiabatic_outside_to_current_inside_before_history {
-        sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
-    }
-    let adiabatic_report_history_outside_temperature_snapshots =
-        if sync_adiabatic_outside_to_current_inside_for_report_only {
-            let snapshots = state
-                .surfaces
-                .iter()
-                .filter(|surface| {
-                    surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
-                })
-                .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
-                .collect::<BTreeMap<_, _>>();
-            sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
-            Some(snapshots)
-        } else {
-            None
-        };
-
-    state.last_ctf_history_slot_terms = heat_balance_ctf_history_slot_samples(&state.surfaces);
-    let inside_ctf_outside_temperature_history_commit_snapshots =
-        interleaved_surface_zone_balance_result
-            .as_ref()
-            .and_then(|result| result.inside_ctf_outside_temperature_snapshots.as_ref());
-    for surface in &mut state.surfaces {
-        if commit_adiabatic_current_inside_to_history_only
-            && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
-        {
-            advance_surface_ctf_histories_with_outside_temperature_override(
-                surface,
-                Some(surface.inside_face_temperature_c),
-            );
-        } else if let Some(outside_temperature_c) =
-            adiabatic_report_history_outside_temperature_snapshots
-                .as_ref()
-                .and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
-        {
-            advance_surface_ctf_histories_with_outside_temperature_override(
-                surface,
-                Some(outside_temperature_c),
-            );
-        } else if let Some(outside_temperature_c) =
-            inside_ctf_outside_temperature_history_commit_override_c(
-                surface,
-                commit_inside_ctf_outside_temperature_to_history,
-                inside_ctf_outside_temperature_history_commit_snapshots,
-            )
-        {
-            advance_surface_ctf_histories_with_outside_temperature_override(
-                surface,
-                Some(outside_temperature_c),
-            );
-        } else {
-            advance_surface_ctf_histories(surface);
-        }
-    }
-    state.last_ctf_history_slot_terms_after_advance =
-        heat_balance_ctf_history_slot_samples(&state.surfaces);
-
-    correct_zone_air_temperatures_from_current_surfaces(
-        &state.surfaces,
-        &mut state.zones,
-        input.timestep_seconds,
-        weather_context,
-        input.outdoor_dry_bulb_c,
-        algorithm_flags.correct_zone_air_after_surface_pass
-            && !algorithm_flags.interleave_zone_air_surface_passes,
-        heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
-        use_inside_ctf_outside_temperature_for_conduction_report,
-    );
-    correct_zone_air_humidity_ratios_from_current_state(
-        &mut state.zones,
-        input.timestep_seconds,
-        weather_context,
-        heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
-    );
-    if use_energyplus_adaptive_system_timestep_zone_air_correction {
-        apply_energyplus_adaptive_system_timestep_zone_air_correction(
-            &state.surfaces,
+        correct_zone_air_humidity_ratios_from_current_state(
             &mut state.zones,
             input.timestep_seconds,
             weather_context,
-            input.outdoor_dry_bulb_c,
-            use_inside_ctf_outside_temperature_for_conduction_report,
+            heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
         );
-    } else {
-        for zone in &mut state.zones {
-            zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
-            zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-            synchronize_single_system_timestep_history(zone);
-            zone.system_timestep_average_surface_convection_report_w = None;
-            zone.system_timestep_average_air_storage_report_w = None;
+        if use_energyplus_adaptive_system_timestep_zone_air_correction {
+            apply_energyplus_adaptive_system_timestep_zone_air_correction(
+                &state.surfaces,
+                &mut state.zones,
+                input.timestep_seconds,
+                weather_context,
+                input.outdoor_dry_bulb_c,
+                use_inside_ctf_outside_temperature_for_conduction_report,
+            );
+        } else {
+            for zone in &mut state.zones {
+                zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
+                zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
+                zone_predictor_corrector::push_system_timestep_histories_source_order_path(|| {
+                    synchronize_single_system_timestep_history(zone);
+                });
+                zone.system_timestep_average_surface_convection_report_w = None;
+                zone.system_timestep_average_air_storage_report_w = None;
+            }
         }
-    }
+    });
     state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
         .as_ref()
         .map(|result| result.inside_surface_iteration_count)

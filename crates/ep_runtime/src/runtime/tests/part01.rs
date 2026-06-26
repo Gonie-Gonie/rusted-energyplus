@@ -690,6 +690,85 @@
     }
 
     #[test]
+    fn heat_balance_source_order_wrappers_pass_through_runtime_blocks() {
+        let mut calls = Vec::new();
+
+        let result = crate::heat_balance::manager::manage_heat_balance_source_order_path(|| {
+            calls.push("ManageHeatBalance");
+            crate::heat_balance::manager::init_heat_balance_source_order_path(|| {
+                calls.push("InitHeatBalance");
+                41
+            })
+        });
+        let result = crate::heat_balance::surface_manager::manage_surface_heat_balance_source_order_path(|| {
+            calls.push("ManageSurfaceHeatBalance");
+            crate::heat_balance::surface_manager::init_surface_heat_balance_source_order_path(|| {
+                calls.push("InitSurfaceHeatBalance");
+                crate::heat_balance::surface_manager::calc_heat_balance_outside_surf_source_order_path(|| {
+                    calls.push("CalcHeatBalanceOutsideSurf");
+                    result + 1
+                })
+            })
+        });
+        crate::heat_balance::surface_manager::calc_heat_balance_inside_surf_source_order_path(|| {
+            calls.push("CalcHeatBalanceInsideSurf");
+        });
+        crate::heat_balance::air_manager::manage_air_heat_balance_source_order_path(|| {
+            calls.push("ManageAirHeatBalance");
+        });
+        crate::heat_balance::zone_predictor_corrector::manage_zone_air_updates_source_order_path(|| {
+            calls.push("ManageZoneAirUpdates");
+            crate::heat_balance::zone_predictor_corrector::push_zone_timestep_histories_source_order_path(|| {
+                calls.push("PushZoneTimestepHistories");
+            });
+            crate::heat_balance::zone_predictor_corrector::predict_step_source_order_path(|| {
+                calls.push("PredictStep");
+            });
+            crate::heat_balance::zone_predictor_corrector::correct_step_source_order_path(|| {
+                calls.push("CorrectStep");
+            });
+            crate::heat_balance::zone_predictor_corrector::revert_zone_timestep_histories_source_order_path(|| {
+                calls.push("RevertZoneTimestepHistories");
+            });
+            crate::heat_balance::zone_predictor_corrector::push_system_timestep_histories_source_order_path(|| {
+                calls.push("PushSystemTimestepHistories");
+            });
+        });
+        crate::heat_balance::surface_manager::update_final_surface_heat_balance_source_order_path(|| {
+            calls.push("UpdateFinalSurfaceHeatBalance");
+        });
+        crate::heat_balance::surface_manager::update_thermal_histories_source_order_path(|| {
+            calls.push("UpdateThermalHistories");
+        });
+        crate::heat_balance::surface_manager::report_surface_heat_balance_source_order_path(|| {
+            calls.push("ReportSurfaceHeatBalance");
+        });
+
+        assert_eq!(result, 42);
+        assert_eq!(
+            calls,
+            vec![
+                "ManageHeatBalance",
+                "InitHeatBalance",
+                "ManageSurfaceHeatBalance",
+                "InitSurfaceHeatBalance",
+                "CalcHeatBalanceOutsideSurf",
+                "CalcHeatBalanceInsideSurf",
+                "ManageAirHeatBalance",
+                "ManageZoneAirUpdates",
+                "PushZoneTimestepHistories",
+                "PredictStep",
+                "CorrectStep",
+                "RevertZoneTimestepHistories",
+                "PushSystemTimestepHistories",
+                "UpdateFinalSurfaceHeatBalance",
+                "UpdateThermalHistories",
+                "ReportSurfaceHeatBalance",
+            ]
+        );
+    }
+
+    #[test]
     fn heat_balance_zone_air_algorithm_lanes_separate_compatibility_and_diagnostics() {
         let candidate = HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate;
         assert_eq!(

@@ -123,6 +123,11 @@ pub const fn manage_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage
     )
 }
 
+/// EnergyPlus `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn manage_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// EnergyPlus `HeatBalanceSurfaceManager::InitSurfaceHeatBalance`.
 #[must_use]
 pub const fn init_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
@@ -131,6 +136,11 @@ pub const fn init_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
         "init-surface-heat-balance",
         "InitSurfaceHeatBalance",
     )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::InitSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn init_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
 }
 
 /// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf`.
@@ -143,6 +153,13 @@ pub const fn calc_heat_balance_outside_surf_stage() -> EnergyPlusCompatibilitySt
     )
 }
 
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf` source-order wrapper.
+pub(crate) fn calc_heat_balance_outside_surf_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
+
 /// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf`.
 #[must_use]
 pub const fn calc_heat_balance_inside_surf_stage() -> EnergyPlusCompatibilityStage {
@@ -151,6 +168,11 @@ pub const fn calc_heat_balance_inside_surf_stage() -> EnergyPlusCompatibilitySta
         "calc-heat-balance-inside-surf",
         "CalcHeatBalanceInsideSurf",
     )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf` source-order wrapper.
+pub(crate) fn calc_heat_balance_inside_surf_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
 }
 
 /// EnergyPlus `HeatBalanceSurfaceManager::UpdateFinalSurfaceHeatBalance`.
@@ -163,6 +185,13 @@ pub const fn update_final_surface_heat_balance_stage() -> EnergyPlusCompatibilit
     )
 }
 
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateFinalSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn update_final_surface_heat_balance_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
+
 /// EnergyPlus `HeatBalanceSurfaceManager::UpdateThermalHistories`.
 #[must_use]
 pub const fn update_thermal_histories_stage() -> EnergyPlusCompatibilityStage {
@@ -173,6 +202,11 @@ pub const fn update_thermal_histories_stage() -> EnergyPlusCompatibilityStage {
     )
 }
 
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateThermalHistories` source-order wrapper.
+pub(crate) fn update_thermal_histories_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// EnergyPlus `HeatBalanceSurfaceManager::ReportSurfaceHeatBalance`.
 #[must_use]
 pub const fn report_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
@@ -181,4 +215,9 @@ pub const fn report_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage
         "report-surface-heat-balance",
         "ReportSurfaceHeatBalance",
     )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::ReportSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn report_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
 }

@@ -14,6 +14,11 @@ pub const fn manage_zone_air_updates_stage() -> EnergyPlusCompatibilityStage {
     }
 }
 
+/// EnergyPlus `ZoneTempPredictorCorrector::ManageZoneAirUpdates` source-order wrapper.
+pub(crate) fn manage_zone_air_updates_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// Source-order ownership note for current zone-air history state.
 pub const ZONE_AIR_HISTORY_OWNER: &str =
     "MAT history and zone-air output timing are owned by ManageZoneAirUpdates.";
@@ -22,13 +27,42 @@ pub const ZONE_AIR_HISTORY_OWNER: &str =
 pub const ZONE_AIR_PREDICT_STEP_PATH: &str =
     "PredictStep is represented by zone-air coefficient assembly before correction.";
 
+/// EnergyPlus `ZoneTempPredictorCorrector::PredictStep` source-order wrapper.
+pub(crate) fn predict_step_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// Source-order note for EnergyPlus `CorrectStep` ownership.
 pub const ZONE_AIR_CORRECT_STEP_PATH: &str =
     "CorrectStep is represented by analytical or third-order zone-air correction.";
 
+/// EnergyPlus `ZoneTempPredictorCorrector::CorrectStep` source-order wrapper.
+pub(crate) fn correct_step_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// Source-order note for zone-air history push and revert ownership.
 pub const ZONE_AIR_HISTORY_PUSH_REVERT_PATH: &str =
     "History push/revert is owned by ManageZoneAirUpdates and timestep history synchronization.";
+
+/// EnergyPlus `ZoneTempPredictorCorrector::RevertZoneTimestepHistories` source-order wrapper.
+pub(crate) fn revert_zone_timestep_histories_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
+
+/// EnergyPlus `ZoneTempPredictorCorrector::PushZoneTimestepHistories` source-order wrapper.
+pub(crate) fn push_zone_timestep_histories_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// EnergyPlus `ZoneTempPredictorCorrector::PushSystemTimestepHistories` source-order wrapper.
+pub(crate) fn push_system_timestep_histories_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
 
 pub(crate) fn step_zone_air_temperature(
     current_temperature_c: f64,

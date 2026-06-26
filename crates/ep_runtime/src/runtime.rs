@@ -51,6 +51,7 @@ use crate::heat_balance::longwave::{
     energyplus_exterior_longwave_terms, energyplus_linearized_radiation_coefficient_w_per_m2_k,
     horizontal_infrared_sky_temperature_c,
 };
+use crate::heat_balance::manager::init_heat_balance_source_order_path;
 #[cfg(test)]
 use crate::heat_balance::radiation::{
     InteriorLongwaveExchangeProbe, InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET,
@@ -237,30 +238,33 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let first_hour_interpolation_starting_values =
         run_period_first_hour_interpolation_starting_values(&model.typed);
-    let mut state = initialize_heat_balance_state_with_ctf_coefficients(
-        model,
-        options.initial_zone_air_temperature_c,
-        ctf_coefficients,
-    )?;
-    seed_zone_air_humidity_ratios_from_weather_records(
-        &mut state,
-        weather_records,
-        weather_dry_bulb_c[0],
-        zone_steps_per_hour,
-        first_hour_interpolation_starting_values,
-    );
-    match options.ctf_initial_history_policy {
-        HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
-            seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+    let mut state = init_heat_balance_source_order_path(|| {
+        let mut state = initialize_heat_balance_state_with_ctf_coefficients(
+            model,
+            options.initial_zone_air_temperature_c,
+            ctf_coefficients,
+        )?;
+        seed_zone_air_humidity_ratios_from_weather_records(
+            &mut state,
+            weather_records,
+            weather_dry_bulb_c[0],
+            zone_steps_per_hour,
+            first_hour_interpolation_starting_values,
+        );
+        match options.ctf_initial_history_policy {
+            HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
+                seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+            }
+            HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
+                seed_energyplus_initial_surface_ctf_histories(
+                    &mut state,
+                    options.initial_zone_air_temperature_c,
+                    weather_dry_bulb_c[0],
+                );
+            }
         }
-        HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
-            seed_energyplus_initial_surface_ctf_histories(
-                &mut state,
-                options.initial_zone_air_temperature_c,
-                weather_dry_bulb_c[0],
-            );
-        }
-    }
+        Ok::<HeatBalanceState, RuntimeError>(state)
+    })?;
     let mut warmup_day_end_zone_air_states = Vec::new();
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,

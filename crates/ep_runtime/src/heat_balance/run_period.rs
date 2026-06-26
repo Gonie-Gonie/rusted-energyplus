@@ -40,6 +40,7 @@ use crate::heat_balance::state::{
 use crate::heat_balance::surface_balance::{
     reported_surface_outside_face_temperature_c, surface_exterior_report_terms,
 };
+use crate::heat_balance::surface_manager;
 use crate::heat_balance::surface_weather::{
     energyplus_exterior_wet_reference_temperature_c,
     energyplus_weather_record_is_rain_at_timestep_with_starting_values,
@@ -478,80 +479,84 @@ pub(crate) fn sample_heat_balance_run_period(
                     zone_air_heat_balance_last[index] = values;
                 }
             }
-            for (index, trace) in surface_temperatures.iter().enumerate() {
-                if let Some(surface_state) = state
-                    .surfaces
-                    .iter()
-                    .find(|surface| surface.surface_id == trace.surface_id)
-                {
-                    let inside_convection_heat_gain_rate_per_area =
-                        surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
-                            surface_state,
-                            &state.zones,
-                            use_surface_reference_air_surface_convection_report,
-                            use_final_inside_convection_report,
-                        );
-                    let inside_convection_heat_gain_rate =
-                        surface_state.area_m2 * inside_convection_heat_gain_rate_per_area;
-                    let inside_convection_coefficient_w_per_m2_k =
-                        surface_inside_convection_report_coefficient_w_per_m2_k(
-                            surface_state,
-                            &state.zones,
-                            use_surface_reference_air_surface_convection_report,
-                            use_final_inside_convection_report,
-                        );
-                    let inside_net_surface_thermal_radiation_heat_gain_rate =
-                        surface_state.area_m2 * surface_state.inside_net_longwave_w_per_m2;
-                    let inside_rate = surface_inside_conduction_rate_w_for_report(
-                        surface_state,
-                        use_inside_ctf_outside_temperature_for_conduction_report,
-                    );
-                    let outside_rate = surface_outside_conduction_rate_w_for_report(
-                        surface_state,
-                        use_inside_ctf_outside_temperature_for_conduction_report,
-                    );
-                    let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
-                    let storage_rate_per_area =
-                        surface_rate_per_area_w_per_m2(storage_rate, surface_state.area_m2);
-                    let outside_face_temperature_c = reported_surface_outside_face_temperature_c(
-                        &model.typed,
-                        surface_state,
-                        timestep_outdoor_dry_bulb_c,
-                        surface_state.inside_face_temperature_c,
-                        weather_context,
-                        options.zone_air_algorithm,
-                    );
-                    let exterior_terms = surface_exterior_report_terms(
-                        &model.typed,
-                        surface_state,
-                        timestep_outdoor_dry_bulb_c,
-                        outside_face_temperature_c,
-                        weather_context,
-                        options.zone_air_algorithm,
-                    );
-                    let typed_surface = model
-                        .typed
+            surface_manager::report_surface_heat_balance_source_order_path(|| {
+                for (index, trace) in surface_temperatures.iter().enumerate() {
+                    if let Some(surface_state) = state
                         .surfaces
                         .iter()
-                        .find(|surface| surface.id == surface_state.surface_id);
-                    let surface_outdoor_air_dry_bulb_temperature_c = typed_surface
-                        .map(|surface| {
-                            energyplus_surface_outdoor_air_temperature_c(
-                                surface,
+                        .find(|surface| surface.surface_id == trace.surface_id)
+                    {
+                        let inside_convection_heat_gain_rate_per_area =
+                            surface_inside_convection_heat_gain_rate_per_area_w_per_m2(
+                                surface_state,
+                                &state.zones,
+                                use_surface_reference_air_surface_convection_report,
+                                use_final_inside_convection_report,
+                            );
+                        let inside_convection_heat_gain_rate =
+                            surface_state.area_m2 * inside_convection_heat_gain_rate_per_area;
+                        let inside_convection_coefficient_w_per_m2_k =
+                            surface_inside_convection_report_coefficient_w_per_m2_k(
+                                surface_state,
+                                &state.zones,
+                                use_surface_reference_air_surface_convection_report,
+                                use_final_inside_convection_report,
+                            );
+                        let inside_net_surface_thermal_radiation_heat_gain_rate =
+                            surface_state.area_m2 * surface_state.inside_net_longwave_w_per_m2;
+                        let inside_rate = surface_inside_conduction_rate_w_for_report(
+                            surface_state,
+                            use_inside_ctf_outside_temperature_for_conduction_report,
+                        );
+                        let outside_rate = surface_outside_conduction_rate_w_for_report(
+                            surface_state,
+                            use_inside_ctf_outside_temperature_for_conduction_report,
+                        );
+                        let storage_rate = surface_heat_storage_rate_w(inside_rate, outside_rate);
+                        let storage_rate_per_area =
+                            surface_rate_per_area_w_per_m2(storage_rate, surface_state.area_m2);
+                        let outside_face_temperature_c =
+                            reported_surface_outside_face_temperature_c(
+                                &model.typed,
+                                surface_state,
                                 timestep_outdoor_dry_bulb_c,
-                            )
-                        })
-                        .unwrap_or(timestep_outdoor_dry_bulb_c);
-                    let surface_outdoor_air_wet_bulb_temperature_c = typed_surface
-                        .map(|surface| {
-                            energyplus_surface_outdoor_air_temperature_c(
-                                surface,
-                                timestep_outdoor_wet_bulb_c,
-                            )
-                        })
-                        .unwrap_or(timestep_outdoor_wet_bulb_c);
-                    let (weather_file_wind_speed_m_per_s, surface_outdoor_air_wind_direction_deg) =
-                        weather_context
+                                surface_state.inside_face_temperature_c,
+                                weather_context,
+                                options.zone_air_algorithm,
+                            );
+                        let exterior_terms = surface_exterior_report_terms(
+                            &model.typed,
+                            surface_state,
+                            timestep_outdoor_dry_bulb_c,
+                            outside_face_temperature_c,
+                            weather_context,
+                            options.zone_air_algorithm,
+                        );
+                        let typed_surface = model
+                            .typed
+                            .surfaces
+                            .iter()
+                            .find(|surface| surface.id == surface_state.surface_id);
+                        let surface_outdoor_air_dry_bulb_temperature_c = typed_surface
+                            .map(|surface| {
+                                energyplus_surface_outdoor_air_temperature_c(
+                                    surface,
+                                    timestep_outdoor_dry_bulb_c,
+                                )
+                            })
+                            .unwrap_or(timestep_outdoor_dry_bulb_c);
+                        let surface_outdoor_air_wet_bulb_temperature_c = typed_surface
+                            .map(|surface| {
+                                energyplus_surface_outdoor_air_temperature_c(
+                                    surface,
+                                    timestep_outdoor_wet_bulb_c,
+                                )
+                            })
+                            .unwrap_or(timestep_outdoor_wet_bulb_c);
+                        let (
+                            weather_file_wind_speed_m_per_s,
+                            surface_outdoor_air_wind_direction_deg,
+                        ) = weather_context
                             .and_then(|context| {
                                 context.records.get(context.record_index).map(|record| {
                                     (
@@ -567,153 +572,155 @@ pub(crate) fn sample_heat_balance_run_period(
                                 })
                             })
                             .unwrap_or((0.0, 0.0));
-                    let surface_outdoor_air_wind_speed_m_per_s = typed_surface
-                        .map(|surface| {
-                            energyplus_surface_outside_wind_speed_m_per_s(
-                                surface,
-                                energyplus_building_terrain(&model.typed),
-                                weather_file_wind_speed_m_per_s,
-                            )
-                        })
-                        .unwrap_or(weather_file_wind_speed_m_per_s);
-                    if hour_index == 0 {
-                        let zone_mean_air_temperature_c = state
-                            .zones
-                            .iter()
-                            .find(|zone| zone.zone_id == surface_state.zone_id)
-                            .map(|zone| zone.mean_air_temperature_c)
-                            .unwrap_or(f64::NAN);
-                        surface_first_sample_trace.push(HeatBalanceSurfaceFirstSampleTrace {
-                            surface_name: surface_state.surface_name.clone(),
-                            construction_name: surface_state.construction_name.clone(),
-                            timestep_index: substep,
-                            outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
-                            zone_mean_air_temperature_c,
-                            inside_face_temperature_c: surface_state.inside_face_temperature_c,
-                            inside_convection_input_inside_face_temperature_c: surface_state
-                                .inside_convection_input_inside_face_temperature_c,
-                            inside_convection_input_reference_air_temperature_c: surface_state
-                                .inside_convection_input_reference_air_temperature_c,
-                            outside_face_temperature_c,
-                            inside_convection_heat_gain_rate_w: inside_convection_heat_gain_rate,
-                            inside_net_surface_thermal_radiation_heat_gain_rate_w:
-                                inside_net_surface_thermal_radiation_heat_gain_rate,
-                            inside_conduction_rate_w: inside_rate,
-                            outside_conduction_rate_w: outside_rate,
-                            heat_storage_rate_w: storage_rate,
-                            outside_convection_heat_gain_rate_w: exterior_terms
-                                .convection_heat_gain_rate_w,
-                            outside_net_thermal_radiation_heat_gain_rate_w: exterior_terms
-                                .net_thermal_radiation_heat_gain_rate_w,
-                            outside_solar_radiation_heat_gain_rate_w: exterior_terms
-                                .solar_radiation_heat_gain_rate_w,
-                        });
-                    }
-                    let sums = &mut surface_sums[index];
-                    sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
-                    sums.inside_adjacent_air_temperature_c +=
-                        surface_state.inside_reference_air_temperature_c;
-                    sums.outside_face_temperature_c += outside_face_temperature_c;
-                    sums.outside_outdoor_air_dry_bulb_temperature_c +=
-                        surface_outdoor_air_dry_bulb_temperature_c;
-                    sums.outside_outdoor_air_wet_bulb_temperature_c +=
-                        surface_outdoor_air_wet_bulb_temperature_c;
-                    sums.outside_outdoor_air_wind_speed_m_per_s +=
-                        surface_outdoor_air_wind_speed_m_per_s;
-                    sums.outside_outdoor_air_wind_direction_deg +=
-                        surface_outdoor_air_wind_direction_deg;
-                    sums.inside_convection_heat_gain_rate_w += inside_convection_heat_gain_rate;
-                    sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
-                        inside_convection_heat_gain_rate_per_area;
-                    sums.inside_convection_coefficient_w_per_m2_k +=
-                        inside_convection_coefficient_w_per_m2_k;
-                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_w +=
-                        inside_net_surface_thermal_radiation_heat_gain_rate;
-                    sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                        let surface_outdoor_air_wind_speed_m_per_s = typed_surface
+                            .map(|surface| {
+                                energyplus_surface_outside_wind_speed_m_per_s(
+                                    surface,
+                                    energyplus_building_terrain(&model.typed),
+                                    weather_file_wind_speed_m_per_s,
+                                )
+                            })
+                            .unwrap_or(weather_file_wind_speed_m_per_s);
+                        if hour_index == 0 {
+                            let zone_mean_air_temperature_c = state
+                                .zones
+                                .iter()
+                                .find(|zone| zone.zone_id == surface_state.zone_id)
+                                .map(|zone| zone.mean_air_temperature_c)
+                                .unwrap_or(f64::NAN);
+                            surface_first_sample_trace.push(HeatBalanceSurfaceFirstSampleTrace {
+                                surface_name: surface_state.surface_name.clone(),
+                                construction_name: surface_state.construction_name.clone(),
+                                timestep_index: substep,
+                                outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
+                                zone_mean_air_temperature_c,
+                                inside_face_temperature_c: surface_state.inside_face_temperature_c,
+                                inside_convection_input_inside_face_temperature_c: surface_state
+                                    .inside_convection_input_inside_face_temperature_c,
+                                inside_convection_input_reference_air_temperature_c: surface_state
+                                    .inside_convection_input_reference_air_temperature_c,
+                                outside_face_temperature_c,
+                                inside_convection_heat_gain_rate_w:
+                                    inside_convection_heat_gain_rate,
+                                inside_net_surface_thermal_radiation_heat_gain_rate_w:
+                                    inside_net_surface_thermal_radiation_heat_gain_rate,
+                                inside_conduction_rate_w: inside_rate,
+                                outside_conduction_rate_w: outside_rate,
+                                heat_storage_rate_w: storage_rate,
+                                outside_convection_heat_gain_rate_w: exterior_terms
+                                    .convection_heat_gain_rate_w,
+                                outside_net_thermal_radiation_heat_gain_rate_w: exterior_terms
+                                    .net_thermal_radiation_heat_gain_rate_w,
+                                outside_solar_radiation_heat_gain_rate_w: exterior_terms
+                                    .solar_radiation_heat_gain_rate_w,
+                            });
+                        }
+                        let sums = &mut surface_sums[index];
+                        sums.inside_face_temperature_c += surface_state.inside_face_temperature_c;
+                        sums.inside_adjacent_air_temperature_c +=
+                            surface_state.inside_reference_air_temperature_c;
+                        sums.outside_face_temperature_c += outside_face_temperature_c;
+                        sums.outside_outdoor_air_dry_bulb_temperature_c +=
+                            surface_outdoor_air_dry_bulb_temperature_c;
+                        sums.outside_outdoor_air_wet_bulb_temperature_c +=
+                            surface_outdoor_air_wet_bulb_temperature_c;
+                        sums.outside_outdoor_air_wind_speed_m_per_s +=
+                            surface_outdoor_air_wind_speed_m_per_s;
+                        sums.outside_outdoor_air_wind_direction_deg +=
+                            surface_outdoor_air_wind_direction_deg;
+                        sums.inside_convection_heat_gain_rate_w += inside_convection_heat_gain_rate;
+                        sums.inside_convection_heat_gain_rate_per_area_w_per_m2 +=
+                            inside_convection_heat_gain_rate_per_area;
+                        sums.inside_convection_coefficient_w_per_m2_k +=
+                            inside_convection_coefficient_w_per_m2_k;
+                        sums.inside_net_surface_thermal_radiation_heat_gain_rate_w +=
+                            inside_net_surface_thermal_radiation_heat_gain_rate;
+                        sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
                         surface_state.inside_net_longwave_w_per_m2;
-                    sums.outside_convection_heat_gain_rate_w +=
-                        exterior_terms.convection_heat_gain_rate_w;
-                    sums.outside_convection_heat_gain_rate_per_area_w_per_m2 +=
-                        exterior_terms.convection_heat_gain_rate_per_area_w_per_m2;
-                    sums.outside_convection_coefficient_w_per_m2_k +=
-                        exterior_terms.convection_coefficient_w_per_m2_k;
-                    sums.outside_net_thermal_radiation_heat_gain_rate_w +=
-                        exterior_terms.net_thermal_radiation_heat_gain_rate_w;
-                    sums.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
-                        exterior_terms.net_thermal_radiation_heat_gain_rate_per_area_w_per_m2;
-                    sums.outside_thermal_radiation_to_air_coefficient_w_per_m2_k +=
-                        exterior_terms.thermal_radiation_to_air_coefficient_w_per_m2_k;
-                    sums.outside_thermal_radiation_to_sky_coefficient_w_per_m2_k +=
-                        exterior_terms.thermal_radiation_to_sky_coefficient_w_per_m2_k;
-                    sums.outside_thermal_radiation_to_ground_coefficient_w_per_m2_k +=
-                        exterior_terms.thermal_radiation_to_ground_coefficient_w_per_m2_k;
-                    sums.outside_solar_radiation_heat_gain_rate_w +=
-                        exterior_terms.solar_radiation_heat_gain_rate_w;
-                    sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 +=
-                        exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2;
-                    let outside_balance = surface_state.outside_balance_diagnostics;
-                    sums.outside_balance_report_temperature_c +=
-                        outside_balance.report_temperature_c;
-                    sums.outside_balance_coefficient_temperature_c +=
-                        outside_balance.coefficient_surface_temperature_c;
-                    sums.outside_balance_convection_reference_temperature_c +=
-                        outside_balance.convection_reference_temperature_c;
-                    sums.outside_balance_equivalent_radiant_temperature_c +=
-                        outside_balance.equivalent_radiant_temperature_c;
-                    sums.outside_balance_radiation_coefficient_w_per_m2_k +=
-                        outside_balance.outside_radiation_coefficient_w_per_m2_k;
-                    sums.outside_quick_balance_inside_source_term_w_per_m2 +=
-                        outside_balance.quick_net_inside_source_w_per_m2;
-                    sums.outside_quick_balance_inside_balance_term_w_per_m2 +=
-                        outside_balance.quick_inside_balance_term_w_per_m2;
-                    sums.outside_quick_balance_numerator_w_per_m2 +=
-                        outside_balance.quick_numerator_w_per_m2;
-                    sums.outside_quick_balance_denominator_w_per_m2_k +=
-                        outside_balance.quick_denominator_w_per_m2_k;
-                    sums.outside_quick_balance_coupling_factor +=
-                        outside_balance.quick_coupling_factor;
-                    sums.inside_conduction_rate_w += inside_rate;
-                    sums.inside_conduction_gain_rate_w += heat_gain_rate_w(inside_rate);
-                    sums.inside_conduction_loss_rate_w += heat_loss_rate_w(inside_rate);
-                    sums.inside_conduction_rate_per_area_w_per_m2 +=
-                        surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2);
-                    sums.ctf_inside_current_outside_term_rate_w +=
-                        surface_ctf_inside_current_outside_term_rate_w_for_report(
-                            surface_state,
-                            use_inside_ctf_outside_temperature_for_conduction_report,
-                        );
-                    sums.ctf_inside_current_inside_term_rate_w +=
-                        surface_ctf_inside_current_inside_term_rate_w(surface_state);
-                    sums.ctf_inside_history_term_rate_w +=
-                        surface_ctf_inside_history_term_rate_w(surface_state);
-                    sums.ctf_inside_history_temperature_term_rate_w +=
-                        heat_balance_ctf_history_slot_inside_temperature_term_rate_w(
-                            &state.last_ctf_history_slot_terms,
-                            &surface_state.surface_name,
-                        );
-                    sums.ctf_inside_history_flux_term_rate_w +=
-                        heat_balance_ctf_history_slot_inside_flux_term_rate_w(
-                            &state.last_ctf_history_slot_terms,
-                            &surface_state.surface_name,
-                        );
-                    sums.outside_conduction_rate_w += outside_rate;
-                    sums.outside_conduction_gain_rate_w += heat_gain_rate_w(outside_rate);
-                    sums.outside_conduction_loss_rate_w += heat_loss_rate_w(outside_rate);
-                    sums.outside_conduction_rate_per_area_w_per_m2 +=
-                        surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2);
-                    sums.ctf_outside_current_outside_term_rate_w +=
-                        surface_ctf_outside_current_outside_term_rate_w_for_report(
-                            surface_state,
-                            use_inside_ctf_outside_temperature_for_conduction_report,
-                        );
-                    sums.ctf_outside_current_inside_term_rate_w +=
-                        surface_ctf_outside_current_inside_term_rate_w(surface_state);
-                    sums.ctf_outside_history_term_rate_w +=
-                        surface_ctf_outside_history_term_rate_w(surface_state);
-                    sums.heat_storage_rate_w += storage_rate;
-                    sums.heat_storage_rate_per_area_w_per_m2 += storage_rate_per_area;
+                        sums.outside_convection_heat_gain_rate_w +=
+                            exterior_terms.convection_heat_gain_rate_w;
+                        sums.outside_convection_heat_gain_rate_per_area_w_per_m2 +=
+                            exterior_terms.convection_heat_gain_rate_per_area_w_per_m2;
+                        sums.outside_convection_coefficient_w_per_m2_k +=
+                            exterior_terms.convection_coefficient_w_per_m2_k;
+                        sums.outside_net_thermal_radiation_heat_gain_rate_w +=
+                            exterior_terms.net_thermal_radiation_heat_gain_rate_w;
+                        sums.outside_net_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                            exterior_terms.net_thermal_radiation_heat_gain_rate_per_area_w_per_m2;
+                        sums.outside_thermal_radiation_to_air_coefficient_w_per_m2_k +=
+                            exterior_terms.thermal_radiation_to_air_coefficient_w_per_m2_k;
+                        sums.outside_thermal_radiation_to_sky_coefficient_w_per_m2_k +=
+                            exterior_terms.thermal_radiation_to_sky_coefficient_w_per_m2_k;
+                        sums.outside_thermal_radiation_to_ground_coefficient_w_per_m2_k +=
+                            exterior_terms.thermal_radiation_to_ground_coefficient_w_per_m2_k;
+                        sums.outside_solar_radiation_heat_gain_rate_w +=
+                            exterior_terms.solar_radiation_heat_gain_rate_w;
+                        sums.outside_solar_radiation_heat_gain_rate_per_area_w_per_m2 +=
+                            exterior_terms.solar_radiation_heat_gain_rate_per_area_w_per_m2;
+                        let outside_balance = surface_state.outside_balance_diagnostics;
+                        sums.outside_balance_report_temperature_c +=
+                            outside_balance.report_temperature_c;
+                        sums.outside_balance_coefficient_temperature_c +=
+                            outside_balance.coefficient_surface_temperature_c;
+                        sums.outside_balance_convection_reference_temperature_c +=
+                            outside_balance.convection_reference_temperature_c;
+                        sums.outside_balance_equivalent_radiant_temperature_c +=
+                            outside_balance.equivalent_radiant_temperature_c;
+                        sums.outside_balance_radiation_coefficient_w_per_m2_k +=
+                            outside_balance.outside_radiation_coefficient_w_per_m2_k;
+                        sums.outside_quick_balance_inside_source_term_w_per_m2 +=
+                            outside_balance.quick_net_inside_source_w_per_m2;
+                        sums.outside_quick_balance_inside_balance_term_w_per_m2 +=
+                            outside_balance.quick_inside_balance_term_w_per_m2;
+                        sums.outside_quick_balance_numerator_w_per_m2 +=
+                            outside_balance.quick_numerator_w_per_m2;
+                        sums.outside_quick_balance_denominator_w_per_m2_k +=
+                            outside_balance.quick_denominator_w_per_m2_k;
+                        sums.outside_quick_balance_coupling_factor +=
+                            outside_balance.quick_coupling_factor;
+                        sums.inside_conduction_rate_w += inside_rate;
+                        sums.inside_conduction_gain_rate_w += heat_gain_rate_w(inside_rate);
+                        sums.inside_conduction_loss_rate_w += heat_loss_rate_w(inside_rate);
+                        sums.inside_conduction_rate_per_area_w_per_m2 +=
+                            surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2);
+                        sums.ctf_inside_current_outside_term_rate_w +=
+                            surface_ctf_inside_current_outside_term_rate_w_for_report(
+                                surface_state,
+                                use_inside_ctf_outside_temperature_for_conduction_report,
+                            );
+                        sums.ctf_inside_current_inside_term_rate_w +=
+                            surface_ctf_inside_current_inside_term_rate_w(surface_state);
+                        sums.ctf_inside_history_term_rate_w +=
+                            surface_ctf_inside_history_term_rate_w(surface_state);
+                        sums.ctf_inside_history_temperature_term_rate_w +=
+                            heat_balance_ctf_history_slot_inside_temperature_term_rate_w(
+                                &state.last_ctf_history_slot_terms,
+                                &surface_state.surface_name,
+                            );
+                        sums.ctf_inside_history_flux_term_rate_w +=
+                            heat_balance_ctf_history_slot_inside_flux_term_rate_w(
+                                &state.last_ctf_history_slot_terms,
+                                &surface_state.surface_name,
+                            );
+                        sums.outside_conduction_rate_w += outside_rate;
+                        sums.outside_conduction_gain_rate_w += heat_gain_rate_w(outside_rate);
+                        sums.outside_conduction_loss_rate_w += heat_loss_rate_w(outside_rate);
+                        sums.outside_conduction_rate_per_area_w_per_m2 +=
+                            surface_rate_per_area_w_per_m2(outside_rate, surface_state.area_m2);
+                        sums.ctf_outside_current_outside_term_rate_w +=
+                            surface_ctf_outside_current_outside_term_rate_w_for_report(
+                                surface_state,
+                                use_inside_ctf_outside_temperature_for_conduction_report,
+                            );
+                        sums.ctf_outside_current_inside_term_rate_w +=
+                            surface_ctf_outside_current_inside_term_rate_w(surface_state);
+                        sums.ctf_outside_history_term_rate_w +=
+                            surface_ctf_outside_history_term_rate_w(surface_state);
+                        sums.heat_storage_rate_w += storage_rate;
+                        sums.heat_storage_rate_per_area_w_per_m2 += storage_rate_per_area;
+                    }
                 }
-            }
+            });
         }
 
         hourly_ctf_history_slots.extend(

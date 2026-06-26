@@ -39,6 +39,11 @@ pub const fn ems_begin_before_init_heat_balance_stage() -> EnergyPlusCompatibili
     )
 }
 
+/// EnergyPlus `HeatBalanceManager::ManageHeatBalance` source-order wrapper.
+pub(crate) fn manage_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// EnergyPlus `HeatBalanceManager::InitHeatBalance`.
 #[must_use]
 pub const fn init_heat_balance_stage() -> EnergyPlusCompatibilityStage {
@@ -47,6 +52,11 @@ pub const fn init_heat_balance_stage() -> EnergyPlusCompatibilityStage {
         "init-heat-balance",
         "InitHeatBalance",
     )
+}
+
+/// EnergyPlus `HeatBalanceManager::InitHeatBalance` source-order wrapper.
+pub(crate) fn init_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
 }
 
 /// EMS begin-zone-timestep callback after `InitHeatBalance`.

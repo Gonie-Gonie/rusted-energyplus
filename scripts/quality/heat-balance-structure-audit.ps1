@@ -186,6 +186,7 @@ Assert-Contains -Path $heatBalanceMod -Pattern 'pub mod timestep;' -Description 
 
 Assert-Contains -Path $manager -Pattern 'pub fn manage_heat_balance_source_order_stages\s*\(' -Description "HeatBalanceManager source-order list"
 foreach ($routine in @(
+        "ManageHeatBalance",
         "GetHeatBalanceInput",
         "InitHeatBalance",
         "RecKeepHeatBalance",
@@ -195,13 +196,15 @@ foreach ($routine in @(
     Assert-Contains -Path $manager -Pattern $routine -Description "HeatBalanceManager routine $routine"
 }
 foreach ($target in @(
+        "manage_heat_balance_source_order_path",
         "get_heat_balance_input_stage",
         "init_heat_balance_stage",
+        "init_heat_balance_source_order_path",
         "rec_keep_heat_balance_stage",
         "report_heat_balance_stage",
         "check_warmup_convergence_stage"
     )) {
-    Assert-Contains -Path $manager -Pattern "$target\s*\(" -Description "HeatBalanceManager ledger target $target"
+    Assert-Contains -Path $manager -Pattern "$target(?:<[^>]+>)?\s*\(" -Description "HeatBalanceManager ledger target $target"
 }
 
 foreach ($routine in @(
@@ -217,14 +220,21 @@ foreach ($routine in @(
 }
 foreach ($target in @(
         "manage_surface_heat_balance_stage",
+        "manage_surface_heat_balance_source_order_path",
         "init_surface_heat_balance_stage",
+        "init_surface_heat_balance_source_order_path",
         "calc_heat_balance_outside_surf_stage",
+        "calc_heat_balance_outside_surf_source_order_path",
         "calc_heat_balance_inside_surf_stage",
+        "calc_heat_balance_inside_surf_source_order_path",
         "update_final_surface_heat_balance_stage",
+        "update_final_surface_heat_balance_source_order_path",
         "update_thermal_histories_stage",
-        "report_surface_heat_balance_stage"
+        "update_thermal_histories_source_order_path",
+        "report_surface_heat_balance_stage",
+        "report_surface_heat_balance_source_order_path"
     )) {
-    Assert-Contains -Path $surfaceManager -Pattern "$target\s*\(" -Description "HeatBalanceSurfaceManager ledger target $target"
+    Assert-Contains -Path $surfaceManager -Pattern "$target(?:<[^>]+>)?\s*\(" -Description "HeatBalanceSurfaceManager ledger target $target"
 }
 
 Assert-Contains -Path $surfaceBalance -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface balance source owner"
@@ -269,6 +279,7 @@ Assert-NotContains -Path $runtime -Pattern 'fn surface_boundary_temperature_c\s*
 Assert-NotContains -Path $runtime -Pattern 'fn surface_steady_u_value_w_per_m2_k\s*\(' -Description "runtime-owned surface steady U-value"
 Assert-Contains -Path $airManager -Pattern 'ManageAirHeatBalance' -Description "HeatBalanceAirManager routine"
 Assert-Contains -Path $airManager -Pattern 'manage_air_heat_balance_stage\s*\(' -Description "HeatBalanceAirManager ledger target manage_air_heat_balance_stage"
+Assert-Contains -Path $airManager -Pattern 'manage_air_heat_balance_source_order_path(?:<[^>]+>)?\s*\(' -Description "HeatBalanceAirManager source-order wrapper"
 Assert-Contains -Path $airManager -Pattern 'weather_context_zone_air_heat_capacity_j_per_k' -Description "weather-driven zone-air heat capacity owner"
 Assert-Contains -Path $airManager -Pattern 'update_zone_air_heat_capacities_from_weather_context' -Description "zone-air weather capacity updater owner"
 Assert-Contains -Path $airManager -Pattern 'seed_zone_air_humidity_ratios_from_weather_records' -Description "zone-air weather humidity seeding owner"
@@ -279,11 +290,17 @@ Assert-NotContains -Path $runtime -Pattern 'fn seed_zone_air_humidity_ratios_fro
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_air_storage_rate_w\s*\(' -Description "runtime-owned zone-air storage report implementation"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ManageZoneAirUpdates' -Description "ZoneTempPredictorCorrector routine"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_stage\s*\(' -Description "ZoneTempPredictorCorrector ledger target manage_zone_air_updates_stage"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector ManageZoneAirUpdates source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_PREDICT_STEP_PATH' -Description "ZoneTempPredictorCorrector PredictStep source-order path"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'PredictStep' -Description "ZoneTempPredictorCorrector PredictStep source routine"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'predict_step_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PredictStep source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_CORRECT_STEP_PATH' -Description "ZoneTempPredictorCorrector CorrectStep source-order path"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'CorrectStep' -Description "ZoneTempPredictorCorrector CorrectStep source routine"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'correct_step_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector CorrectStep source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_HISTORY_PUSH_REVERT_PATH' -Description "ZoneTempPredictorCorrector history push/revert path"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'revert_zone_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector RevertZoneTimestepHistories source-order wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_zone_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushZoneTimestepHistories source-order wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_system_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushSystemTimestepHistories source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_zone_air_temperature_coefficients' -Description "ZoneTempPredictorCorrector coefficient owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_third_order_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector third-order solver owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_analytical_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector analytical solver owner"
@@ -392,6 +409,7 @@ Assert-Contains -Path $summary -Pattern 'HeatBalanceSimulation' -Description "he
 Assert-NotContains -Path $state -Pattern 'pub struct HeatBalanceSimulationSummary' -Description "state-owned simulation summary"
 Assert-Contains -Path $runPeriod -Pattern 'sample_heat_balance_run_period' -Description "run-period sampler owner"
 Assert-Contains -Path $runtime -Pattern 'sample_heat_balance_run_period' -Description "runtime delegates run-period sampling"
+Assert-Contains -Path $runtime -Pattern 'init_heat_balance_source_order_path' -Description "runtime enters InitHeatBalance source-order wrapper"
 Assert-Contains -Path $surfaceWeather -Pattern 'CalcHeatBalanceOutsideSurf' -Description "surface weather source owner"
 Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_exterior_wet_timestep_fraction' -Description "exterior wet timestep fraction owner"
 Assert-Contains -Path $surfaceWeather -Pattern 'energyplus_exterior_wet_context_fraction' -Description "exterior wet context fraction owner"
@@ -403,6 +421,20 @@ Assert-NotContains -Path $runtime -Pattern 'fn energyplus_weather_record_is_rain
 Assert-NotContains -Path $runtime -Pattern 'fn energyplus_exterior_wet_reference_temperature_c\s*\(' -Description "runtime-owned wet exterior reference temperature"
 Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep' -Description "heat-balance timestep advance owner"
 Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep_internal' -Description "heat-balance internal timestep advance owner"
+Assert-Contains -Path $timestep -Pattern 'manager::manage_heat_balance_source_order_path' -Description "timestep enters ManageHeatBalance source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::manage_surface_heat_balance_source_order_path' -Description "timestep enters ManageSurfaceHeatBalance source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::init_surface_heat_balance_source_order_path' -Description "timestep enters InitSurfaceHeatBalance source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::calc_heat_balance_outside_surf_source_order_path' -Description "timestep enters CalcHeatBalanceOutsideSurf source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::calc_heat_balance_inside_surf_source_order_path' -Description "timestep enters CalcHeatBalanceInsideSurf source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'air_manager::manage_air_heat_balance_source_order_path' -Description "timestep enters ManageAirHeatBalance source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::manage_zone_air_updates_source_order_path' -Description "timestep enters ManageZoneAirUpdates source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::predict_step_source_order_path' -Description "timestep enters PredictStep source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::correct_step_source_order_path' -Description "timestep enters CorrectStep source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::update_final_surface_heat_balance_source_order_path' -Description "timestep enters UpdateFinalSurfaceHeatBalance source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'surface_manager::update_thermal_histories_source_order_path' -Description "timestep enters UpdateThermalHistories source-order wrapper"
+Assert-Contains -Path $runPeriod -Pattern 'surface_manager::report_surface_heat_balance_source_order_path' -Description "run-period enters ReportSurfaceHeatBalance source-order wrapper"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'revert_zone_timestep_histories_source_order_path' -Description "adaptive zone-air correction enters RevertZoneTimestepHistories source-order wrapper"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'push_system_timestep_histories_source_order_path' -Description "adaptive zone-air correction enters PushSystemTimestepHistories source-order wrapper"
 Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep\s*\(' -Description "runtime-owned heat-balance timestep advance"
 Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep_internal\s*\(' -Description "runtime-owned internal heat-balance timestep advance"
 Assert-Contains -Path $warmup -Pattern 'CheckWarmupConvergence' -Description "warmup source owner"

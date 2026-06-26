@@ -23,6 +23,11 @@ pub const fn manage_air_heat_balance_stage() -> EnergyPlusCompatibilityStage {
     }
 }
 
+/// EnergyPlus `HeatBalanceAirManager::ManageAirHeatBalance` source-order wrapper.
+pub(crate) fn manage_air_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 pub(crate) fn weather_proxy_zone_air_heat_capacity_j_per_k(
     zone: &ZoneHeatBalanceState,
     context: Option<HeatBalanceWeatherContext<'_>>,
