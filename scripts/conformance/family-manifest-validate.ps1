@@ -43,6 +43,24 @@ function Get-TomlString {
     return $match.Groups["value"].Value
 }
 
+function Get-TomlStringArray {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Key,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $pattern = '(?ms)^\s*' + [regex]::Escape($Key) + '\s*=\s*\[(?<body>.*?)^\s*\]'
+    $match = [regex]::Match($Text, $pattern)
+    if (-not $match.Success) {
+        throw "$Description missing array key: $Key"
+    }
+
+    return @([regex]::Matches($match.Groups["body"].Value, '"(?<value>[^"]*)"') | ForEach-Object {
+            $_.Groups["value"].Value
+        })
+}
+
 function Get-MemberBlocks {
     param([Parameter(Mandatory = $true)][string]$Text)
     return @([regex]::Matches($Text, '(?ms)^\[\[members\]\]\s*(?<body>.*?)(?=^\[\[members\]\]|\z)'))
@@ -98,6 +116,7 @@ if ($familyFiles.Count -eq 0) {
 
 $requiredTopLevelLiterals = @(
     'schema = "rusted-energyplus.case-family.v1"',
+    'member_case_ids = [',
     'varied_parameters = [',
     'invariant_capabilities = [',
     'family_required_variables = [',
@@ -136,15 +155,18 @@ foreach ($familyFile in $familyFiles) {
     $sharedOutputs = Get-TomlString -Text $text -Key "shared_output_requests" -Description "family manifest"
     Assert-FileReference -FamilyDirectory $familyFile.DirectoryName -Reference $sharedOutputs -Description "family shared output request file"
 
+    $declaredMemberCaseIds = @(Get-TomlStringArray -Text $text -Key "member_case_ids" -Description "family manifest")
     $memberBlocks = Get-MemberBlocks -Text $text
     if ($memberBlocks.Count -eq 0) {
         throw "Family manifest has no members: $relative"
     }
 
     $sawBaseCase = $false
+    $actualMemberCaseIds = @()
     foreach ($memberBlock in $memberBlocks) {
         $body = $memberBlock.Groups["body"].Value
         $caseId = Get-MemberString -MemberText $body -Key "case_id" -Description "$relative member"
+        $actualMemberCaseIds += $caseId
         $caseToml = Get-MemberString -MemberText $body -Key "case_toml" -Description "$relative member $caseId"
         $outputRequests = Get-MemberString -MemberText $body -Key "output_requests" -Description "$relative member $caseId"
         $parameterDelta = Get-MemberString -MemberText $body -Key "parameter_delta" -Description "$relative member $caseId"
@@ -167,6 +189,14 @@ foreach ($familyFile in $familyFiles) {
 
     if (-not $sawBaseCase) {
         throw "base_case_id is not present as a family member in $relative"
+    }
+    if ($declaredMemberCaseIds.Count -ne $actualMemberCaseIds.Count) {
+        throw "member_case_ids count must match [[members]] count in $relative"
+    }
+    for ($index = 0; $index -lt $actualMemberCaseIds.Count; $index += 1) {
+        if ($declaredMemberCaseIds[$index] -ne $actualMemberCaseIds[$index]) {
+            throw "member_case_ids[$index] must match [[members]] order in ${relative}: expected $($actualMemberCaseIds[$index]), got $($declaredMemberCaseIds[$index])"
+        }
     }
 
     $reportCommand = Get-TomlString -Text $text -Key "report_command" -Description "family manifest"

@@ -5,6 +5,35 @@ title = "ZoneHVAC:IdealLoadsAirSystem declared branch family"
 oracle_version = "26.1.0"
 primary_case = "ideal_loads_no_oa_sensible_conformance_001"
 base_case_id = "ideal_loads_no_oa_sensible_conformance_001"
+member_case_ids = [
+  "ideal_loads_no_oa_sensible_conformance_001",
+  "ideal_loads_capacity_limit_conformance_001",
+  "ideal_loads_flow_limit_conformance_001",
+  "ideal_loads_flow_capacity_limit_conformance_001",
+  "ideal_loads_constant_shr_conformance_001",
+  "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001",
+  "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001",
+  "ideal_loads_humidistat_dehumidification_conformance_candidate_001",
+  "ideal_loads_humidistat_humidification_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_person_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_area_conformance_candidate_001",
+  "ideal_loads_outdoor_air_air_changes_conformance_candidate_001",
+  "ideal_loads_outdoor_air_sum_conformance_candidate_001",
+  "ideal_loads_outdoor_air_maximum_conformance_candidate_001",
+  "ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001",
+  "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001",
+  "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001",
+  "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001",
+  "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001",
+  "ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001",
+  "ideal_loads_no_oa_report_energy_conformance_candidate_001",
+  "ideal_loads_blank_fuel_efficiency_conformance_candidate_001",
+  "ideal_loads_constant_fuel_efficiency_conformance_candidate_001",
+  "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001",
+  "ideal_loads_no_oa_facility_meter_conformance_candidate_001",
+  "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001",
+]
 shared_output_requests = "output-requests.toml"
 report_command = "scripts/dev.cmd ideal-loads-family-report"
 report_path = ".runtime/release-evidence/v0.1.0/ideal-loads-family/ideal_loads_air_system_family_report.md"

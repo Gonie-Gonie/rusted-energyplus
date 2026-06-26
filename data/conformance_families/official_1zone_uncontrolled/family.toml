@@ -5,6 +5,16 @@ title = "Official 1ZoneUncontrolled heat-balance family"
 oracle_version = "26.1.0"
 primary_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 base_case_id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+member_case_ids = [
+  "official_1zone_uncontrolled_dynamic_conformance_candidate_001",
+  "official_1zone_uncontrolled_dynamic_diagnostic_001",
+  "official_1zone_uncontrolled_3surface_family_001",
+  "heat_balance_nomass_001",
+  "official_1zone_uncontrolled_massive_opaque_family_001",
+  "official_1zone_uncontrolled_varied_internal_gain_family_001",
+  "official_1zone_uncontrolled_varied_material_resistance_family_001",
+  "official_1zone_uncontrolled_varied_timestep_family_001",
+]
 shared_output_requests = "output-requests.toml"
 report_command = "scripts/dev.cmd one-zone-family-report"
 report_path = ".runtime/release-evidence/v0.1.0/one-zone-family/official_1zone_uncontrolled_family_report.md"
