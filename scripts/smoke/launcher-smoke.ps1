@@ -57,10 +57,40 @@ function Assert-Matches {
     Write-Host "OK $Description`: $Pattern"
 }
 
+function Assert-NotMatches {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+    if ($Text -match $Pattern) {
+        throw "Unexpected $Description`: $Pattern"
+    }
+    Write-Host "OK absent $Description`: $Pattern"
+}
+
 $launcherScript = Join-Path $RepoRoot "scripts\gui\eplus-rs-launch.ps1"
 if (-not (Test-Path -LiteralPath $launcherScript -PathType Leaf)) {
     throw "Missing launcher script: $launcherScript"
 }
+$launcherBuildScript = Join-Path $RepoRoot "scripts\gui\build-launcher-exe.ps1"
+if (-not (Test-Path -LiteralPath $launcherBuildScript -PathType Leaf)) {
+    throw "Missing launcher build script: $launcherBuildScript"
+}
+$releasePackageScript = Join-Path $RepoRoot "scripts\release\package.ps1"
+if (-not (Test-Path -LiteralPath $releasePackageScript -PathType Leaf)) {
+    throw "Missing release package script: $releasePackageScript"
+}
+$launcherText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherScript
+Assert-Matches -Text $launcherText -Pattern "Resolve-EplusRsExe" -Description "launcher binary resolver"
+Assert-Matches -Text $launcherText -Pattern "New-LauncherRunArguments" -Description "launcher run command builder"
+Assert-Matches -Text $launcherText -Pattern "Read-RunSummaryStatus" -Description "launcher run-summary reader"
+Assert-Matches -Text $launcherText -Pattern "Read-RunDiagnostics" -Description "launcher diagnostics reader"
+Assert-Matches -Text $launcherText -Pattern "support-report\.md" -Description "launcher support report link"
+Assert-NotMatches -Text $launcherText -Pattern "support-assessment\s" -Description "launcher support pre-step command"
+$releasePackageText = Get-Content -Encoding UTF8 -Raw -LiteralPath $releasePackageScript
+Assert-Matches -Text $releasePackageText -Pattern "build-launcher-exe\.ps1" -Description "release launcher build wiring"
+Assert-Matches -Text $releasePackageText -Pattern "eplus-rs-launch\.exe" -Description "release launcher exe asset"
 
 Write-Host "Running launcher script self-test."
 $selfTestOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $launcherScript -SelfTest 2>&1
@@ -111,7 +141,7 @@ Assert-Matches -Text ([string]$selfTest.phase_line) -Pattern "ep_run" -Descripti
 
 $launcherExe = Join-Path $RepoRoot ".runtime\launcher-smoke\eplus-rs-launch.exe"
 Write-Host "Building launcher executable self-test: $launcherExe"
-$buildOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "scripts\gui\build-launcher-exe.ps1") -OutputPath $launcherExe -SelfTest 2>&1
+$buildOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $launcherBuildScript -OutputPath $launcherExe -SelfTest 2>&1
 if ($LASTEXITCODE -ne 0) {
     $buildOutput | ForEach-Object { Write-Host $_ }
     throw "Launcher executable self-test failed with exit code $LASTEXITCODE"
