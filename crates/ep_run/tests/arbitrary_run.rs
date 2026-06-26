@@ -73,6 +73,29 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
         summary["support"]["matched_capability_ids"][0],
         "official_1zone_uncontrolled_declared_heat_balance"
     );
+    assert_eq!(
+        summary["support"]["matched_capabilities"][0]["evidence_cases"][0],
+        "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+    );
+    assert_eq!(
+        summary["support"]["failed_capability_ids"]
+            .as_array()
+            .expect("failed capability ids should be an array")
+            .len(),
+        0
+    );
+    let support = read_json(&output_dir.join("support-assessment.json"))?;
+    assert_eq!(
+        support["matched_capability_ids"][0],
+        "official_1zone_uncontrolled_declared_heat_balance"
+    );
+    assert_eq!(
+        support["failed_capability_ids"]
+            .as_array()
+            .expect("support failed capability ids should be an array")
+            .len(),
+        0
+    );
     assert_eq!(summary["rust_runtime"]["samples"], 2);
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],

@@ -26,6 +26,7 @@ $required = @(
     "src\generated\milestone-map.md",
     "src\generated\algorithm-ledger.md",
     "src\generated\conformance-case-index.md",
+    "src\generated\capability-index.md",
     "src\generated\object-coverage.md",
     "src\generated\variable-coverage.md",
     "src\generated\script-index.md",

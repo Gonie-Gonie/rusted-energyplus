@@ -33,6 +33,7 @@ pub(super) fn matched_capabilities(
             required_objects: capability.required_objects.clone(),
             forbidden_active_features: capability.forbidden_active_features.clone(),
             algorithms: capability.algorithms.clone(),
+            evidence_cases: capability.evidence_cases.clone(),
             claim_boundary: capability.claim_boundary.clone(),
         })
         .collect()

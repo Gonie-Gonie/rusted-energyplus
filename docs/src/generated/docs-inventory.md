@@ -9,8 +9,8 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 80 |
-| SUMMARY links | 29 |
+| docs files | 81 |
+| SUMMARY links | 30 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
 | Current nav expected | 6 |
@@ -91,6 +91,7 @@ none
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-06-23 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
+| docs/src/generated/capability-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/docs-inventory.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/milestone-map.md | generated | Generated References | present | none |  |  |  |

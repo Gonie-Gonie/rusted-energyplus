@@ -82,6 +82,13 @@ fn mixed_declared_ideal_loads_runs_compatibility_runtime() -> Result<(), Box<dyn
             .iter()
             .any(|id| id == "ideal_loads_finite_limits")
     );
+    assert_eq!(
+        summary["support"]["failed_capability_ids"]
+            .as_array()
+            .expect("failed capability ids should be an array")
+            .len(),
+        0
+    );
     assert_eq!(summary["support"]["conformance_claim"], false);
     assert!(
         summary["support"]["runtime_selection_note"]
@@ -145,6 +152,21 @@ fn ideal_loads_humidity_selected_branch_runs_declared_compatibility_runtime()
     assert_eq!(
         summary["support"]["matched_capability_ids"][0],
         "ideal_loads_humidity_selected_branches"
+    );
+    assert!(
+        summary["support"]["matched_capabilities"][0]["evidence_cases"]
+            .as_array()
+            .expect("evidence cases should be an array")
+            .iter()
+            .any(|case_id| case_id
+                == "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001")
+    );
+    assert_eq!(
+        summary["support"]["failed_capability_ids"]
+            .as_array()
+            .expect("failed capability ids should be an array")
+            .len(),
+        0
     );
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],

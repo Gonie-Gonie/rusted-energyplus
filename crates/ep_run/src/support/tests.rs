@@ -53,6 +53,11 @@ fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>
     );
     assert_eq!(assessment.matched_capabilities.len(), 1);
     assert_eq!(assessment.matched_capabilities[0].domain, "heat_balance");
+    assert_eq!(
+        assessment.matched_capabilities[0].evidence_cases,
+        vec!["official_1zone_uncontrolled_dynamic_conformance_candidate_001"]
+    );
+    assert!(assessment.failed_capability_ids.is_empty());
     assert!(assessment.capability_registry_loaded);
     Ok(())
 }
@@ -239,6 +244,12 @@ fn ideal_loads_no_oa_branch_matches_registry_capability() -> Result<(), Box<dyn 
         vec!["ideal_loads_no_oa_sensible"]
     );
     assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
+    assert!(
+        assessment.matched_capabilities[0]
+            .evidence_cases
+            .contains(&"ideal_loads_no_oa_sensible_conformance_001".to_string())
+    );
+    assert!(assessment.failed_capability_ids.is_empty());
     Ok(())
 }
 
@@ -329,6 +340,10 @@ fn ideal_loads_constant_supply_humidity_branch_matches_registry_capability()
         vec!["ideal_loads_humidity_selected_branches"]
     );
     assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
+    assert!(assessment.matched_capabilities[0].evidence_cases.contains(
+        &"ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001".to_string()
+    ));
+    assert!(assessment.failed_capability_ids.is_empty());
     Ok(())
 }
 #[test]

@@ -201,6 +201,8 @@ pub struct MatchedCapabilityEntry {
     pub forbidden_active_features: Vec<String>,
     /// Algorithm identifiers backing the capability.
     pub algorithms: Vec<String>,
+    /// Declared conformance cases supporting the capability boundary.
+    pub evidence_cases: Vec<String>,
     /// Capability-specific claim boundary.
     pub claim_boundary: String,
 }
@@ -222,6 +224,8 @@ pub struct SupportAssessment {
     pub matched_capability_ids: Vec<String>,
     /// Matched capability metadata from the capability registry.
     pub matched_capabilities: Vec<MatchedCapabilityEntry>,
+    /// Capability identifiers required by runtime selection but absent from the registry.
+    pub failed_capability_ids: Vec<String>,
     /// Requested mode.
     pub mode: String,
     /// Requested partial-run policy.
@@ -434,6 +438,7 @@ pub fn assess_support(
         runtime_selection_note: runtime_selection_note(status, runtime_class, run_result_state),
         matched_capability_ids,
         matched_capabilities,
+        failed_capability_ids: missing_capability_ids,
         mode: mode.id().to_string(),
         partial_policy: partial_policy.id().to_string(),
         output_format: output_format.id().to_string(),

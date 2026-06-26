@@ -39,6 +39,9 @@ algorithms = [
   "zone_air_updates",
   "ctf_conduction_path",
 ]
+evidence_cases = [
+  "official_1zone_uncontrolled_dynamic_conformance_candidate_001",
+]
 claim_boundary = "Official 1ZoneUncontrolled compatibility only for declared variables and tolerances."
 
 [[capability]]
@@ -67,6 +70,18 @@ algorithms = [
   "calc_no_oa_sensible",
   "update_purchased_air",
   "report_purchased_air",
+  "report_purchased_air_energy",
+  "fuel_efficiency_reporting",
+  "ideal_loads_facility_meter",
+]
+evidence_cases = [
+  "ideal_loads_blank_fuel_efficiency_conformance_candidate_001",
+  "ideal_loads_constant_fuel_efficiency_conformance_candidate_001",
+  "ideal_loads_no_oa_facility_meter_conformance_candidate_001",
+  "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001",
+  "ideal_loads_no_oa_report_energy_conformance_candidate_001",
+  "ideal_loads_no_oa_sensible_conformance_001",
+  "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001",
 ]
 claim_boundary = "No-OA/no-limit sensible branch only for declared case variables."
 
@@ -95,6 +110,11 @@ algorithms = [
   "calc_no_oa_sensible_with_flow_limit",
   "calc_no_oa_sensible_with_flow_and_capacity_limit",
 ]
+evidence_cases = [
+  "ideal_loads_capacity_limit_conformance_001",
+  "ideal_loads_flow_capacity_limit_conformance_001",
+  "ideal_loads_flow_limit_conformance_001",
+]
 claim_boundary = "Numeric capacity, flow, and flow+capacity limits only for declared IdealLoads finite-limit cases."
 
 [[capability]]
@@ -120,6 +140,9 @@ forbidden_active_features = [
 algorithms = [
   "calc_constant_sensible_heat_ratio",
 ]
+evidence_cases = [
+  "ideal_loads_constant_shr_conformance_001",
+]
 claim_boundary = "ConstantSensibleHeatRatio branch only where declared and gated."
 
 [[capability]]
@@ -144,6 +167,17 @@ algorithms = [
   "constant_supply_humidity_ratio",
   "humidistat_dehumidification",
   "humidistat_humidification",
+  "humidity_facility_meter",
+]
+evidence_cases = [
+  "ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001",
+  "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001",
+  "ideal_loads_constant_supply_humidity_heating_annual_meter_conformance_candidate_001",
+  "ideal_loads_constant_supply_humidity_heating_conformance_candidate_001",
+  "ideal_loads_humidistat_dehumidification_annual_meter_conformance_candidate_001",
+  "ideal_loads_humidistat_dehumidification_conformance_candidate_001",
+  "ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001",
+  "ideal_loads_humidistat_humidification_conformance_candidate_001",
 ]
 claim_boundary = "Only declared humidity-control candidate branches; broad humidity control remains outside the claim."
 
@@ -175,6 +209,20 @@ algorithms = [
   "sensible_heat_recovery",
   "enthalpy_heat_recovery",
 ]
+evidence_cases = [
+  "ideal_loads_outdoor_air_air_changes_conformance_candidate_001",
+  "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001",
+  "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001",
+  "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001",
+  "ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_area_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_person_conformance_candidate_001",
+  "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001",
+  "ideal_loads_outdoor_air_maximum_conformance_candidate_001",
+  "ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001",
+  "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001",
+  "ideal_loads_outdoor_air_sum_conformance_candidate_001",
+]
 claim_boundary = "Only declared IdealLoads outdoor-air/economizer/heat-recovery branch candidates."
 
 [[unsupported_rule]]
@@ -186,6 +234,7 @@ reason = "Broad HVAC air-loop semantics are not ported."
 [[unsupported_rule]]
 id = "unsupported_hvac_zone_equipment"
 object_patterns = ["ZoneHVAC:*"]
+except_object_patterns = ["ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EquipmentConnections", "ZoneHVAC:EquipmentList"]
 severity = "run_blocked"
 reason = "Broad ZoneHVAC equipment semantics outside declared IdealLoads branches are not ported."
 

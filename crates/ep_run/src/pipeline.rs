@@ -660,6 +660,7 @@ fn finish_successful_summary(
             "capability_registry_loaded": assessment.capability_registry_loaded,
             "matched_capability_ids": assessment.matched_capability_ids.clone(),
             "matched_capabilities": assessment.matched_capabilities.clone(),
+            "failed_capability_ids": assessment.failed_capability_ids.clone(),
             "conformance_claim": false,
         },
         "rust_runtime": rust_runtime_result.as_ref().map(|result| json!({

@@ -269,6 +269,73 @@ def variable_coverage(repo_root: Path) -> str:
     )
 
 
+def capability_index(repo_root: Path) -> str:
+    spec = load_toml(repo_root / "specs" / "capabilities.toml")
+    rows = []
+    for item in spec.get("capability", []):
+        rows.append(
+            [
+                str(item.get("id", "")),
+                str(item.get("domain", "")),
+                str(item.get("support_level", "")),
+                str(item.get("run_state", "")),
+                inline_list([str(value) for value in item.get("required_objects", [])]),
+                inline_list([str(value) for value in item.get("forbidden_active_features", [])]),
+                inline_list([str(value) for value in item.get("algorithms", [])]),
+                inline_list([str(value) for value in item.get("evidence_cases", [])]),
+                str(item.get("claim_boundary", "")),
+            ]
+        )
+
+    unsupported_rows = []
+    for item in spec.get("unsupported_rule", []):
+        unsupported_rows.append(
+            [
+                str(item.get("id", "")),
+                inline_list([str(value) for value in item.get("object_patterns", [])]),
+                inline_list([str(value) for value in item.get("except_object_patterns", [])]),
+                str(item.get("severity", "")),
+                str(item.get("reason", "")),
+            ]
+        )
+
+    partial_rows = []
+    for item in spec.get("partial_rule", []):
+        partial_rows.append(
+            [
+                str(item.get("id", "")),
+                inline_list([str(value) for value in item.get("object_patterns", [])]),
+                str(item.get("eligible_state", "")),
+                str(item.get("reason", "")),
+            ]
+        )
+
+    return (
+        GENERATED_NOTICE
+        + "# Capability Index\n\n"
+        + "Capability metadata is maintained in `specs/capabilities.toml` and consumed by `ep_run` support assessment.\n\n"
+        + "## Capabilities\n\n"
+        + table(
+            [
+                "ID",
+                "Domain",
+                "Support level",
+                "Run state",
+                "Required objects",
+                "Forbidden active features",
+                "Algorithms",
+                "Evidence cases",
+                "Claim boundary",
+            ],
+            rows,
+        )
+        + "\n## Unsupported Rules\n\n"
+        + table(["ID", "Object patterns", "Except patterns", "Severity", "Reason"], unsupported_rows)
+        + "\n## Partial Rules\n\n"
+        + table(["ID", "Object patterns", "Eligible state", "Reason"], partial_rows)
+    )
+
+
 ARTIFACT_HINT_RE = re.compile(
     r"(?i)(?:\.runtime|\.reference|target|dist|docs[\\/]book|docs[\\/]src[\\/]generated|"
     r"tools[\\/]docs[\\/]generated-docs\.manifest\.json|reports[\\/]latest)"
@@ -298,6 +365,7 @@ GENERATED_DOC_OUTPUTS = [
     "docs/src/generated/milestone-map.md",
     "docs/src/generated/algorithm-ledger.md",
     "docs/src/generated/conformance-case-index.md",
+    "docs/src/generated/capability-index.md",
     "docs/src/generated/object-coverage.md",
     "docs/src/generated/variable-coverage.md",
     "docs/src/generated/script-index.md",
@@ -664,6 +732,7 @@ def generated_manifest(repo_root: Path) -> str:
             "specs/algorithm_ledger.toml",
             "specs/object_coverage.toml",
             "specs/variable_coverage.toml",
+            "specs/capabilities.toml",
             "data/conformance_cases/*/case.toml",
             "scripts/**/*",
             "scripts/dev/commands.json",
@@ -689,6 +758,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "milestone-map.md": milestone_map(repo_root),
         repo_root / "docs" / "src" / "generated" / "algorithm-ledger.md": algorithm_ledger(repo_root),
         repo_root / "docs" / "src" / "generated" / "conformance-case-index.md": conformance_case_index(repo_root),
+        repo_root / "docs" / "src" / "generated" / "capability-index.md": capability_index(repo_root),
         repo_root / "docs" / "src" / "generated" / "object-coverage.md": object_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "script-index.md": script_inventory(repo_root),

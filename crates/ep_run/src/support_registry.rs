@@ -29,6 +29,8 @@ pub(crate) struct CapabilitySpec {
     #[serde(default)]
     pub(crate) algorithms: Vec<String>,
     #[serde(default)]
+    pub(crate) evidence_cases: Vec<String>,
+    #[serde(default)]
     pub(crate) claim_boundary: String,
 }
 
@@ -37,6 +39,8 @@ pub(crate) struct SupportRuleSpec {
     pub(crate) id: String,
     #[serde(default)]
     pub(crate) object_patterns: Vec<String>,
+    #[serde(default)]
+    pub(crate) except_object_patterns: Vec<String>,
     #[serde(default)]
     pub(crate) reason: String,
 }
@@ -103,6 +107,10 @@ fn support_rule_for_object<'a>(
         rule.object_patterns
             .iter()
             .any(|pattern| object_pattern_matches(pattern, object_type))
+            && !rule
+                .except_object_patterns
+                .iter()
+                .any(|pattern| object_pattern_matches(pattern, object_type))
     })
 }
 
