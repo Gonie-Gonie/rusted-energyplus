@@ -982,6 +982,12 @@
                          "help":  "Generate and audit the official 1ZoneUncontrolled family report artifacts."
                      },
                      {
+                         "name":  "ideal-loads-family-report",
+                         "path":  "conformance\\ideal-loads-family-report.ps1",
+                         "group":  "conformance",
+                         "help":  "Generate and audit the IdealLoadsAirSystem family report artifacts."
+                     },
+                     {
                          "name":  "conformance-diagnostic-report-smoke",
                          "path":  "conformance\\conformance-diagnostic-report-smoke.ps1",
                          "group":  "conformance",

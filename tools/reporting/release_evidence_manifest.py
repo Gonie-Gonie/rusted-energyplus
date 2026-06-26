@@ -153,6 +153,42 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "1Zone family delta heatmap and status grid.",
         },
         {
+            "role": "ideal-loads-family-report-markdown",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/ideal_loads_air_system_family_report.md"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "Readable IdealLoadsAirSystem branch-family pass/fail, output-class, and not-claimed report.",
+        },
+        {
+            "role": "ideal-loads-family-report-json",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/ideal_loads_air_system_family_report.json"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "Machine-readable IdealLoadsAirSystem family report.",
+        },
+        {
+            "role": "ideal-loads-family-branch-matrix",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/branch-matrix.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family branch status matrix.",
+        },
+        {
+            "role": "ideal-loads-family-rates-plot",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/heating-cooling-rates.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family heating/cooling rate evidence plot.",
+        },
+        {
+            "role": "ideal-loads-family-node-plot",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/supply-node-state.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family supply-node state evidence plot.",
+        },
+        {
+            "role": "ideal-loads-family-meter-plot",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/meter-comparison.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family facility-meter comparison evidence plot.",
+        },
+        {
             "role": "support-coverage-pdf",
             "path": evidence_path(repo_root, version, "support-coverage-report.pdf"),
             "produced_by": f".\\scripts\\dev.cmd support-coverage-report -Version {version}",

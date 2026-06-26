@@ -575,6 +575,36 @@ def load_one_zone_family_report(repo_root: Path, version: str) -> dict[str, Any]
     return report
 
 
+def load_ideal_loads_family_report(repo_root: Path, version: str) -> dict[str, Any]:
+    report_path = (
+        repo_root
+        / ".runtime"
+        / "release-evidence"
+        / f"v{version}"
+        / "ideal-loads-family"
+        / "ideal_loads_air_system_family_report.json"
+    )
+    report = load_optional_json(report_path)
+    if not report:
+        return {
+            "available": False,
+            "path": relative_repo_path(repo_root, report_path),
+            "family_id": "ideal_loads_air_system",
+            "case_count": 0,
+            "branch_count": 0,
+            "output_class_count": 0,
+            "regression_policy": "missing ideal-loads-family report",
+            "pdf_evidence": "missing ideal-loads-family report",
+            "cases": [],
+            "branches": [],
+            "output_classes": [],
+            "not_claimed": [],
+        }
+    report["available"] = True
+    report["path"] = relative_repo_path(repo_root, report_path)
+    return report
+
+
 def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
     requested = repo_path(repo_root, spec.digest_path)
     if requested.is_file():
@@ -1320,6 +1350,7 @@ def build_evidence(
     manifest_snapshot = build_manifest_snapshot(repo_root, version)
     arbitrary_runs = load_arbitrary_run_summaries(repo_root)
     one_zone_family = load_one_zone_family_report(repo_root, version)
+    ideal_loads_family = load_ideal_loads_family_report(repo_root, version)
     return {
         "schema_version": 1,
         "version": version,
@@ -1364,6 +1395,7 @@ def build_evidence(
         "time_series": time_series_records,
         "arbitrary_runs": arbitrary_runs,
         "one_zone_family": one_zone_family,
+        "ideal_loads_family": ideal_loads_family,
         "coverage_snapshot": coverage_snapshot,
         "manifest_snapshot": manifest_snapshot,
         "artifacts": {
@@ -2991,6 +3023,84 @@ def build_one_zone_family_blocker_table(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_ideal_loads_family_summary_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("ideal_loads_family") or {}
+    rows = [
+        ["Available", "yes" if family.get("available") else "missing"],
+        ["Family", family.get("family_id")],
+        ["Report JSON", family.get("path")],
+        ["Cases", family.get("case_count")],
+        ["Branches", family.get("branch_count")],
+        ["Output classes", family.get("output_class_count")],
+        ["Regression policy", family.get("regression_policy")],
+        ["PDF evidence", family.get("pdf_evidence")],
+    ]
+    return table(
+        ["Metric", "Value"],
+        rows,
+        "IdealLoads family report snapshot generated before the PDF evidence pack.",
+        [1.45, 5.65],
+    )
+
+
+def build_ideal_loads_family_branch_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("ideal_loads_family") or {}
+    rows = []
+    for row in family.get("branches", [])[:30]:
+        rows.append(
+            [
+                short_text(row.get("Branch"), 44),
+                row.get("CaseCount"),
+                short_text(row.get("Cases"), 92),
+                row.get("Status"),
+            ]
+        )
+    if not rows:
+        rows.append(["ideal_loads_air_system", 0, "missing", "run ideal-loads-family-report"])
+    return table(
+        ["Branch", "Cases", "Case IDs", "Status"],
+        rows,
+        "IdealLoads branch matrix. Each branch row keeps active/inactive branch metadata visible in generated reports.",
+        [1.35, 0.45, 4.7, 0.6],
+    )
+
+
+def build_ideal_loads_family_output_class_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("ideal_loads_family") or {}
+    rows = []
+    for row in family.get("output_classes", [])[:18]:
+        rows.append(
+            [
+                short_text(row.get("Class"), 58),
+                short_text(row.get("Evidence"), 82),
+                row.get("Status"),
+            ]
+        )
+    if not rows:
+        rows.append(["IdealLoads outputs", "missing ideal-loads-family report", "missing"])
+    return table(
+        ["Output Class", "Evidence", "Status"],
+        rows,
+        "Required IdealLoads output classes from the family checklist.",
+        [2.15, 4.35, 0.6],
+    )
+
+
+def build_ideal_loads_family_not_claimed_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("ideal_loads_family") or {}
+    rows = []
+    for row in family.get("not_claimed", [])[:8]:
+        rows.append([row.get("Item")])
+    if not rows:
+        rows.append(["Missing ideal-loads-family report."])
+    return table(
+        ["Not Claimed"],
+        rows,
+        "Explicit IdealLoads family boundaries retained in the PDF.",
+        [7.1],
+    )
+
+
 def build_coverage_summary_table(evidence: dict[str, Any]) -> Table:
     coverage = evidence.get("coverage_snapshot", {})
     rows = [
@@ -3049,6 +3159,7 @@ def build_reproducibility_table(evidence: dict[str, Any]) -> Table:
         rf".\scripts\dev.cmd support-coverage-report -Version {version}",
         rf".\scripts\dev.cmd user-coverage-handbook -Version {version}",
         rf".\scripts\dev.cmd one-zone-family-report -Version {version}",
+        rf".\scripts\dev.cmd ideal-loads-family-report -Version {version}",
         rf".\scripts\dev.cmd conformance-evidence-report -Version {version} -TimingRepeats 3 -RunDynamicDiagnostic -DynamicTimingRepeats 1",
         rf".\scripts\dev.cmd release-evidence-manifest -Version {version}",
     ]
@@ -3069,6 +3180,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["Case coverage matrix", "done", "PDF includes an excerpt and the full matrix is preserved in JSON."],
         ["Arbitrary-run summary", "done", "PDF reads run-summary.json smoke artifacts and marks them ad-hoc/non-conformance."],
         ["1Zone family report", "done", "Family summary, pass/fail tables, blockers, and not-claimed rows are generated before the evidence pack and tracked by the release manifest."],
+        ["IdealLoads family report", "done", "Branch matrix, output-class coverage, layer separation, node proof, OA/economizer/heat-recovery, humidity, plots, and not-claimed rows are generated before the evidence pack."],
         ["1Zone time-series plots", "done", "MAT/convection/storage/conduction overlays are in the PDF and surface plot assets are exported."],
         ["IdealLoads time-series plots", "done", "No-OA rates/node overlays, branch heatmap, and aggregate meter plot assets are exported."],
         ["Performance evidence", "done", "Repeated timing samples and performance-summary.json define the current measurement policy."],
@@ -3300,6 +3412,18 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
                 placement="H",
             ),
             build_ideal_loads_branch_matrix_table(evidence),
+        ),
+        Chapter(
+            "IdealLoads Family Report",
+            Paragraph(
+                "The IdealLoads family report tracks the declared branch family rather than a single IDF. It keeps "
+                "rate, energy, fuel-energy, node, outdoor-air, economizer, heat-recovery, humidity, and meter layers "
+                "separate so a local branch improvement cannot mask a regression in another declared member."
+            ),
+            build_ideal_loads_family_summary_table(evidence),
+            build_ideal_loads_family_branch_table(evidence),
+            build_ideal_loads_family_output_class_table(evidence),
+            build_ideal_loads_family_not_claimed_table(evidence),
         ),
         Chapter(
             "Time Series Overlays",

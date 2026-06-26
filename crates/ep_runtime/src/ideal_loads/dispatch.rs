@@ -119,6 +119,9 @@ pub const IDEAL_LOADS_RUNTIME_BINDING_SOURCE: &str =
 pub const IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY: &str =
     "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs";
 
+/// SizePurchasedAir policy for the current compatibility subset.
+pub const IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY: &str = "SizePurchasedAir autosizing is blocked for arbitrary-run compatibility; declared conformance cases use resolved numeric or no-limit sizing inputs before CalcPurchAirLoads";
+
 /// Inputs consumed by the source-order PurchasedAir wrapper.
 #[derive(Clone, Copy, Debug)]
 pub struct SimPurchasedAirCompatInput<'a> {

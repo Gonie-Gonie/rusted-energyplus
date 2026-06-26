@@ -661,6 +661,8 @@ fn finish_successful_summary(
             "matched_capability_ids": assessment.matched_capability_ids.clone(),
             "matched_capabilities": assessment.matched_capabilities.clone(),
             "failed_capability_ids": assessment.failed_capability_ids.clone(),
+            "active_ideal_loads_branches": assessment.active_ideal_loads_branches.clone(),
+            "inactive_ideal_loads_branches": assessment.inactive_ideal_loads_branches.clone(),
             "conformance_claim": false,
         },
         "rust_runtime": rust_runtime_result.as_ref().map(|result| json!({

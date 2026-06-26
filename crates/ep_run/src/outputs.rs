@@ -421,6 +421,8 @@ mod tests {
             matched_capability_ids: Vec::new(),
             matched_capabilities: Vec::new(),
             failed_capability_ids: Vec::new(),
+            active_ideal_loads_branches: Vec::new(),
+            inactive_ideal_loads_branches: Vec::new(),
             mode: "compatibility".to_string(),
             partial_policy: "deny".to_string(),
             output_format: "rust-native".to_string(),

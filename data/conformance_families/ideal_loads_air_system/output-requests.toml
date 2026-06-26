@@ -1,0 +1,204 @@
+schema = "rusted-energyplus.output-requests.v1"
+family_id = "ideal_loads_air_system"
+frequency = "detailed"
+zone_scope = "ZONE ONE"
+ideal_loads_scope = "ZONE ONE IDEAL LOADS"
+node_scope = "ZONE ONE INLET"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Heating Setpoint Temperature"
+domain = "zone"
+class = "thermostat"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Thermostat Cooling Setpoint Temperature"
+domain = "zone"
+class = "thermostat"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Rate"
+domain = "hvac"
+class = "zone-total-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Rate"
+domain = "hvac"
+class = "zone-total-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Sensible Heating Rate"
+domain = "hvac"
+class = "zone-sensible-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Sensible Cooling Rate"
+domain = "hvac"
+class = "zone-sensible-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Latent Heating Rate"
+domain = "hvac"
+class = "zone-latent-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Latent Cooling Rate"
+domain = "hvac"
+class = "zone-latent-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Rate"
+domain = "hvac"
+class = "supply-air-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Rate"
+domain = "hvac"
+class = "supply-air-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Heating Rate"
+domain = "hvac"
+class = "outdoor-air-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Outdoor Air Total Cooling Rate"
+domain = "hvac"
+class = "outdoor-air-rate"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Economizer Active Time"
+domain = "hvac"
+class = "economizer"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Active Time"
+domain = "hvac"
+class = "heat-recovery"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Heating Rate"
+domain = "hvac"
+class = "heat-recovery"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Heat Recovery Total Cooling Rate"
+domain = "hvac"
+class = "heat-recovery"
+
+[[output]]
+key = "ZONE ONE INLET"
+variable = "System Node Temperature"
+domain = "node"
+class = "node-state"
+
+[[output]]
+key = "ZONE ONE INLET"
+variable = "System Node Mass Flow Rate"
+domain = "node"
+class = "node-state"
+
+[[output]]
+key = "ZONE ONE INLET"
+variable = "System Node Humidity Ratio"
+domain = "node"
+class = "node-state"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Energy"
+domain = "hvac"
+class = "report-purchased-air-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Energy"
+domain = "hvac"
+class = "report-purchased-air-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Heating Energy"
+domain = "hvac"
+class = "report-purchased-air-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Total Cooling Energy"
+domain = "hvac"
+class = "report-purchased-air-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Heating Fuel Energy"
+domain = "hvac"
+class = "fuel-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Supply Air Total Cooling Fuel Energy"
+domain = "hvac"
+class = "fuel-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Heating Fuel Energy"
+domain = "hvac"
+class = "fuel-energy"
+
+[[output]]
+key = "ZONE ONE IDEAL LOADS"
+variable = "Zone Ideal Loads Zone Cooling Fuel Energy"
+domain = "hvac"
+class = "fuel-energy"
+
+[[meter]]
+name = "DistrictHeatingWater:Facility"
+frequency = "hourly"
+domain = "meter"
+class = "facility-meter"
+
+[[meter]]
+name = "DistrictCooling:Facility"
+frequency = "hourly"
+domain = "meter"
+class = "facility-meter"
+
+[[meter]]
+name = "DistrictHeatingWater:Facility"
+frequency = "monthly"
+domain = "meter"
+class = "facility-meter"
+
+[[meter]]
+name = "DistrictCooling:Facility"
+frequency = "monthly"
+domain = "meter"
+class = "facility-meter"
+
+[[meter]]
+name = "DistrictHeatingWater:Facility"
+frequency = "run-period"
+domain = "meter"
+class = "facility-meter"
+
+[[meter]]
+name = "DistrictCooling:Facility"
+frequency = "run-period"
+domain = "meter"
+class = "facility-meter"

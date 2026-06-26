@@ -3,7 +3,9 @@
 use ep_compiler::{CompileReport, DiagnosticSeverity, ObjectCoverageStatus};
 use ep_model::TypedModel;
 use ep_raw_model::RawModel;
+use ep_runtime::select_purchased_air_branch;
 use serde::Serialize;
+use std::collections::BTreeSet;
 
 use crate::{
     PartialRunPolicy, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunMode,
@@ -226,6 +228,10 @@ pub struct SupportAssessment {
     pub matched_capabilities: Vec<MatchedCapabilityEntry>,
     /// Capability identifiers required by runtime selection but absent from the registry.
     pub failed_capability_ids: Vec<String>,
+    /// Active IdealLoads PurchasedAir branch labels selected from typed systems.
+    pub active_ideal_loads_branches: Vec<String>,
+    /// Known IdealLoads PurchasedAir branch labels that are inactive for this input.
+    pub inactive_ideal_loads_branches: Vec<String>,
     /// Requested mode.
     pub mode: String,
     /// Requested partial-run policy.
@@ -420,6 +426,8 @@ pub fn assess_support(
     let matched_capabilities =
         matched_capabilities(&matched_capability_ids, &capability_registry.spec);
     let run_result_state = RunResultState::from_support_status(status, mode, partial_policy);
+    let (active_ideal_loads_branches, inactive_ideal_loads_branches) =
+        ideal_loads_branch_summary(typed_model);
     if status == SupportStatus::SupportedDiagnosticOnly
         && run_result_state == RunResultState::RunBlocked
     {
@@ -439,6 +447,8 @@ pub fn assess_support(
         matched_capability_ids,
         matched_capabilities,
         failed_capability_ids: missing_capability_ids,
+        active_ideal_loads_branches,
+        inactive_ideal_loads_branches,
         mode: mode.id().to_string(),
         partial_policy: partial_policy.id().to_string(),
         output_format: output_format.id().to_string(),
@@ -455,6 +465,34 @@ pub fn assess_support(
         unsupported_objects,
         diagnostics,
     }
+}
+
+fn ideal_loads_branch_summary(typed_model: Option<&TypedModel>) -> (Vec<String>, Vec<String>) {
+    const KNOWN_BRANCHES: [&str; 9] = [
+        "no_oa_sensible",
+        "finite_capacity",
+        "finite_flow",
+        "flow_and_capacity",
+        "constant_shr",
+        "constant_supply_humidity_cooling",
+        "constant_supply_humidity_heating",
+        "humidistat_dehumidification",
+        "humidistat_humidification",
+    ];
+
+    let active = typed_model
+        .into_iter()
+        .flat_map(|model| model.ideal_loads_air_systems.iter())
+        .map(|system| select_purchased_air_branch(system).label().to_string())
+        .collect::<BTreeSet<_>>();
+    let inactive = KNOWN_BRANCHES
+        .iter()
+        .copied()
+        .filter(|branch| !active.contains(*branch))
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+
+    (active.into_iter().collect(), inactive)
 }
 
 #[cfg(test)]

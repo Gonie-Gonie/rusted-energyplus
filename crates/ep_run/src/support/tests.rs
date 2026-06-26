@@ -243,6 +243,15 @@ fn ideal_loads_no_oa_branch_matches_registry_capability() -> Result<(), Box<dyn 
         assessment.matched_capability_ids,
         vec!["ideal_loads_no_oa_sensible"]
     );
+    assert_eq!(
+        assessment.active_ideal_loads_branches,
+        vec!["no_oa_sensible"]
+    );
+    assert!(
+        assessment
+            .inactive_ideal_loads_branches
+            .contains(&"finite_capacity".to_string())
+    );
     assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
     assert!(
         assessment.matched_capabilities[0]
@@ -338,6 +347,15 @@ fn ideal_loads_constant_supply_humidity_branch_matches_registry_capability()
     assert_eq!(
         assessment.matched_capability_ids,
         vec!["ideal_loads_humidity_selected_branches"]
+    );
+    assert_eq!(
+        assessment.active_ideal_loads_branches,
+        vec!["constant_supply_humidity_cooling"]
+    );
+    assert!(
+        assessment
+            .inactive_ideal_loads_branches
+            .contains(&"humidistat_dehumidification".to_string())
     );
     assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
     assert!(assessment.matched_capabilities[0].evidence_cases.contains(

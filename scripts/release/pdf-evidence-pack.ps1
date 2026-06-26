@@ -31,6 +31,7 @@ Invoke-DevCommand -Command "conformance-index-report" -Arguments @("-Version", $
 Invoke-DevCommand -Command "support-coverage-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "user-coverage-handbook" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "one-zone-family-report" -Arguments @("-Version", $Version)
+Invoke-DevCommand -Command "ideal-loads-family-report" -Arguments @("-Version", $Version)
 
 $numericArgs = @(
     "-Version", $Version,
