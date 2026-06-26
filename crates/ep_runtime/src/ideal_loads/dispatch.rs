@@ -61,6 +61,28 @@ impl IdealLoadsPurchasedAirBranch {
     }
 }
 
+/// Compile-stage branch flags cached for one IdealLoads system.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct IdealLoadsCompiledBranchFlags {
+    /// Feature flags resolved from typed input.
+    pub feature_flags: IdealLoadsFeatureFlags,
+    /// PurchasedAir branch selected from the feature flags.
+    pub purchased_air_branch: IdealLoadsPurchasedAirBranch,
+}
+
+impl IdealLoadsCompiledBranchFlags {
+    /// Builds branch flags from a typed IdealLoads system.
+    #[must_use]
+    pub fn from_system(system: &IdealLoadsAirSystem) -> Self {
+        let feature_flags = IdealLoadsFeatureFlags::from_system(system);
+        let purchased_air_branch = select_purchased_air_branch_from_flags(system, feature_flags);
+        Self {
+            feature_flags,
+            purchased_air_branch,
+        }
+    }
+}
+
 /// Source-order stage metadata for PurchasedAir compatibility.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct IdealLoadsPurchasedAirStage {
@@ -186,7 +208,19 @@ pub struct SimPurchasedAirCompatError {
 pub fn sim_purchased_air_compat(
     input: SimPurchasedAirCompatInput<'_>,
 ) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
-    let boundary = classify_purchased_air_compat_subset(input.system);
+    let branch_flags = IdealLoadsCompiledBranchFlags::from_system(input.system);
+    sim_purchased_air_compat_with_branch_flags(input, branch_flags)
+}
+
+/// Executes `SimPurchasedAir` using compile-stage branch flags cached by the caller.
+pub fn sim_purchased_air_compat_with_branch_flags(
+    input: SimPurchasedAirCompatInput<'_>,
+    branch_flags: IdealLoadsCompiledBranchFlags,
+) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
+    let boundary = classify_purchased_air_compat_subset_with_branch_flags(
+        input.system,
+        branch_flags.feature_flags,
+    );
     if !boundary.is_supported() {
         return Err(SimPurchasedAirCompatError {
             system_id: input.system.id,
@@ -194,7 +228,7 @@ pub fn sim_purchased_air_compat(
         });
     }
 
-    let branch = select_purchased_air_branch(input.system);
+    let branch = branch_flags.purchased_air_branch;
     let init_flags = IdealLoadsInitFlags::no_oa_no_limit_candidate();
     let calculation = if branch.uses_finite_limit_calc() {
         calc_no_oa_sensible_with_limits_and_recirculation_compat(
@@ -238,8 +272,13 @@ pub fn sim_purchased_air_compat(
 /// Selects the Rust-visible PurchasedAir branch for a supported no-OA compatibility system.
 #[must_use]
 pub fn select_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPurchasedAirBranch {
-    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
+    IdealLoadsCompiledBranchFlags::from_system(system).purchased_air_branch
+}
 
+fn select_purchased_air_branch_from_flags(
+    system: &IdealLoadsAirSystem,
+    feature_flags: IdealLoadsFeatureFlags,
+) -> IdealLoadsPurchasedAirBranch {
     match (
         feature_flags.has_flow_limit,
         feature_flags.has_capacity_limit,
@@ -280,11 +319,12 @@ pub fn select_purchased_air_branch(system: &IdealLoadsAirSystem) -> IdealLoadsPu
     }
 }
 
-fn classify_purchased_air_compat_subset(
+fn classify_purchased_air_compat_subset_with_branch_flags(
     system: &IdealLoadsAirSystem,
+    feature_flags: IdealLoadsFeatureFlags,
 ) -> crate::ideal_loads::IdealLoadsSubsetBoundary {
     let mut boundary = classify_no_oa_sensible_subset(system);
-    if supports_no_oa_humidity_selected_branch(system) {
+    if supports_no_oa_humidity_selected_branch_with_flags(system, feature_flags) {
         boundary.unsupported_features.retain(|feature| {
             !matches!(
                 feature,
@@ -296,8 +336,10 @@ fn classify_purchased_air_compat_subset(
     boundary
 }
 
-fn supports_no_oa_humidity_selected_branch(system: &IdealLoadsAirSystem) -> bool {
-    let feature_flags = IdealLoadsFeatureFlags::from_system(system);
+fn supports_no_oa_humidity_selected_branch_with_flags(
+    system: &IdealLoadsAirSystem,
+    feature_flags: IdealLoadsFeatureFlags,
+) -> bool {
     if feature_flags.has_flow_limit || feature_flags.has_capacity_limit {
         return false;
     }
@@ -367,6 +409,27 @@ mod tests {
         assert!(flags.has_flow_limit);
         assert!(flags.has_capacity_limit);
         assert!(flags.has_autosize);
+    }
+
+    #[test]
+    fn ideal_loads_compiled_branch_flags_cache_selected_branch() {
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+        system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.05));
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(500.0));
+
+        let flags = IdealLoadsCompiledBranchFlags::from_system(&system);
+
+        assert!(flags.feature_flags.has_flow_limit);
+        assert!(flags.feature_flags.has_capacity_limit);
+        assert_eq!(
+            flags.purchased_air_branch,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity
+        );
+        assert_eq!(
+            select_purchased_air_branch(&system),
+            flags.purchased_air_branch
+        );
     }
 
     #[test]

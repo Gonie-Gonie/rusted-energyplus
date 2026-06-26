@@ -535,6 +535,46 @@ DATA PERIODS
     }
 
     #[test]
+    fn weather_timestep_series_precomputes_interpolated_samples()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let records = parse_epw_records(
+            r#"LOCATION,Example
+DESIGN CONDITIONS
+TYPICAL/EXTREME PERIODS
+GROUND TEMPERATURES
+HOLIDAYS/DAYLIGHT SAVINGS
+COMMENTS 1
+COMMENTS 2
+DATA PERIODS
+1999,1,1,1,0,Source,10.0,5.0,40,82000,0,0,300,10,20,30,0,0,0,0,350,2.0
+1999,1,1,2,0,Source,14.0,6.0,60,84000,0,0,500,11,21,31,0,0,0,0,10,6.0
+"#,
+        )?;
+
+        let series = precompute_weather_timestep_series(
+            &records,
+            2,
+            FirstHourInterpolationStartingValues::Hour24,
+        );
+
+        assert_eq!(series.hourly_dry_bulb_c(), &[10.0, 14.0]);
+        assert_eq!(series.timestep_samples().len(), 4);
+        let sample = series
+            .sample_for(1, 1)
+            .ok_or_else(|| std::io::Error::other("missing weather timestep sample"))?;
+        assert_eq!(sample.record_index, 1);
+        assert_eq!(sample.timestep, 1);
+        assert!((sample.dry_bulb_c - 12.0).abs() < 1.0e-12);
+        assert!((sample.relative_humidity_percent - 50.0).abs() < 1.0e-12);
+        assert!((sample.atmospheric_pressure_pa - 83_000.0).abs() < 1.0e-12);
+        assert!((sample.horizontal_infrared_radiation_w_per_m2 - 400.0).abs() < 1.0e-12);
+        assert!((sample.wind_speed_m_per_s - 4.0).abs() < 1.0e-12);
+        assert!((sample.wind_direction_deg - 0.0).abs() < 1.0e-12);
+
+        Ok(())
+    }
+
+    #[test]
     fn surface_area_handles_3d_rectangles() {
         let vertices = vec![
             Point3 {

@@ -106,6 +106,160 @@ pub(crate) struct HeatBalanceWeatherContext<'a> {
     pub(crate) first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 }
 
+/// One weather sample precomputed for a zone timestep.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WeatherTimestepSample {
+    /// Zero-based EPW record index.
+    pub record_index: usize,
+    /// One-based zone timestep within the hour.
+    pub timestep: u32,
+    /// Interpolated outdoor dry-bulb temperature in C.
+    pub dry_bulb_c: f64,
+    /// Interpolated relative humidity in percent.
+    pub relative_humidity_percent: f64,
+    /// Interpolated atmospheric pressure in Pa.
+    pub atmospheric_pressure_pa: f64,
+    /// Interpolated horizontal infrared radiation in W/m2.
+    pub horizontal_infrared_radiation_w_per_m2: f64,
+    /// Interpolated wind speed in m/s.
+    pub wind_speed_m_per_s: f64,
+    /// Interpolated wind direction in degrees.
+    pub wind_direction_deg: f64,
+}
+
+/// Weather values resolved once for a model timestep configuration.
+#[derive(Clone, Debug, PartialEq)]
+pub struct WeatherTimestepSeries {
+    /// Zone timesteps per hour used to sample hourly EPW records.
+    pub zone_steps_per_hour: u32,
+    /// First-hour interpolation policy selected by the run period.
+    pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    hourly_dry_bulb_c: Vec<f64>,
+    timestep_samples: Vec<WeatherTimestepSample>,
+}
+
+impl WeatherTimestepSeries {
+    /// Precomputes hourly and zone-timestep weather samples from EPW records.
+    #[must_use]
+    pub fn from_records(
+        records: &[EpwRecord],
+        zone_steps_per_hour: u32,
+        first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    ) -> Self {
+        let steps = zone_steps_per_hour.max(1);
+        let hourly_dry_bulb_c = records
+            .iter()
+            .map(|record| record.dry_bulb_c)
+            .collect::<Vec<_>>();
+        let mut timestep_samples = Vec::with_capacity(records.len() * steps as usize);
+        for (record_index, record) in records.iter().enumerate() {
+            for timestep in 1..=steps {
+                timestep_samples.push(WeatherTimestepSample {
+                    record_index,
+                    timestep,
+                    dry_bulb_c: energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                        Some(records),
+                        record_index,
+                        record.dry_bulb_c,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    ),
+                    relative_humidity_percent:
+                        energyplus_weather_relative_humidity_at_timestep_with_starting_values(
+                            records,
+                            record_index,
+                            record.relative_humidity_percent,
+                            steps,
+                            timestep,
+                            first_hour_interpolation_starting_values,
+                        ),
+                    atmospheric_pressure_pa:
+                        energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
+                            records,
+                            record_index,
+                            record.atmospheric_pressure_pa,
+                            steps,
+                            timestep,
+                            first_hour_interpolation_starting_values,
+                        ),
+                    horizontal_infrared_radiation_w_per_m2:
+                        energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+                            records,
+                            record_index,
+                            record.horizontal_infrared_radiation_wh_per_m2,
+                            steps,
+                            timestep,
+                            first_hour_interpolation_starting_values,
+                        ),
+                    wind_speed_m_per_s:
+                        energyplus_weather_wind_speed_at_timestep_with_starting_values(
+                            records,
+                            record_index,
+                            record.wind_speed_m_per_s,
+                            steps,
+                            timestep,
+                            first_hour_interpolation_starting_values,
+                        ),
+                    wind_direction_deg:
+                        energyplus_weather_wind_direction_at_timestep_with_starting_values(
+                            records,
+                            record_index,
+                            record.wind_direction_deg,
+                            steps,
+                            timestep,
+                            first_hour_interpolation_starting_values,
+                        ),
+                });
+            }
+        }
+
+        Self {
+            zone_steps_per_hour: steps,
+            first_hour_interpolation_starting_values,
+            hourly_dry_bulb_c,
+            timestep_samples,
+        }
+    }
+
+    /// Returns hourly dry-bulb values in EPW record order.
+    #[must_use]
+    pub fn hourly_dry_bulb_c(&self) -> &[f64] {
+        &self.hourly_dry_bulb_c
+    }
+
+    /// Returns precomputed zone-timestep weather samples.
+    #[must_use]
+    pub fn timestep_samples(&self) -> &[WeatherTimestepSample] {
+        &self.timestep_samples
+    }
+
+    /// Returns one precomputed zone-timestep weather sample.
+    #[must_use]
+    pub fn sample_for(&self, record_index: usize, timestep: u32) -> Option<&WeatherTimestepSample> {
+        let timestep_index = timestep.checked_sub(1)? as usize;
+        if timestep_index >= self.zone_steps_per_hour as usize {
+            return None;
+        }
+        self.timestep_samples
+            .get(record_index * self.zone_steps_per_hour as usize + timestep_index)
+    }
+}
+
+/// Precomputes weather samples for the supplied timestep configuration.
+#[must_use]
+pub fn precompute_weather_timestep_series(
+    records: &[EpwRecord],
+    zone_steps_per_hour: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> WeatherTimestepSeries {
+    WeatherTimestepSeries::from_records(
+        records,
+        zone_steps_per_hour,
+        first_hour_interpolation_starting_values,
+    )
+}
+
 pub(crate) fn previous_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
     previous_weather_record_with_first_hour_starting_values(
         records,

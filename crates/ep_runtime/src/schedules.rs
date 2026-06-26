@@ -164,6 +164,9 @@ pub struct ScheduleTrace {
     pub values: Vec<f64>,
 }
 
+/// Precomputed schedule values for one schedule.
+pub type ScheduleValueSeries = ScheduleTrace;
+
 /// One sampled zone internal-gain output series.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ZoneInternalGainTrace {
@@ -192,6 +195,15 @@ pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> V
 /// Simulates constant and supported compact schedules for a fixed number of hourly samples.
 #[must_use]
 pub fn simulate_schedule_values(model: &TypedModel, sample_count: usize) -> Vec<ScheduleTrace> {
+    precompute_schedule_value_series(model, sample_count)
+}
+
+/// Precomputes constant and supported compact schedules for hourly samples.
+#[must_use]
+pub fn precompute_schedule_value_series(
+    model: &TypedModel,
+    sample_count: usize,
+) -> Vec<ScheduleValueSeries> {
     schedule_ids(model)
         .filter_map(|schedule_id| {
             let schedule_name = schedule_name(model, schedule_id)?;

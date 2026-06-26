@@ -16,8 +16,9 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
-    NodeStateProjectionOptions, ResultStore, build_execution_plan, build_hourly_time_axis,
-    load_epw_records, simulate_heat_balance_zone_air_temperatures_with_weather_records,
+    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, build_hourly_time_axis,
+    load_epw_records, precompute_runtime_data,
+    simulate_heat_balance_zone_air_temperatures_with_weather_records,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
 use serde::Serialize;
@@ -241,16 +242,18 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
 
     let plan_start = Instant::now();
     let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
-    let execution_plan = simulation_model.as_ref().map(build_execution_plan);
-    if let (Some(model), Some(plan)) = (simulation_model.as_ref(), execution_plan.as_ref()) {
-        write_graph_and_plan(&config.output_dir, model, plan, config.trace_level)
+    let runtime_precomputed = simulation_model.as_ref().map(precompute_runtime_data);
+    if let (Some(model), Some(precomputed)) =
+        (simulation_model.as_ref(), runtime_precomputed.as_ref())
+    {
+        write_graph_and_plan(&config.output_dir, model, precomputed, config.trace_level)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     }
     timing.push(
         "execution_plan",
         "ep_runtime",
         plan_start.elapsed().as_secs_f64(),
-        "build ModelGraph and runtime ExecutionPlan for supported typed subset",
+        "precompute ModelGraph runtime data, ExecutionPlan, and OutputRegistry for supported typed subset",
     );
 
     let support_start = Instant::now();
@@ -327,7 +330,10 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
 
     let mut rust_runtime_result = None;
     if assessment.allows_rust_runtime() {
-        let source_order_gate = match execution_plan.as_ref().map(source_order_gate_summary) {
+        let source_order_gate = match runtime_precomputed
+            .as_ref()
+            .map(|precomputed| source_order_gate_summary(&precomputed.execution_plan))
+        {
             Some(gate) if gate.matches => gate,
             Some(gate) => {
                 diagnostics.error(
@@ -1025,9 +1031,10 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
 fn write_graph_and_plan(
     output_dir: &Path,
     model: &SimulationModel,
-    plan: &ExecutionPlan,
+    precomputed: &RuntimePrecomputedData,
     trace_level: TraceLevel,
 ) -> Result<(), String> {
+    let plan = &precomputed.execution_plan;
     let graph = &model.graph;
     let graph_summary = json!({
         "schema_version": 1,
@@ -1059,6 +1066,8 @@ fn write_graph_and_plan(
         "schema_version": 1,
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
+        "output_registry_count": precomputed.output_registry.len(),
+        "output_meter_registry_count": precomputed.output_registry.meter_registry().len(),
         "source_order_gate": source_order_gate,
         "expected_source_order_stages": expected_source_order_stages,
         "actual_executed_source_order_stages": actual_executed_source_order_stages,

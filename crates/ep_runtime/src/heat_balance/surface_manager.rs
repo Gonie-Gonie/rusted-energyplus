@@ -22,10 +22,12 @@ pub(crate) struct SurfaceThermalProperties {
     pub(crate) solar_absorptance: f64,
 }
 
+pub(crate) type ConstructionThermalData = SurfaceThermalProperties;
+
 pub(crate) fn surface_thermal_properties(
     model: &TypedModel,
     surface: &Surface,
-) -> Result<SurfaceThermalProperties, RuntimeError> {
+) -> Result<ConstructionThermalData, RuntimeError> {
     let construction = model
         .constructions
         .iter()

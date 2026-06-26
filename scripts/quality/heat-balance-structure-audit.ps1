@@ -93,10 +93,13 @@ $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $typedIds = "crates\ep_model\src\ids.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
+$precompute = "crates\ep_runtime\src\precompute.rs"
 $pipeline = "crates\ep_run\src\pipeline.rs"
 $runSupport = "crates\ep_run\src\support.rs"
 $cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
+$weather = "crates\ep_runtime\src\weather.rs"
+$schedules = "crates\ep_runtime\src\schedules.rs"
 $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
 $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
 
@@ -129,10 +132,13 @@ foreach ($entry in @(
         @($typedIds, "typed compact ID module"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
+        @($precompute, "runtime precompute module"),
         @($pipeline, "arbitrary-run pipeline"),
         @($runSupport, "arbitrary-run support assessment"),
         @($cli, "CLI conformance gate"),
         @($runtime, "runtime orchestration root"),
+        @($weather, "runtime weather module"),
+        @($schedules, "runtime schedules module"),
         @($runtimeTestSourceOrder, "runtime source-order tests"),
         @($runtimeTestDynamic, "runtime dynamic heat-balance tests")
     )) {
@@ -427,6 +433,33 @@ foreach ($surfaceIndex in @(
     )) {
     Assert-Contains -Path $state -Pattern $surfaceIndex -Description "precomputed heat-balance surface index $surfaceIndex"
 }
+foreach ($surfaceCacheField in @(
+        "area_m2",
+        "azimuth_deg",
+        "tilt_deg",
+        "thermal_resistance_m2_k_per_w",
+        "heat_capacity_j_per_m2_k",
+        "outside_boundary_condition",
+        "outside_boundary_target_surface_id",
+        "outside_boundary_target_zone_id",
+        "ctf"
+    )) {
+    Assert-Contains -Path $state -Pattern $surfaceCacheField -Description "precomputed surface cache field $surfaceCacheField"
+}
+Assert-Contains -Path $surfaceManager -Pattern 'pub\(crate\) type ConstructionThermalData' -Description "construction thermal data cache type"
+Assert-Contains -Path $initialization -Pattern 'construction_thermal_data' -Description "construction thermal data cached during heat-balance initialization"
+Assert-Contains -Path $initialization -Pattern 'construction_ctf_coefficients_by_name' -Description "CTF coefficient cache initialized by construction"
+Assert-Contains -Path $weather -Pattern 'pub struct WeatherTimestepSeries' -Description "precomputed weather timestep series"
+Assert-Contains -Path $weather -Pattern 'pub fn precompute_weather_timestep_series' -Description "weather timestep precompute entry"
+Assert-Contains -Path $runtime -Pattern 'precompute_weather_timestep_series' -Description "heat-balance runtime uses weather timestep precompute"
+Assert-Contains -Path $schedules -Pattern 'pub type ScheduleValueSeries' -Description "precomputed schedule value series type"
+Assert-Contains -Path $schedules -Pattern 'pub fn precompute_schedule_value_series' -Description "schedule value precompute entry"
+Assert-Contains -Path $precompute -Pattern 'pub struct RuntimePrecomputedData' -Description "runtime precomputed data bundle"
+Assert-Contains -Path $precompute -Pattern 'output_registry: RuntimeOutputRegistry' -Description "run cached output registry"
+Assert-Contains -Path $precompute -Pattern 'build_execution_plan_with_output_registry' -Description "execution plan uses cached output registry"
+Assert-Contains -Path $executionPlan -Pattern 'pub fn build_execution_plan_with_output_registry' -Description "execution plan cache-aware builder"
+Assert-Contains -Path $pipeline -Pattern 'precompute_runtime_data' -Description "pipeline caches runtime precomputed data"
+Assert-Contains -Path $pipeline -Pattern '"output_registry_count": precomputed\.output_registry\.len\(\)' -Description "execution-plan artifact records cached output registry"
 Assert-Contains -Path $initialization -Pattern 'HeatBalanceSurfaceIndexes::from_model_surfaces' -Description "heat-balance surface indexes initialized once"
 Assert-Contains -Path $zoneAirCorrection -Pattern 'HeatBalanceSurfaceIndexes' -Description "zone-air correction consumes precomputed surface indexes"
 Assert-Contains -Path $timestep -Pattern 'state\.surface_indexes\.surfaces_for_zone' -Description "timestep hot path uses precomputed zone surface indexes"

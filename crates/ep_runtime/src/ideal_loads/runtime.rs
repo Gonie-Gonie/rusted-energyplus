@@ -7,8 +7,9 @@ use ep_model::{IdealLoadsAirSystem, NodeId, OutputHandle, SimulationModel};
 use crate::{
     OutputSeries, ResultStore,
     ideal_loads::{
-        IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, IdealLoadsZoneState,
-        SimPurchasedAirCompatError, SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
+        IdealLoadsCompiledBranchFlags, IdealLoadsPurchasedAirBranch,
+        IdealLoadsSensibleLimitContext, IdealLoadsZoneState, SimPurchasedAirCompatError,
+        SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE,
@@ -23,7 +24,7 @@ use crate::{
         ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
         ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, sim_purchased_air_compat,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, sim_purchased_air_compat_with_branch_flags,
     },
     zone_equipment::{
         IdealLoadsZoneEquipmentDispatchIssue, ZoneSysEnergyDemand,
@@ -98,6 +99,11 @@ pub struct IdealLoadsCompatibilitySimulation {
     pub results: ResultStore,
     /// Runtime summary.
     pub summary: IdealLoadsCompatibilitySummary,
+}
+
+struct IdealLoadsRuntimeSystem<'a> {
+    system: &'a IdealLoadsAirSystem,
+    branch_flags: IdealLoadsCompiledBranchFlags,
 }
 
 /// Runtime error for the IdealLoads compatibility path.
@@ -186,8 +192,18 @@ pub fn simulate_ideal_loads_purchased_air_compat(
     let mut results = ResultStore::new();
     let mut handle_index = 0_u32;
     let mut systems = Vec::new();
+    let compiled_systems = model
+        .typed
+        .ideal_loads_air_systems
+        .iter()
+        .map(|system| IdealLoadsRuntimeSystem {
+            system,
+            branch_flags: IdealLoadsCompiledBranchFlags::from_system(system),
+        })
+        .collect::<Vec<_>>();
 
-    for system in &model.typed.ideal_loads_air_systems {
+    for compiled_system in compiled_systems {
+        let system = compiled_system.system;
         let validation = validate_ideal_loads_zone_equipment_dispatch(model, system.id);
         if !validation.is_dispatchable() {
             return Err(IdealLoadsCompatibilityRuntimeError::DispatchNotSupported {
@@ -212,15 +228,18 @@ pub fn simulate_ideal_loads_purchased_air_compat(
             options.default_heating_demand_w,
             options.default_cooling_demand_w,
         );
-        let output = sim_purchased_air_compat(SimPurchasedAirCompatInput {
-            system,
-            supply_node,
-            zone_state,
-            recirculation_state: zone_state,
-            demand,
-            unit_available: options.unit_available,
-            limit_context,
-        })
+        let output = sim_purchased_air_compat_with_branch_flags(
+            SimPurchasedAirCompatInput {
+                system,
+                supply_node,
+                zone_state,
+                recirculation_state: zone_state,
+                demand,
+                unit_available: options.unit_available,
+                limit_context,
+            },
+            compiled_system.branch_flags,
+        )
         .map_err(|error| {
             IdealLoadsCompatibilityRuntimeError::UnsupportedPurchasedAirBranch { error }
         })?;

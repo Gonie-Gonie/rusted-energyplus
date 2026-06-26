@@ -14,13 +14,14 @@ use crate::heat_balance::state::{
     ZoneHeatBalanceState,
 };
 use crate::heat_balance::surface_boundary::resolve_surface_boundary_target;
-use crate::heat_balance::surface_thermal_properties;
 use crate::heat_balance::zone_air_correction::ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO;
 use crate::heat_balance::zone_predictor_corrector::energyplus_zone_air_temperature_coefficients;
+use crate::heat_balance::{ConstructionThermalData, surface_thermal_properties};
 use crate::schedules::{
     convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
 };
-use ep_model::SimulationModel;
+use ep_model::{ConstructionId, SimulationModel};
+use std::collections::BTreeMap;
 
 const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
 const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
@@ -80,6 +81,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         });
     }
 
+    let mut construction_thermal_data = BTreeMap::<ConstructionId, ConstructionThermalData>::new();
     let mut surfaces = model
         .typed
         .surfaces
@@ -88,7 +90,14 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             let area_m2 = surface_area_m2(&surface.vertices);
             let azimuth_deg = surface_azimuth_deg(&surface.vertices);
             let tilt_deg = surface_tilt_deg(surface.surface_type, &surface.vertices);
-            let thermal = surface_thermal_properties(&model.typed, surface)?;
+            let thermal = match construction_thermal_data.get(&surface.construction) {
+                Some(thermal) => thermal.clone(),
+                None => {
+                    let thermal = surface_thermal_properties(&model.typed, surface)?;
+                    construction_thermal_data.insert(surface.construction, thermal.clone());
+                    thermal
+                }
+            };
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
             let steady_ctf_w_per_m2_k =

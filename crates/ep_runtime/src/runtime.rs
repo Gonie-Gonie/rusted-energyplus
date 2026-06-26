@@ -134,8 +134,8 @@ pub use crate::psychrometrics::{
 #[cfg(test)]
 use crate::schedules::update_surface_radiant_internal_gain_source_terms;
 pub use crate::schedules::{
-    ScheduleTrace, ZoneInternalGainTrace, simulate_constant_schedules, simulate_schedule_values,
-    simulate_zone_internal_convective_gains,
+    ScheduleTrace, ScheduleValueSeries, ZoneInternalGainTrace, precompute_schedule_value_series,
+    simulate_constant_schedules, simulate_schedule_values, simulate_zone_internal_convective_gains,
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
 pub use crate::weather::*;
@@ -201,13 +201,17 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_
     options: HeatBalanceSimulationOptions,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
-    let weather_dry_bulb_c = weather_records
-        .iter()
-        .map(|record| record.dry_bulb_c)
-        .collect::<Vec<_>>();
+    let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
+    let first_hour_interpolation_starting_values =
+        run_period_first_hour_interpolation_starting_values(&model.typed);
+    let weather_series = precompute_weather_timestep_series(
+        weather_records,
+        zone_steps_per_hour,
+        first_hour_interpolation_starting_values,
+    );
     simulate_heat_balance_zone_air_temperatures_internal(
         model,
-        &weather_dry_bulb_c,
+        weather_series.hourly_dry_bulb_c(),
         Some(weather_records),
         options,
         ctf_coefficients,

@@ -79,6 +79,7 @@ $idealLoadsInput = "crates\ep_runtime\src\ideal_loads\input.rs"
 $idealLoadsMeters = "crates\ep_runtime\src\ideal_loads\meters.rs"
 $idealLoadsReport = "crates\ep_runtime\src\ideal_loads\report.rs"
 $idealLoadsReportSemantics = "crates\ep_runtime\src\ideal_loads\report\semantics.rs"
+$idealLoadsRuntime = "crates\ep_runtime\src\ideal_loads\runtime.rs"
 $idealLoadsUpdate = "crates\ep_runtime\src\ideal_loads\update.rs"
 $outdoorAir = "crates\ep_runtime\src\ideal_loads\outdoor_air.rs"
 $outdoorAirTests = "crates\ep_runtime\src\ideal_loads\outdoor_air_tests.rs"
@@ -124,6 +125,7 @@ Assert-FileExists -Path $idealLoadsInput -Description "IdealLoads input boundary
 Assert-FileExists -Path $idealLoadsMeters -Description "IdealLoads meter binding module"
 Assert-FileExists -Path $idealLoadsReport -Description "IdealLoads report module"
 Assert-FileExists -Path $idealLoadsReportSemantics -Description "IdealLoads report semantics module"
+Assert-FileExists -Path $idealLoadsRuntime -Description "IdealLoads compatibility runtime"
 Assert-FileExists -Path $idealLoadsUpdate -Description "IdealLoads node-update module"
 Assert-FileExists -Path $outdoorAir -Description "IdealLoads outdoor-air module"
 Assert-FileExists -Path $outdoorAirTests -Description "IdealLoads outdoor-air tests module"
@@ -325,6 +327,8 @@ Assert-NotContains -Path $outdoorAir -Pattern '#\[test\]' -Description "unit tes
 Assert-NotContains -Path $outdoorAir -Pattern 'energyplus_psychrometric_humidity_ratio_from_rh' -Description "psychrometric humidity-ratio helper import in outdoor-air root"
 
 Assert-Contains -Path $dispatch -Pattern 'pub fn sim_purchased_air_compat\s*\(' -Description "SimPurchasedAir source-order wrapper"
+Assert-Contains -Path $dispatch -Pattern 'pub struct IdealLoadsCompiledBranchFlags' -Description "IdealLoads cached branch flags"
+Assert-Contains -Path $dispatch -Pattern 'pub fn sim_purchased_air_compat_with_branch_flags\s*\(' -Description "SimPurchasedAir wrapper accepts cached branch flags"
 Assert-Contains -Path $dispatch -Pattern 'purchased_air_source_order_stages\s*\(' -Description "PurchasedAir source-order stage summary"
 foreach ($routine in @(
         "GetPurchasedAir",
@@ -340,6 +344,8 @@ Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_RUNTIME_STRING_L
 Assert-Contains -Path $dispatch -Pattern 'pub const IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY' -Description "IdealLoads SizePurchasedAir autosize policy metadata"
 Assert-Contains -Path $dispatch -Pattern 'SizePurchasedAir autosizing is blocked' -Description "IdealLoads SizePurchasedAir blocked autosizing policy"
 Assert-Contains -Path $dispatch -Pattern 'IdealLoadsFeatureFlags::from_system' -Description "PurchasedAir branch dispatch uses compile feature flags"
+Assert-Contains -Path $idealLoadsRuntime -Pattern 'IdealLoadsCompiledBranchFlags::from_system' -Description "IdealLoads runtime caches branch flags per system"
+Assert-Contains -Path $idealLoadsRuntime -Pattern 'sim_purchased_air_compat_with_branch_flags' -Description "IdealLoads runtime uses cached branch flags"
 Assert-Contains -Path $dispatch -Pattern 'calc_no_oa_sensible_with_limits_and_recirculation_compat\s*\(' -Description "finite-limit branch dispatch"
 Assert-Contains -Path $dispatch -Pattern 'calc_no_oa_no_limit_sensible_with_recirculation_context_compat\s*\(' -Description "no-limit branch dispatch"
 Assert-NotContains -Path $dispatch -Pattern 'calc_outdoor_air_sensible_report_rates_compat\s*\(' -Description "outdoor-air diagnostic calculation in source-order conformance wrapper"

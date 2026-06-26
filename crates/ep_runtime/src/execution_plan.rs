@@ -292,6 +292,16 @@ pub fn energyplus_ideal_loads_compatibility_stages() -> Vec<EnergyPlusCompatibil
 /// Builds the first deterministic execution plan for the typed subset.
 #[must_use]
 pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
+    let output_registry = RuntimeOutputRegistry::from_model(model);
+    build_execution_plan_with_output_registry(model, &output_registry)
+}
+
+/// Builds the execution plan from a precomputed output registry.
+#[must_use]
+pub fn build_execution_plan_with_output_registry(
+    model: &SimulationModel,
+    output_registry: &RuntimeOutputRegistry,
+) -> ExecutionPlan {
     let mut setup_steps = vec![ExecutionStep::UpdateWeather];
     setup_steps.extend(schedule_ids(model).map(ExecutionStep::EvaluateSchedule));
 
@@ -363,7 +373,7 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
     push_steps_to_stage(
         &mut stages,
         ExecutionStageKind::ReportHeatBalance,
-        RuntimeOutputRegistry::from_model(model)
+        output_registry
             .outputs()
             .iter()
             .map(|output| ExecutionStep::WriteOutput(output.handle))

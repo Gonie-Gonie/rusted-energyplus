@@ -51,7 +51,8 @@
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients,
         inside_ctf_outside_temperature_history_commit_override_c, parse_epw_dry_bulb_series,
-        parse_epw_records, run_heat_balance_run_period_warmup, run_surface_balance_passes,
+        parse_epw_records, precompute_schedule_value_series, precompute_weather_timestep_series,
+        run_heat_balance_run_period_warmup, run_surface_balance_passes,
         seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures,
@@ -92,7 +93,7 @@
     use crate::{
         ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
         build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_heat_balance_compatibility_stages,
+        energyplus_heat_balance_compatibility_stages, precompute_runtime_data,
     };
     use crate::{
         RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRequest,
@@ -501,6 +502,23 @@
     }
 
     #[test]
+    fn schedule_value_series_precomputes_supported_schedules() {
+        let mut model = TypedModel::default();
+        model.schedules.push(ScheduleConstant {
+            id: ScheduleId(0),
+            name: NormalizedName::new("AlwaysOn"),
+            schedule_type_limits: None,
+            hourly_value: 0.75,
+        });
+
+        let series = precompute_schedule_value_series(&model, 4);
+
+        assert_eq!(series.len(), 1);
+        assert_eq!(series[0].schedule_name, "ALWAYSON");
+        assert_eq!(series[0].values, vec![0.75, 0.75, 0.75, 0.75]);
+    }
+
+    #[test]
     fn zone_internal_convective_gain_trace_excludes_radiant_fraction() {
         let mut model = cube_model();
         model.other_equipment[0].fraction_radiant = 0.25;
@@ -661,6 +679,27 @@
             plan.compatibility_stages,
             energyplus_heat_balance_compatibility_stages()
         );
+    }
+
+    #[test]
+    fn runtime_precomputed_data_caches_registry_used_by_plan() {
+        let model = SimulationModel::from_typed(cube_model());
+
+        let precomputed = precompute_runtime_data(&model);
+        let direct_plan = build_execution_plan(&model);
+
+        assert_eq!(precomputed.execution_plan, direct_plan);
+        assert_eq!(precomputed.output_registry.len(), 157);
+        let report_heat_balance = stage_with_kind(
+            &precomputed.execution_plan.stages,
+            ExecutionStageKind::ReportHeatBalance,
+        );
+        let write_output_count = report_heat_balance
+            .steps
+            .iter()
+            .filter(|step| matches!(step, ExecutionStep::WriteOutput(_)))
+            .count();
+        assert_eq!(write_output_count, precomputed.output_registry.len());
     }
 
     #[test]
