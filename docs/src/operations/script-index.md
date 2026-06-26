@@ -139,8 +139,8 @@ matplotlib for document layout and charts.
 | `official-dynamic-heat-balance-probe-summary` | diagnostic | summarize existing official dynamic heat-balance probe lanes with the report Python | no | `.runtime/official-dynamic-probe-summary.*` |
 | `compare-regression` | compare | run current compare suite and write reports | no | `.runtime/compare-regression` |
 | `compare-series-v2-smoke` | compare | gate timestamp-aware selected series reader and comparison metrics v2 | yes | console output |
-| `launch-ui` | gui | open the EPLaunch-style Windows UI for arbitrary IDF runs | no | local WinForms window |
-| `build-launcher-exe` | gui | build the no-console Windows launcher exe for local testing or release packaging | yes for release package | `target/launcher/eplus-rs-launch.exe` |
+| `launch-ui` | launcher | open the EPLaunch-style Windows UI for arbitrary IDF runs | no | local WinForms window |
+| `build-launcher-exe` | launcher | build the no-console Windows launcher exe for local testing or release packaging | yes for release package | `target/launcher/eplus-rs-launch.exe` |
 | `conformance-schema-smoke` | conformance | validate case/suite schema fixtures | yes | console output |
 | `manifest-validate-all` | conformance | validate all tracked case manifests against Case Manifest / Output Request Schema v2 | yes | console output |
 | `conformance-baseline-smoke` | conformance | generate EnergyPlus baseline artifacts | no | `.runtime/conformance-baseline` |

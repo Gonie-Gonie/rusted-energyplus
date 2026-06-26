@@ -1,7 +1,7 @@
 {
     "groups":  [
                    "setup",
-                   "gui",
+                   "launcher",
                    "quality",
                    "smoke",
                    "compare",
@@ -41,14 +41,14 @@
                      },
                      {
                          "name":  "launch-ui",
-                         "path":  "gui\\eplus-rs-launch.ps1",
-                         "group":  "gui",
+                         "path":  "launcher\\eplus-rs-launch.ps1",
+                         "group":  "launcher",
                          "help":  "Open the EPLaunch-style Windows UI for arbitrary IDF runs."
                      },
                      {
                          "name":  "build-launcher-exe",
-                         "path":  "gui\\build-launcher-exe.ps1",
-                         "group":  "gui",
+                         "path":  "launcher\\build-launcher-exe.ps1",
+                         "group":  "launcher",
                          "help":  "Build the no-console Windows launcher exe for local testing or release packaging."
                      },
                      {

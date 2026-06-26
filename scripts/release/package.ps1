@@ -87,7 +87,7 @@ Copy-RepoItem -Source (Join-Path $RepoRoot "data\conformance_suites") -Destinati
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\src") -Destination (Join-Path $stageRoot "docs\src")
 Copy-RepoItem -Source (Join-Path $RepoRoot "docs\book.toml") -Destination (Join-Path $stageRoot "docs\book.toml")
 
-& (Join-Path $RepoRoot "scripts\gui\build-launcher-exe.ps1") -OutputPath (Join-Path $stageRoot "eplus-rs-launch.exe")
+& (Join-Path $RepoRoot "scripts\launcher\build-launcher-exe.ps1") -OutputPath (Join-Path $stageRoot "eplus-rs-launch.exe")
 
 if (-not $SkipOracle) {
     $resolvedOracleRuntimeRoot = if ([System.IO.Path]::IsPathRooted($OracleRuntimeRoot)) {

@@ -61,7 +61,7 @@ if ($SelfTest) {
         output_type = "WindowsApplication"
         runtime = "direct-winforms"
         starts_powershell = $false
-        source_path = "scripts\gui\eplus-rs-launcher.cs"
+        source_path = "scripts\launcher\eplus-rs-launcher.cs"
         script_path = "not-used-at-runtime"
     } | ConvertTo-Json -Depth 3
 }

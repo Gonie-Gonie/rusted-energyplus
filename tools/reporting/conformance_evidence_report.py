@@ -553,8 +553,8 @@ def text_contains(path: Path, needle: str) -> bool:
 
 
 def load_launcher_evidence(repo_root: Path) -> dict[str, Any]:
-    launcher_script = repo_root / "scripts" / "gui" / "eplus-rs-launch.ps1"
-    build_script = repo_root / "scripts" / "gui" / "build-launcher-exe.ps1"
+    launcher_script = repo_root / "scripts" / "launcher" / "eplus-rs-launch.ps1"
+    build_script = repo_root / "scripts" / "launcher" / "build-launcher-exe.ps1"
     smoke_script = repo_root / "scripts" / "smoke" / "launcher-smoke.ps1"
     screenshot = repo_root / ".runtime" / "launcher-smoke" / "launcher-ready.png"
     rows = [

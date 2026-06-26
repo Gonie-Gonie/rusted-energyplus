@@ -150,11 +150,11 @@ function Assert-LauncherRunSummary {
     Assert-Equal -Actual $Summary.support.conformance_claim -Expected $false -Description "$Description conformance claim"
 }
 
-$launcherScript = Join-Path $RepoRoot "scripts\gui\eplus-rs-launch.ps1"
+$launcherScript = Join-Path $RepoRoot "scripts\launcher\eplus-rs-launch.ps1"
 if (-not (Test-Path -LiteralPath $launcherScript -PathType Leaf)) {
     throw "Missing launcher script: $launcherScript"
 }
-$launcherBuildScript = Join-Path $RepoRoot "scripts\gui\build-launcher-exe.ps1"
+$launcherBuildScript = Join-Path $RepoRoot "scripts\launcher\build-launcher-exe.ps1"
 if (-not (Test-Path -LiteralPath $launcherBuildScript -PathType Leaf)) {
     throw "Missing launcher build script: $launcherBuildScript"
 }

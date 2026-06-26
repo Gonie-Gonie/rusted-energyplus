@@ -171,13 +171,6 @@ none
 | scripts/dev/commands.json | internal | internal helper |  |  |  | `dist`<br>`target` | n/a |
 | scripts/dev.cmd | internal | public user command |  |  |  |  | propagates PowerShell ERRORLEVEL |
 | scripts/dev.ps1 | internal | public user command |  |  |  | `target` | nonzero via PowerShell throw |
-| scripts/gui/build-launcher-exe.ps1 | launcher | developer command | build-launcher-exe |  |  | `target/launcher/eplus-rs-launch.exe` | nonzero via PowerShell throw |
-| scripts/gui/eplus-rs-launch/artifacts.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/gui/eplus-rs-launch/core.ps1 | launcher | internal helper |  | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable` | `Data/USA_CO_Golden-NREL.724666_TMY3.epw` | `.runtime/energyplus/26.1.0`<br>`target/debug/eplus-rs.exe`<br>`target/release/eplus-rs.exe` | PowerShell success unless an uncaught error occurs |
-| scripts/gui/eplus-rs-launch/self_test.ps1 | launcher | internal helper |  |  |  |  | nonzero via PowerShell throw |
-| scripts/gui/eplus-rs-launch/ui.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/gui/eplus-rs-launch.ps1 | launcher | public user command | launch-ui | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime/ep-launch-output` | explicit exit: exit 0 |
-| scripts/gui/eplus-rs-launcher.cs | launcher | internal helper |  | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime`<br>`target` | compiled helper; exit code set by compiled process |
 | scripts/internal/probes/official-hb-flat-adhist-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-final-hconv-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-inside-ctf-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
@@ -185,6 +178,13 @@ none
 | scripts/internal/probes/official-hb-flat-live-refair-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-surf-refair-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/internal/probes/official-hb-flat-zone-surf-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/launcher/build-launcher-exe.ps1 | launcher | developer command | build-launcher-exe |  |  | `target/launcher/eplus-rs-launch.exe` | nonzero via PowerShell throw |
+| scripts/launcher/eplus-rs-launch/artifacts.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/launcher/eplus-rs-launch/core.ps1 | launcher | internal helper |  | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable` | `Data/USA_CO_Golden-NREL.724666_TMY3.epw` | `.runtime/energyplus/26.1.0`<br>`target/debug/eplus-rs.exe`<br>`target/release/eplus-rs.exe` | PowerShell success unless an uncaught error occurs |
+| scripts/launcher/eplus-rs-launch/self_test.ps1 | launcher | internal helper |  |  |  |  | nonzero via PowerShell throw |
+| scripts/launcher/eplus-rs-launch/ui.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/launcher/eplus-rs-launch.ps1 | launcher | public user command | launch-ui | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime/ep-launch-output` | explicit exit: exit 0 |
+| scripts/launcher/eplus-rs-launcher.cs | launcher | internal helper |  | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable`<br>`eplus-rs run` |  | `.runtime`<br>`target` | compiled helper; exit code set by compiled process |
 | scripts/lib/common.ps1 | internal | internal helper |  |  |  |  | nonzero via PowerShell throw |
 | scripts/lib/python.ps1 | internal | internal helper |  |  | `tools/python/requirements-report.txt` | `.runtime/python-venvs/report`<br>`.runtime/python/$ProjectPythonVersion` | PowerShell success unless an uncaught error occurs |
 | scripts/quality/algorithm-ledger-check.ps1 | quality | developer command | algorithm-ledger-check | `tools/docs/validate_algorithm_ledger.py` |  |  | nonzero when checked child process fails |

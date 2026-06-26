@@ -430,7 +430,7 @@ def exit_contract(path: Path, text: str) -> str:
 def script_category(relative_path: str, command: dict[str, Any] | None) -> str:
     if command is not None:
         group = str(command.get("group", ""))
-        if group == "gui":
+        if group == "launcher":
             return "launcher"
         if group in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
             return group
@@ -445,7 +445,7 @@ def script_category(relative_path: str, command: dict[str, Any] | None) -> str:
     if len(parts) < 2:
         return "internal"
     folder = parts[1]
-    if folder == "gui":
+    if folder == "launcher":
         return "launcher"
     if folder in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
         return folder
@@ -462,7 +462,7 @@ def script_status(relative_path: str, command: dict[str, Any] | None) -> str:
     name = str(command.get("name", ""))
     if group == "release":
         return "release command"
-    if group == "gui" and name == "launch-ui":
+    if group == "launcher" and name == "launch-ui":
         return "public user command"
     if group == "setup":
         return "public user command"
