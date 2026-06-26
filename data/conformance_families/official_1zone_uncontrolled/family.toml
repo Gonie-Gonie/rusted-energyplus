@@ -1,13 +1,50 @@
 schema = "rusted-energyplus.case-family.v1"
 id = "official_1zone_uncontrolled"
+family_id = "official_1zone_uncontrolled"
 title = "Official 1ZoneUncontrolled heat-balance family"
 oracle_version = "26.1.0"
 primary_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+base_case_id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 shared_output_requests = "output-requests.toml"
 report_command = "scripts/dev.cmd one-zone-family-report"
 report_path = ".runtime/release-evidence/v0.1.0/one-zone-family/official_1zone_uncontrolled_family_report.md"
 algorithm_capability = "official_1zone_uncontrolled_declared_heat_balance"
 regression_policy = "A change that fixes one family member and breaks another is a family regression."
+regression_rule = "Any newly failing member or newly failing required variable blocks the family unless the claim boundary is intentionally changed."
+aggregation_report_path = ".runtime/release-evidence/v0.1.0/one-zone-family/official_1zone_uncontrolled_family_report.json"
+varied_parameters = [
+  "surface_topology",
+  "material_property",
+  "internal_gain_schedule",
+  "timestep",
+  "thermal_mass",
+]
+invariant_capabilities = [
+  "official_1zone_uncontrolled_declared_heat_balance",
+  "single_zone",
+  "opaque_surface_heat_balance",
+]
+family_required_variables = [
+  "Zone Mean Air Temperature",
+  "Zone Mean Air Humidity Ratio",
+  "Surface Inside Face Temperature",
+  "Surface Outside Face Temperature",
+  "Surface Inside Face Conduction Heat Transfer Rate",
+  "Surface Outside Face Conduction Heat Transfer Rate",
+  "Surface Heat Storage Rate",
+  "Zone Opaque Surface Inside Faces Conduction Rate",
+]
+family_tolerances = [
+  "zone-state: max_abs=1e-6 max_rmse=1e-6",
+  "surface-state: max_abs=1e-6 max_rmse=1e-6",
+  "diagnostic/planned rows: no conformance tolerance until promoted",
+]
+family_not_claimed = [
+  "Broad EnergyPlus heat-balance compatibility",
+  "Fenestration and daylighting surfaces",
+  "AirLoopHVAC, PlantLoop, EMS, PythonPlugin, and autosizing interactions",
+  "Family variants with planned-not-claimed status",
+]
 pdf_evidence = "The numeric conformance PDF includes the 1Zone family report snapshot, and the release evidence manifest tracks the generated family report artifacts."
 
 [[members]]
@@ -15,6 +52,7 @@ case_id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 case_toml = "cases/official_1zone_uncontrolled_dynamic_conformance_candidate_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_dynamic_conformance_candidate_001/output-requests.toml"
 role = "blocking conformance candidate"
+parameter_delta = "base official 1ZoneUncontrolled dynamic source; no family parameter perturbation"
 expected_status = "pass"
 
 [[members]]
@@ -22,6 +60,7 @@ case_id = "official_1zone_uncontrolled_dynamic_diagnostic_001"
 case_toml = "cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_dynamic_diagnostic_001/output-requests.toml"
 role = "broad diagnostic"
+parameter_delta = "base official 1ZoneUncontrolled dynamic source with broad diagnostic output set"
 expected_status = "diagnostic-only"
 
 [[members]]
@@ -29,6 +68,7 @@ case_id = "official_1zone_uncontrolled_3surface_family_001"
 case_toml = "cases/official_1zone_uncontrolled_3surface_family_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_3surface_family_001/output-requests.toml"
 role = "official variant"
+parameter_delta = "surface_topology=3-surface official variant"
 expected_status = "planned-not-claimed"
 
 [[members]]
@@ -36,6 +76,7 @@ case_id = "heat_balance_nomass_001"
 case_toml = "cases/heat_balance_nomass_001/case.toml"
 output_requests = "cases/heat_balance_nomass_001/output-requests.toml"
 role = "no-mass fixture"
+parameter_delta = "material_property=no-mass adiabatic fixture; thermal_mass=absent"
 expected_status = "pass"
 
 [[members]]
@@ -43,6 +84,7 @@ case_id = "official_1zone_uncontrolled_massive_opaque_family_001"
 case_toml = "cases/official_1zone_uncontrolled_massive_opaque_family_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_massive_opaque_family_001/output-requests.toml"
 role = "massive opaque fixture"
+parameter_delta = "material_property=increased heat capacity; thermal_mass=massive opaque"
 expected_status = "planned-not-claimed"
 
 [[members]]
@@ -50,6 +92,7 @@ case_id = "official_1zone_uncontrolled_varied_internal_gain_family_001"
 case_toml = "cases/official_1zone_uncontrolled_varied_internal_gain_family_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_varied_internal_gain_family_001/output-requests.toml"
 role = "varied internal gain fixture"
+parameter_delta = "internal_gain_schedule=non-flat convective gain profile"
 expected_status = "planned-not-claimed"
 
 [[members]]
@@ -57,6 +100,7 @@ case_id = "official_1zone_uncontrolled_varied_material_resistance_family_001"
 case_toml = "cases/official_1zone_uncontrolled_varied_material_resistance_family_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_varied_material_resistance_family_001/output-requests.toml"
 role = "varied material resistance fixture"
+parameter_delta = "material_property=varied opaque material resistance"
 expected_status = "planned-not-claimed"
 
 [[members]]
@@ -64,4 +108,5 @@ case_id = "official_1zone_uncontrolled_varied_timestep_family_001"
 case_toml = "cases/official_1zone_uncontrolled_varied_timestep_family_001/case.toml"
 output_requests = "cases/official_1zone_uncontrolled_varied_timestep_family_001/output-requests.toml"
 role = "varied timestep fixture"
+parameter_delta = "timestep=perturbed timesteps per hour"
 expected_status = "planned-not-claimed"

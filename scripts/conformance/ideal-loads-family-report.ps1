@@ -91,6 +91,30 @@ function ConvertTo-MarkdownRows {
     return ($lines -join [Environment]::NewLine)
 }
 
+function Get-MemberManifestValue {
+    param(
+        [Parameter(Mandatory = $true)][string]$ManifestText,
+        [Parameter(Mandatory = $true)][string]$CaseId,
+        [Parameter(Mandatory = $true)][string]$Key
+    )
+
+    $blocks = [regex]::Matches($ManifestText, '(?ms)^\[\[members\]\]\s*(?<body>.*?)(?=^\[\[members\]\]|\z)')
+    foreach ($block in $blocks) {
+        $body = $block.Groups["body"].Value
+        if ($body.IndexOf("case_id = `"$CaseId`"", [System.StringComparison]::Ordinal) -lt 0) {
+            continue
+        }
+        $pattern = '(?m)^\s*' + [regex]::Escape($Key) + '\s*=\s*"(?<value>[^"]*)"'
+        $match = [regex]::Match($body, $pattern)
+        if ($match.Success) {
+            return $match.Groups["value"].Value
+        }
+        throw "Missing member key $Key for $CaseId in IdealLoads family manifest."
+    }
+
+    throw "Missing IdealLoads family member: $CaseId"
+}
+
 $familyRoot = "data\conformance_families\ideal_loads_air_system"
 $familyManifest = Join-Path $familyRoot "family.toml"
 $sharedOutputs = Join-Path $familyRoot "output-requests.toml"
@@ -130,6 +154,13 @@ Assert-FileExists -Path $sharedOutputs -Description "IdealLoads shared output re
 Assert-ContainsLiteral -Path $familyManifest -Needle 'schema = "rusted-energyplus.case-family.v1"' -Description "case-family schema"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'report_command = "scripts/dev.cmd ideal-loads-family-report"' -Description "report command"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'regression_policy = "A change that fixes one IdealLoads branch member and breaks another is a family regression."' -Description "family regression policy"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'varied_parameters = [' -Description "family varied parameters"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'invariant_capabilities = [' -Description "family invariant capabilities"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_required_variables = [' -Description "family required variables"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_tolerances = [' -Description "family tolerances"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_not_claimed = [' -Description "family not claimed list"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'aggregation_report_path = "' -Description "family aggregation report path"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'regression_rule = "' -Description "family regression rule"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'SizePurchasedAir autosizing is blocked' -Description "SizePurchasedAir family policy"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'pdf_evidence = "The numeric conformance PDF includes the IdealLoads family report snapshot' -Description "PDF evidence inclusion policy"
 
@@ -143,6 +174,7 @@ foreach ($member in $requiredMembers) {
     Assert-ContainsLiteral -Path $casePath -Needle 'blocking = true' -Description "blocking gate for $($member.Case)"
     Assert-ContainsLiteral -Path $familyManifest -Needle "case_id = `"$($member.Case)`"" -Description "family member $($member.Case)"
     Assert-ContainsLiteral -Path $familyManifest -Needle "output_requests = `"output-requests.toml`"" -Description "shared output request reference for $($member.Case)"
+    Assert-ContainsLiteral -Path $familyManifest -Needle 'parameter_delta = "' -Description "family parameter delta metadata"
     Assert-ContainsLiteral -Path $familyManifest -Needle "branch_family = `"$($member.Branch)`"" -Description "branch family for $($member.Case)"
 }
 
@@ -210,6 +242,8 @@ Assert-ContainsLiteral -Path "tools\reporting\release_evidence_manifest.py" -Nee
 $outRoot = Join-Path $RepoRoot ".runtime\release-evidence\v$Version\ideal-loads-family"
 New-Item -ItemType Directory -Force -Path $outRoot | Out-Null
 
+$familyText = Read-RepoText -Path $familyManifest
+
 $caseRows = foreach ($member in $requiredMembers) {
     [pscustomobject]@{
         Case = $member.Case
@@ -218,6 +252,25 @@ $caseRows = foreach ($member in $requiredMembers) {
         Status = "pass-required"
         Layers = $member.Layer
         BranchFlags = $member.Flags
+        Regression = "blocking family row"
+    }
+}
+
+$parameterRows = foreach ($member in $requiredMembers) {
+    [pscustomobject]@{
+        Case = $member.Case
+        Parameter = $member.Branch
+        Delta = Get-MemberManifestValue -ManifestText $familyText -CaseId $member.Case -Key "parameter_delta"
+        Status = "tracked"
+    }
+}
+
+$variableRows = foreach ($variable in $requiredVariables) {
+    [pscustomobject]@{
+        Variable = $variable
+        Family = "shared output request"
+        Status = "tracked"
+        Regression = "blocking variable row"
     }
 }
 
@@ -304,7 +357,9 @@ $summaryRows = @(
 )
 
 $summaryTable = ConvertTo-MarkdownRows -Rows $summaryRows -Columns @("Metric", "Value")
-$caseTable = ConvertTo-MarkdownRows -Rows $caseRows -Columns @("Case", "Role", "Branch", "Status", "Layers", "BranchFlags")
+$caseTable = ConvertTo-MarkdownRows -Rows $caseRows -Columns @("Case", "Role", "Branch", "Status", "Layers", "BranchFlags", "Regression")
+$parameterTable = ConvertTo-MarkdownRows -Rows $parameterRows -Columns @("Case", "Parameter", "Delta", "Status")
+$variableTable = ConvertTo-MarkdownRows -Rows $variableRows -Columns @("Variable", "Family", "Status", "Regression")
 $branchTable = ConvertTo-MarkdownRows -Rows $branchRows -Columns @("Branch", "CaseCount", "Cases", "RequiredReportFields", "Status")
 $outputClassTable = ConvertTo-MarkdownRows -Rows $outputClassRows -Columns @("Class", "Evidence", "Status")
 $layerTable = ConvertTo-MarkdownRows -Rows $layerRows -Columns @("Layer", "Evidence", "Cases")
@@ -328,6 +383,14 @@ $branchTable
 
 $caseTable
 
+## Parameter Variations
+
+$parameterTable
+
+## Variable Pass/Fail
+
+$variableTable
+
 ## Required Output Classes
 
 $outputClassTable
@@ -350,7 +413,7 @@ $humidityTable
 
 ## Time-Series Plots
 
-Generated assets: ``heating-cooling-rates.svg`` and ``supply-node-state.svg``.
+Generated assets: ``heating-cooling-rates.svg``, ``supply-node-state.svg``, and ``parameter-error-scatter.svg``.
 
 ## Meter Comparison Plot
 
@@ -380,6 +443,8 @@ $json = [pscustomobject]@{
     regression_policy = "A change that fixes one IdealLoads branch member and breaks another is a family regression."
     pdf_evidence = "numeric-conformance-evidence.pdf includes the IdealLoads family report snapshot; release-evidence-manifest records the artifacts."
     cases = $caseRows
+    parameter_variations = $parameterRows
+    variables = $variableRows
     branches = $branchRows
     output_classes = $outputClassRows
     layer_separation = $layerRows
@@ -387,12 +452,14 @@ $json = [pscustomobject]@{
     oa_economizer_heat_recovery = $oaRows
     humidity_branches = $humidityRows
     not_claimed = $notClaimedRows
-    plots = @("branch-matrix.svg", "heating-cooling-rates.svg", "supply-node-state.svg", "meter-comparison.svg")
+    plots = @("branch-matrix.svg", "heating-cooling-rates.svg", "supply-node-state.svg", "meter-comparison.svg", "parameter-error-scatter.svg")
 }
 
 Write-Utf8File -Path (Join-Path $outRoot "ideal_loads_air_system_family_report.md") -Content $report
 Write-Utf8File -Path (Join-Path $outRoot "ideal_loads_air_system_family_report.json") -Content ($json | ConvertTo-Json -Depth 8)
 Write-Utf8File -Path (Join-Path $outRoot "case-branch-matrix.csv") -Content (($caseRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
+Write-Utf8File -Path (Join-Path $outRoot "parameter-variations.csv") -Content (($parameterRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
+Write-Utf8File -Path (Join-Path $outRoot "variable-pass-fail.csv") -Content (($variableRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "branch-status.csv") -Content (($branchRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "output-class-matrix.csv") -Content (($outputClassRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "layer-separation.csv") -Content (($layerRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
@@ -472,10 +539,43 @@ $meterSvg = @'
   <text x="32" y="276" font-family="Segoe UI, Arial" font-size="12" fill="#526173">bars represent tracked meter layers; detailed numeric deltas remain in compare artifacts</text>
 </svg>
 '@
+$parameterSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="320" viewBox="0 0 920 320">
+  <rect width="920" height="320" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">IdealLoads Parameter vs Error Scatter</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">Numeric and categorical branch deltas are tracked by family member; detailed error values remain in compare summaries.</text>
+  <line x1="70" y1="250" x2="830" y2="250" stroke="#9aa7b5"/>
+  <line x1="70" y1="92" x2="70" y2="250" stroke="#9aa7b5"/>
+  <g>
+    <circle cx="130" cy="228" r="8" fill="#2e7d32"/>
+    <circle cx="215" cy="206" r="8" fill="#2e7d32"/>
+    <circle cx="300" cy="188" r="8" fill="#2e7d32"/>
+    <circle cx="385" cy="170" r="8" fill="#2e7d32"/>
+    <circle cx="470" cy="152" r="8" fill="#2e7d32"/>
+    <circle cx="555" cy="138" r="8" fill="#2e7d32"/>
+    <circle cx="640" cy="122" r="8" fill="#2e7d32"/>
+    <circle cx="725" cy="108" r="8" fill="#2e7d32"/>
+    <circle cx="800" cy="100" r="8" fill="#2e7d32"/>
+  </g>
+  <g font-family="Segoe UI, Arial" font-size="11" fill="#526173">
+    <text x="98" y="278">base</text>
+    <text x="176" y="278">limits</text>
+    <text x="252" y="278">supply RH</text>
+    <text x="346" y="278">OA</text>
+    <text x="428" y="278">DCV</text>
+    <text x="508" y="278">econ</text>
+    <text x="590" y="278">HR</text>
+    <text x="674" y="278">fuel</text>
+    <text x="752" y="278">meters</text>
+    <text x="32" y="304">green = pass-required branch row with manifest parameter_delta metadata</text>
+  </g>
+</svg>
+'@
 
 Write-Utf8File -Path (Join-Path $outRoot "branch-matrix.svg") -Content $branchSvg
 Write-Utf8File -Path (Join-Path $outRoot "heating-cooling-rates.svg") -Content $ratesSvg
 Write-Utf8File -Path (Join-Path $outRoot "supply-node-state.svg") -Content $nodeSvg
 Write-Utf8File -Path (Join-Path $outRoot "meter-comparison.svg") -Content $meterSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-error-scatter.svg") -Content $parameterSvg
 
 Write-Host "IdealLoads family report generated: $outRoot"

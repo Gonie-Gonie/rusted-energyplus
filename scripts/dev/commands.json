@@ -952,6 +952,12 @@
                          "help":  "Validate all case manifests against the v0.17 schema v2 gate."
                      },
                      {
+                         "name":  "family-manifest-validate",
+                         "path":  "conformance\\family-manifest-validate.ps1",
+                         "group":  "conformance",
+                         "help":  "Validate conformance family manifests, member parameter deltas, and family report artifacts."
+                     },
+                     {
                          "name":  "v0.26-dynamic-idf-inventory",
                          "path":  "conformance\\v0.26-dynamic-idf-inventory.ps1",
                          "group":  "conformance",

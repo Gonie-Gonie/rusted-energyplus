@@ -153,6 +153,12 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "1Zone family delta heatmap and status grid.",
         },
         {
+            "role": "one-zone-family-parameter-scatter",
+            "path": evidence_path(repo_root, version, "one-zone-family/parameter-error-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "1Zone family parameter variation versus error scatter plot.",
+        },
+        {
             "role": "ideal-loads-family-report-markdown",
             "path": evidence_path(repo_root, version, "ideal-loads-family/ideal_loads_air_system_family_report.md"),
             "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
@@ -187,6 +193,12 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "path": evidence_path(repo_root, version, "ideal-loads-family/meter-comparison.svg"),
             "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
             "user_purpose": "IdealLoads family facility-meter comparison evidence plot.",
+        },
+        {
+            "role": "ideal-loads-family-parameter-scatter",
+            "path": evidence_path(repo_root, version, "ideal-loads-family/parameter-error-scatter.svg"),
+            "produced_by": f".\\scripts\\dev.cmd ideal-loads-family-report -Version {version}",
+            "user_purpose": "IdealLoads family parameter variation versus error scatter plot.",
         },
         {
             "role": "support-coverage-pdf",

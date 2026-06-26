@@ -1,13 +1,66 @@
 schema = "rusted-energyplus.case-family.v1"
 id = "ideal_loads_air_system"
+family_id = "ideal_loads_air_system"
 title = "ZoneHVAC:IdealLoadsAirSystem declared branch family"
 oracle_version = "26.1.0"
 primary_case = "ideal_loads_no_oa_sensible_conformance_001"
+base_case_id = "ideal_loads_no_oa_sensible_conformance_001"
 shared_output_requests = "output-requests.toml"
 report_command = "scripts/dev.cmd ideal-loads-family-report"
 report_path = ".runtime/release-evidence/v0.1.0/ideal-loads-family/ideal_loads_air_system_family_report.md"
 algorithm_capability = "ideal_loads_declared_branch_family"
 regression_policy = "A change that fixes one IdealLoads branch member and breaks another is a family regression."
+regression_rule = "Any newly failing IdealLoads family member, output class, or variable blocks the family unless the claim boundary is intentionally changed."
+aggregation_report_path = ".runtime/release-evidence/v0.1.0/ideal-loads-family/ideal_loads_air_system_family_report.json"
+varied_parameters = [
+  "thermostat_setpoint",
+  "ideal_loads_supply_temperature",
+  "flow_limit",
+  "capacity_limit",
+  "humidity_control_type",
+  "outdoor_air_method",
+  "demand_controlled_ventilation",
+  "economizer_type",
+  "heat_recovery_type",
+  "fuel_efficiency_schedule",
+  "meter_report_frequency",
+]
+invariant_capabilities = [
+  "single_zone",
+  "ZoneEquipmentManager dispatch",
+  "PurchasedAirManager source order",
+  "declared IdealLoads branch compatibility",
+]
+family_required_variables = [
+  "Zone Thermostat Heating Setpoint Temperature",
+  "Zone Thermostat Cooling Setpoint Temperature",
+  "Zone Ideal Loads Zone Total Heating Rate",
+  "Zone Ideal Loads Zone Total Cooling Rate",
+  "Zone Ideal Loads Zone Sensible Heating Rate",
+  "Zone Ideal Loads Zone Sensible Cooling Rate",
+  "Zone Ideal Loads Zone Latent Heating Rate",
+  "Zone Ideal Loads Zone Latent Cooling Rate",
+  "Zone Ideal Loads Supply Air Total Heating Rate",
+  "Zone Ideal Loads Supply Air Total Cooling Rate",
+  "Zone Ideal Loads Outdoor Air Total Heating Rate",
+  "Zone Ideal Loads Outdoor Air Total Cooling Rate",
+  "System Node Temperature",
+  "System Node Mass Flow Rate",
+  "System Node Humidity Ratio",
+]
+family_tolerances = [
+  "thermostat: max_abs=1e-9 max_rmse=1e-9",
+  "hvac-state: max_abs varies by branch, recorded in source case manifests",
+  "node-state: max_abs=1e-6 or tighter, recorded in source case manifests",
+  "meter: max_abs=1.0 max_rmse=1.0 where declared",
+]
+family_not_claimed = [
+  "Autosizing and SizePurchasedAir branch parity beyond explicit numeric/no-limit fixtures",
+  "Broad AirLoopHVAC, PlantLoop, EMS, PythonPlugin, and multi-zone HVAC compatibility",
+  "Undeclared outdoor-air/DCV/economizer/heat-recovery combinations",
+  "General humidity-control combinations outside selected branch candidates",
+  "Broad facility meter semantics outside declared hourly/monthly/run-period cases",
+]
 source_order_policy = "Family members enter through ZoneEquipmentManager and the source-order SimPurchasedAir/GetPurchasedAir/InitPurchasedAir/CalcPurchAirLoads/UpdatePurchasedAir/ReportPurchasedAir path."
 size_purchased_air_policy = "SizePurchasedAir autosizing is blocked for arbitrary-run compatibility; declared conformance cases use resolved numeric or no-limit sizing inputs before CalcPurchAirLoads."
 pdf_evidence = "The numeric conformance PDF includes the IdealLoads family report snapshot, and the release evidence manifest tracks the generated family report artifacts."
@@ -17,6 +70,7 @@ case_id = "ideal_loads_no_oa_sensible_conformance_001"
 case_toml = "../../conformance_cases/ideal_loads_no_oa_sensible_conformance_001/case.toml"
 output_requests = "output-requests.toml"
 role = "no-OA/no-limit sensible"
+parameter_delta = "base thermostat_setpoint and supply_temperature; no outdoor air; no numeric limit"
 branch_family = "no_oa_sensible"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -27,6 +81,7 @@ case_id = "ideal_loads_capacity_limit_conformance_001"
 case_toml = "../../conformance_cases/ideal_loads_capacity_limit_conformance_001/case.toml"
 output_requests = "output-requests.toml"
 role = "numeric capacity limit"
+parameter_delta = "capacity_limit=numeric; flow_limit=none; thermostat_setpoint invariant"
 branch_family = "finite_capacity"
 selected_purchased_air_branch = "finite_capacity"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=true; has_autosize=false"
@@ -37,6 +92,7 @@ case_id = "ideal_loads_flow_limit_conformance_001"
 case_toml = "../../conformance_cases/ideal_loads_flow_limit_conformance_001/case.toml"
 output_requests = "output-requests.toml"
 role = "numeric flow limit"
+parameter_delta = "flow_limit=numeric; capacity_limit=none; thermostat_setpoint invariant"
 branch_family = "finite_flow"
 selected_purchased_air_branch = "finite_flow"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=true; has_capacity_limit=false; has_autosize=false"
@@ -47,6 +103,7 @@ case_id = "ideal_loads_flow_capacity_limit_conformance_001"
 case_toml = "../../conformance_cases/ideal_loads_flow_capacity_limit_conformance_001/case.toml"
 output_requests = "output-requests.toml"
 role = "flow-and-capacity limit"
+parameter_delta = "flow_limit=numeric; capacity_limit=numeric; thermostat_setpoint invariant"
 branch_family = "flow_and_capacity"
 selected_purchased_air_branch = "flow_and_capacity"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=true; has_capacity_limit=true; has_autosize=false"
@@ -57,6 +114,7 @@ case_id = "ideal_loads_constant_shr_conformance_001"
 case_toml = "../../conformance_cases/ideal_loads_constant_shr_conformance_001/case.toml"
 output_requests = "output-requests.toml"
 role = "ConstantSensibleHeatRatio cooling"
+parameter_delta = "humidity_control_type=ConstantSensibleHeatRatio cooling; supply_temperature invariant"
 branch_family = "constant_shr"
 selected_purchased_air_branch = "constant_shr"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -67,6 +125,7 @@ case_id = "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_00
 case_toml = "../../conformance_cases/ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "ConstantSupplyHumidityRatio cooling"
+parameter_delta = "humidity_control_type=ConstantSupplyHumidityRatio cooling; supply humidity ratio varied"
 branch_family = "constant_supply_humidity_cooling"
 selected_purchased_air_branch = "constant_supply_humidity_cooling"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=true; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -77,6 +136,7 @@ case_id = "ideal_loads_constant_supply_humidity_heating_conformance_candidate_00
 case_toml = "../../conformance_cases/ideal_loads_constant_supply_humidity_heating_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "ConstantSupplyHumidityRatio heating"
+parameter_delta = "humidity_control_type=ConstantSupplyHumidityRatio heating; supply humidity ratio varied"
 branch_family = "constant_supply_humidity_heating"
 selected_purchased_air_branch = "constant_supply_humidity_heating"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=true; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -87,6 +147,7 @@ case_id = "ideal_loads_humidistat_dehumidification_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_humidistat_dehumidification_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "Humidistat dehumidification"
+parameter_delta = "humidity_control_type=Humidistat dehumidification; humidistat setpoint active"
 branch_family = "humidistat_dehumidification"
 selected_purchased_air_branch = "humidistat_dehumidification"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=true; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -97,6 +158,7 @@ case_id = "ideal_loads_humidistat_humidification_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_humidistat_humidification_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "Humidistat humidification"
+parameter_delta = "humidity_control_type=Humidistat humidification; humidistat setpoint active"
 branch_family = "humidistat_humidification"
 selected_purchased_air_branch = "humidistat_humidification"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=true; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -107,6 +169,7 @@ case_id = "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_flow_zone_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir Flow/Zone"
+parameter_delta = "outdoor_air_method=Flow/Zone; OA schedule blank; economizer and heat recovery inactive"
 branch_family = "outdoor_air_flow_zone"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -117,6 +180,7 @@ case_id = "ideal_loads_outdoor_air_flow_person_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_flow_person_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir Flow/Person"
+parameter_delta = "outdoor_air_method=Flow/Person; people-scaled design outdoor air"
 branch_family = "outdoor_air_flow_person"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -127,6 +191,7 @@ case_id = "ideal_loads_outdoor_air_flow_area_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_flow_area_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir Flow/Area"
+parameter_delta = "outdoor_air_method=Flow/Area; area-scaled design outdoor air"
 branch_family = "outdoor_air_flow_area"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -137,6 +202,7 @@ case_id = "ideal_loads_outdoor_air_air_changes_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_air_changes_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir AirChanges/Hour"
+parameter_delta = "outdoor_air_method=AirChanges/Hour; volume-scaled design outdoor air"
 branch_family = "outdoor_air_air_changes"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -147,6 +213,7 @@ case_id = "ideal_loads_outdoor_air_sum_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_sum_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir Sum"
+parameter_delta = "outdoor_air_method=Sum; combination design outdoor air"
 branch_family = "outdoor_air_sum"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -157,6 +224,7 @@ case_id = "ideal_loads_outdoor_air_maximum_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_maximum_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "OutdoorAir Maximum"
+parameter_delta = "outdoor_air_method=Maximum; combination design outdoor air"
 branch_family = "outdoor_air_maximum"
 selected_purchased_air_branch = "outdoor_air"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -167,6 +235,7 @@ case_id = "ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_occupancy_dcv_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "DCV OccupancySchedule"
+parameter_delta = "outdoor_air_method=Flow/Person; demand_controlled_ventilation=OccupancySchedule"
 branch_family = "dcv_occupancy_schedule"
 selected_purchased_air_branch = "outdoor_air_dcv"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=true; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -177,6 +246,7 @@ case_id = "ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_co2_dcv_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "DCV CO2Setpoint"
+parameter_delta = "outdoor_air_method=Flow/Person; demand_controlled_ventilation=CO2Setpoint"
 branch_family = "dcv_co2_setpoint"
 selected_purchased_air_branch = "outdoor_air_dcv"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=false; has_dcv=true; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -187,6 +257,7 @@ case_id = "ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_differential_dry_bulb_economizer_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "DifferentialDryBulb economizer"
+parameter_delta = "outdoor_air_method=Flow/Zone; economizer_type=DifferentialDryBulb"
 branch_family = "economizer_differential_dry_bulb"
 selected_purchased_air_branch = "outdoor_air_economizer"
 branch_flags = "has_outdoor_air=true; has_economizer=true; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -197,6 +268,7 @@ case_id = "ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_differential_enthalpy_economizer_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "DifferentialEnthalpy economizer"
+parameter_delta = "outdoor_air_method=Flow/Zone; economizer_type=DifferentialEnthalpy"
 branch_family = "economizer_differential_enthalpy"
 selected_purchased_air_branch = "outdoor_air_economizer"
 branch_flags = "has_outdoor_air=true; has_economizer=true; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -207,6 +279,7 @@ case_id = "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "Sensible heat recovery"
+parameter_delta = "outdoor_air_method=Flow/Zone; heat_recovery_type=Sensible"
 branch_family = "heat_recovery_sensible"
 selected_purchased_air_branch = "outdoor_air_heat_recovery"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=true; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -217,6 +290,7 @@ case_id = "ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_
 case_toml = "../../conformance_cases/ideal_loads_outdoor_air_enthalpy_heat_recovery_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "Enthalpy heat recovery"
+parameter_delta = "outdoor_air_method=Flow/Zone; heat_recovery_type=Enthalpy"
 branch_family = "heat_recovery_enthalpy"
 selected_purchased_air_branch = "outdoor_air_heat_recovery"
 branch_flags = "has_outdoor_air=true; has_economizer=false; has_heat_recovery=true; has_dcv=false; has_humidistat=false; has_constant_shr=true; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -227,6 +301,7 @@ case_id = "ideal_loads_no_oa_report_energy_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_no_oa_report_energy_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "ReportPurchasedAir energy"
+parameter_delta = "report_layer=ReportPurchasedAir energy; fixed system substep energy accumulation"
 branch_family = "report_purchased_air_energy"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -237,6 +312,7 @@ case_id = "ideal_loads_blank_fuel_efficiency_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_blank_fuel_efficiency_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "fuel efficiency blank"
+parameter_delta = "fuel_efficiency_schedule=blank; fuel energy branch active"
 branch_family = "fuel_efficiency_blank"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -247,6 +323,7 @@ case_id = "ideal_loads_constant_fuel_efficiency_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_constant_fuel_efficiency_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "fuel efficiency constant schedule"
+parameter_delta = "fuel_efficiency_schedule=Schedule:Constant; fuel energy branch active"
 branch_family = "fuel_efficiency_constant_schedule"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -257,6 +334,7 @@ case_id = "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "fuel efficiency compact schedule"
+parameter_delta = "fuel_efficiency_schedule=Schedule:Compact all-days; fuel energy branch active"
 branch_family = "fuel_efficiency_compact_schedule"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -267,6 +345,7 @@ case_id = "ideal_loads_no_oa_facility_meter_conformance_candidate_001"
 case_toml = "../../conformance_cases/ideal_loads_no_oa_facility_meter_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "facility meter hourly"
+parameter_delta = "meter_report_frequency=hourly; facility meter aggregation active"
 branch_family = "facility_meter_hourly"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"
@@ -277,6 +356,7 @@ case_id = "ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candi
 case_toml = "../../conformance_cases/ideal_loads_no_oa_facility_meter_monthly_run_period_conformance_candidate_001/case.toml"
 output_requests = "output-requests.toml"
 role = "facility meter monthly/run-period"
+parameter_delta = "meter_report_frequency=monthly and run-period; facility meter aggregation active"
 branch_family = "facility_meter_monthly_run_period"
 selected_purchased_air_branch = "no_oa_sensible"
 branch_flags = "has_outdoor_air=false; has_economizer=false; has_heat_recovery=false; has_dcv=false; has_humidistat=false; has_constant_shr=false; has_constant_supply_humidity=false; has_flow_limit=false; has_capacity_limit=false; has_autosize=false"

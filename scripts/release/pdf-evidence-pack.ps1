@@ -30,6 +30,7 @@ if (-not $SkipArbitraryRunSmoke) {
 Invoke-DevCommand -Command "conformance-index-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "support-coverage-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "user-coverage-handbook" -Arguments @("-Version", $Version)
+Invoke-DevCommand -Command "family-manifest-validate"
 Invoke-DevCommand -Command "one-zone-family-report" -Arguments @("-Version", $Version)
 Invoke-DevCommand -Command "ideal-loads-family-report" -Arguments @("-Version", $Version)
 

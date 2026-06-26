@@ -84,6 +84,13 @@ Assert-FileExists -Path $sharedOutputs -Description "1Zone family shared output 
 Assert-FileExists -Path $candidateManifest -Description "1Zone dynamic conformance candidate manifest"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'schema = "rusted-energyplus.case-family.v1"' -Description "case-family schema"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'regression_policy = "A change that fixes one family member and breaks another is a family regression."' -Description "family regression policy"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'varied_parameters = [' -Description "family varied parameters"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'invariant_capabilities = [' -Description "family invariant capabilities"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_required_variables = [' -Description "family required variables"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_tolerances = [' -Description "family tolerances"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'family_not_claimed = [' -Description "family not claimed list"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'aggregation_report_path = "' -Description "family aggregation report path"
+Assert-ContainsLiteral -Path $familyManifest -Needle 'regression_rule = "' -Description "family regression rule"
 Assert-ContainsLiteral -Path $familyManifest -Needle 'pdf_evidence = "The numeric conformance PDF includes the 1Zone family report snapshot' -Description "PDF evidence inclusion policy"
 
 $requiredMembers = @(
@@ -105,6 +112,7 @@ foreach ($member in $requiredMembers) {
     Assert-FileExists -Path $outputsPath -Description "family output-requests.toml for $member"
     Assert-ContainsLiteral -Path $casePath -Needle 'algorithm_capability = "official_1zone_uncontrolled_declared_heat_balance"' -Description "algorithm capability for $member"
     Assert-ContainsLiteral -Path $casePath -Needle 'difference_note = "' -Description "algorithm difference note for $member"
+    Assert-ContainsLiteral -Path $familyManifest -Needle 'parameter_delta = "' -Description "family parameter delta metadata"
     Assert-ContainsLiteral -Path $outputsPath -Needle 'inherits = "../../output-requests.toml"' -Description "shared output request inheritance for $member"
 }
 
@@ -165,8 +173,20 @@ $variableRows = foreach ($variable in $requiredVariables) {
         Candidate = "declared"
         Family = "shared output request"
         Status = "tracked"
+        Regression = "blocking variable row"
     }
 }
+
+$parameterRows = @(
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"; Parameter = "base"; Delta = "official 1ZoneUncontrolled source"; Status = "tracked" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_dynamic_diagnostic_001"; Parameter = "output family"; Delta = "broad diagnostic output set"; Status = "tracked" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_3surface_family_001"; Parameter = "surface_topology"; Delta = "3-surface official variant"; Status = "planned-not-claimed" },
+    [pscustomobject]@{ Case = "heat_balance_nomass_001"; Parameter = "material_property"; Delta = "no-mass adiabatic fixture"; Status = "tracked" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_massive_opaque_family_001"; Parameter = "thermal_mass"; Delta = "increased opaque heat capacity"; Status = "planned-not-claimed" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_varied_internal_gain_family_001"; Parameter = "internal_gain_schedule"; Delta = "non-flat convective gain profile"; Status = "planned-not-claimed" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_varied_material_resistance_family_001"; Parameter = "material_property"; Delta = "varied opaque material resistance"; Status = "planned-not-claimed" },
+    [pscustomobject]@{ Case = "official_1zone_uncontrolled_varied_timestep_family_001"; Parameter = "timestep"; Delta = "perturbed timesteps per hour"; Status = "planned-not-claimed" }
+)
 
 $surfaceRows = @(
     [pscustomobject]@{ Surface = "ZN001:WALL001"; Type = "wall"; RequiredRows = "temperature, conduction, convection, radiation" },
@@ -205,7 +225,8 @@ $summaryRows = @(
 
 $summaryTable = ConvertTo-MarkdownRows -Rows $summaryRows -Columns @("Metric", "Value")
 $caseTable = ConvertTo-MarkdownRows -Rows $caseRows -Columns @("Case", "Role", "Status", "Regression")
-$variableTable = ConvertTo-MarkdownRows -Rows $variableRows -Columns @("Variable", "Candidate", "Family", "Status")
+$parameterTable = ConvertTo-MarkdownRows -Rows $parameterRows -Columns @("Case", "Parameter", "Delta", "Status")
+$variableTable = ConvertTo-MarkdownRows -Rows $variableRows -Columns @("Variable", "Candidate", "Family", "Status", "Regression")
 $surfaceTable = ConvertTo-MarkdownRows -Rows $surfaceRows -Columns @("Surface", "Type", "RequiredRows")
 $firstDivergenceTable = ConvertTo-MarkdownRows -Rows $firstDivergenceRows -Columns @("Rank", "Case", "Variable", "Evidence")
 $topBlockerTable = ConvertTo-MarkdownRows -Rows $topBlockerRows -Columns @("Rank", "Blocker")
@@ -222,6 +243,10 @@ $summaryTable
 
 $caseTable
 
+## Parameter Variations
+
+$parameterTable
+
 ## Variable Pass/Fail
 
 $variableTable
@@ -236,7 +261,7 @@ Generated asset: ``delta-heatmap.svg``.
 
 ## Time-Series Plots
 
-Generated assets: ``mat-time-series.svg`` and ``surface-temperature-time-series.svg``.
+Generated assets: ``mat-time-series.svg``, ``surface-temperature-time-series.svg``, and ``parameter-error-scatter.svg``.
 
 ## First Divergence
 
@@ -269,6 +294,7 @@ $json = [pscustomobject]@{
     regression_policy = "A change that fixes one family member and breaks another is a family regression."
     pdf_evidence = "numeric-conformance-evidence.pdf includes the 1Zone family report snapshot; release-evidence-manifest records the artifacts."
     cases = $caseRows
+    parameter_variations = $parameterRows
     variables = $variableRows
     surfaces = $surfaceRows
     first_divergence = $firstDivergenceRows
@@ -279,6 +305,7 @@ $json = [pscustomobject]@{
 Write-Utf8File -Path (Join-Path $outRoot "official_1zone_uncontrolled_family_report.md") -Content $report
 Write-Utf8File -Path (Join-Path $outRoot "official_1zone_uncontrolled_family_report.json") -Content ($json | ConvertTo-Json -Depth 6)
 Write-Utf8File -Path (Join-Path $outRoot "case-pass-fail.csv") -Content (($caseRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
+Write-Utf8File -Path (Join-Path $outRoot "parameter-variations.csv") -Content (($parameterRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "variable-pass-fail.csv") -Content (($variableRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "surface-pass-fail.csv") -Content (($surfaceRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
 Write-Utf8File -Path (Join-Path $outRoot "first-divergence.csv") -Content (($firstDivergenceRows | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine)
@@ -332,9 +359,30 @@ $surfaceSvg = @'
   <text x="665" y="92" font-family="Segoe UI, Arial" font-size="12" fill="#6d4c41">rust</text>
 </svg>
 '@
+$parameterSvg = @'
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="300" viewBox="0 0 840 300">
+  <rect width="840" height="300" fill="#ffffff"/>
+  <text x="32" y="38" font-family="Segoe UI, Arial" font-size="22" fill="#17212b">1Zone Parameter vs Error Scatter</text>
+  <text x="32" y="65" font-family="Segoe UI, Arial" font-size="13" fill="#526173">Numeric parameter examples are tracked as family rows; planned variants remain not-claimed until blocking compare lanes exist.</text>
+  <line x1="70" y1="230" x2="760" y2="230" stroke="#9aa7b5"/>
+  <line x1="70" y1="80" x2="70" y2="230" stroke="#9aa7b5"/>
+  <circle cx="140" cy="205" r="9" fill="#2e7d32"/>
+  <circle cx="270" cy="188" r="9" fill="#f9a825"/>
+  <circle cx="410" cy="164" r="9" fill="#b0bec5"/>
+  <circle cx="550" cy="142" r="9" fill="#b0bec5"/>
+  <circle cx="700" cy="118" r="9" fill="#b0bec5"/>
+  <text x="92" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">base</text>
+  <text x="226" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">no-mass</text>
+  <text x="360" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">mass</text>
+  <text x="500" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">R-value</text>
+  <text x="656" y="260" font-family="Segoe UI, Arial" font-size="12" fill="#526173">timestep</text>
+  <text x="32" y="286" font-family="Segoe UI, Arial" font-size="12" fill="#526173">green = blocking pass, amber = diagnostic, gray = planned/not claimed</text>
+</svg>
+'@
 
 Write-Utf8File -Path (Join-Path $outRoot "delta-heatmap.svg") -Content $heatmapSvg
 Write-Utf8File -Path (Join-Path $outRoot "mat-time-series.svg") -Content $matSvg
 Write-Utf8File -Path (Join-Path $outRoot "surface-temperature-time-series.svg") -Content $surfaceSvg
+Write-Utf8File -Path (Join-Path $outRoot "parameter-error-scatter.svg") -Content $parameterSvg
 
 Write-Host "1Zone family report generated: $outRoot"
