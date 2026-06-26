@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["Primary conformance candidate uses the shared 1Zone family output set."]

@@ -1,0 +1,131 @@
+schema = "rusted-energyplus.output-requests.v1"
+family_id = "official_1zone_uncontrolled"
+frequency = "hourly"
+surface_scope = "declared opaque surfaces"
+zone_scope = "ZONE ONE"
+weather_scope = "Environment"
+
+[[output]]
+key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+domain = "weather"
+
+[[output]]
+key = "Environment"
+variable = "Site Outdoor Air Wetbulb Temperature"
+domain = "weather"
+
+[[output]]
+key = "Environment"
+variable = "Site Sky Temperature"
+domain = "weather"
+
+[[output]]
+key = "Environment"
+variable = "Site Horizontal Infrared Radiation Rate per Area"
+domain = "weather"
+
+[[output]]
+key = "Environment"
+variable = "Site Rain Status"
+domain = "weather"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Temperature"
+domain = "zone"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Mean Air Humidity Ratio"
+domain = "zone"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Internal Convective Heat Gain Rate"
+domain = "zone"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Surface Convection Rate"
+domain = "zone"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Air Energy Storage Rate"
+domain = "zone"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Temperature"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Outside Face Temperature"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Adjacent Air Temperature"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Conduction Heat Transfer Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Conduction Heat Transfer Rate per Area"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Outside Face Conduction Heat Transfer Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Outside Face Conduction Heat Transfer Rate per Area"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Convection Heat Gain Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Outside Face Convection Heat Gain Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Outside Face Net Thermal Radiation Heat Gain Rate"
+domain = "surface"
+
+[[output]]
+key = "declared opaque surfaces"
+variable = "Surface Heat Storage Rate"
+domain = "surface"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Inside Faces Conduction Rate"
+domain = "surface"
+
+[[output]]
+key = "ZONE ONE"
+variable = "Zone Opaque Surface Outside Faces Conduction Rate"
+domain = "surface"
+
+[[output]]
+key = "Simulation"
+variable = "Surface Inside Face Heat Balance Calculation Iteration Count"
+domain = "surface"

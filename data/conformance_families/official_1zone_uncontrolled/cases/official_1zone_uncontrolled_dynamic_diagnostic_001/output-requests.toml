@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "official_1zone_uncontrolled_dynamic_diagnostic_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["Diagnostic member uses the shared 1Zone family output set with diagnostic-level rows."]

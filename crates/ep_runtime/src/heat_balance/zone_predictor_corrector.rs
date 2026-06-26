@@ -18,6 +18,18 @@ pub const fn manage_zone_air_updates_stage() -> EnergyPlusCompatibilityStage {
 pub const ZONE_AIR_HISTORY_OWNER: &str =
     "MAT history and zone-air output timing are owned by ManageZoneAirUpdates.";
 
+/// Source-order note for EnergyPlus `PredictStep` ownership.
+pub const ZONE_AIR_PREDICT_STEP_PATH: &str =
+    "PredictStep is represented by zone-air coefficient assembly before correction.";
+
+/// Source-order note for EnergyPlus `CorrectStep` ownership.
+pub const ZONE_AIR_CORRECT_STEP_PATH: &str =
+    "CorrectStep is represented by analytical or third-order zone-air correction.";
+
+/// Source-order note for zone-air history push and revert ownership.
+pub const ZONE_AIR_HISTORY_PUSH_REVERT_PATH: &str =
+    "History push/revert is owned by ManageZoneAirUpdates and timestep history synchronization.";
+
 pub(crate) fn step_zone_air_temperature(
     current_temperature_c: f64,
     outdoor_temperature_c: f64,

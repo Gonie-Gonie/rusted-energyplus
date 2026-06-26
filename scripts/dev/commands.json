@@ -976,6 +976,12 @@
                          "help":  "Gate v0.18 output injection and official ExampleFiles oracle baselines."
                      },
                      {
+                         "name":  "one-zone-family-report",
+                         "path":  "conformance\\one-zone-family-report.ps1",
+                         "group":  "conformance",
+                         "help":  "Generate and audit the official 1ZoneUncontrolled family report artifacts."
+                     },
+                     {
                          "name":  "conformance-diagnostic-report-smoke",
                          "path":  "conformance\\conformance-diagnostic-report-smoke.ps1",
                          "group":  "conformance",

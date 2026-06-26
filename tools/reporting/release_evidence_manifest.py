@@ -135,6 +135,24 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "Lightweight text copy of the conformance index.",
         },
         {
+            "role": "one-zone-family-report-markdown",
+            "path": evidence_path(repo_root, version, "one-zone-family/official_1zone_uncontrolled_family_report.md"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "Readable official 1ZoneUncontrolled case-family pass/fail and blocker report.",
+        },
+        {
+            "role": "one-zone-family-report-json",
+            "path": evidence_path(repo_root, version, "one-zone-family/official_1zone_uncontrolled_family_report.json"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "Machine-readable official 1ZoneUncontrolled family report.",
+        },
+        {
+            "role": "one-zone-family-delta-heatmap",
+            "path": evidence_path(repo_root, version, "one-zone-family/delta-heatmap.svg"),
+            "produced_by": f".\\scripts\\dev.cmd one-zone-family-report -Version {version}",
+            "user_purpose": "1Zone family delta heatmap and status grid.",
+        },
+        {
             "role": "support-coverage-pdf",
             "path": evidence_path(repo_root, version, "support-coverage-report.pdf"),
             "produced_by": f".\\scripts\\dev.cmd support-coverage-report -Version {version}",

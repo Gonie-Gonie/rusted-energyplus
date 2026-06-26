@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "official_1zone_uncontrolled_3surface_family_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["Uses the shared output family, remapped to the official 3-surface opaque keys when promoted."]

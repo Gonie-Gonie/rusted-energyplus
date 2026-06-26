@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "official_1zone_uncontrolled_varied_material_resistance_family_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["Uses the shared output family to keep inside/outside conduction rows in the same regression surface."]

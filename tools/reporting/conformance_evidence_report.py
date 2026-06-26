@@ -547,6 +547,34 @@ def load_arbitrary_run_summaries(repo_root: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def load_one_zone_family_report(repo_root: Path, version: str) -> dict[str, Any]:
+    report_path = (
+        repo_root
+        / ".runtime"
+        / "release-evidence"
+        / f"v{version}"
+        / "one-zone-family"
+        / "official_1zone_uncontrolled_family_report.json"
+    )
+    report = load_optional_json(report_path)
+    if not report:
+        return {
+            "available": False,
+            "path": relative_repo_path(repo_root, report_path),
+            "family_id": "official_1zone_uncontrolled",
+            "case_count": 0,
+            "required_variable_count": 0,
+            "regression_policy": "missing one-zone-family report",
+            "pdf_evidence": "missing one-zone-family report",
+            "cases": [],
+            "top_blockers": [],
+            "not_claimed": [],
+        }
+    report["available"] = True
+    report["path"] = relative_repo_path(repo_root, report_path)
+    return report
+
+
 def resolve_dynamic_digest_path(repo_root: Path, spec: DynamicDiagnosticSpec) -> Path:
     requested = repo_path(repo_root, spec.digest_path)
     if requested.is_file():
@@ -1291,6 +1319,7 @@ def build_evidence(
     coverage_snapshot = build_coverage_snapshot(repo_root, version, len(all_series))
     manifest_snapshot = build_manifest_snapshot(repo_root, version)
     arbitrary_runs = load_arbitrary_run_summaries(repo_root)
+    one_zone_family = load_one_zone_family_report(repo_root, version)
     return {
         "schema_version": 1,
         "version": version,
@@ -1334,6 +1363,7 @@ def build_evidence(
         "active_dynamic_diagnostic": dynamic_diagnostic,
         "time_series": time_series_records,
         "arbitrary_runs": arbitrary_runs,
+        "one_zone_family": one_zone_family,
         "coverage_snapshot": coverage_snapshot,
         "manifest_snapshot": manifest_snapshot,
         "artifacts": {
@@ -2905,6 +2935,62 @@ def build_arbitrary_run_summary_table(evidence: dict[str, Any]) -> Table:
     )
 
 
+def build_one_zone_family_summary_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("one_zone_family") or {}
+    rows = [
+        ["Available", "yes" if family.get("available") else "missing"],
+        ["Family", family.get("family_id")],
+        ["Report JSON", family.get("path")],
+        ["Cases", family.get("case_count")],
+        ["Required variables", family.get("required_variable_count")],
+        ["Regression policy", family.get("regression_policy")],
+        ["PDF evidence", family.get("pdf_evidence")],
+    ]
+    return table(
+        ["Metric", "Value"],
+        rows,
+        "Official 1ZoneUncontrolled family report snapshot generated before the PDF evidence pack.",
+        [1.45, 5.65],
+    )
+
+
+def build_one_zone_family_case_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("one_zone_family") or {}
+    rows = []
+    for row in family.get("cases", [])[:10]:
+        rows.append(
+            [
+                short_text(row.get("Case"), 58),
+                row.get("Role"),
+                row.get("Status"),
+                row.get("Regression"),
+            ]
+        )
+    if not rows:
+        rows.append(["official_1zone_uncontrolled", "family", "missing", "run one-zone-family-report"])
+    return table(
+        ["Case", "Role", "Status", "Regression"],
+        rows,
+        "Family case-by-case pass/fail and planned/not-claimed status.",
+        [2.35, 1.3, 0.85, 2.6],
+    )
+
+
+def build_one_zone_family_blocker_table(evidence: dict[str, Any]) -> Table:
+    family = evidence.get("one_zone_family") or {}
+    rows = []
+    for row in family.get("top_blockers", [])[:8]:
+        rows.append([row.get("Rank"), row.get("Blocker")])
+    if not rows:
+        rows.append(["", "Missing one-zone-family report."])
+    return table(
+        ["Rank", "Blocker"],
+        rows,
+        "Top family blockers retained as explicit not-claimed evidence.",
+        [0.45, 6.65],
+    )
+
+
 def build_coverage_summary_table(evidence: dict[str, Any]) -> Table:
     coverage = evidence.get("coverage_snapshot", {})
     rows = [
@@ -2962,6 +3048,7 @@ def build_reproducibility_table(evidence: dict[str, Any]) -> Table:
         rf".\scripts\dev.cmd conformance-index-report -Version {version}",
         rf".\scripts\dev.cmd support-coverage-report -Version {version}",
         rf".\scripts\dev.cmd user-coverage-handbook -Version {version}",
+        rf".\scripts\dev.cmd one-zone-family-report -Version {version}",
         rf".\scripts\dev.cmd conformance-evidence-report -Version {version} -TimingRepeats 3 -RunDynamicDiagnostic -DynamicTimingRepeats 1",
         rf".\scripts\dev.cmd release-evidence-manifest -Version {version}",
     ]
@@ -2981,6 +3068,7 @@ def build_pdf_todo_status_table(_evidence: dict[str, Any]) -> Table:
         ["Coverage charts", "done", "Variable status and declared-vs-passed charts are included."],
         ["Case coverage matrix", "done", "PDF includes an excerpt and the full matrix is preserved in JSON."],
         ["Arbitrary-run summary", "done", "PDF reads run-summary.json smoke artifacts and marks them ad-hoc/non-conformance."],
+        ["1Zone family report", "done", "Family summary, pass/fail tables, blockers, and not-claimed rows are generated before the evidence pack and tracked by the release manifest."],
         ["1Zone time-series plots", "done", "MAT/convection/storage/conduction overlays are in the PDF and surface plot assets are exported."],
         ["IdealLoads time-series plots", "done", "No-OA rates/node overlays, branch heatmap, and aggregate meter plot assets are exported."],
         ["Performance evidence", "done", "Repeated timing samples and performance-summary.json define the current measurement policy."],
@@ -3183,6 +3271,17 @@ def build_document(evidence: dict[str, Any], charts: dict[str, Any]) -> Document
             ),
             build_dynamic_bottleneck_table(dynamic),
             build_dynamic_source_split_table(dynamic),
+        ),
+        Chapter(
+            "1Zone Family Report",
+            Paragraph(
+                "The family report broadens the official 1ZoneUncontrolled evidence view from a single IDF to a "
+                "tracked case family. It keeps planned variants visible as not-claimed rows so a fix in one member "
+                "cannot hide a regression in another member."
+            ),
+            build_one_zone_family_summary_table(evidence),
+            build_one_zone_family_case_table(evidence),
+            build_one_zone_family_blocker_table(evidence),
         ),
         Chapter(
             "IdealLoadsAirSystem",

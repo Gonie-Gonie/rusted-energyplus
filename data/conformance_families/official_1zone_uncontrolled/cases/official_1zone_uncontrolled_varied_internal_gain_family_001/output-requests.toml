@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "official_1zone_uncontrolled_varied_internal_gain_family_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["Uses the shared output family to keep MAT and internal-convective gain regressions coupled."]

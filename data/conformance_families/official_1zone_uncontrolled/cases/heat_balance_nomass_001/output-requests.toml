@@ -1,0 +1,5 @@
+schema = "rusted-energyplus.output-requests.v1"
+case_id = "heat_balance_nomass_001"
+inherits = "../../output-requests.toml"
+frequency = "hourly"
+notes = ["No-mass fixture may satisfy only the subset of shared family outputs that physically exist for the fixture."]

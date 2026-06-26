@@ -190,6 +190,15 @@ foreach ($routine in @(
     )) {
     Assert-Contains -Path $manager -Pattern $routine -Description "HeatBalanceManager routine $routine"
 }
+foreach ($target in @(
+        "get_heat_balance_input_stage",
+        "init_heat_balance_stage",
+        "rec_keep_heat_balance_stage",
+        "report_heat_balance_stage",
+        "check_warmup_convergence_stage"
+    )) {
+    Assert-Contains -Path $manager -Pattern "$target\s*\(" -Description "HeatBalanceManager ledger target $target"
+}
 
 foreach ($routine in @(
         "ManageSurfaceHeatBalance",
@@ -204,8 +213,10 @@ foreach ($routine in @(
 }
 foreach ($target in @(
         "manage_surface_heat_balance_stage",
+        "init_surface_heat_balance_stage",
         "calc_heat_balance_outside_surf_stage",
         "calc_heat_balance_inside_surf_stage",
+        "update_final_surface_heat_balance_stage",
         "update_thermal_histories_stage",
         "report_surface_heat_balance_stage"
     )) {
@@ -264,6 +275,11 @@ Assert-NotContains -Path $runtime -Pattern 'fn seed_zone_air_humidity_ratios_fro
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_air_storage_rate_w\s*\(' -Description "runtime-owned zone-air storage report implementation"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ManageZoneAirUpdates' -Description "ZoneTempPredictorCorrector routine"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_stage\s*\(' -Description "ZoneTempPredictorCorrector ledger target manage_zone_air_updates_stage"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_PREDICT_STEP_PATH' -Description "ZoneTempPredictorCorrector PredictStep source-order path"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'PredictStep' -Description "ZoneTempPredictorCorrector PredictStep source routine"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_CORRECT_STEP_PATH' -Description "ZoneTempPredictorCorrector CorrectStep source-order path"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'CorrectStep' -Description "ZoneTempPredictorCorrector CorrectStep source routine"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_HISTORY_PUSH_REVERT_PATH' -Description "ZoneTempPredictorCorrector history push/revert path"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_zone_air_temperature_coefficients' -Description "ZoneTempPredictorCorrector coefficient owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_third_order_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector third-order solver owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_analytical_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector analytical solver owner"
