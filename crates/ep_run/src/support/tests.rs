@@ -428,7 +428,31 @@ fn ideal_loads_dual_humidity_controls_are_not_selected_branch_compatibility()
     Ok(())
 }
 #[test]
-fn diagnostic_only_support_is_blocked_outside_diagnostic_mode() {
+fn support_status_maps_to_public_run_result_state() {
+    assert_eq!(
+        RunResultState::from_support_status(
+            SupportStatus::Unsupported,
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny
+        ),
+        RunResultState::RunBlocked
+    );
+    assert_eq!(
+        RunResultState::from_support_status(
+            SupportStatus::SupportedCompatibility,
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny
+        ),
+        RunResultState::SupportedCompatibilityRun
+    );
+    assert_eq!(
+        RunResultState::from_support_status(
+            SupportStatus::SupportedCompatibility,
+            RunMode::Diagnostic,
+            PartialRunPolicy::Allow
+        ),
+        RunResultState::SupportedCompatibilityRun
+    );
     assert_eq!(
         RunResultState::from_support_status(
             SupportStatus::SupportedDiagnosticOnly,
