@@ -140,6 +140,33 @@ impl TraceLevel {
     }
 }
 
+/// Explicit surface/node filters for diagnostic trace payloads.
+#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Serialize)]
+pub struct TraceSelection {
+    /// Surface names requested for detailed diagnostic trace payloads.
+    pub surface_names: Vec<String>,
+    /// Node names requested for detailed diagnostic trace payloads.
+    pub node_names: Vec<String>,
+}
+
+impl TraceSelection {
+    /// Returns true when no targeted trace names were requested.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.surface_names.is_empty() && self.node_names.is_empty()
+    }
+
+    /// Adds a requested surface name.
+    pub fn push_surface(&mut self, name: impl Into<String>) {
+        self.surface_names.push(name.into());
+    }
+
+    /// Adds a requested node name.
+    pub fn push_node(&mut self, name: impl Into<String>) {
+        self.node_names.push(name.into());
+    }
+}
+
 /// Top-level arbitrary-run configuration.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RunConfig {
@@ -161,6 +188,8 @@ pub struct RunConfig {
     pub keep_intermediate: bool,
     /// Trace verbosity.
     pub trace_level: TraceLevel,
+    /// Explicit surface/node trace targets.
+    pub trace_selection: TraceSelection,
     /// Promote warning diagnostics to a failing exit.
     pub fail_on_warning: bool,
     /// Stop after import/compile/support assessment.

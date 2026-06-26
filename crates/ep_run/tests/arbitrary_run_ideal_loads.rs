@@ -7,7 +7,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
-    SupportStatus, TraceLevel, run_arbitrary_idf,
+    SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
 };
 use serde_json::Value;
 
@@ -79,6 +79,7 @@ fn mixed_declared_ideal_loads_runs_compatibility_runtime() -> Result<(), Box<dyn
         overwrite: true,
         keep_intermediate: true,
         trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
         fail_on_warning: false,
         dry_run: false,
         oracle_baseline: false,
@@ -163,6 +164,7 @@ fn ideal_loads_humidity_selected_branch_runs_declared_compatibility_runtime()
         overwrite: true,
         keep_intermediate: true,
         trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
         fail_on_warning: false,
         dry_run: false,
         oracle_baseline: false,
@@ -266,6 +268,7 @@ fn assert_ideal_loads_fixture_runs(
         overwrite: true,
         keep_intermediate: true,
         trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
         fail_on_warning: false,
         dry_run: false,
         oracle_baseline: false,

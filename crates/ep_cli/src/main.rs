@@ -36,7 +36,7 @@ use ep_model::{
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
 use ep_run::{
-    PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel,
+    PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
     run_arbitrary_idf,
 };
 use ep_runtime::{
@@ -134,7 +134,7 @@ const CONFORMANCE_INTERNAL_GAINS_REPORT_USAGE: &str =
     "usage: eplus-rs conformance internal-gains-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_NO_OA_SENSIBLE_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-no-oa-sensible-report <case.toml> <oracle-root> <output-root>";
 const CONFORMANCE_IDEAL_LOADS_OUTDOOR_AIR_DESIGN_FLOW_REPORT_USAGE: &str = "usage: eplus-rs conformance ideal-loads-outdoor-air-design-flow-report <case.toml> <oracle-root> <output-root>";
-const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--mode compatibility|diagnostic] [--partial deny|allow] [--oracle-baseline] [--compare-oracle] [--dry-run]";
+const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> --weather <weather.epw> --output-dir <dir> [--mode compatibility|diagnostic] [--partial deny|allow] [--oracle-baseline] [--compare-oracle] [--trace-surface NAME] [--trace-node NAME] [--dry-run]";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -2542,6 +2542,7 @@ fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRun
     let mut overwrite = false;
     let mut keep_intermediate = false;
     let mut trace_level = TraceLevel::Normal;
+    let mut trace_selection = TraceSelection::default();
     let mut fail_on_warning = false;
     let mut dry_run = false;
     let mut oracle_baseline = false;
@@ -2653,6 +2654,26 @@ fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRun
                 trace_level = parsed;
                 index += 2;
             }
+            "--trace-surface" => {
+                let Some(value) = args.get(index + 1) else {
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --trace-surface",
+                        false,
+                    ));
+                };
+                trace_selection.push_surface(value);
+                index += 2;
+            }
+            "--trace-node" => {
+                let Some(value) = args.get(index + 1) else {
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --trace-node",
+                        false,
+                    ));
+                };
+                trace_selection.push_node(value);
+                index += 2;
+            }
             "--fail-on-warning" => {
                 fail_on_warning = true;
                 index += 1;
@@ -2727,6 +2748,7 @@ fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRun
         overwrite,
         keep_intermediate,
         trace_level,
+        trace_selection,
         fail_on_warning,
         dry_run,
         oracle_baseline,
@@ -10958,7 +10980,7 @@ fn heat_balance_warmup_ctf_history_delta(
             };
             if best
                 .as_ref()
-                .map_or(true, |current| candidate.delta > current.delta)
+                .is_none_or(|current| candidate.delta > current.delta)
             {
                 best = Some(candidate);
             }
@@ -14257,6 +14279,7 @@ mod tests {
         assert_eq!(config.partial_policy, PartialRunPolicy::Deny);
         assert_eq!(config.output_format, RunOutputFormat::RustNative);
         assert_eq!(config.trace_level, TraceLevel::Normal);
+        assert!(config.trace_selection.is_empty());
         assert!(!config.overwrite);
         assert!(!config.keep_intermediate);
         assert!(!config.fail_on_warning);
@@ -14266,6 +14289,33 @@ mod tests {
         assert!(!config.json_stdout);
         assert!(config.oracle_root.is_none());
         assert!(config.hours.is_none());
+
+        Ok(())
+    }
+
+    #[test]
+    fn arbitrary_run_parser_sets_selected_trace_targets() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let args = vec![
+            "model.epJSON".to_string(),
+            "-w".to_string(),
+            "weather.epw".to_string(),
+            "-d".to_string(),
+            "out".to_string(),
+            "--trace-level".to_string(),
+            "detailed".to_string(),
+            "--trace-surface".to_string(),
+            "FLOOR".to_string(),
+            "--trace-node".to_string(),
+            "ZONE ONE INLET".to_string(),
+        ];
+
+        let config = super::parse_arbitrary_run_config(&args)
+            .map_err(|error| std::io::Error::other(error.message))?;
+
+        assert_eq!(config.trace_level, TraceLevel::Detailed);
+        assert_eq!(config.trace_selection.surface_names, vec!["FLOOR"]);
+        assert_eq!(config.trace_selection.node_names, vec!["ZONE ONE INLET"]);
 
         Ok(())
     }

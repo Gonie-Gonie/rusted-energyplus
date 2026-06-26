@@ -7,7 +7,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, RunResultState,
-    SupportStatus, TraceLevel, run_arbitrary_idf,
+    SupportStatus, TraceLevel, TraceSelection, run_arbitrary_idf,
 };
 use serde_json::Value;
 
@@ -36,6 +36,7 @@ fn invalid_weather_file_returns_runtime_failure() -> Result<(), Box<dyn std::err
         overwrite: true,
         keep_intermediate: true,
         trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
         fail_on_warning: false,
         dry_run: false,
         oracle_baseline: false,
@@ -100,6 +101,7 @@ fn output_path_file_returns_output_export_failure() -> Result<(), Box<dyn std::e
         overwrite: true,
         keep_intermediate: true,
         trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
         fail_on_warning: false,
         dry_run: false,
         oracle_baseline: false,

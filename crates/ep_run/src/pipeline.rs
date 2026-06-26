@@ -15,9 +15,9 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file};
 use ep_runtime::{
-    ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
-    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, build_hourly_time_axis,
-    load_epw_records, precompute_runtime_data,
+    EpwRecord, ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions,
+    IdealLoadsCompatibilityOptions, NodeStateProjectionOptions, ResultStore,
+    RuntimePrecomputedData, build_hourly_time_axis, load_epw_records, precompute_runtime_data,
     simulate_heat_balance_zone_air_temperatures_with_weather_records,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -35,7 +35,7 @@ use crate::outputs::{
 use crate::{
     RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RunResultState,
     RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus, TraceLevel,
-    assess_support,
+    TraceSelection, assess_support,
 };
 
 /// Completed arbitrary-run outcome.
@@ -128,6 +128,11 @@ struct RustRuntimeResult {
     runtime_class: RuntimeClass,
     sample_count: usize,
     source_order_gate: SourceOrderGateSummary,
+}
+
+struct PreparedRuntimeInputs {
+    sample_count: usize,
+    weather_records: Option<Vec<EpwRecord>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -246,8 +251,14 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     if let (Some(model), Some(precomputed)) =
         (simulation_model.as_ref(), runtime_precomputed.as_ref())
     {
-        write_graph_and_plan(&config.output_dir, model, precomputed, config.trace_level)
-            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        write_graph_and_plan(
+            &config.output_dir,
+            model,
+            precomputed,
+            config.trace_level,
+            &config.trace_selection,
+        )
+        .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     }
     timing.push(
         "execution_plan",
@@ -381,12 +392,44 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
                 );
             }
         };
-        let runtime_start = Instant::now();
-        match execute_rust_runtime(
+        let runtime_setup_start = Instant::now();
+        let runtime_inputs = match prepare_runtime_inputs(
             config,
             simulation_model.as_ref(),
             assessment.runtime_class,
+        ) {
+            Ok(inputs) => inputs,
+            Err(error) => {
+                diagnostics.error("RuntimeConvergenceFailure", "runtime", error);
+                return finish_successful_summary(
+                    config,
+                    &prepared_input,
+                    &assessment,
+                    diagnostics,
+                    timing,
+                    None,
+                    None,
+                    oracle_status,
+                    compare_status,
+                    None,
+                    RunExitCode::Runtime,
+                    "Rust runtime failed",
+                );
+            }
+        };
+        timing.push(
+            "rust_runtime_setup",
+            "ep_run",
+            runtime_setup_start.elapsed().as_secs_f64(),
+            "resolve runtime sample count and parse EPW weather once before the runtime loop",
+        );
+
+        let runtime_start = Instant::now();
+        match execute_rust_runtime(
+            simulation_model.as_ref(),
+            assessment.runtime_class,
             source_order_gate,
+            &runtime_inputs,
         ) {
             Ok(result) => {
                 timing.push(
@@ -654,6 +697,7 @@ fn finish_successful_summary(
             "output_format": config.output_format.id(),
             "keep_intermediate": config.keep_intermediate,
             "trace_level": config.trace_level.id(),
+            "trace_selection": config.trace_selection,
             "fail_on_warning": config.fail_on_warning,
             "dry_run": config.dry_run,
             "oracle_baseline": config.oracle_baseline,
@@ -1033,6 +1077,7 @@ fn write_graph_and_plan(
     model: &SimulationModel,
     precomputed: &RuntimePrecomputedData,
     trace_level: TraceLevel,
+    trace_selection: &TraceSelection,
 ) -> Result<(), String> {
     let plan = &precomputed.execution_plan;
     let graph = &model.graph;
@@ -1072,6 +1117,9 @@ fn write_graph_and_plan(
         "expected_source_order_stages": expected_source_order_stages,
         "actual_executed_source_order_stages": actual_executed_source_order_stages,
         "trace_level": trace_level.id(),
+        "trace_selection": trace_selection,
+        "selected_trace_enabled": selected_trace_enabled(trace_level, trace_selection),
+        "selected_trace_policy": "surface/node trace payloads are emitted only for explicitly requested names; source-order stage snapshots remain metadata-only",
         "stage_snapshots_enabled": trace_level_enables_stage_snapshots(trace_level),
         "stage_snapshot_policy": "metadata-only source-order snapshots generated from ExecutionPlan; no simulation values are read or mutated",
         "stage_snapshots": stage_snapshots,
@@ -1091,17 +1139,22 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
     )?;
-    write_source_order_stage_state_snapshots(output_dir, plan, trace_level)
+    write_source_order_stage_state_snapshots(output_dir, plan, trace_level, trace_selection)
 }
 
 fn trace_level_enables_stage_snapshots(trace_level: TraceLevel) -> bool {
     matches!(trace_level, TraceLevel::Detailed | TraceLevel::Debug)
 }
 
+fn selected_trace_enabled(trace_level: TraceLevel, selection: &TraceSelection) -> bool {
+    trace_level_enables_stage_snapshots(trace_level) && !selection.is_empty()
+}
+
 fn write_source_order_stage_state_snapshots(
     output_dir: &Path,
     plan: &ExecutionPlan,
     trace_level: TraceLevel,
+    trace_selection: &TraceSelection,
 ) -> Result<(), String> {
     if !trace_level_enables_stage_snapshots(trace_level) {
         return Ok(());
@@ -1112,6 +1165,11 @@ fn write_source_order_stage_state_snapshots(
         "snapshot_schema": "rusted-energyplus.source-order-stage-state-snapshot.v1",
         "artifact_class": "diagnostic-trace",
         "trace_level": trace_level.id(),
+        "trace_selection": trace_selection,
+        "selected_trace_enabled": selected_trace_enabled(trace_level, trace_selection),
+        "selected_surface_count": trace_selection.surface_names.len(),
+        "selected_node_count": trace_selection.node_names.len(),
+        "selected_trace_policy": "surface/node trace payloads are emitted only for explicitly requested names; this artifact records stage metadata only",
         "snapshot_count": snapshots.len(),
         "mutation_policy": "diagnostic trace artifact only; runtime calculations never read this file",
         "snapshots": snapshots,
@@ -1277,27 +1335,50 @@ fn write_support_artifacts(
     write_json(&output_dir.join("diagnostics.json"), diagnostics)
 }
 
-fn execute_rust_runtime(
+fn prepare_runtime_inputs(
     config: &RunConfig,
     simulation_model: Option<&SimulationModel>,
     runtime_class: RuntimeClass,
-    source_order_gate: SourceOrderGateSummary,
-) -> Result<RustRuntimeResult, String> {
+) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_sample_count(config, model)?;
+    let weather_records = if runtime_class_requires_weather(runtime_class) {
+        let weather_path = config
+            .weather_path
+            .as_ref()
+            .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
+        Some(
+            load_epw_records(weather_path)
+                .map_err(|error| format!("failed to load EPW weather: {error}"))?,
+        )
+    } else {
+        None
+    };
+
+    Ok(PreparedRuntimeInputs {
+        sample_count,
+        weather_records,
+    })
+}
+
+fn execute_rust_runtime(
+    simulation_model: Option<&SimulationModel>,
+    runtime_class: RuntimeClass,
+    source_order_gate: SourceOrderGateSummary,
+    runtime_inputs: &PreparedRuntimeInputs,
+) -> Result<RustRuntimeResult, String> {
+    let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
+    let sample_count = runtime_inputs.sample_count;
     match runtime_class {
         RuntimeClass::OneZoneHeatBalanceCompatibility
         | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
-            let weather_path = config
-                .weather_path
-                .as_ref()
-                .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-            let weather_records = load_epw_records(weather_path)
-                .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+            let weather_records = runtime_inputs.weather_records.as_deref().ok_or_else(|| {
+                "weather records are required for heat-balance runtime".to_string()
+            })?;
             let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
             let simulation = simulate_heat_balance_zone_air_temperatures_with_weather_records(
                 model,
-                &weather_records,
+                weather_records,
                 options,
             )
             .map_err(|error| error.to_string())?;
@@ -1627,7 +1708,7 @@ mod tests {
     use std::path::Path;
 
     use super::{
-        artifact_map, execution_stage_snapshots, source_order_gate_summary,
+        artifact_map, execution_stage_snapshots, selected_trace_enabled, source_order_gate_summary,
         source_order_stage_state_snapshots, trace_level_enables_stage_snapshots,
     };
     use ep_runtime::{
@@ -1635,7 +1716,7 @@ mod tests {
         ExecutionStep,
     };
 
-    use crate::TraceLevel;
+    use crate::{TraceLevel, TraceSelection};
 
     #[test]
     fn source_order_gate_summary_detects_stage_mismatch() {
@@ -1704,6 +1785,21 @@ mod tests {
         assert_eq!(snapshots[0]["source_order_barrier"].as_bool(), Some(true));
         assert_eq!(snapshots[0]["step_count"].as_u64(), Some(1));
         assert_eq!(snapshots[0]["steps"][0].as_str(), Some("UpdateWeather"));
+    }
+
+    #[test]
+    fn selected_trace_requires_explicit_surface_or_node_names() {
+        let empty = TraceSelection::default();
+        let mut selected = TraceSelection::default();
+        selected.push_surface("FLOOR");
+        selected.push_node("ZONE ONE INLET");
+
+        assert!(!selected_trace_enabled(TraceLevel::Normal, &empty));
+        assert!(!selected_trace_enabled(TraceLevel::Detailed, &empty));
+        assert!(!selected_trace_enabled(TraceLevel::Debug, &empty));
+        assert!(!selected_trace_enabled(TraceLevel::Normal, &selected));
+        assert!(selected_trace_enabled(TraceLevel::Detailed, &selected));
+        assert!(selected_trace_enabled(TraceLevel::Debug, &selected));
     }
 
     #[test]
