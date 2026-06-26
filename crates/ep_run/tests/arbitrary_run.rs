@@ -257,6 +257,39 @@ fn unsupported_ems_blocks_before_runtime() -> Result<(), Box<dyn std::error::Err
 }
 
 #[test]
+fn unsupported_plugins_airflow_and_autosizing_block_before_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    for (name, fixture, diagnostic_code, report_phrase) in [
+        (
+            "unsupported-python-plugin",
+            PYTHON_PLUGIN_EPJSON,
+            "UnsupportedPythonPlugin",
+            "Runtime-modifying plugin/network features are not ported.",
+        ),
+        (
+            "unsupported-airflow-network",
+            AIRFLOW_NETWORK_EPJSON,
+            "UnsupportedAirflowNetwork",
+            "Runtime-modifying plugin/network features are not ported.",
+        ),
+        (
+            "unsupported-autosizing",
+            AUTOSIZING_EPJSON,
+            "UnsupportedSizing",
+            "Sizing workflows are not ported.",
+        ),
+    ] {
+        assert_unsupported_fixture_blocks_before_runtime(
+            name,
+            fixture,
+            diagnostic_code,
+            report_phrase,
+        )?;
+    }
+    Ok(())
+}
+
+#[test]
 fn missing_weather_blocks_heat_balance_before_runtime() -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("missing-weather")?;
     let input_path = case_dir.join("one-zone.epJSON");
@@ -781,6 +814,58 @@ fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
 
 fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
     std::fs::write(path, contents)?;
+    Ok(())
+}
+
+fn assert_unsupported_fixture_blocks_before_runtime(
+    name: &str,
+    fixture: &str,
+    diagnostic_code: &str,
+    report_phrase: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir(name)?;
+    let input_path = case_dir.join("input.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, fixture)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Unsupported);
+    assert_eq!(outcome.support_status, SupportStatus::Unsupported);
+    assert_eq!(outcome.run_result_state, RunResultState::RunBlocked);
+    assert_output_manifest(&output_dir, BLOCKED_AFTER_SUPPORT_MANIFEST)?;
+    assert!(
+        !output_dir
+            .join("results")
+            .join("result-store.json")
+            .exists()
+    );
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "unsupported");
+    assert_eq!(summary["support"]["run_result_state"], "run_blocked");
+    assert!(summary["rust_runtime"].is_null());
+    let diagnostics = std::fs::read_to_string(output_dir.join("diagnostics.json"))?;
+    assert!(diagnostics.contains(diagnostic_code));
+    let support_report = std::fs::read_to_string(output_dir.join("support-report.md"))?;
+    assert!(support_report.contains(report_phrase));
     Ok(())
 }
 

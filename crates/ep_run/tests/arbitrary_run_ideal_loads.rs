@@ -22,6 +22,44 @@ mod output_manifest;
 use output_manifest::{SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest};
 
 #[test]
+fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    let summary = assert_ideal_loads_fixture_runs(
+        "ideal-loads-no-oa",
+        IDEAL_LOADS_EPJSON,
+        "ideal-loads-no-oa-sensible-compatibility",
+        "ideal_loads_no_oa_sensible",
+    )?;
+
+    assert_eq!(summary["rust_runtime"]["samples"], 1);
+    assert!(
+        summary["rust_runtime"]["source_order_stages"]
+            .as_array()
+            .expect("source order stages should be an array")
+            .iter()
+            .any(|stage| stage == "calc-purch-air-loads")
+    );
+    Ok(())
+}
+
+#[test]
+fn ideal_loads_constant_shr_branch_runs_declared_compatibility_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    let summary = assert_ideal_loads_fixture_runs(
+        "ideal-loads-constant-shr",
+        IDEAL_LOADS_CONSTANT_SHR_EPJSON,
+        "ideal-loads-constant-shr-compatibility",
+        "ideal_loads_constant_shr",
+    )?;
+
+    assert_eq!(
+        summary["support"]["matched_capabilities"][0]["evidence_cases"][0],
+        "ideal_loads_constant_shr_conformance_001"
+    );
+    Ok(())
+}
+
+#[test]
 fn mixed_declared_ideal_loads_runs_compatibility_runtime() -> Result<(), Box<dyn std::error::Error>>
 {
     let case_dir = unique_case_dir("mixed-ideal-loads-compatibility")?;
@@ -203,6 +241,67 @@ fn unique_case_dir(name: &str) -> Result<PathBuf, Box<dyn std::error::Error>> {
 fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Error>> {
     std::fs::write(path, contents)?;
     Ok(())
+}
+
+fn assert_ideal_loads_fixture_runs(
+    name: &str,
+    fixture: &str,
+    expected_runtime_class: &str,
+    expected_capability_id: &str,
+) -> Result<Value, Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir(name)?;
+    let input_path = case_dir.join("ideal-loads.epJSON");
+    let output_dir = case_dir.join("out");
+    write_text(&input_path, fixture)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: None,
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(1),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
+    assert_eq!(
+        outcome.support_status,
+        SupportStatus::SupportedCompatibility
+    );
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
+    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
+
+    let summary = read_json(&output_dir.join("run-summary.json"))?;
+    assert_eq!(summary["status"], "success");
+    assert_eq!(summary["support"]["status"], "supported-compatibility");
+    assert_eq!(
+        summary["support"]["run_result_state"],
+        "supported_compatibility_run"
+    );
+    assert_eq!(summary["support"]["runtime_class"], expected_runtime_class);
+    assert_eq!(
+        summary["support"]["matched_capability_ids"][0],
+        expected_capability_id
+    );
+    assert_eq!(
+        summary["rust_runtime"]["runtime_class"],
+        expected_runtime_class
+    );
+    assert_eq!(summary["source_order_gate"]["matches"], true);
+    Ok(summary)
 }
 
 fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
