@@ -1,5 +1,7 @@
 //! Public facade for runtime execution and trace helpers.
 
+#![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
+
 pub mod diagnostic_probes;
 pub mod diagnostics;
 pub mod error;

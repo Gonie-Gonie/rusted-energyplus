@@ -1,5 +1,7 @@
 //! Integration tests for the arbitrary-run pipeline.
 
+#![allow(clippy::expect_used, clippy::unwrap_used)]
+
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 

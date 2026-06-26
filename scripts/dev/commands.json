@@ -82,6 +82,12 @@
                          "help":  "Warn or fail on oversized source files, with explicit legacy waivers."
                      },
                      {
+                         "name":  "source-quality-gate",
+                         "path":  "quality\\source-quality-gate.ps1",
+                         "group":  "quality",
+                         "help":  "Deny production Rust unsafe blocks, unwrap, expect, panic, todo, and unimplemented usage."
+                     },
+                     {
                          "name":  "heat-balance-structure-audit",
                          "path":  "quality\\heat-balance-structure-audit.ps1",
                          "group":  "quality",

@@ -5,6 +5,8 @@
 //! Rust runtime dispatch, optional EnergyPlus oracle baseline, comparison, and
 //! run-summary/report artifact generation.
 
+#![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
+
 mod config;
 mod diagnostics;
 mod oracle;

@@ -1,5 +1,11 @@
 //! Heat-balance compatibility and diagnostic selection APIs.
 
+#![allow(
+    clippy::collapsible_if,
+    clippy::too_many_arguments,
+    clippy::type_complexity
+)]
+
 pub mod air_manager;
 pub mod algorithm;
 pub mod convection;

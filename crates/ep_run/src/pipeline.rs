@@ -242,7 +242,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     let simulation_model = typed_model.cloned().map(SimulationModel::from_typed);
     let execution_plan = simulation_model.as_ref().map(build_execution_plan);
     if let (Some(model), Some(plan)) = (simulation_model.as_ref(), execution_plan.as_ref()) {
-        write_graph_and_plan(&config.output_dir, model, &plan, config.trace_level)
+        write_graph_and_plan(&config.output_dir, model, plan, config.trace_level)
             .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
     }
     timing.push(

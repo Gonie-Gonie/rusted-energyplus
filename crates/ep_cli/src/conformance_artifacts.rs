@@ -542,10 +542,10 @@ fn command_failure_message(label: &str, output: &Output, err_path: Option<&Path>
     let mut message = format!("{label} failed with status {}", output.status);
     append_process_stream_tail(&mut message, "stdout", &output.stdout);
     append_process_stream_tail(&mut message, "stderr", &output.stderr);
-    if let Some(path) = err_path {
-        if let Ok(contents) = std::fs::read_to_string(path) {
-            append_text_tail(&mut message, &format!("{} tail", path.display()), &contents);
-        }
+    if let Some(path) = err_path
+        && let Ok(contents) = std::fs::read_to_string(path)
+    {
+        append_text_tail(&mut message, &format!("{} tail", path.display()), &contents);
     }
     message
 }

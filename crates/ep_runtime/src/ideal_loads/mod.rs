@@ -1,5 +1,7 @@
 //! IdealLoads/PurchasedAir compatibility path.
 
+#![allow(clippy::if_same_then_else, clippy::too_many_arguments)]
+
 mod calc;
 mod dispatch;
 mod init;

@@ -359,8 +359,7 @@ pub(crate) fn run_surface_balance_passes(
             {
                 Some(QuickOutsideConductionContext {
                     reference_air_temperature_c: zone_temperature_c,
-                    inside_convection_coefficient_w_per_m2_k:
-                        inside_convection_coefficient_w_per_m2_k,
+                    inside_convection_coefficient_w_per_m2_k,
                     net_inside_source_w_per_m2,
                     exterior_coefficient_surface_temperature_c:
                         exterior_coefficient_surface_temperatures

@@ -1,5 +1,11 @@
 //! Command line entry point for eplus-rs.
 
+#![allow(clippy::needless_range_loop, clippy::single_char_add_str)]
+#![cfg_attr(
+    test,
+    allow(clippy::approx_constant, clippy::expect_used, clippy::unwrap_used)
+)]
+
 mod conformance_artifacts;
 mod ideal_loads;
 mod internal_gains;

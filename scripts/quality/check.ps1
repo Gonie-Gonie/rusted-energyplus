@@ -23,6 +23,7 @@ if ($LASTEXITCODE -ne 0) { throw "cargo clippy failed" }
 cargo test --workspace
 if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
 
+Invoke-DevCommand -Command "source-quality-gate"
 Invoke-DevCommand -Command "schedule-compact-smoke"
 Invoke-DevCommand -Command "geometry-smoke"
 Invoke-DevCommand -Command "compare-geometry-smoke"
@@ -33,6 +34,7 @@ Invoke-DevCommand -Command "compare-internal-convective-gain-smoke"
 Invoke-DevCommand -Command "compare-internal-convective-gain-conformance"
 Invoke-DevCommand -Command "conformance-schema-smoke"
 Invoke-DevCommand -Command "manifest-validate-all"
+Invoke-DevCommand -Command "family-manifest-validate"
 Invoke-DevCommand -Command "conformance-report-smoke"
 Invoke-DevCommand -Command "official-baseline-smoke"
 Invoke-DevCommand -Command "conformance-diagnostic-report-smoke"
@@ -65,6 +67,8 @@ Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "variable-coverage-check"
 Invoke-DevCommand -Command "pr-port-ticket-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "python-smoke"
+Invoke-DevCommand -Command "one-zone-family-report"
+Invoke-DevCommand -Command "ideal-loads-family-report"
 Invoke-DevCommand -Command "conformance-index-report"
 Invoke-DevCommand -Command "support-coverage-report"
 

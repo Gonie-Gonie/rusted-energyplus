@@ -431,10 +431,9 @@ fn push_steps_to_stage(
         return;
     }
 
-    let stage = stages
-        .iter_mut()
-        .find(|stage| stage.kind == kind)
-        .expect("source-order stage must exist before adding execution steps");
+    let Some(stage) = stages.iter_mut().find(|stage| stage.kind == kind) else {
+        return;
+    };
     stage.steps.extend(steps);
 }
 

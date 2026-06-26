@@ -81,6 +81,7 @@ Invoke-DevCommand -Command "arbitrary-run-smoke"
 Invoke-DevCommand -Command "manifest-validate-all"
 Invoke-DevCommand -Command "docs-generate"
 Invoke-DevCommand -Command "docs-check"
+Invoke-DevCommand -Command "source-quality-gate"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 
 Invoke-DevCommand -Command "package" -Arguments @("-Version", $Version)

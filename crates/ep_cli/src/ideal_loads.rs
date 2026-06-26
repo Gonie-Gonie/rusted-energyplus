@@ -1,3 +1,9 @@
+#![allow(
+    clippy::needless_range_loop,
+    clippy::too_many_arguments,
+    clippy::type_complexity
+)]
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -3353,7 +3359,7 @@ fn evaluate_rows(
     if promote_moisture_predictor {
         let summary = moisture_predictor
             .as_ref()
-            .expect("promoted moisture predictor requires summary");
+            .ok_or_else(|| "promoted moisture predictor requires summary".to_string())?;
         if summary.closed_loop_results.len() < input_trace.sample_count {
             return Err(format!(
                 "IdealLoads Humidistat closed-loop result count {} is shorter than sample count {}",
@@ -3562,7 +3568,7 @@ fn evaluate_rows(
         if promote_moisture_predictor {
             let summary = moisture_predictor
                 .as_ref()
-                .expect("promoted moisture predictor requires summary");
+                .ok_or_else(|| "promoted moisture predictor requires summary".to_string())?;
             ObservedSeries::new(
                 "rust-zone-system-moisture-demand-closed-loop-predictor",
                 "kgWater/s",
@@ -3587,7 +3593,7 @@ fn evaluate_rows(
         if promote_moisture_predictor {
             let summary = moisture_predictor
                 .as_ref()
-                .expect("promoted moisture predictor requires summary");
+                .ok_or_else(|| "promoted moisture predictor requires summary".to_string())?;
             ObservedSeries::new(
                 "rust-zone-system-moisture-demand-closed-loop-predictor",
                 "kgWater/s",
@@ -4030,7 +4036,7 @@ fn evaluate_meter_rows(
     let meter_requests = manifest
         .meters
         .iter()
-        .map(|meter| runtime_meter_request_for_manifest_meter(meter))
+        .map(runtime_meter_request_for_manifest_meter)
         .collect::<Result<Vec<_>, String>>()?;
     let meter_registry = RuntimeOutputRegistry::from_model(model);
     let meter_resolution = meter_registry
