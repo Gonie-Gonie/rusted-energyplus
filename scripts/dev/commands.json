@@ -136,6 +136,12 @@
                          "help":  "Validate source-map, EnergyPlus source, Rust target, case evidence, and port-ticket review contract."
                      },
                      {
+                         "name":  "variable-coverage-check",
+                         "path":  "quality\\variable-coverage-check.ps1",
+                         "group":  "quality",
+                         "help":  "Validate output variable coverage counts, evidence links, and claim boundaries."
+                     },
+                     {
                          "name":  "pr-port-ticket-check",
                          "path":  "quality\\pr-port-ticket-check.ps1",
                          "group":  "quality",

@@ -12,6 +12,7 @@ import json
 import re
 import sys
 import tomllib
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -251,6 +252,14 @@ def object_coverage(repo_root: Path) -> str:
 
 def variable_coverage(repo_root: Path) -> str:
     spec = load_toml(repo_root / "specs" / "variable_coverage.toml")
+    variables = spec.get("variable", [])
+    counts = Counter(str(item.get("status", "")) for item in variables)
+    summary_rows = [
+        ["conformance", str(counts.get("conformance", 0))],
+        ["diagnostic", str(counts.get("diagnostic", 0))],
+        ["baseline", str(counts.get("baseline", 0))],
+        ["total", str(len(variables))],
+    ]
     rows = [
         [
             str(item.get("name", "")),
@@ -265,6 +274,9 @@ def variable_coverage(repo_root: Path) -> str:
         GENERATED_NOTICE
         + "# Variable Coverage\n\n"
         + "Variable coverage is maintained in `specs/variable_coverage.toml`.\n\n"
+        + "## Summary\n\n"
+        + table(["Status", "Count"], summary_rows)
+        + "\n## Variables\n\n"
         + table(["Variable", "Domain", "Status", "First evidence", "Boundary"], rows)
     )
 

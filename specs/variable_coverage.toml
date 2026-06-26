@@ -676,7 +676,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
 
 [[variable]]
 name = "Schedule Value"
@@ -780,7 +780,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Zone Air Heat Balance Air Energy Storage Rate"
@@ -788,7 +788,7 @@ domain = "heat_balance"
 status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
-support_boundary = "Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim."
 
 [[variable]]
 name = "Surface Heat Storage Rate"

@@ -5,6 +5,17 @@
 
 Variable coverage is maintained in `specs/variable_coverage.toml`.
 
+## Summary
+
+| Status | Count |
+|---|---|
+| conformance | 119 |
+| diagnostic | 10 |
+| baseline | 6 |
+| total | 135 |
+
+## Variables
+
 | Variable | Domain | Status | First evidence | Boundary |
 |---|---|---|---|---|
 | Zone Ideal Loads Zone Total Cooling Rate | hvac | conformance | ideal_loads_no_oa_sensible_conformance_001 | Tolerance-gated no-OA/no-limit IdealLoads sensible conformance for ideal_loads_no_oa_sensible_conformance_001, no-OA numeric capacity-limit, flow-limit, and flow-and-capacity-limit conformance for ideal_loads_capacity_limit_conformance_001, ideal_loads_flow_limit_conformance_001, and ideal_loads_flow_capacity_limit_conformance_001, plus no-OA ConstantSensibleHeatRatio cooling conformance for ideal_loads_constant_shr_conformance_001 and no-OA ConstantSupplyHumidityRatio cooling/heating plus Humidistat dehumidification/humidification conformance for declared heating/cooling rate rows in the four no-OA humidity-control conformance candidates; excluded IdealLoads features remain outside the claim. |
@@ -91,7 +102,7 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | OtherEquipment Internal Gains Nominal Fraction Radiant | internal-gain | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | OtherEquipment Internal Gains Nominal Zone Floor Area | internal-gain | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | Zone Total Internal Convective Heating Rate | internal-gain | conformance | internal_gains_001 | Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate. |
-| Zone Air Heat Balance Internal Convective Heat Gain Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim. |
+| Zone Air Heat Balance Internal Convective Heat Gain Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim. |
 | Schedule Value | schedule | conformance | schedule_constant_001 | Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate. |
 | HeatTransfer Surface Area (Gross) | surface | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | HeatTransfer Surface Area (Net) | surface | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
@@ -104,8 +115,8 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | Surface Outside Face Conduction Heat Transfer Rate per Area | surface | conformance | surface_temperature_nomass_001 | Tolerance-gated no-mass adiabatic hourly conformance plus named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; broad CTF/storage/radiation parity remains outside the claim. |
 | Zone Opaque Surface Inside Faces Conduction Rate | surface | conformance | surface_temperature_nomass_001 | Tolerance-gated no-mass adiabatic hourly conformance plus the official 1ZoneUncontrolled dynamic aggregate candidate row under surface-aggregate-state tolerance; broader aggregate and radiation/convection/solar decomposition remain outside the claim. |
 | Zone Opaque Surface Outside Faces Conduction Rate | surface | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic aggregate candidate row under surface-aggregate-state tolerance only; broader aggregate and radiation/convection/solar decomposition remain outside the claim. |
-| Zone Air Heat Balance Surface Convection Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim. |
-| Zone Air Heat Balance Air Energy Storage Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1Zone dynamic source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim. |
+| Zone Air Heat Balance Surface Convection Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim. |
+| Zone Air Heat Balance Air Energy Storage Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broad heat-balance compatibility remains outside the claim. |
 | Surface Heat Storage Rate | surface | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic floor storage conformance only for the declared Surface Heat Storage Rate row under the source-order compatibility lane; broad CTF storage parity remains outside the claim. |
 | Surface Heat Storage Rate per Area | surface | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic floor storage-flux conformance only for the declared Surface Heat Storage Rate per Area row under the source-order compatibility lane; broad CTF storage parity and other storage rows remain outside the claim. |
 | Site Outdoor Air Drybulb Temperature | weather | conformance | weather_fields_001 | Tolerance-gated time-series conformance for the weather case and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate. |
