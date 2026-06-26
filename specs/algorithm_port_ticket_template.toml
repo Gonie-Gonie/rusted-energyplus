@@ -24,6 +24,8 @@ input_state = []
 output_state = []
 history_state_ownership = []
 unsupported_state = []
+inactive_branches = []
+unsupported_active_branches = []
 
 [outputs]
 affected_variables = []

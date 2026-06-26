@@ -98,6 +98,7 @@ function Test-AlgorithmPortTicketBody {
     $commonFields = @(
         "Ticket path or PR section",
         "Algorithm ID",
+        "Domain",
         "Port type",
         "EnergyPlus version",
         "EnergyPlus source file",
@@ -112,6 +113,8 @@ function Test-AlgorithmPortTicketBody {
         "Write state",
         "History/state ownership",
         "Unsupported state",
+        "Inactive branches",
+        "Unsupported active branches",
         "Affected variables",
         "Affected meters",
         "Diagnostic-only variables",
@@ -177,6 +180,7 @@ function New-TestBody {
 $CheckedLine
 - Ticket path or PR section: PR body
 - Algorithm ID: heat_balance/example
+- Domain: heat_balance
 - Port type: $PortType
 - EnergyPlus version: 26.1.0
 - EnergyPlus source file: HeatBalanceManager.cc
@@ -191,6 +195,8 @@ $CheckedLine
 - Write state: result store
 - History/state ownership: heat_balance::state
 - Unsupported state: fenestration
+- Inactive branches: no-HVAC branch disabled by fixture
+- Unsupported active branches: active HVAC branch
 - Affected variables: Zone Mean Air Temperature
 - Affected meters: none
 - Diagnostic-only variables: storage probe

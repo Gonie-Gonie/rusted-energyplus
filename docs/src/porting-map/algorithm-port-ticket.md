@@ -43,6 +43,8 @@ review policy stay aligned.
 | `state_mapping.output_state` | Runtime state written by the routine. |
 | `state_mapping.history_state_ownership` | Timestep or system history slots owned by the routine. |
 | `state_mapping.unsupported_state` | EnergyPlus state branches intentionally not implemented. |
+| `state_mapping.inactive_branches` | EnergyPlus branches that are inactive under the ticket's first target case or fixture assumptions. |
+| `state_mapping.unsupported_active_branches` | EnergyPlus branches that can be active but remain unsupported or outside the compatibility claim. |
 | `outputs.affected_variables` | Output variables whose values may change. |
 | `outputs.affected_meters` | Output meters whose values may change. |
 | `outputs.diagnostic_only_variables` | Variables allowed only in diagnostic reports. |

@@ -18,6 +18,7 @@ For source-order work, prefer the dedicated compatibility or diagnostic probe PR
 - [ ] Diagnostic probe only; no conformance claim
 - Ticket path or PR section:
 - Algorithm ID:
+- Domain:
 - Port type: compatibility / diagnostic_probe / refactor_only
 - EnergyPlus version: 26.1.0
 - EnergyPlus source file:
@@ -32,6 +33,8 @@ For source-order work, prefer the dedicated compatibility or diagnostic probe PR
 - Write state:
 - History/state ownership:
 - Unsupported state:
+- Inactive branches:
+- Unsupported active branches:
 - Affected variables:
 - Affected meters:
 - Diagnostic-only variables:

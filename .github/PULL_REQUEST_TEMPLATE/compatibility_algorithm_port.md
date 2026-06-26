@@ -16,6 +16,7 @@ Use this template when the PR ports an EnergyPlus source routine into the compat
 - [ ] Diagnostic probe only; no conformance claim
 - Ticket path or PR section:
 - Algorithm ID:
+- Domain:
 - Port type: compatibility
 - EnergyPlus version: 26.1.0
 - EnergyPlus source file:
@@ -30,6 +31,8 @@ Use this template when the PR ports an EnergyPlus source routine into the compat
 - Write state:
 - History/state ownership:
 - Unsupported state:
+- Inactive branches:
+- Unsupported active branches:
 - Affected variables:
 - Affected meters:
 - Diagnostic-only variables:

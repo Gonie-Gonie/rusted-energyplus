@@ -16,6 +16,7 @@ Use this template when the PR adds instrumentation or diagnostic-only probes wit
 - [x] Diagnostic probe only; no conformance claim
 - Ticket path or PR section:
 - Algorithm ID:
+- Domain:
 - Port type: diagnostic_probe
 - EnergyPlus version: 26.1.0
 - EnergyPlus source file:
@@ -30,6 +31,8 @@ Use this template when the PR adds instrumentation or diagnostic-only probes wit
 - Write state:
 - History/state ownership:
 - Unsupported state:
+- Inactive branches:
+- Unsupported active branches:
 - Affected variables:
 - Affected meters:
 - Diagnostic-only variables:

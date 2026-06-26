@@ -27,13 +27,22 @@ PORT_TICKET_REQUIRED_FIELDS = {
         "compatibility_path",
         "diagnostic_probe_used",
     ],
-    "state_mapping": ["input_state", "output_state", "history_state_ownership", "unsupported_state"],
+    "state_mapping": [
+        "input_state",
+        "output_state",
+        "history_state_ownership",
+        "unsupported_state",
+        "inactive_branches",
+        "unsupported_active_branches",
+    ],
     "outputs": ["affected_variables", "affected_meters", "diagnostic_only_variables"],
     "evidence": ["first_target_case", "proof_variables", "tolerance_candidate", "report_path", "blocking_gate"],
     "claim_boundary": ["conformance_claim", "not_claimed_branches", "partial_run_allowed"],
 }
 PR_TEMPLATE_REQUIRED_TOKENS = [
+    "Ticket path or PR section:",
     "Algorithm ID:",
+    "Domain:",
     "Port type:",
     "EnergyPlus version:",
     "EnergyPlus source file:",
@@ -48,6 +57,8 @@ PR_TEMPLATE_REQUIRED_TOKENS = [
     "Write state:",
     "History/state ownership:",
     "Unsupported state:",
+    "Inactive branches:",
+    "Unsupported active branches:",
     "Affected variables:",
     "Affected meters:",
     "Diagnostic-only variables:",
@@ -64,6 +75,8 @@ PORT_TICKET_DOC_TOKENS = [
     "specs/algorithm_port_ticket_template.toml",
     "port_type = \"diagnostic_probe\"",
     "claim_boundary.conformance_claim = false",
+    "state_mapping.inactive_branches",
+    "state_mapping.unsupported_active_branches",
     "Compatibility code must not call diagnostic probe functions.",
 ]
 PR_WORKFLOW_REQUIRED_TOKENS = [
@@ -330,6 +343,9 @@ def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
 
     if pr_check_path.is_file():
         pr_check_text = pr_check_path.read_text(encoding="utf-8", errors="replace")
+        for token in PR_TEMPLATE_REQUIRED_TOKENS:
+            field_name = token.rstrip(":")
+            require(field_name in pr_check_text, errors, f"PR port-ticket check missing required field: {field_name}")
         require(
             "source-order algorithm PRs require an Algorithm Port Ticket" in pr_check_text,
             errors,
