@@ -93,6 +93,8 @@ $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $pipeline = "crates\ep_run\src\pipeline.rs"
+$runSupport = "crates\ep_run\src\support.rs"
+$cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
 $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
 $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
@@ -126,6 +128,8 @@ foreach ($entry in @(
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
         @($pipeline, "arbitrary-run pipeline"),
+        @($runSupport, "arbitrary-run support assessment"),
+        @($cli, "CLI conformance gate"),
         @($runtime, "runtime orchestration root"),
         @($runtimeTestSourceOrder, "runtime source-order tests"),
         @($runtimeTestDynamic, "runtime dynamic heat-balance tests")
@@ -454,8 +458,17 @@ Assert-Contains -Path $diagnosticProbe -Pattern 'pub enum DiagnosticHeatBalanceP
 Assert-NotContains -Path $diagnosticProbe -Pattern 'pub enum CompatibilityHeatBalanceAlgorithm' -Description "compatibility algorithm enum in diagnostic probe module"
 Assert-Contains -Path $diagnosticProbe -Pattern 'HeatBalanceZoneAirSelection::Diagnostic' -Description "diagnostic selectors remain diagnostic"
 Assert-Contains -Path $diagnosticProbe -Pattern 'Diagnostic-only heat-balance probes and non-claim baselines' -Description "diagnostic probe non-claim boundary"
+Assert-Contains -Path $diagnosticProbe -Pattern 'pub struct DiagnosticProbeMetadata' -Description "diagnostic probe metadata"
+Assert-Contains -Path $diagnosticProbe -Pattern 'why_it_exists' -Description "diagnostic probe metadata why-it-exists field"
+Assert-Contains -Path $diagnosticProbe -Pattern 'mismatch_investigated' -Description "diagnostic probe metadata mismatch field"
 Assert-Contains -Path $diagnosticProbe -Pattern 'EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe' -Description "diagnostic probe name includes purpose"
 Assert-Contains -Path $algorithm -Pattern 'allows_conformance_promotion' -Description "diagnostic probes cannot promote conformance"
+Assert-Contains -Path $runSupport -Pattern 'pub struct SelectedAlgorithmLane' -Description "run support selected algorithm lane metadata"
+Assert-Contains -Path $runSupport -Pattern 'diagnostic_probe_used' -Description "run support diagnostic-probe lane flag"
+Assert-Contains -Path $runSupport -Pattern 'conformance_promotion_allowed' -Description "run support conformance promotion lane flag"
+Assert-Contains -Path $pipeline -Pattern '"selected_algorithm_lane": assessment\.selected_algorithm_lane\.clone\(\)' -Description "run summary selected algorithm lane"
+Assert-Contains -Path $pipeline -Pattern 'SelectedAlgorithmLane::none' -Description "early run summary selected algorithm lane"
+Assert-Contains -Path $cli -Pattern 'context\.conformance_claim && diagnostic\.diagnostic_probe_used' -Description "conformance gate rejects diagnostic probe lane"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'assert!\(!probe\.allows_conformance_promotion\(\)\)' -Description "probe alias not accepted as compatibility algorithm"
 Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'comparison_class = "diagnostic-only"' -Description "diagnostic probe manifest class"
 Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'conformance_claim = false' -Description "diagnostic probe manifest claim boundary"

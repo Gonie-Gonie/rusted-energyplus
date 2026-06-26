@@ -33,7 +33,8 @@ use crate::outputs::{
 };
 use crate::{
     RunConfig, RunDiagnosticSeverity as Severity, RunDiagnostics, RunExitCode, RunResultState,
-    RuntimeClass, SupportAssessment, SupportStatus, TraceLevel, assess_support,
+    RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus, TraceLevel,
+    assess_support,
 };
 
 /// Completed arbitrary-run outcome.
@@ -562,6 +563,7 @@ fn finish_early(
         "message": message,
         "support_status": support_status.id(),
         "run_result_state": run_result_state.id(),
+        "selected_algorithm_lane": SelectedAlgorithmLane::none(),
         "conformance_claim": false,
         "diagnostics": diagnostic_counts(&diagnostics),
         "timing": timing,
@@ -652,10 +654,12 @@ fn finish_successful_summary(
             "compare_oracle": config.compare_oracle,
             "hours": config.hours,
         },
+        "selected_algorithm_lane": assessment.selected_algorithm_lane.clone(),
         "support": {
             "status": assessment.status.id(),
             "run_result_state": assessment.run_result_state.id(),
             "runtime_class": assessment.runtime_class.id(),
+            "selected_algorithm_lane": assessment.selected_algorithm_lane.clone(),
             "runtime_selection_note": assessment.runtime_selection_note,
             "capability_registry_loaded": assessment.capability_registry_loaded,
             "matched_capability_ids": assessment.matched_capability_ids.clone(),

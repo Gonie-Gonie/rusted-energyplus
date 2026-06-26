@@ -160,6 +160,75 @@ impl RuntimeClass {
             Self::IdealLoadsNodeStateProjection => "ideal-loads-node-state-projection",
         }
     }
+
+    /// Stable algorithm-lane identifier for run summaries and conformance gates.
+    #[must_use]
+    pub const fn selected_algorithm_lane_id(self) -> &'static str {
+        match self {
+            Self::OneZoneHeatBalanceCompatibility
+            | Self::IdealLoadsNoOaSensibleCompatibility
+            | Self::IdealLoadsFiniteLimitCompatibility
+            | Self::IdealLoadsConstantShrCompatibility
+            | Self::IdealLoadsHumiditySelectedBranchesCompatibility
+            | Self::IdealLoadsMixedDeclaredCompatibility => "compatibility-source-order",
+            Self::HeatBalanceZoneAirDiagnostic | Self::IdealLoadsNodeStateProjection => {
+                "diagnostic-probe"
+            }
+            Self::None => "none",
+        }
+    }
+
+    /// Returns true when the selected lane is diagnostic-only probe evidence.
+    #[must_use]
+    pub const fn diagnostic_probe_used(self) -> bool {
+        matches!(
+            self,
+            Self::HeatBalanceZoneAirDiagnostic | Self::IdealLoadsNodeStateProjection
+        )
+    }
+
+    /// Returns true when the selected lane can be promoted into conformance evidence.
+    #[must_use]
+    pub const fn conformance_promotion_allowed(self) -> bool {
+        matches!(
+            self,
+            Self::OneZoneHeatBalanceCompatibility
+                | Self::IdealLoadsNoOaSensibleCompatibility
+                | Self::IdealLoadsFiniteLimitCompatibility
+                | Self::IdealLoadsConstantShrCompatibility
+                | Self::IdealLoadsHumiditySelectedBranchesCompatibility
+                | Self::IdealLoadsMixedDeclaredCompatibility
+        )
+    }
+}
+
+/// Algorithm lane selected by arbitrary-run support assessment.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct SelectedAlgorithmLane {
+    /// Stable lane identifier.
+    pub id: String,
+    /// Whether the lane used a diagnostic probe or diagnostic-only projection.
+    pub diagnostic_probe_used: bool,
+    /// Whether the lane may be promoted into reviewed conformance evidence.
+    pub conformance_promotion_allowed: bool,
+}
+
+impl SelectedAlgorithmLane {
+    /// No runtime lane was selected.
+    #[must_use]
+    pub fn none() -> Self {
+        Self::from_runtime_class(RuntimeClass::None)
+    }
+
+    /// Builds lane metadata from the selected runtime class.
+    #[must_use]
+    pub fn from_runtime_class(runtime_class: RuntimeClass) -> Self {
+        Self {
+            id: runtime_class.selected_algorithm_lane_id().to_string(),
+            diagnostic_probe_used: runtime_class.diagnostic_probe_used(),
+            conformance_promotion_allowed: runtime_class.conformance_promotion_allowed(),
+        }
+    }
 }
 
 /// One object type entry in a support assessment.
@@ -220,6 +289,8 @@ pub struct SupportAssessment {
     pub run_result_state: RunResultState,
     /// Selected runtime class.
     pub runtime_class: RuntimeClass,
+    /// Selected algorithm lane metadata.
+    pub selected_algorithm_lane: SelectedAlgorithmLane,
     /// Human-readable reason tying matched capabilities to the selected runtime and run state.
     pub runtime_selection_note: String,
     /// Matched capability identifiers from the current support boundary.
@@ -443,6 +514,7 @@ pub fn assess_support(
         status,
         run_result_state,
         runtime_class,
+        selected_algorithm_lane: SelectedAlgorithmLane::from_runtime_class(runtime_class),
         runtime_selection_note: runtime_selection_note(status, runtime_class, run_result_state),
         matched_capability_ids,
         matched_capabilities,

@@ -394,7 +394,7 @@ mod tests {
     use super::render_support_report;
     use crate::{
         ClaimBoundary, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunResultState,
-        RuntimeClass, SupportAssessment, SupportStatus,
+        RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus,
     };
 
     #[test]
@@ -416,6 +416,7 @@ mod tests {
             status: SupportStatus::Unsupported,
             run_result_state: RunResultState::RunBlocked,
             runtime_class: RuntimeClass::None,
+            selected_algorithm_lane: SelectedAlgorithmLane::none(),
             runtime_selection_note: "support assessment blocked Rust execution before runtime"
                 .to_string(),
             matched_capability_ids: Vec::new(),

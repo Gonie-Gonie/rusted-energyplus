@@ -4559,6 +4559,12 @@ fn evaluate_heat_balance_conformance<'a>(
             diagnostic.zone_air_algorithm, diagnostic.zone_air_algorithm_lane
         ));
     }
+    if context.conformance_claim && diagnostic.diagnostic_probe_used {
+        failure_reasons.push(format!(
+            "conformance claim cannot use diagnostic probe lane, got {} ({})",
+            diagnostic.zone_air_algorithm, diagnostic.zone_air_algorithm_lane
+        ));
+    }
     if diagnostic.status != "extracted" {
         failure_reasons.push(format!(
             "diagnostic extraction status was {}",

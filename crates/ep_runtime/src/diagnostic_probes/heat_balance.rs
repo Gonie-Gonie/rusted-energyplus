@@ -4,6 +4,15 @@ use crate::heat_balance::{
     CompatibilityHeatBalanceAlgorithm, HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirSelection,
 };
 
+/// Structured metadata for a diagnostic-only heat-balance probe.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DiagnosticProbeMetadata {
+    /// Why the probe is kept in the runtime.
+    pub why_it_exists: &'static str,
+    /// The mismatch family this probe investigates.
+    pub mismatch_investigated: &'static str,
+}
+
 macro_rules! diagnostic_heat_balance_probes {
     ($($variant:ident),+ $(,)?) => {
         /// Diagnostic-only heat-balance probes and non-claim baselines.
@@ -19,6 +28,19 @@ macro_rules! diagnostic_heat_balance_probes {
             pub const fn zone_air_algorithm(self) -> HeatBalanceZoneAirAlgorithm {
                 match self {
                     $(Self::$variant => HeatBalanceZoneAirAlgorithm::$variant,)+
+                }
+            }
+
+            /// Returns non-claim metadata explaining the probe boundary.
+            #[must_use]
+            pub const fn metadata(self) -> DiagnosticProbeMetadata {
+                match self {
+                    $(
+                        Self::$variant => DiagnosticProbeMetadata {
+                            why_it_exists: "Diagnostic-only selector for isolating heat-balance source-order deltas before compatibility promotion.",
+                            mismatch_investigated: "EnergyPlus/Rust heat-balance timing, state-history, or report-row mismatch; not conformance evidence.",
+                        },
+                    )+
                 }
             }
         }
@@ -97,4 +119,17 @@ diagnostic_heat_balance_probes! {
     EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe,
     EnergyPlusAnalyticalCoupledPreviousBoundaryProbe,
     EnergyPlusThirdOrderProbe,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn diagnostic_probe_metadata_declares_non_claim_boundary() {
+        let metadata = DiagnosticHeatBalanceProbe::EnergyPlusThirdOrderProbe.metadata();
+
+        assert!(metadata.why_it_exists.contains("Diagnostic-only"));
+        assert!(metadata.mismatch_investigated.contains("mismatch"));
+    }
 }

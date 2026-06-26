@@ -1,4 +1,4 @@
-use super::{RunResultState, RuntimeClass, SupportStatus, assess_support};
+use super::{RunResultState, RuntimeClass, SelectedAlgorithmLane, SupportStatus, assess_support};
 use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
 use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
@@ -87,6 +87,40 @@ fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn 
     );
     Ok(())
 }
+
+#[test]
+fn runtime_class_reports_selected_algorithm_lane_metadata() {
+    let heat_balance_compat =
+        SelectedAlgorithmLane::from_runtime_class(RuntimeClass::OneZoneHeatBalanceCompatibility);
+    assert_eq!(heat_balance_compat.id, "compatibility-source-order");
+    assert!(!heat_balance_compat.diagnostic_probe_used);
+    assert!(heat_balance_compat.conformance_promotion_allowed);
+
+    let ideal_loads_compat = SelectedAlgorithmLane::from_runtime_class(
+        RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility,
+    );
+    assert_eq!(ideal_loads_compat.id, "compatibility-source-order");
+    assert!(!ideal_loads_compat.diagnostic_probe_used);
+    assert!(ideal_loads_compat.conformance_promotion_allowed);
+
+    let heat_balance_diagnostic =
+        SelectedAlgorithmLane::from_runtime_class(RuntimeClass::HeatBalanceZoneAirDiagnostic);
+    assert_eq!(heat_balance_diagnostic.id, "diagnostic-probe");
+    assert!(heat_balance_diagnostic.diagnostic_probe_used);
+    assert!(!heat_balance_diagnostic.conformance_promotion_allowed);
+
+    let ideal_loads_projection =
+        SelectedAlgorithmLane::from_runtime_class(RuntimeClass::IdealLoadsNodeStateProjection);
+    assert_eq!(ideal_loads_projection.id, "diagnostic-probe");
+    assert!(ideal_loads_projection.diagnostic_probe_used);
+    assert!(!ideal_loads_projection.conformance_promotion_allowed);
+
+    assert_eq!(
+        SelectedAlgorithmLane::none(),
+        SelectedAlgorithmLane::from_runtime_class(RuntimeClass::None)
+    );
+}
+
 #[test]
 fn output_objects_use_partial_rule_from_registry() -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
