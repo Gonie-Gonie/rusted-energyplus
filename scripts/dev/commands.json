@@ -118,6 +118,12 @@
                          "help":  "Guard against unsupported compatibility wording."
                      },
                      {
+                         "name":  "project-contract-check",
+                         "path":  "quality\\project-contract-check.ps1",
+                         "group":  "quality",
+                         "help":  "Validate project contract source-of-truth alignment across specs, README, and current docs."
+                     },
+                     {
                          "name":  "algorithm-ledger-check",
                          "path":  "quality\\algorithm-ledger-check.ps1",
                          "group":  "quality",

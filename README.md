@@ -59,6 +59,7 @@ Focused checks:
 .\scripts\dev.cmd docs-check
 .\scripts\dev.cmd manifest-validate-all
 .\scripts\dev.cmd strict-no-false-conformance
+.\scripts\dev.cmd project-contract-check
 .\scripts\dev.cmd algorithm-ledger-check
 .\scripts\dev.cmd arbitrary-run-smoke
 .\scripts\dev.cmd launcher-smoke
