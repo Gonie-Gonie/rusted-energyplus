@@ -57,6 +57,22 @@ CURRENT_DOC_REQUIRED_PHRASES = [
     "Markdown wording, smoke tests, diagnostics, arbitrary IDF runs, and performance",
     "results do not create compatibility claims.",
 ]
+CURRENT_STATUS_REQUIRED_PHRASES = [
+    "| conformance | Case manifests with `conformance_claim = true`, `specs/variable_coverage.toml`, `specs/algorithm_ledger.toml`, and generated compare reports |",
+    "| diagnostic-only | Case manifests and diagnostic probes with `conformance_claim = false`, diagnostic output levels, and diagnostic reports |",
+    "| baseline-only | EnergyPlus oracle baseline artifacts and output levels marked `baseline` |",
+    "| not claimed | `specs/project_contract.toml`, generated capability/coverage docs, and this document's Not Claimed section |",
+    "README and current-status prose are mirrors, not claim sources.",
+    "The exact case list is generated in `docs/src/generated/conformance-case-index.md`.",
+    "coverage boundaries are generated from `specs/algorithm_ledger.toml`, `specs/object_coverage.toml`, and `specs/variable_coverage.toml`.",
+]
+GENERATED_DOC_REQUIRED_PHRASES = [
+    "Generated from specs/ and data/conformance_cases by tools/docs/generate_docs.py.",
+    "Case metadata is read from `data/conformance_cases/*/case.toml`.",
+    "| Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |",
+    "Variable coverage is maintained in `specs/variable_coverage.toml`.",
+    "Algorithm status is maintained in `specs/algorithm_ledger.toml`.",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -135,11 +151,27 @@ def main() -> int:
     contract_path = repo_root / "specs" / "project_contract.toml"
     readme_path = repo_root / "README.md"
     current_doc_path = repo_root / "docs" / "src" / "current" / "project-contract.md"
+    current_status_path = repo_root / "docs" / "src" / "current" / "current-status.md"
+    generated_case_index_path = repo_root / "docs" / "src" / "generated" / "conformance-case-index.md"
+    generated_variable_coverage_path = repo_root / "docs" / "src" / "generated" / "variable-coverage.md"
+    generated_algorithm_ledger_path = repo_root / "docs" / "src" / "generated" / "algorithm-ledger.md"
     errors: list[str] = []
 
     require(contract_path.is_file(), errors, f"missing project contract spec: {contract_path}")
     require(readme_path.is_file(), errors, f"missing README: {readme_path}")
     require(current_doc_path.is_file(), errors, f"missing current project contract doc: {current_doc_path}")
+    require(current_status_path.is_file(), errors, f"missing current status doc: {current_status_path}")
+    require(generated_case_index_path.is_file(), errors, f"missing generated case index: {generated_case_index_path}")
+    require(
+        generated_variable_coverage_path.is_file(),
+        errors,
+        f"missing generated variable coverage: {generated_variable_coverage_path}",
+    )
+    require(
+        generated_algorithm_ledger_path.is_file(),
+        errors,
+        f"missing generated algorithm ledger: {generated_algorithm_ledger_path}",
+    )
     if contract_path.is_file():
         validate_contract(load_toml(contract_path), errors)
     if readme_path.is_file():
@@ -151,6 +183,18 @@ def main() -> int:
             errors,
             "docs/src/current/project-contract.md",
         )
+    if current_status_path.is_file():
+        require_contains_all(
+            current_status_path.read_text(encoding="utf-8"),
+            CURRENT_STATUS_REQUIRED_PHRASES,
+            errors,
+            "docs/src/current/current-status.md",
+        )
+    generated_text = ""
+    for path in [generated_case_index_path, generated_variable_coverage_path, generated_algorithm_ledger_path]:
+        if path.is_file():
+            generated_text += "\n" + path.read_text(encoding="utf-8")
+    require_contains_all(generated_text, GENERATED_DOC_REQUIRED_PHRASES, errors, "generated docs")
 
     if errors:
         print("Project contract validation failed:", file=sys.stderr)
