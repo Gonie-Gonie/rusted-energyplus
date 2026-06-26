@@ -507,6 +507,47 @@ if ($isCompatibilityCandidateCase) {
     if ($summary.next_pr_target -ne "outside-ctf-history-handoff") {
         throw "Expected candidate next_pr_target to focus outside CTF history handoff, got $($summary.next_pr_target)"
     }
+    if ($null -eq $summary.top_blocker) {
+        throw "Expected candidate summary to include a single top_blocker object"
+    }
+    if ([int]$summary.top_blocker.rank -ne 1) {
+        throw "Expected candidate top_blocker rank to be 1, got $($summary.top_blocker.rank)"
+    }
+    if ($summary.top_blocker.blocker_id -ne "floor-storage-mismatch") {
+        throw "Expected candidate top_blocker to be floor-storage-mismatch, got $($summary.top_blocker.blocker_id)"
+    }
+    $candidateCurrentBlockers = @($summary.current_blockers)
+    if ($candidateCurrentBlockers.Count -lt 8) {
+        throw "Expected candidate current_blockers to include detailed blocker rows, got $($candidateCurrentBlockers.Count)"
+    }
+    foreach ($requiredBlocker in @(
+            "floor-storage-mismatch",
+            "floor-face-temperature-current-inside-mismatch",
+            "ctf-current-term-delta",
+            "ctf-history-temperature-term-delta",
+            "ctf-history-flux-term-delta",
+            "longwave-radiation-source-delta",
+            "hconv-source-timing-delta",
+            "warmup-end-state-mat-delta",
+            "warmup-end-state-surface-temperature-delta",
+            "warmup-end-state-ctf-history-delta"
+        )) {
+        if (-not ($candidateCurrentBlockers | Where-Object { $_.blocker_id -eq $requiredBlocker })) {
+            throw "Expected candidate current_blockers to include $requiredBlocker"
+        }
+    }
+    if ($null -eq $summary.warmup_end_state_deltas) {
+        throw "Expected candidate summary to include warmup_end_state_deltas"
+    }
+    if ($null -eq $summary.warmup_end_state_deltas.surface_temperature) {
+        throw "Expected candidate warmup_end_state_deltas to include surface_temperature"
+    }
+    if ($null -eq $summary.warmup_end_state_deltas.ctf_history) {
+        throw "Expected candidate warmup_end_state_deltas to include ctf_history"
+    }
+    if (@($summary.first_divergence_by_variable).Count -lt 1) {
+        throw "Expected candidate first_divergence_by_variable rows"
+    }
     foreach ($requiredVariable in @(
             "Site Outdoor Air Drybulb Temperature",
             "Zone Mean Air Temperature",
@@ -536,6 +577,20 @@ if ($isCompatibilityCandidateCase) {
     Assert-Contains -Text $reportText -Pattern "compatibility_source_order: true" -Description "candidate markdown source-order compatibility flag"
     Assert-Contains -Text $reportText -Pattern "diagnostic_probe_used: false" -Description "candidate markdown diagnostic probe flag"
     Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
+    Assert-Contains -Text $reportText -Pattern "## Top Blocker" -Description "candidate top blocker section"
+    Assert-Contains -Text $reportText -Pattern "floor-storage-mismatch" -Description "candidate floor storage blocker row"
+    Assert-Contains -Text $reportText -Pattern "## Current Blockers" -Description "candidate current blockers section"
+    Assert-Contains -Text $reportText -Pattern "floor-face-temperature-current-inside-mismatch" -Description "candidate floor face-temperature current-inside blocker row"
+    Assert-Contains -Text $reportText -Pattern "ctf-current-term-delta" -Description "candidate CTF current blocker row"
+    Assert-Contains -Text $reportText -Pattern "ctf-history-temperature-term-delta" -Description "candidate CTF history temperature blocker row"
+    Assert-Contains -Text $reportText -Pattern "ctf-history-flux-term-delta" -Description "candidate CTF history flux blocker row"
+    Assert-Contains -Text $reportText -Pattern "longwave-radiation-source-delta" -Description "candidate radiation source blocker row"
+    Assert-Contains -Text $reportText -Pattern "hconv-source-timing-delta" -Description "candidate hconv/source timing blocker row"
+    Assert-Contains -Text $reportText -Pattern "## Warmup End-State Deltas" -Description "candidate warmup end-state delta section"
+    Assert-Contains -Text $reportText -Pattern "warmup-end-state-mat-delta" -Description "candidate warmup MAT blocker row"
+    Assert-Contains -Text $reportText -Pattern "warmup-end-state-surface-temperature-delta" -Description "candidate warmup surface temperature blocker row"
+    Assert-Contains -Text $reportText -Pattern "warmup-end-state-ctf-history-delta" -Description "candidate warmup CTF history blocker row"
+    Assert-Contains -Text $reportText -Pattern "## First Divergence by Variable" -Description "candidate first divergence by variable section"
     Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
     Assert-Contains -Text $reportText -Pattern "next_pr_target: outside-ctf-history-handoff" -Description "candidate next PR target"
     Assert-Contains -Text $reportText -Pattern "status: fail" -Description "candidate diagnostic status"
@@ -560,6 +615,46 @@ if ($null -eq $topBottleneck.first_delta_sample) {
 }
 if ($null -eq $topBottleneck.max_delta_sample) {
     throw "Expected top bottleneck to include a max_delta_sample fingerprint"
+}
+if ($null -eq $summary.top_blocker) {
+    throw "Expected summary to include a single top_blocker object"
+}
+if ([int]$summary.top_blocker.rank -ne 1) {
+    throw "Expected top_blocker rank to be 1, got $($summary.top_blocker.rank)"
+}
+$currentBlockers = @($summary.current_blockers)
+if ($currentBlockers.Count -lt 8) {
+    throw "Expected current_blockers to include detailed blocker rows, got $($currentBlockers.Count)"
+}
+foreach ($requiredBlocker in @(
+        "ctf-current-term-delta",
+        "ctf-history-temperature-term-delta",
+        "ctf-history-flux-term-delta",
+        "longwave-radiation-source-delta",
+        "hconv-source-timing-delta",
+        "warmup-end-state-mat-delta",
+        "warmup-end-state-surface-temperature-delta",
+        "warmup-end-state-ctf-history-delta"
+    )) {
+    if (-not ($currentBlockers | Where-Object { $_.blocker_id -eq $requiredBlocker })) {
+        throw "Expected current_blockers to include $requiredBlocker"
+    }
+}
+if ($null -eq $summary.warmup_end_state_deltas) {
+    throw "Expected summary to include warmup_end_state_deltas"
+}
+if ($null -eq $summary.warmup_end_state_deltas.surface_temperature) {
+    throw "Expected warmup_end_state_deltas to include surface_temperature"
+}
+if ($null -eq $summary.warmup_end_state_deltas.ctf_history) {
+    throw "Expected warmup_end_state_deltas to include ctf_history"
+}
+$firstDivergenceByVariable = @($summary.first_divergence_by_variable)
+if ($firstDivergenceByVariable.Count -lt 1) {
+    throw "Expected first_divergence_by_variable rows"
+}
+if ($null -eq (@($firstDivergenceByVariable | Where-Object { $_.variable -eq $topBottleneck.output.variable -and $_.key -eq $topBottleneck.output.key })[0])) {
+    throw "Expected first_divergence_by_variable to include the top bottleneck variable"
 }
 $topMaxSampleContext = @($summary.max_sample_contexts)[0]
 if ($null -eq $topMaxSampleContext) {
@@ -1281,6 +1376,19 @@ else {
 }
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
 Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
+Assert-Contains -Text $reportText -Pattern "## Top Blocker" -Description "markdown top blocker section"
+Assert-Contains -Text $reportText -Pattern "## Current Blockers" -Description "markdown current blockers section"
+Assert-Contains -Text $reportText -Pattern "blocker_id" -Description "markdown current blocker id column"
+Assert-Contains -Text $reportText -Pattern "ctf-current-term-delta" -Description "markdown CTF current blocker row"
+Assert-Contains -Text $reportText -Pattern "ctf-history-temperature-term-delta" -Description "markdown CTF history temperature blocker row"
+Assert-Contains -Text $reportText -Pattern "ctf-history-flux-term-delta" -Description "markdown CTF history flux blocker row"
+Assert-Contains -Text $reportText -Pattern "longwave-radiation-source-delta" -Description "markdown radiation source blocker row"
+Assert-Contains -Text $reportText -Pattern "hconv-source-timing-delta" -Description "markdown hconv/source timing blocker row"
+Assert-Contains -Text $reportText -Pattern "## Warmup End-State Deltas" -Description "markdown warmup end-state delta section"
+Assert-Contains -Text $reportText -Pattern "warmup-end-state-mat-delta" -Description "markdown warmup MAT delta row"
+Assert-Contains -Text $reportText -Pattern "warmup-end-state-surface-temperature-delta" -Description "markdown warmup surface temperature delta row"
+Assert-Contains -Text $reportText -Pattern "warmup-end-state-ctf-history-delta" -Description "markdown warmup CTF history delta row"
+Assert-Contains -Text $reportText -Pattern "## First Divergence by Variable" -Description "markdown first divergence by variable section"
 Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
 Assert-Contains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "markdown max-sample context section"
 Assert-Contains -Text $reportText -Pattern "trigger_rank" -Description "markdown max-sample context trigger column"

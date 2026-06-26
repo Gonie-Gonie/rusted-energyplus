@@ -3909,6 +3909,50 @@ struct HeatBalanceMaxSampleContextRow {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceCurrentBlockerRow {
+    rank: usize,
+    blocker_id: String,
+    status: String,
+    key: String,
+    source: String,
+    sample_index: Option<usize>,
+    delta: f64,
+    delta_units: String,
+    evidence: String,
+    next_target: String,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceFirstDivergenceByVariableRow {
+    rank: usize,
+    key: String,
+    variable: String,
+    class: String,
+    sample_index: usize,
+    oracle_c: f64,
+    rust_c: f64,
+    abs_delta_c: f64,
+    rmse_delta_c: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceScalarDeltaRow {
+    key: String,
+    source: String,
+    sample_index: Option<usize>,
+    delta: f64,
+    delta_units: String,
+    evidence: String,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceWarmupEndStateDeltas {
+    mat_delta_c: f64,
+    surface_temperature: Option<HeatBalanceScalarDeltaRow>,
+    ctf_history: Option<HeatBalanceScalarDeltaRow>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 struct HeatBalanceConformanceDiagnostic {
     samples: usize,
     heat_balance_timesteps: usize,
@@ -9534,6 +9578,10 @@ fn render_heat_balance_conformance_json(
     include_sample_rows: bool,
 ) -> String {
     let context = conformance.context;
+    let current_blockers = heat_balance_current_blocker_rows(diagnostic);
+    let first_divergence_by_variable =
+        heat_balance_first_divergence_by_variable_rows(&diagnostic.series);
+    let warmup_end_state_deltas = heat_balance_warmup_end_state_deltas(diagnostic);
     let mut json = String::new();
     json.push_str("{\n");
     json.push_str("  \"schema_version\": 1,\n");
@@ -9692,6 +9740,22 @@ fn render_heat_balance_conformance_json(
         heat_balance_bottlenecks_json(&diagnostic.series)
     ));
     json.push_str(&format!(
+        "  \"top_blocker\": {},\n",
+        heat_balance_top_blocker_json(current_blockers.first())
+    ));
+    json.push_str(&format!(
+        "  \"current_blockers\": {},\n",
+        heat_balance_current_blocker_rows_json(&current_blockers)
+    ));
+    json.push_str(&format!(
+        "  \"warmup_end_state_deltas\": {},\n",
+        heat_balance_warmup_end_state_deltas_json(&warmup_end_state_deltas)
+    ));
+    json.push_str(&format!(
+        "  \"first_divergence_by_variable\": {},\n",
+        heat_balance_first_divergence_by_variable_rows_json(&first_divergence_by_variable)
+    ));
+    json.push_str(&format!(
         "  \"active_blocker_summary\": {},\n",
         json_string(&heat_balance_active_blocker_summary(diagnostic))
     ));
@@ -9833,6 +9897,10 @@ fn render_heat_balance_conformance_report(
     conformance: &HeatBalanceConformance<'_>,
 ) -> String {
     let context = conformance.context;
+    let current_blockers = heat_balance_current_blocker_rows(diagnostic);
+    let first_divergence_by_variable =
+        heat_balance_first_divergence_by_variable_rows(&diagnostic.series);
+    let warmup_end_state_deltas = heat_balance_warmup_end_state_deltas(diagnostic);
     let mut report = String::new();
     if context.conformance_claim {
         report.push_str("# Heat Balance Conformance Report\n\n");
@@ -10028,6 +10096,10 @@ fn render_heat_balance_conformance_report(
         heat_balance_max_rel_delta(diagnostic)
     ));
 
+    report.push_str("## Top Blocker\n\n");
+    heat_balance_report_top_blocker_row(&mut report, current_blockers.first());
+    report.push('\n');
+
     report.push_str("## Active Blocker Summary\n\n");
     report.push_str(&format!(
         "active_blocker: {}\n",
@@ -10037,6 +10109,21 @@ fn render_heat_balance_conformance_report(
         "next_pr_target: {}\n\n",
         heat_balance_next_pr_target(diagnostic)
     ));
+
+    report.push_str("## Current Blockers\n\n");
+    heat_balance_report_current_blocker_rows(&mut report, &current_blockers);
+    report.push('\n');
+
+    report.push_str("## Warmup End-State Deltas\n\n");
+    heat_balance_report_warmup_end_state_delta_rows(&mut report, &warmup_end_state_deltas);
+    report.push('\n');
+
+    report.push_str("## First Divergence by Variable\n\n");
+    heat_balance_report_first_divergence_by_variable_rows(
+        &mut report,
+        &first_divergence_by_variable,
+    );
+    report.push('\n');
 
     report.push_str("## EnergyPlus Compatibility Stage Order\n\n");
     heat_balance_report_compatibility_stage_rows(&mut report, &diagnostic.compatibility_stages);
@@ -10453,6 +10540,433 @@ fn heat_balance_bottleneck_rows(
     rows
 }
 
+fn heat_balance_current_blocker_rows(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+) -> Vec<HeatBalanceCurrentBlockerRow> {
+    let mut rows = Vec::new();
+
+    if let Some(row) = heat_balance_roof_exterior_output_blocker(diagnostic) {
+        let sample_index = row.delta.max_delta_sample.map(|point| point.index);
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "roof-exterior-environmental-balance".to_string(),
+            status: "active".to_string(),
+            key: row.output.key.clone(),
+            source: row.output.variable.clone(),
+            sample_index,
+            delta: row.delta.max_abs_delta_c,
+            delta_units: row.output.class.to_string(),
+            evidence: format!(
+                "rmse={:.12}; max_abs={:.12}",
+                row.delta.rmse_delta_c, row.delta.max_abs_delta_c
+            ),
+            next_target: "roof-exterior-environmental-balance-temperature-offset".to_string(),
+        });
+    }
+
+    for storage in &diagnostic.ctf_storage_max_sample_deltas {
+        let status = if storage.storage_delta_rank == 1 && storage.dominant_storage_surface {
+            "active"
+        } else {
+            "open"
+        };
+        let id_prefix = if heat_balance_is_floor_key(&storage.key, &storage.construction_name) {
+            "floor"
+        } else {
+            "surface"
+        };
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: format!("{id_prefix}-storage-mismatch"),
+            status: status.to_string(),
+            key: storage.key.clone(),
+            source: "surface-heat-storage-vs-conduction-balance".to_string(),
+            sample_index: Some(storage.sample_index),
+            delta: storage.storage_delta_w,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "dominant_mismatch_source={}; dominant_delta_w={:.12}; balance_residual_delta_w={:.12}",
+                storage.dominant_mismatch_source,
+                storage.dominant_mismatch_delta_w,
+                storage.storage_balance_residual_delta_w
+            ),
+            next_target: heat_balance_storage_next_target(storage),
+        });
+
+        if heat_balance_is_floor_key(&storage.key, &storage.construction_name) {
+            let status = if storage.dominant_mismatch_source == "face-temperature-current-inside" {
+                "active"
+            } else {
+                "open"
+            };
+            rows.push(HeatBalanceCurrentBlockerRow {
+                rank: 0,
+                blocker_id: "floor-face-temperature-current-inside-mismatch".to_string(),
+                status: status.to_string(),
+                key: storage.key.clone(),
+                source: "face-temperature-current-inside".to_string(),
+                sample_index: Some(storage.sample_index),
+                delta: storage.inside_current_inside_term_delta_w,
+                delta_units: "W".to_string(),
+                evidence: format!(
+                    "inside_face_temperature_delta_c={:.12}; current_inside_signed_delta_w={:.12}",
+                    storage.inside_face_temperature_delta_c,
+                    storage.inside_current_inside_term_signed_delta_w
+                ),
+                next_target: "floor-inside-current-face-temperature-source-timing".to_string(),
+            });
+        }
+    }
+
+    for ctf in &diagnostic.ctf_history_series_deltas {
+        let (current_source, current_delta, current_sample) =
+            if ctf.inside_current_delta.rmse_delta_c >= ctf.outside_current_delta.rmse_delta_c {
+                (
+                    "inside-current-term",
+                    ctf.inside_current_delta.rmse_delta_c,
+                    ctf.inside_current_delta
+                        .max_delta_sample
+                        .map(|point| point.index),
+                )
+            } else {
+                (
+                    "outside-current-term",
+                    ctf.outside_current_delta.rmse_delta_c,
+                    ctf.outside_current_delta
+                        .max_delta_sample
+                        .map(|point| point.index),
+                )
+            };
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "ctf-current-term-delta".to_string(),
+            status: heat_balance_open_or_closed_status(current_delta).to_string(),
+            key: ctf.key.clone(),
+            source: current_source.to_string(),
+            sample_index: current_sample,
+            delta: current_delta,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "inside_current_rmse_w={:.12}; outside_current_rmse_w={:.12}",
+                ctf.inside_current_delta.rmse_delta_c, ctf.outside_current_delta.rmse_delta_c
+            ),
+            next_target: "ctf-current-face-temperature-source-order".to_string(),
+        });
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "ctf-history-temperature-term-delta".to_string(),
+            status: heat_balance_open_or_closed_status(
+                ctf.inside_history_temperature_term_delta.rmse_delta_c,
+            )
+            .to_string(),
+            key: ctf.key.clone(),
+            source: "inside-history-temperature-term".to_string(),
+            sample_index: ctf
+                .inside_history_temperature_term_delta
+                .max_delta_sample
+                .map(|point| point.index),
+            delta: ctf.inside_history_temperature_term_delta.rmse_delta_c,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "history_total_rmse_w={:.12}",
+                ctf.inside_history_delta.rmse_delta_c
+            ),
+            next_target: "warmup-ctf-history-temperature-handoff".to_string(),
+        });
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "ctf-history-flux-term-delta".to_string(),
+            status: heat_balance_open_or_closed_status(
+                ctf.inside_history_flux_term_delta.rmse_delta_c,
+            )
+            .to_string(),
+            key: ctf.key.clone(),
+            source: "inside-history-flux-term".to_string(),
+            sample_index: ctf
+                .inside_history_flux_term_delta
+                .max_delta_sample
+                .map(|point| point.index),
+            delta: ctf.inside_history_flux_term_delta.rmse_delta_c,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "history_total_rmse_w={:.12}",
+                ctf.inside_history_delta.rmse_delta_c
+            ),
+            next_target: "warmup-ctf-history-flux-handoff".to_string(),
+        });
+    }
+
+    for solve in &diagnostic.inside_solve_series_deltas {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "longwave-radiation-source-delta".to_string(),
+            status: heat_balance_open_or_closed_status(
+                solve.inside_net_longwave_delta.rmse_delta_c,
+            )
+            .to_string(),
+            key: solve.key.clone(),
+            source: "inside-net-longwave-source".to_string(),
+            sample_index: solve
+                .inside_net_longwave_delta
+                .max_delta_sample
+                .map(|point| point.index),
+            delta: solve.inside_net_longwave_delta.rmse_delta_c,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "inside_face_temp_rmse_c={:.12}; implied_numerator_rmse_w={:.12}",
+                solve.inside_face_temperature_delta.rmse_delta_c,
+                solve.implied_solve_numerator_delta.rmse_delta_c
+            ),
+            next_target: "interior-longwave-source-order".to_string(),
+        });
+    }
+
+    for coefficient in &diagnostic.zone_air_surface_coefficient_deltas {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "hconv-source-timing-delta".to_string(),
+            status: heat_balance_open_or_closed_status(
+                coefficient.inside_convection_gain_delta.rmse_delta_c,
+            )
+            .to_string(),
+            key: coefficient.key.clone(),
+            source: "inside-hconv-and-reference-air-source".to_string(),
+            sample_index: coefficient
+                .inside_convection_gain_delta
+                .max_delta_sample
+                .map(|point| point.index),
+            delta: coefficient.inside_convection_gain_delta.rmse_delta_c,
+            delta_units: "W".to_string(),
+            evidence: format!(
+                "inside_hconv_rmse_w_per_m2_k={:.12}; ref_air_temp_rmse_c={:.12}",
+                coefficient.inside_hconv_delta.rmse_delta_c,
+                coefficient.reference_air_temperature_delta.rmse_delta_c
+            ),
+            next_target: "hconv-reference-air-source-timing".to_string(),
+        });
+    }
+
+    let warmup = heat_balance_warmup_end_state_deltas(diagnostic);
+    rows.push(HeatBalanceCurrentBlockerRow {
+        rank: 0,
+        blocker_id: "warmup-end-state-mat-delta".to_string(),
+        status: heat_balance_open_or_closed_status(warmup.mat_delta_c).to_string(),
+        key: "ZONE ONE".to_string(),
+        source: "warmup-final-zone-mean-air-temperature".to_string(),
+        sample_index: None,
+        delta: warmup.mat_delta_c,
+        delta_units: "C".to_string(),
+        evidence: "heat_balance_warmup.final_max_zone_temperature_delta_c".to_string(),
+        next_target: "warmup-zone-air-end-state".to_string(),
+    });
+    if let Some(surface) = &warmup.surface_temperature {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-surface-temperature-delta".to_string(),
+            status: heat_balance_open_or_closed_status(surface.delta).to_string(),
+            key: surface.key.clone(),
+            source: surface.source.clone(),
+            sample_index: surface.sample_index,
+            delta: surface.delta,
+            delta_units: surface.delta_units.clone(),
+            evidence: surface.evidence.clone(),
+            next_target: "warmup-surface-temperature-end-state".to_string(),
+        });
+    } else {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-surface-temperature-delta".to_string(),
+            status: "closed".to_string(),
+            key: "none".to_string(),
+            source: "none".to_string(),
+            sample_index: None,
+            delta: 0.0,
+            delta_units: "none".to_string(),
+            evidence: "unavailable".to_string(),
+            next_target: "warmup-surface-temperature-end-state".to_string(),
+        });
+    }
+    if let Some(ctf_history) = &warmup.ctf_history {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-ctf-history-delta".to_string(),
+            status: heat_balance_open_or_closed_status(ctf_history.delta).to_string(),
+            key: ctf_history.key.clone(),
+            source: ctf_history.source.clone(),
+            sample_index: ctf_history.sample_index,
+            delta: ctf_history.delta,
+            delta_units: ctf_history.delta_units.clone(),
+            evidence: ctf_history.evidence.clone(),
+            next_target: "warmup-ctf-history-end-state".to_string(),
+        });
+    } else {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-ctf-history-delta".to_string(),
+            status: "closed".to_string(),
+            key: "none".to_string(),
+            source: "none".to_string(),
+            sample_index: None,
+            delta: 0.0,
+            delta_units: "none".to_string(),
+            evidence: "unavailable".to_string(),
+            next_target: "warmup-ctf-history-end-state".to_string(),
+        });
+    }
+
+    rows.sort_by(|left, right| {
+        heat_balance_blocker_status_order(&left.status)
+            .cmp(&heat_balance_blocker_status_order(&right.status))
+            .then_with(|| right.delta.total_cmp(&left.delta))
+            .then_with(|| left.blocker_id.cmp(&right.blocker_id))
+            .then_with(|| left.key.cmp(&right.key))
+            .then_with(|| left.source.cmp(&right.source))
+    });
+    for (index, row) in rows.iter_mut().enumerate() {
+        row.rank = index + 1;
+    }
+    rows
+}
+
+fn heat_balance_open_or_closed_status(delta: f64) -> &'static str {
+    if delta.abs() <= 1.0e-12 {
+        "closed"
+    } else {
+        "open"
+    }
+}
+
+fn heat_balance_blocker_status_order(status: &str) -> u8 {
+    match status {
+        "active" => 0,
+        "open" => 1,
+        "closed" => 2,
+        _ => 3,
+    }
+}
+
+fn heat_balance_is_floor_key(key: &str, construction_name: &str) -> bool {
+    key.to_ascii_uppercase().contains("FLR") || construction_name.eq_ignore_ascii_case("FLOOR")
+}
+
+fn heat_balance_storage_next_target(row: &HeatBalanceCtfStorageMaxSampleDelta) -> String {
+    match row.dominant_mismatch_source.as_str() {
+        "face-temperature-current-inside" => {
+            "floor-inside-current-face-temperature-source-timing".to_string()
+        }
+        "face-temperature-current-outside" => {
+            "floor-outside-current-face-temperature-source-timing".to_string()
+        }
+        "history-vector-inside-total" => "warmup-ctf-inside-history-handoff".to_string(),
+        "outside-current-total" => "outside-current-boundary-source-timing".to_string(),
+        "outside-history-total" => "outside-ctf-history-handoff".to_string(),
+        "output-aggregation-storage-balance" => {
+            "storage-output-aggregation-and-sign-convention".to_string()
+        }
+        other => format!("investigate-{other}"),
+    }
+}
+
+fn heat_balance_first_divergence_by_variable_rows(
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Vec<HeatBalanceFirstDivergenceByVariableRow> {
+    let mut rows = series
+        .iter()
+        .filter_map(|row| {
+            let point = row.delta.first_delta_sample?;
+            Some(HeatBalanceFirstDivergenceByVariableRow {
+                rank: 0,
+                key: row.output.key.clone(),
+                variable: row.output.variable.clone(),
+                class: row.output.class.to_string(),
+                sample_index: point.index,
+                oracle_c: point.oracle_c,
+                rust_c: point.rust_c,
+                abs_delta_c: point.abs_delta_c,
+                rmse_delta_c: row.delta.rmse_delta_c,
+            })
+        })
+        .collect::<Vec<_>>();
+    rows.sort_by(|left, right| {
+        left.sample_index
+            .cmp(&right.sample_index)
+            .then_with(|| right.abs_delta_c.total_cmp(&left.abs_delta_c))
+            .then_with(|| left.key.cmp(&right.key))
+            .then_with(|| left.variable.cmp(&right.variable))
+    });
+    for (index, row) in rows.iter_mut().enumerate() {
+        row.rank = index + 1;
+    }
+    rows
+}
+
+fn heat_balance_warmup_end_state_deltas(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+) -> HeatBalanceWarmupEndStateDeltas {
+    HeatBalanceWarmupEndStateDeltas {
+        mat_delta_c: diagnostic
+            .heat_balance_warmup
+            .final_max_zone_temperature_delta_c,
+        surface_temperature: heat_balance_warmup_surface_temperature_delta(&diagnostic.series),
+        ctf_history: heat_balance_warmup_ctf_history_delta(
+            &diagnostic.ctf_history_first_sample_deltas,
+        ),
+    }
+}
+
+fn heat_balance_warmup_surface_temperature_delta(
+    series: &[HeatBalanceSeriesDiagnostic],
+) -> Option<HeatBalanceScalarDeltaRow> {
+    series
+        .iter()
+        .filter(|row| {
+            matches!(
+                row.output.variable.as_str(),
+                "Surface Inside Face Temperature" | "Surface Outside Face Temperature"
+            )
+        })
+        .filter_map(|row| {
+            let point = row.sample_rows.first()?;
+            Some(HeatBalanceScalarDeltaRow {
+                key: row.output.key.clone(),
+                source: row.output.variable.clone(),
+                sample_index: Some(point.index),
+                delta: point.abs_delta_c,
+                delta_units: "C".to_string(),
+                evidence: "first run-period sample after warmup".to_string(),
+            })
+        })
+        .max_by(|left, right| left.delta.total_cmp(&right.delta))
+}
+
+fn heat_balance_warmup_ctf_history_delta(
+    rows: &[HeatBalanceCtfHistoryFirstSampleDelta],
+) -> Option<HeatBalanceScalarDeltaRow> {
+    let mut best: Option<HeatBalanceScalarDeltaRow> = None;
+    for row in rows {
+        for (source, delta) in [
+            ("inside-history-term", row.inside_history_delta_w),
+            ("outside-history-term", row.outside_history_delta_w),
+        ] {
+            let candidate = HeatBalanceScalarDeltaRow {
+                key: row.key.clone(),
+                source: source.to_string(),
+                sample_index: Some(0),
+                delta,
+                delta_units: "W".to_string(),
+                evidence: "first run-period CTF history delta after warmup".to_string(),
+            };
+            if best
+                .as_ref()
+                .map_or(true, |current| candidate.delta > current.delta)
+            {
+                best = Some(candidate);
+            }
+        }
+    }
+    best
+}
+
 fn heat_balance_active_blocker_summary(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
     if let Some(row) = heat_balance_roof_exterior_output_blocker(diagnostic) {
         let sample = row
@@ -10777,6 +11291,119 @@ fn heat_balance_first_sample_bottlenecks_json(series: &[HeatBalanceSeriesDiagnos
             json_number(row.delta.max_rel_delta),
             delta_point_json(row.delta.first_delta_sample),
             delta_point_json(row.delta.max_delta_sample)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_top_blocker_json(row: Option<&HeatBalanceCurrentBlockerRow>) -> String {
+    row.map_or_else(|| "null".to_string(), heat_balance_current_blocker_row_json)
+}
+
+fn heat_balance_current_blocker_rows_json(rows: &[HeatBalanceCurrentBlockerRow]) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&heat_balance_current_blocker_row_json(row));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_current_blocker_row_json(row: &HeatBalanceCurrentBlockerRow) -> String {
+    format!(
+        concat!(
+            "{{ \"rank\": {}, ",
+            "\"blocker_id\": {}, ",
+            "\"status\": {}, ",
+            "\"key\": {}, ",
+            "\"source\": {}, ",
+            "\"sample_index\": {}, ",
+            "\"delta\": {}, ",
+            "\"delta_units\": {}, ",
+            "\"evidence\": {}, ",
+            "\"next_target\": {} }}"
+        ),
+        row.rank,
+        json_string(&row.blocker_id),
+        json_string(&row.status),
+        json_string(&row.key),
+        json_string(&row.source),
+        json_optional_usize(row.sample_index),
+        json_number(row.delta),
+        json_string(&row.delta_units),
+        json_string(&row.evidence),
+        json_string(&row.next_target)
+    )
+}
+
+fn heat_balance_warmup_end_state_deltas_json(deltas: &HeatBalanceWarmupEndStateDeltas) -> String {
+    format!(
+        concat!(
+            "{{ \"mat_delta_c\": {}, ",
+            "\"surface_temperature\": {}, ",
+            "\"ctf_history\": {} }}"
+        ),
+        json_number(deltas.mat_delta_c),
+        heat_balance_scalar_delta_row_json(deltas.surface_temperature.as_ref()),
+        heat_balance_scalar_delta_row_json(deltas.ctf_history.as_ref())
+    )
+}
+
+fn heat_balance_scalar_delta_row_json(row: Option<&HeatBalanceScalarDeltaRow>) -> String {
+    let Some(row) = row else {
+        return "null".to_string();
+    };
+    format!(
+        concat!(
+            "{{ \"key\": {}, ",
+            "\"source\": {}, ",
+            "\"sample_index\": {}, ",
+            "\"delta\": {}, ",
+            "\"delta_units\": {}, ",
+            "\"evidence\": {} }}"
+        ),
+        json_string(&row.key),
+        json_string(&row.source),
+        json_optional_usize(row.sample_index),
+        json_number(row.delta),
+        json_string(&row.delta_units),
+        json_string(&row.evidence)
+    )
+}
+
+fn heat_balance_first_divergence_by_variable_rows_json(
+    rows: &[HeatBalanceFirstDivergenceByVariableRow],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"rank\": {}, ",
+                "\"key\": {}, ",
+                "\"variable\": {}, ",
+                "\"class\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"oracle_c\": {}, ",
+                "\"rust_c\": {}, ",
+                "\"abs_delta_c\": {}, ",
+                "\"rmse_delta_c\": {} }}"
+            ),
+            row.rank,
+            json_string(&row.key),
+            json_string(&row.variable),
+            json_string(&row.class),
+            row.sample_index,
+            json_number(row.oracle_c),
+            json_number(row.rust_c),
+            json_number(row.abs_delta_c),
+            json_number(row.rmse_delta_c)
         ));
     }
     json.push(']');
@@ -11937,6 +12564,131 @@ fn heat_balance_report_bottleneck_rows(
             row.delta.mean_abs_delta_c,
             row.delta.rmse_delta_c,
             row.status
+        ));
+    }
+}
+
+fn heat_balance_report_top_blocker_row(
+    report: &mut String,
+    row: Option<&HeatBalanceCurrentBlockerRow>,
+) {
+    report.push_str(
+        "| rank | blocker_id | status | key | source | sample_index | delta | units | evidence | next_target |\n",
+    );
+    report.push_str("|---:|---|---|---|---|---:|---:|---|---|---|\n");
+    if let Some(row) = row {
+        heat_balance_report_current_blocker_row(report, row);
+    } else {
+        report.push_str(
+            "| 0 | none | closed | none | none | n/a | 0.000000000000 | none | none | none |\n",
+        );
+    }
+}
+
+fn heat_balance_report_current_blocker_rows(
+    report: &mut String,
+    rows: &[HeatBalanceCurrentBlockerRow],
+) {
+    report.push_str(
+        "| rank | blocker_id | status | key | source | sample_index | delta | units | evidence | next_target |\n",
+    );
+    report.push_str("|---:|---|---|---|---|---:|---:|---|---|---|\n");
+    for row in rows {
+        heat_balance_report_current_blocker_row(report, row);
+    }
+}
+
+fn heat_balance_report_current_blocker_row(
+    report: &mut String,
+    row: &HeatBalanceCurrentBlockerRow,
+) {
+    let sample_index = row
+        .sample_index
+        .map_or_else(|| "n/a".to_string(), |value| value.to_string());
+    report.push_str(&format!(
+        "| {} | {} | {} | {} | {} | {} | {:.12} | {} | {} | {} |\n",
+        row.rank,
+        markdown_cell(&row.blocker_id),
+        markdown_cell(&row.status),
+        markdown_cell(&row.key),
+        markdown_cell(&row.source),
+        sample_index,
+        row.delta,
+        markdown_cell(&row.delta_units),
+        markdown_cell(&row.evidence),
+        markdown_cell(&row.next_target)
+    ));
+}
+
+fn heat_balance_report_warmup_end_state_delta_rows(
+    report: &mut String,
+    deltas: &HeatBalanceWarmupEndStateDeltas,
+) {
+    report.push_str("| metric | key | source | sample_index | delta | units | evidence |\n");
+    report.push_str("|---|---|---|---:|---:|---|---|\n");
+    report.push_str(&format!(
+        "| warmup-end-state-mat-delta | ZONE ONE | warmup-final-zone-mean-air-temperature | n/a | {:.12} | C | heat_balance_warmup.final_max_zone_temperature_delta_c |\n",
+        deltas.mat_delta_c
+    ));
+    heat_balance_report_scalar_delta_row(
+        report,
+        "warmup-end-state-surface-temperature-delta",
+        deltas.surface_temperature.as_ref(),
+    );
+    heat_balance_report_scalar_delta_row(
+        report,
+        "warmup-end-state-ctf-history-delta",
+        deltas.ctf_history.as_ref(),
+    );
+}
+
+fn heat_balance_report_scalar_delta_row(
+    report: &mut String,
+    metric: &str,
+    row: Option<&HeatBalanceScalarDeltaRow>,
+) {
+    if let Some(row) = row {
+        let sample_index = row
+            .sample_index
+            .map_or_else(|| "n/a".to_string(), |value| value.to_string());
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {:.12} | {} | {} |\n",
+            markdown_cell(metric),
+            markdown_cell(&row.key),
+            markdown_cell(&row.source),
+            sample_index,
+            row.delta,
+            markdown_cell(&row.delta_units),
+            markdown_cell(&row.evidence)
+        ));
+    } else {
+        report.push_str(&format!(
+            "| {} | none | none | n/a | 0.000000000000 | none | unavailable |\n",
+            markdown_cell(metric)
+        ));
+    }
+}
+
+fn heat_balance_report_first_divergence_by_variable_rows(
+    report: &mut String,
+    rows: &[HeatBalanceFirstDivergenceByVariableRow],
+) {
+    report.push_str(
+        "| rank | key | variable | class | sample_index | oracle_c | rust_c | abs_delta_c | rmse_delta_c |\n",
+    );
+    report.push_str("|---:|---|---|---|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            row.rank,
+            markdown_cell(&row.key),
+            markdown_cell(&row.variable),
+            markdown_cell(&row.class),
+            row.sample_index,
+            row.oracle_c,
+            row.rust_c,
+            row.abs_delta_c,
+            row.rmse_delta_c
         ));
     }
 }
@@ -13107,6 +13859,10 @@ fn json_optional_u32(value: Option<u32>) -> String {
 }
 
 fn json_optional_i64(value: Option<i64>) -> String {
+    value.map_or_else(|| "null".to_string(), |value| value.to_string())
+}
+
+fn json_optional_usize(value: Option<usize>) -> String {
     value.map_or_else(|| "null".to_string(), |value| value.to_string())
 }
 
@@ -15780,6 +16536,20 @@ mod tests {
         assert!(json.contains("\"source_routine\": \"ManageAirHeatBalance\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
         assert!(json.contains("\"bottlenecks\""));
+        assert!(json.contains("\"top_blocker\""));
+        assert!(json.contains("\"current_blockers\""));
+        assert!(json.contains("\"floor-storage-mismatch\""));
+        assert!(json.contains("\"floor-face-temperature-current-inside-mismatch\""));
+        assert!(json.contains("\"ctf-current-term-delta\""));
+        assert!(json.contains("\"ctf-history-temperature-term-delta\""));
+        assert!(json.contains("\"ctf-history-flux-term-delta\""));
+        assert!(json.contains("\"longwave-radiation-source-delta\""));
+        assert!(json.contains("\"hconv-source-timing-delta\""));
+        assert!(json.contains("\"warmup_end_state_deltas\""));
+        assert!(json.contains("\"warmup-end-state-mat-delta\""));
+        assert!(json.contains("\"warmup-end-state-surface-temperature-delta\""));
+        assert!(json.contains("\"warmup-end-state-ctf-history-delta\""));
+        assert!(json.contains("\"first_divergence_by_variable\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"zone_air_first_sample_trace\""));
         assert!(json.contains("\"third_order_solution_temperature_c\""));
@@ -15864,6 +16634,12 @@ mod tests {
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
+        assert!(digest.contains("\"top_blocker\""));
+        assert!(digest.contains("\"current_blockers\""));
+        assert!(digest.contains("\"floor-storage-mismatch\""));
+        assert!(digest.contains("\"ctf-current-term-delta\""));
+        assert!(digest.contains("\"warmup_end_state_deltas\""));
+        assert!(digest.contains("\"first_divergence_by_variable\""));
         assert!(digest.contains("\"max_sample_contexts\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
@@ -15963,6 +16739,20 @@ mod tests {
         assert!(
             report.contains("ctf_seed_construction_summaries: R13WALL (#CTFs=1) @ dt=0.250h [included], FLOOR (#CTFs=5) @ dt=0.250h [skipped]")
         );
+        assert!(report.contains("## Top Blocker"));
+        assert!(report.contains("## Current Blockers"));
+        assert!(report.contains("floor-storage-mismatch"));
+        assert!(report.contains("floor-face-temperature-current-inside-mismatch"));
+        assert!(report.contains("ctf-current-term-delta"));
+        assert!(report.contains("ctf-history-temperature-term-delta"));
+        assert!(report.contains("ctf-history-flux-term-delta"));
+        assert!(report.contains("longwave-radiation-source-delta"));
+        assert!(report.contains("hconv-source-timing-delta"));
+        assert!(report.contains("## Warmup End-State Deltas"));
+        assert!(report.contains("warmup-end-state-mat-delta"));
+        assert!(report.contains("warmup-end-state-surface-temperature-delta"));
+        assert!(report.contains("warmup-end-state-ctf-history-delta"));
+        assert!(report.contains("## First Divergence by Variable"));
         assert!(report.contains("## Bottlenecks"));
         assert!(report.contains("## Max-Sample Contexts"));
         assert!(report.contains("## First-Sample Bottlenecks"));

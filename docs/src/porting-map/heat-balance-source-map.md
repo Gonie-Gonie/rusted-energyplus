@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-12
+last_reviewed: 2026-06-26
 ---
 
 # Heat Balance Source Map
@@ -72,6 +72,30 @@ unless the deviation is documented in a case-specific waiver:
 6. internal convective gain summation
 7. zone air predictor/corrector update
 8. output variable registration and sampling
+
+## Current Blocker Ledger
+
+`scripts/compare/official-dynamic-heat-balance-diagnostic.ps1` now requires the
+diagnostic JSON and Markdown report to expose `top_blocker`,
+`current_blockers`, `warmup_end_state_deltas`, and
+`first_divergence_by_variable`. Resolved items stay in this source map with
+`closed` status rather than disappearing from the trail.
+
+| Blocker id | Status | Source-map note |
+|---|---|---|
+| `floor-storage-mismatch` | active | candidate top blocker row; keeps the floor storage delta separate from generic bottleneck ranking |
+| `floor-face-temperature-current-inside-mismatch` | open | separate floor current-inside face-temperature row under the storage blocker |
+| `ctf-current-term-delta` | open | per-surface CTF current-term row derived from inside/outside current RMSE |
+| `ctf-history-temperature-term-delta` | open | per-surface CTF history temperature-term row |
+| `ctf-history-flux-term-delta` | open | per-surface CTF history flux-term row |
+| `longwave-radiation-source-delta` | open | per-surface inside longwave/radiation source row |
+| `hconv-source-timing-delta` | open | per-surface hconv/reference-air source timing row |
+| `warmup-end-state-mat-delta` | open | warmup final MAT delta row |
+| `warmup-end-state-surface-temperature-delta` | open | first run-period surface-temperature delta used as warmup end-state evidence |
+| `warmup-end-state-ctf-history-delta` | open | first run-period CTF history delta used as warmup end-state evidence |
+| `ctf-coefficient-eio-seeding` | closed | EIO coefficient availability is resolved as diagnostic isolation; current blocker is source/history handoff, not coefficient presence |
+| `source-order-wrapper-boundary` | closed | heat-balance source-order wrappers now exist on the runtime path; remaining rows track algorithm/state deltas behind those wrappers |
+| `diagnostic-probe-conformance-aliasing` | closed | diagnostic probe metadata and compatibility source-order lanes are separated, so probe output cannot be promoted as conformance evidence |
 
 ## June 2026 Source-Audit Boundary
 

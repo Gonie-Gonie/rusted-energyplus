@@ -131,7 +131,7 @@ none
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
+| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-26 |
 | docs/src/porting-map/heat-balance.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
