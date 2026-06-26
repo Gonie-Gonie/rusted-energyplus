@@ -43,6 +43,7 @@
 - [Conformance Case Index](generated/conformance-case-index.md)
 - [Object Coverage](generated/object-coverage.md)
 - [Variable Coverage](generated/variable-coverage.md)
+- [Script Inventory](generated/script-index.md)
 
 # ADR
 

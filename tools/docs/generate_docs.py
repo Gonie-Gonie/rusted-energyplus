@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -44,6 +45,34 @@ def list_value(value: Any) -> str:
     if isinstance(value, list):
         return ", ".join(str(item) for item in value)
     return str(value)
+
+
+def repo_path(path: Path, repo_root: Path) -> str:
+    return str(path.relative_to(repo_root)).replace("\\", "/")
+
+
+def normalized_path(value: str) -> str:
+    return value.replace("\\", "/").strip("`'\",);")
+
+
+def bullet_list(values: list[str]) -> str:
+    if not values:
+        return "none"
+    return "\n".join(f"- `{value}`" for value in values)
+
+
+def inline_list(values: list[str]) -> str:
+    if not values:
+        return ""
+    return "<br>".join(f"`{value}`" for value in values)
+
+
+def read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    return json.loads(read_text(path))
 
 
 def write_or_check(path: Path, content: str, check: bool) -> bool:
@@ -240,6 +269,205 @@ def variable_coverage(repo_root: Path) -> str:
     )
 
 
+ARTIFACT_HINT_RE = re.compile(
+    r"(?i)(?:\.runtime|\.reference|target|dist|docs[\\/]book|docs[\\/]src[\\/]generated|"
+    r"tools[\\/]docs[\\/]generated-docs\.manifest\.json|reports[\\/]latest)"
+    r"(?:[\\/][A-Za-z0-9_.${}()\-]+)*"
+)
+INPUT_HINT_RE = re.compile(
+    r"(?i)(?:data|specs|config|docs[\\/]src|tools[\\/]oracle|tools[\\/]python)"
+    r"[\\/][A-Za-z0-9_.${}()\-\\/]+"
+)
+PYTHON_SCRIPT_RE = re.compile(r"tools[\\/](?:docs|reporting)[\\/][A-Za-z0-9_.-]+\.py")
+DEV_COMMAND_RE = re.compile(r"Invoke-DevCommand\s+-Command\s+['\"]([^'\"]+)['\"]")
+CARGO_COMMAND_RE = re.compile(r"cargo\s+(?:build|clippy|fmt|run|test)[^\r\n`|&;]*")
+README_DEV_COMMAND_RE = re.compile(r"\.\\scripts\\dev\.(?:cmd|ps1)\s+([A-Za-z0-9_.-]+)")
+
+
+def extract_path_hints(pattern: re.Pattern[str], text: str) -> list[str]:
+    normalized = text.replace("\\", "/")
+    return sorted({normalized_path(match.group(0)) for match in pattern.finditer(normalized)})
+
+
+def extract_call_hints(text: str) -> list[str]:
+    calls: set[str] = set()
+    for match in DEV_COMMAND_RE.finditer(text):
+        calls.add(f"dev:{match.group(1)}")
+    for match in CARGO_COMMAND_RE.finditer(text):
+        calls.add(" ".join(match.group(0).split()))
+    for match in PYTHON_SCRIPT_RE.finditer(text.replace("\\", "/")):
+        calls.add(normalized_path(match.group(0)))
+    if re.search(r"eplus-rs(?:\.exe)?\s+run", text, flags=re.IGNORECASE):
+        calls.add("eplus-rs run")
+    if "ConvertInputFormat" in text:
+        calls.add("EnergyPlus ConvertInputFormat")
+    if "energyplus.exe" in text.lower():
+        calls.add("EnergyPlus executable")
+    return sorted(calls)
+
+
+def exit_contract(path: Path, text: str) -> str:
+    suffix = path.suffix.lower()
+    if suffix in {".json", ".md"}:
+        return "n/a"
+    if path.name.lower() == "dev.cmd":
+        return "propagates PowerShell ERRORLEVEL"
+    explicit_exits = sorted(
+        {line.strip() for line in text.splitlines() if re.search(r"^\s*exit(?:\s|/b|$)", line)}
+    )
+    if explicit_exits:
+        return "explicit exit: " + "; ".join(explicit_exits)
+    if "$LASTEXITCODE" in text:
+        return "nonzero when checked child process fails"
+    if "throw " in text or "throw\"" in text:
+        return "nonzero via PowerShell throw"
+    return "PowerShell success unless an uncaught error occurs"
+
+
+def script_category(relative_path: str, command: dict[str, Any] | None) -> str:
+    if command is not None:
+        group = str(command.get("group", ""))
+        if group == "gui":
+            return "launcher"
+        if group in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
+            return group
+
+    if (
+        relative_path.startswith("scripts/quality/strict-no-false-conformance/")
+        or relative_path == "scripts/release/select-release-assets.ps1"
+    ):
+        return "internal"
+
+    parts = relative_path.split("/")
+    if len(parts) < 2:
+        return "internal"
+    folder = parts[1]
+    if folder == "gui":
+        return "launcher"
+    if folder in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
+        return folder
+    return "internal"
+
+
+def script_status(relative_path: str, command: dict[str, Any] | None) -> str:
+    if relative_path in {"scripts/dev.cmd", "scripts/dev.ps1"}:
+        return "public user command"
+    if command is None:
+        return "internal helper"
+
+    group = str(command.get("group", ""))
+    name = str(command.get("name", ""))
+    if group == "release":
+        return "release command"
+    if group == "gui" and name == "launch-ui":
+        return "public user command"
+    if group == "setup":
+        return "public user command"
+    return "developer command"
+
+
+def script_inventory(repo_root: Path) -> str:
+    catalog_path = repo_root / "scripts" / "dev" / "commands.json"
+    catalog = load_json(catalog_path)
+    commands = list(catalog.get("commands", []))
+    aliases = dict(catalog.get("aliases", {}))
+
+    command_by_script: dict[str, dict[str, Any]] = {}
+    command_names = {str(entry.get("name", "")) for entry in commands}
+    missing_targets: list[str] = []
+    duplicate_targets: list[str] = []
+    for entry in commands:
+        script = "scripts/" + normalized_path(str(entry.get("path", "")))
+        key = script.lower()
+        if key in command_by_script:
+            duplicate_targets.append(script)
+        command_by_script[key] = entry
+        if not (repo_root / script).exists():
+            missing_targets.append(f"{entry.get('name', '')} -> {script}")
+
+    script_files = sorted(path for path in (repo_root / "scripts").rglob("*") if path.is_file())
+    rows = []
+    unexposed_ps1: list[str] = []
+    public_folder_unexposed: list[str] = []
+    for path in script_files:
+        relative = repo_path(path, repo_root)
+        command = command_by_script.get(relative.lower())
+        text = read_text(path)
+        category = script_category(relative, command)
+        status = script_status(relative, command)
+        command_name = str(command.get("name", "")) if command else ""
+        calls = extract_call_hints(text)
+        inputs = extract_path_hints(INPUT_HINT_RE, text)
+        artifacts = extract_path_hints(ARTIFACT_HINT_RE, text)
+        rows.append(
+            [
+                relative,
+                category,
+                status,
+                command_name,
+                inline_list(calls),
+                inline_list(inputs),
+                inline_list(artifacts),
+                exit_contract(path, text),
+            ]
+        )
+        if path.suffix.lower() == ".ps1" and command is None:
+            unexposed_ps1.append(relative)
+            if category in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
+                public_folder_unexposed.append(relative)
+
+    readme = read_text(repo_root / "README.md")
+    readme_commands = sorted({match.group(1) for match in README_DEV_COMMAND_RE.finditer(readme)})
+    exposed_or_alias = command_names | set(aliases)
+    missing_readme_commands = [
+        command for command in readme_commands if command not in exposed_or_alias
+    ]
+
+    summary_rows = [
+        ["script files", str(len(script_files))],
+        ["dev commands", str(len(commands))],
+        ["aliases", str(len(aliases))],
+        ["missing command targets", str(len(missing_targets))],
+        ["duplicate command targets", str(len(duplicate_targets))],
+        ["unexposed PowerShell files", str(len(unexposed_ps1))],
+        ["unexposed public-folder PowerShell files", str(len(public_folder_unexposed))],
+        ["README dev commands missing from catalog", str(len(missing_readme_commands))],
+    ]
+
+    return (
+        GENERATED_NOTICE
+        + "# Script Inventory\n\n"
+        + "Script metadata is generated from `scripts/`, `scripts/dev/commands.json`, and README command examples.\n\n"
+        + "Status values distinguish public user commands, developer commands, release commands, and internal helpers. "
+        + "Call, input, and artifact columns are static hints extracted from script text; wrapper commands remain authoritative in `scripts/dev/commands.json`.\n\n"
+        + "## Summary\n\n"
+        + table(["Check", "Count"], summary_rows)
+        + "\n## Dev Command Catalog Checks\n\n"
+        + "**Missing command targets**\n\n"
+        + bullet_list(missing_targets)
+        + "\n\n**Duplicate command targets**\n\n"
+        + bullet_list(duplicate_targets)
+        + "\n\n**README dev commands missing from catalog**\n\n"
+        + bullet_list(missing_readme_commands)
+        + "\n\n**Unexposed PowerShell files in public command folders**\n\n"
+        + bullet_list(public_folder_unexposed)
+        + "\n\n## Inventory\n\n"
+        + table(
+            [
+                "Path",
+                "Category",
+                "Status",
+                "Dev command",
+                "Calls",
+                "Input hints",
+                "Artifact hints",
+                "Exit contract",
+            ],
+            rows,
+        )
+    )
+
+
 def generated_manifest(repo_root: Path) -> str:
     payload = {
         "sources": [
@@ -248,6 +476,9 @@ def generated_manifest(repo_root: Path) -> str:
             "specs/object_coverage.toml",
             "specs/variable_coverage.toml",
             "data/conformance_cases/*/case.toml",
+            "scripts/**/*",
+            "scripts/dev/commands.json",
+            "README.md",
         ],
         "outputs": [
             "docs/src/generated/milestone-map.md",
@@ -255,6 +486,7 @@ def generated_manifest(repo_root: Path) -> str:
             "docs/src/generated/conformance-case-index.md",
             "docs/src/generated/object-coverage.md",
             "docs/src/generated/variable-coverage.md",
+            "docs/src/generated/script-index.md",
         ],
     }
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
@@ -273,6 +505,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "conformance-case-index.md": conformance_case_index(repo_root),
         repo_root / "docs" / "src" / "generated" / "object-coverage.md": object_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),
+        repo_root / "docs" / "src" / "generated" / "script-index.md": script_inventory(repo_root),
         repo_root / "tools" / "docs" / "generated-docs.manifest.json": generated_manifest(repo_root),
     }
 

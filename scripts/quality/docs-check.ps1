@@ -27,7 +27,8 @@ $required = @(
     "src\generated\algorithm-ledger.md",
     "src\generated\conformance-case-index.md",
     "src\generated\object-coverage.md",
-    "src\generated\variable-coverage.md"
+    "src\generated\variable-coverage.md",
+    "src\generated\script-index.md"
 )
 
 foreach ($relative in $required) {
@@ -66,7 +67,10 @@ foreach ($forbidden in @("# Archive", "archive/")) {
 }
 
 $docsSourceFiles = Get-ChildItem -LiteralPath (Join-Path $DocsRoot "src") -Recurse -File -Filter "*.md" |
-    Where-Object { $_.FullName -notlike "*\src\adr\0001-docs-specs-and-evidence-retention.md" }
+    Where-Object {
+        $_.FullName -notlike "*\src\adr\0001-docs-specs-and-evidence-retention.md" -and
+        $_.FullName -notlike "*\src\generated\*"
+    }
 $forbiddenArchiveReferences = @(
     "docs/src/archive",
     "docs\src\archive",
