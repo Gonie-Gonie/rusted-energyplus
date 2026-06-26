@@ -130,6 +130,24 @@ $requiredTopLevelLiterals = @(
 
 $familiesValidated = 0
 $membersValidated = 0
+$requiredTrackedVariations = @(
+    "material_conductivity",
+    "material_thickness",
+    "material_density",
+    "material_specific_heat",
+    "internal_gain_level",
+    "schedule",
+    "timestep",
+    "thermostat_setpoint",
+    "ideal_loads_supply_air_temperature",
+    "ideal_loads_supply_humidity_ratio",
+    "flow_limit",
+    "capacity_limit",
+    "outdoor_air_method",
+    "economizer_type",
+    "heat_recovery_type"
+)
+$trackedVariations = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
 foreach ($familyFile in $familyFiles) {
     $relative = $familyFile.FullName.Substring($RepoRoot.Length).TrimStart("\", "/")
@@ -150,6 +168,10 @@ foreach ($familyFile in $familyFiles) {
     $baseCase = Get-TomlString -Text $text -Key "base_case_id" -Description "family manifest"
     if ($primaryCase -ne $baseCase) {
         throw "base_case_id must match primary_case in $relative"
+    }
+
+    foreach ($variation in @(Get-TomlStringArray -Text $text -Key "varied_parameters" -Description "family manifest")) {
+        [void]$trackedVariations.Add($variation)
     }
 
     $sharedOutputs = Get-TomlString -Text $text -Key "shared_output_requests" -Description "family manifest"
@@ -212,6 +234,12 @@ foreach ($familyFile in $familyFiles) {
     Assert-ContainsLiteral -Path $reportScript -Needle "parameter_variations" -Description "$id family report JSON parameter variation metadata"
     Assert-ContainsLiteral -Path $reportScript -Needle "parameter-error-scatter.svg" -Description "$id family report parameter scatter plot"
     $familiesValidated += 1
+}
+
+foreach ($variation in $requiredTrackedVariations) {
+    if (-not $trackedVariations.Contains($variation)) {
+        throw "Required family parameter variation is not tracked by any family manifest: $variation"
+    }
 }
 
 Write-Host "Family manifest validation"

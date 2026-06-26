@@ -44,6 +44,8 @@ aggregation_report_path = ".runtime/release-evidence/v0.1.0/ideal-loads-family/i
 varied_parameters = [
   "thermostat_setpoint",
   "ideal_loads_supply_temperature",
+  "ideal_loads_supply_air_temperature",
+  "ideal_loads_supply_humidity_ratio",
   "flow_limit",
   "capacity_limit",
   "humidity_control_type",

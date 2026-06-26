@@ -25,7 +25,13 @@ aggregation_report_path = ".runtime/release-evidence/v0.1.0/one-zone-family/offi
 varied_parameters = [
   "surface_topology",
   "material_property",
+  "material_conductivity",
+  "material_thickness",
+  "material_density",
+  "material_specific_heat",
+  "internal_gain_level",
   "internal_gain_schedule",
+  "schedule",
   "timestep",
   "thermal_mass",
 ]
