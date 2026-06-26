@@ -104,6 +104,21 @@ Assert-Equal -Actual @($executionPlan.expected_source_order_stages)[0] -Expected
 Assert-Equal -Actual @($executionPlan.actual_executed_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "execution plan actual source-order first stage"
 Assert-Equal -Actual @($executionPlan.actual_executed_source_order_stages).Count -Expected @($executionPlan.expected_source_order_stages).Count -Description "execution plan expected/actual source-order count"
 
+$traceOutputDir = ".runtime\arbitrary-run-detailed-trace-smoke-script"
+Write-Host "Running detailed trace dry-run smoke: $idf"
+$traceOutput = & $exe run $idf -w $weather -d $traceOutputDir --overwrite --dry-run --trace-level detailed 2>&1
+$traceExitCode = $LASTEXITCODE
+if ($traceExitCode -ne 0) {
+    $traceOutput | ForEach-Object { Write-Host $_ }
+    throw "Expected dry-run exit code 0 from detailed trace run, got $traceExitCode."
+}
+Assert-File -Path (Join-Path $traceOutputDir "logs\source-order-stage-state-snapshots.json")
+$stageStateSnapshots = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $traceOutputDir "logs\source-order-stage-state-snapshots.json") | ConvertFrom-Json
+Assert-Equal -Actual $stageStateSnapshots.schema_version -Expected 1 -Description "stage state snapshot schema version"
+Assert-Equal -Actual $stageStateSnapshots.artifact_class -Expected "diagnostic-trace" -Description "stage state snapshot artifact class"
+Assert-Equal -Actual @($stageStateSnapshots.snapshots | Where-Object { $_.stage_name -eq "init-heat-balance" -and $_.point -eq "before" }).Count -Expected 1 -Description "InitHeatBalance before snapshot"
+Assert-Equal -Actual @($stageStateSnapshots.snapshots | Where-Object { $_.stage_name -eq "init-heat-balance" -and $_.point -eq "after" }).Count -Expected 1 -Description "InitHeatBalance after snapshot"
+
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
 Assert-Equal -Actual $runSummary.exit_code -Expected 8 -Description "run summary exit code"

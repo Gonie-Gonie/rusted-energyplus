@@ -440,6 +440,26 @@ Assert-Contains -Path $pipeline -Pattern '"stages": plan\.stages' -Description "
 Assert-Contains -Path $pipeline -Pattern 'trace_level_enables_stage_snapshots' -Description "trace-level stage snapshot switch"
 Assert-Contains -Path $pipeline -Pattern 'stage_snapshot_policy' -Description "stage snapshot non-mutating policy"
 Assert-Contains -Path $pipeline -Pattern 'metadata-only source-order snapshots' -Description "stage snapshots exclude simulation values"
+Assert-Contains -Path $pipeline -Pattern 'source_order_stage_state_snapshots' -Description "stage state snapshot trace builder"
+Assert-Contains -Path $pipeline -Pattern 'source-order-stage-state-snapshots\.json' -Description "stage state snapshot diagnostic artifact"
+Assert-Contains -Path $pipeline -Pattern 'rusted-energyplus\.source-order-stage-state-snapshot\.v1' -Description "versioned stage state snapshot schema"
+Assert-Contains -Path $pipeline -Pattern 'trace_artifact_only' -Description "stage state snapshots are trace-only"
+foreach ($stageSnapshotTarget in @(
+        'init-heat-balance',
+        'calc-heat-balance-outside-surf',
+        'calc-heat-balance-inside-surf',
+        'manage-air-heat-balance',
+        'update-thermal-histories',
+        'report-surface-heat-balance',
+        'ZoneTempPredictorCorrector::PredictStep',
+        'ZoneTempPredictorCorrector::CorrectStep',
+        'sim-purchased-air',
+        'calc-purch-air-loads',
+        'update-purchased-air',
+        'report-purchased-air'
+    )) {
+    Assert-Contains -Path $pipeline -Pattern ([regex]::Escape($stageSnapshotTarget)) -Description "stage state snapshot target $stageSnapshotTarget"
+}
 
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_third_order_zone_air_correction' -Description "third-order zone-air flag owner"
 Assert-Contains -Path $algorithm -Pattern 'heat_balance_preserves_surface_inside_temperature_for_first_longwave' -Description "first-longwave inside-temperature preservation flag owner"

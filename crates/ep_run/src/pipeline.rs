@@ -1081,11 +1081,38 @@ fn write_graph_and_plan(
     write_json(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
-    )
+    )?;
+    write_source_order_stage_state_snapshots(output_dir, plan, trace_level)
 }
 
 fn trace_level_enables_stage_snapshots(trace_level: TraceLevel) -> bool {
     matches!(trace_level, TraceLevel::Detailed | TraceLevel::Debug)
+}
+
+fn write_source_order_stage_state_snapshots(
+    output_dir: &Path,
+    plan: &ExecutionPlan,
+    trace_level: TraceLevel,
+) -> Result<(), String> {
+    if !trace_level_enables_stage_snapshots(trace_level) {
+        return Ok(());
+    }
+    let snapshots = source_order_stage_state_snapshots(plan, trace_level);
+    let artifact = json!({
+        "schema_version": 1,
+        "snapshot_schema": "rusted-energyplus.source-order-stage-state-snapshot.v1",
+        "artifact_class": "diagnostic-trace",
+        "trace_level": trace_level.id(),
+        "snapshot_count": snapshots.len(),
+        "mutation_policy": "diagnostic trace artifact only; runtime calculations never read this file",
+        "snapshots": snapshots,
+    });
+    write_json(
+        &output_dir
+            .join("logs")
+            .join("source-order-stage-state-snapshots.json"),
+        &artifact,
+    )
 }
 
 fn execution_stage_snapshots(plan: &ExecutionPlan, trace_level: TraceLevel) -> Vec<Value> {
@@ -1107,6 +1134,74 @@ fn execution_stage_snapshots(plan: &ExecutionPlan, trace_level: TraceLevel) -> V
             })
         })
         .collect()
+}
+
+fn source_order_stage_state_snapshot_targets()
+-> &'static [(&'static str, &'static str, &'static str)] {
+    &[
+        ("init-heat-balance", "stage", "heat_balance"),
+        ("calc-heat-balance-outside-surf", "stage", "heat_balance"),
+        ("calc-heat-balance-inside-surf", "stage", "heat_balance"),
+        ("manage-air-heat-balance", "stage", "heat_balance"),
+        ("update-thermal-histories", "stage", "heat_balance"),
+        ("report-surface-heat-balance", "stage", "heat_balance"),
+        (
+            "manage-zone-air-updates",
+            "ZoneTempPredictorCorrector::PredictStep",
+            "zone_temp_predictor_corrector",
+        ),
+        (
+            "manage-zone-air-updates",
+            "ZoneTempPredictorCorrector::CorrectStep",
+            "zone_temp_predictor_corrector",
+        ),
+        ("sim-purchased-air", "stage", "ideal_loads"),
+        ("calc-purch-air-loads", "stage", "ideal_loads"),
+        ("update-purchased-air", "stage", "ideal_loads"),
+        ("report-purchased-air", "stage", "ideal_loads"),
+    ]
+}
+
+fn source_order_stage_state_snapshots(plan: &ExecutionPlan, trace_level: TraceLevel) -> Vec<Value> {
+    if !trace_level_enables_stage_snapshots(trace_level) {
+        return Vec::new();
+    }
+
+    let mut snapshots = Vec::new();
+    for (stage_name, substage, state_domain) in source_order_stage_state_snapshot_targets() {
+        let Some((stage_index, stage)) = plan
+            .stages
+            .iter()
+            .enumerate()
+            .find(|(_, stage)| stage.name == *stage_name)
+        else {
+            continue;
+        };
+        let source_routine = plan
+            .compatibility_stages
+            .iter()
+            .find(|compatibility_stage| compatibility_stage.stage_name == *stage_name)
+            .map(|compatibility_stage| compatibility_stage.source_routine);
+        for point in ["before", "after"] {
+            snapshots.push(json!({
+                "schema_version": 1,
+                "stage_index": stage_index,
+                "stage_kind": stage.kind.id(),
+                "stage_name": stage.name,
+                "source_routine": source_routine,
+                "substage": substage,
+                "point": point,
+                "state_domain": state_domain,
+                "trace_artifact_only": true,
+                "state_observation": {
+                    "step_count": stage.steps.len(),
+                    "source_order_barrier": stage.kind.is_source_order_barrier(),
+                    "capture_mode": "stage-boundary diagnostic snapshot",
+                },
+            }));
+        }
+    }
+    snapshots
 }
 
 fn source_order_gate_summary(plan: &ExecutionPlan) -> SourceOrderGateSummary {
@@ -1501,6 +1596,7 @@ fn artifact_map(output_dir: &Path) -> Value {
         "typed_model_summary_json": output_dir.join("model").join("typed-model-summary.json").display().to_string(),
         "graph_summary_json": output_dir.join("model").join("graph-summary.json").display().to_string(),
         "execution_plan_json": output_dir.join("model").join("execution-plan.json").display().to_string(),
+        "source_order_stage_state_snapshots_json": output_dir.join("logs").join("source-order-stage-state-snapshots.json").display().to_string(),
         "result_store_json": output_dir.join("results").join("result-store.json").display().to_string(),
         "selected_outputs_csv": output_dir.join("results").join("selected-outputs.csv").display().to_string(),
         "meters_csv": output_dir.join("results").join("meters.csv").display().to_string(),
@@ -1523,7 +1619,7 @@ mod tests {
 
     use super::{
         artifact_map, execution_stage_snapshots, source_order_gate_summary,
-        trace_level_enables_stage_snapshots,
+        source_order_stage_state_snapshots, trace_level_enables_stage_snapshots,
     };
     use ep_runtime::{
         EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
@@ -1602,6 +1698,43 @@ mod tests {
     }
 
     #[test]
+    fn detailed_trace_records_before_after_stage_state_snapshots() {
+        let expected = EnergyPlusCompatibilityStage {
+            kind: ExecutionStageKind::InitHeatBalance,
+            stage_name: "init-heat-balance",
+            source_file: "src/EnergyPlus/HeatBalanceManager.cc",
+            source_routine: "InitHeatBalance",
+        };
+        let stage = ExecutionStage {
+            kind: ExecutionStageKind::InitHeatBalance,
+            name: "init-heat-balance".to_string(),
+            steps: vec![ExecutionStep::UpdateWeather],
+        };
+        let plan = ExecutionPlan {
+            stages: vec![stage],
+            compatibility_stages: vec![expected],
+        };
+
+        assert!(source_order_stage_state_snapshots(&plan, TraceLevel::Normal).is_empty());
+
+        let snapshots = source_order_stage_state_snapshots(&plan, TraceLevel::Detailed);
+        assert_eq!(snapshots.len(), 2);
+        assert_eq!(snapshots[0]["schema_version"].as_u64(), Some(1));
+        assert_eq!(
+            snapshots[0]["stage_name"].as_str(),
+            Some("init-heat-balance")
+        );
+        assert_eq!(
+            snapshots[0]["source_routine"].as_str(),
+            Some("InitHeatBalance")
+        );
+        assert_eq!(snapshots[0]["point"].as_str(), Some("before"));
+        assert_eq!(snapshots[1]["point"].as_str(), Some("after"));
+        assert_eq!(snapshots[0]["state_domain"].as_str(), Some("heat_balance"));
+        assert_eq!(snapshots[0]["trace_artifact_only"].as_bool(), Some(true));
+    }
+
+    #[test]
     fn artifact_map_lists_c4_output_contract_paths() {
         let artifacts = artifact_map(Path::new("out"));
         let root = Path::new("out");
@@ -1642,6 +1775,11 @@ mod tests {
             (
                 "execution_plan_json",
                 root.join("model").join("execution-plan.json"),
+            ),
+            (
+                "source_order_stage_state_snapshots_json",
+                root.join("logs")
+                    .join("source-order-stage-state-snapshots.json"),
             ),
             (
                 "result_store_json",
