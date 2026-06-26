@@ -176,9 +176,13 @@ Assert-Matches -Text $launcherText -Pattern ([regex]::Escape('Open-Path -Path $s
 Assert-Matches -Text $launcherText -Pattern "System\.Windows\.Forms\.OpenFileDialog" -Description "launcher input/weather file picker"
 Assert-Matches -Text $launcherText -Pattern "System\.Windows\.Forms\.FolderBrowserDialog" -Description "launcher output/oracle directory picker"
 Assert-Matches -Text $launcherText -Pattern "Claim Boundary" -Description "launcher claim boundary tab"
+Assert-Matches -Text $launcherText -Pattern "Fast and experimental modes are never release conformance evidence" -Description "launcher fast/experimental claim boundary"
+Assert-NotMatches -Text $launcherText -Pattern "full EnergyPlus compatible" -Description "launcher forbidden full compatibility wording"
 Assert-Matches -Text $launcherCsText -Pattern "OpenFileDialog" -Description "direct launcher input/weather file picker"
 Assert-Matches -Text $launcherCsText -Pattern "FolderBrowserDialog" -Description "direct launcher output/oracle directory picker"
 Assert-Matches -Text $launcherCsText -Pattern "Claim Boundary" -Description "direct launcher claim boundary tab"
+Assert-Matches -Text $launcherCsText -Pattern "Fast and experimental modes are never release conformance evidence" -Description "direct launcher fast/experimental claim boundary"
+Assert-NotMatches -Text $launcherCsText -Pattern "full EnergyPlus compatible" -Description "direct launcher forbidden full compatibility wording"
 foreach ($workflowText in @(
         "IDF / epJSON",
         "Weather EPW",
@@ -263,7 +267,34 @@ foreach ($state in @("run_blocked", "partial_supported_run", "supported_compatib
     }
     Assert-Matches -Text ([string]$match[0].detail) -Pattern "exit_code=" -Description "$state exit code detail"
     Assert-Matches -Text ([string]$match[0].detail) -Pattern "conformance_claim=false" -Description "$state claim boundary"
+    Assert-NotMatches -Text ([string]$match[0].detail) -Pattern "full EnergyPlus compatible" -Description "$state forbidden full compatibility wording"
 }
+$blockedPresentation = @($presentations | Where-Object {
+        $_.state_id -eq "run_blocked" -and
+        $_.color -eq "Firebrick" -and
+        $_.title -eq "Simulation was not run." -and
+        $_.detail -match "Simulation was not run\."
+    })
+Assert-Equal -Actual $blockedPresentation.Count -Expected 2 -Description "blocked run red state wording"
+$partialPresentation = @($presentations | Where-Object {
+        $_.state_id -eq "partial_supported_run" -and
+        $_.color -eq "DarkGoldenrod" -and
+        $_.title -eq "Ad-hoc partial run, not conformance evidence." -and
+        $_.detail -match "Ad-hoc partial run, not conformance evidence\."
+    })
+Assert-Equal -Actual $partialPresentation.Count -Expected 1 -Description "partial run yellow state wording"
+$compatPresentation = @($presentations | Where-Object {
+        $_.state_id -eq "supported_compatibility_run" -and
+        $_.color -eq "ForestGreen" -and
+        $_.detail -match "matched_capabilities="
+    })
+Assert-Equal -Actual $compatPresentation.Count -Expected 1 -Description "supported run green matched capabilities"
+$fastPresentation = @($presentations | Where-Object {
+        $_.detail -match "mode=fast" -and
+        $_.detail -match "Fast and experimental modes are never release conformance evidence" -and
+        $_.detail -match "conformance_claim=false"
+    })
+Assert-Equal -Actual $fastPresentation.Count -Expected 1 -Description "fast/experimental non-evidence boundary"
 $blockedOracle = @($presentations | Where-Object {
         $_.state_id -eq "run_blocked" -and
         $_.detail -match "oracle=generated" -and

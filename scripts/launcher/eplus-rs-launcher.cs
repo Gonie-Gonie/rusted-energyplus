@@ -964,15 +964,15 @@ internal sealed class LauncherApp
         string stateMessage = "Run status could not be classified.";
         if (runState == "run_blocked")
         {
-            title = "Simulation was not run";
+            title = "Simulation was not run.";
             color = "Firebrick";
-            stateMessage = "Simulation was not run; top unsupported reasons are in support-report.md.";
+            stateMessage = "Simulation was not run. Top unsupported reasons are in support-report.md.";
         }
         else if (runState == "partial_supported_run")
         {
-            title = "Simulation ran with partial supported subset";
+            title = "Ad-hoc partial run, not conformance evidence.";
             color = "DarkGoldenrod";
-            stateMessage = "Simulation ran with partial supported subset; ignored or inactive objects are listed in support-report.md.";
+            stateMessage = "Ad-hoc partial run, not conformance evidence. Ignored or inactive objects are listed in support-report.md.";
         }
         else if (runState == "supported_compatibility_run")
         {
@@ -986,7 +986,7 @@ internal sealed class LauncherApp
         }
         else if (runMode == "fast" || runMode == "experimental")
         {
-            stateMessage += " This mode is not conformance evidence.";
+            stateMessage += " Fast and experimental modes are never release conformance evidence.";
         }
         string resultPath = !String.IsNullOrWhiteSpace(selectedOutputsPath) ? selectedOutputsPath : resultStorePath;
         string detail = String.Join("; ", new string[] {

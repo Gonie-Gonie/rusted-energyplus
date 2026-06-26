@@ -342,14 +342,14 @@ function Get-RunResultPresentation {
     $stateMessage = "Run status could not be classified."
     switch ($runState) {
         "run_blocked" {
-            $title = "Simulation was not run"
+            $title = "Simulation was not run."
             $color = "Firebrick"
-            $stateMessage = "Simulation was not run; top unsupported reasons are in support-report.md."
+            $stateMessage = "Simulation was not run. Top unsupported reasons are in support-report.md."
         }
         "partial_supported_run" {
-            $title = "Simulation ran with partial supported subset"
+            $title = "Ad-hoc partial run, not conformance evidence."
             $color = "DarkGoldenrod"
-            $stateMessage = "Simulation ran with partial supported subset; ignored or inactive objects are listed in support-report.md."
+            $stateMessage = "Ad-hoc partial run, not conformance evidence. Ignored or inactive objects are listed in support-report.md."
         }
         "supported_compatibility_run" {
             $title = "Supported compatibility run"
@@ -361,7 +361,7 @@ function Get-RunResultPresentation {
         $stateMessage += " Diagnostic-only execution is explicit."
     }
     elseif ($mode -in @("fast", "experimental")) {
-        $stateMessage += " This mode is not conformance evidence."
+        $stateMessage += " Fast and experimental modes are never release conformance evidence."
     }
     $resultPath = if (-not [string]::IsNullOrWhiteSpace([string]$selectedOutputsPath)) {
         [string]$selectedOutputsPath

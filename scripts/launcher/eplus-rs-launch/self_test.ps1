@@ -140,6 +140,25 @@ function Invoke-LauncherSelfTest {
                 result_store_json = ""
                 compare_report_md = "out/compare/compare-report.md"
             }
+        },
+        [pscustomobject]@{
+            support = [pscustomobject]@{
+                run_result_state = "unknown"
+                status = "supported-diagnostic-only"
+                runtime_class = "fast-preview"
+                matched_capability_ids = @()
+            }
+            status = "success"
+            exit_code = 0
+            config = [pscustomobject]@{ mode = "fast" }
+            oracle_status = "not-requested"
+            compare_status = "not-requested"
+            artifacts = [pscustomobject]@{
+                support_report_md = "out/support-report.md"
+                selected_outputs_csv = "out/results/selected-outputs.csv"
+                result_store_json = "out/results/result-store.json"
+                compare_report_md = ""
+            }
         }
     )
     $presentations = @($stateSamples | ForEach-Object { Get-RunResultPresentation -Summary $_ })
@@ -166,21 +185,27 @@ function Invoke-LauncherSelfTest {
                 throw "launcher self-test missed $required presentation for $($presentation.state_id)"
             }
         }
-        if ($presentation.detail -match "fully compatible") {
-            throw "launcher self-test used forbidden fully compatible wording"
+        foreach ($forbidden in @("fully compatible", "full EnergyPlus compatible")) {
+            if ($presentation.detail -match [regex]::Escape($forbidden)) {
+                throw "launcher self-test used forbidden wording: $forbidden"
+            }
         }
     }
-    $blockedPresentation = @($presentations | Where-Object { $_.state_id -eq "run_blocked" -and $_.title -eq "Simulation was not run" -and $_.detail -match "top unsupported reasons" })
+    $blockedPresentation = @($presentations | Where-Object { $_.state_id -eq "run_blocked" -and $_.title -eq "Simulation was not run." -and $_.color -eq "Firebrick" -and $_.detail -match "Simulation was not run\." })
     if ($blockedPresentation.Count -lt 1) {
         throw "launcher self-test missed run_blocked user wording"
     }
-    $partialPresentation = @($presentations | Where-Object { $_.state_id -eq "partial_supported_run" -and $_.title -eq "Simulation ran with partial supported subset" -and $_.detail -match "Diagnostic-only execution is explicit" })
+    $partialPresentation = @($presentations | Where-Object { $_.state_id -eq "partial_supported_run" -and $_.title -eq "Ad-hoc partial run, not conformance evidence." -and $_.color -eq "DarkGoldenrod" -and $_.detail -match "Ad-hoc partial run, not conformance evidence\." -and $_.detail -match "Diagnostic-only execution is explicit" })
     if ($partialPresentation.Count -ne 1) {
         throw "launcher self-test missed partial supported diagnostic wording"
     }
-    $compatPresentation = @($presentations | Where-Object { $_.state_id -eq "supported_compatibility_run" -and $_.detail -match "matched_capabilities=official_1zone_uncontrolled_declared_heat_balance" -and $_.detail -match "compare_report=out/compare/compare-report.md" })
+    $compatPresentation = @($presentations | Where-Object { $_.state_id -eq "supported_compatibility_run" -and $_.color -eq "ForestGreen" -and $_.detail -match "matched_capabilities=official_1zone_uncontrolled_declared_heat_balance" -and $_.detail -match "compare_report=out/compare/compare-report.md" })
     if ($compatPresentation.Count -ne 1) {
         throw "launcher self-test missed supported compatibility detail"
+    }
+    $fastPresentation = @($presentations | Where-Object { $_.detail -match "mode=fast" -and $_.detail -match "Fast and experimental modes are never release conformance evidence" -and $_.detail -match "conformance_claim=false" })
+    if ($fastPresentation.Count -ne 1) {
+        throw "launcher self-test missed fast/experimental non-evidence boundary"
     }
     $phaseLine = Format-PhaseTimingLine -Phase ([pscustomobject]@{
             name = "support_assessment"
