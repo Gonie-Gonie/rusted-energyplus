@@ -2508,11 +2508,24 @@ fn print_run_help() {
     eprintln!("usage: eplus-rs run plant-state-projection <input.epJSON> <output-dir> [--hours N]");
 }
 
-fn run_arbitrary_run_command(args: &[String]) -> i32 {
+#[derive(Debug, Eq, PartialEq)]
+struct ArbitraryRunParseError {
+    message: String,
+    show_usage: bool,
+}
+
+impl ArbitraryRunParseError {
+    fn new(message: impl Into<String>, show_usage: bool) -> Self {
+        Self {
+            message: message.into(),
+            show_usage,
+        }
+    }
+}
+
+fn parse_arbitrary_run_config(args: &[String]) -> Result<RunConfig, ArbitraryRunParseError> {
     let Some(input_path) = args.first() else {
-        eprintln!("missing input path");
-        eprintln!("{ARBITRARY_RUN_USAGE}");
-        return RunExitCode::Args.code();
+        return Err(ArbitraryRunParseError::new("missing input path", true));
     };
 
     let mut weather_path = None;
@@ -2536,43 +2549,52 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
         match args[index].as_str() {
             "--weather" | "-w" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for {}", args[index]);
-                    eprintln!("{ARBITRARY_RUN_USAGE}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("missing value for {}", args[index]),
+                        true,
+                    ));
                 };
                 weather_path = Some(PathBuf::from(value));
                 index += 2;
             }
             "--output-dir" | "-d" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for {}", args[index]);
-                    eprintln!("{ARBITRARY_RUN_USAGE}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("missing value for {}", args[index]),
+                        true,
+                    ));
                 };
                 output_dir = Some(PathBuf::from(value));
                 index += 2;
             }
             "--mode" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for --mode");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --mode",
+                        false,
+                    ));
                 };
                 let Some(parsed) = RunMode::parse(value) else {
-                    eprintln!("unsupported run mode: {value}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("unsupported run mode: {value}"),
+                        false,
+                    ));
                 };
                 mode = parsed;
                 index += 2;
             }
             "--partial" | "--partial-run" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for {}", args[index]);
-                    eprintln!("{ARBITRARY_RUN_USAGE}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("missing value for {}", args[index]),
+                        true,
+                    ));
                 };
                 let Some(parsed) = PartialRunPolicy::parse(value) else {
-                    eprintln!("unsupported partial run policy: {value}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("unsupported partial run policy: {value}"),
+                        false,
+                    ));
                 };
                 partial_policy = parsed;
                 index += 2;
@@ -2587,12 +2609,16 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
             }
             "--format" | "--output-format" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for {}", args[index]);
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("missing value for {}", args[index]),
+                        false,
+                    ));
                 };
                 let Some(parsed) = RunOutputFormat::parse(value) else {
-                    eprintln!("unsupported output format: {value}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("unsupported output format: {value}"),
+                        false,
+                    ));
                 };
                 output_format = parsed;
                 index += 2;
@@ -2607,12 +2633,16 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
             }
             "--trace-level" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for --trace-level");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --trace-level",
+                        false,
+                    ));
                 };
                 let Some(parsed) = TraceLevel::parse(value) else {
-                    eprintln!("unsupported trace level: {value}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("unsupported trace level: {value}"),
+                        false,
+                    ));
                 };
                 trace_level = parsed;
                 index += 2;
@@ -2641,39 +2671,47 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
             }
             "--oracle-root" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for --oracle-root");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --oracle-root",
+                        false,
+                    ));
                 };
                 oracle_root = Some(PathBuf::from(value));
                 index += 2;
             }
             "--hours" => {
                 let Some(value) = args.get(index + 1) else {
-                    eprintln!("missing value for --hours");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        "missing value for --hours",
+                        false,
+                    ));
                 };
                 let Ok(parsed) = value.parse::<usize>() else {
-                    eprintln!("invalid --hours value: {value}");
-                    return RunExitCode::Args.code();
+                    return Err(ArbitraryRunParseError::new(
+                        format!("invalid --hours value: {value}"),
+                        false,
+                    ));
                 };
                 hours = Some(parsed);
                 index += 2;
             }
             unknown => {
-                eprintln!("unsupported run option: {unknown}");
-                eprintln!("{ARBITRARY_RUN_USAGE}");
-                return RunExitCode::Args.code();
+                return Err(ArbitraryRunParseError::new(
+                    format!("unsupported run option: {unknown}"),
+                    true,
+                ));
             }
         }
     }
 
     let Some(output_dir) = output_dir else {
-        eprintln!("missing output directory");
-        eprintln!("{ARBITRARY_RUN_USAGE}");
-        return RunExitCode::Args.code();
+        return Err(ArbitraryRunParseError::new(
+            "missing output directory",
+            true,
+        ));
     };
 
-    let config = RunConfig {
+    Ok(RunConfig {
         input_path: PathBuf::from(input_path),
         weather_path,
         output_dir,
@@ -2690,6 +2728,19 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
         json_stdout,
         oracle_root,
         hours,
+    })
+}
+
+fn run_arbitrary_run_command(args: &[String]) -> i32 {
+    let config = match parse_arbitrary_run_config(args) {
+        Ok(config) => config,
+        Err(error) => {
+            eprintln!("{}", error.message);
+            if error.show_usage {
+                eprintln!("{ARBITRARY_RUN_USAGE}");
+            }
+            return RunExitCode::Args.code();
+        }
     };
 
     match run_arbitrary_idf(&config) {
@@ -2709,6 +2760,14 @@ fn run_arbitrary_run_command(args: &[String]) -> i32 {
                 println!("  run_result_state: {}", outcome.run_result_state.id());
                 println!("  output_dir: {}", outcome.output_dir.display());
                 println!("  run_summary: {}", outcome.run_summary_path.display());
+                println!(
+                    "  diagnostics: {}",
+                    outcome.output_dir.join("diagnostics.json").display()
+                );
+                println!(
+                    "  support_report: {}",
+                    outcome.output_dir.join("support-report.md").display()
+                );
             }
             outcome.exit_code.code()
         }
@@ -13328,7 +13387,7 @@ fn print_modes() {
 #[cfg(test)]
 mod tests {
     use super::run;
-    use ep_run::RunExitCode;
+    use ep_run::{PartialRunPolicy, RunExitCode, RunMode, RunOutputFormat, TraceLevel};
 
     fn disabled_heat_balance_warmup() -> super::HeatBalanceWarmupDiagnostic {
         super::HeatBalanceWarmupDiagnostic {
@@ -13405,6 +13464,149 @@ mod tests {
         let args = vec!["run".to_string()];
 
         assert_eq!(run(&args), RunExitCode::Args.code());
+    }
+
+    #[test]
+    fn arbitrary_run_parser_defaults_to_compatibility() -> Result<(), Box<dyn std::error::Error>> {
+        let args = vec![
+            "model.epJSON".to_string(),
+            "-w".to_string(),
+            "weather.epw".to_string(),
+            "-d".to_string(),
+            "out".to_string(),
+        ];
+
+        let config = super::parse_arbitrary_run_config(&args)
+            .map_err(|error| std::io::Error::other(error.message))?;
+
+        assert_eq!(config.input_path, std::path::PathBuf::from("model.epJSON"));
+        assert_eq!(
+            config.weather_path,
+            Some(std::path::PathBuf::from("weather.epw"))
+        );
+        assert_eq!(config.output_dir, std::path::PathBuf::from("out"));
+        assert_eq!(config.mode, RunMode::Compatibility);
+        assert_eq!(config.partial_policy, PartialRunPolicy::Deny);
+        assert_eq!(config.output_format, RunOutputFormat::RustNative);
+        assert_eq!(config.trace_level, TraceLevel::Normal);
+        assert!(!config.overwrite);
+        assert!(!config.keep_intermediate);
+        assert!(!config.fail_on_warning);
+        assert!(!config.dry_run);
+        assert!(!config.oracle_baseline);
+        assert!(!config.compare_oracle);
+        assert!(!config.json_stdout);
+        assert!(config.oracle_root.is_none());
+        assert!(config.hours.is_none());
+
+        Ok(())
+    }
+
+    #[test]
+    fn arbitrary_run_parser_sets_c1_flags() -> Result<(), Box<dyn std::error::Error>> {
+        let args = vec![
+            "model.idf".to_string(),
+            "--weather".to_string(),
+            "weather.epw".to_string(),
+            "--output-dir".to_string(),
+            "out".to_string(),
+            "--mode".to_string(),
+            "diagnostic".to_string(),
+            "--partial".to_string(),
+            "allow".to_string(),
+            "--output-format".to_string(),
+            "both".to_string(),
+            "--overwrite".to_string(),
+            "--keep-intermediate".to_string(),
+            "--trace-level".to_string(),
+            "debug".to_string(),
+            "--fail-on-warning".to_string(),
+            "--json".to_string(),
+            "--dry-run".to_string(),
+            "--oracle-baseline".to_string(),
+            "--oracle-root".to_string(),
+            "oracle".to_string(),
+            "--hours".to_string(),
+            "2".to_string(),
+        ];
+
+        let config = super::parse_arbitrary_run_config(&args)
+            .map_err(|error| std::io::Error::other(error.message))?;
+
+        assert_eq!(config.input_path, std::path::PathBuf::from("model.idf"));
+        assert_eq!(
+            config.weather_path,
+            Some(std::path::PathBuf::from("weather.epw"))
+        );
+        assert_eq!(config.output_dir, std::path::PathBuf::from("out"));
+        assert_eq!(config.mode, RunMode::Diagnostic);
+        assert_eq!(config.partial_policy, PartialRunPolicy::Allow);
+        assert_eq!(config.output_format, RunOutputFormat::Both);
+        assert_eq!(config.trace_level, TraceLevel::Debug);
+        assert!(config.overwrite);
+        assert!(config.keep_intermediate);
+        assert!(config.fail_on_warning);
+        assert!(config.json_stdout);
+        assert!(config.dry_run);
+        assert!(config.oracle_baseline);
+        assert!(!config.compare_oracle);
+        assert_eq!(config.oracle_root, Some(std::path::PathBuf::from("oracle")));
+        assert_eq!(config.hours, Some(2));
+
+        Ok(())
+    }
+
+    #[test]
+    fn arbitrary_run_compare_oracle_implies_baseline_and_both_output()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let args = vec![
+            "model.epJSON".to_string(),
+            "-w".to_string(),
+            "weather.epw".to_string(),
+            "-d".to_string(),
+            "out".to_string(),
+            "--compare-oracle".to_string(),
+        ];
+
+        let config = super::parse_arbitrary_run_config(&args)
+            .map_err(|error| std::io::Error::other(error.message))?;
+
+        assert!(config.compare_oracle);
+        assert!(config.oracle_baseline);
+        assert_eq!(config.output_format, RunOutputFormat::Both);
+
+        Ok(())
+    }
+
+    #[test]
+    fn arbitrary_run_parser_rejects_missing_output_dir() {
+        let args = vec![
+            "model.epJSON".to_string(),
+            "-w".to_string(),
+            "weather.epw".to_string(),
+        ];
+
+        let error = super::parse_arbitrary_run_config(&args).expect_err("missing output dir");
+
+        assert_eq!(error.message, "missing output directory");
+        assert!(error.show_usage);
+    }
+
+    #[test]
+    fn arbitrary_run_parser_rejects_unknown_option() {
+        let args = vec![
+            "model.epJSON".to_string(),
+            "-w".to_string(),
+            "weather.epw".to_string(),
+            "-d".to_string(),
+            "out".to_string(),
+            "--bad".to_string(),
+        ];
+
+        let error = super::parse_arbitrary_run_config(&args).expect_err("unknown option");
+
+        assert_eq!(error.message, "unsupported run option: --bad");
+        assert!(error.show_usage);
     }
 
     #[test]
