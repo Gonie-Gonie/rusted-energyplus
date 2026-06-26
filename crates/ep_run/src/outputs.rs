@@ -8,6 +8,8 @@ use serde_json::{Number, Value, json};
 
 use crate::{RunDiagnostics, RunExitCode, RunResultState, SupportAssessment};
 
+const SUPPORT_REPORT_SUMMARY_LIMIT: usize = 10;
+
 pub(crate) fn write_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)
@@ -147,6 +149,25 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         "conformance_claim: {}\n\n",
         assessment.claim_boundary.conformance_claim
     ));
+    report.push_str("## Top Blocked Reasons\n\n");
+    let blocked_reasons = collect_blocked_reasons(assessment);
+    if blocked_reasons.is_empty() {
+        report.push_str("No blocking support reasons were emitted.\n\n");
+    } else {
+        for reason in blocked_reasons.iter().take(SUPPORT_REPORT_SUMMARY_LIMIT) {
+            report.push_str(&format!("- {}\n", markdown_cell(reason)));
+        }
+        let omitted = blocked_reasons
+            .len()
+            .saturating_sub(SUPPORT_REPORT_SUMMARY_LIMIT);
+        if omitted > 0 {
+            report.push_str(&format!(
+                "- {omitted} more blocking reason(s) are available in support-assessment.json and diagnostics.json.\n"
+            ));
+        }
+        report.push('\n');
+    }
+    report.push_str("Detailed support assessment data is recorded in support-assessment.json.\n\n");
 
     if !assessment.matched_capabilities.is_empty() {
         report.push_str("## Matched Capabilities\n\n");
@@ -201,10 +222,15 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
         report.push('\n');
     }
 
-    report.push_str("## Diagnostics\n\n");
+    report.push_str("## Diagnostic Summary\n\n");
     report.push_str("| severity | code | stage | blocking | message |\n");
     report.push_str("| --- | --- | --- | --- | --- |\n");
-    for diagnostic in &assessment.diagnostics.diagnostics {
+    for diagnostic in assessment
+        .diagnostics
+        .diagnostics
+        .iter()
+        .take(SUPPORT_REPORT_SUMMARY_LIMIT)
+    {
         report.push_str(&format!(
             "| {} | {} | {} | {} | {} |\n",
             diagnostic.severity.id(),
@@ -214,7 +240,53 @@ pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
             markdown_cell(&diagnostic.message)
         ));
     }
+    let omitted_diagnostics = assessment
+        .diagnostics
+        .diagnostics
+        .len()
+        .saturating_sub(SUPPORT_REPORT_SUMMARY_LIMIT);
+    if omitted_diagnostics > 0 {
+        report.push_str(&format!(
+            "\n_{omitted_diagnostics} more diagnostic(s) are available in support-assessment.json and diagnostics.json._\n"
+        ));
+    }
     report
+}
+
+fn collect_blocked_reasons(assessment: &SupportAssessment) -> Vec<String> {
+    let mut reasons = Vec::new();
+    for entry in &assessment.unsupported_objects {
+        push_unique_reason(
+            &mut reasons,
+            format!("{} ({}): {}", entry.object_type, entry.count, entry.note),
+        );
+    }
+    for diagnostic in assessment
+        .diagnostics
+        .diagnostics
+        .iter()
+        .filter(|diagnostic| diagnostic.blocking)
+    {
+        let object_context = match (&diagnostic.object_type, &diagnostic.object_name) {
+            (Some(object_type), Some(object_name)) => format!(" [{object_type}: {object_name}]"),
+            (Some(object_type), None) => format!(" [{object_type}]"),
+            _ => String::new(),
+        };
+        push_unique_reason(
+            &mut reasons,
+            format!(
+                "{}{}: {}",
+                diagnostic.code, object_context, diagnostic.message
+            ),
+        );
+    }
+    reasons
+}
+
+fn push_unique_reason(reasons: &mut Vec<String>, reason: String) {
+    if !reasons.iter().any(|existing| existing == &reason) {
+        reasons.push(reason);
+    }
 }
 
 pub(crate) fn render_compatibility_boundary(assessment: &SupportAssessment) -> String {
@@ -315,4 +387,64 @@ fn csv_field(value: &str) -> String {
 
 fn markdown_cell(value: &str) -> String {
     value.replace('|', "\\|").replace('\n', " ")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::render_support_report;
+    use crate::{
+        ClaimBoundary, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunResultState,
+        RuntimeClass, SupportAssessment, SupportStatus,
+    };
+
+    #[test]
+    fn support_report_limits_blocked_reason_summary_to_ten() {
+        let mut diagnostics = RunDiagnostics::default();
+        for index in 0..12 {
+            diagnostics.push(
+                RunDiagnostic::new(
+                    RunDiagnosticSeverity::Error,
+                    format!("Blocked{index}"),
+                    "support",
+                    format!("blocked reason {index}"),
+                )
+                .with_object("TestObject", Some(format!("Object {index}"))),
+            );
+        }
+        let report = render_support_report(&SupportAssessment {
+            schema_version: 1,
+            status: SupportStatus::Unsupported,
+            run_result_state: RunResultState::RunBlocked,
+            runtime_class: RuntimeClass::None,
+            runtime_selection_note: "support assessment blocked Rust execution before runtime"
+                .to_string(),
+            matched_capability_ids: Vec::new(),
+            matched_capabilities: Vec::new(),
+            failed_capability_ids: Vec::new(),
+            mode: "compatibility".to_string(),
+            partial_policy: "deny".to_string(),
+            output_format: "rust-native".to_string(),
+            trace_level: "normal".to_string(),
+            capability_registry: "specs/capabilities.toml".to_string(),
+            capability_registry_loaded: true,
+            claim_boundary: ClaimBoundary {
+                conformance_claim: false,
+                release_evidence: false,
+                statement: "Ad-hoc arbitrary runs are not release evidence.".to_string(),
+            },
+            typed_objects: Vec::new(),
+            ignored_raw_only_objects: Vec::new(),
+            unsupported_objects: Vec::new(),
+            diagnostics,
+        });
+
+        assert!(report.contains("## Top Blocked Reasons"));
+        assert!(report.contains("blocked reason 0"));
+        assert!(report.contains("blocked reason 9"));
+        assert!(!report.contains("blocked reason 10"));
+        assert!(!report.contains("blocked reason 11"));
+        assert!(report.contains("2 more blocking reason(s)"));
+        assert!(report.contains("2 more diagnostic(s)"));
+        assert!(report.contains("support-assessment.json"));
+    }
 }
