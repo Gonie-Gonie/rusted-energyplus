@@ -55,6 +55,7 @@ $script:StderrTask = $null
 $script:StdoutPath = ""
 $script:StderrPath = ""
 $script:LauncherSettingsPath = Get-LauncherSettingsPath
+$script:CancelRequested = $false
 
 $settings = Read-LauncherSettings -Path $script:LauncherSettingsPath
 if ($null -ne $settings) {
@@ -184,6 +185,7 @@ function Refresh-Ui {
             (-not [string]::IsNullOrWhiteSpace($script:OutputDir))
 
         $runButton.Enabled = $canRun
+        $cancelButton.Enabled = $isRunning
         $inputButton.Enabled = -not $isRunning
         $weatherButton.Enabled = -not $isRunning
         $outputButton.Enabled = -not $isRunning
@@ -301,6 +303,11 @@ function Finish-Run {
         $stateDetailLabel.Text = $presentation.detail
         $stateDetailLabel.ForeColor = [System.Drawing.Color]::FromName($presentation.color)
     }
+    elseif ($script:CancelRequested) {
+        $statusLabel.Text = "Cancelled."
+        $stateDetailLabel.Text = "Run process was cancelled before run-summary.json was written."
+        $stateDetailLabel.ForeColor = [System.Drawing.Color]::DarkGoldenrod
+    }
     elseif ($exitCode -eq 0) {
         $statusLabel.Text = "Done."
         $stateDetailLabel.Text = "No run-summary.json was written."
@@ -311,6 +318,7 @@ function Finish-Run {
         $stateDetailLabel.Text = "No run-summary.json was written."
         $stateDetailLabel.ForeColor = [System.Drawing.Color]::Firebrick
     }
+    $script:CancelRequested = $false
     Refresh-Ui
 }
 
@@ -338,6 +346,7 @@ function Start-Run {
         $script:OracleBaseline = $true
         $script:OutputFormat = "both"
     }
+    $script:CancelRequested = $false
     Save-LauncherSettings -Path $script:LauncherSettingsPath
     New-Item -ItemType Directory -Force -Path $script:OutputDir | Out-Null
     $arguments = New-LauncherRunArguments `
@@ -375,11 +384,32 @@ function Start-Run {
     $stateDetailLabel.Text = (($arguments | ForEach-Object { Quote-ProcessArgument $_ }) -join " ")
     $stateDetailLabel.ForeColor = [System.Drawing.Color]::DimGray
     $phaseList.Items.Clear()
-    [void]$phaseList.Items.Add("queued: input_resolver -> typed_compile -> support_assessment -> execution_plan -> runtime/output")
+    foreach ($stage in @("Input", "Convert", "RawModel", "TypedModel", "Graph", "Support", "Plan", "Runtime", "Export", "Oracle", "Compare")) {
+        [void]$phaseList.Items.Add("queued: $stage")
+    }
     $diagnosticsList.Items.Clear()
     [void]$diagnosticsList.Items.Add("Waiting for diagnostics.json.")
     Refresh-Ui
     $timer.Start()
+}
+
+function Cancel-Run {
+    if ($null -eq $script:CurrentProcess) {
+        return
+    }
+    $script:CancelRequested = $true
+    $statusLabel.Text = "Cancelling..."
+    $stateDetailLabel.Text = "Stopping eplus-rs run process."
+    $stateDetailLabel.ForeColor = [System.Drawing.Color]::DarkGoldenrod
+    try {
+        if (-not $script:CurrentProcess.HasExited) {
+            $script:CurrentProcess.Kill()
+        }
+    }
+    catch {
+        Show-Error "Failed to cancel eplus-rs.exe: $_"
+    }
+    Refresh-Ui
 }
 
 $form = New-Object System.Windows.Forms.Form
@@ -434,12 +464,13 @@ $traceCombo = New-ComboBox @("normal", "detailed", "debug") $script:TraceLevel 6
 $failOnWarningButton = New-Button "Strict Warnings: OFF" 706 298 122 30
 $form.Controls.AddRange(@($modeLabel, $modeCombo, $partialLabel, $partialCombo, $formatLabel, $formatCombo, $traceLabel, $traceCombo, $failOnWarningButton))
 
-$oracleBaselineButton = New-Button "Oracle Baseline: OFF" 18 342 180 34
-$compareButton = New-Button "Oracle Compare: ON" 214 342 170 34
-$overwriteButton = New-Button "Overwrite: ON" 400 342 150 34
-$runButton = New-Button "Run" 570 342 120 34
-$openOutputButton = New-Button "Open Output" 708 342 120 34
-$form.Controls.AddRange(@($oracleBaselineButton, $compareButton, $overwriteButton, $runButton, $openOutputButton))
+$oracleBaselineButton = New-Button "Oracle Baseline: OFF" 18 342 170 34
+$compareButton = New-Button "Oracle Compare: ON" 198 342 160 34
+$overwriteButton = New-Button "Overwrite: ON" 368 342 140 34
+$runButton = New-Button "Run" 520 342 90 34
+$cancelButton = New-Button "Cancel" 620 342 90 34
+$openOutputButton = New-Button "Open Output" 720 342 108 34
+$form.Controls.AddRange(@($oracleBaselineButton, $compareButton, $overwriteButton, $runButton, $cancelButton, $openOutputButton))
 
 $openRunReportButton = New-Button "Open Run Report" 18 390 150 34
 $openDiagnosticsButton = New-Button "Open Diagnostics" 180 390 150 34
@@ -658,6 +689,7 @@ $traceCombo.Add_SelectedIndexChanged({
 })
 
 $runButton.Add_Click({ Start-Run })
+$cancelButton.Add_Click({ Cancel-Run })
 $openOutputButton.Add_Click({ Open-Path -Path $script:OutputDir })
 $openRunReportButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "reports\run-report.md") })
 $openDiagnosticsButton.Add_Click({ Open-Path -Path (Join-Path $script:OutputDir "diagnostics.json") })

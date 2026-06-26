@@ -84,10 +84,14 @@ if (-not (Test-Path -LiteralPath $releasePackageScript -PathType Leaf)) {
 $launcherText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherScript
 Assert-Matches -Text $launcherText -Pattern "Resolve-EplusRsExe" -Description "launcher binary resolver"
 Assert-Matches -Text $launcherText -Pattern "New-LauncherRunArguments" -Description "launcher run command builder"
+Assert-Matches -Text $launcherText -Pattern "Cancel-Run" -Description "launcher cancel command"
 Assert-Matches -Text $launcherText -Pattern "Read-RunSummaryStatus" -Description "launcher run-summary reader"
 Assert-Matches -Text $launcherText -Pattern "Read-RunDiagnostics" -Description "launcher diagnostics reader"
 Assert-Matches -Text $launcherText -Pattern "support-report\.md" -Description "launcher support report link"
 Assert-NotMatches -Text $launcherText -Pattern "support-assessment\s" -Description "launcher support pre-step command"
+foreach ($progressStage in @("Input", "Convert", "RawModel", "TypedModel", "Graph", "Support", "Plan", "Runtime", "Export", "Oracle", "Compare")) {
+    Assert-Matches -Text $launcherText -Pattern ([regex]::Escape($progressStage)) -Description "launcher progress stage $progressStage"
+}
 $releasePackageText = Get-Content -Encoding UTF8 -Raw -LiteralPath $releasePackageScript
 Assert-Matches -Text $releasePackageText -Pattern "build-launcher-exe\.ps1" -Description "release launcher build wiring"
 Assert-Matches -Text $releasePackageText -Pattern "eplus-rs-launch\.exe" -Description "release launcher exe asset"
