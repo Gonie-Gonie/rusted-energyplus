@@ -1050,12 +1050,18 @@ fn write_graph_and_plan(
         &graph_summary,
     )?;
     let source_order_gate = source_order_gate_summary(plan);
+    let expected_source_order_stages = source_order_gate.expected_source_order_stages.clone();
+    let actual_executed_source_order_stages = source_order_gate
+        .actual_executed_source_order_stages
+        .clone();
     let stage_snapshots = execution_stage_snapshots(plan, trace_level);
     let plan_json = json!({
         "schema_version": 1,
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
         "source_order_gate": source_order_gate,
+        "expected_source_order_stages": expected_source_order_stages,
+        "actual_executed_source_order_stages": actual_executed_source_order_stages,
         "trace_level": trace_level.id(),
         "stage_snapshots_enabled": trace_level_enables_stage_snapshots(trace_level),
         "stage_snapshot_policy": "metadata-only source-order snapshots generated from ExecutionPlan; no simulation values are read or mutated",

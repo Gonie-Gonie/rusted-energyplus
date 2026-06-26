@@ -56,17 +56,17 @@ pub enum ExecutionStageKind {
     /// EnergyPlus `ZoneEquipmentManager::ManageZoneEquipment`.
     ZoneEquipmentManager,
     /// EnergyPlus `PurchasedAirManager::SimPurchasedAir`.
-    PurchasedAirManagerSim,
+    SimPurchasedAir,
     /// EnergyPlus `PurchasedAirManager::GetPurchasedAir`.
-    PurchasedAirManagerGet,
+    GetPurchasedAir,
     /// EnergyPlus `PurchasedAirManager::InitPurchasedAir`.
-    PurchasedAirManagerInit,
+    InitPurchasedAir,
     /// EnergyPlus `PurchasedAirManager::CalcPurchAirLoads`.
-    PurchasedAirManagerCalc,
+    CalcPurchAirLoads,
     /// EnergyPlus `PurchasedAirManager::UpdatePurchasedAir`.
-    PurchasedAirManagerUpdate,
+    UpdatePurchasedAir,
     /// EnergyPlus `PurchasedAirManager::ReportPurchasedAir`.
-    PurchasedAirManagerReport,
+    ReportPurchasedAir,
 }
 
 impl ExecutionStageKind {
@@ -105,12 +105,12 @@ impl ExecutionStageKind {
             }
             Self::CheckWarmupConvergence => "check_warmup_convergence",
             Self::ZoneEquipmentManager => "zone_equipment_manager",
-            Self::PurchasedAirManagerSim => "purchased_air_manager_sim",
-            Self::PurchasedAirManagerGet => "purchased_air_manager_get",
-            Self::PurchasedAirManagerInit => "purchased_air_manager_init",
-            Self::PurchasedAirManagerCalc => "purchased_air_manager_calc",
-            Self::PurchasedAirManagerUpdate => "purchased_air_manager_update",
-            Self::PurchasedAirManagerReport => "purchased_air_manager_report",
+            Self::SimPurchasedAir => "sim_purchased_air",
+            Self::GetPurchasedAir => "get_purchased_air",
+            Self::InitPurchasedAir => "init_purchased_air",
+            Self::CalcPurchAirLoads => "calc_purch_air_loads",
+            Self::UpdatePurchasedAir => "update_purchased_air",
+            Self::ReportPurchasedAir => "report_purchased_air",
         }
     }
 
@@ -251,37 +251,37 @@ pub fn energyplus_ideal_loads_compatibility_stages() -> Vec<EnergyPlusCompatibil
             source_routine: "ManageZoneEquipment",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerSim,
+            kind: ExecutionStageKind::SimPurchasedAir,
             stage_name: "sim-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "SimPurchasedAir",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerGet,
+            kind: ExecutionStageKind::GetPurchasedAir,
             stage_name: "get-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "GetPurchasedAir",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerInit,
+            kind: ExecutionStageKind::InitPurchasedAir,
             stage_name: "init-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "InitPurchasedAir",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerCalc,
+            kind: ExecutionStageKind::CalcPurchAirLoads,
             stage_name: "calc-purch-air-loads",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "CalcPurchAirLoads",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerUpdate,
+            kind: ExecutionStageKind::UpdatePurchasedAir,
             stage_name: "update-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "UpdatePurchasedAir",
         },
         EnergyPlusCompatibilityStage {
-            kind: ExecutionStageKind::PurchasedAirManagerReport,
+            kind: ExecutionStageKind::ReportPurchasedAir,
             stage_name: "report-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "ReportPurchasedAir",
@@ -386,32 +386,32 @@ pub fn build_execution_plan(model: &SimulationModel) -> ExecutionPlan {
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerSim,
+            ExecutionStageKind::SimPurchasedAir,
             purchased_air_sim_steps,
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerGet,
+            ExecutionStageKind::GetPurchasedAir,
             purchased_air_get_steps,
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerInit,
+            ExecutionStageKind::InitPurchasedAir,
             purchased_air_init_steps,
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerCalc,
+            ExecutionStageKind::CalcPurchAirLoads,
             purchased_air_calc_steps,
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerUpdate,
+            ExecutionStageKind::UpdatePurchasedAir,
             purchased_air_update_steps,
         );
         push_steps_to_stage(
             &mut stages,
-            ExecutionStageKind::PurchasedAirManagerReport,
+            ExecutionStageKind::ReportPurchasedAir,
             purchased_air_report_steps,
         );
     }

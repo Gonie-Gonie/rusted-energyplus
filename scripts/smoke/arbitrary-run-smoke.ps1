@@ -100,6 +100,9 @@ Assert-Equal -Actual @($executionPlan.stages)[9].kind -Expected "manage_zone_air
 Assert-Equal -Actual @($executionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "execution plan source-order first kind"
 Assert-Equal -Actual @($executionPlan.compatibility_stages)[4].kind -Expected "manage_surface_heat_balance" -Description "execution plan source-order surface manager kind"
 Assert-Equal -Actual @($executionPlan.compatibility_stages)[9].kind -Expected "manage_zone_air_updates" -Description "execution plan source-order zone air update compatibility kind"
+Assert-Equal -Actual @($executionPlan.expected_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "execution plan expected source-order first stage"
+Assert-Equal -Actual @($executionPlan.actual_executed_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "execution plan actual source-order first stage"
+Assert-Equal -Actual @($executionPlan.actual_executed_source_order_stages).Count -Expected @($executionPlan.expected_source_order_stages).Count -Description "execution plan expected/actual source-order count"
 
 $runSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $outputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $runSummary.status -Expected "oracle-compare" -Description "run summary status"
@@ -169,6 +172,8 @@ $blockedExecutionPlan = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path 
 Assert-Equal -Actual @($blockedExecutionPlan.stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan first source-order kind"
 Assert-Equal -Actual @($blockedExecutionPlan.stages)[9].kind -Expected "manage_zone_air_updates" -Description "blocked execution plan zone air update kind"
 Assert-Equal -Actual @($blockedExecutionPlan.compatibility_stages)[0].kind -Expected "get_heat_balance_input" -Description "blocked execution plan source-order first kind"
+Assert-Equal -Actual @($blockedExecutionPlan.expected_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "blocked execution plan expected source-order first stage"
+Assert-Equal -Actual @($blockedExecutionPlan.actual_executed_source_order_stages)[0] -Expected "get-heat-balance-input" -Description "blocked execution plan actual source-order first stage"
 
 $blockedSummary = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $blockedOutputDir "run-summary.json") | ConvertFrom-Json
 Assert-Equal -Actual $blockedSummary.status -Expected "unsupported" -Description "blocked run summary status"

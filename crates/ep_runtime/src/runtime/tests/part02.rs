@@ -164,43 +164,41 @@
             ExecutionStep::SimZoneEquipment(ZoneEquipmentListId(0))
         );
 
-        let purchased_air_sim =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerSim);
+        let purchased_air_sim = stage_with_kind(&plan.stages, ExecutionStageKind::SimPurchasedAir);
         assert_eq!(
             purchased_air_sim.steps[0],
             ExecutionStep::SimPurchasedAir(IdealLoadsAirSystemId(0))
         );
 
-        let purchased_air_get =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerGet);
+        let purchased_air_get = stage_with_kind(&plan.stages, ExecutionStageKind::GetPurchasedAir);
         assert_eq!(
             purchased_air_get.steps[0],
             ExecutionStep::GetIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
 
         let purchased_air_init =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerInit);
+            stage_with_kind(&plan.stages, ExecutionStageKind::InitPurchasedAir);
         assert_eq!(
             purchased_air_init.steps[0],
             ExecutionStep::InitIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
 
         let purchased_air_calc =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerCalc);
+            stage_with_kind(&plan.stages, ExecutionStageKind::CalcPurchAirLoads);
         assert_eq!(
             purchased_air_calc.steps[0],
             ExecutionStep::EvaluateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
 
         let purchased_air_update =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerUpdate);
+            stage_with_kind(&plan.stages, ExecutionStageKind::UpdatePurchasedAir);
         assert_eq!(
             purchased_air_update.steps[0],
             ExecutionStep::UpdateIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
         );
 
         let purchased_air_report =
-            stage_with_kind(&plan.stages, ExecutionStageKind::PurchasedAirManagerReport);
+            stage_with_kind(&plan.stages, ExecutionStageKind::ReportPurchasedAir);
         assert_eq!(
             purchased_air_report.steps[0],
             ExecutionStep::ReportIdealLoadsAirSystem(IdealLoadsAirSystemId(0))
