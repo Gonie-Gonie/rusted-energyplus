@@ -285,6 +285,7 @@ function Finish-Run {
     $supportTextBox.Text = Read-ArtifactPreview `
         -Path (Join-Path $script:OutputDir "support-report.md") `
         -MissingText "Support report is not available for this run."
+    $claimBoundaryTextBox.Text = "Claim boundary is not available until run-summary.json is written."
     $selectedOutputsPath = Join-Path $script:OutputDir "results\selected-outputs.csv"
     $resultStorePath = Join-Path $script:OutputDir "results\result-store.json"
     $resultPreviewPath = if (Test-LeafPath -Path $selectedOutputsPath) { $selectedOutputsPath } else { $resultStorePath }
@@ -303,6 +304,7 @@ function Finish-Run {
         $statusLabel.Text = $presentation.title
         $stateDetailLabel.Text = $presentation.detail
         $stateDetailLabel.ForeColor = [System.Drawing.Color]::FromName($presentation.color)
+        $claimBoundaryTextBox.Text = "Claim Boundary`r`n`r`n$($presentation.detail)`r`n`r`nFast and experimental modes are never release conformance evidence."
     }
     elseif ($script:CancelRequested) {
         $statusLabel.Text = "Cancelled."
@@ -491,6 +493,8 @@ $diagnosticsTab = New-Object System.Windows.Forms.TabPage
 $diagnosticsTab.Text = "Diagnostics"
 $supportTab = New-Object System.Windows.Forms.TabPage
 $supportTab.Text = "Support Report"
+$claimBoundaryTab = New-Object System.Windows.Forms.TabPage
+$claimBoundaryTab.Text = "Claim Boundary"
 $resultsTab = New-Object System.Windows.Forms.TabPage
 $resultsTab.Text = "Results"
 $compareTab = New-Object System.Windows.Forms.TabPage
@@ -518,6 +522,10 @@ $supportTextBox = New-ReadOnlyMultilineBox
 $supportTextBox.Text = "Support report will appear after a run."
 $supportTab.Controls.Add($supportTextBox)
 
+$claimBoundaryTextBox = New-ReadOnlyMultilineBox
+$claimBoundaryTextBox.Text = "Claim boundary will appear after a run."
+$claimBoundaryTab.Controls.Add($claimBoundaryTextBox)
+
 $resultsTextBox = New-ReadOnlyMultilineBox
 $resultsTextBox.Text = "Result artifacts will appear after a supported Rust run."
 $resultsTab.Controls.Add($resultsTextBox)
@@ -538,7 +546,7 @@ $logsTextBox = New-ReadOnlyMultilineBox
 $logsTextBox.Text = "Launcher stdout/stderr logs will appear after a run."
 $logsTab.Controls.Add($logsTextBox)
 
-foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $resultsTab, $compareTab, $plotsTab, $evidenceTab, $logsTab)) {
+foreach ($tab in @($summaryTab, $diagnosticsTab, $supportTab, $claimBoundaryTab, $resultsTab, $compareTab, $plotsTab, $evidenceTab, $logsTab)) {
     [void]$resultTabs.TabPages.Add($tab)
 }
 $form.Controls.Add($resultTabs)

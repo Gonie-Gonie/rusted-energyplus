@@ -163,6 +163,9 @@ if (-not (Test-Path -LiteralPath $releasePackageScript -PathType Leaf)) {
     throw "Missing release package script: $releasePackageScript"
 }
 $launcherText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherScript
+$launcherCsPath = Join-Path $RepoRoot "scripts\launcher\eplus-rs-launcher.cs"
+Assert-File -Path $launcherCsPath -Description "direct C# launcher source"
+$launcherCsText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherCsPath
 Assert-Matches -Text $launcherText -Pattern "Resolve-EplusRsExe" -Description "launcher binary resolver"
 Assert-Matches -Text $launcherText -Pattern "New-LauncherRunArguments" -Description "launcher run command builder"
 Assert-Matches -Text $launcherText -Pattern "Cancel-Run" -Description "launcher cancel command"
@@ -170,6 +173,31 @@ Assert-Matches -Text $launcherText -Pattern "Read-RunSummaryStatus" -Description
 Assert-Matches -Text $launcherText -Pattern "Read-RunDiagnostics" -Description "launcher diagnostics reader"
 Assert-Matches -Text $launcherText -Pattern "support-report\.md" -Description "launcher support report link"
 Assert-Matches -Text $launcherText -Pattern ([regex]::Escape('Open-Path -Path $script:OutputDir')) -Description "launcher open output handler"
+Assert-Matches -Text $launcherText -Pattern "System\.Windows\.Forms\.OpenFileDialog" -Description "launcher input/weather file picker"
+Assert-Matches -Text $launcherText -Pattern "System\.Windows\.Forms\.FolderBrowserDialog" -Description "launcher output/oracle directory picker"
+Assert-Matches -Text $launcherText -Pattern "Claim Boundary" -Description "launcher claim boundary tab"
+Assert-Matches -Text $launcherCsText -Pattern "OpenFileDialog" -Description "direct launcher input/weather file picker"
+Assert-Matches -Text $launcherCsText -Pattern "FolderBrowserDialog" -Description "direct launcher output/oracle directory picker"
+Assert-Matches -Text $launcherCsText -Pattern "Claim Boundary" -Description "direct launcher claim boundary tab"
+foreach ($workflowText in @(
+        "IDF / epJSON",
+        "Weather EPW",
+        "Output Folder",
+        "Mode",
+        "Partial",
+        "Oracle Baseline",
+        "Oracle Compare",
+        "Trace",
+        "Run",
+        "Cancel",
+        "Open Output",
+        "Open Support Report",
+        "Diagnostics",
+        "Oracle Compare",
+        "Claim Boundary"
+    )) {
+    Assert-Matches -Text $launcherCsText -Pattern ([regex]::Escape($workflowText)) -Description "direct launcher workflow control $workflowText"
+}
 Assert-Matches -Text $launcherText -Pattern "ScreenshotPath" -Description "launcher screenshot capture option"
 Assert-NotMatches -Text $launcherText -Pattern "support-assessment\s" -Description "launcher support pre-step command"
 foreach ($progressStage in @("Input", "Convert", "RawModel", "TypedModel", "Graph", "Support", "Plan", "Runtime", "Export", "Oracle", "Compare")) {

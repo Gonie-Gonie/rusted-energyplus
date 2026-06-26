@@ -116,6 +116,7 @@ internal sealed class LauncherApp
     private ListBox phaseList;
     private ListBox diagnosticsList;
     private TextBox supportTextBox;
+    private TextBox claimBoundaryTextBox;
     private TextBox resultsTextBox;
     private TextBox compareTextBox;
     private TextBox plotsTextBox;
@@ -279,6 +280,7 @@ internal sealed class LauncherApp
         phaseList = NewListBox("No phase timing.");
         diagnosticsList = NewListBox("No diagnostics.");
         supportTextBox = NewReadOnlyMultilineBox("Support report will appear after a run.");
+        claimBoundaryTextBox = NewReadOnlyMultilineBox("Claim boundary will appear after a run.");
         resultsTextBox = NewReadOnlyMultilineBox("Result artifacts will appear after a supported Rust run.");
         compareTextBox = NewReadOnlyMultilineBox("Oracle comparison artifacts will appear when compare is enabled.");
         plotsTextBox = NewReadOnlyMultilineBox("Plot artifacts will appear after a run writes reports\\plots, plots, or compare\\plots.");
@@ -288,6 +290,7 @@ internal sealed class LauncherApp
         AddTab(resultTabs, "Summary", phaseList);
         AddTab(resultTabs, "Diagnostics", diagnosticsList);
         AddTab(resultTabs, "Support Report", supportTextBox);
+        AddTab(resultTabs, "Claim Boundary", claimBoundaryTextBox);
         AddTab(resultTabs, "Results", resultsTextBox);
         AddTab(resultTabs, "Oracle Compare", compareTextBox);
         AddTab(resultTabs, "Plots", plotsTextBox);
@@ -624,6 +627,7 @@ internal sealed class LauncherApp
         }
 
         supportTextBox.Text = ReadArtifactPreview(Path.Combine(outputDir, "support-report.md"), "Support report is not available for this run.");
+        claimBoundaryTextBox.Text = "Claim boundary is not available until run-summary.json is written.";
         string selectedOutputsPath = Path.Combine(outputDir, "results", "selected-outputs.csv");
         string resultStorePath = Path.Combine(outputDir, "results", "result-store.json");
         string resultPreviewPath = File.Exists(selectedOutputsPath) ? selectedOutputsPath : resultStorePath;
@@ -639,6 +643,7 @@ internal sealed class LauncherApp
             statusLabel.Text = presentation.Title;
             stateDetailLabel.Text = presentation.Detail;
             stateDetailLabel.ForeColor = Color.FromName(presentation.Color);
+            claimBoundaryTextBox.Text = FormatClaimBoundaryText(presentation);
         }
         else if (cancelRequested)
         {
@@ -1001,6 +1006,13 @@ internal sealed class LauncherApp
             "compare_report=" + compareReportPath
         });
         return new Presentation(runState, title, color, detail);
+    }
+
+    private static string FormatClaimBoundaryText(Presentation presentation)
+    {
+        return "Claim Boundary\r\n\r\n" +
+            presentation.Detail +
+            "\r\n\r\nFast and experimental modes are never release conformance evidence.";
     }
 
     private List<object> GetPhases(Dictionary<string, object> summary)
