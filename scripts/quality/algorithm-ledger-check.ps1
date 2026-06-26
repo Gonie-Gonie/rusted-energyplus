@@ -10,9 +10,19 @@ $ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $RepoRoot = Get-RepoRoot
 Set-Location $RepoRoot
 
-$python = Get-PortablePythonExe
-if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
-    throw "Portable Python is missing. Run .\scripts\dev.cmd setup first."
+$python = $null
+$portablePython = Get-PortablePythonExe
+if (Test-Path -LiteralPath $portablePython -PathType Leaf) {
+    $python = $portablePython
+}
+else {
+    $command = Get-Command python -ErrorAction SilentlyContinue
+    if ($null -ne $command) {
+        $python = $command.Source
+    }
+}
+if ($null -eq $python) {
+    throw "Python 3.11+ was not found. Run .\scripts\dev.cmd setup first."
 }
 
 $script = Join-Path $RepoRoot "tools\docs\validate_algorithm_ledger.py"

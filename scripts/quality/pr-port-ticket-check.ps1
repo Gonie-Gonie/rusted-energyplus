@@ -82,7 +82,7 @@ function Assert-FieldEquals {
 }
 
 function Test-AlgorithmPortTicketBody {
-    param([Parameter(Mandatory = $true)][string]$Text)
+    param([AllowEmptyString()][Parameter(Mandatory = $true)][string]$Text)
 
     if ([string]::IsNullOrWhiteSpace($Text)) {
         throw "PR body is empty; source-order algorithm PRs require an Algorithm Port Ticket or an explicit non-algorithm checkbox."

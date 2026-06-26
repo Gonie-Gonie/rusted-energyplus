@@ -66,6 +66,15 @@ PORT_TICKET_DOC_TOKENS = [
     "claim_boundary.conformance_claim = false",
     "Compatibility code must not call diagnostic probe functions.",
 ]
+PR_WORKFLOW_REQUIRED_TOKENS = [
+    "pull_request:",
+    "Algorithm Port Ticket",
+    "pr-port-ticket-check",
+]
+STRUCTURE_AUDIT_BY_SOURCE_ORDER_DOMAIN = {
+    "heat_balance": "scripts/quality/heat-balance-structure-audit.ps1",
+    "hvac": "scripts/quality/ideal-loads-structure-audit.ps1",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -83,12 +92,100 @@ def path_before_anchor(value: str) -> str:
     return value.split("::", 1)[0]
 
 
+def anchor_tokens(value: str) -> list[str]:
+    if "::" not in value:
+        return []
+    return [token for token in value.split("::")[1:] if token]
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    import json
+
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def variable_names(repo_root: Path) -> set[str]:
+    spec = load_toml(repo_root / "specs" / "variable_coverage.toml")
+    return {str(item.get("name", "")).strip() for item in spec.get("variable", [])}
+
+
+def command_names(repo_root: Path) -> set[str]:
+    catalog = load_json(repo_root / "scripts" / "dev" / "commands.json")
+    return {str(entry.get("name", "")) for entry in catalog.get("commands", [])}
+
+
+def dev_command_from_gate(script: str) -> str:
+    parts = script.replace("\\", "/").split()
+    for index, part in enumerate(parts):
+        if part.endswith("scripts/dev.cmd") or part.endswith("scripts/dev.ps1"):
+            if index + 1 < len(parts):
+                return parts[index + 1]
+    return ""
+
+
+def validate_rust_target_symbol(repo_root: Path, algorithm_id: str, target: str, errors: list[str]) -> None:
+    tokens = anchor_tokens(target)
+    if not tokens:
+        return
+    target_path = repo_root / path_before_anchor(target)
+    if not target_path.is_file():
+        return
+    text = target_path.read_text(encoding="utf-8", errors="replace")
+    for token in tokens:
+        require(token in text, errors, f"{algorithm_id}: Rust target symbol token not found in {target}: {token}")
+
+
+def validate_source_order_scaffold(repo_root: Path, algorithm: dict[str, Any], errors: list[str]) -> None:
+    algorithm_id = str(algorithm.get("id", "")).strip()
+    if "source_order" not in algorithm_id:
+        return
+    domain = str(algorithm.get("domain", "")).strip()
+    audit_path = STRUCTURE_AUDIT_BY_SOURCE_ORDER_DOMAIN.get(domain)
+    require(
+        audit_path is not None,
+        errors,
+        f"{algorithm_id}: source-order scaffold needs a structure audit mapping for domain {domain}",
+    )
+    if audit_path is None:
+        return
+
+    audit_file = repo_root / audit_path
+    require(audit_file.is_file(), errors, f"{algorithm_id}: structure audit missing: {audit_path}")
+    check_path = repo_root / "scripts" / "quality" / "check.ps1"
+    if check_path.is_file():
+        check_text = check_path.read_text(encoding="utf-8", errors="replace")
+        require(
+            Path(audit_path).stem in check_text,
+            errors,
+            f"{algorithm_id}: structure audit {Path(audit_path).stem} must run from quality/check.ps1",
+        )
+    else:
+        require(False, errors, f"{algorithm_id}: quality check wrapper missing: scripts/quality/check.ps1")
+
+    if not audit_file.is_file():
+        return
+    audit_text = audit_file.read_text(encoding="utf-8", errors="replace")
+    symbol_tokens = [token for target in algorithm.get("rust_target", []) for token in anchor_tokens(str(target))]
+    require(
+        any(token in audit_text for token in symbol_tokens),
+        errors,
+        f"{algorithm_id}: structure audit must reference at least one source-order rust target symbol",
+    )
+
+
 def require(condition: bool, errors: list[str], message: str) -> None:
     if not condition:
         errors.append(message)
 
 
-def validate_algorithm(repo_root: Path, reference_root: Path, algorithm: dict[str, Any], errors: list[str]) -> None:
+def validate_algorithm(
+    repo_root: Path,
+    reference_root: Path,
+    algorithm: dict[str, Any],
+    covered_variables: set[str],
+    commands: set[str],
+    errors: list[str],
+) -> None:
     algorithm_id = str(algorithm.get("id", "")).strip()
     prefix = algorithm_id or "<missing-id>"
 
@@ -125,6 +222,7 @@ def validate_algorithm(repo_root: Path, reference_root: Path, algorithm: dict[st
     for target in rust_targets:
         target_path = repo_root / path_before_anchor(str(target))
         require(target_path.is_file(), errors, f"{prefix}: Rust target does not exist: {target}")
+        validate_rust_target_symbol(repo_root, prefix, str(target), errors)
 
     first_case = str(algorithm.get("first_case", "")).strip()
     require(bool(first_case), errors, f"{prefix}: first_case must not be empty")
@@ -133,6 +231,8 @@ def validate_algorithm(repo_root: Path, reference_root: Path, algorithm: dict[st
 
     proof_variables = [str(value).strip() for value in algorithm.get("proof_variables", [])]
     require(bool(proof_variables), errors, f"{prefix}: proof_variables must not be empty")
+    for variable in proof_variables:
+        require(variable in covered_variables, errors, f"{prefix}: proof variable missing from variable coverage: {variable}")
 
     claim_level = str(algorithm.get("claim_level", "")).strip()
     require(bool(claim_level), errors, f"{prefix}: claim_level must not be empty")
@@ -145,25 +245,49 @@ def validate_algorithm(repo_root: Path, reference_root: Path, algorithm: dict[st
 
     if case_path.is_file():
         case = load_toml(case_path)
+        gate = case.get("gate") or {}
+        gate_script = str(gate.get("script", "")).strip()
         outputs = case.get("outputs", [])
         output_variables = {str(output.get("variable", "")) for output in outputs}
         if status == "conformance":
             require(case.get("comparison_class") == "conformance", errors, f"{prefix}: conformance entry requires conformance case")
             require(case.get("conformance_claim") is True, errors, f"{prefix}: conformance entry requires conformance_claim=true")
-            require(bool((case.get("gate") or {}).get("blocking")), errors, f"{prefix}: conformance claim requires blocking gate")
+            require(bool(gate.get("blocking")), errors, f"{prefix}: conformance claim requires blocking gate")
+            require(bool(gate_script), errors, f"{prefix}: conformance claim requires a gate script")
+            command = dev_command_from_gate(gate_script)
+            require(command in commands, errors, f"{prefix}: gate script must call a registered dev command: {gate_script}")
             for variable in proof_variables:
                 require(variable in output_variables, errors, f"{prefix}: proof variable is not requested by first_case: {variable}")
         elif status == "diagnostic_only":
             require(case.get("conformance_claim") is False, errors, f"{prefix}: diagnostic entry must not use a conformance claim")
+        elif status == "scaffold":
+            require(claim_level == "none", errors, f"{prefix}: scaffold entry must use claim_level=none")
+            require(
+                not str(algorithm.get("first_evidence", "")).strip(),
+                errors,
+                f"{prefix}: scaffold entry must not claim first_evidence",
+            )
+            boundary = str(algorithm.get("support_boundary", "")).lower()
+            require("scaffold" in boundary, errors, f"{prefix}: scaffold support_boundary must state scaffold status")
+            require(
+                "does not add" in boundary or "no " in boundary or "not " in boundary,
+                errors,
+                f"{prefix}: scaffold support_boundary must state that no conformance is added",
+            )
+            validate_source_order_scaffold(repo_root, algorithm, errors)
 
 
 def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
     template_path = repo_root / "specs" / "algorithm_port_ticket_template.toml"
     pr_template_path = repo_root / ".github" / "pull_request_template.md"
+    workflow_path = repo_root / ".github" / "workflows" / "pull-request.yml"
+    pr_check_path = repo_root / "scripts" / "quality" / "pr-port-ticket-check.ps1"
     doc_path = repo_root / "docs" / "src" / "porting-map" / "algorithm-port-ticket.md"
 
     require(template_path.is_file(), errors, f"missing algorithm port ticket template: {template_path}")
     require(pr_template_path.is_file(), errors, f"missing PR template: {pr_template_path}")
+    require(workflow_path.is_file(), errors, f"missing PR workflow: {workflow_path}")
+    require(pr_check_path.is_file(), errors, f"missing PR port-ticket check: {pr_check_path}")
     require(doc_path.is_file(), errors, f"missing algorithm port ticket docs: {doc_path}")
     if not template_path.is_file():
         return
@@ -199,6 +323,24 @@ def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
         for token in PR_TEMPLATE_REQUIRED_TOKENS:
             require(token in pr_text, errors, f"PR template missing algorithm port ticket field token: {token}")
 
+    if workflow_path.is_file():
+        workflow_text = workflow_path.read_text(encoding="utf-8", errors="replace")
+        for token in PR_WORKFLOW_REQUIRED_TOKENS:
+            require(token in workflow_text, errors, f"PR workflow missing algorithm port ticket token: {token}")
+
+    if pr_check_path.is_file():
+        pr_check_text = pr_check_path.read_text(encoding="utf-8", errors="replace")
+        require(
+            "source-order algorithm PRs require an Algorithm Port Ticket" in pr_check_text,
+            errors,
+            "PR port-ticket check must enforce source-order algorithm ticket coverage",
+        )
+        require(
+            "Invoke-SelfTest" in pr_check_text,
+            errors,
+            "PR port-ticket check must expose self-test coverage",
+        )
+
     if doc_path.is_file():
         doc_text = doc_path.read_text(encoding="utf-8", errors="replace")
         for token in PORT_TICKET_DOC_TOKENS:
@@ -223,13 +365,15 @@ def main() -> int:
     spec = load_toml(ledger_path)
     algorithms = spec.get("algorithm", [])
     require(isinstance(algorithms, list) and bool(algorithms), errors, "algorithm ledger must contain at least one [[algorithm]]")
+    covered_variables = variable_names(repo_root)
+    commands = command_names(repo_root)
 
     seen_ids: set[str] = set()
     for algorithm in algorithms:
         algorithm_id = str(algorithm.get("id", "")).strip()
         require(algorithm_id not in seen_ids, errors, f"duplicate algorithm id: {algorithm_id}")
         seen_ids.add(algorithm_id)
-        validate_algorithm(repo_root, reference_root, algorithm, errors)
+        validate_algorithm(repo_root, reference_root, algorithm, covered_variables, commands, errors)
 
     if errors:
         print("Algorithm ledger validation failed:", file=sys.stderr)

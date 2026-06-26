@@ -7,7 +7,7 @@ energyplus_source = [
   "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::ZoneHeatBalanceState",
+  "crates/ep_runtime/src/heat_balance/state.rs::ZoneHeatBalanceState",
   "crates/ep_runtime/src/runtime.rs::simulate_heat_balance",
 ]
 status = "conformance"
@@ -124,7 +124,7 @@ proof_variables = [
   "Surface Outside Face Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold only for HeatBalanceSurfaceManager barriers. Numerical surface-temperature and heat-flux claims remain limited to promoted conformance entries and their declared variables."
+support_boundary = "Source-order scaffold only for HeatBalanceSurfaceManager barriers. This entry does not add numerical surface-temperature or heat-flux conformance beyond promoted conformance entries and their declared variables."
 
 [[algorithm]]
 id = "heat_balance_air_manager_source_order"
@@ -160,7 +160,7 @@ proof_variables = [
   "Zone Mean Air Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold only for ManageZoneAirUpdates and its MAT history/output-timing ownership. It records the barrier without expanding zone-air conformance beyond promoted variables."
+support_boundary = "Source-order scaffold only for ManageZoneAirUpdates and its MAT history/output-timing ownership. This entry does not add zone-air conformance beyond promoted variables."
 
 [[algorithm]]
 id = "surface_inside_temperature"
@@ -170,7 +170,7 @@ energyplus_source = [
   "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
 ]
 rust_target = [
-  "crates/ep_runtime/src/runtime.rs::SurfaceHeatBalanceState",
+  "crates/ep_runtime/src/heat_balance/state.rs::SurfaceHeatBalanceState",
   "crates/ep_runtime/src/runtime.rs::simulate_heat_balance",
 ]
 status = "conformance"
@@ -316,7 +316,7 @@ proof_variables = [
   "System Node Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold for ZoneEquipmentManager dispatch into PurchasedAirManager. It records ManageZoneEquipment, SimZoneEquipment, SimPurchasedAir, GetPurchasedAir, InitPurchasedAir, CalcPurchAirLoads, UpdatePurchasedAir, and ReportPurchasedAir barriers without broadening IdealLoads or HVAC conformance."
+support_boundary = "Source-order scaffold for ZoneEquipmentManager dispatch into PurchasedAirManager. It records ManageZoneEquipment, SimZoneEquipment, SimPurchasedAir, GetPurchasedAir, InitPurchasedAir, CalcPurchAirLoads, UpdatePurchasedAir, and ReportPurchasedAir barriers and does not add IdealLoads or HVAC conformance."
 
 [[algorithm]]
 id = "ideal_loads_constant_shr_humidity_control"
