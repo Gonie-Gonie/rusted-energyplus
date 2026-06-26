@@ -11,4 +11,5 @@ $params = @{
     SurfaceIterations = 20
 }
 
-& (Join-Path $PSScriptRoot "official-dynamic-heat-balance-diagnostic.ps1") @params
+$DiagnosticScript = Join-Path $PSScriptRoot "..\..\compare\official-dynamic-heat-balance-diagnostic.ps1"
+& $DiagnosticScript @params

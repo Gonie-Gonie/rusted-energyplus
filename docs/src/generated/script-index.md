@@ -17,7 +17,7 @@ Status values distinguish public user commands, developer commands, release comm
 | missing command targets | 0 |
 | duplicate command targets | 0 |
 | unexposed PowerShell files | 16 |
-| unexposed public-folder PowerShell files | 7 |
+| unexposed public-folder PowerShell files | 0 |
 | README dev commands missing from catalog | 0 |
 
 ## Dev Command Catalog Checks
@@ -36,13 +36,7 @@ none
 
 **Unexposed PowerShell files in public command folders**
 
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-adhist-report-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-final-hconv-report-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-live-hconv-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-live-refair-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-surf-refair-report-iter20-probe.ps1`
-- `scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-zone-surf-report-iter20-probe.ps1`
+none
 
 ## Inventory
 
@@ -154,16 +148,9 @@ none
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-commit-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-commit-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-adhist-report-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-final-hconv-report-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval30-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval30-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-inside-ctf-report-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-live-hconv-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-live-refair-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-surf-refair-report-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
-| scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-zone-surf-report-iter20-probe.ps1 | compare | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-iter20-probe.ps1 | compare | developer command | official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-iter20-probe |  |  |  | PowerShell success unless an uncaught error occurs |
@@ -187,6 +174,13 @@ none
 | scripts/gui/eplus-rs-launch/self_test.ps1 | launcher | internal helper |  |  |  |  | nonzero via PowerShell throw |
 | scripts/gui/eplus-rs-launch/ui.ps1 | launcher | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/gui/eplus-rs-launch.ps1 | launcher | public user command | launch-ui | `EnergyPlus ConvertInputFormat`<br>`EnergyPlus executable` |  | `.runtime/ep-launch-output` | explicit exit: exit 0 |
+| scripts/internal/probes/official-hb-flat-adhist-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-final-hconv-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-inside-ctf-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-live-hconv-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-live-refair-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-surf-refair-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
+| scripts/internal/probes/official-hb-flat-zone-surf-report-iter20.ps1 | internal | internal helper |  |  |  |  | PowerShell success unless an uncaught error occurs |
 | scripts/lib/common.ps1 | internal | internal helper |  |  |  |  | nonzero via PowerShell throw |
 | scripts/lib/python.ps1 | internal | internal helper |  |  | `tools/python/requirements-report.txt` | `.runtime/python-venvs/report`<br>`.runtime/python/$ProjectPythonVersion` | PowerShell success unless an uncaught error occurs |
 | scripts/quality/algorithm-ledger-check.ps1 | quality | developer command | algorithm-ledger-check | `tools/docs/validate_algorithm_ledger.py` |  |  | nonzero when checked child process fails |
