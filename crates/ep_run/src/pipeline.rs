@@ -1450,15 +1450,20 @@ fn artifact_map(output_dir: &Path) -> Value {
         "run_summary_json": output_dir.join("run-summary.json").display().to_string(),
         "support_assessment_json": output_dir.join("support-assessment.json").display().to_string(),
         "support_report_md": output_dir.join("support-report.md").display().to_string(),
+        "original_idf": output_dir.join("input").join("original.idf").display().to_string(),
+        "original_epjson": output_dir.join("input").join("original.epJSON").display().to_string(),
         "converted_epjson": output_dir.join("input").join("converted.epJSON").display().to_string(),
+        "input_hashes_json": output_dir.join("input").join("input-hashes.json").display().to_string(),
         "raw_model_summary_json": output_dir.join("model").join("raw-model-summary.json").display().to_string(),
         "typed_model_summary_json": output_dir.join("model").join("typed-model-summary.json").display().to_string(),
         "graph_summary_json": output_dir.join("model").join("graph-summary.json").display().to_string(),
         "execution_plan_json": output_dir.join("model").join("execution-plan.json").display().to_string(),
         "result_store_json": output_dir.join("results").join("result-store.json").display().to_string(),
         "selected_outputs_csv": output_dir.join("results").join("selected-outputs.csv").display().to_string(),
+        "meters_csv": output_dir.join("results").join("meters.csv").display().to_string(),
         "run_report_md": output_dir.join("reports").join("run-report.md").display().to_string(),
         "compatibility_boundary_md": output_dir.join("reports").join("compatibility-boundary.md").display().to_string(),
+        "command_log": output_dir.join("logs").join("command.log").display().to_string(),
         "oracle_dir": output_dir.join("oracle").display().to_string(),
         "compare_summary_json": output_dir.join("compare").join("compare-summary.json").display().to_string(),
         "compare_report_md": output_dir.join("compare").join("compare-report.md").display().to_string(),
@@ -1471,7 +1476,9 @@ fn markdown_cell(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::source_order_gate_summary;
+    use std::path::Path;
+
+    use super::{artifact_map, source_order_gate_summary};
     use ep_runtime::{
         EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
     };
@@ -1505,5 +1512,76 @@ mod tests {
             gate.actual_executed_source_order_stages,
             vec!["init-heat-balance"]
         );
+    }
+
+    #[test]
+    fn artifact_map_lists_c4_output_contract_paths() {
+        let artifacts = artifact_map(Path::new("out"));
+        let root = Path::new("out");
+        for (key, expected) in [
+            ("diagnostics_json", root.join("diagnostics.json")),
+            ("eplusrs_err", root.join("eplusrs.err")),
+            ("run_summary_json", root.join("run-summary.json")),
+            (
+                "support_assessment_json",
+                root.join("support-assessment.json"),
+            ),
+            ("support_report_md", root.join("support-report.md")),
+            ("original_idf", root.join("input").join("original.idf")),
+            (
+                "original_epjson",
+                root.join("input").join("original.epJSON"),
+            ),
+            (
+                "converted_epjson",
+                root.join("input").join("converted.epJSON"),
+            ),
+            (
+                "input_hashes_json",
+                root.join("input").join("input-hashes.json"),
+            ),
+            (
+                "raw_model_summary_json",
+                root.join("model").join("raw-model-summary.json"),
+            ),
+            (
+                "typed_model_summary_json",
+                root.join("model").join("typed-model-summary.json"),
+            ),
+            (
+                "graph_summary_json",
+                root.join("model").join("graph-summary.json"),
+            ),
+            (
+                "execution_plan_json",
+                root.join("model").join("execution-plan.json"),
+            ),
+            (
+                "result_store_json",
+                root.join("results").join("result-store.json"),
+            ),
+            (
+                "selected_outputs_csv",
+                root.join("results").join("selected-outputs.csv"),
+            ),
+            ("meters_csv", root.join("results").join("meters.csv")),
+            ("run_report_md", root.join("reports").join("run-report.md")),
+            (
+                "compatibility_boundary_md",
+                root.join("reports").join("compatibility-boundary.md"),
+            ),
+            ("command_log", root.join("logs").join("command.log")),
+            ("oracle_dir", root.join("oracle")),
+            (
+                "compare_summary_json",
+                root.join("compare").join("compare-summary.json"),
+            ),
+            (
+                "compare_report_md",
+                root.join("compare").join("compare-report.md"),
+            ),
+        ] {
+            assert_eq!(artifacts[key], expected.display().to_string());
+        }
     }
 }
