@@ -110,6 +110,12 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
             "user_purpose": "Machine-readable numerical conformance aggregate and series detail.",
         },
         {
+            "role": "conformance-summary-json",
+            "path": evidence_path(repo_root, version, "conformance-summary.json"),
+            "produced_by": f".\\scripts\\dev.cmd conformance-evidence-report -Version {version}",
+            "user_purpose": "Machine-readable summary of PDF evidence inputs, aggregate status, and artifacts.",
+        },
+        {
             "role": "conformance-index-pdf",
             "path": evidence_path(repo_root, version, "conformance-index-report.pdf"),
             "produced_by": f".\\scripts\\dev.cmd conformance-index-report -Version {version}",
@@ -261,12 +267,14 @@ def expected_asset_specs(repo_root: Path, version: str, target: str) -> list[dic
         ("one-zone-mat-plot", "1zone_zone_mean_air_temperature.png", "1Zone MAT Oracle/Rust time-series overlay."),
         ("one-zone-surface-temperature-plot", "1zone_surface_inside_face_temperature.png", "1Zone representative surface temperature overlay."),
         ("one-zone-conduction-heatmap", "1zone_surface_conduction_delta_heatmap.png", "1Zone surface conduction absolute-delta heatmap."),
+        ("one-zone-family-pass-fail-heatmap", "1zone_family_pass_fail_heatmap.png", "1Zone family pass/fail heatmap."),
         ("one-zone-delta-histogram", "1zone_delta_histogram.png", "1Zone key output absolute-delta distribution histogram."),
         ("ideal-loads-rates-plot", "ideal_loads_zone_total_rates.png", "IdealLoads no-OA heating/cooling rate overlay."),
         ("ideal-loads-node-state-plot", "ideal_loads_supply_node_state.png", "IdealLoads no-OA supply node state overlay."),
         ("ideal-loads-branch-heatmap", "ideal_loads_branch_status_heatmap.png", "IdealLoads branch-level evidence status heatmap."),
         ("ideal-loads-meter-comparison", "ideal_loads_meter_comparison.png", "IdealLoads facility meter aggregate delta comparison."),
         ("stage-timing-plot", "stage_timing_stacked_bar.png", "Compare stage timing stacked bar chart."),
+        ("trace-overhead-plot", "trace_overhead.png", "Trace/report overhead chart outside numerical comparison."),
         ("plot-evidence-summary-json", "plot-evidence-summary.json", "Machine-readable plot export manifest."),
     ]
     specs.extend(

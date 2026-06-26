@@ -11,6 +11,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import BoundaryNorm, ListedColormap
 
 
 def parse_args() -> argparse.Namespace:
@@ -24,6 +25,12 @@ def parse_args() -> argparse.Namespace:
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_optional_json(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    return load_json(path)
 
 
 def evidence_root(repo_root: Path, version: str) -> Path:
@@ -174,6 +181,28 @@ def plot_record(record: dict[str, Any], title: str, ylabel: str | None = None) -
     return fig
 
 
+def placeholder_plot(title: str, note: str) -> Any:
+    fig, ax = plt.subplots(figsize=(8.2, 4.2))
+    ax.set_title(title, loc="left", fontweight="bold")
+    ax.text(0.5, 0.52, note, ha="center", va="center", fontsize=10, color="#5b6775", transform=ax.transAxes)
+    ax.text(
+        0.5,
+        0.42,
+        "Generated as an evidence-pack placeholder so the plot manifest stays structurally complete.",
+        ha="center",
+        va="center",
+        fontsize=8,
+        color="#697789",
+        transform=ax.transAxes,
+    )
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for spine in ax.spines.values():
+        spine.set_color("#d7dde5")
+    fig.tight_layout()
+    return fig
+
+
 def one_zone_surface_temperature_plot(summary: dict[str, Any]) -> Any:
     matches = dynamic_series(summary, None, "Surface Inside Face Temperature")
     selected: list[dict[str, Any]] = []
@@ -190,6 +219,12 @@ def one_zone_surface_temperature_plot(summary: dict[str, Any]) -> Any:
         if match is not None:
             selected.append(match)
     fig, ax = plt.subplots(figsize=(8.2, 4.6))
+    if not selected:
+        plt.close(fig)
+        return placeholder_plot(
+            "1Zone Representative Surface Inside Face Temperature",
+            "Missing dynamic compare-summary sample rows.",
+        )
     for series in selected:
         output = series.get("output") or {}
         key = str(output.get("key", "surface"))
@@ -250,6 +285,9 @@ def one_zone_delta_histogram(summary: dict[str, Any]) -> Any:
             values.extend(delta)
         if values:
             ax.hist(values, bins=60, alpha=0.42, label=label, color=color)
+    if not ax.has_data():
+        plt.close(fig)
+        return placeholder_plot("1Zone Delta Distribution", "Missing dynamic compare-summary sample rows.")
     ax.set_title("1Zone Delta Distribution", loc="left", fontweight="bold")
     ax.set_xlabel("Absolute delta")
     ax.set_ylabel("Sample count")
@@ -394,6 +432,50 @@ def ideal_loads_branch_heatmap_plot(repo_root: Path, version: str) -> Any:
     return fig
 
 
+def family_status_code(status: str | None) -> int:
+    text = str(status or "").lower()
+    if "fail" in text:
+        return 0
+    if "planned" in text or "not-claimed" in text:
+        return 1
+    if "diagnostic" in text:
+        return 2
+    if "pass" in text or "tracked" in text:
+        return 3
+    return 1
+
+
+def one_zone_family_pass_fail_heatmap(repo_root: Path, version: str) -> Any:
+    report = load_optional_json(
+        evidence_root(repo_root, version)
+        / "one-zone-family"
+        / "official_1zone_uncontrolled_family_report.json"
+    )
+    cases = report.get("cases", [])
+    columns = ["case", "variable", "regression"]
+    matrix = [[family_status_code(case.get("Status")) for _column in columns] for case in cases]
+    labels = [str(case.get("Case", "missing")).replace("official_1zone_uncontrolled_", "")[:42] for case in cases]
+    if not matrix:
+        matrix = [[1, 1, 1]]
+        labels = ["missing"]
+    cmap = ListedColormap(["#c62828", "#b0bec5", "#f9a825", "#2e7d32"])
+    norm = BoundaryNorm([-0.5, 0.5, 1.5, 2.5, 3.5], cmap.N)
+    fig, ax = plt.subplots(figsize=(8.2, max(3.0, 0.36 * len(labels) + 1.2)))
+    image = ax.imshow(matrix, aspect="auto", cmap=cmap, norm=norm)
+    ax.set_xticks(range(len(columns)), columns)
+    ax.set_yticks(range(len(labels)), labels)
+    ax.set_title("1Zone Family Pass/Fail Heatmap", loc="left", fontweight="bold")
+    ax.tick_params(axis="y", labelsize=6.8)
+    for y, row in enumerate(matrix):
+        for x, value in enumerate(row):
+            label = {0: "fail", 1: "not", 2: "diag", 3: "pass"}[value]
+            ax.text(x, y, label, ha="center", va="center", fontsize=6.4, color="#17212b")
+    cbar = fig.colorbar(image, ax=ax, fraction=0.028, pad=0.02)
+    cbar.set_ticks([0, 1, 2, 3], labels=["fail", "not", "diag", "pass"])
+    fig.tight_layout()
+    return fig
+
+
 def ideal_loads_meter_comparison_plot(repo_root: Path) -> Any:
     summaries = sorted(
         (repo_root / ".runtime").glob("ideal-loads-*facility-meter*/26.1.0/*/compare/compare-summary.json")
@@ -426,6 +508,32 @@ def ideal_loads_meter_comparison_plot(repo_root: Path) -> Any:
     return fig
 
 
+def trace_overhead_plot(repo_root: Path, version: str) -> Any:
+    performance = load_optional_json(evidence_root(repo_root, version) / "performance-summary.json")
+    cases = performance.get("cases", [])
+    labels = [str(case.get("case_id", f"C{index + 1}"))[:42] for index, case in enumerate(cases)]
+    values = []
+    for case in cases:
+        stat = case.get("release_gate_overhead", {})
+        values.append(float(stat.get("mean") or 0.0))
+    if not values:
+        labels = ["missing"]
+        values = [0.0]
+    fig, ax = plt.subplots(figsize=(8.4, max(3.0, 0.34 * len(labels) + 1.2)))
+    y_values = list(range(len(labels)))
+    ax.barh(y_values, values, color="#697789", edgecolor="none")
+    max_value = max(values, default=1.0) or 1.0
+    for y, value in zip(y_values, values):
+        ax.text(value + max_value * 0.012, y, f"{value:.3g}", va="center", fontsize=7)
+    ax.set_yticks(y_values, labels)
+    ax.invert_yaxis()
+    ax.set_xlabel("Mean seconds")
+    ax.set_title("Trace and Report Overhead", loc="left", fontweight="bold")
+    style_axis(ax, "x")
+    fig.tight_layout()
+    return fig
+
+
 def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Path) -> dict[str, Any]:
     ensure_dir(output_dir)
     ensure_dir(latest_dir)
@@ -434,39 +542,46 @@ def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Pat
     save_figure(coverage_status_plot(evidence), output_dir, latest_dir, "coverage_status_bar.png", plots)
     save_figure(declared_vs_passed_plot(evidence), output_dir, latest_dir, "declared_vs_passed_series.png", plots)
     mat = find_time_series(evidence, "1Zone", "Zone Mean Air Temperature")
-    if mat:
-        save_figure(
-            plot_record(mat, "1Zone Zone Mean Air Temperature", "C"),
-            output_dir,
-            latest_dir,
-            "1zone_zone_mean_air_temperature.png",
-            plots,
-        )
+    save_figure(
+        plot_record(mat, "1Zone Zone Mean Air Temperature", "C")
+        if mat
+        else placeholder_plot("1Zone Zone Mean Air Temperature", "Missing 1Zone MAT time-series record."),
+        output_dir,
+        latest_dir,
+        "1zone_zone_mean_air_temperature.png",
+        plots,
+    )
     dynamic_summary = dynamic_compare_summary(repo_root, evidence)
-    if dynamic_summary:
-        save_figure(
-            one_zone_surface_temperature_plot(dynamic_summary),
-            output_dir,
-            latest_dir,
-            "1zone_surface_inside_face_temperature.png",
-            plots,
-        )
-        save_figure(
-            one_zone_conduction_delta_heatmap(dynamic_summary),
-            output_dir,
-            latest_dir,
-            "1zone_surface_conduction_delta_heatmap.png",
-            plots,
-        )
-        save_figure(
-            one_zone_delta_histogram(dynamic_summary),
-            output_dir,
-            latest_dir,
-            "1zone_delta_histogram.png",
-            plots,
-        )
+    save_figure(
+        one_zone_surface_temperature_plot(dynamic_summary),
+        output_dir,
+        latest_dir,
+        "1zone_surface_inside_face_temperature.png",
+        plots,
+    )
+    save_figure(
+        one_zone_conduction_delta_heatmap(dynamic_summary),
+        output_dir,
+        latest_dir,
+        "1zone_surface_conduction_delta_heatmap.png",
+        plots,
+    )
+    save_figure(
+        one_zone_delta_histogram(dynamic_summary),
+        output_dir,
+        latest_dir,
+        "1zone_delta_histogram.png",
+        plots,
+    )
     save_figure(ideal_loads_rates_plot(evidence), output_dir, latest_dir, "ideal_loads_zone_total_rates.png", plots)
     save_figure(ideal_loads_node_state_plot(evidence), output_dir, latest_dir, "ideal_loads_supply_node_state.png", plots)
+    save_figure(
+        one_zone_family_pass_fail_heatmap(repo_root, version),
+        output_dir,
+        latest_dir,
+        "1zone_family_pass_fail_heatmap.png",
+        plots,
+    )
     save_figure(
         ideal_loads_branch_heatmap_plot(repo_root, version),
         output_dir,
@@ -482,6 +597,7 @@ def build_plots(repo_root: Path, version: str, output_dir: Path, latest_dir: Pat
         plots,
     )
     save_figure(stage_timing_plot(evidence), output_dir, latest_dir, "stage_timing_stacked_bar.png", plots)
+    save_figure(trace_overhead_plot(repo_root, version), output_dir, latest_dir, "trace_overhead.png", plots)
     summary = {
         "schema_version": 1,
         "version": version,
