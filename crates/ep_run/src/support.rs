@@ -469,6 +469,7 @@ pub fn assess_support(
     assess_typed_runtime_boundaries(
         typed_model,
         raw_model,
+        &capability_registry.spec,
         mode,
         &mut unsupported_objects,
         &mut diagnostics,

@@ -242,6 +242,7 @@ fn supports_outdoor_air_selected_branch(
 pub(super) fn assess_typed_runtime_boundaries(
     typed_model: Option<&TypedModel>,
     raw_model: &RawModel,
+    registry: &CapabilityRegistrySpec,
     mode: RunMode,
     unsupported_objects: &mut Vec<SupportObjectEntry>,
     diagnostics: &mut RunDiagnostics,
@@ -265,6 +266,41 @@ pub(super) fn assess_typed_runtime_boundaries(
                 "the arbitrary runtime currently supports one-zone cases; found {} zones",
                 typed_model.zones.len()
             ),
+        );
+    }
+
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "AirLoopHVAC",
+        typed_model.air_loops.len(),
+    );
+    for fan in &typed_model.fans {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            fan.kind.object_type(),
+            1,
+        );
+    }
+    for coil in &typed_model.coils {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            coil.kind.object_type(),
+            1,
+        );
+    }
+    for manager in &typed_model.setpoint_managers {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            manager.object_type.0.as_str(),
+            1,
         );
     }
 
@@ -349,6 +385,35 @@ pub(super) fn assess_typed_runtime_boundaries(
     }
 
     warn_for_ignored_semantic_objects(raw_model, diagnostics);
+}
+
+fn push_typed_unsupported_object(
+    registry: &CapabilityRegistrySpec,
+    unsupported_objects: &mut Vec<SupportObjectEntry>,
+    diagnostics: &mut RunDiagnostics,
+    object_type: &str,
+    count: usize,
+) {
+    if count == 0 || unsupported_rule_for_object(registry, object_type).is_none() {
+        return;
+    }
+
+    let (code, note) = unsupported_object_reason(registry, object_type);
+    unsupported_objects.push(SupportObjectEntry {
+        object_type: object_type.to_string(),
+        count,
+        status: "unsupported".to_string(),
+        note: note.clone(),
+    });
+    diagnostics.push(
+        RunDiagnostic::new(
+            RunDiagnosticSeverity::Error,
+            code,
+            "support",
+            format!("{object_type} is typed for graph/source-map diagnostics but not executable in arbitrary-run compatibility mode"),
+        )
+        .with_object(object_type.to_string(), None),
+    );
 }
 
 fn push_typed_boundary(
