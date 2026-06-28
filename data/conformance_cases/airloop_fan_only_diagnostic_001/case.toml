@@ -1,0 +1,68 @@
+id = "airloop_fan_only_diagnostic_001"
+title = "AirLoopHVAC fan-only diagnostic fixture"
+milestone = "C3-airloop-hvac-skeleton"
+purpose = "Record baseline-only AirLoopHVAC fan graph evidence without claiming fan or air-loop numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This C3 case is a diagnostic-only AirLoopHVAC graph and output-request gate.",
+  "The fan-only fixture compiles AirLoopHVAC, BranchList, Branch, Fan:ConstantVolume, SetpointManager, and AvailabilityManager typed skeletons.",
+  "Fan-only conformance promotion remains blocked until node and fan variables have a tolerance-gated comparison path."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "minimal-epjson"
+source_file = "data/testcases/minimal/airloop-fan-only.epJSON"
+tier = "C"
+
+[scope]
+domains = ["hvac", "node"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = true
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/airloop_fan_only_diagnostic_001/airloop_fan_only_diagnostic.idf"
+epjson = "data/testcases/minimal/airloop-fan-only.epJSON"
+
+[[outputs]]
+key = "Fan Inlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "Fan Outlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "Supply Fan"
+variable = "Fan Electricity Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = "compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd airloop-fan-only-diagnostic-smoke"
+blocking = true

@@ -40,6 +40,8 @@ pub(crate) fn result_store_json(results: &ResultStore) -> Value {
                 "key": series.key,
                 "variable_name": series.variable_name,
                 "units": series.units,
+                "store_type": series.store_type().id(),
+                "store_type_source": "ep_runtime::ResultStore",
                 "samples": series.values.len(),
                 "first": series.values.first().copied().map(finite_json_number),
                 "last": series.values.last().copied().map(finite_json_number),
@@ -61,15 +63,17 @@ pub(crate) fn result_store_json(results: &ResultStore) -> Value {
 }
 
 pub(crate) fn write_selected_outputs_csv(path: &Path, results: &ResultStore) -> Result<(), String> {
-    let mut csv = String::from("series_index,handle,key,variable_name,units,sample_index,value\n");
+    let mut csv =
+        String::from("series_index,handle,key,variable_name,units,store_type,sample_index,value\n");
     for (series_index, series) in results.series.iter().enumerate() {
         for (sample_index, value) in series.values.iter().enumerate() {
             csv.push_str(&format!(
-                "{series_index},{},{},{},{},{sample_index},{}\n",
+                "{series_index},{},{},{},{},{},{sample_index},{}\n",
                 series.handle.0,
                 csv_field(&series.key),
                 csv_field(&series.variable_name),
                 csv_field(&series.units),
+                series.store_type().id(),
                 if value.is_finite() {
                     format!("{value:.12}")
                 } else {
@@ -104,15 +108,38 @@ pub(crate) fn render_eplusrs_err(diagnostics: &RunDiagnostics, exit_code: RunExi
         return text;
     }
     for diagnostic in &diagnostics.diagnostics {
+        let context = diagnostic_context_label(diagnostic);
         text.push_str(&format!(
-            "{} [{}] {}: {}\n",
+            "{} [{}] {}{}: {}\n",
             diagnostic.severity.id(),
             diagnostic.code,
             diagnostic.stage,
+            context,
             diagnostic.message
         ));
     }
     text
+}
+
+fn diagnostic_context_label(diagnostic: &crate::RunDiagnostic) -> String {
+    let mut fields = Vec::new();
+    if let Some(surface) = diagnostic.surface.as_ref() {
+        fields.push(format!("surface={surface}"));
+    }
+    if let Some(zone) = diagnostic.zone.as_ref() {
+        fields.push(format!("zone={zone}"));
+    }
+    if let Some(timestep) = diagnostic.timestep {
+        fields.push(format!("timestep={timestep}"));
+    }
+    if let Some(output_handle) = diagnostic.output_handle {
+        fields.push(format!("output_handle={output_handle}"));
+    }
+    if fields.is_empty() {
+        String::new()
+    } else {
+        format!(" ({})", fields.join(", "))
+    }
 }
 
 pub(crate) fn render_support_report(assessment: &SupportAssessment) -> String {
@@ -391,11 +418,34 @@ fn markdown_cell(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::render_support_report;
+    use super::{render_eplusrs_err, render_support_report};
     use crate::{
-        ClaimBoundary, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunResultState,
-        RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus,
+        ClaimBoundary, RunDiagnostic, RunDiagnosticSeverity, RunDiagnostics, RunExitCode,
+        RunResultState, RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus,
     };
+
+    #[test]
+    fn eplusrs_err_renders_structured_diagnostic_context() {
+        let mut diagnostics = RunDiagnostics::default();
+        diagnostics.push(
+            RunDiagnostic::new(
+                RunDiagnosticSeverity::Error,
+                "ToleranceFailure",
+                "conformance-gate",
+                "Zone Mean Air Temperature exceeded tolerance",
+            )
+            .with_zone(Some("ZONE ONE".to_string()))
+            .with_timestep(Some(42))
+            .with_output_handle(Some(7)),
+        );
+
+        let text = render_eplusrs_err(&diagnostics, RunExitCode::OracleCompare);
+
+        assert!(text.contains("error [ToleranceFailure] conformance-gate"));
+        assert!(text.contains("zone=ZONE ONE"));
+        assert!(text.contains("timestep=42"));
+        assert!(text.contains("output_handle=7"));
+    }
 
     #[test]
     fn support_report_limits_blocked_reason_summary_to_ten() {

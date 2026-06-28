@@ -2,8 +2,8 @@
 
 use crate::{RuntimeOutputRegistry, manage_heat_balance_source_order_stages};
 use ep_model::{
-    IdealLoadsAirSystemId, OutputHandle, ScheduleId, SimulationModel, ZoneEquipmentListId, ZoneId,
-    ZoneThermostatId,
+    ConstructionId, IdealLoadsAirSystemId, OutputHandle, ScheduleId, SimulationModel, SurfaceId,
+    ZoneEquipmentListId, ZoneId, ZoneThermostatId,
 };
 
 /// Runtime execution-plan stage kind.
@@ -155,6 +155,70 @@ pub enum ExecutionStep {
     WriteOutput(OutputHandle),
 }
 
+/// Per-stage state dependency contract compiled from the typed model.
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct ExecutionStageDependency {
+    /// State domains read by this stage.
+    pub reads: Vec<&'static str>,
+    /// State domains written by this stage.
+    pub writes: Vec<&'static str>,
+}
+
+impl ExecutionStageDependency {
+    fn new(reads: &[&'static str], writes: &[&'static str]) -> Self {
+        Self {
+            reads: reads.to_vec(),
+            writes: writes.to_vec(),
+        }
+    }
+}
+
+/// Typed IDs prebound to a stage before runtime execution begins.
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct ExecutionStagePreboundSet {
+    /// ResultStore output handles written by this stage.
+    pub output_handles: Vec<OutputHandle>,
+    /// Surface loop targets resolved from the typed model.
+    pub surface_ids: Vec<SurfaceId>,
+    /// Zone loop targets resolved from the typed model.
+    pub zone_ids: Vec<ZoneId>,
+    /// Construction coefficient references resolved from the typed model.
+    pub construction_ids: Vec<ConstructionId>,
+    /// Schedule IDs resolved from the typed model.
+    pub schedule_ids: Vec<ScheduleId>,
+    /// Weather series indices consumed by this stage.
+    pub weather_series_indices: Vec<usize>,
+}
+
+/// Runtime lookup policy attached to a compiled execution plan.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ExecutionPlanRuntimePolicy {
+    /// Object lookup policy after RawModel/TypedModel compilation.
+    pub post_typed_model_object_lookup: &'static str,
+    /// String comparison policy for runtime stage execution.
+    pub stage_execution_string_comparison: &'static str,
+    /// HashMap lookup policy for runtime stage execution.
+    pub stage_execution_hash_map_lookup: &'static str,
+    /// Ordering policy for compatibility mode.
+    pub compatibility_plan_order: &'static str,
+    /// Stage grouping policy across compatibility and fast modes.
+    pub fast_mode_grouping_policy: &'static str,
+}
+
+impl ExecutionPlanRuntimePolicy {
+    /// Compatibility-mode runtime policy for precompiled plans.
+    #[must_use]
+    pub const fn compatibility_precompiled() -> Self {
+        Self {
+            post_typed_model_object_lookup: "forbidden-after-rawmodel-typedmodel-runtime-uses-prebound-typed-ids",
+            stage_execution_string_comparison: "forbidden-in-source-order-stage-execution",
+            stage_execution_hash_map_lookup: "compile-and-report-only-hot-stages-use-vecs-and-typed-ids",
+            compatibility_plan_order: "deterministic-energyplus-source-order-then-typed-model-order",
+            fast_mode_grouping_policy: "compatibility-mode-forbids-stage-reordering-fast-mode-only-safe-grouping",
+        }
+    }
+}
+
 /// Named runtime execution stage.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ExecutionStage {
@@ -164,15 +228,31 @@ pub struct ExecutionStage {
     pub name: String,
     /// Ordered execution steps in this stage.
     pub steps: Vec<ExecutionStep>,
+    /// State dependency contract for this stage.
+    pub dependencies: ExecutionStageDependency,
+    /// Typed IDs and handles resolved before runtime execution.
+    pub prebound: ExecutionStagePreboundSet,
 }
 
 impl ExecutionStage {
-    fn from_compatibility_stage(stage: EnergyPlusCompatibilityStage) -> Self {
+    /// Creates a stage with dependency metadata and no prebound IDs.
+    #[must_use]
+    pub fn new(
+        kind: ExecutionStageKind,
+        name: impl Into<String>,
+        steps: Vec<ExecutionStep>,
+    ) -> Self {
         Self {
-            kind: stage.kind,
-            name: stage.stage_name.to_string(),
-            steps: Vec::new(),
+            kind,
+            name: name.into(),
+            steps,
+            dependencies: stage_dependencies(kind),
+            prebound: ExecutionStagePreboundSet::default(),
         }
+    }
+
+    fn from_compatibility_stage(stage: EnergyPlusCompatibilityStage) -> Self {
+        Self::new(stage.kind, stage.stage_name, Vec::new())
     }
 }
 
@@ -196,9 +276,24 @@ pub struct ExecutionPlan {
     pub stages: Vec<ExecutionStage>,
     /// EnergyPlus heat-balance routine order that compatibility mode must preserve.
     pub compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
+    /// Runtime lookup and ordering policy for this plan.
+    pub runtime_policy: ExecutionPlanRuntimePolicy,
 }
 
 impl ExecutionPlan {
+    /// Creates a deterministic execution plan with compatibility runtime policy.
+    #[must_use]
+    pub fn new(
+        stages: Vec<ExecutionStage>,
+        compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
+    ) -> Self {
+        Self {
+            stages,
+            compatibility_stages,
+            runtime_policy: ExecutionPlanRuntimePolicy::compatibility_precompiled(),
+        }
+    }
+
     /// Returns the total step count across all stages.
     #[must_use]
     pub fn step_count(&self) -> usize {
@@ -426,10 +521,9 @@ pub fn build_execution_plan_with_output_registry(
         );
     }
 
-    ExecutionPlan {
-        stages,
-        compatibility_stages,
-    }
+    compile_stage_contracts(&mut stages, model, output_registry);
+
+    ExecutionPlan::new(stages, compatibility_stages)
 }
 
 fn push_steps_to_stage(
@@ -460,4 +554,206 @@ fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '
                 .iter()
                 .map(|schedule| schedule.id),
         )
+}
+
+fn compile_stage_contracts(
+    stages: &mut [ExecutionStage],
+    model: &SimulationModel,
+    output_registry: &RuntimeOutputRegistry,
+) {
+    let output_handles = output_registry
+        .outputs()
+        .iter()
+        .map(|output| output.handle)
+        .collect::<Vec<_>>();
+    let surface_ids = model
+        .typed
+        .surfaces
+        .iter()
+        .map(|surface| surface.id)
+        .collect::<Vec<_>>();
+    let zone_ids = model
+        .typed
+        .zones
+        .iter()
+        .map(|zone| zone.id)
+        .collect::<Vec<_>>();
+    let construction_ids = model
+        .typed
+        .constructions
+        .iter()
+        .map(|construction| construction.id)
+        .collect::<Vec<_>>();
+    let schedule_ids = schedule_ids(model).collect::<Vec<_>>();
+    let weather_series_indices = vec![0_usize];
+
+    for stage in stages {
+        stage.dependencies = stage_dependencies(stage.kind);
+        stage.prebound = stage_prebound_set(
+            stage.kind,
+            &output_handles,
+            &surface_ids,
+            &zone_ids,
+            &construction_ids,
+            &schedule_ids,
+            &weather_series_indices,
+        );
+    }
+}
+
+fn stage_prebound_set(
+    kind: ExecutionStageKind,
+    output_handles: &[OutputHandle],
+    surface_ids: &[SurfaceId],
+    zone_ids: &[ZoneId],
+    construction_ids: &[ConstructionId],
+    schedule_ids: &[ScheduleId],
+    weather_series_indices: &[usize],
+) -> ExecutionStagePreboundSet {
+    let mut prebound = ExecutionStagePreboundSet::default();
+    match kind {
+        ExecutionStageKind::InitHeatBalance => {
+            prebound.schedule_ids.extend_from_slice(schedule_ids);
+            prebound
+                .weather_series_indices
+                .extend_from_slice(weather_series_indices);
+        }
+        ExecutionStageKind::ManageSurfaceHeatBalance
+        | ExecutionStageKind::InitSurfaceHeatBalance
+        | ExecutionStageKind::CalcHeatBalanceOutsideSurf
+        | ExecutionStageKind::CalcHeatBalanceInsideSurf
+        | ExecutionStageKind::UpdateFinalSurfaceHeatBalance
+        | ExecutionStageKind::UpdateThermalHistories
+        | ExecutionStageKind::ReportSurfaceHeatBalance => {
+            prebound.surface_ids.extend_from_slice(surface_ids);
+            prebound
+                .construction_ids
+                .extend_from_slice(construction_ids);
+            if matches!(kind, ExecutionStageKind::CalcHeatBalanceOutsideSurf) {
+                prebound
+                    .weather_series_indices
+                    .extend_from_slice(weather_series_indices);
+            }
+        }
+        ExecutionStageKind::ManageAirHeatBalance
+        | ExecutionStageKind::ManageZoneAirUpdates
+        | ExecutionStageKind::RecKeepHeatBalance
+        | ExecutionStageKind::ReportHeatBalance
+        | ExecutionStageKind::CheckWarmupConvergence => {
+            prebound.zone_ids.extend_from_slice(zone_ids);
+            if matches!(kind, ExecutionStageKind::ReportHeatBalance) {
+                prebound.output_handles.extend_from_slice(output_handles);
+            }
+        }
+        ExecutionStageKind::ZoneEquipmentManager => {
+            prebound.zone_ids.extend_from_slice(zone_ids);
+        }
+        ExecutionStageKind::ReportPurchasedAir => {
+            prebound.output_handles.extend_from_slice(output_handles);
+        }
+        _ => {}
+    }
+    prebound
+}
+
+fn stage_dependencies(kind: ExecutionStageKind) -> ExecutionStageDependency {
+    match kind {
+        ExecutionStageKind::GetHeatBalanceInput => {
+            ExecutionStageDependency::new(&["typed_model"], &["heat_balance_input"])
+        }
+        ExecutionStageKind::InitHeatBalance => ExecutionStageDependency::new(
+            &["weather_series", "schedule_series", "heat_balance_input"],
+            &["environment_state", "schedule_state", "heat_balance_state"],
+        ),
+        ExecutionStageKind::ManageSurfaceHeatBalance => ExecutionStageDependency::new(
+            &["surface_state", "zone_state", "construction_thermal_data"],
+            &["surface_heat_balance_state"],
+        ),
+        ExecutionStageKind::InitSurfaceHeatBalance => ExecutionStageDependency::new(
+            &["surface_state", "construction_thermal_data"],
+            &["surface_state"],
+        ),
+        ExecutionStageKind::CalcHeatBalanceOutsideSurf => ExecutionStageDependency::new(
+            &[
+                "surface_state",
+                "weather_series",
+                "construction_thermal_data",
+            ],
+            &["outside_surface_heat_balance"],
+        ),
+        ExecutionStageKind::CalcHeatBalanceInsideSurf => ExecutionStageDependency::new(
+            &["surface_state", "zone_state", "construction_thermal_data"],
+            &["inside_surface_heat_balance"],
+        ),
+        ExecutionStageKind::ManageAirHeatBalance => ExecutionStageDependency::new(
+            &["zone_state", "surface_heat_balance_state"],
+            &["zone_air_heat_balance_state"],
+        ),
+        ExecutionStageKind::ManageZoneAirUpdates => ExecutionStageDependency::new(
+            &["zone_air_heat_balance_state", "thermostat_state"],
+            &["zone_state"],
+        ),
+        ExecutionStageKind::UpdateFinalSurfaceHeatBalance => ExecutionStageDependency::new(
+            &[
+                "inside_surface_heat_balance",
+                "outside_surface_heat_balance",
+            ],
+            &["surface_state"],
+        ),
+        ExecutionStageKind::UpdateThermalHistories => ExecutionStageDependency::new(
+            &["surface_state", "construction_thermal_data"],
+            &["surface_history_state"],
+        ),
+        ExecutionStageKind::ReportSurfaceHeatBalance => ExecutionStageDependency::new(
+            &["surface_state", "surface_history_state"],
+            &["result_store"],
+        ),
+        ExecutionStageKind::RecKeepHeatBalance => {
+            ExecutionStageDependency::new(&["zone_state", "surface_state"], &["result_store"])
+        }
+        ExecutionStageKind::ReportHeatBalance => ExecutionStageDependency::new(
+            &["zone_state", "surface_state", "result_store"],
+            &["result_store"],
+        ),
+        ExecutionStageKind::CheckWarmupConvergence => ExecutionStageDependency::new(
+            &["zone_state", "surface_state"],
+            &["warmup_convergence_state"],
+        ),
+        ExecutionStageKind::ZoneEquipmentManager => {
+            ExecutionStageDependency::new(&["zone_state"], &["zone_equipment_state"])
+        }
+        ExecutionStageKind::SimPurchasedAir => ExecutionStageDependency::new(
+            &["zone_equipment_state"],
+            &["purchased_air_dispatch_state"],
+        ),
+        ExecutionStageKind::GetPurchasedAir => ExecutionStageDependency::new(
+            &["purchased_air_dispatch_state"],
+            &["purchased_air_input_state"],
+        ),
+        ExecutionStageKind::InitPurchasedAir => ExecutionStageDependency::new(
+            &["purchased_air_input_state", "schedule_series"],
+            &["purchased_air_state"],
+        ),
+        ExecutionStageKind::CalcPurchAirLoads => ExecutionStageDependency::new(
+            &["zone_state", "purchased_air_state"],
+            &["purchased_air_loads_state"],
+        ),
+        ExecutionStageKind::UpdatePurchasedAir => ExecutionStageDependency::new(
+            &["purchased_air_loads_state"],
+            &["node_state", "purchased_air_state"],
+        ),
+        ExecutionStageKind::ReportPurchasedAir => {
+            ExecutionStageDependency::new(&["purchased_air_state", "node_state"], &["result_store"])
+        }
+        ExecutionStageKind::EmsBeginZoneTimestepBeforeInitHeatBalance
+        | ExecutionStageKind::EmsBeginZoneTimestepAfterInitHeatBalance
+        | ExecutionStageKind::EmsEndZoneTimestepBeforeZoneReporting
+        | ExecutionStageKind::EmsEndZoneTimestepAfterZoneReporting => {
+            ExecutionStageDependency::new(&["ems_state"], &["ems_state"])
+        }
+        ExecutionStageKind::Environment
+        | ExecutionStageKind::Zone
+        | ExecutionStageKind::ZoneEquipment
+        | ExecutionStageKind::Output => ExecutionStageDependency::default(),
+    }
 }

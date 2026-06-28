@@ -71,5 +71,10 @@ Assert-Contains -Text $planText -Pattern "plant_loop_branch_list_edges: 2" -Desc
 Assert-Contains -Text $planText -Pattern "plant_branch_list_member_edges: 4" -Description "plant branch-list member graph edges"
 Assert-Contains -Text $planText -Pattern "plant_connector_list_member_edges: 2" -Description "plant connector-list member graph edges"
 Assert-Contains -Text $planText -Pattern "plant_branch_component_edges: 4" -Description "plant branch component graph edges"
+Assert-Contains -Text $planText -Pattern "plant_loop_half_loops: 2" -Description "plant half-loop graph nodes"
+Assert-Contains -Text $planText -Pattern "plant_loop_branch_list_member_edges: 3" -Description "plant half-loop branch-list graph edges"
+Assert-Contains -Text $planText -Pattern "plant_loop_connector_list_member_edges: 2" -Description "plant half-loop connector-list graph edges"
+Assert-Contains -Text $planText -Pattern "plant_component_registry_entries: 3" -Description "plant component registry entries"
+Assert-Contains -Text $planText -Pattern "plant_loop_graph_diagnostics: 0" -Description "plant loop unsupported-topology diagnostic count"
 
 Write-Host "Plant-loop skeleton smoke passed."

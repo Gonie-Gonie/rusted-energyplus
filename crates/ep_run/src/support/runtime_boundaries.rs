@@ -324,7 +324,7 @@ pub(super) fn assess_typed_runtime_boundaries(
                 diagnostics.push(
                     RunDiagnostic::new(
                         RunDiagnosticSeverity::Error,
-                        "UnsupportedAlgorithm",
+                        "UnsupportedHeatBalanceBranch",
                         "support",
                         format!(
                             "IdealLoads system '{}' uses unsupported feature flags: {:?}",

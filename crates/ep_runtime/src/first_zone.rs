@@ -1,15 +1,17 @@
 //! First-zone simulation and geometry summary value types.
 
 use crate::geometry::{surface_area_m2, zone_volume_m3};
-use crate::heat_balance::{step_zone_air_temperature, surface_thermal_properties};
+use crate::heat_balance::{
+    ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO, step_zone_air_temperature,
+    surface_thermal_properties,
+};
+use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
 use crate::schedules::internal_gain_w;
 use crate::{OutputSeries, ResultStore, RuntimeError, SimulationMode, SimulationState, ZoneState};
 use ep_model::{
     OutputHandle, OutsideBoundaryCondition, SimulationModel, SurfaceId, SurfaceType, Zone, ZoneId,
 };
 
-const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
-const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
 
 /// Options for the first uncontrolled one-zone simulation subset.
@@ -84,7 +86,12 @@ pub fn simulate_first_zone_uncontrolled(
     }
 
     let zone = model.typed.zones.first().ok_or(RuntimeError::NoZones)?;
-    let characteristics = derive_first_zone_characteristics(model, zone, options.sample_count)?;
+    let characteristics = derive_first_zone_characteristics(
+        model,
+        zone,
+        options.sample_count,
+        options.initial_zone_air_temperature_c,
+    )?;
     let zone_steps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
 
@@ -153,6 +160,7 @@ fn derive_first_zone_characteristics(
     model: &SimulationModel,
     zone: &Zone,
     sample_count: usize,
+    initial_zone_air_temperature_c: f64,
 ) -> Result<FirstZoneSimulationSummary, RuntimeError> {
     let volume_m3 =
         zone_volume_m3(&model.typed, zone).ok_or_else(|| RuntimeError::MissingZoneVolume {
@@ -160,8 +168,12 @@ fn derive_first_zone_characteristics(
         })?;
     let (exterior_area_m2, conductance_w_per_k) = exterior_zone_conductance(model, zone)?;
     let multiplier = f64::from(zone.multiplier.max(1));
-    let air_heat_capacity_j_per_k =
-        volume_m3 * multiplier * AIR_DENSITY_KG_PER_M3 * AIR_SPECIFIC_HEAT_J_PER_KG_K;
+    let air_heat_capacity_j_per_k = energyplus_standard_zone_air_heat_capacity_j_per_k(
+        volume_m3 * multiplier,
+        initial_zone_air_temperature_c,
+        ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+    )
+    .unwrap_or(0.0);
     let internal_gain_w = internal_gain_w(&model.typed, zone.id, 1);
 
     Ok(FirstZoneSimulationSummary {

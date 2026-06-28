@@ -111,6 +111,12 @@ pub struct PlantConnectorList {
     pub connectors: Vec<PlantConnectorListEntry>,
 }
 
+/// Generic typed `BranchList` alias used by AirLoop and Plant graph skeletons.
+pub type BranchList = PlantBranchList;
+
+/// Generic typed `ConnectorList` alias used by AirLoop and Plant graph skeletons.
+pub type ConnectorList = PlantConnectorList;
+
 /// Typed `Pump:ConstantSpeed` identity and node endpoints.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PumpConstantSpeed {

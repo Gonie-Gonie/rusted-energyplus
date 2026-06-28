@@ -50,6 +50,16 @@ pub(crate) struct SurfaceHeatBalanceTrace {
     pub(crate) inside_convection_coefficient_w_per_m2_k: Vec<f64>,
     pub(crate) inside_net_surface_thermal_radiation_heat_gain_rate_w: Vec<f64>,
     pub(crate) inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
+    pub(crate) inside_radiant_internal_gain_source_term_rate_w: Vec<f64>,
+    pub(crate) inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2: Vec<f64>,
+    pub(crate) inside_shortwave_absorbed_source_term_rate_w: Vec<f64>,
+    pub(crate) inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2: Vec<f64>,
+    pub(crate) inside_additional_heat_source_term_rate_w: Vec<f64>,
+    pub(crate) inside_additional_heat_source_term_rate_per_area_w_per_m2: Vec<f64>,
+    pub(crate) inside_radiant_hvac_source_term_rate_w: Vec<f64>,
+    pub(crate) inside_radiant_hvac_source_term_rate_per_area_w_per_m2: Vec<f64>,
+    pub(crate) inside_total_source_term_rate_w: Vec<f64>,
+    pub(crate) inside_total_source_term_rate_per_area_w_per_m2: Vec<f64>,
     pub(crate) outside_convection_heat_gain_rate_w: Vec<f64>,
     pub(crate) outside_convection_heat_gain_rate_per_area_w_per_m2: Vec<f64>,
     pub(crate) outside_convection_coefficient_w_per_m2_k: Vec<f64>,
@@ -104,6 +114,16 @@ pub(crate) struct SurfaceHeatBalanceTraceSums {
     pub(crate) inside_convection_coefficient_w_per_m2_k: f64,
     pub(crate) inside_net_surface_thermal_radiation_heat_gain_rate_w: f64,
     pub(crate) inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: f64,
+    pub(crate) inside_radiant_internal_gain_source_term_rate_w: f64,
+    pub(crate) inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2: f64,
+    pub(crate) inside_shortwave_absorbed_source_term_rate_w: f64,
+    pub(crate) inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2: f64,
+    pub(crate) inside_additional_heat_source_term_rate_w: f64,
+    pub(crate) inside_additional_heat_source_term_rate_per_area_w_per_m2: f64,
+    pub(crate) inside_radiant_hvac_source_term_rate_w: f64,
+    pub(crate) inside_radiant_hvac_source_term_rate_per_area_w_per_m2: f64,
+    pub(crate) inside_total_source_term_rate_w: f64,
+    pub(crate) inside_total_source_term_rate_per_area_w_per_m2: f64,
     pub(crate) outside_convection_heat_gain_rate_w: f64,
     pub(crate) outside_convection_heat_gain_rate_per_area_w_per_m2: f64,
     pub(crate) outside_convection_coefficient_w_per_m2_k: f64,
@@ -320,7 +340,14 @@ pub(crate) fn heat_balance_zone_air_state_sample(
         zone_timestep_average_air_humidity_ratio: zone.zone_timestep_average_air_humidity_ratio,
         previous_air_humidity_ratios: zone.previous_air_humidity_ratios,
         previous_system_air_humidity_ratios: zone.previous_system_air_humidity_ratios,
+        use_zone_timestep_history: zone.use_zone_timestep_history,
+        shorten_timestep_sys: zone.shorten_timestep_sys,
+        prior_timestep_seconds: zone.prior_timestep_seconds,
         air_heat_capacity_j_per_k: zone.air_heat_capacity_j_per_k,
+        sum_mcp_w_per_k: zone.sum_mcp_w_per_k,
+        sum_mcp_t_w: zone.sum_mcp_t_w,
+        sum_sys_mcp_w_per_k: zone.sum_sys_mcp_w_per_k,
+        sum_sys_mcp_t_w: zone.sum_sys_mcp_t_w,
         zone_air_temperature_coefficients: zone.zone_air_temperature_coefficients,
     }
 }
@@ -430,6 +457,24 @@ pub(crate) fn surface_heat_balance_traces_from_state(
             inside_net_surface_thermal_radiation_heat_gain_rate_w: Vec::with_capacity(sample_count),
             inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
                 Vec::with_capacity(sample_count),
+            inside_radiant_internal_gain_source_term_rate_w: Vec::with_capacity(sample_count),
+            inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2: Vec::with_capacity(
+                sample_count,
+            ),
+            inside_shortwave_absorbed_source_term_rate_w: Vec::with_capacity(sample_count),
+            inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2: Vec::with_capacity(
+                sample_count,
+            ),
+            inside_additional_heat_source_term_rate_w: Vec::with_capacity(sample_count),
+            inside_additional_heat_source_term_rate_per_area_w_per_m2: Vec::with_capacity(
+                sample_count,
+            ),
+            inside_radiant_hvac_source_term_rate_w: Vec::with_capacity(sample_count),
+            inside_radiant_hvac_source_term_rate_per_area_w_per_m2: Vec::with_capacity(
+                sample_count,
+            ),
+            inside_total_source_term_rate_w: Vec::with_capacity(sample_count),
+            inside_total_source_term_rate_per_area_w_per_m2: Vec::with_capacity(sample_count),
             outside_convection_heat_gain_rate_w: Vec::with_capacity(sample_count),
             outside_convection_heat_gain_rate_per_area_w_per_m2: Vec::with_capacity(sample_count),
             outside_convection_coefficient_w_per_m2_k: Vec::with_capacity(sample_count),
@@ -617,6 +662,36 @@ pub(crate) fn push_surface_heat_balance_trace_averages(
                 sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2
                     / divisor,
             );
+        trace
+            .inside_radiant_internal_gain_source_term_rate_w
+            .push(sums.inside_radiant_internal_gain_source_term_rate_w / divisor);
+        trace
+            .inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2
+            .push(sums.inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2 / divisor);
+        trace
+            .inside_shortwave_absorbed_source_term_rate_w
+            .push(sums.inside_shortwave_absorbed_source_term_rate_w / divisor);
+        trace
+            .inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2
+            .push(sums.inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2 / divisor);
+        trace
+            .inside_additional_heat_source_term_rate_w
+            .push(sums.inside_additional_heat_source_term_rate_w / divisor);
+        trace
+            .inside_additional_heat_source_term_rate_per_area_w_per_m2
+            .push(sums.inside_additional_heat_source_term_rate_per_area_w_per_m2 / divisor);
+        trace
+            .inside_radiant_hvac_source_term_rate_w
+            .push(sums.inside_radiant_hvac_source_term_rate_w / divisor);
+        trace
+            .inside_radiant_hvac_source_term_rate_per_area_w_per_m2
+            .push(sums.inside_radiant_hvac_source_term_rate_per_area_w_per_m2 / divisor);
+        trace
+            .inside_total_source_term_rate_w
+            .push(sums.inside_total_source_term_rate_w / divisor);
+        trace
+            .inside_total_source_term_rate_per_area_w_per_m2
+            .push(sums.inside_total_source_term_rate_per_area_w_per_m2 / divisor);
         trace
             .outside_convection_heat_gain_rate_w
             .push(sums.outside_convection_heat_gain_rate_w / divisor);

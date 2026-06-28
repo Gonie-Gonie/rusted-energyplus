@@ -15,10 +15,11 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file};
 use ep_runtime::{
-    EpwRecord, ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions,
-    IdealLoadsCompatibilityOptions, NodeStateProjectionOptions, ResultStore,
-    RuntimePrecomputedData, build_hourly_time_axis, load_epw_records, precompute_runtime_data,
-    simulate_heat_balance_zone_air_temperatures_with_weather_records,
+    ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
+    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleValueSeries, TimeAxis,
+    WeatherTimestepSeries, build_hourly_time_axis, load_epw_records, precompute_runtime_data,
+    precompute_schedule_value_series_for_time_axis, precompute_weather_timestep_series,
+    simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
 use serde::Serialize;
@@ -132,12 +133,15 @@ struct RustRuntimeResult {
 
 struct PreparedRuntimeInputs {
     sample_count: usize,
-    weather_records: Option<Vec<EpwRecord>>,
+    time_axis: TimeAxis,
+    schedule_series: Vec<ScheduleValueSeries>,
+    weather_series: Option<WeatherTimestepSeries>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 struct GraphAndPlanExportSummary {
     trace_wall_seconds: f64,
+    trace_file_size_bytes: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -337,7 +341,10 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
             "trace_overhead",
             "ep_run",
             graph_and_plan_export.trace_wall_seconds,
-            "generate trace metadata and optional source-order stage snapshot artifacts",
+            format!(
+                "generate trace metadata and optional source-order stage snapshot artifacts; trace_file_size_bytes={}",
+                graph_and_plan_export.trace_file_size_bytes
+            ),
         );
     }
 
@@ -1157,19 +1164,41 @@ fn write_graph_and_plan(
     let trace_enabled = trace_level_enables_stage_snapshots(trace_level);
     let trace_start = Instant::now();
     let stage_snapshots = execution_stage_snapshots(plan, trace_level);
+    let trace_file_size_bytes =
+        write_source_order_stage_state_snapshots(output_dir, plan, trace_level, trace_selection)?;
     let plan_json = json!({
         "schema_version": 1,
         "stage_count": plan.stages.len(),
         "step_count": plan.step_count(),
         "output_registry_count": precomputed.output_registry.len(),
         "output_meter_registry_count": precomputed.output_registry.meter_registry().len(),
+        "runtime_lookup_policy": {
+            "post_typed_model_object_lookup": plan.runtime_policy.post_typed_model_object_lookup,
+            "stage_execution_string_comparison": plan.runtime_policy.stage_execution_string_comparison,
+            "stage_execution_hash_map_lookup": plan.runtime_policy.stage_execution_hash_map_lookup,
+            "compatibility_plan_order": plan.runtime_policy.compatibility_plan_order,
+            "fast_mode_grouping_policy": plan.runtime_policy.fast_mode_grouping_policy,
+        },
+        "prebound_summary": {
+            "surface_loop_targets": model.typed.surfaces.len(),
+            "zone_loop_targets": model.typed.zones.len(),
+            "construction_coefficient_references": model.typed.constructions.len(),
+            "schedule_ids": model.typed.schedules.len() + model.typed.compact_schedules.len(),
+            "weather_series_indices": 1,
+            "output_handles": precomputed.output_registry.len(),
+        },
         "source_order_gate": source_order_gate,
         "expected_source_order_stages": expected_source_order_stages,
         "actual_executed_source_order_stages": actual_executed_source_order_stages,
         "trace_level": trace_level.id(),
         "trace_selection": trace_selection,
         "selected_trace_enabled": selected_trace_enabled(trace_level, trace_selection),
-        "selected_trace_policy": "surface/node trace payloads are emitted only for explicitly requested names; source-order stage snapshots remain metadata-only",
+        "selected_trace_policy": "zone/surface/ctf payloads are emitted only for explicitly requested names; source-order stage snapshots remain metadata-only",
+        "ctf_split_trace_enabled": ctf_split_trace_enabled(trace_level, trace_selection),
+        "full_surface_trace_opt_in": full_surface_trace_opt_in(trace_level, trace_selection),
+        "trace_output_write_policy": "buffered-json-writer",
+        "trace_variable_handle_policy": "trace handles are separate from RuntimeOutputRegistry output handles",
+        "trace_file_size_bytes": trace_file_size_bytes,
         "stage_snapshots_enabled": trace_level_enables_stage_snapshots(trace_level),
         "stage_snapshot_policy": "metadata-only source-order snapshots generated from ExecutionPlan; no simulation values are read or mutated",
         "stage_snapshots": stage_snapshots,
@@ -1177,6 +1206,18 @@ fn write_graph_and_plan(
             "kind": stage.kind.id(),
             "name": stage.name,
             "steps": stage.steps.iter().map(execution_step_label).collect::<Vec<_>>(),
+            "dependencies": {
+                "reads": stage.dependencies.reads.clone(),
+                "writes": stage.dependencies.writes.clone(),
+            },
+            "prebound": {
+                "output_handles": stage.prebound.output_handles.iter().map(|id| id.0).collect::<Vec<_>>(),
+                "surface_ids": stage.prebound.surface_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+                "zone_ids": stage.prebound.zone_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+                "construction_ids": stage.prebound.construction_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+                "schedule_ids": stage.prebound.schedule_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+                "weather_series_indices": stage.prebound.weather_series_indices.clone(),
+            },
         })).collect::<Vec<_>>(),
         "compatibility_stages": plan.compatibility_stages.iter().map(|stage| json!({
             "kind": stage.kind.id(),
@@ -1189,22 +1230,43 @@ fn write_graph_and_plan(
         &output_dir.join("model").join("execution-plan.json"),
         &plan_json,
     )?;
-    write_source_order_stage_state_snapshots(output_dir, plan, trace_level, trace_selection)?;
     Ok(GraphAndPlanExportSummary {
         trace_wall_seconds: if trace_enabled {
             trace_start.elapsed().as_secs_f64()
         } else {
             0.0
         },
+        trace_file_size_bytes,
     })
 }
 
 fn trace_level_enables_stage_snapshots(trace_level: TraceLevel) -> bool {
-    matches!(trace_level, TraceLevel::Detailed | TraceLevel::Debug)
+    matches!(
+        trace_level,
+        TraceLevel::Stage
+            | TraceLevel::Zone
+            | TraceLevel::Surface
+            | TraceLevel::Ctf
+            | TraceLevel::Full
+    )
 }
 
 fn selected_trace_enabled(trace_level: TraceLevel, selection: &TraceSelection) -> bool {
-    trace_level_enables_stage_snapshots(trace_level) && !selection.is_empty()
+    matches!(
+        trace_level,
+        TraceLevel::Zone | TraceLevel::Surface | TraceLevel::Ctf | TraceLevel::Full
+    ) && !selection.is_empty()
+}
+
+fn ctf_split_trace_enabled(trace_level: TraceLevel, selection: &TraceSelection) -> bool {
+    matches!(trace_level, TraceLevel::Ctf | TraceLevel::Full) && !selection.surface_names.is_empty()
+}
+
+fn full_surface_trace_opt_in(trace_level: TraceLevel, selection: &TraceSelection) -> bool {
+    matches!(
+        trace_level,
+        TraceLevel::Surface | TraceLevel::Ctf | TraceLevel::Full
+    ) && !selection.surface_names.is_empty()
 }
 
 fn write_source_order_stage_state_snapshots(
@@ -1212,11 +1274,14 @@ fn write_source_order_stage_state_snapshots(
     plan: &ExecutionPlan,
     trace_level: TraceLevel,
     trace_selection: &TraceSelection,
-) -> Result<(), String> {
+) -> Result<u64, String> {
     if !trace_level_enables_stage_snapshots(trace_level) {
-        return Ok(());
+        return Ok(0);
     }
     let snapshots = source_order_stage_state_snapshots(plan, trace_level);
+    let trace_path = output_dir
+        .join("logs")
+        .join("source-order-stage-state-snapshots.json");
     let artifact = json!({
         "schema_version": 1,
         "snapshot_schema": "rusted-energyplus.source-order-stage-state-snapshot.v1",
@@ -1224,19 +1289,21 @@ fn write_source_order_stage_state_snapshots(
         "trace_level": trace_level.id(),
         "trace_selection": trace_selection,
         "selected_trace_enabled": selected_trace_enabled(trace_level, trace_selection),
+        "ctf_split_trace_enabled": ctf_split_trace_enabled(trace_level, trace_selection),
+        "full_surface_trace_opt_in": full_surface_trace_opt_in(trace_level, trace_selection),
         "selected_surface_count": trace_selection.surface_names.len(),
         "selected_node_count": trace_selection.node_names.len(),
-        "selected_trace_policy": "surface/node trace payloads are emitted only for explicitly requested names; this artifact records stage metadata only",
+        "selected_trace_policy": "zone/surface/ctf payloads are emitted only for explicitly requested names; this artifact records stage metadata only",
+        "trace_output_write_policy": "buffered-json-writer",
+        "trace_variable_handle_policy": "trace handles are separate from RuntimeOutputRegistry output handles",
         "snapshot_count": snapshots.len(),
         "mutation_policy": "diagnostic trace artifact only; runtime calculations never read this file",
         "snapshots": snapshots,
     });
-    write_json(
-        &output_dir
-            .join("logs")
-            .join("source-order-stage-state-snapshots.json"),
-        &artifact,
-    )
+    write_json(&trace_path, &artifact)?;
+    Ok(std::fs::metadata(&trace_path)
+        .map(|metadata| metadata.len())
+        .unwrap_or(0))
 }
 
 fn execution_stage_snapshots(plan: &ExecutionPlan, trace_level: TraceLevel) -> Vec<Value> {
@@ -1399,22 +1466,29 @@ fn prepare_runtime_inputs(
 ) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_sample_count(config, model)?;
-    let weather_records = if runtime_class_requires_weather(runtime_class) {
+    let time_axis = build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?;
+    let schedule_series = precompute_schedule_value_series_for_time_axis(&model.typed, &time_axis);
+    let weather_series = if runtime_class_requires_weather(runtime_class) {
         let weather_path = config
             .weather_path
             .as_ref()
             .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-        Some(
-            load_epw_records(weather_path)
-                .map_err(|error| format!("failed to load EPW weather: {error}"))?,
-        )
+        let weather_records = load_epw_records(weather_path)
+            .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+        Some(precompute_weather_timestep_series(
+            &weather_records,
+            model.typed.timestep.number_of_timesteps_per_hour.max(1),
+            time_axis.first_hour_interpolation_starting_values,
+        ))
     } else {
         None
     };
 
     Ok(PreparedRuntimeInputs {
         sample_count,
-        weather_records,
+        time_axis,
+        schedule_series,
+        weather_series,
     })
 }
 
@@ -1429,13 +1503,15 @@ fn execute_rust_runtime(
     match runtime_class {
         RuntimeClass::OneZoneHeatBalanceCompatibility
         | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
-            let weather_records = runtime_inputs.weather_records.as_deref().ok_or_else(|| {
+            let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
                 "weather records are required for heat-balance runtime".to_string()
             })?;
+            let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
+            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_series.len();
             let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
-            let simulation = simulate_heat_balance_zone_air_temperatures_with_weather_records(
+            let simulation = simulate_heat_balance_zone_air_temperatures_with_weather_series(
                 model,
-                weather_records,
+                weather_series,
                 options,
             )
             .map_err(|error| error.to_string())?;
@@ -1766,8 +1842,9 @@ mod tests {
     use std::path::Path;
 
     use super::{
-        artifact_map, execution_stage_snapshots, input_error_diagnostic_code,
-        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
+        artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
+        full_surface_trace_opt_in, input_error_diagnostic_code, selected_trace_enabled,
+        source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots,
     };
     use ep_runtime::{
@@ -1805,15 +1882,12 @@ mod tests {
             source_file: "src/EnergyPlus/HeatBalanceManager.cc",
             source_routine: "GetHeatBalanceInput",
         };
-        let actual = ExecutionStage {
-            kind: ExecutionStageKind::InitHeatBalance,
-            name: "init-heat-balance".to_string(),
-            steps: Vec::new(),
-        };
-        let plan = ExecutionPlan {
-            stages: vec![actual],
-            compatibility_stages: vec![expected],
-        };
+        let actual = ExecutionStage::new(
+            ExecutionStageKind::InitHeatBalance,
+            "init-heat-balance",
+            Vec::new(),
+        );
+        let plan = ExecutionPlan::new(vec![actual], vec![expected]);
 
         let gate = source_order_gate_summary(&plan);
 
@@ -1836,15 +1910,12 @@ mod tests {
             source_file: "src/EnergyPlus/HeatBalanceManager.cc",
             source_routine: "GetHeatBalanceInput",
         };
-        let stage = ExecutionStage {
-            kind: ExecutionStageKind::GetHeatBalanceInput,
-            name: "get-heat-balance-input".to_string(),
-            steps: vec![ExecutionStep::UpdateWeather],
-        };
-        let plan = ExecutionPlan {
-            stages: vec![stage],
-            compatibility_stages: vec![expected],
-        };
+        let stage = ExecutionStage::new(
+            ExecutionStageKind::GetHeatBalanceInput,
+            "get-heat-balance-input",
+            vec![ExecutionStep::UpdateWeather],
+        );
+        let plan = ExecutionPlan::new(vec![stage], vec![expected]);
 
         assert!(!trace_level_enables_stage_snapshots(TraceLevel::Normal));
         assert!(trace_level_enables_stage_snapshots(TraceLevel::Detailed));
@@ -1877,8 +1948,11 @@ mod tests {
         assert!(!selected_trace_enabled(TraceLevel::Detailed, &empty));
         assert!(!selected_trace_enabled(TraceLevel::Debug, &empty));
         assert!(!selected_trace_enabled(TraceLevel::Normal, &selected));
-        assert!(selected_trace_enabled(TraceLevel::Detailed, &selected));
+        assert!(!selected_trace_enabled(TraceLevel::Detailed, &selected));
+        assert!(selected_trace_enabled(TraceLevel::Surface, &selected));
         assert!(selected_trace_enabled(TraceLevel::Debug, &selected));
+        assert!(ctf_split_trace_enabled(TraceLevel::Ctf, &selected));
+        assert!(full_surface_trace_opt_in(TraceLevel::Surface, &selected));
     }
 
     #[test]
@@ -1889,15 +1963,12 @@ mod tests {
             source_file: "src/EnergyPlus/HeatBalanceManager.cc",
             source_routine: "InitHeatBalance",
         };
-        let stage = ExecutionStage {
-            kind: ExecutionStageKind::InitHeatBalance,
-            name: "init-heat-balance".to_string(),
-            steps: vec![ExecutionStep::UpdateWeather],
-        };
-        let plan = ExecutionPlan {
-            stages: vec![stage],
-            compatibility_stages: vec![expected],
-        };
+        let stage = ExecutionStage::new(
+            ExecutionStageKind::InitHeatBalance,
+            "init-heat-balance",
+            vec![ExecutionStep::UpdateWeather],
+        );
+        let plan = ExecutionPlan::new(vec![stage], vec![expected]);
 
         assert!(source_order_stage_state_snapshots(&plan, TraceLevel::Normal).is_empty());
 

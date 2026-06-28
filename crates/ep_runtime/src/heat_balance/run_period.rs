@@ -4,8 +4,9 @@ use crate::heat_balance::air_manager::{
     weather_proxy_zone_air_heat_capacity_j_per_k, zone_air_heat_balance_air_storage_rate_w,
 };
 use crate::heat_balance::convection::{
-    energyplus_building_terrain, energyplus_surface_outdoor_air_temperature_c,
-    energyplus_surface_outside_wind_speed_m_per_s,
+    energyplus_building_terrain, energyplus_outside_convection_branch_id,
+    energyplus_surface_outdoor_air_temperature_c, energyplus_surface_outside_wind_speed_m_per_s,
+    energyplus_tarp_inside_convection_branch_id, heat_balance_uses_doe2_outside_convection,
 };
 use crate::heat_balance::ctf::{
     heat_balance_ctf_history_slot_inside_flux_term_rate_w,
@@ -39,6 +40,7 @@ use crate::heat_balance::state::{
 };
 use crate::heat_balance::surface_balance::{
     reported_surface_outside_face_temperature_c, surface_exterior_report_terms,
+    surface_inside_face_balance_equation_terms_w_per_m2,
 };
 use crate::heat_balance::surface_manager;
 use crate::heat_balance::surface_weather::{
@@ -64,8 +66,12 @@ use crate::heat_balance::{
     heat_balance_uses_weather_air_storage_report,
     heat_balance_zone_air_algorithm_execution_variant,
 };
+use crate::psychrometrics::{
+    energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
+};
 use crate::weather::{
-    EpwRecord, energyplus_weather_dry_bulb_at_timestep_with_starting_values,
+    EpwRecord, WeatherTimestepSeries, energyplus_weather_atmospheric_pressure_for_context,
+    energyplus_weather_dry_bulb_at_timestep_with_starting_values,
     energyplus_weather_horizontal_infrared_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
     heat_balance_weather_context_for_timestep,
@@ -78,6 +84,7 @@ pub(crate) fn sample_heat_balance_run_period(
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
     options: HeatBalanceSimulationOptions,
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
@@ -156,22 +163,25 @@ pub(crate) fn sample_heat_balance_run_period(
             BTreeMap::<(String, usize), HeatBalanceCtfHistorySlotFirstSampleAccumulator>::new();
 
         for substep in 1..=steps {
-            let timestep_outdoor_dry_bulb_c =
-                energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                    weather_records,
-                    hour_index,
-                    outdoor_dry_bulb_c,
-                    steps,
-                    substep,
-                    first_hour_interpolation_starting_values,
-                );
             let weather_context = heat_balance_weather_context_for_timestep(
-                weather_records,
+                weather_series,
                 hour_index,
                 steps,
                 substep,
                 first_hour_interpolation_starting_values,
             );
+            let timestep_outdoor_dry_bulb_c = weather_context
+                .and_then(|context| context.sample.map(|sample| sample.dry_bulb_c))
+                .unwrap_or_else(|| {
+                    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                        weather_records,
+                        hour_index,
+                        outdoor_dry_bulb_c,
+                        steps,
+                        substep,
+                        first_hour_interpolation_starting_values,
+                    )
+                });
             let timestep_outdoor_wet_bulb_c = weather_context
                 .map(|context| {
                     energyplus_exterior_wet_reference_temperature_c(
@@ -196,17 +206,19 @@ pub(crate) fn sample_heat_balance_run_period(
             );
             let timestep_rain_status = weather_context
                 .map(|context| {
-                    if energyplus_weather_record_is_rain_at_timestep_with_starting_values(
-                        context.records,
-                        context.record_index,
-                        substep,
-                        steps,
-                        context.first_hour_interpolation_starting_values,
-                    ) {
-                        1.0
-                    } else {
-                        0.0
-                    }
+                    let is_raining = context
+                        .sample
+                        .map(|sample| sample.liquid_precipitation_depth_mm >= 0.8)
+                        .unwrap_or_else(|| {
+                            energyplus_weather_record_is_rain_at_timestep_with_starting_values(
+                                context.records,
+                                context.record_index,
+                                substep,
+                                steps,
+                                context.first_hour_interpolation_starting_values,
+                            )
+                        });
+                    if is_raining { 1.0 } else { 0.0 }
                 })
                 .unwrap_or(0.0);
             advance_heat_balance_state_one_timestep_internal(
@@ -259,15 +271,18 @@ pub(crate) fn sample_heat_balance_run_period(
             rain_status_sum += timestep_rain_status;
             for (index, (zone_id, _zone_name, _values)) in zone_temperatures.iter().enumerate() {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                    let reported_zone_temperature_c = if matches!(
-                        options.zone_air_algorithm,
-                        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
-                            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
-                    ) {
-                        zone_state.zone_timestep_average_air_temperature_c
-                    } else {
-                        zone_state.mean_air_temperature_c
-                    };
+                    let reported_zone_temperature_c =
+                        crate::heat_balance::air_manager::report_zone_mean_air_temp_compat(|| {
+                            if matches!(
+                                options.zone_air_algorithm,
+                                HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
+                                    | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
+                            ) {
+                                zone_state.zone_timestep_average_air_temperature_c
+                            } else {
+                                zone_state.mean_air_temperature_c
+                            }
+                        });
                     zone_temperature_sums[index] += reported_zone_temperature_c;
                 }
             }
@@ -297,6 +312,25 @@ pub(crate) fn sample_heat_balance_run_period(
                         0.0
                     };
                     if hour_index == 0 {
+                        let barometric_pressure_pa = weather_context
+                            .and_then(|context| {
+                                context.records.get(context.record_index).map(|record| {
+                                    energyplus_weather_atmospheric_pressure_for_context(
+                                        context,
+                                        record.atmospheric_pressure_pa,
+                                    )
+                                })
+                            })
+                            .unwrap_or(101_325.0);
+                        let rho_air_kg_per_m3 = energyplus_moist_air_density_kg_per_m3(
+                            barometric_pressure_pa,
+                            zone_state.mean_air_temperature_c,
+                            zone_state.air_humidity_ratio,
+                        )
+                        .unwrap_or(f64::NAN);
+                        let cp_air_j_per_kg_k = energyplus_moist_air_specific_heat_j_per_kg_k(
+                            zone_state.air_humidity_ratio,
+                        );
                         let coefficients = zone_state.zone_air_temperature_coefficients;
                         let third_order_solution_temperature_c =
                             if coefficients.third_order_temp_dependent_load_w_per_k.abs()
@@ -322,10 +356,20 @@ pub(crate) fn sample_heat_balance_run_period(
                                 .previous_system_mean_air_temperatures_c,
                             previous_system_timestep_count: zone_state
                                 .previous_system_timestep_count,
+                            use_zone_timestep_history: zone_state.use_zone_timestep_history,
+                            shorten_timestep_sys: zone_state.shorten_timestep_sys,
+                            prior_timestep_seconds: zone_state.prior_timestep_seconds,
                             air_humidity_ratio: zone_state.air_humidity_ratio,
                             zone_timestep_average_air_humidity_ratio: zone_state
                                 .zone_timestep_average_air_humidity_ratio,
+                            barometric_pressure_pa,
+                            rho_air_kg_per_m3,
+                            cp_air_j_per_kg_k,
                             air_heat_capacity_j_per_k: zone_state.air_heat_capacity_j_per_k,
+                            sum_mcp_w_per_k: zone_state.sum_mcp_w_per_k,
+                            sum_mcp_t_w: zone_state.sum_mcp_t_w,
+                            sum_sys_mcp_w_per_k: zone_state.sum_sys_mcp_w_per_k,
+                            sum_sys_mcp_t_w: zone_state.sum_sys_mcp_t_w,
                             zone_timestep_air_power_cap_w_per_k,
                             zone_air_temperature_coefficients: coefficients,
                             third_order_solution_numerator_w: coefficients
@@ -509,12 +553,34 @@ pub(crate) fn sample_heat_balance_run_period(
                                 use_surface_reference_air_surface_convection_report,
                                 use_final_inside_convection_report,
                             );
-                        let inside_net_surface_thermal_radiation_heat_gain_rate =
-                            surface_state.area_m2 * surface_state.inside_net_longwave_w_per_m2;
                         let inside_rate = surface_inside_conduction_rate_w_for_report(
                             surface_state,
                             use_inside_ctf_outside_temperature_for_conduction_report,
                         );
+                        let inside_rate_per_area =
+                            surface_rate_per_area_w_per_m2(inside_rate, surface_state.area_m2);
+                        let inside_face_balance_terms =
+                            surface_inside_face_balance_equation_terms_w_per_m2(
+                                surface_state,
+                                inside_rate_per_area,
+                                inside_convection_heat_gain_rate_per_area,
+                            );
+                        let _inside_face_balance_diagnostic_sum_per_area =
+                            inside_face_balance_terms.signed_balance_terms_w_per_m2();
+                        let inside_net_surface_thermal_radiation_heat_gain_rate =
+                            surface_state.area_m2 * inside_face_balance_terms.q_lwx_w_per_m2;
+                        let inside_radiant_internal_gain_source_term_rate =
+                            surface_state.area_m2 * inside_face_balance_terms.q_lws_w_per_m2;
+                        let inside_shortwave_absorbed_source_term_rate =
+                            surface_state.area_m2 * inside_face_balance_terms.q_sol_w_per_m2;
+                        let inside_additional_heat_source_term_rate = surface_state.area_m2
+                            * inside_face_balance_terms.q_additional_inside_heat_source_w_per_m2;
+                        let inside_radiant_hvac_source_term_rate = surface_state.area_m2
+                            * inside_face_balance_terms.q_radiant_hvac_w_per_m2;
+                        let inside_total_source_term_rate_per_area =
+                            inside_face_balance_terms.non_convective_source_w_per_m2();
+                        let inside_total_source_term_rate =
+                            surface_state.area_m2 * inside_total_source_term_rate_per_area;
                         let outside_rate = surface_outside_conduction_rate_w_for_report(
                             surface_state,
                             use_inside_ctf_outside_temperature_for_conduction_report,
@@ -595,6 +661,11 @@ pub(crate) fn sample_heat_balance_run_period(
                                 .find(|zone| zone.zone_id == surface_state.zone_id)
                                 .map(|zone| zone.mean_air_temperature_c)
                                 .unwrap_or(f64::NAN);
+                            let use_doe2_outside_convection =
+                                heat_balance_uses_doe2_outside_convection(
+                                    &model.typed,
+                                    options.zone_air_algorithm,
+                                );
                             surface_first_sample_trace.push(HeatBalanceSurfaceFirstSampleTrace {
                                 surface_name: surface_state.surface_name.clone(),
                                 construction_name: surface_state.construction_name.clone(),
@@ -606,11 +677,52 @@ pub(crate) fn sample_heat_balance_run_period(
                                     .inside_convection_input_inside_face_temperature_c,
                                 inside_convection_input_reference_air_temperature_c: surface_state
                                     .inside_convection_input_reference_air_temperature_c,
+                                inside_convection_algorithm: "TARP",
+                                inside_convection_tarp_branch:
+                                    energyplus_tarp_inside_convection_branch_id(
+                                        surface_state,
+                                        surface_state
+                                            .inside_convection_input_inside_face_temperature_c,
+                                        surface_state
+                                            .inside_convection_input_reference_air_temperature_c,
+                                    ),
+                                outside_convection_algorithm: if use_doe2_outside_convection {
+                                    "DOE-2"
+                                } else {
+                                    "SimpleCombined"
+                                },
+                                outside_convection_branch: energyplus_outside_convection_branch_id(
+                                    surface_state,
+                                    typed_surface,
+                                    surface_outdoor_air_wind_direction_deg,
+                                    use_doe2_outside_convection,
+                                ),
                                 outside_face_temperature_c,
                                 inside_convection_heat_gain_rate_w:
                                     inside_convection_heat_gain_rate,
                                 inside_net_surface_thermal_radiation_heat_gain_rate_w:
                                     inside_net_surface_thermal_radiation_heat_gain_rate,
+                                inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2:
+                                    surface_state.inside_net_longwave_w_per_m2,
+                                inside_radiant_internal_gain_source_term_w:
+                                    inside_radiant_internal_gain_source_term_rate,
+                                inside_radiant_internal_gain_source_term_w_per_m2:
+                                    surface_state.inside_radiant_internal_gain_w_per_m2,
+                                inside_shortwave_absorbed_source_term_w:
+                                    inside_shortwave_absorbed_source_term_rate,
+                                inside_shortwave_absorbed_source_term_w_per_m2:
+                                    surface_state.inside_shortwave_absorbed_w_per_m2,
+                                inside_additional_heat_source_term_w:
+                                    inside_additional_heat_source_term_rate,
+                                inside_additional_heat_source_term_w_per_m2:
+                                    surface_state.inside_additional_heat_source_w_per_m2,
+                                inside_radiant_hvac_source_term_w:
+                                    inside_radiant_hvac_source_term_rate,
+                                inside_radiant_hvac_source_term_w_per_m2:
+                                    surface_state.inside_radiant_hvac_w_per_m2,
+                                inside_total_source_term_w: inside_total_source_term_rate,
+                                inside_total_source_term_w_per_m2:
+                                    inside_total_source_term_rate_per_area,
                                 inside_conduction_rate_w: inside_rate,
                                 outside_conduction_rate_w: outside_rate,
                                 heat_storage_rate_w: storage_rate,
@@ -644,6 +756,25 @@ pub(crate) fn sample_heat_balance_run_period(
                             inside_net_surface_thermal_radiation_heat_gain_rate;
                         sums.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2 +=
                         surface_state.inside_net_longwave_w_per_m2;
+                        sums.inside_radiant_internal_gain_source_term_rate_w +=
+                            inside_radiant_internal_gain_source_term_rate;
+                        sums.inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2 +=
+                            surface_state.inside_radiant_internal_gain_w_per_m2;
+                        sums.inside_shortwave_absorbed_source_term_rate_w +=
+                            inside_shortwave_absorbed_source_term_rate;
+                        sums.inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2 +=
+                            surface_state.inside_shortwave_absorbed_w_per_m2;
+                        sums.inside_additional_heat_source_term_rate_w +=
+                            inside_additional_heat_source_term_rate;
+                        sums.inside_additional_heat_source_term_rate_per_area_w_per_m2 +=
+                            surface_state.inside_additional_heat_source_w_per_m2;
+                        sums.inside_radiant_hvac_source_term_rate_w +=
+                            inside_radiant_hvac_source_term_rate;
+                        sums.inside_radiant_hvac_source_term_rate_per_area_w_per_m2 +=
+                            surface_state.inside_radiant_hvac_w_per_m2;
+                        sums.inside_total_source_term_rate_w += inside_total_source_term_rate;
+                        sums.inside_total_source_term_rate_per_area_w_per_m2 +=
+                            inside_total_source_term_rate_per_area;
                         sums.outside_convection_heat_gain_rate_w +=
                             exterior_terms.convection_heat_gain_rate_w;
                         sums.outside_convection_heat_gain_rate_per_area_w_per_m2 +=
@@ -671,6 +802,10 @@ pub(crate) fn sample_heat_balance_run_period(
                             outside_balance.coefficient_surface_temperature_c;
                         sums.outside_balance_convection_reference_temperature_c +=
                             outside_balance.convection_reference_temperature_c;
+                        let _outside_balance_wet_branch_state = (
+                            outside_balance.wet_timestep_fraction,
+                            outside_balance.wet_reference_temperature_c,
+                        );
                         sums.outside_balance_equivalent_radiant_temperature_c +=
                             outside_balance.equivalent_radiant_temperature_c;
                         sums.outside_balance_radiation_coefficient_w_per_m2_k +=

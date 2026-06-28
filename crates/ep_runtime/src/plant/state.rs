@@ -3,7 +3,7 @@
 use crate::{OutputSeries, ResultStore, RuntimeError};
 use ep_model::{
     BranchId, BranchListId, LoopId, NodeId, OutputHandle, PlantBranchComponent, PlantLoop,
-    SimulationModel, TypedModel,
+    PlantLoopSide, SimulationModel, TypedModel,
 };
 
 /// Source map that owns plant diagnostic output registration and future update paths.
@@ -16,6 +16,165 @@ pub const PLANT_STATE_WARMUP_RULE: &str =
     "EnergyPlus warmup samples are not represented in this diagnostic projection";
 /// Sizing/design-day boundary for the diagnostic plant-state projection.
 pub const PLANT_STATE_SIZING_RULE: &str = "PlantLoop sizing-period baseline rows remain diagnostic-only until plant loop algorithms are ported";
+
+/// Static source-map row for one plant subsystem.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PlantRuntimeSourceMap {
+    /// EnergyPlus object or subsystem.
+    pub object_type: &'static str,
+    /// EnergyPlus source file that owns the current behavior.
+    pub source_file: &'static str,
+    /// Source entry point to preserve during future porting.
+    pub source_entry_point: &'static str,
+    /// Current Rust-side policy.
+    pub current_policy: &'static str,
+}
+
+/// Pump source map used by diagnostic plant graph and output work.
+pub const PLANT_PUMP_SOURCE_MAP: PlantRuntimeSourceMap = PlantRuntimeSourceMap {
+    object_type: "Pump:*",
+    source_file: "src/EnergyPlus/Pumps.cc",
+    source_entry_point: "SimPumps",
+    current_policy: "typed identity and diagnostic output plumbing only",
+};
+
+/// Boiler source map used by diagnostic plant graph and output work.
+pub const PLANT_BOILER_SOURCE_MAP: PlantRuntimeSourceMap = PlantRuntimeSourceMap {
+    object_type: "Boiler:HotWater",
+    source_file: "src/EnergyPlus/Boilers.cc",
+    source_entry_point: "BoilerSpecs::simulate",
+    current_policy: "typed identity only until plant equipment simulation is ported",
+};
+
+/// Chiller source map used by diagnostic plant graph and output work.
+pub const PLANT_CHILLER_SOURCE_MAP: PlantRuntimeSourceMap = PlantRuntimeSourceMap {
+    object_type: "Chiller:Electric:EIR",
+    source_file: "src/EnergyPlus/ChillerElectricEIR.cc",
+    source_entry_point: "ElectricEIRChillerSpecs::simulate",
+    current_policy: "typed identity only until plant equipment simulation is ported",
+};
+
+/// PlantLoadProfile source map used by diagnostic plant graph and output work.
+pub const PLANT_LOAD_PROFILE_SOURCE_MAP: PlantRuntimeSourceMap = PlantRuntimeSourceMap {
+    object_type: "LoadProfile:Plant",
+    source_file: "src/EnergyPlus/PlantLoadProfile.cc",
+    source_entry_point: "PlantProfileData::simulate",
+    current_policy: "diagnostic baseline-only projection",
+};
+
+/// Operation scheme source map used by future PlantLoop scheduler work.
+pub const PLANT_OPERATION_SCHEME_SOURCE_MAP: PlantRuntimeSourceMap = PlantRuntimeSourceMap {
+    object_type: "PlantEquipmentOperationSchemes",
+    source_file: "src/EnergyPlus/Plant/PlantManager.cc",
+    source_entry_point: "ManagePlantLoops",
+    current_policy: "selected scheme trace only; no conformance promotion",
+};
+
+/// Setpoint-manager interaction source map used by future PlantLoop scheduler work.
+pub const PLANT_SETPOINT_MANAGER_INTERACTION_SOURCE_MAP: PlantRuntimeSourceMap =
+    PlantRuntimeSourceMap {
+        object_type: "SetpointManager:*",
+        source_file: "src/EnergyPlus/Plant/PlantManager.cc",
+        source_entry_point: "ManagePlantLoops",
+        current_policy: "interaction map only; plant setpoint dispatch is not ported",
+    };
+
+/// Diagnostic trace for a component flow request before PlantLoop algorithms are ported.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantFlowRequestTrace {
+    /// Plant loop ID.
+    pub loop_id: LoopId,
+    /// Supply/plant side or demand side.
+    pub side: PlantLoopSide,
+    /// Component object type.
+    pub component_type: String,
+    /// Component name.
+    pub component_name: String,
+    /// Component inlet node.
+    pub inlet_node: NodeId,
+    /// Component outlet node.
+    pub outlet_node: NodeId,
+    /// Requested mass flow in kg/s.
+    pub requested_mass_flow_rate_kg_per_s: f64,
+}
+
+/// Diagnostic trace for operation-scheme selection.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantSelectedOperationSchemeTrace {
+    /// Plant loop ID.
+    pub loop_id: LoopId,
+    /// Selected scheme name or diagnostic placeholder.
+    pub scheme_name: String,
+    /// Source map row that owns future scheduler parity.
+    pub source_map: PlantRuntimeSourceMap,
+    /// True while PlantLoop remains baseline-only.
+    pub diagnostic_only: bool,
+}
+
+/// Diagnostic trace for loop residual evidence.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlantResidualTrace {
+    /// Plant loop ID.
+    pub loop_id: LoopId,
+    /// Supply/plant side or demand side.
+    pub side: PlantLoopSide,
+    /// Requested loop load in W.
+    pub requested_load_w: f64,
+    /// Delivered loop load in W.
+    pub delivered_load_w: f64,
+    /// Difference between requested and delivered load in W.
+    pub residual_w: f64,
+}
+
+/// Creates a diagnostic flow-request trace row for one plant component.
+#[must_use]
+pub fn trace_plant_flow_request(
+    loop_id: LoopId,
+    side: PlantLoopSide,
+    component: &PlantBranchComponent,
+    requested_mass_flow_rate_kg_per_s: f64,
+) -> PlantFlowRequestTrace {
+    PlantFlowRequestTrace {
+        loop_id,
+        side,
+        component_type: component.object_type.0.clone(),
+        component_name: component.name.0.clone(),
+        inlet_node: component.inlet_node,
+        outlet_node: component.outlet_node,
+        requested_mass_flow_rate_kg_per_s,
+    }
+}
+
+/// Creates a diagnostic selected-operation-scheme trace row.
+#[must_use]
+pub fn trace_selected_plant_operation_scheme(
+    loop_id: LoopId,
+    scheme_name: impl Into<String>,
+) -> PlantSelectedOperationSchemeTrace {
+    PlantSelectedOperationSchemeTrace {
+        loop_id,
+        scheme_name: scheme_name.into(),
+        source_map: PLANT_OPERATION_SCHEME_SOURCE_MAP,
+        diagnostic_only: true,
+    }
+}
+
+/// Creates a diagnostic residual trace row.
+#[must_use]
+pub fn trace_plant_residual(
+    loop_id: LoopId,
+    side: PlantLoopSide,
+    requested_load_w: f64,
+    delivered_load_w: f64,
+) -> PlantResidualTrace {
+    PlantResidualTrace {
+        loop_id,
+        side,
+        requested_load_w,
+        delivered_load_w,
+        residual_w: requested_load_w - delivered_load_w,
+    }
+}
 
 /// Diagnostic role assigned to one plant equipment projection row.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -480,12 +639,16 @@ fn node_name_for_id(model: &TypedModel, node_id: NodeId) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{
-        PLANT_STATE_SOURCE_MAP_PATH, PlantEquipmentRole, PlantStateProjectionOptions,
-        simulate_plant_state_projection,
+        PLANT_BOILER_SOURCE_MAP, PLANT_CHILLER_SOURCE_MAP, PLANT_LOAD_PROFILE_SOURCE_MAP,
+        PLANT_OPERATION_SCHEME_SOURCE_MAP, PLANT_PUMP_SOURCE_MAP,
+        PLANT_SETPOINT_MANAGER_INTERACTION_SOURCE_MAP, PLANT_STATE_SOURCE_MAP_PATH,
+        PlantEquipmentRole, PlantStateProjectionOptions, simulate_plant_state_projection,
+        trace_plant_flow_request, trace_plant_residual, trace_selected_plant_operation_scheme,
     };
     use ep_model::{
         BranchId, BranchListId, LoopId, Node, NodeId, NormalizedName, PlantBranch,
-        PlantBranchComponent, PlantBranchList, PlantLoop, SimulationModel, TypedModel,
+        PlantBranchComponent, PlantBranchList, PlantLoop, PlantLoopSide, SimulationModel,
+        TypedModel,
     };
 
     #[test]
@@ -551,6 +714,51 @@ mod tests {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn plant_diagnostic_traces_preserve_source_maps_and_residuals() {
+        let component = PlantBranchComponent {
+            object_type: NormalizedName::new("Pump:ConstantSpeed"),
+            name: NormalizedName::new("HW Pump"),
+            inlet_node: NodeId(0),
+            outlet_node: NodeId(1),
+        };
+
+        let flow_trace =
+            trace_plant_flow_request(LoopId(0), PlantLoopSide::Plant, &component, 0.25);
+        assert_eq!(flow_trace.loop_id, LoopId(0));
+        assert_eq!(flow_trace.side, PlantLoopSide::Plant);
+        assert_eq!(flow_trace.component_name, "HW PUMP");
+        assert_eq!(flow_trace.requested_mass_flow_rate_kg_per_s, 0.25);
+
+        let scheme_trace = trace_selected_plant_operation_scheme(LoopId(0), "SequentialLoad");
+        assert_eq!(scheme_trace.source_map, PLANT_OPERATION_SCHEME_SOURCE_MAP);
+        assert_eq!(scheme_trace.scheme_name, "SequentialLoad");
+        assert!(scheme_trace.diagnostic_only);
+
+        let residual_trace = trace_plant_residual(LoopId(0), PlantLoopSide::Demand, 1000.0, 875.0);
+        assert_eq!(residual_trace.side, PlantLoopSide::Demand);
+        assert_eq!(residual_trace.residual_w, 125.0);
+
+        assert_eq!(PLANT_PUMP_SOURCE_MAP.source_entry_point, "SimPumps");
+        assert_eq!(
+            PLANT_BOILER_SOURCE_MAP.source_entry_point,
+            "BoilerSpecs::simulate"
+        );
+        assert_eq!(PLANT_CHILLER_SOURCE_MAP.object_type, "Chiller:Electric:EIR");
+        assert_eq!(
+            PLANT_LOAD_PROFILE_SOURCE_MAP.object_type,
+            "LoadProfile:Plant"
+        );
+        assert_eq!(
+            PLANT_SETPOINT_MANAGER_INTERACTION_SOURCE_MAP.object_type,
+            "SetpointManager:*"
+        );
+        assert_eq!(
+            PLANT_SETPOINT_MANAGER_INTERACTION_SOURCE_MAP.current_policy,
+            "interaction map only; plant setpoint dispatch is not ported"
+        );
     }
 
     fn plant_state_projection_model() -> SimulationModel {

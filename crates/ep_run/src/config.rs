@@ -109,22 +109,44 @@ impl RunOutputFormat {
 /// CLI trace verbosity.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TraceLevel {
-    /// Write normal summaries only.
-    Normal,
-    /// Include extra model and timing details.
-    Detailed,
-    /// Include debug-oriented details where available.
-    Debug,
+    /// Disable optional diagnostic trace artifacts.
+    Off,
+    /// Write release-safe summaries only.
+    Summary,
+    /// Include source-order stage metadata.
+    Stage,
+    /// Include selected zone trace payloads.
+    Zone,
+    /// Include selected surface trace payloads.
+    Surface,
+    /// Include selected CTF split trace payloads.
+    Ctf,
+    /// Include all available opt-in diagnostic trace payloads.
+    Full,
 }
 
 impl TraceLevel {
+    /// Backward-compatible alias for summary-level traces.
+    #[allow(non_upper_case_globals)]
+    pub const Normal: Self = Self::Summary;
+    /// Backward-compatible alias for stage-level traces.
+    #[allow(non_upper_case_globals)]
+    pub const Detailed: Self = Self::Stage;
+    /// Backward-compatible alias for full debug traces.
+    #[allow(non_upper_case_globals)]
+    pub const Debug: Self = Self::Full;
+
     /// Parses a CLI trace-level token.
     #[must_use]
     pub fn parse(value: &str) -> Option<Self> {
         match value.trim().to_ascii_lowercase().as_str() {
-            "normal" => Some(Self::Normal),
-            "detailed" | "detail" => Some(Self::Detailed),
-            "debug" => Some(Self::Debug),
+            "off" => Some(Self::Off),
+            "summary" | "normal" => Some(Self::Summary),
+            "stage" | "detailed" | "detail" => Some(Self::Stage),
+            "zone" => Some(Self::Zone),
+            "surface" => Some(Self::Surface),
+            "ctf" => Some(Self::Ctf),
+            "full" | "debug" => Some(Self::Full),
             _ => None,
         }
     }
@@ -133,9 +155,13 @@ impl TraceLevel {
     #[must_use]
     pub const fn id(self) -> &'static str {
         match self {
-            Self::Normal => "normal",
-            Self::Detailed => "detailed",
-            Self::Debug => "debug",
+            Self::Off => "off",
+            Self::Summary => "summary",
+            Self::Stage => "stage",
+            Self::Zone => "zone",
+            Self::Surface => "surface",
+            Self::Ctf => "ctf",
+            Self::Full => "full",
         }
     }
 }

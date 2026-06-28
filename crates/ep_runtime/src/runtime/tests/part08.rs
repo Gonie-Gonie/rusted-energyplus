@@ -339,6 +339,7 @@
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 2.0,
             inside_0_w_per_m2_k: 3.0,
+            flux_0: None,
             const_in_part_w_per_m2: 1.0,
             const_out_part_w_per_m2: 5.0,
             outside_history_w_per_m2_k: vec![0.1, 0.2],
@@ -418,13 +419,13 @@
     #[test]
     fn result_store_finds_series_case_insensitively() {
         let mut store = ResultStore::new();
-        store.add_series(OutputSeries {
-            handle: OutputHandle(0),
-            key: "ZONE ONE".to_string(),
-            variable_name: "Zone Mean Air Temperature".to_string(),
-            units: "C".to_string(),
-            values: vec![20.0, 21.0],
-        });
+        store.write_output_by_handle(
+            OutputHandle(0),
+            "ZONE ONE".to_string(),
+            "Zone Mean Air Temperature".to_string(),
+            "C".to_string(),
+            vec![20.0, 21.0],
+        );
 
         assert_eq!(store.sample_count(), 2);
         assert!(
@@ -432,6 +433,7 @@
                 .find_series("zone one", "zone mean air temperature")
                 .is_some()
         );
+        assert_eq!(store.find_handle(OutputHandle(0)).unwrap().values[1], 21.0);
     }
 
     #[test]
@@ -480,6 +482,54 @@
     }
 
     #[test]
+    fn runtime_output_registry_records_duplicate_registration_diagnostic() {
+        let mut typed = cube_model();
+        let mut duplicate_zone = typed.zones[0].clone();
+        duplicate_zone.id = ZoneId(1);
+        typed.zones.push(duplicate_zone);
+        let model = SimulationModel::from_typed(typed);
+        let registry = RuntimeOutputRegistry::from_model(&model);
+
+        assert!(registry.diagnostics().has_errors());
+        assert!(
+            registry
+                .diagnostics()
+                .diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.code
+                    == RuntimeDiagnosticCode::DuplicateOutputRegistration)
+        );
+    }
+
+    #[test]
+    fn runtime_diagnostic_codes_cover_conformance_blockers() {
+        assert_eq!(
+            RuntimeDiagnosticCode::UnsupportedHeatBalanceBranch.id(),
+            "UnsupportedHeatBalanceBranch"
+        );
+        assert_eq!(
+            RuntimeDiagnosticCode::UnsupportedSurfaceBoundary.id(),
+            "UnsupportedSurfaceBoundary"
+        );
+        assert_eq!(
+            RuntimeDiagnosticCode::NonFiniteHeatBalanceState.id(),
+            "NonFiniteHeatBalanceState"
+        );
+        assert_eq!(
+            RuntimeDiagnosticCode::OutputVariableUnavailable.id(),
+            "OutputVariableUnavailable"
+        );
+        assert_eq!(
+            RuntimeDiagnosticCode::TimestampMismatch.id(),
+            "TimestampMismatch"
+        );
+        assert_eq!(
+            RuntimeDiagnosticCode::ToleranceFailure.id(),
+            "ToleranceFailure"
+        );
+    }
+
+    #[test]
     fn runtime_output_registry_skips_no_sun_surface_solar_output() {
         let mut typed = cube_model();
         typed.surfaces[0].sun_exposure = SunExposure::NoSun;
@@ -518,26 +568,21 @@
     }
 
     #[test]
-    fn runtime_output_registry_diagnoses_unavailable_system_node_output() {
+    fn runtime_output_registry_resolves_system_node_setpoint_output() {
         let model = ideal_loads_node_state_model();
         let registry = RuntimeOutputRegistry::from_model(&model);
 
         let resolution = registry.resolve_output_requests(&[RuntimeOutputRequest::hourly(
             "ZONE ONE INLET",
-            NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+            NODE_STATE_SETPOINT_VARIABLE,
         )]);
 
-        assert!(resolution.resolved.is_empty());
-        assert!(resolution.diagnostics.has_errors());
-        let diagnostic = &resolution.diagnostics.diagnostics[0];
+        assert!(resolution.diagnostics.is_empty());
+        assert_eq!(resolution.resolved.len(), 1);
+        assert_eq!(resolution.resolved[0].definition.key, "ZONE ONE INLET");
         assert_eq!(
-            diagnostic.code,
-            RuntimeDiagnosticCode::OutputVariableUnavailable
-        );
-        assert_eq!(diagnostic.key.as_deref(), Some("ZONE ONE INLET"));
-        assert_eq!(
-            diagnostic.variable_name.as_deref(),
-            Some(NODE_STATE_EXCLUDED_SETPOINT_VARIABLE)
+            resolution.resolved[0].definition.variable_name,
+            NODE_STATE_SETPOINT_VARIABLE
         );
     }
 
@@ -588,6 +633,25 @@
             "DistrictHeatingWater:Facility"
         );
         assert_eq!(
+            resolution.resolved[0].definition.aggregation_plan.kind,
+            RuntimeMeterAggregationKind::HeatingEnergyTransfer
+        );
+        assert_eq!(
+            resolution.resolved[0].definition.aggregation_plan.period,
+            RuntimeMeterAggregationPeriod::Hourly
+        );
+        assert_eq!(
+            resolution.resolved[0].definition.dependency_output_handles.len(),
+            1
+        );
+        assert_eq!(
+            resolution.resolved[0]
+                .definition
+                .aggregation_plan
+                .dependency_output_handles,
+            resolution.resolved[0].definition.dependency_output_handles
+        );
+        assert_eq!(
             heating_binding.fuel_energy_variable,
             crate::ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY
         );
@@ -595,6 +659,14 @@
         assert_eq!(
             resolution.resolved[1].definition.name,
             "DistrictCooling:Facility"
+        );
+        assert_eq!(
+            resolution.resolved[1].definition.aggregation_plan.kind,
+            RuntimeMeterAggregationKind::CoolingEnergyTransfer
+        );
+        assert_eq!(
+            resolution.resolved[1].definition.dependency_output_handles.len(),
+            1
         );
         assert_eq!(
             cooling_binding.fuel_energy_variable,
@@ -606,12 +678,64 @@
             RuntimeOutputFrequency::Monthly
         );
         assert_eq!(
+            resolution.resolved[2].definition.aggregation_plan.period,
+            RuntimeMeterAggregationPeriod::Monthly
+        );
+        assert_eq!(
             resolution.resolved[3].definition.frequency,
             RuntimeOutputFrequency::Annual
         );
         assert_eq!(
+            resolution.resolved[3].definition.aggregation_plan.period,
+            RuntimeMeterAggregationPeriod::Annual
+        );
+        assert_eq!(
             resolution.resolved[4].definition.frequency,
             RuntimeOutputFrequency::RunPeriod
+        );
+        assert_eq!(
+            resolution.resolved[4].definition.aggregation_plan.period,
+            RuntimeMeterAggregationPeriod::RunPeriod
+        );
+        assert_eq!(meter_rate_to_energy_j(2.5, 3600.0), 9000.0);
+        assert!(meter_value_is_zero_near_j(METER_ZERO_NEAR_TOLERANCE_J));
+        assert!(!meter_value_is_zero_near_j(
+            METER_ZERO_NEAR_TOLERANCE_J * 10.0
+        ));
+    }
+
+    #[test]
+    fn runtime_meter_aggregation_kind_resolves_facility_meter_families() {
+        assert_eq!(
+            RuntimeMeterAggregationKind::from_meter_name(ELECTRICITY_FACILITY_METER),
+            RuntimeMeterAggregationKind::FacilityElectricity
+        );
+        assert_eq!(
+            RuntimeMeterAggregationKind::from_meter_name(GAS_FACILITY_METER),
+            RuntimeMeterAggregationKind::FacilityGas
+        );
+        assert_eq!(
+            RuntimeMeterAggregationKind::from_meter_name(HEATING_ENERGY_TRANSFER_METER),
+            RuntimeMeterAggregationKind::HeatingEnergyTransfer
+        );
+        assert_eq!(
+            RuntimeMeterAggregationKind::from_meter_name(COOLING_ENERGY_TRANSFER_METER),
+            RuntimeMeterAggregationKind::CoolingEnergyTransfer
+        );
+
+        let source_map = component_output_to_facility_meter_source_map(
+            "Fan Electricity Rate",
+            ELECTRICITY_FACILITY_METER,
+        );
+        assert_eq!(source_map.component_output_variable, "Fan Electricity Rate");
+        assert_eq!(source_map.facility_meter_name, ELECTRICITY_FACILITY_METER);
+        assert_eq!(
+            source_map.aggregation_kind,
+            RuntimeMeterAggregationKind::FacilityElectricity
+        );
+        assert_eq!(
+            source_map.source_map,
+            COMPONENT_OUTPUT_TO_FACILITY_METER_SOURCE_MAP
         );
     }
 
@@ -675,4 +799,8 @@
             Some("System Node Humidity Ratio")
         );
         assert_eq!(diagnostic.handle, Some(OutputHandle(7)));
+        assert_eq!(diagnostic.stage.as_deref(), Some("result-store"));
+        assert_eq!(diagnostic.surface, None);
+        assert_eq!(diagnostic.zone, None);
+        assert_eq!(diagnostic.timestep, None);
     }

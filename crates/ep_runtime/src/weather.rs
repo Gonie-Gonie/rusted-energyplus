@@ -1,6 +1,8 @@
 //! EPW weather parsing helpers.
 
-use crate::psychrometrics::energyplus_psychrometric_humidity_ratio_from_rh;
+use crate::psychrometrics::{
+    energyplus_outdoor_wet_bulb_c, energyplus_psychrometric_humidity_ratio_from_rh,
+};
 use ep_model::FirstHourInterpolationStartingValues;
 use std::fmt::{Display, Formatter};
 use std::path::Path;
@@ -100,6 +102,7 @@ pub struct EpwRecord {
 #[derive(Clone, Copy)]
 pub(crate) struct HeatBalanceWeatherContext<'a> {
     pub(crate) records: &'a [EpwRecord],
+    pub(crate) sample: Option<&'a WeatherTimestepSample>,
     pub(crate) record_index: usize,
     pub(crate) zone_steps_per_hour: u32,
     pub(crate) zone_timestep: Option<u32>,
@@ -115,16 +118,28 @@ pub struct WeatherTimestepSample {
     pub timestep: u32,
     /// Interpolated outdoor dry-bulb temperature in C.
     pub dry_bulb_c: f64,
+    /// Interpolated outdoor wet-bulb temperature in C.
+    pub wet_bulb_c: f64,
     /// Interpolated relative humidity in percent.
     pub relative_humidity_percent: f64,
+    /// Interpolated outdoor humidity ratio in kgWater/kgDryAir.
+    pub outdoor_humidity_ratio: f64,
     /// Interpolated atmospheric pressure in Pa.
     pub atmospheric_pressure_pa: f64,
     /// Interpolated horizontal infrared radiation in W/m2.
     pub horizontal_infrared_radiation_w_per_m2: f64,
+    /// Interpolated global horizontal solar radiation in W/m2.
+    pub global_horizontal_radiation_w_per_m2: f64,
+    /// Interpolated direct normal solar radiation in W/m2.
+    pub direct_normal_radiation_w_per_m2: f64,
+    /// Interpolated diffuse horizontal solar radiation in W/m2.
+    pub diffuse_horizontal_radiation_w_per_m2: f64,
     /// Interpolated wind speed in m/s.
     pub wind_speed_m_per_s: f64,
     /// Interpolated wind direction in degrees.
     pub wind_direction_deg: f64,
+    /// Interpolated liquid precipitation depth in mm.
+    pub liquid_precipitation_depth_mm: f64,
 }
 
 /// Weather values resolved once for a model timestep configuration.
@@ -134,7 +149,18 @@ pub struct WeatherTimestepSeries {
     pub zone_steps_per_hour: u32,
     /// First-hour interpolation policy selected by the run period.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    hourly_records: Vec<EpwRecord>,
     hourly_dry_bulb_c: Vec<f64>,
+    timestep_dry_bulb_c: Vec<f64>,
+    timestep_wet_bulb_c: Vec<f64>,
+    timestep_relative_humidity_percent: Vec<f64>,
+    timestep_atmospheric_pressure_pa: Vec<f64>,
+    timestep_wind_speed_m_per_s: Vec<f64>,
+    timestep_wind_direction_deg: Vec<f64>,
+    timestep_global_horizontal_radiation_w_per_m2: Vec<f64>,
+    timestep_direct_normal_radiation_w_per_m2: Vec<f64>,
+    timestep_diffuse_horizontal_radiation_w_per_m2: Vec<f64>,
+    timestep_horizontal_infrared_radiation_w_per_m2: Vec<f64>,
     timestep_samples: Vec<WeatherTimestepSample>,
 }
 
@@ -151,65 +177,156 @@ impl WeatherTimestepSeries {
             .iter()
             .map(|record| record.dry_bulb_c)
             .collect::<Vec<_>>();
+        let mut timestep_dry_bulb_c = Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_wet_bulb_c = Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_relative_humidity_percent =
+            Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_atmospheric_pressure_pa =
+            Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_wind_speed_m_per_s = Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_wind_direction_deg = Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_global_horizontal_radiation_w_per_m2 =
+            Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_direct_normal_radiation_w_per_m2 =
+            Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_diffuse_horizontal_radiation_w_per_m2 =
+            Vec::with_capacity(records.len() * steps as usize);
+        let mut timestep_horizontal_infrared_radiation_w_per_m2 =
+            Vec::with_capacity(records.len() * steps as usize);
         let mut timestep_samples = Vec::with_capacity(records.len() * steps as usize);
         for (record_index, record) in records.iter().enumerate() {
             for timestep in 1..=steps {
-                timestep_samples.push(WeatherTimestepSample {
+                let dry_bulb_c = energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                    Some(records),
                     record_index,
+                    record.dry_bulb_c,
+                    steps,
                     timestep,
-                    dry_bulb_c: energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                        Some(records),
+                    first_hour_interpolation_starting_values,
+                );
+                let relative_humidity_percent =
+                    energyplus_weather_relative_humidity_at_timestep_with_starting_values(
+                        records,
                         record_index,
-                        record.dry_bulb_c,
+                        record.relative_humidity_percent,
                         steps,
                         timestep,
                         first_hour_interpolation_starting_values,
-                    ),
-                    relative_humidity_percent:
-                        energyplus_weather_relative_humidity_at_timestep_with_starting_values(
-                            records,
-                            record_index,
-                            record.relative_humidity_percent,
-                            steps,
-                            timestep,
-                            first_hour_interpolation_starting_values,
-                        ),
-                    atmospheric_pressure_pa:
-                        energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
-                            records,
-                            record_index,
-                            record.atmospheric_pressure_pa,
-                            steps,
-                            timestep,
-                            first_hour_interpolation_starting_values,
-                        ),
-                    horizontal_infrared_radiation_w_per_m2:
-                        energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
-                            records,
-                            record_index,
-                            record.horizontal_infrared_radiation_wh_per_m2,
-                            steps,
-                            timestep,
-                            first_hour_interpolation_starting_values,
-                        ),
-                    wind_speed_m_per_s:
-                        energyplus_weather_wind_speed_at_timestep_with_starting_values(
-                            records,
-                            record_index,
-                            record.wind_speed_m_per_s,
-                            steps,
-                            timestep,
-                            first_hour_interpolation_starting_values,
-                        ),
-                    wind_direction_deg:
-                        energyplus_weather_wind_direction_at_timestep_with_starting_values(
-                            records,
-                            record_index,
-                            record.wind_direction_deg,
-                            steps,
-                            timestep,
-                            first_hour_interpolation_starting_values,
-                        ),
+                    );
+                let atmospheric_pressure_pa =
+                    energyplus_weather_atmospheric_pressure_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.atmospheric_pressure_pa,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let horizontal_infrared_radiation_w_per_m2 =
+                    energyplus_weather_horizontal_infrared_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.horizontal_infrared_radiation_wh_per_m2,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let global_horizontal_radiation_w_per_m2 =
+                    energyplus_weather_global_horizontal_radiation_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.global_horizontal_radiation_wh_per_m2,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let direct_normal_radiation_w_per_m2 =
+                    energyplus_weather_direct_normal_radiation_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.direct_normal_radiation_wh_per_m2,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let diffuse_horizontal_radiation_w_per_m2 =
+                    energyplus_weather_diffuse_horizontal_radiation_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.diffuse_horizontal_radiation_wh_per_m2,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let wind_speed_m_per_s =
+                    energyplus_weather_wind_speed_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.wind_speed_m_per_s,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let wind_direction_deg =
+                    energyplus_weather_wind_direction_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.wind_direction_deg,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let liquid_precipitation_depth_mm =
+                    energyplus_weather_liquid_precipitation_at_timestep_with_starting_values(
+                        records,
+                        record_index,
+                        record.liquid_precipitation_depth_mm,
+                        steps,
+                        timestep,
+                        first_hour_interpolation_starting_values,
+                    );
+                let outdoor_humidity_ratio = energyplus_psychrometric_humidity_ratio_from_rh(
+                    dry_bulb_c,
+                    (relative_humidity_percent * 0.01).clamp(0.0, 1.0),
+                    atmospheric_pressure_pa,
+                )
+                .unwrap_or(0.0);
+                let wet_bulb_c = energyplus_outdoor_wet_bulb_c(
+                    dry_bulb_c,
+                    relative_humidity_percent,
+                    atmospheric_pressure_pa,
+                )
+                .unwrap_or(dry_bulb_c);
+
+                timestep_dry_bulb_c.push(dry_bulb_c);
+                timestep_wet_bulb_c.push(wet_bulb_c);
+                timestep_relative_humidity_percent.push(relative_humidity_percent);
+                timestep_atmospheric_pressure_pa.push(atmospheric_pressure_pa);
+                timestep_wind_speed_m_per_s.push(wind_speed_m_per_s);
+                timestep_wind_direction_deg.push(wind_direction_deg);
+                timestep_global_horizontal_radiation_w_per_m2
+                    .push(global_horizontal_radiation_w_per_m2);
+                timestep_direct_normal_radiation_w_per_m2.push(direct_normal_radiation_w_per_m2);
+                timestep_diffuse_horizontal_radiation_w_per_m2
+                    .push(diffuse_horizontal_radiation_w_per_m2);
+                timestep_horizontal_infrared_radiation_w_per_m2
+                    .push(horizontal_infrared_radiation_w_per_m2);
+
+                timestep_samples.push(WeatherTimestepSample {
+                    record_index,
+                    timestep,
+                    dry_bulb_c,
+                    wet_bulb_c,
+                    relative_humidity_percent,
+                    outdoor_humidity_ratio,
+                    atmospheric_pressure_pa,
+                    horizontal_infrared_radiation_w_per_m2,
+                    global_horizontal_radiation_w_per_m2,
+                    direct_normal_radiation_w_per_m2,
+                    diffuse_horizontal_radiation_w_per_m2,
+                    wind_speed_m_per_s,
+                    wind_direction_deg,
+                    liquid_precipitation_depth_mm,
                 });
             }
         }
@@ -217,15 +334,50 @@ impl WeatherTimestepSeries {
         Self {
             zone_steps_per_hour: steps,
             first_hour_interpolation_starting_values,
+            hourly_records: records.to_vec(),
             hourly_dry_bulb_c,
+            timestep_dry_bulb_c,
+            timestep_wet_bulb_c,
+            timestep_relative_humidity_percent,
+            timestep_atmospheric_pressure_pa,
+            timestep_wind_speed_m_per_s,
+            timestep_wind_direction_deg,
+            timestep_global_horizontal_radiation_w_per_m2,
+            timestep_direct_normal_radiation_w_per_m2,
+            timestep_diffuse_horizontal_radiation_w_per_m2,
+            timestep_horizontal_infrared_radiation_w_per_m2,
             timestep_samples,
         }
+    }
+
+    /// Returns hourly EPW records parsed before runtime execution.
+    #[must_use]
+    pub fn hourly_records(&self) -> &[EpwRecord] {
+        &self.hourly_records
     }
 
     /// Returns hourly dry-bulb values in EPW record order.
     #[must_use]
     pub fn hourly_dry_bulb_c(&self) -> &[f64] {
         &self.hourly_dry_bulb_c
+    }
+
+    /// Returns precomputed dry-bulb values in zone-timestep order.
+    #[must_use]
+    pub fn timestep_dry_bulb_c(&self) -> &[f64] {
+        &self.timestep_dry_bulb_c
+    }
+
+    /// Returns precomputed wet-bulb values in zone-timestep order.
+    #[must_use]
+    pub fn timestep_wet_bulb_c(&self) -> &[f64] {
+        &self.timestep_wet_bulb_c
+    }
+
+    /// Returns precomputed direct-normal solar values in zone-timestep order.
+    #[must_use]
+    pub fn timestep_direct_normal_radiation_w_per_m2(&self) -> &[f64] {
+        &self.timestep_direct_normal_radiation_w_per_m2
     }
 
     /// Returns precomputed zone-timestep weather samples.
@@ -294,14 +446,15 @@ pub(crate) fn next_weather_record(records: &[EpwRecord], record_index: usize) ->
 }
 
 pub(crate) fn heat_balance_weather_context_for_timestep(
-    weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
     record_index: usize,
     zone_steps_per_hour: u32,
     zone_timestep: u32,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> Option<HeatBalanceWeatherContext<'_>> {
-    weather_records.map(|records| HeatBalanceWeatherContext {
-        records,
+    weather_series.map(|series| HeatBalanceWeatherContext {
+        records: series.hourly_records(),
+        sample: series.sample_for(record_index, zone_timestep),
         record_index,
         zone_steps_per_hour,
         zone_timestep: Some(zone_timestep),
@@ -376,6 +529,9 @@ pub(crate) fn energyplus_weather_relative_humidity_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_relative_humidity_percent: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.relative_humidity_percent;
+    }
     let Some(timestep) = context.zone_timestep else {
         return fallback_relative_humidity_percent;
     };
@@ -431,6 +587,9 @@ pub(crate) fn energyplus_weather_atmospheric_pressure_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_atmospheric_pressure_pa: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.atmospheric_pressure_pa;
+    }
     let Some(timestep) = context.zone_timestep else {
         return fallback_atmospheric_pressure_pa;
     };
@@ -486,6 +645,9 @@ pub(crate) fn weather_context_outdoor_humidity_ratio(
     context: HeatBalanceWeatherContext<'_>,
     fallback_dry_bulb_c: f64,
 ) -> Option<f64> {
+    if let Some(sample) = context.sample {
+        return Some(sample.outdoor_humidity_ratio);
+    }
     let record = context.records.get(context.record_index)?;
     let dry_bulb_c = context
         .zone_timestep
@@ -518,6 +680,9 @@ pub(crate) fn energyplus_weather_horizontal_infrared_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_horizontal_infrared_w_per_m2: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.horizontal_infrared_radiation_w_per_m2;
+    }
     let Some(timestep) = context.zone_timestep else {
         return fallback_hourly_horizontal_infrared_w_per_m2;
     };
@@ -569,10 +734,89 @@ pub(crate) fn energyplus_weather_horizontal_infrared_at_timestep_with_starting_v
     )
 }
 
+pub(crate) fn energyplus_weather_global_horizontal_radiation_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_global_horizontal_radiation_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_global_horizontal_radiation_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.global_horizontal_radiation_wh_per_m2,
+    )
+}
+
+pub(crate) fn energyplus_weather_direct_normal_radiation_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_direct_normal_radiation_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_direct_normal_radiation_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.direct_normal_radiation_wh_per_m2,
+    )
+}
+
+pub(crate) fn energyplus_weather_diffuse_horizontal_radiation_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_diffuse_horizontal_radiation_w_per_m2: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_diffuse_horizontal_radiation_w_per_m2,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.diffuse_horizontal_radiation_wh_per_m2,
+    )
+}
+
+pub(crate) fn energyplus_weather_liquid_precipitation_at_timestep_with_starting_values(
+    records: &[EpwRecord],
+    record_index: usize,
+    fallback_hourly_liquid_precipitation_depth_mm: f64,
+    zone_steps_per_hour: u32,
+    zone_timestep: u32,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+) -> f64 {
+    energyplus_weather_scalar_at_timestep(
+        records,
+        record_index,
+        fallback_hourly_liquid_precipitation_depth_mm,
+        zone_steps_per_hour,
+        zone_timestep,
+        first_hour_interpolation_starting_values,
+        |record| record.liquid_precipitation_depth_mm,
+    )
+}
+
 pub(crate) fn energyplus_weather_wind_speed_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_wind_speed_m_per_s: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.wind_speed_m_per_s;
+    }
     let Some(timestep) = context.zone_timestep else {
         return fallback_hourly_wind_speed_m_per_s;
     };
@@ -628,6 +872,9 @@ pub(crate) fn energyplus_weather_wind_direction_for_context(
     context: HeatBalanceWeatherContext<'_>,
     fallback_hourly_wind_direction_deg: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.wind_direction_deg;
+    }
     let Some(timestep) = context.zone_timestep else {
         return fallback_hourly_wind_direction_deg;
     };

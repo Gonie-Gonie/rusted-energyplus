@@ -55,6 +55,7 @@
             10.0,
             Some(HeatBalanceWeatherContext {
                 records: &records,
+                sample: None,
                 record_index: 0,
                 zone_steps_per_hour: 4,
                 zone_timestep: None,
@@ -195,10 +196,63 @@
             minimum_days: 6,
             maximum_days: 10,
             temperature_convergence_tolerance_delta_c: 0.1,
+            loads_convergence_tolerance_w: 0.04,
         };
         let overridden = enabled.with_warmup_minimum_days(20);
         assert_eq!(overridden.warmup.minimum_days, 20);
         assert_eq!(overridden.warmup.maximum_days, 20);
+
+        let disabled_again = overridden.without_warmup();
+        assert!(!disabled_again.warmup.enabled);
+        assert_eq!(disabled_again.warmup.minimum_days, 0);
+        assert_eq!(disabled_again.warmup.maximum_days, 0);
+    }
+
+    #[test]
+    fn heat_balance_warmup_convergence_uses_daily_temperature_extrema()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let mut warmup_day_end_states = Vec::new();
+        let options = HeatBalanceWarmupOptions {
+            enabled: true,
+            minimum_days: 1,
+            maximum_days: 3,
+            temperature_convergence_tolerance_delta_c: 0.5,
+            loads_convergence_tolerance_w: 0.0,
+        };
+        let daily_temperatures = [10.0, 20.0, 5.0, 20.0, 5.0, 20.0];
+
+        let summary = run_heat_balance_run_period_warmup(
+            &typed,
+            &mut state,
+            &[0.0, 0.0],
+            None,
+            None,
+            1,
+            SECONDS_PER_HOUR,
+            options,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            1,
+            None,
+            HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
+            FirstHourInterpolationStartingValues::Hour24,
+            &mut warmup_day_end_states,
+            |_, state, _, _, _, _, _, _| {
+                let temperature_c = daily_temperatures[state.timestep_index];
+                let zone = &mut state.zones[0];
+                zone.mean_air_temperature_c = temperature_c;
+                zone.zone_timestep_average_air_temperature_c = temperature_c;
+                state.timestep_index += 1;
+            },
+        );
+
+        assert_eq!(summary.day_count, 3);
+        assert!(summary.converged);
+        assert_eq!(summary.final_max_zone_temperature_delta_c, 0.0);
+
+        Ok(())
     }
 
     #[test]
@@ -233,11 +287,17 @@ DATA PERIODS
             .iter()
             .map(|record| record.dry_bulb_c)
             .collect::<Vec<_>>();
+        let weather_series = precompute_weather_timestep_series(
+            &records,
+            1,
+            FirstHourInterpolationStartingValues::Hour24,
+        );
         let options = HeatBalanceWarmupOptions {
             enabled: true,
             minimum_days: 1,
             maximum_days: 1,
             temperature_convergence_tolerance_delta_c: 0.0,
+            loads_convergence_tolerance_w: 0.0,
         };
         let mut dry_only_state = initialize_heat_balance_state(&model, 20.0)?;
         let mut weather_context_state = initialize_heat_balance_state(&model, 20.0)?;
@@ -248,6 +308,7 @@ DATA PERIODS
             &typed,
             &mut dry_only_state,
             &weather_dry_bulb_c,
+            None,
             None,
             1,
             SECONDS_PER_HOUR,
@@ -265,6 +326,7 @@ DATA PERIODS
             &mut weather_context_state,
             &weather_dry_bulb_c,
             Some(&records),
+            Some(&weather_series),
             1,
             SECONDS_PER_HOUR,
             options,

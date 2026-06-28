@@ -150,6 +150,15 @@ domain = "zone"
 level = "conformance"
 
 [[outputs]]
+key = "ZONE ONE"
+variable = "Zone Air Heat Balance Outdoor Air Transfer Rate"
+frequency = "hourly"
+class = "zone-state"
+source = "eso"
+domain = "zone"
+level = "conformance"
+
+[[outputs]]
 key = "Simulation"
 variable = "Surface Inside Face Heat Balance Calculation Iteration Count"
 frequency = "hourly"

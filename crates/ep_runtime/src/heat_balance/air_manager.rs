@@ -7,8 +7,8 @@ use crate::heat_balance::algorithm::{
 use crate::heat_balance::state::{HeatBalanceState, ZoneHeatBalanceState};
 use crate::psychrometrics::energyplus_zone_air_heat_capacity_j_per_k;
 use crate::weather::{
-    EpwRecord, HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
-    weather_context_outdoor_humidity_ratio,
+    HeatBalanceWeatherContext, WeatherTimestepSeries,
+    energyplus_weather_atmospheric_pressure_for_context, weather_context_outdoor_humidity_ratio,
 };
 use ep_model::FirstHourInterpolationStartingValues;
 
@@ -26,6 +26,31 @@ pub const fn manage_air_heat_balance_stage() -> EnergyPlusCompatibilityStage {
 /// EnergyPlus `HeatBalanceAirManager::ManageAirHeatBalance` source-order wrapper.
 pub(crate) fn manage_air_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
     execute()
+}
+
+/// Compatibility alias for EnergyPlus `GetAirHeatBalanceInput` ownership.
+pub(crate) fn get_air_heat_balance_input_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility alias for EnergyPlus air heat-balance initialization.
+pub(crate) fn init_air_heat_balance_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility alias for EnergyPlus air heat-balance calculation.
+pub(crate) fn calc_heat_balance_air_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility alias for zone mean air temperature reporting.
+pub(crate) fn report_zone_mean_air_temp_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility alias for EnergyPlus `HeatBalanceAirManager::ManageAirHeatBalance`.
+pub(crate) fn manage_air_heat_balance_compat<T>(execute: impl FnOnce() -> T) -> T {
+    manage_air_heat_balance_source_order_path(execute)
 }
 
 pub(crate) fn weather_proxy_zone_air_heat_capacity_j_per_k(
@@ -81,19 +106,20 @@ pub(crate) fn update_zone_air_heat_capacities_from_weather_context(
     }
 }
 
-pub(crate) fn seed_zone_air_humidity_ratios_from_weather_records(
+pub(crate) fn seed_zone_air_humidity_ratios_from_weather_series(
     state: &mut HeatBalanceState,
-    weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
     fallback_dry_bulb_c: f64,
     zone_steps_per_hour: u32,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) {
-    let Some(records) = weather_records else {
+    let Some(series) = weather_series else {
         return;
     };
     let Some(humidity_ratio) = weather_context_outdoor_humidity_ratio(
         HeatBalanceWeatherContext {
-            records,
+            records: series.hourly_records(),
+            sample: series.sample_for(0, 1),
             record_index: 0,
             zone_steps_per_hour,
             zone_timestep: Some(1),

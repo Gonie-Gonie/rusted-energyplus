@@ -232,6 +232,49 @@ fn loads_air_side_node_diagnostic_case_fixture() -> Result<(), Box<dyn std::erro
 }
 
 #[test]
+fn loads_airloop_hvac_diagnostic_case_fixtures() -> Result<(), Box<dyn std::error::Error>> {
+    for (case_id, expected_outputs, expected_hvac_outputs) in [
+        ("airloop_fan_only_diagnostic_001", 3, 1),
+        ("airloop_coil_only_diagnostic_001", 3, 1),
+        ("ptac_diagnostic_001", 2, 1),
+        ("airloop_5zone_aircooled_diagnostic_001", 4, 2),
+    ] {
+        let manifest = load_case_file(
+            repo_root().join(format!("data/conformance_cases/{case_id}/case.toml")),
+        )?;
+
+        assert_eq!(manifest.id, case_id);
+        assert_eq!(manifest.milestone, "C3-airloop-hvac-skeleton");
+        assert_eq!(manifest.comparison_class, ComparisonClass::DiagnosticOnly);
+        assert!(!manifest.conformance_claim);
+        assert!(manifest.tolerances.is_empty());
+        assert_eq!(manifest.outputs.len(), expected_outputs);
+        assert_eq!(
+            manifest
+                .outputs
+                .iter()
+                .filter(|output| output.class == VariableClass::HvacState)
+                .count(),
+            expected_hvac_outputs
+        );
+        assert!(manifest.outputs.iter().any(|output| {
+            output.class == VariableClass::NodeState && output.level == Some(OutputLevel::Baseline)
+        }));
+        let metadata = manifest.manifest_v2.as_ref().ok_or_else(|| {
+            std::io::Error::other("airloop diagnostic case should declare manifest_v2")
+        })?;
+        assert_eq!(metadata.tier, CaseTier::C);
+        assert!(metadata.source_file.ends_with(".epJSON"));
+        let gate = manifest.gate.as_ref().ok_or_else(|| {
+            std::io::Error::other("airloop diagnostic case should declare a gate")
+        })?;
+        assert!(gate.blocking);
+    }
+
+    Ok(())
+}
+
+#[test]
 fn loads_plant_loop_diagnostic_case_fixture() -> Result<(), Box<dyn std::error::Error>> {
     let manifest = load_case_file(
         repo_root().join("data/conformance_cases/plant_loop_diagnostic_001/case.toml"),

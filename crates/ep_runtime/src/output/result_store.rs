@@ -6,6 +6,27 @@ use super::{
 };
 use ep_model::OutputHandle;
 use std::collections::BTreeSet;
+
+/// EnergyPlus-style output store type for one reported series.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OutputStoreType {
+    /// Values are averaged over the reporting interval.
+    Average,
+    /// Values are summed over the reporting interval.
+    Sum,
+}
+
+impl OutputStoreType {
+    /// Stable lower-case identifier.
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::Average => "average",
+            Self::Sum => "sum",
+        }
+    }
+}
+
 /// One output series stored by the runtime.
 #[derive(Clone, Debug, PartialEq)]
 pub struct OutputSeries {
@@ -19,6 +40,14 @@ pub struct OutputSeries {
     pub units: String,
     /// Sampled output values.
     pub values: Vec<f64>,
+}
+
+impl OutputSeries {
+    /// Returns the EnergyPlus-style store type associated with this series.
+    #[must_use]
+    pub fn store_type(&self) -> OutputStoreType {
+        output_store_type_for_variable(&self.variable_name, &self.units)
+    }
 }
 
 /// Structured output store for runtime-native results.
@@ -37,7 +66,31 @@ impl ResultStore {
 
     /// Adds a complete output series.
     pub fn add_series(&mut self, series: OutputSeries) {
-        self.series.push(series);
+        self.write_output_by_handle(
+            series.handle,
+            series.key,
+            series.variable_name,
+            series.units,
+            series.values,
+        );
+    }
+
+    /// Writes one complete output series by prebound output handle.
+    pub fn write_output_by_handle(
+        &mut self,
+        handle: OutputHandle,
+        key: String,
+        variable_name: String,
+        units: String,
+        values: Vec<f64>,
+    ) {
+        self.series.push(OutputSeries {
+            handle,
+            key,
+            variable_name,
+            units,
+            values,
+        });
     }
 
     /// Returns the maximum sample count across all output series.
@@ -78,6 +131,10 @@ impl ResultStore {
                     severity: RuntimeDiagnosticSeverity::Error,
                     code: RuntimeDiagnosticCode::DuplicateOutputHandle,
                     message: format!("duplicate runtime output handle {}", series.handle.0),
+                    stage: Some("result-store".to_string()),
+                    surface: None,
+                    zone: None,
+                    timestep: None,
                     key: Some(series.key.clone()),
                     variable_name: Some(series.variable_name.clone()),
                     meter_name: None,
@@ -98,6 +155,10 @@ impl ResultStore {
                         "duplicate runtime output series {} / {}",
                         series.key, series.variable_name
                     ),
+                    stage: Some("result-store".to_string()),
+                    surface: None,
+                    zone: None,
+                    timestep: None,
                     key: Some(series.key.clone()),
                     variable_name: Some(series.variable_name.clone()),
                     meter_name: None,
@@ -133,4 +194,16 @@ pub struct ResultStoreProfile {
     pub sample_count: usize,
     /// Number of output series without samples.
     pub empty_series_count: usize,
+}
+
+/// Infers the EnergyPlus output store type from a variable name and units.
+#[must_use]
+pub fn output_store_type_for_variable(variable_name: &str, units: &str) -> OutputStoreType {
+    let variable = variable_name.trim().to_ascii_lowercase();
+    let units = units.trim().to_ascii_lowercase();
+    if units == "j" || variable.ends_with(" energy") || variable.contains(" electricity energy") {
+        OutputStoreType::Sum
+    } else {
+        OutputStoreType::Average
+    }
 }

@@ -62,7 +62,7 @@ fn render_markdown(context: &InternalGainContext<'_>) -> String {
         report.push_str(&format!("gate_script: {}\n", gate.script));
         report.push_str(&format!("gate_blocking: {}\n", gate.blocking));
     }
-    report.push_str("claim_boundary: Zone Total Internal Convective Heating Rate only; static EIO nominal rows remain diagnostic here\n");
+    report.push_str("claim_boundary: configured Zone Total Internal Convective/Radiant Heating Rate ESO traces only; static EIO nominal rows remain diagnostic here\n");
     report.push_str(
         "timestamp_rule: hour-ending hourly samples aligned by EnergyPlus ESO timestamp labels\n\n",
     );
@@ -138,7 +138,7 @@ fn render_json(context: &InternalGainContext<'_>) -> String {
         manifest.conformance_claim
     ));
     json.push_str("  \"runtime_class\": \"internal-gain-trace\",\n");
-    json.push_str("  \"claim_boundary\": \"Zone Total Internal Convective Heating Rate only; static EIO nominal rows remain diagnostic in this dynamic report\",\n");
+    json.push_str("  \"claim_boundary\": \"configured Zone Total Internal Convective/Radiant Heating Rate ESO traces only; static EIO nominal rows remain diagnostic in this dynamic report\",\n");
     json.push_str(&format!(
         "  \"report_contract\": {},\n",
         report_contract_json(manifest)

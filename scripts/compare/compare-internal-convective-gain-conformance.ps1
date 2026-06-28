@@ -136,7 +136,7 @@ if ($series.rmse_delta -gt 0.000000001) {
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "Internal Gains Conformance Report" -Description "markdown report header"
 Assert-Contains -Text $reportText -Pattern "gate_blocking: true" -Description "markdown blocking gate"
-Assert-Contains -Text $reportText -Pattern "claim_boundary: Zone Total Internal Convective Heating Rate only" -Description "claim boundary"
+Assert-Contains -Text $reportText -Pattern "claim_boundary: configured Zone Total Internal Convective/Radiant Heating Rate ESO traces only" -Description "claim boundary"
 Assert-Contains -Text $reportText -Pattern "| ZONE ONE | Zone Total Internal Convective Heating Rate | conformance" -Description "markdown conformance row"
 
 Write-Host "Internal convective gain conformance gate passed."

@@ -7,7 +7,7 @@ pub use crate::first_zone::*;
 pub use crate::geometry::{surface_area_m2, surface_geometry_summaries, zone_geometry_summaries};
 #[cfg(test)]
 pub(crate) use crate::geometry::{surface_azimuth_deg, surface_tilt_deg};
-use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_records;
+use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_series;
 #[cfg(test)]
 use crate::heat_balance::air_manager::{
     update_zone_air_heat_capacities_from_weather_context, zone_air_heat_balance_air_storage_rate_w,
@@ -15,10 +15,11 @@ use crate::heat_balance::air_manager::{
 #[cfg(test)]
 use crate::heat_balance::convection::{
     ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
-    ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K,
+    ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, energyplus_ashrae_tarp_natural_convection_branch,
     energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
     energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
-    energyplus_surface_outdoor_air_temperature_c, energyplus_surface_outside_wind_speed_m_per_s,
+    energyplus_outside_convection_branch_id, energyplus_surface_outdoor_air_temperature_c,
+    energyplus_surface_outside_wind_speed_m_per_s, energyplus_tarp_inside_convection_branch_id,
     energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
     heat_balance_uses_doe2_outside_convection,
 };
@@ -30,9 +31,10 @@ use crate::heat_balance::ctf::{
     advance_surface_ctf_histories, advance_surface_ctf_histories_with_outside_temperature_override,
     energyplus_ctf_inside_face_temperature_c, energyplus_ctf_outside_face_temperature_c,
     energyplus_ctf_outside_face_temperature_quick_conduction_c, surface_ctf_history_slot_samples,
-    surface_heat_storage_rate_w, surface_inside_conduction_flux_w_per_m2,
-    surface_inside_conduction_rate_w, surface_outside_conduction_flux_w_per_m2,
-    surface_outside_conduction_rate_w, update_surface_ctf_history_constants,
+    surface_ctf_inside_current_inside_term_rate_w_from_sources, surface_heat_storage_rate_w,
+    surface_inside_conduction_flux_w_per_m2, surface_inside_conduction_rate_w,
+    surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
+    update_surface_ctf_history_constants,
 };
 #[cfg(test)]
 pub(crate) use crate::heat_balance::initialization::initialize_heat_balance_state;
@@ -106,6 +108,7 @@ pub(crate) use crate::heat_balance::trace::*;
 pub(crate) use crate::heat_balance::warmup::run_heat_balance_run_period_warmup;
 #[cfg(test)]
 use crate::heat_balance::zone_air_correction::{
+    ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
     apply_energyplus_adaptive_system_timestep_zone_air_correction,
     energyplus_down_interpolate_three_history_values,
     zone_air_system_timestep_storage_report_rate_w,
@@ -127,15 +130,21 @@ pub(crate) use crate::heat_balance::{surface_air_sky_radiation_split, surface_sk
 #[cfg(test)]
 pub(crate) use crate::psychrometrics::energyplus_outdoor_wet_bulb_c;
 pub use crate::psychrometrics::{
-    energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
-    energyplus_psychrometric_humidity_ratio_from_rh, energyplus_water_vapor_gas_enthalpy_j_per_kg,
-    energyplus_zone_air_heat_capacity_j_per_k,
+    ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA, energyplus_moist_air_density_kg_per_m3,
+    energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psychrometric_humidity_ratio_from_rh,
+    energyplus_standard_zone_air_heat_capacity_j_per_k,
+    energyplus_water_vapor_gas_enthalpy_j_per_kg, energyplus_zone_air_heat_capacity_j_per_k,
 };
 #[cfg(test)]
 use crate::schedules::update_surface_radiant_internal_gain_source_terms;
 pub use crate::schedules::{
-    ScheduleTrace, ScheduleValueSeries, ZoneInternalGainTrace, precompute_schedule_value_series,
-    simulate_constant_schedules, simulate_schedule_values, simulate_zone_internal_convective_gains,
+    CompiledScheduleInterval, ScheduleSeriesKind, ScheduleTrace, ScheduleValueSeries,
+    ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
+    ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE, ZoneInternalGainTrace,
+    precompile_compact_schedule_intervals, precompute_schedule_value_series,
+    precompute_schedule_value_series_for_time_axis, simulate_constant_schedules,
+    simulate_schedule_values, simulate_zone_internal_convective_gains,
+    simulate_zone_internal_radiant_gains,
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;
 pub use crate::weather::*;
@@ -169,6 +178,7 @@ pub fn simulate_heat_balance_zone_air_temperatures(
     simulate_heat_balance_zone_air_temperatures_internal(
         model,
         weather_dry_bulb_c,
+        None,
         None,
         options,
         &[],
@@ -209,10 +219,40 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_
         zone_steps_per_hour,
         first_hour_interpolation_starting_values,
     );
+    simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients(
+        model,
+        &weather_series,
+        options,
+        ctf_coefficients,
+    )
+}
+
+/// Simulates hourly zone mean air temperatures with precomputed weather samples.
+pub fn simulate_heat_balance_zone_air_temperatures_with_weather_series(
+    model: &SimulationModel,
+    weather_series: &WeatherTimestepSeries,
+    options: HeatBalanceSimulationOptions,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients(
+        model,
+        weather_series,
+        options,
+        &[],
+    )
+}
+
+/// Simulates hourly zone mean air temperatures with precomputed weather and CTF rows.
+pub fn simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients(
+    model: &SimulationModel,
+    weather_series: &WeatherTimestepSeries,
+    options: HeatBalanceSimulationOptions,
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+) -> Result<HeatBalanceSimulation, RuntimeError> {
     simulate_heat_balance_zone_air_temperatures_internal(
         model,
         weather_series.hourly_dry_bulb_c(),
-        Some(weather_records),
+        Some(weather_series.hourly_records()),
+        Some(weather_series),
         options,
         ctf_coefficients,
     )
@@ -222,6 +262,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     model: &SimulationModel,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
     options: HeatBalanceSimulationOptions,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
@@ -248,9 +289,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
             options.initial_zone_air_temperature_c,
             ctf_coefficients,
         )?;
-        seed_zone_air_humidity_ratios_from_weather_records(
+        seed_zone_air_humidity_ratios_from_weather_series(
             &mut state,
-            weather_records,
+            weather_series,
             weather_dry_bulb_c[0],
             zone_steps_per_hour,
             first_hour_interpolation_starting_values,
@@ -275,6 +316,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut state,
         weather_dry_bulb_c,
         weather_records,
+        weather_series,
         zone_steps_per_hour,
         seconds_per_timestep,
         options.warmup,
@@ -319,6 +361,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut state,
         weather_dry_bulb_c,
         weather_records,
+        weather_series,
         options,
         zone_steps_per_hour,
         seconds_per_timestep,
@@ -342,9 +385,32 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         samples: options.sample_count,
         timestep_count: state.timestep_index,
         run_period_timestep_count: state.timestep_index - run_period_timestep_start,
+        time_axis_source: "shared TimeAxis for weather/schedule/output/report",
+        zone_timesteps_per_hour: zone_steps_per_hour,
+        zone_timestep_seconds: seconds_per_timestep,
+        system_timestep_nominal_seconds: seconds_per_timestep,
+        variable_system_timestep_support: if state.variable_system_timestep_placeholder {
+            "placeholder-state-backed"
+        } else {
+            "disabled"
+        },
+        shorten_timestep_sys_state: true,
+        use_zone_timestep_history_state: true,
+        hvac_iteration_count: state.hvac_iteration_count,
+        plant_iteration_count: state.plant_iteration_count,
+        warmup_reported_samples: 0,
+        run_period_reported_samples: options.sample_count,
+        design_day_reported_samples: 0,
         warmup,
         zone_count: state.zones.len(),
         surface_count: state.surfaces.len(),
+        construction_cache_hash: state.construction_cache_hash,
+        construction_cache_build_wall_seconds: state.construction_cache_build_wall_seconds,
+        construction_cache_entry_count: state.construction_cache_entry_count,
+        construction_cache_no_mass_count: state.construction_cache_no_mass_count,
+        construction_cache_massive_ctf_count: state.construction_cache_massive_ctf_count,
+        construction_cache_eio_seeded_count: state.construction_cache_eio_seeded_count,
+        construction_cache_rust_generated_count: state.construction_cache_rust_generated_count,
         surface_iteration_count: options.surface_iteration_count,
         inside_hconv_reevaluation_interval: options.inside_hconv_reevaluation_interval,
         ctf_initial_history_policy: options.ctf_initial_history_policy,

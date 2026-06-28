@@ -18,10 +18,10 @@ use conformance_artifacts::{
     generate_conformance_report_skeleton,
 };
 use ep_compare::{
-    Tolerance, compare_series, load_eio_construction_ctf, load_eio_construction_ctf_coefficients,
-    load_eio_heat_transfer_surfaces, load_eio_material_ctf_summary,
-    load_eio_other_equipment_nominal, load_eio_warmup_environments, load_eio_zone_geometry,
-    load_eso_series, load_eso_time_series,
+    SeriesSample, Tolerance, compare_series, load_eio_construction_ctf,
+    load_eio_construction_ctf_coefficients, load_eio_heat_transfer_surfaces,
+    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_warmup_environments,
+    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -30,8 +30,8 @@ use ep_conformance::{
     load_case_v2_file,
 };
 use ep_model::{
-    Construction, Material, OtherEquipment, OutsideBoundaryCondition, ScheduleId, SimulationModel,
-    SurfaceType, TypedModel,
+    Construction, DayOfWeek, Material, ModelGraph, OtherEquipment, OutsideBoundaryCondition,
+    ScheduleId, SimulationModel, SurfaceType, TypedModel,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
@@ -40,14 +40,15 @@ use ep_run::{
     run_arbitrary_idf,
 };
 use ep_runtime::{
-    ConstructionCtfCoefficientOverride, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStep,
-    FirstZoneSimulationOptions, HeatBalanceAlgorithmLane, HeatBalanceCtfHistorySlotFirstSample,
-    HeatBalanceCtfHistorySlotHourlySample, HeatBalanceCtfHistorySlotSample,
-    HeatBalanceCtfInitialHistoryPolicy, HeatBalanceSimulationOptions,
-    HeatBalanceSurfaceFirstSampleTrace, HeatBalanceSurfaceIterationFirstSampleTrace,
-    HeatBalanceSurfaceIterationSampleTrace, HeatBalanceSurfaceLoopZoneAirCorrection,
-    HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupSummary,
-    HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirFirstSampleTrace,
+    ConstructionCtfCoefficientOverride, ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+    ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA, EnergyPlusCompatibilityStage, ExecutionPlan,
+    ExecutionStep, FirstZoneSimulationOptions, HeatBalanceAlgorithmLane,
+    HeatBalanceCtfHistorySlotFirstSample, HeatBalanceCtfHistorySlotHourlySample,
+    HeatBalanceCtfHistorySlotSample, HeatBalanceCtfInitialHistoryPolicy,
+    HeatBalanceSimulationOptions, HeatBalanceSurfaceFirstSampleTrace,
+    HeatBalanceSurfaceIterationFirstSampleTrace, HeatBalanceSurfaceIterationSampleTrace,
+    HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupDayEndZoneAirStateSample,
+    HeatBalanceWarmupSummary, HeatBalanceZoneAirAlgorithm, HeatBalanceZoneAirFirstSampleTrace,
     HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
     HeatBalanceZoneConductionReportSource, NodeStateProjection, NodeStateProjectionOptions,
     PlantStateProjection, PlantStateProjectionOptions, RUST_ZONE_AIR_CURRENT_TEMPERATURE_VARIABLE,
@@ -67,7 +68,17 @@ use ep_runtime::{
     SURFACE_CTF_OUTSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_CURRENT_OUTSIDE_TERM_RATE_VARIABLE,
     SURFACE_CTF_OUTSIDE_HISTORY_TERM_RATE_VARIABLE,
+    SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+    SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_VARIABLE,
     SURFACE_INSIDE_HEAT_BALANCE_ITERATION_COUNT_VARIABLE,
+    SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+    SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_VARIABLE,
+    SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+    SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_VARIABLE,
+    SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+    SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_VARIABLE,
+    SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+    SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_VARIABLE,
     SURFACE_OUTSIDE_BALANCE_COEFFICIENT_TEMPERATURE_VARIABLE,
     SURFACE_OUTSIDE_BALANCE_CONVECTION_REFERENCE_TEMPERATURE_VARIABLE,
     SURFACE_OUTSIDE_BALANCE_EQUIVALENT_RADIANT_TEMPERATURE_VARIABLE,
@@ -79,10 +90,12 @@ use ep_runtime::{
     SURFACE_OUTSIDE_QUICK_BALANCE_INSIDE_SOURCE_TERM_VARIABLE,
     SURFACE_OUTSIDE_QUICK_BALANCE_NUMERATOR_VARIABLE, SimulationMode, SurfaceGeometrySummary,
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
-    build_hourly_time_axis, energyplus_heat_balance_compatibility_stages, load_epw_dry_bulb_series,
-    load_epw_records, simulate_constant_schedules, simulate_first_zone_uncontrolled,
-    simulate_heat_balance_zone_air_temperatures,
-    simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients,
+    build_hourly_time_axis, energyplus_heat_balance_compatibility_stages,
+    energyplus_zone_air_heat_capacity_j_per_k, load_epw_dry_bulb_series, load_epw_records,
+    output_store_type_for_variable, precompute_schedule_value_series_for_time_axis,
+    precompute_weather_timestep_series, simulate_constant_schedules,
+    simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+    simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection, surface_area_m2,
     surface_geometry_summaries, zone_geometry_summaries,
 };
@@ -97,6 +110,7 @@ use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
+const HEAT_BALANCE_TOP_RMSE_LIMIT: usize = 10;
 const HEAT_BALANCE_MAX_SAMPLE_CONTEXT_LIMIT: usize = 8;
 const OFFICIAL_DYNAMIC_HEAT_BALANCE_CANDIDATE_CASE_ID: &str =
     "official_1zone_uncontrolled_dynamic_conformance_candidate_001";
@@ -118,9 +132,6 @@ const HEAT_BALANCE_ZONE_AIR_REPORT_SAMPLING_ENV: &str =
 const HEAT_BALANCE_SURFACE_LOOP_ZONE_AIR_CORRECTION_ENV: &str =
     "RUSTED_ENERGYPLUS_HEAT_BALANCE_SURFACE_LOOP_ZONE_AIR_CORRECTION";
 const HEAT_BALANCE_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K: f64 = 5.0;
-const HEAT_BALANCE_REPORT_AIR_DENSITY_KG_PER_M3: f64 = 1.2;
-const HEAT_BALANCE_REPORT_AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
-
 const ZONE_TEMPERATURE_COMPARE_USAGE: &str = "usage: eplus-rs compare zone-temperature <input.epJSON> <weather.epw> <eplusout.eso> [--report-dir DIR]";
 const CONFORMANCE_DIAGNOSTIC_REPORT_USAGE: &str =
     "usage: eplus-rs conformance diagnostic-report <case.toml> <oracle-root> <output-root>";
@@ -367,6 +378,17 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     );
     println!("  nodes: {}", model.typed.nodes.len());
     println!("  node_lists: {}", model.typed.node_lists.len());
+    println!("  air_loops: {}", model.typed.air_loops.len());
+    println!("  fans: {}", model.typed.fans.len());
+    println!("  coils: {}", model.typed.coils.len());
+    println!(
+        "  setpoint_managers: {}",
+        model.typed.setpoint_managers.len()
+    );
+    println!(
+        "  availability_managers: {}",
+        model.typed.availability_managers.len()
+    );
     println!("  plant_loops: {}", model.typed.plant_loops.len());
     println!("  plant_branches: {}", model.typed.plant_branches.len());
     println!(
@@ -436,14 +458,80 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         "  plant_branch_component_edges: {}",
         model.graph.plant_branch_components.len()
     );
+    println!(
+        "  plant_loop_half_loops: {}",
+        model.graph.plant_loop_graph.half_loops.len()
+    );
+    println!(
+        "  plant_loop_branch_list_member_edges: {}",
+        model.graph.plant_loop_graph.branch_list_members.len()
+    );
+    println!(
+        "  plant_loop_connector_list_member_edges: {}",
+        model.graph.plant_loop_graph.connector_list_members.len()
+    );
+    println!(
+        "  plant_component_registry_entries: {}",
+        model.graph.plant_loop_graph.component_registry.len()
+    );
+    println!(
+        "  plant_loop_graph_diagnostics: {}",
+        model.graph.plant_loop_graph.diagnostics.len()
+    );
+    println!(
+        "  air_loop_branch_list_edges: {}",
+        model.graph.air_loop_graph.branch_lists.len()
+    );
+    println!(
+        "  air_loop_branch_list_member_edges: {}",
+        model.graph.air_loop_graph.branch_list_members.len()
+    );
+    println!(
+        "  air_loop_connector_list_edges: {}",
+        model.graph.air_loop_graph.connector_lists.len()
+    );
+    println!(
+        "  air_loop_execution_steps: {}",
+        model.graph.air_loop_graph.execution_order.len()
+    );
+    println!(
+        "  component_registry_entries: {}",
+        model.graph.component_registry.entries.len()
+    );
+    println!(
+        "  node_graph_component_ownership_edges: {}",
+        model.graph.node_graph.component_node_ownership.len()
+    );
     println!("  stages: {}", plan.stages.len());
     println!("  steps: {}", plan.step_count());
+    println!(
+        "  post_typed_model_object_lookup: {}",
+        plan.runtime_policy.post_typed_model_object_lookup
+    );
+    println!(
+        "  stage_execution_string_comparison: {}",
+        plan.runtime_policy.stage_execution_string_comparison
+    );
+    println!(
+        "  stage_execution_hash_map_lookup: {}",
+        plan.runtime_policy.stage_execution_hash_map_lookup
+    );
+    println!(
+        "  compatibility_plan_order: {}",
+        plan.runtime_policy.compatibility_plan_order
+    );
     for stage in &plan.stages {
         println!(
-            "    {} ({}): {}",
+            "    {} ({}): steps={}, outputs={}, surfaces={}, zones={}, constructions={}, schedules={}, weather_series={}",
             stage.name,
             stage.kind.id(),
-            stage.steps.len()
+            stage.steps.len(),
+            stage.prebound.output_handles.len(),
+            stage.prebound.surface_ids.len(),
+            stage.prebound.zone_ids.len(),
+            stage.prebound.construction_ids.len(),
+            stage.prebound.schedule_ids.len(),
+            stage.prebound.weather_series_indices.len()
         );
         for (index, step) in stage.steps.iter().enumerate() {
             println!("      {index}: {}", execution_step_label(step));
@@ -848,6 +936,11 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
             println!("  compare_digest: {}", summary.compare_digest.display());
+            println!("  selected_outputs: {}", summary.selected_outputs.display());
+            println!(
+                "  performance_summary: {}",
+                summary.performance_summary.display()
+            );
             println!("  samples: {}", summary.samples);
             println!(
                 "  heat_balance_timesteps: {}",
@@ -897,6 +990,43 @@ fn run_conformance_heat_balance_report(args: &[String]) -> i32 {
                 "  surface_loop_zone_air_correction: {}",
                 summary.surface_loop_zone_air_correction
             );
+            println!(
+                "  construction_cache_hash: {}",
+                summary.construction_cache_hash
+            );
+            println!(
+                "  construction_cache_build_wall_seconds: {:.12}",
+                summary.construction_cache_build_wall_seconds
+            );
+            println!(
+                "  construction_cache_entries: {}",
+                summary.construction_cache_entry_count
+            );
+            println!(
+                "  construction_cache_no_mass_entries: {}",
+                summary.construction_cache_no_mass_count
+            );
+            println!(
+                "  construction_cache_massive_ctf_entries: {}",
+                summary.construction_cache_massive_ctf_count
+            );
+            println!(
+                "  construction_cache_eio_seeded_entries: {}",
+                summary.construction_cache_eio_seeded_count
+            );
+            println!(
+                "  construction_cache_rust_generated_entries: {}",
+                summary.construction_cache_rust_generated_count
+            );
+            println!(
+                "  heat_balance_active_branch_scope: official-1zone-declared-compatibility-branches-only"
+            );
+            println!(
+                "  heat_balance_unsupported_active_branch_policy: block-conformance-promotion"
+            );
+            for (branch, status, policy) in heat_balance_branch_status_rows() {
+                println!("  heat_balance_branch: {branch} | {status} | {policy}");
+            }
             println!("  status: {}", summary.status);
             if summary.status == "pass" { 0 } else { 1 }
         }
@@ -954,6 +1084,11 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
             println!("  compare_report: {}", summary.compare_report.display());
             println!("  compare_summary: {}", summary.compare_summary.display());
             println!("  compare_digest: {}", summary.compare_digest.display());
+            println!("  selected_outputs: {}", summary.selected_outputs.display());
+            println!(
+                "  performance_summary: {}",
+                summary.performance_summary.display()
+            );
             println!("  samples: {}", summary.samples);
             println!(
                 "  heat_balance_timesteps: {}",
@@ -1003,6 +1138,43 @@ fn run_conformance_heat_balance_diagnostic_report(args: &[String]) -> i32 {
                 "  surface_loop_zone_air_correction: {}",
                 summary.surface_loop_zone_air_correction
             );
+            println!(
+                "  construction_cache_hash: {}",
+                summary.construction_cache_hash
+            );
+            println!(
+                "  construction_cache_build_wall_seconds: {:.12}",
+                summary.construction_cache_build_wall_seconds
+            );
+            println!(
+                "  construction_cache_entries: {}",
+                summary.construction_cache_entry_count
+            );
+            println!(
+                "  construction_cache_no_mass_entries: {}",
+                summary.construction_cache_no_mass_count
+            );
+            println!(
+                "  construction_cache_massive_ctf_entries: {}",
+                summary.construction_cache_massive_ctf_count
+            );
+            println!(
+                "  construction_cache_eio_seeded_entries: {}",
+                summary.construction_cache_eio_seeded_count
+            );
+            println!(
+                "  construction_cache_rust_generated_entries: {}",
+                summary.construction_cache_rust_generated_count
+            );
+            println!(
+                "  heat_balance_active_branch_scope: official-1zone-declared-compatibility-branches-only"
+            );
+            println!(
+                "  heat_balance_unsupported_active_branch_policy: block-conformance-promotion"
+            );
+            for (branch, status, policy) in heat_balance_branch_status_rows() {
+                println!("  heat_balance_branch: {branch} | {status} | {policy}");
+            }
             println!("  status: {}", summary.status);
             0
         }
@@ -1357,6 +1529,8 @@ struct HeatBalanceReportSummary {
     compare_report: PathBuf,
     compare_summary: PathBuf,
     compare_digest: PathBuf,
+    selected_outputs: PathBuf,
+    performance_summary: PathBuf,
     samples: usize,
     heat_balance_timesteps: usize,
     heat_balance_run_period_timesteps: usize,
@@ -1373,6 +1547,13 @@ struct HeatBalanceReportSummary {
     zone_conduction_report_source: &'static str,
     zone_air_report_sampling: &'static str,
     surface_loop_zone_air_correction: &'static str,
+    construction_cache_hash: u64,
+    construction_cache_build_wall_seconds: f64,
+    construction_cache_entry_count: usize,
+    construction_cache_no_mass_count: usize,
+    construction_cache_massive_ctf_count: usize,
+    construction_cache_eio_seeded_count: usize,
+    construction_cache_rust_generated_count: usize,
     status: &'static str,
 }
 
@@ -1462,6 +1643,8 @@ fn generate_conformance_heat_balance_report(
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
         compare_digest: compare_dir.join("compare-digest.json"),
+        selected_outputs: compare_dir.join("selected_outputs.json"),
+        performance_summary: compare_dir.join("performance-summary.json"),
         samples: diagnostic.samples,
         heat_balance_timesteps: diagnostic.heat_balance_timesteps,
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
@@ -1478,6 +1661,13 @@ fn generate_conformance_heat_balance_report(
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         zone_air_report_sampling: diagnostic.zone_air_report_sampling,
         surface_loop_zone_air_correction: diagnostic.surface_loop_zone_air_correction,
+        construction_cache_hash: diagnostic.construction_cache_hash,
+        construction_cache_build_wall_seconds: diagnostic.construction_cache_build_wall_seconds,
+        construction_cache_entry_count: diagnostic.construction_cache_entry_count,
+        construction_cache_no_mass_count: diagnostic.construction_cache_no_mass_count,
+        construction_cache_massive_ctf_count: diagnostic.construction_cache_massive_ctf_count,
+        construction_cache_eio_seeded_count: diagnostic.construction_cache_eio_seeded_count,
+        construction_cache_rust_generated_count: diagnostic.construction_cache_rust_generated_count,
         status: conformance.status,
     })
 }
@@ -1537,6 +1727,8 @@ fn generate_conformance_heat_balance_diagnostic_report(
         compare_report: compare_dir.join("compare-report.md"),
         compare_summary: compare_dir.join("compare-summary.json"),
         compare_digest: compare_dir.join("compare-digest.json"),
+        selected_outputs: compare_dir.join("selected_outputs.json"),
+        performance_summary: compare_dir.join("performance-summary.json"),
         samples: diagnostic.samples,
         heat_balance_timesteps: diagnostic.heat_balance_timesteps,
         heat_balance_run_period_timesteps: diagnostic.heat_balance_run_period_timesteps,
@@ -1553,6 +1745,13 @@ fn generate_conformance_heat_balance_diagnostic_report(
         zone_conduction_report_source: diagnostic.zone_conduction_report_source,
         zone_air_report_sampling: diagnostic.zone_air_report_sampling,
         surface_loop_zone_air_correction: diagnostic.surface_loop_zone_air_correction,
+        construction_cache_hash: diagnostic.construction_cache_hash,
+        construction_cache_build_wall_seconds: diagnostic.construction_cache_build_wall_seconds,
+        construction_cache_entry_count: diagnostic.construction_cache_entry_count,
+        construction_cache_no_mass_count: diagnostic.construction_cache_no_mass_count,
+        construction_cache_massive_ctf_count: diagnostic.construction_cache_massive_ctf_count,
+        construction_cache_eio_seeded_count: diagnostic.construction_cache_eio_seeded_count,
+        construction_cache_rust_generated_count: diagnostic.construction_cache_rust_generated_count,
         status: conformance.status,
     })
 }
@@ -1908,8 +2107,8 @@ fn render_node_state_projection_markdown(projection: &NodeStateProjection) -> St
         projection.summary.evidence_policy.sentinel_rule
     ));
     report.push_str(&format!(
-        "excluded_variable: {}\n\n",
-        projection.summary.evidence_policy.excluded_variable
+        "setpoint_variable: {}\n\n",
+        projection.summary.evidence_policy.setpoint_variable
     ));
     report.push_str(
         "| key | role | variable | units | samples | first | last | nonzero_count | status |\n",
@@ -1972,8 +2171,8 @@ fn render_node_state_projection_summary_json(projection: &NodeStateProjection) -
         json_string(projection.summary.evidence_policy.sentinel_rule)
     ));
     json.push_str(&format!(
-        "    \"excluded_variable\": {}\n",
-        json_string(projection.summary.evidence_policy.excluded_variable)
+        "    \"setpoint_variable\": {}\n",
+        json_string(projection.summary.evidence_policy.setpoint_variable)
     ));
     json.push_str("  },\n");
     json.push_str("  \"artifacts\": {\n");
@@ -3904,6 +4103,19 @@ impl HeatBalanceConformanceContext {
 struct HeatBalanceSeriesDiagnostic {
     output: ZoneTemperatureReportOutput,
     samples: usize,
+    oracle_count: usize,
+    rust_count: usize,
+    oracle_units: Option<String>,
+    oracle_frequency: Option<String>,
+    energyplus_store_type: &'static str,
+    rust_store_type: &'static str,
+    store_type_match: bool,
+    oracle_first_timestamp: Option<String>,
+    rust_first_timestamp: Option<String>,
+    oracle_last_timestamp: Option<String>,
+    rust_last_timestamp: Option<String>,
+    timestamp_match: bool,
+    first_reported_sample_hour_ending: bool,
     oracle_first_c: f64,
     rust_first_c: f64,
     oracle_last_c: f64,
@@ -3911,6 +4123,15 @@ struct HeatBalanceSeriesDiagnostic {
     delta: DeltaSummary,
     sample_rows: Vec<DeltaPoint>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceOracleSeries {
+    output: ZoneTemperatureReportOutput,
+    units: Option<String>,
+    frequency: Option<String>,
+    store_type: &'static str,
+    samples: Vec<SeriesSample>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3972,6 +4193,7 @@ struct HeatBalanceWarmupEndStateDeltas {
     mat_delta_c: f64,
     surface_temperature: Option<HeatBalanceScalarDeltaRow>,
     ctf_history: Option<HeatBalanceScalarDeltaRow>,
+    zone_history: Option<HeatBalanceScalarDeltaRow>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -3979,6 +4201,7 @@ struct HeatBalanceConformanceDiagnostic {
     samples: usize,
     heat_balance_timesteps: usize,
     heat_balance_run_period_timesteps: usize,
+    time_axis: HeatBalanceTimeAxisDiagnostic,
     heat_balance_warmup: HeatBalanceWarmupDiagnostic,
     ctf_seed: HeatBalanceCtfSeedDiagnostic,
     zone_air_algorithm: &'static str,
@@ -3992,6 +4215,13 @@ struct HeatBalanceConformanceDiagnostic {
     zone_conduction_report_source: &'static str,
     zone_air_report_sampling: &'static str,
     surface_loop_zone_air_correction: &'static str,
+    construction_cache_hash: u64,
+    construction_cache_build_wall_seconds: f64,
+    construction_cache_entry_count: usize,
+    construction_cache_no_mass_count: usize,
+    construction_cache_massive_ctf_count: usize,
+    construction_cache_eio_seeded_count: usize,
+    construction_cache_rust_generated_count: usize,
     compatibility_stages: Vec<EnergyPlusCompatibilityStage>,
     zone_count: usize,
     surface_count: usize,
@@ -4006,6 +4236,9 @@ struct HeatBalanceConformanceDiagnostic {
     inside_balance_max_sample_deltas: Vec<HeatBalanceInsideBalanceMaxSampleDelta>,
     inside_solve_max_sample_deltas: Vec<HeatBalanceInsideSolveMaxSampleDelta>,
     inside_solve_series_deltas: Vec<HeatBalanceInsideSolveSeriesDelta>,
+    inside_source_term_series_summaries: Vec<HeatBalanceInsideSourceTermSeriesSummary>,
+    floor_inside_current_diagnostics: Vec<HeatBalanceFloorInsideCurrentDiagnostic>,
+    floor_inside_current_term_series: Vec<HeatBalanceFloorInsideCurrentTermSeries>,
     adiabatic_history_max_sample_deltas: Vec<HeatBalanceAdiabaticHistoryMaxSampleDelta>,
     ctf_history_run_period_initial_slots: Vec<HeatBalanceCtfHistorySlotSample>,
     ctf_history_first_sample_slots: Vec<HeatBalanceCtfHistorySlotFirstSample>,
@@ -4019,8 +4252,44 @@ struct HeatBalanceConformanceDiagnostic {
     surface_iteration_max_sample_trace: Vec<HeatBalanceSurfaceIterationSampleTrace>,
     rust_zone_air_debug_series: Vec<HeatBalanceRustDebugSeries>,
     rust_outside_balance_debug_series: Vec<HeatBalanceRustDebugSeries>,
+    performance_profile: HeatBalancePerformanceProfile,
     series: Vec<HeatBalanceSeriesDiagnostic>,
     status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceTimeAxisDiagnostic {
+    source: &'static str,
+    zone_timesteps_per_hour: u32,
+    zone_timestep_seconds: f64,
+    system_timestep_nominal_seconds: f64,
+    variable_system_timestep_support: &'static str,
+    shorten_timestep_sys_state: bool,
+    use_zone_timestep_history_state: bool,
+    hvac_iteration_count: u32,
+    plant_iteration_count: u32,
+    warmup_reported_samples: usize,
+    run_period_reported_samples: usize,
+    design_day_reported_samples: usize,
+}
+
+impl Default for HeatBalanceTimeAxisDiagnostic {
+    fn default() -> Self {
+        Self {
+            source: "shared TimeAxis for weather/schedule/output/report",
+            zone_timesteps_per_hour: 1,
+            zone_timestep_seconds: 3600.0,
+            system_timestep_nominal_seconds: 3600.0,
+            variable_system_timestep_support: "placeholder-state-backed",
+            shorten_timestep_sys_state: true,
+            use_zone_timestep_history_state: true,
+            hvac_iteration_count: 0,
+            plant_iteration_count: 0,
+            warmup_reported_samples: 0,
+            run_period_reported_samples: 0,
+            design_day_reported_samples: 0,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -4261,6 +4530,12 @@ struct HeatBalanceInsideSolveMaxSampleDelta {
     reference_air_source_signed_delta_w: f64,
     reference_air_source_split_abs_sum_w: f64,
     reference_air_source_cancellation_delta_w: f64,
+    oracle_surface_temperature_sink_w: f64,
+    rust_surface_temperature_sink_w: f64,
+    surface_temperature_sink_delta_w: f64,
+    oracle_surface_temperature_sink_w_per_m2: f64,
+    rust_surface_temperature_sink_w_per_m2: f64,
+    surface_temperature_sink_delta_w_per_m2: f64,
     reference_air_coefficient_source_signed_delta_w: f64,
     reference_air_coefficient_source_delta_w: f64,
     reference_air_temperature_source_signed_delta_w: f64,
@@ -4326,6 +4601,86 @@ struct HeatBalanceInsideSolveSeriesDelta {
     inside_net_longwave_delta: DeltaSummary,
     tracked_solve_source_delta: DeltaSummary,
     solve_source_residual_delta: DeltaSummary,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceInsideSourceTermSeriesSummary {
+    key: String,
+    term_name: String,
+    area_m2: f64,
+    samples: usize,
+    rate_variable: String,
+    per_area_variable: String,
+    max_abs_w: f64,
+    max_abs_w_per_m2: f64,
+    area_residual_max_abs_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceInsideSourceTermSampleDelta {
+    term_name: String,
+    rate_variable: String,
+    sample_index: usize,
+    oracle_w: f64,
+    rust_w: f64,
+    signed_delta_w: f64,
+    abs_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceFloorInsideCurrentDiagnostic {
+    key: String,
+    construction_name: String,
+    sample_index: usize,
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    inside_face_temperature_signed_delta_c: f64,
+    inside_face_temperature_delta_c: f64,
+    oracle_reference_air_temperature_c: f64,
+    rust_reference_air_temperature_c: f64,
+    reference_air_temperature_signed_delta_c: f64,
+    reference_air_temperature_delta_c: f64,
+    oracle_hconv_int_w_per_m2_k: f64,
+    rust_hconv_int_w_per_m2_k: f64,
+    hconv_int_signed_delta_w_per_m2_k: f64,
+    hconv_int_delta_w_per_m2_k: f64,
+    oracle_inside_current_inside_term_w: f64,
+    rust_inside_current_inside_term_w: f64,
+    inside_current_inside_term_signed_delta_w: f64,
+    inside_current_inside_term_delta_w: f64,
+    temperature_timing_expected_signed_delta_w: f64,
+    temperature_timing_expected_abs_delta_w: f64,
+    temperature_timing_coverage_ratio: f64,
+    coefficient_delta_w_per_m2_k: f64,
+    current_inside_mismatch_classification: String,
+    next_source_order_focus: String,
+    max_sample_source_terms: Vec<HeatBalanceInsideSourceTermSampleDelta>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceFloorInsideCurrentTermSample {
+    sample_index: usize,
+    oracle_inside_face_temperature_c: f64,
+    rust_inside_face_temperature_c: f64,
+    oracle_inside_current_inside_term_w: f64,
+    rust_inside_current_inside_term_w: f64,
+    signed_delta_w: f64,
+    abs_delta_w: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceFloorInsideCurrentTermSeries {
+    key: String,
+    construction_name: String,
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    samples: usize,
+    max_sample_index: usize,
+    max_abs_delta_w: f64,
+    max_signed_delta_w: f64,
+    sample_rows: Vec<HeatBalanceFloorInsideCurrentTermSample>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -4404,6 +4759,14 @@ struct HeatBalanceCtfConstructionSummary {
 #[derive(Clone, Debug, PartialEq)]
 struct HeatBalanceWarmupDiagnostic {
     enabled: bool,
+    building_minimum_days: Option<u32>,
+    building_maximum_days: Option<u32>,
+    building_temperature_convergence_tolerance_delta_c: Option<f64>,
+    building_loads_convergence_tolerance_w: Option<f64>,
+    minimum_days: u32,
+    maximum_days: u32,
+    temperature_convergence_tolerance_delta_c: f64,
+    loads_convergence_tolerance_w: f64,
     day_count: u32,
     timestep_count: usize,
     hours_per_day: usize,
@@ -4416,6 +4779,15 @@ impl From<HeatBalanceWarmupSummary> for HeatBalanceWarmupDiagnostic {
     fn from(summary: HeatBalanceWarmupSummary) -> Self {
         Self {
             enabled: summary.enabled,
+            building_minimum_days: None,
+            building_maximum_days: None,
+            building_temperature_convergence_tolerance_delta_c: None,
+            building_loads_convergence_tolerance_w: None,
+            minimum_days: summary.minimum_days,
+            maximum_days: summary.maximum_days,
+            temperature_convergence_tolerance_delta_c: summary
+                .temperature_convergence_tolerance_delta_c,
+            loads_convergence_tolerance_w: summary.loads_convergence_tolerance_w,
             day_count: summary.day_count,
             timestep_count: summary.timestep_count,
             hours_per_day: summary.hours_per_day,
@@ -4431,6 +4803,74 @@ struct HeatBalanceConformance<'a> {
     context: &'a HeatBalanceConformanceContext,
     status: &'static str,
     failure_reasons: Vec<String>,
+    diagnostics: Vec<HeatBalanceGateDiagnostic>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct HeatBalanceGateDiagnostic {
+    severity: &'static str,
+    code: &'static str,
+    stage: &'static str,
+    surface: Option<String>,
+    zone: Option<String>,
+    timestep: Option<u64>,
+    output_handle: Option<u32>,
+    message: String,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalancePerformanceProfile {
+    phases: Vec<HeatBalancePerformancePhase>,
+    compatibility_mode_separated_from_fast_mode: bool,
+    speedup_claim_policy: &'static str,
+    trace_write_policy: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalancePerformancePhase {
+    name: &'static str,
+    engine: &'static str,
+    wall_seconds: f64,
+    scope: &'static str,
+}
+
+impl HeatBalancePerformanceProfile {
+    fn new() -> Self {
+        Self {
+            phases: Vec::new(),
+            compatibility_mode_separated_from_fast_mode: true,
+            speedup_claim_policy: "speedup is reported only when the conformance gate status is pass",
+            trace_write_policy: "trace write time is measured as zero when trace output is disabled",
+        }
+    }
+
+    fn push(
+        &mut self,
+        name: &'static str,
+        engine: &'static str,
+        wall_seconds: f64,
+        scope: &'static str,
+    ) {
+        self.phases.push(HeatBalancePerformancePhase {
+            name,
+            engine,
+            wall_seconds,
+            scope,
+        });
+    }
+
+    fn phase_wall_seconds(&self, name: &str) -> Option<f64> {
+        self.phases
+            .iter()
+            .find(|phase| phase.name == name)
+            .map(|phase| phase.wall_seconds)
+    }
+}
+
+impl Default for HeatBalancePerformanceProfile {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 fn heat_balance_conformance_context_from_manifest(
@@ -4552,6 +4992,24 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case(
             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area",
         )
+        || variable
+            .eq_ignore_ascii_case(SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_VARIABLE)
+        || variable.eq_ignore_ascii_case(
+            SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        )
+        || variable
+            .eq_ignore_ascii_case(SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_VARIABLE)
+        || variable.eq_ignore_ascii_case(
+            SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        )
+        || variable.eq_ignore_ascii_case(SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_VARIABLE)
+        || variable
+            .eq_ignore_ascii_case(SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_PER_AREA_VARIABLE)
+        || variable.eq_ignore_ascii_case(SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_VARIABLE)
+        || variable
+            .eq_ignore_ascii_case(SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_PER_AREA_VARIABLE)
+        || variable.eq_ignore_ascii_case(SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_VARIABLE)
+        || variable.eq_ignore_ascii_case(SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_PER_AREA_VARIABLE)
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Transfer Rate")
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Gain Rate")
         || variable.eq_ignore_ascii_case("Surface Inside Face Conduction Heat Loss Rate")
@@ -4610,6 +5068,7 @@ fn is_supported_heat_balance_output_variable(variable: &str) -> bool {
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Internal Convective Heat Gain Rate")
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Surface Convection Rate")
         || variable.eq_ignore_ascii_case("Zone Air Heat Balance Air Energy Storage Rate")
+        || variable.eq_ignore_ascii_case("Zone Air Heat Balance Outdoor Air Transfer Rate")
 }
 
 fn evaluate_heat_balance_conformance<'a>(
@@ -4655,7 +5114,31 @@ fn evaluate_heat_balance_conformance<'a>(
             failure_reasons.push(format!("{label} extraction status was {}", series.status));
         }
         if !series.delta.length_match {
-            failure_reasons.push(format!("{label} series length mismatch"));
+            failure_reasons.push(format!(
+                "{label} sample count mismatch: oracle_count={} rust_count={}",
+                series.oracle_count, series.rust_count
+            ));
+        }
+        if !series.timestamp_match {
+            failure_reasons.push(format!(
+                "{label} timestamp mismatch: oracle_first={:?} rust_first={:?} oracle_last={:?} rust_last={:?}",
+                series.oracle_first_timestamp,
+                series.rust_first_timestamp,
+                series.oracle_last_timestamp,
+                series.rust_last_timestamp
+            ));
+        }
+        if !series.first_reported_sample_hour_ending {
+            failure_reasons.push(format!(
+                "{label} first reported sample timestamp is not hour-ending: oracle_first={:?} rust_first={:?}",
+                series.oracle_first_timestamp, series.rust_first_timestamp
+            ));
+        }
+        if !series.store_type_match {
+            failure_reasons.push(format!(
+                "{label} output store type mismatch: energyplus={} rust={}",
+                series.energyplus_store_type, series.rust_store_type
+            ));
         }
         let Some(tolerance) = context.tolerance_for_class(series.output.class) else {
             failure_reasons.push(format!("{label} missing {} tolerance", series.output.class));
@@ -4664,38 +5147,127 @@ fn evaluate_heat_balance_conformance<'a>(
         if let Some(max_abs_c) = tolerance.max_abs_c
             && series.delta.max_abs_delta_c > max_abs_c
         {
+            let sample_index = series.delta.max_delta_sample.map(|sample| sample.index);
             failure_reasons.push(format!(
-                "{label} max_abs_delta_c {:.12} exceeds {:.12}",
-                series.delta.max_abs_delta_c, max_abs_c
+                "{label} max_abs_delta_c {:.12} exceeds {:.12} sample_index={}",
+                series.delta.max_abs_delta_c,
+                max_abs_c,
+                sample_index
+                    .map(|index| index.to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
             ));
         }
         if let Some(max_rmse_c) = tolerance.max_rmse_c
             && series.delta.rmse_delta_c > max_rmse_c
         {
+            let sample_index = series.delta.max_delta_sample.map(|sample| sample.index);
             failure_reasons.push(format!(
-                "{label} rmse_delta_c {:.12} exceeds {:.12}",
-                series.delta.rmse_delta_c, max_rmse_c
+                "{label} rmse_delta_c {:.12} exceeds {:.12} sample_index={}",
+                series.delta.rmse_delta_c,
+                max_rmse_c,
+                sample_index
+                    .map(|index| index.to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
             ));
         }
         if let Some(max_rel) = tolerance.max_rel
             && series.delta.max_rel_delta > max_rel
         {
+            let sample_index = series.delta.max_delta_sample.map(|sample| sample.index);
             failure_reasons.push(format!(
-                "{label} max_rel_delta {:.12} exceeds {:.12}",
-                series.delta.max_rel_delta, max_rel
+                "{label} max_rel_delta {:.12} exceeds {:.12} sample_index={}",
+                series.delta.max_rel_delta,
+                max_rel,
+                sample_index
+                    .map(|index| index.to_string())
+                    .unwrap_or_else(|| "unknown".to_string())
             ));
         }
     }
 
+    let diagnostics = heat_balance_gate_diagnostics_from_failure_reasons(&failure_reasons);
+    let has_error_diagnostics = diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.severity == "error");
+
     HeatBalanceConformance {
         context,
-        status: if failure_reasons.is_empty() {
-            "pass"
-        } else {
+        status: if has_error_diagnostics {
             "fail"
+        } else {
+            "pass"
         },
         failure_reasons,
+        diagnostics,
     }
+}
+
+fn heat_balance_gate_diagnostics_from_failure_reasons(
+    failure_reasons: &[String],
+) -> Vec<HeatBalanceGateDiagnostic> {
+    failure_reasons
+        .iter()
+        .map(|reason| {
+            let code = heat_balance_failure_diagnostic_code(reason);
+            let (surface, zone) = heat_balance_failure_location_context(reason);
+            HeatBalanceGateDiagnostic {
+                severity: "error",
+                code,
+                stage: "conformance-gate",
+                surface,
+                zone,
+                timestep: heat_balance_failure_timestep_context(reason),
+                output_handle: None,
+                message: reason.clone(),
+            }
+        })
+        .collect()
+}
+
+fn heat_balance_failure_diagnostic_code(reason: &str) -> &'static str {
+    if reason.contains("source-order compatibility lane")
+        || reason.contains("diagnostic probe lane")
+        || reason.contains("conformance report did not include")
+    {
+        "UnsupportedHeatBalanceBranch"
+    } else if reason.contains("timestamp mismatch")
+        || reason.contains("first reported sample timestamp")
+    {
+        "TimestampMismatch"
+    } else if reason.contains("exceeds") || reason.contains("missing") {
+        "ToleranceFailure"
+    } else if reason.contains("extraction status") || reason.contains("output store type mismatch")
+    {
+        "OutputVariableUnavailable"
+    } else {
+        "NonFiniteHeatBalanceState"
+    }
+}
+
+fn heat_balance_failure_location_context(reason: &str) -> (Option<String>, Option<String>) {
+    let Some(label) = reason.split_whitespace().next() else {
+        return (None, None);
+    };
+    let Some((key, variable)) = label.split_once('/') else {
+        return (None, None);
+    };
+    if variable.starts_with("Surface ") {
+        (Some(key.to_string()), None)
+    } else if variable.starts_with("Zone ") {
+        (None, Some(key.to_string()))
+    } else {
+        (None, None)
+    }
+}
+
+fn heat_balance_failure_timestep_context(reason: &str) -> Option<u64> {
+    let marker = "sample_index=";
+    let start = reason.find(marker)? + marker.len();
+    let digits = reason[start..]
+        .chars()
+        .take_while(|character| character.is_ascii_digit())
+        .collect::<String>();
+    digits.parse::<u64>().ok()
 }
 
 fn heat_balance_context_requires_compatibility_candidate(
@@ -4718,32 +5290,99 @@ fn build_heat_balance_conformance_diagnostic(
     eso_path: &Path,
     context: &HeatBalanceConformanceContext,
 ) -> Result<HeatBalanceConformanceDiagnostic, String> {
+    let mut performance_profile = HeatBalancePerformanceProfile::new();
+    let parse_start = Instant::now();
     let raw_model = load_epjson_file(input_path).map_err(|error| error.to_string())?;
+    performance_profile.push(
+        "parse_time",
+        "ep_raw_model",
+        elapsed_seconds_since(parse_start),
+        "load and parse converted epJSON into RawModel",
+    );
+    performance_profile.push(
+        "raw_model_build",
+        "ep_raw_model",
+        0.0,
+        "RawModel construction is performed inside load_epjson_file and included in parse_time",
+    );
+    let typed_compile_start = Instant::now();
     let result = compile_raw_model(&raw_model);
+    performance_profile.push(
+        "typed_model_compile",
+        "ep_compiler",
+        elapsed_seconds_since(typed_compile_start),
+        "compile RawModel into the typed subset used by heat-balance conformance",
+    );
     let Some(model) = result.model else {
         return Err(format_compile_diagnostics(&result.report));
     };
+
+    let model_graph_start = Instant::now();
+    let graph = ModelGraph::from_typed(&model);
+    performance_profile.push(
+        "model_graph_build",
+        "ep_model",
+        elapsed_seconds_since(model_graph_start),
+        "build static ModelGraph edges from TypedModel",
+    );
+    let simulation_model_start = Instant::now();
+    let simulation_model = SimulationModel {
+        typed: model,
+        graph,
+    };
+    performance_profile.push(
+        "simulation_model_compile",
+        "ep_model",
+        elapsed_seconds_since(simulation_model_start),
+        "assemble runtime SimulationModel from TypedModel and prebuilt ModelGraph",
+    );
+    let execution_plan_start = Instant::now();
+    let _execution_plan = build_execution_plan(&simulation_model);
+    performance_profile.push(
+        "execution_plan_build",
+        "ep_runtime",
+        elapsed_seconds_since(execution_plan_start),
+        "build source-order ExecutionPlan for the runtime-ready model",
+    );
 
     let mut oracle_series = Vec::with_capacity(context.outputs.len());
     for output in &context.outputs {
         let time_series = load_eso_time_series(eso_path, &output.key, &output.variable)
             .map_err(|error| error.to_string())?;
-        let values = run_period_eso_values(&time_series);
-        if values.is_empty() {
+        let samples = run_period_eso_samples(&time_series);
+        if samples.is_empty() {
             return Err(format!(
                 "EnergyPlus series is empty: {}/{}",
                 output.key, output.variable
             ));
         }
-        oracle_series.push((output.clone(), values));
+        let units = time_series.metadata.units.clone();
+        let store_type = output_store_type_for_variable(
+            &time_series.metadata.variable,
+            units.as_deref().unwrap_or(""),
+        );
+        oracle_series.push(HeatBalanceOracleSeries {
+            output: output.clone(),
+            units,
+            frequency: time_series.metadata.frequency.clone(),
+            store_type: store_type.id(),
+            samples,
+        });
     }
     let sample_count = oracle_series
         .iter()
-        .map(|(_output, values)| values.len())
+        .map(|series| series.samples.len())
         .max()
         .unwrap_or(0);
 
+    let weather_parse_start = Instant::now();
     let weather_records = load_epw_records(weather_path).map_err(|error| error.to_string())?;
+    performance_profile.push(
+        "weather_parse",
+        "ep_runtime",
+        elapsed_seconds_since(weather_parse_start),
+        "parse EPW records once before runtime execution",
+    );
     let weather_values = weather_records
         .iter()
         .map(|record| record.dry_bulb_c)
@@ -4756,7 +5395,6 @@ fn build_heat_balance_conformance_diagnostic(
         ));
     }
 
-    let simulation_model = SimulationModel::from_typed(model);
     let official_dynamic_candidate = heat_balance_context_requires_compatibility_candidate(context);
     let official_dynamic_candidate_warmup_days = if official_dynamic_candidate {
         Some(
@@ -4813,14 +5451,41 @@ fn build_heat_balance_conformance_diagnostic(
     } else {
         load_runtime_ctf_coefficients_from_eio(eio_path)?
     };
+    let weather_schedule_precompute_start = Instant::now();
+    let time_axis =
+        build_hourly_time_axis(&simulation_model.typed).map_err(|error| error.to_string())?;
+    let _schedule_series =
+        precompute_schedule_value_series_for_time_axis(&simulation_model.typed, &time_axis);
+    let weather_series = precompute_weather_timestep_series(
+        &weather_records,
+        simulation_model
+            .typed
+            .timestep
+            .number_of_timesteps_per_hour
+            .max(1),
+        time_axis.first_hour_interpolation_starting_values,
+    );
+    performance_profile.push(
+        "weather_schedule_precompute",
+        "ep_runtime",
+        elapsed_seconds_since(weather_schedule_precompute_start),
+        "precompute TimeAxis schedule values and weather timestep samples before runtime execution",
+    );
+    let runtime_start = Instant::now();
     let mut simulation =
-        simulate_heat_balance_zone_air_temperatures_with_weather_records_and_ctf_coefficients(
+        simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients(
             &simulation_model,
-            &weather_records,
+            &weather_series,
             simulation_options,
             &ctf_coefficients,
         )
         .map_err(|error| error.to_string())?;
+    performance_profile.push(
+        "runtime_heat_balance_execution",
+        "ep_runtime",
+        elapsed_seconds_since(runtime_start),
+        "execute heat-balance compatibility runtime using precomputed weather/schedule inputs",
+    );
     append_surface_incident_solar_radiation_series(
         &mut simulation.results,
         &simulation_model,
@@ -4828,13 +5493,34 @@ fn build_heat_balance_conformance_diagnostic(
         sample_count,
     );
     let mut heat_balance_warmup: HeatBalanceWarmupDiagnostic = simulation.summary.warmup.into();
+    if let Some(building) = simulation_model.typed.building.as_ref() {
+        heat_balance_warmup.building_minimum_days = Some(building.minimum_number_of_warmup_days);
+        heat_balance_warmup.building_maximum_days = Some(building.maximum_number_of_warmup_days);
+        heat_balance_warmup.building_temperature_convergence_tolerance_delta_c =
+            Some(building.temperature_convergence_tolerance_delta_c);
+        heat_balance_warmup.building_loads_convergence_tolerance_w =
+            Some(building.loads_convergence_tolerance_w);
+    }
     heat_balance_warmup.oracle_run_period_day_count = match official_dynamic_candidate_warmup_days {
         Some(days) => Some(days),
         None => eio_run_period_warmup_days(eio_path).map_err(|error| error.to_string())?,
     };
 
+    let output_report_start = Instant::now();
+    let rust_timestamps = heat_balance_rust_hourly_timestamp_labels(&simulation_model.typed)?;
     let mut series = Vec::with_capacity(oracle_series.len());
-    for (output, oracle_values) in oracle_series {
+    for oracle in oracle_series {
+        let output = oracle.output;
+        let oracle_values = oracle
+            .samples
+            .iter()
+            .map(|sample| sample.value)
+            .collect::<Vec<_>>();
+        let oracle_timestamps = oracle
+            .samples
+            .iter()
+            .map(|sample| sample.timestamp.clone())
+            .collect::<Vec<_>>();
         let Some(rust_series) = simulation
             .results
             .find_series(&output.key, &output.variable)
@@ -4847,14 +5533,41 @@ fn build_heat_balance_conformance_diagnostic(
 
         let delta = delta_summary(&oracle_values, &rust_series.values);
         let sample_rows = delta_points(&oracle_values, &rust_series.values);
+        let timestamp_match = heat_balance_timestamps_match(&oracle_timestamps, &rust_timestamps);
+        let first_reported_sample_hour_ending = oracle_timestamps
+            .first()
+            .and_then(Option::as_deref)
+            .is_some_and(heat_balance_timestamp_is_hour_ending)
+            && rust_timestamps
+                .first()
+                .is_some_and(|timestamp| heat_balance_timestamp_is_hour_ending(timestamp));
+        let rust_store_type = rust_series.store_type().id();
+        let store_type_match = oracle.store_type == rust_store_type;
         let finite = oracle_values
             .iter()
             .chain(rust_series.values.iter())
             .all(|value| value.is_finite());
-        let extracted = finite && delta.length_match;
+        let extracted = finite
+            && delta.length_match
+            && timestamp_match
+            && first_reported_sample_hour_ending
+            && store_type_match;
         series.push(HeatBalanceSeriesDiagnostic {
             output,
             samples: delta.samples,
+            oracle_count: oracle_values.len(),
+            rust_count: rust_series.values.len(),
+            oracle_units: oracle.units,
+            oracle_frequency: oracle.frequency,
+            energyplus_store_type: oracle.store_type,
+            rust_store_type,
+            store_type_match,
+            oracle_first_timestamp: oracle_timestamps.first().cloned().flatten(),
+            rust_first_timestamp: rust_timestamps.first().cloned(),
+            oracle_last_timestamp: oracle_timestamps.last().cloned().flatten(),
+            rust_last_timestamp: rust_timestamps.last().cloned(),
+            timestamp_match,
+            first_reported_sample_hour_ending,
             oracle_first_c: oracle_values[0],
             rust_first_c: rust_series.values.first().copied().unwrap_or(f64::NAN),
             oracle_last_c: oracle_values[oracle_values.len() - 1],
@@ -4905,6 +5618,21 @@ fn build_heat_balance_conformance_diagnostic(
         &ctf_coefficients,
         &simulation.results,
     );
+    let inside_source_term_series_summaries =
+        heat_balance_inside_source_term_series_summaries(&simulation_model, &simulation.results);
+    let floor_inside_current_diagnostics = heat_balance_floor_inside_current_diagnostics(
+        &simulation_model,
+        &series,
+        &ctf_coefficients,
+        &simulation.results,
+        &ctf_storage_max_sample_deltas,
+    );
+    let floor_inside_current_term_series = heat_balance_floor_inside_current_term_series(
+        &simulation_model,
+        &series,
+        &ctf_coefficients,
+        &simulation.results,
+    );
     let adiabatic_history_max_sample_deltas = heat_balance_adiabatic_history_max_sample_deltas(
         &simulation_model,
         &series,
@@ -4925,10 +5653,39 @@ fn build_heat_balance_conformance_diagnostic(
         &simulation.summary.surface_iteration_sample_trace,
         &ctf_storage_max_sample_deltas,
     );
+    let rust_zone_air_debug_series = heat_balance_zone_air_debug_series(&simulation.results);
+    let rust_outside_balance_debug_series =
+        heat_balance_outside_balance_debug_series(&simulation.results);
+    performance_profile.push(
+        "output_report_generation",
+        "ep_cli",
+        elapsed_seconds_since(output_report_start),
+        "assemble comparison rows, diagnostics, debug series, and report-ready evidence",
+    );
+    performance_profile.push(
+        "trace_write",
+        "ep_cli",
+        0.0,
+        "no trace artifact is written by the conformance profile path; trace output is opt-in",
+    );
     Ok(HeatBalanceConformanceDiagnostic {
         samples: sample_count,
         heat_balance_timesteps: simulation.summary.timestep_count,
         heat_balance_run_period_timesteps: simulation.summary.run_period_timestep_count,
+        time_axis: HeatBalanceTimeAxisDiagnostic {
+            source: simulation.summary.time_axis_source,
+            zone_timesteps_per_hour: simulation.summary.zone_timesteps_per_hour,
+            zone_timestep_seconds: simulation.summary.zone_timestep_seconds,
+            system_timestep_nominal_seconds: simulation.summary.system_timestep_nominal_seconds,
+            variable_system_timestep_support: simulation.summary.variable_system_timestep_support,
+            shorten_timestep_sys_state: simulation.summary.shorten_timestep_sys_state,
+            use_zone_timestep_history_state: simulation.summary.use_zone_timestep_history_state,
+            hvac_iteration_count: simulation.summary.hvac_iteration_count,
+            plant_iteration_count: simulation.summary.plant_iteration_count,
+            warmup_reported_samples: simulation.summary.warmup_reported_samples,
+            run_period_reported_samples: simulation.summary.run_period_reported_samples,
+            design_day_reported_samples: simulation.summary.design_day_reported_samples,
+        },
         heat_balance_warmup,
         ctf_seed,
         zone_air_algorithm: heat_balance_zone_air_algorithm_label(zone_air_algorithm),
@@ -4953,6 +5710,19 @@ fn build_heat_balance_conformance_diagnostic(
         surface_loop_zone_air_correction: heat_balance_surface_loop_zone_air_correction_label(
             simulation.summary.surface_loop_zone_air_correction,
         ),
+        construction_cache_hash: simulation.summary.construction_cache_hash,
+        construction_cache_build_wall_seconds: simulation
+            .summary
+            .construction_cache_build_wall_seconds,
+        construction_cache_entry_count: simulation.summary.construction_cache_entry_count,
+        construction_cache_no_mass_count: simulation.summary.construction_cache_no_mass_count,
+        construction_cache_massive_ctf_count: simulation
+            .summary
+            .construction_cache_massive_ctf_count,
+        construction_cache_eio_seeded_count: simulation.summary.construction_cache_eio_seeded_count,
+        construction_cache_rust_generated_count: simulation
+            .summary
+            .construction_cache_rust_generated_count,
         compatibility_stages: energyplus_heat_balance_compatibility_stages(),
         zone_count: simulation.summary.zone_count,
         surface_count: simulation.summary.surface_count,
@@ -4966,6 +5736,9 @@ fn build_heat_balance_conformance_diagnostic(
         inside_balance_max_sample_deltas,
         inside_solve_max_sample_deltas,
         inside_solve_series_deltas,
+        inside_source_term_series_summaries,
+        floor_inside_current_diagnostics,
+        floor_inside_current_term_series,
         adiabatic_history_max_sample_deltas,
         ctf_history_run_period_initial_slots: simulation
             .summary
@@ -4983,10 +5756,9 @@ fn build_heat_balance_conformance_diagnostic(
             .summary
             .surface_iteration_first_sample_trace,
         surface_iteration_max_sample_trace,
-        rust_zone_air_debug_series: heat_balance_zone_air_debug_series(&simulation.results),
-        rust_outside_balance_debug_series: heat_balance_outside_balance_debug_series(
-            &simulation.results,
-        ),
+        rust_zone_air_debug_series,
+        rust_outside_balance_debug_series,
+        performance_profile,
         series,
         status: if extracted { "extracted" } else { "failed" },
     })
@@ -5670,13 +6442,13 @@ fn heat_balance_zone_air_model_air_power_cap_w_per_k(
     if volume_m3 <= 0.0 || timestep_seconds <= 0.0 {
         return None;
     }
-    Some(
-        volume_m3
-            * zone_multiplier
-            * HEAT_BALANCE_REPORT_AIR_DENSITY_KG_PER_M3
-            * HEAT_BALANCE_REPORT_AIR_SPECIFIC_HEAT_J_PER_KG_K
-            / timestep_seconds,
+    energyplus_zone_air_heat_capacity_j_per_k(
+        volume_m3 * zone_multiplier,
+        ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA,
+        20.0,
+        ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
     )
+    .map(|air_heat_capacity_j_per_k| air_heat_capacity_j_per_k / timestep_seconds)
 }
 
 fn inferred_third_order_history_term_w(
@@ -6500,6 +7272,13 @@ fn heat_balance_inside_solve_max_sample_deltas(
             let rust_reference_air_source_w = area_m2
                 * inside_convection_coefficient.rust_c
                 * rust_inferred_reference_air_temperature_c;
+            let oracle_surface_temperature_sink_w_per_m2 =
+                inside_convection_coefficient.oracle_c * inside_temperature.oracle_c;
+            let rust_surface_temperature_sink_w_per_m2 =
+                inside_convection_coefficient.rust_c * inside_temperature.rust_c;
+            let oracle_surface_temperature_sink_w =
+                area_m2 * oracle_surface_temperature_sink_w_per_m2;
+            let rust_surface_temperature_sink_w = area_m2 * rust_surface_temperature_sink_w_per_m2;
             let oracle_outside_temperature_source_w = area_m2
                 * heat_balance_inside_solve_outside_temperature_source_w_per_m2(
                     surface.outside_boundary_condition,
@@ -6627,6 +7406,16 @@ fn heat_balance_inside_solve_max_sample_deltas(
                 reference_air_source_signed_delta_w,
                 reference_air_source_split_abs_sum_w,
                 reference_air_source_cancellation_delta_w,
+                oracle_surface_temperature_sink_w,
+                rust_surface_temperature_sink_w,
+                surface_temperature_sink_delta_w: (oracle_surface_temperature_sink_w
+                    - rust_surface_temperature_sink_w)
+                    .abs(),
+                oracle_surface_temperature_sink_w_per_m2,
+                rust_surface_temperature_sink_w_per_m2,
+                surface_temperature_sink_delta_w_per_m2: (oracle_surface_temperature_sink_w_per_m2
+                    - rust_surface_temperature_sink_w_per_m2)
+                    .abs(),
                 reference_air_coefficient_source_signed_delta_w,
                 reference_air_coefficient_source_delta_w,
                 reference_air_temperature_source_signed_delta_w,
@@ -6957,6 +7746,402 @@ fn heat_balance_inside_solve_series_deltas(
                     &zero_baseline,
                     &solve_source_residual_signed_delta,
                 ),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_inside_source_term_series_summaries(
+    model: &SimulationModel,
+    results: &ResultStore,
+) -> Vec<HeatBalanceInsideSourceTermSeriesSummary> {
+    let mut rows = Vec::new();
+    for surface in &model.typed.surfaces {
+        let area_m2 = surface_area_m2(&surface.vertices);
+        if area_m2 <= 0.0 {
+            continue;
+        }
+
+        for (term_name, rate_variable, per_area_variable) in
+            heat_balance_inside_source_term_definitions()
+        {
+            let Some(rate_values) =
+                heat_balance_result_series_values(results, &surface.name.0, rate_variable)
+            else {
+                continue;
+            };
+            let Some(per_area_values) =
+                heat_balance_result_series_values(results, &surface.name.0, per_area_variable)
+            else {
+                continue;
+            };
+            let samples = rate_values.len().min(per_area_values.len());
+            if samples == 0 {
+                continue;
+            }
+
+            let mut max_abs_w: f64 = 0.0;
+            let mut max_abs_w_per_m2: f64 = 0.0;
+            let mut area_residual_max_abs_w: f64 = 0.0;
+            for index in 0..samples {
+                let rate_w = rate_values[index];
+                let per_area_w_per_m2 = per_area_values[index];
+                if rate_w.is_finite() {
+                    max_abs_w = max_abs_w.max(rate_w.abs());
+                }
+                if per_area_w_per_m2.is_finite() {
+                    max_abs_w_per_m2 = max_abs_w_per_m2.max(per_area_w_per_m2.abs());
+                }
+                if rate_w.is_finite() && per_area_w_per_m2.is_finite() {
+                    area_residual_max_abs_w =
+                        area_residual_max_abs_w.max((rate_w - per_area_w_per_m2 * area_m2).abs());
+                }
+            }
+
+            rows.push(HeatBalanceInsideSourceTermSeriesSummary {
+                key: surface.name.0.clone(),
+                term_name: term_name.to_string(),
+                area_m2,
+                samples,
+                rate_variable: rate_variable.to_string(),
+                per_area_variable: per_area_variable.to_string(),
+                max_abs_w,
+                max_abs_w_per_m2,
+                area_residual_max_abs_w,
+            });
+        }
+    }
+
+    rows
+}
+
+fn heat_balance_inside_source_term_definitions() -> [(&'static str, &'static str, &'static str); 6]
+{
+    [
+        (
+            "inside-net-longwave",
+            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
+            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area",
+        ),
+        (
+            "radiant-internal-gain",
+            SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_VARIABLE,
+            SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        ),
+        (
+            "shortwave-absorbed",
+            SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_VARIABLE,
+            SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        ),
+        (
+            "additional-inside-heat-source",
+            SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_VARIABLE,
+            SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        ),
+        (
+            "radiant-hvac",
+            SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_VARIABLE,
+            SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        ),
+        (
+            "total-source",
+            SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_VARIABLE,
+            SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_PER_AREA_VARIABLE,
+        ),
+    ]
+}
+
+fn heat_balance_floor_inside_current_diagnostics(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    results: &ResultStore,
+    storage_deltas: &[HeatBalanceCtfStorageMaxSampleDelta],
+) -> Vec<HeatBalanceFloorInsideCurrentDiagnostic> {
+    storage_deltas
+        .iter()
+        .filter(|storage| heat_balance_is_floor_key(&storage.key, &storage.construction_name))
+        .filter_map(|storage| {
+            let surface = model
+                .typed
+                .surfaces
+                .iter()
+                .find(|surface| surface.name.0.eq_ignore_ascii_case(&storage.key))?;
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            let zero = ctf_coefficients.iter().find(|coefficient| {
+                coefficient.time_index == 0
+                    && coefficient
+                        .construction_name
+                        .eq_ignore_ascii_case(&construction.name.0)
+            })?;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+            let sample_index = storage.sample_index;
+            let inside_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Temperature",
+                sample_index,
+            )?;
+            let reference_air_temperature = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Adjacent Air Temperature",
+                sample_index,
+            )?;
+            let hconv_int = heat_balance_sample_point_for_output(
+                series,
+                &surface.name.0,
+                "Surface Inside Face Convection Heat Transfer Coefficient",
+                sample_index,
+            )?;
+            let rust_inside_current_inside_term_w = heat_balance_result_series_value(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+                sample_index,
+            )?;
+            let oracle_inside_current_inside_term_w =
+                heat_balance_inside_current_inside_term_rate_w_from_sources(
+                    area_m2,
+                    zero.inside_w_per_m2_k,
+                    inside_temperature.oracle_c,
+                );
+            let rust_recomputed_inside_current_inside_term_w =
+                heat_balance_inside_current_inside_term_rate_w_from_sources(
+                    area_m2,
+                    zero.inside_w_per_m2_k,
+                    inside_temperature.rust_c,
+                );
+            let inside_face_temperature_signed_delta_c =
+                inside_temperature.oracle_c - inside_temperature.rust_c;
+            let inside_face_temperature_delta_c = inside_face_temperature_signed_delta_c.abs();
+            let reference_air_temperature_signed_delta_c =
+                reference_air_temperature.oracle_c - reference_air_temperature.rust_c;
+            let reference_air_temperature_delta_c = reference_air_temperature_signed_delta_c.abs();
+            let hconv_int_signed_delta_w_per_m2_k = hconv_int.oracle_c - hconv_int.rust_c;
+            let hconv_int_delta_w_per_m2_k = hconv_int_signed_delta_w_per_m2_k.abs();
+            let inside_current_inside_term_signed_delta_w =
+                oracle_inside_current_inside_term_w - rust_inside_current_inside_term_w;
+            let inside_current_inside_term_delta_w =
+                inside_current_inside_term_signed_delta_w.abs();
+            let temperature_timing_expected_signed_delta_w =
+                oracle_inside_current_inside_term_w - rust_recomputed_inside_current_inside_term_w;
+            let temperature_timing_expected_abs_delta_w =
+                temperature_timing_expected_signed_delta_w.abs();
+            let temperature_timing_coverage_ratio = heat_balance_ratio_or_zero(
+                temperature_timing_expected_abs_delta_w,
+                inside_current_inside_term_delta_w,
+            );
+            let coefficient_delta_w_per_m2_k = 0.0;
+            let current_inside_mismatch_classification =
+                heat_balance_floor_inside_current_classification(
+                    zero.inside_w_per_m2_k,
+                    inside_current_inside_term_delta_w,
+                    temperature_timing_coverage_ratio,
+                    reference_air_temperature_delta_c,
+                    hconv_int_delta_w_per_m2_k,
+                );
+            let next_source_order_focus = match current_inside_mismatch_classification.as_str() {
+                "temperature-timing" => "UpdateThermalHistories/source-order",
+                "hconv-cadence" => "inside-convection-cadence",
+                "coefficient" => "ctf-coefficient-source",
+                "closed" => "none",
+                _ => "surface-source-order-residual",
+            }
+            .to_string();
+
+            Some(HeatBalanceFloorInsideCurrentDiagnostic {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                sample_index,
+                area_m2,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                oracle_inside_face_temperature_c: inside_temperature.oracle_c,
+                rust_inside_face_temperature_c: inside_temperature.rust_c,
+                inside_face_temperature_signed_delta_c,
+                inside_face_temperature_delta_c,
+                oracle_reference_air_temperature_c: reference_air_temperature.oracle_c,
+                rust_reference_air_temperature_c: reference_air_temperature.rust_c,
+                reference_air_temperature_signed_delta_c,
+                reference_air_temperature_delta_c,
+                oracle_hconv_int_w_per_m2_k: hconv_int.oracle_c,
+                rust_hconv_int_w_per_m2_k: hconv_int.rust_c,
+                hconv_int_signed_delta_w_per_m2_k,
+                hconv_int_delta_w_per_m2_k,
+                oracle_inside_current_inside_term_w,
+                rust_inside_current_inside_term_w,
+                inside_current_inside_term_signed_delta_w,
+                inside_current_inside_term_delta_w,
+                temperature_timing_expected_signed_delta_w,
+                temperature_timing_expected_abs_delta_w,
+                temperature_timing_coverage_ratio,
+                coefficient_delta_w_per_m2_k,
+                current_inside_mismatch_classification,
+                next_source_order_focus,
+                max_sample_source_terms: heat_balance_inside_source_terms_at_sample(
+                    series,
+                    results,
+                    &surface.name.0,
+                    sample_index,
+                ),
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_floor_inside_current_classification(
+    ctf_inside_0_w_per_m2_k: f64,
+    inside_current_inside_term_delta_w: f64,
+    temperature_timing_coverage_ratio: f64,
+    reference_air_temperature_delta_c: f64,
+    hconv_int_delta_w_per_m2_k: f64,
+) -> String {
+    if !ctf_inside_0_w_per_m2_k.is_finite() {
+        return "coefficient".to_string();
+    }
+    if inside_current_inside_term_delta_w <= 1.0e-9 {
+        return "closed".to_string();
+    }
+    if temperature_timing_coverage_ratio >= 0.98 {
+        return "temperature-timing".to_string();
+    }
+    if reference_air_temperature_delta_c > 1.0e-3 || hconv_int_delta_w_per_m2_k > 1.0e-6 {
+        return "hconv-cadence".to_string();
+    }
+    "source-order-residual".to_string()
+}
+
+fn heat_balance_inside_current_inside_term_rate_w_from_sources(
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    inside_face_temperature_c: f64,
+) -> f64 {
+    if area_m2 <= 0.0 {
+        return 0.0;
+    }
+    -area_m2 * inside_face_temperature_c * ctf_inside_0_w_per_m2_k
+}
+
+fn heat_balance_inside_source_terms_at_sample(
+    series: &[HeatBalanceSeriesDiagnostic],
+    results: &ResultStore,
+    key: &str,
+    sample_index: usize,
+) -> Vec<HeatBalanceInsideSourceTermSampleDelta> {
+    heat_balance_inside_source_term_definitions()
+        .into_iter()
+        .filter_map(|(term_name, rate_variable, _per_area_variable)| {
+            let rust_w =
+                heat_balance_result_series_value(results, key, rate_variable, sample_index)?;
+            let point =
+                heat_balance_sample_point_for_output(series, key, rate_variable, sample_index);
+            let oracle_w = point.map_or(f64::NAN, |point| point.oracle_c);
+            let signed_delta_w = point.map_or(f64::NAN, |point| point.oracle_c - point.rust_c);
+            let abs_delta_w = point.map_or(f64::NAN, |point| point.abs_delta_c);
+            Some(HeatBalanceInsideSourceTermSampleDelta {
+                term_name: term_name.to_string(),
+                rate_variable: rate_variable.to_string(),
+                sample_index,
+                oracle_w,
+                rust_w,
+                signed_delta_w,
+                abs_delta_w,
+            })
+        })
+        .collect()
+}
+
+fn heat_balance_floor_inside_current_term_series(
+    model: &SimulationModel,
+    series: &[HeatBalanceSeriesDiagnostic],
+    ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    results: &ResultStore,
+) -> Vec<HeatBalanceFloorInsideCurrentTermSeries> {
+    model
+        .typed
+        .surfaces
+        .iter()
+        .filter_map(|surface| {
+            let construction = model
+                .typed
+                .constructions
+                .iter()
+                .find(|construction| construction.id == surface.construction)?;
+            if !heat_balance_is_floor_key(&surface.name.0, &construction.name.0) {
+                return None;
+            }
+            let zero = ctf_coefficients.iter().find(|coefficient| {
+                coefficient.time_index == 0
+                    && coefficient
+                        .construction_name
+                        .eq_ignore_ascii_case(&construction.name.0)
+            })?;
+            let area_m2 = surface_area_m2(&surface.vertices);
+            if area_m2 <= 0.0 {
+                return None;
+            }
+            let inside_temperature =
+                heat_balance_series(series, &surface.name.0, "Surface Inside Face Temperature")?;
+            let rust_inside_current_inside_terms = heat_balance_result_series_values(
+                results,
+                &surface.name.0,
+                SURFACE_CTF_INSIDE_CURRENT_INSIDE_TERM_RATE_VARIABLE,
+            )?;
+            let samples = inside_temperature
+                .sample_rows
+                .len()
+                .min(rust_inside_current_inside_terms.len());
+            if samples == 0 {
+                return None;
+            }
+            let mut sample_rows = Vec::with_capacity(samples);
+            for index in 0..samples {
+                let point = inside_temperature.sample_rows[index];
+                let rust_inside_current_inside_term_w = rust_inside_current_inside_terms[index];
+                if !rust_inside_current_inside_term_w.is_finite() {
+                    continue;
+                }
+                let oracle_inside_current_inside_term_w =
+                    heat_balance_inside_current_inside_term_rate_w_from_sources(
+                        area_m2,
+                        zero.inside_w_per_m2_k,
+                        point.oracle_c,
+                    );
+                let signed_delta_w =
+                    oracle_inside_current_inside_term_w - rust_inside_current_inside_term_w;
+                sample_rows.push(HeatBalanceFloorInsideCurrentTermSample {
+                    sample_index: point.index,
+                    oracle_inside_face_temperature_c: point.oracle_c,
+                    rust_inside_face_temperature_c: point.rust_c,
+                    oracle_inside_current_inside_term_w,
+                    rust_inside_current_inside_term_w,
+                    signed_delta_w,
+                    abs_delta_w: signed_delta_w.abs(),
+                });
+            }
+            let max_row = sample_rows
+                .iter()
+                .max_by(|left, right| left.abs_delta_w.total_cmp(&right.abs_delta_w))?;
+            let max_sample_index = max_row.sample_index;
+            let max_abs_delta_w = max_row.abs_delta_w;
+            let max_signed_delta_w = max_row.signed_delta_w;
+            Some(HeatBalanceFloorInsideCurrentTermSeries {
+                key: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                area_m2,
+                ctf_inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+                samples: sample_rows.len(),
+                max_sample_index,
+                max_abs_delta_w,
+                max_signed_delta_w,
+                sample_rows,
             })
         })
         .collect()
@@ -7562,10 +8747,15 @@ fn apply_heat_balance_warmup_minimum_days_from_env(
 ) -> Result<HeatBalanceSimulationOptions, String> {
     match std::env::var(HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV) {
         Ok(value) => {
-            parse_heat_balance_warmup_minimum_days(&value).map(|minimum_days| match minimum_days {
-                Some(minimum_days) => options.with_warmup_minimum_days(minimum_days),
-                None => options,
-            })
+            parse_heat_balance_warmup_minimum_days(&value).map(
+                |override_value| match override_value {
+                    HeatBalanceWarmupMinimumDaysOverride::Unchanged => options,
+                    HeatBalanceWarmupMinimumDaysOverride::Disabled => options.without_warmup(),
+                    HeatBalanceWarmupMinimumDaysOverride::MinimumDays(minimum_days) => {
+                        options.with_warmup_minimum_days(minimum_days)
+                    }
+                },
+            )
         }
         Err(std::env::VarError::NotPresent) => Ok(options),
         Err(error) => Err(format!(
@@ -7574,18 +8764,33 @@ fn apply_heat_balance_warmup_minimum_days_from_env(
     }
 }
 
-fn parse_heat_balance_warmup_minimum_days(value: &str) -> Result<Option<u32>, String> {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum HeatBalanceWarmupMinimumDaysOverride {
+    Unchanged,
+    Disabled,
+    MinimumDays(u32),
+}
+
+fn parse_heat_balance_warmup_minimum_days(
+    value: &str,
+) -> Result<HeatBalanceWarmupMinimumDaysOverride, String> {
     let trimmed = value.trim();
     if trimmed.is_empty() {
-        return Ok(None);
+        return Ok(HeatBalanceWarmupMinimumDaysOverride::Unchanged);
+    }
+    match trimmed.to_ascii_lowercase().as_str() {
+        "disabled" | "disable" | "off" | "no-warmup" => {
+            return Ok(HeatBalanceWarmupMinimumDaysOverride::Disabled);
+        }
+        _ => {}
     }
     let days = trimmed.parse::<u32>().map_err(|error| {
-        format!("unsupported {HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV}: {trimmed}; expected positive integer days ({error})")
+        format!("unsupported {HEAT_BALANCE_WARMUP_MINIMUM_DAYS_ENV}: {trimmed}; expected positive integer days or disabled ({error})")
     })?;
     if days == 0 {
-        return Ok(None);
+        return Ok(HeatBalanceWarmupMinimumDaysOverride::Unchanged);
     }
-    Ok(Some(days))
+    Ok(HeatBalanceWarmupMinimumDaysOverride::MinimumDays(days))
 }
 
 fn apply_heat_balance_surface_iterations_from_env(
@@ -7899,7 +9104,15 @@ fn heat_balance_zone_air_algorithm_label(
     }
 }
 
+#[cfg(test)]
 fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
+    run_period_eso_samples(series)
+        .into_iter()
+        .map(|sample| sample.value)
+        .collect()
+}
+
+fn run_period_eso_samples(series: &ep_compare::EsoTimeSeries) -> Vec<SeriesSample> {
     let run_period_values = series
         .samples
         .iter()
@@ -7912,11 +9125,11 @@ fn run_period_eso_values(series: &ep_compare::EsoTimeSeries) -> Vec<f64> {
                     environment.to_ascii_uppercase().starts_with("RUN PERIOD")
                 })
         })
-        .map(|sample| sample.value)
+        .cloned()
         .collect::<Vec<_>>();
 
     if run_period_values.is_empty() {
-        series.samples.iter().map(|sample| sample.value).collect()
+        series.samples.clone()
     } else {
         run_period_values
     }
@@ -7928,6 +9141,89 @@ fn eso_timestamp_environment(timestamp: &str) -> Option<&str> {
         .split(';')
         .next()
         .filter(|environment| !environment.is_empty())
+}
+
+fn heat_balance_rust_hourly_timestamp_labels(model: &TypedModel) -> Result<Vec<String>, String> {
+    let axis = build_hourly_time_axis(model).map_err(|error| error.to_string())?;
+    let start_day = model
+        .run_periods
+        .first()
+        .and_then(|run_period| run_period.day_of_week_for_start_day)
+        .unwrap_or(DayOfWeek::Monday);
+    Ok(axis
+        .points
+        .iter()
+        .map(|point| {
+            let day_index = point.sample_index / 24;
+            let day_of_week = day_of_week_after(start_day, day_index);
+            format!(
+                "env={};day={};month={};date={};dst=0;hour={};start=0.00;end=60.00;day_type={}",
+                axis.run_period_name,
+                day_index + 1,
+                point.month,
+                point.day_of_month,
+                point.hour,
+                day_of_week_label(day_of_week)
+            )
+        })
+        .collect())
+}
+
+fn heat_balance_timestamps_match(oracle: &[Option<String>], rust: &[String]) -> bool {
+    oracle.len() == rust.len()
+        && oracle
+            .iter()
+            .zip(rust)
+            .all(|(oracle, rust)| oracle.as_deref() == Some(rust.as_str()))
+}
+
+fn heat_balance_timestamp_is_hour_ending(timestamp: &str) -> bool {
+    let hour = eso_timestamp_field(timestamp, "hour")
+        .and_then(|value| value.parse::<u32>().ok())
+        .is_some_and(|hour| (1..=24).contains(&hour));
+    let start = eso_timestamp_field(timestamp, "start").is_some_and(|value| value == "0.00");
+    let end = eso_timestamp_field(timestamp, "end").is_some_and(|value| value == "60.00");
+    hour && start && end
+}
+
+fn eso_timestamp_field<'a>(timestamp: &'a str, field: &str) -> Option<&'a str> {
+    timestamp.split(';').find_map(|part| {
+        let (key, value) = part.split_once('=')?;
+        (key == field).then_some(value)
+    })
+}
+
+fn day_of_week_after(start_day: DayOfWeek, day_offset: usize) -> DayOfWeek {
+    let start_index = match start_day {
+        DayOfWeek::Monday => 0,
+        DayOfWeek::Tuesday => 1,
+        DayOfWeek::Wednesday => 2,
+        DayOfWeek::Thursday => 3,
+        DayOfWeek::Friday => 4,
+        DayOfWeek::Saturday => 5,
+        DayOfWeek::Sunday => 6,
+    };
+    match (start_index + day_offset) % 7 {
+        0 => DayOfWeek::Monday,
+        1 => DayOfWeek::Tuesday,
+        2 => DayOfWeek::Wednesday,
+        3 => DayOfWeek::Thursday,
+        4 => DayOfWeek::Friday,
+        5 => DayOfWeek::Saturday,
+        _ => DayOfWeek::Sunday,
+    }
+}
+
+fn day_of_week_label(day: DayOfWeek) -> &'static str {
+    match day {
+        DayOfWeek::Monday => "Monday",
+        DayOfWeek::Tuesday => "Tuesday",
+        DayOfWeek::Wednesday => "Wednesday",
+        DayOfWeek::Thursday => "Thursday",
+        DayOfWeek::Friday => "Friday",
+        DayOfWeek::Saturday => "Saturday",
+        DayOfWeek::Sunday => "Sunday",
+    }
 }
 
 fn eio_run_period_warmup_days(path: &Path) -> Result<Option<u32>, ep_compare::EioError> {
@@ -8973,6 +10269,34 @@ fn print_delta_sample(label: &str, point: Option<DeltaPoint>) {
 
 fn print_heat_balance_warmup(prefix: &str, warmup: &HeatBalanceWarmupDiagnostic) {
     println!("{prefix}warmup_enabled: {}", warmup.enabled);
+    println!(
+        "{prefix}building_warmup_minimum_days: {}",
+        heat_balance_optional_u32_label(warmup.building_minimum_days)
+    );
+    println!(
+        "{prefix}building_warmup_maximum_days: {}",
+        heat_balance_optional_u32_label(warmup.building_maximum_days)
+    );
+    println!(
+        "{prefix}building_temperature_convergence_tolerance_delta_c: {}",
+        heat_balance_optional_number_label(
+            warmup.building_temperature_convergence_tolerance_delta_c
+        )
+    );
+    println!(
+        "{prefix}building_loads_convergence_tolerance_w: {}",
+        heat_balance_optional_number_label(warmup.building_loads_convergence_tolerance_w)
+    );
+    println!("{prefix}warmup_minimum_days: {}", warmup.minimum_days);
+    println!("{prefix}warmup_maximum_days: {}", warmup.maximum_days);
+    println!(
+        "{prefix}warmup_temperature_convergence_tolerance_delta_c: {:.12}",
+        warmup.temperature_convergence_tolerance_delta_c
+    );
+    println!(
+        "{prefix}warmup_loads_convergence_tolerance_w: {:.12}",
+        warmup.loads_convergence_tolerance_w
+    );
     println!("{prefix}warmup_days: {}", warmup.day_count);
     println!(
         "{prefix}oracle_run_period_warmup_days: {}",
@@ -8998,6 +10322,10 @@ fn print_heat_balance_warmup(prefix: &str, warmup: &HeatBalanceWarmupDiagnostic)
 
 fn heat_balance_optional_u32_label(value: Option<u32>) -> String {
     value.map_or_else(|| "none".to_string(), |value| value.to_string())
+}
+
+fn heat_balance_optional_number_label(value: Option<f64>) -> String {
+    value.map_or_else(|| "none".to_string(), |value| format!("{value:.12}"))
 }
 
 fn heat_balance_warmup_day_count_delta(warmup: &HeatBalanceWarmupDiagnostic) -> Option<i64> {
@@ -9201,6 +10529,48 @@ fn render_zone_temperature_report(
         diagnostic.heat_balance_warmup.enabled
     ));
     report.push_str(&format!(
+        "building_warmup_minimum_days: {}\n",
+        heat_balance_optional_u32_label(diagnostic.heat_balance_warmup.building_minimum_days)
+    ));
+    report.push_str(&format!(
+        "building_warmup_maximum_days: {}\n",
+        heat_balance_optional_u32_label(diagnostic.heat_balance_warmup.building_maximum_days)
+    ));
+    report.push_str(&format!(
+        "building_temperature_convergence_tolerance_delta_c: {}\n",
+        heat_balance_optional_number_label(
+            diagnostic
+                .heat_balance_warmup
+                .building_temperature_convergence_tolerance_delta_c
+        )
+    ));
+    report.push_str(&format!(
+        "building_loads_convergence_tolerance_w: {}\n",
+        heat_balance_optional_number_label(
+            diagnostic
+                .heat_balance_warmup
+                .building_loads_convergence_tolerance_w
+        )
+    ));
+    report.push_str(&format!(
+        "warmup_minimum_days: {}\n",
+        diagnostic.heat_balance_warmup.minimum_days
+    ));
+    report.push_str(&format!(
+        "warmup_maximum_days: {}\n",
+        diagnostic.heat_balance_warmup.maximum_days
+    ));
+    report.push_str(&format!(
+        "warmup_temperature_convergence_tolerance_delta_c: {:.12}\n",
+        diagnostic
+            .heat_balance_warmup
+            .temperature_convergence_tolerance_delta_c
+    ));
+    report.push_str(&format!(
+        "warmup_loads_convergence_tolerance_w: {:.12}\n",
+        diagnostic.heat_balance_warmup.loads_convergence_tolerance_w
+    ));
+    report.push_str(&format!(
         "warmup_days: {}\n",
         diagnostic.heat_balance_warmup.day_count
     ));
@@ -9285,6 +10655,8 @@ fn write_heat_balance_conformance_report(
 
     let summary_path = report_dir.join("compare-summary.json");
     let digest_path = report_dir.join("compare-digest.json");
+    let selected_outputs_path = report_dir.join("selected_outputs.json");
+    let performance_summary_path = report_dir.join("performance-summary.json");
     let report_path = report_dir.join("compare-report.md");
     let outside_balance_debug_path = report_dir.join("rust-outside-balance-diagnostics.json");
     let zone_air_debug_path = report_dir.join("rust-zone-air-diagnostics.json");
@@ -9299,6 +10671,16 @@ fn write_heat_balance_conformance_report(
         render_heat_balance_conformance_digest_json(diagnostic, conformance),
     )
     .map_err(|error| format!("failed to write heat-balance digest: {error}"))?;
+    std::fs::write(
+        &selected_outputs_path,
+        render_heat_balance_selected_outputs_json(diagnostic, conformance),
+    )
+    .map_err(|error| format!("failed to write heat-balance selected outputs: {error}"))?;
+    std::fs::write(
+        &performance_summary_path,
+        render_heat_balance_performance_summary_json(diagnostic, conformance, timing),
+    )
+    .map_err(|error| format!("failed to write heat-balance performance summary: {error}"))?;
     std::fs::write(
         &report_path,
         render_heat_balance_conformance_report(diagnostic, conformance),
@@ -9334,6 +10716,86 @@ fn render_heat_balance_conformance_digest_json(
     conformance: &HeatBalanceConformance<'_>,
 ) -> String {
     render_heat_balance_conformance_json(diagnostic, conformance, false)
+}
+
+fn render_heat_balance_selected_outputs_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!(
+        "  \"case_id\": {},\n",
+        json_string(&conformance.context.case_id)
+    ));
+    json.push_str("  \"metadata_policy\": \"EnergyPlus ESO dictionary metadata and ep_runtime::ResultStore store type metadata\",\n");
+    json.push_str("  \"timestamp_rule\": \"hour-ending hourly samples aligned to the run-period time axis\",\n");
+    json.push_str("  \"series\": [\n");
+    for (index, row) in diagnostic.series.iter().enumerate() {
+        json.push_str("    {\n");
+        json.push_str(&format!(
+            "      \"key\": {},\n",
+            json_string(&row.output.key)
+        ));
+        json.push_str(&format!(
+            "      \"variable\": {},\n",
+            json_string(&row.output.variable)
+        ));
+        json.push_str(&format!(
+            "      \"frequency\": {},\n",
+            json_string(row.output.frequency)
+        ));
+        json.push_str(&format!(
+            "      \"energyplus_units\": {},\n",
+            row.oracle_units
+                .as_ref()
+                .map_or_else(|| "null".to_string(), |units| json_string(units))
+        ));
+        json.push_str(&format!(
+            "      \"energyplus_frequency\": {},\n",
+            row.oracle_frequency
+                .as_ref()
+                .map_or_else(|| "null".to_string(), |frequency| json_string(frequency))
+        ));
+        json.push_str(&format!(
+            "      \"energyplus_store_type\": {},\n",
+            json_string(row.energyplus_store_type)
+        ));
+        json.push_str("      \"energyplus_store_type_source\": \"selected EnergyPlus ESO dictionary units/variable metadata\",\n");
+        json.push_str(&format!(
+            "      \"rust_store_type\": {},\n",
+            json_string(row.rust_store_type)
+        ));
+        json.push_str("      \"rust_store_type_source\": \"ep_runtime::ResultStore\",\n");
+        json.push_str(&format!("      \"oracle_count\": {},\n", row.oracle_count));
+        json.push_str(&format!("      \"rust_count\": {},\n", row.rust_count));
+        json.push_str(&format!("      \"sample_count\": {},\n", row.samples));
+        json.push_str(&format!(
+            "      \"timestamp_match\": {},\n",
+            row.timestamp_match
+        ));
+        json.push_str(&format!(
+            "      \"first_reported_sample_hour_ending\": {},\n",
+            row.first_reported_sample_hour_ending
+        ));
+        json.push_str(&format!(
+            "      \"first_timestamp\": {},\n",
+            json_optional_string(row.oracle_first_timestamp.as_deref())
+        ));
+        json.push_str(&format!(
+            "      \"last_timestamp\": {}\n",
+            json_optional_string(row.oracle_last_timestamp.as_deref())
+        ));
+        json.push_str("    }");
+        if index + 1 < diagnostic.series.len() {
+            json.push(',');
+        }
+        json.push('\n');
+    }
+    json.push_str("  ]\n");
+    json.push_str("}\n");
+    json
 }
 
 fn render_heat_balance_rust_outside_balance_debug_json(
@@ -9381,6 +10843,185 @@ fn render_heat_balance_rust_outside_balance_debug_json(
     }
     json.push_str("]\n");
     json.push_str("}\n");
+    json
+}
+
+fn render_heat_balance_performance_summary_json(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
+    timing: &ReportTimingSummary,
+) -> String {
+    let speedup_claim_allowed = conformance.status == "pass"
+        && timing.baseline.energyplus_oracle_wall_seconds > 0.0
+        && timing.rust_compare_report_wall_seconds > 0.0;
+    let speedup = if speedup_claim_allowed {
+        Some(
+            timing.baseline.energyplus_oracle_wall_seconds
+                / timing.rust_compare_report_wall_seconds,
+        )
+    } else {
+        None
+    };
+    let profile = &diagnostic.performance_profile;
+    let mut json = String::new();
+    json.push_str("{\n");
+    json.push_str("  \"schema_version\": 1,\n");
+    json.push_str(&format!(
+        "  \"case_id\": {},\n",
+        json_string(&conformance.context.case_id)
+    ));
+    json.push_str(&format!(
+        "  \"comparison_class\": {},\n",
+        json_string(conformance.context.comparison_class)
+    ));
+    json.push_str(&format!(
+        "  \"conformance_status\": {},\n",
+        json_string(conformance.status)
+    ));
+    json.push_str(
+        "  \"measurement\": \"wall-clock seconds measured inside ep_cli unless noted\",\n",
+    );
+    json.push_str(&format!(
+        "  \"speedup_claim_policy\": {},\n",
+        json_string(profile.speedup_claim_policy)
+    ));
+    json.push_str(&format!(
+        "  \"speedup_claim_allowed\": {},\n",
+        speedup_claim_allowed
+    ));
+    json.push_str(&format!(
+        "  \"energyplus_vs_rust_speedup\": {},\n",
+        json_optional_number(speedup)
+    ));
+    json.push_str(&format!(
+        "  \"compatibility_mode_separated_from_fast_mode\": {},\n",
+        profile.compatibility_mode_separated_from_fast_mode
+    ));
+    json.push_str("  \"compatibility_mode\": \"compatibility-source-order conformance path\",\n");
+    json.push_str("  \"fast_mode\": \"not used for conformance speedup claims\",\n");
+    json.push_str(&format!(
+        "  \"trace_write_policy\": {},\n",
+        json_string(profile.trace_write_policy)
+    ));
+    json.push_str(&format!(
+        "  \"energyplus_oracle_wall_seconds\": {},\n",
+        json_number(timing.baseline.energyplus_oracle_wall_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"rust_compare_report_wall_seconds\": {},\n",
+        json_number(timing.rust_compare_report_wall_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"rust_runtime_heat_balance_wall_seconds\": {},\n",
+        json_optional_number(profile.phase_wall_seconds("runtime_heat_balance_execution"))
+    ));
+    json.push_str("  \"required_phase_names\": [\"parse_time\", \"raw_model_build\", \"typed_model_compile\", \"simulation_model_compile\", \"model_graph_build\", \"execution_plan_build\", \"weather_schedule_precompute\", \"runtime_heat_balance_execution\", \"output_report_generation\", \"trace_write\"],\n");
+    json.push_str("  \"phases\": [\n");
+    json.push_str(&format!(
+        "    {{ \"name\": \"energyplus_oracle\", \"engine\": \"EnergyPlus\", \"wall_seconds\": {}, \"scope\": \"EnergyPlus oracle runtime for the same case\" }}",
+        json_number(timing.baseline.energyplus_oracle_wall_seconds)
+    ));
+    json.push_str(",\n");
+    json.push_str(&format!(
+        "    {{ \"name\": \"rust_compare_report\", \"engine\": \"rusted-energyplus\", \"wall_seconds\": {}, \"scope\": \"Rust context, comparison, and artifact generation after oracle files exist\" }}",
+        json_number(timing.rust_compare_report_wall_seconds)
+    ));
+    for phase in &profile.phases {
+        json.push_str(",\n");
+        json.push_str(&format!(
+            "    {{ \"name\": {}, \"engine\": {}, \"wall_seconds\": {}, \"scope\": {} }}",
+            json_string(phase.name),
+            json_string(phase.engine),
+            json_number(phase.wall_seconds),
+            json_string(phase.scope)
+        ));
+    }
+    json.push_str("\n  ]\n");
+    json.push_str("}\n");
+    json
+}
+
+fn heat_balance_performance_profile_json(profile: &HeatBalancePerformanceProfile) -> String {
+    let mut json = String::new();
+    json.push_str("{ ");
+    json.push_str(&format!(
+        "\"compatibility_mode_separated_from_fast_mode\": {}, ",
+        profile.compatibility_mode_separated_from_fast_mode
+    ));
+    json.push_str(&format!(
+        "\"speedup_claim_policy\": {}, ",
+        json_string(profile.speedup_claim_policy)
+    ));
+    json.push_str(&format!(
+        "\"trace_write_policy\": {}, ",
+        json_string(profile.trace_write_policy)
+    ));
+    json.push_str("\"phases\": [");
+    for (index, phase) in profile.phases.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            "{{ \"name\": {}, \"engine\": {}, \"wall_seconds\": {}, \"scope\": {} }}",
+            json_string(phase.name),
+            json_string(phase.engine),
+            json_number(phase.wall_seconds),
+            json_string(phase.scope)
+        ));
+    }
+    json.push_str("] }");
+    json
+}
+
+fn heat_balance_time_axis_json(time_axis: &HeatBalanceTimeAxisDiagnostic) -> String {
+    let mut json = String::new();
+    json.push_str("{ ");
+    json.push_str(&format!("\"source\": {}, ", json_string(time_axis.source)));
+    json.push_str(&format!(
+        "\"zone_timesteps_per_hour\": {}, ",
+        time_axis.zone_timesteps_per_hour
+    ));
+    json.push_str(&format!(
+        "\"zone_timestep_seconds\": {}, ",
+        json_number(time_axis.zone_timestep_seconds)
+    ));
+    json.push_str(&format!(
+        "\"system_timestep_nominal_seconds\": {}, ",
+        json_number(time_axis.system_timestep_nominal_seconds)
+    ));
+    json.push_str(&format!(
+        "\"variable_system_timestep_support\": {}, ",
+        json_string(time_axis.variable_system_timestep_support)
+    ));
+    json.push_str(&format!(
+        "\"shorten_timestep_sys_state\": {}, ",
+        time_axis.shorten_timestep_sys_state
+    ));
+    json.push_str(&format!(
+        "\"use_zone_timestep_history_state\": {}, ",
+        time_axis.use_zone_timestep_history_state
+    ));
+    json.push_str(&format!(
+        "\"hvac_iteration_count\": {}, ",
+        time_axis.hvac_iteration_count
+    ));
+    json.push_str(&format!(
+        "\"plant_iteration_count\": {}, ",
+        time_axis.plant_iteration_count
+    ));
+    json.push_str(&format!(
+        "\"warmup_reported_samples\": {}, ",
+        time_axis.warmup_reported_samples
+    ));
+    json.push_str(&format!(
+        "\"run_period_reported_samples\": {}, ",
+        time_axis.run_period_reported_samples
+    ));
+    json.push_str(&format!(
+        "\"design_day_reported_samples\": {}",
+        time_axis.design_day_reported_samples
+    ));
+    json.push_str(" }");
     json
 }
 
@@ -9480,7 +11121,14 @@ fn heat_balance_zone_air_state_json(state: &HeatBalanceZoneAirStateSample) -> St
             "\"zone_timestep_average_air_humidity_ratio\": {}, ",
             "\"previous_air_humidity_ratios\": {}, ",
             "\"previous_system_air_humidity_ratios\": {}, ",
+            "\"use_zone_timestep_history\": {}, ",
+            "\"shorten_timestep_sys\": {}, ",
+            "\"prior_timestep_seconds\": {}, ",
             "\"air_heat_capacity_j_per_k\": {}, ",
+            "\"sum_mcp_w_per_k\": {}, ",
+            "\"sum_mcp_t_w\": {}, ",
+            "\"sum_sys_mcp_w_per_k\": {}, ",
+            "\"sum_sys_mcp_t_w\": {}, ",
             "\"zone_air_temperature_coefficients\": {{ ",
             "\"temp_dependent_coefficient_w_per_k\": {}, ",
             "\"temp_independent_coefficient_w\": {}, ",
@@ -9500,7 +11148,14 @@ fn heat_balance_zone_air_state_json(state: &HeatBalanceZoneAirStateSample) -> St
         json_number(state.zone_timestep_average_air_humidity_ratio),
         json_number_array(&state.previous_air_humidity_ratios),
         json_number_array(&state.previous_system_air_humidity_ratios),
+        state.use_zone_timestep_history,
+        state.shorten_timestep_sys,
+        json_number(state.prior_timestep_seconds),
         json_number(state.air_heat_capacity_j_per_k),
+        json_number(state.sum_mcp_w_per_k),
+        json_number(state.sum_mcp_t_w),
+        json_number(state.sum_sys_mcp_w_per_k),
+        json_number(state.sum_sys_mcp_t_w),
         json_number(coefficients.temp_dependent_coefficient_w_per_k),
         json_number(coefficients.temp_independent_coefficient_w),
         json_number(coefficients.air_power_cap_w_per_k),
@@ -9550,9 +11205,19 @@ fn heat_balance_zone_air_first_sample_trace_json(
                 "\"previous_mean_air_temperatures_c\": {}, ",
                 "\"previous_system_mean_air_temperatures_c\": {}, ",
                 "\"previous_system_timestep_count\": {}, ",
+                "\"use_zone_timestep_history\": {}, ",
+                "\"shorten_timestep_sys\": {}, ",
+                "\"prior_timestep_seconds\": {}, ",
                 "\"air_humidity_ratio\": {}, ",
                 "\"zone_timestep_average_air_humidity_ratio\": {}, ",
+                "\"barometric_pressure_pa\": {}, ",
+                "\"rho_air_kg_per_m3\": {}, ",
+                "\"cp_air_j_per_kg_k\": {}, ",
                 "\"air_heat_capacity_j_per_k\": {}, ",
+                "\"sum_mcp_w_per_k\": {}, ",
+                "\"sum_mcp_t_w\": {}, ",
+                "\"sum_sys_mcp_w_per_k\": {}, ",
+                "\"sum_sys_mcp_t_w\": {}, ",
                 "\"zone_timestep_air_power_cap_w_per_k\": {}, ",
                 "\"zone_air_temperature_coefficients\": {{ ",
                 "\"temp_dependent_coefficient_w_per_k\": {}, ",
@@ -9575,9 +11240,19 @@ fn heat_balance_zone_air_first_sample_trace_json(
             json_number_array(&row.previous_mean_air_temperatures_c),
             json_number_array(&row.previous_system_mean_air_temperatures_c),
             row.previous_system_timestep_count,
+            row.use_zone_timestep_history,
+            row.shorten_timestep_sys,
+            json_number(row.prior_timestep_seconds),
             json_number(row.air_humidity_ratio),
             json_number(row.zone_timestep_average_air_humidity_ratio),
+            json_number(row.barometric_pressure_pa),
+            json_number(row.rho_air_kg_per_m3),
+            json_number(row.cp_air_j_per_kg_k),
             json_number(row.air_heat_capacity_j_per_k),
+            json_number(row.sum_mcp_w_per_k),
+            json_number(row.sum_mcp_t_w),
+            json_number(row.sum_sys_mcp_w_per_k),
+            json_number(row.sum_sys_mcp_t_w),
             json_number(row.zone_timestep_air_power_cap_w_per_k),
             json_number(coefficients.temp_dependent_coefficient_w_per_k),
             json_number(coefficients.temp_independent_coefficient_w),
@@ -9659,6 +11334,13 @@ fn render_heat_balance_conformance_json(
         "  \"failure_reasons\": {},\n",
         string_array_json(&conformance.failure_reasons)
     ));
+    json.push_str(&format!(
+        "  \"diagnostics\": {},\n",
+        heat_balance_gate_diagnostics_json(&conformance.diagnostics)
+    ));
+    json.push_str(
+        "  \"diagnostic_error_policy\": \"conformance candidates fail when any structured diagnostic severity is error or higher\",\n",
+    );
     json.push_str(&format!("  \"samples\": {},\n", diagnostic.samples));
     json.push_str(&format!(
         "  \"heat_balance_timesteps\": {},\n",
@@ -9667,6 +11349,10 @@ fn render_heat_balance_conformance_json(
     json.push_str(&format!(
         "  \"heat_balance_run_period_timesteps\": {},\n",
         diagnostic.heat_balance_run_period_timesteps
+    ));
+    json.push_str(&format!(
+        "  \"time_axis\": {},\n",
+        heat_balance_time_axis_json(&diagnostic.time_axis)
     ));
     json.push_str(&format!(
         "  \"heat_balance_warmup\": {},\n",
@@ -9721,6 +11407,42 @@ fn render_heat_balance_conformance_json(
         json_string(diagnostic.surface_loop_zone_air_correction)
     ));
     json.push_str(&format!(
+        "  \"construction_cache_hash\": {},\n",
+        diagnostic.construction_cache_hash
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_build_wall_seconds\": {},\n",
+        json_number(diagnostic.construction_cache_build_wall_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_entry_count\": {},\n",
+        diagnostic.construction_cache_entry_count
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_no_mass_count\": {},\n",
+        diagnostic.construction_cache_no_mass_count
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_massive_ctf_count\": {},\n",
+        diagnostic.construction_cache_massive_ctf_count
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_eio_seeded_count\": {},\n",
+        diagnostic.construction_cache_eio_seeded_count
+    ));
+    json.push_str(&format!(
+        "  \"construction_cache_rust_generated_count\": {},\n",
+        diagnostic.construction_cache_rust_generated_count
+    ));
+    json.push_str(&format!(
+        "  \"performance_profile\": {},\n",
+        heat_balance_performance_profile_json(&diagnostic.performance_profile)
+    ));
+    json.push_str(&format!(
+        "  \"heat_balance_branch_status\": {},\n",
+        heat_balance_branch_status_json()
+    ));
+    json.push_str(&format!(
         "  \"compatibility_stages\": {},\n",
         heat_balance_compatibility_stages_json(&diagnostic.compatibility_stages)
     ));
@@ -9764,6 +11486,21 @@ fn render_heat_balance_conformance_json(
     json.push_str(&format!(
         "  \"top_blocker\": {},\n",
         heat_balance_top_blocker_json(current_blockers.first())
+    ));
+    json.push_str(&format!(
+        "  \"top_blocking_mismatch\": {},\n",
+        json_string(&heat_balance_top_blocking_mismatch(
+            diagnostic,
+            &current_blockers
+        ))
+    ));
+    json.push_str(&format!(
+        "  \"active_lane\": {},\n",
+        json_string(diagnostic.zone_air_algorithm_lane)
+    ));
+    json.push_str(&format!(
+        "  \"best_diagnostic_lane\": {},\n",
+        json_string(&heat_balance_best_diagnostic_lane(diagnostic))
     ));
     json.push_str(&format!(
         "  \"current_blockers\": {},\n",
@@ -9870,6 +11607,25 @@ fn render_heat_balance_conformance_json(
         heat_balance_inside_solve_series_deltas_json(&diagnostic.inside_solve_series_deltas)
     ));
     json.push_str(&format!(
+        "  \"inside_source_term_series_summaries\": {},\n",
+        heat_balance_inside_source_term_series_summaries_json(
+            &diagnostic.inside_source_term_series_summaries
+        )
+    ));
+    json.push_str(&format!(
+        "  \"floor_inside_current_diagnostics\": {},\n",
+        heat_balance_floor_inside_current_diagnostics_json(
+            &diagnostic.floor_inside_current_diagnostics
+        )
+    ));
+    json.push_str(&format!(
+        "  \"floor_inside_current_term_series\": {},\n",
+        heat_balance_floor_inside_current_term_series_json(
+            &diagnostic.floor_inside_current_term_series,
+            include_sample_rows
+        )
+    ));
+    json.push_str(&format!(
         "  \"adiabatic_history_max_sample_deltas\": {},\n",
         heat_balance_adiabatic_history_max_sample_deltas_json(
             &diagnostic.adiabatic_history_max_sample_deltas
@@ -9905,6 +11661,8 @@ fn render_heat_balance_conformance_json(
     json.push_str("    \"compare_report_md\": \"compare-report.md\",\n");
     json.push_str("    \"compare_summary_json\": \"compare-summary.json\",\n");
     json.push_str("    \"compare_digest_json\": \"compare-digest.json\",\n");
+    json.push_str("    \"oracle_selected_outputs_json\": \"selected_outputs.json\",\n");
+    json.push_str("    \"performance_summary_json\": \"performance-summary.json\",\n");
     json.push_str(
         "    \"rust_outside_balance_diagnostics_json\": \"rust-outside-balance-diagnostics.json\",\n",
     );
@@ -9923,12 +11681,18 @@ fn render_heat_balance_conformance_report(
     let first_divergence_by_variable =
         heat_balance_first_divergence_by_variable_rows(&diagnostic.series);
     let warmup_end_state_deltas = heat_balance_warmup_end_state_deltas(diagnostic);
-    let mut report = String::new();
-    if context.conformance_claim {
-        report.push_str("# Heat Balance Conformance Report\n\n");
-    } else {
-        report.push_str("# Heat Balance Diagnostic Report\n\n");
+    if !context.conformance_claim {
+        return render_heat_balance_compact_diagnostic_report(
+            diagnostic,
+            conformance,
+            &current_blockers,
+            &first_divergence_by_variable,
+            &warmup_end_state_deltas,
+        );
     }
+
+    let mut report = String::new();
+    report.push_str("# Heat Balance Conformance Report\n\n");
     report.push_str("## Manifest\n\n");
     report.push_str(&format!("case_id: {}\n", context.case_id));
     report.push_str(&format!("oracle_version: {}\n", context.oracle_version));
@@ -9974,6 +11738,21 @@ fn render_heat_balance_conformance_report(
             report.push_str(&format!("- {}\n", reason));
         }
     }
+    if conformance.diagnostics.is_empty() {
+        report.push_str("diagnostics: none\n");
+    } else {
+        report.push_str("diagnostics:\n");
+        for diagnostic in &conformance.diagnostics {
+            report.push_str(&format!(
+                "- {} [{}] {}{}: {}\n",
+                diagnostic.severity,
+                diagnostic.code,
+                diagnostic.stage,
+                heat_balance_gate_diagnostic_context_label(diagnostic),
+                diagnostic.message
+            ));
+        }
+    }
     report.push_str(&format!("samples: {}\n", diagnostic.samples));
     report.push_str(&format!(
         "heat_balance_timesteps: {}\n",
@@ -9984,8 +11763,98 @@ fn render_heat_balance_conformance_report(
         diagnostic.heat_balance_run_period_timesteps
     ));
     report.push_str(&format!(
+        "time_axis_source: {}\n",
+        diagnostic.time_axis.source
+    ));
+    report.push_str(&format!(
+        "zone_timesteps_per_hour: {}\n",
+        diagnostic.time_axis.zone_timesteps_per_hour
+    ));
+    report.push_str(&format!(
+        "zone_timestep_seconds: {:.12}\n",
+        diagnostic.time_axis.zone_timestep_seconds
+    ));
+    report.push_str(&format!(
+        "system_timestep_nominal_seconds: {:.12}\n",
+        diagnostic.time_axis.system_timestep_nominal_seconds
+    ));
+    report.push_str(&format!(
+        "variable_system_timestep_support: {}\n",
+        diagnostic.time_axis.variable_system_timestep_support
+    ));
+    report.push_str(&format!(
+        "shorten_timestep_sys_state: {}\n",
+        diagnostic.time_axis.shorten_timestep_sys_state
+    ));
+    report.push_str(&format!(
+        "use_zone_timestep_history_state: {}\n",
+        diagnostic.time_axis.use_zone_timestep_history_state
+    ));
+    report.push_str(&format!(
+        "hvac_iteration_count: {}\n",
+        diagnostic.time_axis.hvac_iteration_count
+    ));
+    report.push_str(&format!(
+        "plant_iteration_count: {}\n",
+        diagnostic.time_axis.plant_iteration_count
+    ));
+    report.push_str(&format!(
+        "warmup_reported_samples: {}\n",
+        diagnostic.time_axis.warmup_reported_samples
+    ));
+    report.push_str(&format!(
+        "run_period_reported_samples: {}\n",
+        diagnostic.time_axis.run_period_reported_samples
+    ));
+    report.push_str(&format!(
+        "design_day_reported_samples: {}\n",
+        diagnostic.time_axis.design_day_reported_samples
+    ));
+    report.push_str(&format!(
         "warmup_enabled: {}\n",
         diagnostic.heat_balance_warmup.enabled
+    ));
+    report.push_str(&format!(
+        "building_warmup_minimum_days: {}\n",
+        heat_balance_optional_u32_label(diagnostic.heat_balance_warmup.building_minimum_days)
+    ));
+    report.push_str(&format!(
+        "building_warmup_maximum_days: {}\n",
+        heat_balance_optional_u32_label(diagnostic.heat_balance_warmup.building_maximum_days)
+    ));
+    report.push_str(&format!(
+        "building_temperature_convergence_tolerance_delta_c: {}\n",
+        heat_balance_optional_number_label(
+            diagnostic
+                .heat_balance_warmup
+                .building_temperature_convergence_tolerance_delta_c
+        )
+    ));
+    report.push_str(&format!(
+        "building_loads_convergence_tolerance_w: {}\n",
+        heat_balance_optional_number_label(
+            diagnostic
+                .heat_balance_warmup
+                .building_loads_convergence_tolerance_w
+        )
+    ));
+    report.push_str(&format!(
+        "warmup_minimum_days: {}\n",
+        diagnostic.heat_balance_warmup.minimum_days
+    ));
+    report.push_str(&format!(
+        "warmup_maximum_days: {}\n",
+        diagnostic.heat_balance_warmup.maximum_days
+    ));
+    report.push_str(&format!(
+        "warmup_temperature_convergence_tolerance_delta_c: {:.12}\n",
+        diagnostic
+            .heat_balance_warmup
+            .temperature_convergence_tolerance_delta_c
+    ));
+    report.push_str(&format!(
+        "warmup_loads_convergence_tolerance_w: {:.12}\n",
+        diagnostic.heat_balance_warmup.loads_convergence_tolerance_w
     ));
     report.push_str(&format!(
         "warmup_days: {}\n",
@@ -10048,6 +11917,45 @@ fn render_heat_balance_conformance_report(
         diagnostic.ctf_seed.skipped_coefficients
     ));
     report.push_str(&format!(
+        "construction_cache_hash: {}\n",
+        diagnostic.construction_cache_hash
+    ));
+    report.push_str(&format!(
+        "construction_cache_build_wall_seconds: {:.12}\n",
+        diagnostic.construction_cache_build_wall_seconds
+    ));
+    report.push_str(&format!(
+        "construction_cache_entries: {}\n",
+        diagnostic.construction_cache_entry_count
+    ));
+    report.push_str(&format!(
+        "construction_cache_no_mass_entries: {}\n",
+        diagnostic.construction_cache_no_mass_count
+    ));
+    report.push_str(&format!(
+        "construction_cache_massive_ctf_entries: {}\n",
+        diagnostic.construction_cache_massive_ctf_count
+    ));
+    report.push_str(&format!(
+        "construction_cache_eio_seeded_entries: {}\n",
+        diagnostic.construction_cache_eio_seeded_count
+    ));
+    report.push_str(&format!(
+        "construction_cache_rust_generated_entries: {}\n",
+        diagnostic.construction_cache_rust_generated_count
+    ));
+    report.push_str("performance_summary: performance-summary.json\n");
+    report.push_str(&format!(
+        "speedup_claim_policy: {}\n",
+        diagnostic.performance_profile.speedup_claim_policy
+    ));
+    report.push_str(&format!(
+        "compatibility_mode_separated_from_fast_mode: {}\n",
+        diagnostic
+            .performance_profile
+            .compatibility_mode_separated_from_fast_mode
+    ));
+    report.push_str(&format!(
         "zone_air_algorithm: {}\n",
         diagnostic.zone_air_algorithm
     ));
@@ -10091,6 +11999,10 @@ fn render_heat_balance_conformance_report(
         "surface_loop_zone_air_correction: {}\n",
         diagnostic.surface_loop_zone_air_correction
     ));
+    report.push_str(
+        "heat_balance_active_branch_scope: official-1zone-declared-compatibility-branches-only\n",
+    );
+    report.push_str("heat_balance_unsupported_active_branch_policy: block-conformance-promotion\n");
     report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
     report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
     report.push_str(&format!(
@@ -10149,6 +12061,10 @@ fn render_heat_balance_conformance_report(
 
     report.push_str("## EnergyPlus Compatibility Stage Order\n\n");
     heat_balance_report_compatibility_stage_rows(&mut report, &diagnostic.compatibility_stages);
+    report.push('\n');
+
+    report.push_str("## Heat-Balance Branch Status\n\n");
+    heat_balance_report_branch_status_rows(&mut report);
     report.push('\n');
 
     report.push_str("## Bottlenecks\n\n");
@@ -10268,6 +12184,27 @@ fn render_heat_balance_conformance_report(
     );
     report.push('\n');
 
+    report.push_str("## Inside Source Term Series Summaries\n\n");
+    heat_balance_report_inside_source_term_series_summary_rows(
+        &mut report,
+        &diagnostic.inside_source_term_series_summaries,
+    );
+    report.push('\n');
+
+    report.push_str("## Floor Inside-Current Diagnostic\n\n");
+    heat_balance_report_floor_inside_current_diagnostic_rows(
+        &mut report,
+        &diagnostic.floor_inside_current_diagnostics,
+    );
+    report.push('\n');
+
+    report.push_str("## Floor Inside-Current Term Series\n\n");
+    heat_balance_report_floor_inside_current_term_series_rows(
+        &mut report,
+        &diagnostic.floor_inside_current_term_series,
+    );
+    report.push('\n');
+
     report.push_str("## Adiabatic History Max-Sample Deltas\n\n");
     heat_balance_report_adiabatic_history_max_sample_delta_rows(
         &mut report,
@@ -10304,15 +12241,255 @@ fn render_heat_balance_conformance_report(
     report.push('\n');
 
     report.push_str("## Series\n\n");
-    heat_balance_report_series_rows(&mut report, &diagnostic.series);
+    heat_balance_report_series_rows(&mut report, context, &diagnostic.series);
     report.push('\n');
 
     report.push_str("## Delta Samples\n\n");
-    heat_balance_report_delta_rows(&mut report, &diagnostic.series);
+    heat_balance_report_delta_rows(&mut report, context, &diagnostic.series);
     report.push('\n');
 
     report.push_str("## Hourly Samples\n\n");
-    heat_balance_report_sample_rows(&mut report, &diagnostic.series);
+    heat_balance_report_sample_rows(&mut report, context, &diagnostic.series);
+    report
+}
+
+fn render_heat_balance_compact_diagnostic_report(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    conformance: &HeatBalanceConformance<'_>,
+    current_blockers: &[HeatBalanceCurrentBlockerRow],
+    first_divergence_by_variable: &[HeatBalanceFirstDivergenceByVariableRow],
+    warmup_end_state_deltas: &HeatBalanceWarmupEndStateDeltas,
+) -> String {
+    let context = conformance.context;
+    let mut report = String::new();
+    report.push_str("# Heat Balance Diagnostic Report\n\n");
+
+    report.push_str("## Bottleneck Tracker\n\n");
+    report.push_str(&format!("case_id: {}\n", context.case_id));
+    report.push_str(&format!("comparison_class: {}\n", context.comparison_class));
+    report.push_str(&format!(
+        "conformance_claim: {}\n",
+        context.conformance_claim
+    ));
+    report.push_str(&format!("status: {}\n", conformance.status));
+    report.push_str(&format!(
+        "top_blocking_mismatch: {}\n",
+        heat_balance_top_blocking_mismatch(diagnostic, current_blockers)
+    ));
+    report.push_str(&format!(
+        "next_blocking_source_mismatch: {}\n",
+        heat_balance_top_blocking_mismatch(diagnostic, current_blockers)
+    ));
+    report.push_str(&format!(
+        "active_lane: {}\n",
+        diagnostic.zone_air_algorithm_lane
+    ));
+    report.push_str(&format!(
+        "active_algorithm: {}\n",
+        diagnostic.zone_air_algorithm
+    ));
+    report.push_str(&format!(
+        "best_diagnostic_lane: {}\n",
+        heat_balance_best_diagnostic_lane(diagnostic)
+    ));
+    report.push_str(&format!(
+        "active_blocker: {}\n",
+        heat_balance_active_blocker_summary(diagnostic)
+    ));
+    report.push_str(&format!(
+        "next_pr_target: {}\n\n",
+        heat_balance_next_pr_target(diagnostic)
+    ));
+
+    report.push_str("## Top Blocker\n\n");
+    heat_balance_report_top_blocker_row(&mut report, current_blockers.first());
+    report.push('\n');
+
+    report.push_str("## Top 10 RMSE Variables\n\n");
+    heat_balance_report_top_rmse_variable_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Blocking Diagnostic Split\n\n");
+    heat_balance_report_blocking_diagnostic_split_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Zone-Air Coefficient Split\n\n");
+    heat_balance_report_zone_air_coefficient_delta_rows(
+        &mut report,
+        &diagnostic.zone_air_coefficient_deltas,
+    );
+    report.push('\n');
+
+    report.push_str("## Surface Family RMSE\n\n");
+    heat_balance_report_surface_family_rmse_rows(&mut report, &diagnostic.series);
+    report.push('\n');
+
+    report.push_str("## Source-Order Trace\n\n");
+    heat_balance_report_source_order_trace_rows(&mut report, &diagnostic.compatibility_stages);
+    report.push('\n');
+
+    report.push_str("## Result\n\n");
+    if conformance.failure_reasons.is_empty() {
+        report.push_str("failure_reasons: none\n");
+    } else {
+        report.push_str("failure_reasons: compacted\n");
+        report.push_str(&format!(
+            "failure_reason_count: {}\n",
+            conformance.failure_reasons.len()
+        ));
+        if let Some(reason) = conformance.failure_reasons.first() {
+            report.push_str(&format!("top_failure_reason: {}\n", reason));
+        }
+    }
+    report.push_str(&format!("oracle_version: {}\n", context.oracle_version));
+    report.push_str(&format!("outputs: {}\n", context.outputs.len()));
+    report.push_str(&format!(
+        "tolerance_policy: {}\n",
+        context.tolerance_label()
+    ));
+    if let Some(report_contract) = &context.report {
+        report.push_str(&format!("report_format: {}\n", report_contract.format));
+        report.push_str(&format!("report_path: {}\n", report_contract.path));
+    }
+    if let Some(gate) = &context.gate {
+        report.push_str(&format!("gate_script: {}\n", gate.script));
+        report.push_str(&format!("gate_blocking: {}\n", gate.blocking));
+    }
+    report.push_str(&format!("samples: {}\n", diagnostic.samples));
+    report.push_str(&format!(
+        "heat_balance_timesteps: {}\n",
+        diagnostic.heat_balance_timesteps
+    ));
+    report.push_str(&format!(
+        "heat_balance_run_period_timesteps: {}\n",
+        diagnostic.heat_balance_run_period_timesteps
+    ));
+    report.push_str(&format!(
+        "warmup_enabled: {}\n",
+        diagnostic.heat_balance_warmup.enabled
+    ));
+    report.push_str(&format!(
+        "oracle_run_period_warmup_days: {}\n",
+        diagnostic
+            .heat_balance_warmup
+            .oracle_run_period_day_count
+            .map(|days| days.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "warmup_day_count_delta: {}\n",
+        heat_balance_warmup_day_count_delta(&diagnostic.heat_balance_warmup)
+            .map(|delta| delta.to_string())
+            .unwrap_or_else(|| "none".to_string())
+    ));
+    report.push_str(&format!(
+        "ctf_seed_policy: {}\n",
+        diagnostic.ctf_seed.policy
+    ));
+    report.push_str(&format!(
+        "ctf_seed_included_constructions: {}\n",
+        heat_balance_ctf_seed_included_label(&diagnostic.ctf_seed)
+    ));
+    report.push_str(&format!(
+        "ctf_seed_skipped_constructions: {}\n",
+        heat_balance_ctf_seed_skipped_label(&diagnostic.ctf_seed)
+    ));
+    report.push_str(&format!(
+        "ctf_seed_construction_summaries: {}\n",
+        heat_balance_ctf_seed_construction_summary_label(&diagnostic.ctf_seed)
+    ));
+    report.push_str(&format!(
+        "zone_air_algorithm: {}\n",
+        diagnostic.zone_air_algorithm
+    ));
+    report.push_str(&format!(
+        "zone_air_algorithm_lane: {}\n",
+        diagnostic.zone_air_algorithm_lane
+    ));
+    report.push_str(&format!(
+        "compatibility_source_order: {}\n",
+        diagnostic.compatibility_source_order
+    ));
+    report.push_str(&format!(
+        "diagnostic_probe_used: {}\n",
+        diagnostic.diagnostic_probe_used
+    ));
+    report.push_str(&format!(
+        "conformance_promotion_allowed: {}\n",
+        diagnostic.conformance_promotion_allowed
+    ));
+    report.push_str(&format!(
+        "surface_iteration_count: {}\n",
+        diagnostic.surface_iteration_count
+    ));
+    report.push_str(&format!(
+        "inside_hconv_reevaluation_interval: {}\n",
+        heat_balance_optional_u32_label(diagnostic.inside_hconv_reevaluation_interval)
+    ));
+    report.push_str(&format!(
+        "ctf_initial_history_policy: {}\n",
+        diagnostic.ctf_initial_history_policy
+    ));
+    report.push_str(&format!(
+        "zone_conduction_report_source: {}\n",
+        diagnostic.zone_conduction_report_source
+    ));
+    report.push_str(&format!(
+        "zone_air_report_sampling: {}\n",
+        diagnostic.zone_air_report_sampling
+    ));
+    report.push_str(&format!(
+        "surface_loop_zone_air_correction: {}\n",
+        diagnostic.surface_loop_zone_air_correction
+    ));
+    report.push_str(&format!("zone_count: {}\n", diagnostic.zone_count));
+    report.push_str(&format!("surface_count: {}\n", diagnostic.surface_count));
+    report.push_str(&format!(
+        "max_abs_delta_c: {:.12}\n",
+        heat_balance_gated_max_abs_delta(diagnostic, context)
+    ));
+    report.push_str(&format!(
+        "rmse_delta_c: {:.12}\n",
+        heat_balance_gated_max_rmse_delta(diagnostic, context)
+    ));
+    report.push_str(&format!(
+        "max_rel_delta: {:.12}\n",
+        heat_balance_gated_max_rel_delta(diagnostic, context)
+    ));
+    report.push_str(&format!(
+        "all_series_max_abs_delta_c: {:.12}\n",
+        heat_balance_max_abs_delta(diagnostic)
+    ));
+    report.push_str(&format!(
+        "all_series_rmse_delta_c: {:.12}\n",
+        heat_balance_max_rmse_delta(diagnostic)
+    ));
+    report.push_str(&format!(
+        "all_series_max_rel_delta: {:.12}\n\n",
+        heat_balance_max_rel_delta(diagnostic)
+    ));
+
+    report.push_str("## Warmup End-State Deltas\n\n");
+    heat_balance_report_warmup_end_state_delta_rows(&mut report, warmup_end_state_deltas);
+    report.push('\n');
+
+    report.push_str("## First Divergence by Variable\n\n");
+    let compact_first_divergence_count = first_divergence_by_variable.len().min(5);
+    report.push_str(&format!(
+        "first_divergence_rows: top-{}-of-{}\n\n",
+        compact_first_divergence_count,
+        first_divergence_by_variable.len()
+    ));
+    heat_balance_report_first_divergence_by_variable_rows(
+        &mut report,
+        &first_divergence_by_variable[..compact_first_divergence_count],
+    );
+    report.push('\n');
+
+    report.push_str("## Diagnostic Evidence\n\n");
+    report.push_str("compare_summary_json: compare-summary.json\n");
+    report.push_str("compare_digest_json: compare-digest.json\n");
+    report.push_str("trace_policy: detailed probe traces remain in JSON artifacts\n");
     report
 }
 
@@ -10373,12 +12550,27 @@ fn zone_temperature_gate_json(gate: Option<&ZoneTemperatureGateContract>) -> Str
 fn heat_balance_warmup_json(warmup: &HeatBalanceWarmupDiagnostic) -> String {
     format!(
         concat!(
-            "{{ \"enabled\": {}, \"day_count\": {}, \"timestep_count\": {}, ",
+            "{{ \"enabled\": {}, ",
+            "\"building_minimum_days\": {}, \"building_maximum_days\": {}, ",
+            "\"building_temperature_convergence_tolerance_delta_c\": {}, ",
+            "\"building_loads_convergence_tolerance_w\": {}, ",
+            "\"minimum_days\": {}, \"maximum_days\": {}, ",
+            "\"temperature_convergence_tolerance_delta_c\": {}, ",
+            "\"loads_convergence_tolerance_w\": {}, ",
+            "\"day_count\": {}, \"timestep_count\": {}, ",
             "\"hours_per_day\": {}, \"converged\": {}, ",
             "\"final_max_zone_temperature_delta_c\": {}, ",
             "\"oracle_run_period_day_count\": {}, \"day_count_delta\": {} }}"
         ),
         warmup.enabled,
+        json_optional_u32(warmup.building_minimum_days),
+        json_optional_u32(warmup.building_maximum_days),
+        json_optional_number(warmup.building_temperature_convergence_tolerance_delta_c),
+        json_optional_number(warmup.building_loads_convergence_tolerance_w),
+        warmup.minimum_days,
+        warmup.maximum_days,
+        json_number(warmup.temperature_convergence_tolerance_delta_c),
+        json_number(warmup.loads_convergence_tolerance_w),
         warmup.day_count,
         warmup.timestep_count,
         warmup.hours_per_day,
@@ -10538,6 +12730,53 @@ fn heat_balance_outputs_json(outputs: &[ZoneTemperatureReportOutput]) -> String 
     }
     json.push(']');
     json
+}
+
+fn heat_balance_gate_diagnostics_json(diagnostics: &[HeatBalanceGateDiagnostic]) -> String {
+    let mut json = String::from("[");
+    for (index, diagnostic) in diagnostics.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"severity\": {}, \"code\": {}, \"stage\": {}, ",
+                "\"surface\": {}, \"zone\": {}, \"timestep\": {}, ",
+                "\"output_handle\": {}, \"message\": {} }}"
+            ),
+            json_string(diagnostic.severity),
+            json_string(diagnostic.code),
+            json_string(diagnostic.stage),
+            json_optional_string(diagnostic.surface.as_deref()),
+            json_optional_string(diagnostic.zone.as_deref()),
+            json_optional_u64(diagnostic.timestep),
+            json_optional_u32(diagnostic.output_handle),
+            json_string(&diagnostic.message)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_gate_diagnostic_context_label(diagnostic: &HeatBalanceGateDiagnostic) -> String {
+    let mut fields = Vec::new();
+    if let Some(surface) = diagnostic.surface.as_ref() {
+        fields.push(format!("surface={surface}"));
+    }
+    if let Some(zone) = diagnostic.zone.as_ref() {
+        fields.push(format!("zone={zone}"));
+    }
+    if let Some(timestep) = diagnostic.timestep {
+        fields.push(format!("timestep={timestep}"));
+    }
+    if let Some(output_handle) = diagnostic.output_handle {
+        fields.push(format!("output_handle={output_handle}"));
+    }
+    if fields.is_empty() {
+        String::new()
+    } else {
+        format!(" ({})", fields.join(", "))
+    }
 }
 
 fn heat_balance_bottleneck_rows(
@@ -10835,6 +13074,33 @@ fn heat_balance_current_blocker_rows(
             next_target: "warmup-ctf-history-end-state".to_string(),
         });
     }
+    if let Some(zone_history) = &warmup.zone_history {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-zone-history-delta".to_string(),
+            status: heat_balance_open_or_closed_status(zone_history.delta).to_string(),
+            key: zone_history.key.clone(),
+            source: zone_history.source.clone(),
+            sample_index: zone_history.sample_index,
+            delta: zone_history.delta,
+            delta_units: zone_history.delta_units.clone(),
+            evidence: zone_history.evidence.clone(),
+            next_target: "warmup-zone-history-end-state".to_string(),
+        });
+    } else {
+        rows.push(HeatBalanceCurrentBlockerRow {
+            rank: 0,
+            blocker_id: "warmup-end-state-zone-history-delta".to_string(),
+            status: "closed".to_string(),
+            key: "none".to_string(),
+            source: "none".to_string(),
+            sample_index: None,
+            delta: 0.0,
+            delta_units: "none".to_string(),
+            evidence: "unavailable".to_string(),
+            next_target: "warmup-zone-history-end-state".to_string(),
+        });
+    }
 
     rows.sort_by(|left, right| {
         heat_balance_blocker_status_order(&left.status)
@@ -10933,6 +13199,9 @@ fn heat_balance_warmup_end_state_deltas(
         ctf_history: heat_balance_warmup_ctf_history_delta(
             &diagnostic.ctf_history_first_sample_deltas,
         ),
+        zone_history: heat_balance_warmup_zone_history_delta(
+            &diagnostic.zone_air_coefficient_deltas,
+        ),
     }
 }
 
@@ -10987,6 +13256,24 @@ fn heat_balance_warmup_ctf_history_delta(
         }
     }
     best
+}
+
+fn heat_balance_warmup_zone_history_delta(
+    rows: &[HeatBalanceZoneAirCoefficientDelta],
+) -> Option<HeatBalanceScalarDeltaRow> {
+    let row = rows.iter().find(|row| row.key == "ZONE ONE")?;
+    let point = row
+        .temp_history_term_delta
+        .first_delta_sample
+        .or(row.temp_history_term_delta.max_delta_sample)?;
+    Some(HeatBalanceScalarDeltaRow {
+        key: row.key.clone(),
+        source: "TempHistoryTerm".to_string(),
+        sample_index: Some(point.index),
+        delta: point.abs_delta_c,
+        delta_units: "W".to_string(),
+        evidence: "zone_air_coefficient_deltas.temp_history_term_delta handoff".to_string(),
+    })
 }
 
 fn heat_balance_active_blocker_summary(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
@@ -11059,6 +13346,59 @@ fn heat_balance_next_pr_target(diagnostic: &HeatBalanceConformanceDiagnostic) ->
     }
 
     "none".to_string()
+}
+
+fn heat_balance_top_blocking_mismatch(
+    diagnostic: &HeatBalanceConformanceDiagnostic,
+    current_blockers: &[HeatBalanceCurrentBlockerRow],
+) -> String {
+    let Some(row) = current_blockers.first() else {
+        return "none".to_string();
+    };
+
+    if row.blocker_id == "roof-exterior-environmental-balance" {
+        return "roof-exterior-environmental-balance".to_string();
+    }
+
+    if row.blocker_id == "floor-face-temperature-current-inside-mismatch"
+        || row.next_target == "floor-inside-current-face-temperature-source-timing"
+    {
+        return "floor-inside-current-source-timing".to_string();
+    }
+
+    if row.blocker_id == "floor-storage-mismatch" {
+        if let Some(storage) = diagnostic
+            .ctf_storage_max_sample_deltas
+            .iter()
+            .find(|storage| heat_balance_is_floor_key(&storage.key, &storage.construction_name))
+        {
+            return heat_balance_storage_blocking_mismatch(storage);
+        }
+    }
+
+    row.blocker_id.clone()
+}
+
+fn heat_balance_storage_blocking_mismatch(row: &HeatBalanceCtfStorageMaxSampleDelta) -> String {
+    match row.dominant_mismatch_source.as_str() {
+        "face-temperature-current-inside" => "floor-inside-current-source-timing".to_string(),
+        "face-temperature-current-outside" => "floor-outside-current-source-timing".to_string(),
+        "history-vector-inside-total" => "inside-ctf-history-handoff".to_string(),
+        "outside-current-total" => "outside-current-boundary-source-timing".to_string(),
+        "outside-history-total" => "outside-ctf-history-handoff".to_string(),
+        "output-aggregation-storage-balance" => "storage-output-aggregation".to_string(),
+        other => format!("storage-{other}"),
+    }
+}
+
+fn heat_balance_best_diagnostic_lane(diagnostic: &HeatBalanceConformanceDiagnostic) -> String {
+    if diagnostic.diagnostic_probe_used {
+        diagnostic.zone_air_algorithm.to_string()
+    } else if diagnostic.compatibility_source_order {
+        "energyplus-heat-balance-compat-candidate".to_string()
+    } else {
+        diagnostic.zone_air_algorithm_lane.to_string()
+    }
 }
 
 fn heat_balance_roof_exterior_output_blocker(
@@ -11367,11 +13707,13 @@ fn heat_balance_warmup_end_state_deltas_json(deltas: &HeatBalanceWarmupEndStateD
         concat!(
             "{{ \"mat_delta_c\": {}, ",
             "\"surface_temperature\": {}, ",
-            "\"ctf_history\": {} }}"
+            "\"ctf_history\": {}, ",
+            "\"zone_history\": {} }}"
         ),
         json_number(deltas.mat_delta_c),
         heat_balance_scalar_delta_row_json(deltas.surface_temperature.as_ref()),
-        heat_balance_scalar_delta_row_json(deltas.ctf_history.as_ref())
+        heat_balance_scalar_delta_row_json(deltas.ctf_history.as_ref()),
+        heat_balance_scalar_delta_row_json(deltas.zone_history.as_ref())
     )
 }
 
@@ -11450,9 +13792,24 @@ fn heat_balance_surface_first_sample_trace_json(
                 "\"inside_face_temperature_c\": {}, ",
                 "\"inside_convection_input_inside_face_temperature_c\": {}, ",
                 "\"inside_convection_input_reference_air_temperature_c\": {}, ",
+                "\"inside_convection_algorithm\": {}, ",
+                "\"inside_convection_tarp_branch\": {}, ",
+                "\"outside_convection_algorithm\": {}, ",
+                "\"outside_convection_branch\": {}, ",
                 "\"outside_face_temperature_c\": {}, ",
                 "\"inside_convection_heat_gain_rate_w\": {}, ",
                 "\"inside_net_surface_thermal_radiation_heat_gain_rate_w\": {}, ",
+                "\"inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2\": {}, ",
+                "\"inside_radiant_internal_gain_source_term_w\": {}, ",
+                "\"inside_radiant_internal_gain_source_term_w_per_m2\": {}, ",
+                "\"inside_shortwave_absorbed_source_term_w\": {}, ",
+                "\"inside_shortwave_absorbed_source_term_w_per_m2\": {}, ",
+                "\"inside_additional_heat_source_term_w\": {}, ",
+                "\"inside_additional_heat_source_term_w_per_m2\": {}, ",
+                "\"inside_radiant_hvac_source_term_w\": {}, ",
+                "\"inside_radiant_hvac_source_term_w_per_m2\": {}, ",
+                "\"inside_total_source_term_w\": {}, ",
+                "\"inside_total_source_term_w_per_m2\": {}, ",
                 "\"inside_conduction_rate_w\": {}, ",
                 "\"outside_conduction_rate_w\": {}, ",
                 "\"heat_storage_rate_w\": {}, ",
@@ -11468,9 +13825,24 @@ fn heat_balance_surface_first_sample_trace_json(
             json_number(row.inside_face_temperature_c),
             json_number(row.inside_convection_input_inside_face_temperature_c),
             json_number(row.inside_convection_input_reference_air_temperature_c),
+            json_string(row.inside_convection_algorithm),
+            json_string(row.inside_convection_tarp_branch),
+            json_string(row.outside_convection_algorithm),
+            json_string(row.outside_convection_branch),
             json_number(row.outside_face_temperature_c),
             json_number(row.inside_convection_heat_gain_rate_w),
             json_number(row.inside_net_surface_thermal_radiation_heat_gain_rate_w),
+            json_number(row.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2),
+            json_number(row.inside_radiant_internal_gain_source_term_w),
+            json_number(row.inside_radiant_internal_gain_source_term_w_per_m2),
+            json_number(row.inside_shortwave_absorbed_source_term_w),
+            json_number(row.inside_shortwave_absorbed_source_term_w_per_m2),
+            json_number(row.inside_additional_heat_source_term_w),
+            json_number(row.inside_additional_heat_source_term_w_per_m2),
+            json_number(row.inside_radiant_hvac_source_term_w),
+            json_number(row.inside_radiant_hvac_source_term_w_per_m2),
+            json_number(row.inside_total_source_term_w),
+            json_number(row.inside_total_source_term_w_per_m2),
             json_number(row.inside_conduction_rate_w),
             json_number(row.outside_conduction_rate_w),
             json_number(row.heat_storage_rate_w),
@@ -11502,6 +13874,62 @@ fn heat_balance_compatibility_stages_json(rows: &[EnergyPlusCompatibilityStage])
             json_string(row.stage_name),
             json_string(row.source_file),
             json_string(row.source_routine)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_branch_status_rows() -> [(&'static str, &'static str, &'static str); 6] {
+    [
+        (
+            "pool_heat_transfer",
+            "not-active-in-target-case",
+            "excluded-from-conformance",
+        ),
+        (
+            "radiant_system_surface_source",
+            "not-active-in-target-case",
+            "excluded-from-conformance",
+        ),
+        (
+            "hamt_heat_and_moisture_transfer",
+            "not-active-in-target-case",
+            "excluded-from-conformance",
+        ),
+        (
+            "condfd_finite_difference_conduction",
+            "not-active-in-target-case",
+            "excluded-from-conformance",
+        ),
+        (
+            "kiva_foundation_heat_transfer",
+            "not-active-in-target-case",
+            "excluded-from-conformance",
+        ),
+        (
+            "unsupported_active_heat_balance_branch",
+            "blocked-if-active",
+            "block-conformance-promotion",
+        ),
+    ]
+}
+
+fn heat_balance_branch_status_json() -> String {
+    let mut json = String::from("[");
+    for (index, (branch, status, policy)) in heat_balance_branch_status_rows()
+        .iter()
+        .copied()
+        .enumerate()
+    {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            "{{ \"branch\": {}, \"status\": {}, \"promotion_policy\": {} }}",
+            json_string(branch),
+            json_string(status),
+            json_string(policy)
         ));
     }
     json.push(']');
@@ -12075,6 +14503,12 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
                 "\"reference_air_source_signed_delta_w\": {}, ",
                 "\"reference_air_source_split_abs_sum_w\": {}, ",
                 "\"reference_air_source_cancellation_delta_w\": {}, ",
+                "\"oracle_surface_temperature_sink_w\": {}, ",
+                "\"rust_surface_temperature_sink_w\": {}, ",
+                "\"surface_temperature_sink_delta_w\": {}, ",
+                "\"oracle_surface_temperature_sink_w_per_m2\": {}, ",
+                "\"rust_surface_temperature_sink_w_per_m2\": {}, ",
+                "\"surface_temperature_sink_delta_w_per_m2\": {}, ",
                 "\"reference_air_coefficient_source_signed_delta_w\": {}, ",
                 "\"reference_air_coefficient_source_delta_w\": {}, ",
                 "\"reference_air_temperature_source_signed_delta_w\": {}, ",
@@ -12153,6 +14587,12 @@ fn heat_balance_inside_solve_max_sample_deltas_json(
             json_number(row.reference_air_source_signed_delta_w),
             json_number(row.reference_air_source_split_abs_sum_w),
             json_number(row.reference_air_source_cancellation_delta_w),
+            json_number(row.oracle_surface_temperature_sink_w),
+            json_number(row.rust_surface_temperature_sink_w),
+            json_number(row.surface_temperature_sink_delta_w),
+            json_number(row.oracle_surface_temperature_sink_w_per_m2),
+            json_number(row.rust_surface_temperature_sink_w_per_m2),
+            json_number(row.surface_temperature_sink_delta_w_per_m2),
             json_number(row.reference_air_coefficient_source_signed_delta_w),
             json_number(row.reference_air_coefficient_source_delta_w),
             json_number(row.reference_air_temperature_source_signed_delta_w),
@@ -12246,6 +14686,238 @@ fn heat_balance_inside_solve_series_deltas_json(
             delta_summary_json(&row.inside_net_longwave_delta),
             delta_summary_json(&row.tracked_solve_source_delta),
             delta_summary_json(&row.solve_source_residual_delta)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_inside_source_term_series_summaries_json(
+    rows: &[HeatBalanceInsideSourceTermSeriesSummary],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"term_name\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"samples\": {}, ",
+                "\"rate_variable\": {}, ",
+                "\"per_area_variable\": {}, ",
+                "\"max_abs_w\": {}, ",
+                "\"max_abs_w_per_m2\": {}, ",
+                "\"area_residual_max_abs_w\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.term_name),
+            json_number(row.area_m2),
+            row.samples,
+            json_string(&row.rate_variable),
+            json_string(&row.per_area_variable),
+            json_number(row.max_abs_w),
+            json_number(row.max_abs_w_per_m2),
+            json_number(row.area_residual_max_abs_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_floor_inside_current_diagnostics_json(
+    rows: &[HeatBalanceFloorInsideCurrentDiagnostic],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"key\": {}, ",
+                "\"construction_name\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"area_m2\": {}, ",
+                "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"inside_face_temperature_signed_delta_c\": {}, ",
+                "\"inside_face_temperature_delta_c\": {}, ",
+                "\"oracle_reference_air_temperature_c\": {}, ",
+                "\"rust_reference_air_temperature_c\": {}, ",
+                "\"reference_air_temperature_signed_delta_c\": {}, ",
+                "\"reference_air_temperature_delta_c\": {}, ",
+                "\"oracle_hconv_int_w_per_m2_k\": {}, ",
+                "\"rust_hconv_int_w_per_m2_k\": {}, ",
+                "\"hconv_int_signed_delta_w_per_m2_k\": {}, ",
+                "\"hconv_int_delta_w_per_m2_k\": {}, ",
+                "\"oracle_inside_current_inside_term_w\": {}, ",
+                "\"rust_inside_current_inside_term_w\": {}, ",
+                "\"inside_current_inside_term_signed_delta_w\": {}, ",
+                "\"inside_current_inside_term_delta_w\": {}, ",
+                "\"temperature_timing_expected_signed_delta_w\": {}, ",
+                "\"temperature_timing_expected_abs_delta_w\": {}, ",
+                "\"temperature_timing_coverage_ratio\": {}, ",
+                "\"coefficient_delta_w_per_m2_k\": {}, ",
+                "\"current_inside_mismatch_classification\": {}, ",
+                "\"next_source_order_focus\": {}, ",
+                "\"max_sample_source_terms\": {} }}"
+            ),
+            json_string(&row.key),
+            json_string(&row.construction_name),
+            row.sample_index,
+            json_number(row.area_m2),
+            json_number(row.ctf_inside_0_w_per_m2_k),
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.inside_face_temperature_signed_delta_c),
+            json_number(row.inside_face_temperature_delta_c),
+            json_number(row.oracle_reference_air_temperature_c),
+            json_number(row.rust_reference_air_temperature_c),
+            json_number(row.reference_air_temperature_signed_delta_c),
+            json_number(row.reference_air_temperature_delta_c),
+            json_number(row.oracle_hconv_int_w_per_m2_k),
+            json_number(row.rust_hconv_int_w_per_m2_k),
+            json_number(row.hconv_int_signed_delta_w_per_m2_k),
+            json_number(row.hconv_int_delta_w_per_m2_k),
+            json_number(row.oracle_inside_current_inside_term_w),
+            json_number(row.rust_inside_current_inside_term_w),
+            json_number(row.inside_current_inside_term_signed_delta_w),
+            json_number(row.inside_current_inside_term_delta_w),
+            json_number(row.temperature_timing_expected_signed_delta_w),
+            json_number(row.temperature_timing_expected_abs_delta_w),
+            json_number(row.temperature_timing_coverage_ratio),
+            json_number(row.coefficient_delta_w_per_m2_k),
+            json_string(&row.current_inside_mismatch_classification),
+            json_string(&row.next_source_order_focus),
+            heat_balance_inside_source_term_sample_deltas_json(&row.max_sample_source_terms)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_inside_source_term_sample_deltas_json(
+    rows: &[HeatBalanceInsideSourceTermSampleDelta],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"term_name\": {}, ",
+                "\"rate_variable\": {}, ",
+                "\"sample_index\": {}, ",
+                "\"oracle_w\": {}, ",
+                "\"rust_w\": {}, ",
+                "\"signed_delta_w\": {}, ",
+                "\"abs_delta_w\": {} }}"
+            ),
+            json_string(&row.term_name),
+            json_string(&row.rate_variable),
+            row.sample_index,
+            json_number(row.oracle_w),
+            json_number(row.rust_w),
+            json_number(row.signed_delta_w),
+            json_number(row.abs_delta_w)
+        ));
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_floor_inside_current_term_series_json(
+    rows: &[HeatBalanceFloorInsideCurrentTermSeries],
+    include_sample_rows: bool,
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        if include_sample_rows {
+            let sample_rows = row.sample_rows.iter().collect::<Vec<_>>();
+            json.push_str(&format!(
+                concat!(
+                    "{{ \"key\": {}, ",
+                    "\"construction_name\": {}, ",
+                    "\"area_m2\": {}, ",
+                    "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                    "\"samples\": {}, ",
+                    "\"max_sample_index\": {}, ",
+                    "\"max_abs_delta_w\": {}, ",
+                    "\"max_signed_delta_w\": {}, ",
+                    "\"sample_rows_scope\": \"all-timesteps\", ",
+                    "\"sample_rows\": {} }}"
+                ),
+                json_string(&row.key),
+                json_string(&row.construction_name),
+                json_number(row.area_m2),
+                json_number(row.ctf_inside_0_w_per_m2_k),
+                row.samples,
+                row.max_sample_index,
+                json_number(row.max_abs_delta_w),
+                json_number(row.max_signed_delta_w),
+                heat_balance_floor_inside_current_term_sample_refs_json(&sample_rows)
+            ));
+        } else {
+            json.push_str(&format!(
+                concat!(
+                    "{{ \"key\": {}, ",
+                    "\"construction_name\": {}, ",
+                    "\"area_m2\": {}, ",
+                    "\"ctf_inside_0_w_per_m2_k\": {}, ",
+                    "\"samples\": {}, ",
+                    "\"max_sample_index\": {}, ",
+                    "\"max_abs_delta_w\": {}, ",
+                    "\"max_signed_delta_w\": {}, ",
+                    "\"sample_rows_scope\": \"omitted-in-digest\" }}"
+                ),
+                json_string(&row.key),
+                json_string(&row.construction_name),
+                json_number(row.area_m2),
+                json_number(row.ctf_inside_0_w_per_m2_k),
+                row.samples,
+                row.max_sample_index,
+                json_number(row.max_abs_delta_w),
+                json_number(row.max_signed_delta_w)
+            ));
+        }
+    }
+    json.push(']');
+    json
+}
+
+fn heat_balance_floor_inside_current_term_sample_refs_json(
+    rows: &[&HeatBalanceFloorInsideCurrentTermSample],
+) -> String {
+    let mut json = String::from("[");
+    for (index, row) in rows.iter().enumerate() {
+        if index > 0 {
+            json.push_str(", ");
+        }
+        json.push_str(&format!(
+            concat!(
+                "{{ \"sample_index\": {}, ",
+                "\"oracle_inside_face_temperature_c\": {}, ",
+                "\"rust_inside_face_temperature_c\": {}, ",
+                "\"oracle_inside_current_inside_term_w\": {}, ",
+                "\"rust_inside_current_inside_term_w\": {}, ",
+                "\"signed_delta_w\": {}, ",
+                "\"abs_delta_w\": {} }}"
+            ),
+            row.sample_index,
+            json_number(row.oracle_inside_face_temperature_c),
+            json_number(row.rust_inside_face_temperature_c),
+            json_number(row.oracle_inside_current_inside_term_w),
+            json_number(row.rust_inside_current_inside_term_w),
+            json_number(row.signed_delta_w),
+            json_number(row.abs_delta_w)
         ));
     }
     json.push(']');
@@ -12507,6 +15179,56 @@ fn heat_balance_series_json_with_sample_rows(
         ));
         json.push_str(&format!("      \"status\": {},\n", json_string(row.status)));
         json.push_str(&format!("      \"samples\": {},\n", row.samples));
+        json.push_str(&format!("      \"oracle_count\": {},\n", row.oracle_count));
+        json.push_str(&format!("      \"rust_count\": {},\n", row.rust_count));
+        json.push_str(&format!(
+            "      \"oracle_units\": {},\n",
+            row.oracle_units
+                .as_ref()
+                .map_or_else(|| "null".to_string(), |units| json_string(units))
+        ));
+        json.push_str(&format!(
+            "      \"oracle_frequency\": {},\n",
+            row.oracle_frequency
+                .as_ref()
+                .map_or_else(|| "null".to_string(), |frequency| json_string(frequency))
+        ));
+        json.push_str(&format!(
+            "      \"energyplus_store_type\": {},\n",
+            json_string(row.energyplus_store_type)
+        ));
+        json.push_str(&format!(
+            "      \"rust_store_type\": {},\n",
+            json_string(row.rust_store_type)
+        ));
+        json.push_str(&format!(
+            "      \"store_type_match\": {},\n",
+            row.store_type_match
+        ));
+        json.push_str(&format!(
+            "      \"timestamp_match\": {},\n",
+            row.timestamp_match
+        ));
+        json.push_str(&format!(
+            "      \"first_reported_sample_hour_ending\": {},\n",
+            row.first_reported_sample_hour_ending
+        ));
+        json.push_str(&format!(
+            "      \"oracle_first_timestamp\": {},\n",
+            json_optional_string(row.oracle_first_timestamp.as_deref())
+        ));
+        json.push_str(&format!(
+            "      \"rust_first_timestamp\": {},\n",
+            json_optional_string(row.rust_first_timestamp.as_deref())
+        ));
+        json.push_str(&format!(
+            "      \"oracle_last_timestamp\": {},\n",
+            json_optional_string(row.oracle_last_timestamp.as_deref())
+        ));
+        json.push_str(&format!(
+            "      \"rust_last_timestamp\": {},\n",
+            json_optional_string(row.rust_last_timestamp.as_deref())
+        ));
         json.push_str(&format!(
             "      \"length_match\": {},\n",
             row.delta.length_match
@@ -12642,6 +15364,370 @@ fn heat_balance_report_current_blocker_row(
     ));
 }
 
+fn heat_balance_report_top_rmse_variable_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| rank | key | variable | category | family | class | first_hour_abs_delta_c | annual_rmse_delta_c | max_abs_delta_c | status |\n",
+    );
+    report.push_str("|---:|---|---|---|---|---|---:|---:|---:|---|\n");
+    for (index, row) in heat_balance_top_rmse_rows(series, HEAT_BALANCE_TOP_RMSE_LIMIT)
+        .iter()
+        .enumerate()
+    {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {} | {} | {:.12} | {:.12} | {} |\n",
+            index + 1,
+            markdown_cell(&row.output.key),
+            markdown_cell(&row.output.variable),
+            heat_balance_series_category(row),
+            heat_balance_series_family(row),
+            markdown_cell(row.output.class),
+            heat_balance_optional_f64_label(heat_balance_first_hour_abs_delta(row)),
+            row.delta.rmse_delta_c,
+            row.delta.max_abs_delta_c,
+            row.status
+        ));
+    }
+}
+
+fn heat_balance_report_blocking_diagnostic_split_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| metric | key | variable | category | first_hour_abs_delta_c | annual_rmse_delta_c | max_abs_delta_c | status |\n",
+    );
+    report.push_str("|---|---|---|---|---:|---:|---:|---|\n");
+    heat_balance_report_diagnostic_split_row(
+        report,
+        "mat-rmse",
+        heat_balance_top_matching_rmse_row(series, |row| {
+            row.output.key == "ZONE ONE" && row.output.variable == "Zone Mean Air Temperature"
+        }),
+    );
+    heat_balance_report_diagnostic_split_row(
+        report,
+        "surface-conduction-rmse",
+        heat_balance_top_matching_rmse_row(series, |row| {
+            row.output
+                .variable
+                .contains("Conduction Heat Transfer Rate")
+        }),
+    );
+    heat_balance_report_diagnostic_split_row(
+        report,
+        "zone-air-storage-rmse",
+        heat_balance_top_matching_rmse_row(series, |row| {
+            row.output.variable == "Zone Air Heat Balance Air Energy Storage Rate"
+        }),
+    );
+    heat_balance_report_diagnostic_split_row(
+        report,
+        "zone-surface-convection-rmse",
+        heat_balance_top_matching_rmse_row(series, |row| {
+            row.output.variable == "Zone Air Heat Balance Surface Convection Rate"
+        }),
+    );
+}
+
+fn heat_balance_report_diagnostic_split_row(
+    report: &mut String,
+    metric: &str,
+    row: Option<&HeatBalanceSeriesDiagnostic>,
+) {
+    if let Some(row) = row {
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {:.12} | {:.12} | {} |\n",
+            markdown_cell(metric),
+            markdown_cell(&row.output.key),
+            markdown_cell(&row.output.variable),
+            heat_balance_series_category(row),
+            heat_balance_optional_f64_label(heat_balance_first_hour_abs_delta(row)),
+            row.delta.rmse_delta_c,
+            row.delta.max_abs_delta_c,
+            row.status
+        ));
+    } else {
+        report.push_str(&format!(
+            "| {} | none | none | unavailable | n/a | 0.000000000000 | 0.000000000000 | unavailable |\n",
+            markdown_cell(metric)
+        ));
+    }
+}
+
+fn heat_balance_top_rmse_rows(
+    series: &[HeatBalanceSeriesDiagnostic],
+    limit: usize,
+) -> Vec<&HeatBalanceSeriesDiagnostic> {
+    let mut rows = series.iter().collect::<Vec<_>>();
+    rows.sort_by(|left, right| {
+        right
+            .delta
+            .rmse_delta_c
+            .total_cmp(&left.delta.rmse_delta_c)
+            .then_with(|| {
+                right
+                    .delta
+                    .max_abs_delta_c
+                    .total_cmp(&left.delta.max_abs_delta_c)
+            })
+            .then_with(|| left.output.key.cmp(&right.output.key))
+            .then_with(|| left.output.variable.cmp(&right.output.variable))
+    });
+    rows.truncate(limit);
+    rows
+}
+
+fn heat_balance_top_matching_rmse_row<'a, F>(
+    series: &'a [HeatBalanceSeriesDiagnostic],
+    predicate: F,
+) -> Option<&'a HeatBalanceSeriesDiagnostic>
+where
+    F: Fn(&HeatBalanceSeriesDiagnostic) -> bool,
+{
+    series
+        .iter()
+        .filter(|row| predicate(row))
+        .max_by(|left, right| {
+            left.delta
+                .rmse_delta_c
+                .total_cmp(&right.delta.rmse_delta_c)
+                .then_with(|| {
+                    left.delta
+                        .max_abs_delta_c
+                        .total_cmp(&right.delta.max_abs_delta_c)
+                })
+        })
+}
+
+fn heat_balance_first_hour_abs_delta(row: &HeatBalanceSeriesDiagnostic) -> Option<f64> {
+    row.sample_rows
+        .iter()
+        .find(|point| point.index == 0)
+        .or_else(|| row.sample_rows.first())
+        .map(|point| point.abs_delta_c)
+        .or_else(|| row.delta.first_delta_sample.map(|point| point.abs_delta_c))
+}
+
+fn heat_balance_optional_f64_label(value: Option<f64>) -> String {
+    value.map_or_else(|| "n/a".to_string(), |value| format!("{value:.12}"))
+}
+
+fn heat_balance_series_category(row: &HeatBalanceSeriesDiagnostic) -> &'static str {
+    let variable = row.output.variable.to_ascii_lowercase();
+    let class = row.output.class.to_ascii_lowercase();
+    if variable.contains("radiation")
+        || variable.contains("solar")
+        || variable.contains("infrared")
+        || variable.contains("sky")
+        || variable.contains("longwave")
+    {
+        "radiation"
+    } else if variable.starts_with("zone air ") {
+        "zone"
+    } else if variable.contains("conduction") || variable.contains("storage") {
+        "ctf"
+    } else if class.starts_with("zone") || variable.starts_with("zone ") {
+        "zone"
+    } else if class.starts_with("surface")
+        || heat_balance_surface_family_matches(&row.output.key, "floor")
+        || heat_balance_surface_family_matches(&row.output.key, "roof")
+        || heat_balance_surface_family_matches(&row.output.key, "wall")
+    {
+        "surface"
+    } else if class == "weather" {
+        "weather"
+    } else {
+        "other"
+    }
+}
+
+fn heat_balance_series_family(row: &HeatBalanceSeriesDiagnostic) -> &'static str {
+    if heat_balance_surface_family_matches(&row.output.key, "floor") {
+        "floor"
+    } else if heat_balance_surface_family_matches(&row.output.key, "roof") {
+        "roof"
+    } else if heat_balance_surface_family_matches(&row.output.key, "wall") {
+        "wall"
+    } else if row.output.class.starts_with("zone") || row.output.key.contains("ZONE") {
+        "zone"
+    } else if row.output.key == "Environment" {
+        "environment"
+    } else {
+        "other"
+    }
+}
+
+fn heat_balance_report_surface_family_rmse_rows(
+    report: &mut String,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| family | key | variable | class | samples | rmse_delta_c | max_abs_delta_c | status |\n",
+    );
+    report.push_str("|---|---|---|---|---:|---:|---:|---|\n");
+    for family in ["floor", "roof", "wall"] {
+        if let Some(row) = heat_balance_surface_family_top_rmse_row(series, family) {
+            report.push_str(&format!(
+                "| {} | {} | {} | {} | {} | {:.12} | {:.12} | {} |\n",
+                family,
+                markdown_cell(&row.output.key),
+                markdown_cell(&row.output.variable),
+                row.output.class,
+                row.samples,
+                row.delta.rmse_delta_c,
+                row.delta.max_abs_delta_c,
+                row.status
+            ));
+        } else {
+            report.push_str(&format!(
+                "| {} | none | none | none | 0 | 0.000000000000 | 0.000000000000 | unavailable |\n",
+                family
+            ));
+        }
+    }
+}
+
+fn heat_balance_report_source_order_trace_rows(
+    report: &mut String,
+    stages: &[EnergyPlusCompatibilityStage],
+) {
+    report.push_str(
+        "source_order_wrapper: ep_runtime::heat_balance::manager::manage_heat_balance_source_order_path\n",
+    );
+    report.push_str("energyplus_source_order: HeatBalanceManager -> HeatBalanceSurfaceManager -> HeatBalanceAirManager -> ZoneTempPredictorCorrector -> HeatBalanceManager reports\n");
+    report.push_str("rust_execution_plan_order: ExecutionPlan.compatibility_stages\n");
+    report.push_str("stage_snapshot_policy: start/end surface+MAT snapshot anchors are reported as trace artifact links; detailed values stay in compare-summary.json, compare-digest.json, and rust-zone-air-diagnostics.json\n\n");
+    report.push_str(
+        "| trace | energyplus_source_routine | rust_execution_stage | source_file | start_snapshot | end_snapshot |\n",
+    );
+    report.push_str("|---|---|---|---|---|---|\n");
+    heat_balance_report_source_order_trace_row(
+        report,
+        "ManageHeatBalance",
+        "ManageHeatBalance",
+        None,
+        "surface+MAT before ManageHeatBalance wrapper",
+        "surface+MAT after ManageHeatBalance wrapper",
+    );
+    for (trace, routine, start_snapshot, end_snapshot) in [
+        (
+            "InitHeatBalance",
+            "InitHeatBalance",
+            "surface+MAT before InitHeatBalance",
+            "surface+MAT after InitHeatBalance",
+        ),
+        (
+            "CalcHeatBalanceOutsideSurf",
+            "CalcHeatBalanceOutsideSurf",
+            "surface+MAT before outside surface balance",
+            "surface+MAT after outside surface balance",
+        ),
+        (
+            "CalcHeatBalanceInsideSurf",
+            "CalcHeatBalanceInsideSurf",
+            "surface+MAT before inside surface balance",
+            "surface+MAT after inside surface balance",
+        ),
+        (
+            "ManageAirHeatBalance",
+            "ManageAirHeatBalance",
+            "surface+MAT before zone air solve",
+            "surface+MAT after zone air solve",
+        ),
+        (
+            "UpdateThermalHistories",
+            "UpdateThermalHistories",
+            "surface+MAT before thermal history update",
+            "surface+MAT after thermal history update",
+        ),
+        (
+            "ReportSurfaceHeatBalance",
+            "ReportSurfaceHeatBalance",
+            "surface+MAT before surface output sampling",
+            "surface+MAT after surface output sampling",
+        ),
+    ] {
+        heat_balance_report_source_order_trace_row(
+            report,
+            trace,
+            routine,
+            heat_balance_stage_for_routine(stages, routine),
+            start_snapshot,
+            end_snapshot,
+        );
+    }
+    heat_balance_report_source_order_trace_row(
+        report,
+        "ReportZoneMeanAirTemp",
+        "ReportHeatBalance -> ReportZoneMeanAirTemp",
+        heat_balance_stage_for_routine(stages, "ReportHeatBalance"),
+        "surface+MAT before zone MAT output sampling",
+        "surface+MAT after zone MAT output sampling",
+    );
+}
+
+fn heat_balance_report_source_order_trace_row(
+    report: &mut String,
+    trace: &str,
+    source_routine: &str,
+    stage: Option<&EnergyPlusCompatibilityStage>,
+    start_snapshot: &str,
+    end_snapshot: &str,
+) {
+    let rust_stage = stage.map_or("manage-heat-balance-wrapper", |stage| stage.stage_name);
+    let source_file = stage.map_or("src/EnergyPlus/HeatBalanceManager.cc", |stage| {
+        stage.source_file
+    });
+    report.push_str(&format!(
+        "| {} | {} | {} | {} | {} | {} |\n",
+        markdown_cell(trace),
+        markdown_cell(source_routine),
+        markdown_cell(rust_stage),
+        markdown_cell(source_file),
+        markdown_cell(start_snapshot),
+        markdown_cell(end_snapshot)
+    ));
+}
+
+fn heat_balance_stage_for_routine<'a>(
+    stages: &'a [EnergyPlusCompatibilityStage],
+    routine: &str,
+) -> Option<&'a EnergyPlusCompatibilityStage> {
+    stages.iter().find(|stage| stage.source_routine == routine)
+}
+
+fn heat_balance_surface_family_top_rmse_row<'a>(
+    series: &'a [HeatBalanceSeriesDiagnostic],
+    family: &str,
+) -> Option<&'a HeatBalanceSeriesDiagnostic> {
+    series
+        .iter()
+        .filter(|row| heat_balance_surface_family_matches(&row.output.key, family))
+        .max_by(|left, right| {
+            left.delta
+                .rmse_delta_c
+                .total_cmp(&right.delta.rmse_delta_c)
+                .then_with(|| {
+                    left.delta
+                        .max_abs_delta_c
+                        .total_cmp(&right.delta.max_abs_delta_c)
+                })
+        })
+}
+
+fn heat_balance_surface_family_matches(key: &str, family: &str) -> bool {
+    let key = key.to_ascii_uppercase();
+    match family {
+        "floor" => key.contains("FLR") || key.contains("FLOOR"),
+        "roof" => key.contains("ROOF"),
+        "wall" => key.contains("WALL"),
+        _ => false,
+    }
+}
+
 fn heat_balance_report_warmup_end_state_delta_rows(
     report: &mut String,
     deltas: &HeatBalanceWarmupEndStateDeltas,
@@ -12661,6 +15747,11 @@ fn heat_balance_report_warmup_end_state_delta_rows(
         report,
         "warmup-end-state-ctf-history-delta",
         deltas.ctf_history.as_ref(),
+    );
+    heat_balance_report_scalar_delta_row(
+        report,
+        "warmup-end-state-zone-history-delta",
+        deltas.zone_history.as_ref(),
     );
 }
 
@@ -12788,14 +15879,14 @@ fn heat_balance_report_surface_first_sample_trace_rows(
     rows: &[HeatBalanceSurfaceFirstSampleTrace],
 ) {
     report.push_str(
-        "| key | construction | timestep | outdoor_db_c | zone_mat_c | inside_temp_c | hconv_input_inside_temp_c | hconv_input_ref_air_c | outside_temp_c | inside_conv_w | inside_lw_w | inside_cond_w | outside_cond_w | storage_w | outside_conv_w | outside_lw_w | outside_solar_w |\n",
+        "| key | construction | timestep | outdoor_db_c | zone_mat_c | inside_temp_c | hconv_input_inside_temp_c | hconv_input_ref_air_c | inside_hconv_algorithm | inside_hconv_branch | outside_hconv_algorithm | outside_hconv_branch | outside_temp_c | inside_conv_w | inside_lw_w | inside_lw_w_per_m2 | rad_int_w | rad_int_w_per_m2 | shortwave_w | shortwave_w_per_m2 | add_src_w | add_src_w_per_m2 | radiant_hvac_w | radiant_hvac_w_per_m2 | total_src_w | total_src_w_per_m2 | inside_cond_w | outside_cond_w | storage_w | outside_conv_w | outside_lw_w | outside_solar_w |\n",
     );
     report.push_str(
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
+        "|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n",
     );
     for row in rows {
         report.push_str(&format!(
-            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.surface_name),
             markdown_cell(&row.construction_name),
             row.timestep_index,
@@ -12804,9 +15895,24 @@ fn heat_balance_report_surface_first_sample_trace_rows(
             row.inside_face_temperature_c,
             row.inside_convection_input_inside_face_temperature_c,
             row.inside_convection_input_reference_air_temperature_c,
+            markdown_cell(row.inside_convection_algorithm),
+            markdown_cell(row.inside_convection_tarp_branch),
+            markdown_cell(row.outside_convection_algorithm),
+            markdown_cell(row.outside_convection_branch),
             row.outside_face_temperature_c,
             row.inside_convection_heat_gain_rate_w,
             row.inside_net_surface_thermal_radiation_heat_gain_rate_w,
+            row.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2,
+            row.inside_radiant_internal_gain_source_term_w,
+            row.inside_radiant_internal_gain_source_term_w_per_m2,
+            row.inside_shortwave_absorbed_source_term_w,
+            row.inside_shortwave_absorbed_source_term_w_per_m2,
+            row.inside_additional_heat_source_term_w,
+            row.inside_additional_heat_source_term_w_per_m2,
+            row.inside_radiant_hvac_source_term_w,
+            row.inside_radiant_hvac_source_term_w_per_m2,
+            row.inside_total_source_term_w,
+            row.inside_total_source_term_w_per_m2,
             row.inside_conduction_rate_w,
             row.outside_conduction_rate_w,
             row.heat_storage_rate_w,
@@ -12822,13 +15928,13 @@ fn heat_balance_report_zone_air_first_sample_trace_rows(
     rows: &[HeatBalanceZoneAirFirstSampleTrace],
 ) {
     report.push_str(
-        "| key | timestep | outdoor_db_c | mat_c | timestep_avg_mat_c | prev1_c | prev2_c | prev3_c | air_cap_w_per_k | temp_dep_w_per_k | temp_ind_w | history_w | denominator_w_per_k | solution_c |\n",
+        "| key | timestep | outdoor_db_c | mat_c | timestep_avg_mat_c | prev1_c | prev2_c | prev3_c | use_zone_timestep_history | shorten_timestep_sys | prior_timestep_seconds | barometric_pressure_pa | humidity_ratio | rho_air_kg_per_m3 | cp_air_j_per_kg_k | sum_mcp_w_per_k | sum_mcp_t_w | sum_sys_mcp_w_per_k | sum_sys_mcp_t_w | air_cap_w_per_k | temp_dep_w_per_k | temp_ind_w | history_w | denominator_w_per_k | solution_c |\n",
     );
-    report.push_str("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
+    report.push_str("|---|---:|---:|---:|---:|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n");
     for row in rows {
         let coefficients = row.zone_air_temperature_coefficients;
         report.push_str(&format!(
-            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
+            "| {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} |\n",
             markdown_cell(&row.zone_name),
             row.timestep_index,
             row.outdoor_dry_bulb_c,
@@ -12837,6 +15943,17 @@ fn heat_balance_report_zone_air_first_sample_trace_rows(
             row.previous_mean_air_temperatures_c[0],
             row.previous_mean_air_temperatures_c[1],
             row.previous_mean_air_temperatures_c[2],
+            row.use_zone_timestep_history,
+            row.shorten_timestep_sys,
+            row.prior_timestep_seconds,
+            row.barometric_pressure_pa,
+            row.air_humidity_ratio,
+            row.rho_air_kg_per_m3,
+            row.cp_air_j_per_kg_k,
+            row.sum_mcp_w_per_k,
+            row.sum_mcp_t_w,
+            row.sum_sys_mcp_w_per_k,
+            row.sum_sys_mcp_t_w,
             row.zone_timestep_air_power_cap_w_per_k,
             coefficients.temp_dependent_coefficient_w_per_k,
             coefficients.temp_independent_coefficient_w,
@@ -12927,6 +16044,19 @@ fn heat_balance_report_compatibility_stage_rows(
             row.stage_name,
             row.source_file,
             row.source_routine
+        ));
+    }
+}
+
+fn heat_balance_report_branch_status_rows(report: &mut String) {
+    report.push_str("| branch | status | promotion policy |\n");
+    report.push_str("|---|---|---|\n");
+    for (branch, status, policy) in heat_balance_branch_status_rows() {
+        report.push_str(&format!(
+            "| {} | {} | {} |\n",
+            markdown_cell(branch),
+            markdown_cell(status),
+            markdown_cell(policy)
         ));
     }
 }
@@ -13494,6 +16624,10 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
         "ref_air_signed_w",
         "ref_air_abs_sum_w",
         "ref_air_cancel_w",
+        "surface_temp_sink_delta_w",
+        "surface_temp_sink_delta_w_per_m2",
+        "oracle_surface_temp_sink_w",
+        "rust_surface_temp_sink_w",
         "ref_air_hconv_signed_w",
         "ref_air_hconv_delta_w",
         "ref_air_temp_signed_w",
@@ -13554,6 +16688,10 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
             format!("{:.12}", row.reference_air_source_signed_delta_w),
             format!("{:.12}", row.reference_air_source_split_abs_sum_w),
             format!("{:.12}", row.reference_air_source_cancellation_delta_w),
+            format!("{:.12}", row.surface_temperature_sink_delta_w),
+            format!("{:.12}", row.surface_temperature_sink_delta_w_per_m2),
+            format!("{:.12}", row.oracle_surface_temperature_sink_w),
+            format!("{:.12}", row.rust_surface_temperature_sink_w),
             format!(
                 "{:.12}",
                 row.reference_air_coefficient_source_signed_delta_w
@@ -13592,6 +16730,96 @@ fn heat_balance_report_inside_solve_max_sample_delta_rows(
             format!("{:.12}", row.rust_inferred_reference_air_temperature_c),
         ];
         report.push_str(&format!("| {} |\n", values.join(" | ")));
+    }
+}
+
+fn heat_balance_report_inside_source_term_series_summary_rows(
+    report: &mut String,
+    rows: &[HeatBalanceInsideSourceTermSeriesSummary],
+) {
+    report.push_str(
+        "| key | term | samples | area_m2 | max_abs_w | max_abs_w_per_m2 | area_residual_max_abs_w | rate_variable | per_area_variable |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---|---|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {} | {} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.term_name),
+            row.samples,
+            row.area_m2,
+            row.max_abs_w,
+            row.max_abs_w_per_m2,
+            row.area_residual_max_abs_w,
+            markdown_cell(&row.rate_variable),
+            markdown_cell(&row.per_area_variable)
+        ));
+    }
+}
+
+fn heat_balance_report_floor_inside_current_diagnostic_rows(
+    report: &mut String,
+    rows: &[HeatBalanceFloorInsideCurrentDiagnostic],
+) {
+    report.push_str(
+        "| key | construction | sample_index | classification | next_source_order_focus | ctf_inside_0_w_per_m2_k | tin_oracle_c | tin_rust_c | tin_delta_c | tref_delta_c | hconv_delta_w_per_m2_k | oracle_current_inside_w | rust_current_inside_w | current_inside_delta_w | temp_timing_coverage_ratio | source_terms |\n",
+    );
+    report
+        .push_str("|---|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|\n");
+    for row in rows {
+        let source_terms = row
+            .max_sample_source_terms
+            .iter()
+            .map(|term| {
+                format!(
+                    "{}={:.6}/{:.6}/d{:.6}",
+                    term.term_name, term.oracle_w, term.rust_w, term.signed_delta_w
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("; ");
+        report.push_str(&format!(
+            "| {} | {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {:.12} | {} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            row.sample_index,
+            markdown_cell(&row.current_inside_mismatch_classification),
+            markdown_cell(&row.next_source_order_focus),
+            row.ctf_inside_0_w_per_m2_k,
+            row.oracle_inside_face_temperature_c,
+            row.rust_inside_face_temperature_c,
+            row.inside_face_temperature_delta_c,
+            row.reference_air_temperature_delta_c,
+            row.hconv_int_delta_w_per_m2_k,
+            row.oracle_inside_current_inside_term_w,
+            row.rust_inside_current_inside_term_w,
+            row.inside_current_inside_term_delta_w,
+            row.temperature_timing_coverage_ratio,
+            markdown_cell(&source_terms)
+        ));
+    }
+}
+
+fn heat_balance_report_floor_inside_current_term_series_rows(
+    report: &mut String,
+    rows: &[HeatBalanceFloorInsideCurrentTermSeries],
+) {
+    report.push_str(
+        "| key | construction | samples | area_m2 | ctf_inside_0_w_per_m2_k | max_sample_index | max_abs_delta_w | max_signed_delta_w |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---:|---:|\n");
+    for row in rows {
+        report.push_str(&format!(
+            "| {} | {} | {} | {:.12} | {:.12} | {} | {:.12} | {:.12} |\n",
+            markdown_cell(&row.key),
+            markdown_cell(&row.construction_name),
+            row.samples,
+            row.area_m2,
+            row.ctf_inside_0_w_per_m2_k,
+            row.max_sample_index,
+            row.max_abs_delta_w,
+            row.max_signed_delta_w
+        ));
     }
 }
 
@@ -13737,18 +16965,29 @@ fn heat_balance_report_ctf_history_hourly_slot_rows(
     }
 }
 
-fn heat_balance_report_series_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
+fn heat_balance_report_series_rows(
+    report: &mut String,
+    context: &HeatBalanceConformanceContext,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
     report.push_str(
-        "| key | variable | class | samples | max_abs_delta_c | mean_abs_delta_c | rmse_delta_c | status |\n",
+        "| key | variable | class | sample_count | oracle_count | rust_count | store_type | timestamp_match | tolerance | max_abs_delta_c | mean_abs_delta_c | rmse_delta_c | status |\n",
     );
-    report.push_str("|---|---|---|---:|---:|---:|---:|---|\n");
+    report.push_str("|---|---|---|---:|---:|---:|---|---|---|---:|---:|---:|---|\n");
     for row in series {
+        let tolerance = heat_balance_report_tolerance_label(context, row);
         report.push_str(&format!(
-            "| {} | {} | {} | {} | {:.12} | {:.12} | {:.12} | {} |\n",
+            "| {} | {} | {} | {} | {} | {} | {}/{} | {} | {} | {:.12} | {:.12} | {:.12} | {} |\n",
             markdown_cell(&row.output.key),
             markdown_cell(&row.output.variable),
             row.output.class,
             row.samples,
+            row.oracle_count,
+            row.rust_count,
+            row.energyplus_store_type,
+            row.rust_store_type,
+            row.timestamp_match,
+            markdown_cell(&tolerance),
             row.delta.max_abs_delta_c,
             row.delta.mean_abs_delta_c,
             row.delta.rmse_delta_c,
@@ -13757,49 +16996,80 @@ fn heat_balance_report_series_rows(report: &mut String, series: &[HeatBalanceSer
     }
 }
 
-fn heat_balance_report_delta_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
-    report.push_str("| output | sample | index | oracle_c | rust_c | abs_delta_c |\n");
-    report.push_str("|---|---|---:|---:|---:|---:|\n");
+fn heat_balance_report_delta_rows(
+    report: &mut String,
+    context: &HeatBalanceConformanceContext,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report.push_str(
+        "| output | sample | index | oracle_value | rust_value | delta | tolerance | status |\n",
+    );
+    report.push_str("|---|---|---:|---:|---:|---:|---|---|\n");
     for row in series {
         let output = format!("{}/{}", row.output.key, row.output.variable);
+        let tolerance = heat_balance_report_tolerance_label(context, row);
         report_named_delta_row(
             report,
             &output,
             "first_delta_sample",
             row.delta.first_delta_sample,
+            &tolerance,
+            row.status,
         );
         report_named_delta_row(
             report,
             &output,
             "max_delta_sample",
             row.delta.max_delta_sample,
+            &tolerance,
+            row.status,
         );
     }
 }
 
-fn heat_balance_report_sample_rows(report: &mut String, series: &[HeatBalanceSeriesDiagnostic]) {
-    report.push_str("| output | index | oracle | rust | abs_delta |\n");
-    report.push_str("|---|---:|---:|---:|---:|\n");
+fn heat_balance_report_sample_rows(
+    report: &mut String,
+    context: &HeatBalanceConformanceContext,
+    series: &[HeatBalanceSeriesDiagnostic],
+) {
+    report
+        .push_str("| output | index | oracle_value | rust_value | delta | tolerance | status |\n");
+    report.push_str("|---|---:|---:|---:|---:|---|---|\n");
     for row in series {
         let output = format!("{}/{}", row.output.key, row.output.variable);
+        let tolerance = heat_balance_report_tolerance_label(context, row);
         if row.sample_rows.is_empty() {
             report.push_str(&format!(
-                "| {} | n/a | n/a | n/a | n/a |\n",
-                markdown_cell(&output)
+                "| {} | n/a | n/a | n/a | n/a | {} | {} |\n",
+                markdown_cell(&output),
+                markdown_cell(&tolerance),
+                row.status
             ));
             continue;
         }
         for point in &row.sample_rows {
             report.push_str(&format!(
-                "| {} | {} | {:.12} | {:.12} | {:.12} |\n",
+                "| {} | {} | {:.12} | {:.12} | {:.12} | {} | {} |\n",
                 markdown_cell(&output),
                 point.index,
                 point.oracle_c,
                 point.rust_c,
-                point.abs_delta_c
+                point.abs_delta_c,
+                markdown_cell(&tolerance),
+                row.status
             ));
         }
     }
+}
+
+fn heat_balance_report_tolerance_label(
+    context: &HeatBalanceConformanceContext,
+    row: &HeatBalanceSeriesDiagnostic,
+) -> String {
+    context
+        .tolerance_for_class(row.output.class)
+        .map(HeatBalanceToleranceReport::label)
+        .unwrap_or_else(|| format!("{} missing", row.output.class))
 }
 
 fn report_named_delta_row(
@@ -13807,19 +17077,25 @@ fn report_named_delta_row(
     output: &str,
     label: &str,
     point: Option<DeltaPoint>,
+    tolerance: &str,
+    status: &str,
 ) {
     match point {
         Some(point) => report.push_str(&format!(
-            "| {} | {label} | {} | {:.6} | {:.6} | {:.6} |\n",
+            "| {} | {label} | {} | {:.12} | {:.12} | {:.12} | {} | {} |\n",
             markdown_cell(output),
             point.index,
             point.oracle_c,
             point.rust_c,
-            point.abs_delta_c
+            point.abs_delta_c,
+            markdown_cell(tolerance),
+            status
         )),
         None => report.push_str(&format!(
-            "| {} | {label} | n/a | n/a | n/a | n/a |\n",
-            markdown_cell(output)
+            "| {} | {label} | n/a | n/a | n/a | n/a | {} | {} |\n",
+            markdown_cell(output),
+            markdown_cell(tolerance),
+            status
         )),
     }
 }
@@ -13880,12 +17156,20 @@ fn json_optional_u32(value: Option<u32>) -> String {
     value.map_or_else(|| "null".to_string(), |value| value.to_string())
 }
 
+fn json_optional_u64(value: Option<u64>) -> String {
+    value.map_or_else(|| "null".to_string(), |value| value.to_string())
+}
+
 fn json_optional_i64(value: Option<i64>) -> String {
     value.map_or_else(|| "null".to_string(), |value| value.to_string())
 }
 
 fn json_optional_usize(value: Option<usize>) -> String {
     value.map_or_else(|| "null".to_string(), |value| value.to_string())
+}
+
+fn json_optional_string(value: Option<&str>) -> String {
+    value.map_or_else(|| "null".to_string(), json_string)
 }
 
 fn json_number(value: f64) -> String {
@@ -14041,6 +17325,14 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     );
     println!("  nodes: {}", model.nodes.len());
     println!("  node_lists: {}", model.node_lists.len());
+    println!("  air_loops: {}", model.air_loops.len());
+    println!("  fans: {}", model.fans.len());
+    println!("  coils: {}", model.coils.len());
+    println!("  setpoint_managers: {}", model.setpoint_managers.len());
+    println!(
+        "  availability_managers: {}",
+        model.availability_managers.len()
+    );
     println!("  plant_loops: {}", model.plant_loops.len());
     println!("  plant_branches: {}", model.plant_branches.len());
     println!("  plant_branch_lists: {}", model.plant_branch_lists.len());
@@ -14182,6 +17474,14 @@ mod tests {
     fn disabled_heat_balance_warmup() -> super::HeatBalanceWarmupDiagnostic {
         super::HeatBalanceWarmupDiagnostic {
             enabled: false,
+            building_minimum_days: None,
+            building_maximum_days: None,
+            building_temperature_convergence_tolerance_delta_c: None,
+            building_loads_convergence_tolerance_w: None,
+            minimum_days: 0,
+            maximum_days: 0,
+            temperature_convergence_tolerance_delta_c: 0.0,
+            loads_convergence_tolerance_w: 0.0,
             day_count: 0,
             timestep_count: 0,
             hours_per_day: 0,
@@ -15023,17 +18323,27 @@ mod tests {
 
     #[test]
     fn heat_balance_warmup_minimum_days_parser_accepts_empty_or_positive_days() {
+        use super::HeatBalanceWarmupMinimumDaysOverride::{Disabled, MinimumDays, Unchanged};
+
         assert_eq!(
             super::parse_heat_balance_warmup_minimum_days("").unwrap(),
-            None
+            Unchanged
         );
         assert_eq!(
             super::parse_heat_balance_warmup_minimum_days("0").unwrap(),
-            None
+            Unchanged
+        );
+        assert_eq!(
+            super::parse_heat_balance_warmup_minimum_days("disabled").unwrap(),
+            Disabled
+        );
+        assert_eq!(
+            super::parse_heat_balance_warmup_minimum_days("no-warmup").unwrap(),
+            Disabled
         );
         assert_eq!(
             super::parse_heat_balance_warmup_minimum_days("20").unwrap(),
-            Some(20)
+            MinimumDays(20)
         );
         assert!(super::parse_heat_balance_warmup_minimum_days("-1").is_err());
         assert!(super::parse_heat_balance_warmup_minimum_days("oracle").is_err());
@@ -15192,6 +18502,13 @@ mod tests {
             samples: 2,
             heat_balance_timesteps: 8,
             heat_balance_run_period_timesteps: 8,
+            time_axis: super::HeatBalanceTimeAxisDiagnostic {
+                zone_timesteps_per_hour: 4,
+                zone_timestep_seconds: 900.0,
+                system_timestep_nominal_seconds: 900.0,
+                run_period_reported_samples: 2,
+                ..super::HeatBalanceTimeAxisDiagnostic::default()
+            },
             heat_balance_warmup: disabled_heat_balance_warmup(),
             ctf_seed: super::disabled_heat_balance_ctf_seed_diagnostic(),
             zone_air_algorithm: "simplified-analytical",
@@ -15205,6 +18522,13 @@ mod tests {
             zone_conduction_report_source: "zone-state",
             zone_air_report_sampling: "average",
             surface_loop_zone_air_correction: "each-surface-iteration",
+            construction_cache_hash: 12345,
+            construction_cache_build_wall_seconds: 0.001,
+            construction_cache_entry_count: 1,
+            construction_cache_no_mass_count: 1,
+            construction_cache_massive_ctf_count: 0,
+            construction_cache_eio_seeded_count: 0,
+            construction_cache_rust_generated_count: 1,
             compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
@@ -15392,6 +18716,12 @@ mod tests {
                 reference_air_source_signed_delta_w: -1700.0,
                 reference_air_source_split_abs_sum_w: 1700.0,
                 reference_air_source_cancellation_delta_w: 0.0,
+                oracle_surface_temperature_sink_w: 3200.0,
+                rust_surface_temperature_sink_w: 5100.0,
+                surface_temperature_sink_delta_w: 1900.0,
+                oracle_surface_temperature_sink_w_per_m2: 32.0,
+                rust_surface_temperature_sink_w_per_m2: 51.0,
+                surface_temperature_sink_delta_w_per_m2: 19.0,
                 reference_air_coefficient_source_signed_delta_w: -1400.0,
                 reference_air_coefficient_source_delta_w: 1400.0,
                 reference_air_temperature_source_signed_delta_w: -300.0,
@@ -15461,6 +18791,95 @@ mod tests {
                 inside_net_longwave_delta: super::delta_summary(&[0.0, 0.0], &[2.0, 3.0]),
                 tracked_solve_source_delta: super::delta_summary(&[0.0, 0.0], &[-1695.0, -1793.0]),
                 solve_source_residual_delta: super::delta_summary(&[0.0, 0.0], &[805.0, 807.0]),
+            }],
+            inside_source_term_series_summaries: vec![
+                super::HeatBalanceInsideSourceTermSeriesSummary {
+                    key: "FLOOR".to_string(),
+                    term_name: "inside-net-longwave".to_string(),
+                    area_m2: 100.0,
+                    samples: 2,
+                    rate_variable:
+                        "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+                            .to_string(),
+                    per_area_variable:
+                        "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area"
+                            .to_string(),
+                    max_abs_w: 2.0,
+                    max_abs_w_per_m2: 0.02,
+                    area_residual_max_abs_w: 0.0,
+                },
+            ],
+            floor_inside_current_diagnostics: vec![
+                super::HeatBalanceFloorInsideCurrentDiagnostic {
+                    key: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    sample_index: 1,
+                    area_m2: 100.0,
+                    ctf_inside_0_w_per_m2_k: 4.0,
+                    oracle_inside_face_temperature_c: 16.0,
+                    rust_inside_face_temperature_c: 17.0,
+                    inside_face_temperature_signed_delta_c: -1.0,
+                    inside_face_temperature_delta_c: 1.0,
+                    oracle_reference_air_temperature_c: 20.0,
+                    rust_reference_air_temperature_c: 20.0,
+                    reference_air_temperature_signed_delta_c: 0.0,
+                    reference_air_temperature_delta_c: 0.0,
+                    oracle_hconv_int_w_per_m2_k: 2.0,
+                    rust_hconv_int_w_per_m2_k: 2.0,
+                    hconv_int_signed_delta_w_per_m2_k: 0.0,
+                    hconv_int_delta_w_per_m2_k: 0.0,
+                    oracle_inside_current_inside_term_w: -6400.0,
+                    rust_inside_current_inside_term_w: -6800.0,
+                    inside_current_inside_term_signed_delta_w: 400.0,
+                    inside_current_inside_term_delta_w: 400.0,
+                    temperature_timing_expected_signed_delta_w: 400.0,
+                    temperature_timing_expected_abs_delta_w: 400.0,
+                    temperature_timing_coverage_ratio: 1.0,
+                    coefficient_delta_w_per_m2_k: 0.0,
+                    current_inside_mismatch_classification: "temperature-timing".to_string(),
+                    next_source_order_focus: "UpdateThermalHistories/source-order".to_string(),
+                    max_sample_source_terms: vec![super::HeatBalanceInsideSourceTermSampleDelta {
+                        term_name: "inside-net-longwave".to_string(),
+                        rate_variable:
+                            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+                                .to_string(),
+                        sample_index: 1,
+                        oracle_w: -12.0,
+                        rust_w: -10.0,
+                        signed_delta_w: -2.0,
+                        abs_delta_w: 2.0,
+                    }],
+                },
+            ],
+            floor_inside_current_term_series: vec![super::HeatBalanceFloorInsideCurrentTermSeries {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                samples: 2,
+                max_sample_index: 0,
+                max_abs_delta_w: 400.0,
+                max_signed_delta_w: 400.0,
+                sample_rows: vec![
+                    super::HeatBalanceFloorInsideCurrentTermSample {
+                        sample_index: 0,
+                        oracle_inside_face_temperature_c: 16.0,
+                        rust_inside_face_temperature_c: 17.0,
+                        oracle_inside_current_inside_term_w: -6400.0,
+                        rust_inside_current_inside_term_w: -6800.0,
+                        signed_delta_w: 400.0,
+                        abs_delta_w: 400.0,
+                    },
+                    super::HeatBalanceFloorInsideCurrentTermSample {
+                        sample_index: 1,
+                        oracle_inside_face_temperature_c: 17.0,
+                        rust_inside_face_temperature_c: 18.0,
+                        oracle_inside_current_inside_term_w: -6800.0,
+                        rust_inside_current_inside_term_w: -7200.0,
+                        signed_delta_w: 400.0,
+                        abs_delta_w: 400.0,
+                    },
+                ],
             }],
             adiabatic_history_max_sample_deltas: vec![
                 super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
@@ -15595,9 +19014,19 @@ mod tests {
                 previous_mean_air_temperatures_c: [22.0, 21.0, 20.0],
                 previous_system_mean_air_temperatures_c: [22.0, 21.0, 20.0],
                 previous_system_timestep_count: 1,
+                use_zone_timestep_history: true,
+                shorten_timestep_sys: false,
+                prior_timestep_seconds: 900.0,
                 air_humidity_ratio: 0.004,
                 zone_timestep_average_air_humidity_ratio: 0.004,
+                barometric_pressure_pa: 82_000.0,
+                rho_air_kg_per_m3: 0.982,
+                cp_air_j_per_kg_k: 1012.2758,
                 air_heat_capacity_j_per_k: 1200.0,
+                sum_mcp_w_per_k: 0.0,
+                sum_mcp_t_w: 0.0,
+                sum_sys_mcp_w_per_k: 0.0,
+                sum_sys_mcp_t_w: 0.0,
                 zone_timestep_air_power_cap_w_per_k: 1.333333333333,
                 zone_air_temperature_coefficients: ep_runtime::ZoneAirTemperatureCoefficients {
                     temp_dependent_coefficient_w_per_k: 10.0,
@@ -15620,9 +19049,24 @@ mod tests {
                 inside_face_temperature_c: 22.0,
                 inside_convection_input_inside_face_temperature_c: 22.0,
                 inside_convection_input_reference_air_temperature_c: 23.0,
+                inside_convection_algorithm: "TARP",
+                inside_convection_tarp_branch: "stable-horizontal-or-tilt",
+                outside_convection_algorithm: "DOE-2",
+                outside_convection_branch: "not-outdoors",
                 outside_face_temperature_c: 11.0,
                 inside_convection_heat_gain_rate_w: 1.0,
                 inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
+                inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: 0.02,
+                inside_radiant_internal_gain_source_term_w: 0.0,
+                inside_radiant_internal_gain_source_term_w_per_m2: 0.0,
+                inside_shortwave_absorbed_source_term_w: 0.0,
+                inside_shortwave_absorbed_source_term_w_per_m2: 0.0,
+                inside_additional_heat_source_term_w: 0.0,
+                inside_additional_heat_source_term_w_per_m2: 0.0,
+                inside_radiant_hvac_source_term_w: 0.0,
+                inside_radiant_hvac_source_term_w_per_m2: 0.0,
+                inside_total_source_term_w: 2.0,
+                inside_total_source_term_w_per_m2: 0.02,
                 inside_conduction_rate_w: -10.0,
                 outside_conduction_rate_w: 10.0,
                 heat_storage_rate_w: 0.0,
@@ -15641,6 +19085,7 @@ mod tests {
             ],
             rust_zone_air_debug_series: vec![],
             rust_outside_balance_debug_series: vec![],
+            performance_profile: super::HeatBalancePerformanceProfile::default(),
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -15652,6 +19097,31 @@ mod tests {
                         level: Some("conformance"),
                     },
                     samples: 2,
+                    oracle_count: 2,
+                    rust_count: 2,
+                    oracle_units: Some("C".to_string()),
+                    oracle_frequency: Some("Hourly".to_string()),
+                    energyplus_store_type: "average",
+                    rust_store_type: "average",
+                    store_type_match: true,
+                    oracle_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    oracle_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=2;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=2;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    timestamp_match: true,
+                    first_reported_sample_hour_ending: true,
                     oracle_first_c: 23.0,
                     rust_first_c: 23.0,
                     oracle_last_c: 23.0,
@@ -15670,6 +19140,31 @@ mod tests {
                         level: Some("conformance"),
                     },
                     samples: 2,
+                    oracle_count: 2,
+                    rust_count: 2,
+                    oracle_units: Some("C".to_string()),
+                    oracle_frequency: Some("Hourly".to_string()),
+                    energyplus_store_type: "average",
+                    rust_store_type: "average",
+                    store_type_match: true,
+                    oracle_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    oracle_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=2;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=2;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    timestamp_match: true,
+                    first_reported_sample_hour_ending: true,
                     oracle_first_c: 23.0,
                     rust_first_c: 23.0,
                     oracle_last_c: 23.0,
@@ -15834,6 +19329,11 @@ mod tests {
         assert!(digest.contains("\"case_id\": \"heat_balance_nomass_001\""));
         assert!(digest.contains("\"series_count\": 2"));
         assert!(digest.contains("\"compatibility_stages\""));
+        assert!(digest.contains("\"construction_cache_hash\": 12345"));
+        assert!(digest.contains("\"construction_cache_build_wall_seconds\""));
+        assert!(digest.contains("\"construction_cache_eio_seeded_count\": 0"));
+        assert!(report.contains("construction_cache_hash: 12345"));
+        assert!(report.contains("construction_cache_rust_generated_entries: 1"));
         assert!(digest.contains("\"variable\": \"Surface Inside Face Temperature\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
         assert!(digest.contains("\"surface_first_sample_trace\""));
@@ -16005,8 +19505,23 @@ mod tests {
             samples: 1,
             heat_balance_timesteps: 4,
             heat_balance_run_period_timesteps: 4,
+            time_axis: super::HeatBalanceTimeAxisDiagnostic {
+                zone_timesteps_per_hour: 4,
+                zone_timestep_seconds: 900.0,
+                system_timestep_nominal_seconds: 900.0,
+                run_period_reported_samples: 1,
+                ..super::HeatBalanceTimeAxisDiagnostic::default()
+            },
             heat_balance_warmup: super::HeatBalanceWarmupDiagnostic {
                 enabled: true,
+                building_minimum_days: Some(6),
+                building_maximum_days: Some(30),
+                building_temperature_convergence_tolerance_delta_c: Some(0.004),
+                building_loads_convergence_tolerance_w: Some(0.04),
+                minimum_days: 6,
+                maximum_days: 20,
+                temperature_convergence_tolerance_delta_c: 0.004,
+                loads_convergence_tolerance_w: 0.04,
                 day_count: 6,
                 timestep_count: 576,
                 hours_per_day: 24,
@@ -16056,6 +19571,13 @@ mod tests {
             zone_conduction_report_source: "surface-report",
             zone_air_report_sampling: "last-system-state",
             surface_loop_zone_air_correction: "after-surface-loop",
+            construction_cache_hash: 67890,
+            construction_cache_build_wall_seconds: 0.002,
+            construction_cache_entry_count: 3,
+            construction_cache_no_mass_count: 2,
+            construction_cache_massive_ctf_count: 1,
+            construction_cache_eio_seeded_count: 2,
+            construction_cache_rust_generated_count: 1,
             compatibility_stages: super::energyplus_heat_balance_compatibility_stages(),
             zone_count: 1,
             surface_count: 6,
@@ -16243,6 +19765,12 @@ mod tests {
                 reference_air_source_signed_delta_w: -2830.0,
                 reference_air_source_split_abs_sum_w: 2830.0,
                 reference_air_source_cancellation_delta_w: 0.0,
+                oracle_surface_temperature_sink_w: 3200.0,
+                rust_surface_temperature_sink_w: 5950.0,
+                surface_temperature_sink_delta_w: 2750.0,
+                oracle_surface_temperature_sink_w_per_m2: 32.0,
+                rust_surface_temperature_sink_w_per_m2: 59.5,
+                surface_temperature_sink_delta_w_per_m2: 27.5,
                 reference_air_coefficient_source_signed_delta_w: -2025.0,
                 reference_air_coefficient_source_delta_w: 2025.0,
                 reference_air_temperature_source_signed_delta_w: -805.0,
@@ -16312,6 +19840,95 @@ mod tests {
                 inside_net_longwave_delta: super::delta_summary(&[0.0, 0.0], &[1.0, 1.5]),
                 tracked_solve_source_delta: super::delta_summary(&[0.0, 0.0], &[-2826.0, -2894.5]),
                 solve_source_residual_delta: super::delta_summary(&[0.0, 0.0], &[524.0, 555.5]),
+            }],
+            inside_source_term_series_summaries: vec![
+                super::HeatBalanceInsideSourceTermSeriesSummary {
+                    key: "FLOOR".to_string(),
+                    term_name: "inside-net-longwave".to_string(),
+                    area_m2: 100.0,
+                    samples: 2,
+                    rate_variable:
+                        "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+                            .to_string(),
+                    per_area_variable:
+                        "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area"
+                            .to_string(),
+                    max_abs_w: 2.0,
+                    max_abs_w_per_m2: 0.02,
+                    area_residual_max_abs_w: 0.0,
+                },
+            ],
+            floor_inside_current_diagnostics: vec![
+                super::HeatBalanceFloorInsideCurrentDiagnostic {
+                    key: "FLOOR".to_string(),
+                    construction_name: "FLOOR".to_string(),
+                    sample_index: 1,
+                    area_m2: 100.0,
+                    ctf_inside_0_w_per_m2_k: 4.0,
+                    oracle_inside_face_temperature_c: 16.0,
+                    rust_inside_face_temperature_c: 17.0,
+                    inside_face_temperature_signed_delta_c: -1.0,
+                    inside_face_temperature_delta_c: 1.0,
+                    oracle_reference_air_temperature_c: 20.0,
+                    rust_reference_air_temperature_c: 20.0,
+                    reference_air_temperature_signed_delta_c: 0.0,
+                    reference_air_temperature_delta_c: 0.0,
+                    oracle_hconv_int_w_per_m2_k: 2.0,
+                    rust_hconv_int_w_per_m2_k: 2.0,
+                    hconv_int_signed_delta_w_per_m2_k: 0.0,
+                    hconv_int_delta_w_per_m2_k: 0.0,
+                    oracle_inside_current_inside_term_w: -6400.0,
+                    rust_inside_current_inside_term_w: -6800.0,
+                    inside_current_inside_term_signed_delta_w: 400.0,
+                    inside_current_inside_term_delta_w: 400.0,
+                    temperature_timing_expected_signed_delta_w: 400.0,
+                    temperature_timing_expected_abs_delta_w: 400.0,
+                    temperature_timing_coverage_ratio: 1.0,
+                    coefficient_delta_w_per_m2_k: 0.0,
+                    current_inside_mismatch_classification: "temperature-timing".to_string(),
+                    next_source_order_focus: "UpdateThermalHistories/source-order".to_string(),
+                    max_sample_source_terms: vec![super::HeatBalanceInsideSourceTermSampleDelta {
+                        term_name: "inside-net-longwave".to_string(),
+                        rate_variable:
+                            "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate"
+                                .to_string(),
+                        sample_index: 1,
+                        oracle_w: -12.0,
+                        rust_w: -10.0,
+                        signed_delta_w: -2.0,
+                        abs_delta_w: 2.0,
+                    }],
+                },
+            ],
+            floor_inside_current_term_series: vec![super::HeatBalanceFloorInsideCurrentTermSeries {
+                key: "FLOOR".to_string(),
+                construction_name: "FLOOR".to_string(),
+                area_m2: 100.0,
+                ctf_inside_0_w_per_m2_k: 4.0,
+                samples: 2,
+                max_sample_index: 0,
+                max_abs_delta_w: 400.0,
+                max_signed_delta_w: 400.0,
+                sample_rows: vec![
+                    super::HeatBalanceFloorInsideCurrentTermSample {
+                        sample_index: 0,
+                        oracle_inside_face_temperature_c: 16.0,
+                        rust_inside_face_temperature_c: 17.0,
+                        oracle_inside_current_inside_term_w: -6400.0,
+                        rust_inside_current_inside_term_w: -6800.0,
+                        signed_delta_w: 400.0,
+                        abs_delta_w: 400.0,
+                    },
+                    super::HeatBalanceFloorInsideCurrentTermSample {
+                        sample_index: 1,
+                        oracle_inside_face_temperature_c: 17.0,
+                        rust_inside_face_temperature_c: 18.0,
+                        oracle_inside_current_inside_term_w: -6800.0,
+                        rust_inside_current_inside_term_w: -7200.0,
+                        signed_delta_w: 400.0,
+                        abs_delta_w: 400.0,
+                    },
+                ],
             }],
             adiabatic_history_max_sample_deltas: vec![
                 super::HeatBalanceAdiabaticHistoryMaxSampleDelta {
@@ -16446,9 +20063,19 @@ mod tests {
                 previous_mean_air_temperatures_c: [1.0, 1.0, 1.0],
                 previous_system_mean_air_temperatures_c: [1.0, 1.0, 1.0],
                 previous_system_timestep_count: 1,
+                use_zone_timestep_history: true,
+                shorten_timestep_sys: false,
+                prior_timestep_seconds: 900.0,
                 air_humidity_ratio: 0.004,
                 zone_timestep_average_air_humidity_ratio: 0.004,
+                barometric_pressure_pa: 82_000.0,
+                rho_air_kg_per_m3: 0.982,
+                cp_air_j_per_kg_k: 1012.2758,
                 air_heat_capacity_j_per_k: 1200.0,
+                sum_mcp_w_per_k: 0.0,
+                sum_mcp_t_w: 0.0,
+                sum_sys_mcp_w_per_k: 0.0,
+                sum_sys_mcp_t_w: 0.0,
                 zone_timestep_air_power_cap_w_per_k: 1.333333333333,
                 zone_air_temperature_coefficients: ep_runtime::ZoneAirTemperatureCoefficients {
                     temp_dependent_coefficient_w_per_k: 10.0,
@@ -16471,9 +20098,24 @@ mod tests {
                 inside_face_temperature_c: 22.0,
                 inside_convection_input_inside_face_temperature_c: 22.0,
                 inside_convection_input_reference_air_temperature_c: 23.0,
+                inside_convection_algorithm: "TARP",
+                inside_convection_tarp_branch: "stable-horizontal-or-tilt",
+                outside_convection_algorithm: "DOE-2",
+                outside_convection_branch: "not-outdoors",
                 outside_face_temperature_c: 11.0,
                 inside_convection_heat_gain_rate_w: 1.0,
                 inside_net_surface_thermal_radiation_heat_gain_rate_w: 2.0,
+                inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2: 0.02,
+                inside_radiant_internal_gain_source_term_w: 0.0,
+                inside_radiant_internal_gain_source_term_w_per_m2: 0.0,
+                inside_shortwave_absorbed_source_term_w: 0.0,
+                inside_shortwave_absorbed_source_term_w_per_m2: 0.0,
+                inside_additional_heat_source_term_w: 0.0,
+                inside_additional_heat_source_term_w_per_m2: 0.0,
+                inside_radiant_hvac_source_term_w: 0.0,
+                inside_radiant_hvac_source_term_w_per_m2: 0.0,
+                inside_total_source_term_w: 2.0,
+                inside_total_source_term_w_per_m2: 0.02,
                 inside_conduction_rate_w: -2.0,
                 outside_conduction_rate_w: 1.0,
                 heat_storage_rate_w: 1.0,
@@ -16492,6 +20134,7 @@ mod tests {
             ],
             rust_zone_air_debug_series: vec![],
             rust_outside_balance_debug_series: vec![],
+            performance_profile: super::HeatBalancePerformanceProfile::default(),
             series: vec![
                 super::HeatBalanceSeriesDiagnostic {
                     output: super::ZoneTemperatureReportOutput {
@@ -16503,6 +20146,31 @@ mod tests {
                         level: Some("diagnostic"),
                     },
                     samples: 1,
+                    oracle_count: 1,
+                    rust_count: 1,
+                    oracle_units: Some("C".to_string()),
+                    oracle_frequency: Some("Hourly".to_string()),
+                    energyplus_store_type: "average",
+                    rust_store_type: "average",
+                    store_type_match: true,
+                    oracle_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    oracle_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    timestamp_match: true,
+                    first_reported_sample_hour_ending: true,
                     oracle_first_c: 1.0,
                     rust_first_c: 2.0,
                     oracle_last_c: 1.0,
@@ -16521,6 +20189,31 @@ mod tests {
                         level: Some("diagnostic"),
                     },
                     samples: 1,
+                    oracle_count: 1,
+                    rust_count: 1,
+                    oracle_units: Some("W".to_string()),
+                    oracle_frequency: Some("Hourly".to_string()),
+                    energyplus_store_type: "average",
+                    rust_store_type: "average",
+                    store_type_match: true,
+                    oracle_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_first_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    oracle_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    rust_last_timestamp: Some(
+                        "env=RUN PERIOD 1;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=60.00;day_type=Tuesday"
+                            .to_string(),
+                    ),
+                    timestamp_match: true,
+                    first_reported_sample_hour_ending: true,
                     oracle_first_c: -85131.0,
                     rust_first_c: -85105.0,
                     oracle_last_c: -85131.0,
@@ -16582,6 +20275,11 @@ mod tests {
         assert!(json.contains(
             "\"next_pr_target\": \"roof-exterior-environmental-balance-temperature-offset\""
         ));
+        assert!(
+            json.contains("\"top_blocking_mismatch\": \"roof-exterior-environmental-balance\"")
+        );
+        assert!(json.contains("\"active_lane\": \"diagnostic-probe\""));
+        assert!(json.contains("\"best_diagnostic_lane\": \"energyplus-third-order-probe\""));
         assert!(json.contains("\"compatibility_stages\""));
         assert!(json.contains("\"source_routine\": \"ManageAirHeatBalance\""));
         assert!(json.contains("\"construction_name\": \"FLOOR\""));
@@ -16599,6 +20297,7 @@ mod tests {
         assert!(json.contains("\"warmup-end-state-mat-delta\""));
         assert!(json.contains("\"warmup-end-state-surface-temperature-delta\""));
         assert!(json.contains("\"warmup-end-state-ctf-history-delta\""));
+        assert!(json.contains("\"warmup-end-state-zone-history-delta\""));
         assert!(json.contains("\"first_divergence_by_variable\""));
         assert!(json.contains("\"first_sample_bottlenecks\""));
         assert!(json.contains("\"zone_air_first_sample_trace\""));
@@ -16681,6 +20380,11 @@ mod tests {
         assert!(digest.contains(
             "\"next_pr_target\": \"roof-exterior-environmental-balance-temperature-offset\""
         ));
+        assert!(
+            digest.contains("\"top_blocking_mismatch\": \"roof-exterior-environmental-balance\"")
+        );
+        assert!(digest.contains("\"active_lane\": \"diagnostic-probe\""));
+        assert!(digest.contains("\"best_diagnostic_lane\": \"energyplus-third-order-probe\""));
         assert!(digest.contains("\"construction_summaries\""));
         assert!(digest.contains("\"construction_name\": \"FLOOR\""));
         assert!(digest.contains("\"bottlenecks\""));
@@ -16689,6 +20393,7 @@ mod tests {
         assert!(digest.contains("\"floor-storage-mismatch\""));
         assert!(digest.contains("\"ctf-current-term-delta\""));
         assert!(digest.contains("\"warmup_end_state_deltas\""));
+        assert!(digest.contains("\"warmup-end-state-zone-history-delta\""));
         assert!(digest.contains("\"first_divergence_by_variable\""));
         assert!(digest.contains("\"max_sample_contexts\""));
         assert!(digest.contains("\"first_sample_bottlenecks\""));
@@ -16764,9 +20469,16 @@ mod tests {
         assert!(digest.contains("\"series\""));
         assert!(!digest.contains("\"sample_rows\""));
         assert!(report.contains("Heat Balance Diagnostic Report"));
-        assert!(report.contains("Rust Surface First-Sample Trace"));
+        assert!(report.contains("## Bottleneck Tracker"));
         assert!(report.contains("comparison_class: diagnostic-only"));
         assert!(report.contains("conformance_claim: false"));
+        assert!(report.contains("top_blocking_mismatch: roof-exterior-environmental-balance"));
+        assert!(
+            report.contains("next_blocking_source_mismatch: roof-exterior-environmental-balance")
+        );
+        assert!(report.contains("active_lane: diagnostic-probe"));
+        assert!(report.contains("active_algorithm: energyplus-third-order-probe"));
+        assert!(report.contains("best_diagnostic_lane: energyplus-third-order-probe"));
         assert!(report.contains("oracle_run_period_warmup_days: 20"));
         assert!(report.contains("warmup_day_count_delta: -14"));
         assert!(report.contains("ctf_seed_policy: steady-no-mass-only"));
@@ -16782,81 +20494,70 @@ mod tests {
             report
                 .contains("next_pr_target: roof-exterior-environmental-balance-temperature-offset")
         );
-        assert!(report.contains("## EnergyPlus Compatibility Stage Order"));
-        assert!(report.contains("ManageAirHeatBalance"));
         assert!(report.contains("ctf_seed_included_constructions: R13WALL, ROOF31"));
         assert!(report.contains("ctf_seed_skipped_constructions: FLOOR (#CTFs=5)"));
         assert!(
             report.contains("ctf_seed_construction_summaries: R13WALL (#CTFs=1) @ dt=0.250h [included], FLOOR (#CTFs=5) @ dt=0.250h [skipped]")
         );
         assert!(report.contains("## Top Blocker"));
-        assert!(report.contains("## Current Blockers"));
-        assert!(report.contains("floor-storage-mismatch"));
-        assert!(report.contains("floor-face-temperature-current-inside-mismatch"));
-        assert!(report.contains("ctf-current-term-delta"));
-        assert!(report.contains("ctf-history-temperature-term-delta"));
-        assert!(report.contains("ctf-history-flux-term-delta"));
-        assert!(report.contains("longwave-radiation-source-delta"));
-        assert!(report.contains("hconv-source-timing-delta"));
+        assert!(report.contains("roof-exterior-environmental-balance"));
+        assert!(report.contains("## Top 10 RMSE Variables"));
+        assert!(report.contains("| rank | key | variable | category | family | class | first_hour_abs_delta_c | annual_rmse_delta_c | max_abs_delta_c | status |"));
+        assert!(report.contains("| 1 | ZN001:ROOF001 | Surface Outside Face Convection Heat Gain Rate | surface | roof | surface-state |"));
+        assert!(report.contains("## Blocking Diagnostic Split"));
+        assert!(report.contains("| mat-rmse | ZONE ONE | Zone Mean Air Temperature | zone |"));
+        assert!(report.contains("| surface-conduction-rmse |"));
+        assert!(report.contains("| zone-air-storage-rmse |"));
+        assert!(report.contains("| zone-surface-convection-rmse |"));
+        assert!(report.contains("## Zone-Air Coefficient Split"));
+        assert!(report.contains("| key | samples | first_divergence_source | first_divergence_sample | first_divergence_delta | SumHA_rmse | SumHATsurf_rmse | SumHATref_rmse | TempDepCoef_rmse | TempIndCoef_rmse | AirPowerCap_rmse | TempHistoryTerm_rmse | MAT_rmse | AirStorage_rmse | SurfaceConvection_rmse |"));
+        assert!(report.contains("| ZONE ONE | 2 | TempDepCoef | 1 |"));
+        assert!(report.contains("## Surface Family RMSE"));
+        assert!(report.contains("| floor |"));
+        assert!(report.contains("| roof | ZN001:ROOF001"));
+        assert!(report.contains("| wall |"));
+        assert!(report.contains("## Source-Order Trace"));
+        assert!(report.contains(
+            "source_order_wrapper: ep_runtime::heat_balance::manager::manage_heat_balance_source_order_path"
+        ));
+        assert!(report.contains("rust_execution_plan_order: ExecutionPlan.compatibility_stages"));
+        assert!(
+            report.contains(
+                "| ManageHeatBalance | ManageHeatBalance | manage-heat-balance-wrapper |"
+            )
+        );
+        assert!(report.contains("| InitHeatBalance | InitHeatBalance | init-heat-balance |"));
+        assert!(report.contains("| CalcHeatBalanceOutsideSurf | CalcHeatBalanceOutsideSurf | calc-heat-balance-outside-surf |"));
+        assert!(report.contains("| CalcHeatBalanceInsideSurf | CalcHeatBalanceInsideSurf | calc-heat-balance-inside-surf |"));
+        assert!(
+            report.contains(
+                "| ManageAirHeatBalance | ManageAirHeatBalance | manage-air-heat-balance |"
+            )
+        );
+        assert!(report.contains(
+            "| UpdateThermalHistories | UpdateThermalHistories | update-thermal-histories |"
+        ));
+        assert!(report.contains(
+            "| ReportSurfaceHeatBalance | ReportSurfaceHeatBalance | report-surface-heat-balance |"
+        ));
+        assert!(report.contains(
+            "| ReportZoneMeanAirTemp | ReportHeatBalance -> ReportZoneMeanAirTemp | report-heat-balance |"
+        ));
         assert!(report.contains("## Warmup End-State Deltas"));
         assert!(report.contains("warmup-end-state-mat-delta"));
         assert!(report.contains("warmup-end-state-surface-temperature-delta"));
         assert!(report.contains("warmup-end-state-ctf-history-delta"));
+        assert!(report.contains("warmup-end-state-zone-history-delta"));
         assert!(report.contains("## First Divergence by Variable"));
-        assert!(report.contains("## Bottlenecks"));
-        assert!(report.contains("## Max-Sample Contexts"));
-        assert!(report.contains("## First-Sample Bottlenecks"));
-        assert!(report.contains("## Rust Zone-Air First-Sample Trace"));
-        assert!(report.contains("solution_c"));
-        assert!(report.contains("## Rust CTF First-Sample Components"));
-        assert!(report.contains("## Zone-Air Coefficient Deltas"));
-        assert!(report.contains("first_divergence_source"));
-        assert!(report.contains("TempDepCoef_rmse"));
-        assert!(report.contains("TempIndCoef_rmse"));
-        assert!(report.contains("AirPowerCap_rmse"));
-        assert!(report.contains("TempHistoryTerm_rmse"));
-        assert!(report.contains("SumHA_rmse"));
-        assert!(report.contains("SumHATsurf_rmse"));
-        assert!(report.contains("SumHATref_rmse"));
-        assert!(report.contains("## Zone-Air Surface Convection Closure Deltas"));
-        assert!(report.contains("closure_delta_rmse_w"));
-        assert!(report.contains("## Zone-Air Surface Coefficient Deltas"));
-        assert!(report.contains("ref_air_temp_rmse"));
-        assert!(report.contains("inside_conv_gain_rmse"));
-        assert!(report.contains("## CTF History First-Sample Deltas"));
-        assert!(report.contains("## CTF History Series Deltas"));
-        assert!(report.contains("in_curr_out_rmse_w"));
-        assert!(report.contains("in_curr_in_rmse_w"));
-        assert!(report.contains("out_curr_out_rmse_w"));
-        assert!(report.contains("out_curr_in_rmse_w"));
-        assert!(report.contains("out_history_rmse_w"));
-        assert!(report.contains("in_hist_temp_rms_w"));
-        assert!(report.contains("in_hist_flux_rms_w"));
-        assert!(report.contains("## CTF Storage Max-Sample Deltas"));
-        assert!(report.contains("out_history_delta_w"));
-        assert!(report.contains("dominant"));
-        assert!(report.contains("dominant_mismatch_source"));
-        assert!(report.contains("storage_balance_residual_delta_w"));
-        assert!(report.contains("inside_temp_delta_c"));
-        assert!(report.contains("current_out_signed_w"));
-        assert!(report.contains("current_in_signed_w"));
-        assert!(report.contains("rust_history_temp_w"));
-        assert!(report.contains("rust_history_flux_w"));
-        assert!(report.contains("## Inside Balance Max-Sample Deltas"));
-        assert!(report.contains("residual_delta_w"));
-        assert!(report.contains("## Inside Solve Max-Sample Deltas"));
-        assert!(report.contains("implied_numerator_delta_w"));
-        assert!(report.contains("rust_history_temp_w"));
-        assert!(report.contains("## Inside Solve Series Deltas"));
-        assert!(report.contains("implied_num_rmse_w"));
-        assert!(report.contains("source_residual_rmse_w"));
-        assert!(report.contains("ref_air_coeff_rmse_w"));
-        assert!(report.contains("## Adiabatic History Max-Sample Deltas"));
-        assert!(report.contains("out_minus_in_delta_c"));
-        assert!(report.contains("## Rust CTF History Run-Period Initial Slots"));
-        assert!(report.contains("## Rust CTF History First-Sample Slots"));
-        assert!(report.contains("## Rust CTF History Max-Sample Slots"));
-        assert!(report.contains("## Rust CTF History Max-Sample Slots After Advance"));
+        assert!(report.contains("first_divergence_rows: top-"));
+        assert!(report.contains("## Diagnostic Evidence"));
+        assert!(report.contains("compare_digest_json: compare-digest.json"));
+        assert!(!report.contains("## Current Blockers"));
+        assert!(!report.contains("## EnergyPlus Compatibility Stage Order"));
+        assert!(!report.contains("## Bottlenecks"));
+        assert!(!report.contains("## Max-Sample Contexts"));
+        assert!(!report.contains("## Rust Zone-Air First-Sample Trace"));
+        assert!(!report.contains("## Hourly Samples"));
         assert!(report.contains("status: fail"));
     }
 

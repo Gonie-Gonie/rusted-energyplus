@@ -1,0 +1,5 @@
+!- Diagnostic-only source placeholder.
+!- The executable C3 fixture is data/testcases/minimal/airloop-fan-only.epJSON.
+!- Fan-only conformance remains blocked until node/fan variables are tolerance-gated.
+
+Version,26.1;

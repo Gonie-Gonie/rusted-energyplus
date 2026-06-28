@@ -1,0 +1,59 @@
+id = "ptac_diagnostic_001"
+title = "PTAC diagnostic fixture"
+milestone = "C3-airloop-hvac-skeleton"
+purpose = "Preserve a PTAC diagnostic fixture and explicit unsupported ZoneHVAC boundary without claiming PTAC numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This C3 case is a diagnostic-only PTAC coverage fixture.",
+  "ZoneHVAC:PackagedTerminalAirConditioner remains raw-only and blocked by the broad ZoneHVAC unsupported rule outside declared IdealLoads branches.",
+  "PTAC conformance promotion remains blocked until a typed PTAC component family, zone equipment dispatch path, and tolerance-gated comparison path exist."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "minimal-epjson"
+source_file = "data/testcases/minimal/ptac-diagnostic.epJSON"
+tier = "C"
+
+[scope]
+domains = ["hvac", "node", "zone"]
+has_zone = true
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/ptac_diagnostic_001/ptac_diagnostic.idf"
+epjson = "data/testcases/minimal/ptac-diagnostic.epJSON"
+
+[[outputs]]
+key = "PTAC Zone Inlet Node"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "PTAC Unit"
+variable = "Zone Packaged Terminal Air Conditioner Total Heating Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = "compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd airloop-diagnostic-fixtures-smoke"
+blocking = true

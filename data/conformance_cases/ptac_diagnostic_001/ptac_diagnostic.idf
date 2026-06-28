@@ -1,0 +1,5 @@
+!- Diagnostic-only source placeholder.
+!- The executable C3 fixture is data/testcases/minimal/ptac-diagnostic.epJSON.
+!- PTAC conformance remains blocked until ZoneHVAC:PackagedTerminalAirConditioner is typed and tolerance-gated.
+
+Version,26.1;

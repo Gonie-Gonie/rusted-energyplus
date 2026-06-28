@@ -248,7 +248,7 @@
         assert_eq!(simulation.summary.surface_count, 6);
         assert_eq!(simulation.state.timestep_index, 12);
         assert_eq!(simulation.results.sample_count(), 2);
-        assert_eq!(simulation.results.series.len(), 329);
+        assert_eq!(simulation.results.series.len(), 390);
         assert_eq!(
             simulation.summary.run_period_initial_zone_air_states.len(),
             1
@@ -615,6 +615,7 @@
                 outside_0_w_per_m2_k: 0.0,
                 cross_0_w_per_m2_k: 0.0,
                 inside_0_w_per_m2_k: 0.0,
+                flux_0: None,
                 const_in_part_w_per_m2: 0.0,
                 const_out_part_w_per_m2: 0.0,
                 outside_history_w_per_m2_k: Vec::new(),

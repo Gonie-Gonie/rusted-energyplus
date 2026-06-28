@@ -42,6 +42,13 @@ pub(crate) fn energyplus_exterior_wet_context_fraction(
     }
 
     let steps = context.zone_steps_per_hour.max(1);
+    if let Some(sample) = context.sample {
+        return if sample.liquid_precipitation_depth_mm >= ENERGYPLUS_HOURLY_RAIN_THRESHOLD_MM {
+            1.0
+        } else {
+            0.0
+        };
+    }
     if let Some(timestep) = context.zone_timestep {
         return if energyplus_weather_record_is_rain_at_timestep_with_starting_values(
             context.records,
@@ -111,6 +118,9 @@ pub(crate) fn energyplus_exterior_wet_reference_temperature_c(
     context: HeatBalanceWeatherContext<'_>,
     fallback_dry_bulb_c: f64,
 ) -> f64 {
+    if let Some(sample) = context.sample {
+        return sample.wet_bulb_c;
+    }
     let Some(record) = context.records.get(context.record_index) else {
         return fallback_dry_bulb_c;
     };

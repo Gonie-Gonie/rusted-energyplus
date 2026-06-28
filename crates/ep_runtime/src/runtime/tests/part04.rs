@@ -170,6 +170,7 @@
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 0.5,
             inside_0_w_per_m2_k: 3.0,
+            flux_0: None,
             const_in_part_w_per_m2: 0.0,
             const_out_part_w_per_m2: 0.0,
             outside_history_w_per_m2_k: Vec::new(),
@@ -256,6 +257,7 @@
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 0.5,
             inside_0_w_per_m2_k: 3.0,
+            flux_0: None,
             const_in_part_w_per_m2: 0.0,
             const_out_part_w_per_m2: 0.0,
             outside_history_w_per_m2_k: Vec::new(),
@@ -345,6 +347,16 @@
         assert!((temperature - 15.1).abs() < 1.0e-12);
 
         Ok(())
+    }
+
+    #[test]
+    fn surface_ctf_inside_current_inside_term_uses_named_source_equation() {
+        let term = surface_ctf_inside_current_inside_term_rate_w_from_sources(12.0, 3.5, 19.25);
+        assert!((term - -808.5).abs() < 1.0e-12);
+        assert_eq!(
+            surface_ctf_inside_current_inside_term_rate_w_from_sources(0.0, 3.5, 19.25),
+            0.0
+        );
     }
 
     #[test]
@@ -681,6 +693,7 @@
         assert!((state.zones[0].sum_ha_w_per_k - expected_sum_ha).abs() < 1.0e-12);
         assert!((state.zones[0].sum_hat_surf_w - expected_sum_hat_surf).abs() < 1.0e-12);
         assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
+        let expected_air_power_cap = state.zones[0].air_heat_capacity_j_per_k / 600.0;
         let coefficients = state.zones[0].zone_air_temperature_coefficients;
         assert!(
             (coefficients.temp_dependent_coefficient_w_per_k - expected_sum_ha).abs() < 1.0e-12
@@ -691,8 +704,9 @@
                 .abs()
                 < 1.0e-12
         );
-        assert!((coefficients.air_power_cap_w_per_k - (1207.2 / 600.0)).abs() < 1.0e-12);
-        let expected_history = (1207.2 / 600.0) * (3.0 * 20.0 - 1.5 * 20.0 + 20.0 / 3.0);
+        assert!((coefficients.air_power_cap_w_per_k - expected_air_power_cap).abs() < 1.0e-12);
+        let expected_history =
+            expected_air_power_cap * (3.0 * 20.0 - 1.5 * 20.0 + 20.0 / 3.0);
         assert!((coefficients.third_order_history_term_w - expected_history).abs() < 1.0e-12);
 
         Ok(())
@@ -778,6 +792,7 @@
         }];
         let context = HeatBalanceWeatherContext {
             records: &records,
+            sample: None,
             record_index: 0,
             zone_steps_per_hour: 4,
             zone_timestep: Some(1),

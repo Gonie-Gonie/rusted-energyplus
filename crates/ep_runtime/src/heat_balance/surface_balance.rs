@@ -432,12 +432,66 @@ pub(crate) fn heat_balance_uses_cached_exterior_report_terms(
     )
 }
 
+/// EnergyPlus engineering-reference inside-face heat-balance terms.
+///
+/// All fields are per-area terms in W/m2. The q_* names mirror the
+/// engineering-reference notation while preserving the Rust report slots that
+/// distinguish longwave, shortwave, conduction, and convection terms.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub(crate) struct InsideFaceBalanceEquationTerms {
+    /// Internal longwave exchange, EnergyPlus `SurfQdotRadNetLWInPerArea`.
+    pub(crate) q_lwx_w_per_m2: f64,
+    /// Shortwave radiation from lights/internal sources.
+    pub(crate) q_sw_w_per_m2: f64,
+    /// Longwave radiation from internal sources/equipment/people.
+    pub(crate) q_lws_w_per_m2: f64,
+    /// Conduction flux to the inside face.
+    pub(crate) q_ki_w_per_m2: f64,
+    /// Solar/shortwave radiation absorbed at the inside face.
+    pub(crate) q_sol_w_per_m2: f64,
+    /// Convection exchange with zone air.
+    pub(crate) q_conv_w_per_m2: f64,
+    /// Additional inside heat source term.
+    pub(crate) q_additional_inside_heat_source_w_per_m2: f64,
+    /// Radiant HVAC source term.
+    pub(crate) q_radiant_hvac_w_per_m2: f64,
+}
+
+impl InsideFaceBalanceEquationTerms {
+    pub(crate) fn non_convective_source_w_per_m2(self) -> f64 {
+        self.q_lwx_w_per_m2
+            + self.q_sw_w_per_m2
+            + self.q_lws_w_per_m2
+            + self.q_sol_w_per_m2
+            + self.q_additional_inside_heat_source_w_per_m2
+            + self.q_radiant_hvac_w_per_m2
+    }
+
+    pub(crate) fn signed_balance_terms_w_per_m2(self) -> f64 {
+        self.non_convective_source_w_per_m2() + self.q_ki_w_per_m2 + self.q_conv_w_per_m2
+    }
+}
+
+pub(crate) fn surface_inside_face_balance_equation_terms_w_per_m2(
+    surface: &SurfaceHeatBalanceState,
+    q_ki_w_per_m2: f64,
+    q_conv_w_per_m2: f64,
+) -> InsideFaceBalanceEquationTerms {
+    InsideFaceBalanceEquationTerms {
+        q_lwx_w_per_m2: surface.inside_net_longwave_w_per_m2,
+        q_sw_w_per_m2: 0.0,
+        q_lws_w_per_m2: surface.inside_radiant_internal_gain_w_per_m2,
+        q_ki_w_per_m2,
+        q_sol_w_per_m2: surface.inside_shortwave_absorbed_w_per_m2,
+        q_conv_w_per_m2,
+        q_additional_inside_heat_source_w_per_m2: surface.inside_additional_heat_source_w_per_m2,
+        q_radiant_hvac_w_per_m2: surface.inside_radiant_hvac_w_per_m2,
+    }
+}
+
 pub(crate) fn surface_inside_ctf_source_terms_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
-    surface.inside_radiant_internal_gain_w_per_m2
-        + surface.inside_shortwave_absorbed_w_per_m2
-        + surface.inside_additional_heat_source_w_per_m2
-        + surface.inside_radiant_hvac_w_per_m2
-        + surface.inside_net_longwave_w_per_m2
+    surface_inside_face_balance_equation_terms_w_per_m2(surface, 0.0, 0.0)
+        .non_convective_source_w_per_m2()
 }
 
 pub(crate) fn exterior_surface_energy_balance(
@@ -547,6 +601,8 @@ pub(crate) fn exterior_surface_energy_balance(
         report_temperature_c: temperature_c,
         coefficient_surface_temperature_c,
         convection_reference_temperature_c: environmental.outdoor_air_temperature_c,
+        wet_timestep_fraction: wet_timestep_fraction.clamp(0.0, 1.0),
+        wet_reference_temperature_c,
         equivalent_radiant_temperature_c: environmental.radiant_temperature_c,
         outside_radiation_coefficient_w_per_m2_k: environmental
             .outside_radiation_coefficient_w_per_m2_k,

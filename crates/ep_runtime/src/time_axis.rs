@@ -22,11 +22,52 @@ pub struct TimePoint {
     pub hour: u32,
 }
 
+/// Zone timestep settings attached to a shared run-period time axis.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ZoneTimestepAxis {
+    /// Number of zone timesteps in each weather/output hour.
+    pub timesteps_per_hour: u32,
+    /// Nominal zone timestep duration in seconds.
+    pub timestep_seconds: f64,
+}
+
+/// System timestep settings attached to a shared run-period time axis.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SystemTimestepAxis {
+    /// Nominal system timestep duration before adaptive shortening.
+    pub nominal_timestep_seconds: f64,
+    /// Explicit placeholder for later variable system timestep support.
+    pub variable_system_timestep_support: &'static str,
+    /// Whether `ShortenTimeStepSys` state is represented in runtime state.
+    pub shorten_timestep_sys_state: bool,
+    /// Whether `UseZoneTimeStepHistory` state is represented in runtime state.
+    pub use_zone_timestep_history_state: bool,
+}
+
+/// Reported sample partitioning for one shared time axis.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct TimeAxisSamplePartitions {
+    /// Whether warmup samples are part of the reported output sample axis.
+    pub warmup_reported_samples: usize,
+    /// Number of reported run-period hourly samples.
+    pub run_period_reported_samples: usize,
+    /// Number of design-day reported samples in this axis.
+    pub design_day_reported_samples: usize,
+}
+
 /// Hourly time axis for one run period.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TimeAxis {
     /// Run period name.
     pub run_period_name: String,
+    /// First-hour weather interpolation policy selected by the run period.
+    pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    /// Zone timestep profile used by weather, schedules, output, and report sampling.
+    pub zone_timestep: ZoneTimestepAxis,
+    /// System timestep profile used by adaptive zone-air correction state.
+    pub system_timestep: SystemTimestepAxis,
+    /// Warmup/run-period/design-day sample partitioning.
+    pub sample_partitions: TimeAxisSamplePartitions,
     /// Hourly samples in output order.
     pub points: Vec<TimePoint>,
 }
@@ -100,7 +141,10 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
         &fallback
     };
 
-    build_hourly_time_axis_for_run_period(run_period)
+    build_hourly_time_axis_for_run_period_with_zone_timesteps(
+        run_period,
+        model.timestep.number_of_timesteps_per_hour.max(1),
+    )
 }
 
 pub(crate) fn run_period_first_hour_interpolation_starting_values(
@@ -116,6 +160,14 @@ pub(crate) fn run_period_first_hour_interpolation_starting_values(
 /// Builds an hourly time axis for one run period.
 pub fn build_hourly_time_axis_for_run_period(
     run_period: &RunPeriod,
+) -> Result<TimeAxis, TimeAxisError> {
+    build_hourly_time_axis_for_run_period_with_zone_timesteps(run_period, 1)
+}
+
+/// Builds an hourly time axis for one run period and an explicit zone timestep count.
+pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
+    run_period: &RunPeriod,
+    zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
     let begin_year = run_period
         .begin_year
@@ -176,8 +228,27 @@ pub fn build_hourly_time_axis_for_run_period(
         ordinal += 1;
     }
 
+    let zone_timesteps_per_hour = zone_timesteps_per_hour.max(1);
+    let zone_timestep_seconds = 3600.0 / f64::from(zone_timesteps_per_hour);
     Ok(TimeAxis {
         run_period_name: run_period.name.0.clone(),
+        first_hour_interpolation_starting_values: run_period
+            .first_hour_interpolation_starting_values,
+        zone_timestep: ZoneTimestepAxis {
+            timesteps_per_hour: zone_timesteps_per_hour,
+            timestep_seconds: zone_timestep_seconds,
+        },
+        system_timestep: SystemTimestepAxis {
+            nominal_timestep_seconds: zone_timestep_seconds,
+            variable_system_timestep_support: "placeholder-state-backed",
+            shorten_timestep_sys_state: true,
+            use_zone_timestep_history_state: true,
+        },
+        sample_partitions: TimeAxisSamplePartitions {
+            warmup_reported_samples: 0,
+            run_period_reported_samples: points.len(),
+            design_day_reported_samples: 0,
+        },
         points,
     })
 }

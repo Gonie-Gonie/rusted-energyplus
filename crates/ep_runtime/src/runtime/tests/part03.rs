@@ -17,7 +17,17 @@
         );
         assert_eq!(state.zones[0].previous_system_timestep_count, 1);
         assert_eq!(state.zones[0].volume_m3, 1.0);
-        assert!((state.zones[0].air_heat_capacity_j_per_k - 1207.2).abs() < 1.0e-9);
+        let expected_initial_air_heat_capacity =
+            energyplus_standard_zone_air_heat_capacity_j_per_k(
+                1.0,
+                20.0,
+                ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+            )
+                .expect("valid standard initial air heat capacity");
+        assert!(
+            (state.zones[0].air_heat_capacity_j_per_k - expected_initial_air_heat_capacity).abs()
+                < 1.0e-9
+        );
         assert_eq!(state.zones[0].convective_internal_gain_w, 12.0);
         assert_eq!(state.zones[0].opaque_surface_conductance_w_per_k, 6.0);
         assert_eq!(state.zones[0].opaque_surface_heat_gain_w, 0.0);
@@ -47,6 +57,29 @@
             0.0
         );
         assert_eq!(state.surfaces.len(), 6);
+        assert_ne!(state.construction_cache_hash, 0);
+        assert!(state.construction_cache_build_wall_seconds >= 0.0);
+        assert_eq!(state.construction_cache_entry_count, 1);
+        assert_eq!(state.construction_cache_no_mass_count, 1);
+        assert_eq!(state.construction_cache_massive_ctf_count, 0);
+        assert_eq!(state.construction_cache_eio_seeded_count, 0);
+        assert_eq!(state.construction_cache_rust_generated_count, 1);
+        let construction_cache =
+            crate::heat_balance::surface_manager::ConstructionThermalDataCache::build(
+                &model.typed,
+                &BTreeMap::new(),
+            )?;
+        let cache_token = construction_cache.invalidation_token();
+        assert_eq!(
+            cache_token.coefficient_cache_hash,
+            construction_cache.coefficient_cache_hash
+        );
+        assert!(!construction_cache.is_invalidated_by(cache_token));
+        let stale_token =
+            crate::heat_balance::surface_manager::ConstructionCacheInvalidationToken::from_coefficient_cache_hash(
+                cache_token.coefficient_cache_hash.wrapping_add(1),
+            );
+        assert!(construction_cache.is_invalidated_by(stale_token));
         let surface_slots = (0..state.surfaces.len()).collect::<Vec<_>>();
         assert_eq!(
             state.surface_indexes.surfaces_by_zone,
@@ -56,8 +89,26 @@
             state.surface_indexes.surfaces_by_construction,
             vec![surface_slots.clone()]
         );
-        assert_eq!(state.surface_indexes.opaque_surfaces, surface_slots);
+        assert_eq!(
+            state.surface_indexes.opaque_surfaces_by_zone,
+            vec![surface_slots.clone()]
+        );
+        assert_eq!(
+            state.surface_indexes.opaque_surfaces,
+            surface_slots.clone()
+        );
         assert!(state.surface_indexes.fenestration_surfaces.is_empty());
+        assert_eq!(
+            state.surface_indexes.exterior_surfaces,
+            surface_slots.clone()
+        );
+        assert!(state.surface_indexes.ground_surfaces.is_empty());
+        assert!(state.surface_indexes.adiabatic_surfaces.is_empty());
+        assert!(state.surface_indexes.interzone_surfaces.is_empty());
+        assert_eq!(
+            state.surface_indexes.output_requested_surfaces,
+            surface_slots.clone()
+        );
         assert_eq!(
             state.surface_indexes.ctf_surfaces,
             state.surface_indexes.opaque_surfaces
@@ -89,6 +140,7 @@
             OutsideBoundaryCondition::Outdoors
         );
         assert_eq!(state.surfaces[0].construction_name, "WALL");
+        assert_eq!(state.surfaces[0].construction_thermal_data_index, 0);
         assert_eq!(state.surfaces[0].outside_layer_material_name, "R1");
         assert_eq!(
             state.surfaces[0].outside_layer_roughness,
@@ -116,6 +168,32 @@
         assert_eq!(state.surfaces[0].heat_gain_to_zone_w, 0.0);
         assert_eq!(state.surfaces[0].inside_face_temperature_c, 20.0);
         assert_eq!(state.surfaces[0].outside_face_temperature_c, 20.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn same_model_heat_balance_states_reset_and_remain_independent()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model = SimulationModel::from_typed(cube_model());
+
+        let mut first_state = initialize_heat_balance_state(&model, 20.0)?;
+        let second_state = initialize_heat_balance_state(&model, 20.0)?;
+
+        first_state.timestep_index = 12;
+        first_state.zones[0].mean_air_temperature_c = 31.0;
+        first_state.surfaces[0].inside_face_temperature_c = 28.0;
+
+        assert_eq!(second_state.timestep_index, 0);
+        assert_eq!(second_state.zones[0].mean_air_temperature_c, 20.0);
+        assert_eq!(second_state.surfaces[0].inside_face_temperature_c, 20.0);
+
+        let reset_state = initialize_heat_balance_state(&model, 20.0)?;
+        assert_eq!(reset_state.timestep_index, 0);
+        assert_eq!(reset_state.zones[0].mean_air_temperature_c, 20.0);
+        assert_eq!(reset_state.surfaces[0].inside_face_temperature_c, 20.0);
+        assert_eq!(reset_state.zones.len(), second_state.zones.len());
+        assert_eq!(reset_state.surfaces.len(), second_state.surfaces.len());
 
         Ok(())
     }
@@ -259,13 +337,25 @@
         let unstable = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(22.0, 20.0, 1.0);
         let expected_unstable = 9.482 * unstable_delta / (7.238 - 1.0);
         assert!((unstable - expected_unstable).abs() < 1.0e-12);
+        assert_eq!(
+            energyplus_ashrae_tarp_natural_convection_branch(22.0, 20.0, 1.0).id(),
+            "unstable-horizontal-or-tilt"
+        );
 
         let stable = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(22.0, 20.0, -1.0);
         let expected_stable = 1.810 * unstable_delta / (1.382 + 1.0);
         assert!((stable - expected_stable).abs() < 1.0e-12);
+        assert_eq!(
+            energyplus_ashrae_tarp_natural_convection_branch(22.0, 20.0, -1.0).id(),
+            "stable-horizontal-or-tilt"
+        );
 
         let zero_delta = energyplus_ashrae_tarp_natural_convection_w_per_m2_k(20.0, 20.0, 1.0);
         assert_eq!(zero_delta, 0.0);
+        assert_eq!(
+            energyplus_ashrae_tarp_natural_convection_branch(28.0, 20.0, 0.0).id(),
+            "vertical-wall"
+        );
     }
 
     #[test]
@@ -294,16 +384,28 @@
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 22.0, 20.0);
         let expected_floor = 9.482 * delta_term / (7.238 - 1.0);
         assert!((floor_coefficient - expected_floor).abs() < 1.0e-12);
+        assert_eq!(
+            energyplus_tarp_inside_convection_branch_id(floor, 22.0, 20.0),
+            "unstable-horizontal-or-tilt"
+        );
 
         let roof_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(roof, 22.0, 20.0);
         let expected_roof = 1.810 * delta_term / (1.382 + 1.0);
         assert!((roof_coefficient - expected_roof).abs() < 1.0e-12);
+        assert_eq!(
+            energyplus_tarp_inside_convection_branch_id(roof, 22.0, 20.0),
+            "stable-horizontal-or-tilt"
+        );
 
         let wall_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(wall, 22.0, 20.0);
         let expected_wall = 1.31 * delta_term;
         assert!((wall_coefficient - expected_wall).abs() < 1.0e-12);
+        assert_eq!(
+            energyplus_tarp_inside_convection_branch_id(wall, 22.0, 20.0),
+            "vertical-wall"
+        );
 
         let zero_delta_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 20.0, 20.0);
@@ -313,7 +415,8 @@
     }
 
     #[test]
-    fn energyplus_doe2_outside_convection_uses_wind_side_and_roughness() {
+    fn energyplus_doe2_outside_convection_uses_wind_side_and_roughness()
+    -> Result<(), Box<dyn std::error::Error>> {
         let windward = energyplus_doe2_outside_convection_coefficient_w_per_m2_k(
             35.0,
             20.0,
@@ -346,6 +449,34 @@
         assert!((leeward - 11.929263692153699).abs() < 1.0e-12);
         assert!(windward > leeward);
         assert!(smoother < windward);
+
+        let typed = cube_model();
+        let model = SimulationModel::from_typed(typed.clone());
+        let state = initialize_heat_balance_state(&model, 20.0)?;
+        let wall_state = state
+            .surfaces
+            .iter()
+            .find(|surface| surface.surface_name == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing wall surface state"))?;
+        let wall = typed
+            .surfaces
+            .iter()
+            .find(|surface| surface.name.0 == "WALL Y0")
+            .ok_or_else(|| std::io::Error::other("missing wall surface"))?;
+        assert_eq!(
+            energyplus_outside_convection_branch_id(wall_state, Some(wall), 180.0, true),
+            "doe2-windward"
+        );
+        assert_eq!(
+            energyplus_outside_convection_branch_id(wall_state, Some(wall), 0.0, true),
+            "doe2-leeward"
+        );
+        assert_eq!(
+            energyplus_outside_convection_branch_id(wall_state, Some(wall), 180.0, false),
+            "simple-combined"
+        );
+
+        Ok(())
     }
 
     #[test]
@@ -533,6 +664,7 @@
         assert_eq!(ctf.outside_0_w_per_m2_k, 2.0);
         assert_eq!(ctf.cross_0_w_per_m2_k, 0.5);
         assert_eq!(ctf.inside_0_w_per_m2_k, 3.0);
+        assert_eq!(ctf.flux_0, None);
         assert_eq!(ctf.outside_history_w_per_m2_k, vec![0.4, -0.4]);
         assert_eq!(ctf.cross_history_w_per_m2_k, vec![0.1, 0.2]);
         assert_eq!(ctf.inside_history_w_per_m2_k, vec![0.3, -0.3]);
@@ -608,6 +740,7 @@
         assert_eq!(ctf.outside_0_w_per_m2_k, 58.08561);
         assert_eq!(ctf.cross_0_w_per_m2_k, 0.72354869);
         assert_eq!(ctf.inside_0_w_per_m2_k, 58.08561);
+        assert_eq!(ctf.flux_0, None);
         assert_eq!(
             ctf.outside_history_w_per_m2_k,
             vec![
@@ -659,6 +792,7 @@
         let simulation = simulate_heat_balance_zone_air_temperatures_internal(
             &model,
             &[5.0],
+            None,
             None,
             HeatBalanceSimulationOptions::hourly_samples(1),
             &[

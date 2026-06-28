@@ -54,6 +54,7 @@ pub(crate) fn steady_surface_ctf_state(
         outside_0_w_per_m2_k: coefficient_w_per_m2_k,
         cross_0_w_per_m2_k: coefficient_w_per_m2_k,
         inside_0_w_per_m2_k: coefficient_w_per_m2_k,
+        flux_0: None,
         const_in_part_w_per_m2: 0.0,
         const_out_part_w_per_m2: 0.0,
         outside_history_w_per_m2_k: Vec::new(),
@@ -104,6 +105,7 @@ pub(crate) fn surface_ctf_state_from_coefficients(
         outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
         cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
         inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+        flux_0: zero.flux,
         const_in_part_w_per_m2: 0.0,
         const_out_part_w_per_m2: 0.0,
         outside_history_w_per_m2_k: history
@@ -127,6 +129,14 @@ pub(crate) fn surface_ctf_state_from_coefficients(
         outside_flux_history_w_per_m2: vec![0.0; history_terms],
         inside_flux_history_w_per_m2: vec![0.0; history_terms],
     })
+}
+
+pub(crate) fn surface_ctf_state_from_coefficient_rows(
+    coefficients: &[ConstructionCtfCoefficientOverride],
+    initial_temperature_c: f64,
+) -> Option<SurfaceCtfState> {
+    let coefficients = coefficients.iter().collect::<Vec<_>>();
+    surface_ctf_state_from_coefficients(&coefficients, initial_temperature_c)
 }
 
 /// Inputs for the EnergyPlus CTF inside-face temperature balance subset.
@@ -428,10 +438,22 @@ pub(crate) fn surface_ctf_inside_current_outside_term_rate_w_with_outside_temper
 pub(crate) fn surface_ctf_inside_current_inside_term_rate_w(
     surface: &SurfaceHeatBalanceState,
 ) -> f64 {
-    if surface.area_m2 <= 0.0 {
+    surface_ctf_inside_current_inside_term_rate_w_from_sources(
+        surface.area_m2,
+        surface.ctf.inside_0_w_per_m2_k,
+        surface.inside_face_temperature_c,
+    )
+}
+
+pub(crate) fn surface_ctf_inside_current_inside_term_rate_w_from_sources(
+    area_m2: f64,
+    ctf_inside_0_w_per_m2_k: f64,
+    inside_face_temperature_c: f64,
+) -> f64 {
+    if area_m2 <= 0.0 {
         return 0.0;
     }
-    -surface.area_m2 * surface.inside_face_temperature_c * surface.ctf.inside_0_w_per_m2_k
+    -area_m2 * inside_face_temperature_c * ctf_inside_0_w_per_m2_k
 }
 
 pub(crate) fn surface_ctf_inside_history_term_rate_w(surface: &SurfaceHeatBalanceState) -> f64 {
@@ -621,8 +643,12 @@ pub(crate) fn heat_balance_ctf_history_slot_inside_flux_term_rate_w(
 }
 
 pub(crate) fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBalanceState) {
-    surface.ctf.const_in_part_w_per_m2 = 0.0;
-    surface.ctf.const_out_part_w_per_m2 = 0.0;
+    surface.ctf.const_in_part_w_per_m2 = surface_ctf_const_in_part_w_per_m2(surface);
+    surface.ctf.const_out_part_w_per_m2 = surface_ctf_const_out_part_w_per_m2(surface);
+}
+
+pub(crate) fn surface_ctf_const_in_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+    let mut const_in_part_w_per_m2 = 0.0;
     let terms = surface_ctf_history_term_count(surface);
 
     for term in 0..terms {
@@ -644,12 +670,6 @@ pub(crate) fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBala
             .get(term)
             .copied()
             .unwrap_or(0.0);
-        let outside_flux_w_per_m2 = surface
-            .ctf
-            .outside_flux_history_w_per_m2
-            .get(term)
-            .copied()
-            .unwrap_or(0.0);
         let cross = surface
             .ctf
             .cross_history_w_per_m2_k
@@ -662,6 +682,44 @@ pub(crate) fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBala
             .get(term)
             .copied()
             .unwrap_or(0.0);
+        let flux = surface.ctf.flux_history.get(term).copied().unwrap_or(0.0);
+
+        const_in_part_w_per_m2 += cross * outside_temperature_c - inside * inside_temperature_c
+            + flux * inside_flux_w_per_m2;
+    }
+
+    const_in_part_w_per_m2
+}
+
+pub(crate) fn surface_ctf_const_out_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+    let mut const_out_part_w_per_m2 = 0.0;
+    let terms = surface_ctf_history_term_count(surface);
+
+    for term in 0..terms {
+        let outside_temperature_c = surface
+            .ctf
+            .outside_temperature_history_c
+            .get(term)
+            .copied()
+            .unwrap_or(surface.outside_face_temperature_c);
+        let inside_temperature_c = surface
+            .ctf
+            .inside_temperature_history_c
+            .get(term)
+            .copied()
+            .unwrap_or(surface.inside_face_temperature_c);
+        let outside_flux_w_per_m2 = surface
+            .ctf
+            .outside_flux_history_w_per_m2
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
+        let cross = surface
+            .ctf
+            .cross_history_w_per_m2_k
+            .get(term)
+            .copied()
+            .unwrap_or(0.0);
         let outside = surface
             .ctf
             .outside_history_w_per_m2_k
@@ -670,13 +728,11 @@ pub(crate) fn update_surface_ctf_history_constants(surface: &mut SurfaceHeatBala
             .unwrap_or(0.0);
         let flux = surface.ctf.flux_history.get(term).copied().unwrap_or(0.0);
 
-        surface.ctf.const_in_part_w_per_m2 += cross * outside_temperature_c
-            - inside * inside_temperature_c
-            + flux * inside_flux_w_per_m2;
-        surface.ctf.const_out_part_w_per_m2 += outside * outside_temperature_c
-            - cross * inside_temperature_c
+        const_out_part_w_per_m2 += outside * outside_temperature_c - cross * inside_temperature_c
             + flux * outside_flux_w_per_m2;
     }
+
+    const_out_part_w_per_m2
 }
 
 pub(crate) fn advance_surface_ctf_histories(surface: &mut SurfaceHeatBalanceState) {

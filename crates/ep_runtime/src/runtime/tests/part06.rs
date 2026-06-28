@@ -650,6 +650,7 @@
             energyplus_exterior_wet_context_fraction(
                 HeatBalanceWeatherContext {
                     records: &records,
+                    sample: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(3),
@@ -664,6 +665,7 @@
             energyplus_exterior_wet_context_fraction(
                 HeatBalanceWeatherContext {
                     records: &records,
+                    sample: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: Some(4),
@@ -678,6 +680,7 @@
             energyplus_exterior_wet_context_fraction(
                 HeatBalanceWeatherContext {
                     records: &records,
+                    sample: None,
                     record_index: 1,
                     zone_steps_per_hour: 4,
                     zone_timestep: None,
@@ -732,7 +735,10 @@
         assert!(
             (heat_capacity - volume_m3 * expected_density * expected_specific_heat).abs() < 1.0e-9
         );
-        assert!(heat_capacity < volume_m3 * 1.2 * 1006.0);
+        let standard_heat_capacity =
+            energyplus_standard_zone_air_heat_capacity_j_per_k(volume_m3, 20.0, humidity_ratio)
+                .expect("valid standard-pressure heat capacity");
+        assert!(heat_capacity < standard_heat_capacity);
     }
 
     #[test]
@@ -755,6 +761,7 @@
         let records = [previous, current];
         let context = HeatBalanceWeatherContext {
             records: &records,
+            sample: None,
             record_index: 1,
             zone_steps_per_hour: 4,
             zone_timestep: Some(2),

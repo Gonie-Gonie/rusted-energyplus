@@ -226,6 +226,18 @@
                          "help":  "Gate the v0.11 air-side node baseline evidence and Rust projection."
                      },
                      {
+                         "name":  "airloop-fan-only-diagnostic-smoke",
+                         "path":  "smoke\\airloop-fan-only-diagnostic-smoke.ps1",
+                         "group":  "smoke",
+                         "help":  "Gate the C3 AirLoopHVAC fan-only diagnostic graph and output boundary."
+                     },
+                     {
+                         "name":  "airloop-diagnostic-fixtures-smoke",
+                         "path":  "smoke\\airloop-diagnostic-fixtures-smoke.ps1",
+                         "group":  "smoke",
+                         "help":  "Gate the C3 AirLoopHVAC coil-only, PTAC, and 5ZoneAirCooled diagnostic fixtures."
+                     },
+                     {
                          "name":  "ideal-loads-no-oa-sensible-conformance",
                          "path":  "smoke\\ideal-loads-no-oa-sensible-conformance.ps1",
                          "group":  "smoke",
@@ -896,6 +908,12 @@
                          "path":  "compare\\official-dynamic-heat-balance-third-order-probe.ps1",
                          "group":  "compare",
                          "help":  "Run the official dynamic diagnostic with the EnergyPlus third-order zone-air probe enabled."
+                     },
+                     {
+                         "name":  "official-dynamic-heat-balance-warmup-lanes",
+                         "path":  "compare\\official-dynamic-heat-balance-warmup-lanes.ps1",
+                         "group":  "compare",
+                         "help":  "Run no-warmup, Building-convergence, and fixed-20 warmup lanes and summarize first run-period handoff deltas."
                      },
                      {
                          "name":  "official-dynamic-heat-balance-warmup-20-probe",

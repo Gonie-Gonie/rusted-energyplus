@@ -15,8 +15,8 @@ use crate::heat_balance::state::{
 use crate::heat_balance::zone_predictor_corrector::{
     correct_step_source_order_path, energyplus_analytical_zone_air_temperature_c,
     energyplus_third_order_zone_air_temperature_from_coefficients,
-    energyplus_zone_air_temperature_coefficients, push_system_timestep_histories_source_order_path,
-    revert_zone_timestep_histories_source_order_path,
+    energyplus_zone_air_temperature_coefficients, push_system_timestep_histories_compat,
+    revert_zone_timestep_histories_compat,
 };
 use crate::psychrometrics::energyplus_psychrometric_humidity_ratio_from_rh;
 use crate::weather::{
@@ -28,7 +28,8 @@ use std::collections::BTreeMap;
 /// EnergyPlus source-order owner for zone-air correction and history updates.
 pub const ZONE_AIR_CORRECTION_OWNER_STAGE: &str = "ManageZoneAirUpdates";
 
-pub(crate) const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
+/// Default zone-air humidity ratio used before weather-driven correction.
+pub const ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO: f64 = 0.008;
 const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 const ENERGYPLUS_MAX_ZONE_TEMP_DIFF_C: f64 = 0.3;
 const ENERGYPLUS_MIN_SYSTEM_TIMESTEP_SECONDS: f64 = 60.0;
@@ -87,8 +88,8 @@ pub(crate) fn correct_zone_air_temperatures_from_current_surfaces(
             zone.sum_hat_surf_w,
             zone.sum_hat_ref_w,
             zone.convective_internal_gain_w,
-            0.0,
-            0.0,
+            zone.sum_mcp_w_per_k + zone.sum_sys_mcp_w_per_k,
+            zone.sum_mcp_t_w + zone.sum_sys_mcp_t_w,
             zone.air_heat_capacity_j_per_k,
             timestep_seconds,
             zone.previous_mean_air_temperatures_c,
@@ -202,9 +203,11 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
         };
 
         if system_timestep_count <= 1 {
+            zone.shorten_timestep_sys = false;
+            zone.prior_timestep_seconds = zone_timestep_seconds;
             zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
             zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-            push_system_timestep_histories_source_order_path(|| {
+            push_system_timestep_histories_compat(|| {
                 synchronize_single_system_timestep_history(zone);
             });
             zone.system_timestep_average_surface_convection_report_w = None;
@@ -213,6 +216,8 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
         }
 
         let system_timestep_seconds = zone_timestep_seconds / f64::from(system_timestep_count);
+        zone.shorten_timestep_sys = true;
+        zone.prior_timestep_seconds = system_timestep_seconds;
         let mut system_temperature_history =
             if system_timestep_count == zone.previous_system_timestep_count {
                 zone.previous_system_mean_air_temperatures_c
@@ -236,7 +241,7 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
 
         let reset_zone_air_state_from_system_history =
             system_timestep_count != zone.previous_system_timestep_count;
-        revert_zone_timestep_histories_source_order_path(|| {
+        revert_zone_timestep_histories_compat(|| {
             if reset_zone_air_state_from_system_history {
                 zone.mean_air_temperature_c = system_temperature_history[0];
                 zone.air_humidity_ratio = system_humidity_history[0];
@@ -292,7 +297,7 @@ pub(crate) fn apply_energyplus_adaptive_system_timestep_zone_air_correction(
             ];
         }
 
-        push_system_timestep_histories_source_order_path(|| {
+        push_system_timestep_histories_compat(|| {
             zone.zone_timestep_average_air_temperature_c = zone_temperature_average_c;
             zone.zone_timestep_average_air_humidity_ratio = zone_humidity_average;
             zone.previous_system_mean_air_temperatures_c = system_temperature_history;
@@ -363,8 +368,8 @@ pub(crate) fn correct_single_zone_air_temperature_from_current_surfaces(
         zone.sum_hat_surf_w,
         zone.sum_hat_ref_w,
         zone.convective_internal_gain_w,
-        0.0,
-        0.0,
+        zone.sum_mcp_w_per_k + zone.sum_sys_mcp_w_per_k,
+        zone.sum_mcp_t_w + zone.sum_sys_mcp_t_w,
         zone.air_heat_capacity_j_per_k,
         timestep_seconds,
         previous_mean_air_temperatures_c,

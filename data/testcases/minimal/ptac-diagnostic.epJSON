@@ -1,0 +1,73 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "upper_limit_value": 1.0,
+      "numeric_type": "Continuous"
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {
+      "schedule_type_limits_name": "Fraction",
+      "hourly_value": 1.0
+    }
+  },
+  "Zone": {
+    "PTAC Zone": {
+      "volume": 75.0
+    }
+  },
+  "Fan:OnOff": {
+    "PTAC Supply Fan": {
+      "availability_schedule_name": "Always On",
+      "fan_total_efficiency": 0.7,
+      "pressure_rise": 300.0,
+      "maximum_flow_rate": 0.35,
+      "motor_efficiency": 0.9,
+      "motor_in_airstream_fraction": 1.0,
+      "air_inlet_node_name": "PTAC Mixed Air Node",
+      "air_outlet_node_name": "PTAC Fan Outlet"
+    }
+  },
+  "Coil:Heating:Electric": {
+    "PTAC Heating Coil": {
+      "availability_schedule_name": "Always On",
+      "efficiency": 1.0,
+      "nominal_capacity": 1200.0,
+      "air_inlet_node_name": "PTAC Fan Outlet",
+      "air_outlet_node_name": "PTAC Supply Node"
+    }
+  },
+  "ZoneHVAC:PackagedTerminalAirConditioner": {
+    "PTAC Unit": {
+      "availability_schedule_name": "Always On",
+      "air_inlet_node_name": "PTAC Zone Return Node",
+      "air_outlet_node_name": "PTAC Zone Inlet Node",
+      "supply_air_flow_rate_during_cooling_operation": 0.35,
+      "supply_air_flow_rate_during_heating_operation": 0.35,
+      "outdoor_air_mixer_object_type": "OutdoorAir:Mixer",
+      "outdoor_air_mixer_name": "PTAC Outdoor Air Mixer",
+      "supply_air_fan_object_type": "Fan:OnOff",
+      "supply_air_fan_name": "PTAC Supply Fan",
+      "heating_coil_object_type": "Coil:Heating:Electric",
+      "heating_coil_name": "PTAC Heating Coil"
+    }
+  },
+  "Output:Variable": {
+    "PTAC Zone Inlet Node Temperature": {
+      "key_value": "PTAC Zone Inlet Node",
+      "variable_name": "System Node Temperature",
+      "reporting_frequency": "Hourly"
+    },
+    "PTAC Unit Heating Rate": {
+      "key_value": "PTAC Unit",
+      "variable_name": "Zone Packaged Terminal Air Conditioner Total Heating Rate",
+      "reporting_frequency": "Hourly"
+    }
+  }
+}

@@ -41,6 +41,14 @@ pub struct RunDiagnostic {
     pub object_name: Option<String>,
     /// Field name when applicable.
     pub field: Option<String>,
+    /// Surface name when applicable.
+    pub surface: Option<String>,
+    /// Zone name when applicable.
+    pub zone: Option<String>,
+    /// Zero-based timestep or sample index when applicable.
+    pub timestep: Option<u64>,
+    /// Output handle when applicable.
+    pub output_handle: Option<u32>,
     /// Human-readable message.
     pub message: String,
     /// True when this diagnostic blocks Rust execution.
@@ -64,6 +72,10 @@ impl RunDiagnostic {
             object_type: None,
             object_name: None,
             field: None,
+            surface: None,
+            zone: None,
+            timestep: None,
+            output_handle: None,
             message: message.into(),
             blocking,
         }
@@ -85,6 +97,34 @@ impl RunDiagnostic {
     #[must_use]
     pub fn with_field(mut self, field: Option<String>) -> Self {
         self.field = field;
+        self
+    }
+
+    /// Adds surface context.
+    #[must_use]
+    pub fn with_surface(mut self, surface: Option<String>) -> Self {
+        self.surface = surface;
+        self
+    }
+
+    /// Adds zone context.
+    #[must_use]
+    pub fn with_zone(mut self, zone: Option<String>) -> Self {
+        self.zone = zone;
+        self
+    }
+
+    /// Adds timestep/sample context.
+    #[must_use]
+    pub fn with_timestep(mut self, timestep: Option<u64>) -> Self {
+        self.timestep = timestep;
+        self
+    }
+
+    /// Adds output-handle context.
+    #[must_use]
+    pub fn with_output_handle(mut self, output_handle: Option<u32>) -> Self {
+        self.output_handle = output_handle;
         self
     }
 }

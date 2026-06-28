@@ -80,12 +80,18 @@
         model.other_equipment.push(OtherEquipment {
             id: InternalGainId(0),
             name: NormalizedName::new("Plug Load"),
+            fuel_type: NormalizedName::new("None"),
             zone: ZoneId(0),
             schedule: Some(ScheduleId(0)),
+            design_level_calculation_method:
+                OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
             design_level_w: 12.0,
+            power_per_floor_area_w_per_m2: 0.0,
+            power_per_person_w: 0.0,
             fraction_latent: 0.0,
             fraction_radiant: 0.0,
             fraction_lost: 0.0,
+            carbon_dioxide_generation_rate_m3_per_s_w: 0.0,
         });
         model.surfaces.extend(cube_surfaces());
         model

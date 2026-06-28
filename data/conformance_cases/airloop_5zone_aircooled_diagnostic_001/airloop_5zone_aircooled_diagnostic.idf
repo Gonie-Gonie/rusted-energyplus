@@ -1,0 +1,5 @@
+!- Diagnostic-only source placeholder.
+!- The executable C3 fixture is data/testcases/minimal/5zone-aircooled-diagnostic.epJSON.
+!- 5ZoneAirCooled promotion remains blocked until the official examplefile lane is tolerance-gated.
+
+Version,26.1;

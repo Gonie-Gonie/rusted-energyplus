@@ -1,26 +1,27 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AutoOrNumber, AutosizeOrNumber, BoilerHotWater, BranchId, BranchListId, Building,
-    ChillerElectricEir, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
+    AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent, BoilerHotWater,
+    BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent, CoilComponentKind,
+    ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
     DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
-    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
-    FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
-    IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
-    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
-    MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList,
-    NodeListId, NormalizedName, NumericType, OtherEquipment, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
-    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
-    Point3, PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SiteLocation,
-    SolarDistribution, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId,
+    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod, FanComponent,
+    FanComponentKind, FirstHourInterpolationStartingValues, HeatRecoveryType,
+    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
+    IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme,
+    LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId,
+    NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
+    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
+    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
+    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
+    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SunExposure,
+    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -215,6 +216,19 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ZoneHVAC:IdealLoadsAirSystem",
     "ZoneHVAC:EquipmentList",
     "ZoneHVAC:EquipmentConnections",
+    "AirLoopHVAC",
+    "Fan:ConstantVolume",
+    "Fan:OnOff",
+    "Fan:VariableVolume",
+    "Fan:SystemModel",
+    "Coil:Heating:Electric",
+    "Coil:Heating:Fuel",
+    "Coil:Heating:Water",
+    "Coil:Cooling:Water",
+    "Coil:Cooling:DX:SingleSpeed",
+    "SetpointManager:Scheduled",
+    "SetpointManager:SingleZone:Reheat",
+    "AvailabilityManager:Scheduled",
     "PlantLoop",
     "Branch",
     "BranchList",
@@ -268,6 +282,10 @@ impl<'a> Compiler<'a> {
         self.parse_ideal_loads_air_systems(&mut model);
         self.parse_zone_equipment_lists(&mut model);
         self.parse_zone_equipment_connections(&mut model);
+        self.parse_fans(&mut model);
+        self.parse_coils(&mut model);
+        self.parse_setpoint_managers(&mut model);
+        self.parse_availability_managers(&mut model);
         self.parse_pumps_constant_speed(&mut model);
         self.parse_boilers_hot_water(&mut model);
         self.parse_chillers_electric_eir(&mut model);
@@ -275,6 +293,7 @@ impl<'a> Compiler<'a> {
         self.parse_plant_branch_lists(&mut model);
         self.parse_plant_connectors(&mut model);
         self.parse_plant_connector_lists(&mut model);
+        self.parse_air_loops(&mut model);
         self.parse_plant_loops(&mut model);
         self.parse_other_equipment(&mut model);
         self.parse_people(&mut model);
@@ -1575,6 +1594,184 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_fans(&mut self, model: &mut TypedModel) {
+        for (object_type, kind) in [
+            ("Fan:ConstantVolume", FanComponentKind::ConstantVolume),
+            ("Fan:OnOff", FanComponentKind::OnOff),
+            ("Fan:VariableVolume", FanComponentKind::VariableVolume),
+            ("Fan:SystemModel", FanComponentKind::SystemModel),
+        ] {
+            for (name, object) in self.objects(object_type) {
+                let Some(inlet_node_name) =
+                    self.required_string(object_type, &name, &object, "air_inlet_node_name")
+                else {
+                    continue;
+                };
+                let Some(outlet_node_name) =
+                    self.required_string(object_type, &name, &object, "air_outlet_node_name")
+                else {
+                    continue;
+                };
+                let Some(inlet_node) = self.register_node(model, &inlet_node_name) else {
+                    continue;
+                };
+                let Some(outlet_node) = self.register_node(model, &outlet_node_name) else {
+                    continue;
+                };
+                let Some(id_value) = self.checked_id(object_type, &name, model.fans.len()) else {
+                    continue;
+                };
+                let id = ComponentId(id_value);
+                if model.fan_names.insert(&name, id).is_some() {
+                    self.duplicate_name(object_type, &name);
+                    continue;
+                }
+
+                model.fans.push(FanComponent {
+                    id,
+                    kind,
+                    name: NormalizedName::new(&name),
+                    availability_schedule: self.optional_schedule_reference(
+                        model,
+                        object_type,
+                        &name,
+                        &object,
+                        "availability_schedule_name",
+                    ),
+                    inlet_node,
+                    outlet_node,
+                    maximum_flow_rate_m3_per_s: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "maximum_flow_rate",
+                    ),
+                    pressure_rise_pa: self.optional_number(
+                        object_type,
+                        &name,
+                        &object,
+                        "pressure_rise",
+                    ),
+                });
+            }
+        }
+    }
+
+    fn parse_coils(&mut self, model: &mut TypedModel) {
+        for (object_type, kind) in [
+            ("Coil:Heating:Electric", CoilComponentKind::HeatingElectric),
+            ("Coil:Heating:Fuel", CoilComponentKind::HeatingFuel),
+            ("Coil:Heating:Water", CoilComponentKind::HeatingWater),
+            ("Coil:Cooling:Water", CoilComponentKind::CoolingWater),
+            (
+                "Coil:Cooling:DX:SingleSpeed",
+                CoilComponentKind::CoolingDxSingleSpeed,
+            ),
+        ] {
+            for (name, object) in self.objects(object_type) {
+                let inlet_node = self
+                    .optional_string(object_type, &name, &object, "air_inlet_node_name")
+                    .and_then(|node_name| self.register_node(model, &node_name));
+                let outlet_node = self
+                    .optional_string(object_type, &name, &object, "air_outlet_node_name")
+                    .and_then(|node_name| self.register_node(model, &node_name));
+                let Some(id_value) = self.checked_id(object_type, &name, model.coils.len()) else {
+                    continue;
+                };
+                let id = ComponentId(id_value);
+                if model.coil_names.insert(&name, id).is_some() {
+                    self.duplicate_name(object_type, &name);
+                    continue;
+                }
+
+                model.coils.push(CoilComponent {
+                    id,
+                    kind,
+                    name: NormalizedName::new(&name),
+                    inlet_node,
+                    outlet_node,
+                    availability_schedule: self.optional_schedule_reference(
+                        model,
+                        object_type,
+                        &name,
+                        &object,
+                        "availability_schedule_name",
+                    ),
+                });
+            }
+        }
+    }
+
+    fn parse_setpoint_managers(&mut self, model: &mut TypedModel) {
+        for object_type in [
+            "SetpointManager:Scheduled",
+            "SetpointManager:SingleZone:Reheat",
+        ] {
+            for (name, object) in self.objects(object_type) {
+                let setpoint_node = self
+                    .optional_string(
+                        object_type,
+                        &name,
+                        &object,
+                        "setpoint_node_or_nodelist_name",
+                    )
+                    .and_then(|node_or_list| {
+                        self.register_node_or_nodelist_name(model, &node_or_list);
+                        model.node_names.resolve(&node_or_list)
+                    });
+                let Some(id_value) =
+                    self.checked_id(object_type, &name, model.setpoint_managers.len())
+                else {
+                    continue;
+                };
+                let id = ComponentId(id_value);
+                if model.setpoint_manager_names.insert(&name, id).is_some() {
+                    self.duplicate_name(object_type, &name);
+                    continue;
+                }
+
+                model.setpoint_managers.push(SetpointManagerComponent {
+                    id,
+                    object_type: NormalizedName::new(object_type),
+                    name: NormalizedName::new(&name),
+                    setpoint_node,
+                });
+            }
+        }
+    }
+
+    fn parse_availability_managers(&mut self, model: &mut TypedModel) {
+        for object_type in ["AvailabilityManager:Scheduled"] {
+            for (name, object) in self.objects(object_type) {
+                let Some(id_value) =
+                    self.checked_id(object_type, &name, model.availability_managers.len())
+                else {
+                    continue;
+                };
+                let id = ComponentId(id_value);
+                if model.availability_manager_names.insert(&name, id).is_some() {
+                    self.duplicate_name(object_type, &name);
+                    continue;
+                }
+
+                model
+                    .availability_managers
+                    .push(AvailabilityManagerComponent {
+                        id,
+                        object_type: NormalizedName::new(object_type),
+                        name: NormalizedName::new(&name),
+                        schedule: self.optional_schedule_reference(
+                            model,
+                            object_type,
+                            &name,
+                            &object,
+                            "schedule_name",
+                        ),
+                    });
+            }
+        }
+    }
+
     fn parse_pumps_constant_speed(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Pump:ConstantSpeed") {
             let Some(inlet_node_name) =
@@ -1873,6 +2070,90 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_air_loops(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("AirLoopHVAC") {
+            let branch_list = self
+                .optional_string("AirLoopHVAC", &name, &object, "branch_list_name")
+                .and_then(|branch_list_name| {
+                    self.resolve_name(
+                        &model.plant_branch_list_names,
+                        "AirLoopHVAC",
+                        &name,
+                        "branch_list_name",
+                        &branch_list_name,
+                        "BranchList",
+                    )
+                });
+            let connector_list = self
+                .optional_string("AirLoopHVAC", &name, &object, "connector_list_name")
+                .and_then(|connector_list_name| {
+                    self.resolve_name(
+                        &model.plant_connector_list_names,
+                        "AirLoopHVAC",
+                        &name,
+                        "connector_list_name",
+                        &connector_list_name,
+                        "ConnectorList",
+                    )
+                });
+            let supply_side_inlet_node = self
+                .optional_string("AirLoopHVAC", &name, &object, "supply_side_inlet_node_name")
+                .and_then(|node_name| self.register_node(model, &node_name));
+            let demand_side_outlet_node = self
+                .optional_string(
+                    "AirLoopHVAC",
+                    &name,
+                    &object,
+                    "demand_side_outlet_node_name",
+                )
+                .and_then(|node_name| self.register_node(model, &node_name));
+            let demand_side_inlet_node_names = self.node_or_nodelist_name_array(
+                model,
+                "AirLoopHVAC",
+                &name,
+                &object,
+                "demand_side_inlet_node_names",
+                "demand_side_inlet_node_name",
+            );
+            let supply_side_outlet_node_names = self.node_or_nodelist_name_array(
+                model,
+                "AirLoopHVAC",
+                &name,
+                &object,
+                "supply_side_outlet_node_names",
+                "supply_side_outlet_node_name",
+            );
+            let Some(id_value) = self.checked_id("AirLoopHVAC", &name, model.air_loops.len())
+            else {
+                continue;
+            };
+            let id = LoopId(id_value);
+            if model.air_loop_names.insert(&name, id).is_some() {
+                self.duplicate_name("AirLoopHVAC", &name);
+                continue;
+            }
+
+            model.air_loops.push(AirLoopHvac {
+                id,
+                name: NormalizedName::new(&name),
+                availability_manager_list_name: self
+                    .optional_string(
+                        "AirLoopHVAC",
+                        &name,
+                        &object,
+                        "availability_manager_list_name",
+                    )
+                    .map(|value| NormalizedName::new(&value)),
+                branch_list,
+                connector_list,
+                supply_side_inlet_node,
+                demand_side_outlet_node,
+                demand_side_inlet_node_names,
+                supply_side_outlet_node_names,
+            });
+        }
+    }
+
     fn parse_plant_loops(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("PlantLoop") {
             let Some(plant_side_inlet_node_name) =
@@ -2056,11 +2337,65 @@ impl<'a> Compiler<'a> {
                 continue;
             }
 
+            let fuel_type = self
+                .optional_string("OtherEquipment", &name, &object, "fuel_type")
+                .map(|value| NormalizedName::new(&value))
+                .unwrap_or_else(|| {
+                    self.record_default("OtherEquipment", &name, "fuel_type", "None");
+                    NormalizedName::new("None")
+                });
+            let design_level_calculation_method = self.enum_default(
+                "OtherEquipment",
+                &name,
+                (&object, "design_level_calculation_method"),
+                OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
+                "EquipmentLevel",
+                parse_other_equipment_design_level_calculation_method,
+            );
+            let fraction_latent = self.number_range_default(
+                "OtherEquipment",
+                &name,
+                &object,
+                "fraction_latent",
+                0.0,
+                0.0..=1.0,
+            );
+            let fraction_radiant = self.number_range_default(
+                "OtherEquipment",
+                &name,
+                &object,
+                "fraction_radiant",
+                0.0,
+                0.0..=1.0,
+            );
+            let fraction_lost = self.number_range_default(
+                "OtherEquipment",
+                &name,
+                &object,
+                "fraction_lost",
+                0.0,
+                0.0..=1.0,
+            );
+            let fraction_sum = fraction_latent + fraction_radiant + fraction_lost;
+            if fraction_sum > 1.0 + 1.0e-12 {
+                self.error(
+                    "InvalidOtherEquipmentFractionSum",
+                    "OtherEquipment",
+                    Some(&name),
+                    Some("fraction_latent+fraction_radiant+fraction_lost"),
+                    format!(
+                        "OtherEquipment/{name} latent+radiant+lost fractions must be less than or equal to 1.0, got {fraction_sum}"
+                    ),
+                );
+            }
+
             model.other_equipment.push(OtherEquipment {
                 id,
                 name: NormalizedName::new(&name),
+                fuel_type,
                 zone,
                 schedule,
+                design_level_calculation_method,
                 design_level_w: self.number_default(
                     "OtherEquipment",
                     &name,
@@ -2068,25 +2403,30 @@ impl<'a> Compiler<'a> {
                     "design_level",
                     0.0,
                 ),
-                fraction_latent: self.number_default(
+                power_per_floor_area_w_per_m2: self.number_range_default(
                     "OtherEquipment",
                     &name,
                     &object,
-                    "fraction_latent",
+                    "power_per_floor_area",
                     0.0,
+                    0.0..=f64::INFINITY,
                 ),
-                fraction_radiant: self.number_default(
+                power_per_person_w: self.number_range_default(
                     "OtherEquipment",
                     &name,
                     &object,
-                    "fraction_radiant",
+                    "power_per_person",
                     0.0,
+                    0.0..=f64::INFINITY,
                 ),
-                fraction_lost: self.number_default(
+                fraction_latent,
+                fraction_radiant,
+                fraction_lost,
+                carbon_dioxide_generation_rate_m3_per_s_w: self.number_default(
                     "OtherEquipment",
                     &name,
                     &object,
-                    "fraction_lost",
+                    "carbon_dioxide_generation_rate",
                     0.0,
                 ),
             });
@@ -2865,6 +3205,30 @@ impl<'a> Compiler<'a> {
                     "Chiller:Electric:EIR",
                 )
                 .is_some(),
+            "fan:constantvolume" | "fan:onoff" | "fan:variablevolume" | "fan:systemmodel" => self
+                .resolve_name(
+                    &model.fan_names,
+                    object_type,
+                    object_name,
+                    field,
+                    component_name,
+                    component_object_type,
+                )
+                .is_some(),
+            "coil:heating:electric"
+            | "coil:heating:fuel"
+            | "coil:heating:water"
+            | "coil:cooling:water"
+            | "coil:cooling:dx:singlespeed" => self
+                .resolve_name(
+                    &model.coil_names,
+                    object_type,
+                    object_name,
+                    field,
+                    component_name,
+                    component_object_type,
+                )
+                .is_some(),
             _ => true,
         }
     }
@@ -2941,6 +3305,51 @@ impl<'a> Compiler<'a> {
         }
 
         Some(nodes)
+    }
+
+    fn node_or_nodelist_name_array(
+        &mut self,
+        model: &mut TypedModel,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        array_field: &str,
+        name_field: &str,
+    ) -> Vec<NormalizedName> {
+        let Some(value) = field_value(object, array_field) else {
+            return Vec::new();
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type(object_type, object_name, array_field, "array");
+            return Vec::new();
+        };
+
+        let mut names = Vec::new();
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    object_type,
+                    Some(object_name),
+                    Some(array_field),
+                    format!("{object_type}/{object_name} node entry {index} must be an object"),
+                );
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(node_or_list_name) =
+                self.required_string(object_type, &entry_name, &entry_object, name_field)
+            else {
+                continue;
+            };
+            self.register_node_or_nodelist_name(model, &node_or_list_name);
+            names.push(NormalizedName::new(&node_or_list_name));
+        }
+        names
     }
 
     fn objects(&self, object_type: &str) -> Vec<(String, RawObject)> {
@@ -3908,6 +4317,31 @@ fn parse_outside_surface_convection_algorithm(
     }
 }
 
+fn parse_other_equipment_design_level_calculation_method(
+    value: &str,
+) -> Option<OtherEquipmentDesignLevelCalculationMethod> {
+    match value {
+        value if value.eq_ignore_ascii_case("EquipmentLevel") => {
+            Some(OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel)
+        }
+        value
+            if value.eq_ignore_ascii_case("Watts/Area")
+                || value.eq_ignore_ascii_case("Power/Area")
+                || value.eq_ignore_ascii_case("WattsPerZoneFloorArea") =>
+        {
+            Some(OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea)
+        }
+        value
+            if value.eq_ignore_ascii_case("Watts/Person")
+                || value.eq_ignore_ascii_case("Power/Person")
+                || value.eq_ignore_ascii_case("WattsPerPerson") =>
+        {
+            Some(OtherEquipmentDesignLevelCalculationMethod::WattsPerPerson)
+        }
+        _ => None,
+    }
+}
+
 fn parse_numeric_type(value: &str) -> Option<NumericType> {
     match value {
         value if value.eq_ignore_ascii_case("Continuous") => Some(NumericType::Continuous),
@@ -4218,7 +4652,8 @@ mod tests {
         AutosizeOrNumber, DayOfWeek, DehumidificationControlType,
         DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
         HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
-        LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph, OutdoorAirEconomizerType,
+        LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
+        OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
     };
     use ep_raw_model::parse_epjson_str;
@@ -4393,12 +4828,17 @@ mod tests {
                 "Zone": {"Zone One": {}},
                 "OtherEquipment": {
                     "Plug Load": {
+                        "fuel_type": "Electricity",
                         "zone_or_zonelist_or_space_or_spacelist_name": "zone one",
                         "schedule_name": "always on",
+                        "design_level_calculation_method": "Power/Area",
                         "design_level": 125.0,
+                        "power_per_floor_area": 7.5,
+                        "power_per_person": 25.0,
                         "fraction_latent": 0.1,
                         "fraction_radiant": 0.2,
-                        "fraction_lost": 0.3
+                        "fraction_lost": 0.3,
+                        "carbon_dioxide_generation_rate": 0.0000001
                     }
                 },
                 "People": {
@@ -4431,12 +4871,23 @@ mod tests {
         );
         assert_eq!(model.materials[1].thermal_resistance(), Some(2.29));
         assert_eq!(model.other_equipment.len(), 1);
+        assert_eq!(model.other_equipment[0].fuel_type.0, "ELECTRICITY");
         assert_eq!(model.other_equipment[0].zone.0, 0);
         assert_eq!(model.other_equipment[0].schedule.map(|id| id.0), Some(0));
+        assert_eq!(
+            model.other_equipment[0].design_level_calculation_method,
+            OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+        );
         assert_eq!(model.other_equipment[0].design_level_w, 125.0);
+        assert_eq!(model.other_equipment[0].power_per_floor_area_w_per_m2, 7.5);
+        assert_eq!(model.other_equipment[0].power_per_person_w, 25.0);
         assert_eq!(model.other_equipment[0].fraction_latent, 0.1);
         assert_eq!(model.other_equipment[0].fraction_radiant, 0.2);
         assert_eq!(model.other_equipment[0].fraction_lost, 0.3);
+        assert_eq!(
+            model.other_equipment[0].carbon_dioxide_generation_rate_m3_per_s_w,
+            0.0000001
+        );
         assert_eq!(model.people.len(), 1);
         assert_eq!(model.people[0].zone.0, 0);
         assert_eq!(
@@ -4448,6 +4899,39 @@ mod tests {
             PeopleNumberCalculationMethod::People
         );
         assert_eq!(model.people[0].number_of_people, 5.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn other_equipment_fraction_sum_above_one_is_error() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {}},
+                "OtherEquipment": {
+                    "Bad Fractions": {
+                        "zone_or_zonelist_or_space_or_spacelist_name": "zone one",
+                        "design_level": 100.0,
+                        "fraction_latent": 0.4,
+                        "fraction_radiant": 0.4,
+                        "fraction_lost": 0.3
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "InvalidOtherEquipmentFractionSum"
+                && diagnostic.object_type == "OtherEquipment"
+                && diagnostic.object_name.as_deref() == Some("Bad Fractions")
+                && diagnostic.field.as_deref()
+                    == Some("fraction_latent+fraction_radiant+fraction_lost")
+        }));
 
         Ok(())
     }

@@ -1,0 +1,146 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "upper_limit_value": 1.0,
+      "numeric_type": "Continuous"
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {
+      "schedule_type_limits_name": "Fraction",
+      "hourly_value": 1.0
+    }
+  },
+  "Zone": {
+    "Core Zone": {
+      "volume": 120.0
+    },
+    "North Zone": {
+      "volume": 90.0
+    },
+    "South Zone": {
+      "volume": 90.0
+    },
+    "East Zone": {
+      "volume": 90.0
+    },
+    "West Zone": {
+      "volume": 90.0
+    }
+  },
+  "Fan:VariableVolume": {
+    "5Zone Supply Fan": {
+      "availability_schedule_name": "Always On",
+      "fan_total_efficiency": 0.7,
+      "pressure_rise": 700.0,
+      "maximum_flow_rate": 1.5,
+      "motor_efficiency": 0.9,
+      "motor_in_airstream_fraction": 1.0,
+      "air_inlet_node_name": "5Zone Supply Fan Inlet",
+      "air_outlet_node_name": "5Zone Supply Fan Outlet"
+    }
+  },
+  "Coil:Cooling:DX:SingleSpeed": {
+    "5Zone DX Cooling Coil": {
+      "availability_schedule_name": "Always On",
+      "air_inlet_node_name": "5Zone Supply Fan Outlet",
+      "air_outlet_node_name": "5Zone Cooling Coil Outlet"
+    }
+  },
+  "Branch": {
+    "5Zone Supply Branch": {
+      "components": [
+        {
+          "component_object_type": "Fan:VariableVolume",
+          "component_name": "5Zone Supply Fan",
+          "component_inlet_node_name": "5Zone Supply Fan Inlet",
+          "component_outlet_node_name": "5Zone Supply Fan Outlet"
+        },
+        {
+          "component_object_type": "Coil:Cooling:DX:SingleSpeed",
+          "component_name": "5Zone DX Cooling Coil",
+          "component_inlet_node_name": "5Zone Supply Fan Outlet",
+          "component_outlet_node_name": "5Zone Cooling Coil Outlet"
+        }
+      ]
+    }
+  },
+  "BranchList": {
+    "5Zone Air Loop Branches": {
+      "branches": [
+        {
+          "branch_name": "5Zone Supply Branch"
+        }
+      ]
+    }
+  },
+  "AirLoopHVAC": {
+    "5Zone AirCooled Diagnostic Air Loop": {
+      "branch_list_name": "5Zone Air Loop Branches",
+      "supply_side_inlet_node_name": "5Zone Supply Fan Inlet",
+      "demand_side_outlet_node_name": "5Zone Cooling Coil Outlet",
+      "demand_side_inlet_node_names": [
+        {
+          "demand_side_inlet_node_name": "5Zone Return Node"
+        }
+      ],
+      "supply_side_outlet_node_names": [
+        {
+          "supply_side_outlet_node_name": "Core Zone Supply Node"
+        },
+        {
+          "supply_side_outlet_node_name": "North Zone Supply Node"
+        },
+        {
+          "supply_side_outlet_node_name": "South Zone Supply Node"
+        },
+        {
+          "supply_side_outlet_node_name": "East Zone Supply Node"
+        },
+        {
+          "supply_side_outlet_node_name": "West Zone Supply Node"
+        }
+      ]
+    }
+  },
+  "SetpointManager:Scheduled": {
+    "5Zone Supply Air Setpoint Manager": {
+      "control_variable": "Temperature",
+      "schedule_name": "Always On",
+      "setpoint_node_or_nodelist_name": "5Zone Cooling Coil Outlet"
+    }
+  },
+  "AvailabilityManager:Scheduled": {
+    "5Zone Availability": {
+      "schedule_name": "Always On"
+    }
+  },
+  "Output:Variable": {
+    "5Zone Supply Fan Outlet Temperature": {
+      "key_value": "5Zone Supply Fan Outlet",
+      "variable_name": "System Node Temperature",
+      "reporting_frequency": "Hourly"
+    },
+    "5Zone Cooling Coil Outlet Temperature": {
+      "key_value": "5Zone Cooling Coil Outlet",
+      "variable_name": "System Node Temperature",
+      "reporting_frequency": "Hourly"
+    },
+    "5Zone Supply Fan Electricity Rate": {
+      "key_value": "5Zone Supply Fan",
+      "variable_name": "Fan Electricity Rate",
+      "reporting_frequency": "Hourly"
+    },
+    "5Zone Cooling Coil Total Cooling Rate": {
+      "key_value": "5Zone DX Cooling Coil",
+      "variable_name": "Cooling Coil Total Cooling Rate",
+      "reporting_frequency": "Hourly"
+    }
+  }
+}

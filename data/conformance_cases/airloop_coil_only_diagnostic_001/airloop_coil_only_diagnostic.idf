@@ -1,0 +1,5 @@
+!- Diagnostic-only source placeholder.
+!- The executable C3 fixture is data/testcases/minimal/airloop-coil-only.epJSON.
+!- Coil-only conformance remains blocked until node/coil variables are tolerance-gated.
+
+Version,26.1;

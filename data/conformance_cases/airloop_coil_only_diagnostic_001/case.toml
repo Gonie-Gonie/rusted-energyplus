@@ -1,0 +1,68 @@
+id = "airloop_coil_only_diagnostic_001"
+title = "AirLoopHVAC coil-only diagnostic fixture"
+milestone = "C3-airloop-hvac-skeleton"
+purpose = "Record baseline-only AirLoopHVAC coil graph evidence without claiming coil or air-loop numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This C3 case is a diagnostic-only AirLoopHVAC graph and output-request gate.",
+  "The coil-only fixture compiles AirLoopHVAC, BranchList, Branch, Coil:Heating:Electric, SetpointManager, and AvailabilityManager typed skeletons.",
+  "Coil-only conformance promotion remains blocked until node and coil variables have a tolerance-gated comparison path."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "minimal-epjson"
+source_file = "data/testcases/minimal/airloop-coil-only.epJSON"
+tier = "C"
+
+[scope]
+domains = ["hvac", "node"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = true
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/airloop_coil_only_diagnostic_001/airloop_coil_only_diagnostic.idf"
+epjson = "data/testcases/minimal/airloop-coil-only.epJSON"
+
+[[outputs]]
+key = "Coil Inlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "Coil Outlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "Heating Coil"
+variable = "Heating Coil Heating Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = "compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd airloop-diagnostic-fixtures-smoke"
+blocking = true

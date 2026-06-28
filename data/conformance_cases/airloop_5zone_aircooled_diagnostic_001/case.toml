@@ -1,0 +1,77 @@
+id = "airloop_5zone_aircooled_diagnostic_001"
+title = "5ZoneAirCooled air-loop diagnostic fixture"
+milestone = "C3-airloop-hvac-skeleton"
+purpose = "Keep a five-zone air-cooled HVAC diagnostic case in the C-tier backlog without claiming broad AirLoopHVAC numerical conformance."
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This C3 case is a reduced diagnostic placeholder for the future EnergyPlus 5ZoneAirCooled examplefile lane.",
+  "The fixture preserves a five-zone AirLoopHVAC graph with fan and DX coil typed skeleton coverage.",
+  "5ZoneAirCooled promotion remains blocked until the official examplefile input, air terminal dispatch, sizing, and tolerance-gated HVAC comparisons are wired."
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "minimal-epjson"
+source_file = "data/testcases/minimal/5zone-aircooled-diagnostic.epJSON"
+tier = "C"
+
+[scope]
+domains = ["hvac", "node", "zone"]
+has_zone = true
+has_surface = false
+has_fenestration = false
+has_air_loop = true
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/airloop_5zone_aircooled_diagnostic_001/airloop_5zone_aircooled_diagnostic.idf"
+epjson = "data/testcases/minimal/5zone-aircooled-diagnostic.epJSON"
+
+[[outputs]]
+key = "5Zone Supply Fan Outlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "5Zone Cooling Coil Outlet"
+variable = "System Node Temperature"
+frequency = "hourly"
+class = "node-state"
+source = "eso"
+domain = "node"
+level = "baseline"
+
+[[outputs]]
+key = "5Zone Supply Fan"
+variable = "Fan Electricity Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "baseline"
+
+[[outputs]]
+key = "5Zone DX Cooling Coil"
+variable = "Cooling Coil Total Cooling Rate"
+frequency = "hourly"
+class = "hvac-state"
+source = "eso"
+domain = "hvac"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = "compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd airloop-diagnostic-fixtures-smoke"
+blocking = true

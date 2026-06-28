@@ -8,7 +8,7 @@ use crate::heat_balance::state::{
 use crate::heat_balance::summary::HeatBalanceWarmupSummary;
 use crate::heat_balance::trace::heat_balance_zone_air_state_sample;
 use crate::weather::{
-    EpwRecord, HeatBalanceWeatherContext,
+    EpwRecord, HeatBalanceWeatherContext, WeatherTimestepSeries,
     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
     heat_balance_weather_context_for_timestep,
 };
@@ -19,6 +19,7 @@ pub(crate) fn run_heat_balance_run_period_warmup<F>(
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     options: HeatBalanceWarmupOptions,
@@ -50,10 +51,11 @@ where
     let maximum_days = options.maximum_days.max(options.minimum_days).max(1);
     let tolerance = options.temperature_convergence_tolerance_delta_c.max(0.0);
     let timestep_start = state.timestep_index;
-    let mut previous_day_end_temperatures: Option<Vec<f64>> = None;
+    let mut previous_day_extrema: Option<HeatBalanceWarmupDayTemperatureExtrema> = None;
     let mut final_delta = f64::INFINITY;
 
     for day in 1..=maximum_days {
+        let mut day_extrema = HeatBalanceWarmupDayTemperatureExtrema::new(state.zones.len());
         for (hour_index, outdoor_dry_bulb_c) in weather_dry_bulb_c
             .iter()
             .copied()
@@ -63,22 +65,25 @@ where
             let hour_ending = u32::try_from(hour_index % 24 + 1).unwrap_or(24);
             let steps = zone_steps_per_hour.max(1);
             for substep in 1..=steps {
-                let timestep_outdoor_dry_bulb_c =
-                    energyplus_weather_dry_bulb_at_timestep_with_starting_values(
-                        weather_records,
-                        hour_index,
-                        outdoor_dry_bulb_c,
-                        steps,
-                        substep,
-                        first_hour_interpolation_starting_values,
-                    );
                 let weather_context = heat_balance_weather_context_for_timestep(
-                    weather_records,
+                    weather_series,
                     hour_index,
                     steps,
                     substep,
                     first_hour_interpolation_starting_values,
                 );
+                let timestep_outdoor_dry_bulb_c = weather_context
+                    .and_then(|context| context.sample.map(|sample| sample.dry_bulb_c))
+                    .unwrap_or_else(|| {
+                        energyplus_weather_dry_bulb_at_timestep_with_starting_values(
+                            weather_records,
+                            hour_index,
+                            outdoor_dry_bulb_c,
+                            steps,
+                            substep,
+                            first_hour_interpolation_starting_values,
+                        )
+                    });
                 advance_timestep(
                     model,
                     state,
@@ -93,6 +98,7 @@ where
                     inside_hconv_reevaluation_interval,
                     surface_loop_zone_air_correction,
                 );
+                day_extrema.record_state(state);
             }
         }
 
@@ -103,14 +109,15 @@ where
                 state: heat_balance_zone_air_state_sample(zone),
             }
         }));
-        if let Some(previous_temperatures) = &previous_day_end_temperatures {
-            final_delta = max_abs_pair_delta(
-                previous_temperatures.as_slice(),
-                day_end_temperatures.as_slice(),
-            );
+        if let Some(previous_extrema) = &previous_day_extrema {
+            final_delta = day_extrema.max_abs_delta(previous_extrema);
             if day >= options.minimum_days && final_delta <= tolerance {
                 return HeatBalanceWarmupSummary {
                     enabled: true,
+                    minimum_days: options.minimum_days,
+                    maximum_days,
+                    temperature_convergence_tolerance_delta_c: tolerance,
+                    loads_convergence_tolerance_w: options.loads_convergence_tolerance_w,
                     day_count: day,
                     timestep_count: state.timestep_index - timestep_start,
                     hours_per_day,
@@ -119,16 +126,85 @@ where
                 };
             }
         }
-        previous_day_end_temperatures = Some(day_end_temperatures);
+        if day_extrema.is_empty() {
+            day_extrema.record_temperatures(&day_end_temperatures);
+        }
+        previous_day_extrema = Some(day_extrema);
     }
 
     HeatBalanceWarmupSummary {
         enabled: true,
+        minimum_days: options.minimum_days,
+        maximum_days,
+        temperature_convergence_tolerance_delta_c: tolerance,
+        loads_convergence_tolerance_w: options.loads_convergence_tolerance_w,
         day_count: maximum_days,
         timestep_count: state.timestep_index - timestep_start,
         hours_per_day,
         converged: false,
         final_max_zone_temperature_delta_c: final_delta,
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct HeatBalanceWarmupDayTemperatureExtrema {
+    max_temperatures_c: Vec<f64>,
+    min_temperatures_c: Vec<f64>,
+}
+
+impl HeatBalanceWarmupDayTemperatureExtrema {
+    fn new(zone_count: usize) -> Self {
+        Self {
+            max_temperatures_c: vec![f64::NEG_INFINITY; zone_count],
+            min_temperatures_c: vec![f64::INFINITY; zone_count],
+        }
+    }
+
+    fn record_state(&mut self, state: &HeatBalanceState) {
+        let temperatures = state
+            .zones
+            .iter()
+            .map(|zone| {
+                if zone.zone_timestep_average_air_temperature_c.is_finite() {
+                    zone.zone_timestep_average_air_temperature_c
+                } else {
+                    zone.mean_air_temperature_c
+                }
+            })
+            .collect::<Vec<_>>();
+        self.record_temperatures(&temperatures);
+    }
+
+    fn record_temperatures(&mut self, temperatures_c: &[f64]) {
+        for (index, temperature_c) in temperatures_c.iter().copied().enumerate() {
+            if let Some(max_temperature_c) = self.max_temperatures_c.get_mut(index) {
+                *max_temperature_c = max_temperature_c.max(temperature_c);
+            }
+            if let Some(min_temperature_c) = self.min_temperatures_c.get_mut(index) {
+                *min_temperature_c = min_temperature_c.min(temperature_c);
+            }
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.max_temperatures_c
+            .iter()
+            .all(|temperature_c| !temperature_c.is_finite())
+            && self
+                .min_temperatures_c
+                .iter()
+                .all(|temperature_c| !temperature_c.is_finite())
+    }
+
+    fn max_abs_delta(&self, previous: &Self) -> f64 {
+        max_abs_pair_delta(
+            self.max_temperatures_c.as_slice(),
+            previous.max_temperatures_c.as_slice(),
+        )
+        .max(max_abs_pair_delta(
+            self.min_temperatures_c.as_slice(),
+            previous.min_temperatures_c.as_slice(),
+        ))
     }
 }
 

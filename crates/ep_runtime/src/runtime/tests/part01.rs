@@ -4,14 +4,15 @@
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
         ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
-        FirstZoneSimulationOptions, HeatBalanceCtfInitialHistoryPolicy,
+        ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO, FirstZoneSimulationOptions,
+        HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
         HeatBalanceSurfaceLoopZoneAirCorrection, HeatBalanceWarmupOptions,
         HeatBalanceWarmupSummary, HeatBalanceWeatherContext, HeatBalanceZoneAirReportSampling,
         HeatBalanceZoneConductionReportSource, InteriorLongwaveExchangeProbe,
         InteriorLongwaveSurfaceSnapshot, KELVIN_OFFSET, OutputSeries,
         QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
-        STEFAN_BOLTZMANN_W_PER_M2_K4, SimulationMode, SimulationState,
+        STEFAN_BOLTZMANN_W_PER_M2_K4, ScheduleSeriesKind, SimulationMode, SimulationState,
         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
         SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
@@ -19,9 +20,9 @@
         append_surface_incident_solar_radiation_series,
         apply_energyplus_adaptive_system_timestep_zone_air_correction,
         energyplus_analytical_zone_air_temperature_c, energyplus_anisotropic_sky_multiplier,
-        energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
-        energyplus_average_solar_coefficients, energyplus_ctf_inside_face_temperature_c,
-        energyplus_ctf_outside_face_temperature_c,
+        energyplus_approximate_view_factors, energyplus_ashrae_tarp_natural_convection_branch,
+        energyplus_ashrae_tarp_natural_convection_w_per_m2_k, energyplus_average_solar_coefficients,
+        energyplus_ctf_inside_face_temperature_c, energyplus_ctf_outside_face_temperature_c,
         energyplus_ctf_outside_face_temperature_quick_conduction_c,
         energyplus_daily_solar_coefficients,
         energyplus_doe2_outside_convection_coefficient_w_per_m2_k,
@@ -29,10 +30,12 @@
         energyplus_exterior_wet_timestep_fraction,
         energyplus_linearized_radiation_coefficient_w_per_m2_k,
         energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
-        energyplus_outdoor_wet_bulb_c, energyplus_scriptf_from_view_factors,
+        energyplus_outdoor_wet_bulb_c, energyplus_outside_convection_branch_id,
+        energyplus_scriptf_from_view_factors, energyplus_standard_zone_air_heat_capacity_j_per_k,
         energyplus_shadowing_period_solar_coefficients,
         energyplus_surface_outdoor_air_temperature_c,
         energyplus_surface_outside_wind_speed_m_per_s,
+        energyplus_tarp_inside_convection_branch_id,
         energyplus_tarp_inside_convection_coefficient_w_per_m2_k,
         energyplus_third_order_zone_air_temperature_c,
         energyplus_weather_atmospheric_pressure_at_timestep,
@@ -51,16 +54,19 @@
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients,
         inside_ctf_outside_temperature_history_commit_override_c, parse_epw_dry_bulb_series,
-        parse_epw_records, precompute_schedule_value_series, precompute_weather_timestep_series,
+        parse_epw_records, precompute_schedule_value_series,
+        precompute_schedule_value_series_for_time_axis, precompute_weather_timestep_series,
         run_heat_balance_run_period_warmup, run_surface_balance_passes,
         seed_energyplus_initial_surface_ctf_histories, seed_initial_surface_ctf_boundary_histories,
         simulate_constant_schedules, simulate_first_zone_uncontrolled,
         simulate_heat_balance_zone_air_temperatures,
         simulate_heat_balance_zone_air_temperatures_internal,
         simulate_heat_balance_zone_air_temperatures_with_weather_records, simulate_schedule_values,
-        simulate_zone_internal_convective_gains, solar_position_rad_at_local_hour,
-        solar_weather_interpolation_weights, surface_air_sky_radiation_split, surface_area_m2,
-        surface_azimuth_deg, surface_ctf_history_slot_samples, surface_exterior_report_terms,
+        simulate_zone_internal_convective_gains, simulate_zone_internal_radiant_gains,
+        solar_position_rad_at_local_hour, solar_weather_interpolation_weights,
+        surface_air_sky_radiation_split, surface_area_m2, surface_azimuth_deg,
+        surface_ctf_history_slot_samples,
+        surface_ctf_inside_current_inside_term_rate_w_from_sources, surface_exterior_report_terms,
         surface_geometry_summaries, surface_heat_storage_rate_w,
         surface_incident_solar_components_hourly_average_w_per_m2,
         surface_incident_solar_radiation_for_weather_context_w_per_m2,
@@ -84,7 +90,7 @@
     };
     use crate::heat_balance::{HeatBalanceAlgorithmLane, HeatBalanceZoneAirAlgorithm};
     use crate::node::{
-        NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+        NODE_STATE_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
         NodeStateStore, node_temperature_setpoint_from_energyplus,
         simulate_ideal_loads_node_state_projection,
@@ -96,7 +102,12 @@
         energyplus_heat_balance_compatibility_stages, precompute_runtime_data,
     };
     use crate::{
-        RuntimeDiagnosticCode, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRequest,
+        COMPONENT_OUTPUT_TO_FACILITY_METER_SOURCE_MAP, COOLING_ENERGY_TRANSFER_METER,
+        ELECTRICITY_FACILITY_METER, GAS_FACILITY_METER, HEATING_ENERGY_TRANSFER_METER,
+        METER_ZERO_NEAR_TOLERANCE_J, RuntimeDiagnosticCode, RuntimeMeterAggregationKind,
+        RuntimeMeterAggregationPeriod, RuntimeMeterRequest, RuntimeOutputFrequency,
+        RuntimeOutputRequest, component_output_to_facility_meter_source_map,
+        meter_rate_to_energy_j, meter_value_is_zero_near_j,
     };
     use ep_model::{
         AutoOrNumber, AutosizeOrNumber, Construction, ConstructionId, DehumidificationControlType,
@@ -104,8 +115,9 @@
         HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
         IdealLoadsLimit, InternalGainId, LoadDistributionScheme, Material, MaterialId,
         MaterialKind, MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
-        OtherEquipment, OutdoorAirEconomizerType, OutputHandle, OutsideBoundaryCondition,
-        OutsideSurfaceConvectionAlgorithm, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
+        OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
+        OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+        PeopleNumberCalculationMethod, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
         ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel, SiteLocation,
         SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
         ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure,
@@ -130,6 +142,65 @@
         assert_eq!(solar_weather_interpolation_weights(4, 2), (0.0, 1.0, 0.0));
         assert_eq!(solar_weather_interpolation_weights(4, 3), (0.0, 0.75, 0.25));
         assert_eq!(solar_weather_interpolation_weights(4, 4), (0.0, 0.5, 0.5));
+    }
+
+    #[test]
+    fn weather_timestep_series_precomputes_full_weather_fields() {
+        let previous = EpwRecord {
+            year: 2013,
+            month: 1,
+            day: 1,
+            hour: 1,
+            minute: 60,
+            dry_bulb_c: 10.0,
+            dew_point_c: 2.0,
+            relative_humidity_percent: 40.0,
+            atmospheric_pressure_pa: 80_000.0,
+            horizontal_infrared_radiation_wh_per_m2: 300.0,
+            global_horizontal_radiation_wh_per_m2: 200.0,
+            direct_normal_radiation_wh_per_m2: 100.0,
+            diffuse_horizontal_radiation_wh_per_m2: 50.0,
+            wind_direction_deg: 350.0,
+            wind_speed_m_per_s: 2.0,
+            liquid_precipitation_depth_mm: 0.0,
+        };
+        let current = EpwRecord {
+            dry_bulb_c: 22.0,
+            relative_humidity_percent: 80.0,
+            atmospheric_pressure_pa: 84_000.0,
+            horizontal_infrared_radiation_wh_per_m2: 500.0,
+            global_horizontal_radiation_wh_per_m2: 600.0,
+            direct_normal_radiation_wh_per_m2: 300.0,
+            diffuse_horizontal_radiation_wh_per_m2: 150.0,
+            wind_direction_deg: 10.0,
+            wind_speed_m_per_s: 10.0,
+            liquid_precipitation_depth_mm: 1.0,
+            ..previous
+        };
+        let records = [previous, current];
+        let series = precompute_weather_timestep_series(
+            &records,
+            4,
+            FirstHourInterpolationStartingValues::Hour24,
+        );
+        let sample = series.sample_for(1, 2).expect("precomputed sample");
+
+        assert_eq!(series.hourly_records(), &records);
+        assert_eq!(series.timestep_dry_bulb_c().len(), 8);
+        assert_eq!(series.timestep_wet_bulb_c().len(), 8);
+        assert_eq!(series.timestep_direct_normal_radiation_w_per_m2().len(), 8);
+        assert!((sample.dry_bulb_c - 16.0).abs() < 1.0e-12);
+        assert!((sample.relative_humidity_percent - 60.0).abs() < 1.0e-12);
+        assert!((sample.atmospheric_pressure_pa - 82_000.0).abs() < 1.0e-12);
+        assert!((sample.wind_speed_m_per_s - 6.0).abs() < 1.0e-12);
+        assert!((sample.wind_direction_deg - 0.0).abs() < 1.0e-12);
+        assert!((sample.global_horizontal_radiation_w_per_m2 - 400.0).abs() < 1.0e-12);
+        assert!((sample.direct_normal_radiation_w_per_m2 - 200.0).abs() < 1.0e-12);
+        assert!((sample.diffuse_horizontal_radiation_w_per_m2 - 100.0).abs() < 1.0e-12);
+        assert!((sample.horizontal_infrared_radiation_w_per_m2 - 400.0).abs() < 1.0e-12);
+        assert!((sample.liquid_precipitation_depth_mm - 0.5).abs() < 1.0e-12);
+        assert!(sample.wet_bulb_c.is_finite());
+        assert!(sample.outdoor_humidity_ratio.is_finite());
     }
 
     #[test]
@@ -467,6 +538,10 @@
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].schedule_name, "ALWAYSON");
         assert_eq!(traces[0].values, vec![1.0, 1.0, 1.0]);
+        assert_eq!(
+            traces[0].kind,
+            ScheduleSeriesKind::ConstantScalar { value: 1.0 }
+        );
     }
 
     #[test]
@@ -499,6 +574,16 @@
         assert_eq!(traces[0].values[8], 1.0);
         assert_eq!(traces[0].values[17], 1.0);
         assert_eq!(traces[0].values[18], 0.0);
+        match &traces[0].kind {
+            ScheduleSeriesKind::CompactIntervals { intervals } => {
+                assert_eq!(intervals.len(), 3);
+                assert_eq!(intervals[0].start_minute_of_day, 1);
+                assert_eq!(intervals[0].end_minute_of_day, 8 * 60);
+                assert_eq!(intervals[1].start_minute_of_day, 8 * 60 + 1);
+                assert_eq!(intervals[1].end_minute_of_day, 18 * 60);
+            }
+            other => panic!("expected compact intervals, got {other:?}"),
+        }
     }
 
     #[test]
@@ -519,6 +604,54 @@
     }
 
     #[test]
+    fn schedule_value_series_can_compile_from_time_axis() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let mut model = TypedModel::default();
+        model.schedules.push(ScheduleConstant {
+            id: ScheduleId(0),
+            name: NormalizedName::new("AlwaysOn"),
+            schedule_type_limits: None,
+            hourly_value: 0.5,
+        });
+        model.run_periods.push(RunPeriod {
+            id: RunPeriodId(0),
+            name: NormalizedName::new("Two Days"),
+            begin_month: 1,
+            begin_day_of_month: 1,
+            begin_year: Some(2013),
+            end_month: 1,
+            end_day_of_month: 2,
+            end_year: Some(2013),
+            day_of_week_for_start_day: None,
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour1,
+        });
+        let axis = build_hourly_time_axis(&model)?;
+        let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
+
+        assert_eq!(
+            axis.first_hour_interpolation_starting_values,
+            FirstHourInterpolationStartingValues::Hour1
+        );
+        assert_eq!(axis.zone_timestep.timesteps_per_hour, 6);
+        assert_eq!(axis.zone_timestep.timestep_seconds, 600.0);
+        assert_eq!(axis.system_timestep.nominal_timestep_seconds, 600.0);
+        assert_eq!(
+            axis.system_timestep.variable_system_timestep_support,
+            "placeholder-state-backed"
+        );
+        assert!(axis.system_timestep.shorten_timestep_sys_state);
+        assert!(axis.system_timestep.use_zone_timestep_history_state);
+        assert_eq!(axis.sample_partitions.warmup_reported_samples, 0);
+        assert_eq!(axis.sample_partitions.run_period_reported_samples, 48);
+        assert_eq!(axis.sample_partitions.design_day_reported_samples, 0);
+        assert_eq!(series.len(), 1);
+        assert_eq!(series[0].values.len(), axis.sample_count());
+        assert_eq!(series[0].values[0], 0.5);
+
+        Ok(())
+    }
+
+    #[test]
     fn zone_internal_convective_gain_trace_excludes_radiant_fraction() {
         let mut model = cube_model();
         model.other_equipment[0].fraction_radiant = 0.25;
@@ -528,6 +661,51 @@
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].zone_name, "ZONE ONE");
         assert_eq!(traces[0].values_w, vec![9.0, 9.0]);
+
+        let radiant_traces = simulate_zone_internal_radiant_gains(&model, 2);
+
+        assert_eq!(radiant_traces.len(), 1);
+        assert_eq!(radiant_traces[0].zone_name, "ZONE ONE");
+        assert_eq!(radiant_traces[0].values_w, vec![3.0, 3.0]);
+    }
+
+    #[test]
+    fn other_equipment_design_level_methods_drive_internal_gains() {
+        let mut area_model = cube_model();
+        area_model.other_equipment[0].design_level_calculation_method =
+            OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea;
+        area_model.other_equipment[0].design_level_w = 0.0;
+        area_model.other_equipment[0].power_per_floor_area_w_per_m2 = 20.0;
+        area_model.other_equipment[0].fraction_latent = 0.1;
+        area_model.other_equipment[0].fraction_radiant = 0.2;
+        area_model.other_equipment[0].fraction_lost = 0.3;
+
+        let area_trace = simulate_zone_internal_convective_gains(&area_model, 1);
+        let area_radiant_trace = simulate_zone_internal_radiant_gains(&area_model, 1);
+
+        assert!((area_trace[0].values_w[0] - 8.0).abs() < 1.0e-12);
+        assert!((area_radiant_trace[0].values_w[0] - 4.0).abs() < 1.0e-12);
+
+        let mut people_model = cube_model();
+        people_model.other_equipment[0].design_level_calculation_method =
+            OtherEquipmentDesignLevelCalculationMethod::WattsPerPerson;
+        people_model.other_equipment[0].design_level_w = 0.0;
+        people_model.other_equipment[0].power_per_person_w = 15.0;
+        people_model.other_equipment[0].fraction_latent = 0.1;
+        people_model.people.push(People {
+            id: InternalGainId(1),
+            name: NormalizedName::new("People"),
+            zone: ZoneId(0),
+            number_of_people_schedule: None,
+            number_of_people_calculation_method: PeopleNumberCalculationMethod::People,
+            number_of_people: 3.0,
+            people_per_floor_area: 0.0,
+            floor_area_per_person: 0.0,
+        });
+
+        let people_trace = simulate_zone_internal_convective_gains(&people_model, 1);
+
+        assert!((people_trace[0].values_w[0] - 40.5).abs() < 1.0e-12);
     }
 
     #[test]
@@ -641,6 +819,22 @@
             plan.expected_source_order_stage_ids(),
             plan.actual_source_order_stage_ids()
         );
+        assert_eq!(
+            plan.runtime_policy.post_typed_model_object_lookup,
+            "forbidden-after-rawmodel-typedmodel-runtime-uses-prebound-typed-ids"
+        );
+        assert_eq!(
+            plan.runtime_policy.stage_execution_string_comparison,
+            "forbidden-in-source-order-stage-execution"
+        );
+        assert_eq!(
+            plan.runtime_policy.stage_execution_hash_map_lookup,
+            "compile-and-report-only-hot-stages-use-vecs-and-typed-ids"
+        );
+        assert_eq!(
+            plan.runtime_policy.compatibility_plan_order,
+            "deterministic-energyplus-source-order-then-typed-model-order"
+        );
 
         let init_heat_balance = stage_with_kind(&plan.stages, ExecutionStageKind::InitHeatBalance);
         assert_eq!(init_heat_balance.steps[0], ExecutionStep::UpdateWeather);
@@ -648,12 +842,24 @@
             init_heat_balance.steps[1],
             ExecutionStep::EvaluateSchedule(ScheduleId(0))
         );
+        assert_eq!(init_heat_balance.prebound.schedule_ids, vec![ScheduleId(0)]);
+        assert_eq!(init_heat_balance.prebound.weather_series_indices, vec![0]);
+        assert!(
+            init_heat_balance
+                .dependencies
+                .reads
+                .contains(&"weather_series")
+        );
 
         let manage_zone_air_updates =
             stage_with_kind(&plan.stages, ExecutionStageKind::ManageZoneAirUpdates);
         assert_eq!(
             manage_zone_air_updates.steps[0],
             ExecutionStep::SolveZone(ZoneId(0))
+        );
+        assert_eq!(
+            manage_zone_air_updates.prebound.zone_ids,
+            vec![ZoneId(0)]
         );
 
         let report_heat_balance =
@@ -674,6 +880,11 @@
         assert_eq!(
             report_heat_balance.steps[10],
             ExecutionStep::WriteOutput(OutputHandle(10))
+        );
+        assert_eq!(report_heat_balance.prebound.output_handles.len(), 13);
+        assert_eq!(
+            report_heat_balance.prebound.output_handles[0],
+            OutputHandle(0)
         );
         assert_eq!(
             plan.compatibility_stages,
@@ -700,6 +911,22 @@
             .filter(|step| matches!(step, ExecutionStep::WriteOutput(_)))
             .count();
         assert_eq!(write_output_count, precomputed.output_registry.len());
+        assert_eq!(
+            report_heat_balance.prebound.output_handles.len(),
+            precomputed.output_registry.len()
+        );
+        let calc_inside_surface = stage_with_kind(
+            &precomputed.execution_plan.stages,
+            ExecutionStageKind::CalcHeatBalanceInsideSurf,
+        );
+        assert_eq!(
+            calc_inside_surface.prebound.surface_ids.len(),
+            model.typed.surfaces.len()
+        );
+        assert_eq!(
+            calc_inside_surface.prebound.construction_ids.len(),
+            model.typed.constructions.len()
+        );
     }
 
     #[test]

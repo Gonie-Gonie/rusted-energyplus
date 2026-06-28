@@ -51,7 +51,7 @@ pub fn surface_geometry_summaries(model: &TypedModel) -> Vec<SurfaceGeometrySumm
         .collect()
 }
 
-fn zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+pub(crate) fn zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
     model
         .surfaces
         .iter()

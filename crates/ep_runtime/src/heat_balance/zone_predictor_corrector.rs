@@ -3,6 +3,38 @@
 use super::state::ZoneAirTemperatureCoefficients;
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 
+/// EnergyPlus `ZoneTempPredictorCorrector` update dispatch selector.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PredictorCorrectorCtrl {
+    /// EnergyPlus `GetZoneSetPoints` update.
+    GetZoneSetPoints,
+    /// EnergyPlus `PredictStep` update.
+    PredictStep,
+    /// EnergyPlus `CorrectStep` update.
+    CorrectStep,
+    /// EnergyPlus `RevertZoneTimestepHistories` update.
+    RevertZoneTimestepHistories,
+    /// EnergyPlus `PushZoneTimestepHistories` update.
+    PushZoneTimestepHistories,
+    /// EnergyPlus `PushSystemTimestepHistories` update.
+    PushSystemTimestepHistories,
+}
+
+impl PredictorCorrectorCtrl {
+    /// Returns the EnergyPlus source routine name for the update selector.
+    #[must_use]
+    pub const fn source_routine(self) -> &'static str {
+        match self {
+            Self::GetZoneSetPoints => "GetZoneSetPoints",
+            Self::PredictStep => "PredictStep",
+            Self::CorrectStep => "CorrectStep",
+            Self::RevertZoneTimestepHistories => "RevertZoneTimestepHistories",
+            Self::PushZoneTimestepHistories => "PushZoneTimestepHistories",
+            Self::PushSystemTimestepHistories => "PushSystemTimestepHistories",
+        }
+    }
+}
+
 /// EnergyPlus `ZoneTempPredictorCorrector::ManageZoneAirUpdates`.
 #[must_use]
 pub const fn manage_zone_air_updates_stage() -> EnergyPlusCompatibilityStage {
@@ -19,6 +51,29 @@ pub(crate) fn manage_zone_air_updates_source_order_path<T>(execute: impl FnOnce(
     execute()
 }
 
+/// Compatibility dispatch wrapper for EnergyPlus `ManageZoneAirUpdates`.
+pub(crate) fn manage_zone_air_updates_compat<T>(
+    _update_type: PredictorCorrectorCtrl,
+    execute: impl FnOnce() -> T,
+) -> T {
+    manage_zone_air_updates_source_order_path(execute)
+}
+
+/// Compatibility wrapper for EnergyPlus `GetZoneAirSetPoints`.
+pub(crate) fn get_zone_air_set_points_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility wrapper for EnergyPlus `InitZoneAirSetPoints`.
+pub(crate) fn init_zone_air_set_points_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// Compatibility wrapper for zone air temperature setpoint calculation.
+pub(crate) fn calc_zone_air_temp_set_points_compat<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
 /// Source-order ownership note for current zone-air history state.
 pub const ZONE_AIR_HISTORY_OWNER: &str =
     "MAT history and zone-air output timing are owned by ManageZoneAirUpdates.";
@@ -26,6 +81,11 @@ pub const ZONE_AIR_HISTORY_OWNER: &str =
 /// Source-order note for EnergyPlus `PredictStep` ownership.
 pub const ZONE_AIR_PREDICT_STEP_PATH: &str =
     "PredictStep is represented by zone-air coefficient assembly before correction.";
+
+/// Compatibility wrapper for EnergyPlus predictor load assembly.
+pub(crate) fn predict_system_loads_compat<T>(execute: impl FnOnce() -> T) -> T {
+    predict_step_source_order_path(execute)
+}
 
 /// EnergyPlus `ZoneTempPredictorCorrector::PredictStep` source-order wrapper.
 pub(crate) fn predict_step_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
@@ -35,6 +95,11 @@ pub(crate) fn predict_step_source_order_path<T>(execute: impl FnOnce() -> T) -> 
 /// Source-order note for EnergyPlus `CorrectStep` ownership.
 pub const ZONE_AIR_CORRECT_STEP_PATH: &str =
     "CorrectStep is represented by analytical or third-order zone-air correction.";
+
+/// Compatibility wrapper for EnergyPlus `CorrectZoneAirTemps`.
+pub(crate) fn correct_zone_air_temps_compat<T>(execute: impl FnOnce() -> T) -> T {
+    correct_step_source_order_path(execute)
+}
 
 /// EnergyPlus `ZoneTempPredictorCorrector::CorrectStep` source-order wrapper.
 pub(crate) fn correct_step_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
@@ -52,9 +117,19 @@ pub(crate) fn revert_zone_timestep_histories_source_order_path<T>(
     execute()
 }
 
+/// Compatibility wrapper for EnergyPlus `RevertZoneTimestepHistories`.
+pub(crate) fn revert_zone_timestep_histories_compat<T>(execute: impl FnOnce() -> T) -> T {
+    revert_zone_timestep_histories_source_order_path(execute)
+}
+
 /// EnergyPlus `ZoneTempPredictorCorrector::PushZoneTimestepHistories` source-order wrapper.
 pub(crate) fn push_zone_timestep_histories_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
     execute()
+}
+
+/// Compatibility wrapper for EnergyPlus `PushZoneTimestepHistories`.
+pub(crate) fn push_zone_timestep_histories_compat<T>(execute: impl FnOnce() -> T) -> T {
+    push_zone_timestep_histories_source_order_path(execute)
 }
 
 /// EnergyPlus `ZoneTempPredictorCorrector::PushSystemTimestepHistories` source-order wrapper.
@@ -62,6 +137,11 @@ pub(crate) fn push_system_timestep_histories_source_order_path<T>(
     execute: impl FnOnce() -> T,
 ) -> T {
     execute()
+}
+
+/// Compatibility wrapper for EnergyPlus `PushSystemTimestepHistories`.
+pub(crate) fn push_system_timestep_histories_compat<T>(execute: impl FnOnce() -> T) -> T {
+    push_system_timestep_histories_source_order_path(execute)
 }
 
 pub(crate) fn step_zone_air_temperature(

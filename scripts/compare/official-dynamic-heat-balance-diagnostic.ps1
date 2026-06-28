@@ -516,6 +516,15 @@ if ($isCompatibilityCandidateCase) {
     if ($summary.top_blocker.blocker_id -ne "floor-storage-mismatch") {
         throw "Expected candidate top_blocker to be floor-storage-mismatch, got $($summary.top_blocker.blocker_id)"
     }
+    if ([string]::IsNullOrWhiteSpace($summary.top_blocking_mismatch)) {
+        throw "Expected candidate top_blocking_mismatch to classify the active mismatch"
+    }
+    if ($summary.active_lane -ne "compatibility-source-order") {
+        throw "Expected candidate active_lane compatibility-source-order, got $($summary.active_lane)"
+    }
+    if ($summary.best_diagnostic_lane -ne "energyplus-heat-balance-compat-candidate") {
+        throw "Expected candidate best_diagnostic_lane energyplus-heat-balance-compat-candidate, got $($summary.best_diagnostic_lane)"
+    }
     $candidateCurrentBlockers = @($summary.current_blockers)
     if ($candidateCurrentBlockers.Count -lt 8) {
         throw "Expected candidate current_blockers to include detailed blocker rows, got $($candidateCurrentBlockers.Count)"
@@ -530,7 +539,8 @@ if ($isCompatibilityCandidateCase) {
             "hconv-source-timing-delta",
             "warmup-end-state-mat-delta",
             "warmup-end-state-surface-temperature-delta",
-            "warmup-end-state-ctf-history-delta"
+            "warmup-end-state-ctf-history-delta",
+            "warmup-end-state-zone-history-delta"
         )) {
         if (-not ($candidateCurrentBlockers | Where-Object { $_.blocker_id -eq $requiredBlocker })) {
             throw "Expected candidate current_blockers to include $requiredBlocker"
@@ -544,6 +554,9 @@ if ($isCompatibilityCandidateCase) {
     }
     if ($null -eq $summary.warmup_end_state_deltas.ctf_history) {
         throw "Expected candidate warmup_end_state_deltas to include ctf_history"
+    }
+    if ($null -eq $summary.warmup_end_state_deltas.zone_history) {
+        throw "Expected candidate warmup_end_state_deltas to include zone_history"
     }
     if (@($summary.first_divergence_by_variable).Count -lt 1) {
         throw "Expected candidate first_divergence_by_variable rows"
@@ -577,22 +590,28 @@ if ($isCompatibilityCandidateCase) {
     Assert-Contains -Text $reportText -Pattern "compatibility_source_order: true" -Description "candidate markdown source-order compatibility flag"
     Assert-Contains -Text $reportText -Pattern "diagnostic_probe_used: false" -Description "candidate markdown diagnostic probe flag"
     Assert-Contains -Text $reportText -Pattern "conformance_promotion_allowed: true" -Description "candidate markdown promotion flag"
+    Assert-Contains -Text $reportText -Pattern "## Bottleneck Tracker" -Description "candidate compact bottleneck tracker"
+    Assert-Contains -Text $reportText -Pattern "top_blocking_mismatch:" -Description "candidate top blocking mismatch"
+    Assert-Contains -Text $reportText -Pattern "active_lane: compatibility-source-order" -Description "candidate active lane"
+    Assert-Contains -Text $reportText -Pattern "best_diagnostic_lane: energyplus-heat-balance-compat-candidate" -Description "candidate best diagnostic lane"
     Assert-Contains -Text $reportText -Pattern "## Top Blocker" -Description "candidate top blocker section"
     Assert-Contains -Text $reportText -Pattern "floor-storage-mismatch" -Description "candidate floor storage blocker row"
-    Assert-Contains -Text $reportText -Pattern "## Current Blockers" -Description "candidate current blockers section"
-    Assert-Contains -Text $reportText -Pattern "floor-face-temperature-current-inside-mismatch" -Description "candidate floor face-temperature current-inside blocker row"
-    Assert-Contains -Text $reportText -Pattern "ctf-current-term-delta" -Description "candidate CTF current blocker row"
-    Assert-Contains -Text $reportText -Pattern "ctf-history-temperature-term-delta" -Description "candidate CTF history temperature blocker row"
-    Assert-Contains -Text $reportText -Pattern "ctf-history-flux-term-delta" -Description "candidate CTF history flux blocker row"
-    Assert-Contains -Text $reportText -Pattern "longwave-radiation-source-delta" -Description "candidate radiation source blocker row"
-    Assert-Contains -Text $reportText -Pattern "hconv-source-timing-delta" -Description "candidate hconv/source timing blocker row"
+    Assert-Contains -Text $reportText -Pattern "## Surface Family RMSE" -Description "candidate surface family RMSE table"
+    Assert-Contains -Text $reportText -Pattern "| floor |" -Description "candidate floor RMSE row"
+    Assert-Contains -Text $reportText -Pattern "| roof |" -Description "candidate roof RMSE row"
+    Assert-Contains -Text $reportText -Pattern "| wall |" -Description "candidate wall RMSE row"
     Assert-Contains -Text $reportText -Pattern "## Warmup End-State Deltas" -Description "candidate warmup end-state delta section"
     Assert-Contains -Text $reportText -Pattern "warmup-end-state-mat-delta" -Description "candidate warmup MAT blocker row"
     Assert-Contains -Text $reportText -Pattern "warmup-end-state-surface-temperature-delta" -Description "candidate warmup surface temperature blocker row"
     Assert-Contains -Text $reportText -Pattern "warmup-end-state-ctf-history-delta" -Description "candidate warmup CTF history blocker row"
-    Assert-Contains -Text $reportText -Pattern "## First Divergence by Variable" -Description "candidate first divergence by variable section"
-    Assert-Contains -Text $reportText -Pattern "## Active Blocker Summary" -Description "candidate active blocker summary section"
+    Assert-Contains -Text $reportText -Pattern "warmup-end-state-zone-history-delta" -Description "candidate warmup zone history blocker row"
+Assert-Contains -Text $reportText -Pattern "## First Divergence by Variable" -Description "candidate first divergence by variable section"
+Assert-Contains -Text $reportText -Pattern "first_divergence_rows: top-" -Description "candidate compact first divergence rows"
+    Assert-Contains -Text $reportText -Pattern "## Diagnostic Evidence" -Description "candidate compact diagnostic evidence section"
     Assert-Contains -Text $reportText -Pattern "next_pr_target: outside-ctf-history-handoff" -Description "candidate next PR target"
+    Assert-NotContains -Text $reportText -Pattern "## Current Blockers" -Description "candidate compact report current blocker appendix"
+    Assert-NotContains -Text $reportText -Pattern "## Bottlenecks" -Description "candidate compact report bottleneck appendix"
+    Assert-NotContains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "candidate compact report max-sample appendix"
     Assert-Contains -Text $reportText -Pattern "status: fail" -Description "candidate diagnostic status"
 
     Write-Host "Official dynamic heat-balance compatibility candidate passed structural checks."
@@ -622,6 +641,15 @@ if ($null -eq $summary.top_blocker) {
 if ([int]$summary.top_blocker.rank -ne 1) {
     throw "Expected top_blocker rank to be 1, got $($summary.top_blocker.rank)"
 }
+if ([string]::IsNullOrWhiteSpace($summary.top_blocking_mismatch)) {
+    throw "Expected summary to include top_blocking_mismatch"
+}
+if ($summary.active_lane -ne $expectedAlgorithmLane) {
+    throw "Expected active_lane $expectedAlgorithmLane, got $($summary.active_lane)"
+}
+if ([string]::IsNullOrWhiteSpace($summary.best_diagnostic_lane)) {
+    throw "Expected summary to include best_diagnostic_lane"
+}
 $currentBlockers = @($summary.current_blockers)
 if ($currentBlockers.Count -lt 8) {
     throw "Expected current_blockers to include detailed blocker rows, got $($currentBlockers.Count)"
@@ -634,7 +662,8 @@ foreach ($requiredBlocker in @(
         "hconv-source-timing-delta",
         "warmup-end-state-mat-delta",
         "warmup-end-state-surface-temperature-delta",
-        "warmup-end-state-ctf-history-delta"
+        "warmup-end-state-ctf-history-delta",
+        "warmup-end-state-zone-history-delta"
     )) {
     if (-not ($currentBlockers | Where-Object { $_.blocker_id -eq $requiredBlocker })) {
         throw "Expected current_blockers to include $requiredBlocker"
@@ -648,6 +677,9 @@ if ($null -eq $summary.warmup_end_state_deltas.surface_temperature) {
 }
 if ($null -eq $summary.warmup_end_state_deltas.ctf_history) {
     throw "Expected warmup_end_state_deltas to include ctf_history"
+}
+if ($null -eq $summary.warmup_end_state_deltas.zone_history) {
+    throw "Expected warmup_end_state_deltas to include zone_history"
 }
 $firstDivergenceByVariable = @($summary.first_divergence_by_variable)
 if ($firstDivergenceByVariable.Count -lt 1) {
@@ -904,8 +936,24 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if (-not [bool]$floorStorageMaxSampleDelta.dominant_storage_surface) {
         throw "Expected FLOOR storage max-sample row to be marked dominant"
     }
-    if ($floorStorageMaxSampleDelta.dominant_mismatch_source -ne "face-temperature-current-inside") {
-        throw "Expected FLOOR storage max-sample dominant mismatch source to target face-temperature-current-inside, got $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    $expectedFloorStorageNextTarget = switch ($floorStorageMaxSampleDelta.dominant_mismatch_source) {
+        "face-temperature-current-inside" { "floor-inside-current-face-temperature-source-timing" }
+        "face-temperature-current-outside" { "floor-outside-current-face-temperature-source-timing" }
+        "history-vector-inside-total" { "warmup-ctf-inside-history-handoff" }
+        "outside-current-total" { "outside-current-boundary-source-timing" }
+        "outside-history-total" { "outside-ctf-history-handoff" }
+        "output-aggregation-storage-balance" { "storage-output-aggregation-and-sign-convention" }
+        default { $null }
+    }
+    if ($null -eq $expectedFloorStorageNextTarget) {
+        throw "Unexpected FLOOR storage max-sample dominant mismatch source: $($floorStorageMaxSampleDelta.dominant_mismatch_source)"
+    }
+    $floorStorageBlocker = @($summary.current_blockers | Where-Object { $_.blocker_id -eq "floor-storage-mismatch" -and $_.key -eq "ZN001:FLR001" })[0]
+    if ($null -eq $floorStorageBlocker) {
+        throw "Expected current_blockers to include active FLOOR floor-storage-mismatch"
+    }
+    if ($floorStorageBlocker.next_target -ne $expectedFloorStorageNextTarget) {
+        throw "Expected FLOOR storage next target $expectedFloorStorageNextTarget for dominant mismatch source $($floorStorageMaxSampleDelta.dominant_mismatch_source), got $($floorStorageBlocker.next_target)"
     }
     $floorInsideBalanceMaxSampleDelta = @($summary.inside_balance_max_sample_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideBalanceMaxSampleDelta) {
@@ -1363,8 +1411,12 @@ Assert-Contains -Text $reportText -Pattern "ctf_initial_history_policy: $CtfInit
 Assert-Contains -Text $reportText -Pattern "zone_conduction_report_source: $ZoneConductionReportSource" -Description "markdown zone conduction report source metadata"
 Assert-Contains -Text $reportText -Pattern "zone_air_report_sampling: $ZoneAirReportSampling" -Description "markdown zone air report sampling metadata"
 Assert-Contains -Text $reportText -Pattern "surface_loop_zone_air_correction: $SurfaceLoopZoneAirCorrection" -Description "markdown surface loop zone-air correction metadata"
-Assert-Contains -Text $reportText -Pattern "## EnergyPlus Compatibility Stage Order" -Description "markdown compatibility stage order section"
-Assert-Contains -Text $reportText -Pattern "UpdateThermalHistories" -Description "markdown UpdateThermalHistories stage"
+Assert-Contains -Text $reportText -Pattern "## Bottleneck Tracker" -Description "markdown compact bottleneck tracker"
+Assert-Contains -Text $reportText -Pattern "top_blocking_mismatch:" -Description "markdown top blocking mismatch"
+Assert-Contains -Text $reportText -Pattern "next_blocking_source_mismatch:" -Description "markdown next blocking source mismatch"
+Assert-Contains -Text $reportText -Pattern "active_lane: $expectedAlgorithmLane" -Description "markdown active lane"
+Assert-Contains -Text $reportText -Pattern "active_algorithm: $ZoneAirAlgorithm" -Description "markdown active algorithm"
+Assert-Contains -Text $reportText -Pattern "best_diagnostic_lane:" -Description "markdown best diagnostic lane"
 if ($CtfSeedPolicy -eq "steady-no-mass-only") {
     Assert-Contains -Text $reportText -Pattern "ctf_seed_skipped_constructions: FLOOR (#CTFs=5)" -Description "markdown skipped mass CTF construction"
     Assert-Contains -Text $reportText -Pattern "FLOOR (#CTFs=5) @ dt=0.250h [skipped]" -Description "markdown skipped mass CTF summary"
@@ -1375,120 +1427,63 @@ else {
     Assert-Contains -Text $reportText -Pattern "FLOOR (#CTFs=5) @ dt=0.250h [included]" -Description "markdown all-eio mass CTF summary"
 }
 Assert-Contains -Text $reportText -Pattern "failure_reasons:" -Description "markdown failure diagnostics"
-Assert-Contains -Text $reportText -Pattern "mean_abs_delta_c" -Description "markdown mean absolute delta column"
 Assert-Contains -Text $reportText -Pattern "## Top Blocker" -Description "markdown top blocker section"
-Assert-Contains -Text $reportText -Pattern "## Current Blockers" -Description "markdown current blockers section"
-Assert-Contains -Text $reportText -Pattern "blocker_id" -Description "markdown current blocker id column"
-Assert-Contains -Text $reportText -Pattern "ctf-current-term-delta" -Description "markdown CTF current blocker row"
-Assert-Contains -Text $reportText -Pattern "ctf-history-temperature-term-delta" -Description "markdown CTF history temperature blocker row"
-Assert-Contains -Text $reportText -Pattern "ctf-history-flux-term-delta" -Description "markdown CTF history flux blocker row"
-Assert-Contains -Text $reportText -Pattern "longwave-radiation-source-delta" -Description "markdown radiation source blocker row"
-Assert-Contains -Text $reportText -Pattern "hconv-source-timing-delta" -Description "markdown hconv/source timing blocker row"
+Assert-Contains -Text $reportText -Pattern "blocker_id" -Description "markdown top blocker id column"
+Assert-Contains -Text $reportText -Pattern "## Top 10 RMSE Variables" -Description "markdown top 10 RMSE section"
+Assert-Contains -Text $reportText -Pattern "| rank | key | variable | category | family | class | first_hour_abs_delta_c | annual_rmse_delta_c | max_abs_delta_c | status |" -Description "markdown top 10 RMSE columns"
+Assert-Contains -Text $reportText -Pattern "| 1 | ZN001:ROOF001 | Surface Outside Face Convection Heat Gain Rate | surface | roof | surface-state |" -Description "markdown top RMSE classified roof row"
+Assert-Contains -Text $reportText -Pattern "## Blocking Diagnostic Split" -Description "markdown blocking diagnostic split section"
+Assert-Contains -Text $reportText -Pattern "| mat-rmse | ZONE ONE | Zone Mean Air Temperature | zone |" -Description "markdown MAT RMSE split row"
+Assert-Contains -Text $reportText -Pattern "| surface-conduction-rmse |" -Description "markdown surface conduction RMSE split row"
+Assert-Contains -Text $reportText -Pattern "| zone-air-storage-rmse | ZONE ONE | Zone Air Heat Balance Air Energy Storage Rate | zone |" -Description "markdown zone air storage RMSE split row"
+Assert-Contains -Text $reportText -Pattern "| zone-surface-convection-rmse | ZONE ONE | Zone Air Heat Balance Surface Convection Rate | zone |" -Description "markdown zone surface convection RMSE split row"
+Assert-Contains -Text $reportText -Pattern "## Zone-Air Coefficient Split" -Description "markdown zone-air coefficient split section"
+Assert-Contains -Text $reportText -Pattern "| key | samples | first_divergence_source | first_divergence_sample | first_divergence_delta | SumHA_rmse | SumHATsurf_rmse | SumHATref_rmse | TempDepCoef_rmse | TempIndCoef_rmse | AirPowerCap_rmse | TempHistoryTerm_rmse | MAT_rmse | AirStorage_rmse | SurfaceConvection_rmse |" -Description "markdown zone-air coefficient split columns"
+$zoneAirFirstDivergenceSample = if ($null -eq $zoneAirCoefficientDelta.first_divergence_sample_index) {
+    "n/a"
+}
+else {
+    [string]$zoneAirCoefficientDelta.first_divergence_sample_index
+}
+Assert-Contains -Text $reportText -Pattern "| ZONE ONE | 8760 | $($zoneAirCoefficientDelta.first_divergence_source) | $zoneAirFirstDivergenceSample |" -Description "markdown zone-air first divergence row"
+Assert-Contains -Text $reportText -Pattern "## Surface Family RMSE" -Description "markdown surface family RMSE section"
+Assert-Contains -Text $reportText -Pattern "| floor |" -Description "markdown floor RMSE row"
+Assert-Contains -Text $reportText -Pattern "| roof |" -Description "markdown roof RMSE row"
+Assert-Contains -Text $reportText -Pattern "| wall |" -Description "markdown wall RMSE row"
+Assert-Contains -Text $reportText -Pattern "## Source-Order Trace" -Description "markdown source-order trace section"
+Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::heat_balance::manager::manage_heat_balance_source_order_path" -Description "markdown ManageHeatBalance source-order wrapper"
+Assert-Contains -Text $reportText -Pattern "rust_execution_plan_order: ExecutionPlan.compatibility_stages" -Description "markdown Rust ExecutionPlan order"
+Assert-Contains -Text $reportText -Pattern "stage_snapshot_policy: start/end surface+MAT snapshot anchors" -Description "markdown source-order stage snapshot policy"
+Assert-Contains -Text $reportText -Pattern "| ManageHeatBalance | ManageHeatBalance | manage-heat-balance-wrapper |" -Description "markdown ManageHeatBalance trace row"
+Assert-Contains -Text $reportText -Pattern "| InitHeatBalance | InitHeatBalance | init-heat-balance |" -Description "markdown InitHeatBalance trace row"
+Assert-Contains -Text $reportText -Pattern "| CalcHeatBalanceOutsideSurf | CalcHeatBalanceOutsideSurf | calc-heat-balance-outside-surf |" -Description "markdown outside surface trace row"
+Assert-Contains -Text $reportText -Pattern "| CalcHeatBalanceInsideSurf | CalcHeatBalanceInsideSurf | calc-heat-balance-inside-surf |" -Description "markdown inside surface trace row"
+Assert-Contains -Text $reportText -Pattern "| ManageAirHeatBalance | ManageAirHeatBalance | manage-air-heat-balance |" -Description "markdown air heat-balance trace row"
+Assert-Contains -Text $reportText -Pattern "| UpdateThermalHistories | UpdateThermalHistories | update-thermal-histories |" -Description "markdown thermal history trace row"
+Assert-Contains -Text $reportText -Pattern "| ReportSurfaceHeatBalance | ReportSurfaceHeatBalance | report-surface-heat-balance |" -Description "markdown surface report trace row"
+Assert-Contains -Text $reportText -Pattern "| ReportZoneMeanAirTemp | ReportHeatBalance -> ReportZoneMeanAirTemp | report-heat-balance |" -Description "markdown zone MAT report trace row"
 Assert-Contains -Text $reportText -Pattern "## Warmup End-State Deltas" -Description "markdown warmup end-state delta section"
 Assert-Contains -Text $reportText -Pattern "warmup-end-state-mat-delta" -Description "markdown warmup MAT delta row"
 Assert-Contains -Text $reportText -Pattern "warmup-end-state-surface-temperature-delta" -Description "markdown warmup surface temperature delta row"
 Assert-Contains -Text $reportText -Pattern "warmup-end-state-ctf-history-delta" -Description "markdown warmup CTF history delta row"
+Assert-Contains -Text $reportText -Pattern "warmup-end-state-zone-history-delta" -Description "markdown warmup zone history delta row"
 Assert-Contains -Text $reportText -Pattern "## First Divergence by Variable" -Description "markdown first divergence by variable section"
-Assert-Contains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck ranking section"
-Assert-Contains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "markdown max-sample context section"
-Assert-Contains -Text $reportText -Pattern "trigger_rank" -Description "markdown max-sample context trigger column"
-Assert-Contains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample bottleneck ranking section"
-Assert-Contains -Text $reportText -Pattern "## Rust Zone-Air First-Sample Trace" -Description "markdown zone-air first-sample trace section"
-Assert-Contains -Text $reportText -Pattern "solution_c" -Description "markdown zone-air first-sample solution column"
-Assert-Contains -Text $reportText -Pattern "## Rust Warmup Day-End Zone-Air Trace" -Description "markdown warmup day-end zone-air trace section"
-Assert-Contains -Text $reportText -Pattern "warmup_day" -Description "markdown warmup day-end day column"
-Assert-Contains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface first-sample trace section"
-Assert-Contains -Text $reportText -Pattern "outdoor_db_c" -Description "markdown surface first-sample outdoor dry-bulb column"
-Assert-Contains -Text $reportText -Pattern "outside_temp_c" -Description "markdown surface first-sample outside temperature column"
-Assert-Contains -Text $reportText -Pattern "## Rust Surface Iteration Max-Sample Trace" -Description "markdown surface iteration max-sample trace section"
-Assert-Contains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF first-sample component section"
-Assert-Contains -Text $reportText -Pattern "in_history_w" -Description "markdown CTF component history column"
-Assert-Contains -Text $reportText -Pattern "## Zone-Air Coefficient Deltas" -Description "markdown zone-air coefficient delta section"
-Assert-Contains -Text $reportText -Pattern "first_divergence_source" -Description "markdown zone-air first divergence column"
-Assert-Contains -Text $reportText -Pattern "SumHA_rmse" -Description "markdown zone-air SumHA RMSE column"
-Assert-Contains -Text $reportText -Pattern "SumHATsurf_rmse" -Description "markdown zone-air SumHATsurf RMSE column"
-Assert-Contains -Text $reportText -Pattern "SumHATref_rmse" -Description "markdown zone-air SumHATref RMSE column"
-Assert-Contains -Text $reportText -Pattern "TempDepCoef_rmse" -Description "markdown zone-air TempDepCoef RMSE column"
-Assert-Contains -Text $reportText -Pattern "TempIndCoef_rmse" -Description "markdown zone-air TempIndCoef RMSE column"
-Assert-Contains -Text $reportText -Pattern "AirPowerCap_rmse" -Description "markdown zone-air AirPowerCap RMSE column"
-Assert-Contains -Text $reportText -Pattern "TempHistoryTerm_rmse" -Description "markdown zone-air TempHistoryTerm RMSE column"
-Assert-Contains -Text $reportText -Pattern "## Zone-Air Surface Convection Closure Deltas" -Description "markdown zone-air surface convection closure section"
-Assert-Contains -Text $reportText -Pattern "closure_delta_rmse_w" -Description "markdown zone-air surface convection closure delta column"
-Assert-Contains -Text $reportText -Pattern "## Zone-Air Surface Coefficient Deltas" -Description "markdown zone-air surface coefficient delta section"
-Assert-Contains -Text $reportText -Pattern "ref_air_temp_rmse" -Description "markdown zone-air surface reference-air temperature RMSE column"
-Assert-Contains -Text $reportText -Pattern "inside_conv_gain_rmse" -Description "markdown zone-air surface convection gain RMSE column"
-Assert-Contains -Text $reportText -Pattern "## CTF History First-Sample Deltas" -Description "markdown CTF first-sample history delta section"
-Assert-Contains -Text $reportText -Pattern "ctf_y0" -Description "markdown CTF zero cross coefficient column"
-Assert-Contains -Text $reportText -Pattern "in_temp_abs_delta_c" -Description "markdown CTF inside face temperature delta column"
-Assert-Contains -Text $reportText -Pattern "out_temp_abs_delta_c" -Description "markdown CTF outside face temperature delta column"
-Assert-Contains -Text $reportText -Pattern "in_current_abs_delta_w" -Description "markdown CTF current delta column"
-Assert-Contains -Text $reportText -Pattern "in_history_abs_delta_w" -Description "markdown CTF history delta column"
-Assert-Contains -Text $reportText -Pattern "## CTF History Series Deltas" -Description "markdown CTF history series delta section"
-Assert-Contains -Text $reportText -Pattern "in_curr_out_rmse_w" -Description "markdown CTF inside current-outside series RMSE column"
-Assert-Contains -Text $reportText -Pattern "in_curr_in_rmse_w" -Description "markdown CTF inside current-inside series RMSE column"
-Assert-Contains -Text $reportText -Pattern "out_curr_out_rmse_w" -Description "markdown CTF outside current-outside series RMSE column"
-Assert-Contains -Text $reportText -Pattern "out_curr_in_rmse_w" -Description "markdown CTF outside current-inside series RMSE column"
-Assert-Contains -Text $reportText -Pattern "in_history_rmse_w" -Description "markdown CTF history series RMSE column"
-Assert-Contains -Text $reportText -Pattern "out_history_rmse_w" -Description "markdown CTF outside history series RMSE column"
-Assert-Contains -Text $reportText -Pattern "## CTF Storage Max-Sample Deltas" -Description "markdown CTF storage max-sample delta section"
-Assert-Contains -Text $reportText -Pattern "storage_delta_w" -Description "markdown CTF storage max-sample delta column"
-Assert-Contains -Text $reportText -Pattern "dominant" -Description "markdown CTF storage dominant column"
-Assert-Contains -Text $reportText -Pattern "dominant_mismatch_source" -Description "markdown CTF storage dominant mismatch source column"
-Assert-Contains -Text $reportText -Pattern "storage_balance_residual_delta_w" -Description "markdown CTF storage balance residual column"
-Assert-Contains -Text $reportText -Pattern "inside_temp_delta_c" -Description "markdown CTF storage inside face temperature delta column"
-Assert-Contains -Text $reportText -Pattern "in_hist_temp_rms_w" -Description "markdown CTF history temperature split annual column"
-Assert-Contains -Text $reportText -Pattern "in_hist_flux_rms_w" -Description "markdown CTF history flux split annual column"
-Assert-Contains -Text $reportText -Pattern "current_out_signed_w" -Description "markdown CTF storage current outside split column"
-Assert-Contains -Text $reportText -Pattern "current_in_signed_w" -Description "markdown CTF storage current inside split column"
-Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown CTF storage history temperature split column"
-Assert-Contains -Text $reportText -Pattern "rust_history_flux_w" -Description "markdown CTF storage history flux split column"
-Assert-Contains -Text $reportText -Pattern "## Inside Balance Max-Sample Deltas" -Description "markdown inside-balance max-sample delta section"
-Assert-Contains -Text $reportText -Pattern "residual_delta_w" -Description "markdown inside-balance residual delta column"
-Assert-Contains -Text $reportText -Pattern "## Inside Solve Max-Sample Deltas" -Description "markdown inside-solve max-sample delta section"
-Assert-Contains -Text $reportText -Pattern "implied_numerator_delta_w" -Description "markdown inside-solve implied numerator delta column"
-Assert-Contains -Text $reportText -Pattern "source_coverage_ratio" -Description "markdown inside-solve source coverage column"
-Assert-Contains -Text $reportText -Pattern "source_residual_delta_w" -Description "markdown inside-solve source residual column"
-Assert-Contains -Text $reportText -Pattern "rust_history_temp_w" -Description "markdown inside-solve Rust history temperature split column"
-Assert-Contains -Text $reportText -Pattern "## Inside Solve Series Deltas" -Description "markdown inside-solve series delta section"
-Assert-Contains -Text $reportText -Pattern "implied_num_rmse_w" -Description "markdown inside-solve series implied numerator RMSE column"
-Assert-Contains -Text $reportText -Pattern "source_residual_rmse_w" -Description "markdown inside-solve series residual RMSE column"
-Assert-Contains -Text $reportText -Pattern "ref_air_coeff_rmse_w" -Description "markdown inside-solve series reference-air coefficient RMSE column"
-Assert-Contains -Text $reportText -Pattern "## Adiabatic History Max-Sample Deltas" -Description "markdown adiabatic-history max-sample delta section"
-Assert-Contains -Text $reportText -Pattern "out_minus_in_delta_c" -Description "markdown adiabatic-history outside-minus-inside delta column"
-Assert-Contains -Text $reportText -Pattern "## Rust CTF History Run-Period Initial Slots" -Description "markdown CTF run-period initial slot section"
-Assert-Contains -Text $reportText -Pattern "## Rust CTF History First-Sample Slots" -Description "markdown CTF first-sample slot section"
-Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots" -Description "markdown CTF max-sample slot section"
-Assert-Contains -Text $reportText -Pattern "## Rust CTF History Max-Sample Slots After Advance" -Description "markdown post-advance CTF max-sample slot section"
-Assert-Contains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample section"
-Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Drybulb Temperature" -Description "markdown weather drybulb variable"
-Assert-Contains -Text $reportText -Pattern "Site Outdoor Air Wetbulb Temperature" -Description "markdown weather wetbulb variable"
-Assert-Contains -Text $reportText -Pattern "Site Sky Temperature" -Description "markdown weather sky temperature variable"
-Assert-Contains -Text $reportText -Pattern "Site Horizontal Infrared Radiation Rate per Area" -Description "markdown weather horizontal infrared variable"
-Assert-Contains -Text $reportText -Pattern "Site Rain Status" -Description "markdown weather rain variable"
-Assert-Contains -Text $reportText -Pattern "Zone Mean Air Humidity Ratio" -Description "markdown zone humidity variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Temperature" -Description "markdown inside face temperature variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Adjacent Air Temperature" -Description "markdown adjacent air temperature variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Transfer Coefficient" -Description "markdown inside convection coefficient variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Convection Heat Gain Rate" -Description "markdown inside convection source variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate" -Description "markdown inside radiation source variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Temperature" -Description "markdown outside face temperature variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Solar Radiation Rate per Area" -Description "markdown outside incident solar variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Beam Solar Radiation Rate per Area" -Description "markdown outside incident beam solar variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area" -Description "markdown outside incident sky diffuse solar variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area" -Description "markdown outside incident ground diffuse solar variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Convection Heat Gain Rate" -Description "markdown outside convection source variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Net Thermal Radiation Heat Gain Rate" -Description "markdown outside radiation source variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient" -Description "markdown outside radiation sky coefficient variable"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Solar Radiation Heat Gain Rate" -Description "markdown outside solar source variable"
-Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Inside Faces Conduction Rate" -Description "markdown zone conduction variable"
-Assert-Contains -Text $reportText -Pattern "Zone Opaque Surface Outside Faces Conduction Rate" -Description "markdown zone outside conduction variable"
-Assert-Contains -Text $reportText -Pattern "Surface Inside Face Heat Balance Calculation Iteration Count" -Description "markdown inside surface iteration count variable"
-Assert-Contains -Text $reportText -Pattern "Zone Air Heat Balance Surface Convection Rate" -Description "markdown zone air heat-balance variable"
-Assert-Contains -Text $reportText -Pattern "ZN001:FLR001" -Description "markdown floor decomposition key"
-Assert-Contains -Text $reportText -Pattern "ZN001:WALL001" -Description "markdown wall decomposition key"
-Assert-Contains -Text $reportText -Pattern "Surface Outside Face Conduction Heat Transfer Rate" -Description "markdown floor outside conduction variable"
-Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate" -Description "markdown floor storage variable"
-Assert-Contains -Text $reportText -Pattern "Surface Heat Storage Rate per Area" -Description "markdown floor storage per-area variable"
+Assert-Contains -Text $reportText -Pattern "first_divergence_rows: top-" -Description "markdown compact first divergence rows"
+Assert-Contains -Text $reportText -Pattern "## Diagnostic Evidence" -Description "markdown compact diagnostic evidence section"
+Assert-Contains -Text $reportText -Pattern "compare_summary_json: compare-summary.json" -Description "markdown summary artifact path"
+Assert-Contains -Text $reportText -Pattern "compare_digest_json: compare-digest.json" -Description "markdown digest artifact path"
+Assert-NotContains -Text $reportText -Pattern "## Current Blockers" -Description "markdown current blocker appendix"
+Assert-NotContains -Text $reportText -Pattern "## EnergyPlus Compatibility Stage Order" -Description "markdown compatibility stage appendix"
+Assert-NotContains -Text $reportText -Pattern "## Bottlenecks" -Description "markdown bottleneck appendix"
+Assert-NotContains -Text $reportText -Pattern "## Max-Sample Contexts" -Description "markdown max-sample appendix"
+Assert-NotContains -Text $reportText -Pattern "## First-Sample Bottlenecks" -Description "markdown first-sample appendix"
+Assert-NotContains -Text $reportText -Pattern "## Rust Zone-Air First-Sample Trace" -Description "markdown zone-air trace appendix"
+Assert-NotContains -Text $reportText -Pattern "## Rust Surface First-Sample Trace" -Description "markdown surface trace appendix"
+Assert-NotContains -Text $reportText -Pattern "## Rust CTF First-Sample Components" -Description "markdown CTF component appendix"
+Assert-NotContains -Text $reportText -Pattern "## Zone-Air Coefficient Deltas" -Description "markdown zone-air coefficient appendix"
+Assert-NotContains -Text $reportText -Pattern "## CTF History Series Deltas" -Description "markdown CTF history series appendix"
+Assert-NotContains -Text $reportText -Pattern "## Inside Solve Series Deltas" -Description "markdown inside-solve series appendix"
+Assert-NotContains -Text $reportText -Pattern "## Hourly Samples" -Description "markdown hourly sample appendix"
 Assert-Contains -Text $reportText -Pattern "status: fail" -Description "markdown diagnostic status"
 
 Write-Host "Official dynamic heat-balance diagnostic passed with CTF seed policy $CtfSeedPolicy."

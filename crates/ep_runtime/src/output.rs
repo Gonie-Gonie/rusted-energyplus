@@ -14,10 +14,14 @@ pub use result_store::*;
 use std::collections::BTreeSet;
 
 use crate::ideal_loads::{
-    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE,
-    ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
-    ideal_loads_facility_meter_binding,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+    ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+    ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, ideal_loads_facility_meter_binding,
 };
 
 /// Runtime-native output reporting frequency.
@@ -148,6 +152,43 @@ impl RuntimeOutputDefinition {
     }
 }
 
+/// Compile-time output variable registration spec.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct OutputVariableSpec {
+    /// EnergyPlus output key.
+    pub key: String,
+    /// EnergyPlus output variable name.
+    pub variable_name: String,
+    /// Display units.
+    pub units: String,
+    /// Reporting frequency.
+    pub frequency: RuntimeOutputFrequency,
+    /// Runtime source path.
+    pub source: RuntimeOutputSource,
+}
+
+impl OutputVariableSpec {
+    fn new(
+        key: &str,
+        variable_name: &str,
+        units: &str,
+        frequency: RuntimeOutputFrequency,
+        source: RuntimeOutputSource,
+    ) -> Self {
+        Self {
+            key: NormalizedName::new(key).0,
+            variable_name: variable_name.to_string(),
+            units: units.to_string(),
+            frequency,
+            source,
+        }
+    }
+
+    fn identity(&self) -> OutputIdentity {
+        OutputIdentity::new(&self.key, &self.variable_name, self.frequency)
+    }
+}
+
 /// One meter the runtime knows how to produce.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RuntimeMeterDefinition {
@@ -161,6 +202,10 @@ pub struct RuntimeMeterDefinition {
     pub frequency: RuntimeOutputFrequency,
     /// Runtime source path.
     pub source: RuntimeOutputSource,
+    /// Output handles precompiled as meter aggregation dependencies.
+    pub dependency_output_handles: Vec<OutputHandle>,
+    /// Precompiled aggregation plan for this meter.
+    pub aggregation_plan: RuntimeMeterAggregationPlan,
 }
 
 impl RuntimeMeterDefinition {
@@ -174,6 +219,7 @@ impl RuntimeMeterDefinition {
 pub struct RuntimeOutputRegistry {
     outputs: Vec<RuntimeOutputDefinition>,
     meter_registry: RuntimeMeterRegistry,
+    diagnostics: RuntimeDiagnosticStore,
 }
 
 impl RuntimeOutputRegistry {
@@ -183,6 +229,7 @@ impl RuntimeOutputRegistry {
         Self {
             outputs: Vec::new(),
             meter_registry: RuntimeMeterRegistry::new(),
+            diagnostics: RuntimeDiagnosticStore::new(),
         }
     }
 
@@ -205,6 +252,12 @@ impl RuntimeOutputRegistry {
     #[must_use]
     pub fn meter_registry(&self) -> &RuntimeMeterRegistry {
         &self.meter_registry
+    }
+
+    /// Returns compile/precompute diagnostics collected while registering outputs.
+    #[must_use]
+    pub fn diagnostics(&self) -> &RuntimeDiagnosticStore {
+        &self.diagnostics
     }
 
     /// Returns the number of registered output variables.
@@ -250,6 +303,10 @@ impl RuntimeOutputRegistry {
                         request.variable_name,
                         request.frequency.id()
                     ),
+                    stage: Some("output-resolution".to_string()),
+                    surface: None,
+                    zone: None,
+                    timestep: None,
                     key: Some(request.key.clone()),
                     variable_name: Some(request.variable_name.clone()),
                     meter_name: None,
@@ -273,6 +330,10 @@ impl RuntimeOutputRegistry {
                         request.variable_name,
                         request.frequency.id()
                     ),
+                    stage: Some("output-resolution".to_string()),
+                    surface: None,
+                    zone: None,
+                    timestep: None,
                     key: Some(request.key.clone()),
                     variable_name: Some(request.variable_name.clone()),
                     meter_name: None,
@@ -457,6 +518,7 @@ impl RuntimeOutputRegistry {
                 ("System Node Temperature", "C"),
                 ("System Node Humidity Ratio", "kgWater/kgDryAir"),
                 ("System Node Mass Flow Rate", "kg/s"),
+                ("System Node Setpoint Temperature", "C"),
             ] {
                 self.push_output(
                     &node.name.0,
@@ -481,6 +543,20 @@ impl RuntimeOutputRegistry {
                     &system.name.0,
                     variable_name,
                     "W",
+                    RuntimeOutputFrequency::Hourly,
+                    RuntimeOutputSource::RuntimeState,
+                );
+            }
+            for variable_name in [
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY,
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
+                ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
+            ] {
+                self.push_output(
+                    &system.name.0,
+                    variable_name,
+                    "J",
                     RuntimeOutputFrequency::Hourly,
                     RuntimeOutputSource::RuntimeState,
                 );
@@ -528,22 +604,50 @@ impl RuntimeOutputRegistry {
         frequency: RuntimeOutputFrequency,
         source: RuntimeOutputSource,
     ) {
-        let identity = OutputIdentity::new(key, variable_name, frequency);
+        self.push_output_spec(OutputVariableSpec::new(
+            key,
+            variable_name,
+            units,
+            frequency,
+            source,
+        ));
+    }
+
+    fn push_output_spec(&mut self, spec: OutputVariableSpec) {
+        let identity = spec.identity();
         if self
             .outputs
             .iter()
             .any(|definition| definition.identity() == identity)
         {
+            self.diagnostics.push(RuntimeDiagnostic {
+                severity: RuntimeDiagnosticSeverity::Error,
+                code: RuntimeDiagnosticCode::DuplicateOutputRegistration,
+                message: format!(
+                    "duplicate runtime output registration {} / {} ({})",
+                    spec.key,
+                    spec.variable_name,
+                    spec.frequency.id()
+                ),
+                stage: Some("output-registration".to_string()),
+                surface: None,
+                zone: None,
+                timestep: None,
+                key: Some(spec.key),
+                variable_name: Some(spec.variable_name),
+                meter_name: None,
+                handle: None,
+            });
             return;
         }
 
         self.outputs.push(RuntimeOutputDefinition {
             handle: OutputHandle(self.outputs.len() as u32),
-            key: NormalizedName::new(key).0,
-            variable_name: variable_name.to_string(),
-            units: units.to_string(),
-            frequency,
-            source,
+            key: spec.key,
+            variable_name: spec.variable_name,
+            units: spec.units,
+            frequency: spec.frequency,
+            source: spec.source,
         });
     }
 
@@ -551,22 +655,40 @@ impl RuntimeOutputRegistry {
         for system in &model.ideal_loads_air_systems {
             for fuel_type in [system.heating_fuel_type, system.cooling_fuel_type] {
                 if let Some(binding) = ideal_loads_facility_meter_binding(fuel_type) {
+                    let dependency_output_handles = self.output_handles_for_meter_dependency(
+                        &system.name.0,
+                        binding.fuel_energy_variable,
+                    );
                     for frequency in [
                         RuntimeOutputFrequency::Hourly,
                         RuntimeOutputFrequency::Monthly,
                         RuntimeOutputFrequency::Annual,
                         RuntimeOutputFrequency::RunPeriod,
                     ] {
-                        self.meter_registry.push_meter(
+                        self.meter_registry.push_meter_with_dependencies(
                             binding.meter_name,
                             "J",
                             frequency,
                             RuntimeOutputSource::Meter,
+                            dependency_output_handles.clone(),
                         );
                     }
                 }
             }
         }
+    }
+
+    fn output_handles_for_meter_dependency(
+        &self,
+        key: &str,
+        variable_name: &str,
+    ) -> Vec<OutputHandle> {
+        let identity = OutputIdentity::new(key, variable_name, RuntimeOutputFrequency::Hourly);
+        self.outputs
+            .iter()
+            .filter(|definition| definition.identity() == identity)
+            .map(|definition| definition.handle)
+            .collect()
     }
 }
 

@@ -311,7 +311,8 @@ pub(crate) fn run_surface_balance_passes(
                 );
             }
         }
-        for surface in surfaces.iter_mut() {
+        for surface_index in surface_indexes.ctf_surface_indices().iter().copied() {
+            let surface = &mut surfaces[surface_index];
             let previous_inside_face_temperature_c = if surface_iteration_index == 0 {
                 first_pass_inside_temperatures
                     .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())

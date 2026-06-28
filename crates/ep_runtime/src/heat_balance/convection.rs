@@ -4,8 +4,8 @@ use crate::geometry::surface_azimuth_deg;
 use crate::heat_balance::algorithm::HeatBalanceZoneAirAlgorithm;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{
-    MaterialSurfaceRoughness, OutsideSurfaceConvectionAlgorithm, Point3, Surface, Terrain,
-    TypedModel, WindExposure,
+    MaterialSurfaceRoughness, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3,
+    Surface, Terrain, TypedModel, WindExposure,
 };
 
 /// Current inside convection routine family used by the compatibility lane.
@@ -23,6 +23,23 @@ const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;
 const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;
 pub(crate) const ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M: f64 = 1.5;
 const ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum EnergyPlusTarpNaturalConvectionBranch {
+    VerticalWall,
+    UnstableHorizontalOrTilt,
+    StableHorizontalOrTilt,
+}
+
+impl EnergyPlusTarpNaturalConvectionBranch {
+    pub(crate) const fn id(self) -> &'static str {
+        match self {
+            Self::VerticalWall => "vertical-wall",
+            Self::UnstableHorizontalOrTilt => "unstable-horizontal-or-tilt",
+            Self::StableHorizontalOrTilt => "stable-horizontal-or-tilt",
+        }
+    }
+}
 
 /// EnergyPlus ASHRAE TARP inside natural convection coefficient for one surface.
 #[must_use]
@@ -47,28 +64,67 @@ pub fn energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
     )
 }
 
+#[must_use]
+pub(crate) fn energyplus_tarp_inside_convection_branch_id(
+    surface: &SurfaceHeatBalanceState,
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+) -> &'static str {
+    let inside_cos_tilt = -surface.tilt_deg.to_radians().cos();
+    energyplus_ashrae_tarp_natural_convection_branch(
+        surface_temperature_c,
+        air_temperature_c,
+        inside_cos_tilt,
+    )
+    .id()
+}
+
 pub(crate) fn energyplus_ashrae_tarp_natural_convection_w_per_m2_k(
     surface_temperature_c: f64,
     air_temperature_c: f64,
     cos_tilt: f64,
 ) -> f64 {
+    match energyplus_ashrae_tarp_natural_convection_branch(
+        surface_temperature_c,
+        air_temperature_c,
+        cos_tilt,
+    ) {
+        EnergyPlusTarpNaturalConvectionBranch::VerticalWall => {
+            energyplus_ashrae_vertical_wall_convection_w_per_m2_k(
+                surface_temperature_c - air_temperature_c,
+            )
+        }
+        EnergyPlusTarpNaturalConvectionBranch::UnstableHorizontalOrTilt => {
+            energyplus_walton_unstable_horizontal_or_tilt_convection_w_per_m2_k(
+                surface_temperature_c - air_temperature_c,
+                cos_tilt,
+            )
+        }
+        EnergyPlusTarpNaturalConvectionBranch::StableHorizontalOrTilt => {
+            energyplus_walton_stable_horizontal_or_tilt_convection_w_per_m2_k(
+                surface_temperature_c - air_temperature_c,
+                cos_tilt,
+            )
+        }
+    }
+}
+
+pub(crate) fn energyplus_ashrae_tarp_natural_convection_branch(
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+    cos_tilt: f64,
+) -> EnergyPlusTarpNaturalConvectionBranch {
     let delta_temperature_c = surface_temperature_c - air_temperature_c;
     if delta_temperature_c.abs() <= f64::EPSILON || cos_tilt.abs() <= 1.0e-12 {
-        return energyplus_ashrae_vertical_wall_convection_w_per_m2_k(delta_temperature_c);
+        return EnergyPlusTarpNaturalConvectionBranch::VerticalWall;
     }
 
     if (delta_temperature_c < 0.0 && cos_tilt < 0.0)
         || (delta_temperature_c > 0.0 && cos_tilt > 0.0)
     {
-        energyplus_walton_unstable_horizontal_or_tilt_convection_w_per_m2_k(
-            delta_temperature_c,
-            cos_tilt,
-        )
+        EnergyPlusTarpNaturalConvectionBranch::UnstableHorizontalOrTilt
     } else {
-        energyplus_walton_stable_horizontal_or_tilt_convection_w_per_m2_k(
-            delta_temperature_c,
-            cos_tilt,
-        )
+        EnergyPlusTarpNaturalConvectionBranch::StableHorizontalOrTilt
     }
 }
 
@@ -135,6 +191,36 @@ fn energyplus_surface_is_windward(
         diff -= 360.0;
     }
     diff.abs() - 90.0 <= 0.001
+}
+
+#[must_use]
+pub(crate) fn energyplus_outside_convection_branch_id(
+    surface_state: &SurfaceHeatBalanceState,
+    typed_surface: Option<&Surface>,
+    wind_direction_deg: f64,
+    use_doe2_outside_convection: bool,
+) -> &'static str {
+    if surface_state.outside_boundary_condition != OutsideBoundaryCondition::Outdoors
+        || surface_state.area_m2 <= 0.0
+    {
+        return "not-outdoors";
+    }
+    if !use_doe2_outside_convection {
+        return "simple-combined";
+    }
+    let Some(typed_surface) = typed_surface else {
+        return "missing-surface";
+    };
+
+    if energyplus_surface_is_windward(
+        surface_state.tilt_deg.to_radians().cos(),
+        surface_azimuth_deg(&typed_surface.vertices),
+        wind_direction_deg,
+    ) {
+        "doe2-windward"
+    } else {
+        "doe2-leeward"
+    }
 }
 
 fn energyplus_mowitt_forced_windward_w_per_m2_k(wind_speed_m_per_s: f64) -> f64 {

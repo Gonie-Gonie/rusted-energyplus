@@ -7,6 +7,12 @@ use crate::heat_balance::{
 /// Structured metadata for a diagnostic-only heat-balance probe.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DiagnosticProbeMetadata {
+    /// Stable probe name used in reports and audits.
+    pub name: &'static str,
+    /// Short purpose statement for the probe.
+    pub purpose: &'static str,
+    /// Expected bottleneck family this probe should isolate.
+    pub expected_bottleneck: &'static str,
     /// Why the probe is kept in the runtime.
     pub why_it_exists: &'static str,
     /// The mismatch family this probe investigates.
@@ -37,6 +43,9 @@ macro_rules! diagnostic_heat_balance_probes {
                 match self {
                     $(
                         Self::$variant => DiagnosticProbeMetadata {
+                            name: stringify!($variant),
+                            purpose: "Isolate one heat-balance source-order hypothesis without expanding conformance claims.",
+                            expected_bottleneck: "A timing, state-history, surface-balance, zone-air, or report-row delta that must be promoted through a compatibility lane before conformance.",
                             why_it_exists: "Diagnostic-only selector for isolating heat-balance source-order deltas before compatibility promotion.",
                             mismatch_investigated: "EnergyPlus/Rust heat-balance timing, state-history, or report-row mismatch; not conformance evidence.",
                         },
@@ -129,6 +138,9 @@ mod tests {
     fn diagnostic_probe_metadata_declares_non_claim_boundary() {
         let metadata = DiagnosticHeatBalanceProbe::EnergyPlusThirdOrderProbe.metadata();
 
+        assert_eq!(metadata.name, "EnergyPlusThirdOrderProbe");
+        assert!(metadata.purpose.contains("without expanding conformance"));
+        assert!(metadata.expected_bottleneck.contains("delta"));
         assert!(metadata.why_it_exists.contains("Diagnostic-only"));
         assert!(metadata.mismatch_investigated.contains("mismatch"));
     }

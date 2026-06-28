@@ -5,7 +5,7 @@ use crate::geometry::{surface_area_m2, surface_azimuth_deg, surface_tilt_deg, zo
 use crate::heat_balance::ctf::{
     ConstructionCtfCoefficientOverride, construction_ctf_coefficients_by_name,
     steady_ctf_coefficient_w_per_m2_k, steady_surface_ctf_state,
-    surface_ctf_state_from_coefficients,
+    surface_ctf_state_from_coefficient_rows,
 };
 use crate::heat_balance::inside_convection::zone_surface_convection_sums_for_indices;
 use crate::heat_balance::state::{
@@ -14,17 +14,15 @@ use crate::heat_balance::state::{
     ZoneHeatBalanceState,
 };
 use crate::heat_balance::surface_boundary::resolve_surface_boundary_target;
+use crate::heat_balance::surface_manager::ConstructionThermalDataCache;
 use crate::heat_balance::zone_air_correction::ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO;
 use crate::heat_balance::zone_predictor_corrector::energyplus_zone_air_temperature_coefficients;
-use crate::heat_balance::{ConstructionThermalData, surface_thermal_properties};
+use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
 use crate::schedules::{
     convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
 };
-use ep_model::{ConstructionId, SimulationModel};
-use std::collections::BTreeMap;
+use ep_model::SimulationModel;
 
-const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
-const AIR_SPECIFIC_HEAT_J_PER_KG_K: f64 = 1006.0;
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 /// Initializes the heat-balance state shell without advancing the solver.
 pub fn initialize_heat_balance_state(
@@ -64,10 +62,16 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             zone_timestep_average_air_humidity_ratio: ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
             previous_air_humidity_ratios: [ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO; 3],
             previous_system_air_humidity_ratios: [ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO; 3],
+            use_zone_timestep_history: true,
+            shorten_timestep_sys: false,
+            prior_timestep_seconds: 0.0,
             volume_m3,
-            air_heat_capacity_j_per_k: volume_m3
-                * AIR_DENSITY_KG_PER_M3
-                * AIR_SPECIFIC_HEAT_J_PER_KG_K,
+            air_heat_capacity_j_per_k: energyplus_standard_zone_air_heat_capacity_j_per_k(
+                volume_m3,
+                initial_zone_air_temperature_c,
+                ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
+            )
+            .unwrap_or(0.0),
             convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
@@ -75,13 +79,20 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             sum_ha_w_per_k: 0.0,
             sum_hat_surf_w: 0.0,
             sum_hat_ref_w: 0.0,
+            sum_mcp_w_per_k: 0.0,
+            sum_mcp_t_w: 0.0,
+            sum_sys_mcp_w_per_k: 0.0,
+            sum_sys_mcp_t_w: 0.0,
             zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients::ZERO,
             system_timestep_average_surface_convection_report_w: None,
             system_timestep_average_air_storage_report_w: None,
         });
     }
 
-    let mut construction_thermal_data = BTreeMap::<ConstructionId, ConstructionThermalData>::new();
+    let construction_thermal_data =
+        ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?;
+    let construction_cache_token = construction_thermal_data.invalidation_token();
+    debug_assert!(!construction_thermal_data.is_invalidated_by(construction_cache_token));
     let mut surfaces = model
         .typed
         .surfaces
@@ -90,29 +101,18 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             let area_m2 = surface_area_m2(&surface.vertices);
             let azimuth_deg = surface_azimuth_deg(&surface.vertices);
             let tilt_deg = surface_tilt_deg(surface.surface_type, &surface.vertices);
-            let thermal = match construction_thermal_data.get(&surface.construction) {
-                Some(thermal) => thermal.clone(),
-                None => {
-                    let thermal = surface_thermal_properties(&model.typed, surface)?;
-                    construction_thermal_data.insert(surface.construction, thermal.clone());
-                    thermal
-                }
-            };
+            let thermal = construction_thermal_data.data_for_surface(surface)?;
             let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
             let steady_ctf_w_per_m2_k =
                 steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
-            let ctf = ctf_coefficients_by_construction
-                .get(&thermal.construction_name)
-                .and_then(|coefficients| {
-                    surface_ctf_state_from_coefficients(
-                        coefficients,
-                        initial_zone_air_temperature_c,
-                    )
-                })
-                .unwrap_or_else(|| {
-                    steady_surface_ctf_state(steady_ctf_w_per_m2_k, initial_zone_air_temperature_c)
-                });
+            let ctf = surface_ctf_state_from_coefficient_rows(
+                &thermal.ctf_coefficients,
+                initial_zone_air_temperature_c,
+            )
+            .unwrap_or_else(|| {
+                steady_surface_ctf_state(steady_ctf_w_per_m2_k, initial_zone_air_temperature_c)
+            });
 
             Ok(SurfaceHeatBalanceState {
                 surface_id: surface.id,
@@ -127,9 +127,10 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 outside_boundary_target_surface_id: boundary.surface_id,
                 outside_boundary_target_zone_id: boundary.zone_id,
                 construction_id: thermal.construction_id,
-                construction_name: thermal.construction_name,
+                construction_thermal_data_index: thermal.cache_index,
+                construction_name: thermal.construction_name.clone(),
                 outside_layer_material_id: thermal.outside_layer_material_id,
-                outside_layer_material_name: thermal.outside_layer_material_name,
+                outside_layer_material_name: thermal.outside_layer_material_name.clone(),
                 outside_layer_roughness: thermal.outside_layer_roughness,
                 area_m2,
                 azimuth_deg,
@@ -175,17 +176,20 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         zone.sum_ha_w_per_k = sum_ha_w_per_k;
         zone.sum_hat_surf_w = sum_hat_surf_w;
         zone.sum_hat_ref_w = sum_hat_ref_w;
-        zone.zone_air_temperature_coefficients = energyplus_zone_air_temperature_coefficients(
-            zone.sum_ha_w_per_k,
-            zone.sum_hat_surf_w,
-            zone.sum_hat_ref_w,
-            zone.convective_internal_gain_w,
-            0.0,
-            0.0,
-            zone.air_heat_capacity_j_per_k,
-            0.0,
-            zone.previous_mean_air_temperatures_c,
-        );
+        zone.zone_air_temperature_coefficients =
+            crate::heat_balance::air_manager::get_air_heat_balance_input_compat(|| {
+                energyplus_zone_air_temperature_coefficients(
+                    zone.sum_ha_w_per_k,
+                    zone.sum_hat_surf_w,
+                    zone.sum_hat_ref_w,
+                    zone.convective_internal_gain_w,
+                    zone.sum_mcp_w_per_k + zone.sum_sys_mcp_w_per_k,
+                    zone.sum_mcp_t_w + zone.sum_sys_mcp_t_w,
+                    zone.air_heat_capacity_j_per_k,
+                    0.0,
+                    zone.previous_mean_air_temperatures_c,
+                )
+            });
     }
 
     Ok(HeatBalanceState {
@@ -193,6 +197,18 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
         zones,
         surfaces,
         surface_indexes,
+        construction_cache_hash: construction_thermal_data.coefficient_cache_hash,
+        construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
+        construction_cache_entry_count: construction_thermal_data.len(),
+        construction_cache_no_mass_count: construction_thermal_data.no_mass_construction_ids.len(),
+        construction_cache_massive_ctf_count: construction_thermal_data
+            .massive_ctf_construction_ids
+            .len(),
+        construction_cache_eio_seeded_count: construction_thermal_data.eio_seeded_count(),
+        construction_cache_rust_generated_count: construction_thermal_data.rust_generated_count(),
+        variable_system_timestep_placeholder: true,
+        hvac_iteration_count: 0,
+        plant_iteration_count: 0,
         last_ctf_history_slot_terms: Vec::new(),
         last_ctf_history_slot_terms_after_advance: Vec::new(),
         last_inside_surface_iteration_count: 0,

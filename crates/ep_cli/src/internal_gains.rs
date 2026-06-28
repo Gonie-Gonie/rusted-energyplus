@@ -13,7 +13,9 @@ use ep_conformance::{
 use ep_model::{DayOfWeek, TypedModel};
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    TimeAxis, TimePoint, build_hourly_time_axis, simulate_zone_internal_convective_gains,
+    TimeAxis, TimePoint, ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
+    ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE, build_hourly_time_axis,
+    simulate_zone_internal_convective_gains, simulate_zone_internal_radiant_gains,
 };
 
 use crate::conformance_artifacts::{
@@ -121,7 +123,7 @@ pub(crate) fn run_compare_internal_convective_gain(args: &[String]) -> i32 {
         let values = match load_eso_series(
             eso_path,
             &zone.name.0,
-            "Zone Total Internal Convective Heating Rate",
+            ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
         ) {
             Ok(values) => values,
             Err(error) => {
@@ -294,16 +296,18 @@ fn validate_report_output(output: &OutputRequest) -> Result<(), String> {
             output.variable
         ));
     }
-    if !output
-        .variable
-        .eq_ignore_ascii_case("Zone Total Internal Convective Heating Rate")
-    {
+    if !is_supported_internal_gain_rate_variable(&output.variable) {
         return Err(format!(
-            "internal-gains report currently supports Zone Total Internal Convective Heating Rate, got {}",
+            "internal-gains report supports Zone Total Internal Convective Heating Rate and Zone Total Internal Radiant Heating Rate, got {}",
             output.variable
         ));
     }
     Ok(())
+}
+
+fn is_supported_internal_gain_rate_variable(variable: &str) -> bool {
+    variable.eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE)
+        || variable.eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE)
 }
 
 fn report_outputs(manifest: &ConformanceCase) -> Vec<&OutputRequest> {
@@ -384,14 +388,29 @@ fn observed_samples(
     model: &TypedModel,
     time_axis: &TimeAxis,
 ) -> Result<Vec<SeriesSample>, String> {
-    let traces = simulate_zone_internal_convective_gains(model, time_axis.sample_count());
+    let traces = if output
+        .variable
+        .eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE)
+    {
+        simulate_zone_internal_convective_gains(model, time_axis.sample_count())
+    } else if output
+        .variable
+        .eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE)
+    {
+        simulate_zone_internal_radiant_gains(model, time_axis.sample_count())
+    } else {
+        return Err(format!(
+            "unsupported internal gain output variable: {}",
+            output.variable
+        ));
+    };
     let trace = traces
         .iter()
         .find(|trace| trace.zone_name.eq_ignore_ascii_case(&output.key))
         .ok_or_else(|| {
             format!(
-                "missing Rust internal convective gain trace: {}",
-                output.key
+                "missing Rust internal gain trace for {}: {}",
+                output.variable, output.key
             )
         })?;
     Ok(samples_with_time_axis(&trace.values_w, time_axis))

@@ -6,6 +6,8 @@ const ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE: f64 = 0.0001;
 const ENERGYPLUS_WET_BULB_MAX_ITERATIONS: u32 = 100;
 const ENERGYPLUS_PSAT_CACHE_PRECISION_BITS: u32 = 24;
 const ENERGYPLUS_PSAT_CACHE_GRID_SHIFT: u32 = 64 - 12 - ENERGYPLUS_PSAT_CACHE_PRECISION_BITS;
+/// Standard atmospheric pressure used by EnergyPlus psychrometric defaults.
+pub const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 
 pub(crate) fn energyplus_outdoor_wet_bulb_c(
     dry_bulb_c: f64,
@@ -113,6 +115,20 @@ pub fn energyplus_zone_air_heat_capacity_j_per_k(
     let specific_heat_j_per_kg_k = energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio);
 
     Some(volume_m3 * density_kg_per_m3 * specific_heat_j_per_kg_k)
+}
+
+/// Returns EnergyPlus-style zone air heat capacity at standard pressure.
+pub fn energyplus_standard_zone_air_heat_capacity_j_per_k(
+    volume_m3: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> Option<f64> {
+    energyplus_zone_air_heat_capacity_j_per_k(
+        volume_m3,
+        ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA,
+        dry_bulb_c,
+        humidity_ratio,
+    )
 }
 
 /// Returns EnergyPlus `PsyRhoAirFnPbTdbW`-style moist-air density in kg/m3.

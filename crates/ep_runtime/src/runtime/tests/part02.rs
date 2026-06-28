@@ -217,15 +217,15 @@
 
         assert_eq!(projection.summary.samples, 4);
         assert_eq!(projection.summary.node_count, 3);
-        assert_eq!(projection.summary.series_count, 9);
+        assert_eq!(projection.summary.series_count, 12);
         assert_eq!(projection.summary.state_node_count, 3);
         assert_eq!(
             projection.summary.evidence_policy.source_map_path,
             NODE_STATE_SOURCE_MAP_PATH
         );
         assert_eq!(
-            projection.summary.evidence_policy.excluded_variable,
-            NODE_STATE_EXCLUDED_SETPOINT_VARIABLE
+            projection.summary.evidence_policy.setpoint_variable,
+            NODE_STATE_SETPOINT_VARIABLE
         );
         assert_eq!(
             node_temperature_setpoint_from_energyplus(NODE_TEMPERATURE_SETPOINT_SENTINEL_C),
@@ -276,6 +276,14 @@
         assert!((inlet_state.mass_flow_rate_kg_per_s - 0.3).abs() < 1.0e-12);
         assert!((inlet_state.temperature_c - 50.0).abs() < 1.0e-12);
         assert_eq!(inlet_state.temperature_setpoint_c, None);
+        let inlet_setpoint = projection
+            .results
+            .find_series("ZONE ONE INLET", "System Node Setpoint Temperature")
+            .ok_or_else(|| std::io::Error::other("missing inlet setpoint series"))?;
+        assert_eq!(
+            inlet_setpoint.values,
+            vec![NODE_TEMPERATURE_SETPOINT_SENTINEL_C; 4]
+        );
 
         let zone_air_temperature = projection
             .results

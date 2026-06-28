@@ -229,60 +229,75 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             });
         });
     });
-    air_manager::manage_air_heat_balance_source_order_path(|| {
-        zone_predictor_corrector::manage_zone_air_updates_source_order_path(|| {
-            zone_predictor_corrector::push_zone_timestep_histories_source_order_path(|| {
-                zone_predictor_corrector::predict_step_source_order_path(|| {
-                    for zone in &mut state.zones {
-                        let previous_temperature_c = zone.mean_air_temperature_c;
-                        let previous_zone_history_temperature_c =
-                            if use_energyplus_adaptive_system_timestep_zone_air_correction {
-                                zone.zone_timestep_average_air_temperature_c
-                            } else {
-                                previous_temperature_c
-                            };
-                        zone.previous_mean_air_temperatures_c = [
-                            previous_zone_history_temperature_c,
-                            zone.previous_mean_air_temperatures_c[0],
-                            zone.previous_mean_air_temperatures_c[1],
-                        ];
-                        let previous_humidity_ratio = zone.air_humidity_ratio;
-                        let previous_zone_history_humidity_ratio =
-                            if use_energyplus_adaptive_system_timestep_zone_air_correction {
-                                zone.zone_timestep_average_air_humidity_ratio
-                            } else {
-                                previous_humidity_ratio
-                            };
-                        zone.previous_air_humidity_ratios = [
-                            previous_zone_history_humidity_ratio,
-                            zone.previous_air_humidity_ratios[0],
-                            zone.previous_air_humidity_ratios[1],
-                        ];
-                        zone.convective_internal_gain_w =
-                            convective_internal_gain_w(model, zone.zone_id, hour_ending);
+    air_manager::manage_air_heat_balance_compat(|| {
+        air_manager::init_air_heat_balance_compat(|| {});
+        air_manager::calc_heat_balance_air_compat(|| {
+            zone_predictor_corrector::manage_zone_air_updates_compat(
+                zone_predictor_corrector::PredictorCorrectorCtrl::PredictStep,
+                || {
+                    zone_predictor_corrector::get_zone_air_set_points_compat(|| {
+                        zone_predictor_corrector::init_zone_air_set_points_compat(|| {
+                            zone_predictor_corrector::calc_zone_air_temp_set_points_compat(|| {})
+                        })
+                    });
+                    zone_predictor_corrector::push_zone_timestep_histories_compat(|| {
+                        zone_predictor_corrector::predict_system_loads_compat(|| {
+                            for zone in &mut state.zones {
+                                zone.use_zone_timestep_history =
+                                    use_energyplus_adaptive_system_timestep_zone_air_correction;
+                                zone.shorten_timestep_sys = false;
+                                zone.prior_timestep_seconds = input.timestep_seconds;
+                                let previous_temperature_c = zone.mean_air_temperature_c;
+                                let previous_zone_history_temperature_c =
+                                    if use_energyplus_adaptive_system_timestep_zone_air_correction {
+                                        zone.zone_timestep_average_air_temperature_c
+                                    } else {
+                                        previous_temperature_c
+                                    };
+                                zone.previous_mean_air_temperatures_c = [
+                                    previous_zone_history_temperature_c,
+                                    zone.previous_mean_air_temperatures_c[0],
+                                    zone.previous_mean_air_temperatures_c[1],
+                                ];
+                                let previous_humidity_ratio = zone.air_humidity_ratio;
+                                let previous_zone_history_humidity_ratio =
+                                    if use_energyplus_adaptive_system_timestep_zone_air_correction {
+                                        zone.zone_timestep_average_air_humidity_ratio
+                                    } else {
+                                        previous_humidity_ratio
+                                    };
+                                zone.previous_air_humidity_ratios = [
+                                    previous_zone_history_humidity_ratio,
+                                    zone.previous_air_humidity_ratios[0],
+                                    zone.previous_air_humidity_ratios[1],
+                                ];
+                                zone.convective_internal_gain_w =
+                                    convective_internal_gain_w(model, zone.zone_id, hour_ending);
 
-                        let zone_surface_indexes =
-                            state.surface_indexes.surfaces_for_zone(zone.zone_id);
-                        let conductance_w_per_k = zone_surface_indexes
-                            .iter()
-                            .filter_map(|surface_index| state.surfaces.get(*surface_index))
-                            .map(|surface| surface.conductance_w_per_k)
-                            .sum::<f64>();
-                        let conductance_weighted_outside_temperature = zone_surface_indexes
-                            .iter()
-                            .filter_map(|surface_index| state.surfaces.get(*surface_index))
-                            .map(|surface| {
-                                surface.conductance_w_per_k * surface.outside_face_temperature_c
-                            })
-                            .sum::<f64>();
-                        let equivalent_outside_temperature_c = if conductance_w_per_k > 0.0 {
-                            conductance_weighted_outside_temperature / conductance_w_per_k
-                        } else {
-                            previous_temperature_c
-                        };
+                                let zone_surface_indexes =
+                                    state.surface_indexes.surfaces_for_zone(zone.zone_id);
+                                let conductance_w_per_k = zone_surface_indexes
+                                    .iter()
+                                    .filter_map(|surface_index| state.surfaces.get(*surface_index))
+                                    .map(|surface| surface.conductance_w_per_k)
+                                    .sum::<f64>();
+                                let conductance_weighted_outside_temperature = zone_surface_indexes
+                                    .iter()
+                                    .filter_map(|surface_index| state.surfaces.get(*surface_index))
+                                    .map(|surface| {
+                                        surface.conductance_w_per_k
+                                            * surface.outside_face_temperature_c
+                                    })
+                                    .sum::<f64>();
+                                let equivalent_outside_temperature_c = if conductance_w_per_k > 0.0
+                                {
+                                    conductance_weighted_outside_temperature / conductance_w_per_k
+                                } else {
+                                    previous_temperature_c
+                                };
 
-                        zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
-                        zone.mean_air_temperature_c = match feature_zone_air_algorithm {
+                                zone.opaque_surface_conductance_w_per_k = conductance_w_per_k;
+                                zone.mean_air_temperature_c = match feature_zone_air_algorithm {
             HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical => step_zone_air_temperature(
                 previous_temperature_c,
                 equivalent_outside_temperature_c,
@@ -420,8 +435,8 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                     sum_hat_surf_w,
                     sum_hat_ref_w,
                     zone.convective_internal_gain_w,
-                    0.0,
-                    0.0,
+                    zone.sum_mcp_w_per_k + zone.sum_sys_mcp_w_per_k,
+                    zone.sum_mcp_t_w + zone.sum_sys_mcp_t_w,
                     zone.air_heat_capacity_j_per_k,
                     input.timestep_seconds,
                     zone.previous_mean_air_temperatures_c,
@@ -445,8 +460,8 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                     sum_hat_surf_w,
                     sum_hat_ref_w,
                     zone.convective_internal_gain_w,
-                    0.0,
-                    0.0,
+                    zone.sum_mcp_w_per_k + zone.sum_sys_mcp_w_per_k,
+                    zone.sum_mcp_t_w + zone.sum_sys_mcp_t_w,
                     zone.air_heat_capacity_j_per_k,
                     input.timestep_seconds,
                     zone.previous_mean_air_temperatures_c,
@@ -457,9 +472,11 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                 )
             }
         };
-                    }
-                });
-            });
+                            }
+                        });
+                    });
+                },
+            );
         });
     });
     update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
@@ -734,47 +751,54 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             heat_balance_ctf_history_slot_samples(&state.surfaces);
     });
 
-    zone_predictor_corrector::correct_step_source_order_path(|| {
-        correct_zone_air_temperatures_from_current_surfaces(
-            &state.surfaces,
-            &state.surface_indexes,
-            &mut state.zones,
-            input.timestep_seconds,
-            weather_context,
-            input.outdoor_dry_bulb_c,
-            algorithm_flags.correct_zone_air_after_surface_pass
-                && !algorithm_flags.interleave_zone_air_surface_passes,
-            heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
-            use_inside_ctf_outside_temperature_for_conduction_report,
-        );
-        correct_zone_air_humidity_ratios_from_current_state(
-            &mut state.zones,
-            input.timestep_seconds,
-            weather_context,
-            heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
-        );
-        if use_energyplus_adaptive_system_timestep_zone_air_correction {
-            apply_energyplus_adaptive_system_timestep_zone_air_correction(
-                &state.surfaces,
-                &state.surface_indexes,
-                &mut state.zones,
-                input.timestep_seconds,
-                weather_context,
-                input.outdoor_dry_bulb_c,
-                use_inside_ctf_outside_temperature_for_conduction_report,
-            );
-        } else {
-            for zone in &mut state.zones {
-                zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
-                zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
-                zone_predictor_corrector::push_system_timestep_histories_source_order_path(|| {
-                    synchronize_single_system_timestep_history(zone);
-                });
-                zone.system_timestep_average_surface_convection_report_w = None;
-                zone.system_timestep_average_air_storage_report_w = None;
-            }
-        }
-    });
+    zone_predictor_corrector::manage_zone_air_updates_compat(
+        zone_predictor_corrector::PredictorCorrectorCtrl::CorrectStep,
+        || {
+            zone_predictor_corrector::correct_zone_air_temps_compat(|| {
+                correct_zone_air_temperatures_from_current_surfaces(
+                    &state.surfaces,
+                    &state.surface_indexes,
+                    &mut state.zones,
+                    input.timestep_seconds,
+                    weather_context,
+                    input.outdoor_dry_bulb_c,
+                    algorithm_flags.correct_zone_air_after_surface_pass
+                        && !algorithm_flags.interleave_zone_air_surface_passes,
+                    heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
+                    use_inside_ctf_outside_temperature_for_conduction_report,
+                );
+                correct_zone_air_humidity_ratios_from_current_state(
+                    &mut state.zones,
+                    input.timestep_seconds,
+                    weather_context,
+                    heat_balance_uses_third_order_zone_air_correction(feature_zone_air_algorithm),
+                );
+                if use_energyplus_adaptive_system_timestep_zone_air_correction {
+                    apply_energyplus_adaptive_system_timestep_zone_air_correction(
+                        &state.surfaces,
+                        &state.surface_indexes,
+                        &mut state.zones,
+                        input.timestep_seconds,
+                        weather_context,
+                        input.outdoor_dry_bulb_c,
+                        use_inside_ctf_outside_temperature_for_conduction_report,
+                    );
+                } else {
+                    for zone in &mut state.zones {
+                        zone.zone_timestep_average_air_temperature_c = zone.mean_air_temperature_c;
+                        zone.zone_timestep_average_air_humidity_ratio = zone.air_humidity_ratio;
+                        zone.shorten_timestep_sys = false;
+                        zone.prior_timestep_seconds = input.timestep_seconds;
+                        zone_predictor_corrector::push_system_timestep_histories_compat(|| {
+                            synchronize_single_system_timestep_history(zone);
+                        });
+                        zone.system_timestep_average_surface_convection_report_w = None;
+                        zone.system_timestep_average_air_storage_report_w = None;
+                    }
+                }
+            });
+        },
+    );
     state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
         .as_ref()
         .map(|result| result.inside_surface_iteration_count)

@@ -7,8 +7,9 @@ use ep_model::{
 };
 
 use super::state::{
-    NODE_STATE_EXCLUDED_SETPOINT_VARIABLE, NODE_STATE_SENTINEL_RULE, NODE_STATE_SOURCE_MAP_PATH,
-    NODE_STATE_TIMESTAMP_RULE, NODE_STATE_WARMUP_RULE, NodeStateRole, NodeStateStore,
+    NODE_STATE_SENTINEL_RULE, NODE_STATE_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
+    NODE_STATE_TIMESTAMP_RULE, NODE_STATE_WARMUP_RULE, NODE_TEMPERATURE_SETPOINT_SENTINEL_C,
+    NodeStateRole, NodeStateStore,
 };
 
 const AIR_DENSITY_KG_PER_M3: f64 = 1.2;
@@ -55,10 +56,10 @@ pub struct NodeStateProjectionEvidencePolicy {
     pub timestamp_rule: &'static str,
     /// Warmup handling rule for samples written by the projection.
     pub warmup_rule: &'static str,
-    /// Sentinel filtering rule for future setpoint sampling.
+    /// Sentinel handling rule for setpoint sampling.
     pub sentinel_rule: &'static str,
-    /// Output variable intentionally excluded by the sentinel rule.
-    pub excluded_variable: &'static str,
+    /// Output variable written through the setpoint sentinel rule.
+    pub setpoint_variable: &'static str,
 }
 
 impl NodeStateProjectionEvidencePolicy {
@@ -70,7 +71,7 @@ impl NodeStateProjectionEvidencePolicy {
             timestamp_rule: NODE_STATE_TIMESTAMP_RULE,
             warmup_rule: NODE_STATE_WARMUP_RULE,
             sentinel_rule: NODE_STATE_SENTINEL_RULE,
-            excluded_variable: NODE_STATE_EXCLUDED_SETPOINT_VARIABLE,
+            setpoint_variable: NODE_STATE_SETPOINT_VARIABLE,
         }
     }
 }
@@ -254,6 +255,17 @@ pub fn simulate_ideal_loads_node_state_projection(
             "System Node Mass Flow Rate",
             "kg/s",
             node_state.mass_flow_rate_kg_per_s,
+            options.sample_count,
+        );
+        add_constant_output_series(
+            &mut results,
+            &mut handle_index,
+            &node.node_name,
+            "System Node Setpoint Temperature",
+            "C",
+            node_state
+                .temperature_setpoint_c
+                .unwrap_or(NODE_TEMPERATURE_SETPOINT_SENTINEL_C),
             options.sample_count,
         );
     }

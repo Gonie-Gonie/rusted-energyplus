@@ -12,10 +12,10 @@ pub const NODE_STATE_TIMESTAMP_RULE: &str =
 /// Warmup handling rule for the diagnostic node-state projection.
 pub const NODE_STATE_WARMUP_RULE: &str =
     "EnergyPlus warmup samples are not represented in this diagnostic projection";
-/// Sentinel handling rule for excluded node setpoint output.
-pub const NODE_STATE_SENTINEL_RULE: &str = "System Node Setpoint Temperature remains excluded; EnergyPlus SensedNodeFlagValue (-999) is represented as None";
-/// Node output variable excluded until setpoint ownership and sentinel filtering are ported.
-pub const NODE_STATE_EXCLUDED_SETPOINT_VARIABLE: &str = "System Node Setpoint Temperature";
+/// Sentinel handling rule for node setpoint output.
+pub const NODE_STATE_SENTINEL_RULE: &str = "System Node Setpoint Temperature is written from NodeStateStore; EnergyPlus SensedNodeFlagValue (-999) is represented as None in state and preserved as the output sentinel";
+/// Node output variable covered by the sentinel rule.
+pub const NODE_STATE_SETPOINT_VARIABLE: &str = "System Node Setpoint Temperature";
 
 /// Role assigned to a node-state projection row.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

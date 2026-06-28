@@ -1,0 +1,96 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "ScheduleTypeLimits": {
+    "Fraction": {
+      "lower_limit_value": 0.0,
+      "upper_limit_value": 1.0,
+      "numeric_type": "Continuous"
+    }
+  },
+  "Schedule:Constant": {
+    "Always On": {
+      "schedule_type_limits_name": "Fraction",
+      "hourly_value": 1.0
+    }
+  },
+  "Coil:Heating:Electric": {
+    "Heating Coil": {
+      "availability_schedule_name": "Always On",
+      "efficiency": 1.0,
+      "nominal_capacity": 1000.0,
+      "air_inlet_node_name": "Coil Inlet",
+      "air_outlet_node_name": "Coil Outlet"
+    }
+  },
+  "Branch": {
+    "Coil Only Branch": {
+      "components": [
+        {
+          "component_object_type": "Coil:Heating:Electric",
+          "component_name": "Heating Coil",
+          "component_inlet_node_name": "Coil Inlet",
+          "component_outlet_node_name": "Coil Outlet"
+        }
+      ]
+    }
+  },
+  "BranchList": {
+    "Coil Only Branches": {
+      "branches": [
+        {
+          "branch_name": "Coil Only Branch"
+        }
+      ]
+    }
+  },
+  "AirLoopHVAC": {
+    "Coil Only Air Loop": {
+      "branch_list_name": "Coil Only Branches",
+      "supply_side_inlet_node_name": "Coil Inlet",
+      "demand_side_outlet_node_name": "Coil Outlet",
+      "demand_side_inlet_node_names": [
+        {
+          "demand_side_inlet_node_name": "Zone Return Node"
+        }
+      ],
+      "supply_side_outlet_node_names": [
+        {
+          "supply_side_outlet_node_name": "Zone Supply Node"
+        }
+      ]
+    }
+  },
+  "SetpointManager:Scheduled": {
+    "Supply Air Setpoint Manager": {
+      "control_variable": "Temperature",
+      "schedule_name": "Always On",
+      "setpoint_node_or_nodelist_name": "Coil Outlet"
+    }
+  },
+  "AvailabilityManager:Scheduled": {
+    "Coil Availability": {
+      "schedule_name": "Always On"
+    }
+  },
+  "Output:Variable": {
+    "Coil Inlet Node Temperature": {
+      "key_value": "Coil Inlet",
+      "variable_name": "System Node Temperature",
+      "reporting_frequency": "Hourly"
+    },
+    "Coil Outlet Node Temperature": {
+      "key_value": "Coil Outlet",
+      "variable_name": "System Node Temperature",
+      "reporting_frequency": "Hourly"
+    },
+    "Heating Coil Heating Rate": {
+      "key_value": "Heating Coil",
+      "variable_name": "Heating Coil Heating Rate",
+      "reporting_frequency": "Hourly"
+    }
+  }
+}

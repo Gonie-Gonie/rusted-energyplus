@@ -18,6 +18,37 @@ pub const SURFACE_REPORT_OWNER_STAGE: &str = "ReportSurfaceHeatBalance";
 pub(crate) type ZoneScalarSeries = (ZoneId, String, Vec<f64>);
 pub(crate) type ZoneAirHeatBalanceSeries = (ZoneId, String, Vec<f64>, Vec<f64>, Vec<f64>);
 
+/// Diagnostic inside-face radiant internal gain source term rate variable name.
+pub const SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_VARIABLE: &str =
+    "Surface Inside Face Radiant Internal Gain Source Term Rate";
+/// Diagnostic inside-face radiant internal gain source term rate per-area variable name.
+pub const SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_PER_AREA_VARIABLE: &str =
+    "Surface Inside Face Radiant Internal Gain Source Term Rate per Area";
+/// Diagnostic inside-face absorbed shortwave source term rate variable name.
+pub const SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_VARIABLE: &str =
+    "Surface Inside Face Shortwave Absorbed Source Term Rate";
+/// Diagnostic inside-face absorbed shortwave source term rate per-area variable name.
+pub const SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_PER_AREA_VARIABLE: &str =
+    "Surface Inside Face Shortwave Absorbed Source Term Rate per Area";
+/// Diagnostic inside-face additional heat source term rate variable name.
+pub const SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_VARIABLE: &str =
+    "Surface Inside Face Additional Heat Source Term Rate";
+/// Diagnostic inside-face additional heat source term rate per-area variable name.
+pub const SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_PER_AREA_VARIABLE: &str =
+    "Surface Inside Face Additional Heat Source Term Rate per Area";
+/// Diagnostic inside-face radiant HVAC source term rate variable name.
+pub const SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_VARIABLE: &str =
+    "Surface Inside Face Radiant HVAC Source Term Rate";
+/// Diagnostic inside-face radiant HVAC source term rate per-area variable name.
+pub const SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_PER_AREA_VARIABLE: &str =
+    "Surface Inside Face Radiant HVAC Source Term Rate per Area";
+/// Diagnostic inside-face total non-convective source term rate variable name.
+pub const SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_VARIABLE: &str =
+    "Surface Inside Face Total Source Term Rate";
+/// Diagnostic inside-face total non-convective source term rate per-area variable name.
+pub const SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_PER_AREA_VARIABLE: &str =
+    "Surface Inside Face Total Source Term Rate per Area";
+
 pub(crate) struct HeatBalanceResultSeriesTraces {
     pub(crate) zone_temperatures: Vec<ZoneScalarSeries>,
     pub(crate) zone_humidity_ratios: Vec<ZoneScalarSeries>,
@@ -176,6 +207,7 @@ pub(crate) fn heat_balance_result_store_from_traces(
         air_storage_values,
     ) in zone_air_heat_balance_rates
     {
+        let outdoor_air_transfer_values = vec![0.0; internal_gain_values.len()];
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
             key: zone_name.clone(),
@@ -194,10 +226,18 @@ pub(crate) fn heat_balance_result_store_from_traces(
         handle_index += 1;
         results.add_series(OutputSeries {
             handle: OutputHandle(handle_index),
-            key: zone_name,
+            key: zone_name.clone(),
             variable_name: "Zone Air Heat Balance Air Energy Storage Rate".to_string(),
             units: "W".to_string(),
             values: air_storage_values,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: zone_name,
+            variable_name: "Zone Air Heat Balance Outdoor Air Transfer Rate".to_string(),
+            units: "W".to_string(),
+            values: outdoor_air_transfer_values,
         });
         handle_index += 1;
     }
@@ -397,6 +437,91 @@ pub(crate) fn heat_balance_result_store_from_traces(
                     .to_string(),
             units: "W/m2".to_string(),
             values: trace.inside_net_surface_thermal_radiation_heat_gain_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_VARIABLE
+                .to_string(),
+            units: "W".to_string(),
+            values: trace.inside_radiant_internal_gain_source_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_RADIANT_INTERNAL_GAIN_SOURCE_TERM_RATE_PER_AREA_VARIABLE
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_radiant_internal_gain_source_term_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.inside_shortwave_absorbed_source_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_SHORTWAVE_ABSORBED_SOURCE_TERM_RATE_PER_AREA_VARIABLE
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_shortwave_absorbed_source_term_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.inside_additional_heat_source_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_ADDITIONAL_HEAT_SOURCE_TERM_RATE_PER_AREA_VARIABLE
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_additional_heat_source_term_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.inside_radiant_hvac_source_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_RADIANT_HVAC_SOURCE_TERM_RATE_PER_AREA_VARIABLE
+                .to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_radiant_hvac_source_term_rate_per_area_w_per_m2,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_VARIABLE.to_string(),
+            units: "W".to_string(),
+            values: trace.inside_total_source_term_rate_w,
+        });
+        handle_index += 1;
+        results.add_series(OutputSeries {
+            handle: OutputHandle(handle_index),
+            key: trace.surface_name.clone(),
+            variable_name: SURFACE_INSIDE_TOTAL_SOURCE_TERM_RATE_PER_AREA_VARIABLE.to_string(),
+            units: "W/m2".to_string(),
+            values: trace.inside_total_source_term_rate_per_area_w_per_m2,
         });
         handle_index += 1;
         results.add_series(OutputSeries {
