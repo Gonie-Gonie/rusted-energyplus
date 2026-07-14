@@ -1,0 +1,571 @@
+schema = "rusted-energyplus.diagnostic-probe-ledger.v1"
+source_map = "docs/src/porting-map/heat-balance-source-map.md"
+historical_result_evidence = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+suite_script = "scripts/compare/official-dynamic-heat-balance-probe-suite.ps1"
+rust_selector_source = "crates/ep_runtime/src/diagnostic_probes/heat_balance.rs"
+
+[lifecycle]
+probe_unit = "full-executable-lane"
+active_hypothesis_status = "unresolved"
+closed_replay_switch = "IncludeClosed"
+default_suite_policy = "active-only"
+
+[[hypothesis]]
+id = "warmup-surftempin-first-sample-state-mismatch"
+algorithm_id = "heat_balance_surface_manager_source_order"
+owner_routine_id = "calc_heat_balance_inside_surf_2_ctf_only"
+source_file = "src/EnergyPlus/HeatBalanceSurfaceManager.cc"
+source_routine = "CalcHeatBalanceInsideSurf2CTFOnly"
+source_state = "SurfTempIn"
+statement = "After repeated-day warmup, at least one first-run-period CTF surface has different EnergyPlus SurfTempIn and Rust inside-face state values at the reporting boundary."
+expected_observation = "The nonempty zone-air warmup day-end trace establishes repeated-day context, and one first-run-period CTF row directly reports finite oracle_inside_face_temperature_c and rust_inside_face_temperature_c values whose absolute difference equals a nonzero inside_face_temperature_delta_c; reject the hypothesis if no such direct state mismatch exists."
+status = "unresolved"
+resolution = ""
+evidence_ref = ""
+source_map_anchor = "diagnostic-probe-hypothesis:warmup-surftempin-first-sample-state-mismatch"
+
+[[active_probe]]
+id = "observe-warmup-surftempin-first-sample-state-mismatch"
+hypothesis_id = "warmup-surftempin-first-sample-state-mismatch"
+kind = "observation"
+command = "official-dynamic-heat-balance-warmup-surftempin-first-sample-probe"
+script = "scripts/compare/official-dynamic-heat-balance-warmup-surftempin-first-sample-probe.ps1"
+suite_lane = "official-dynamic-heat-balance-warmup-surftempin-first-sample-probe.ps1"
+selector_kind = "compatibility-observation"
+selector = "EnergyPlusHeatBalanceCompatCandidate"
+cli_name = "energyplus-heat-balance-compat-candidate"
+reference_lane = "compatibility-source-order"
+source_state = "SurfTempIn"
+single_change = "Observation-only direct comparison of EnergyPlus SurfTempIn and Rust inside-face state at the first run-period sample after warmup; no runtime algorithm flag or compatibility behavior changes."
+ctf_seed_policy = "all-eio"
+ctf_initial_history_policy = "energyplus-surf-initial"
+warmup_minimum_days = 20
+surface_iterations = 20
+observation_only = true
+observation_json_array = "ctf_history_first_sample_deltas"
+observation_key = "ZN001:FLR001"
+observation_oracle_field = "oracle_inside_face_temperature_c"
+observation_rust_field = "rust_inside_face_temperature_c"
+observation_delta_field = "inside_face_temperature_delta_c"
+minimum_abs_delta_c = 1.0e-9
+report_path = ".runtime/official-dynamic-probe-warmup-surftempin-first-sample/26.1.0/official_1zone_uncontrolled_dynamic_diagnostic_001/compare/compare-digest.json"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalProbe"
+cli_name = "energyplus-analytical-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalSurfaceFirstProbe"
+cli_name = "energyplus-analytical-surface-first-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledProbe"
+cli_name = "energyplus-analytical-coupled-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe"
+cli_name = "energyplus-analytical-coupled-previous-inside-doe2-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvCurrentLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvCurrentAdiabaticProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-current-adiabatic-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStoragePreviousMatSurfaceConvectionProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-previous-mat-surface-convection-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceFrozenOutsideProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-frozen-outside-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryCommitProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-commit-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveReferenceAirProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-reference-air-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatLiveHconvProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-live-hconv-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatSurfaceReferenceAirReportProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-surface-reference-air-report-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatFinalHconvReportProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-final-hconv-report-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-inside-ctf-report-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatAdiabaticReportProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-inside-ctf-outside-history-scriptf-flat-adiabatic-report-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceAdiabaticHistoryCommitProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-frozen-reference-air-current-longwave-converged-surface-adiabatic-history-commit-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionCurrentAdiabaticHistoryProbe"
+cli_name = "energyplus-third-order-coupled-previous-inside-quick-outside-interleaved-interior-longwave-frozen-hconv-weather-air-storage-balance-surface-convection-current-adiabatic-history-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedScriptFInteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideScriptFInteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-scriptf-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe"
+cli_name = "energyplus-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-interior-longwave-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusAnalyticalCoupledPreviousBoundaryProbe"
+cli_name = "energyplus-analytical-coupled-previous-boundary-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_selector]]
+rust_variant = "EnergyPlusThirdOrderProbe"
+cli_name = "energyplus-third-order-probe"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-boundary-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-doe2-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-interior-longwave-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-doe2-scriptf-lw-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-epseed-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interior-longwave-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-iter8-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-current-adiabatic-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-current-lw-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-interleaved-scriptf-lw-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-iter8-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-previous-inside-quick-outside-scriptf-lw-iter5-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-coupled-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-surface-first-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-analytical-surface-first-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-surface-iter3-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-frozen-hconv-weather-air-storage-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-third-order-coupled-previous-inside-quick-outside-interleaved-lw-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-all-ctf-warmup-20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-analytical-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-analytical-surface-first-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-current-adhist-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-adhist-commit-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-frozen-outside-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-commit-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval2-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-hconv-reeval30-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-flat-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-inside-ctf-out-hist-scriptf-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-converged-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-current-lw-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-frozen-refair-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-balance-surfconv-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-third-order-weather-storage-prevmat-surfconv-iter20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/compare/official-dynamic-heat-balance-warmup-20-probe.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-adhist-report-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-final-hconv-report-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-inside-ctf-report-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-live-hconv-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-live-refair-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-surf-refair-report-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"
+
+[[closed_script]]
+path = "scripts/internal/probes/official-hb-flat-zone-surf-report-iter20.ps1"
+status = "closed"
+evidence_ref = "docs/src/porting-map/heat-balance-source-map.md#diagnostic-probe-lifecycle-ledger"

@@ -33,8 +33,8 @@ port_ticket_mappings = [
   "src/EnergyPlus/ZoneTempPredictorCorrector.cc|ManageZoneAirUpdates|ManageZoneAirUpdates|ManageZoneAirUpdates",
 ]
 rust_target = [
-  "crates/ep_runtime/src/heat_balance/algorithm.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility",
-  "crates/ep_runtime/src/heat_balance/algorithm.rs::heat_balance_zone_air_algorithm_feature_base",
+  "crates/ep_runtime/src/heat_balance/algorithm.rs::CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat",
+  "crates/ep_runtime/src/heat_balance/algorithm.rs::CompatibilityHeatBalanceAlgorithm::runtime_config",
   "scripts/compare/official-dynamic-heat-balance-compat-candidate.ps1",
 ]
 status = "conformance"
@@ -144,6 +144,11 @@ routine.manage_surface_heat_balance.source_routine = "ManageSurfaceHeatBalance"
 routine.manage_surface_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
 routine.manage_surface_heat_balance.completion_status = "source_mapped"
 routine.manage_surface_heat_balance.required_for_full_domain = true
+routine.calc_heat_balance_inside_surf_2_ctf_only.source_file = "src/EnergyPlus/HeatBalanceSurfaceManager.cc"
+routine.calc_heat_balance_inside_surf_2_ctf_only.source_routine = "CalcHeatBalanceInsideSurf2CTFOnly"
+routine.calc_heat_balance_inside_surf_2_ctf_only.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.calc_heat_balance_inside_surf_2_ctf_only.completion_status = "source_mapped"
+routine.calc_heat_balance_inside_surf_2_ctf_only.required_for_full_domain = true
 
 [[algorithm]]
 id = "heat_balance_air_manager_source_order"

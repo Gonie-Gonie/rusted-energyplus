@@ -433,6 +433,59 @@ function Assert-SourceMapCodeToken {
     }
 }
 
+function Test-RustFunctionTarget {
+    param(
+        [Parameter(Mandatory = $true)][string]$RustText,
+        [Parameter(Mandatory = $true)][string]$Target
+    )
+
+    $parts = @($Target -split "::")
+    $functionToken = $parts[-1]
+    if ($functionToken -notmatch "^[A-Za-z_][A-Za-z0-9_]*$") {
+        return $false
+    }
+    $functionPattern = "(?m)\bfn\s+$([regex]::Escape($functionToken))\b"
+    if ($parts.Count -eq 1) {
+        return [regex]::IsMatch($RustText, $functionPattern)
+    }
+    if ($parts.Count -ne 2) {
+        return $false
+    }
+
+    $ownerToken = $parts[0]
+    if ($ownerToken -notmatch "^[A-Za-z_][A-Za-z0-9_]*$") {
+        return $false
+    }
+    $owner = [regex]::Escape($ownerToken)
+    $implPattern = "(?m)^\s*impl(?:\s*<[^>{}\r\n]*>)?\s+(?:(?:[A-Za-z_][A-Za-z0-9_:<>]*\s+for\s+))?${owner}(?:\s*<[^>{}\r\n]*>)?(?:\s+where[^\{]*)?\s*\{"
+    foreach ($match in [regex]::Matches($RustText, $implPattern)) {
+        $openBraceIndex = $match.Index + $match.Length - 1
+        $depth = 0
+        $closeBraceIndex = -1
+        for ($index = $openBraceIndex; $index -lt $RustText.Length; $index += 1) {
+            if ($RustText[$index] -eq '{') {
+                $depth += 1
+            }
+            elseif ($RustText[$index] -eq '}') {
+                $depth -= 1
+                if ($depth -eq 0) {
+                    $closeBraceIndex = $index
+                    break
+                }
+            }
+        }
+        if ($closeBraceIndex -lt 0) {
+            continue
+        }
+        $bodyStart = $openBraceIndex + 1
+        $bodyLength = $closeBraceIndex - $bodyStart
+        if ([regex]::IsMatch($RustText.Substring($bodyStart, $bodyLength), $functionPattern)) {
+            return $true
+        }
+    }
+    return $false
+}
+
 function Assert-TicketReferences {
     param(
         [Parameter(Mandatory = $true)][hashtable]$Values,
@@ -486,7 +539,7 @@ function Assert-TicketReferences {
             Sort-Object -Unique
     )
     $rustText = Get-Content -Encoding UTF8 -Raw -LiteralPath $rustModulePath
-    if (-not [regex]::IsMatch($rustText, "(?m)\bfn\s+$([regex]::Escape($rustFunction))\b")) {
+    if (-not (Test-RustFunctionTarget -RustText $rustText -Target $rustFunction)) {
         throw "Rust target function does not exist in ${rustModule}: $rustFunction"
     }
 

@@ -19,7 +19,8 @@ param(
     [ValidateSet("each-surface-iteration", "after-surface-loop")]
     [string]$SurfaceLoopZoneAirCorrection = "each-surface-iteration",
     [string]$CaseId = "official_1zone_uncontrolled_dynamic_diagnostic_001",
-    [string]$OutputRootRelativeOverride = ""
+    [string]$OutputRootRelativeOverride = "",
+    [switch]$ObservationOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -483,6 +484,11 @@ else {
     if (-not $floorCtfSummary.included) {
         throw "Expected all-eio policy to mark FLOOR CTF summary as included"
     }
+}
+
+if ($ObservationOnly) {
+    Write-Host "Official dynamic heat-balance observation artifacts passed common structural checks."
+    return
 }
 
 if ($isCompatibilityCandidateCase) {

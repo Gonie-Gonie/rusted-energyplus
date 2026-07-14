@@ -69,6 +69,21 @@ function Invoke-PrPortTicketSelfTest {
     $conformanceRuntimeFile = "crates/ep_runtime/src/heat_balance/algorithm.rs"
     $diagnosticScript = "scripts/smoke/air-side-node-diagnostic-smoke.ps1"
     $headRevision = (& git -C $RepoRoot rev-parse HEAD).Trim()
+    $algorithmText = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $RepoRoot $conformanceRuntimeFile)
+    if (-not (Test-RustFunctionTarget -RustText $algorithmText -Target "CompatibilityHeatBalanceAlgorithm::runtime_config")) {
+        throw "Qualified Rust target self-test could not find the method on its owner impl"
+    }
+    if (Test-RustFunctionTarget -RustText $algorithmText -Target "WrongOwner::runtime_config") {
+        throw "Qualified Rust target self-test accepted a method from the wrong owner impl"
+    }
+    $syntheticRust = "impl Owner { fn owned() { if true { } } }`nfn target() { }"
+    if (Test-RustFunctionTarget -RustText $syntheticRust -Target "Owner::target") {
+        throw "Qualified Rust target self-test accepted a free function after the owner impl"
+    }
+    if (-not (Test-RustFunctionTarget -RustText $syntheticRust -Target "Owner::owned")) {
+        throw "Qualified Rust target self-test lost a method with nested braces"
+    }
+    Write-Host "OK PR port-ticket self-test: qualified_rust_function_owner"
     $validCompatibility = New-PrPortTicketTestBody
     $validDiagnostic = New-PrPortTicketTestBody `
         -PortType "diagnostic_probe" `
@@ -96,7 +111,7 @@ function Invoke-PrPortTicketSelfTest {
         -SourceRoutine "ManageZoneAirUpdates" `
         -SourceOrderStage "ManageZoneAirUpdates" `
         -RustModule "crates/ep_runtime/src/heat_balance/algorithm.rs" `
-        -RustFunction "heat_balance_zone_air_algorithm_feature_base" `
+        -RustFunction "CompatibilityHeatBalanceAlgorithm::runtime_config" `
         -ExecutionStage "ManageZoneAirUpdates"
     $validRefactor = New-PrPortTicketTestBody `
         -PortType "refactor_only" `
@@ -642,6 +657,18 @@ function Invoke-PrPortTicketSelfTest {
         throw "Git delete parser self-test did not preserve and classify the deleted path."
     }
     Write-Host "OK PR port-ticket self-test: deleted_sensitive_path"
+
+    foreach ($probePolicyPath in @(
+        "specs/diagnostic_probe_ledger.toml",
+        "scripts/quality/diagnostic-probe-check.ps1",
+        "tools/docs/diagnostic_probe_ledger_self_tests.py",
+        "tools/docs/validate_diagnostic_probe_ledger.py"
+    )) {
+        if (-not (Test-AlgorithmSourceOrderPath -Path $probePolicyPath)) {
+            throw "Diagnostic probe lifecycle policy path was not classified as source-order-sensitive: $probePolicyPath"
+        }
+    }
+    Write-Host "OK PR port-ticket self-test: diagnostic_probe_policy_sensitive_paths"
 
     $newSensitiveRenamePaths = @(
         ConvertFrom-GitNameStatusZ -Text "R097${nul}docs/old.rs${nul}${runtimeFile}${nul}"

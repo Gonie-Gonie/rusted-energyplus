@@ -165,16 +165,45 @@ def extract_executable_script_references(text: str) -> list[tuple[str, str]]:
             if absolute_span not in assignment_spans:
                 references.append((match.group(1), direct_kind))
 
-    for match in SCRIPT_ARRAY_ASSIGNMENT_RE.finditer(text):
-        array_name = match.group(1)
-        body = match.group(2)
-        dynamic_runner = re.compile(
-            rf"foreach\s*\(\s*\$([A-Za-z_][A-Za-z0-9_]*)\s+in\s+\${re.escape(array_name)}\s*\)"
-            rf"[\s\S]*?&\s*\(\s*Join-Path[^\r\n]*\$\1\b",
-            re.IGNORECASE,
+    array_assignments = list(SCRIPT_ARRAY_ASSIGNMENT_RE.finditer(text))
+    executable_arrays: set[str] = set()
+    for runner in re.finditer(
+        r"foreach\s*\(\s*\$(?P<item>[A-Za-z_][A-Za-z0-9_]*)\s+in\s+"
+        r"\$(?P<array>[A-Za-z_][A-Za-z0-9_]*)\s*\)",
+        text,
+        flags=re.IGNORECASE,
+    ):
+        item = runner.group("item")
+        if re.search(
+            rf"&\s*\(\s*Join-Path[^\r\n]*\${re.escape(item)}\b",
+            text[runner.end() :],
+            flags=re.IGNORECASE,
+        ):
+            executable_arrays.add(runner.group("array").lower())
+
+    # Follow simple PowerShell array composition into a dynamically executed
+    # runner array. This keeps conditional active/closed lane registries in the
+    # call graph without treating every quoted script path as executable.
+    array_links = [
+        (match.group("destination").lower(), match.group("source").lower())
+        for match in re.finditer(
+            r"(?im)^\s*\$(?P<destination>[A-Za-z_][A-Za-z0-9_]*)\s*(?:=|\+=)\s*"
+            r"(?:@\(\s*)?\$(?P<source>[A-Za-z_][A-Za-z0-9_]*)\s*(?:\)\s*)?(?:#.*)?$",
+            text,
         )
-        if not dynamic_runner.search(text):
+    ]
+    changed = True
+    while changed:
+        changed = False
+        for destination, source in array_links:
+            if destination in executable_arrays and source not in executable_arrays:
+                executable_arrays.add(source)
+                changed = True
+
+    for match in array_assignments:
+        if match.group(1).lower() not in executable_arrays:
             continue
+        body = match.group(2)
         for reference in QUOTED_SCRIPT_REFERENCE_RE.finditer(body):
             references.append((reference.group(1), "dynamic_executes"))
     return references

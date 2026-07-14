@@ -200,7 +200,11 @@ function Test-AlgorithmSourceOrderPath {
     $durableClaimPaths = @(
         "specs/algorithm_ledger.toml",
         "specs/capabilities.toml",
-        "scripts/dev/commands.json"
+        "specs/diagnostic_probe_ledger.toml",
+        "scripts/quality/diagnostic-probe-check.ps1",
+        "scripts/dev/commands.json",
+        "tools/docs/diagnostic_probe_ledger_self_tests.py",
+        "tools/docs/validate_diagnostic_probe_ledger.py"
     )
     if ($durableClaimPaths -contains $lower) {
         return $true

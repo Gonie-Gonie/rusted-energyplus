@@ -55,7 +55,12 @@ $lanes = @(
     "lane-a.ps1",
     "lane-b.ps1"
 )
-foreach ($lane in $lanes) {
+$closedLanes = @(
+    "lane-closed.ps1"
+)
+$allLanes = @($lanes)
+$allLanes += $closedLanes
+foreach ($lane in $allLanes) {
     & (Join-Path $PSScriptRoot $lane)
 }
 powershell -File "%~dp0dev.ps1"
@@ -68,6 +73,7 @@ Add-Type `
         ("run.ps1", "executes"),
         ("lane-a.ps1", "dynamic_executes"),
         ("lane-b.ps1", "dynamic_executes"),
+        ("lane-closed.ps1", "dynamic_executes"),
         ("%~dp0dev.ps1", "executes"),
         ("launcher.cs", "compiles"),
     }

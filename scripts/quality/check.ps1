@@ -65,6 +65,8 @@ Invoke-DevCommand -Command "spec-cross-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "algorithm-ledger-check" -Arguments @("-SelfTest")
+Invoke-DevCommand -Command "diagnostic-probe-check"
+Invoke-DevCommand -Command "diagnostic-probe-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "variable-coverage-check"
 Invoke-DevCommand -Command "script-inventory-check"
 Invoke-DevCommand -Command "pr-port-ticket-check" -Arguments @("-SelfTest")

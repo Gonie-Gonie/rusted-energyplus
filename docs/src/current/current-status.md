@@ -63,10 +63,12 @@ and do not change the variable coverage total.
 The official `1ZoneUncontrolled` target is currently declared-variable
 compatibility only. Broad CTF storage parity, broad solar/radiation parity,
 fenestration, infiltration, and general heat-balance compatibility remain
-outside the claim. The active all-CTF diagnostic probe currently keeps the
-mass-floor storage blocker at sample 2435 with `face-temperature-current-inside`
-as the dominant mismatch source; this is diagnostic evidence, not a promoted
-claim.
+outside the claim. The diagnostic probe lifecycle currently contains one
+unresolved first-run-period `SurfTempIn` state-mismatch hypothesis and one observation-only
+executable lane. The 40 historical Rust
+probe selectors and 56 historical wrapper lanes are closed replay artifacts,
+excluded from the default suite; none of this diagnostic evidence is a
+promoted claim.
 
 IdealLoadsAirSystem evidence is branch-scoped and variable-scoped. No-OA
 sensible, finite-limit, ConstantSensibleHeatRatio, selected humidity,
@@ -147,6 +149,12 @@ runtime success; phase timing formatting; and wrapper invocation through
   that config; diagnostic enum and long-form variant matching stay in
   `diagnostic_probes` (plus tests), and the CLI delegates selector parsing and
   display names to that boundary.
+- `specs/diagnostic_probe_ledger.toml` and
+  `scripts/quality/diagnostic-probe-check.ps1` enforce exact set equality
+  between source-map hypotheses and active full executable lanes. Historical
+  selectors and wrappers are excluded from the default suite. Historical
+  replay remains explicit through `-IncludeClosed` or retained direct wrapper
+  commands.
 - heat-balance source-order stage definitions live under
   `heat_balance::{manager,surface_manager,air_manager,zone_predictor_corrector,
   ctf,convection,radiation,reports}` and are guarded by

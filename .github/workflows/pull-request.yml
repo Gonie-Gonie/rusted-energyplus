@@ -45,6 +45,8 @@ jobs:
         run: |
           .\scripts\dev.cmd algorithm-ledger-check
           .\scripts\dev.cmd algorithm-ledger-check -SelfTest
+          .\scripts\dev.cmd diagnostic-probe-check
+          .\scripts\dev.cmd diagnostic-probe-check -SelfTest
 
   algorithm-port-ticket:
     name: Algorithm Port Ticket

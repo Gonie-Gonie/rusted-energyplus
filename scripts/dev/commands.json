@@ -149,6 +149,12 @@
                          "help":  "Validate algorithm evidence, routine completion phases, full-domain readiness, and the port-ticket review contract."
                      },
                      {
+                         "name":  "diagnostic-probe-check",
+                         "path":  "quality\\diagnostic-probe-check.ps1",
+                         "group":  "quality",
+                         "help":  "Validate the one-to-one diagnostic probe lifecycle ledger and active suite."
+                     },
+                     {
                          "name":  "variable-coverage-check",
                          "path":  "quality\\variable-coverage-check.ps1",
                          "group":  "quality",
@@ -635,6 +641,12 @@
                          "help":  "Run the official 1ZoneUncontrolled dynamic heat-balance diagnostic case."
                      },
                      {
+                         "name":  "official-dynamic-heat-balance-warmup-surftempin-first-sample-probe",
+                         "path":  "compare\\official-dynamic-heat-balance-warmup-surftempin-first-sample-probe.ps1",
+                         "group":  "compare",
+                         "help":  "Observe the unresolved first-run-period SurfTempIn state mismatch after warmup on the compatibility lane."
+                     },
+                     {
                          "name":  "official-dynamic-heat-balance-compat-candidate",
                          "path":  "compare\\official-dynamic-heat-balance-compat-candidate.ps1",
                          "group":  "compare",
@@ -950,7 +962,7 @@
                          "name":  "official-dynamic-heat-balance-probe-suite",
                          "path":  "compare\\official-dynamic-heat-balance-probe-suite.ps1",
                          "group":  "compare",
-                         "help":  "Refresh all official dynamic heat-balance probe lanes and regenerate the probe summary."
+                         "help":  "Run active one-hypothesis heat-balance probes; pass -IncludeClosed to replay historical lanes."
                      },
                      {
                          "name":  "compare-static-model-conformance",

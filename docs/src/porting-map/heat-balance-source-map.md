@@ -97,6 +97,50 @@ diagnostic JSON and Markdown report to expose `top_blocker`,
 | `source-order-wrapper-boundary` | closed | heat-balance source-order wrappers now exist on the runtime path; remaining rows track algorithm/state deltas behind those wrappers |
 | `diagnostic-probe-conformance-aliasing` | closed | diagnostic probe metadata, selector matching, and compatibility source-order execution are separated; diagnostic selectors resolve to a probe-agnostic runtime config before compatibility code runs, so probe output cannot be promoted as conformance evidence |
 
+<a id="diagnostic-probe-lifecycle-ledger"></a>
+
+## Diagnostic Probe Lifecycle Ledger
+
+The blocker ledger above records observed output and state deltas. Its active
+and open rows are not, by themselves, source-state hypotheses and therefore do
+not determine the number of active probes. A hypothesis in this registry must
+name one scalar EnergyPlus state, one source ownership boundary, and one
+falsifiable expected observation.
+
+The active probe unit is a full executable lane: its selector, CTF and warmup
+policies, iteration and convection settings, report settings, wrapper command,
+and expected observation travel together. An enum variant by itself is not an
+active probe. Historical probe selectors and wrappers are closed replay
+artifacts; they are excluded from the default active suite. They remain
+reproducible through the suite's explicit `-IncludeClosed` path and retained
+direct wrapper commands. The recorded source-audit narrative below is retained
+as their closure and replay evidence; it does not reopen a closed hypothesis or
+make its lane active.
+
+### Active Source-State Hypothesis Registry
+
+<a id="diagnostic-probe-hypothesis:warmup-surftempin-first-sample-state-mismatch"></a>
+
+#### `warmup-surftempin-first-sample-state-mismatch`
+
+| Field | Contract |
+|---|---|
+| Status | `unresolved` |
+| Algorithm / owner routine | `heat_balance_surface_manager_source_order` / `calc_heat_balance_inside_surf_2_ctf_only` |
+| EnergyPlus ownership | `src/EnergyPlus/HeatBalanceSurfaceManager.cc::CalcHeatBalanceInsideSurf2CTFOnly` under the `ManageSurfaceHeatBalance` stage order |
+| Scalar source state | `SurfTempIn` |
+| Hypothesis | After repeated-day warmup, at least one first-run-period CTF surface has different EnergyPlus `SurfTempIn` and Rust inside-face state values at the reporting boundary. This is a direct state-mismatch hypothesis, not a claim that the mismatch's upstream cause has already been identified. |
+| Expected observation | With forcing and the compatibility configuration held fixed, the observation-only lane finds the `ZN001:FLR001` first-run-period CTF row whose finite `oracle_inside_face_temperature_c` and `rust_inside_face_temperature_c` values differ by more than `1.0e-9 C`, with their absolute difference equal to `inside_face_temperature_delta_c`. The EnergyPlus `Surface Inside Face Temperature` report exposes `SurfTempIn`; the warmup day-end zone-air trace establishes the repeated-day context. If that direct state mismatch is absent, this hypothesis is rejected rather than converted into a compatibility branch. |
+| Latest observation | 2026-07-14 active-lane run: 20 warmup day-end rows; `ZN001:FLR001` sample-`0` EnergyPlus `SurfTempIn` `-0.115727652883 C`, Rust inside-face state `-0.116329096525 C`, absolute delta `0.000601443642 C`. The direct mismatch remains present, so the hypothesis stays unresolved. |
+| Active lane | `official-dynamic-heat-balance-warmup-surftempin-first-sample-probe` |
+
+The locked source establishes the ownership boundary: the CTF-only inside solve
+calculates `SurfTempInTmp` and copies it to the directly reported `SurfTempIn`,
+while its caller continues through the air balance, final surface pass, and
+`UpdateThermalHistories`. The hypothesis records only the directly observed
+`SurfTempIn` mismatch at that boundary; it does not attribute the mismatch to
+`SurfTempInTmp` or assert that the upstream defect has already been located.
+
 ## June 2026 Source-Audit Boundary
 
 The official `1ZoneUncontrolled` dynamic promotion lane must keep the following
