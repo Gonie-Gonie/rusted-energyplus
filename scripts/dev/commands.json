@@ -347,6 +347,12 @@
                          "help":  "Gate the EnergyPlus and Rust expected-failure paths for a nonexistent fifth-Sunday input-file special day."
                      },
                      {
+                         "name":  "compare-calendar-special-day-duration-wrap-exact",
+                         "path":  "compare\\compare-calendar-special-day-duration-wrap-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired exact common-year and leap-year duration-three input-file Holiday annual-table wrap state and ordered hourly day types."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",

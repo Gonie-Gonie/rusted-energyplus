@@ -10,6 +10,23 @@ $RepoRoot = Get-RepoRoot
 Set-Location $RepoRoot
 . (Join-Path $PSScriptRoot "strict-no-false-conformance\assertions.ps1")
 
+function Assert-RegexContains {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing file for false-conformance guard: $Path"
+    }
+    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    if ($text -notmatch $Pattern) {
+        throw "Missing required compatibility boundary for $Description`: $Pattern"
+    }
+    Write-Host "OK compatibility boundary for $Description"
+}
+
 Assert-DoesNotContain -Path "README.md" -Pattern "first runtime path for an uncontrolled one-zone building subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "ResultStore output from the first uncontrolled one-zone simulation subset" -Description "README scope"
 Assert-DoesNotContain -Path "README.md" -Pattern "zone temperature comparison passes" -Description "README scope"
@@ -296,6 +313,66 @@ Assert-Contains -Path "data\conformance_cases\calendar_special_day_nonexistent_f
 Assert-Contains -Path "data\conformance_cases\calendar_special_day_nonexistent_fifth_weekday_failure_001\calendar_special_day_nonexistent_fifth_weekday_failure.idf" -Pattern 'RunPeriod,Missing Fifth Sunday Run Period,2,28,2016,3,1,2016,Sunday,No,No,Yes,No,No,No;' -Description "nonexistent fifth-weekday 2016 run period and enabled weekend policy"
 Assert-Contains -Path "data\conformance_cases\calendar_special_day_nonexistent_fifth_weekday_failure_001\case.toml" -Pattern 'one duration-one input-file Holiday named `Missing Fifth Sunday Holiday`' -Description "nonexistent fifth-weekday duration-one Holiday boundary"
 Assert-Contains -Path "data\conformance_cases\calendar_special_day_nonexistent_fifth_weekday_failure_001\calendar_special_day_nonexistent_fifth_weekday_failure.idf" -Pattern '5th Sunday in February' -Description "nonexistent fifth-weekday exact date rule"
+$durationWrapCases = @(
+    @{
+        Label = "common-year duration wrap"
+        CasePath = "data\conformance_cases\calendar_special_day_duration_wrap_common_year_hourly_exact_001\case.toml"
+        IdfPath = "data\conformance_cases\calendar_special_day_duration_wrap_common_year_hourly_exact_001\calendar_special_day_duration_wrap_common_year_hourly_exact.idf"
+        WeatherPath = "data\conformance_cases\calendar_special_day_duration_wrap_common_year_hourly_exact_001\calendar_special_day_duration_wrap_common_year_hourly_exact.epw"
+        Year = 2017
+        StartWeekday = "Sunday"
+        StartOrdinal = 365
+        LastDayType = "Tuesday"
+        LastDayIndex = 3
+        LeapPolicy = "No"
+    },
+    @{
+        Label = "leap-year duration wrap"
+        CasePath = "data\conformance_cases\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\case.toml"
+        IdfPath = "data\conformance_cases\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\calendar_special_day_duration_wrap_leap_year_hourly_exact.idf"
+        WeatherPath = "data\conformance_cases\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\calendar_special_day_duration_wrap_leap_year_hourly_exact.epw"
+        Year = 2016
+        StartWeekday = "Friday"
+        StartOrdinal = 366
+        LastDayType = "Sunday"
+        LastDayIndex = 1
+        LeapPolicy = "Yes"
+    }
+)
+foreach ($durationWrapCase in $durationWrapCases) {
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'comparison_class = "conformance"' -Description "$($durationWrapCase.Label) conformance class"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'conformance_claim = true' -Description "$($durationWrapCase.Label) conformance claim"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'tier = "A"' -Description "$($durationWrapCase.Label) Tier A evidence"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'domains = ["weather"]' -Description "$($durationWrapCase.Label) weather-only domain"
+    foreach ($scopeField in @("has_zone", "has_surface", "has_fenestration", "has_air_loop", "has_plant_loop", "has_ems", "has_python_plugin", "has_daylighting")) {
+        Assert-Contains -Path $durationWrapCase.CasePath -Pattern "$scopeField = false" -Description "$($durationWrapCase.Label) disabled $scopeField scope"
+    }
+    Assert-CaseOutputLevel -Path $durationWrapCase.CasePath -Key "ENVIRONMENT" -Variable "Site Day Type Index" -Level "conformance" -Description "$($durationWrapCase.Label) promoted weather output"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'frequency = "hourly"' -Description "$($durationWrapCase.Label) hourly output frequency"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'timestamp_contract = "ordered-exact-unique"' -Description "$($durationWrapCase.Label) ordered timestamp contract"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'abs_tol = 0.0' -Description "$($durationWrapCase.Label) exact absolute tolerance"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'rmse_tol = 0.0' -Description "$($durationWrapCase.Label) exact RMSE tolerance"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern '72 ordered, unique hour-ending Site Day Type Index samples' -Description "$($durationWrapCase.Label) 72-sample claim boundary"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern "explicit $($durationWrapCase.Year)-01-01 through $($durationWrapCase.Year)-01-03 RunPeriod" -Description "$($durationWrapCase.Label) exact three-day calendar"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern "day-of-year $($durationWrapCase.StartOrdinal)" -Description "$($durationWrapCase.Label) EnergyPlus annual-table start ordinal"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern "producing 48 Holiday index-8 samples followed by 24 $($durationWrapCase.LastDayType) index-$($durationWrapCase.LastDayIndex) samples" -Description "$($durationWrapCase.Label) exact 8/8/$($durationWrapCase.LastDayIndex) daily values"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'This is same-year cyclic annual-table wrap, not a cross-year RunPeriod; overlap, definition order, precedence, warnings' -Description "$($durationWrapCase.Label) overlap/order/cross-year non-claim"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'script = "scripts/dev.cmd compare-calendar-special-day-duration-wrap-exact"' -Description "$($durationWrapCase.Label) blocking gate"
+    Assert-Contains -Path $durationWrapCase.CasePath -Pattern 'blocking = true' -Description "$($durationWrapCase.Label) blocking flag"
+    Assert-RegexContains -Path $durationWrapCase.IdfPath -Pattern "(?s)RunPeriod,\s*Special Day Duration Wrap Run Period,\s*1,\s*1,\s*$($durationWrapCase.Year),\s*1,\s*3,\s*$($durationWrapCase.Year),\s*$($durationWrapCase.StartWeekday)," -Description "$($durationWrapCase.Label) exact RunPeriod"
+    Assert-RegexContains -Path $durationWrapCase.IdfPath -Pattern '(?s)RunPeriodControl:SpecialDays,\s*Three Day Year Wrap Holiday,\s*12/31,\s*3,\s*Holiday;' -Description "$($durationWrapCase.Label) duration-three 12/31 Holiday"
+    foreach ($policyLine in @(
+            "No,  !- Use Weather File Holidays and Special Days",
+            "No,  !- Use Weather File Daylight Saving Period",
+            "No,  !- Apply Weekend Holiday Rule",
+            "No,  !- Use Weather File Rain Indicators",
+            "No,  !- Use Weather File Snow Indicators",
+            "No;  !- Treat Weather as Actual"
+        )) {
+        Assert-Contains -Path $durationWrapCase.IdfPath -Pattern $policyLine -Description "$($durationWrapCase.Label) isolated RunPeriod policy"
+    }
+    Assert-Contains -Path $durationWrapCase.WeatherPath -Pattern "HOLIDAYS/DAYLIGHT SAVINGS,$($durationWrapCase.LeapPolicy),0,0,0" -Description "$($durationWrapCase.Label) isolated EPW calendar policy"
+}
 Assert-Contains -Path "data\conformance_cases\calendar_schedule_weather_leap_policy_no_001\calendar_schedule_weather_leap_policy_no.epw" -Pattern "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0" -Description "weather-effective no-leap EPW policy"
 Assert-Contains -Path "data\conformance_cases\calendar_schedule_weather_leap_policy_no_001\calendar_schedule_weather_leap_policy_no.epw" -Pattern "Same 72 raw rows as the Yes fixture" -Description "weather-effective retained raw leap rows"
 Assert-Contains -Path "data\conformance_cases\weather_record_start_offset_nonactual_001\case.toml" -Pattern 'timestamp_contract = "ordered-exact-unique"' -Description "weather record-selection ordered timestamp contract"
@@ -967,6 +1044,21 @@ Assert-Contains -Path "scripts\compare\compare-calendar-special-day-nonexistent-
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-nonexistent-nth-error.ps1" -Pattern 'numeric_output_conformance_claimed = $false' -Description "nonexistent fifth-weekday no numeric-output conformance"
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-nonexistent-nth-error.ps1" -Pattern 'Apply Weekend Holiday Rule is explicitly Yes and does not rescue or shift the nonexistent Nth-weekday rule' -Description "nonexistent fifth-weekday Weekend Yes cannot rescue rule"
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-nonexistent-nth-error.ps1" -Pattern 'No other ordinal, weekday, month, year, date form, duration, overlap, precedence, weekend behavior, or successful numeric output is claimed.' -Description "nonexistent fifth-weekday report non-claim"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'Common-year and leap-year duration-wrap special-day exact gate passed.' -Description "paired duration-wrap exact conformance gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'StartDayOfYear = 365' -Description "common-year EnergyPlus day-365 wrap boundary"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'FinalDayTypeIndex = 3.0' -Description "common-year exact 8/8/3 daily value boundary"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'StartDayOfYear = 366' -Description "leap-year EnergyPlus day-366 wrap boundary"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'FinalDayTypeIndex = 1.0' -Description "leap-year exact 8/8/1 daily value boundary"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'Duration-wrap IDFs differ outside the explicit year and start-weekday fields' -Description "paired duration-wrap explicit-field fixture isolation"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;' -Description "paired duration-wrap clean EnergyPlus completion"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$weatherRows.Count -ne 72' -Description "paired duration-wrap 72-row EPW gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$specialDays.hourly_samples -ne 48' -Description "paired duration-wrap 48-Holiday-hour gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$resolved[0].duration_days -ne 3' -Description "paired duration-wrap duration-three gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'if ($values.Count -ne 72 -or $timestampRows.Count -ne 72)' -Description "paired duration-wrap oracle value/timestamp count gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'if ($index -lt 48) { 8.0 } else { $case.FinalDayTypeIndex }' -Description "paired duration-wrap per-sample Holiday and terminal weekday gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$series.timestamp_observed_unique -ne $true -or $series.timestamp_order_match -ne $true' -Description "paired duration-wrap ordered unique timestamp gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$series.max_rmse_tolerance -ne 0.0 -or $series.max_abs_delta -ne 0.0' -Description "paired duration-wrap zero-tolerance exact-value gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'same-year cyclic annual-table wrap, not a cross-year RunPeriod' -Description "paired duration-wrap cross-year non-claim gate"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern "Weather record-selection gate passed." -Description "weather record-selection conformance gate"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern '$dataRows.Count -ne 72' -Description "weather record-selection 72-row source gate"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern '$selection.source_start_record_index -ne 24' -Description "weather record-selection literal start gate"

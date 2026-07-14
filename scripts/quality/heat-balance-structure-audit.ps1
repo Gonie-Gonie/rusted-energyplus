@@ -209,6 +209,8 @@ $specialDays = "crates\ep_runtime\src\time_axis\special_days.rs"
 $schedules = "crates\ep_runtime\src\schedules.rs"
 $timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
 $timeWeatherScheduleSpecialDays = "crates\ep_cli\src\time_weather_schedule_special_days.rs"
+$algorithmLedger = "specs\algorithm_ledger.toml"
+$durationWrapGate = "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -268,6 +270,8 @@ foreach ($entry in @(
         @($schedules, "runtime schedules module"),
         @($timeWeatherSchedule, "time/weather/schedule report module"),
         @($timeWeatherScheduleSpecialDays, "time/weather/schedule special-day report module"),
+        @($algorithmLedger, "algorithm source-order ledger"),
+        @($durationWrapGate, "common-year and leap-year special-day duration-wrap gate"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
         @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
@@ -636,10 +640,20 @@ Assert-Contains -Path $specialDays -Pattern 'CalendarRuleResolutionError::NthWee
 Assert-Contains -Path $specialDays -Pattern 'run_period.use_weather_file_holidays_and_special_days' -Description "RunPeriod EPW holiday use-policy branch"
 Assert-Contains -Path $specialDays -Pattern 'SpecialDaySource::WeatherFile' -Description "weather-file special-day source attribution"
 Assert-Contains -Path $specialDays -Pattern 'DayType::Sunday' -Description "source-exact EPW holiday Sunday day type"
+Assert-Contains -Path $specialDays -Pattern 'for offset in 0\.\.duration_days' -Description "special-day inclusive duration loop"
+Assert-Contains -Path $specialDays -Pattern 'wrap_ordinal\(start_day_of_year \+ offset, days_in_year\)' -Description "special-day common-year and leap-year annual-table wrap application"
+Assert-Contains -Path $specialDays -Pattern 'fn wrap_ordinal\s*\([\s\S]*% days_in_year' -Description "special-day cyclic annual-table wrap owner"
 Assert-Contains -Path $specialDays -Pattern 'day_types_by_ordinal\[ordinal as usize\] = Some\(day_type\)' -Description "later special-day definitions overwrite ordinal state"
 Assert-Contains -Path $timeAxis -Pattern 'special_day_type: day\.special_day_type' -Description "special day projected into both time-point axes"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn model_special_day_overrides_both_axes_for_every_hour_of_leap_day\s*\(' -Description "fixed-date special day both-axis test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn special_day_duration_is_inclusive_and_wraps_the_same_year_annual_table\s*\(' -Description "special-day same-year annual-table duration and wrap test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'start\.day_of_year, 366' -Description "special-day leap-year day-366 wrap test boundary"
+Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 365' -Description "EnergyPlus common-year duration wrap at annual day 365"
+Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 366' -Description "EnergyPlus leap-year duration wrap at annual day 366"
+Assert-Contains -Path $durationWrapGate -Pattern 'if \(\$index -lt 48\) \{ 8\.0 \} else \{ \$case\.FinalDayTypeIndex \}' -Description "EnergyPlus duration-three wrap produces two in-range Holiday days then weekday"
+Assert-Contains -Path $durationWrapGate -Pattern 'EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;' -Description "EnergyPlus duration-wrap clean source branch"
+Assert-Contains -Path $algorithmLedger -Pattern '(?s)\[\[algorithm\]\]\s*id = "calendar_time_state"(?:(?!\[\[algorithm\]\]).)*status = "scaffold"(?:(?!\[\[algorithm\]\]).)*claim_level = "none"' -Description "calendar algorithm remains scaffold with no family claim"
+Assert-Contains -Path $algorithmLedger -Pattern 'routine\.set_special_day_dates\.completion_status = "source_mapped"' -Description "SetSpecialDayDates remains source-mapped"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn later_typed_special_day_definition_overwrites_an_earlier_definition\s*\(' -Description "special-day later-wins unit test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn weekend_rule_shifts_only_fixed_single_day_special_days_to_monday\s*\(' -Description "special-day weekend-rule unit test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn nth_and_last_special_day_rules_resolve_and_nonexistent_nth_is_rejected\s*\(' -Description "special-day Nth/last resolution and invalid-fifth test"

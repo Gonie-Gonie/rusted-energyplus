@@ -108,10 +108,20 @@ CLAIM_BOUNDARY = (
     "precedence, declaration order, year wrap, or cross-year behavior; schedule lookup; tomorrow "
     "state; and successful-run raw ESO serialization remain outside the smoke boundary. EPW "
     "Nth/Last rules; blank/default policy behavior; EPW holidays beyond the paired "
-    "fixed use-policy cases below; other special-day types; duration, overlap, precedence, "
-    "declaration order, year wrap, or cross-year behavior; schedule lookup; "
-    "tomorrow state; and raw ESO timestamp serialization remain outside "
-    "this claim. The paired fixed EPW "
+    "fixed use-policy cases below; other special-day types; duration/date combinations beyond the "
+    "exact pair below; overlap, precedence, declaration order, warnings, actual cross-year run "
+    "periods, or per-year reprojection; schedule lookup; tomorrow state; and raw ESO timestamp "
+    "serialization remain outside this claim. The paired duration-wrap input-file Holiday cases "
+    "each use an explicit January 1 through January 3 same-year RunPeriod and one December 31 "
+    "duration-three Holiday. The common-year 2017 case resolves day of year 365 and matches 72 "
+    "ordered, exact, unique, zero-tolerance Site Day Type Index samples in daily order 8/8/3; the "
+    "leap-observed 2016 case resolves day of year 366 and matches 72 samples in daily order 8/8/1. "
+    "Each series contains exactly 48 Holiday=8 samples. All RunPeriod policy flags are explicitly "
+    "No. This proves only the common-year `JDay1 == 366 && LeapYearAdd == 0` and leap-year "
+    "`JDay1 == 367` SetSpecialDayDates source branches for a same-year cyclic annual table. Actual "
+    "cross-year execution or reprojection; overlap, precedence, declaration order, or warnings; "
+    "other durations, dates, special-day types, policy values, or EPW calendar rules remain outside "
+    "the claim. The paired fixed EPW "
     "holiday cases share one "
     "February 29 weather-file holiday and differ only in the RunPeriod use flag. Their 72 ordered, "
     "unique Site Day Type Index samples and normalized timestamps match exactly: enabled is 24 "
@@ -139,6 +149,8 @@ CASE_LABELS = {
     "calendar_special_day_weekend_rule_disabled_hourly_exact_001": "Weekend holiday disabled",
     "calendar_special_day_weekend_saturday_enabled_hourly_exact_001": "Saturday holiday enabled",
     "calendar_special_day_weekend_saturday_disabled_hourly_exact_001": "Saturday holiday disabled",
+    "calendar_special_day_duration_wrap_common_year_hourly_exact_001": "Duration wrap common",
+    "calendar_special_day_duration_wrap_leap_year_hourly_exact_001": "Duration wrap leap",
     "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001": "EPW holiday enabled",
     "calendar_epw_holiday_fixed_date_disabled_hourly_exact_001": "EPW holiday disabled",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
@@ -304,6 +316,20 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Common-year duration wrap",
+        command="compare-calendar-special-day-duration-wrap-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_common_year_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_common_year_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_common_year_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Leap-year duration wrap",
+        command="compare-calendar-special-day-duration-wrap-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="EPW holiday enabled",
