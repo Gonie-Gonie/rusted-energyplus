@@ -1,0 +1,59 @@
+id = "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001"
+title = "EPW fixed-date holiday enabled exact order"
+milestone = "full-source-order-calendar-epw-holiday-policy"
+purpose = "Block on exact ordered hourly Site Day Type Index state when a RunPeriod enables one fixed EPW holiday."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case is paired with calendar_epw_holiday_fixed_date_disabled_hourly_exact_001 and shares the same leap-observed EPW with one fixed February 29 holiday.",
+  "The RunPeriod explicitly enables weather-file holidays, so the middle Monday uses EnergyPlus' source-exact EPW holiday type Sunday index 1; the 72 hourly values are 24 Sunday=1, 24 Sunday=1, and 24 Tuesday=3.",
+  "No input-file special day is present, and weekend observation and daylight saving are explicitly disabled so the case isolates the EPW holiday intake/use-policy branch.",
+  "Weekend shifting, Nth/last rules, multiple or overlapping holidays, EPW-versus-IDF precedence, schedule lookup, tomorrow state, raw ESO serialization, actual weather, and cross-year traversal remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_epw_holiday_fixed_date_enabled_hourly_exact_001/calendar_epw_holiday_fixed_date_enabled_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_epw_holiday_fixed_date_enabled_hourly_exact_001/calendar_epw_holiday_fixed_date_enabled_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_holiday_fixed_date_enabled_hourly_exact_001/calendar_epw_holiday_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_epw_holiday_fixed_date_enabled_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-epw-holiday-policy-exact"
+blocking = true

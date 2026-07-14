@@ -12,7 +12,9 @@ const EPW_HEADER_LINE_COUNT: usize = 8;
 #[path = "weather_calendar.rs"]
 mod weather_calendar;
 use weather_calendar::parse_epw_calendar_metadata;
-pub use weather_calendar::{EpwCalendarDateRule, EpwCalendarMetadata, EpwDaylightSavingPeriod};
+pub use weather_calendar::{
+    EpwCalendarDateRule, EpwCalendarMetadata, EpwDaylightSavingPeriod, EpwHoliday,
+};
 
 #[path = "weather_data_periods.rs"]
 mod weather_data_periods;

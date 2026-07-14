@@ -18,7 +18,9 @@ pub use daylight_saving::{
 };
 use daylight_saving::{daylight_saving_is_active, resolve_daylight_saving_axis_state};
 pub use error::TimeAxisError;
-pub use special_days::{ResolvedSpecialDay, ResolvedSpecialDayDate, SpecialDayAxisState};
+pub use special_days::{
+    ResolvedSpecialDay, ResolvedSpecialDayDate, SpecialDayAxisState, SpecialDaySource,
+};
 use special_days::{resolve_special_day_axis_state, special_day_type_for_ordinal};
 pub use weather_calendar::resolve_weather_environment_calendar;
 
@@ -570,6 +572,7 @@ fn build_environment_time_axis_for_run_period_internal(
         run_period,
         &calendar,
         weather_calendar.as_ref(),
+        metadata,
         special_day_inputs,
     )?;
     let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
@@ -772,6 +775,7 @@ fn build_hourly_time_axis_for_run_period_internal(
         run_period,
         &calendar,
         weather_calendar.as_ref(),
+        metadata,
         special_day_inputs,
     )?;
     let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);

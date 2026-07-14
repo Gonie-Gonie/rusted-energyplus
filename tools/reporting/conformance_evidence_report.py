@@ -78,9 +78,15 @@ CLAIM_BOUNDARY = (
     "24 Sunday values, 24 Holiday values, and 24 Tuesday values. Nth/last-weekday special-day "
     "rules, same-year annual-table duration/wrap, directly ordered typed-vector overwrite, and "
     "weekend observation remain source-mapped unit evidence only; compiled IDF overlap precedence "
-    "and cross-year reprojection are unclaimed. EPW holidays and use-policy, EPW/IDF precedence, schedule "
-    "day-type lookup, tomorrow state, raw ESO timestamp serialization, actual-weather year matching, "
-    "cross-year traversal, multiple-data-period execution, records-per-hour greater than one, "
+    "and cross-year reprojection are unclaimed. The paired fixed EPW holiday cases share one "
+    "February 29 weather-file holiday and differ only in the RunPeriod use flag. Their 72 ordered, "
+    "unique Site Day Type Index samples and normalized timestamps match exactly: enabled is 24 "
+    "Sunday=1, 24 source-exact EPW-holiday Sunday=1, and 24 Tuesday=3; disabled is 24 Sunday=1, "
+    "24 Monday=2, and 24 Tuesday=3. This pair proves only fixed-date EPW holiday intake and "
+    "RunPeriod enable/disable filtering. Weekend shifting, Nth/last rules, multiple or overlapping "
+    "holidays, EPW/IDF precedence, schedule day-type lookup, tomorrow state, raw ESO timestamp "
+    "serialization, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
+    "records-per-hour greater than one, "
     "subhourly solar interpolation, complete SetCurrentWeather/solar/WeatherManager conformance, "
     "and general time, weather, and schedule compatibility are not claimed."
 )
@@ -93,6 +99,8 @@ CASE_LABELS = {
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
+    "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001": "EPW holiday enabled",
+    "calendar_epw_holiday_fixed_date_disabled_hourly_exact_001": "EPW holiday disabled",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
@@ -120,6 +128,7 @@ VARIABLE_LABELS = {
     "Zone Opaque Surface Inside Faces Conduction Rate": "Zone opaque cond",
     "Schedule Value": "Schedule value",
     "Site Daylight Saving Time Status": "DST status",
+    "Site Day Type Index": "Day type",
     "Site Outdoor Air Drybulb Temperature": "Outdoor drybulb",
     "Zone Total Internal Convective Heating Rate": "Internal convective",
     "Zone Thermostat Heating Setpoint Temperature": "Heat SP",
@@ -213,6 +222,20 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW holiday enabled",
+        command="compare-calendar-epw-holiday-policy-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_enabled_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_enabled_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_enabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW holiday disabled",
+        command="compare-calendar-epw-holiday-policy-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_disabled_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_disabled_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_holiday_fixed_date_disabled_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weather records",

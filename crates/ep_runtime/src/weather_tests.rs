@@ -22,6 +22,7 @@ fn parses_leap_year_observed_yes_and_no() -> Result<(), Box<dyn std::error::Erro
     assert!(leap_weather.calendar_metadata.leap_year_observed);
     assert!(!non_leap_weather.calendar_metadata.leap_year_observed);
     assert_eq!(leap_weather.calendar_metadata.daylight_saving_period, None);
+    assert!(leap_weather.calendar_metadata.holidays.is_empty());
     assert_eq!(leap_weather.data_periods.records_per_hour, 1);
     assert_eq!(leap_weather.data_periods.periods.len(), 1);
     assert_eq!(
@@ -40,6 +41,66 @@ fn parses_leap_year_observed_yes_and_no() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(leap_weather.records[0].day, 29);
 
     Ok(())
+}
+
+#[test]
+fn parses_epw_holidays_in_header_order() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = epw_text("Yes").replace(
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0",
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,2,Leap Day Holiday,2/29,Second Sunday,2nd Sunday in March",
+    );
+
+    let metadata = parse_epw_weather_file(&contents)?.calendar_metadata;
+
+    assert_eq!(
+        metadata.holidays,
+        vec![
+            EpwHoliday {
+                name: "LEAP DAY HOLIDAY".to_string(),
+                date: EpwCalendarDateRule::MonthDay {
+                    month: 2,
+                    day_of_month: 29,
+                },
+            },
+            EpwHoliday {
+                name: "SECOND SUNDAY".to_string(),
+                date: EpwCalendarDateRule::NthWeekdayInMonth {
+                    nth: 2,
+                    weekday: ep_model::DayOfWeek::Sunday,
+                    month: 3,
+                },
+            },
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn rejects_invalid_or_incomplete_epw_holiday_fields() {
+    for (header, expected) in [
+        ("HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,-1", "number of holidays"),
+        ("HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,1000000", "holiday name"),
+        (
+            "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,1,Missing Date",
+            "holiday date",
+        ),
+        (
+            "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,1,Bad Date,0",
+            "holiday date",
+        ),
+    ] {
+        let contents = epw_text("Yes").replace("HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0", header);
+        assert!(
+            matches!(
+                parse_epw_weather_file(&contents),
+                Err(EpwError::InvalidNumber { field, .. })
+                    | Err(EpwError::MissingField { field, .. })
+                    | Err(EpwError::InvalidValue { field, .. })
+                    if field == expected
+            ),
+            "header should reject {expected}: {header}"
+        );
+    }
 }
 
 #[test]

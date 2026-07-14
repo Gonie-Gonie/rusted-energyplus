@@ -16,13 +16,24 @@ pub struct EpwDaylightSavingPeriod {
     pub end: EpwCalendarDateRule,
 }
 
+/// One holiday declared by an EPW `HOLIDAYS/DAYLIGHT SAVINGS` header.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EpwHoliday {
+    /// Weather-file holiday name, normalized like EnergyPlus' uppercased header.
+    pub name: String,
+    /// Calendar rule selecting the holiday date.
+    pub date: EpwCalendarDateRule,
+}
+
 /// Calendar policy carried by an EPW weather file header.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct EpwCalendarMetadata {
     /// Whether the EPW `Leap Year Observed` field starts with `Y` after trimming.
     pub leap_year_observed: bool,
     /// Weather-file daylight-saving range, or `None` when the header uses `0`.
     pub daylight_saving_period: Option<EpwDaylightSavingPeriod>,
+    /// Weather-file holidays in source header order.
+    pub holidays: Vec<EpwHoliday>,
 }
 
 pub(super) fn parse_epw_calendar_metadata(contents: &str) -> Result<EpwCalendarMetadata, EpwError> {
@@ -82,11 +93,57 @@ pub(super) fn parse_epw_calendar_metadata(contents: &str) -> Result<EpwCalendarM
             ));
         }
     };
+    let holiday_count_value = epw_field(&fields, line_number, 4, "number of holidays")?;
+    let holiday_count = parse_holiday_count(holiday_count_value, line_number)?;
+    let holiday_fields = fields.len().saturating_sub(5);
+    let available_holiday_pairs = holiday_fields / 2;
+    if holiday_count > available_holiday_pairs {
+        return Err(EpwError::MissingField {
+            line: line_number,
+            field: if holiday_fields.is_multiple_of(2) {
+                "holiday name"
+            } else {
+                "holiday date"
+            },
+        });
+    }
+    let mut holidays = Vec::with_capacity(holiday_count);
+    for holiday_index in 0..holiday_count {
+        let name_field_index = 5 + holiday_index * 2;
+        let date_field_index = name_field_index + 1;
+        let name = epw_field(&fields, line_number, name_field_index, "holiday name")?
+            .trim()
+            .to_ascii_uppercase();
+        let date_value = epw_field(&fields, line_number, date_field_index, "holiday date")?;
+        let date = parse_calendar_date_rule(date_value, line_number, "holiday date")?
+            .ok_or_else(|| invalid_date_rule(line_number, "holiday date", date_value))?;
+        holidays.push(EpwHoliday { name, date });
+    }
 
     Ok(EpwCalendarMetadata {
         leap_year_observed,
         daylight_saving_period,
+        holidays,
     })
+}
+
+fn parse_holiday_count(value: &str, line: usize) -> Result<usize, EpwError> {
+    let parsed = value
+        .trim()
+        .parse::<f64>()
+        .map_err(|_| EpwError::InvalidNumber {
+            line,
+            field: "number of holidays",
+            value: value.to_string(),
+        })?;
+    if !parsed.is_finite() || parsed < 0.0 || parsed.fract() != 0.0 || parsed > usize::MAX as f64 {
+        return Err(EpwError::InvalidNumber {
+            line,
+            field: "number of holidays",
+            value: value.to_string(),
+        });
+    }
+    Ok(parsed as usize)
 }
 
 fn parse_calendar_date_rule(

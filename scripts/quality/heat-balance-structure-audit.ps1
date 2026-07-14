@@ -200,6 +200,7 @@ $cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
 $weather = "crates\ep_runtime\src\weather.rs"
 $weatherCalendar = "crates\ep_runtime\src\weather_calendar.rs"
+$weatherTests = "crates\ep_runtime\src\weather_tests.rs"
 $timeAxis = "crates\ep_runtime\src\time_axis.rs"
 $calendarRules = "crates\ep_runtime\src\time_axis\calendar_rules.rs"
 $dayType = "crates\ep_runtime\src\time_axis\day_type.rs"
@@ -217,6 +218,7 @@ $runtimeTestResults = "crates\ep_runtime\src\runtime\tests\part05.rs"
 $runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
 $runtimeTestCalendar = "crates\ep_runtime\src\runtime\tests\part10.rs"
 $runtimeTestSpecialDays = "crates\ep_runtime\src\runtime\tests\part11.rs"
+$runtimeTestEpwHolidays = "crates\ep_runtime\src\runtime\tests\part12.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -257,6 +259,7 @@ foreach ($entry in @(
         @($runtime, "runtime orchestration root"),
         @($weather, "runtime weather module"),
         @($weatherCalendar, "EPW calendar metadata parser"),
+        @($weatherTests, "EPW weather parser tests"),
         @($timeAxis, "runtime time-axis module"),
         @($calendarRules, "shared calendar-rule resolver"),
         @($dayType, "EnergyPlus day-type module"),
@@ -273,7 +276,8 @@ foreach ($entry in @(
         @($runtimeTestResults, "runtime heat-balance result tests"),
         @($runtimeTestRadiation, "runtime heat-balance radiation tests"),
         @($runtimeTestCalendar, "runtime calendar and DST tests"),
-        @($runtimeTestSpecialDays, "runtime special-day tests")
+        @($runtimeTestSpecialDays, "runtime special-day tests"),
+        @($runtimeTestEpwHolidays, "runtime EPW holiday tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -595,6 +599,12 @@ Assert-Contains -Path $weather -Pattern 'pub\(crate\) fn next_solar_weather_reco
 Assert-Contains -Path $weatherCalendar -Pattern 'pub use ep_model::CalendarDateRule as EpwCalendarDateRule' -Description "shared typed EPW calendar date rule"
 Assert-Contains -Path $weatherCalendar -Pattern 'pub daylight_saving_period: Option<EpwDaylightSavingPeriod>' -Description "EPW daylight-saving metadata"
 Assert-Contains -Path $weatherCalendar -Pattern 'fn parse_calendar_date_rule\s*\(' -Description "EPW daylight-saving date-rule parser"
+Assert-Contains -Path $weatherCalendar -Pattern 'pub struct EpwHoliday' -Description "typed EPW holiday metadata"
+Assert-Contains -Path $weatherCalendar -Pattern 'pub holidays: Vec<EpwHoliday>' -Description "source-order EPW holiday collection"
+Assert-Contains -Path $weatherCalendar -Pattern 'let holiday_count = parse_holiday_count' -Description "EPW holiday-count parser"
+Assert-Contains -Path $weatherCalendar -Pattern 'holidays\.push\(EpwHoliday \{ name, date \}\)' -Description "EPW holiday name/date intake"
+Assert-Contains -Path $weatherTests -Pattern 'fn parses_epw_holidays_in_header_order\s*\(' -Description "EPW holiday parser order test"
+Assert-Contains -Path $weatherTests -Pattern 'fn rejects_invalid_or_incomplete_epw_holiday_fields\s*\(' -Description "EPW holiday parser validation test"
 Assert-Contains -Path $daylightSaving -Pattern 'pub struct DaylightSavingAxisState' -Description "shared time-axis daylight-saving state"
 Assert-Contains -Path $daylightSaving -Pattern 'fn resolve_daylight_saving_axis_state\s*\(' -Description "time-axis daylight-saving resolver"
 Assert-Contains -Path $timeAxis -Pattern 'dst: daylight_saving_is_active\(daylight_saving, weather_day_of_year\)' -Description "daily daylight-saving projection into time points"
@@ -613,6 +623,9 @@ Assert-Contains -Path $dayType -Pattern 'pub const fn energyplus_index\s*\(' -De
 Assert-Contains -Path $specialDays -Pattern 'pub struct SpecialDayAxisState' -Description "shared time-axis special-day state"
 Assert-Contains -Path $specialDays -Pattern 'fn resolve_special_day_axis_state\s*\(' -Description "time-axis special-day resolver"
 Assert-Contains -Path $specialDays -Pattern 'SpecialDayCrossYearUnsupported' -Description "cross-year special-day explicit rejection"
+Assert-Contains -Path $specialDays -Pattern 'run_period.use_weather_file_holidays_and_special_days' -Description "RunPeriod EPW holiday use-policy branch"
+Assert-Contains -Path $specialDays -Pattern 'SpecialDaySource::WeatherFile' -Description "weather-file special-day source attribution"
+Assert-Contains -Path $specialDays -Pattern 'DayType::Sunday' -Description "source-exact EPW holiday Sunday day type"
 Assert-Contains -Path $specialDays -Pattern 'day_types_by_ordinal\[ordinal as usize\] = Some\(day_type\)' -Description "later special-day definitions overwrite ordinal state"
 Assert-Contains -Path $timeAxis -Pattern 'special_day_type: day\.special_day_type' -Description "special day projected into both time-point axes"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn model_special_day_overrides_both_axes_for_every_hour_of_leap_day\s*\(' -Description "fixed-date special day both-axis test"
@@ -620,8 +633,14 @@ Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn special_day_duration_
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn later_typed_special_day_definition_overwrites_an_earlier_definition\s*\(' -Description "special-day later-wins unit test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn weekend_rule_shifts_only_fixed_single_day_special_days_to_monday\s*\(' -Description "special-day weekend-rule unit test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn cross_year_special_days_are_rejected_until_each_year_can_be_reprojected\s*\(' -Description "cross-year special-day explicit rejection test"
+Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn run_period_flag_enables_epw_sunday_type_holiday_on_both_time_axes\s*\(' -Description "EPW holiday policy and Sunday-type both-axis test"
+Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn disabling_epw_holidays_does_not_disable_input_file_special_days\s*\(' -Description "EPW-only holiday filtering test"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'Site Day Type Index' -Description "special day type report mapping"
 Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'special_day_hourly_samples' -Description "special-day report diagnostic sample count"
+Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'weather_file_holidays_declared' -Description "EPW holiday declaration diagnostic"
+Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'run_period_uses_weather_file_holidays' -Description "EPW holiday use-policy diagnostic"
+Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'weather_file_holidays_resolved' -Description "EPW holiday resolution diagnostic"
+Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'special_day.source.label\(\)' -Description "special-day source diagnostic attribution"
 Assert-Contains -Path $solar -Pattern 'next_solar_weather_record_within_day\s*\(' -Description "solar interpolation consumes day-local NextHr weather selector"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'fn solar_next_hour_record_wraps_within_each_accepted_day\s*\(' -Description "accepted-day solar Hour24 NextHr wrap test"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'solar_weather_interpolation_weights\(1,\s*1\),\s*\(0\.0,\s*1\.0,\s*0\.0\)' -Description "single-timestep current-only solar weather weights"

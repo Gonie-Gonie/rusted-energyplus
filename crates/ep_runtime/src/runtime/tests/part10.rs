@@ -41,6 +41,7 @@ fn daylight_saving_metadata(
     EpwCalendarMetadata {
         leap_year_observed: false,
         daylight_saving_period: Some(EpwDaylightSavingPeriod { start, end }),
+        holidays: Vec::new(),
     }
 }
 
@@ -212,6 +213,7 @@ fn weather_file_nth_weekday_daylight_saving_preserves_run_period_month_weekdays(
         &EpwCalendarMetadata {
             leap_year_observed: true,
             daylight_saving_period: Some(period),
+            holidays: Vec::new(),
         },
     )?;
     let non_leap_axis = build_hourly_time_axis_for_run_period_with_weather_metadata(
@@ -219,6 +221,7 @@ fn weather_file_nth_weekday_daylight_saving_preserves_run_period_month_weekdays(
         &EpwCalendarMetadata {
             leap_year_observed: false,
             daylight_saving_period: Some(period),
+            holidays: Vec::new(),
         },
     )?;
 
@@ -466,10 +469,12 @@ fn weather_calendar_separates_gregorian_weather_and_schedule_leap_state()
     let leap_metadata = EpwCalendarMetadata {
         leap_year_observed: true,
         daylight_saving_period: None,
+        holidays: Vec::new(),
     };
     let non_leap_metadata = EpwCalendarMetadata {
         leap_year_observed: false,
         daylight_saving_period: None,
+        holidays: Vec::new(),
     };
     let gregorian_axis = build_hourly_time_axis_for_run_period(&run_period)?;
     let leap_axis =
@@ -572,6 +577,7 @@ fn weather_calendar_uses_non_leap_ordinals_for_february_29_endpoints()
     let metadata = EpwCalendarMetadata {
         leap_year_observed: false,
         daylight_saving_period: None,
+        holidays: Vec::new(),
     };
     let mut february_29_only = test_run_period("February 29 Only", 2, 29, 2, 29);
     february_29_only.begin_year = Some(2016);
@@ -673,6 +679,7 @@ fn metadata_aware_calendar_rejects_actual_weather_for_both_leap_policies() {
                 &EpwCalendarMetadata {
                     leap_year_observed,
                     daylight_saving_period: None,
+                    holidays: Vec::new(),
                 }
             ),
             Err(TimeAxisError::ActualWeatherUnsupported { .. })
@@ -693,6 +700,7 @@ fn metadata_aware_calendar_rejects_cross_year_run_periods() {
                 &EpwCalendarMetadata {
                     leap_year_observed,
                     daylight_saving_period: None,
+                    holidays: Vec::new(),
                 }
             ),
             Err(TimeAxisError::WeatherMetadataCrossYearUnsupported {

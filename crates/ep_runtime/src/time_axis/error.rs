@@ -70,7 +70,7 @@ pub enum TimeAxisError {
         /// Requested month.
         month: u32,
     },
-    /// An input-file nth-weekday special-day rule has no date in the month.
+    /// A weather-file or input-file nth-weekday special-day rule has no date in the month.
     SpecialDayDateRuleDoesNotExist {
         /// Run period name.
         run_period_name: String,

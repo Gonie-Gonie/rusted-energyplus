@@ -317,6 +317,12 @@
                          "help":  "Gate exact input-file fixed-date special-day state and ordered hourly timestamps."
                      },
                      {
+                         "name":  "compare-calendar-epw-holiday-policy-exact",
+                         "path":  "compare\\compare-calendar-epw-holiday-policy-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired exact EPW fixed-date holiday enabled/disabled policy state and ordered hourly day types."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",
