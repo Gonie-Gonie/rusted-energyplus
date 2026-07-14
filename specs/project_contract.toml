@@ -71,6 +71,8 @@ required_routines = [
   "get_run_period_data",
   "setup_environment_types",
   "get_next_environment",
+  "get_special_day_period_data",
+  "set_special_day_dates",
   "process_epw_header",
   "manage_weather",
   "initialize_weather",

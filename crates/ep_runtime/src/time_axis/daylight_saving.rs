@@ -1,10 +1,7 @@
-use super::{
-    DEFAULT_LEAP_RUN_PERIOD_YEAR, DEFAULT_RUN_PERIOD_YEAR, Date, ResolvedRunPeriodCalendar,
-    ResolvedWeatherEnvironmentCalendar, TimeAxisError, day_of_year, days_in_month,
-    energyplus_weekday_number, invalid_date_error, shift_day_of_week,
-};
+use super::calendar_rules::{CalendarRuleResolutionError, resolve_calendar_date_rule};
+use super::{ResolvedRunPeriodCalendar, ResolvedWeatherEnvironmentCalendar, TimeAxisError};
 use crate::weather::{EpwCalendarDateRule, EpwCalendarMetadata, EpwDaylightSavingPeriod};
-use ep_model::{DayOfWeek, RunPeriod};
+use ep_model::RunPeriod;
 
 /// One concrete weather-effective daylight-saving boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -106,130 +103,39 @@ fn resolve_daylight_saving_date_rule(
     rule: EpwCalendarDateRule,
     boundary: &'static str,
 ) -> Result<ResolvedDaylightSavingDate, TimeAxisError> {
-    let (month, day_of_month) = match rule {
-        EpwCalendarDateRule::MonthDay {
-            month,
-            day_of_month,
-        } => (month, day_of_month),
-        EpwCalendarDateRule::NthWeekdayInMonth {
-            nth,
-            weekday,
-            month,
-        } => {
-            let first_weekday =
-                run_period_month_weekday_for_month_day(run_period, calendar, month, 1, boundary)?;
-            let first_occurrence = 1
-                + (energyplus_weekday_number(weekday) - energyplus_weekday_number(first_weekday))
-                    .rem_euclid(7) as u32;
-            let day_of_month = first_occurrence + 7 * nth.saturating_sub(1);
-            let weather_shape_year = if weather_effective_leap_year {
-                DEFAULT_LEAP_RUN_PERIOD_YEAR
-            } else {
-                DEFAULT_RUN_PERIOD_YEAR
-            };
-            if nth == 0 || day_of_month > days_in_month(weather_shape_year, month) {
-                return Err(TimeAxisError::DaylightSavingDateRuleDoesNotExist {
-                    run_period_name: run_period.name.0.clone(),
-                    boundary,
-                    nth,
-                    weekday,
-                    month,
-                });
-            }
-            (month, day_of_month)
-        }
-        EpwCalendarDateRule::LastWeekdayInMonth { weekday, month } => {
-            let first_weekday =
-                run_period_month_weekday_for_month_day(run_period, calendar, month, 1, boundary)?;
-            let mut day_of_month = 1
-                + (energyplus_weekday_number(weekday) - energyplus_weekday_number(first_weekday))
-                    .rem_euclid(7) as u32;
-            let weather_shape_year = if weather_effective_leap_year {
-                DEFAULT_LEAP_RUN_PERIOD_YEAR
-            } else {
-                DEFAULT_RUN_PERIOD_YEAR
-            };
-            let last_day_of_month = days_in_month(weather_shape_year, month);
-            while day_of_month + 7 <= last_day_of_month {
-                day_of_month += 7;
-            }
-            (month, day_of_month)
-        }
-    };
-    let day_of_year =
-        weather_effective_day_of_year(month, day_of_month, weather_effective_leap_year)
-            .ok_or_else(|| {
-                invalid_date_error(
-                    run_period,
-                    if boundary == "start" {
-                        "daylight-saving start"
-                    } else {
-                        "daylight-saving end"
-                    },
-                    Date {
-                        year: calendar.start_year,
-                        month,
-                        day_of_month,
-                    },
-                )
-            })?;
-    Ok(ResolvedDaylightSavingDate {
-        month,
-        day_of_month,
-        day_of_year,
-    })
-}
-
-fn run_period_month_weekday_for_month_day(
-    run_period: &RunPeriod,
-    calendar: &ResolvedRunPeriodCalendar,
-    month: u32,
-    day_of_month: u32,
-    boundary: &'static str,
-) -> Result<DayOfWeek, TimeAxisError> {
-    // EnergyPlus seeds Environment::MonWeekDay while RunPeriod input is read,
-    // before the environment-specific LeapYearAdd is applied. Preserve that
-    // non-leap weekday projection for Nth/Last rule resolution; the resolved
-    // date is converted to a weather-effective ordinal separately below.
-    let start_day_of_year =
-        weather_effective_day_of_year(calendar.start_month, calendar.start_day_of_month, false)
-            .ok_or_else(|| invalid_date_error(run_period, "begin", calendar.start_date()))?;
-    let target_day_of_year =
-        weather_effective_day_of_year(month, day_of_month, false).ok_or_else(|| {
-            invalid_date_error(
-                run_period,
-                if boundary == "start" {
+    let resolved = resolve_calendar_date_rule(calendar, weather_effective_leap_year, rule)
+        .map_err(|error| match error {
+            CalendarRuleResolutionError::InvalidDate {
+                month,
+                day_of_month,
+            } => TimeAxisError::InvalidDate {
+                run_period_name: run_period.name.0.clone(),
+                field: if boundary == "start" {
                     "daylight-saving start"
                 } else {
                     "daylight-saving end"
                 },
-                Date {
-                    year: calendar.start_year,
-                    month,
-                    day_of_month,
-                },
-            )
+                year: calendar.start_year,
+                month,
+                day_of_month,
+            },
+            CalendarRuleResolutionError::NthWeekdayDoesNotExist {
+                nth,
+                weekday,
+                month,
+            } => TimeAxisError::DaylightSavingDateRuleDoesNotExist {
+                run_period_name: run_period.name.0.clone(),
+                boundary,
+                nth,
+                weekday,
+                month,
+            },
         })?;
-    Ok(shift_day_of_week(
-        calendar.start_day_of_week,
-        i64::from(target_day_of_year) - i64::from(start_day_of_year),
-    ))
-}
-
-fn weather_effective_day_of_year(
-    month: u32,
-    day_of_month: u32,
-    weather_effective_leap_year: bool,
-) -> Option<u32> {
-    if month == 2 && day_of_month == 29 && !weather_effective_leap_year {
-        return Some(60);
-    }
-    let weather_shape_year = if weather_effective_leap_year {
-        DEFAULT_LEAP_RUN_PERIOD_YEAR
-    } else {
-        DEFAULT_RUN_PERIOD_YEAR
-    };
-    day_of_year(weather_shape_year, month, day_of_month)
+    Ok(ResolvedDaylightSavingDate {
+        month: resolved.month,
+        day_of_month: resolved.day_of_month,
+        day_of_year: resolved.day_of_year,
+    })
 }
 
 pub(super) fn daylight_saving_is_active(

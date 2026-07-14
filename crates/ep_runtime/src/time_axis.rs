@@ -3,16 +3,23 @@
 use crate::weather::EpwCalendarMetadata;
 use ep_model::{
     DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod, RunPeriodId,
-    TypedModel,
+    RunPeriodSpecialDay, TypedModel,
 };
-use std::fmt::{Display, Formatter};
 
+mod calendar_rules;
+mod day_type;
 mod daylight_saving;
+mod error;
+mod special_days;
 mod weather_calendar;
+pub use day_type::DayType;
 pub use daylight_saving::{
     DaylightSavingAxisState, ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
 };
 use daylight_saving::{daylight_saving_is_active, resolve_daylight_saving_axis_state};
+pub use error::TimeAxisError;
+pub use special_days::{ResolvedSpecialDay, ResolvedSpecialDayDate, SpecialDayAxisState};
+use special_days::{resolve_special_day_axis_state, special_day_type_for_ordinal};
 pub use weather_calendar::resolve_weather_environment_calendar;
 
 pub(crate) const DEFAULT_RUN_PERIOD_YEAR: u32 = 2017;
@@ -24,70 +31,6 @@ const EARLIEST_GREGORIAN_RUN_PERIOD_YEAR: u32 = 1583;
 pub enum EnvironmentKind {
     /// A weather-file run period (`RunPeriodWeather` in EnergyPlus).
     WeatherRunPeriod,
-}
-
-/// Schedule day type selected for a simulation day.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum DayType {
-    /// Sunday schedule day.
-    Sunday,
-    /// Monday schedule day.
-    Monday,
-    /// Tuesday schedule day.
-    Tuesday,
-    /// Wednesday schedule day.
-    Wednesday,
-    /// Thursday schedule day.
-    Thursday,
-    /// Friday schedule day.
-    Friday,
-    /// Saturday schedule day.
-    Saturday,
-    /// Holiday schedule day.
-    Holiday,
-    /// Summer design-day schedule day.
-    SummerDesignDay,
-    /// Winter design-day schedule day.
-    WinterDesignDay,
-    /// First custom schedule day.
-    CustomDay1,
-    /// Second custom schedule day.
-    CustomDay2,
-}
-
-impl From<DayOfWeek> for DayType {
-    fn from(value: DayOfWeek) -> Self {
-        match value {
-            DayOfWeek::Monday => Self::Monday,
-            DayOfWeek::Tuesday => Self::Tuesday,
-            DayOfWeek::Wednesday => Self::Wednesday,
-            DayOfWeek::Thursday => Self::Thursday,
-            DayOfWeek::Friday => Self::Friday,
-            DayOfWeek::Saturday => Self::Saturday,
-            DayOfWeek::Sunday => Self::Sunday,
-        }
-    }
-}
-
-impl DayType {
-    /// Returns the EnergyPlus timestamp label for this schedule day type.
-    #[must_use]
-    pub const fn label(self) -> &'static str {
-        match self {
-            Self::Sunday => "Sunday",
-            Self::Monday => "Monday",
-            Self::Tuesday => "Tuesday",
-            Self::Wednesday => "Wednesday",
-            Self::Thursday => "Thursday",
-            Self::Friday => "Friday",
-            Self::Saturday => "Saturday",
-            Self::Holiday => "Holiday",
-            Self::SummerDesignDay => "SummerDesignDay",
-            Self::WinterDesignDay => "WinterDesignDay",
-            Self::CustomDay1 => "CustomDay1",
-            Self::CustomDay2 => "CustomDay2",
-        }
-    }
 }
 
 /// Calendar dates resolved from one `RunPeriod` using EnergyPlus year rules.
@@ -188,11 +131,11 @@ pub struct EnvironmentTimePoint {
     pub gregorian_day_of_week: DayOfWeek,
     /// Simulation-effective weekday after weather-calendar skips.
     pub day_of_week: DayOfWeek,
-    /// Schedule day type before special-day overrides.
+    /// Effective schedule day type after special-day overrides.
     pub day_type: DayType,
     /// Daylight-saving state resolved from the active weather-file period.
     pub dst: bool,
-    /// Effective special schedule day type, or `None` before overrides.
+    /// Special schedule day type when one overrides the weekday.
     pub special_day_type: Option<DayType>,
     /// EnergyPlus hour ending, 1-24.
     pub hour: u32,
@@ -238,6 +181,8 @@ pub struct EnvironmentTimeAxis {
     pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
     /// Weather-file daylight-saving declaration, use flag, and resolved range.
     pub daylight_saving: DaylightSavingAxisState,
+    /// Input-file special-day declarations and resolved ordinal lookup state.
+    pub special_days: SpecialDayAxisState,
     /// First-hour weather interpolation policy selected by the run period.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     /// Zone timestep profile.
@@ -288,10 +233,12 @@ pub struct TimePoint {
     pub gregorian_day_of_week: DayOfWeek,
     /// Simulation-effective weekday after weather-calendar skips.
     pub day_of_week: DayOfWeek,
-    /// Schedule day type before special-day overrides.
+    /// Effective schedule day type after special-day overrides.
     pub day_type: DayType,
     /// Daylight-saving state resolved from the active weather-file period.
     pub dst: bool,
+    /// Special schedule day type when one overrides the weekday.
+    pub special_day_type: Option<DayType>,
     /// EnergyPlus-style hour ending, 1-24.
     pub hour: u32,
     /// Start minute of the hourly interval.
@@ -351,6 +298,8 @@ pub struct TimeAxis {
     pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
     /// Weather-file daylight-saving declaration, use flag, and resolved range.
     pub daylight_saving: DaylightSavingAxisState,
+    /// Input-file special-day declarations and resolved ordinal lookup state.
+    pub special_days: SpecialDayAxisState,
     /// First-hour weather interpolation policy selected by the run period.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     /// Zone timestep profile used by weather, schedules, output, and report sampling.
@@ -370,126 +319,6 @@ impl TimeAxis {
         self.points.len()
     }
 }
-
-/// Error returned while resolving a run period or building a time axis.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum TimeAxisError {
-    /// An end year was supplied without the required start year.
-    EndYearWithoutStartYear {
-        /// Run period name.
-        run_period_name: String,
-    },
-    /// EnergyPlus does not accept run-period years before 1583.
-    StartYearBeforeGregorianCalendar {
-        /// Run period name.
-        run_period_name: String,
-        /// Invalid start year.
-        year: u32,
-    },
-    /// A run-period date was invalid.
-    InvalidDate {
-        /// Run period name.
-        run_period_name: String,
-        /// Field group, such as begin or end.
-        field: &'static str,
-        /// Calendar year.
-        year: u32,
-        /// Month number.
-        month: u32,
-        /// Day of month.
-        day_of_month: u32,
-    },
-    /// The end date came before the begin date.
-    InvalidRange {
-        /// Run period name.
-        run_period_name: String,
-    },
-    /// Metadata-aware actual-weather traversal is not implemented yet.
-    ActualWeatherUnsupported {
-        /// Run period name.
-        run_period_name: String,
-    },
-    /// Metadata-aware cross-year weather traversal is not implemented yet.
-    WeatherMetadataCrossYearUnsupported {
-        /// Run period name.
-        run_period_name: String,
-        /// Resolved Gregorian start year.
-        start_year: u32,
-        /// Resolved Gregorian end year.
-        end_year: u32,
-    },
-    /// An EPW nth-weekday daylight-saving rule has no date in the resolved month.
-    DaylightSavingDateRuleDoesNotExist {
-        /// Run period name.
-        run_period_name: String,
-        /// Rule boundary, `start` or `end`.
-        boundary: &'static str,
-        /// One-based requested weekday occurrence.
-        nth: u32,
-        /// Requested weekday.
-        weekday: DayOfWeek,
-        /// Requested month.
-        month: u32,
-    },
-}
-
-impl Display for TimeAxisError {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::EndYearWithoutStartYear { run_period_name } => write!(
-                formatter,
-                "run period {run_period_name} has an end year without a start year"
-            ),
-            Self::StartYearBeforeGregorianCalendar {
-                run_period_name,
-                year,
-            } => write!(
-                formatter,
-                "run period {run_period_name} start year {year} is before 1583"
-            ),
-            Self::InvalidDate {
-                run_period_name,
-                field,
-                year,
-                month,
-                day_of_month,
-            } => write!(
-                formatter,
-                "run period {run_period_name} has invalid {field} date {year:04}-{month:02}-{day_of_month:02}"
-            ),
-            Self::InvalidRange { run_period_name } => {
-                write!(
-                    formatter,
-                    "run period {run_period_name} ends before it begins"
-                )
-            }
-            Self::ActualWeatherUnsupported { run_period_name } => write!(
-                formatter,
-                "run period {run_period_name} treats weather as actual, but metadata-aware EPW record traversal is not implemented"
-            ),
-            Self::WeatherMetadataCrossYearUnsupported {
-                run_period_name,
-                start_year,
-                end_year,
-            } => write!(
-                formatter,
-                "run period {run_period_name} spans {start_year}-{end_year}, but metadata-aware cross-year weather traversal is not implemented"
-            ),
-            Self::DaylightSavingDateRuleDoesNotExist {
-                run_period_name,
-                boundary,
-                nth,
-                weekday,
-                month,
-            } => write!(
-                formatter,
-                "run period {run_period_name} has no occurrence {nth} of {weekday:?} in month {month} for its daylight-saving {boundary} rule"
-            ),
-        }
-    }
-}
-
-impl std::error::Error for TimeAxisError {}
 
 /// Resolves EnergyPlus run-period year, range, leap-day, and weekday rules.
 pub fn resolve_run_period_calendar(
@@ -620,8 +449,10 @@ pub fn build_environment_time_axes(
 ) -> Result<Vec<EnvironmentTimeAxis>, TimeAxisError> {
     let zone_timesteps_per_hour = model.timestep.number_of_timesteps_per_hour.max(1);
     if model.run_periods.is_empty() {
-        return build_environment_time_axis_for_run_period_with_zone_timesteps(
+        return build_environment_time_axis_for_run_period_internal(
             &default_run_period(),
+            None,
+            &model.run_period_special_days,
             1,
             zone_timesteps_per_hour,
         )
@@ -633,8 +464,10 @@ pub fn build_environment_time_axes(
         .iter()
         .enumerate()
         .map(|(index, run_period)| {
-            build_environment_time_axis_for_run_period_with_zone_timesteps(
+            build_environment_time_axis_for_run_period_internal(
                 run_period,
+                None,
+                &model.run_period_special_days,
                 index + 1,
                 zone_timesteps_per_hour,
             )
@@ -649,9 +482,10 @@ pub fn build_environment_time_axes_with_weather_metadata(
 ) -> Result<Vec<EnvironmentTimeAxis>, TimeAxisError> {
     let zone_timesteps_per_hour = model.timestep.number_of_timesteps_per_hour.max(1);
     if model.run_periods.is_empty() {
-        return build_environment_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+        return build_environment_time_axis_for_run_period_internal(
             &default_run_period(),
-            metadata,
+            Some(metadata),
+            &model.run_period_special_days,
             1,
             zone_timesteps_per_hour,
         )
@@ -663,9 +497,10 @@ pub fn build_environment_time_axes_with_weather_metadata(
         .iter()
         .enumerate()
         .map(|(index, run_period)| {
-            build_environment_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+            build_environment_time_axis_for_run_period_internal(
                 run_period,
-                metadata,
+                Some(metadata),
+                &model.run_period_special_days,
                 index + 1,
                 zone_timesteps_per_hour,
             )
@@ -689,6 +524,7 @@ pub fn build_environment_time_axis_for_run_period_with_zone_timesteps(
     build_environment_time_axis_for_run_period_internal(
         run_period,
         None,
+        &[],
         environment_index,
         zone_timesteps_per_hour,
     )
@@ -704,6 +540,7 @@ pub fn build_environment_time_axis_for_run_period_with_weather_metadata_and_zone
     build_environment_time_axis_for_run_period_internal(
         run_period,
         Some(metadata),
+        &[],
         environment_index,
         zone_timesteps_per_hour,
     )
@@ -712,6 +549,7 @@ pub fn build_environment_time_axis_for_run_period_with_weather_metadata_and_zone
 fn build_environment_time_axis_for_run_period_internal(
     run_period: &RunPeriod,
     metadata: Option<&EpwCalendarMetadata>,
+    special_day_inputs: &[RunPeriodSpecialDay],
     environment_index: usize,
     zone_timesteps_per_hour: u32,
 ) -> Result<EnvironmentTimeAxis, TimeAxisError> {
@@ -728,6 +566,12 @@ fn build_environment_time_axis_for_run_period_internal(
         weather_calendar.as_ref(),
         metadata,
     )?;
+    let special_days = resolve_special_day_axis_state(
+        run_period,
+        &calendar,
+        weather_calendar.as_ref(),
+        special_day_inputs,
+    )?;
     let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
     let zone_timesteps_per_hour = timestep_profile.zone_timestep.timesteps_per_hour;
     let interval_minutes = 60.0 / f64::from(zone_timesteps_per_hour);
@@ -736,6 +580,7 @@ fn build_environment_time_axis_for_run_period_internal(
         &calendar,
         weather_calendar.as_ref(),
         &daylight_saving,
+        &special_days,
     )?;
     let total_points = days
         .len()
@@ -765,9 +610,9 @@ fn build_environment_time_axis_for_run_period_internal(
                     schedule_day_of_year: day.schedule_day_of_year,
                     gregorian_day_of_week: day.gregorian_day_of_week,
                     day_of_week: day.day_of_week,
-                    day_type: day.day_of_week.into(),
+                    day_type: day.day_type,
                     dst: day.dst,
-                    special_day_type: None,
+                    special_day_type: day.special_day_type,
                     hour,
                     zone_timestep,
                     start_minute,
@@ -793,6 +638,7 @@ fn build_environment_time_axis_for_run_period_internal(
         calendar,
         weather_calendar,
         daylight_saving,
+        special_days,
         first_hour_interpolation_starting_values: run_period
             .first_hour_interpolation_starting_values,
         zone_timestep: timestep_profile.zone_timestep,
@@ -814,8 +660,10 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
         &fallback
     };
 
-    build_hourly_time_axis_for_run_period_with_zone_timesteps(
+    build_hourly_time_axis_for_run_period_internal(
         run_period,
+        None,
+        &model.run_period_special_days,
         model.timestep.number_of_timesteps_per_hour.max(1),
     )
 }
@@ -833,9 +681,10 @@ pub fn build_hourly_time_axis_with_weather_metadata(
         &fallback
     };
 
-    build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+    build_hourly_time_axis_for_run_period_internal(
         run_period,
-        metadata,
+        Some(metadata),
+        &model.run_period_special_days,
         model.timestep.number_of_timesteps_per_hour.max(1),
     )
 }
@@ -873,7 +722,7 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
     run_period: &RunPeriod,
     zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
-    build_hourly_time_axis_for_run_period_internal(run_period, None, zone_timesteps_per_hour)
+    build_hourly_time_axis_for_run_period_internal(run_period, None, &[], zone_timesteps_per_hour)
 }
 
 /// Builds an hourly time axis after applying EPW calendar metadata.
@@ -895,6 +744,7 @@ pub fn build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_time
     build_hourly_time_axis_for_run_period_internal(
         run_period,
         Some(metadata),
+        &[],
         zone_timesteps_per_hour,
     )
 }
@@ -902,6 +752,7 @@ pub fn build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_time
 fn build_hourly_time_axis_for_run_period_internal(
     run_period: &RunPeriod,
     metadata: Option<&EpwCalendarMetadata>,
+    special_day_inputs: &[RunPeriodSpecialDay],
     zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
     let weather_calendar = metadata
@@ -917,12 +768,19 @@ fn build_hourly_time_axis_for_run_period_internal(
         weather_calendar.as_ref(),
         metadata,
     )?;
+    let special_days = resolve_special_day_axis_state(
+        run_period,
+        &calendar,
+        weather_calendar.as_ref(),
+        special_day_inputs,
+    )?;
     let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
     let days = resolved_calendar_days(
         run_period,
         &calendar,
         weather_calendar.as_ref(),
         &daylight_saving,
+        &special_days,
     )?;
     let mut points = Vec::with_capacity(days.len() * 24);
 
@@ -942,8 +800,9 @@ fn build_hourly_time_axis_for_run_period_internal(
                 schedule_day_of_year: day.schedule_day_of_year,
                 gregorian_day_of_week: day.gregorian_day_of_week,
                 day_of_week: day.day_of_week,
-                day_type: day.day_of_week.into(),
+                day_type: day.day_type,
                 dst: day.dst,
+                special_day_type: day.special_day_type,
                 hour,
                 start_minute: 0.0,
                 end_minute: 60.0,
@@ -955,6 +814,7 @@ fn build_hourly_time_axis_for_run_period_internal(
         run_period_name: run_period.name.0.clone(),
         weather_calendar,
         daylight_saving,
+        special_days,
         first_hour_interpolation_starting_values: run_period
             .first_hour_interpolation_starting_values,
         zone_timestep: timestep_profile.zone_timestep,
@@ -1006,7 +866,9 @@ struct ResolvedCalendarDay {
     schedule_day_of_year: u32,
     gregorian_day_of_week: DayOfWeek,
     day_of_week: DayOfWeek,
+    day_type: DayType,
     dst: bool,
+    special_day_type: Option<DayType>,
 }
 
 fn default_run_period() -> RunPeriod {
@@ -1043,6 +905,7 @@ fn resolved_calendar_days(
     calendar: &ResolvedRunPeriodCalendar,
     weather_calendar: Option<&ResolvedWeatherEnvironmentCalendar>,
     daylight_saving: &DaylightSavingAxisState,
+    special_days: &SpecialDayAxisState,
 ) -> Result<Vec<ResolvedCalendarDay>, TimeAxisError> {
     let weather_file_allows_leap_years = weather_calendar
         .map(|calendar| calendar.weather_file_allows_leap_years)
@@ -1086,6 +949,7 @@ fn resolved_calendar_days(
         } else {
             gregorian_day_of_week
         };
+        let special_day_type = special_day_type_for_ordinal(special_days, weather_day_of_year);
         days.push(ResolvedCalendarDay {
             day_of_sim: days.len() + 1,
             date,
@@ -1097,7 +961,9 @@ fn resolved_calendar_days(
             schedule_day_of_year,
             gregorian_day_of_week,
             day_of_week: simulation_day_of_week,
+            day_type: special_day_type.unwrap_or_else(|| simulation_day_of_week.into()),
             dst: daylight_saving_is_active(daylight_saving, weather_day_of_year),
+            special_day_type,
         });
         if day_index + 1 < expected_days {
             date = next_day(date);

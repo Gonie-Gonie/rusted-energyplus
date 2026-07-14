@@ -1,0 +1,59 @@
+id = "calendar_special_day_fixed_date_hourly_exact_001"
+title = "IDF fixed-date special-day state exact order"
+milestone = "full-source-order-calendar-special-day-fixed-date"
+purpose = "Block on exact ordered hourly Site Day Type Index state and Holiday timestamps across one input-file fixed-date special day."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to 72 ordered, unique hour-ending Site Day Type Index samples and their effective day-type timestamps from 2016-02-28 through 2016-03-01.",
+  "The input-file 2/29 duration-one Holiday proves exactly 24 Sunday index-1 samples, 24 Holiday index-8 samples, and 24 Tuesday index-3 samples, with Holiday only on the middle day's timestamps.",
+  "The EPW observes leap years but declares no holidays or daylight-saving period; the RunPeriod explicitly disables weather-file holidays, daylight saving, and weekend adjustment so this fixture isolates one fixed-date RunPeriodControl:SpecialDays override.",
+  "EPW holiday intake and its use flag, weekend shifting, durations beyond one day, Nth/last-weekday rules, overlaps and precedence, schedule lookup, raw ESO serialization, actual weather, and cross-year traversal remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_fixed_date_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-fixed-date-exact"
+blocking = true

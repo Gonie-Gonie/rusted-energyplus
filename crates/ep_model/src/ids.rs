@@ -16,6 +16,7 @@ typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(ScheduleId);
 typed_id!(RunPeriodId);
+typed_id!(RunPeriodSpecialDayId);
 typed_id!(ThermostatSetpointId);
 typed_id!(ZoneThermostatId);
 typed_id!(ZoneHumidistatId);

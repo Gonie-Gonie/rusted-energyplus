@@ -29,6 +29,10 @@ use crate::{
     report_format_label, source_artifact_label, variable_class_label,
 };
 
+#[path = "time_weather_schedule_special_days.rs"]
+mod special_days_report;
+use special_days_report::{append_special_days_markdown, special_days_json};
+
 pub(crate) struct TimeWeatherScheduleReportSummary {
     pub(crate) baseline: BaselineSummary,
     pub(crate) report_dir: PathBuf,
@@ -463,6 +467,12 @@ fn weather_samples(
             .iter()
             .map(|point| f64::from(u8::from(point.dst)))
             .collect()
+    } else if output.variable.eq_ignore_ascii_case("Site Day Type Index") {
+        time_axis
+            .points
+            .iter()
+            .map(|point| f64::from(point.day_type.energyplus_index()))
+            .collect()
     } else {
         weather_records
             .iter()
@@ -702,6 +712,7 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
     } else {
         report.push_str("weather_calendar_policy_applied: false\n");
     }
+    append_special_days_markdown(&mut report, &context.time_axis);
     if let Some(weather) = context.weather_environment.as_ref() {
         report.push_str("weather_record_selection_applied: true\n");
         report.push_str(&format!(
@@ -834,6 +845,10 @@ fn render_json(context: &TimeWeatherScheduleContext<'_>) -> String {
     json.push_str(&format!(
         "  \"weather_calendar\": {},\n",
         weather_calendar_json(&context.time_axis)
+    ));
+    json.push_str(&format!(
+        "  \"special_days\": {},\n",
+        special_days_json(&context.time_axis)
     ));
     json.push_str(&format!(
         "  \"weather_record_selection\": {},\n",

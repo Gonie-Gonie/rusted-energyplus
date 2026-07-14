@@ -7,9 +7,10 @@ use crate::{
     IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId,
     NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People,
     PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId, ScheduleCompact, ScheduleConstant,
-    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId, RunPeriodSpecialDay,
+    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, Surface,
+    SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
     TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
     ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
     ZoneThermostatId,
@@ -30,6 +31,10 @@ pub struct TypedModel {
     pub run_periods: Vec<RunPeriod>,
     /// Run period names.
     pub run_period_names: NameMap<RunPeriodId>,
+    /// Input-file holidays and other special schedule days.
+    pub run_period_special_days: Vec<RunPeriodSpecialDay>,
+    /// Run-period special-day names.
+    pub run_period_special_day_names: NameMap<RunPeriodSpecialDayId>,
     /// Site location.
     pub site: Option<SiteLocation>,
     /// Materials.
@@ -163,6 +168,8 @@ impl Default for TypedModel {
             surface_convection_algorithms: SurfaceConvectionAlgorithms::default(),
             run_periods: Vec::new(),
             run_period_names: NameMap::default(),
+            run_period_special_days: Vec::new(),
+            run_period_special_day_names: NameMap::default(),
             site: None,
             materials: Vec::new(),
             material_names: NameMap::default(),
@@ -238,6 +245,7 @@ impl TypedModel {
             + usize::from(self.surface_convection_algorithms.inside.is_some())
             + usize::from(self.surface_convection_algorithms.outside.is_some())
             + self.run_periods.len()
+            + self.run_period_special_days.len()
             + self.materials.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()

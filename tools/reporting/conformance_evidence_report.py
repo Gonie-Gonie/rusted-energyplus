@@ -71,8 +71,15 @@ CLAIM_BOUNDARY = (
     "unique Site Daylight Saving Time Status samples and normalized timestamps match exactly, with "
     "24 inactive followed by 48 active. Nth/last-weekday rules, southern year-wrap ranges, and "
     "RunPeriod disabling remain source-mapped unit evidence only. The IDF "
-    "RunPeriodControl:DaylightSavingTime object, DST-shifted schedule lookup and hour-24 rollover, "
-    "holidays and special days, raw ESO timestamp serialization, actual-weather year matching, "
+    "RunPeriodControl:DaylightSavingTime object, DST-shifted schedule lookup, and hour-24 rollover "
+    "remain outside this checkpoint. "
+    "The fixed-date input-file special-day case separately proves one February 29 Holiday: 72 "
+    "ordered, unique Site Day Type Index samples and normalized timestamps match exactly as "
+    "24 Sunday values, 24 Holiday values, and 24 Tuesday values. Nth/last-weekday special-day "
+    "rules, same-year annual-table duration/wrap, directly ordered typed-vector overwrite, and "
+    "weekend observation remain source-mapped unit evidence only; compiled IDF overlap precedence "
+    "and cross-year reprojection are unclaimed. EPW holidays and use-policy, EPW/IDF precedence, schedule "
+    "day-type lookup, tomorrow state, raw ESO timestamp serialization, actual-weather year matching, "
     "cross-year traversal, multiple-data-period execution, records-per-hour greater than one, "
     "subhourly solar interpolation, complete SetCurrentWeather/solar/WeatherManager conformance, "
     "and general time, weather, and schedule compatibility are not claimed."
@@ -85,6 +92,7 @@ CASE_LABELS = {
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
+    "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
@@ -198,6 +206,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Calendar special day",
+        command="compare-calendar-special-day-fixed-date-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weather records",

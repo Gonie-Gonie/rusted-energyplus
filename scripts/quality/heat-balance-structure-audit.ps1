@@ -188,6 +188,8 @@ $summary = "crates\ep_runtime\src\heat_balance\summary.rs"
 $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $typedIds = "crates\ep_model\src\ids.rs"
+$calendarObjects = "crates\ep_model\src\objects\calendar.rs"
+$compiler = "crates\ep_compiler\src\compiler.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $precompute = "crates\ep_runtime\src\precompute.rs"
@@ -199,9 +201,13 @@ $runtime = "crates\ep_runtime\src\runtime.rs"
 $weather = "crates\ep_runtime\src\weather.rs"
 $weatherCalendar = "crates\ep_runtime\src\weather_calendar.rs"
 $timeAxis = "crates\ep_runtime\src\time_axis.rs"
+$calendarRules = "crates\ep_runtime\src\time_axis\calendar_rules.rs"
+$dayType = "crates\ep_runtime\src\time_axis\day_type.rs"
 $daylightSaving = "crates\ep_runtime\src\time_axis\daylight_saving.rs"
+$specialDays = "crates\ep_runtime\src\time_axis\special_days.rs"
 $schedules = "crates\ep_runtime\src\schedules.rs"
 $timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
+$timeWeatherScheduleSpecialDays = "crates\ep_cli\src\time_weather_schedule_special_days.rs"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -210,6 +216,7 @@ $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part03.rs"
 $runtimeTestResults = "crates\ep_runtime\src\runtime\tests\part05.rs"
 $runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
 $runtimeTestCalendar = "crates\ep_runtime\src\runtime\tests\part10.rs"
+$runtimeTestSpecialDays = "crates\ep_runtime\src\runtime\tests\part11.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -238,6 +245,8 @@ foreach ($entry in @(
         @($surfaceWeather, "surface weather ownership module"),
         @($timestep, "heat-balance timestep ownership module"),
         @($typedIds, "typed compact ID module"),
+        @($calendarObjects, "typed calendar control module"),
+        @($compiler, "typed model compiler"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
         @($precompute, "runtime precompute module"),
@@ -249,9 +258,13 @@ foreach ($entry in @(
         @($weather, "runtime weather module"),
         @($weatherCalendar, "EPW calendar metadata parser"),
         @($timeAxis, "runtime time-axis module"),
+        @($calendarRules, "shared calendar-rule resolver"),
+        @($dayType, "EnergyPlus day-type module"),
         @($daylightSaving, "runtime daylight-saving resolver"),
+        @($specialDays, "runtime special-day resolver"),
         @($schedules, "runtime schedules module"),
         @($timeWeatherSchedule, "time/weather/schedule report module"),
+        @($timeWeatherScheduleSpecialDays, "time/weather/schedule special-day report module"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
         @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
@@ -259,7 +272,8 @@ foreach ($entry in @(
         @($runtimeTestDynamic, "runtime dynamic heat-balance tests"),
         @($runtimeTestResults, "runtime heat-balance result tests"),
         @($runtimeTestRadiation, "runtime heat-balance radiation tests"),
-        @($runtimeTestCalendar, "runtime calendar and DST tests")
+        @($runtimeTestCalendar, "runtime calendar and DST tests"),
+        @($runtimeTestSpecialDays, "runtime special-day tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -578,7 +592,7 @@ Assert-Contains -Path $initialization -Pattern 'construction_ctf_coefficients_by
 Assert-Contains -Path $weather -Pattern 'pub struct WeatherTimestepSeries' -Description "precomputed weather timestep series"
 Assert-Contains -Path $weather -Pattern 'pub fn precompute_weather_timestep_series' -Description "weather timestep precompute entry"
 Assert-Contains -Path $weather -Pattern 'pub\(crate\) fn next_solar_weather_record_within_day\s*\(' -Description "day-local solar NextHr weather selector"
-Assert-Contains -Path $weatherCalendar -Pattern 'pub enum EpwCalendarDateRule' -Description "typed EPW calendar date rule"
+Assert-Contains -Path $weatherCalendar -Pattern 'pub use ep_model::CalendarDateRule as EpwCalendarDateRule' -Description "shared typed EPW calendar date rule"
 Assert-Contains -Path $weatherCalendar -Pattern 'pub daylight_saving_period: Option<EpwDaylightSavingPeriod>' -Description "EPW daylight-saving metadata"
 Assert-Contains -Path $weatherCalendar -Pattern 'fn parse_calendar_date_rule\s*\(' -Description "EPW daylight-saving date-rule parser"
 Assert-Contains -Path $daylightSaving -Pattern 'pub struct DaylightSavingAxisState' -Description "shared time-axis daylight-saving state"
@@ -591,6 +605,23 @@ Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_last_weekda
 Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_daylight_saving_range_wraps_across_the_weather_year\s*\(' -Description "year-wrapping DST range test"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'Site Daylight Saving Time Status' -Description "DST status report mapping"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'daylight_saving_hourly_samples' -Description "DST report diagnostic sample count"
+Assert-Contains -Path $calendarObjects -Pattern 'pub struct RunPeriodSpecialDay' -Description "typed input-file special-day object"
+Assert-Contains -Path $calendarObjects -Pattern 'pub fn parse_calendar_date_rule' -Description "shared calendar date-rule parser"
+Assert-Contains -Path $compiler -Pattern 'fn parse_run_period_special_days\s*\(' -Description "typed RunPeriodControl SpecialDays compiler"
+Assert-Contains -Path $calendarRules -Pattern 'fn resolve_calendar_date_rule\s*\(' -Description "shared EnergyPlus calendar date-rule resolver"
+Assert-Contains -Path $dayType -Pattern 'pub const fn energyplus_index\s*\(' -Description "EnergyPlus Site Day Type Index mapping"
+Assert-Contains -Path $specialDays -Pattern 'pub struct SpecialDayAxisState' -Description "shared time-axis special-day state"
+Assert-Contains -Path $specialDays -Pattern 'fn resolve_special_day_axis_state\s*\(' -Description "time-axis special-day resolver"
+Assert-Contains -Path $specialDays -Pattern 'SpecialDayCrossYearUnsupported' -Description "cross-year special-day explicit rejection"
+Assert-Contains -Path $specialDays -Pattern 'day_types_by_ordinal\[ordinal as usize\] = Some\(day_type\)' -Description "later special-day definitions overwrite ordinal state"
+Assert-Contains -Path $timeAxis -Pattern 'special_day_type: day\.special_day_type' -Description "special day projected into both time-point axes"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn model_special_day_overrides_both_axes_for_every_hour_of_leap_day\s*\(' -Description "fixed-date special day both-axis test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn special_day_duration_is_inclusive_and_wraps_the_same_year_annual_table\s*\(' -Description "special-day same-year annual-table duration and wrap test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn later_typed_special_day_definition_overwrites_an_earlier_definition\s*\(' -Description "special-day later-wins unit test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn weekend_rule_shifts_only_fixed_single_day_special_days_to_monday\s*\(' -Description "special-day weekend-rule unit test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn cross_year_special_days_are_rejected_until_each_year_can_be_reprojected\s*\(' -Description "cross-year special-day explicit rejection test"
+Assert-Contains -Path $timeWeatherSchedule -Pattern 'Site Day Type Index' -Description "special day type report mapping"
+Assert-Contains -Path $timeWeatherScheduleSpecialDays -Pattern 'special_day_hourly_samples' -Description "special-day report diagnostic sample count"
 Assert-Contains -Path $solar -Pattern 'next_solar_weather_record_within_day\s*\(' -Description "solar interpolation consumes day-local NextHr weather selector"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'fn solar_next_hour_record_wraps_within_each_accepted_day\s*\(' -Description "accepted-day solar Hour24 NextHr wrap test"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'solar_weather_interpolation_weights\(1,\s*1\),\s*\(0\.0,\s*1\.0,\s*0\.0\)' -Description "single-timestep current-only solar weather weights"

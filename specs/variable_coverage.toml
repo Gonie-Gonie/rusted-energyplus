@@ -855,6 +855,14 @@ first_evidence = "calendar_dst_fixed_date_hourly_exact_001"
 support_boundary = "Zero-tolerance-gated, ordered-exact-unique hourly conformance for calendar_dst_fixed_date_hourly_exact_001 only. The case proves an EPW fixed 2/29 through 3/1 daylight-saving period enabled by RunPeriod, with 24 inactive then 48 active hourly samples on the shared metadata-aware TimeAxis. Nth/last-weekday rules and southern year-wrap ranges remain source-mapped unit evidence only. IDF RunPeriodControl:DaylightSavingTime, DST-shifted schedule lookup and hour-24 rollover, holidays/special days, raw ESO timestamp serialization, actual-weather execution, cross-year EPW record traversal, and broad WeatherManager compatibility remain outside the claim."
 
 [[variable]]
+name = "Site Day Type Index"
+domain = "weather"
+status = "conformance"
+first_case = "calendar_special_day_fixed_date_hourly_exact_001"
+first_evidence = "calendar_special_day_fixed_date_hourly_exact_001"
+support_boundary = "Zero-tolerance-gated, ordered-exact-unique hourly conformance for calendar_special_day_fixed_date_hourly_exact_001 only. The explicit 2016-02-28 through 2016-03-01 case proves exactly 72 normalized timestamps and Site Day Type Index samples for one fixed IDF 2/29 duration-one Holiday: 24 Sunday=1, 24 Holiday=8, and 24 Tuesday=3. Its RunPeriod explicitly disables weather-file holidays, weekend observation, and DST, so those policy branches are not claimed. Nth/last rules, same-year annual-table duration/wrap beyond the declared duration-one date, directly ordered typed-vector overwrite, and weekend shifting remain unit/source evidence only; compiled IDF overlap precedence and cross-year reprojection are unclaimed. EPW holidays and use-policy/precedence, schedule day-type lookup, tomorrow special-day state, raw ESO timestamp serialization, and broad WeatherManager or schedule compatibility remain outside the claim."
+
+[[variable]]
 name = "Site Outdoor Air Drybulb Temperature"
 domain = "weather"
 status = "conformance"

@@ -311,6 +311,12 @@
                          "help":  "Gate exact EPW fixed-date daylight-saving state and ordered hourly timestamps."
                      },
                      {
+                         "name":  "compare-calendar-special-day-fixed-date-exact",
+                         "path":  "compare\\compare-calendar-special-day-fixed-date-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact input-file fixed-date special-day state and ordered hourly timestamps."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",

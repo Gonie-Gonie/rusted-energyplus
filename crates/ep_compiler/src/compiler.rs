@@ -15,13 +15,14 @@ use ep_model::{
     OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
-    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SunExposure,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
+    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
     Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
     ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
     ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
@@ -199,6 +200,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "SurfaceConvectionAlgorithm:Inside",
     "SurfaceConvectionAlgorithm:Outside",
     "RunPeriod",
+    "RunPeriodControl:SpecialDays",
     "Site:Location",
     "Material",
     "Material:NoMass",
@@ -267,6 +269,7 @@ impl<'a> Compiler<'a> {
         self.parse_timestep(&mut model);
         self.parse_surface_convection_algorithms(&mut model);
         self.parse_run_periods(&mut model);
+        self.parse_run_period_special_days(&mut model);
         self.parse_site_location(&mut model);
         self.parse_materials(&mut model);
         self.parse_constructions(&mut model);
@@ -553,6 +556,73 @@ impl<'a> Compiler<'a> {
                     "No",
                     parse_yes_no,
                 ),
+            });
+        }
+    }
+
+    fn parse_run_period_special_days(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "RunPeriodControl:SpecialDays";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let Some(id_value) =
+                self.checked_id(OBJECT_TYPE, &name, model.run_period_special_days.len())
+            else {
+                continue;
+            };
+            let id = RunPeriodSpecialDayId(id_value);
+            if model
+                .run_period_special_day_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            let Some(start_date_text) =
+                self.required_string(OBJECT_TYPE, &name, &object, "start_date")
+            else {
+                continue;
+            };
+            let Some(start_date) = parse_calendar_date_rule(&start_date_text) else {
+                self.error(
+                    "InvalidCalendarDateRule",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("start_date"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} field start_date has unsupported date rule '{start_date_text}'"
+                    ),
+                );
+                continue;
+            };
+            let duration_days = self.u32_default(OBJECT_TYPE, &name, &object, "duration", 1);
+            if !(1..=366).contains(&duration_days) {
+                self.error(
+                    "InvalidNumericRange",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("duration"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} field duration must be between 1 and 366, got {duration_days}"
+                    ),
+                );
+                continue;
+            }
+            let special_day_type = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "special_day_type"),
+                SpecialDayType::Holiday,
+                "Holiday",
+                parse_special_day_type,
+            );
+
+            model.run_period_special_days.push(RunPeriodSpecialDay {
+                id,
+                name: NormalizedName::new(&name),
+                start_date,
+                duration_days,
+                special_day_type,
             });
         }
     }
@@ -4622,6 +4692,21 @@ fn parse_day_of_week(value: &str) -> Option<ep_model::DayOfWeek> {
     }
 }
 
+fn parse_special_day_type(value: &str) -> Option<SpecialDayType> {
+    match value {
+        value if value.eq_ignore_ascii_case("Holiday") => Some(SpecialDayType::Holiday),
+        value if value.eq_ignore_ascii_case("SummerDesignDay") => {
+            Some(SpecialDayType::SummerDesignDay)
+        }
+        value if value.eq_ignore_ascii_case("WinterDesignDay") => {
+            Some(SpecialDayType::WinterDesignDay)
+        }
+        value if value.eq_ignore_ascii_case("CustomDay1") => Some(SpecialDayType::CustomDay1),
+        value if value.eq_ignore_ascii_case("CustomDay2") => Some(SpecialDayType::CustomDay2),
+        _ => None,
+    }
+}
+
 fn parse_first_hour_interpolation_starting_values(
     value: &str,
 ) -> Option<FirstHourInterpolationStartingValues> {
@@ -4705,12 +4790,13 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
     use ep_model::{
-        AutosizeOrNumber, DayOfWeek, DehumidificationControlType,
+        AutosizeOrNumber, CalendarDateRule, DayOfWeek, DehumidificationControlType,
         DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
         HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
         LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
+        SpecialDayType,
     };
     use ep_raw_model::parse_epjson_str;
 
@@ -5129,6 +5215,212 @@ mod tests {
                     && diagnostic.field.as_deref() == Some(field)
             }));
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_typed_run_period_special_day_rules_types_and_coverage()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:SpecialDays": {
+                    "A Fixed Holiday": {
+                        "start_date": "2/29",
+                        "duration": 2,
+                        "special_day_type": "Holiday"
+                    },
+                    "B Nth Summer": {
+                        "start_date": "2nd Sunday in March",
+                        "duration": 1,
+                        "special_day_type": "SummerDesignDay"
+                    },
+                    "C Last Winter": {
+                        "start_date": "Last Monday in May",
+                        "duration": 3,
+                        "special_day_type": "WinterDesignDay"
+                    },
+                    "D Custom One": {
+                        "start_date": "July 4",
+                        "duration": 1,
+                        "special_day_type": "CustomDay1"
+                    },
+                    "E Custom Two": {
+                        "start_date": "5 November",
+                        "duration": 1,
+                        "special_day_type": "CustomDay2"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        assert_eq!(result.report.typed_object_count, 6);
+        let coverage = result
+            .report
+            .coverage
+            .iter()
+            .find(|entry| entry.object_type == "RunPeriodControl:SpecialDays")
+            .ok_or_else(|| std::io::Error::other("missing special-day coverage"))?;
+        assert_eq!(coverage.object_count, 5);
+        assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
+
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.run_period_special_days.len(), 5);
+        assert_eq!(model.run_period_special_day_names.len(), 5);
+        assert_eq!(model.object_count(), 6);
+
+        let fixed = &model.run_period_special_days[0];
+        assert_eq!(
+            fixed.start_date,
+            CalendarDateRule::MonthDay {
+                month: 2,
+                day_of_month: 29
+            }
+        );
+        assert_eq!(fixed.duration_days, 2);
+        assert_eq!(fixed.special_day_type, SpecialDayType::Holiday);
+        assert_eq!(
+            model
+                .run_period_special_day_names
+                .resolve("a fixed holiday"),
+            Some(fixed.id)
+        );
+
+        assert_eq!(
+            model.run_period_special_days[1].start_date,
+            CalendarDateRule::NthWeekdayInMonth {
+                nth: 2,
+                weekday: DayOfWeek::Sunday,
+                month: 3
+            }
+        );
+        assert_eq!(
+            model.run_period_special_days[1].special_day_type,
+            SpecialDayType::SummerDesignDay
+        );
+        assert_eq!(
+            model.run_period_special_days[2].start_date,
+            CalendarDateRule::LastWeekdayInMonth {
+                weekday: DayOfWeek::Monday,
+                month: 5
+            }
+        );
+        assert_eq!(model.run_period_special_days[2].duration_days, 3);
+        assert_eq!(
+            model.run_period_special_days[2].special_day_type,
+            SpecialDayType::WinterDesignDay
+        );
+        assert_eq!(
+            model.run_period_special_days[3].special_day_type,
+            SpecialDayType::CustomDay1
+        );
+        assert_eq!(
+            model.run_period_special_days[4].special_day_type,
+            SpecialDayType::CustomDay2
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn defaults_run_period_special_day_duration_and_type() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:SpecialDays": {
+                    "Default Holiday": {
+                        "start_date": "January 1",
+                        "special_day_type": ""
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.run_period_special_days.len(), 1);
+        assert_eq!(model.run_period_special_days[0].duration_days, 1);
+        assert_eq!(
+            model.run_period_special_days[0].special_day_type,
+            SpecialDayType::Holiday
+        );
+        for (field, value) in [("duration", "1"), ("special_day_type", "Holiday")] {
+            assert!(result.report.defaults_applied.iter().any(|application| {
+                application.object_type == "RunPeriodControl:SpecialDays"
+                    && application.object_name == "Default Holiday"
+                    && application.field == field
+                    && application.value == value
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_invalid_run_period_special_day_inputs() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:SpecialDays": {
+                    "A Zero Duration": {
+                        "start_date": "January 1",
+                        "duration": 0,
+                        "special_day_type": "Holiday"
+                    },
+                    "B Long Duration": {
+                        "start_date": "January 2",
+                        "duration": 367,
+                        "special_day_type": "Holiday"
+                    },
+                    "C Bad Start": {
+                        "start_date": "Not A Calendar Date",
+                        "duration": 1,
+                        "special_day_type": "Holiday"
+                    },
+                    "D Bad Type": {
+                        "start_date": "January 4",
+                        "duration": 1,
+                        "special_day_type": "Festival"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.model.is_none());
+        for object_name in ["A Zero Duration", "B Long Duration"] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.severity == DiagnosticSeverity::Error
+                    && diagnostic.code == "InvalidNumericRange"
+                    && diagnostic.object_type == "RunPeriodControl:SpecialDays"
+                    && diagnostic.object_name.as_deref() == Some(object_name)
+                    && diagnostic.field.as_deref() == Some("duration")
+            }));
+        }
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "InvalidCalendarDateRule"
+                && diagnostic.object_type == "RunPeriodControl:SpecialDays"
+                && diagnostic.object_name.as_deref() == Some("C Bad Start")
+                && diagnostic.field.as_deref() == Some("start_date")
+        }));
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "InvalidEnumValue"
+                && diagnostic.object_type == "RunPeriodControl:SpecialDays"
+                && diagnostic.object_name.as_deref() == Some("D Bad Type")
+                && diagnostic.field.as_deref() == Some("special_day_type")
+        }));
 
         Ok(())
     }
