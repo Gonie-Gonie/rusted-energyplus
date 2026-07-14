@@ -32,7 +32,7 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
     let weather_path = case_dir.join("weather.epw");
     let output_dir = case_dir.join("out");
     write_text(&input_path, ONE_ZONE_EPJSON)?;
-    write_text(&weather_path, TWO_HOUR_EPW)?;
+    write_text(&weather_path, ONE_DAY_EPW)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
@@ -124,6 +124,107 @@ fn one_zone_runtime_writes_stable_output_layout() -> Result<(), Box<dyn std::err
         summary["rust_runtime"]["source_order_stages"][0],
         "get-heat-balance-input"
     );
+    Ok(())
+}
+
+#[test]
+fn weather_runtime_selects_run_period_start_after_leading_epw_decoy()
+-> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("weather-record-start-offset")?;
+    let input_path = case_dir.join("one-zone-july-run-period.epJSON");
+    let output_dir = case_dir.join("out");
+    let weather_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../data/conformance_cases/weather_record_start_offset_nonactual_001")
+        .join("weather_record_start_offset_nonactual.epw")
+        .canonicalize()?;
+    let mut input_text = ONE_ZONE_EPJSON.trim_end().trim_end_matches('}').to_string();
+    input_text.push_str(
+        r#",
+  "RunPeriod": {
+    "Weather Record Offset Run Period": {
+      "begin_month": 7,
+      "begin_day_of_month": 1,
+      "begin_year": 2016,
+      "end_month": 7,
+      "end_day_of_month": 2,
+      "end_year": 2016,
+      "day_of_week_for_start_day": "Friday",
+      "first_hour_interpolation_starting_values": "Hour24",
+      "use_weather_file_holidays_and_special_days": "No",
+      "use_weather_file_daylight_saving_period": "No",
+      "apply_weekend_holiday_rule": "No",
+      "use_weather_file_rain_indicators": "No",
+      "use_weather_file_snow_indicators": "No",
+      "treat_weather_as_actual": "No"
+    }
+  }
+}"#,
+    );
+    write_text(&input_path, &input_text)?;
+
+    let outcome = run_arbitrary_idf(&RunConfig {
+        input_path,
+        weather_path: Some(weather_path),
+        output_dir: output_dir.clone(),
+        mode: RunMode::Compatibility,
+        partial_policy: PartialRunPolicy::Deny,
+        output_format: RunOutputFormat::RustNative,
+        overwrite: true,
+        keep_intermediate: true,
+        trace_level: TraceLevel::Normal,
+        trace_selection: TraceSelection::default(),
+        fail_on_warning: false,
+        dry_run: false,
+        oracle_baseline: false,
+        compare_oracle: false,
+        json_stdout: false,
+        oracle_root: None,
+        hours: Some(2),
+    })?;
+
+    assert_eq!(outcome.exit_code, RunExitCode::Success);
+    assert_eq!(
+        outcome.run_result_state,
+        RunResultState::SupportedCompatibilityRun
+    );
+    let results = read_json(&output_dir.join("results").join("result-store.json"))?;
+    let outdoor_dry_bulb = results["series"]
+        .as_array()
+        .expect("result series should be an array")
+        .iter()
+        .find(|series| {
+            series["key"] == "Environment"
+                && series["variable_name"] == "Site Outdoor Air Drybulb Temperature"
+        })
+        .expect("outdoor dry-bulb result series should exist");
+    assert_eq!(outdoor_dry_bulb["samples"], 2);
+
+    // Timestep defaults to six samples per hour. Under the explicit Hour24
+    // policy, the first selected hour interpolates from July 1 hour 24 (12.4 C)
+    // to hour 1 (10.1 C); the June 30 decoy records never enter this average.
+    let average_interpolation_weight = (1_u32..=6)
+        .map(|timestep| f64::from(timestep) / 6.0)
+        .sum::<f64>()
+        / 6.0;
+    let expected_first =
+        12.4 * (1.0 - average_interpolation_weight) + 10.1 * average_interpolation_weight;
+    let expected_last =
+        10.1 * (1.0 - average_interpolation_weight) + 10.2 * average_interpolation_weight;
+    let actual_first = outdoor_dry_bulb["first"]
+        .as_f64()
+        .expect("first outdoor dry-bulb value should be numeric");
+    let actual_last = outdoor_dry_bulb["last"]
+        .as_f64()
+        .expect("last outdoor dry-bulb value should be numeric");
+    assert!(
+        (actual_first - expected_first).abs() <= 1.0e-12,
+        "unexpected first selected dry-bulb average: expected {expected_first}, found {actual_first}"
+    );
+    assert!(
+        (actual_last - expected_last).abs() <= 1.0e-12,
+        "unexpected second selected dry-bulb average: expected {expected_last}, found {actual_last}"
+    );
+    assert!(actual_first > 0.0 && actual_last > 0.0);
     Ok(())
 }
 
@@ -495,7 +596,7 @@ fn fail_on_warning_promotes_warning_to_non_success() -> Result<(), Box<dyn std::
 }"#,
     );
     write_text(&input_path, &input_text)?;
-    write_text(&weather_path, TWO_HOUR_EPW)?;
+    write_text(&weather_path, ONE_DAY_EPW)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
@@ -557,7 +658,7 @@ fn partial_output_request_runs_when_allowed() -> Result<(), Box<dyn std::error::
 }"#,
     );
     write_text(&input_path, &input_text)?;
-    write_text(&weather_path, TWO_HOUR_EPW)?;
+    write_text(&weather_path, ONE_DAY_EPW)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,

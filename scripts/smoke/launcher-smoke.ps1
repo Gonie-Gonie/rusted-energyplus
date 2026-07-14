@@ -421,17 +421,17 @@ $weatherPath = Join-Path $fixtureRoot "one-day.epw"
 $weatherLines = @(
 @'
 LOCATION,Example
-DESIGN CONDITIONS
-TYPICAL/EXTREME PERIODS
-GROUND TEMPERATURES
-HOLIDAYS/DAYLIGHT SAVINGS
+DESIGN CONDITIONS,0
+TYPICAL/EXTREME PERIODS,0
+GROUND TEMPERATURES,0
+HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0
 COMMENTS 1
 COMMENTS 2
-DATA PERIODS
+DATA PERIODS,1,1,Data,Friday,1/1,1/1
 '@
 )
 foreach ($hour in 1..24) {
-    $weatherLines += "1999,1,1,$hour,0,Source,-3.0,-4.0,50,82000,0,0,300,10,20,30,0,0,0,0,180,2.5"
+    $weatherLines += "1999,1,1,$hour,60,Source,-3.0,-4.0,50,82000,0,0,0,0,0,0,0,0,0,0,180,2.5"
 }
 Write-Utf8NoBomFile -Path $weatherPath -Contents (($weatherLines -join "`n") + "`n")
 

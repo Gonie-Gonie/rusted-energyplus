@@ -17,8 +17,9 @@ use ep_raw_model::{RawModel, load_epjson_file};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
     NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleValueSeries, TimeAxis,
-    WeatherTimestepSeries, build_hourly_time_axis, load_epw_records, precompute_runtime_data,
-    precompute_schedule_value_series_for_time_axis, precompute_weather_timestep_series,
+    WeatherTimestepSeries, build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata,
+    load_epw_weather_file, precompute_runtime_data, precompute_schedule_value_series_for_time_axis,
+    precompute_weather_timestep_series, select_epw_environment_weather,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -455,7 +456,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
             "rust_runtime_setup",
             "ep_run",
             runtime_setup_start.elapsed().as_secs_f64(),
-            "resolve runtime sample count and parse EPW weather once before the runtime loop",
+            "resolve runtime inputs before the loop; weather runtimes load rich EPW metadata, build the metadata-aware time axis, select source-order records, and precompute weather timesteps",
         );
 
         let runtime_start = Instant::now();
@@ -1465,24 +1466,38 @@ fn prepare_runtime_inputs(
     runtime_class: RuntimeClass,
 ) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
-    let sample_count = runtime_sample_count(config, model)?;
-    let time_axis = build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?;
-    let schedule_series = precompute_schedule_value_series_for_time_axis(&model.typed, &time_axis);
-    let weather_series = if runtime_class_requires_weather(runtime_class) {
+    let (time_axis, weather_series) = if runtime_class_requires_weather(runtime_class) {
         let weather_path = config
             .weather_path
             .as_ref()
             .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-        let weather_records = load_epw_records(weather_path)
+        let weather_file = load_epw_weather_file(weather_path)
             .map_err(|error| format!("failed to load EPW weather: {error}"))?;
-        Some(precompute_weather_timestep_series(
-            &weather_records,
-            model.typed.timestep.number_of_timesteps_per_hour.max(1),
+        let time_axis = build_hourly_time_axis_with_weather_metadata(
+            &model.typed,
+            &weather_file.calendar_metadata,
+        )
+        .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
+        let environment_weather = select_epw_environment_weather(&weather_file, &time_axis)
+            .map_err(|error| format!("failed to select EPW environment records: {error}"))?;
+        let weather_series = precompute_weather_timestep_series(
+            environment_weather.hourly_records(),
+            time_axis.zone_timestep.timesteps_per_hour,
             time_axis.first_hour_interpolation_starting_values,
-        ))
+        );
+        (time_axis, Some(weather_series))
     } else {
-        None
+        (
+            build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?,
+            None,
+        )
     };
+    let sample_count = runtime_sample_count(
+        config,
+        &time_axis,
+        runtime_class_requires_weather(runtime_class),
+    )?;
+    let schedule_series = precompute_schedule_value_series_for_time_axis(&model.typed, &time_axis);
 
     Ok(PreparedRuntimeInputs {
         sample_count,
@@ -1564,12 +1579,19 @@ fn runtime_class_requires_weather(runtime_class: RuntimeClass) -> bool {
     )
 }
 
-fn runtime_sample_count(config: &RunConfig, model: &SimulationModel) -> Result<usize, String> {
-    if let Some(hours) = config.hours {
-        return Ok(hours);
+fn runtime_sample_count(
+    config: &RunConfig,
+    time_axis: &TimeAxis,
+    constrain_to_time_axis: bool,
+) -> Result<usize, String> {
+    let available_samples = time_axis.sample_count();
+    let requested_samples = config.hours.unwrap_or(available_samples);
+    if constrain_to_time_axis && requested_samples > available_samples {
+        return Err(format!(
+            "requested {requested_samples} runtime hours but the resolved time axis contains only {available_samples} hourly samples"
+        ));
     }
-    let axis = build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?;
-    Ok(axis.sample_count())
+    Ok(requested_samples)
 }
 
 fn write_runtime_artifacts(output_dir: &Path, results: &ResultStore) -> Result<(), String> {

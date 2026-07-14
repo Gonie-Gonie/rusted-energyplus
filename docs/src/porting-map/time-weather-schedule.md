@@ -212,8 +212,10 @@ declared pair; it does not prove the raw text emitted by
 record selection or data-period matching, DST, holidays, actual-weather
 execution, cross-year traversal, any of the three internal day-of-year fields, warmup, or
 the full schedule lookup family.
-The new path is consumed by the dedicated CLI report and gate; migration into
-the general runtime/`ep_run` execution path also remains deferred.
+The weather-aware axis and record selector are also consumed during setup for
+weather-required heat-balance `ep_run` classes. The normalized timestamp
+comparison labels and schedule-series evidence remain owned by the dedicated
+CLI report and gate; their general runtime consumption remains deferred.
 
 ## Source-Order EPW Record Selection Checkpoint
 
@@ -260,8 +262,10 @@ subhourly interpolation, `SetCurrentWeather` field parity, actual-weather year
 matching, cross-year traversal, execution across multiple data periods,
 records-per-hour greater than one, DST, holidays or special days, missing-value
 repair, cyclic multi-year execution, or broad WeatherManager compatibility.
-The selector remains a dedicated time/weather report boundary; general
-runtime/`ep_run` migration is still deferred.
+The selector feeds both the dedicated time/weather report boundary and
+`ep_run::prepare_runtime_inputs` for weather-required heat-balance classes.
+That arbitrary-run wiring is runtime plumbing, not independent oracle evidence
+or a completion claim for any mapped EnergyPlus routine.
 
 ## Current Rust Boundary
 
@@ -269,8 +273,8 @@ runtime/`ep_run` migration is still deferred.
 |---|---|---|
 | run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, metadata-aware actual-weather and cross-year inputs fail explicitly, and the other five RunPeriod weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active RunPeriod holiday/DST/weather behavior, actual-weather and cross-year traversal, and full EnergyPlus warning-text parity |
 | canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias) and `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday | warmup lifecycle, DST ranges, special-day overrides, actual-weather and cross-year behavior, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
-| legacy hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows | migration into general runtime/`ep_run` consumers, calendar projections beyond the declared pair, and all remaining calendar-dependent output semantics |
-| EPW weather | `EpwWeatherFile` keeps parsed calendar and `DATA PERIODS` metadata with `EpwRecord` rows; the dedicated hourly report applies `Leap Year Observed` and selects a complete same-year non-actual, one-record-per-hour stream by source date. The external offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order; unit tests separately lock Today/Tomorrow source-index transitions and interpolation seeds | actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, general runtime/`ep_run` migration, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather` parity |
+| hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, calendar projections beyond the declared pair, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
+| EPW weather | `EpwWeatherFile` keeps parsed calendar and `DATA PERIODS` metadata with `EpwRecord` rows; the dedicated hourly report applies `Leap Year Observed` and selects a complete same-year non-actual, one-record-per-hour stream by source date. Weather-required heat-balance `ep_run` setup now applies the same selector before weather-timestep precomputation. The external offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order; unit tests separately lock Today/Tomorrow source-index transitions and interpolation seeds | actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, hour-24 solar day-boundary parity, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather` parity |
 | schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the paired exact cases lock the same 1-through-24 daily profile for 72 versus 48 weather-effective hours | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
 | output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy schedule cases and the record-selection weather case enforce ordered, unique, exact normalized labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
 
@@ -345,7 +349,8 @@ Until those gates pass, broader results remain foundation, smoke, or diagnostic
 evidence only; the declared 72-label/48-label pair keeps only the narrow
 normalized hourly Schedule Value conformance boundary stated above, and the
 offset case keeps only its narrow non-actual ordered record-date/dry-bulb
-boundary. Record selection beyond that case, runtime/`ep_run` migration, DST,
-holidays, raw ESO output, actual-weather execution, cross-year traversal,
-multiple-data-period execution, and records-per-hour greater than one remain
-explicitly deferred.
+boundary. Its consumption by weather-required heat-balance `ep_run` setup adds
+no independent conformance evidence. Record selection beyond that case,
+weather consumers outside the stated setup, DST, holidays, raw ESO output,
+actual-weather execution, cross-year traversal, multiple-data-period execution,
+and records-per-hour greater than one remain explicitly deferred.

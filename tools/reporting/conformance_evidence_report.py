@@ -60,10 +60,12 @@ CLAIM_BOUNDARY = (
     "not claim general EPW record selection. The separate weather record-offset case proves only "
     "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
-    "Today/Tomorrow buffers and subhourly interpolation remain unit evidence. Runtime/ep_run "
-    "migration, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
-    "records-per-hour greater than one, DST, holidays, raw ESO serialization, and general time, "
-    "weather, and schedule compatibility are not claimed."
+    "Weather-required heat-balance ep_run setup consumes the same selector before weather-timestep "
+    "precomputation, but that arbitrary-run wiring adds no independent conformance evidence. "
+    "Today/Tomorrow buffers and subhourly interpolation remain unit evidence. Weather consumers "
+    "outside that setup, actual-weather year matching, cross-year traversal, multiple-data-period "
+    "execution, records-per-hour greater than one, DST, holidays, hour-24 solar day-boundary parity, "
+    "raw ESO serialization, and general time, weather, and schedule compatibility are not claimed."
 )
 
 CASE_LABELS = {
