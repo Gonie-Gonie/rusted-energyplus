@@ -4,6 +4,7 @@
 
 mod calc;
 mod dispatch;
+mod humidistat;
 mod init;
 mod input;
 mod meters;
@@ -14,6 +15,7 @@ mod update;
 
 pub use calc::*;
 pub use dispatch::*;
+pub use humidistat::*;
 pub use init::*;
 pub use input::*;
 pub use meters::*;

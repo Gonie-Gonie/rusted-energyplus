@@ -45,12 +45,12 @@ use ep_runtime::{
     IdealLoadsFeatureFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
     IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
     IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
-    IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState,
-    NoOaThirdOrderHumidityCorrectorInput, NoOaThirdOrderMoistureDemandInput, OutputSeries,
-    ResultStore, RuntimeMeterRequest, RuntimeOutputFrequency, RuntimeOutputRegistry,
-    SimPurchasedAirCompatInput, SimPurchasedAirOutdoorAirCompatInput,
-    ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
-    ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
+    IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState, NoOaHumidistatClosedLoopState,
+    NoOaHumidistatZoneTimestepError, NoOaHumidistatZoneTimestepInput,
+    NoOaThirdOrderMoistureDemandInput, OutputSeries, ResultStore, RuntimeMeterRequest,
+    RuntimeOutputFrequency, RuntimeOutputRegistry, SimPurchasedAirCompatInput,
+    SimPurchasedAirOutdoorAirCompatInput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+    ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
     ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_HEATING_RATE,
@@ -89,16 +89,17 @@ use ep_runtime::{
     ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
+    advance_no_oa_humidistat_zone_timestep_compat,
     calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_no_oa_third_order_moisture_demand_compat,
     calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, correct_no_oa_third_order_humidity_ratio_compat,
-    design_outdoor_air_volume_flow_components_m3_per_s, energyplus_moist_air_density_kg_per_m3,
-    ideal_loads_facility_meter_binding, ideal_loads_zone_equipment_stages, load_epw_records,
-    meter_rate_to_energy_j, purchased_air_source_order_stages, select_purchased_air_branch,
-    sim_purchased_air_compat, sim_purchased_air_outdoor_air_compat, surface_area_m2,
-    third_order_humidity_history_term, validate_ideal_loads_zone_equipment_dispatch,
+    classify_no_oa_sensible_subset, design_outdoor_air_volume_flow_components_m3_per_s,
+    energyplus_moist_air_density_kg_per_m3, ideal_loads_facility_meter_binding,
+    ideal_loads_zone_equipment_stages, load_epw_records, meter_rate_to_energy_j,
+    purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
+    sim_purchased_air_outdoor_air_compat, surface_area_m2, third_order_humidity_history_term,
+    validate_ideal_loads_zone_equipment_dispatch,
 };
 
 use crate::conformance_artifacts::{
@@ -5154,7 +5155,7 @@ fn moisture_predictor_summary(
         promoted_input: false,
         history_source: "EnergyPlus Zone Mean Air Humidity Ratio row lag plus warmup tail seeds WPrevZoneTS; promoted Humidistat branch values then use Rust closed-loop humidity history",
         latent_gain_source: "typed OtherEquipment design_level * fraction_latent * schedule; radiant-system, pool, people, infiltration, mixing, EMS, and fault latent terms are outside this diagnostic",
-        closed_loop_state_source: "promoted Humidistat branch and closed-loop diagnostic recompute humidity demand, source-order return humidity, and correctHumRat after the seeded history; EnergyPlus still supplies sensible demand, zone temperature trace, latent gain schedule, and pressure",
+        closed_loop_state_source: "ep_runtime::advance_no_oa_humidistat_zone_timestep_compat atomically owns each seeded fixed zone-timestep predictor, source-order SimPurchasedAir, correctHumRat, and humidity-history push transition; adaptive or multiple system substeps remain outside this boundary, and EnergyPlus still supplies warmup seed history, sensible demand, temperatures, latent gain schedule, relative-humidity schedules, and pressure",
         history_residual_source: "predictor residual divided by EnergyPlus ThirdOrder C coefficient and zone multiplier; includes any latent-gain, schedule, psychrometric, or WPrevZoneTSTemp mismatch as an equivalent humidity-history delta",
         humidifying_equivalent_history_delta_max: humidifying_history_term
             .row_lag_minus_inferred_max_abs_delta,
@@ -5306,84 +5307,77 @@ fn humidistat_closed_loop_comparisons(
     let mut zone_latent_cooling = Vec::with_capacity(sample_count);
     let mut supply_air_latent_heating = Vec::with_capacity(sample_count);
     let mut supply_air_latent_cooling = Vec::with_capacity(sample_count);
-    let mut zone_mean_humidity_history = oracle_zone_air_humidity_history(input.input_trace, 0);
-    let mut zone_air_humidity_history =
-        oracle_zone_air_humidity_ratio_history(input.input_trace, 0);
-    let zone_multiplier = input.zone_multiplier.max(1.0);
+    let mut closed_loop_state = NoOaHumidistatClosedLoopState::from_seed_histories(
+        oracle_zone_air_humidity_history(input.input_trace, 0),
+        oracle_zone_air_humidity_ratio_history(input.input_trace, 0),
+    );
 
     for index in 0..sample_count {
         let pressure = *input.barometric_pressure_trace.get(index).ok_or_else(|| {
             format!("IdealLoads Humidistat closed-loop missing pressure sample {index}")
         })?;
         let predictor_state = oracle_zone_predictor_state(input.input_trace, index);
-        let predictor_state = IdealLoadsZoneState {
-            air_temperature_c: predictor_state.air_temperature_c,
-            air_humidity_ratio: zone_air_humidity_history[0],
-        };
-        let predicted =
-            calc_no_oa_third_order_moisture_demand_compat(NoOaThirdOrderMoistureDemandInput {
-                zone_state: predictor_state,
-                previous_zone_timestep_humidity_ratios: zone_mean_humidity_history,
-                zone_volume_m3: input.zone_volume_m3,
-                zone_moisture_capacity_multiplier: input.zone_moisture_capacity_multiplier,
-                timestep_seconds: input.timestep_seconds,
-                barometric_pressure_pa: pressure,
-                latent_gain_w: input.latent_gain[index],
-                humidifying_relative_humidity_percent: input.humidifying_rh[index],
-                dehumidifying_relative_humidity_percent: input.dehumidifying_rh[index],
-                zone_multiplier,
-            })
-            .ok_or_else(|| {
-                format!("IdealLoads Humidistat closed-loop predictor rejected sample {index}")
-            })?;
-        humidifying.push(predicted.humidifying_setpoint_load_kg_per_s);
-        dehumidifying.push(predicted.dehumidifying_setpoint_load_kg_per_s);
-
         let active_demand = input.input_trace.active_demand.samples[index].value;
-        let mut demand = ZoneSysEnergyDemand::sensible_only(
+        let sensible_demand = ZoneSysEnergyDemand::sensible_only(
             input.zone.id,
             active_demand.max(0.0),
             active_demand.min(0.0),
         );
-        demand.remaining_output_req_to_humid_sp_kg_per_s =
-            predicted.humidifying_setpoint_load_kg_per_s;
-        demand.remaining_output_req_to_dehumid_sp_kg_per_s =
-            predicted.dehumidifying_setpoint_load_kg_per_s;
-
         let calc_temperature = if input.source_order_trace_uses_recirculation {
             input.input_trace.recirculation_node_temperature.samples[index].value
         } else {
             input.input_trace.zone_node_temperature.samples[index.saturating_sub(1)].value
         };
-        let calc_state = IdealLoadsZoneState {
-            air_temperature_c: calc_temperature,
-            air_humidity_ratio: zone_air_humidity_history[0],
-        };
-        let recirculation_state = if input.source_order_trace_uses_recirculation {
-            IdealLoadsZoneState {
-                air_temperature_c: input.input_trace.recirculation_node_temperature.samples[index]
-                    .value,
-                air_humidity_ratio: zone_air_humidity_history[0],
-            }
+        let recirculation_temperature = if input.source_order_trace_uses_recirculation {
+            input.input_trace.recirculation_node_temperature.samples[index].value
         } else {
-            calc_state
+            calc_temperature
         };
-        let purchased_air = sim_purchased_air_compat(SimPurchasedAirCompatInput {
-            system: input.system,
-            supply_node: input.supply_node,
-            zone_state: calc_state,
-            recirculation_state,
-            demand,
-            unit_available: true,
-            limit_context: input.limit_context.with_barometric_pressure_pa(pressure),
-        })
-        .map_err(|error| {
-            format!(
+
+        let step = advance_no_oa_humidistat_zone_timestep_compat(
+            &mut closed_loop_state,
+            NoOaHumidistatZoneTimestepInput {
+                system: input.system,
+                supply_node: input.supply_node,
+                sensible_demand,
+                predictor_zone_air_temperature_c: predictor_state.air_temperature_c,
+                purchased_air_zone_temperature_c: calc_temperature,
+                recirculation_air_temperature_c: recirculation_temperature,
+                corrector_zone_air_temperature_c: input.input_trace.zone_air_temperature.samples
+                    [index]
+                    .value,
+                zone_volume_m3: input.zone_volume_m3,
+                zone_moisture_capacity_multiplier: input.zone_moisture_capacity_multiplier,
+                zone_timestep_seconds: input.timestep_seconds,
+                barometric_pressure_pa: pressure,
+                latent_gain_w: input.latent_gain[index],
+                humidifying_relative_humidity_percent: input.humidifying_rh[index],
+                dehumidifying_relative_humidity_percent: input.dehumidifying_rh[index],
+                zone_multiplier: input.zone_multiplier,
+                unit_available: true,
+                limit_context: input.limit_context,
+            },
+        )
+        .map_err(|error| match error {
+            NoOaHumidistatZoneTimestepError::UnsupportedBranch(branch) => format!(
+                "IdealLoads Humidistat closed-loop rejected branch {branch:?} at sample {index}"
+            ),
+            NoOaHumidistatZoneTimestepError::MoisturePredictorRejected => {
+                format!("IdealLoads Humidistat closed-loop predictor rejected sample {index}")
+            }
+            NoOaHumidistatZoneTimestepError::PurchasedAir(error) => format!(
                 "IdealLoads Humidistat closed-loop rejected system {:?}: {:?}",
                 error.system_id, error.unsupported_features
-            )
+            ),
+            NoOaHumidistatZoneTimestepError::HumidityCorrectorRejected => {
+                format!("IdealLoads Humidistat closed-loop correctHumRat rejected sample {index}")
+            }
         })?;
-        let result = purchased_air.calculation;
+        let predicted = step.moisture_demand;
+        humidifying.push(predicted.humidifying_setpoint_load_kg_per_s);
+        dehumidifying.push(predicted.dehumidifying_setpoint_load_kg_per_s);
+
+        let result = step.purchased_air.calculation;
         results.push(result);
         supply_mass_flow.push(result.supply_mass_flow_rate_kg_per_s);
         supply_humidity.push(result.supply_humidity_ratio);
@@ -5391,38 +5385,7 @@ fn humidistat_closed_loop_comparisons(
         zone_latent_cooling.push(result.zone_latent_cooling_rate_w);
         supply_air_latent_heating.push(result.supply_air_latent_heating_rate_w);
         supply_air_latent_cooling.push(result.supply_air_latent_cooling_rate_w);
-
-        let corrector_state = IdealLoadsZoneState {
-            air_temperature_c: input.input_trace.zone_air_temperature.samples[index].value,
-            air_humidity_ratio: zone_air_humidity_history[0],
-        };
-        let corrected =
-            correct_no_oa_third_order_humidity_ratio_compat(NoOaThirdOrderHumidityCorrectorInput {
-                zone_state: corrector_state,
-                previous_zone_timestep_humidity_ratios: zone_mean_humidity_history,
-                zone_volume_m3: input.zone_volume_m3,
-                zone_moisture_capacity_multiplier: input.zone_moisture_capacity_multiplier,
-                timestep_seconds: input.timestep_seconds,
-                barometric_pressure_pa: pressure,
-                latent_gain_w: input.latent_gain[index],
-                supply_mass_flow_rate_kg_per_s: result.supply_mass_flow_rate_kg_per_s
-                    / zone_multiplier,
-                supply_humidity_ratio: result.supply_humidity_ratio,
-            })
-            .ok_or_else(|| {
-                format!("IdealLoads Humidistat closed-loop correctHumRat rejected sample {index}")
-            })?;
-        corrected_zone_humidity.push(corrected.zone_air_humidity_ratio);
-        zone_air_humidity_history = [
-            corrected.zone_air_humidity_ratio,
-            zone_air_humidity_history[0],
-            zone_air_humidity_history[1],
-        ];
-        zone_mean_humidity_history = [
-            corrected.zone_air_humidity_ratio,
-            zone_mean_humidity_history[0],
-            zone_mean_humidity_history[1],
-        ];
+        corrected_zone_humidity.push(step.humidity_correction.zone_air_humidity_ratio);
     }
 
     let mut comparisons = Vec::new();

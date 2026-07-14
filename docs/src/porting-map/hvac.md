@@ -325,11 +325,18 @@ humidity rows, annual meter rows, fully owned moisture-history closure, and
 broad meter behavior as diagnostic proof only; the
 hourly, monthly, and run-period `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
-The report now includes a diagnostic Rust closed-loop humidity table that
-combines the ported no-OA ThirdOrder predictor, `SimPurchasedAir`, and the
-ported `correctHumRat` subset. That table is for isolating remaining
-`WPrevZoneTSTemp` warmup/system-history residuals and is not used as the
-promoted Humidistat input.
+The seeded closed-loop ThirdOrder predictor and `SimPurchasedAir` results are
+the promoted calculation path and moisture-demand rows for this declared
+candidate. The corrected zone-humidity and history-residual comparisons remain
+diagnostic evidence for isolating `WPrevZoneTSTemp` warmup/system-history
+differences; the path is still seeded and forced by EnergyPlus trace inputs and
+is not a standalone Humidistat simulation.
+The seeded fixed zone-timestep predictor-to-corrector transition and both
+humidity-history pushes are owned atomically by
+`ep_runtime::advance_no_oa_humidistat_zone_timestep_compat`. Adaptive or
+multiple system substeps remain outside this boundary. EnergyPlus trace data
+still supplies the initial histories and timestep forcing, so this ownership
+change does not promote fully standalone history closure.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares
@@ -351,9 +358,11 @@ humidity rows, annual meter rows, fully owned moisture-history closure, and
 broad meter behavior as diagnostic proof only; the
 hourly, monthly, and run-period `DistrictHeatingWater:Facility` and
 `DistrictCooling:Facility` meters are conformance rows.
-The report includes the same diagnostic Rust closed-loop humidity table for
-humidification; promotion still waits on non-oracle warmup/system-history
-closure for `WPrevZoneTSTemp`.
+The report uses the same seeded closed-loop predictor and `SimPurchasedAir`
+results as the promoted humidification calculation path. Its corrected
+zone-humidity and history-residual comparisons remain diagnostic, and broader
+promotion still waits on non-oracle warmup/system-history closure for
+`WPrevZoneTSTemp`.
 
 The compare run has `comparison_class = "conformance"`, `conformance_claim =
 true`, `tolerance_policy: conformance-gate`, and `status: pass`. It compares

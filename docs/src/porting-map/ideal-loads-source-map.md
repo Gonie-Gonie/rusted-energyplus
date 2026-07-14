@@ -274,15 +274,23 @@ dehumidification supply mass flow, supply humidity ratio, and cooling report
 rows with zero tolerance failures. The original
 `ideal_loads_humidistat_dehumidification_diagnostic_001` remains available as
 non-claim regression/proof evidence for the broader diagnostic output set.
-The compare report also records a diagnostic Rust closed-loop humidity pass
-through the ported no-OA ThirdOrder moisture-demand predictor, `SimPurchasedAir`,
-and the ported `correctHumRat` subset. That table remains diagnostic evidence
-for fully owned zone-moisture history closure; the promoted comparison is still
-trace-driven, not a broad standalone Humidistat simulation claim.
+The seeded closed-loop ThirdOrder predictor and `SimPurchasedAir` results feed
+the promoted calculation and moisture-demand rows. The accompanying corrected
+zone-humidity and history-residual comparisons remain diagnostic evidence for
+fully owned zone-moisture history closure. The promoted path is still
+trace-seeded and trace-forced, not a broad standalone Humidistat simulation
+claim.
 The ThirdOrder coefficient evaluation is shared through
 `ep_runtime::third_order_humidity_history_term` by the predictor, corrector,
 and CLI residual diagnostic; the history samples and closure remain
 trace-driven and this ownership cleanup does not widen the claim.
+`ep_runtime::advance_no_oa_humidistat_zone_timestep_compat` now owns each seeded
+fixed zone-timestep predictor, moisture-demand injection, `SimPurchasedAir`,
+`correctHumRat`, and history-push transition atomically. Adaptive or multiple
+system substeps remain outside this boundary. The CLI still adapts EnergyPlus
+warmup seed histories, sensible load, temperatures, latent gain, RH schedules,
+and pressure, then compares returned runtime values; this does not widen the
+claim.
 
 `ideal_loads_humidistat_humidification_conformance_candidate_001` promotes the
 matching no-OA Humidistat humidification lane for declared thermostat,
@@ -297,10 +305,10 @@ clamp, and matches the supply humidity and heating report rows with zero
 tolerance failures. The original
 `ideal_loads_humidistat_humidification_diagnostic_001` remains available as
 non-claim regression/proof evidence for the broader diagnostic output set.
-The compare report also records the same diagnostic Rust closed-loop humidity
-pass for the humidification fixture; that diagnostic table is not the promoted
-claim until the zone-moisture history is reproduced without EnergyPlus trace
-state.
+The compare path uses the same seeded closed-loop predictor and
+`SimPurchasedAir` results for promoted humidification rows. Corrected
+zone-humidity and history-residual comparisons remain diagnostic until the
+zone-moisture history is reproduced without EnergyPlus trace state.
 
 These remain diagnostic-only: fully owned Humidistat schedule-to-moisture-demand
 calculation without EnergyPlus trace state/history, `WPrevZoneTSTemp`
