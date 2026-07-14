@@ -34,6 +34,27 @@ pub(super) fn render_outdoor_air_summary_json(
     ));
     json.push_str("  \"timestamp_rule\": \"EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\",\n");
     json.push_str(&format!(
+        "  \"timestep_source\": {},\n",
+        json_string(context.timestep.source)
+    ));
+    json.push_str(&format!(
+        "  \"nominal_system_timestep_substeps\": {},\n",
+        json_number(context.timestep.nominal_system_timestep_substeps)
+    ));
+    json.push_str(&format!(
+        "  \"nominal_system_timestep_seconds\": {},\n",
+        json_number(context.timestep.nominal_system_timestep_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"zone_timestep_seconds\": {},\n",
+        json_number(context.timestep.zone_timestep_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"adaptive_system_timestep_claim\": {},\n",
+        context.timestep.adaptive_system_timestep_claim
+    ));
+    json.push_str("  \"sample_timestep_source\": \"ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback\",\n");
+    json.push_str(&format!(
         "  \"source_order_wrapper\": {},\n",
         json_string(IDEAL_LOADS_OUTDOOR_AIR_SOURCE_ORDER_WRAPPER)
     ));

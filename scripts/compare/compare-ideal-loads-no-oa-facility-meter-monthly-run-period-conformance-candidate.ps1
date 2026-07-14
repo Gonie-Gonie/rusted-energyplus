@@ -302,14 +302,23 @@ if (@($energyRows | Where-Object { $_.level -ne "diagnostic" -or $_.units -ne "J
     throw "IdealLoads energy rows must remain diagnostic joule rows"
 }
 
-if ([Math]::Abs([double]$summary.system_timestep_substeps - 8.0) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads system timestep substeps: $($summary.system_timestep_substeps)"
+if ($summary.timestep_source -ne "ep_runtime::TimeAxis") {
+    throw "Unexpected IdealLoads timestep source: $($summary.timestep_source)"
 }
-if ([Math]::Abs([double]$summary.system_timestep_seconds - 112.5) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads system timestep seconds: $($summary.system_timestep_seconds)"
+if ([Math]::Abs([double]$summary.nominal_system_timestep_substeps - 1.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads nominal system timestep substeps: $($summary.nominal_system_timestep_substeps)"
 }
-if ([Math]::Abs([double]$summary.energy_report_interval_seconds - 900.0) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads energy report interval seconds: $($summary.energy_report_interval_seconds)"
+if ([Math]::Abs([double]$summary.nominal_system_timestep_seconds - 900.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads nominal system timestep seconds: $($summary.nominal_system_timestep_seconds)"
+}
+if ([Math]::Abs([double]$summary.zone_timestep_seconds - 900.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads zone timestep seconds: $($summary.zone_timestep_seconds)"
+}
+if ($summary.adaptive_system_timestep_claim -ne $false) {
+    throw "IdealLoads report must not claim adaptive system timestep behavior"
+}
+if ($summary.sample_timestep_source -ne "ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback") {
+    throw "Unexpected IdealLoads sample timestep source: $($summary.sample_timestep_source)"
 }
 if ($summary.rust_meter_time_series_comparison -ne $true) {
     throw "IdealLoads meter requests must compare Rust monthly/annual/run-period facility meter series"

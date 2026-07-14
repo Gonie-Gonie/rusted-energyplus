@@ -40,6 +40,15 @@ source anchors:
   out-of-claim IdealLoads sizing semantics; autosized IdealLoads flow/capacity
   conformance remains outside the current claim.
 
+`crates/ep_cli/src/ideal_loads/case_adapter/time_axis.rs` adapts the shared
+`ep_runtime::TimeAxis` nominal zone/system timestep metadata and ESO sample
+start/end timestamps for the comparison harness. It restores integer TimeAxis
+subdivisions when the difference is within ESO's two-decimal-minute display
+precision, keeps other valid durations unchanged, and falls back to the nominal
+zone timestep for missing or invalid timestamps. The adapter explicitly keeps
+adaptive system timestep behavior outside the current claim; it does not
+implement `SystemTimeStepState`.
+
 autosized IdealLoads flow/capacity conformance remains outside the current
 claim; `SizePurchasedAir` is represented by the runtime policy constant
 `IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY`, and arbitrary-run compatibility blocks

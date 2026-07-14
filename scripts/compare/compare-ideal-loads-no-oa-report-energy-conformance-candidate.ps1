@@ -239,7 +239,7 @@ if ($summary.series_count -ne 28) {
 if ($summary.meter_source -ne "EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic") {
     throw "Unexpected meter source: $($summary.meter_source)"
 }
-if ($summary.energy_source -ne "EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; declared non-fuel energy conformance fixed 8-substep fixture branch") {
+if ($summary.energy_source -ne "EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; declared non-fuel energy conformance") {
     throw "Unexpected energy source: $($summary.energy_source)"
 }
 if ($summary.energy_output_level_policy -ne "conformance for declared no-OA non-fuel ReportPurchasedAir energy rows only") {
@@ -319,14 +319,23 @@ if (@($fuelEnergyRows | Where-Object { $_.level -ne "diagnostic" -or $_.rust_sou
     throw "Fuel energy rows must remain diagnostic blank fuel-efficiency TimeStepSysSec rows"
 }
 
-if ([Math]::Abs([double]$summary.system_timestep_substeps - 8.0) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads system timestep substeps: $($summary.system_timestep_substeps)"
+if ($summary.timestep_source -ne "ep_runtime::TimeAxis") {
+    throw "Unexpected IdealLoads timestep source: $($summary.timestep_source)"
 }
-if ([Math]::Abs([double]$summary.system_timestep_seconds - 112.5) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads system timestep seconds: $($summary.system_timestep_seconds)"
+if ([Math]::Abs([double]$summary.nominal_system_timestep_substeps - 1.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads nominal system timestep substeps: $($summary.nominal_system_timestep_substeps)"
 }
-if ([Math]::Abs([double]$summary.energy_report_interval_seconds - 900.0) -gt 1.0e-9) {
-    throw "Unexpected IdealLoads energy report interval seconds: $($summary.energy_report_interval_seconds)"
+if ([Math]::Abs([double]$summary.nominal_system_timestep_seconds - 900.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads nominal system timestep seconds: $($summary.nominal_system_timestep_seconds)"
+}
+if ([Math]::Abs([double]$summary.zone_timestep_seconds - 900.0) -gt 1.0e-9) {
+    throw "Unexpected IdealLoads zone timestep seconds: $($summary.zone_timestep_seconds)"
+}
+if ($summary.adaptive_system_timestep_claim -ne $false) {
+    throw "IdealLoads report must not claim adaptive system timestep behavior"
+}
+if ($summary.sample_timestep_source -ne "ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback") {
+    throw "Unexpected IdealLoads sample timestep source: $($summary.sample_timestep_source)"
 }
 if ($summary.rust_meter_time_series_comparison -ne $true) {
     throw "IdealLoads meter requests must compare Rust hourly facility meter series"
@@ -458,7 +467,13 @@ Assert-Contains -Text $reportText -Pattern "rate_output_source: ReportPurchasedA
 Assert-Contains -Text $reportText -Pattern "energy_output_timestep_source: ReportPurchasedAir rate * TimeStepSysSec" -Description "markdown energy output timestep source"
 Assert-Contains -Text $reportText -Pattern "energy_output_level_policy: conformance for declared no-OA non-fuel ReportPurchasedAir energy rows only" -Description "markdown energy output level policy"
 Assert-Contains -Text $reportText -Pattern "fuel_energy_output_level_policy: diagnostic-only until fuel-efficiency path is separately proven" -Description "markdown fuel energy output level policy"
-Assert-Contains -Text $reportText -Pattern "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; declared non-fuel energy conformance fixed_system_substeps=8 system_timestep_seconds=112.500000000000 energy_report_interval_seconds=900.000000000000" -Description "markdown energy source"
+Assert-Contains -Text $reportText -Pattern "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; declared non-fuel energy conformance" -Description "markdown energy source"
+Assert-Contains -Text $reportText -Pattern "timestep_source: ep_runtime::TimeAxis" -Description "markdown timestep source"
+Assert-Contains -Text $reportText -Pattern "nominal_system_timestep_substeps: 1" -Description "markdown nominal system timestep substeps"
+Assert-Contains -Text $reportText -Pattern "nominal_system_timestep_seconds: 900.000000000000" -Description "markdown nominal system timestep seconds"
+Assert-Contains -Text $reportText -Pattern "zone_timestep_seconds: 900.000000000000" -Description "markdown zone timestep seconds"
+Assert-Contains -Text $reportText -Pattern "adaptive_system_timestep_claim: false" -Description "markdown adaptive system timestep boundary"
+Assert-Contains -Text $reportText -Pattern "sample_timestep_source: ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback" -Description "markdown sample timestep source"
 Assert-Contains -Text $reportText -Pattern "meter_source: EnergyPlus Output:Meter hourly MTR vs Rust aggregated fuel-energy diagnostic; rust_meter_time_series_comparison=true requested_meters=2" -Description "markdown meter source"
 Assert-Contains -Text $reportText -Pattern "meter_aggregation_source: ep_runtime::RuntimeMeterRegistry" -Description "markdown meter aggregation source"
 Assert-Contains -Text $reportText -Pattern "meter_fuel_energy_binding_source: ep_runtime::ideal_loads_facility_meter_binding" -Description "markdown meter fuel-energy binding source"

@@ -153,12 +153,17 @@ and mass flow, plus hourly `DistrictHeatingWater:Facility` and
 command writes matching Rust `ResultStore` series for 28 Detailed output rows
 over 110 samples. The 10 declared conformance rows are tolerance-gated; the
 remaining rows are diagnostic proof only. Energy rows use the EnergyPlus
-`ReportPurchasedAir` raw `rate * TimeStepSysSec` branch with a fixed
-8-substep, 112.5 s system timestep in this fixture, then the `OutputProcessor`
-`Sum` report interval emits the 900 s zone-timestep total. Fuel energy rows in
-this conformance fixture use the blank fuel-efficiency schedule branch. The
-facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy
-diagnostics only in this sensible case; adaptive system timestep,
+`ReportPurchasedAir` raw `rate * TimeStepSysSec` branch and the
+`OutputProcessor` `Sum` report interval. Rust obtains the 900 s nominal
+zone/system timestep and nominal count of one from `ep_runtime::TimeAxis`, and
+uses each ESO sample's start/end duration. Because ESO minutes are printed to
+two decimals, a duration within that display precision of an integer TimeAxis
+subdivision is restored to the exact subdivision; other valid durations remain
+unchanged, with the nominal zone timestep as the missing/invalid fallback. Fuel
+energy rows in this conformance fixture use the blank fuel-efficiency schedule
+branch. The facility meters are
+hourly oracle-MTR vs Rust aggregated fuel-energy diagnostics only in this
+sensible case; adaptive system timestep,
 monthly/annual/run-period facility meter aggregation, and broad meter
 conformance remain outside the claim.
 Fuel-efficiency conformance is claimed only by the separate

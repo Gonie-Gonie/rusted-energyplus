@@ -4,6 +4,7 @@
     clippy::type_complexity
 )]
 
+mod case_adapter;
 mod commands;
 mod reports;
 
@@ -12,6 +13,11 @@ pub(crate) use commands::{
 };
 
 use reports::write_outdoor_air_artifacts;
+
+use case_adapter::{
+    IdealLoadsTimestepContext, ideal_loads_sample_timestep_hours,
+    ideal_loads_sample_timestep_seconds, ideal_loads_timestep_context,
+};
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -129,8 +135,6 @@ const ZONE_SYSTEM_PREDICTED_HEATING_LOAD: &str =
     "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate";
 const ZONE_SYSTEM_PREDICTED_COOLING_LOAD: &str =
     "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate";
-const IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS: f64 = 8.0;
-const IDEAL_LOADS_OUTDOOR_AIR_SYSTEM_SUBSTEPS: f64 = 8.0;
 const IDEAL_LOADS_OUTDOOR_AIR_FLOW_ZONE_CONFORMANCE_CASE_ID: &str =
     "ideal_loads_outdoor_air_flow_zone_conformance_candidate_001";
 const IDEAL_LOADS_OUTDOOR_AIR_FLOW_PERSON_CONFORMANCE_CASE_ID: &str =
@@ -348,8 +352,7 @@ struct IdealLoadsDiagnosticContext<'a> {
     recirculation_node_name: Option<String>,
     system_name: String,
     supply_node_name: String,
-    system_timestep_seconds: f64,
-    energy_report_interval_seconds: f64,
+    timestep: IdealLoadsTimestepContext,
     fuel_efficiency: IdealLoadsFuelEfficiencyContext,
     rows: Vec<IdealLoadsDiagnosticRow>,
     meter_rows: Vec<IdealLoadsMeterDiagnosticRow>,
@@ -515,6 +518,7 @@ struct IdealLoadsOutdoorAirDiagnosticContext<'a> {
     outdoor_air_mass_flow_rate_kg_per_s: f64,
     outdoor_air_mass_flow_rate_min_kg_per_s: f64,
     outdoor_air_mass_flow_rate_max_kg_per_s: f64,
+    timestep: IdealLoadsTimestepContext,
     sample_count: usize,
     rows: Vec<IdealLoadsDiagnosticRow>,
     result_store: ResultStore,
@@ -1433,6 +1437,7 @@ fn build_outdoor_air_design_flow_context<'a>(
             .join("; ")
     })?;
     let model = SimulationModel::from_typed(typed);
+    let timestep = ideal_loads_timestep_context(&model.typed)?;
     if model.typed.zones.len() != 1 {
         return Err(format!(
             "IdealLoads outdoor-air design-flow report requires one zone, got {}",
@@ -1735,7 +1740,7 @@ fn build_outdoor_air_design_flow_context<'a>(
     let (outdoor_air_mass_flow_rate_min_kg_per_s, outdoor_air_mass_flow_rate_max_kg_per_s) =
         finite_min_max(&outdoor_air_mass_flow_rates);
 
-    let zone_timestep_hours = ideal_loads_energy_report_interval_seconds(&model) / 3600.0;
+    let zone_timestep_hours = timestep.zone_timestep_seconds / 3600.0;
     let sample_timestep_hours = expected_series
         .first()
         .map(|series| {
@@ -1744,7 +1749,7 @@ fn build_outdoor_air_design_flow_context<'a>(
                 .iter()
                 .take(sample_count)
                 .map(|sample| {
-                    ideal_loads_outdoor_air_sample_timestep_hours(
+                    ideal_loads_sample_timestep_hours(
                         sample.timestamp.as_deref(),
                         zone_timestep_hours,
                     )
@@ -1904,6 +1909,7 @@ fn build_outdoor_air_design_flow_context<'a>(
         outdoor_air_mass_flow_rate_kg_per_s: outdoor_air_design_mass_flow_rate_kg_per_s,
         outdoor_air_mass_flow_rate_min_kg_per_s,
         outdoor_air_mass_flow_rate_max_kg_per_s,
+        timestep,
         sample_count,
         rows,
         result_store,
@@ -2718,6 +2724,7 @@ fn build_context<'a>(
             .join("; ")
     })?;
     let model = SimulationModel::from_typed(typed);
+    let timestep = ideal_loads_timestep_context(&model.typed)?;
     if model.typed.zones.len() != 1 {
         return Err(format!(
             "IdealLoads no-OA report requires one zone, got {}",
@@ -2841,8 +2848,6 @@ fn build_context<'a>(
         &zone_air_node.name.0,
         recirculation_node_name.as_deref(),
     )?;
-    let system_timestep_seconds = ideal_loads_system_timestep_seconds(&model);
-    let energy_report_interval_seconds = ideal_loads_energy_report_interval_seconds(&model);
     let fuel_efficiency = ideal_loads_fuel_efficiency_context(&model, system, &input_trace)?;
     let mtr = baseline.output_dir.join("eplusout.mtr");
     let (rows, meter_rows, result_store, mode_counts, moisture_predictor) = evaluate_rows(
@@ -2857,7 +2862,7 @@ fn build_context<'a>(
         recirculation_node_name.as_deref(),
         &system.name.0,
         &supply_node.name.0,
-        energy_report_interval_seconds,
+        timestep.zone_timestep_seconds,
         fuel_efficiency.clone(),
     )?;
 
@@ -2902,8 +2907,7 @@ fn build_context<'a>(
         recirculation_node_name,
         system_name,
         supply_node_name,
-        system_timestep_seconds,
-        energy_report_interval_seconds,
+        timestep,
         fuel_efficiency,
         rows,
         meter_rows,
@@ -3019,37 +3023,6 @@ fn load_input_trace(
         humidifying_moisture_demand,
         dehumidifying_moisture_demand,
     })
-}
-
-fn ideal_loads_system_timestep_seconds(model: &SimulationModel) -> f64 {
-    let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
-    3600.0 / f64::from(zone_timesteps_per_hour) / IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS
-}
-
-fn ideal_loads_energy_report_interval_seconds(model: &SimulationModel) -> f64 {
-    let zone_timesteps_per_hour = model.typed.timestep.number_of_timesteps_per_hour.max(1);
-    3600.0 / f64::from(zone_timesteps_per_hour)
-}
-
-fn ideal_loads_outdoor_air_sample_timestep_hours(
-    timestamp: Option<&str>,
-    zone_timestep_hours: f64,
-) -> f64 {
-    let Some(timestamp) = timestamp else {
-        return zone_timestep_hours;
-    };
-    let Some(start_minute) = timestamp_numeric_field(timestamp, "start") else {
-        return zone_timestep_hours;
-    };
-    let Some(end_minute) = timestamp_numeric_field(timestamp, "end") else {
-        return zone_timestep_hours;
-    };
-    let duration_hours = (end_minute - start_minute) / 60.0;
-    if duration_hours > 0.0 && duration_hours < zone_timestep_hours * 0.75 {
-        zone_timestep_hours / IDEAL_LOADS_OUTDOOR_AIR_SYSTEM_SUBSTEPS
-    } else {
-        zone_timestep_hours
-    }
 }
 
 fn timestamp_numeric_field(timestamp: &str, field_name: &str) -> Option<f64> {
@@ -3175,7 +3148,7 @@ fn evaluate_rows(
     recirculation_node_name: Option<&str>,
     system_name: &str,
     supply_node_name: &str,
-    energy_report_interval_seconds: f64,
+    nominal_zone_timestep_seconds: f64,
     fuel_efficiency: IdealLoadsFuelEfficiencyContext,
 ) -> Result<
     (
@@ -3225,6 +3198,7 @@ fn evaluate_rows(
         limit_context,
         &barometric_pressure_trace,
         source_order_trace_uses_recirculation,
+        nominal_zone_timestep_seconds,
     )?;
     let promote_moisture_predictor = moisture_predictor.is_some()
         && manifest_promotes_humidistat_moisture_predictor(manifest, system);
@@ -3629,7 +3603,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_ENERGY,
             energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |result| result.supply_air_total_heating_rate_w,
         );
         add_result_energy_series(
@@ -3639,7 +3613,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,
             energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |result| result.supply_air_total_cooling_rate_w,
         );
         add_result_energy_series(
@@ -3649,7 +3623,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
             energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |result| result.zone_total_heating_rate_w,
         );
         add_result_energy_series(
@@ -3659,7 +3633,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
             energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |result| result.zone_total_cooling_rate_w,
         );
     }
@@ -3713,7 +3687,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_HEATING_FUEL_ENERGY,
             fuel_energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |index, result| {
                 result.supply_air_total_heating_rate_w / fuel_efficiency.heating_at(index)
             },
@@ -3725,7 +3699,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_FUEL_ENERGY,
             fuel_energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |index, result| {
                 result.supply_air_total_cooling_rate_w / fuel_efficiency.cooling_at(index)
             },
@@ -3737,7 +3711,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_HEATING_FUEL_ENERGY,
             fuel_energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |index, result| result.zone_total_heating_rate_w / fuel_efficiency.heating_at(index),
         );
         add_result_energy_series_indexed(
@@ -3747,7 +3721,7 @@ fn evaluate_rows(
             ZONE_IDEAL_LOADS_ZONE_COOLING_FUEL_ENERGY,
             fuel_energy_source,
             &timestamps,
-            energy_report_interval_seconds,
+            nominal_zone_timestep_seconds,
             |index, result| result.zone_total_cooling_rate_w / fuel_efficiency.cooling_at(index),
         );
     }
@@ -5011,6 +4985,7 @@ fn moisture_predictor_summary(
     limit_context: IdealLoadsSensibleLimitContext,
     barometric_pressure_trace: &[f64],
     source_order_trace_uses_recirculation: bool,
+    timestep_seconds: f64,
 ) -> Result<Option<IdealLoadsMoisturePredictorSummary>, String> {
     if !uses_humidistat_control(system) {
         return Ok(None);
@@ -5075,7 +5050,6 @@ fn moisture_predictor_summary(
     })?;
     let zone_moisture_capacity_multiplier = 1.0;
     let zone_multiplier = f64::from(zone.multiplier.max(1));
-    let timestep_seconds = ideal_loads_energy_report_interval_seconds(model);
     let mut humidifying = Vec::with_capacity(input_trace.sample_count);
     let mut dehumidifying = Vec::with_capacity(input_trace.sample_count);
     for index in 0..input_trace.sample_count {
@@ -5772,7 +5746,7 @@ fn add_result_energy_series(
         .copied()
         .enumerate()
         .map(|(index, result)| {
-            let interval_seconds = energy_report_seconds_from_timestamp(
+            let interval_seconds = ideal_loads_sample_timestep_seconds(
                 timestamps
                     .get(index)
                     .and_then(|timestamp| timestamp.as_deref()),
@@ -5802,7 +5776,7 @@ fn add_result_energy_series_indexed(
         .copied()
         .enumerate()
         .map(|(index, result)| {
-            let interval_seconds = energy_report_seconds_from_timestamp(
+            let interval_seconds = ideal_loads_sample_timestep_seconds(
                 timestamps
                     .get(index)
                     .and_then(|timestamp| timestamp.as_deref()),
@@ -5815,42 +5789,6 @@ fn add_result_energy_series_indexed(
         (key.to_string(), variable.to_string()),
         ObservedSeries::new(source, "J", values),
     );
-}
-
-fn energy_report_seconds_from_timestamp(
-    timestamp: Option<&str>,
-    default_report_interval_seconds: f64,
-) -> f64 {
-    let Some(timestamp) = timestamp else {
-        return default_report_interval_seconds;
-    };
-    let mut start_minutes = None;
-    let mut end_minutes = None;
-    for field in timestamp.split(';') {
-        let Some((key, value)) = field.split_once('=') else {
-            continue;
-        };
-        if key.eq_ignore_ascii_case("start") {
-            start_minutes = value.trim().parse::<f64>().ok();
-        } else if key.eq_ignore_ascii_case("end") {
-            end_minutes = value.trim().parse::<f64>().ok();
-        }
-    }
-    let (Some(start_minutes), Some(end_minutes)) = (start_minutes, end_minutes) else {
-        return default_report_interval_seconds;
-    };
-    let duration_minutes = end_minutes - start_minutes;
-    if duration_minutes <= 0.0 || !duration_minutes.is_finite() {
-        return default_report_interval_seconds;
-    }
-    let default_report_interval_minutes = default_report_interval_seconds / 60.0;
-    if default_report_interval_minutes <= 0.0 || !default_report_interval_minutes.is_finite() {
-        return default_report_interval_seconds;
-    }
-    let substeps = (default_report_interval_minutes / duration_minutes)
-        .round()
-        .max(1.0);
-    default_report_interval_seconds / substeps
 }
 
 fn values_from_samples(samples: &[SeriesSample], sample_count: usize) -> Vec<f64> {
@@ -6085,12 +6023,27 @@ fn render_markdown(context: &IdealLoadsDiagnosticContext<'_>) -> String {
         context.fuel_efficiency.heating, context.fuel_efficiency.cooling
     ));
     report.push_str(&format!(
-        "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; {} fixed_system_substeps={:.0} system_timestep_seconds={:.12} energy_report_interval_seconds={:.12}\n",
-        report_energy_source_policy(context),
-        IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS,
-        context.system_timestep_seconds,
-        context.energy_report_interval_seconds
+        "energy_source: EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; {}\n",
+        report_energy_source_policy(context)
     ));
+    report.push_str(&format!("timestep_source: {}\n", context.timestep.source));
+    report.push_str(&format!(
+        "nominal_system_timestep_substeps: {:.0}\n",
+        context.timestep.nominal_system_timestep_substeps
+    ));
+    report.push_str(&format!(
+        "nominal_system_timestep_seconds: {:.12}\n",
+        context.timestep.nominal_system_timestep_seconds
+    ));
+    report.push_str(&format!(
+        "zone_timestep_seconds: {:.12}\n",
+        context.timestep.zone_timestep_seconds
+    ));
+    report.push_str(&format!(
+        "adaptive_system_timestep_claim: {}\n",
+        context.timestep.adaptive_system_timestep_claim
+    ));
+    report.push_str("sample_timestep_source: ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback\n");
     report.push_str(&format!(
         "rate_output_source: {}\n",
         IDEAL_LOADS_RATE_OUTPUT_SOURCE
@@ -6731,7 +6684,7 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     json.push_str(&format!(
         "  \"energy_source\": {},\n",
         json_string(&format!(
-            "EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; {} fixed 8-substep fixture branch",
+            "EnergyPlus ReportPurchasedAir raw rate * TimeStepSysSec summed by OutputProcessor; {}",
             report_energy_source_policy(context)
         ))
     ));
@@ -6811,17 +6764,26 @@ fn render_summary_json(context: &IdealLoadsDiagnosticContext<'_>) -> String {
     }
     json.push_str("  ],\n");
     json.push_str(&format!(
-        "  \"system_timestep_substeps\": {},\n",
-        json_number(IDEAL_LOADS_NO_OA_ENERGY_SYSTEM_SUBSTEPS)
+        "  \"timestep_source\": {},\n",
+        json_string(context.timestep.source)
     ));
     json.push_str(&format!(
-        "  \"system_timestep_seconds\": {},\n",
-        json_number(context.system_timestep_seconds)
+        "  \"nominal_system_timestep_substeps\": {},\n",
+        json_number(context.timestep.nominal_system_timestep_substeps)
     ));
     json.push_str(&format!(
-        "  \"energy_report_interval_seconds\": {},\n",
-        json_number(context.energy_report_interval_seconds)
+        "  \"nominal_system_timestep_seconds\": {},\n",
+        json_number(context.timestep.nominal_system_timestep_seconds)
     ));
+    json.push_str(&format!(
+        "  \"zone_timestep_seconds\": {},\n",
+        json_number(context.timestep.zone_timestep_seconds)
+    ));
+    json.push_str(&format!(
+        "  \"adaptive_system_timestep_claim\": {},\n",
+        context.timestep.adaptive_system_timestep_claim
+    ));
+    json.push_str("  \"sample_timestep_source\": \"ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback\",\n");
     json.push_str("  \"zone_demand_synthetic_rc_model\": false,\n");
     json.push_str(&format!(
         "  \"zone\": {},\n",

@@ -143,6 +143,18 @@ if ($summary.series_count -ne 22) {
 if ($summary.samples -ne 96) {
     throw "Unexpected IdealLoads outdoor-air sample count: $($summary.samples)"
 }
+if ($summary.timestep_source -ne "ep_runtime::TimeAxis") {
+    throw "Unexpected IdealLoads timestep source: $($summary.timestep_source)"
+}
+Assert-NearlyEqual -Actual $summary.nominal_system_timestep_substeps -Expected 1.0 -Tolerance 0.000000001 -Description "nominal system timestep substeps"
+Assert-NearlyEqual -Actual $summary.nominal_system_timestep_seconds -Expected 900.0 -Tolerance 0.000000001 -Description "nominal system timestep seconds"
+Assert-NearlyEqual -Actual $summary.zone_timestep_seconds -Expected 900.0 -Tolerance 0.000000001 -Description "zone timestep seconds"
+if ($summary.adaptive_system_timestep_claim -ne $false) {
+    throw "IdealLoads outdoor-air report must not claim adaptive system timestep behavior"
+}
+if ($summary.sample_timestep_source -ne "ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback") {
+    throw "Unexpected IdealLoads sample timestep source: $($summary.sample_timestep_source)"
+}
 Assert-NearlyEqual -Actual $summary.design_volume_flow_rate_m3_per_s -Expected 0.05 -Tolerance 0.000000000001 -Description "outdoor-air Sum final design volume flow"
 if ($summary.zone_volume_m3 -ne 1.0) {
     throw "Unexpected outdoor-air zone volume: $($summary.zone_volume_m3)"
@@ -359,6 +371,12 @@ Assert-NearlyEqual -Actual $stageSummary.outdoor_air_air_changes_m3_per_s -Expec
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Sum branch for declared variables only" -Description "markdown claim boundary"
+Assert-Contains -Text $reportText -Pattern "timestep_source: ep_runtime::TimeAxis" -Description "markdown timestep source"
+Assert-Contains -Text $reportText -Pattern "nominal_system_timestep_substeps: 1" -Description "markdown nominal system timestep substeps"
+Assert-Contains -Text $reportText -Pattern "nominal_system_timestep_seconds: 900.000000000000" -Description "markdown nominal system timestep seconds"
+Assert-Contains -Text $reportText -Pattern "zone_timestep_seconds: 900.000000000000" -Description "markdown zone timestep seconds"
+Assert-Contains -Text $reportText -Pattern "adaptive_system_timestep_claim: false" -Description "markdown adaptive system timestep boundary"
+Assert-Contains -Text $reportText -Pattern "sample_timestep_source: ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback" -Description "markdown sample timestep source"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat" -Description "markdown source-order wrapper"
 Assert-Contains -Text $reportText -Pattern "ideal_loads_invocation_path: zone-equipment-validated source-order PurchasedAir wrapper" -Description "markdown IdealLoads invocation path"
 Assert-Contains -Text $reportText -Pattern "direct_calc_helper_invocation: false" -Description "markdown direct calc helper invocation"

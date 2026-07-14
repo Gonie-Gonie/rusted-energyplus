@@ -13,7 +13,7 @@ notes = [
   "IdealLoads rate, latent report, and node comparisons use Detailed output to avoid false deltas from zone-timestep averaging of nonlinear mass-flow and enthalpy formulas.",
   "Zone System Predicted Sensible Load to Setpoint is the active signed demand input; heating/cooling setpoint loads remain diagnostic proof inputs for ZoneSysEnergyDemand.",
   "Mass-flow comparison uses the source-order pre-update zone air node state; same-timestamp zone air node outputs are diagnostic proof rows.",
-  "Energy and fuel energy rows are diagnostic-only proof for the ReportPurchasedAir rate-to-TimeStepSysSec fixed 8-substep fixture branch and blank fuel-efficiency branch.",
+  "Energy and fuel energy rows are diagnostic-only proof for the ReportPurchasedAir rate-to-TimeStepSysSec and blank fuel-efficiency branches; nominal timestep metadata comes from ep_runtime::TimeAxis and adaptive system timestep behavior remains outside the claim.",
   "DistrictHeatingWater:Facility and DistrictCooling:Facility meters are hourly oracle-MTR vs Rust aggregated fuel-energy diagnostics only; non-unity efficiency schedules remain diagnostic-only, and broad meter conformance remains outside the claim."
 ]
 

@@ -44,6 +44,15 @@ pub struct SystemTimestepAxis {
     pub use_zone_timestep_history_state: bool,
 }
 
+/// Zone and system timestep settings shared by runtime time axes.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TimeAxisTimestepProfile {
+    /// Zone timestep profile derived from the model timestep object.
+    pub zone_timestep: ZoneTimestepAxis,
+    /// Nominal system timestep profile before adaptive shortening.
+    pub system_timestep: SystemTimestepAxis,
+}
+
 /// Reported sample partitioning for one shared time axis.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct TimeAxisSamplePartitions {
@@ -147,6 +156,17 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
     )
 }
 
+/// Builds the timestep-only portion of a runtime time axis.
+///
+/// This does not validate or allocate run-period calendar points, so consumers
+/// that only need timestep metadata do not become coupled to calendar ranges.
+#[must_use]
+pub fn time_axis_timestep_profile(model: &TypedModel) -> TimeAxisTimestepProfile {
+    time_axis_timestep_profile_for_zone_timesteps(
+        model.timestep.number_of_timesteps_per_hour.max(1),
+    )
+}
+
 pub(crate) fn run_period_first_hour_interpolation_starting_values(
     model: &TypedModel,
 ) -> FirstHourInterpolationStartingValues {
@@ -228,12 +248,28 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
         ordinal += 1;
     }
 
-    let zone_timesteps_per_hour = zone_timesteps_per_hour.max(1);
-    let zone_timestep_seconds = 3600.0 / f64::from(zone_timesteps_per_hour);
+    let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
     Ok(TimeAxis {
         run_period_name: run_period.name.0.clone(),
         first_hour_interpolation_starting_values: run_period
             .first_hour_interpolation_starting_values,
+        zone_timestep: timestep_profile.zone_timestep,
+        system_timestep: timestep_profile.system_timestep,
+        sample_partitions: TimeAxisSamplePartitions {
+            warmup_reported_samples: 0,
+            run_period_reported_samples: points.len(),
+            design_day_reported_samples: 0,
+        },
+        points,
+    })
+}
+
+fn time_axis_timestep_profile_for_zone_timesteps(
+    zone_timesteps_per_hour: u32,
+) -> TimeAxisTimestepProfile {
+    let zone_timesteps_per_hour = zone_timesteps_per_hour.max(1);
+    let zone_timestep_seconds = 3600.0 / f64::from(zone_timesteps_per_hour);
+    TimeAxisTimestepProfile {
         zone_timestep: ZoneTimestepAxis {
             timesteps_per_hour: zone_timesteps_per_hour,
             timestep_seconds: zone_timestep_seconds,
@@ -244,13 +280,7 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
             shorten_timestep_sys_state: true,
             use_zone_timestep_history_state: true,
         },
-        sample_partitions: TimeAxisSamplePartitions {
-            warmup_reported_samples: 0,
-            run_period_reported_samples: points.len(),
-            design_day_reported_samples: 0,
-        },
-        points,
-    })
+    }
 }
 
 #[derive(Clone, Copy)]

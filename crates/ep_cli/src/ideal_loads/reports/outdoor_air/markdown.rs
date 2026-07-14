@@ -27,6 +27,24 @@ pub(super) fn render_outdoor_air_markdown(
         outdoor_air_tolerance_policy(context)
     ));
     report.push_str("timestamp_rule: EnergyPlus timestep ESO timestamps; Rust samples inherit oracle timestep labels\n");
+    report.push_str(&format!("timestep_source: {}\n", context.timestep.source));
+    report.push_str(&format!(
+        "nominal_system_timestep_substeps: {:.0}\n",
+        context.timestep.nominal_system_timestep_substeps
+    ));
+    report.push_str(&format!(
+        "nominal_system_timestep_seconds: {:.12}\n",
+        context.timestep.nominal_system_timestep_seconds
+    ));
+    report.push_str(&format!(
+        "zone_timestep_seconds: {:.12}\n",
+        context.timestep.zone_timestep_seconds
+    ));
+    report.push_str(&format!(
+        "adaptive_system_timestep_claim: {}\n",
+        context.timestep.adaptive_system_timestep_claim
+    ));
+    report.push_str("sample_timestep_source: ESO timestamp duration with ep_runtime::TimeAxis integer-substep normalization and nominal fallback\n");
     let purchased_air_source_order = purchased_air_source_order_stages()
         .iter()
         .map(|stage| stage.source_routine)
