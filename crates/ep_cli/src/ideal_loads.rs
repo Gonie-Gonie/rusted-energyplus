@@ -39,7 +39,6 @@ use ep_model::{
     OutdoorAirEconomizerType, OutputHandle, PeopleNumberCalculationMethod, ScheduleId,
     SimulationModel, SurfaceType, TypedModel, Zone,
 };
-use ep_raw_model::load_epjson_file;
 use ep_runtime::{
     EpwRecord, IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE,
     IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_METER_AGGREGATION_SOURCE,
@@ -1420,8 +1419,7 @@ fn build_outdoor_air_design_flow_context<'a>(
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
 ) -> Result<IdealLoadsOutdoorAirDiagnosticContext<'a>, String> {
-    let raw_model = load_epjson_file(&baseline.epjson)
-        .map_err(|error| format!("failed to load baseline epJSON: {error}"))?;
+    let raw_model = baseline.load_raw_model()?;
     let compile_result = compile_raw_model(&raw_model);
     let typed = compile_result.model.ok_or_else(|| {
         compile_result
@@ -2692,8 +2690,7 @@ fn build_context<'a>(
     manifest: &'a ConformanceCase,
     baseline: &'a BaselineSummary,
 ) -> Result<IdealLoadsDiagnosticContext<'a>, String> {
-    let raw_model = load_epjson_file(&baseline.epjson)
-        .map_err(|error| format!("failed to load baseline epJSON: {error}"))?;
+    let raw_model = baseline.load_raw_model()?;
     let compile_result = compile_raw_model(&raw_model);
     let typed = compile_result.model.ok_or_else(|| {
         compile_result

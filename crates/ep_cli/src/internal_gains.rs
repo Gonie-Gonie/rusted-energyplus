@@ -323,8 +323,7 @@ fn build_context<'a>(
     manifest: &'a ConformanceCase,
     baseline: &BaselineSummary,
 ) -> Result<InternalGainContext<'a>, String> {
-    let raw_model = load_epjson_file(&baseline.epjson)
-        .map_err(|error| format!("failed to load baseline epJSON: {error}"))?;
+    let raw_model = baseline.load_raw_model()?;
     let compile_result = compile_raw_model(&raw_model);
     let model = compile_result.model.ok_or_else(|| {
         let diagnostics = compile_result

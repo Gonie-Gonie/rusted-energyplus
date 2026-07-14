@@ -34,7 +34,7 @@ use ep_model::{
     SimulationModel, SurfaceType, TypedModel,
 };
 use ep_oracle::default_oracle_release;
-use ep_raw_model::{RawModelSummary, load_epjson_file};
+use ep_raw_model::{RawModel, RawModelSummary, load_epjson_file};
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
     run_arbitrary_idf,
@@ -1576,7 +1576,8 @@ fn generate_conformance_diagnostic_report(
         .weather
         .as_ref()
         .ok_or_else(|| "zone-temperature diagnostic requires input.weather".to_string())?;
-    let diagnostic = build_zone_temperature_diagnostic(&baseline.epjson, weather, &baseline.eso)?;
+    let raw_model = baseline.load_raw_model()?;
+    let diagnostic = build_zone_temperature_diagnostic(&raw_model, weather, &baseline.eso)?;
     write_zone_temperature_diagnostic_report(&compare_dir, &diagnostic, Some(&report_context))?;
 
     Ok(DiagnosticReportSummary {
@@ -1610,7 +1611,7 @@ fn generate_conformance_heat_balance_report(
         .ok_or_else(|| "heat-balance conformance requires input.weather".to_string())?;
     let rust_context_start = Instant::now();
     let diagnostic = build_heat_balance_conformance_diagnostic(
-        &baseline.epjson,
+        &baseline,
         weather,
         &baseline.eio,
         &baseline.eso,
@@ -1694,7 +1695,7 @@ fn generate_conformance_heat_balance_diagnostic_report(
         .ok_or_else(|| "heat-balance diagnostic requires input.weather".to_string())?;
     let rust_context_start = Instant::now();
     let diagnostic = build_heat_balance_conformance_diagnostic(
-        &baseline.epjson,
+        &baseline,
         weather,
         &baseline.eio,
         &baseline.eso,
@@ -5285,7 +5286,7 @@ fn heat_balance_series_is_gated(
 }
 
 fn build_heat_balance_conformance_diagnostic(
-    input_path: &Path,
+    baseline: &BaselineSummary,
     weather_path: &Path,
     eio_path: &Path,
     eso_path: &Path,
@@ -5293,18 +5294,18 @@ fn build_heat_balance_conformance_diagnostic(
 ) -> Result<HeatBalanceConformanceDiagnostic, String> {
     let mut performance_profile = HeatBalancePerformanceProfile::new();
     let parse_start = Instant::now();
-    let raw_model = load_epjson_file(input_path).map_err(|error| error.to_string())?;
+    let raw_model = baseline.load_raw_model()?;
     performance_profile.push(
         "parse_time",
         "ep_raw_model",
         elapsed_seconds_since(parse_start),
-        "load and parse converted epJSON into RawModel",
+        "load converted epJSON and recover staged IDF declaration order into RawModel",
     );
     performance_profile.push(
         "raw_model_build",
         "ep_raw_model",
         0.0,
-        "RawModel construction is performed inside load_epjson_file and included in parse_time",
+        "RawModel construction and IDF-order recovery are included in parse_time",
     );
     let typed_compile_start = Instant::now();
     let result = compile_raw_model(&raw_model);
@@ -9008,12 +9009,11 @@ fn heat_balance_gated_max_rel_delta(
 }
 
 fn build_zone_temperature_diagnostic(
-    input_path: &Path,
+    raw_model: &RawModel,
     weather_path: &Path,
     eso_path: &Path,
 ) -> Result<ZoneTemperatureDiagnostic, String> {
-    let raw_model = load_epjson_file(input_path).map_err(|error| error.to_string())?;
-    let result = compile_raw_model(&raw_model);
+    let result = compile_raw_model(raw_model);
     let Some(model) = result.model else {
         return Err(format_compile_diagnostics(&result.report));
     };
@@ -9090,7 +9090,14 @@ fn run_compare_zone_temperature(args: &[String]) -> i32 {
     let weather_path = parsed.weather_path.as_path();
     let eso_path = parsed.eso_path.as_path();
 
-    let diagnostic = match build_zone_temperature_diagnostic(input_path, weather_path, eso_path) {
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(raw_model) => raw_model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let diagnostic = match build_zone_temperature_diagnostic(&raw_model, weather_path, eso_path) {
         Ok(diagnostic) => diagnostic,
         Err(error) => {
             eprintln!("{error}");

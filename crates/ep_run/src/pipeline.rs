@@ -13,7 +13,7 @@ use ep_compare::{
 use ep_compiler::{CompileReport, compile_raw_model};
 use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
-use ep_raw_model::{RawModel, load_epjson_file};
+use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
     NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleValueSeries, TimeAxis,
@@ -218,13 +218,23 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
     );
 
     let raw_start = Instant::now();
-    let raw_model = match load_epjson_file(&prepared_input.converted_epjson_path) {
+    let raw_model_result = match prepared_input.input_kind {
+        OracleInputKind::Idf => load_epjson_file_with_idf_order(
+            &prepared_input.converted_epjson_path,
+            &prepared_input.original_path,
+        ),
+        OracleInputKind::EpJson => load_epjson_file(&prepared_input.converted_epjson_path),
+    };
+    let raw_model = match raw_model_result {
         Ok(model) => model,
         Err(error) => {
             diagnostics.error(
                 "RawModelParseFailed",
                 "raw-model",
-                format!("failed to load converted epJSON: {error}"),
+                format!(
+                    "failed to load {} input into RawModel: {error}",
+                    prepared_input.input_kind.id()
+                ),
             );
             return finish_early(
                 config,
@@ -241,7 +251,7 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         "raw_model",
         "ep_raw_model",
         raw_start.elapsed().as_secs_f64(),
-        "parse epJSON into RawModel while preserving unknown objects",
+        "parse epJSON into RawModel, preserve unknown objects, and recover configured IDF order",
     );
     write_raw_model_summary(&config.output_dir, &raw_model)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
@@ -1869,9 +1879,11 @@ mod tests {
         source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots,
     };
+    use ep_compiler::compile_raw_model;
+    use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
-        EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
-        ExecutionStep,
+        DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
+        ExecutionStep, build_hourly_time_axis,
     };
 
     use crate::{TraceLevel, TraceSelection};
@@ -1894,6 +1906,83 @@ mod tests {
             input_error_diagnostic_code("failed to stage epJSON input: denied"),
             "RawModelParseFailed"
         );
+    }
+
+    #[test]
+    fn compiled_idf_declaration_order_drives_later_special_day_overwrite()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let epjson = r#"{
+            "RunPeriod": {
+                "Ordered Special Days": {
+                    "begin_month": 6,
+                    "begin_day_of_month": 15,
+                    "begin_year": 2017,
+                    "end_month": 6,
+                    "end_day_of_month": 15,
+                    "end_year": 2017,
+                    "day_of_week_for_start_day": "Thursday",
+                    "use_weather_file_holidays_and_special_days": "No",
+                    "apply_weekend_holiday_rule": "No"
+                }
+            },
+            "RunPeriodControl:SpecialDays": {
+                "Zulu Earlier Holiday": {
+                    "start_date": "6/15",
+                    "duration": 1,
+                    "special_day_type": "Holiday"
+                },
+                "Alpha Later Custom": {
+                    "start_date": "6/15",
+                    "duration": 1,
+                    "special_day_type": "CustomDay2"
+                }
+            }
+        }"#;
+        let idf = r#"
+            RunPeriod,
+              Ordered Special Days,
+              6,
+              15,
+              2017,
+              6,
+              15,
+              2017,
+              Thursday;
+            RunPeriodControl:SpecialDays,
+              Zulu Earlier Holiday,
+              6/15,
+              1,
+              Holiday;
+            RunPeriodControl:SpecialDays,
+              Alpha Later Custom,
+              6/15,
+              1,
+              CustomDay2;
+        "#;
+        let raw_model = parse_epjson_str_with_idf_order(epjson, idf)?;
+        let compile_result = compile_raw_model(&raw_model);
+        let Some(model) = compile_result.model else {
+            return Err(std::io::Error::other(
+                "expected declaration-ordered special-day model to compile",
+            )
+            .into());
+        };
+
+        let axis = build_hourly_time_axis(&model)?;
+        assert_eq!(axis.special_days.resolved_days.len(), 2);
+        assert_eq!(
+            axis.special_days.resolved_days[0].name,
+            "ZULU EARLIER HOLIDAY"
+        );
+        assert_eq!(
+            axis.special_days.resolved_days[1].name,
+            "ALPHA LATER CUSTOM"
+        );
+        assert!(axis.points.iter().all(|point| {
+            point.day_type == DayType::CustomDay2
+                && point.special_day_type == Some(DayType::CustomDay2)
+        }));
+        Ok(())
     }
 
     #[test]

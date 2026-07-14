@@ -1,8 +1,14 @@
 //! Raw epJSON-preserving model structures.
 
+mod idf_order;
+
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+pub use idf_order::{
+    IDF_ORDER_TARGETS, IdfOrderError, IdfOrderTarget, apply_idf_declaration_order,
+};
 
 /// EnergyPlus object type name as found in epJSON.
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -58,9 +64,24 @@ pub struct RawModel {
     pub version: Option<String>,
     /// Objects grouped by type and name.
     pub objects: BTreeMap<ObjectType, BTreeMap<ObjectName, RawObject>>,
+    /// Per-type declaration order recovered from staged IDF input.
+    idf_declaration_order: BTreeMap<ObjectType, Vec<ObjectName>>,
 }
 
 impl RawModel {
+    /// Builds a model from its public epJSON fields without an IDF-order overlay.
+    #[must_use]
+    pub fn new(
+        version: Option<String>,
+        objects: BTreeMap<ObjectType, BTreeMap<ObjectName, RawObject>>,
+    ) -> Self {
+        Self {
+            version,
+            objects,
+            idf_declaration_order: BTreeMap::new(),
+        }
+    }
+
     /// Returns the total object instance count.
     #[must_use]
     pub fn object_count(&self) -> usize {
@@ -86,6 +107,65 @@ impl RawModel {
             .iter()
             .map(|(object_type, instances)| (object_type.0.clone(), instances.len()))
             .collect()
+    }
+
+    /// Returns one object type's instances in effective input order.
+    ///
+    /// Native epJSON models retain canonical object-name order. Converted IDF
+    /// models use a validated declaration-order overlay for configured types.
+    pub fn ordered_instances(
+        &self,
+        object_type: &str,
+    ) -> Result<Vec<(&ObjectName, &RawObject)>, IdfOrderError> {
+        let object_type = ObjectType(object_type.to_string());
+        let instances = self.objects.get(&object_type);
+        let declaration_order = self.idf_declaration_order.get(&object_type);
+
+        match (instances, declaration_order) {
+            (None, None) => Ok(Vec::new()),
+            (Some(instances), None) => Ok(instances.iter().collect()),
+            (None, Some(order)) => Err(IdfOrderError::new(format!(
+                "IDF declaration-order overlay for {} has {} name(s), but the object map is absent",
+                object_type.0,
+                order.len()
+            ))),
+            (Some(instances), Some(order)) => {
+                if order.len() != instances.len() {
+                    return Err(IdfOrderError::new(format!(
+                        "IDF declaration-order overlay count mismatch for {}: overlay has {}, object map has {}",
+                        object_type.0,
+                        order.len(),
+                        instances.len()
+                    )));
+                }
+
+                let mut ordered = Vec::with_capacity(order.len());
+                let mut seen = std::collections::BTreeSet::new();
+                for name in order {
+                    if !seen.insert(name) {
+                        return Err(IdfOrderError::new(format!(
+                            "IDF declaration-order overlay for {} repeats object name {}",
+                            object_type.0, name.0
+                        )));
+                    }
+                    let Some((actual_name, object)) = instances.get_key_value(name) else {
+                        return Err(IdfOrderError::new(format!(
+                            "IDF declaration-order overlay for {} names missing object {}",
+                            object_type.0, name.0
+                        )));
+                    };
+                    ordered.push((actual_name, object));
+                }
+                Ok(ordered)
+            }
+        }
+    }
+
+    /// Returns true when one object type has a recovered IDF declaration order.
+    #[must_use]
+    pub fn has_idf_declaration_order(&self, object_type: &str) -> bool {
+        self.idf_declaration_order
+            .contains_key(&ObjectType(object_type.to_string()))
     }
 
     /// Returns a compact inspection summary.
@@ -120,6 +200,15 @@ pub enum EpJsonError {
     Io(std::io::Error),
     /// JSON parsing failed.
     Json(serde_json::Error),
+    /// Staged IDF read failed while recovering declaration order.
+    IdfIo {
+        /// IDF path that could not be read.
+        path: PathBuf,
+        /// Underlying filesystem error.
+        source: std::io::Error,
+    },
+    /// Staged IDF declaration order could not be reconciled with epJSON.
+    IdfOrder(IdfOrderError),
     /// Top-level JSON value was not an object.
     TopLevelNotObject,
     /// A top-level object type did not contain an object map.
@@ -141,6 +230,17 @@ impl Display for EpJsonError {
         match self {
             Self::Io(error) => write!(formatter, "failed to read epJSON: {error}"),
             Self::Json(error) => write!(formatter, "failed to parse epJSON: {error}"),
+            Self::IdfIo { path, source } => write!(
+                formatter,
+                "failed to read staged IDF {} for declaration-order recovery: {source}",
+                path.display()
+            ),
+            Self::IdfOrder(error) => {
+                write!(
+                    formatter,
+                    "failed to recover staged IDF declaration order: {error}"
+                )
+            }
             Self::TopLevelNotObject => {
                 write!(formatter, "epJSON top-level value must be an object")
             }
@@ -166,6 +266,8 @@ impl std::error::Error for EpJsonError {
         match self {
             Self::Io(error) => Some(error),
             Self::Json(error) => Some(error),
+            Self::IdfIo { source, .. } => Some(source),
+            Self::IdfOrder(error) => Some(error),
             Self::TopLevelNotObject
             | Self::ObjectTypeNotObject { .. }
             | Self::ObjectInstanceNotObject { .. } => None,
@@ -185,10 +287,33 @@ impl From<serde_json::Error> for EpJsonError {
     }
 }
 
+impl From<IdfOrderError> for EpJsonError {
+    fn from(error: IdfOrderError) -> Self {
+        Self::IdfOrder(error)
+    }
+}
+
 /// Loads an epJSON file into a RawModel.
 pub fn load_epjson_file(path: impl AsRef<Path>) -> Result<RawModel, EpJsonError> {
     let contents = std::fs::read_to_string(path)?;
     parse_epjson_str(&contents)
+}
+
+/// Loads converted epJSON and overlays configured declaration order from staged IDF.
+///
+/// The default target set is currently limited to `RunPeriodControl:SpecialDays`.
+pub fn load_epjson_file_with_idf_order(
+    epjson_path: impl AsRef<Path>,
+    idf_path: impl AsRef<Path>,
+) -> Result<RawModel, EpJsonError> {
+    let mut model = load_epjson_file(epjson_path)?;
+    let idf_path = idf_path.as_ref();
+    let idf = std::fs::read(idf_path).map_err(|source| EpJsonError::IdfIo {
+        path: idf_path.to_path_buf(),
+        source,
+    })?;
+    idf_order::apply_idf_declaration_order_bytes(&mut model, &idf, IDF_ORDER_TARGETS)?;
+    Ok(model)
 }
 
 /// Parses epJSON text into a RawModel.
@@ -237,6 +362,13 @@ pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
     }
 
     model.version = extract_version(&model);
+    Ok(model)
+}
+
+/// Parses converted epJSON and overlays configured declaration order from staged IDF text.
+pub fn parse_epjson_str_with_idf_order(epjson: &str, idf: &str) -> Result<RawModel, EpJsonError> {
+    let mut model = parse_epjson_str(epjson)?;
+    apply_idf_declaration_order(&mut model, idf, IDF_ORDER_TARGETS)?;
     Ok(model)
 }
 

@@ -8,7 +8,6 @@ use ep_conformance::{
     ToleranceRule, VariableClass,
 };
 use ep_model::TypedModel;
-use ep_raw_model::load_epjson_file;
 use ep_runtime::surface_geometry_summaries;
 use std::path::{Path, PathBuf};
 
@@ -265,8 +264,7 @@ fn build_static_model_report(
     manifest: &ConformanceCase,
     baseline: &BaselineSummary,
 ) -> Result<StaticModelReport, String> {
-    let raw_model = load_epjson_file(&baseline.epjson)
-        .map_err(|error| format!("failed to load staged epJSON: {error}"))?;
+    let raw_model = baseline.load_raw_model()?;
     let result = compile_raw_model(&raw_model);
     let Some(model) = result.model else {
         return Err(format!(

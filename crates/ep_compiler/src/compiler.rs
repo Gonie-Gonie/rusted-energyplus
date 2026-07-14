@@ -24,7 +24,7 @@ use ep_model::{
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
     ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
-use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
+use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
 
@@ -3470,17 +3470,23 @@ impl<'a> Compiler<'a> {
         names
     }
 
-    fn objects(&self, object_type: &str) -> Vec<(String, RawObject)> {
-        self.raw_model
-            .objects
-            .get(&ObjectType(object_type.to_string()))
-            .map(|objects| {
-                objects
-                    .iter()
-                    .map(|(name, object)| (name.0.clone(), object.clone()))
-                    .collect()
-            })
-            .unwrap_or_default()
+    fn objects(&mut self, object_type: &str) -> Vec<(String, RawObject)> {
+        match self.raw_model.ordered_instances(object_type) {
+            Ok(objects) => objects
+                .into_iter()
+                .map(|(name, object)| (name.0.clone(), object.clone()))
+                .collect(),
+            Err(error) => {
+                self.error(
+                    "InvalidIdfDeclarationOrder",
+                    object_type,
+                    None,
+                    None,
+                    error.to_string(),
+                );
+                Vec::new()
+            }
+        }
     }
 
     fn single_object(&mut self, object_type: &str) -> Option<(String, RawObject)> {
@@ -4798,7 +4804,7 @@ mod tests {
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
         SpecialDayType,
     };
-    use ep_raw_model::parse_epjson_str;
+    use ep_raw_model::{parse_epjson_str, parse_epjson_str_with_idf_order};
 
     #[test]
     fn compile_report_records_typed_and_reference_stages() -> Result<(), Box<dyn std::error::Error>>
@@ -5324,6 +5330,73 @@ mod tests {
             SpecialDayType::CustomDay2
         );
 
+        Ok(())
+    }
+
+    #[test]
+    fn idf_overlay_orders_special_days_while_native_epjson_stays_name_sorted()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let epjson = r#"{
+            "RunPeriodControl:SpecialDays": {
+                "Zulu Earlier Holiday": {
+                    "start_date": "6/15",
+                    "duration": 1,
+                    "special_day_type": "Holiday"
+                },
+                "Alpha Later Custom": {
+                    "start_date": "6/15",
+                    "duration": 1,
+                    "special_day_type": "CustomDay2"
+                }
+            }
+        }"#;
+        let idf = r#"
+            RunPeriodControl:SpecialDays,
+              Zulu Earlier Holiday,
+              6/15,
+              1,
+              Holiday;
+            RunPeriodControl:SpecialDays,
+              Alpha Later Custom,
+              6/15,
+              1,
+              CustomDay2;
+        "#;
+
+        let idf_raw_model = parse_epjson_str_with_idf_order(epjson, idf)?;
+        let idf_result = compile_raw_model(&idf_raw_model);
+        assert!(!idf_result.has_errors());
+        let Some(idf_model) = idf_result.model else {
+            return Err(std::io::Error::other("expected IDF-overlay typed model").into());
+        };
+        assert_eq!(idf_model.run_period_special_days.len(), 2);
+        assert_eq!(
+            idf_model.run_period_special_days[0].name.0,
+            "ZULU EARLIER HOLIDAY"
+        );
+        assert_eq!(idf_model.run_period_special_days[0].id.0, 0);
+        assert_eq!(
+            idf_model.run_period_special_days[1].name.0,
+            "ALPHA LATER CUSTOM"
+        );
+        assert_eq!(idf_model.run_period_special_days[1].id.0, 1);
+
+        let epjson_raw_model = parse_epjson_str(epjson)?;
+        let epjson_result = compile_raw_model(&epjson_raw_model);
+        assert!(!epjson_result.has_errors());
+        let Some(epjson_model) = epjson_result.model else {
+            return Err(std::io::Error::other("expected native epJSON typed model").into());
+        };
+        assert_eq!(
+            epjson_model.run_period_special_days[0].name.0,
+            "ALPHA LATER CUSTOM"
+        );
+        assert_eq!(epjson_model.run_period_special_days[0].id.0, 0);
+        assert_eq!(
+            epjson_model.run_period_special_days[1].name.0,
+            "ZULU EARLIER HOLIDAY"
+        );
+        assert_eq!(epjson_model.run_period_special_days[1].id.0, 1);
         Ok(())
     }
 

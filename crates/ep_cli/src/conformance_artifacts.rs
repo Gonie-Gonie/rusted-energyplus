@@ -1,5 +1,6 @@
 use ep_compare::load_eso_series;
 use ep_conformance::{ConformanceCase, OutputRegistry, SourceArtifact, TimestampContract};
+use ep_raw_model::{RawModel, load_epjson_file_with_idf_order};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -35,6 +36,16 @@ pub(crate) struct BaselineSummary {
     pub(crate) injected_meters: usize,
     pub(crate) injected_surface_details: bool,
     pub(crate) timing: BaselineTimingSummary,
+}
+
+impl BaselineSummary {
+    pub(crate) fn load_raw_model(&self) -> Result<RawModel, String> {
+        load_epjson_file_with_idf_order(&self.epjson, &self.idf).map_err(|error| {
+            format!(
+                "failed to load baseline converted epJSON with staged IDF declaration order: {error}"
+            )
+        })
+    }
 }
 
 pub(crate) struct ReportSkeletonSummary {

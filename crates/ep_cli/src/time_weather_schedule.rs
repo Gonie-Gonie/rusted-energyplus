@@ -12,7 +12,6 @@ use ep_conformance::{
     TimestampContract, VariableClass,
 };
 use ep_model::TypedModel;
-use ep_raw_model::load_epjson_file;
 use ep_runtime::{
     EpwEnvironmentWeather, ScheduleValueSeries, TimeAxis, build_hourly_time_axis,
     build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
@@ -237,8 +236,7 @@ fn build_context<'a>(
     manifest: &'a ConformanceCase,
     baseline: &BaselineSummary,
 ) -> Result<TimeWeatherScheduleContext<'a>, String> {
-    let raw_model = load_epjson_file(&baseline.epjson)
-        .map_err(|error| format!("failed to load baseline epJSON: {error}"))?;
+    let raw_model = baseline.load_raw_model()?;
     let compile_result = compile_raw_model(&raw_model);
     let model = compile_result.model.ok_or_else(|| {
         let diagnostics = compile_result
