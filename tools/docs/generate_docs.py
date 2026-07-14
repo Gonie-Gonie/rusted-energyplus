@@ -281,9 +281,27 @@ def variable_coverage(repo_root: Path) -> str:
         + "# Variable Coverage\n\n"
         + "Variable coverage is maintained in `specs/variable_coverage.toml`.\n\n"
         + "## Summary\n\n"
+        + "<!-- ANCHOR: current-status-variable-summary -->\n"
         + table(["Status", "Count"], summary_rows)
+        + "<!-- ANCHOR_END: current-status-variable-summary -->\n"
         + "\n## Variables\n\n"
         + table(["Variable", "Domain", "Status", "First evidence", "Boundary"], rows)
+    )
+
+
+def current_status_classification(repo_root: Path) -> str:
+    contract = load_toml(repo_root / "specs" / "project_contract.toml")
+    rows = [
+        [
+            str(item.get("id", "")),
+            str(item.get("source_of_truth", "")),
+            str(item.get("current_boundary", "")),
+        ]
+        for item in contract.get("current_status_classification", [])
+    ]
+    return (
+        GENERATED_NOTICE
+        + table(["Classification", "Source of truth", "Current boundary"], rows)
     )
 
 
@@ -377,6 +395,7 @@ GENERATED_DOC_OUTPUTS = [
     "docs/src/generated/milestone-map.md",
     "docs/src/generated/algorithm-ledger.md",
     "docs/src/generated/conformance-case-index.md",
+    "docs/src/generated/current-status-classification.md",
     "docs/src/generated/capability-index.md",
     "docs/src/generated/object-coverage.md",
     "docs/src/generated/variable-coverage.md",
@@ -690,6 +709,7 @@ def docs_inventory(repo_root: Path) -> str:
 def generated_manifest(repo_root: Path) -> str:
     payload = {
         "sources": [
+            "specs/project_contract.toml",
             "specs/milestones.toml",
             "specs/algorithm_ledger.toml",
             "specs/object_coverage.toml",
@@ -723,6 +743,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "milestone-map.md": milestone_map(repo_root),
         repo_root / "docs" / "src" / "generated" / "algorithm-ledger.md": algorithm_ledger(repo_root),
         repo_root / "docs" / "src" / "generated" / "conformance-case-index.md": conformance_case_index(repo_root),
+        repo_root / "docs" / "src" / "generated" / "current-status-classification.md": current_status_classification(repo_root),
         repo_root / "docs" / "src" / "generated" / "capability-index.md": capability_index(repo_root),
         repo_root / "docs" / "src" / "generated" / "object-coverage.md": object_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),

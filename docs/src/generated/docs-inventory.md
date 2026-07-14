@@ -9,7 +9,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 81 |
+| docs files | 82 |
 | SUMMARY links | 19 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
@@ -105,7 +105,7 @@ none
 | docs/src/conformance/tolerance-policy.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-05 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-06-23 |
-| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-06-23 |
+| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-07-14 |
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
@@ -113,6 +113,7 @@ none
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/capability-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
+| docs/src/generated/current-status-classification.md | generated | not in SUMMARY | present | none |  |  |  |
 | docs/src/generated/docs-inventory.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/milestone-map.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |

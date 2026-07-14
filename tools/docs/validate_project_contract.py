@@ -41,6 +41,12 @@ REQUIRED_FORBIDDEN_CHANGES = {
     "setpoint_manager_timing_change",
     "plant_dispatch_semantics_change",
 }
+EXPECTED_CURRENT_STATUS_CLASSIFICATION_IDS = [
+    "conformance",
+    "diagnostic-only",
+    "baseline-only",
+    "not claimed",
+]
 README_REQUIRED_PHRASES = [
     "Rust-only EnergyPlus-compatible porting project.",
     "EnergyPlus 26.1.0 as the locked oracle",
@@ -58,13 +64,10 @@ CURRENT_DOC_REQUIRED_PHRASES = [
     "results do not create compatibility claims.",
 ]
 CURRENT_STATUS_REQUIRED_PHRASES = [
-    "| conformance | Case manifests with `conformance_claim = true`, `specs/variable_coverage.toml`, `specs/algorithm_ledger.toml`, and generated compare reports |",
-    "| diagnostic-only | Case manifests and diagnostic probes with `conformance_claim = false`, diagnostic output levels, and diagnostic reports |",
-    "| baseline-only | EnergyPlus oracle baseline artifacts and output levels marked `baseline` |",
-    "| not claimed | `specs/project_contract.toml`, generated capability/coverage docs, and this document's Not Claimed section |",
-    "README and current-status prose are mirrors, not claim sources.",
     "The exact case list is generated in `docs/src/generated/conformance-case-index.md`.",
     "coverage boundaries are generated from `specs/algorithm_ledger.toml`, `specs/object_coverage.toml`, and `specs/variable_coverage.toml`.",
+    "{{#include ../generated/current-status-classification.md}}",
+    "{{#include ../generated/variable-coverage.md:current-status-variable-summary}}",
 ]
 GENERATED_DOC_REQUIRED_PHRASES = [
     "Generated from specs/ and data/conformance_cases by tools/docs/generate_docs.py.",
@@ -72,6 +75,8 @@ GENERATED_DOC_REQUIRED_PHRASES = [
     "| Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |",
     "Variable coverage is maintained in `specs/variable_coverage.toml`.",
     "Algorithm status is maintained in `specs/algorithm_ledger.toml`.",
+    "| Classification | Source of truth | Current boundary |",
+    "README and current-status prose are mirrors, not claim sources.",
 ]
 
 
@@ -98,6 +103,10 @@ def require_contains_all(text: str, phrases: list[str], errors: list[str], label
         require(normalized_phrase in normalized_text, errors, f"{label} missing required phrase: {phrase}")
 
 
+def markdown_cell(value: Any) -> str:
+    return str(value).replace("|", "\\|").replace("\n", "<br>")
+
+
 def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
     oracle = contract.get("oracle", {})
     language = contract.get("language", {})
@@ -107,6 +116,7 @@ def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
     diagnostic_only = contract.get("diagnostic_only", {})
     partial_runs = contract.get("partial_runs", {})
     documentation = contract.get("documentation", {})
+    current_status_classifications = contract.get("current_status_classification", [])
 
     require(oracle.get("energyplus_version") == EXPECTED_VERSION, errors, "project contract must pin EnergyPlus 26.1.0")
     require(oracle.get("compatibility_mode_required") is True, errors, "project contract must require compatibility mode")
@@ -144,6 +154,25 @@ def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
     require(documentation.get("generated_docs_role") == "navigation", errors, "generated docs must remain navigation")
     require(documentation.get("reports_role") == "evidence", errors, "reports must be evidence")
 
+    classification_ids = [str(item.get("id", "")) for item in current_status_classifications]
+    require(
+        classification_ids == EXPECTED_CURRENT_STATUS_CLASSIFICATION_IDS,
+        errors,
+        "current-status classifications must use the required ids and order",
+    )
+    for item in current_status_classifications:
+        classification_id = str(item.get("id", "")) or "<missing-id>"
+        require(
+            bool(str(item.get("source_of_truth", "")).strip()),
+            errors,
+            f"{classification_id}: current-status source_of_truth must not be empty",
+        )
+        require(
+            bool(str(item.get("current_boundary", "")).strip()),
+            errors,
+            f"{classification_id}: current-status current_boundary must not be empty",
+        )
+
 
 def main() -> int:
     args = parse_args()
@@ -155,7 +184,9 @@ def main() -> int:
     generated_case_index_path = repo_root / "docs" / "src" / "generated" / "conformance-case-index.md"
     generated_variable_coverage_path = repo_root / "docs" / "src" / "generated" / "variable-coverage.md"
     generated_algorithm_ledger_path = repo_root / "docs" / "src" / "generated" / "algorithm-ledger.md"
+    generated_current_status_path = repo_root / "docs" / "src" / "generated" / "current-status-classification.md"
     errors: list[str] = []
+    contract: dict[str, Any] = {}
 
     require(contract_path.is_file(), errors, f"missing project contract spec: {contract_path}")
     require(readme_path.is_file(), errors, f"missing README: {readme_path}")
@@ -172,8 +203,14 @@ def main() -> int:
         errors,
         f"missing generated algorithm ledger: {generated_algorithm_ledger_path}",
     )
+    require(
+        generated_current_status_path.is_file(),
+        errors,
+        f"missing generated current-status classification: {generated_current_status_path}",
+    )
     if contract_path.is_file():
-        validate_contract(load_toml(contract_path), errors)
+        contract = load_toml(contract_path)
+        validate_contract(contract, errors)
     if readme_path.is_file():
         require_contains_all(readme_path.read_text(encoding="utf-8"), README_REQUIRED_PHRASES, errors, "README.md")
     if current_doc_path.is_file():
@@ -191,10 +228,28 @@ def main() -> int:
             "docs/src/current/current-status.md",
         )
     generated_text = ""
-    for path in [generated_case_index_path, generated_variable_coverage_path, generated_algorithm_ledger_path]:
+    for path in [
+        generated_case_index_path,
+        generated_variable_coverage_path,
+        generated_algorithm_ledger_path,
+        generated_current_status_path,
+    ]:
         if path.is_file():
             generated_text += "\n" + path.read_text(encoding="utf-8")
     require_contains_all(generated_text, GENERATED_DOC_REQUIRED_PHRASES, errors, "generated docs")
+    if generated_current_status_path.is_file():
+        classification_text = generated_current_status_path.read_text(encoding="utf-8")
+        for item in contract.get("current_status_classification", []):
+            expected_row = (
+                f"| {markdown_cell(item.get('id', ''))} | "
+                f"{markdown_cell(item.get('source_of_truth', ''))} | "
+                f"{markdown_cell(item.get('current_boundary', ''))} |"
+            )
+            require(
+                expected_row in classification_text,
+                errors,
+                f"generated current-status classification missing row: {item.get('id', '')}",
+            )
 
     if errors:
         print("Project contract validation failed:", file=sys.stderr)

@@ -2617,7 +2617,7 @@ caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::i
 callees = ["scripts/lib/common.ps1", "scripts/quality/strict-no-false-conformance/assertions.ps1"]
 callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/quality/strict-no-false-conformance/assertions.ps1::dot_sources"]
 calls = ["script:scripts/lib/common.ps1", "script:scripts/quality/strict-no-false-conformance/assertions.ps1", "tools/docs/validate_algorithm_ledger.py", "tools/reporting/conformance_evidence_report.py", "tools/reporting/conformance_index_report.py", "tools/reporting/release_evidence_manifest.py", "tools/reporting/support_coverage_report.py", "tools/reporting/user_coverage_handbook.py"]
-generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/conformance-case-index.md", "docs/src/generated/variable-coverage.md"]
+generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/conformance-case-index.md", "docs/src/generated/current-status-classification.md", "docs/src/generated/variable-coverage.md"]
 reachable_from_public_root = true
 exit_contract = "PowerShell success unless an uncaught error occurs"
 

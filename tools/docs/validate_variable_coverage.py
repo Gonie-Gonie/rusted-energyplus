@@ -12,12 +12,15 @@ from typing import Any
 
 
 ALLOWED_STATUS = {"conformance", "diagnostic", "baseline"}
-CURRENT_STATUS_COUNT_RE = re.compile(
-    r"tracks\s+(?P<conformance>\d+)\s+conformance output variables,\s+"
-    r"(?P<diagnostic>\d+)\s+diagnostic output variables,\s+and\s+"
-    r"(?P<baseline>\d+)\s+baseline output variables,\s+for\s+"
-    r"(?P<total>\d+)\s+tracked output variables",
-    re.IGNORECASE | re.DOTALL,
+CURRENT_STATUS_DIRECT_COUNT_RE = re.compile(
+    r"(?:\b\d+\s+(?:(?:conformance|diagnostic|baseline|tracked)\s+)?output\s+variables?\b"
+    r"|\b(?:conformance|diagnostic|baseline|tracked)\s+output\s+variables?"
+    r"\s*(?::|=|-|\bis\b|\bare\b)?\s*\d+\b"
+    r"|^\s*\|\s*(?:conformance|diagnostic|baseline|total|tracked)\s*\|\s*\d+\s*\|)",
+    re.IGNORECASE | re.MULTILINE,
+)
+CURRENT_STATUS_SUMMARY_INCLUDE = (
+    "{{#include ../generated/variable-coverage.md:current-status-variable-summary}}"
 )
 README_DIRECT_COUNT_RE = re.compile(
     r"(?i)(?:\b\d+\s+(?:conformance|diagnostic|baseline|tracked)\s+output variables"
@@ -106,19 +109,36 @@ def validate_generated_summary(
     if not generated_path.is_file():
         return
     text = read_text(generated_path)
+    anchor_start = "<!-- ANCHOR: current-status-variable-summary -->"
+    anchor_end = "<!-- ANCHOR_END: current-status-variable-summary -->"
+    start_index = text.find(anchor_start)
+    end_index = text.find(anchor_end)
+    require(
+        text.count(anchor_start) == 1 and text.count(anchor_end) == 1,
+        errors,
+        "generated variable coverage summary must expose exactly one current-status include anchor",
+    )
+    require(
+        0 <= start_index < end_index,
+        errors,
+        "generated variable coverage summary anchor markers must be ordered",
+    )
+    summary_text = text[start_index + len(anchor_start) : end_index] if 0 <= start_index < end_index else ""
     for status in ("conformance", "diagnostic", "baseline"):
         require(
-            f"| {status} | {counts.get(status, 0)} |" in text,
+            f"| {status} | {counts.get(status, 0)} |" in summary_text,
             errors,
-            f"generated variable coverage summary missing {status} count {counts.get(status, 0)}",
+            f"generated variable coverage include missing {status} count {counts.get(status, 0)}",
         )
-    require(f"| total | {total} |" in text, errors, f"generated variable coverage summary missing total count {total}")
+    require(
+        f"| total | {total} |" in summary_text,
+        errors,
+        f"generated variable coverage include missing total count {total}",
+    )
 
 
 def validate_current_status(
     repo_root: Path,
-    counts: Counter[str],
-    total: int,
     errors: list[str],
 ) -> None:
     current_path = repo_root / "docs" / "src" / "current" / "current-status.md"
@@ -126,19 +146,17 @@ def validate_current_status(
     if not current_path.is_file():
         return
     text = read_text(current_path)
-    match = CURRENT_STATUS_COUNT_RE.search(" ".join(text.split()))
-    require(match is not None, errors, "current-status.md must state generated variable status counts")
-    if match is None:
-        return
-    expected = {
-        "conformance": counts.get("conformance", 0),
-        "diagnostic": counts.get("diagnostic", 0),
-        "baseline": counts.get("baseline", 0),
-        "total": total,
-    }
-    for key, value in expected.items():
-        found = int(match.group(key))
-        require(found == value, errors, f"current-status.md {key} variable count {found} != generated {value}")
+    require(
+        text.count(CURRENT_STATUS_SUMMARY_INCLUDE) == 1,
+        errors,
+        "current-status.md must include the generated variable coverage summary exactly once",
+    )
+    direct_count = CURRENT_STATUS_DIRECT_COUNT_RE.search(text)
+    require(
+        direct_count is None,
+        errors,
+        "current-status.md must not hard-code variable coverage counts",
+    )
 
 
 def validate_readme(repo_root: Path, errors: list[str]) -> None:
@@ -289,7 +307,7 @@ def main() -> int:
         validate_variable(variable, cases, all_conformance_variables, errors)
 
     validate_generated_summary(repo_root, counts, total, errors)
-    validate_current_status(repo_root, counts, total, errors)
+    validate_current_status(repo_root, errors)
     validate_readme(repo_root, errors)
 
     if errors:

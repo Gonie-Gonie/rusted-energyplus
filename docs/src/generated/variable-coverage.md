@@ -7,12 +7,14 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 
 ## Summary
 
+<!-- ANCHOR: current-status-variable-summary -->
 | Status | Count |
 |---|---|
 | conformance | 119 |
 | diagnostic | 10 |
 | baseline | 6 |
 | total | 135 |
+<!-- ANCHOR_END: current-status-variable-summary -->
 
 ## Variables
 

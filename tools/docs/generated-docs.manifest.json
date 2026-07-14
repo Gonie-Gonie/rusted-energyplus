@@ -3,6 +3,7 @@
     "docs/src/generated/milestone-map.md",
     "docs/src/generated/algorithm-ledger.md",
     "docs/src/generated/conformance-case-index.md",
+    "docs/src/generated/current-status-classification.md",
     "docs/src/generated/capability-index.md",
     "docs/src/generated/object-coverage.md",
     "docs/src/generated/variable-coverage.md",
@@ -11,6 +12,7 @@
     "specs/script_inventory.toml"
   ],
   "sources": [
+    "specs/project_contract.toml",
     "specs/milestones.toml",
     "specs/algorithm_ledger.toml",
     "specs/object_coverage.toml",

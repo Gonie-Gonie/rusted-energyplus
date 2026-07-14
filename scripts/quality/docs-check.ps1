@@ -26,6 +26,7 @@ $required = @(
     "src\generated\milestone-map.md",
     "src\generated\algorithm-ledger.md",
     "src\generated\conformance-case-index.md",
+    "src\generated\current-status-classification.md",
     "src\generated\capability-index.md",
     "src\generated\object-coverage.md",
     "src\generated\variable-coverage.md",
@@ -63,6 +64,28 @@ foreach ($relative in @(
 $summaryPath = Join-Path $DocsRoot "src\SUMMARY.md"
 $summary = Get-Content -Raw -LiteralPath $summaryPath
 $summaryLines = Get-Content -LiteralPath $summaryPath
+$currentStatusPath = Join-Path $DocsRoot "src\current\current-status.md"
+$currentStatus = Get-Content -Raw -LiteralPath $currentStatusPath
+$expectedCurrentStatusIncludes = @(
+    "{{#include ../generated/current-status-classification.md}}",
+    "{{#include ../generated/variable-coverage.md:current-status-variable-summary}}"
+)
+foreach ($include in $expectedCurrentStatusIncludes) {
+    $includeCount = ([regex]::Matches($currentStatus, [regex]::Escape($include))).Count
+    if ($includeCount -ne 1) {
+        throw "current-status.md must include generated fragment exactly once: $include"
+    }
+}
+if ($currentStatus -match '(?im)^\s*\|\s*Classification\s*\|') {
+    throw "current-status.md must not retain a hand-written classification table."
+}
+if ($currentStatus -match '(?im)^\s*\|\s*(?:conformance|diagnostic-only|baseline-only|not claimed)\s*\|') {
+    throw "current-status.md must not retain hand-written classification rows."
+}
+$directVariableCountPattern = '(?im)(?:\b\d+\s+(?:(?:conformance|diagnostic|baseline|tracked)\s+)?output\s+variables?\b|\b(?:conformance|diagnostic|baseline|tracked)\s+output\s+variables?\s*(?::|=|-|\bis\b|\bare\b)?\s*\d+\b|^\s*\|\s*(?:conformance|diagnostic|baseline|total|tracked)\s*\|\s*\d+\s*\|)'
+if ($currentStatus -match $directVariableCountPattern) {
+    throw "current-status.md must not retain hand-written variable coverage counts."
+}
 $expectedCurrentLinks = @(
     "current/project-contract.md",
     "current/current-status.md",
