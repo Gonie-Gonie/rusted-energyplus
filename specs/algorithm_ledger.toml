@@ -44,6 +44,7 @@ proof_variables = [
   "Zone Mean Air Temperature",
   "Zone Mean Air Humidity Ratio",
   "Zone Air Heat Balance Internal Convective Heat Gain Rate",
+  "Zone Air Heat Balance Outdoor Air Transfer Rate",
   "Surface Inside Face Temperature",
   "Surface Inside Face Adjacent Air Temperature",
   "Surface Outside Face Temperature",

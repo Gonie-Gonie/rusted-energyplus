@@ -61,7 +61,7 @@ Invoke-DevCommand -Command "ideal-loads-structure-audit"
 Invoke-DevCommand -Command "ideal-loads-claim-inventory-audit"
 Invoke-DevCommand -Command "strict-no-false-conformance"
 Invoke-DevCommand -Command "project-contract-check"
-Invoke-DevCommand -Command "capability-registry-check"
+Invoke-DevCommand -Command "spec-cross-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "variable-coverage-check"

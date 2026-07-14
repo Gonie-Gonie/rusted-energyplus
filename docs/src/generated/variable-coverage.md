@@ -10,10 +10,10 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 <!-- ANCHOR: current-status-variable-summary -->
 | Status | Count |
 |---|---|
-| conformance | 119 |
+| conformance | 120 |
 | diagnostic | 10 |
-| baseline | 6 |
-| total | 135 |
+| baseline | 10 |
+| total | 140 |
 <!-- ANCHOR_END: current-status-variable-summary -->
 
 ## Variables
@@ -78,6 +78,10 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | Plant Supply Side Heating Demand Rate | plant | baseline | plant_loop_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | Plant Supply Side Inlet Mass Flow Rate | plant | baseline | plant_loop_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | Pump Electricity Rate | plant | baseline | plant_loop_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
+| Fan Electricity Rate | hvac | baseline | airloop_fan_only_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
+| Cooling Coil Total Cooling Rate | hvac | baseline | airloop_5zone_aircooled_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
+| Heating Coil Heating Rate | hvac | baseline | airloop_coil_only_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
+| Zone Packaged Terminal Air Conditioner Total Heating Rate | hvac | baseline | ptac_diagnostic_001 | EnergyPlus oracle baseline request only; Rust numerical parity is not claimed. |
 | Zone Thermostat Cooling Setpoint Temperature | zone | conformance | ideal_loads_no_oa_sensible_conformance_001 | Tolerance-gated thermostat setpoint conformance within the no-OA/no-limit and numeric finite-limit IdealLoads cases; no broad thermostat control claim. |
 | Zone Thermostat Heating Setpoint Temperature | zone | conformance | ideal_loads_no_oa_sensible_conformance_001 | Tolerance-gated thermostat setpoint conformance within the no-OA/no-limit and numeric finite-limit IdealLoads cases; no broad thermostat control claim. |
 | Construction CTF Layer Count | construction | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
@@ -105,6 +109,7 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | OtherEquipment Internal Gains Nominal Zone Floor Area | internal-gain | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | Zone Total Internal Convective Heating Rate | internal-gain | conformance | internal_gains_001 | Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate. |
 | Zone Air Heat Balance Internal Convective Heat Gain Rate | heat_balance | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim. |
+| Zone Air Heat Balance Outdoor Air Transfer Rate | zone | conformance | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | Tolerance-gated official 1ZoneUncontrolled dynamic candidate conformance for the declared Zone Air Heat Balance Outdoor Air Transfer Rate row only; broad infiltration, ventilation, mixing, and air-balance compatibility remain outside the claim. |
 | Schedule Value | schedule | conformance | schedule_constant_001 | Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate. |
 | HeatTransfer Surface Area (Gross) | surface | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | HeatTransfer Surface Area (Net) | surface | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |

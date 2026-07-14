@@ -33,11 +33,11 @@ forbidden_active_features = [
   "Autosizing",
 ]
 algorithms = [
-  "manage_heat_balance",
-  "manage_surface_heat_balance",
-  "manage_air_heat_balance",
-  "zone_air_updates",
-  "ctf_conduction_path",
+  "heat_balance_manager_source_order",
+  "heat_balance_surface_manager_source_order",
+  "heat_balance_air_manager_source_order",
+  "zone_temp_predictor_corrector_source_order",
+  "official_dynamic_heat_balance_compat_candidate",
 ]
 evidence_cases = [
   "official_1zone_uncontrolled_dynamic_conformance_candidate_001",
@@ -65,14 +65,8 @@ forbidden_active_features = [
   "PythonPlugin",
 ]
 algorithms = [
-  "zone_equipment_manager",
-  "sim_purchased_air",
-  "calc_no_oa_sensible",
-  "update_purchased_air",
-  "report_purchased_air",
-  "report_purchased_air_energy",
-  "fuel_efficiency_reporting",
-  "ideal_loads_facility_meter",
+  "ideal_loads_zone_equipment_purchased_air_source_order",
+  "ideal_loads_air_system",
 ]
 evidence_cases = [
   "ideal_loads_blank_fuel_efficiency_conformance_candidate_001",
@@ -106,9 +100,7 @@ forbidden_active_features = [
   "PythonPlugin",
 ]
 algorithms = [
-  "calc_no_oa_sensible_with_capacity_limit",
-  "calc_no_oa_sensible_with_flow_limit",
-  "calc_no_oa_sensible_with_flow_and_capacity_limit",
+  "ideal_loads_air_system",
 ]
 evidence_cases = [
   "ideal_loads_capacity_limit_conformance_001",
@@ -138,7 +130,7 @@ forbidden_active_features = [
   "PythonPlugin",
 ]
 algorithms = [
-  "calc_constant_sensible_heat_ratio",
+  "ideal_loads_constant_shr_humidity_control",
 ]
 evidence_cases = [
   "ideal_loads_constant_shr_conformance_001",
@@ -164,10 +156,10 @@ forbidden_active_features = [
   "PythonPlugin",
 ]
 algorithms = [
-  "constant_supply_humidity_ratio",
-  "humidistat_dehumidification",
-  "humidistat_humidification",
-  "humidity_facility_meter",
+  "ideal_loads_constant_supply_humidity_control",
+  "ideal_loads_constant_supply_humidity_heating_control",
+  "ideal_loads_humidistat_dehumidification_control",
+  "ideal_loads_humidistat_humidification_control",
 ]
 evidence_cases = [
   "ideal_loads_constant_supply_humidity_cooling_annual_meter_conformance_candidate_001",
@@ -198,16 +190,7 @@ forbidden_active_features = [
   "PlantLoop",
 ]
 algorithms = [
-  "outdoor_air_flow_zone",
-  "outdoor_air_flow_person",
-  "outdoor_air_flow_area",
-  "outdoor_air_air_changes",
-  "outdoor_air_sum",
-  "outdoor_air_maximum",
-  "differential_dry_bulb_economizer",
-  "differential_enthalpy_economizer",
-  "sensible_heat_recovery",
-  "enthalpy_heat_recovery",
+  "ideal_loads_outdoor_air_design_flow",
 ]
 evidence_cases = [
   "ideal_loads_outdoor_air_air_changes_conformance_candidate_001",

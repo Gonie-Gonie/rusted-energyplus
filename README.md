@@ -60,7 +60,7 @@ Focused checks:
 .\scripts\dev.cmd manifest-validate-all
 .\scripts\dev.cmd strict-no-false-conformance
 .\scripts\dev.cmd project-contract-check
-.\scripts\dev.cmd capability-registry-check
+.\scripts\dev.cmd spec-cross-check
 .\scripts\dev.cmd algorithm-ledger-check
 .\scripts\dev.cmd arbitrary-run-smoke
 .\scripts\dev.cmd launcher-smoke

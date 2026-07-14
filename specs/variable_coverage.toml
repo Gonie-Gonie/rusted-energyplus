@@ -463,6 +463,38 @@ first_evidence = "plant_loop_diagnostic_001"
 support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
 
 [[variable]]
+name = "Fan Electricity Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "airloop_fan_only_diagnostic_001"
+first_evidence = "airloop_fan_only_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Cooling Coil Total Cooling Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "airloop_5zone_aircooled_diagnostic_001"
+first_evidence = "airloop_5zone_aircooled_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Heating Coil Heating Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "airloop_coil_only_diagnostic_001"
+first_evidence = "airloop_coil_only_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
+name = "Zone Packaged Terminal Air Conditioner Total Heating Rate"
+domain = "hvac"
+status = "baseline"
+first_case = "ptac_diagnostic_001"
+first_evidence = "ptac_diagnostic_001"
+support_boundary = "EnergyPlus oracle baseline request only; Rust numerical parity is not claimed."
+
+[[variable]]
 name = "Zone Thermostat Cooling Setpoint Temperature"
 domain = "zone"
 status = "conformance"
@@ -677,6 +709,14 @@ status = "conformance"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic conformance candidate source-order compatibility evidence only; broader internal-gain radiant/latent coupling remains outside the claim."
+
+[[variable]]
+name = "Zone Air Heat Balance Outdoor Air Transfer Rate"
+domain = "zone"
+status = "conformance"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic candidate conformance for the declared Zone Air Heat Balance Outdoor Air Transfer Rate row only; broad infiltration, ventilation, mixing, and air-balance compatibility remain outside the claim."
 
 [[variable]]
 name = "Schedule Value"

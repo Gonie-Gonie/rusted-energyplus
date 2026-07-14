@@ -40,11 +40,14 @@ CURRENT_STATUS_PHRASES = [
     "IdealLoads outdoor-air, economizer, heat-recovery",
     "remain outside arbitrary-run compatibility",
 ]
+ALLOWED_MANIFEST_OUTPUT_LEVELS = {"baseline", "diagnostic", "conformance"}
+COMPATIBILITY_ALGORITHM_STATUSES = {"conformance", "scaffold"}
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate specs/capabilities.toml.")
     parser.add_argument("--repo-root", required=True, type=Path)
+    parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
 
 
@@ -60,6 +63,26 @@ def read_text(path: Path) -> str:
 def require(condition: bool, errors: list[str], message: str) -> None:
     if not condition:
         errors.append(message)
+
+
+def load_case_manifests(repo_root: Path, errors: list[str]) -> dict[str, dict[str, Any]]:
+    cases: dict[str, dict[str, Any]] = {}
+    for path in sorted((repo_root / "data" / "conformance_cases").glob("*/case.toml")):
+        case = load_toml(path)
+        directory_id = path.parent.name
+        raw_case_id = case.get("id")
+        case_id = raw_case_id.strip() if isinstance(raw_case_id, str) else ""
+        require(bool(case_id), errors, f"case manifest has empty id: {path}")
+        require(
+            case_id == directory_id,
+            errors,
+            f"case manifest id must match its directory: {case_id!r} != {directory_id!r}",
+        )
+        storage_id = case_id or directory_id
+        require(storage_id not in cases, errors, f"duplicate case manifest id: {storage_id}")
+        if storage_id not in cases:
+            cases[storage_id] = case
+    return cases
 
 
 def values(item: dict[str, Any], key: str) -> list[str]:
@@ -111,19 +134,18 @@ def capability_for_ideal_loads_case(case_id: str) -> str:
     return "ideal_loads_no_oa_sensible"
 
 
-def conformance_claim_case_ids(repo_root: Path, prefix: str) -> set[str]:
-    case_ids: set[str] = set()
-    for path in (repo_root / "data" / "conformance_cases").glob(f"{prefix}*/case.toml"):
-        data = load_toml(path)
-        if data.get("conformance_claim") is True:
-            case_ids.add(str(data.get("id", path.parent.name)))
-    return case_ids
+def conformance_claim_case_ids(cases: dict[str, dict[str, Any]], prefix: str) -> set[str]:
+    return {
+        case_id
+        for case_id, case in cases.items()
+        if case_id.startswith(prefix) and case.get("conformance_claim") is True
+    }
 
 
 def validate_capabilities(
-    repo_root: Path,
     registry: dict[str, Any],
     run_states: dict[str, Any],
+    cases: dict[str, dict[str, Any]],
     errors: list[str],
 ) -> None:
     capabilities = registry.get("capability", [])
@@ -157,24 +179,30 @@ def validate_capabilities(
             f"capability {capability_id} must keep support_level=compatibility",
         )
         for case_id in values(capability, "evidence_cases"):
-            case_path = repo_root / "data" / "conformance_cases" / case_id / "case.toml"
-            require(case_path.is_file(), errors, f"capability {capability_id} references missing evidence case {case_id}")
-            if case_path.is_file():
-                case = load_toml(case_path)
+            case = cases.get(case_id)
+            require(case is not None, errors, f"capability {capability_id} references missing evidence case {case_id}")
+            if case is not None:
                 require(
                     case.get("conformance_claim") is True,
                     errors,
                     f"capability {capability_id} evidence case {case_id} must be conformance_claim=true",
                 )
+                require(
+                    case.get("comparison_class") == "conformance",
+                    errors,
+                    f"capability {capability_id} evidence case {case_id} must use comparison_class=conformance",
+                )
 
-    official_cases = set(values(capability_by_id["official_1zone_uncontrolled_declared_heat_balance"], "evidence_cases"))
-    require(
-        official_cases == EXPECTED_OFFICIAL_CASES,
-        errors,
-        "official 1Zone capability must match the declared current-status conformance candidate",
-    )
+    official_capability = capability_by_id.get("official_1zone_uncontrolled_declared_heat_balance")
+    if official_capability is not None:
+        official_cases = set(values(official_capability, "evidence_cases"))
+        require(
+            official_cases == EXPECTED_OFFICIAL_CASES,
+            errors,
+            "official 1Zone capability must match the declared current-status conformance candidate",
+        )
 
-    ideal_claims = conformance_claim_case_ids(repo_root, "ideal_loads_")
+    ideal_claims = conformance_claim_case_ids(cases, "ideal_loads_")
     expected_by_capability: dict[str, set[str]] = {
         capability_id: set() for capability_id in EXPECTED_CAPABILITY_IDS if capability_id.startswith("ideal_loads_")
     }
@@ -182,12 +210,442 @@ def validate_capabilities(
         expected_by_capability[capability_for_ideal_loads_case(case_id)].add(case_id)
 
     for capability_id, expected_cases in expected_by_capability.items():
-        actual_cases = set(values(capability_by_id[capability_id], "evidence_cases"))
+        capability = capability_by_id.get(capability_id)
+        if capability is None:
+            continue
+        actual_cases = set(values(capability, "evidence_cases"))
         require(
             actual_cases == expected_cases,
             errors,
             f"{capability_id} evidence_cases mismatch: expected {sorted(expected_cases)}, found {sorted(actual_cases)}",
         )
+
+
+def validate_spec_cross_references(
+    registry: dict[str, Any],
+    ledger: dict[str, Any],
+    variable_coverage: dict[str, Any],
+    cases: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    algorithms = ledger.get("algorithm", [])
+    algorithm_ids = [str(item.get("id", "")).strip() for item in algorithms]
+    algorithm_by_id = {
+        str(item.get("id", "")).strip(): item
+        for item in algorithms
+        if str(item.get("id", "")).strip()
+    }
+    require(all(algorithm_ids), errors, "algorithm ledger ids must be non-empty")
+    require(len(algorithm_ids) == len(set(algorithm_ids)), errors, "algorithm ledger ids must be unique")
+
+    variables = variable_coverage.get("variable", [])
+    variable_names = [str(item.get("name", "")).strip() for item in variables]
+    variable_by_name = {
+        str(item.get("name", "")).strip(): item
+        for item in variables
+        if str(item.get("name", "")).strip()
+    }
+    require(all(variable_names), errors, "variable coverage names must be non-empty")
+    require(len(variable_names) == len(set(variable_names)), errors, "variable coverage names must be unique")
+
+    for capability in registry.get("capability", []):
+        capability_id = str(capability.get("id", "")).strip() or "<missing-id>"
+        algorithm_refs = values(capability, "algorithms")
+        evidence_refs = values(capability, "evidence_cases")
+        require(
+            len(algorithm_refs) == len(set(algorithm_refs)),
+            errors,
+            f"capability {capability_id} algorithm references must be unique",
+        )
+        require(
+            len(evidence_refs) == len(set(evidence_refs)),
+            errors,
+            f"capability {capability_id} evidence case references must be unique",
+        )
+
+        for algorithm_id in algorithm_refs:
+            algorithm = algorithm_by_id.get(algorithm_id)
+            require(
+                algorithm is not None,
+                errors,
+                f"capability {capability_id} references unknown algorithm ledger id {algorithm_id}",
+            )
+            if algorithm is not None and capability.get("support_level") == "compatibility":
+                status = str(algorithm.get("status", ""))
+                require(
+                    status in COMPATIBILITY_ALGORITHM_STATUSES,
+                    errors,
+                    f"compatibility capability {capability_id} references algorithm {algorithm_id} with status {status!r}",
+                )
+
+        for case_id in evidence_refs:
+            case = cases.get(case_id)
+            require(
+                case is not None,
+                errors,
+                f"capability {capability_id} references missing evidence case {case_id}",
+            )
+            if case is not None:
+                require(
+                    case.get("conformance_claim") is True,
+                    errors,
+                    f"capability {capability_id} evidence case {case_id} must be conformance_claim=true",
+                )
+                require(
+                    case.get("comparison_class") == "conformance",
+                    errors,
+                    f"capability {capability_id} evidence case {case_id} must use comparison_class=conformance",
+                )
+
+    for algorithm in algorithms:
+        algorithm_id = str(algorithm.get("id", "")).strip() or "<missing-id>"
+        status = str(algorithm.get("status", "")).strip()
+        first_case_id = str(algorithm.get("first_case", "")).strip()
+        first_evidence_id = str(algorithm.get("first_evidence", "")).strip()
+        require(
+            bool(first_case_id),
+            errors,
+            f"algorithm {algorithm_id} first_case must be non-empty",
+        )
+        first_case = cases.get(first_case_id)
+        require(
+            first_case is not None,
+            errors,
+            f"algorithm {algorithm_id} first_case missing from case manifests: {first_case_id}",
+        )
+        if status == "scaffold":
+            require(
+                not first_evidence_id,
+                errors,
+                f"scaffold algorithm {algorithm_id} must not claim first_evidence",
+            )
+        else:
+            require(
+                bool(first_evidence_id),
+                errors,
+                f"algorithm {algorithm_id} first_evidence must be non-empty",
+            )
+        if first_evidence_id:
+            require(
+                first_evidence_id in cases,
+                errors,
+                f"algorithm {algorithm_id} first_evidence missing from case manifests: {first_evidence_id}",
+            )
+
+        proof_variables = values(algorithm, "proof_variables")
+        require(
+            len(proof_variables) == len(set(proof_variables)),
+            errors,
+            f"algorithm {algorithm_id} proof variable references must be unique",
+        )
+        for variable_name in proof_variables:
+            variable = variable_by_name.get(variable_name)
+            require(
+                variable is not None,
+                errors,
+                f"algorithm {algorithm_id} proof variable missing from variable coverage: {variable_name}",
+            )
+            if variable is not None and status == "conformance":
+                require(
+                    variable.get("status") == "conformance",
+                    errors,
+                    f"conformance algorithm {algorithm_id} proof variable must have conformance coverage: {variable_name}",
+                )
+            if first_case is not None and status == "conformance":
+                first_case_levels = {
+                    str(output.get("level", "")).strip()
+                    for output in first_case.get("outputs", [])
+                    if str(output.get("variable", "")).strip() == variable_name
+                }
+                require(
+                    bool(first_case_levels),
+                    errors,
+                    f"conformance algorithm {algorithm_id} proof variable is not requested by first_case {first_case_id}: {variable_name}",
+                )
+
+    manifest_output_cases: dict[str, set[str]] = {}
+    conformance_output_cases: dict[str, set[str]] = {}
+    for case_id, case in cases.items():
+        require(
+            str(case.get("id", "")).strip() == case_id,
+            errors,
+            f"case manifest map key/id mismatch: {case_id!r} != {case.get('id')!r}",
+        )
+        for index, output in enumerate(case.get("outputs", [])):
+            variable_name = str(output.get("variable", "")).strip()
+            level = str(output.get("level", "")).strip()
+            prefix = f"{case_id} outputs[{index}]"
+            require(bool(variable_name), errors, f"{prefix} must name a variable")
+            require(
+                level in ALLOWED_MANIFEST_OUTPUT_LEVELS,
+                errors,
+                f"{prefix} has unsupported evidence level {level!r}",
+            )
+            if not variable_name:
+                continue
+            manifest_output_cases.setdefault(variable_name, set()).add(case_id)
+            if level == "conformance":
+                conformance_output_cases.setdefault(variable_name, set()).add(case_id)
+
+    for variable_name, case_ids in sorted(manifest_output_cases.items()):
+        variable = variable_by_name.get(variable_name)
+        require(
+            variable is not None,
+            errors,
+            f"manifest output variable missing from variable coverage: {variable_name} ({', '.join(sorted(case_ids))})",
+        )
+    for variable_name in sorted(variable_by_name):
+        require(
+            variable_name in manifest_output_cases,
+            errors,
+            f"variable coverage entry is not requested by any case manifest: {variable_name}",
+        )
+    for variable_name, case_ids in sorted(conformance_output_cases.items()):
+        variable = variable_by_name.get(variable_name)
+        if variable is not None:
+            require(
+                variable.get("status") == "conformance",
+                errors,
+                f"conformance manifest output must have conformance coverage: {variable_name} ({', '.join(sorted(case_ids))})",
+            )
+    for variable_name, variable in sorted(variable_by_name.items()):
+        first_case_id = str(variable.get("first_case", "")).strip()
+        first_evidence_id = str(variable.get("first_evidence", "")).strip()
+        require(
+            bool(first_case_id),
+            errors,
+            f"variable coverage {variable_name} first_case must be non-empty",
+        )
+        require(
+            bool(first_evidence_id),
+            errors,
+            f"variable coverage {variable_name} first_evidence must be non-empty",
+        )
+        first_case = cases.get(first_case_id)
+        require(
+            first_case is not None,
+            errors,
+            f"variable coverage {variable_name} first_case missing from case manifests: {first_case_id}",
+        )
+        require(
+            first_evidence_id in cases,
+            errors,
+            f"variable coverage {variable_name} first_evidence missing from case manifests: {first_evidence_id}",
+        )
+        if first_case is not None:
+            first_case_levels = {
+                str(output.get("level", "")).strip()
+                for output in first_case.get("outputs", [])
+                if str(output.get("variable", "")).strip() == variable_name
+            }
+            require(
+                bool(first_case_levels),
+                errors,
+                f"variable coverage {variable_name} is not requested by first_case {first_case_id}",
+            )
+            if variable.get("status") == "conformance":
+                require(
+                    "conformance" in first_case_levels,
+                    errors,
+                    f"conformance variable coverage {variable_name} is not a conformance output of first_case {first_case_id}",
+                )
+        if variable.get("status") == "conformance":
+            require(
+                variable_name in conformance_output_cases,
+                errors,
+                f"conformance variable coverage has no conformance-level manifest output: {variable_name}",
+            )
+
+
+def cross_spec_self_test_fixture() -> tuple[
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, dict[str, Any]],
+]:
+    registry = {
+        "capability": [
+            {
+                "id": "fixture_capability",
+                "support_level": "compatibility",
+                "algorithms": ["fixture_algorithm"],
+                "evidence_cases": ["fixture_case"],
+            }
+        ]
+    }
+    ledger = {
+        "algorithm": [
+            {
+                "id": "fixture_algorithm",
+                "status": "conformance",
+                "first_case": "fixture_case",
+                "first_evidence": "fixture_case",
+                "proof_variables": ["Fixture Output"],
+            }
+        ]
+    }
+    variable_coverage = {
+        "variable": [
+            {
+                "name": "Fixture Output",
+                "status": "conformance",
+                "first_case": "fixture_case",
+                "first_evidence": "fixture_case",
+            }
+        ]
+    }
+    cases = {
+        "fixture_case": {
+            "id": "fixture_case",
+            "comparison_class": "conformance",
+            "conformance_claim": True,
+            "outputs": [
+                {
+                    "variable": "Fixture Output",
+                    "level": "conformance",
+                }
+            ],
+        }
+    }
+    return registry, ledger, variable_coverage, cases
+
+
+def validate_cross_spec_self_test(errors: list[str]) -> None:
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    fixture_errors: list[str] = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(not fixture_errors, errors, f"cross-spec valid-fixture self-test failed: {fixture_errors}")
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    registry["capability"][0]["algorithms"] = ["missing_algorithm"]
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("references unknown algorithm ledger id" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject an unknown capability algorithm",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    registry["capability"][0]["evidence_cases"] = ["missing_case"]
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("references missing evidence case" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing capability evidence case",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    variable_coverage["variable"] = []
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("manifest output variable missing from variable coverage" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject an uncovered manifest output",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    ledger["algorithm"][0]["proof_variables"] = ["Missing Proof Output"]
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("proof variable missing from variable coverage" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject an uncovered algorithm proof variable",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    ledger["algorithm"][0]["first_case"] = "missing_case"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("algorithm fixture_algorithm first_case missing" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing algorithm first_case",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    ledger["algorithm"][0]["first_evidence"] = "missing_case"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("algorithm fixture_algorithm first_evidence missing" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing algorithm first_evidence",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    variable_coverage["variable"][0]["first_case"] = "missing_case"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("variable coverage Fixture Output first_case missing" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing variable first_case",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    variable_coverage["variable"][0]["first_evidence"] = "missing_case"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("variable coverage Fixture Output first_evidence missing" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing variable first_evidence",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    variable_coverage["variable"][0]["status"] = "diagnostic"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any(
+            "conformance algorithm fixture_algorithm proof variable must have conformance coverage"
+            in error
+            for error in fixture_errors
+        ),
+        errors,
+        "cross-spec self-test did not reject conformance coverage status drift",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    variable_coverage["variable"].append(
+        {
+            "name": "Orphan Fixture Output",
+            "status": "diagnostic",
+            "first_case": "fixture_case",
+            "first_evidence": "fixture_case",
+        }
+    )
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("variable coverage entry is not requested" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject an orphan variable coverage entry",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    cases["fixture_case"]["id"] = "different_case"
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("case manifest map key/id mismatch" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a mismatched manifest id",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    del cases["fixture_case"]["id"]
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any("case manifest map key/id mismatch" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject a missing manifest id",
+    )
 
 
 def validate_rules(registry: dict[str, Any], errors: list[str]) -> None:
@@ -290,10 +748,16 @@ def main() -> int:
     args = parse_args()
     repo_root = args.repo_root.resolve()
     registry = load_toml(repo_root / "specs" / "capabilities.toml")
+    ledger = load_toml(repo_root / "specs" / "algorithm_ledger.toml")
+    variable_coverage = load_toml(repo_root / "specs" / "variable_coverage.toml")
     run_states = load_toml(repo_root / "specs" / "run_result_states.toml")
     errors: list[str] = []
+    cases = load_case_manifests(repo_root, errors)
 
-    validate_capabilities(repo_root, registry, run_states, errors)
+    validate_capabilities(registry, run_states, cases, errors)
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, errors)
+    if args.self_test:
+        validate_cross_spec_self_test(errors)
     validate_rules(registry, errors)
     validate_rust_wiring(repo_root, errors)
     validate_current_status(repo_root, errors)
@@ -305,12 +769,32 @@ def main() -> int:
         return 1
 
     capability_ids = sorted(str(item.get("id", "")) for item in registry.get("capability", []))
-    print("Capability registry check")
+    algorithm_ref_count = sum(
+        len(values(capability, "algorithms"))
+        for capability in registry.get("capability", [])
+    )
+    evidence_ref_count = sum(
+        len(values(capability, "evidence_cases"))
+        for capability in registry.get("capability", [])
+    )
+    output_variable_count = len(
+        {
+            str(output.get("variable", "")).strip()
+            for case in cases.values()
+            for output in case.get("outputs", [])
+            if str(output.get("variable", "")).strip()
+        }
+    )
+    print("Capability registry and spec cross-check")
     print(f"  capability_ids: {', '.join(capability_ids)}")
     print(f"  unsupported_rules: {len(registry.get('unsupported_rule', []))}")
     print(f"  partial_rules: {len(registry.get('partial_rule', []))}")
+    print(f"  algorithm_ledger_references: {algorithm_ref_count}")
+    print(f"  evidence_case_references: {evidence_ref_count}")
+    print(f"  covered_manifest_output_variables: {output_variable_count}")
     print("  rust_wiring: valid")
     print("  conformance_case_mapping: valid")
+    print(f"  mutation_self_test: {'pass' if args.self_test else 'not requested'}")
     return 0
 
 

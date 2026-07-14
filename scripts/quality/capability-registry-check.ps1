@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [switch]$SelfTest
+)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -30,7 +32,12 @@ if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
     throw "Missing capability registry validator: $script"
 }
 
-& $python $script --repo-root $RepoRoot
+$arguments = @($script, "--repo-root", $RepoRoot)
+if ($SelfTest) {
+    $arguments += "--self-test"
+}
+
+& $python @arguments
 if ($LASTEXITCODE -ne 0) {
     throw "Capability registry check failed with exit code $LASTEXITCODE"
 }

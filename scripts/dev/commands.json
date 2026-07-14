@@ -11,6 +11,7 @@
     "aliases":  {
                     "docs":  "docs-check",
                     "guard":  "strict-no-false-conformance",
+                    "capability-registry-check":  "spec-cross-check",
                     "verify-v0.1":  "v0.1-verify",
                     "verify-v0.32":  "v0.32-verify"
                 },
@@ -136,10 +137,10 @@
                          "help":  "Validate project contract source-of-truth alignment across specs, README, and current docs."
                      },
                      {
-                         "name":  "capability-registry-check",
+                         "name":  "spec-cross-check",
                          "path":  "quality\\capability-registry-check.ps1",
                          "group":  "quality",
-                         "help":  "Validate capability registry fields, evidence-case mappings, support rules, and ep_run artifact wiring."
+                         "help":  "Cross-check capability algorithms, evidence manifests, output coverage, support rules, and ep_run artifact wiring."
                      },
                      {
                          "name":  "algorithm-ledger-check",

@@ -9,6 +9,26 @@ permissions:
   pull-requests: read
 
 jobs:
+  spec-cross-check:
+    name: Spec Cross-Check
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Cross-check capability, algorithm, case, and variable specs
+        run: .\scripts\dev.cmd spec-cross-check -SelfTest
+
   algorithm-port-ticket:
     name: Algorithm Port Ticket
     runs-on: windows-latest
