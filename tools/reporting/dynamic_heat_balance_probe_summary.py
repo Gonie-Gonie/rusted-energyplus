@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -787,27 +786,6 @@ def nested_numeric(payload: dict[str, Any], *keys: str) -> float | None:
     return numeric(value)
 
 
-def signed_delta(payload: dict[str, Any], rust_key: str, oracle_key: str) -> float | None:
-    rust = numeric(payload.get(rust_key))
-    oracle = numeric(payload.get(oracle_key))
-    if rust is None or oracle is None:
-        return None
-    return rust - oracle
-
-
-def sum_optional(left: float | None, right: float | None) -> float | None:
-    if left is None or right is None:
-        return None
-    return left + right
-
-
-def sum_present(values: list[float | None]) -> float | None:
-    present = [value for value in values if value is not None]
-    if not present:
-        return None
-    return sum(present)
-
-
 def first_matching_key(rows: Any, key: str) -> dict[str, Any] | None:
     return next(iter(matching_key_rows(rows, key)), None)
 
@@ -836,26 +814,6 @@ def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | No
 
     first_sample = first_sample or {}
     series = series or {}
-    inside_current_signed = signed_delta(
-        first_sample,
-        "rust_inside_current_term_w",
-        "oracle_inside_current_term_w",
-    )
-    inside_history_signed = signed_delta(
-        first_sample,
-        "rust_inside_history_term_w",
-        "oracle_inside_history_term_w",
-    )
-    outside_current_signed = signed_delta(
-        first_sample,
-        "rust_outside_current_term_w",
-        "oracle_outside_current_term_w",
-    )
-    outside_history_signed = signed_delta(
-        first_sample,
-        "rust_outside_history_term_w",
-        "oracle_outside_history_term_w",
-    )
     return {
         "key": FLOOR_CTF_DRIVER_KEY,
         "construction_name": first_sample.get("construction_name")
@@ -866,18 +824,6 @@ def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | No
         ),
         "outside_face_temperature_delta_c": first_sample.get(
             "outside_face_temperature_delta_c"
-        ),
-        "inside_current_signed_delta_w": inside_current_signed,
-        "inside_history_signed_delta_w": inside_history_signed,
-        "inside_cancellation_residual_w": sum_optional(
-            inside_current_signed,
-            inside_history_signed,
-        ),
-        "outside_current_signed_delta_w": outside_current_signed,
-        "outside_history_signed_delta_w": outside_history_signed,
-        "outside_cancellation_residual_w": sum_optional(
-            outside_current_signed,
-            outside_history_signed,
         ),
         "inside_current_abs_delta_w": first_sample.get("inside_current_delta_w"),
         "inside_history_abs_delta_w": first_sample.get("inside_history_delta_w"),
@@ -906,19 +852,6 @@ def floor_ctf_history_driver_row(summary: dict[str, Any]) -> dict[str, Any] | No
     }
 
 
-def slot_inside_history_temperature_equivalent_delta_c(
-    slot: dict[str, Any] | None,
-    history_delta_w: float | None,
-) -> float | None:
-    if slot is None or history_delta_w is None:
-        return None
-    area = numeric(slot.get("area_m2"))
-    coefficient = numeric(slot.get("inside_history_coefficient_w_per_m2_k"))
-    if area is None or coefficient is None or area == 0.0 or coefficient == 0.0:
-        return None
-    return -history_delta_w / (area * coefficient)
-
-
 def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] | None:
     inside_solve = first_matching_key(
         summary.get("inside_solve_max_sample_deltas"),
@@ -937,141 +870,48 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
     inside_solve = inside_solve or {}
     slot1 = slots[0] if len(slots) >= 1 else None
     slot2 = slots[1] if len(slots) >= 2 else None
-    implied_numerator_delta_w = numeric(
-        inside_solve.get("implied_solve_numerator_delta_w")
+    required_precomputed_fields = (
+        "reference_air_source_signed_delta_w",
+        "reference_air_source_split_abs_sum_w",
+        "reference_air_source_cancellation_delta_w",
+        "reference_air_coefficient_source_signed_delta_w",
+        "reference_air_coefficient_source_delta_w",
+        "reference_air_temperature_source_signed_delta_w",
+        "reference_air_temperature_source_delta_w",
+        "tracked_solve_source_delta_w",
+        "solve_source_residual_delta_w",
+        "tracked_solve_source_coverage_ratio",
+        "reference_air_source_share",
+        "reference_air_coefficient_source_share",
+        "reference_air_temperature_source_share",
+        "outside_temperature_source_share",
+        "inside_history_source_share",
+        "inside_net_longwave_source_share",
+        "solve_source_residual_share",
     )
-    reference_air_source_delta_w = numeric(
-        inside_solve.get("reference_air_source_delta_w")
+    precomputed_fields_present = all(
+        numeric(inside_solve.get(field)) is not None
+        for field in required_precomputed_fields
     )
-    reference_air_source_signed_delta_w = numeric(
-        inside_solve.get("reference_air_source_signed_delta_w")
-    )
-    reference_air_source_split_abs_sum_w = numeric(
-        inside_solve.get("reference_air_source_split_abs_sum_w")
-    )
-    reference_air_source_cancellation_delta_w = numeric(
-        inside_solve.get("reference_air_source_cancellation_delta_w")
-    )
-    reference_air_coefficient_source_signed_delta_w = numeric(
-        inside_solve.get("reference_air_coefficient_source_signed_delta_w")
-    )
-    reference_air_coefficient_source_delta_w = numeric(
-        inside_solve.get("reference_air_coefficient_source_delta_w")
-    )
-    reference_air_temperature_source_signed_delta_w = numeric(
-        inside_solve.get("reference_air_temperature_source_signed_delta_w")
-    )
-    reference_air_temperature_source_delta_w = numeric(
-        inside_solve.get("reference_air_temperature_source_delta_w")
-    )
-    area_m2 = numeric(inside_solve.get("area_m2"))
-    oracle_hconv = numeric(
-        inside_solve.get("oracle_inside_convection_coefficient_w_per_m2_k")
-    )
-    rust_hconv = numeric(
-        inside_solve.get("rust_inside_convection_coefficient_w_per_m2_k")
-    )
-    oracle_ref_air = numeric(
-        inside_solve.get("oracle_inferred_reference_air_temperature_c")
-    )
-    rust_ref_air = numeric(
-        inside_solve.get("rust_inferred_reference_air_temperature_c")
-    )
-    oracle_reference_air_source_w = numeric(
-        inside_solve.get("oracle_reference_air_source_w")
-    )
-    rust_reference_air_source_w = numeric(
-        inside_solve.get("rust_reference_air_source_w")
-    )
-    if (
-        area_m2 is not None
-        and oracle_hconv is not None
-        and rust_hconv is not None
-        and oracle_ref_air is not None
-        and rust_ref_air is not None
-    ):
-        if reference_air_coefficient_source_signed_delta_w is None:
-            reference_air_coefficient_source_signed_delta_w = (
-                area_m2 * (oracle_hconv - rust_hconv) * oracle_ref_air
-            )
-        if reference_air_temperature_source_signed_delta_w is None:
-            reference_air_temperature_source_signed_delta_w = (
-                area_m2 * rust_hconv * (oracle_ref_air - rust_ref_air)
-            )
-        if reference_air_coefficient_source_delta_w is None:
-            reference_air_coefficient_source_delta_w = abs(
-                reference_air_coefficient_source_signed_delta_w
-            )
-        if reference_air_temperature_source_delta_w is None:
-            reference_air_temperature_source_delta_w = abs(
-                reference_air_temperature_source_signed_delta_w
-            )
-    if (
-        reference_air_source_signed_delta_w is None
-        and oracle_reference_air_source_w is not None
-        and rust_reference_air_source_w is not None
-    ):
-        reference_air_source_signed_delta_w = (
-            oracle_reference_air_source_w - rust_reference_air_source_w
-        )
-    if (
-        reference_air_source_split_abs_sum_w is None
-        and reference_air_coefficient_source_delta_w is not None
-        and reference_air_temperature_source_delta_w is not None
-    ):
-        reference_air_source_split_abs_sum_w = (
-            reference_air_coefficient_source_delta_w
-            + reference_air_temperature_source_delta_w
-        )
-    if (
-        reference_air_source_cancellation_delta_w is None
-        and reference_air_source_split_abs_sum_w is not None
-        and reference_air_source_delta_w is not None
-    ):
-        reference_air_source_cancellation_delta_w = (
-            reference_air_source_split_abs_sum_w - reference_air_source_delta_w
-        )
-    outside_temperature_source_delta_w = numeric(
-        inside_solve.get("outside_temperature_source_delta_w")
-    )
-    history_delta_w = numeric(inside_solve.get("inside_history_delta_w"))
-    inside_net_longwave_delta_w = numeric(
-        inside_solve.get("inside_net_longwave_delta_w")
-    )
-    tracked_source_delta_w = numeric(
-        inside_solve.get("tracked_solve_source_delta_w")
-    ) or sum_present(
-        [
-            reference_air_source_delta_w,
-            outside_temperature_source_delta_w,
-            history_delta_w,
-            inside_net_longwave_delta_w,
-        ]
-    )
-    untracked_source_delta_w = numeric(
-        inside_solve.get("solve_source_residual_delta_w")
-    )
-    if untracked_source_delta_w is None:
-        untracked_source_delta_w = (
-            implied_numerator_delta_w - tracked_source_delta_w
-            if implied_numerator_delta_w is not None
-            and tracked_source_delta_w is not None
-            else None
-        )
-    tracked_source_coverage_ratio = numeric(
-        inside_solve.get("tracked_solve_source_coverage_ratio")
-    ) or ratio(
-        tracked_source_delta_w,
-        implied_numerator_delta_w,
-    )
+
+    sample_index = inside_solve.get("sample_index")
+    if sample_index is None:
+        sample_index = (slot1 or {}).get("sample_index")
+    area_m2 = inside_solve.get("area_m2")
+    if area_m2 is None:
+        area_m2 = (slot1 or {}).get("area_m2")
 
     return {
         "key": FLOOR_CTF_DRIVER_KEY,
+        "status": (
+            "precomputed-rust-diagnostics"
+            if precomputed_fields_present
+            else "missing-precomputed-rust-diagnostics"
+        ),
         "construction_name": inside_solve.get("construction_name")
         or (slot1 or {}).get("construction_name"),
-        "sample_index": inside_solve.get("sample_index")
-        or (slot1 or {}).get("sample_index"),
-        "area_m2": inside_solve.get("area_m2") or (slot1 or {}).get("area_m2"),
+        "sample_index": sample_index,
+        "area_m2": area_m2,
         "slot_count": len(slots),
         "inside_face_temperature_delta_c": inside_solve.get(
             "inside_face_temperature_delta_c"
@@ -1085,22 +925,26 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         "reference_air_source_delta_w": inside_solve.get(
             "reference_air_source_delta_w"
         ),
-        "reference_air_source_signed_delta_w": reference_air_source_signed_delta_w,
-        "reference_air_source_split_abs_sum_w": reference_air_source_split_abs_sum_w,
-        "reference_air_source_cancellation_delta_w": (
-            reference_air_source_cancellation_delta_w
+        "reference_air_source_signed_delta_w": inside_solve.get(
+            "reference_air_source_signed_delta_w"
         ),
-        "reference_air_coefficient_source_signed_delta_w": (
-            reference_air_coefficient_source_signed_delta_w
+        "reference_air_source_split_abs_sum_w": inside_solve.get(
+            "reference_air_source_split_abs_sum_w"
         ),
-        "reference_air_coefficient_source_delta_w": (
-            reference_air_coefficient_source_delta_w
+        "reference_air_source_cancellation_delta_w": inside_solve.get(
+            "reference_air_source_cancellation_delta_w"
         ),
-        "reference_air_temperature_source_signed_delta_w": (
-            reference_air_temperature_source_signed_delta_w
+        "reference_air_coefficient_source_signed_delta_w": inside_solve.get(
+            "reference_air_coefficient_source_signed_delta_w"
         ),
-        "reference_air_temperature_source_delta_w": (
-            reference_air_temperature_source_delta_w
+        "reference_air_coefficient_source_delta_w": inside_solve.get(
+            "reference_air_coefficient_source_delta_w"
+        ),
+        "reference_air_temperature_source_signed_delta_w": inside_solve.get(
+            "reference_air_temperature_source_signed_delta_w"
+        ),
+        "reference_air_temperature_source_delta_w": inside_solve.get(
+            "reference_air_temperature_source_delta_w"
         ),
         "outside_temperature_source_delta_w": inside_solve.get(
             "outside_temperature_source_delta_w"
@@ -1134,51 +978,30 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         "inside_net_longwave_delta_w": inside_solve.get(
             "inside_net_longwave_delta_w"
         ),
-        "tracked_source_delta_w": tracked_source_delta_w,
-        "untracked_source_delta_w": untracked_source_delta_w,
-        "tracked_source_coverage_ratio": tracked_source_coverage_ratio,
-        "reference_air_source_share": numeric(
-            inside_solve.get("reference_air_source_share")
-        ) or ratio(
-            reference_air_source_delta_w,
-            implied_numerator_delta_w,
+        "tracked_source_delta_w": inside_solve.get("tracked_solve_source_delta_w"),
+        "untracked_source_delta_w": inside_solve.get(
+            "solve_source_residual_delta_w"
         ),
-        "reference_air_coefficient_source_share": numeric(
-            inside_solve.get("reference_air_coefficient_source_share")
-        ) or ratio(
-            reference_air_coefficient_source_delta_w,
-            implied_numerator_delta_w,
+        "tracked_source_coverage_ratio": inside_solve.get(
+            "tracked_solve_source_coverage_ratio"
         ),
-        "reference_air_temperature_source_share": numeric(
-            inside_solve.get("reference_air_temperature_source_share")
-        ) or ratio(
-            reference_air_temperature_source_delta_w,
-            implied_numerator_delta_w,
+        "reference_air_source_share": inside_solve.get("reference_air_source_share"),
+        "reference_air_coefficient_source_share": inside_solve.get(
+            "reference_air_coefficient_source_share"
         ),
-        "outside_temperature_source_share": numeric(
-            inside_solve.get("outside_temperature_source_share")
-        ) or ratio(
-            outside_temperature_source_delta_w,
-            implied_numerator_delta_w,
+        "reference_air_temperature_source_share": inside_solve.get(
+            "reference_air_temperature_source_share"
         ),
-        "inside_history_source_share": numeric(
-            inside_solve.get("inside_history_source_share")
-        ) or ratio(
-            history_delta_w,
-            implied_numerator_delta_w,
+        "outside_temperature_source_share": inside_solve.get(
+            "outside_temperature_source_share"
         ),
-        "inside_net_longwave_source_share": numeric(
-            inside_solve.get("inside_net_longwave_source_share")
-        ) or ratio(
-            inside_net_longwave_delta_w,
-            implied_numerator_delta_w,
+        "inside_history_source_share": inside_solve.get(
+            "inside_history_source_share"
         ),
-        "untracked_source_share": numeric(
-            inside_solve.get("solve_source_residual_share")
-        ) or ratio(
-            untracked_source_delta_w,
-            implied_numerator_delta_w,
+        "inside_net_longwave_source_share": inside_solve.get(
+            "inside_net_longwave_source_share"
         ),
+        "untracked_source_share": inside_solve.get("solve_source_residual_share"),
         "slot1_inside_total_term_w": (slot1 or {}).get("inside_total_term_w"),
         "slot1_inside_temperature_term_w": (slot1 or {}).get(
             "inside_temperature_term_w"
@@ -1190,12 +1013,6 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         "slot1_outside_temperature_history_c": (slot1 or {}).get(
             "outside_temperature_history_c"
         ),
-        "slot1_inside_history_temperature_equivalent_delta_c": (
-            slot_inside_history_temperature_equivalent_delta_c(
-                slot1,
-                history_delta_w,
-            )
-        ),
         "slot2_inside_total_term_w": (slot2 or {}).get("inside_total_term_w"),
         "slot2_inside_temperature_term_w": (slot2 or {}).get(
             "inside_temperature_term_w"
@@ -1206,12 +1023,6 @@ def floor_ctf_max_sample_driver_row(summary: dict[str, Any]) -> dict[str, Any] |
         ),
         "slot2_outside_temperature_history_c": (slot2 or {}).get(
             "outside_temperature_history_c"
-        ),
-        "slot2_inside_history_temperature_equivalent_delta_c": (
-            slot_inside_history_temperature_equivalent_delta_c(
-                slot2,
-                history_delta_w,
-            )
         ),
     }
 
@@ -1232,129 +1043,80 @@ def ratio(numerator: float | None, denominator: float | None) -> float | None:
     return numerator / denominator
 
 
-def sample_rows(series: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = series.get("sample_rows")
-    if not isinstance(rows, list):
-        return []
-    return [row for row in rows if isinstance(row, dict)]
-
-
-def sample_numeric(row: dict[str, Any], field: str) -> float | None:
-    return numeric(row.get(field))
-
-
-def residual_stats(values: list[float]) -> dict[str, float | None]:
-    if not values:
-        return {
-            "max_abs_w": None,
-            "rmse_w": None,
-            "mean_abs_w": None,
-        }
-    abs_values = [abs(value) for value in values]
-    return {
-        "max_abs_w": max(abs_values),
-        "rmse_w": math.sqrt(sum(value * value for value in values) / len(values)),
-        "mean_abs_w": sum(abs_values) / len(abs_values),
-    }
-
-
 def zone_surface_convection_closure_row(summary: dict[str, Any]) -> dict[str, Any]:
-    zone_series = find_series(
-        summary,
-        FocusMetric("ZONE ONE", ZONE_SURFACE_CONVECTION_VARIABLE),
+    closure = first_matching_key(
+        summary.get("zone_air_surface_convection_closure_deltas"),
+        "ZONE ONE",
     )
-    surface_series = []
-    for series in summary.get("series", []):
-        if not isinstance(series, dict):
-            continue
-        output = series.get("output", {})
-        if not isinstance(output, dict):
-            continue
-        if output.get("variable") == SURFACE_INSIDE_CONVECTION_VARIABLE:
-            surface_series.append(series)
-    surface_series.sort(key=series_output_label)
-
-    if zone_series is None:
+    if closure is None:
         return {
-            "status": "missing-zone-row",
-            "surface_count": len(surface_series),
-            "samples": None,
-            "sign_convention": "zone_plus_surface_report_heat_gain",
-        }
-    if not surface_series:
-        return {
-            "status": "missing-surface-rows",
-            "surface_count": 0,
+            "status": "missing-precomputed-rust-diagnostics",
+            "surface_count": None,
             "samples": None,
             "sign_convention": "zone_plus_surface_report_heat_gain",
         }
 
-    zone_samples = sample_rows(zone_series)
-    surface_samples = [sample_rows(series) for series in surface_series]
-    if not zone_samples or any(not rows for rows in surface_samples):
-        return {
-            "status": "missing-samples",
-            "surface_count": len(surface_series),
-            "samples": 0,
-            "sign_convention": "zone_plus_surface_report_heat_gain",
-        }
-
-    sample_window = min(len(zone_samples), *(len(rows) for rows in surface_samples))
-    oracle_residuals: list[float] = []
-    rust_residuals: list[float] = []
-    delta_residuals: list[float] = []
-
-    for sample_index in range(sample_window):
-        zone_oracle = sample_numeric(zone_samples[sample_index], "oracle_c")
-        zone_rust = sample_numeric(zone_samples[sample_index], "rust_c")
-        if zone_oracle is None or zone_rust is None:
-            continue
-
-        oracle_surface_sum = 0.0
-        rust_surface_sum = 0.0
-        sample_ok = True
-        for rows in surface_samples:
-            surface_oracle = sample_numeric(rows[sample_index], "oracle_c")
-            surface_rust = sample_numeric(rows[sample_index], "rust_c")
-            if surface_oracle is None or surface_rust is None:
-                sample_ok = False
-                break
-            oracle_surface_sum += surface_oracle
-            rust_surface_sum += surface_rust
-        if not sample_ok:
-            continue
-
-        oracle_residual = zone_oracle + oracle_surface_sum
-        rust_residual = zone_rust + rust_surface_sum
-        oracle_residuals.append(oracle_residual)
-        rust_residuals.append(rust_residual)
-        delta_residuals.append(rust_residual - oracle_residual)
-
-    oracle_stats = residual_stats(oracle_residuals)
-    rust_stats = residual_stats(rust_residuals)
-    delta_stats = residual_stats(delta_residuals)
-    status = "computed" if oracle_residuals else "missing-values"
-    if oracle_residuals and len(oracle_residuals) != sample_window:
-        status = "computed-with-skipped-samples"
+    required_stat_paths = tuple(
+        (summary_name, statistic_name)
+        for summary_name in (
+            "oracle_closure_residual",
+            "rust_closure_residual",
+            "closure_residual_delta",
+        )
+        for statistic_name in (
+            "max_abs_delta_c",
+            "rmse_delta_c",
+            "mean_abs_delta_c",
+        )
+    )
+    precomputed_fields_present = (
+        numeric(closure.get("surface_count")) is not None
+        and numeric(closure.get("samples")) is not None
+        and all(
+            nested_numeric(closure, *path) is not None
+            for path in required_stat_paths
+        )
+    )
 
     return {
-        "status": status,
-        "zone_key": "ZONE ONE",
+        "status": (
+            "precomputed-rust-diagnostics"
+            if precomputed_fields_present
+            else "missing-precomputed-rust-diagnostics"
+        ),
+        "zone_key": closure.get("key", "ZONE ONE"),
         "zone_variable": ZONE_SURFACE_CONVECTION_VARIABLE,
         "surface_variable": SURFACE_INSIDE_CONVECTION_VARIABLE,
-        "surface_count": len(surface_series),
-        "samples": len(oracle_residuals),
-        "sample_window": sample_window,
+        "surface_count": closure.get("surface_count"),
+        "samples": closure.get("samples"),
         "sign_convention": "zone_plus_surface_report_heat_gain",
-        "oracle_closure_max_abs_w": oracle_stats["max_abs_w"],
-        "oracle_closure_rmse_w": oracle_stats["rmse_w"],
-        "oracle_closure_mean_abs_w": oracle_stats["mean_abs_w"],
-        "rust_closure_max_abs_w": rust_stats["max_abs_w"],
-        "rust_closure_rmse_w": rust_stats["rmse_w"],
-        "rust_closure_mean_abs_w": rust_stats["mean_abs_w"],
-        "closure_delta_max_abs_w": delta_stats["max_abs_w"],
-        "closure_delta_rmse_w": delta_stats["rmse_w"],
-        "closure_delta_mean_abs_w": delta_stats["mean_abs_w"],
+        "oracle_closure_max_abs_w": nested_numeric(
+            closure, "oracle_closure_residual", "max_abs_delta_c"
+        ),
+        "oracle_closure_rmse_w": nested_numeric(
+            closure, "oracle_closure_residual", "rmse_delta_c"
+        ),
+        "oracle_closure_mean_abs_w": nested_numeric(
+            closure, "oracle_closure_residual", "mean_abs_delta_c"
+        ),
+        "rust_closure_max_abs_w": nested_numeric(
+            closure, "rust_closure_residual", "max_abs_delta_c"
+        ),
+        "rust_closure_rmse_w": nested_numeric(
+            closure, "rust_closure_residual", "rmse_delta_c"
+        ),
+        "rust_closure_mean_abs_w": nested_numeric(
+            closure, "rust_closure_residual", "mean_abs_delta_c"
+        ),
+        "closure_delta_max_abs_w": nested_numeric(
+            closure, "closure_residual_delta", "max_abs_delta_c"
+        ),
+        "closure_delta_rmse_w": nested_numeric(
+            closure, "closure_residual_delta", "rmse_delta_c"
+        ),
+        "closure_delta_mean_abs_w": nested_numeric(
+            closure, "closure_residual_delta", "mean_abs_delta_c"
+        ),
     }
 
 
@@ -1702,7 +1464,7 @@ def build_summary(repo_root: Path) -> dict[str, Any]:
     annotate_default_surface_balance_deltas(lanes)
     annotate_reference_focus_movements(lanes)
     return {
-        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v17",
+        "schema": "rusted-energyplus.dynamic-heat-balance-probe-summary.v18",
         "oracle_version": ORACLE_VERSION,
         "case_id": CASE_ID,
         "expected_series_count": EXPECTED_SERIES_COUNT,
@@ -1741,6 +1503,12 @@ def fmt_number(value: Any) -> str:
 def fmt_signed_number(value: Any) -> str:
     if isinstance(value, (int, float)):
         return f"{value:+.6f}"
+    return "none"
+
+
+def fmt_count(value: Any) -> str:
+    if isinstance(value, int):
+        return str(value)
     return "none"
 
 
@@ -1974,12 +1742,12 @@ def render_markdown(summary: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Floor CTF History Cancellation Drivers",
+            "## Floor CTF History Drivers",
             "",
-            "Signed first-sample current/history deltas show whether large CTF current and history misses cancel into the reported conduction residual. Annual RMSE columns keep the latent current/history mismatch visible even when the reported storage row partially cancels.",
+            "Rust-produced first-sample absolute current/history deltas and annual RMSE columns keep the latent CTF mismatch visible without reconstructing heat-transfer terms in the report generator.",
             "",
-            "| lane | in temp abs C | out temp abs C | in current dW | in history dW | in residual W | out current dW | out history dW | out residual W | in current RMSE | in history RMSE | out current RMSE | out history RMSE |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "| lane | in temp abs C | out temp abs C | in current abs W | in history abs W | out current abs W | out history abs W | in current RMSE | in history RMSE | out current RMSE | out history RMSE |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for lane in summary["lanes"]:
@@ -1987,28 +1755,14 @@ def render_markdown(summary: dict[str, Any]) -> str:
         if not isinstance(driver, dict):
             continue
         lines.append(
-            "| {lane} | {in_temp} | {out_temp} | {in_current} | {in_history} | {in_residual} | {out_current} | {out_history} | {out_residual} | {in_current_rmse} | {in_history_rmse} | {out_current_rmse} | {out_history_rmse} |".format(
+            "| {lane} | {in_temp} | {out_temp} | {in_current} | {in_history} | {out_current} | {out_history} | {in_current_rmse} | {in_history_rmse} | {out_current_rmse} | {out_history_rmse} |".format(
                 lane=lane["lane"],
                 in_temp=fmt_number(driver.get("inside_face_temperature_delta_c")),
                 out_temp=fmt_number(driver.get("outside_face_temperature_delta_c")),
-                in_current=fmt_signed_number(
-                    driver.get("inside_current_signed_delta_w")
-                ),
-                in_history=fmt_signed_number(
-                    driver.get("inside_history_signed_delta_w")
-                ),
-                in_residual=fmt_signed_number(
-                    driver.get("inside_cancellation_residual_w")
-                ),
-                out_current=fmt_signed_number(
-                    driver.get("outside_current_signed_delta_w")
-                ),
-                out_history=fmt_signed_number(
-                    driver.get("outside_history_signed_delta_w")
-                ),
-                out_residual=fmt_signed_number(
-                    driver.get("outside_cancellation_residual_w")
-                ),
+                in_current=fmt_number(driver.get("inside_current_abs_delta_w")),
+                in_history=fmt_number(driver.get("inside_history_abs_delta_w")),
+                out_current=fmt_number(driver.get("outside_current_abs_delta_w")),
+                out_history=fmt_number(driver.get("outside_history_abs_delta_w")),
                 in_current_rmse=fmt_number(driver.get("inside_current_rmse_w")),
                 in_history_rmse=fmt_number(driver.get("inside_history_rmse_w")),
                 out_current_rmse=fmt_number(driver.get("outside_current_rmse_w")),
@@ -2020,10 +1774,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
             "",
             "## Floor CTF Max-Sample Drivers",
             "",
-            "Max-sample solve/source rows keep the active floor storage bottleneck visible after the first-sample history cancellation has settled. Tracked source coverage sums the currently decomposed numerator deltas: reference air, outside-temperature source, CTF history, and inside longwave. Reference-air deltas are split into signed hconv-coefficient and reference-air-temperature components, plus an absolute cancellation term, so hconv timing can be separated from MAT/source timing even when the components offset each other. The untracked residual mostly represents still-unsplit damping/source-order effects and is the next place to add source probes when coverage is low.",
+            "Max-sample solve/source rows consume the Rust diagnostic decomposition directly. Tracked source coverage, reference-air splits, cancellation, and residual values are no longer reconstructed by this report generator; older artifacts are marked as missing precomputed diagnostics.",
             "",
-            "| lane | sample | Tin dC | ref air dC | numerator dW | tracked dW | coverage | untracked dW | history share | ref-air share | ref hconv share | ref temp share | LW share | outside share | history dW | history signed W | current signed W | current-out signed W | current-in signed W | current cancel W | conduction signed W | ref air dW | ref signed W | ref cancel W | ref hconv dW | ref hconv signed W | ref temp dW | ref temp signed W | LW dW | history temp W | history flux W | slots | slot1 total W | slot1 Tin C | slot1 equiv dC | slot2 total W | slot2 Tin C | slot2 equiv dC |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "| lane | sample | Tin dC | ref air dC | numerator dW | tracked dW | coverage | untracked dW | history share | ref-air share | ref hconv share | ref temp share | LW share | outside share | history dW | history signed W | current signed W | current-out signed W | current-in signed W | current cancel W | conduction signed W | ref air dW | ref signed W | ref cancel W | ref hconv dW | ref hconv signed W | ref temp dW | ref temp signed W | LW dW | history temp W | history flux W | slots | slot1 total W | slot1 Tin C | slot2 total W | slot2 Tin C | source |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
     )
     for lane in summary["lanes"]:
@@ -2031,9 +1785,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
         if not isinstance(driver, dict):
             continue
         lines.append(
-            "| {lane} | {sample} | {in_temp} | {ref_air_temp} | {numerator} | {tracked} | {coverage} | {untracked} | {history_share} | {ref_air_share} | {ref_hconv_share} | {ref_temp_share} | {lw_share} | {outside_share} | {history} | {history_signed} | {current_signed} | {current_out_signed} | {current_in_signed} | {current_cancel} | {conduction_signed} | {ref_air} | {ref_air_signed} | {ref_air_cancel} | {ref_hconv} | {ref_hconv_signed} | {ref_temp} | {ref_temp_signed} | {lw} | {history_temp} | {history_flux} | {slots} | {slot1_total} | {slot1_tin} | {slot1_equiv} | {slot2_total} | {slot2_tin} | {slot2_equiv} |".format(
+            "| {lane} | {sample} | {in_temp} | {ref_air_temp} | {numerator} | {tracked} | {coverage} | {untracked} | {history_share} | {ref_air_share} | {ref_hconv_share} | {ref_temp_share} | {lw_share} | {outside_share} | {history} | {history_signed} | {current_signed} | {current_out_signed} | {current_in_signed} | {current_cancel} | {conduction_signed} | {ref_air} | {ref_air_signed} | {ref_air_cancel} | {ref_hconv} | {ref_hconv_signed} | {ref_temp} | {ref_temp_signed} | {lw} | {history_temp} | {history_flux} | {slots} | {slot1_total} | {slot1_tin} | {slot2_total} | {slot2_tin} | {source} |".format(
                 lane=lane["lane"],
-                sample=driver.get("sample_index") or "none",
+                sample=fmt_count(driver.get("sample_index")),
                 in_temp=fmt_number(driver.get("inside_face_temperature_delta_c")),
                 ref_air_temp=fmt_number(
                     driver.get("inferred_reference_air_temperature_delta_c")
@@ -2099,21 +1853,16 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     driver.get("rust_inside_history_flux_term_w")
                 ),
                 lw=fmt_number(driver.get("inside_net_longwave_delta_w")),
-                slots=driver.get("slot_count") or "none",
+                slots=fmt_count(driver.get("slot_count")),
                 slot1_total=fmt_number(driver.get("slot1_inside_total_term_w")),
                 slot1_tin=fmt_number(
                     driver.get("slot1_inside_temperature_history_c")
-                ),
-                slot1_equiv=fmt_signed_number(
-                    driver.get("slot1_inside_history_temperature_equivalent_delta_c")
                 ),
                 slot2_total=fmt_number(driver.get("slot2_inside_total_term_w")),
                 slot2_tin=fmt_number(
                     driver.get("slot2_inside_temperature_history_c")
                 ),
-                slot2_equiv=fmt_signed_number(
-                    driver.get("slot2_inside_history_temperature_equivalent_delta_c")
-                ),
+                source=driver.get("status", "none"),
             )
         )
     lines.extend(

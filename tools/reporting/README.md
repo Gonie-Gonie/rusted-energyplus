@@ -98,21 +98,20 @@ Current generators:
   temperature RMSE, then reports storage/conduction RMSE per face-temperature
   RMSE. This keeps CTF amplification cases, where small temperature misses
   become large storage-rate deltas, visible before a runtime candidate is
-  promoted. It also prints signed `ZN001:FLR001` CTF current/history
-  first-sample deltas and annual current/history RMSE so cancellation can be
-  reviewed directly when a probe improves reported storage but leaves latent
-  mass-floor history mismatch behind. The same report includes the floor
+  promoted. It also prints Rust-produced absolute `ZN001:FLR001` CTF
+  current/history first-sample deltas and annual current/history RMSE so latent
+  mass-floor history mismatch remains visible without reconstructing
+  heat-transfer terms in Python. The same report includes the floor
   max-sample inside-solve decomposition, tracked numerator-source coverage,
   and recent CTF history slot 1/2 contributions so the active storage
   bottleneck can be traced to reference-air, longwave, damping/source-order, or
-  history-slot timing before adding another probe lane. It also
-  splits reference-air source deltas into signed hconv-coefficient and
-  reference-air-temperature components, reports their absolute cancellation
-  when they offset each other, and reports zone surface-convection
-  closure against the signed sum of individual surface inside-convection
-  heat-gain rows. This keeps EnergyPlus AirRpt source/timing differences
-  visible before treating surface report rows as a substitute for
-  `CalcZoneComponentLoadSums`.
+  history-slot timing before adding another probe lane. The reporter consumes
+  Rust-produced reference-air source splits, cancellation, tracked-source
+  coverage, and zone surface-convection closure summaries directly. Missing
+  fields mark older artifacts as missing precomputed Rust diagnostics instead
+  of triggering a Python physics fallback. This keeps EnergyPlus AirRpt
+  source/timing differences visible before treating surface report rows as a
+  substitute for `CalcZoneComponentLoadSums`.
 
 Conformance-facing scripts should keep this split:
 
@@ -121,6 +120,10 @@ Conformance-facing scripts should keep this split:
   arguments through to the generator.
 - `tools/reporting/*.py` owns data shaping, chart readability, document layout,
   and durable artifact serialization.
+
+Reporting helpers must consume runtime and comparison diagnostics as data; they
+must not reconstruct heat-balance, HVAC, psychrometric, or other simulation
+physics when an artifact field is absent.
 
 When a Python report includes charts, review the rendered PDF/HTML output as
 part of the change. Temporary screenshots or page images are useful for QA, but

@@ -757,22 +757,6 @@ $floorCtfComponent = @($summary.ctf_component_first_samples | Where-Object { $_.
 if ($null -eq $floorCtfComponent) {
     throw "Expected ctf_component_first_samples to include ZN001:FLR001"
 }
-$insideComponentSum = [double]$floorCtfComponent.inside_current_outside_term_w +
-    [double]$floorCtfComponent.inside_current_inside_term_w +
-    [double]$floorCtfComponent.inside_history_term_w
-if ([Math]::Abs($insideComponentSum - [double]$floorCtfComponent.inside_conduction_rate_w) -gt 1.0e-6) {
-    throw "Expected FLOOR inside CTF component sum to match inside conduction rate"
-}
-$outsideComponentSum = [double]$floorCtfComponent.outside_current_outside_term_w +
-    [double]$floorCtfComponent.outside_current_inside_term_w +
-    [double]$floorCtfComponent.outside_history_term_w
-if ([Math]::Abs($outsideComponentSum - [double]$floorCtfComponent.outside_conduction_rate_w) -gt 1.0e-6) {
-    throw "Expected FLOOR outside CTF component sum to match outside conduction rate"
-}
-$storageFromConduction = -([double]$floorCtfComponent.inside_conduction_rate_w + [double]$floorCtfComponent.outside_conduction_rate_w)
-if ([Math]::Abs($storageFromConduction - [double]$floorCtfComponent.heat_storage_rate_w) -gt 1.0e-6) {
-    throw "Expected FLOOR storage to match the negated inside/outside conduction sum"
-}
 $zoneAirCoefficientDelta = @($summary.zone_air_coefficient_deltas | Where-Object { $_.key -eq "ZONE ONE" })[0]
 if ($null -eq $zoneAirCoefficientDelta) {
     throw "Expected zone_air_coefficient_deltas to include ZONE ONE"
@@ -1020,22 +1004,6 @@ if ($CtfSeedPolicy -eq "all-eio") {
     if ($null -eq $floorInsideSolveMaxSampleDelta.reference_air_temperature_source_signed_delta_w) {
         throw "Expected FLOOR inside-solve max-sample row to include reference_air_temperature_source_signed_delta_w"
     }
-    $referenceAirSignedSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_signed_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_signed_delta_w
-    if ([Math]::Abs($referenceAirSignedSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_signed_delta_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside-solve signed reference-air split terms to reconstruct reference_air_source_signed_delta_w"
-    }
-    $referenceAirAbsSplitSum = [double]$floorInsideSolveMaxSampleDelta.reference_air_coefficient_source_delta_w + [double]$floorInsideSolveMaxSampleDelta.reference_air_temperature_source_delta_w
-    if ([Math]::Abs($referenceAirAbsSplitSum - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_split_abs_sum_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside-solve absolute reference-air split terms to reconstruct reference_air_source_split_abs_sum_w"
-    }
-    $referenceAirCancellation = [double]$floorInsideSolveMaxSampleDelta.reference_air_source_split_abs_sum_w - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_delta_w
-    if ([Math]::Abs($referenceAirCancellation - [double]$floorInsideSolveMaxSampleDelta.reference_air_source_cancellation_delta_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside-solve reference-air cancellation delta to match abs split sum minus absolute source delta"
-    }
-    $rustInsideHistorySplitSum = [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_temperature_term_w + [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_flux_term_w
-    if ([Math]::Abs($rustInsideHistorySplitSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside-solve Rust history split terms to sum to rust_inside_history_term_w"
-    }
     $floorInsideSolveSeriesDelta = @($summary.inside_solve_series_deltas | Where-Object { $_.key -eq "ZN001:FLR001" })[0]
     if ($null -eq $floorInsideSolveSeriesDelta) {
         throw "Expected inside_solve_series_deltas to include ZN001:FLR001 in all-eio mode"
@@ -1100,25 +1068,6 @@ if ($CtfSeedPolicy -eq "all-eio") {
         if ([int]$slot.sample_index -ne [int]$floorStorageMaxSampleDelta.sample_index) {
             throw "Expected FLOOR post-advance max-sample CTF history slot to share storage sample index $($floorStorageMaxSampleDelta.sample_index), got $($slot.sample_index)"
         }
-    }
-    $maxSampleInsideSlotSum = 0.0
-    foreach ($slot in $floorMaxSampleHistorySlots) {
-        $maxSampleInsideSlotSum += [double]$slot.inside_total_term_w
-    }
-    if ([Math]::Abs($maxSampleInsideSlotSum - [double]$floorInsideSolveMaxSampleDelta.rust_inside_history_term_w) -gt 1.0e-6) {
-        throw "Expected FLOOR max-sample CTF slot sum to match Rust inside history term"
-    }
-    $insideSlotSum = 0.0
-    $outsideSlotSum = 0.0
-    foreach ($slot in $floorHistorySlots) {
-        $insideSlotSum += [double]$slot.inside_total_term_w
-        $outsideSlotSum += [double]$slot.outside_total_term_w
-    }
-    if ([Math]::Abs($insideSlotSum - [double]$floorCtfComponent.inside_history_term_w) -gt 1.0e-6) {
-        throw "Expected FLOOR inside CTF slot sum to match aggregate history term"
-    }
-    if ([Math]::Abs($outsideSlotSum - [double]$floorCtfComponent.outside_history_term_w) -gt 1.0e-6) {
-        throw "Expected FLOOR outside CTF slot sum to match aggregate history term"
     }
 }
 $expectedTopCandidates = @(

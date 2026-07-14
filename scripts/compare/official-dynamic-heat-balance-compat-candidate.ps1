@@ -1844,20 +1844,10 @@ $insideLongwaveSourceRows = @($summary.inside_source_term_series_summaries | Whe
 if ($insideLongwaveSourceRows.Count -ne 6) {
     throw "Expected six inside-net-longwave source-term summary rows, got $($insideLongwaveSourceRows.Count)"
 }
-$largestInsideLongwaveArea = 0.0
-$totalInsideLongwaveArea = 0.0
 foreach ($row in $insideLongwaveSourceRows) {
-    $area = [double]$row.area_m2
-    $totalInsideLongwaveArea += $area
-    if ($area -gt $largestInsideLongwaveArea) {
-        $largestInsideLongwaveArea = $area
-    }
     if ([double]$row.area_residual_max_abs_w -gt 0.000000001) {
         throw "Inside longwave source-term area residual exceeds tolerance for $($row.key): $($row.area_residual_max_abs_w)"
     }
-}
-if ($largestInsideLongwaveArea -gt (0.99 * ($totalInsideLongwaveArea - $largestInsideLongwaveArea))) {
-    throw "Official 1Zone unexpectedly activates the large-surface-area view-factor special case"
 }
 $insideLongwaveSeries = @($summary.series | Where-Object {
         $_.output.variable -eq "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate" `

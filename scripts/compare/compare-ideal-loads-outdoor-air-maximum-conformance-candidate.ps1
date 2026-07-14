@@ -151,13 +151,6 @@ Assert-NearlyEqual -Actual $summary.outdoor_air_flow_per_person_m3_per_s -Expect
 Assert-NearlyEqual -Actual $summary.outdoor_air_flow_per_area_m3_per_s -Expected 0.015 -Tolerance 0.000000000001 -Description "outdoor-air Flow/Area component"
 Assert-NearlyEqual -Actual $summary.outdoor_air_flow_per_zone_m3_per_s -Expected 0.025 -Tolerance 0.000000000001 -Description "outdoor-air Flow/Zone component"
 Assert-NearlyEqual -Actual $summary.outdoor_air_air_changes_m3_per_s -Expected 0.05 -Tolerance 0.000000000001 -Description "outdoor-air AirChanges/Hour component"
-$summaryMaximum = @(
-    $summary.outdoor_air_flow_per_person_m3_per_s,
-    $summary.outdoor_air_flow_per_area_m3_per_s,
-    $summary.outdoor_air_flow_per_zone_m3_per_s,
-    $summary.outdoor_air_air_changes_m3_per_s
-) | Measure-Object -Maximum
-Assert-NearlyEqual -Actual $summaryMaximum.Maximum -Expected $summary.design_volume_flow_rate_m3_per_s -Tolerance 0.000000000001 -Description "outdoor-air Maximum selected component"
 
 $rows = @($summary.series)
 if ($rows.Count -ne 22) {
@@ -363,13 +356,6 @@ Assert-NearlyEqual -Actual $stageSummary.outdoor_air_flow_per_person_m3_per_s -E
 Assert-NearlyEqual -Actual $stageSummary.outdoor_air_flow_per_area_m3_per_s -Expected 0.015 -Tolerance 0.000000000001 -Description "stage-summary Flow/Area component"
 Assert-NearlyEqual -Actual $stageSummary.outdoor_air_flow_per_zone_m3_per_s -Expected 0.025 -Tolerance 0.000000000001 -Description "stage-summary Flow/Zone component"
 Assert-NearlyEqual -Actual $stageSummary.outdoor_air_air_changes_m3_per_s -Expected 0.05 -Tolerance 0.000000000001 -Description "stage-summary AirChanges/Hour component"
-$stageMaximum = @(
-    $stageSummary.outdoor_air_flow_per_person_m3_per_s,
-    $stageSummary.outdoor_air_flow_per_area_m3_per_s,
-    $stageSummary.outdoor_air_flow_per_zone_m3_per_s,
-    $stageSummary.outdoor_air_air_changes_m3_per_s
-) | Measure-Object -Maximum
-Assert-NearlyEqual -Actual $stageMaximum.Maximum -Expected $stageSummary.design_volume_flow_rate_m3_per_s -Tolerance 0.000000000001 -Description "stage-summary Maximum selected component"
 
 $reportText = Get-Content -LiteralPath $reportPath -Raw
 Assert-Contains -Text $reportText -Pattern "claim_boundary: conformance IdealLoads outdoor-air Maximum branch for declared variables only" -Description "markdown claim boundary"

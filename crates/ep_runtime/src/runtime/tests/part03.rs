@@ -524,30 +524,39 @@
         let surface = &mut state.surfaces[0];
         surface.inside_face_temperature_c = 20.0;
         surface.outside_face_temperature_c = 10.0;
-        surface.ctf.cross_history_w_per_m2_k = vec![0.2];
-        surface.ctf.inside_history_w_per_m2_k = vec![0.3];
-        surface.ctf.outside_history_w_per_m2_k = vec![0.4];
-        surface.ctf.flux_history = vec![0.5];
-        surface.ctf.outside_temperature_history_c = vec![8.0];
-        surface.ctf.inside_temperature_history_c = vec![18.0];
-        surface.ctf.inside_flux_history_w_per_m2 = vec![1.2];
-        surface.ctf.outside_flux_history_w_per_m2 = vec![-0.4];
+        surface.ctf.cross_history_w_per_m2_k = vec![0.2, 0.1];
+        surface.ctf.inside_history_w_per_m2_k = vec![0.3, 0.05];
+        surface.ctf.outside_history_w_per_m2_k = vec![0.4, 0.2];
+        surface.ctf.flux_history = vec![0.5, 0.25];
+        surface.ctf.outside_temperature_history_c = vec![8.0, 7.0];
+        surface.ctf.inside_temperature_history_c = vec![18.0, 17.0];
+        surface.ctf.inside_flux_history_w_per_m2 = vec![1.2, 0.8];
+        surface.ctf.outside_flux_history_w_per_m2 = vec![-0.4, -0.2];
 
         update_surface_ctf_history_constants(surface);
 
-        assert!((surface.ctf.const_in_part_w_per_m2 - (-3.2)).abs() < 1.0e-12);
-        assert!((surface.ctf.const_out_part_w_per_m2 - (-0.6)).abs() < 1.0e-12);
+        assert!((surface.ctf.const_in_part_w_per_m2 - (-3.15)).abs() < 1.0e-12);
+        assert!((surface.ctf.const_out_part_w_per_m2 - (-0.95)).abs() < 1.0e-12);
 
         let slot_samples = surface_ctf_history_slot_samples(surface);
-        assert_eq!(slot_samples.len(), 1);
+        assert_eq!(slot_samples.len(), 2);
         let slot = &slot_samples[0];
         assert_eq!(slot.slot_index, 1);
+        assert_eq!(slot_samples[1].slot_index, 2);
+        let inside_slot_sum = slot_samples
+            .iter()
+            .map(|sample| sample.inside_total_term_w)
+            .sum::<f64>();
+        let outside_slot_sum = slot_samples
+            .iter()
+            .map(|sample| sample.outside_total_term_w)
+            .sum::<f64>();
         assert!(
-            (slot.inside_total_term_w - surface.area_m2 * surface.ctf.const_in_part_w_per_m2).abs()
+            (inside_slot_sum - surface.area_m2 * surface.ctf.const_in_part_w_per_m2).abs()
                 < 1.0e-12
         );
         assert!(
-            (slot.outside_total_term_w + surface.area_m2 * surface.ctf.const_out_part_w_per_m2)
+            (outside_slot_sum + surface.area_m2 * surface.ctf.const_out_part_w_per_m2)
                 .abs()
                 < 1.0e-12
         );
@@ -556,12 +565,15 @@
         let outside_flux = surface_outside_conduction_flux_w_per_m2(surface);
         advance_surface_ctf_histories(surface);
 
-        assert_eq!(surface.ctf.outside_temperature_history_c, vec![10.0]);
-        assert_eq!(surface.ctf.inside_temperature_history_c, vec![20.0]);
-        assert_eq!(surface.ctf.inside_flux_history_w_per_m2, vec![inside_flux]);
+        assert_eq!(surface.ctf.outside_temperature_history_c, vec![10.0, 8.0]);
+        assert_eq!(surface.ctf.inside_temperature_history_c, vec![20.0, 18.0]);
+        assert_eq!(
+            surface.ctf.inside_flux_history_w_per_m2,
+            vec![inside_flux, 1.2]
+        );
         assert_eq!(
             surface.ctf.outside_flux_history_w_per_m2,
-            vec![outside_flux]
+            vec![outside_flux, -0.4]
         );
 
         Ok(())

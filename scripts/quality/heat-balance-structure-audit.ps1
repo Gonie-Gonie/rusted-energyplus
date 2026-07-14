@@ -101,8 +101,13 @@ $cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
 $weather = "crates\ep_runtime\src\weather.rs"
 $schedules = "crates\ep_runtime\src\schedules.rs"
+$probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
+$dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
+$dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
 $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
 $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
+$runtimeTestResults = "crates\ep_runtime\src\runtime\tests\part05.rs"
+$runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -141,8 +146,13 @@ foreach ($entry in @(
         @($runtime, "runtime orchestration root"),
         @($weather, "runtime weather module"),
         @($schedules, "runtime schedules module"),
+        @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
+        @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
+        @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
         @($runtimeTestSourceOrder, "runtime source-order tests"),
-        @($runtimeTestDynamic, "runtime dynamic heat-balance tests")
+        @($runtimeTestDynamic, "runtime dynamic heat-balance tests"),
+        @($runtimeTestResults, "runtime heat-balance result tests"),
+        @($runtimeTestRadiation, "runtime heat-balance radiation tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -619,9 +629,29 @@ Assert-Contains -Path $cli -Pattern 'context\.conformance_claim && diagnostic\.d
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'assert!\(!probe\.allows_conformance_promotion\(\)\)' -Description "probe alias not accepted as compatibility algorithm"
 Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'comparison_class = "diagnostic-only"' -Description "diagnostic probe manifest class"
 Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_diagnostic_001\case.toml" -Pattern 'conformance_claim = false' -Description "diagnostic probe manifest claim boundary"
-Assert-Contains -Path "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1" -Pattern 'comparison_class: diagnostic-only' -Description "diagnostic probe report class"
-Assert-Contains -Path "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1" -Pattern 'conformance_claim: false' -Description "diagnostic probe report claim boundary"
+Assert-Contains -Path $dynamicDiagnosticScript -Pattern 'comparison_class: diagnostic-only' -Description "diagnostic probe report class"
+Assert-Contains -Path $dynamicDiagnosticScript -Pattern 'conformance_claim: false' -Description "diagnostic probe report claim boundary"
 Assert-Contains -Path "crates\ep_conformance\src\tests.rs" -Pattern 'rejects_diagnostic_case_with_true_conformance_claim' -Description "diagnostic probe outputs cannot become conformance claims"
 Assert-Contains -Path "data\conformance_cases\official_1zone_uncontrolled_dynamic_conformance_candidate_001\case.toml" -Pattern 'conformance_claim = true' -Description "probe removal keeps conformance evidence separate"
+Assert-Contains -Path $runtimeTestResults -Pattern 'fn heat_balance_trace_writes_zone_air_temperature_results\s*\(' -Description "runtime CTF component identity test"
+Assert-NotContains -Path $dynamicDiagnosticScript -Pattern '\$insideComponentSum|\$outsideComponentSum|\$storageFromConduction' -Description "script-owned CTF component identity reconstruction"
+Assert-NotContains -Path $dynamicDiagnosticScript -Pattern '\$referenceAirSignedSplitSum|\$referenceAirAbsSplitSum|\$referenceAirCancellation|\$rustInsideHistorySplitSum' -Description "script-owned max-sample source reconstruction"
+Assert-NotContains -Path $dynamicDiagnosticScript -Pattern '\$maxSampleInsideSlotSum|\$insideSlotSum|\$outsideSlotSum' -Description "script-owned CTF slot aggregation"
+Assert-Contains -Path $runtimeTestResults -Pattern 'inside_conduction_series\.values\[0\]\s*-\s*inside_current_outside_term\.values\[0\]' -Description "runtime inside CTF component identity assertion"
+Assert-Contains -Path $runtimeTestResults -Pattern 'outside_conduction_series\.values\[0\]\s*-\s*outside_current_outside_term\.values\[0\]' -Description "runtime outside CTF component identity assertion"
+Assert-Contains -Path $runtimeTestResults -Pattern 'storage_series\.values\[0\]\s*\+\s*inside_conduction_series\.values\[0\]\s*\+\s*outside_conduction_series\.values\[0\]' -Description "runtime CTF storage identity assertion"
+Assert-Contains -Path $runtimeTestDynamic -Pattern 'let inside_slot_sum = slot_samples' -Description "runtime multi-slot inside CTF aggregation test"
+Assert-Contains -Path $runtimeTestDynamic -Pattern 'let outside_slot_sum = slot_samples' -Description "runtime multi-slot outside CTF aggregation test"
+Assert-Contains -Path $runtimeTestRadiation -Pattern 'fn approximate_view_factors_match_energyplus_1zone_eio\s*\(' -Description "official 1Zone view-factor runtime test"
+Assert-NotContains -Path $dynamicCompatScript -Pattern '\$largestInsideLongwaveArea|\$totalInsideLongwaveArea' -Description "script-owned large-surface view-factor predicate"
+
+Assert-Contains -Path $probeSummaryReport -Pattern 'rusted-energyplus\.dynamic-heat-balance-probe-summary\.v18' -Description "precomputed diagnostic report schema"
+Assert-Contains -Path $probeSummaryReport -Pattern 'zone_air_surface_convection_closure_deltas' -Description "report consumes Rust surface-convection closure diagnostics"
+Assert-Contains -Path $probeSummaryReport -Pattern 'missing-precomputed-rust-diagnostics' -Description "stale report artifact marker"
+Assert-NotContains -Path $probeSummaryReport -Pattern 'def\s+slot_inside_history_temperature_equivalent_delta_c\s*\(' -Description "Python CTF temperature-equivalent physics fallback"
+Assert-NotContains -Path $probeSummaryReport -Pattern 'def\s+signed_delta\s*\(' -Description "Python signed CTF source reconstruction helper"
+Assert-NotContains -Path $probeSummaryReport -Pattern 'def\s+residual_stats\s*\(' -Description "Python surface-convection closure reconstruction helper"
+Assert-NotContains -Path $probeSummaryReport -Pattern 'oracle_reference_air_source_w\s*-\s*rust_reference_air_source_w' -Description "Python reference-air source reconstruction"
+Assert-NotContains -Path $probeSummaryReport -Pattern 'oracle_residuals|rust_residuals|delta_residuals' -Description "Python zone surface-convection residual reconstruction"
 
 Write-Host "Heat-balance structure audit complete."
