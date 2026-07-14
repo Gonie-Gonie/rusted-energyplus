@@ -7,6 +7,12 @@ use ep_model::FirstHourInterpolationStartingValues;
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
+const EPW_HEADER_LINE_COUNT: usize = 8;
+
+#[path = "weather_calendar.rs"]
+mod weather_calendar;
+use weather_calendar::parse_epw_calendar_metadata;
+
 /// Error returned while reading EPW weather data.
 #[derive(Debug)]
 pub enum EpwError {
@@ -21,6 +27,20 @@ pub enum EpwError {
     },
     /// EPW numeric field could not be parsed.
     InvalidNumber {
+        /// One-based line number.
+        line: usize,
+        /// EPW field name.
+        field: &'static str,
+        /// Raw field text.
+        value: String,
+    },
+    /// A required EPW header row was not present in the header block.
+    MissingHeader {
+        /// EPW header row name.
+        header: &'static str,
+    },
+    /// EPW text field did not contain one of its supported values.
+    InvalidValue {
         /// One-based line number.
         line: usize,
         /// EPW field name.
@@ -43,6 +63,15 @@ impl Display for EpwError {
                     "EPW row at line {line} has invalid {field} value '{value}'"
                 )
             }
+            Self::MissingHeader { header } => {
+                write!(formatter, "EPW header block is missing {header}")
+            }
+            Self::InvalidValue { line, field, value } => {
+                write!(
+                    formatter,
+                    "EPW row at line {line} has invalid {field} value '{value}'"
+                )
+            }
         }
     }
 }
@@ -51,7 +80,10 @@ impl std::error::Error for EpwError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
-            Self::MissingField { .. } | Self::InvalidNumber { .. } => None,
+            Self::MissingField { .. }
+            | Self::InvalidNumber { .. }
+            | Self::MissingHeader { .. }
+            | Self::InvalidValue { .. } => None,
         }
     }
 }
@@ -60,6 +92,22 @@ impl From<std::io::Error> for EpwError {
     fn from(error: std::io::Error) -> Self {
         Self::Io(error)
     }
+}
+
+/// Calendar policy carried by an EPW weather file header.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct EpwCalendarMetadata {
+    /// Whether the EPW `Leap Year Observed` field starts with `Y` after trimming.
+    pub leap_year_observed: bool,
+}
+
+/// Parsed EPW weather file with header policy and hourly records kept together.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EpwWeatherFile {
+    /// Calendar metadata parsed from the EPW header block.
+    pub calendar_metadata: EpwCalendarMetadata,
+    /// Hourly EPW data rows in source order.
+    pub records: Vec<EpwRecord>,
 }
 
 /// One hourly EPW weather record for the current compatibility subset.
@@ -963,17 +1011,35 @@ pub(crate) fn energyplus_weather_interpolation_weight(
     (f64::from(zone_timestep.clamp(1, steps)) / f64::from(steps)).min(1.0)
 }
 
+/// Loads an EPW weather file with its calendar metadata and hourly records.
+pub fn load_epw_weather_file(path: impl AsRef<Path>) -> Result<EpwWeatherFile, EpwError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_epw_weather_file(&contents)
+}
+
 /// Loads hourly EPW records from a weather file.
 pub fn load_epw_records(path: impl AsRef<Path>) -> Result<Vec<EpwRecord>, EpwError> {
     let contents = std::fs::read_to_string(path)?;
     parse_epw_records(&contents)
 }
 
+/// Parses an EPW weather file with its calendar metadata and hourly records.
+pub fn parse_epw_weather_file(contents: &str) -> Result<EpwWeatherFile, EpwError> {
+    Ok(EpwWeatherFile {
+        calendar_metadata: parse_epw_calendar_metadata(contents)?,
+        records: parse_epw_data_records(contents)?,
+    })
+}
+
 /// Parses hourly EPW records from weather text.
 pub fn parse_epw_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
+    parse_epw_data_records(contents)
+}
+
+fn parse_epw_data_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
     let mut records = Vec::new();
 
-    for (line_index, line) in contents.lines().enumerate().skip(8) {
+    for (line_index, line) in contents.lines().enumerate().skip(EPW_HEADER_LINE_COUNT) {
         let line_number = line_index + 1;
         if line.trim().is_empty() {
             continue;
@@ -1104,3 +1170,7 @@ fn epw_field<'a>(
         .copied()
         .ok_or(EpwError::MissingField { line, field })
 }
+
+#[cfg(test)]
+#[path = "weather_tests.rs"]
+mod tests;

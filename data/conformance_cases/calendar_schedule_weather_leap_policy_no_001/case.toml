@@ -1,0 +1,60 @@
+id = "calendar_schedule_weather_leap_policy_no_001"
+title = "EPW non-leap policy and hourly Schedule:Compact exact order"
+milestone = "full-source-order-weather-effective-calendar"
+purpose = "Block on EnergyPlus weather-effective calendar timestamps and Schedule:Compact values when a leap-year RunPeriod uses an EPW that does not observe leap years."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case is paired with calendar_schedule_hourly_exact_001 and uses the same IDF date range and the same 72 raw EPW rows.",
+  "The only calendar-policy difference is Leap Year Observed=No, so EnergyPlus and Rust must both omit the 24 February 29 hourly simulation samples and report 48 ordered, unique hour-ending samples even though the fixture retains those raw EPW rows.",
+  "Rust source-mapped unit tests carry March 1 Gregorian, weather, and leap-shaped schedule day-of-year state as 61, 60, and 61, while the simulation weekday is Monday even though the Gregorian weekday is Tuesday.",
+  "This external AllDays/hour-only Schedule Value series and normalized timestamp do not independently prove any of those three ordinal day fields.",
+  "The claim is limited to normalized hourly timestamp labels and the declared Schedule Value series; raw ESO serialization, general EPW record selection, actual-weather execution, cross-year traversal, DST, holidays, and broader Schedule:Compact compatibility remain outside it.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_hourly_exact_001/calendar_schedule_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_hourly_exact_001/calendar_schedule_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_weather_leap_policy_no_001/calendar_schedule_weather_leap_policy_no.epw"
+
+[[outputs]]
+key = "CALENDAR HOURLY 1 TO 24"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_weather_leap_policy_no_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-weather-effective-calendar"
+blocking = true

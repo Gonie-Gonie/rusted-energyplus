@@ -299,6 +299,12 @@
                          "help":  "Gate ordered, exact, unique hourly calendar timestamps and Schedule:Compact values across the 2016 leap day."
                      },
                      {
+                         "name":  "compare-weather-effective-calendar",
+                         "path":  "compare\\compare-weather-effective-calendar.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired EPW Leap Year Observed Yes/No calendar and Schedule:Compact evidence."
+                     },
+                     {
                          "name":  "compare-weather-conformance",
                          "path":  "compare\\compare-weather-conformance.ps1",
                          "group":  "compare",

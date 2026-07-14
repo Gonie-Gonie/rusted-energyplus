@@ -100,13 +100,17 @@ The first checkpoint introduces one canonical run-period calendar spine:
   materialized.
 - `EnvironmentTimePoint` owns the environment identity, zero-based sample
   index, one-based `day_of_sim`, Gregorian year/month/day, Gregorian leap-year
-  flag and day-of-year, EnergyPlus' leap-shaped `schedule_day_of_year`,
-  Gregorian weekday and current day type, explicit DST/special-day state, hour
+  flag, weather-effective leap shape and `LeapYearAdd`, separate Gregorian,
+  weather, and leap-shaped schedule day-of-year fields, separate Gregorian and
+  simulation weekdays, current day type, explicit DST/special-day state, hour
   `1..24`, zone timestep `1..N`, minute bounds, current-time hours, one-based
   simulation-timestep index, and environment/day/hour begin/end flags.
 - `build_environment_time_axes` builds the ordered axes for typed run periods;
-  `build_environment_time_axis_for_run_period` builds one axis and rejects an
-  invalid date or reversed range.
+  `build_environment_time_axes_with_weather_metadata` applies parsed EPW
+  calendar policy to the same projection; the one-run-period builders reject
+  an invalid date or reversed range, while metadata-aware builders additionally
+  reject actual-weather and cross-year traversal until their EPW data-period
+  and record-selection branches are ported.
 - Existing `TimeAxis` and `TimePoint` values remain the canonical axis's
   one-sample-per-hour, hour-ending projection for existing weather, schedule,
   output, and report consumers. They are not a second calendar authority.
@@ -125,32 +129,67 @@ retains a February 29 slot even in a non-leap year, matching the indexing shape
 consumed by EnergyPlus schedules.
 
 The checkpoint intentionally fixes `dst=false`, leaves
-`special_day_type=None`, and derives `DayType` from the ordinary weekday only.
+`special_day_type=None`, and derives `DayType` from the simulation-effective
+weekday only. That weekday equals the Gregorian weekday on ordinary paths but
+does not advance across a February 29 skipped by EPW policy.
 Its `gregorian_year_is_leap_year` field is date arithmetic state, not
 EnergyPlus' weather-effective `CurrentYearIsLeapYear`; the latter also depends
-on EPW leap-year support and remains deferred to the EPW environment gate.
+on EPW leap-year support. The paired weather-effective checkpoint below now
+resolves that distinction for its declared local fixtures, without widening the
+claim to general EPW environment traversal.
 The typed `RunPeriod` holiday, DST, weekend-observation, rain, snow, actual
-weather, and first-hour policy fields are intake state; except for the
-first-hour policy carried by the axis, they are not yet active calendar or
-weather behavior. The checkpoint also excludes warmup points, design days,
+weather, and first-hour policy fields are intake state. The first-hour policy
+is carried by the axis. Metadata-aware axes reject all actual-weather and
+cross-year run periods rather than returning a partial calendar; their full
+record traversal is not ported.
+The other five policy booleans are not yet active calendar or weather behavior.
+The checkpoint also excludes warmup points, design days,
 `RunPeriod:CustomRange`, EnergyPlus environment filtering, and EnergyPlus'
 invalid/default `Timestep` normalization rules. Those exclusions prevent the
 hourly projection from being described as a complete port of
 `ManageSimulation` or `GetNextEnvironment`.
 
-## Ordered Exact Hourly Evidence Checkpoint
+## Ordered Exact Hourly and Weather-Effective Leap Evidence Checkpoint
 
 `calendar_schedule_hourly_exact_001` exercises the hourly projection across
 the explicit Gregorian range 2016-02-28 through 2016-03-01. It requests an
 all-days `Schedule:Compact` profile whose 24 hourly values are 1 through 24,
-so the oracle and Rust sides each produce 72 samples spanning the leap day.
-Its local 72-record EPW declares that leap years are observed; this keeps the
-oracle on the Gregorian 2016 calendar without pretending that Rust has already
-ported general EPW leap-policy selection. The fixture disables weather-file
-holidays, DST, weekend observation, rain, and snow so those unported branches
-cannot be mistaken for evidence.
+so the oracle and Rust sides each produce 72 samples spanning the leap day when
+its EPW declares `Leap Year Observed=Yes`.
 
-The case opts into an `ordered-exact-unique` timestamp contract. Unlike the
+`calendar_schedule_weather_leap_policy_no_001` is the paired negative-policy
+case. It uses the same IDF and retains the same 72 raw weather rows; only the EPW
+calendar policy changes to `Leap Year Observed=No`. The parsed
+`EpwWeatherFile` keeps header metadata and records together, and the hourly
+report path applies that metadata through `ResolvedWeatherEnvironmentCalendar`.
+The Yes case therefore retains 72 samples and ends on Tuesday March 1, while the
+No case skips all 24 February 29 simulation samples and retains 48 samples,
+ending on simulation Monday March 1 even though that Gregorian date is Tuesday.
+On that no-leap March 1 point the Gregorian day of year is 61, the
+weather-effective day of year is 60, and the leap-shaped schedule day of year
+remains 61. Runtime unit tests lock those three meanings as separate internal
+state against the mapped EnergyPlus assignments. The paired external oracle
+gate does not independently prove any of those three day-of-year fields: its current
+AllDays/Until schedule depends only on hour, while its normalized timestamp
+contains month/day and simulation weekday but not ordinal day.
+For a same-year no-leap-policy RunPeriod whose input boundary itself is February
+29, EnergyPlus computes duration with non-leap ordinals before weather reading:
+February 29 aliases ordinal 60, then the raw February 29 day is discarded and
+March 1 supplies that simulation day. Rust mirrors this source rule, so a
+February-29-only period has one Gregorian input day, one skipped raw leap date,
+and one effective March 1 simulation day; `effective_days` is therefore not
+defined as `gregorian_days - leap_days_skipped`. Unit tests also cover February
+28 through February 29 becoming February 28 plus March 1. These endpoint tests
+are source-mapped internal evidence, not additional external case claims.
+This calendar layer models `SetupEnvironmentTypes`; it does not yet perform the
+later literal EPW start-record search. EnergyPlus succeeds for a February 29
+start under a no-leap header only when a raw February 29 row is present to find
+and discard, as it is in the declared fixture; without that row the oracle
+rewinds and terminates. A future record-aware gate must cover both outcomes.
+Both fixtures disable weather-file holidays, DST, weekend observation, rain,
+and snow so those unported branches cannot be mistaken for evidence.
+
+Both cases opt into an `ordered-exact-unique` timestamp contract. Unlike the
 existing label-alignment comparator, this contract treats each input slice as
 the ordering authority and requires every sample to have a timestamp, every
 timestamp on each side to be unique, equal lengths, and exact timestamp-string
@@ -164,23 +203,25 @@ families are rejected instead of silently ignoring the declaration.
 
 The exact strings are normalized comparison labels assembled from runtime-owned
 calendar fields and the EnergyPlus ESO parser's timestamp fields. This proves
-the ordered hourly projection for this declared fixture; it does not prove the
-raw text emitted by `OutputProcessor::WriteTimeStampFormatData`, subhourly
-records, environment selection, DST, holidays, warmup, or the full schedule
-lookup family. In particular, standard TMY files that do not observe leap years
-follow a different EnergyPlus calendar shape and remain a later EPW environment
-gate.
+the ordered hourly projection and header-driven leap-policy difference for the
+declared pair; it does not prove the raw text emitted by
+`OutputProcessor::WriteTimeStampFormatData`, subhourly records, general EPW
+record selection or data-period matching, DST, holidays, actual-weather
+execution, cross-year traversal, any of the three internal day-of-year fields, warmup, or
+the full schedule lookup family.
+The new path is consumed by the dedicated CLI report and gate; migration into
+the general runtime/`ep_run` execution path also remains deferred.
 
 ## Current Rust Boundary
 
 | Boundary | Current Rust status | Missing source behavior |
 |---|---|---|
-| run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, while the six weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active weather-policy behavior, and full EnergyPlus warning-text parity |
-| canonical calendar | `ResolvedRunPeriodCalendar`, `EnvironmentTimeAxis`, and `EnvironmentTimePoint` provide the first run-period/zone-timestep spine | warmup lifecycle, weather-effective leap state, DST ranges, special-day overrides, EnergyPlus `Timestep` default/invalid-value normalization, environment kinds beyond weather run periods, and source-order environment selection |
-| legacy hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar with inclusive run-period dates and the same resolved years/weekdays; `calendar_schedule_hourly_exact_001` locks 72 normalized labels in source order across the 2016 leap day | calendar projections beyond the declared fixture and all remaining calendar-dependent output semantics |
-| EPW weather | `EpwRecord` parses multiple weather fields; `WeatherTimestepSeries` precomputes the current interpolation subset | environment-date selection, today/tomorrow lifecycle, EPW data-period rules, actual-weather traversal, missing/range handling, and complete `SetCurrentWeather` parity |
-| schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the exact case locks one 1-through-24 profile for three days | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
-| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; one explicit leap-day case enforces ordered, unique, exact labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
+| run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, metadata-aware actual-weather and cross-year inputs fail explicitly, and the other five RunPeriod weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active RunPeriod holiday/DST/weather behavior, actual-weather and cross-year traversal, and full EnergyPlus warning-text parity |
+| canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias) and `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday | warmup lifecycle, DST ranges, special-day overrides, actual-weather and cross-year behavior, EnergyPlus `Timestep` default/invalid-value normalization, environment kinds beyond weather run periods, and source-order environment selection |
+| legacy hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows | migration into general runtime/`ep_run` consumers, calendar projections beyond the declared pair, and all remaining calendar-dependent output semantics |
+| EPW weather | `EpwWeatherFile` keeps parsed calendar metadata and `EpwRecord` rows together; the dedicated hourly report applies `Leap Year Observed` before projection, while `WeatherTimestepSeries` precomputes the current interpolation subset | general environment-date and record selection, today/tomorrow lifecycle, EPW data-period rules, actual-weather traversal, cross-year behavior, missing/range handling, and complete `SetCurrentWeather` parity |
+| schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the paired exact cases lock the same 1-through-24 daily profile for 72 versus 48 weather-effective hours | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
+| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy cases enforce ordered, unique, exact normalized labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
 
 Existing dry-bulb, dew-point, relative-humidity, pressure, wind, radiation, and
 precipitation diagnostics remain useful evidence for individual weather
@@ -200,10 +241,10 @@ earlier gate.
    `UseHolidays`, `ApplyWeekendRule`, special-day precedence, `HolidayIndex`,
    tomorrow's holiday/day type, and the weekday-versus-special `DayType`
    selection used by schedules and timestamps.
-3. **EPW environment gate.** Select records by the resolved environment and
-   data period rather than vector position; port first-day/today/tomorrow
-   handoff, typical versus actual weather, multi-year wrap, leap-file policy,
-   missing/range rules, and all active `InitializeWeather`,
+3. **EPW environment gate.** Extend the paired header-level leap-policy state
+   into record selection by resolved environment and data period rather than
+   vector position; port first-day/today/tomorrow handoff, typical versus actual
+   weather, multi-year wrap, cross-year policy, missing/range rules, and all active `InitializeWeather`,
    `UpdateWeatherData`, and `SetCurrentWeather` fields at every zone timestep.
 4. **Schedule gate.** Compile full supported schedule objects into the
    EnergyPlus 366-day/day-type/timestep layout, update one `currentVal` per
@@ -220,11 +261,13 @@ script-side timestamp reconstruction to substitute for missing runtime state.
 
 ## Claim Boundary and Stop Rule
 
-The calendar spine by itself claims no EnergyPlus time, weather, schedule, or
-timestamp conformance. The later exact fixture claims only its declared 72
-normalized hourly labels and AllDays/Until schedule values. In particular,
-that case, an exact Gregorian hourly count, a parsed EPW row, or a matching
-constant schedule is not evidence that
+The calendar spine by itself claims no broad EnergyPlus time, weather, schedule,
+or timestamp conformance. The paired exact fixtures claim only their declared
+normalized hourly labels and AllDays/Until Schedule Value series: 72 samples
+ending Tuesday for `Leap Year Observed=Yes`, and 48 samples ending simulation
+Monday for `No`, from the same IDF and 72 raw EPW rows. In particular, those
+case-scoped counts, a parsed EPW header or row, or a matching constant schedule
+are not evidence that
 `ManageSimulation`, `ManageWeather`, `getHrTsVal`, or
 `WriteTimeStampFormatData` has been fully ported.
 
@@ -239,5 +282,7 @@ Promotion requires all of the following on the same canonical axis:
 - exact time-family timestamps and reporting-frequency boundary rows.
 
 Until those gates pass, broader results remain foundation, smoke, or diagnostic
-evidence only; the declared 72-label exact case keeps only the narrow
-case-scoped conformance boundary stated above.
+evidence only; the declared 72-label/48-label pair keeps only the narrow
+normalized hourly Schedule Value conformance boundary stated above. General EPW
+record selection, runtime/`ep_run` migration, DST, holidays, raw ESO output,
+actual-weather execution, and cross-year traversal remain explicitly deferred.

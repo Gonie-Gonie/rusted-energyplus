@@ -14,7 +14,8 @@ use ep_conformance::{
 use ep_model::TypedModel;
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    ScheduleValueSeries, TimeAxis, build_hourly_time_axis, load_epw_records,
+    ScheduleValueSeries, TimeAxis, build_hourly_time_axis,
+    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
     normalized_hourly_timestamp_label, precompute_schedule_value_series_for_time_axis,
 };
 
@@ -243,7 +244,24 @@ fn build_context<'a>(
             .join("; ");
         format!("failed to compile baseline epJSON: {diagnostics}")
     })?;
-    let time_axis = build_hourly_time_axis(&model)
+    let weather_file = baseline
+        .weather
+        .as_ref()
+        .map(|weather| {
+            load_epw_weather_file(weather).map_err(|error| format!("failed to load EPW: {error}"))
+        })
+        .transpose()?;
+    let time_axis = weather_file
+        .as_ref()
+        .map_or_else(
+            || build_hourly_time_axis(&model),
+            |weather_file| {
+                build_hourly_time_axis_with_weather_metadata(
+                    &model,
+                    &weather_file.calendar_metadata,
+                )
+            },
+        )
         .map_err(|error| format!("failed to build time axis: {error}"))?;
     let schedule_series = manifest
         .outputs
@@ -256,11 +274,13 @@ fn build_context<'a>(
         .iter()
         .any(|output| output.class == VariableClass::Weather)
     {
-        let weather = baseline
-            .weather
-            .as_ref()
-            .ok_or_else(|| "weather output comparison requires input.weather".to_string())?;
-        Some(load_epw_records(weather).map_err(|error| format!("failed to load EPW: {error}"))?)
+        Some(
+            weather_file
+                .as_ref()
+                .ok_or_else(|| "weather output comparison requires input.weather".to_string())?
+                .records
+                .as_slice(),
+        )
     } else {
         None
     };
@@ -274,7 +294,7 @@ fn build_context<'a>(
             &model,
             &time_axis,
             schedule_series.as_deref(),
-            weather_records.as_deref(),
+            weather_records,
         )?;
         let tolerance = tolerance_for_output(manifest, output)?;
         let max_rmse_tolerance = max_rmse_tolerance_for_output(manifest, output)?;
@@ -595,6 +615,35 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
         "time_axis_samples: {}\n",
         context.time_axis.sample_count()
     ));
+    if let Some(calendar) = context.time_axis.weather_calendar.as_ref() {
+        report.push_str("weather_calendar_policy_applied: true\n");
+        report.push_str(&format!(
+            "weather_file_allows_leap_years: {}\n",
+            calendar.weather_file_allows_leap_years
+        ));
+        report.push_str(&format!(
+            "gregorian_calendar_days: {}\n",
+            calendar.gregorian.total_days
+        ));
+        report.push_str(&format!(
+            "weather_effective_calendar_days: {}\n",
+            calendar.total_days
+        ));
+        report.push_str(&format!(
+            "leap_days_skipped: {}\n",
+            calendar.leap_days_skipped
+        ));
+        report.push_str(&format!(
+            "start_year_gregorian_leap: {}\n",
+            calendar.gregorian.start_year_is_leap_year
+        ));
+        report.push_str(&format!(
+            "start_year_weather_effective_leap: {}\n",
+            calendar.start_year_is_weather_effective_leap_year
+        ));
+    } else {
+        report.push_str("weather_calendar_policy_applied: false\n");
+    }
     report.push_str(&format!(
         "typed_schedules: {}\n\n",
         context.model.schedule_names.len()
@@ -694,6 +743,10 @@ fn render_json(context: &TimeWeatherScheduleContext<'_>) -> String {
     json.push_str(&format!(
         "  \"time_axis_samples\": {},\n",
         context.time_axis.sample_count()
+    ));
+    json.push_str(&format!(
+        "  \"weather_calendar\": {},\n",
+        weather_calendar_json(&context.time_axis)
     ));
     json.push_str(&format!("  \"series_count\": {},\n", context.rows.len()));
     json.push_str(&format!(
@@ -877,6 +930,21 @@ fn gate_json(manifest: &ConformanceCase) -> String {
         "{{\"script\": {}, \"blocking\": {}}}",
         json_string(&gate.script),
         gate.blocking
+    )
+}
+
+fn weather_calendar_json(time_axis: &TimeAxis) -> String {
+    let Some(calendar) = time_axis.weather_calendar.as_ref() else {
+        return "null".to_string();
+    };
+    format!(
+        "{{\"policy_applied\": true, \"weather_file_allows_leap_years\": {}, \"gregorian_calendar_days\": {}, \"weather_effective_calendar_days\": {}, \"leap_days_skipped\": {}, \"start_year_gregorian_leap\": {}, \"start_year_weather_effective_leap\": {}}}",
+        calendar.weather_file_allows_leap_years,
+        calendar.gregorian.total_days,
+        calendar.total_days,
+        calendar.leap_days_skipped,
+        calendar.gregorian.start_year_is_leap_year,
+        calendar.start_year_is_weather_effective_leap_year,
     )
 }
 

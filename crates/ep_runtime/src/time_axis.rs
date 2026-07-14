@@ -1,10 +1,14 @@
 //! Run-period environment, calendar, and time-axis helpers.
 
+use crate::weather::EpwCalendarMetadata;
 use ep_model::{
     DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod, RunPeriodId,
     TypedModel,
 };
 use std::fmt::{Display, Formatter};
+
+mod weather_calendar;
+pub use weather_calendar::resolve_weather_environment_calendar;
 
 pub(crate) const DEFAULT_RUN_PERIOD_YEAR: u32 = 2017;
 const DEFAULT_LEAP_RUN_PERIOD_YEAR: u32 = 2012;
@@ -104,7 +108,7 @@ pub struct ResolvedRunPeriodCalendar {
     pub end_day_of_month: u32,
     /// Whether the resolved end year is a Gregorian leap year.
     pub end_year_is_leap_year: bool,
-    /// Inclusive number of simulation days.
+    /// Inclusive number of Gregorian input days before EPW policy is applied.
     pub total_days: usize,
 }
 
@@ -116,6 +120,28 @@ impl ResolvedRunPeriodCalendar {
             day_of_month: self.start_day_of_month,
         }
     }
+}
+
+/// Calendar state after applying the EPW leap-year policy to one run period.
+///
+/// `gregorian` remains the input-date interpretation. `total_days` follows
+/// weather-effective endpoint ordinals: with EPW leap years disabled, a
+/// February 29 endpoint aliases March 1 rather than reducing the duration.
+/// Thus a February-29-only period has Gregorian/skipped/effective counts 1/1/1.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ResolvedWeatherEnvironmentCalendar {
+    /// Gregorian run-period interpretation before EPW policy is applied.
+    pub gregorian: ResolvedRunPeriodCalendar,
+    /// Whether the EPW header says that leap years are observed.
+    pub weather_file_allows_leap_years: bool,
+    /// Whether the start year is leap-shaped for weather processing.
+    pub start_year_is_weather_effective_leap_year: bool,
+    /// Whether the end year is leap-shaped for weather processing.
+    pub end_year_is_weather_effective_leap_year: bool,
+    /// Raw February 29 dates skipped or endpoint-aliased; not a duration subtraction.
+    pub leap_days_skipped: usize,
+    /// Inclusive number of weather-effective simulation days.
+    pub total_days: usize,
 }
 
 /// One zone-timestep state in EnergyPlus environment-loop order.
@@ -136,18 +162,26 @@ pub struct EnvironmentTimePoint {
     pub year: u32,
     /// Whether `year` is a proleptic-Gregorian leap year.
     ///
-    /// EnergyPlus weather-effective leap state also depends on the EPW header
-    /// and is intentionally deferred to the weather environment gate.
+    /// EPW-dependent leap shape is stored separately in
+    /// `weather_effective_year_is_leap_year`.
     pub gregorian_year_is_leap_year: bool,
+    /// Leap shape used by this axis; Gregorian-only projections use Gregorian shape.
+    pub weather_effective_year_is_leap_year: bool,
+    /// EnergyPlus `LeapYearAdd` value for weather day-of-year calculations.
+    pub leap_year_add: u32,
     /// Month number, 1-12.
     pub month: u32,
     /// Day of month.
     pub day_of_month: u32,
     /// Gregorian ordinal day in the current year, 1-365/366.
+    pub gregorian_day_of_year: u32,
+    /// Weather-effective ordinal day, 1-365/366.
     pub day_of_year: u32,
     /// Leap-shaped schedule ordinal, where March 1 is always day 61.
     pub schedule_day_of_year: u32,
-    /// Gregorian weekday.
+    /// Gregorian weekday for the calendar date.
+    pub gregorian_day_of_week: DayOfWeek,
+    /// Simulation-effective weekday after weather-calendar skips.
     pub day_of_week: DayOfWeek,
     /// Schedule day type before special-day overrides.
     pub day_type: DayType,
@@ -195,6 +229,8 @@ pub struct EnvironmentTimeAxis {
     pub environment_kind: EnvironmentKind,
     /// Calendar resolved from the environment's run period.
     pub calendar: ResolvedRunPeriodCalendar,
+    /// EPW policy applied to this axis, or `None` for a Gregorian-only projection.
+    pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
     /// First-hour weather interpolation policy selected by the run period.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     /// Zone timestep profile.
@@ -224,18 +260,26 @@ pub struct TimePoint {
     pub year: u32,
     /// Whether `year` is a proleptic-Gregorian leap year.
     ///
-    /// EnergyPlus weather-effective leap state also depends on the EPW header
-    /// and is intentionally deferred to the weather environment gate.
+    /// EPW-dependent leap shape is stored separately in
+    /// `weather_effective_year_is_leap_year`.
     pub gregorian_year_is_leap_year: bool,
+    /// Leap shape used by this axis; Gregorian-only projections use Gregorian shape.
+    pub weather_effective_year_is_leap_year: bool,
+    /// EnergyPlus `LeapYearAdd` value for weather day-of-year calculations.
+    pub leap_year_add: u32,
     /// Month number, 1-12.
     pub month: u32,
     /// Day of month.
     pub day_of_month: u32,
     /// Gregorian ordinal day in the current year, 1-365/366.
+    pub gregorian_day_of_year: u32,
+    /// Weather-effective ordinal day, 1-365/366.
     pub day_of_year: u32,
     /// Leap-shaped schedule ordinal, where March 1 is always day 61.
     pub schedule_day_of_year: u32,
-    /// Gregorian weekday.
+    /// Gregorian weekday for the calendar date.
+    pub gregorian_day_of_week: DayOfWeek,
+    /// Simulation-effective weekday after weather-calendar skips.
     pub day_of_week: DayOfWeek,
     /// Schedule day type before special-day overrides.
     pub day_type: DayType,
@@ -296,6 +340,8 @@ pub struct TimeAxisSamplePartitions {
 pub struct TimeAxis {
     /// Run period name.
     pub run_period_name: String,
+    /// EPW policy applied to this axis, or `None` for a Gregorian-only projection.
+    pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
     /// First-hour weather interpolation policy selected by the run period.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     /// Zone timestep profile used by weather, schedules, output, and report sampling.
@@ -349,6 +395,20 @@ pub enum TimeAxisError {
         /// Run period name.
         run_period_name: String,
     },
+    /// Metadata-aware actual-weather traversal is not implemented yet.
+    ActualWeatherUnsupported {
+        /// Run period name.
+        run_period_name: String,
+    },
+    /// Metadata-aware cross-year weather traversal is not implemented yet.
+    WeatherMetadataCrossYearUnsupported {
+        /// Run period name.
+        run_period_name: String,
+        /// Resolved Gregorian start year.
+        start_year: u32,
+        /// Resolved Gregorian end year.
+        end_year: u32,
+    },
 }
 
 impl Display for TimeAxisError {
@@ -381,6 +441,18 @@ impl Display for TimeAxisError {
                     "run period {run_period_name} ends before it begins"
                 )
             }
+            Self::ActualWeatherUnsupported { run_period_name } => write!(
+                formatter,
+                "run period {run_period_name} treats weather as actual, but metadata-aware EPW record traversal is not implemented"
+            ),
+            Self::WeatherMetadataCrossYearUnsupported {
+                run_period_name,
+                start_year,
+                end_year,
+            } => write!(
+                formatter,
+                "run period {run_period_name} spans {start_year}-{end_year}, but metadata-aware cross-year weather traversal is not implemented"
+            ),
         }
     }
 }
@@ -538,6 +610,37 @@ pub fn build_environment_time_axes(
         .collect()
 }
 
+/// Builds canonical zone-timestep axes after applying EPW calendar metadata.
+pub fn build_environment_time_axes_with_weather_metadata(
+    model: &TypedModel,
+    metadata: &EpwCalendarMetadata,
+) -> Result<Vec<EnvironmentTimeAxis>, TimeAxisError> {
+    let zone_timesteps_per_hour = model.timestep.number_of_timesteps_per_hour.max(1);
+    if model.run_periods.is_empty() {
+        return build_environment_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+            &default_run_period(),
+            metadata,
+            1,
+            zone_timesteps_per_hour,
+        )
+        .map(|axis| vec![axis]);
+    }
+
+    model
+        .run_periods
+        .iter()
+        .enumerate()
+        .map(|(index, run_period)| {
+            build_environment_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+                run_period,
+                metadata,
+                index + 1,
+                zone_timesteps_per_hour,
+            )
+        })
+        .collect()
+}
+
 /// Builds a canonical axis for one run period with one zone timestep per hour.
 pub fn build_environment_time_axis_for_run_period(
     run_period: &RunPeriod,
@@ -551,17 +654,53 @@ pub fn build_environment_time_axis_for_run_period_with_zone_timesteps(
     environment_index: usize,
     zone_timesteps_per_hour: u32,
 ) -> Result<EnvironmentTimeAxis, TimeAxisError> {
-    let calendar = resolve_run_period_calendar(run_period)?;
+    build_environment_time_axis_for_run_period_internal(
+        run_period,
+        None,
+        environment_index,
+        zone_timesteps_per_hour,
+    )
+}
+
+/// Builds a canonical environment axis after applying EPW calendar metadata.
+pub fn build_environment_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+    run_period: &RunPeriod,
+    metadata: &EpwCalendarMetadata,
+    environment_index: usize,
+    zone_timesteps_per_hour: u32,
+) -> Result<EnvironmentTimeAxis, TimeAxisError> {
+    build_environment_time_axis_for_run_period_internal(
+        run_period,
+        Some(metadata),
+        environment_index,
+        zone_timesteps_per_hour,
+    )
+}
+
+fn build_environment_time_axis_for_run_period_internal(
+    run_period: &RunPeriod,
+    metadata: Option<&EpwCalendarMetadata>,
+    environment_index: usize,
+    zone_timesteps_per_hour: u32,
+) -> Result<EnvironmentTimeAxis, TimeAxisError> {
+    let weather_calendar = metadata
+        .map(|metadata| resolve_weather_environment_calendar(run_period, metadata))
+        .transpose()?;
+    let calendar = weather_calendar.as_ref().map_or_else(
+        || resolve_run_period_calendar(run_period),
+        |weather_calendar| Ok(weather_calendar.gregorian.clone()),
+    )?;
     let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
     let zone_timesteps_per_hour = timestep_profile.zone_timestep.timesteps_per_hour;
     let interval_minutes = 60.0 / f64::from(zone_timesteps_per_hour);
-    let total_points = calendar
-        .total_days
+    let days = resolved_calendar_days(run_period, &calendar, weather_calendar.as_ref())?;
+    let total_points = days
+        .len()
         .saturating_mul(24)
         .saturating_mul(zone_timesteps_per_hour as usize);
     let mut points = Vec::with_capacity(total_points);
 
-    for day in resolved_calendar_days(run_period, &calendar)? {
+    for day in days {
         for hour in 1..=24 {
             for zone_timestep in 1..=zone_timesteps_per_hour {
                 let start_minute = f64::from(zone_timestep - 1) * interval_minutes;
@@ -574,10 +713,14 @@ pub fn build_environment_time_axis_for_run_period_with_zone_timesteps(
                     day_of_sim: day.day_of_sim,
                     year: day.date.year,
                     gregorian_year_is_leap_year: day.gregorian_year_is_leap_year,
+                    weather_effective_year_is_leap_year: day.weather_effective_year_is_leap_year,
+                    leap_year_add: day.leap_year_add,
                     month: day.date.month,
                     day_of_month: day.date.day_of_month,
+                    gregorian_day_of_year: day.gregorian_day_of_year,
                     day_of_year: day.day_of_year,
                     schedule_day_of_year: day.schedule_day_of_year,
+                    gregorian_day_of_week: day.gregorian_day_of_week,
                     day_of_week: day.day_of_week,
                     day_type: day.day_of_week.into(),
                     dst: false,
@@ -605,6 +748,7 @@ pub fn build_environment_time_axis_for_run_period_with_zone_timesteps(
         environment_name: run_period.name.0.clone(),
         environment_kind: EnvironmentKind::WeatherRunPeriod,
         calendar,
+        weather_calendar,
         first_hour_interpolation_starting_values: run_period
             .first_hour_interpolation_starting_values,
         zone_timestep: timestep_profile.zone_timestep,
@@ -628,6 +772,26 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
 
     build_hourly_time_axis_for_run_period_with_zone_timesteps(
         run_period,
+        model.timestep.number_of_timesteps_per_hour.max(1),
+    )
+}
+
+/// Builds the first hourly time axis after applying EPW calendar metadata.
+pub fn build_hourly_time_axis_with_weather_metadata(
+    model: &TypedModel,
+    metadata: &EpwCalendarMetadata,
+) -> Result<TimeAxis, TimeAxisError> {
+    let fallback;
+    let run_period = if let Some(run_period) = model.run_periods.first() {
+        run_period
+    } else {
+        fallback = default_run_period();
+        &fallback
+    };
+
+    build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+        run_period,
+        metadata,
         model.timestep.number_of_timesteps_per_hour.max(1),
     )
 }
@@ -665,21 +829,63 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
     run_period: &RunPeriod,
     zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
-    let calendar = resolve_run_period_calendar(run_period)?;
-    let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
-    let mut points = Vec::with_capacity(calendar.total_days * 24);
+    build_hourly_time_axis_for_run_period_internal(run_period, None, zone_timesteps_per_hour)
+}
 
-    for day in resolved_calendar_days(run_period, &calendar)? {
+/// Builds an hourly time axis after applying EPW calendar metadata.
+pub fn build_hourly_time_axis_for_run_period_with_weather_metadata(
+    run_period: &RunPeriod,
+    metadata: &EpwCalendarMetadata,
+) -> Result<TimeAxis, TimeAxisError> {
+    build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+        run_period, metadata, 1,
+    )
+}
+
+/// Builds an hourly time axis with EPW metadata and an explicit zone timestep count.
+pub fn build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_timesteps(
+    run_period: &RunPeriod,
+    metadata: &EpwCalendarMetadata,
+    zone_timesteps_per_hour: u32,
+) -> Result<TimeAxis, TimeAxisError> {
+    build_hourly_time_axis_for_run_period_internal(
+        run_period,
+        Some(metadata),
+        zone_timesteps_per_hour,
+    )
+}
+
+fn build_hourly_time_axis_for_run_period_internal(
+    run_period: &RunPeriod,
+    metadata: Option<&EpwCalendarMetadata>,
+    zone_timesteps_per_hour: u32,
+) -> Result<TimeAxis, TimeAxisError> {
+    let weather_calendar = metadata
+        .map(|metadata| resolve_weather_environment_calendar(run_period, metadata))
+        .transpose()?;
+    let calendar = weather_calendar.as_ref().map_or_else(
+        || resolve_run_period_calendar(run_period),
+        |weather_calendar| Ok(weather_calendar.gregorian.clone()),
+    )?;
+    let timestep_profile = time_axis_timestep_profile_for_zone_timesteps(zone_timesteps_per_hour);
+    let days = resolved_calendar_days(run_period, &calendar, weather_calendar.as_ref())?;
+    let mut points = Vec::with_capacity(days.len() * 24);
+
+    for day in days {
         for hour in 1..=24 {
             points.push(TimePoint {
                 sample_index: points.len(),
                 day_of_sim: day.day_of_sim,
                 year: day.date.year,
                 gregorian_year_is_leap_year: day.gregorian_year_is_leap_year,
+                weather_effective_year_is_leap_year: day.weather_effective_year_is_leap_year,
+                leap_year_add: day.leap_year_add,
                 month: day.date.month,
                 day_of_month: day.date.day_of_month,
+                gregorian_day_of_year: day.gregorian_day_of_year,
                 day_of_year: day.day_of_year,
                 schedule_day_of_year: day.schedule_day_of_year,
+                gregorian_day_of_week: day.gregorian_day_of_week,
                 day_of_week: day.day_of_week,
                 day_type: day.day_of_week.into(),
                 dst: false,
@@ -692,6 +898,7 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
 
     Ok(TimeAxis {
         run_period_name: run_period.name.0.clone(),
+        weather_calendar,
         first_hour_interpolation_starting_values: run_period
             .first_hour_interpolation_starting_values,
         zone_timestep: timestep_profile.zone_timestep,
@@ -736,8 +943,12 @@ struct ResolvedCalendarDay {
     day_of_sim: usize,
     date: Date,
     gregorian_year_is_leap_year: bool,
+    weather_effective_year_is_leap_year: bool,
+    leap_year_add: u32,
+    gregorian_day_of_year: u32,
     day_of_year: u32,
     schedule_day_of_year: u32,
+    gregorian_day_of_week: DayOfWeek,
     day_of_week: DayOfWeek,
 }
 
@@ -773,12 +984,37 @@ fn validated_date_ordinal(
 fn resolved_calendar_days(
     run_period: &RunPeriod,
     calendar: &ResolvedRunPeriodCalendar,
+    weather_calendar: Option<&ResolvedWeatherEnvironmentCalendar>,
 ) -> Result<Vec<ResolvedCalendarDay>, TimeAxisError> {
-    let mut days = Vec::with_capacity(calendar.total_days);
+    let weather_file_allows_leap_years = weather_calendar
+        .map(|calendar| calendar.weather_file_allows_leap_years)
+        .unwrap_or(true);
+    let expected_days = weather_calendar
+        .map(|calendar| calendar.total_days)
+        .unwrap_or(calendar.total_days);
+    let mut days = Vec::with_capacity(expected_days);
     let mut date = calendar.start_date();
-    for day_index in 0..calendar.total_days {
+    if !weather_file_allows_leap_years && date.month == 2 && date.day_of_month == 29 {
+        date = next_day(date);
+    }
+    for day_index in 0..expected_days {
         let date_ordinal = validated_date_ordinal(run_period, "current", date)?;
-        let Some(actual_day_of_year) = day_of_year(date.year, date.month, date.day_of_month) else {
+        let Some(gregorian_day_of_year) = day_of_year(date.year, date.month, date.day_of_month)
+        else {
+            return Err(invalid_date_error(run_period, "current", date));
+        };
+        let gregorian_year_is_leap_year = is_leap_year(date.year);
+        let weather_effective_year_is_leap_year =
+            gregorian_year_is_leap_year && weather_file_allows_leap_years;
+        let leap_year_add = u32::from(weather_effective_year_is_leap_year);
+        let weather_shape_year = if weather_effective_year_is_leap_year {
+            DEFAULT_LEAP_RUN_PERIOD_YEAR
+        } else {
+            DEFAULT_RUN_PERIOD_YEAR
+        };
+        let Some(weather_day_of_year) =
+            day_of_year(weather_shape_year, date.month, date.day_of_month)
+        else {
             return Err(invalid_date_error(run_period, "current", date));
         };
         let Some(schedule_day_of_year) =
@@ -786,18 +1022,32 @@ fn resolved_calendar_days(
         else {
             return Err(invalid_date_error(run_period, "current", date));
         };
+        let gregorian_day_of_week = day_of_week(date_ordinal);
+        let simulation_day_of_week = if weather_calendar.is_some() {
+            advance_day_of_week(calendar.start_day_of_week, days.len())
+        } else {
+            gregorian_day_of_week
+        };
         days.push(ResolvedCalendarDay {
-            day_of_sim: day_index + 1,
+            day_of_sim: days.len() + 1,
             date,
-            gregorian_year_is_leap_year: is_leap_year(date.year),
-            day_of_year: actual_day_of_year,
+            gregorian_year_is_leap_year,
+            weather_effective_year_is_leap_year,
+            leap_year_add,
+            gregorian_day_of_year,
+            day_of_year: weather_day_of_year,
             schedule_day_of_year,
-            day_of_week: day_of_week(date_ordinal),
+            gregorian_day_of_week,
+            day_of_week: simulation_day_of_week,
         });
-        if day_index + 1 < calendar.total_days {
+        if day_index + 1 < expected_days {
             date = next_day(date);
+            if !weather_file_allows_leap_years && date.month == 2 && date.day_of_month == 29 {
+                date = next_day(date);
+            }
         }
     }
+    debug_assert_eq!(days.len(), expected_days);
     Ok(days)
 }
 
@@ -842,6 +1092,22 @@ fn energyplus_weekday_number(day_of_week: DayOfWeek) -> i32 {
         DayOfWeek::Thursday => 5,
         DayOfWeek::Friday => 6,
         DayOfWeek::Saturday => 7,
+    }
+}
+
+fn advance_day_of_week(start: DayOfWeek, elapsed_simulation_days: usize) -> DayOfWeek {
+    let number = ((energyplus_weekday_number(start) - 1
+        + i32::try_from(elapsed_simulation_days % 7).unwrap_or(0))
+        % 7)
+        + 1;
+    match number {
+        1 => DayOfWeek::Sunday,
+        2 => DayOfWeek::Monday,
+        3 => DayOfWeek::Tuesday,
+        4 => DayOfWeek::Wednesday,
+        5 => DayOfWeek::Thursday,
+        6 => DayOfWeek::Friday,
+        _ => DayOfWeek::Saturday,
     }
 }
 

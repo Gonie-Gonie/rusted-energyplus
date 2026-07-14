@@ -1027,9 +1027,14 @@ fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(manifest.id, "foundation");
     assert_eq!(manifest.oracle_version, "26.1.0");
-    assert_eq!(manifest.cases.len(), 8);
+    assert_eq!(manifest.cases.len(), 9);
     assert!(manifest.cases.iter().any(|case| {
         case.ends_with("data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml")
+    }));
+    assert!(manifest.cases.iter().any(|case| {
+        case.ends_with(
+            "data/conformance_cases/calendar_schedule_weather_leap_policy_no_001/case.toml",
+        )
     }));
     assert!(
         manifest

@@ -3,7 +3,8 @@
         CtfOutsideQuickConductionBalanceInput,
         ENERGYPLUS_DEFAULT_BUILDING_SURFACE_GROUND_TEMPERATURE_C,
         ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M,
-        ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C, EpwRecord,
+        ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K, ENERGYPLUS_ZONE_INITIAL_TEMP_C,
+        EpwCalendarMetadata, EpwRecord,
         ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO, FirstZoneSimulationOptions,
         HeatBalanceCtfInitialHistoryPolicy,
         HeatBalanceSimulationOptions, HeatBalanceStepInput,
@@ -96,9 +97,13 @@
     use crate::time_axis::{Date, next_day};
     use crate::{
         ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
-        TimeAxisError, build_environment_time_axes, build_execution_plan, build_hourly_time_axis,
-        build_hourly_time_axis_for_run_period, energyplus_heat_balance_compatibility_stages,
-        normalized_hourly_timestamp_label, precompute_runtime_data, resolve_run_period_calendar,
+        TimeAxisError, build_environment_time_axes,
+        build_environment_time_axes_with_weather_metadata, build_execution_plan,
+        build_hourly_time_axis, build_hourly_time_axis_for_run_period,
+        build_hourly_time_axis_for_run_period_with_weather_metadata,
+        energyplus_heat_balance_compatibility_stages, normalized_hourly_timestamp_label,
+        precompute_runtime_data, resolve_run_period_calendar,
+        resolve_weather_environment_calendar,
     };
     use crate::{
         COMPONENT_OUTPUT_TO_FACILITY_METER_SOURCE_MAP, COOLING_ENERGY_TRANSFER_METER,

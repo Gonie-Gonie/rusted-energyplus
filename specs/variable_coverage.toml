@@ -724,7 +724,7 @@ domain = "schedule"
 status = "conformance"
 first_case = "schedule_constant_001"
 first_evidence = "schedule_constant_001"
-support_boundary = "Tolerance-gated hourly conformance for Schedule:Constant in schedule_constant_001 and ordered-exact-unique normalized hourly timestamp plus AllDays/Until Schedule:Compact value conformance for the explicit three-day leap-date range in calendar_schedule_hourly_exact_001 using its local leap-observed EPW. Raw ESO serialization, standard non-leap TMY policy, subhourly lookup, DST, holidays, and broader schedule grammar remain outside the claim."
+support_boundary = "Tolerance-gated hourly conformance for Schedule:Constant in schedule_constant_001 and ordered-exact-unique normalized hourly timestamp plus AllDays/Until Schedule:Compact value conformance for the paired calendar_schedule_hourly_exact_001 and calendar_schedule_weather_leap_policy_no_001 cases. The pair uses the same IDF and 72 raw EPW rows to prove exactly 72 Tuesday-ending samples when Leap Year Observed=Yes and 48 simulation-Monday-ending samples when No. Gregorian/weather/schedule day-of-year state is unit-tested internally as 61/60/61 on no-leap March 1 but is not proved by this hour-only external schedule series. This claim covers only the normalized hourly Schedule Value series. General EPW record selection, runtime/ep_run migration, raw ESO serialization, actual weather, cross-year traversal, subhourly lookup, DST, holidays, and broader schedule grammar remain outside the claim."
 
 [[variable]]
 name = "HeatTransfer Surface Area (Gross)"

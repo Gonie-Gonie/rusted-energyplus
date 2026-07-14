@@ -52,9 +52,14 @@ CLAIM_BOUNDARY = (
     "ZoneHVAC:IdealLoadsAirSystem no-outdoor-air sensible target. Existing promoted gates remain "
     "regression locks for declared variables only; broad 1Zone dynamic and broad IdealLoads/HVAC "
     "compatibility are not claimed until the target output families in this report pass their own "
-    "blocking gates. The calendar/schedule exact case is limited to its declared 72 normalized "
-    "hourly timestamps and AllDays Schedule:Compact values; it does not claim raw ESO timestamp "
-    "serialization or general time and schedule compatibility."
+    "blocking gates. The paired calendar/schedule cases are limited to normalized hourly "
+    "Schedule Value timestamps and values: the same IDF and 72 raw EPW rows produce 72 samples "
+    "ending Tuesday when leap years are observed and 48 ending simulation Monday when they are "
+    "not. Gregorian, weather, and schedule day-of-year state is source-mapped and unit-tested "
+    "internally, but this hour-only external pair does not prove those ordinal fields. It also does "
+    "not claim general EPW record selection, runtime/ep_run migration, DST, holidays, raw ESO "
+    "serialization, actual-weather execution, cross-year traversal, or general time and schedule "
+    "compatibility."
 )
 
 CASE_LABELS = {
@@ -62,6 +67,7 @@ CASE_LABELS = {
     "surface_temperature_nomass_001": "Surface no-mass",
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
+    "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
     "official_1zone_uncontrolled_dynamic_diagnostic_001": "Official 1Zone dynamic",
@@ -158,6 +164,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Weather calendar",
+        command="compare-weather-effective-calendar",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="v0.22",
