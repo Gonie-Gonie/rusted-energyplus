@@ -4,6 +4,7 @@ oracle_version = "26.1.0"
 cases = [
   "data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml",
   "data/conformance_cases/calendar_schedule_weather_leap_policy_no_001/case.toml",
+  "data/conformance_cases/weather_record_start_offset_nonactual_001/case.toml",
   "data/conformance_cases/schedule_constant_001/case.toml",
   "data/conformance_cases/weather_fields_001/case.toml",
   "data/conformance_cases/official_1zone_static_model_001/case.toml",

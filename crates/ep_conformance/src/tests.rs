@@ -1027,7 +1027,7 @@ fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(manifest.id, "foundation");
     assert_eq!(manifest.oracle_version, "26.1.0");
-    assert_eq!(manifest.cases.len(), 9);
+    assert_eq!(manifest.cases.len(), 10);
     assert!(manifest.cases.iter().any(|case| {
         case.ends_with("data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml")
     }));
@@ -1035,6 +1035,9 @@ fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
         case.ends_with(
             "data/conformance_cases/calendar_schedule_weather_leap_policy_no_001/case.toml",
         )
+    }));
+    assert!(manifest.cases.iter().any(|case| {
+        case.ends_with("data/conformance_cases/weather_record_start_offset_nonactual_001/case.toml")
     }));
     assert!(
         manifest
@@ -1426,7 +1429,7 @@ fn absent_timestamp_contract_remains_backward_compatible() -> Result<(), Box<dyn
 }
 
 #[test]
-fn rejects_timestamp_contract_outside_hourly_schedule_eso_boundary() {
+fn accepts_weather_and_rejects_timestamp_contract_outside_hourly_eso_boundary() {
     for (source, frequency) in [
         ("eso", "static"),
         ("eso", "timestep"),
@@ -1448,8 +1451,12 @@ fn rejects_timestamp_contract_outside_hourly_schedule_eso_boundary() {
         ));
     }
 
-    let wrong_class = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
+    let weather = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
         .replace("class = \"schedule\"", "class = \"weather\"");
+    assert!(parse_case_str(&weather).is_ok());
+
+    let wrong_class = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
+        .replace("class = \"schedule\"", "class = \"zone-state\"");
     assert!(matches!(
         parse_case_str(&wrong_class),
         Err(ManifestError::Validation(

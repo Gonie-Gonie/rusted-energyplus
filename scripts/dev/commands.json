@@ -305,6 +305,12 @@
                          "help":  "Gate paired EPW Leap Year Observed Yes/No calendar and Schedule:Compact evidence."
                      },
                      {
+                         "name":  "compare-weather-record-selection",
+                         "path":  "compare\\compare-weather-record-selection.ps1",
+                         "group":  "compare",
+                         "help":  "Gate non-actual EPW literal start-record selection with a leading decoy day."
+                     },
+                     {
                          "name":  "compare-weather-conformance",
                          "path":  "compare\\compare-weather-conformance.ps1",
                          "group":  "compare",

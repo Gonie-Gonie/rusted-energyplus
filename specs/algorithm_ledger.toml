@@ -231,8 +231,11 @@ port_ticket_mappings = [
   "src/EnergyPlus/WeatherManager.cc|GetRunPeriodData|GetRunPeriodData|Environment",
   "src/EnergyPlus/WeatherManager.cc|SetupEnvironmentTypes|SetupEnvironmentTypes|Environment",
   "src/EnergyPlus/WeatherManager.cc|GetNextEnvironment|GetNextEnvironment|Environment",
+  "src/EnergyPlus/WeatherManager.cc|ProcessEPWHeader|ProcessEPWHeader|Environment",
   "src/EnergyPlus/WeatherManager.cc|ManageWeather|ManageWeather|Environment",
   "src/EnergyPlus/WeatherManager.cc|InitializeWeather|InitializeWeather|Environment",
+  "src/EnergyPlus/WeatherManager.cc|ReadWeatherForDay|ReadWeatherForDay|Environment",
+  "src/EnergyPlus/WeatherManager.cc|ReadEPlusWeatherForDay|ReadEPlusWeatherForDay|Environment",
   "src/EnergyPlus/WeatherManager.cc|UpdateWeatherData|UpdateWeatherData|Environment",
   "src/EnergyPlus/WeatherManager.cc|SetCurrentWeather|SetCurrentWeather|Environment",
   "src/EnergyPlus/ScheduleManager.cc|UpdateScheduleVals|UpdateScheduleVals|Environment",
@@ -247,7 +250,12 @@ rust_target = [
   "crates/ep_runtime/src/time_axis.rs::build_environment_time_axes",
   "crates/ep_runtime/src/time_axis.rs::build_hourly_time_axis",
   "crates/ep_runtime/src/time_axis.rs::build_hourly_time_axis_with_weather_metadata",
+  "crates/ep_runtime/src/weather.rs::EpwDataPeriod",
+  "crates/ep_runtime/src/weather.rs::EpwDataPeriods",
   "crates/ep_runtime/src/weather.rs::EpwWeatherFile",
+  "crates/ep_runtime/src/weather_data_periods.rs::parse_epw_data_periods",
+  "crates/ep_runtime/src/weather_environment.rs::EpwEnvironmentWeather",
+  "crates/ep_runtime/src/weather_environment.rs::select_epw_environment_weather",
   "crates/ep_runtime/src/output/timestamp.rs::normalized_hourly_timestamp_label",
 ]
 status = "scaffold"
@@ -255,13 +263,15 @@ first_case = "schedule_constant_001"
 family_cases = [
   "calendar_schedule_hourly_exact_001",
   "calendar_schedule_weather_leap_policy_no_001",
+  "weather_record_start_offset_nonactual_001",
   "weather_fields_001",
 ]
 proof_variables = [
   "Schedule Value",
+  "Site Outdoor Air Drybulb Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold for EnergyPlus environment, calendar, weather-update, schedule-update, and timestamp ownership. The paired calendar_schedule_hourly_exact_001 and calendar_schedule_weather_leap_policy_no_001 cases use the same IDF and the same 72 raw EPW rows to lock the narrow weather-effective leap-policy branch: Leap Year Observed=Yes retains 72 ordered samples through Tuesday March 1, while No skips February 29 and retains 48 through simulation Monday. Rust unit tests separately lock Gregorian/weather/schedule day-of-year state as 61/60/61 on no-leap March 1; the external pair does not prove those ordinal fields because its AllDays schedule is hour-only and its normalized timestamp omits them. Both cases require exact normalized hourly Schedule Value labels and values. This does not complete any mapped EnergyPlus routine. General EPW record selection, runtime/ep_run migration, DST, holidays and special days, actual-weather traversal, cross-year behavior, warmup, design-day, raw ESO timestamp serialization, and broad schedule/weather conformance remain outside the claim."
+support_boundary = "Source-order scaffold for EnergyPlus environment, calendar, EPW header/day-read, weather-update, schedule-update, and timestamp ownership. The paired calendar_schedule_hourly_exact_001 and calendar_schedule_weather_leap_policy_no_001 cases use the same IDF and the same 72 raw EPW rows to lock the narrow weather-effective leap-policy branch: Leap Year Observed=Yes retains 72 ordered samples through Tuesday March 1, while No skips February 29 and retains 48 through simulation Monday. Rust unit tests separately lock Gregorian/weather/schedule day-of-year state as 61/60/61 on no-leap March 1; the external pair does not prove those ordinal fields because its AllDays schedule is hour-only and its normalized timestamp omits them. Both cases require exact normalized hourly Schedule Value labels and values. weather_record_start_offset_nonactual_001 separately proves that the supported same-year non-actual, single-data-period, one-record-per-hour selector skips 24 leading decoy rows and exactly matches 48 ordered hourly dry-bulb timestamps and values at zero tolerance; differing EPW row years prove only month/day matching. Today/Tomorrow source-index transitions and subhourly interpolation seeds remain unit evidence, not external internal-state claims. This does not complete any mapped EnergyPlus routine. Runtime/ep_run migration, actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, DST, holidays and special days, missing/range repair, warmup, design-day, raw ESO timestamp serialization, and broad schedule/weather conformance remain outside the claim."
 routine.manage_simulation.source_file = "src/EnergyPlus/SimulationManager.cc"
 routine.manage_simulation.source_routine = "ManageSimulation"
 routine.manage_simulation.source_map = "docs/src/porting-map/time-weather-schedule.md"
@@ -292,6 +302,21 @@ routine.initialize_weather.source_routine = "InitializeWeather"
 routine.initialize_weather.source_map = "docs/src/porting-map/time-weather-schedule.md"
 routine.initialize_weather.completion_status = "source_mapped"
 routine.initialize_weather.required_for_full_domain = true
+routine.process_epw_header.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.process_epw_header.source_routine = "ProcessEPWHeader"
+routine.process_epw_header.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.process_epw_header.completion_status = "source_mapped"
+routine.process_epw_header.required_for_full_domain = true
+routine.read_weather_for_day.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.read_weather_for_day.source_routine = "ReadWeatherForDay"
+routine.read_weather_for_day.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.read_weather_for_day.completion_status = "source_mapped"
+routine.read_weather_for_day.required_for_full_domain = true
+routine.read_eplus_weather_for_day.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.read_eplus_weather_for_day.source_routine = "ReadEPlusWeatherForDay"
+routine.read_eplus_weather_for_day.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.read_eplus_weather_for_day.completion_status = "source_mapped"
+routine.read_eplus_weather_for_day.required_for_full_domain = true
 routine.update_weather_data.source_file = "src/EnergyPlus/WeatherManager.cc"
 routine.update_weather_data.source_routine = "UpdateWeatherData"
 routine.update_weather_data.source_map = "docs/src/porting-map/time-weather-schedule.md"

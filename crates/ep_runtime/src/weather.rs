@@ -3,7 +3,7 @@
 use crate::psychrometrics::{
     energyplus_outdoor_wet_bulb_c, energyplus_psychrometric_humidity_ratio_from_rh,
 };
-use ep_model::FirstHourInterpolationStartingValues;
+use ep_model::{DayOfWeek, FirstHourInterpolationStartingValues};
 use std::fmt::{Display, Formatter};
 use std::path::Path;
 
@@ -12,6 +12,17 @@ const EPW_HEADER_LINE_COUNT: usize = 8;
 #[path = "weather_calendar.rs"]
 mod weather_calendar;
 use weather_calendar::parse_epw_calendar_metadata;
+
+#[path = "weather_data_periods.rs"]
+mod weather_data_periods;
+use weather_data_periods::parse_epw_data_periods;
+
+#[path = "weather_environment.rs"]
+mod weather_environment;
+pub use weather_environment::{
+    EpwEnvironmentWeather, EpwEnvironmentWeatherError, EpwWeatherDayBufferTransition,
+    select_epw_environment_weather,
+};
 
 /// Error returned while reading EPW weather data.
 #[derive(Debug)]
@@ -101,11 +112,46 @@ pub struct EpwCalendarMetadata {
     pub leap_year_observed: bool,
 }
 
+/// One month/day endpoint declared by an EPW `DATA PERIODS` header.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct EpwDataPeriodDate {
+    /// Optional calendar year for actual-weather data periods.
+    pub year: Option<u32>,
+    /// Month number, 1-12.
+    pub month: u32,
+    /// Day of month.
+    pub day: u32,
+}
+
+/// One source-order period declared by an EPW `DATA PERIODS` header.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EpwDataPeriod {
+    /// Data-period name or description.
+    pub name: String,
+    /// Weekday assigned to the first source day.
+    pub start_day_of_week: DayOfWeek,
+    /// First date contained by the period.
+    pub start_date: EpwDataPeriodDate,
+    /// Last date contained by the period.
+    pub end_date: EpwDataPeriodDate,
+}
+
+/// Parsed EPW `DATA PERIODS` header state.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EpwDataPeriods {
+    /// Number of weather records stored per hour.
+    pub records_per_hour: u32,
+    /// Data periods in header order.
+    pub periods: Vec<EpwDataPeriod>,
+}
+
 /// Parsed EPW weather file with header policy and hourly records kept together.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EpwWeatherFile {
     /// Calendar metadata parsed from the EPW header block.
     pub calendar_metadata: EpwCalendarMetadata,
+    /// Parsed `DATA PERIODS` metadata used to validate and position weather reads.
+    pub data_periods: EpwDataPeriods,
     /// Hourly EPW data rows in source order.
     pub records: Vec<EpwRecord>,
 }
@@ -1025,23 +1071,46 @@ pub fn load_epw_records(path: impl AsRef<Path>) -> Result<Vec<EpwRecord>, EpwErr
 
 /// Parses an EPW weather file with its calendar metadata and hourly records.
 pub fn parse_epw_weather_file(contents: &str) -> Result<EpwWeatherFile, EpwError> {
+    let (data_periods, data_start_line_index) = parse_epw_data_periods(contents)?;
     Ok(EpwWeatherFile {
         calendar_metadata: parse_epw_calendar_metadata(contents)?,
-        records: parse_epw_data_records(contents)?,
+        data_periods,
+        records: parse_epw_data_records(contents, true, data_start_line_index)?,
     })
 }
 
 /// Parses hourly EPW records from weather text.
 pub fn parse_epw_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
-    parse_epw_data_records(contents)
+    parse_epw_data_records(contents, false, EPW_HEADER_LINE_COUNT)
 }
 
-fn parse_epw_data_records(contents: &str) -> Result<Vec<EpwRecord>, EpwError> {
+fn parse_epw_data_records(
+    contents: &str,
+    reject_interior_blank_rows: bool,
+    data_start_line_index: usize,
+) -> Result<Vec<EpwRecord>, EpwError> {
     let mut records = Vec::new();
+    let data_lines = contents
+        .lines()
+        .enumerate()
+        .skip(data_start_line_index)
+        .collect::<Vec<_>>();
+    let last_nonblank_position = data_lines
+        .iter()
+        .rposition(|(_line_index, line)| !line.trim().is_empty());
 
-    for (line_index, line) in contents.lines().enumerate().skip(EPW_HEADER_LINE_COUNT) {
+    for (data_position, (line_index, line)) in data_lines.into_iter().enumerate() {
         let line_number = line_index + 1;
         if line.trim().is_empty() {
+            if reject_interior_blank_rows
+                && last_nonblank_position.is_some_and(|last| data_position < last)
+            {
+                return Err(EpwError::InvalidValue {
+                    line: line_number,
+                    field: "weather data row",
+                    value: String::new(),
+                });
+            }
             continue;
         }
         let fields = line.split(',').collect::<Vec<_>>();

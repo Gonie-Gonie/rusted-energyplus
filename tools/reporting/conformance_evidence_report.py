@@ -57,9 +57,13 @@ CLAIM_BOUNDARY = (
     "ending Tuesday when leap years are observed and 48 ending simulation Monday when they are "
     "not. Gregorian, weather, and schedule day-of-year state is source-mapped and unit-tested "
     "internally, but this hour-only external pair does not prove those ordinal fields. It also does "
-    "not claim general EPW record selection, runtime/ep_run migration, DST, holidays, raw ESO "
-    "serialization, actual-weather execution, cross-year traversal, or general time and schedule "
-    "compatibility."
+    "not claim general EPW record selection. The separate weather record-offset case proves only "
+    "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
+    "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
+    "Today/Tomorrow buffers and subhourly interpolation remain unit evidence. Runtime/ep_run "
+    "migration, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
+    "records-per-hour greater than one, DST, holidays, raw ESO serialization, and general time, "
+    "weather, and schedule compatibility are not claimed."
 )
 
 CASE_LABELS = {
@@ -68,6 +72,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
+    "weather_record_start_offset_nonactual_001": "Weather record offset",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
     "official_1zone_uncontrolled_dynamic_diagnostic_001": "Official 1Zone dynamic",
@@ -171,6 +176,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Weather records",
+        command="compare-weather-record-selection",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_record_start_offset_nonactual_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_record_start_offset_nonactual_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\weather_record_start_offset_nonactual_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="v0.22",

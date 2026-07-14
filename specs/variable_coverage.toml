@@ -852,7 +852,7 @@ domain = "weather"
 status = "conformance"
 first_case = "weather_fields_001"
 first_evidence = "weather_fields_001"
-support_boundary = "Tolerance-gated time-series conformance for the weather case and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate."
+support_boundary = "Tolerance-gated time-series conformance for weather_fields_001 and as a required weather alignment variable in the official 1ZoneUncontrolled dynamic candidate. weather_record_start_offset_nonactual_001 separately locks zero-tolerance, ordered-exact-unique hourly dry-bulb timestamps and values for a same-year non-actual July 1 through July 2 selection after 24 leading EPW decoy rows. That case proves only single-data-period, one-record-per-hour month/day positioning and order; internal Today/Tomorrow buffers, subhourly interpolation, actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, DST, holidays, missing-value repair, and broad weather processing remain outside the claim."
 
 [[variable]]
 name = "Site Outdoor Air Wetbulb Temperature"

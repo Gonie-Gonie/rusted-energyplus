@@ -67,7 +67,7 @@ impl OutputRequest {
         if self.timestamp_contract.is_some()
             && !(self.frequency == OutputFrequency::Hourly
                 && self.source == SourceArtifact::Eso
-                && self.class == VariableClass::Schedule)
+                && matches!(self.class, VariableClass::Schedule | VariableClass::Weather))
         {
             return Err(ValidationError::InvalidTimestampContractOutput { index });
         }

@@ -14,9 +14,10 @@ use ep_conformance::{
 use ep_model::TypedModel;
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    ScheduleValueSeries, TimeAxis, build_hourly_time_axis,
+    EpwEnvironmentWeather, ScheduleValueSeries, TimeAxis, build_hourly_time_axis,
     build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
     normalized_hourly_timestamp_label, precompute_schedule_value_series_for_time_axis,
+    select_epw_environment_weather,
 };
 
 use crate::conformance_artifacts::{
@@ -42,6 +43,7 @@ struct TimeWeatherScheduleContext<'a> {
     manifest: &'a ConformanceCase,
     model: TypedModel,
     time_axis: TimeAxis,
+    weather_environment: Option<EpwEnvironmentWeather>,
     rows: Vec<TimeWeatherScheduleRow>,
 }
 
@@ -268,22 +270,28 @@ fn build_context<'a>(
         .iter()
         .any(|output| output.class == VariableClass::Schedule)
         .then(|| precompute_schedule_value_series_for_time_axis(&model, &time_axis));
-
-    let weather_records = if manifest
+    let has_weather_output = manifest
         .outputs
         .iter()
-        .any(|output| output.class == VariableClass::Weather)
-    {
+        .any(|output| output.class == VariableClass::Weather);
+    let weather_environment = if has_weather_output {
         Some(
             weather_file
                 .as_ref()
-                .ok_or_else(|| "weather output comparison requires input.weather".to_string())?
-                .records
-                .as_slice(),
+                .ok_or_else(|| "weather output comparison requires input.weather".to_string())
+                .and_then(|weather_file| {
+                    select_epw_environment_weather(weather_file, &time_axis).map_err(|error| {
+                        format!("failed to select EPW environment records: {error}")
+                    })
+                })?,
         )
     } else {
         None
     };
+
+    let weather_records = weather_environment
+        .as_ref()
+        .map(EpwEnvironmentWeather::hourly_records);
 
     let mut rows = Vec::new();
     for output in &manifest.outputs {
@@ -380,6 +388,7 @@ fn build_context<'a>(
         manifest,
         model,
         time_axis,
+        weather_environment,
         rows,
     })
 }
@@ -438,16 +447,15 @@ fn weather_samples(
 ) -> Result<Vec<SeriesSample>, String> {
     let weather_records = weather_records
         .ok_or_else(|| "weather output comparison requires EPW records".to_string())?;
-    if weather_records.len() < time_axis.sample_count() {
+    if weather_records.len() != time_axis.sample_count() {
         return Err(format!(
-            "EPW has {} samples but time axis requires {}",
+            "selected EPW environment has {} samples but time axis requires {}",
             weather_records.len(),
             time_axis.sample_count()
         ));
     }
     let values = weather_records
         .iter()
-        .take(time_axis.sample_count())
         .map(|record| weather_value(output, record))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(samples_with_time_axis(&values, time_axis))
@@ -644,6 +652,35 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
     } else {
         report.push_str("weather_calendar_policy_applied: false\n");
     }
+    if let Some(weather) = context.weather_environment.as_ref() {
+        report.push_str("weather_record_selection_applied: true\n");
+        report.push_str(&format!(
+            "weather_data_period_index: {}\n",
+            weather.data_period_index + 1
+        ));
+        report.push_str(&format!(
+            "weather_source_start_record_index: {}\n",
+            weather.source_start_record_index
+        ));
+        report.push_str(&format!(
+            "weather_initial_tomorrow_record_index: {}\n",
+            weather.initial_tomorrow_source_record_start
+        ));
+        report.push_str(&format!(
+            "weather_selected_hourly_records: {}\n",
+            weather.hourly_records().len()
+        ));
+        report.push_str(&format!(
+            "weather_skipped_raw_february_29_days: {}\n",
+            weather.skipped_february_29_source_record_starts.len()
+        ));
+        report.push_str(&format!(
+            "weather_day_buffer_transitions: {}\n",
+            weather.day_buffer_transitions.len()
+        ));
+    } else {
+        report.push_str("weather_record_selection_applied: false\n");
+    }
     report.push_str(&format!(
         "typed_schedules: {}\n\n",
         context.model.schedule_names.len()
@@ -747,6 +784,10 @@ fn render_json(context: &TimeWeatherScheduleContext<'_>) -> String {
     json.push_str(&format!(
         "  \"weather_calendar\": {},\n",
         weather_calendar_json(&context.time_axis)
+    ));
+    json.push_str(&format!(
+        "  \"weather_record_selection\": {},\n",
+        weather_record_selection_json(context.weather_environment.as_ref())
     ));
     json.push_str(&format!("  \"series_count\": {},\n", context.rows.len()));
     json.push_str(&format!(
@@ -945,6 +986,21 @@ fn weather_calendar_json(time_axis: &TimeAxis) -> String {
         calendar.leap_days_skipped,
         calendar.gregorian.start_year_is_leap_year,
         calendar.start_year_is_weather_effective_leap_year,
+    )
+}
+
+fn weather_record_selection_json(weather: Option<&EpwEnvironmentWeather>) -> String {
+    let Some(weather) = weather else {
+        return "null".to_string();
+    };
+    format!(
+        "{{\"applied\": true, \"data_period_index\": {}, \"source_start_record_index\": {}, \"initial_tomorrow_source_record_index\": {}, \"selected_hourly_records\": {}, \"skipped_raw_february_29_days\": {}, \"day_buffer_transitions\": {}}}",
+        weather.data_period_index + 1,
+        weather.source_start_record_index,
+        weather.initial_tomorrow_source_record_start,
+        weather.hourly_records().len(),
+        weather.skipped_february_29_source_record_starts.len(),
+        weather.day_buffer_transitions.len(),
     )
 }
 

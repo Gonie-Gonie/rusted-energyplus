@@ -1,0 +1,59 @@
+id = "weather_record_start_offset_nonactual_001"
+title = "Non-actual EPW literal start-record selection"
+milestone = "full-source-order-weather-record-selection"
+purpose = "Block on source-order EPW start-date positioning instead of using the leading weather rows for a non-January RunPeriod."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The local EPW contains June 30 decoy rows before the requested July 1 through July 2 RunPeriod.",
+  "The three source days deliberately use years that differ from the RunPeriod, proving only the declared non-actual month/day matching branch.",
+  "The ordered hourly timestamp/value series proves record-date selection and order for this single-period, one-record-per-hour fixture; it does not independently prove the internal Today/Tomorrow buffers or subhourly interpolation.",
+  "Actual weather, cross-year traversal, multiple DATA PERIOD execution, records-per-hour greater than one, DST, holidays, missing-value repair, and broad WeatherManager compatibility remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/weather_record_start_offset_nonactual_001/weather_record_start_offset_nonactual.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/weather_record_start_offset_nonactual_001/weather_record_start_offset_nonactual.idf"
+weather = "data/conformance_cases/weather_record_start_offset_nonactual_001/weather_record_start_offset_nonactual.epw"
+
+[[outputs]]
+key = "Environment"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/weather_record_start_offset_nonactual_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-weather-record-selection"
+blocking = true

@@ -211,7 +211,7 @@ impl Display for ValidationError {
             }
             Self::InvalidTimestampContractOutput { index } => write!(
                 formatter,
-                "output {index} timestamp_contract is currently supported only for hourly schedule eso series"
+                "output {index} timestamp_contract is currently supported only for hourly schedule or weather eso series"
             ),
             Self::MissingOutputDomain { index } => {
                 write!(formatter, "output {index} is missing v2 domain")
