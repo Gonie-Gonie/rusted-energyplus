@@ -241,6 +241,7 @@ rust_target = [
   "crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand",
   "crates/ep_runtime/src/node/mod.rs::IdealLoadsSupplyNodeUpdate",
   "crates/ep_runtime/src/output.rs::RuntimeMeterRegistry",
+  "crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j",
   "crates/ep_compare/src/mtr.rs::load_mtr_time_series",
   "crates/ep_compare/src/mtr.rs::load_mtr_time_series_for_frequency",
   "crates/ep_cli/src/ideal_loads.rs::monthly_meter_samples_from_detailed_energy",
@@ -483,6 +484,7 @@ energyplus_source = [
 rust_target = [
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_with_recirculation_context_compat",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::calc_no_oa_third_order_moisture_demand_compat",
+    "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::third_order_humidity_history_term",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::correct_no_oa_third_order_humidity_ratio_compat",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::humidistat_dehumidification_mass_flow_rate_kg_per_s",
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::heating_section_dehumidification_mass_flow_rate_kg_per_s",
@@ -551,6 +553,7 @@ energyplus_source = [
 rust_target = [
     "crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_with_recirculation_context_compat",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::calc_no_oa_third_order_moisture_demand_compat",
+    "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::third_order_humidity_history_term",
     "crates/ep_runtime/src/ideal_loads/calc/moisture_demand.rs::correct_no_oa_third_order_humidity_ratio_compat",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::humidistat_humidification_mass_flow_rate_kg_per_s",
     "crates/ep_runtime/src/ideal_loads/calc/humidity.rs::heating_supply_humidity_ratio",

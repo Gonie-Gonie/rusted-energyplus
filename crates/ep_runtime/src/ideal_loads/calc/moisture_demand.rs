@@ -9,6 +9,13 @@ use super::types::IdealLoadsZoneState;
 
 const THIRD_ORDER_CURRENT_WEIGHT: f64 = 11.0 / 6.0;
 
+/// Evaluates the EnergyPlus ThirdOrder humidity-ratio history term.
+#[must_use]
+pub fn third_order_humidity_history_term(previous_zone_timestep_humidity_ratios: [f64; 3]) -> f64 {
+    let [w_prev_0, w_prev_1, w_prev_2] = previous_zone_timestep_humidity_ratios;
+    3.0 * w_prev_0 - 1.5 * w_prev_1 + (1.0 / 3.0) * w_prev_2
+}
+
 /// Inputs for the no-OA ThirdOrder `calcPredictedHumidityRatio` subset.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct NoOaThirdOrderMoistureDemandInput {
@@ -120,8 +127,8 @@ pub fn calc_no_oa_third_order_moisture_demand_compat(
     let c = density_kg_per_m3 * input.zone_volume_m3 * input.zone_moisture_capacity_multiplier
         / input.timestep_seconds;
     let b = input.latent_gain_w / vapor_enthalpy_j_per_kg;
-    let [w_prev_0, w_prev_1, w_prev_2] = input.previous_zone_timestep_humidity_ratios;
-    let third_order_history = 3.0 * w_prev_0 - 1.5 * w_prev_1 + (1.0 / 3.0) * w_prev_2;
+    let third_order_history =
+        third_order_humidity_history_term(input.previous_zone_timestep_humidity_ratios);
 
     let humidifying_rh_percent = if input.humidifying_relative_humidity_percent
         > input.dehumidifying_relative_humidity_percent
@@ -213,8 +220,8 @@ pub fn correct_no_oa_third_order_humidity_ratio_compat(
     let b = input.latent_gain_w / vapor_enthalpy_j_per_kg
         + input.supply_mass_flow_rate_kg_per_s * input.supply_humidity_ratio;
     let a = input.supply_mass_flow_rate_kg_per_s;
-    let [w_prev_0, w_prev_1, w_prev_2] = input.previous_zone_timestep_humidity_ratios;
-    let third_order_history = 3.0 * w_prev_0 - 1.5 * w_prev_1 + (1.0 / 3.0) * w_prev_2;
+    let third_order_history =
+        third_order_humidity_history_term(input.previous_zone_timestep_humidity_ratios);
     let denominator = THIRD_ORDER_CURRENT_WEIGHT * c + a;
     if denominator <= 0.0 {
         return None;

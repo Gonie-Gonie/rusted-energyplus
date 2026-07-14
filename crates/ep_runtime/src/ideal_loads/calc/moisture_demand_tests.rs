@@ -2,7 +2,7 @@ use super::{
     moisture_demand::{
         NoOaThirdOrderHumidityCorrectorInput, NoOaThirdOrderMoistureDemandInput,
         calc_no_oa_third_order_moisture_demand_compat,
-        correct_no_oa_third_order_humidity_ratio_compat,
+        correct_no_oa_third_order_humidity_ratio_compat, third_order_humidity_history_term,
     },
     types::IdealLoadsZoneState,
 };
@@ -10,6 +10,18 @@ use crate::{
     energyplus_moist_air_density_kg_per_m3, energyplus_psychrometric_humidity_ratio_from_rh,
     energyplus_water_vapor_gas_enthalpy_j_per_kg,
 };
+
+#[test]
+fn third_order_humidity_history_term_matches_energyplus_coefficients() {
+    let history = [0.0085, 0.0082, 0.0081];
+    let expected = 3.0 * history[0] - 1.5 * history[1] + (1.0 / 3.0) * history[2];
+
+    assert_close(
+        third_order_humidity_history_term(history),
+        expected,
+        1.0e-15,
+    );
+}
 
 #[test]
 fn no_oa_third_order_moisture_demand_matches_energyplus_predictor_formula() {
