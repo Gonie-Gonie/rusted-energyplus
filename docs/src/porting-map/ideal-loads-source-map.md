@@ -339,9 +339,11 @@ Sensible/Enthalpy heat-recovery candidate rows. The current Rust surface is:
   `StdRhoAir` conversion
 - `Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate` as the EnergyPlus
   System/Average proof input for
-  `ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP`, combined with the
-  source-order `CalcPurchAirMinOAMassFlow` `max(minimum OA, CO2 demand)` branch
-  for the declared Flow/Person CO2Setpoint DCV candidate
+  `ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP`
+- `calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s` in
+  `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs` owns the source-order
+  `CalcPurchAirMinOAMassFlow` `max(minimum OA, CO2 demand)` branch for the
+  declared Flow/Person CO2Setpoint DCV candidate
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
   Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and
   DifferentialDryBulb/DifferentialEnthalpy economizer OA report-rate and

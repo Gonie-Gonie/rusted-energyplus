@@ -26,6 +26,20 @@ pub fn occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s(
     )
 }
 
+/// Applies the CO2Setpoint DCV lower bound from the calculated minimum OA flow.
+///
+/// EnergyPlus `CalcPurchAirMinOAMassFlow` raises the minimum outdoor-air mass
+/// flow to `ZoneSysContDemand::OutputRequiredToCO2SP` when that contaminant
+/// demand is larger.
+#[must_use]
+pub fn calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(
+    minimum_outdoor_air_mass_flow_rate_kg_per_s: f64,
+    output_required_to_co2_setpoint_mass_flow_rate_kg_per_s: f64,
+) -> f64 {
+    minimum_outdoor_air_mass_flow_rate_kg_per_s
+        .max(output_required_to_co2_setpoint_mass_flow_rate_kg_per_s)
+}
+
 /// Applies OccupancySchedule DCV current people, OA schedule, and StdRhoAir.
 #[must_use]
 pub fn calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s(

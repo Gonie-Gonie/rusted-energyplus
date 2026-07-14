@@ -86,6 +86,7 @@ use ep_runtime::{
     ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
+    calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_no_oa_third_order_moisture_demand_compat,
     calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
     calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
@@ -1718,8 +1719,10 @@ fn build_outdoor_air_design_flow_context<'a>(
         co2_setpoint_required_mass_flow_rates
             .iter()
             .map(|co2_required_mass_flow_rate_kg_per_s| {
-                outdoor_air_design_mass_flow_rate_kg_per_s
-                    .max(*co2_required_mass_flow_rate_kg_per_s)
+                calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(
+                    outdoor_air_design_mass_flow_rate_kg_per_s,
+                    *co2_required_mass_flow_rate_kg_per_s,
+                )
             })
             .collect::<Vec<_>>()
     } else {

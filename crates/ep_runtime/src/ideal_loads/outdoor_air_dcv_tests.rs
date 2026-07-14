@@ -34,6 +34,35 @@ fn occupancy_schedule_dcv_uses_current_people_for_flow_person() {
 }
 
 #[test]
+fn co2_setpoint_dcv_selects_required_flow_above_minimum() {
+    assert_eq!(
+        calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(0.05, 0.08),
+        0.08
+    );
+}
+
+#[test]
+fn co2_setpoint_dcv_preserves_minimum_for_noncontrolling_requirements() {
+    for required_mass_flow_rate_kg_per_s in [0.03, 0.05, -0.01] {
+        assert_eq!(
+            calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(
+                0.05,
+                required_mass_flow_rate_kg_per_s,
+            ),
+            0.05
+        );
+    }
+}
+
+#[test]
+fn co2_setpoint_dcv_preserves_finite_minimum_for_nan_requirement() {
+    assert_eq!(
+        calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(0.05, f64::NAN),
+        0.05
+    );
+}
+
+#[test]
 fn zero_minimum_oa_still_conditions_recirculation_when_unit_available() {
     let result = calc_outdoor_air_sensible_report_rates_compat(
         &test_system(),
