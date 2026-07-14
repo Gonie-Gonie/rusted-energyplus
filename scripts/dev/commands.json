@@ -326,7 +326,7 @@
                          "name":  "compare-calendar-weekend-holiday-policy-exact",
                          "path":  "compare\\compare-calendar-weekend-holiday-policy-exact.ps1",
                          "group":  "compare",
-                         "help":  "Gate paired exact fixed-Sunday input-file Holiday weekend-observation Yes/No policy state and ordered hourly day types."
+                         "help":  "Gate exact fixed-Sunday input-file Holiday weekend-observation Yes/No/blank executable-observed policy state and ordered hourly day types."
                      },
                      {
                          "name":  "compare-calendar-weekend-saturday-policy-exact",

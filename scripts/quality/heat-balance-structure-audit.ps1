@@ -213,6 +213,7 @@ $timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
 $timeWeatherScheduleSpecialDays = "crates\ep_cli\src\time_weather_schedule_special_days.rs"
 $algorithmLedger = "specs\algorithm_ledger.toml"
 $durationWrapGate = "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1"
+$weekendHolidayGate = "scripts\compare\compare-calendar-weekend-holiday-policy-exact.ps1"
 $overlapOrderGate = "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1"
 $epwIdfPrecedenceGate = "scripts\compare\compare-calendar-special-day-epw-idf-precedence-exact.ps1"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
@@ -278,6 +279,7 @@ foreach ($entry in @(
         @($timeWeatherScheduleSpecialDays, "time/weather/schedule special-day report module"),
         @($algorithmLedger, "algorithm source-order ledger"),
         @($durationWrapGate, "common-year and leap-year special-day duration-wrap gate"),
+        @($weekendHolidayGate, "fixed-Sunday Yes/No/blank weekend holiday gate"),
         @($overlapOrderGate, "paired special-day overlap declaration-order gate"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
@@ -665,6 +667,18 @@ Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 365' -Descrip
 Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 366' -Description "EnergyPlus leap-year duration wrap at annual day 366"
 Assert-Contains -Path $durationWrapGate -Pattern 'if \(\$index -lt 48\) \{ 8\.0 \} else \{ \$case\.FinalDayTypeIndex \}' -Description "EnergyPlus duration-three wrap produces two in-range Holiday days then weekday"
 Assert-Contains -Path $durationWrapGate -Pattern 'EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;' -Description "EnergyPlus duration-wrap clean source branch"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'Id = "calendar_special_day_weekend_rule_blank_hourly_exact_001"[\s\S]*?WeekendPolicy = \$true[\s\S]*?BlankPolicy = \$true[\s\S]*?StartDay = 29[\s\S]*?StartDayOfYear = 60[\s\S]*?ShiftDays = 1' -Description "blank A5 follows EnergyPlus executable enabled Sunday-shift branch"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\(\?m\)\^\\s\*,\\s\*!-\\s\*Apply Weekend Holiday Rule\\s\*\$' -Description "blank A5 is genuinely empty"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\$casePolicyFieldMatches\.Count -ne 1' -Description "every fixed-Sunday fixture has exactly one annotated A5 field"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\$idfText\.Remove\(\$policyFieldMatch\.Index, \$policyFieldMatch\.Length\)\.Insert\(' -Description "three-case normalization replaces only the matched A5 field span"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'Weekend holiday IDFs differ outside the explicit Yes/No/blank policy field' -Description "three fixed-Sunday fixtures isolate only A5"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\$specialDays\.apply_weekend_rule -ne \$case\.WeekendPolicy' -Description "reported blank A5 policy follows executable state"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\$resolved\[0\]\.start_day_of_year -ne \$case\.StartDayOfYear' -Description "fixed-Sunday resolved day-of-year contract"
+Assert-Contains -Path $weekendHolidayGate -Pattern '\$resolved\[0\]\.weekend_shift_days -ne \$case\.ShiftDays' -Description "fixed-Sunday resolved shift contract"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;' -Description "fixed-Sunday three-case clean EnergyPlus completion"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'Blank and explicit Yes oracle values diverge at sample \$index' -Description "blank and explicit Yes exact value equality"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'Blank and explicit Yes oracle timestamps diverge at sample \$index' -Description "blank and explicit Yes exact timestamp equality"
+Assert-Contains -Path $weekendHolidayGate -Pattern 'Fixed-Sunday explicit Yes/No and blank weekend holiday policy exact gate passed\.' -Description "fixed-Sunday three-case blocking gate"
 Assert-Contains -Path $overlapOrderGate -Pattern 'ExpectedNames = @\("ZULU HOLIDAY DEFINITION", "ALPHA CUSTOM DAY DEFINITION"\)' -Description "Zulu-then-Alpha SpecialDays source order"
 Assert-Contains -Path $overlapOrderGate -Pattern 'ExpectedNames = @\("ALPHA CUSTOM DAY DEFINITION", "ZULU HOLIDAY DEFINITION"\)' -Description "Alpha-then-Zulu SpecialDays source order"
 Assert-Contains -Path $overlapOrderGate -Pattern 'identical SpecialDays definitions in exact reverse order' -Description "paired overlap fixtures isolate reversed declaration order"

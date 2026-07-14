@@ -20,6 +20,8 @@ $Cases = @(
         IdfName = "calendar_special_day_weekend_rule_enabled_hourly_exact.idf"
         WeekendPolicy = $true
         PolicyText = "Yes, !- Apply Weekend Holiday Rule"
+        PolicyValue = "Yes"
+        BlankPolicy = $false
         FirstValue = 1.0
         FirstLabel = "Sunday"
         MiddleValue = 8.0
@@ -34,6 +36,8 @@ $Cases = @(
         IdfName = "calendar_special_day_weekend_rule_disabled_hourly_exact.idf"
         WeekendPolicy = $false
         PolicyText = "No,  !- Apply Weekend Holiday Rule"
+        PolicyValue = "No"
+        BlankPolicy = $false
         FirstValue = 8.0
         FirstLabel = "Holiday"
         MiddleValue = 2.0
@@ -42,6 +46,22 @@ $Cases = @(
         StartDayOfYear = 59
         ShiftDays = 0
         ExpectedFirstTimestamp = "env=SPECIAL DAY WEEKEND RULE RUN PERIOD;day=1;month=2;date=28;dst=0;hour=1;start=0.00;end=60.00;day_type=Holiday"
+    },
+    [pscustomobject]@{
+        Id = "calendar_special_day_weekend_rule_blank_hourly_exact_001"
+        IdfName = "calendar_special_day_weekend_rule_blank_hourly_exact.idf"
+        WeekendPolicy = $true
+        PolicyText = ",     !- Apply Weekend Holiday Rule"
+        PolicyValue = ""
+        BlankPolicy = $true
+        FirstValue = 1.0
+        FirstLabel = "Sunday"
+        MiddleValue = 8.0
+        MiddleLabel = "Holiday"
+        StartDay = 29
+        StartDayOfYear = 60
+        ShiftDays = 1
+        ExpectedFirstTimestamp = "env=SPECIAL DAY WEEKEND RULE RUN PERIOD;day=1;month=2;date=28;dst=0;hour=1;start=0.00;end=60.00;day_type=Sunday"
     }
 )
 
@@ -105,6 +125,7 @@ if ($weatherRows.Count -ne 72) {
 }
 
 $idfTexts = @{}
+$policyFieldMatches = @{}
 foreach ($case in $Cases) {
     $caseText = Get-Content -LiteralPath $case.CasePath -Raw -Encoding UTF8
     $idfText = Get-Content -LiteralPath $case.IdfPath -Raw -Encoding UTF8
@@ -116,16 +137,49 @@ foreach ($case in $Cases) {
     Assert-Contains -Text $caseText -Pattern "weather = `"$WeatherRef`"" -Description "$($case.Id) shared EPW attribution"
     Assert-Contains -Text $caseText -Pattern 'script = "scripts/dev.cmd compare-calendar-weekend-holiday-policy-exact"' -Description "$($case.Id) manifest gate attribution"
     Assert-Contains -Text $caseText -Pattern "blocking = true" -Description "$($case.Id) manifest blocking flag"
-    Assert-Contains -Text $idfText -Pattern $case.PolicyText -Description "$($case.Id) explicit weekend policy"
+    Assert-Contains -Text $idfText -Pattern $case.PolicyText -Description "$($case.Id) weekend policy field"
+    $casePolicyFieldMatches = [regex]::Matches(
+        $idfText,
+        '(?m)^[^\S\r\n]*(?<value>[^,\r\n]*),[^\S\r\n]*!-[^\S\r\n]*Apply Weekend Holiday Rule[^\S\r\n]*$'
+    )
+    if ($casePolicyFieldMatches.Count -ne 1) {
+        throw "$($case.Id) must contain exactly one Apply Weekend Holiday Rule field"
+    }
+    $policyValue = $casePolicyFieldMatches[0].Groups["value"].Value.Trim()
+    if ($policyValue -cne $case.PolicyValue) {
+        throw "$($case.Id) expected Apply Weekend Holiday Rule value '$($case.PolicyValue)', found '$policyValue'"
+    }
+    $policyFieldMatches[$case.Id] = $casePolicyFieldMatches[0]
+    if ($case.BlankPolicy) {
+        $blankPolicyMatches = [regex]::Matches(
+            $idfText,
+            '(?m)^\s*,\s*!-\s*Apply Weekend Holiday Rule\s*$'
+        )
+        if ($blankPolicyMatches.Count -ne 1) {
+            throw "$($case.Id) must contain exactly one genuinely blank Apply Weekend Holiday Rule field"
+        }
+        if ($blankPolicyMatches[0].Value -match '(?i)\b(?:Yes|No)\b') {
+            throw "$($case.Id) blank Apply Weekend Holiday Rule field contains an explicit Yes/No value"
+        }
+        Write-Host "OK $($case.Id) genuinely blank weekend policy field."
+    }
     Assert-Contains -Text $idfText -Pattern "No,  !- Use Weather File Holidays and Special Days" -Description "$($case.Id) disabled EPW holiday policy"
     Assert-Contains -Text $idfText -Pattern "No,  !- Use Weather File Daylight Saving Period" -Description "$($case.Id) disabled DST policy"
     Assert-Contains -Text $idfText -Pattern "Sunday Holiday" -Description "$($case.Id) fixed Sunday special day"
 }
 
-$enabledNormalized = $idfTexts[$Cases[0].Id].Replace($Cases[0].PolicyText, "<WEEKEND HOLIDAY POLICY>")
-$disabledNormalized = $idfTexts[$Cases[1].Id].Replace($Cases[1].PolicyText, "<WEEKEND HOLIDAY POLICY>")
-if ($enabledNormalized -cne $disabledNormalized) {
-    throw "Paired weekend holiday IDFs differ outside the explicit weekend policy"
+$normalizedIdfs = @(
+    $Cases | ForEach-Object {
+        $idfText = $idfTexts[$_.Id]
+        $policyFieldMatch = $policyFieldMatches[$_.Id]
+        $idfText.Remove($policyFieldMatch.Index, $policyFieldMatch.Length).Insert(
+            $policyFieldMatch.Index,
+            "<WEEKEND HOLIDAY POLICY>"
+        )
+    }
+)
+if ($normalizedIdfs[0] -cne $normalizedIdfs[1] -or $normalizedIdfs[0] -cne $normalizedIdfs[2]) {
+    throw "Weekend holiday IDFs differ outside the explicit Yes/No/blank policy field"
 }
 
 $cargo = Get-Command cargo -ErrorAction SilentlyContinue
@@ -133,7 +187,10 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Running paired fixed-Sunday weekend holiday policy exact gate."
+$oracleValuesByCase = @{}
+$oracleTimestampsByCase = @{}
+
+Write-Host "Running fixed-Sunday explicit Yes/No and blank weekend holiday policy exact gate."
 foreach ($case in $Cases) {
     Remove-RepoDirectory -Path $case.OutputRoot
     $output = & $cargo.Source run -p ep_cli --quiet -- conformance time-weather-schedule-report $case.CasePath $OracleRoot $OutputRoot 2>&1
@@ -148,7 +205,8 @@ foreach ($case in $Cases) {
     $summaryPath = Join-Path $case.OutputRoot "compare\compare-summary.json"
     $reportPath = Join-Path $case.OutputRoot "compare\compare-report.md"
     $oracleEsoPath = Join-Path $case.OutputRoot "oracle\eplusout.eso"
-    foreach ($path in @($summaryPath, $reportPath, $oracleEsoPath)) {
+    $oracleErrPath = Join-Path $case.OutputRoot "oracle\eplusout.err"
+    foreach ($path in @($summaryPath, $reportPath, $oracleEsoPath, $oracleErrPath)) {
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
             throw "Missing $($case.Id) comparison artifact: $path"
         }
@@ -214,6 +272,15 @@ foreach ($case in $Cases) {
             throw "Unexpected $($case.Id) oracle day type at sample $index`: $($timestampRows[$index])"
         }
     }
+    $oracleValuesByCase[$case.Id] = @($values)
+    $oracleTimestampsByCase[$case.Id] = @($timestampRows)
+
+    $oracleErrText = Get-Content -LiteralPath $oracleErrPath -Raw -Encoding UTF8
+    Assert-Contains -Text $oracleErrText -Pattern "EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;" -Description "$($case.Id) clean EnergyPlus completion"
+    if ([regex]::Matches($oracleErrText, '(?m)^\s*\*\* Warning \*\*').Count -ne 0 -or
+        [regex]::Matches($oracleErrText, '(?m)^\s*\*\* Severe\s+\*\*').Count -ne 0) {
+        throw "$($case.Id) must complete without EnergyPlus warnings or severe errors"
+    }
 
     $reportText = Get-Content -LiteralPath $reportPath -Raw -Encoding UTF8
     Assert-Contains -Text $reportText -Pattern "input_file_special_days_declared: 1" -Description "$($case.Id) markdown input special-day count"
@@ -223,4 +290,17 @@ foreach ($case in $Cases) {
     Assert-Contains -Text $reportText -Pattern "special_day_resolved: SUNDAY HOLIDAY 2/$($case.StartDay) duration=1 day_type=Holiday weekend_shift_days=$($case.ShiftDays) source=input-file" -Description "$($case.Id) markdown resolved projection"
 }
 
-Write-Host "Paired fixed-Sunday weekend holiday policy exact gate passed."
+$enabledValues = $oracleValuesByCase[$Cases[0].Id]
+$blankValues = $oracleValuesByCase[$Cases[2].Id]
+$enabledTimestamps = $oracleTimestampsByCase[$Cases[0].Id]
+$blankTimestamps = $oracleTimestampsByCase[$Cases[2].Id]
+for ($index = 0; $index -lt 72; ++$index) {
+    if ($blankValues[$index] -ne $enabledValues[$index]) {
+        throw "Blank and explicit Yes oracle values diverge at sample $index"
+    }
+    if ($blankTimestamps[$index] -cne $enabledTimestamps[$index]) {
+        throw "Blank and explicit Yes oracle timestamps diverge at sample $index"
+    }
+}
+
+Write-Host "Fixed-Sunday explicit Yes/No and blank weekend holiday policy exact gate passed."

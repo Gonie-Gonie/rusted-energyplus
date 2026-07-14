@@ -75,20 +75,27 @@ CLAIM_BOUNDARY = (
     "remain outside this checkpoint. "
     "The fixed-date input-file special-day case separately proves one February 29 Holiday: 72 "
     "ordered, unique Site Day Type Index samples and normalized timestamps match exactly as "
-    "24 Sunday values, 24 Holiday values, and 24 Tuesday values. The paired fixed-Sunday "
-    "input-file Holiday cases differ only in the explicit RunPeriod weekend-rule flag. With Yes, "
-    "the duration-one MonthDay 2/28 Holiday is observed on Monday 2/29, producing 24 Sunday=1, "
-    "24 Holiday=8, and 24 Tuesday=3 samples; with No, it remains on Sunday 2/28, producing 24 "
-    "Holiday=8, 24 Monday=2, and 24 Tuesday=3 samples. Both 72-sample series and normalized "
-    "timestamps are ordered, exact, unique, and zero-tolerance gated. This pair proves only the "
-    "fixed-Sunday plus-one-day observation branch. The separate paired fixed-Saturday input-file "
+    "24 Sunday values, 24 Holiday values, and 24 Tuesday values. The three fixed-Sunday "
+    "input-file Holiday cases differ only in RunPeriod A5 as explicit Yes, explicit No, or blank. "
+    "With Yes or blank, the duration-one MonthDay 2/28 Holiday is observed on Monday 2/29, day "
+    "of year 60, shift 1, producing 24 Sunday=1, 24 Holiday=8, and 24 Tuesday=3 samples; the "
+    "blank and Yes values are equal sample-for-sample and their timestamp rows are identical. "
+    "With No, the Holiday remains on Sunday 2/28, day of year 59, shift 0, producing 24 "
+    "Holiday=8, 24 Monday=2, and 24 Tuesday=3 samples. All three 72-sample series and normalized "
+    "timestamps are ordered, exact, unique, and zero-tolerance gated, and all three EnergyPlus "
+    "runs complete with exactly 0 Warning and 0 Severe errors. EnergyPlus 26.1's IDD and epJSON "
+    "schema declare A5 default No, while this exact blank IDF executes with "
+    "apply_weekend_rule=true. These cases prove only the fixed-Sunday plus-one-day branch and "
+    "that narrow executable-observed mismatch. Omitted A5, native epJSON defaults, other "
+    "blank/default fields, EIO Special Days date semantics, and warning text or repetition parity "
+    "beyond the exact clean counts remain unclaimed. The separate paired fixed-Saturday input-file "
     "Holiday cases also differ only in the explicit weekend-rule flag. With Yes, the duration-one "
     "MonthDay 2/27 Holiday is observed on Monday 2/29, producing 24 Saturday=7, 24 Sunday=1, and "
     "24 Holiday=8 samples; with No, it remains on Saturday 2/27, producing 24 Holiday=8, 24 "
     "Sunday=1, and 24 Monday=2 samples. Both 72-sample series and normalized timestamps are "
     "ordered, exact, unique, and zero-tolerance gated. This second pair proves only the "
     "fixed-Saturday plus-two-day observation branch; the Sunday plus-one-day branch remains the "
-    "separate pair above. The paired input-file weekday-rule cases use only the explicit 2032-02-22 "
+    "three-case evidence above. The paired input-file weekday-rule cases use only the explicit 2032-02-22 "
     "through 2032-03-01 calendar and two literal IDF forms. `4th Sunday in February` resolves to "
     "2/22, day of year 53, and matches 216 ordered, exact, unique, zero-tolerance samples with "
     "daily indices 8/2/3/4/5/6/7/1/2. `Last Sunday in February` resolves to leap day 2/29, day "
@@ -107,7 +114,8 @@ CLAIM_BOUNDARY = (
     "artifact parity; weekend behavior beyond this explicit non-rescue; duration, overlap, "
     "precedence, declaration order, year wrap, or cross-year behavior; schedule lookup; tomorrow "
     "state; and successful-run raw ESO serialization remain outside the smoke boundary. EPW "
-    "Nth/Last rules; blank/default policy behavior; EPW holidays beyond the paired "
+    "Nth/Last rules; omitted-A5/native-epJSON defaults and blank/default behavior for other fields; "
+    "EPW holidays beyond the paired "
     "fixed use-policy cases below; other special-day types; duration/date combinations beyond the "
     "exact pair below; overlap arrangements beyond the exact pair, declaration order beyond "
     "SpecialDays, warning parity, actual cross-year run "
@@ -168,6 +176,7 @@ CASE_LABELS = {
     "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
     "calendar_special_day_weekend_rule_enabled_hourly_exact_001": "Weekend holiday enabled",
     "calendar_special_day_weekend_rule_disabled_hourly_exact_001": "Weekend holiday disabled",
+    "calendar_special_day_weekend_rule_blank_hourly_exact_001": "Weekend holiday blank",
     "calendar_special_day_weekend_saturday_enabled_hourly_exact_001": "Saturday holiday enabled",
     "calendar_special_day_weekend_saturday_disabled_hourly_exact_001": "Saturday holiday disabled",
     "calendar_special_day_duration_wrap_common_year_hourly_exact_001": "Duration wrap common",
@@ -326,6 +335,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Weekend holiday blank",
+        command="compare-calendar-weekend-holiday-policy-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_blank_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_blank_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_blank_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Saturday holiday enabled",

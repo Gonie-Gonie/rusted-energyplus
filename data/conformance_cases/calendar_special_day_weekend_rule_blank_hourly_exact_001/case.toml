@@ -1,0 +1,59 @@
+id = "calendar_special_day_weekend_rule_blank_hourly_exact_001"
+title = "Sunday fixed special day with blank weekend rule"
+milestone = "full-source-order-calendar-special-day-weekend-rule"
+purpose = "Block on exact ordered hourly day types when EnergyPlus executable semantics treat a blank weekend rule as enabled for one fixed Sunday input-file Holiday."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case shares the existing leap-observed 72-row EPW and fixed-Sunday definition with the explicit Yes/No weekend-rule cases; only the RunPeriod Apply Weekend Holiday Rule field is blank.",
+  "The locked EnergyPlus 26.1.0 executable treats this blank field as enabled, so the fixed duration-one Sunday 2/28 input-file Holiday is observed on Monday 2/29; the 72 hourly values are 24 Sunday=1, 24 Holiday=8, and 24 Tuesday=3, exactly matching the explicit Yes case.",
+  "Weather-file holidays and daylight saving are explicitly disabled so the case isolates only the executable-observed blank Apply Weekend Holiday Rule behavior and fixed-Sunday plus-one-day projection.",
+  "The EnergyPlus IDD/schema default wording, other blank or omitted RunPeriod fields, native epJSON input, Saturday or other date/type/rule forms, warning text or repetition parity beyond the exact clean 0 Warning/0 Severe completion counts, multiple or overlapping days, schedule lookup, tomorrow state, raw ESO serialization beyond the gated series, actual weather, and cross-year traversal remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_weekend_rule_blank_hourly_exact_001/calendar_special_day_weekend_rule_blank_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_weekend_rule_blank_hourly_exact_001/calendar_special_day_weekend_rule_blank_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_weekend_rule_blank_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-weekend-holiday-policy-exact"
+blocking = true
