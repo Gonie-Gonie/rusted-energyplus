@@ -78,11 +78,41 @@ PORT_TICKET_DOC_TOKENS = [
     "state_mapping.inactive_branches",
     "state_mapping.unsupported_active_branches",
     "Compatibility code must not call diagnostic probe functions.",
+    "port_ticket_mappings",
+    "full gate invocation",
+    "one Algorithm ID",
 ]
 PR_WORKFLOW_REQUIRED_TOKENS = [
     "pull_request:",
     "Algorithm Port Ticket",
     "pr-port-ticket-check",
+    "fetch-depth: 0",
+    "ref: ${{ github.event.pull_request.head.sha }}",
+    "persist-credentials: false",
+    "github.event.pull_request.base.sha",
+    "github.event.pull_request.head.sha",
+    "-BaseSha",
+    "-HeadSha",
+]
+PR_CHECK_DIFF_TOKENS = [
+    "merge-base",
+    "--name-status",
+    "--find-renames=50%",
+    "ConvertFrom-GitNameStatusZ",
+    "ConvertFrom-GitNameStatusRecordsZ",
+    "Test-AlgorithmSourceOrderPath",
+    "Get-EvidenceGateScriptPaths",
+    "Get-LedgerMappedScriptPaths",
+    "ChangedFilesProvided",
+    "Assert-TicketReferences",
+    "map every head-side sensitive Rust path",
+    "Assert-ChangedContractCoverage",
+    "Get-ChangedTomlBlockIds",
+    "Get-ChangedTomlSectionKeys",
+    "Get-UnrelatedEvidenceCommandNames",
+    "Get-AllowedGateCommandBoundaryNames",
+    "scripts/dev/commands.json",
+    "data/conformance_cases",
 ]
 STRUCTURE_AUDIT_BY_SOURCE_ORDER_DOMAIN = {
     "heat_balance": "scripts/quality/heat-balance-structure-audit.ps1",
@@ -208,14 +238,15 @@ def validate_algorithm(
     require(status in ALLOWED_STATUS, errors, f"{prefix}: unsupported status {status!r}")
 
     source_map = str(algorithm.get("source_map", "")).strip()
+    source_map_text = ""
     require(bool(source_map), errors, f"{prefix}: source_map must not be empty")
     if source_map:
         source_map_path = repo_root / path_before_anchor(source_map)
         require(source_map_path.is_file(), errors, f"{prefix}: source_map does not exist: {source_map}")
         if source_map_path.is_file():
-            text = source_map_path.read_text(encoding="utf-8", errors="replace")
+            source_map_text = source_map_path.read_text(encoding="utf-8", errors="replace")
             require(
-                "Reference version: EnergyPlus 26.1.0" in text,
+                "Reference version: EnergyPlus 26.1.0" in source_map_text,
                 errors,
                 f"{prefix}: source_map must pin EnergyPlus 26.1.0",
             )
@@ -229,6 +260,30 @@ def validate_algorithm(
     for source in energyplus_sources:
         source_path = reference_root / path_before_anchor(str(source))
         require(source_path.is_file(), errors, f"{prefix}: EnergyPlus source does not exist: {source}")
+
+    execution_plan_path = repo_root / "crates" / "ep_runtime" / "src" / "execution_plan.rs"
+    execution_plan_text = execution_plan_path.read_text(encoding="utf-8", errors="replace")
+    port_ticket_mappings = algorithm.get("port_ticket_mappings", [])
+    require(isinstance(port_ticket_mappings, list), errors, f"{prefix}: port_ticket_mappings must be an array")
+    if isinstance(port_ticket_mappings, list):
+        for mapping in port_ticket_mappings:
+            parts = [part.strip() for part in str(mapping).split("|")]
+            require(len(parts) == 4 and all(parts), errors, f"{prefix}: invalid port_ticket_mapping: {mapping}")
+            if len(parts) != 4:
+                continue
+            source, routine, source_stage, execution_stage = parts
+            require(source in energyplus_sources, errors, f"{prefix}: ticket mapping source is not in energyplus_source: {source}")
+            source_path = reference_root / source
+            if source_path.is_file():
+                source_text = source_path.read_text(encoding="utf-8", errors="replace")
+                require(routine in source_text, errors, f"{prefix}: ticket mapping routine missing from {source}: {routine}")
+            require(f"`{routine}`" in source_map_text or f"::{routine}`" in source_map_text, errors, f"{prefix}: ticket mapping routine missing from source_map: {routine}")
+            require(source_stage in source_map_text, errors, f"{prefix}: ticket mapping source stage missing from source_map: {source_stage}")
+            require(
+                f"    {execution_stage}," in execution_plan_text,
+                errors,
+                f"{prefix}: ticket mapping ExecutionStageKind does not exist: {execution_stage}",
+            )
 
     rust_targets = algorithm.get("rust_target", [])
     require(isinstance(rust_targets, list) and bool(rust_targets), errors, f"{prefix}: rust_target must not be empty")
@@ -295,12 +350,18 @@ def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
     pr_template_path = repo_root / ".github" / "pull_request_template.md"
     workflow_path = repo_root / ".github" / "workflows" / "pull-request.yml"
     pr_check_path = repo_root / "scripts" / "quality" / "pr-port-ticket-check.ps1"
+    pr_check_changed_files_path = repo_root / "scripts" / "quality" / "pr-port-ticket-check" / "changed-files.ps1"
+    pr_check_contract_diff_path = repo_root / "scripts" / "quality" / "pr-port-ticket-check" / "contract-diff.ps1"
+    pr_check_self_test_path = repo_root / "scripts" / "quality" / "pr-port-ticket-check" / "self-tests.ps1"
     doc_path = repo_root / "docs" / "src" / "porting-map" / "algorithm-port-ticket.md"
 
     require(template_path.is_file(), errors, f"missing algorithm port ticket template: {template_path}")
     require(pr_template_path.is_file(), errors, f"missing PR template: {pr_template_path}")
     require(workflow_path.is_file(), errors, f"missing PR workflow: {workflow_path}")
     require(pr_check_path.is_file(), errors, f"missing PR port-ticket check: {pr_check_path}")
+    require(pr_check_changed_files_path.is_file(), errors, f"missing PR port-ticket changed-file library: {pr_check_changed_files_path}")
+    require(pr_check_contract_diff_path.is_file(), errors, f"missing PR port-ticket contract-diff library: {pr_check_contract_diff_path}")
+    require(pr_check_self_test_path.is_file(), errors, f"missing PR port-ticket self-tests: {pr_check_self_test_path}")
     require(doc_path.is_file(), errors, f"missing algorithm port ticket docs: {doc_path}")
     if not template_path.is_file():
         return
@@ -343,6 +404,17 @@ def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
 
     if pr_check_path.is_file():
         pr_check_text = pr_check_path.read_text(encoding="utf-8", errors="replace")
+        changed_files_text = (
+            pr_check_changed_files_path.read_text(encoding="utf-8", errors="replace")
+            if pr_check_changed_files_path.is_file()
+            else ""
+        )
+        contract_diff_text = (
+            pr_check_contract_diff_path.read_text(encoding="utf-8", errors="replace")
+            if pr_check_contract_diff_path.is_file()
+            else ""
+        )
+        pr_check_contract_text = pr_check_text + "\n" + changed_files_text + "\n" + contract_diff_text
         for token in PR_TEMPLATE_REQUIRED_TOKENS:
             field_name = token.rstrip(":")
             require(field_name in pr_check_text, errors, f"PR port-ticket check missing required field: {field_name}")
@@ -352,10 +424,78 @@ def validate_port_ticket_contract(repo_root: Path, errors: list[str]) -> None:
             "PR port-ticket check must enforce source-order algorithm ticket coverage",
         )
         require(
-            "Invoke-SelfTest" in pr_check_text,
+            "Invoke-PrPortTicketSelfTest" in pr_check_text,
             errors,
             "PR port-ticket check must expose self-test coverage",
         )
+        for token in PR_CHECK_DIFF_TOKENS:
+            require(token in pr_check_contract_text, errors, f"PR port-ticket check missing changed-file contract token: {token}")
+        require(
+            "pr-port-ticket-check\\changed-files.ps1" in pr_check_text,
+            errors,
+            "PR port-ticket check must load its changed-file library",
+        )
+        require(
+            "pr-port-ticket-check\\contract-diff.ps1" in pr_check_text,
+            errors,
+            "PR port-ticket check must load its contract-diff library",
+        )
+        require(
+            ".reference\\energyplus-src" not in pr_check_contract_text,
+            errors,
+            "PR port-ticket check must run in a clean checkout without ignored reference source",
+        )
+
+    if pr_check_self_test_path.is_file():
+        self_test_text = pr_check_self_test_path.read_text(encoding="utf-8", errors="replace")
+        for token in [
+            "runtime_source_order_cannot_opt_out",
+            "docs_only_auto_pass",
+            "rename_old_and_new_paths",
+            "fake_ticket_location",
+            "valid_conformance",
+            "missing_energyplus_routine",
+            "placeholder_state",
+            "unrelated_algorithm_ticket",
+            "ideal_loads_evidence_gate_cannot_opt_out",
+            "default_template_unique_ticket_fields",
+            "mapped_file_cannot_cover_unrelated_rust",
+            "ticket_rust_module_must_change",
+            "invalid_source_order_stage",
+            "common_word_is_not_a_routine",
+            "routine_from_other_source",
+            "stage_from_other_algorithm",
+            "unmapped_existing_rust_function",
+            "non_ledger_first_case",
+            "uncovered_affected_variable",
+            "invalid_tolerance_candidate",
+            "tilde_fence_cannot_supply_ticket",
+            "html_comment_cannot_supply_ticket",
+            "unclosed_html_comment_cannot_supply_ticket",
+            "gate_command_with_arguments",
+            "deleted_sensitive_path",
+            "rename_new_sensitive_path",
+            "mapped_deleted_rust_path",
+            "unrelated_deleted_rust_path",
+            "unrelated_deleted_gate_script",
+            "mapped_deleted_gate_script",
+            "capabilities_cannot_opt_out",
+            "evidence_command_catalog_cannot_opt_out",
+            "case_manifest_cannot_opt_out",
+            "unrelated_ledger_ticket_without_base_context",
+            "non_evidence_command_catalog_auto_pass",
+            "valid_case_manifest_change",
+            "unrelated_case_manifest_ticket",
+            "rename_base_and_head_sides",
+            "changed_algorithm_block_id",
+            "ledger_newline_normalization",
+            "evidence_command_subset",
+            "capability_section_boundary",
+            "capability_root_hitchhike",
+            "gate_command_boundary_union",
+            "new_case_command_transition",
+        ]:
+            require(token in self_test_text, errors, f"PR port-ticket self-test missing mutation: {token}")
 
     if doc_path.is_file():
         doc_text = doc_path.read_text(encoding="utf-8", errors="replace")

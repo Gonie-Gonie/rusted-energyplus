@@ -1,6 +1,7 @@
 # Compatibility Algorithm Port
 
 Use this template when the PR ports an EnergyPlus source routine into the compatibility runtime path.
+The changed-file gate requires every field below in the PR body even when `Ticket path or PR section` links elsewhere. Keep the PR scoped to one Algorithm ID.
 
 ## Change Type
 

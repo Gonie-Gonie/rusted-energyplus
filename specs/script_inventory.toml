@@ -3,7 +3,7 @@
 schema = "rusted-energyplus.script-inventory.v1"
 schema_version = 1
 generated_by = "tools/docs/generate_docs.py"
-script_count = 201
+script_count = 204
 dev_command_count = 183
 unused_script_count = 0
 unreachable_count = 0
@@ -2526,6 +2526,54 @@ reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
 [[script]]
+path = "scripts/quality/pr-port-ticket-check/changed-files.ps1"
+kind = "ps1"
+category = "quality"
+classification = "internal"
+command = ""
+entrypoint = ""
+callers = ["scripts/quality/pr-port-ticket-check.ps1"]
+caller_evidence = ["scripts/quality/pr-port-ticket-check.ps1::dot_sources"]
+callees = []
+callee_evidence = []
+calls = []
+generated_artifacts = []
+reachable_from_public_root = true
+exit_contract = "nonzero when checked child process fails"
+
+[[script]]
+path = "scripts/quality/pr-port-ticket-check/contract-diff.ps1"
+kind = "ps1"
+category = "quality"
+classification = "internal"
+command = ""
+entrypoint = ""
+callers = ["scripts/quality/pr-port-ticket-check.ps1"]
+caller_evidence = ["scripts/quality/pr-port-ticket-check.ps1::dot_sources"]
+callees = []
+callee_evidence = []
+calls = []
+generated_artifacts = []
+reachable_from_public_root = true
+exit_contract = "nonzero when checked child process fails"
+
+[[script]]
+path = "scripts/quality/pr-port-ticket-check/self-tests.ps1"
+kind = "ps1"
+category = "quality"
+classification = "internal"
+command = ""
+entrypoint = ""
+callers = ["scripts/quality/pr-port-ticket-check.ps1"]
+caller_evidence = ["scripts/quality/pr-port-ticket-check.ps1::dot_sources"]
+callees = []
+callee_evidence = []
+calls = []
+generated_artifacts = [".runtime/air-side-node-diagnostic/26.1.0/report-skeleton/air_side_node_diagnostic_001/compare-report.md", ".runtime/fake-report.md", ".runtime/official-dynamic-compat-candidate/26.1.0/official_1zone_uncontrolled_dynamic_conformance_candidate_001/compare/compare-report.md"]
+reachable_from_public_root = true
+exit_contract = "nonzero via PowerShell throw"
+
+[[script]]
 path = "scripts/quality/pr-port-ticket-check.ps1"
 kind = "ps1"
 category = "quality"
@@ -2534,10 +2582,10 @@ command = "pr-port-ticket-check"
 entrypoint = "dev:pr-port-ticket-check"
 callers = ["scripts/dev.ps1", "scripts/quality/check.ps1"]
 caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::invoke_dev_command"]
-callees = []
-callee_evidence = []
-calls = []
-generated_artifacts = [".runtime/report.md"]
+callees = ["scripts/quality/pr-port-ticket-check/changed-files.ps1", "scripts/quality/pr-port-ticket-check/contract-diff.ps1", "scripts/quality/pr-port-ticket-check/self-tests.ps1"]
+callee_evidence = ["scripts/quality/pr-port-ticket-check/changed-files.ps1::dot_sources", "scripts/quality/pr-port-ticket-check/contract-diff.ps1::dot_sources", "scripts/quality/pr-port-ticket-check/self-tests.ps1::dot_sources"]
+calls = ["script:scripts/quality/pr-port-ticket-check/changed-files.ps1", "script:scripts/quality/pr-port-ticket-check/contract-diff.ps1", "script:scripts/quality/pr-port-ticket-check/self-tests.ps1"]
+generated_artifacts = []
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 

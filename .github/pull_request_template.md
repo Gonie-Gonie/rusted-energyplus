@@ -11,7 +11,7 @@
 
 ## Algorithm Port Ticket
 
-For source-order work, prefer the dedicated compatibility or diagnostic probe PR template in `.github/PULL_REQUEST_TEMPLATE/`. The PR gate rejects algorithm/source-order changes without a completed ticket.
+For source-order work, prefer the dedicated compatibility or diagnostic probe PR template in `.github/PULL_REQUEST_TEMPLATE/`. The PR gate classifies the base-to-head diff and rejects sensitive changes without a completed ticket; the non-algorithm checkbox cannot override that classification. Embed every field below even when linking to another ticket, and split source-order work so each PR carries one Algorithm ID.
 
 - [ ] Not an algorithm/source-order change
 - [ ] Compatibility port ticket completed
@@ -49,12 +49,10 @@ For source-order work, prefer the dedicated compatibility or diagnostic probe PR
 
 ## Claim Boundary
 
-- Conformance claim: yes / no
 - If yes, case IDs:
 - Variables/meters:
-- Tolerance:
-- Report path:
-- Blocking gate:
+- Boundary tolerance notes:
+- Additional boundary notes:
 
 ## Evidence Level
 

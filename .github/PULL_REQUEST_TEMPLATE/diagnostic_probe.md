@@ -1,6 +1,7 @@
 # Diagnostic Probe
 
 Use this template when the PR adds instrumentation or diagnostic-only probes without promoting compatibility evidence.
+The changed-file gate requires every field below in the PR body even when `Ticket path or PR section` links elsewhere. Keep the PR scoped to one Algorithm ID.
 
 ## Change Type
 

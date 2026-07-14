@@ -40,11 +40,17 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate Algorithm Port Ticket
         env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           $bodyPath = Join-Path $env:RUNNER_TEMP "pull-request-body.md"
           Set-Content -Encoding UTF8 -LiteralPath $bodyPath -Value $env:PR_BODY
-          .\scripts\dev.cmd pr-port-ticket-check -BodyPath $bodyPath
+          .\scripts\dev.cmd pr-port-ticket-check -BodyPath $bodyPath -BaseSha $env:BASE_SHA -HeadSha $env:HEAD_SHA

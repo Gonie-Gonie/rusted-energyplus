@@ -28,8 +28,13 @@ energyplus_source = [
   "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
   "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
 ]
+port_ticket_mappings = [
+  "src/EnergyPlus/HeatBalanceManager.cc|ManageHeatBalance|GetHeatBalanceInput|GetHeatBalanceInput",
+  "src/EnergyPlus/ZoneTempPredictorCorrector.cc|ManageZoneAirUpdates|ManageZoneAirUpdates|ManageZoneAirUpdates",
+]
 rust_target = [
   "crates/ep_runtime/src/heat_balance/algorithm.rs::HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility",
+  "crates/ep_runtime/src/heat_balance/algorithm.rs::heat_balance_zone_air_algorithm_feature_base",
   "scripts/compare/official-dynamic-heat-balance-compat-candidate.ps1",
 ]
 status = "conformance"
@@ -92,6 +97,9 @@ domain = "heat_balance"
 source_map = "docs/src/porting-map/heat-balance-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/HeatBalanceManager.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/HeatBalanceManager.cc|ManageHeatBalance|GetHeatBalanceInput|GetHeatBalanceInput",
 ]
 rust_target = [
   "crates/ep_runtime/src/heat_balance/manager.rs::manage_heat_balance_source_order_stages",
@@ -190,6 +198,9 @@ source_map = "docs/src/porting-map/node-state-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/DataLoopNode.hh",
   "src/EnergyPlus/OutputProcessor.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/OutputProcessor.cc|SetupOutputVariable|SetupOutputVariable|Output",
 ]
 rust_target = [
   "crates/ep_runtime/src/node/state.rs::NodeStateStore",

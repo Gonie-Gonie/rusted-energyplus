@@ -1,5 +1,16 @@
-# Copy this template into the relevant design note, issue, or PR body before
-# porting an EnergyPlus source routine into compatibility-mode Rust code.
+# Copy this contract into the PR body before porting an EnergyPlus source
+# routine. A linked issue or design note may hold the working ticket, but the
+# PR body keeps the complete field snapshot validated by the changed-file gate.
+# Source-order-sensitive PRs are intentionally limited to one Algorithm ID.
+# The chosen ledger algorithm must map every surviving changed production Rust
+# module, the named target module must itself change, and an exact
+# port_ticket_mappings tuple must connect source, routine, source-order stage,
+# and ExecutionStageKind. Its checked-in source map must name the routine and
+# stage. Merge-base mappings cover deleted/pre-rename paths, while head
+# mappings cover added/modified/post-rename paths and changed ledger,
+# capability, case, and evidence-command metadata. Capability-registry edits
+# outside linked [[capability]] blocks are rejected, and every changed evidence
+# command must remain inside the selected algorithm's base/head case boundary.
 
 [algorithm_port_ticket]
 algorithm_id = ""

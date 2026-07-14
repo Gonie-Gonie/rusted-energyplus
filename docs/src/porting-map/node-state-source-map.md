@@ -57,6 +57,9 @@ numerical conformance claim is promoted. This map is a planning guard.
 Flow Rate`, `System Node Humidity Ratio`, and `System Node Setpoint
 Temperature` against each discovered `NodeID` through `SetupOutputVariable`.
 The registered report fields bind directly to `Node::NodeData` members.
+The diagnostic Rust projection is emitted at `ExecutionStageKind::Output`, so
+the ticket mapping connects `OutputProcessor::SetupOutputVariable` to the
+runtime output barrier without claiming numerical node-state conformance.
 
 The v0.11 fixture requests only:
 

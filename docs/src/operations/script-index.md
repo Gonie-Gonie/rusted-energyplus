@@ -65,7 +65,7 @@ matplotlib for document layout and charts.
 | `perf` | quality | run local performance checks | no | console output |
 | `strict-no-false-conformance` | quality | scan for forbidden compatibility wording | yes | failure on wording |
 | `algorithm-ledger-check` | quality | validate source-map, EnergyPlus source, Rust target, first-case, and gate links | yes | console output |
-| `pr-port-ticket-check` | quality | reject PR bodies that omit required Algorithm Port Ticket metadata | yes for source-order PRs | failure on PR body |
+| `pr-port-ticket-check` | quality | require a cross-checked Algorithm Port Ticket for source-order-sensitive base/head diffs | yes for source-order PRs | failure on diff or PR body |
 | `raw-model-smoke` | smoke | inspect RawModel fixtures | no | console output |
 | `typed-model-smoke` | smoke | compile TypedModel fixtures | no | console output |
 | `model-plan-smoke` | smoke | verify graph and execution-plan summaries | no | console output |

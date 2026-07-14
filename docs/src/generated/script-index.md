@@ -11,11 +11,11 @@ Caller edges come from execution-shaped direct, variable-backed, dynamic-list, c
 
 | Check | Count |
 |---|---|
-| executable script records | 201 |
+| executable script records | 204 |
 | dev commands | 183 |
 | aliases | 5 |
 | public scripts | 185 |
-| internal scripts | 16 |
+| internal scripts | 19 |
 | removable scripts | 0 |
 | missing command targets | 0 |
 | duplicate command targets | 0 |
@@ -211,7 +211,10 @@ none
 | scripts/quality/ideal-loads-conformance-report-audit.ps1 | quality | public | dev:ideal-loads-conformance-report-audit | `scripts/dev.ps1` | `script:scripts/dev.cmd`<br>`script:scripts/lib/common.ps1` |  | nonzero when checked child process fails |
 | scripts/quality/ideal-loads-structure-audit.ps1 | quality | public | dev:ideal-loads-structure-audit | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` | `script:scripts/lib/common.ps1` |  | nonzero via PowerShell throw |
 | scripts/quality/perf.ps1 | quality | public | dev:perf | `scripts/dev.ps1` | `dev:conformance-evidence-report`<br>`dev:performance-summary`<br>`script:scripts/lib/common.ps1`<br>`script:scripts/release/conformance-evidence-report.ps1`<br>`script:scripts/release/performance-summary.ps1` | `.runtime/release-evidence/v$Version` | nonzero via PowerShell throw |
-| scripts/quality/pr-port-ticket-check.ps1 | quality | public | dev:pr-port-ticket-check | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` |  | `.runtime/report.md` | nonzero via PowerShell throw |
+| scripts/quality/pr-port-ticket-check/changed-files.ps1 | quality | internal |  | `scripts/quality/pr-port-ticket-check.ps1` |  |  | nonzero when checked child process fails |
+| scripts/quality/pr-port-ticket-check/contract-diff.ps1 | quality | internal |  | `scripts/quality/pr-port-ticket-check.ps1` |  |  | nonzero when checked child process fails |
+| scripts/quality/pr-port-ticket-check/self-tests.ps1 | quality | internal |  | `scripts/quality/pr-port-ticket-check.ps1` |  | `.runtime/air-side-node-diagnostic/26.1.0/report-skeleton/air_side_node_diagnostic_001/compare-report.md`<br>`.runtime/fake-report.md`<br>`.runtime/official-dynamic-compat-candidate/26.1.0/official_1zone_uncontrolled_dynamic_conformance_candidate_001/compare/compare-report.md` | nonzero via PowerShell throw |
+| scripts/quality/pr-port-ticket-check.ps1 | quality | public | dev:pr-port-ticket-check | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` | `script:scripts/quality/pr-port-ticket-check/changed-files.ps1`<br>`script:scripts/quality/pr-port-ticket-check/contract-diff.ps1`<br>`script:scripts/quality/pr-port-ticket-check/self-tests.ps1` |  | nonzero via PowerShell throw |
 | scripts/quality/project-contract-check.ps1 | quality | public | dev:project-contract-check | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` | `script:scripts/lib/common.ps1`<br>`script:scripts/lib/python.ps1`<br>`tools/docs/validate_project_contract.py` |  | nonzero when checked child process fails |
 | scripts/quality/script-inventory-check.ps1 | quality | public | dev:script-inventory-check | `scripts/dev.ps1`<br>`scripts/quality/check.ps1`<br>`scripts/quality/docs-check.ps1` | `script:scripts/lib/common.ps1`<br>`script:scripts/lib/python.ps1`<br>`tools/docs/validate_script_inventory.py` |  | nonzero when checked child process fails |
 | scripts/quality/source-quality-gate.ps1 | quality | public | dev:source-quality-gate | `scripts/dev.ps1`<br>`scripts/quality/check.ps1`<br>`scripts/release/v0.1-verify.ps1` | `script:scripts/lib/common.ps1` |  | nonzero via PowerShell throw |
