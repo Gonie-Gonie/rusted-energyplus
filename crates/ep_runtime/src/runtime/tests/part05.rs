@@ -56,18 +56,26 @@
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatProbe;
         let converged_surface_probe =
             HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceProbe;
-        assert!(heat_balance_uses_balance_surface_convection_report(
-            converged_surface_probe
-        ));
-        assert!(!heat_balance_uses_balance_surface_convection_report(
-            scriptf_flat_probe
-        ));
         assert!(
-            heat_balance_uses_surface_reference_air_surface_convection_report(scriptf_flat_probe)
+            converged_surface_probe
+                .runtime_config()
+                .use_balance_surface_convection_report
         );
-        assert!(!heat_balance_uses_surface_reference_air_convection_report(
+        assert!(
+            !scriptf_flat_probe
+                .runtime_config()
+                .use_balance_surface_convection_report
+        );
+        assert!(
             scriptf_flat_probe
-        ));
+                .runtime_config()
+                .use_surface_reference_air_surface_convection_report
+        );
+        assert!(
+            !scriptf_flat_probe
+                .runtime_config()
+                .use_surface_reference_air_convection_report
+        );
         let final_coefficient = surface_inside_convection_report_coefficient_w_per_m2_k(
             &state.surfaces[0],
             &state.zones,
@@ -500,24 +508,15 @@
     }
 
     #[test]
-    fn compat_candidate_report_flags_follow_execution_variant() {
-        let report_algorithm = super::heat_balance_zone_air_algorithm_execution_variant(
-            HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate,
-        );
+    fn compat_candidate_report_flags_follow_runtime_config() {
+        let candidate_config =
+            HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate.runtime_config();
+        let source_order_config = HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
+            .runtime_config();
 
-        assert_eq!(
-            report_algorithm,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
-        );
+        assert_eq!(candidate_config, source_order_config);
         assert!(
-            super::heat_balance_uses_surface_reference_air_surface_convection_report(
-                report_algorithm
-            )
-        );
-        assert!(
-            !super::heat_balance_uses_surface_reference_air_surface_convection_report(
-                HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
-            )
+            candidate_config.use_surface_reference_air_surface_convection_report
         );
     }
 
@@ -558,7 +557,7 @@
                     timestep_seconds,
                 },
                 None,
-                options.zone_air_algorithm,
+                options.zone_air_algorithm.runtime_config(),
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
@@ -568,7 +567,7 @@
             last_air_storage = zone_air_heat_balance_air_storage_rate_w(
                 zone,
                 timestep_seconds,
-                options.zone_air_algorithm,
+                options.zone_air_algorithm.runtime_config(),
                 None,
             );
             surface_convection_sum += last_surface_convection;

@@ -729,7 +729,7 @@
         let analytical = zone_air_heat_balance_air_storage_rate_w(
             zone,
             60.0,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
             None,
         );
         assert!((analytical - 95.0).abs() < 1.0e-12);
@@ -737,7 +737,7 @@
         let third_order = zone_air_heat_balance_air_storage_rate_w(
             zone,
             60.0,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe.runtime_config(),
             None,
         );
         assert!((third_order - 20.0).abs() < 1.0e-12);
@@ -745,7 +745,7 @@
         let third_order_report_capacity = zone_air_heat_balance_air_storage_rate_w(
             zone,
             60.0,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe.runtime_config(),
             Some(600.0),
         );
         assert!((third_order_report_capacity - 10.0).abs() < 1.0e-12);
@@ -753,7 +753,7 @@
         let invalid_timestep = zone_air_heat_balance_air_storage_rate_w(
             zone,
             0.0,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderProbe.runtime_config(),
             Some(600.0),
         );
         assert_eq!(invalid_timestep, 0.0);

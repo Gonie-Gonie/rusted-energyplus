@@ -3,6 +3,7 @@
 use crate::heat_balance::air_manager::{
     weather_proxy_zone_air_heat_capacity_j_per_k, zone_air_heat_balance_air_storage_rate_w,
 };
+use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::convection::{
     energyplus_building_terrain, energyplus_outside_convection_branch_id,
     energyplus_surface_outdoor_air_temperature_c, energyplus_surface_outside_wind_speed_m_per_s,
@@ -57,15 +58,6 @@ use crate::heat_balance::trace::{
     zone_air_heat_balance_trace_series_from_state, zone_conduction_traces_from_state,
     zone_scalar_trace_series_from_state,
 };
-use crate::heat_balance::{
-    HeatBalanceZoneAirAlgorithm, heat_balance_uses_balance_surface_convection_report,
-    heat_balance_uses_final_inside_convection_report,
-    heat_balance_uses_previous_mat_surface_convection_report,
-    heat_balance_uses_surface_reference_air_convection_report,
-    heat_balance_uses_surface_reference_air_surface_convection_report,
-    heat_balance_uses_weather_air_storage_report,
-    heat_balance_zone_air_algorithm_execution_variant,
-};
 use crate::psychrometrics::{
     energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
 };
@@ -86,6 +78,7 @@ pub(crate) fn sample_heat_balance_run_period(
     weather_records: Option<&[EpwRecord]>,
     weather_series: Option<&WeatherTimestepSeries>,
     options: HeatBalanceSimulationOptions,
+    runtime_config: HeatBalanceRuntimeConfig,
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
@@ -112,20 +105,13 @@ pub(crate) fn sample_heat_balance_run_period(
     let mut zone_air_first_sample_trace = Vec::new();
     let mut surface_iteration_first_sample_trace = Vec::new();
     let mut surface_iteration_sample_trace = Vec::new();
-    let report_zone_air_algorithm =
-        heat_balance_zone_air_algorithm_execution_variant(options.zone_air_algorithm);
     let use_surface_reference_air_zone_convection_report =
-        heat_balance_uses_surface_reference_air_convection_report(report_zone_air_algorithm);
+        runtime_config.use_surface_reference_air_convection_report;
     let use_surface_reference_air_surface_convection_report =
-        heat_balance_uses_surface_reference_air_surface_convection_report(
-            report_zone_air_algorithm,
-        );
-    let use_final_inside_convection_report =
-        heat_balance_uses_final_inside_convection_report(report_zone_air_algorithm);
-    let use_inside_ctf_outside_temperature_for_conduction_report = matches!(
-        report_zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusThirdOrderCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveFrozenHconvWeatherAirStorageBalanceSurfaceConvectionFrozenReferenceAirCurrentLongwaveConvergedSurfaceInsideCtfOutsideHistoryScriptFFlatInsideCtfReportProbe
-    );
+        runtime_config.use_surface_reference_air_surface_convection_report;
+    let use_final_inside_convection_report = runtime_config.use_final_inside_convection_report;
+    let use_inside_ctf_outside_temperature_for_conduction_report =
+        runtime_config.use_inside_ctf_outside_temperature_for_conduction_report;
     let use_surface_report_zone_conduction_rates = matches!(
         options.zone_conduction_report_source,
         HeatBalanceZoneConductionReportSource::SurfaceReport
@@ -230,7 +216,7 @@ pub(crate) fn sample_heat_balance_run_period(
                     timestep_seconds: seconds_per_timestep,
                 },
                 weather_context,
-                options.zone_air_algorithm,
+                runtime_config,
                 options.surface_iteration_count,
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
@@ -273,11 +259,7 @@ pub(crate) fn sample_heat_balance_run_period(
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
                     let reported_zone_temperature_c =
                         crate::heat_balance::air_manager::report_zone_mean_air_temp_compat(|| {
-                            if matches!(
-                                options.zone_air_algorithm,
-                                HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
-                                    | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
-                            ) {
+                            if runtime_config.report_zone_timestep_averages {
                                 zone_state.zone_timestep_average_air_temperature_c
                             } else {
                                 zone_state.mean_air_temperature_c
@@ -288,15 +270,12 @@ pub(crate) fn sample_heat_balance_run_period(
             }
             for (index, (zone_id, _zone_name, _values)) in zone_humidity_ratios.iter().enumerate() {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
-                    let reported_zone_humidity_ratio = if matches!(
-                        options.zone_air_algorithm,
-                        HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate
-                            | HeatBalanceZoneAirAlgorithm::EnergyPlusSourceOrder1ZoneOpaqueCompatibility
-                    ) {
-                        zone_state.zone_timestep_average_air_humidity_ratio
-                    } else {
-                        zone_state.air_humidity_ratio
-                    };
+                    let reported_zone_humidity_ratio =
+                        if runtime_config.report_zone_timestep_averages {
+                            zone_state.zone_timestep_average_air_humidity_ratio
+                        } else {
+                            zone_state.air_humidity_ratio
+                        };
                     zone_humidity_ratio_sums[index] += reported_zone_humidity_ratio;
                 }
             }
@@ -464,8 +443,7 @@ pub(crate) fn sample_heat_balance_run_period(
             {
                 if let Some(zone_state) = state.zones.iter().find(|zone| zone.zone_id == *zone_id) {
                     let third_order_report_air_heat_capacity_j_per_k =
-                        if heat_balance_uses_weather_air_storage_report(options.zone_air_algorithm)
-                        {
+                        if runtime_config.use_weather_air_storage_report {
                             weather_proxy_zone_air_heat_capacity_j_per_k(
                                 zone_state,
                                 weather_context,
@@ -477,7 +455,7 @@ pub(crate) fn sample_heat_balance_run_period(
                     let air_storage_rate_w = zone_air_heat_balance_air_storage_rate_w(
                         zone_state,
                         seconds_per_timestep,
-                        options.zone_air_algorithm,
+                        runtime_config,
                         third_order_report_air_heat_capacity_j_per_k,
                     );
                     let air_storage_rate_w = zone_state
@@ -499,16 +477,12 @@ pub(crate) fn sample_heat_balance_run_period(
                             &state.surfaces,
                             zone_surface_indexes,
                         )
-                    } else if heat_balance_uses_balance_surface_convection_report(
-                        options.zone_air_algorithm,
-                    ) {
+                    } else if runtime_config.use_balance_surface_convection_report {
                         zone_air_heat_balance_surface_convection_rate_from_balance_w(
                             zone_state,
                             air_storage_rate_w,
                         )
-                    } else if heat_balance_uses_previous_mat_surface_convection_report(
-                        options.zone_air_algorithm,
-                    ) {
+                    } else if runtime_config.use_previous_mat_surface_convection_report {
                         zone_air_heat_balance_surface_convection_rate_at_air_temperature_w(
                             zone_state,
                             zone_state.previous_mean_air_temperatures_c[0],
@@ -595,7 +569,7 @@ pub(crate) fn sample_heat_balance_run_period(
                                 timestep_outdoor_dry_bulb_c,
                                 surface_state.inside_face_temperature_c,
                                 weather_context,
-                                options.zone_air_algorithm,
+                                runtime_config,
                             );
                         let exterior_terms = surface_exterior_report_terms(
                             &model.typed,
@@ -603,7 +577,7 @@ pub(crate) fn sample_heat_balance_run_period(
                             timestep_outdoor_dry_bulb_c,
                             outside_face_temperature_c,
                             weather_context,
-                            options.zone_air_algorithm,
+                            runtime_config,
                         );
                         let typed_surface = model
                             .typed
@@ -664,7 +638,7 @@ pub(crate) fn sample_heat_balance_run_period(
                             let use_doe2_outside_convection =
                                 heat_balance_uses_doe2_outside_convection(
                                     &model.typed,
-                                    options.zone_air_algorithm,
+                                    runtime_config,
                                 );
                             surface_first_sample_trace.push(HeatBalanceSurfaceFirstSampleTrace {
                                 surface_name: surface_state.surface_name.clone(),

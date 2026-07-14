@@ -1340,20 +1340,19 @@ fn unsupported_plant_topology_diagnostics(
             });
         }
 
-        if let Some(connector_list) = half_loop.connector_list {
-            if !model
+        if let Some(connector_list) = half_loop.connector_list
+            && !model
                 .plant_connector_lists
                 .iter()
                 .any(|list| list.id == connector_list)
-            {
-                diagnostics.push(PlantLoopGraphDiagnostic {
-                    plant_loop: Some(half_loop.plant_loop),
-                    side: Some(half_loop.side),
-                    severity: PlantLoopGraphDiagnosticSeverity::Error,
-                    code: PlantLoopGraphDiagnosticCode::UnsupportedTopology,
-                    message: "plant half-loop references an unresolved connector list".to_string(),
-                });
-            }
+        {
+            diagnostics.push(PlantLoopGraphDiagnostic {
+                plant_loop: Some(half_loop.plant_loop),
+                side: Some(half_loop.side),
+                severity: PlantLoopGraphDiagnosticSeverity::Error,
+                code: PlantLoopGraphDiagnosticCode::UnsupportedTopology,
+                message: "plant half-loop references an unresolved connector list".to_string(),
+            });
         }
     }
     diagnostics

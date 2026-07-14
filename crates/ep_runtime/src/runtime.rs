@@ -119,11 +119,7 @@ use crate::heat_balance::{
     energyplus_average_solar_coefficients, energyplus_daily_solar_coefficients,
     energyplus_shadowing_period_solar_coefficients, energyplus_third_order_zone_air_temperature_c,
     energyplus_weather_record_day_of_year, energyplus_zone_air_temperature_coefficients,
-    heat_balance_uses_balance_surface_convection_report,
-    heat_balance_uses_surface_reference_air_convection_report,
-    heat_balance_uses_surface_reference_air_surface_convection_report,
-    heat_balance_zone_air_algorithm_execution_variant, solar_position_rad_at_local_hour,
-    solar_weather_interpolation_weights,
+    solar_position_rad_at_local_hour, solar_weather_interpolation_weights,
 };
 #[cfg(test)]
 pub(crate) use crate::heat_balance::{surface_air_sky_radiation_split, surface_sky_view_factor};
@@ -283,6 +279,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);
     let first_hour_interpolation_starting_values =
         run_period_first_hour_interpolation_starting_values(&model.typed);
+    let heat_balance_runtime_config = options.zone_air_algorithm.runtime_config();
     let mut state = init_heat_balance_source_order_path(|| {
         let mut state = initialize_heat_balance_state_with_ctf_coefficients(
             model,
@@ -320,7 +317,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         zone_steps_per_hour,
         seconds_per_timestep,
         options.warmup,
-        options.zone_air_algorithm,
+        heat_balance_runtime_config,
         options.surface_iteration_count,
         options.inside_hconv_reevaluation_interval,
         options.surface_loop_zone_air_correction,
@@ -363,6 +360,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         weather_records,
         weather_series,
         options,
+        heat_balance_runtime_config,
         zone_steps_per_hour,
         seconds_per_timestep,
         first_hour_interpolation_starting_values,

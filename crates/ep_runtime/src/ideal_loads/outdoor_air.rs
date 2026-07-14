@@ -161,7 +161,6 @@ pub struct IdealLoadsOutdoorAirPurchasedAirTrace {
 }
 
 /// Executes the outdoor-air source-order `SimPurchasedAir` equivalent.
-#[must_use]
 pub fn sim_purchased_air_outdoor_air_compat(
     input: SimPurchasedAirOutdoorAirCompatInput<'_>,
 ) -> Result<SimPurchasedAirOutdoorAirCompatOutput, SimPurchasedAirOutdoorAirCompatError> {

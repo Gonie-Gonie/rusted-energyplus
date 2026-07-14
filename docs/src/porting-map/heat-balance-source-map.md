@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-26
+last_reviewed: 2026-07-14
 ---
 
 # Heat Balance Source Map
@@ -95,7 +95,7 @@ diagnostic JSON and Markdown report to expose `top_blocker`,
 | `warmup-end-state-ctf-history-delta` | open | first run-period CTF history delta used as warmup end-state evidence |
 | `ctf-coefficient-eio-seeding` | closed | EIO coefficient availability is resolved as diagnostic isolation; current blocker is source/history handoff, not coefficient presence |
 | `source-order-wrapper-boundary` | closed | heat-balance source-order wrappers now exist on the runtime path; remaining rows track algorithm/state deltas behind those wrappers |
-| `diagnostic-probe-conformance-aliasing` | closed | diagnostic probe metadata and compatibility source-order lanes are separated, so probe output cannot be promoted as conformance evidence |
+| `diagnostic-probe-conformance-aliasing` | closed | diagnostic probe metadata, selector matching, and compatibility source-order execution are separated; diagnostic selectors resolve to a probe-agnostic runtime config before compatibility code runs, so probe output cannot be promoted as conformance evidence |
 
 ## June 2026 Source-Audit Boundary
 
@@ -505,11 +505,14 @@ EnergyPlus 26.1.0 anchors for opaque conduction:
   `ZoneAirTemperatureCoefficients`, and exposes EnergyPlus-shaped analytical
   and third-order zone-air temperature helpers. Heat-balance runtime selection
   now exposes `CompatibilityHeatBalanceAlgorithm`, `DiagnosticHeatBalanceProbe`,
-  and `HeatBalanceZoneAirSelection` so compatibility and probe lanes have
-  separate typed APIs. `DiagnosticHeatBalanceProbe` lives under the
-  `diagnostic_probes` module boundary while the CLI/runtime split still bridges
-  through the legacy `HeatBalanceZoneAirAlgorithm` selector. The
-  default predictor equation itself remains the simplified diagnostic shell
+  and the probe-agnostic `HeatBalanceRuntimeConfig` so compatibility and probe
+  lanes have separate typed APIs. `DiagnosticHeatBalanceProbe`, the legacy
+  `HeatBalanceZoneAirAlgorithm` selector, and all long-form probe matching live
+  under the `diagnostic_probes` module boundary. That boundary resolves each
+  selector to `HeatBalanceRuntimeConfig` before compatibility runtime code is
+  entered; the CLI delegates selector parsing and display names to the same
+  module instead of matching the diagnostic variants itself. The default
+  predictor equation itself remains the simplified diagnostic shell
   until all coefficient inputs are wired from source-mapped runtime state.
   Rust now has unit-checked helpers for the EnergyPlus moist-air capacitance
   formulas used by `AirPowerCap`

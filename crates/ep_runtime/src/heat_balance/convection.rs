@@ -1,7 +1,7 @@
 //! Heat-balance convection source-order ownership notes.
 
 use crate::geometry::surface_azimuth_deg;
-use crate::heat_balance::algorithm::HeatBalanceZoneAirAlgorithm;
+use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use ep_model::{
     MaterialSurfaceRoughness, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3,
@@ -414,27 +414,14 @@ pub(crate) fn surface_centroid_z_m(vertices: &[Point3]) -> f64 {
 
 pub(crate) fn heat_balance_uses_doe2_outside_convection(
     model: &TypedModel,
-    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    runtime_config: HeatBalanceRuntimeConfig,
 ) -> bool {
-    model_uses_doe2_outside_convection(model)
-        || zone_air_algorithm_uses_doe2_outside_convection(zone_air_algorithm)
+    model_uses_doe2_outside_convection(model) || runtime_config.use_doe2_outside_convection
 }
 
 pub(crate) fn model_uses_doe2_outside_convection(model: &TypedModel) -> bool {
     matches!(
         model.surface_convection_algorithms.outside,
         Some(OutsideSurfaceConvectionAlgorithm::Doe2)
-    )
-}
-
-pub(crate) fn zone_air_algorithm_uses_doe2_outside_convection(
-    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
-) -> bool {
-    matches!(
-        zone_air_algorithm,
-        HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2Probe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2InteriorLongwaveProbe
-            | HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideDoe2ScriptFInteriorLongwaveProbe
     )
 }

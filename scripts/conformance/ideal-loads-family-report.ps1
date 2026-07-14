@@ -231,7 +231,7 @@ Assert-ContainsLiteral -Path "crates\ep_runtime\src\ideal_loads\dispatch.rs" -Ne
 Assert-ContainsLiteral -Path "crates\ep_runtime\src\execution_plan.rs" -Needle 'energyplus_ideal_loads_compatibility_stages' -Description "execution-plan IdealLoads stage list"
 Assert-ContainsLiteral -Path "crates\ep_run\src\pipeline.rs" -Needle '"active_ideal_loads_branches"' -Description "run-summary active branch list"
 Assert-ContainsLiteral -Path "crates\ep_run\src\pipeline.rs" -Needle '"inactive_ideal_loads_branches"' -Description "run-summary inactive branch list"
-Assert-ContainsLiteral -Path "crates\ep_run\src\support\runtime_boundaries.rs" -Needle 'UnsupportedAlgorithm' -Description "unsupported active branch fails support assessment"
+Assert-ContainsLiteral -Path "crates\ep_run\src\support\runtime_boundaries.rs" -Needle 'UnsupportedHeatBalanceBranch' -Description "unsupported active branch fails support assessment"
 Assert-ContainsLiteral -Path "crates\ep_cli\src\ideal_loads.rs" -Needle 'selected_purchased_air_branch' -Description "IdealLoads report active branch field"
 Assert-ContainsLiteral -Path "crates\ep_cli\src\ideal_loads.rs" -Needle 'inactive_branches' -Description "IdealLoads report inactive branch field"
 Assert-ContainsLiteral -Path "crates\ep_cli\src\ideal_loads.rs" -Needle 'ideal_loads_feature_flags' -Description "IdealLoads report feature flags"

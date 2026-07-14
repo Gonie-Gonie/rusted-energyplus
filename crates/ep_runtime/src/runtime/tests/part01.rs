@@ -47,10 +47,7 @@
         energyplus_weather_wind_direction_at_timestep, energyplus_weather_wind_speed_at_timestep,
         energyplus_zone_air_heat_capacity_j_per_k, energyplus_zone_air_temperature_coefficients,
         exterior_surface_energy_balance, fix_energyplus_approximate_view_factors,
-        heat_balance_uses_balance_surface_convection_report,
         heat_balance_uses_doe2_outside_convection,
-        heat_balance_uses_surface_reference_air_convection_report,
-        heat_balance_uses_surface_reference_air_surface_convection_report,
         horizontal_infrared_sky_temperature_c, initialize_heat_balance_state,
         initialize_heat_balance_state_with_ctf_coefficients,
         inside_ctf_outside_temperature_history_commit_override_c, parse_epw_dry_bulb_series,
@@ -88,7 +85,8 @@
         zone_air_system_timestep_storage_report_rate_w, zone_geometry_summaries,
         zone_surface_report_conduction_rates_for_indices_w,
     };
-    use crate::heat_balance::{HeatBalanceAlgorithmLane, HeatBalanceZoneAirAlgorithm};
+    use crate::diagnostic_probes::HeatBalanceZoneAirAlgorithm;
+    use crate::heat_balance::HeatBalanceAlgorithmLane;
     use crate::node::{
         NODE_STATE_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
@@ -545,7 +543,8 @@
     }
 
     #[test]
-    fn compact_schedule_trace_uses_until_segments() {
+    fn compact_schedule_trace_uses_until_segments()
+    -> Result<(), Box<dyn std::error::Error>> {
         let mut model = TypedModel::default();
         model.compact_schedules.push(ScheduleCompact {
             id: ScheduleId(0),
@@ -582,8 +581,15 @@
                 assert_eq!(intervals[1].start_minute_of_day, 8 * 60 + 1);
                 assert_eq!(intervals[1].end_minute_of_day, 18 * 60);
             }
-            other => panic!("expected compact intervals, got {other:?}"),
+            other => {
+                return Err(std::io::Error::other(format!(
+                    "expected compact intervals, got {other:?}"
+                ))
+                .into());
+            }
         }
+
+        Ok(())
     }
 
     #[test]

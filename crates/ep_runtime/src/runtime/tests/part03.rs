@@ -456,12 +456,12 @@
         let wall_state = state
             .surfaces
             .iter()
-            .find(|surface| surface.surface_name == "WALL Y0")
+            .find(|surface| surface.surface_name == "WALL Y1")
             .ok_or_else(|| std::io::Error::other("missing wall surface state"))?;
         let wall = typed
             .surfaces
             .iter()
-            .find(|surface| surface.name.0 == "WALL Y0")
+            .find(|surface| surface.name.0 == "WALL Y1")
             .ok_or_else(|| std::io::Error::other("missing wall surface"))?;
         assert_eq!(
             energyplus_outside_convection_branch_id(wall_state, Some(wall), 180.0, true),

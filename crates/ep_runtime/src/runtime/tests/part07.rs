@@ -62,7 +62,7 @@
                 first_hour_interpolation_starting_values:
                     FirstHourInterpolationStartingValues::Hour24,
             }),
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
         );
 
         assert_eq!(
@@ -233,7 +233,7 @@
             1,
             SECONDS_PER_HOUR,
             options,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
             1,
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
@@ -313,7 +313,7 @@ DATA PERIODS
             1,
             SECONDS_PER_HOUR,
             options,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
             1,
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
@@ -330,7 +330,7 @@ DATA PERIODS
             1,
             SECONDS_PER_HOUR,
             options,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
             1,
             None,
             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,

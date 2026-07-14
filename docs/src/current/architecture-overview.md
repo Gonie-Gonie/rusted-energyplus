@@ -33,7 +33,13 @@ Core crates:
 
 Compatibility modules must map to EnergyPlus source routines. Diagnostic probe
 modules may call compatibility functions and add instrumentation, but
-compatibility modules must not call diagnostic probes.
+compatibility modules must not call diagnostic probes. Heat-balance diagnostic
+selection is converted once, inside `ep_runtime::diagnostic_probes`, into the
+probe-agnostic `HeatBalanceRuntimeConfig`; production runtime consumers accept
+that config and must not import or match `DiagnosticHeatBalanceProbe` or its
+legacy long-form variants. The CLI delegates diagnostic selector parsing and
+display names to the same diagnostic module instead of duplicating those
+variant matches.
 
 `ExecutionPlan` is the source-order barrier between support assessment and
 runtime execution. Arbitrary runs write expected and actual source-order stage

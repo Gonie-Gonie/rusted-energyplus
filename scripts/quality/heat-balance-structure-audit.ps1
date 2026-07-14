@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$SelfTest)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -65,6 +65,103 @@ function Assert-LineLimit {
     }
 }
 
+function Remove-RustTestModuleText {
+    param([Parameter(Mandatory = $true)][string]$Text)
+
+    $testModule = [regex]::Match(
+        $Text,
+        '(?m)^\s*#\s*\[\s*cfg\s*\(\s*test\s*\)\s*\]\s*\r?\n\s*mod\s+tests\b'
+    )
+    if ($testModule.Success) {
+        return $Text.Substring(0, $testModule.Index)
+    }
+    return $Text
+}
+
+function Read-RustProductionText {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    return Remove-RustTestModuleText -Text (Read-RepoText -Path $Path)
+}
+
+function Assert-RustProductionTreeNotContains {
+    param(
+        [Parameter(Mandatory = $true)][string[]]$Roots,
+        [Parameter(Mandatory = $true)][string[]]$AllowedPrefixes,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $violations = [System.Collections.Generic.List[string]]::new()
+    foreach ($root in $Roots) {
+        foreach ($file in Get-ChildItem -LiteralPath $root -Filter "*.rs" -File -Recurse) {
+            $relativePath = $file.FullName.Substring($RepoRoot.Length).TrimStart('\', '/') -replace '\\', '/'
+            if ($relativePath -match '(^|/)tests(/|\.rs$)') {
+                continue
+            }
+            if (@($AllowedPrefixes | Where-Object { $relativePath.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -gt 0) {
+                continue
+            }
+
+            $text = Read-RustProductionText -Path $file.FullName
+            $match = [regex]::Match($text, $Pattern)
+            if ($match.Success) {
+                $line = ($text.Substring(0, $match.Index) -split "`n").Count
+                $violations.Add("${relativePath}:${line}")
+            }
+        }
+    }
+
+    if ($violations.Count -gt 0) {
+        throw "$Description unexpectedly present outside its diagnostic/test boundary: $($violations -join ', ')"
+    }
+}
+
+function Assert-RustProductionMatchCount {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Pattern,
+        [Parameter(Mandatory = $true)][int]$ExpectedCount,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $text = Read-RustProductionText -Path $Path
+    $actualCount = [regex]::Matches($text, $Pattern).Count
+    if ($actualCount -ne $ExpectedCount) {
+        throw "$Description expected $ExpectedCount production matches in $Path, got $actualCount"
+    }
+}
+
+function Invoke-DiagnosticProbeBoundarySelfTest {
+    $diagnosticTypePattern = '\bDiagnosticHeatBalanceProbe\b'
+    $longVariantPattern = '\bEnergyPlus[A-Za-z0-9_]*Probe\b'
+    $injectedProduction = @'
+fn injected_compatibility_consumer() {
+    let _probe: Option<DiagnosticHeatBalanceProbe> = None;
+    let _variant = EnergyPlusInjectedLongProbe;
+}
+'@
+    $production = Remove-RustTestModuleText -Text $injectedProduction
+    if ($production -notmatch $diagnosticTypePattern -or $production -notmatch $longVariantPattern) {
+        throw "diagnostic probe boundary self-test failed to detect an injected production violation"
+    }
+
+    $injectedTestOnly = @'
+#[cfg(test)]
+mod tests {
+    fn diagnostic_variant_is_allowed_in_tests() {
+        let _variant = EnergyPlusInjectedLongProbe;
+    }
+}
+'@
+    $testOnlyProduction = Remove-RustTestModuleText -Text $injectedTestOnly
+    if ($testOnlyProduction -match $longVariantPattern) {
+        throw "diagnostic probe boundary self-test failed to exclude a test-only variant"
+    }
+
+    Write-Host "Heat-balance diagnostic probe boundary self-test complete."
+}
+
 $heatBalanceMod = "crates\ep_runtime\src\heat_balance\mod.rs"
 $algorithm = "crates\ep_runtime\src\heat_balance\algorithm.rs"
 $manager = "crates\ep_runtime\src\heat_balance\manager.rs"
@@ -105,7 +202,7 @@ $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
 $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
-$runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part02.rs"
+$runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part03.rs"
 $runtimeTestResults = "crates\ep_runtime\src\runtime\tests\part05.rs"
 $runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
 
@@ -157,14 +254,15 @@ foreach ($entry in @(
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
 
-Assert-LineLimit -Path $algorithm -Limit 650 -Description "heat-balance algorithm selector module"
+Assert-LineLimit -Path $algorithm -Limit 200 -Description "probe-agnostic heat-balance runtime-config module"
+Assert-LineLimit -Path $diagnosticProbe -Limit 800 -Description "heat-balance diagnostic selector module"
 Assert-LineLimit -Path $manager -Limit 180 -Description "HeatBalanceManager source-order module"
-Assert-LineLimit -Path $surfaceManager -Limit 240 -Description "HeatBalanceSurfaceManager source-order module"
+Assert-LineLimit -Path $surfaceManager -Limit 400 -Description "HeatBalanceSurfaceManager source-order orchestration module"
 Assert-LineLimit -Path $surfaceBalance -Limit 720 -Description "surface balance ownership module"
 Assert-LineLimit -Path $surfaceBoundary -Limit 280 -Description "surface boundary ownership module"
-Assert-LineLimit -Path $surfaceLoop -Limit 420 -Description "surface loop ownership module"
+Assert-LineLimit -Path $surfaceLoop -Limit 430 -Description "surface loop ownership module"
 Assert-LineLimit -Path $airManager -Limit 260 -Description "HeatBalanceAirManager source-order module"
-Assert-LineLimit -Path $zonePredictorCorrector -Limit 240 -Description "ZoneTempPredictorCorrector source-order module"
+Assert-LineLimit -Path $zonePredictorCorrector -Limit 270 -Description "ZoneTempPredictorCorrector source-order module"
 Assert-LineLimit -Path $zoneAirCorrection -Limit 520 -Description "zone-air correction ownership module"
 Assert-LineLimit -Path $ctf -Limit 800 -Description "CTF ownership module"
 Assert-LineLimit -Path $insideConvection -Limit 360 -Description "inside convection ownership module"
@@ -173,12 +271,12 @@ Assert-LineLimit -Path $convection -Limit 420 -Description "convection ownership
 Assert-LineLimit -Path $longwave -Limit 180 -Description "exterior longwave ownership module"
 Assert-LineLimit -Path $radiation -Limit 800 -Description "radiation ownership module"
 Assert-LineLimit -Path $solar -Limit 760 -Description "solar radiation ownership module"
-Assert-LineLimit -Path $reports -Limit 820 -Description "report ownership module"
-Assert-LineLimit -Path $state -Limit 800 -Description "heat-balance state ownership module"
-Assert-LineLimit -Path $runPeriod -Limit 800 -Description "run-period sampling ownership module"
-Assert-LineLimit -Path $trace -Limit 780 -Description "heat-balance trace ownership module"
-Assert-LineLimit -Path $summary -Limit 140 -Description "heat-balance summary ownership module"
-Assert-LineLimit -Path $warmup -Limit 180 -Description "warmup ownership module"
+Assert-LineLimit -Path $reports -Limit 900 -Description "report ownership module"
+Assert-LineLimit -Path $state -Limit 980 -Description "heat-balance state ownership module"
+Assert-LineLimit -Path $runPeriod -Limit 920 -Description "run-period sampling ownership module"
+Assert-LineLimit -Path $trace -Limit 800 -Description "heat-balance trace ownership module"
+Assert-LineLimit -Path $summary -Limit 160 -Description "heat-balance summary ownership module"
+Assert-LineLimit -Path $warmup -Limit 220 -Description "warmup ownership module"
 Assert-LineLimit -Path $surfaceWeather -Limit 180 -Description "surface weather ownership module"
 Assert-LineLimit -Path $timestep -Limit 800 -Description "heat-balance timestep ownership module"
 
@@ -311,17 +409,20 @@ Assert-NotContains -Path $runtime -Pattern 'fn surface_steady_u_value_w_per_m2_k
 Assert-Contains -Path $airManager -Pattern 'ManageAirHeatBalance' -Description "HeatBalanceAirManager routine"
 Assert-Contains -Path $airManager -Pattern 'manage_air_heat_balance_stage\s*\(' -Description "HeatBalanceAirManager ledger target manage_air_heat_balance_stage"
 Assert-Contains -Path $airManager -Pattern 'manage_air_heat_balance_source_order_path(?:<[^>]+>)?\s*\(' -Description "HeatBalanceAirManager source-order wrapper"
+Assert-Contains -Path $airManager -Pattern 'manage_air_heat_balance_compat(?:<[^>]+>)?\s*\(' -Description "HeatBalanceAirManager compatibility alias"
 Assert-Contains -Path $airManager -Pattern 'weather_context_zone_air_heat_capacity_j_per_k' -Description "weather-driven zone-air heat capacity owner"
 Assert-Contains -Path $airManager -Pattern 'update_zone_air_heat_capacities_from_weather_context' -Description "zone-air weather capacity updater owner"
-Assert-Contains -Path $airManager -Pattern 'seed_zone_air_humidity_ratios_from_weather_records' -Description "zone-air weather humidity seeding owner"
+Assert-Contains -Path $airManager -Pattern 'seed_zone_air_humidity_ratios_from_weather_series' -Description "zone-air weather-series humidity seeding owner"
 Assert-Contains -Path $airManager -Pattern 'zone_air_heat_balance_air_storage_rate_w' -Description "zone-air storage report owner"
 Assert-NotContains -Path $runtime -Pattern 'fn weather_context_zone_air_heat_capacity_j_per_k\s*\(' -Description "runtime-owned zone-air weather capacity implementation"
 Assert-NotContains -Path $runtime -Pattern 'fn update_zone_air_heat_capacities_from_weather_context\s*\(' -Description "runtime-owned zone-air weather capacity updater"
-Assert-NotContains -Path $runtime -Pattern 'fn seed_zone_air_humidity_ratios_from_weather_records\s*\(' -Description "runtime-owned weather humidity seeding"
+Assert-NotContains -Path $runtime -Pattern 'fn seed_zone_air_humidity_ratios_from_weather_series\s*\(' -Description "runtime-owned weather-series humidity seeding"
 Assert-NotContains -Path $runtime -Pattern 'fn zone_air_heat_balance_air_storage_rate_w\s*\(' -Description "runtime-owned zone-air storage report implementation"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ManageZoneAirUpdates' -Description "ZoneTempPredictorCorrector routine"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_stage\s*\(' -Description "ZoneTempPredictorCorrector ledger target manage_zone_air_updates_stage"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector ManageZoneAirUpdates source-order wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'manage_zone_air_updates_compat(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector compatibility wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'predict_system_loads_compat(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector predictor compatibility wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_PREDICT_STEP_PATH' -Description "ZoneTempPredictorCorrector PredictStep source-order path"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'PredictStep' -Description "ZoneTempPredictorCorrector PredictStep source routine"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'predict_step_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PredictStep source-order wrapper"
@@ -332,6 +433,9 @@ Assert-Contains -Path $zonePredictorCorrector -Pattern 'ZONE_AIR_HISTORY_PUSH_RE
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'revert_zone_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector RevertZoneTimestepHistories source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_zone_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushZoneTimestepHistories source-order wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_system_timestep_histories_source_order_path(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushSystemTimestepHistories source-order wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'revert_zone_timestep_histories_compat(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector RevertZoneTimestepHistories compatibility wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_zone_timestep_histories_compat(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushZoneTimestepHistories compatibility wrapper"
+Assert-Contains -Path $zonePredictorCorrector -Pattern 'push_system_timestep_histories_compat(?:<[^>]+>)?\s*\(' -Description "ZoneTempPredictorCorrector PushSystemTimestepHistories compatibility wrapper"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_zone_air_temperature_coefficients' -Description "ZoneTempPredictorCorrector coefficient owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_third_order_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector third-order solver owner"
 Assert-Contains -Path $zonePredictorCorrector -Pattern 'energyplus_analytical_zone_air_temperature_c' -Description "ZoneTempPredictorCorrector analytical solver owner"
@@ -458,7 +562,7 @@ foreach ($surfaceCacheField in @(
     )) {
     Assert-Contains -Path $state -Pattern $surfaceCacheField -Description "precomputed surface cache field $surfaceCacheField"
 }
-Assert-Contains -Path $surfaceManager -Pattern 'pub\(crate\) type ConstructionThermalData' -Description "construction thermal data cache type"
+Assert-Contains -Path $surfaceManager -Pattern 'pub\(crate\) struct ConstructionThermalData' -Description "construction thermal data cache entry"
 Assert-Contains -Path $initialization -Pattern 'construction_thermal_data' -Description "construction thermal data cached during heat-balance initialization"
 Assert-Contains -Path $initialization -Pattern 'construction_ctf_coefficients_by_name' -Description "CTF coefficient cache initialized by construction"
 Assert-Contains -Path $weather -Pattern 'pub struct WeatherTimestepSeries' -Description "precomputed weather timestep series"
@@ -486,7 +590,7 @@ Assert-Contains -Path $radiation -Pattern 'HeatBalanceSurfaceIndexes' -Descripti
 Assert-NotContains -Path $radiation -Pattern 'BTreeMap::<ZoneId, Vec<usize>>::new' -Description "radiation-owned per-call zone surface grouping"
 Assert-Contains -Path $state -Pattern 'pub zones: Vec<ZoneHeatBalanceState>' -Description "heat-balance runtime loops have compact zone Vec state"
 Assert-Contains -Path $state -Pattern 'pub surfaces: Vec<SurfaceHeatBalanceState>' -Description "heat-balance runtime loops have compact surface Vec state"
-Assert-Contains -Path $algorithm -Pattern 'HeatBalanceTimestepAlgorithmFlags' -Description "heat-balance branch conditions are compiled into flag groups"
+Assert-Contains -Path $algorithm -Pattern 'pub\(crate\) struct HeatBalanceRuntimeConfig' -Description "heat-balance branch conditions are compiled into a probe-agnostic runtime config"
 Assert-Contains -Path $cli -Pattern 'let mut trace_level = TraceLevel::Normal' -Description "diagnostic trace defaults to normal level"
 Assert-Contains -Path $runConfig -Pattern 'pub struct TraceSelection' -Description "selected trace target configuration"
 Assert-Contains -Path $runConfig -Pattern 'pub surface_names: Vec<String>' -Description "selected surface trace targets"
@@ -494,7 +598,7 @@ Assert-Contains -Path $runConfig -Pattern 'pub node_names: Vec<String>' -Descrip
 Assert-Contains -Path $cli -Pattern '--trace-surface' -Description "CLI selected surface trace option"
 Assert-Contains -Path $cli -Pattern '--trace-node' -Description "CLI selected node trace option"
 Assert-Contains -Path $pipeline -Pattern 'selected_trace_enabled' -Description "selected trace requires explicit target names"
-Assert-Contains -Path $pipeline -Pattern 'surface/node trace payloads are emitted only for explicitly requested names' -Description "selected trace policy artifact"
+Assert-Contains -Path $pipeline -Pattern 'zone/surface/ctf payloads are emitted only for explicitly requested names' -Description "selected trace policy artifact"
 Assert-Contains -Path $pipeline -Pattern 'write_runtime_artifacts' -Description "output export after runtime"
 Assert-Contains -Path $pipeline -Pattern 'rust_output_export' -Description "output export phase timing"
 Assert-Contains -Path $pipeline -Pattern 'render_run_report' -Description "report generation after runtime completion path"
@@ -523,15 +627,15 @@ Assert-Contains -Path $timestep -Pattern 'surface_manager::manage_surface_heat_b
 Assert-Contains -Path $timestep -Pattern 'surface_manager::init_surface_heat_balance_source_order_path' -Description "timestep enters InitSurfaceHeatBalance source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::calc_heat_balance_outside_surf_source_order_path' -Description "timestep enters CalcHeatBalanceOutsideSurf source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::calc_heat_balance_inside_surf_source_order_path' -Description "timestep enters CalcHeatBalanceInsideSurf source-order wrapper"
-Assert-Contains -Path $timestep -Pattern 'air_manager::manage_air_heat_balance_source_order_path' -Description "timestep enters ManageAirHeatBalance source-order wrapper"
-Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::manage_zone_air_updates_source_order_path' -Description "timestep enters ManageZoneAirUpdates source-order wrapper"
-Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::predict_step_source_order_path' -Description "timestep enters PredictStep source-order wrapper"
+Assert-Contains -Path $timestep -Pattern 'air_manager::manage_air_heat_balance_compat' -Description "timestep enters ManageAirHeatBalance compatibility wrapper"
+Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::manage_zone_air_updates_compat' -Description "timestep enters ManageZoneAirUpdates compatibility wrapper"
+Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::predict_system_loads_compat' -Description "timestep enters PredictStep compatibility wrapper"
 Assert-Contains -Path $timestep -Pattern 'zone_predictor_corrector::correct_step_source_order_path' -Description "timestep enters CorrectStep source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::update_final_surface_heat_balance_source_order_path' -Description "timestep enters UpdateFinalSurfaceHeatBalance source-order wrapper"
 Assert-Contains -Path $timestep -Pattern 'surface_manager::update_thermal_histories_source_order_path' -Description "timestep enters UpdateThermalHistories source-order wrapper"
 Assert-Contains -Path $runPeriod -Pattern 'surface_manager::report_surface_heat_balance_source_order_path' -Description "run-period enters ReportSurfaceHeatBalance source-order wrapper"
-Assert-Contains -Path $zoneAirCorrection -Pattern 'revert_zone_timestep_histories_source_order_path' -Description "adaptive zone-air correction enters RevertZoneTimestepHistories source-order wrapper"
-Assert-Contains -Path $zoneAirCorrection -Pattern 'push_system_timestep_histories_source_order_path' -Description "adaptive zone-air correction enters PushSystemTimestepHistories source-order wrapper"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'revert_zone_timestep_histories_compat' -Description "adaptive zone-air correction enters RevertZoneTimestepHistories compatibility wrapper"
+Assert-Contains -Path $zoneAirCorrection -Pattern 'push_system_timestep_histories_compat' -Description "adaptive zone-air correction enters PushSystemTimestepHistories compatibility wrapper"
 Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep\s*\(' -Description "runtime-owned heat-balance timestep advance"
 Assert-NotContains -Path $runtime -Pattern 'fn advance_heat_balance_state_one_timestep_internal\s*\(' -Description "runtime-owned internal heat-balance timestep advance"
 Assert-Contains -Path $warmup -Pattern 'CheckWarmupConvergence' -Description "warmup source owner"
@@ -590,31 +694,60 @@ foreach ($stageSnapshotTarget in @(
     Assert-Contains -Path $pipeline -Pattern ([regex]::Escape($stageSnapshotTarget)) -Description "stage state snapshot target $stageSnapshotTarget"
 }
 
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_third_order_zone_air_correction' -Description "third-order zone-air flag owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_preserves_surface_inside_temperature_for_first_longwave' -Description "first-longwave inside-temperature preservation flag owner"
-Assert-Contains -Path $algorithm -Pattern 'HeatBalanceTimestepAlgorithmFlags' -Description "timestep algorithm flag bundle owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_timestep_algorithm_flags' -Description "timestep algorithm flag selector owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_weather_air_storage_report' -Description "weather air-storage report flag owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_balance_surface_convection_report' -Description "balance surface convection report flag owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_surface_reference_air_surface_convection_report' -Description "surface reference-air convection report flag owner"
-Assert-Contains -Path $algorithm -Pattern 'heat_balance_uses_final_inside_convection_report' -Description "final inside convection report flag owner"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_third_order_zone_air_correction\s*\(' -Description "runtime-owned third-order zone-air flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_preserves_surface_inside_temperature_for_first_longwave\s*\(' -Description "runtime-owned first-longwave preservation flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_weather_air_storage_report\s*\(' -Description "runtime-owned weather air-storage report flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_previous_mat_surface_convection_report\s*\(' -Description "runtime-owned previous-MAT convection report flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_balance_surface_convection_report\s*\(' -Description "runtime-owned balance convection report flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_surface_reference_air_convection_report\s*\(' -Description "runtime-owned surface reference-air report flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_surface_reference_air_surface_convection_report\s*\(' -Description "runtime-owned surface reference-air convection report flag"
-Assert-NotContains -Path $runtime -Pattern 'fn heat_balance_uses_final_inside_convection_report\s*\(' -Description "runtime-owned final inside convection report flag"
+Assert-Contains -Path $algorithm -Pattern 'pub\(crate\) struct HeatBalanceRuntimeConfig' -Description "probe-agnostic runtime config owner"
+Assert-Contains -Path $algorithm -Pattern 'pub\(crate\) struct HeatBalanceTimestepAlgorithmFlags' -Description "probe-agnostic timestep flag bundle owner"
+Assert-Contains -Path $algorithm -Pattern 'pub\(crate\) const fn runtime_config\s*\(' -Description "compatibility runtime config selector"
+foreach ($runtimeConfigField in @(
+        'use_third_order_zone_air_correction',
+        'preserve_surface_inside_temperature_for_first_longwave',
+        'use_weather_air_storage_report',
+        'use_balance_surface_convection_report',
+        'use_surface_reference_air_surface_convection_report',
+        'use_final_inside_convection_report'
+    )) {
+    Assert-Contains -Path $algorithm -Pattern "pub\(crate\) $runtimeConfigField`: bool" -Description "runtime config field $runtimeConfigField"
+}
+Assert-Contains -Path $algorithm -Pattern '(?s)Self::SourceOrder1ZoneOpaqueCompat => HeatBalanceRuntimeConfig \{.*use_third_order_zone_air_correction: true.*use_weather_air_storage_report: true.*use_surface_reference_air_surface_convection_report: true' -Description "compatibility selector declares runtime config directly"
+Assert-Contains -Path $algorithm -Pattern '(?s)timestep: HeatBalanceTimestepAlgorithmFlags \{.*correct_zone_air_after_surface_pass: true.*interleave_zone_air_surface_passes: true.*use_quick_outside_conduction: true' -Description "compatibility selector declares timestep flags directly"
 Assert-Contains -Path $algorithm -Pattern 'pub enum CompatibilityHeatBalanceAlgorithm' -Description "compatibility algorithm enum"
-Assert-Contains -Path $algorithm -Pattern 'pub enum HeatBalanceZoneAirSelection' -Description "typed heat-balance selection enum"
-Assert-Contains -Path $algorithm -Pattern 'EnergyPlusSourceOrder1ZoneOpaqueCompatibility' -Description "explicit source-order selector"
-Assert-NotContains -Path $algorithm -Pattern 'CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat =>\s*\{\s*HeatBalanceZoneAirAlgorithm::EnergyPlusHeatBalanceCompatCandidate' -Description "compatibility selector mapped to legacy candidate alias"
+Assert-Contains -Path $algorithm -Pattern 'SourceOrder1ZoneOpaqueCompat' -Description "explicit source-order compatibility selector"
+Assert-NotContains -Path $algorithm -Pattern '\bHeatBalanceZoneAirAlgorithm\b' -Description "legacy diagnostic selector in compatibility algorithm module"
 Assert-NotContains -Path $algorithm -Pattern 'pub enum DiagnosticHeatBalanceProbe' -Description "diagnostic probe enum in compatibility algorithm module"
 Assert-Contains -Path $diagnosticProbe -Pattern 'pub enum DiagnosticHeatBalanceProbe' -Description "diagnostic probe enum"
+Assert-Contains -Path $diagnosticProbe -Pattern 'pub enum HeatBalanceZoneAirAlgorithm' -Description "legacy diagnostic selector owner"
+Assert-Contains -Path $diagnosticProbe -Pattern 'pub fn from_cli_name\s*\(' -Description "diagnostic selector CLI parser owner"
+Assert-Contains -Path $diagnosticProbe -Pattern 'pub const fn cli_name\s*\(' -Description "diagnostic selector CLI name owner"
+Assert-Contains -Path $diagnosticProbe -Pattern 'pub\(crate\) const fn runtime_config\s*\(' -Description "diagnostic selector runtime config conversion owner"
 Assert-NotContains -Path $diagnosticProbe -Pattern 'pub enum CompatibilityHeatBalanceAlgorithm' -Description "compatibility algorithm enum in diagnostic probe module"
-Assert-Contains -Path $diagnosticProbe -Pattern 'HeatBalanceZoneAirSelection::Diagnostic' -Description "diagnostic selectors remain diagnostic"
-Assert-Contains -Path $diagnosticProbe -Pattern 'Diagnostic-only heat-balance probes and non-claim baselines' -Description "diagnostic probe non-claim boundary"
+Assert-RustProductionTreeNotContains `
+    -Roots @("crates\ep_runtime\src", "crates\ep_run\src", "crates\ep_cli\src") `
+    -AllowedPrefixes @("crates/ep_runtime/src/diagnostic_probes/") `
+    -Pattern '\bDiagnosticHeatBalanceProbe\b' `
+    -Description "diagnostic heat-balance probe type"
+Assert-RustProductionTreeNotContains `
+    -Roots @("crates\ep_runtime\src", "crates\ep_run\src", "crates\ep_cli\src") `
+    -AllowedPrefixes @("crates/ep_runtime/src/diagnostic_probes/") `
+    -Pattern '\bEnergyPlus[A-Za-z0-9_]*Probe\b' `
+    -Description "diagnostic heat-balance probe variant"
+Assert-RustProductionTreeNotContains `
+    -Roots @("crates\ep_runtime\src\heat_balance") `
+    -AllowedPrefixes @(
+        "crates/ep_runtime/src/heat_balance/state.rs",
+        "crates/ep_runtime/src/heat_balance/timestep.rs"
+    ) `
+    -Pattern '\bHeatBalanceZoneAirAlgorithm\b' `
+    -Description "legacy heat-balance selector in an algorithm consumer"
+$runtimeConfigCallPattern = [regex]::Escape(([char]46).ToString() + 'runtime_config()')
+$optionsRuntimeConfigPattern = 'options\.zone_air_algorithm' + $runtimeConfigCallPattern
+Assert-Contains -Path $runtime -Pattern ('let heat_balance_runtime_config = ' + $optionsRuntimeConfigPattern) -Description "runtime selection boundary converts once to runtime config"
+Assert-Contains -Path $timestep -Pattern ('HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical' + $runtimeConfigCallPattern) -Description "public diagnostic timestep wrapper converts its default selector"
+Assert-RustProductionMatchCount -Path $runtime -Pattern $optionsRuntimeConfigPattern -ExpectedCount 1 -Description "runtime selector-to-config conversion"
+Assert-RustProductionMatchCount -Path $timestep -Pattern '\bHeatBalanceZoneAirAlgorithm\b' -ExpectedCount 2 -Description "timestep legacy selector allowlist"
+Assert-Contains -Path $runPeriod -Pattern 'runtime_config: HeatBalanceRuntimeConfig' -Description "run-period consumer accepts runtime config"
+Assert-NotContains -Path $runPeriod -Pattern ('zone_air_algorithm' + $runtimeConfigCallPattern) -Description "run-period consumer converts a legacy selector"
+Assert-Contains -Path $cli -Pattern 'HeatBalanceZoneAirAlgorithm::from_cli_name\(value\)' -Description "CLI delegates diagnostic selector parsing"
+Assert-Contains -Path $cli -Pattern 'zone_air_algorithm\.cli_name\(\)' -Description "CLI delegates diagnostic selector display names"
+Assert-Contains -Path $diagnosticProbe -Pattern 'Diagnostic-only heat-balance selectors and non-claim baselines' -Description "diagnostic probe non-claim boundary"
 Assert-Contains -Path $diagnosticProbe -Pattern 'pub struct DiagnosticProbeMetadata' -Description "diagnostic probe metadata"
 Assert-Contains -Path $diagnosticProbe -Pattern 'why_it_exists' -Description "diagnostic probe metadata why-it-exists field"
 Assert-Contains -Path $diagnosticProbe -Pattern 'mismatch_investigated' -Description "diagnostic probe metadata mismatch field"
@@ -653,5 +786,9 @@ Assert-NotContains -Path $probeSummaryReport -Pattern 'def\s+signed_delta\s*\(' 
 Assert-NotContains -Path $probeSummaryReport -Pattern 'def\s+residual_stats\s*\(' -Description "Python surface-convection closure reconstruction helper"
 Assert-NotContains -Path $probeSummaryReport -Pattern 'oracle_reference_air_source_w\s*-\s*rust_reference_air_source_w' -Description "Python reference-air source reconstruction"
 Assert-NotContains -Path $probeSummaryReport -Pattern 'oracle_residuals|rust_residuals|delta_residuals' -Description "Python zone surface-convection residual reconstruction"
+
+if ($SelfTest) {
+    Invoke-DiagnosticProbeBoundarySelfTest
+}
 
 Write-Host "Heat-balance structure audit complete."

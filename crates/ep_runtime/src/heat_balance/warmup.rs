@@ -1,6 +1,6 @@
 //! Run-period warmup loop and CheckWarmupConvergence helpers.
 
-use crate::heat_balance::algorithm::HeatBalanceZoneAirAlgorithm;
+use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
 use crate::heat_balance::state::{
     HeatBalanceState, HeatBalanceStepInput, HeatBalanceSurfaceLoopZoneAirCorrection,
     HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupOptions,
@@ -23,7 +23,7 @@ pub(crate) fn run_heat_balance_run_period_warmup<F>(
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     options: HeatBalanceWarmupOptions,
-    zone_air_algorithm: HeatBalanceZoneAirAlgorithm,
+    runtime_config: HeatBalanceRuntimeConfig,
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
@@ -37,7 +37,7 @@ where
         &mut HeatBalanceState,
         HeatBalanceStepInput,
         Option<HeatBalanceWeatherContext<'weather>>,
-        HeatBalanceZoneAirAlgorithm,
+        HeatBalanceRuntimeConfig,
         u32,
         Option<u32>,
         HeatBalanceSurfaceLoopZoneAirCorrection,
@@ -93,7 +93,7 @@ where
                         timestep_seconds: seconds_per_timestep,
                     },
                     weather_context,
-                    zone_air_algorithm,
+                    runtime_config,
                     surface_iteration_count,
                     inside_hconv_reevaluation_interval,
                     surface_loop_zone_air_correction,

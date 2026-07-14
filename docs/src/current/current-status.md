@@ -142,8 +142,11 @@ runtime success; phase timing formatting; and wrapper invocation through
 
 - heat-balance compatibility and diagnostic selections have separate typed
   APIs, the diagnostic probe enum lives under `diagnostic_probes`, and the
-  official 1Zone compatibility selector resolves to an explicit compatibility
-  execution variant.
+  official 1Zone compatibility selector resolves directly to a probe-agnostic
+  `HeatBalanceRuntimeConfig`. Compatibility algorithm consumers receive only
+  that config; diagnostic enum and long-form variant matching stay in
+  `diagnostic_probes` (plus tests), and the CLI delegates selector parsing and
+  display names to that boundary.
 - heat-balance source-order stage definitions live under
   `heat_balance::{manager,surface_manager,air_manager,zone_predictor_corrector,
   ctf,convection,radiation,reports}` and are guarded by

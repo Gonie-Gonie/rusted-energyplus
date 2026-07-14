@@ -399,18 +399,19 @@
 
         assert!(!heat_balance_uses_doe2_outside_convection(
             &model,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config()
         ));
         assert!(heat_balance_uses_doe2_outside_convection(
             &model,
             HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideDoe2Probe
+                .runtime_config()
         ));
 
         model.surface_convection_algorithms.outside = Some(OutsideSurfaceConvectionAlgorithm::Doe2);
 
         assert!(heat_balance_uses_doe2_outside_convection(
             &model,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config()
         ));
     }
 
@@ -443,7 +444,8 @@
             10.0,
             surface.outside_face_temperature_c,
             None,
-            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe,
+            HeatBalanceZoneAirAlgorithm::EnergyPlusAnalyticalCoupledPreviousInsideQuickOutsideInterleavedInteriorLongwaveProbe
+                .runtime_config(),
         );
         let fallback_terms = surface_exterior_report_terms(
             &model.typed,
@@ -451,7 +453,7 @@
             10.0,
             surface.outside_face_temperature_c,
             None,
-            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical,
+            HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
         );
 
         assert_eq!(cached_terms, surface.outside_report_terms);

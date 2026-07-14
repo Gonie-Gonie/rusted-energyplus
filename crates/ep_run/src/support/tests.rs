@@ -474,7 +474,7 @@ fn ideal_loads_dual_humidity_controls_are_not_selected_branch_compatibility()
     assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
     assert_eq!(assessment.runtime_class, RuntimeClass::None);
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
-        diagnostic.code == "UnsupportedAlgorithm"
+        diagnostic.code == "UnsupportedHeatBalanceBranch"
             && diagnostic.message.contains("unsupported feature flags")
     }));
     Ok(())

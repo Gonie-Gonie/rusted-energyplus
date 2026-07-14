@@ -1,6 +1,6 @@
 //! Heat-balance trace and diagnostic state value types.
 
-use super::algorithm::HeatBalanceZoneAirAlgorithm;
+use crate::diagnostic_probes::HeatBalanceZoneAirAlgorithm;
 use ep_model::{
     ConstructionId, MaterialId, MaterialSurfaceRoughness, OutsideBoundaryCondition,
     SimulationModel, SurfaceId, SurfaceType, ZoneId,
