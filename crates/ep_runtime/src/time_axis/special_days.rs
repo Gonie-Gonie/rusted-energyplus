@@ -6,7 +6,7 @@ use super::{
 use crate::weather::EpwCalendarMetadata;
 use ep_model::{CalendarDateRule, RunPeriod, RunPeriodSpecialDay};
 
-/// Concrete start date used to project one input-file special day.
+/// Concrete start date used to project one weather-file or input-file special day.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct ResolvedSpecialDayDate {
     /// Month number, 1-12.
@@ -42,7 +42,7 @@ impl SpecialDaySource {
 pub struct ResolvedSpecialDay {
     /// Whether this definition came from the EPW header or input file.
     pub source: SpecialDaySource,
-    /// Input object name.
+    /// Weather-file or input-file definition name.
     pub name: String,
     /// Concrete start after any applicable weekend shift.
     pub start: ResolvedSpecialDayDate,
