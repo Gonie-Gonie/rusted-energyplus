@@ -1,0 +1,59 @@
+id = "calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001"
+title = "Zulu-then-Alpha overlapping special-day declaration order"
+milestone = "full-source-order-calendar-special-day-overlap-order"
+purpose = "Block on exact ordered hourly day types when a later Alpha CustomDay1 definition overwrites an earlier Zulu Holiday definition on the same fixed date."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case is paired with calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001; the IDF names, dates, durations, day types, RunPeriod, and shared leap-observed EPW are identical, while only the two RunPeriodControl:SpecialDays declarations are reversed.",
+  "Zulu Holiday Definition is declared first and Alpha Custom Day Definition second on 2/29, so the later CustomDay1 definition wins the exact overlap; the 72 ordered hourly values are 24 Sunday=1, 24 CustomDay1=11, and 24 Tuesday=3.",
+  "The deliberately reverse-alphabetic Zulu-then-Alpha declaration order proves source declaration order rather than converted epJSON name order; weather-file holidays, daylight saving, weekend adjustment, rain, snow, and actual-weather handling are explicitly disabled.",
+  "The numerical claim covers only the 72 successful ordered, unique hour-ending Site Day Type Index values and timestamps. EnergyPlus-versus-Rust warning text, count, repetition, and diagnostics parity; other dates, durations, day types, overlap shapes, duplicate names, mixed EPW/IDF precedence, year wrap, schedule lookup, tomorrow state, raw ESO serialization, actual weather, and cross-year traversal remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001/calendar_special_day_overlap_zulu_then_alpha_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001/calendar_special_day_overlap_zulu_then_alpha_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-overlap-order-exact"
+blocking = true

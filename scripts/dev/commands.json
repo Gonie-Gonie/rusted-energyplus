@@ -353,6 +353,12 @@
                          "help":  "Gate paired exact common-year and leap-year duration-three input-file Holiday annual-table wrap state and ordered hourly day types."
                      },
                      {
+                         "name":  "compare-calendar-special-day-overlap-order-exact",
+                         "path":  "compare\\compare-calendar-special-day-overlap-order-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired exact overlapping special-day source declaration order, last-definition precedence, and ordered hourly day types."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",

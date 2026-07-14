@@ -189,6 +189,8 @@ $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $typedIds = "crates\ep_model\src\ids.rs"
 $calendarObjects = "crates\ep_model\src\objects\calendar.rs"
+$rawModel = "crates\ep_raw_model\src\lib.rs"
+$idfOrder = "crates\ep_raw_model\src\idf_order.rs"
 $compiler = "crates\ep_compiler\src\compiler.rs"
 $diagnosticProbe = "crates\ep_runtime\src\diagnostic_probes\heat_balance.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
@@ -211,6 +213,7 @@ $timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
 $timeWeatherScheduleSpecialDays = "crates\ep_cli\src\time_weather_schedule_special_days.rs"
 $algorithmLedger = "specs\algorithm_ledger.toml"
 $durationWrapGate = "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1"
+$overlapOrderGate = "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -250,6 +253,8 @@ foreach ($entry in @(
         @($timestep, "heat-balance timestep ownership module"),
         @($typedIds, "typed compact ID module"),
         @($calendarObjects, "typed calendar control module"),
+        @($rawModel, "raw-model declaration-order API"),
+        @($idfOrder, "targeted IDF declaration-order recovery"),
         @($compiler, "typed model compiler"),
         @($diagnosticProbe, "diagnostic probe selector module"),
         @($executionPlan, "execution plan module"),
@@ -272,6 +277,7 @@ foreach ($entry in @(
         @($timeWeatherScheduleSpecialDays, "time/weather/schedule special-day report module"),
         @($algorithmLedger, "algorithm source-order ledger"),
         @($durationWrapGate, "common-year and leap-year special-day duration-wrap gate"),
+        @($overlapOrderGate, "paired special-day overlap declaration-order gate"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
         @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
@@ -624,7 +630,13 @@ Assert-Contains -Path $calendarObjects -Pattern 'pub fn parse_calendar_date_rule
 Assert-Contains -Path $calendarObjects -Pattern 'parse_ordinal_number\(tokens\[0\]\)' -Description "Nth-weekday ordinal parser path"
 Assert-Contains -Path $calendarObjects -Pattern 'NthWeekdayInMonth' -Description "typed Nth-weekday calendar-rule variant"
 Assert-Contains -Path $calendarObjects -Pattern 'LastWeekdayInMonth' -Description "typed last-weekday calendar-rule variant"
+Assert-Contains -Path $rawModel -Pattern 'pub fn ordered_instances\s*\(' -Description "raw-model ordered-instance gateway"
+Assert-Contains -Path $rawModel -Pattern 'pub fn load_epjson_file_with_idf_order\s*\(' -Description "IDF-backed epJSON order-overlay loader"
+Assert-Contains -Path $idfOrder -Pattern 'object_type: "RunPeriodControl:SpecialDays"' -Description "SpecialDays-only declaration-order target"
+Assert-Contains -Path $idfOrder -Pattern 'IDF declaration-order recovery count mismatch' -Description "IDF/epJSON order-overlay count mismatch rejection"
+Assert-Contains -Path $idfOrder -Pattern 'converted epJSON contains multiple case-insensitive name matches' -Description "ambiguous IDF order-overlay name rejection"
 Assert-Contains -Path $compiler -Pattern 'fn parse_run_period_special_days\s*\(' -Description "typed RunPeriodControl SpecialDays compiler"
+Assert-Contains -Path $compiler -Pattern 'raw_model\.ordered_instances\(object_type\)' -Description "compiler consumes raw-model ordered-instance gateway"
 Assert-Contains -Path $compiler -Pattern 'fn parses_typed_run_period_special_day_rules_types_and_coverage\s*\(' -Description "typed Nth/last special-day compiler test"
 Assert-Contains -Path $calendarRules -Pattern 'fn resolve_calendar_date_rule\s*\(' -Description "shared EnergyPlus calendar date-rule resolver"
 Assert-Contains -Path $calendarRules -Pattern 'CalendarDateRule::NthWeekdayInMonth' -Description "Nth-weekday calendar resolver branch"
@@ -652,6 +664,13 @@ Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 365' -Descrip
 Assert-Contains -Path $durationWrapGate -Pattern 'StartDayOfYear = 366' -Description "EnergyPlus leap-year duration wrap at annual day 366"
 Assert-Contains -Path $durationWrapGate -Pattern 'if \(\$index -lt 48\) \{ 8\.0 \} else \{ \$case\.FinalDayTypeIndex \}' -Description "EnergyPlus duration-three wrap produces two in-range Holiday days then weekday"
 Assert-Contains -Path $durationWrapGate -Pattern 'EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;' -Description "EnergyPlus duration-wrap clean source branch"
+Assert-Contains -Path $overlapOrderGate -Pattern 'ExpectedNames = @\("ZULU HOLIDAY DEFINITION", "ALPHA CUSTOM DAY DEFINITION"\)' -Description "Zulu-then-Alpha SpecialDays source order"
+Assert-Contains -Path $overlapOrderGate -Pattern 'ExpectedNames = @\("ALPHA CUSTOM DAY DEFINITION", "ZULU HOLIDAY DEFINITION"\)' -Description "Alpha-then-Zulu SpecialDays source order"
+Assert-Contains -Path $overlapOrderGate -Pattern 'identical SpecialDays definitions in exact reverse order' -Description "paired overlap fixtures isolate reversed declaration order"
+Assert-Contains -Path $overlapOrderGate -Pattern '\$specialDays\.input_file_declared -ne 2' -Description "paired overlap gate resolves exactly two input-file definitions"
+Assert-Contains -Path $overlapOrderGate -Pattern '\$entry\.name -cne \$case\.ExpectedNames\[\$definitionIndex\]' -Description "resolved SpecialDays retain IDF declaration order"
+Assert-Contains -Path $overlapOrderGate -Pattern '\$expectedValue = if \(\$dayOffset -eq 0\) \{ 1\.0 \} elseif \(\$dayOffset -eq 1\) \{ \$case\.MiddleDayTypeIndex \} else \{ 3\.0 \}' -Description "later overlapping SpecialDays definition wins exact middle-day value"
+Assert-Contains -Path $overlapOrderGate -Pattern 'EnergyPlus-versus-Rust warning text, count, repetition, and diagnostics parity' -Description "overlap numerical claim excludes warning parity"
 Assert-Contains -Path $algorithmLedger -Pattern '(?s)\[\[algorithm\]\]\s*id = "calendar_time_state"(?:(?!\[\[algorithm\]\]).)*status = "scaffold"(?:(?!\[\[algorithm\]\]).)*claim_level = "none"' -Description "calendar algorithm remains scaffold with no family claim"
 Assert-Contains -Path $algorithmLedger -Pattern 'routine\.set_special_day_dates\.completion_status = "source_mapped"' -Description "SetSpecialDayDates remains source-mapped"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn later_typed_special_day_definition_overwrites_an_earlier_definition\s*\(' -Description "special-day later-wins unit test"
@@ -659,6 +678,7 @@ Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn weekend_rule_shifts_o
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn nth_and_last_special_day_rules_resolve_and_nonexistent_nth_is_rejected\s*\(' -Description "special-day Nth/last resolution and invalid-fifth test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'build_hourly_time_axis\(&nonexistent_model\)\.expect_err' -Description "nonexistent Nth-weekday time-axis rejection test"
 Assert-Contains -Path $pipeline -Pattern 'prepare_runtime_inputs\([\s\S]*diagnostics\.error\("RuntimeConvergenceFailure", "runtime", error\)' -Description "ep_run runtime-input error diagnostic projection"
+Assert-Contains -Path $pipeline -Pattern 'load_epjson_file_with_idf_order' -Description "IDF arbitrary-run preserves configured declaration order"
 Assert-Contains -Path $pipeline -Pattern 'RunExitCode::Runtime' -Description "ep_run runtime failure exit mapping"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn cross_year_special_days_are_rejected_until_each_year_can_be_reprojected\s*\(' -Description "cross-year special-day explicit rejection test"
 Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn run_period_flag_enables_epw_sunday_type_holiday_on_both_time_axes\s*\(' -Description "EPW holiday policy and Sunday-type both-axis test"

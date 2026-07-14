@@ -109,7 +109,8 @@ CLAIM_BOUNDARY = (
     "state; and successful-run raw ESO serialization remain outside the smoke boundary. EPW "
     "Nth/Last rules; blank/default policy behavior; EPW holidays beyond the paired "
     "fixed use-policy cases below; other special-day types; duration/date combinations beyond the "
-    "exact pair below; overlap, precedence, declaration order, warnings, actual cross-year run "
+    "exact pair below; overlap arrangements beyond the exact pair, declaration order beyond "
+    "SpecialDays, warning parity, actual cross-year run "
     "periods, or per-year reprojection; schedule lookup; tomorrow state; and raw ESO timestamp "
     "serialization remain outside this claim. The paired duration-wrap input-file Holiday cases "
     "each use an explicit January 1 through January 3 same-year RunPeriod and one December 31 "
@@ -121,7 +122,18 @@ CLAIM_BOUNDARY = (
     "`JDay1 == 367` SetSpecialDayDates source branches for a same-year cyclic annual table. Actual "
     "cross-year execution or reprojection; overlap, precedence, declaration order, or warnings; "
     "other durations, dates, special-day types, policy values, or EPW calendar rules remain outside "
-    "the claim. The paired fixed EPW "
+    "the claim. The paired overlapping input-file SpecialDays cases share the explicit 2016-02-28 "
+    "through 2016-03-01 RunPeriod, two duration-one February 29 definitions named Zulu Holiday "
+    "Definition and Alpha Custom Day Definition, and the same 72-row EPW; their IDFs differ only "
+    "in the two "
+    "SpecialDays declarations' source order. Zulu then Alpha proves that the later Alpha CustomDay1 "
+    "wins with daily indices 1/11/3, while Alpha then Zulu proves that the later Zulu Holiday wins "
+    "with daily indices 1/8/3. Both 72-sample Site Day Type Index series and normalized timestamps "
+    "are ordered, exact, unique, and zero-tolerance gated. This claim is limited to original IDF "
+    "declaration-order recovery for RunPeriodControl:SpecialDays and later-definition overwrite on "
+    "one identical fixed date. Declaration order for other object types, native epJSON ordering, "
+    "other overlap shapes/counts/durations/types, EPW-versus-IDF precedence, and EnergyPlus warning "
+    "text or repetition parity remain unclaimed. The paired fixed EPW "
     "holiday cases share one "
     "February 29 weather-file holiday and differ only in the RunPeriod use flag. Their 72 ordered, "
     "unique Site Day Type Index samples and normalized timestamps match exactly: enabled is 24 "
@@ -151,6 +163,8 @@ CASE_LABELS = {
     "calendar_special_day_weekend_saturday_disabled_hourly_exact_001": "Saturday holiday disabled",
     "calendar_special_day_duration_wrap_common_year_hourly_exact_001": "Duration wrap common",
     "calendar_special_day_duration_wrap_leap_year_hourly_exact_001": "Duration wrap leap",
+    "calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001": "Overlap Zulu then Alpha",
+    "calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001": "Overlap Alpha then Zulu",
     "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001": "EPW holiday enabled",
     "calendar_epw_holiday_fixed_date_disabled_hourly_exact_001": "EPW holiday disabled",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
@@ -330,6 +344,20 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_duration_wrap_leap_year_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Overlap Zulu then Alpha",
+        command="compare-calendar-special-day-overlap-order-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Overlap Alpha then Zulu",
+        command="compare-calendar-special-day-overlap-order-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="EPW holiday enabled",

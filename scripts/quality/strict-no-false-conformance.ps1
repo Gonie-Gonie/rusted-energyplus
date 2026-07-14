@@ -373,6 +373,52 @@ foreach ($durationWrapCase in $durationWrapCases) {
     }
     Assert-Contains -Path $durationWrapCase.WeatherPath -Pattern "HOLIDAYS/DAYLIGHT SAVINGS,$($durationWrapCase.LeapPolicy),0,0,0" -Description "$($durationWrapCase.Label) isolated EPW calendar policy"
 }
+$overlapOrderCases = @(
+    @{
+        Label = "Zulu-then-Alpha overlap order"
+        CasePath = "data\conformance_cases\calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001\case.toml"
+        IdfPath = "data\conformance_cases\calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001\calendar_special_day_overlap_zulu_then_alpha_hourly_exact.idf"
+        OrderPattern = '(?s)RunPeriodControl:SpecialDays,\s*Zulu Holiday Definition,\s*2/29,\s*1,\s*Holiday;.*RunPeriodControl:SpecialDays,\s*Alpha Custom Day Definition,\s*2/29,\s*1,\s*CustomDay1;'
+        DailyClaim = "24 Sunday=1, 24 CustomDay1=11, and 24 Tuesday=3"
+    },
+    @{
+        Label = "Alpha-then-Zulu overlap order"
+        CasePath = "data\conformance_cases\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\case.toml"
+        IdfPath = "data\conformance_cases\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\calendar_special_day_overlap_alpha_then_zulu_hourly_exact.idf"
+        OrderPattern = '(?s)RunPeriodControl:SpecialDays,\s*Alpha Custom Day Definition,\s*2/29,\s*1,\s*CustomDay1;.*RunPeriodControl:SpecialDays,\s*Zulu Holiday Definition,\s*2/29,\s*1,\s*Holiday;'
+        DailyClaim = "24 Sunday=1, 24 Holiday=8, and 24 Tuesday=3"
+    }
+)
+foreach ($overlapCase in $overlapOrderCases) {
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'comparison_class = "conformance"' -Description "$($overlapCase.Label) conformance class"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'conformance_claim = true' -Description "$($overlapCase.Label) conformance claim"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'tier = "A"' -Description "$($overlapCase.Label) Tier A evidence"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'domains = ["weather"]' -Description "$($overlapCase.Label) weather-only domain"
+    foreach ($scopeField in @("has_zone", "has_surface", "has_fenestration", "has_air_loop", "has_plant_loop", "has_ems", "has_python_plugin", "has_daylighting")) {
+        Assert-Contains -Path $overlapCase.CasePath -Pattern "$scopeField = false" -Description "$($overlapCase.Label) disabled $scopeField scope"
+    }
+    Assert-CaseOutputLevel -Path $overlapCase.CasePath -Key "ENVIRONMENT" -Variable "Site Day Type Index" -Level "conformance" -Description "$($overlapCase.Label) promoted weather output"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'frequency = "hourly"' -Description "$($overlapCase.Label) hourly output frequency"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'timestamp_contract = "ordered-exact-unique"' -Description "$($overlapCase.Label) ordered timestamp contract"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'abs_tol = 0.0' -Description "$($overlapCase.Label) exact absolute tolerance"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'rmse_tol = 0.0' -Description "$($overlapCase.Label) exact RMSE tolerance"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'weather = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.epw"' -Description "$($overlapCase.Label) shared isolated EPW"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern $overlapCase.DailyClaim -Description "$($overlapCase.Label) exact daily value boundary"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'EnergyPlus-versus-Rust warning text, count, repetition, and diagnostics parity' -Description "$($overlapCase.Label) warning parity non-claim"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'script = "scripts/dev.cmd compare-calendar-special-day-overlap-order-exact"' -Description "$($overlapCase.Label) blocking gate"
+    Assert-Contains -Path $overlapCase.CasePath -Pattern 'blocking = true' -Description "$($overlapCase.Label) blocking flag"
+    Assert-RegexContains -Path $overlapCase.IdfPath -Pattern $overlapCase.OrderPattern -Description "$($overlapCase.Label) exact SpecialDays declaration order"
+    foreach ($policyLine in @(
+            "No,  !- Use Weather File Holidays and Special Days",
+            "No,  !- Use Weather File Daylight Saving Period",
+            "No,  !- Apply Weekend Holiday Rule",
+            "No,  !- Use Weather File Rain Indicators",
+            "No,  !- Use Weather File Snow Indicators",
+            "No;  !- Treat Weather as Actual"
+        )) {
+        Assert-Contains -Path $overlapCase.IdfPath -Pattern $policyLine -Description "$($overlapCase.Label) isolated RunPeriod policy"
+    }
+}
 Assert-Contains -Path "data\conformance_cases\calendar_schedule_weather_leap_policy_no_001\calendar_schedule_weather_leap_policy_no.epw" -Pattern "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0" -Description "weather-effective no-leap EPW policy"
 Assert-Contains -Path "data\conformance_cases\calendar_schedule_weather_leap_policy_no_001\calendar_schedule_weather_leap_policy_no.epw" -Pattern "Same 72 raw rows as the Yes fixture" -Description "weather-effective retained raw leap rows"
 Assert-Contains -Path "data\conformance_cases\weather_record_start_offset_nonactual_001\case.toml" -Pattern 'timestamp_contract = "ordered-exact-unique"' -Description "weather record-selection ordered timestamp contract"
@@ -1059,6 +1105,21 @@ Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wra
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$series.timestamp_observed_unique -ne $true -or $series.timestamp_order_match -ne $true' -Description "paired duration-wrap ordered unique timestamp gate"
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern '$series.max_rmse_tolerance -ne 0.0 -or $series.max_abs_delta -ne 0.0' -Description "paired duration-wrap zero-tolerance exact-value gate"
 Assert-Contains -Path "scripts\compare\compare-calendar-special-day-duration-wrap-exact.ps1" -Pattern 'same-year cyclic annual-table wrap, not a cross-year RunPeriod' -Description "paired duration-wrap cross-year non-claim gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'Paired special-day overlap declaration-order exact gate passed.' -Description "paired SpecialDays overlap-order exact conformance gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$weatherRows.Count -ne 72' -Description "paired overlap-order shared 72-row EPW gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'ExpectedNames = @("ZULU HOLIDAY DEFINITION", "ALPHA CUSTOM DAY DEFINITION")' -Description "Zulu-then-Alpha expected declaration order"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'ExpectedNames = @("ALPHA CUSTOM DAY DEFINITION", "ZULU HOLIDAY DEFINITION")' -Description "Alpha-then-Zulu expected declaration order"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'Overlap-order IDFs must contain identical SpecialDays definitions in exact reverse order' -Description "paired overlap-order exact definition reversal gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'Overlap-order IDFs differ outside the order of the two SpecialDays blocks' -Description "paired overlap-order fixture isolation gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$specialDays.input_file_declared -ne 2' -Description "paired overlap-order exact two-definition gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$resolved[$definitionIndex]' -Description "paired overlap-order resolved declaration sequence gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$values.Count -ne 72 -or $timestampRows.Count -ne 72' -Description "paired overlap-order 72-value/timestamp gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$expectedValue = if ($dayOffset -eq 0) { 1.0 } elseif ($dayOffset -eq 1) { $case.MiddleDayTypeIndex } else { 3.0 }' -Description "paired overlap-order per-day later-wins value gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$series.timestamp_observed_unique -ne $true -or $series.timestamp_order_match -ne $true' -Description "paired overlap-order ordered unique timestamp gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$series.max_rmse_tolerance -ne 0.0 -or $series.max_abs_delta -ne 0.0' -Description "paired overlap-order zero-tolerance exact-value gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'EnergyPlus Completed Successfully-- 3 Warning; 0 Severe Errors;' -Description "paired overlap-order EnergyPlus warning/severe source count"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern '$warningLineCount -ne 3 -or $severeLineCount -ne 0' -Description "paired overlap-order EnergyPlus-only warning count gate"
+Assert-Contains -Path "scripts\compare\compare-calendar-special-day-overlap-order-exact.ps1" -Pattern 'Rust warning text/count/repetition parity is not claimed' -Description "paired overlap-order warning parity non-claim"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern "Weather record-selection gate passed." -Description "weather record-selection conformance gate"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern '$dataRows.Count -ne 72' -Description "weather record-selection 72-row source gate"
 Assert-Contains -Path "scripts\compare\compare-weather-record-selection.ps1" -Pattern '$selection.source_start_record_index -ne 24' -Description "weather record-selection literal start gate"
