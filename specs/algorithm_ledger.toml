@@ -246,7 +246,7 @@ rust_target = [
   "crates/ep_cli/src/ideal_loads.rs::monthly_meter_samples_from_detailed_energy",
   "crates/ep_cli/src/ideal_loads.rs::meter_samples_from_detailed_energy",
   "crates/ep_cli/src/ideal_loads.rs::run_period_samples",
-  "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_no_oa_sensible_report",
+  "crates/ep_cli/src/ideal_loads/commands/mod.rs::generate_ideal_loads_no_oa_sensible_report",
   "scripts/compare/compare-ideal-loads-fuel-efficiency-diagnostic.ps1",
   "scripts/compare/compare-ideal-loads-blank-fuel-efficiency-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-constant-fuel-efficiency-conformance-candidate.ps1",
@@ -263,7 +263,7 @@ rust_target = [
   "scripts/compare/compare-ideal-loads-no-oa-facility-meter-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-no-oa-facility-meter-monthly-run-period-conformance-candidate.ps1",
   "scripts/compare/compare-ideal-loads-no-oa-report-energy-conformance-candidate.ps1",
-  "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
+  "crates/ep_cli/src/ideal_loads/commands/mod.rs::generate_ideal_loads_outdoor_air_design_flow_report",
 ]
 status = "conformance"
 first_case = "ideal_loads_no_oa_sensible_conformance_001"
@@ -638,7 +638,7 @@ rust_target = [
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_TOTAL_COOLING_RATE",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME",
   "crates/ep_runtime/src/ideal_loads/report.rs::ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME",
-  "crates/ep_cli/src/ideal_loads.rs::generate_ideal_loads_outdoor_air_design_flow_report",
+  "crates/ep_cli/src/ideal_loads/commands/mod.rs::generate_ideal_loads_outdoor_air_design_flow_report",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_zone_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_flow_person_conformance_manifest",
   "crates/ep_cli/src/ideal_loads.rs::manifest_allows_outdoor_air_occupancy_dcv_conformance_manifest",
