@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-06-08
+last_reviewed: 2026-07-14
 ---
 
 # Script Index
@@ -25,6 +25,15 @@ directly. The implementation scripts live in field-specific folders:
 - `scripts/lib`
 
 Run `.\scripts\dev.cmd list` for the command catalog.
+
+`scripts/dev/commands.json` is the authoritative public command catalog.
+`specs/script_inventory.toml` is a generated machine-readable registry of every
+PowerShell, batch, and compiled C# helper under `scripts/`; it records category,
+public/internal/removable classification, forward and reverse caller evidence,
+artifact hints, and reachability from `scripts/dev.cmd`. Run
+`.\scripts\dev.cmd script-inventory-check` to reject stale metadata, missing
+entrypoints, or unreachable scripts. The generated registry is an inventory
+exception to the otherwise hand-maintained decision-source role of `specs/`.
 
 Read the table by evidence lane, not just by folder:
 

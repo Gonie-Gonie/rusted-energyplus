@@ -65,6 +65,7 @@ Invoke-DevCommand -Command "capability-registry-check"
 Invoke-DevCommand -Command "source-smoke"
 Invoke-DevCommand -Command "algorithm-ledger-check"
 Invoke-DevCommand -Command "variable-coverage-check"
+Invoke-DevCommand -Command "script-inventory-check"
 Invoke-DevCommand -Command "pr-port-ticket-check" -Arguments @("-SelfTest")
 Invoke-DevCommand -Command "python-smoke"
 Invoke-DevCommand -Command "one-zone-family-report"

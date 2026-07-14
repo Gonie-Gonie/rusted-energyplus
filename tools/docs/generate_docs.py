@@ -16,12 +16,18 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from script_inventory import collect_script_inventory, script_inventory_toml
+
 
 GENERATED_NOTICE = """<!-- DO NOT EDIT.
      Generated from specs/ and data/conformance_cases by tools/docs/generate_docs.py. -->
 
 """
 
+SCRIPT_INVENTORY_NOTICE = """<!-- DO NOT EDIT.
+     Generated from scripts/ and scripts/dev/commands.json by tools/docs/generate_docs.py. -->
+
+"""
 
 def load_toml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
@@ -348,18 +354,6 @@ def capability_index(repo_root: Path) -> str:
     )
 
 
-ARTIFACT_HINT_RE = re.compile(
-    r"(?i)(?:\.runtime|\.reference|target|dist|docs[\\/]book|docs[\\/]src[\\/]generated|"
-    r"tools[\\/]docs[\\/]generated-docs\.manifest\.json|reports[\\/]latest)"
-    r"(?:[\\/][A-Za-z0-9_.${}()\-]+)*"
-)
-INPUT_HINT_RE = re.compile(
-    r"(?i)(?:data|specs|config|docs[\\/]src|tools[\\/]oracle|tools[\\/]python)"
-    r"[\\/][A-Za-z0-9_.${}()\-\\/]+"
-)
-PYTHON_SCRIPT_RE = re.compile(r"tools[\\/](?:docs|reporting)[\\/][A-Za-z0-9_.-]+\.py")
-DEV_COMMAND_RE = re.compile(r"Invoke-DevCommand\s+-Command\s+['\"]([^'\"]+)['\"]")
-CARGO_COMMAND_RE = re.compile(r"cargo\s+(?:build|clippy|fmt|run|test)[^\r\n`|&;]*")
 README_DEV_COMMAND_RE = re.compile(r"\.\\scripts\\dev\.(?:cmd|ps1)\s+([A-Za-z0-9_.-]+)")
 SUMMARY_LINK_RE = re.compile(r"^\s*(?:-\s*)?\[[^\]]+\]\(([^)]+)\)")
 FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---", re.DOTALL)
@@ -389,142 +383,19 @@ GENERATED_DOC_OUTPUTS = [
     "docs/src/generated/script-index.md",
     "docs/src/generated/docs-inventory.md",
 ]
+GENERATED_METADATA_OUTPUTS = [
+    "specs/script_inventory.toml",
+]
 
 
-def extract_path_hints(pattern: re.Pattern[str], text: str) -> list[str]:
-    normalized = text.replace("\\", "/")
-    return sorted({normalized_path(match.group(0)) for match in pattern.finditer(normalized)})
-
-
-def extract_call_hints(text: str) -> list[str]:
-    calls: set[str] = set()
-    for match in DEV_COMMAND_RE.finditer(text):
-        calls.add(f"dev:{match.group(1)}")
-    for match in CARGO_COMMAND_RE.finditer(text):
-        calls.add(" ".join(match.group(0).split()))
-    for match in PYTHON_SCRIPT_RE.finditer(text.replace("\\", "/")):
-        calls.add(normalized_path(match.group(0)))
-    if re.search(r"eplus-rs(?:\.exe)?\s+run", text, flags=re.IGNORECASE):
-        calls.add("eplus-rs run")
-    if "ConvertInputFormat" in text:
-        calls.add("EnergyPlus ConvertInputFormat")
-    if "energyplus.exe" in text.lower():
-        calls.add("EnergyPlus executable")
-    return sorted(calls)
-
-
-def exit_contract(path: Path, text: str) -> str:
-    suffix = path.suffix.lower()
-    if suffix in {".json", ".md"}:
-        return "n/a"
-    if suffix == ".cs":
-        return "compiled helper; exit code set by compiled process"
-    if path.name.lower() == "dev.cmd":
-        return "propagates PowerShell ERRORLEVEL"
-    explicit_exits = sorted(
-        {line.strip() for line in text.splitlines() if re.search(r"^\s*exit(?:\s|/b|$)", line)}
-    )
-    if explicit_exits:
-        return "explicit exit: " + "; ".join(explicit_exits)
-    if "$LASTEXITCODE" in text:
-        return "nonzero when checked child process fails"
-    if "throw " in text or "throw\"" in text:
-        return "nonzero via PowerShell throw"
-    return "PowerShell success unless an uncaught error occurs"
-
-
-def script_category(relative_path: str, command: dict[str, Any] | None) -> str:
-    if command is not None:
-        group = str(command.get("group", ""))
-        if group == "launcher":
-            return "launcher"
-        if group in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
-            return group
-
-    if (
-        relative_path.startswith("scripts/quality/strict-no-false-conformance/")
-        or relative_path == "scripts/release/select-release-assets.ps1"
-    ):
-        return "internal"
-
-    parts = relative_path.split("/")
-    if len(parts) < 2:
-        return "internal"
-    folder = parts[1]
-    if folder == "launcher":
-        return "launcher"
-    if folder in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
-        return folder
-    return "internal"
-
-
-def script_status(relative_path: str, command: dict[str, Any] | None) -> str:
-    if relative_path in {"scripts/dev.cmd", "scripts/dev.ps1"}:
-        return "public user command"
-    if command is None:
-        return "internal helper"
-
-    group = str(command.get("group", ""))
-    name = str(command.get("name", ""))
-    if group == "release":
-        return "release command"
-    if group == "launcher" and name == "launch-ui":
-        return "public user command"
-    if group == "setup":
-        return "public user command"
-    return "developer command"
 
 
 def script_inventory(repo_root: Path) -> str:
-    catalog_path = repo_root / "scripts" / "dev" / "commands.json"
-    catalog = load_json(catalog_path)
+    inventory = collect_script_inventory(repo_root)
+    catalog = load_json(repo_root / "scripts" / "dev" / "commands.json")
     commands = list(catalog.get("commands", []))
     aliases = dict(catalog.get("aliases", {}))
-
-    command_by_script: dict[str, dict[str, Any]] = {}
     command_names = {str(entry.get("name", "")) for entry in commands}
-    missing_targets: list[str] = []
-    duplicate_targets: list[str] = []
-    for entry in commands:
-        script = "scripts/" + normalized_path(str(entry.get("path", "")))
-        key = script.lower()
-        if key in command_by_script:
-            duplicate_targets.append(script)
-        command_by_script[key] = entry
-        if not (repo_root / script).exists():
-            missing_targets.append(f"{entry.get('name', '')} -> {script}")
-
-    script_files = sorted(path for path in (repo_root / "scripts").rglob("*") if path.is_file())
-    rows = []
-    unexposed_ps1: list[str] = []
-    public_folder_unexposed: list[str] = []
-    for path in script_files:
-        relative = repo_path(path, repo_root)
-        command = command_by_script.get(relative.lower())
-        text = read_text(path)
-        category = script_category(relative, command)
-        status = script_status(relative, command)
-        command_name = str(command.get("name", "")) if command else ""
-        calls = extract_call_hints(text)
-        inputs = extract_path_hints(INPUT_HINT_RE, text)
-        artifacts = extract_path_hints(ARTIFACT_HINT_RE, text)
-        rows.append(
-            [
-                relative,
-                category,
-                status,
-                command_name,
-                inline_list(calls),
-                inline_list(inputs),
-                inline_list(artifacts),
-                exit_contract(path, text),
-            ]
-        )
-        if path.suffix.lower() == ".ps1" and command is None:
-            unexposed_ps1.append(relative)
-            if category in {"setup", "quality", "smoke", "compare", "conformance", "release"}:
-                public_folder_unexposed.append(relative)
-
     readme = read_text(repo_root / "README.md")
     readme_commands = sorted({match.group(1) for match in README_DEV_COMMAND_RE.finditer(readme)})
     exposed_or_alias = command_names | set(aliases)
@@ -532,43 +403,69 @@ def script_inventory(repo_root: Path) -> str:
         command for command in readme_commands if command not in exposed_or_alias
     ]
 
+    classification_counts = Counter(
+        str(record["classification"]) for record in inventory["scripts"]
+    )
     summary_rows = [
-        ["script files", str(len(script_files))],
-        ["dev commands", str(len(commands))],
+        ["executable script records", str(inventory["script_count"])],
+        ["dev commands", str(inventory["dev_command_count"])],
         ["aliases", str(len(aliases))],
-        ["missing command targets", str(len(missing_targets))],
-        ["duplicate command targets", str(len(duplicate_targets))],
-        ["unexposed PowerShell files", str(len(unexposed_ps1))],
-        ["unexposed public-folder PowerShell files", str(len(public_folder_unexposed))],
+        ["public scripts", str(classification_counts["public"])],
+        ["internal scripts", str(classification_counts["internal"])],
+        ["removable scripts", str(classification_counts["removable"])],
+        ["missing command targets", str(len(inventory["missing_command_targets"]))],
+        ["duplicate command targets", str(len(inventory["duplicate_command_targets"]))],
+        ["command catalog errors", str(len(inventory["catalog_errors"]))],
+        ["scripts without callers", str(inventory["unused_script_count"])],
+        [
+            "public scripts without dev/Rust entrypoint",
+            str(inventory["public_without_entrypoint_count"]),
+        ],
         ["README dev commands missing from catalog", str(len(missing_readme_commands))],
+    ]
+    rows = [
+        [
+            str(record["path"]),
+            str(record["category"]),
+            str(record["classification"]),
+            str(record["entrypoint"]),
+            inline_list(record["callers"]),
+            inline_list(record["calls"]),
+            inline_list(record["generated_artifacts"]),
+            str(record["exit_contract"]),
+        ]
+        for record in inventory["scripts"]
     ]
 
     return (
-        GENERATED_NOTICE
+        SCRIPT_INVENTORY_NOTICE
         + "# Script Inventory\n\n"
-        + "Script metadata is generated from `scripts/`, `scripts/dev/commands.json`, and README command examples.\n\n"
-        + "Status values distinguish public user commands, developer commands, release commands, and internal helpers. "
-        + "Call, input, and artifact columns are static hints extracted from script text; wrapper commands remain authoritative in `scripts/dev/commands.json`.\n\n"
+        + "The machine-readable registry is `specs/script_inventory.toml`, generated from executable files under `scripts/` and the authoritative public command catalog in `scripts/dev/commands.json`.\n\n"
+        + "Caller edges come from execution-shaped direct, variable-backed, dynamic-list, catalog, and `Invoke-DevCommand` dependencies. Artifact values are static path hints, not proof that a run produced the path.\n\n"
         + "## Summary\n\n"
         + table(["Check", "Count"], summary_rows)
         + "\n## Dev Command Catalog Checks\n\n"
         + "**Missing command targets**\n\n"
-        + bullet_list(missing_targets)
+        + bullet_list(inventory["missing_command_targets"])
         + "\n\n**Duplicate command targets**\n\n"
-        + bullet_list(duplicate_targets)
+        + bullet_list(inventory["duplicate_command_targets"])
         + "\n\n**README dev commands missing from catalog**\n\n"
         + bullet_list(missing_readme_commands)
-        + "\n\n**Unexposed PowerShell files in public command folders**\n\n"
-        + bullet_list(public_folder_unexposed)
+        + "\n\n**Command catalog errors**\n\n"
+        + bullet_list(inventory["catalog_errors"])
+        + "\n\n**Scripts without callers**\n\n"
+        + bullet_list(inventory["unused_scripts"])
+        + "\n\n**Public scripts without dev/Rust entrypoint**\n\n"
+        + bullet_list(inventory["public_without_entrypoint"])
         + "\n\n## Inventory\n\n"
         + table(
             [
                 "Path",
                 "Category",
-                "Status",
-                "Dev command",
+                "Classification",
+                "Entrypoint",
+                "Callers",
                 "Calls",
-                "Input hints",
                 "Artifact hints",
                 "Exit contract",
             ],
@@ -666,7 +563,11 @@ def docs_inventory(repo_root: Path) -> str:
         normalized_status = front_matter_status.strip().lower()
         generated_notice = "n/a"
         if category == "generated":
-            generated_notice = "present" if text.startswith(GENERATED_NOTICE) else "missing"
+            generated_notice = (
+                "present"
+                if text.startswith((GENERATED_NOTICE, SCRIPT_INVENTORY_NOTICE))
+                else "missing"
+            )
             if generated_notice == "missing":
                 generated_missing_notice.append(relative)
         if summary_section and category == "removable":
@@ -797,12 +698,15 @@ def generated_manifest(repo_root: Path) -> str:
             "data/conformance_cases/*/case.toml",
             "scripts/**/*",
             "scripts/dev/commands.json",
+            "tools/docs/generate_docs.py",
+            "tools/docs/script_inventory.py",
             "README.md",
             "docs/src/**/*.md",
             "docs/src/SUMMARY.md",
         ],
         "outputs": [
             *GENERATED_DOC_OUTPUTS,
+            *GENERATED_METADATA_OUTPUTS,
         ],
     }
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
@@ -824,6 +728,7 @@ def main() -> int:
         repo_root / "docs" / "src" / "generated" / "variable-coverage.md": variable_coverage(repo_root),
         repo_root / "docs" / "src" / "generated" / "script-index.md": script_inventory(repo_root),
         repo_root / "docs" / "src" / "generated" / "docs-inventory.md": docs_inventory(repo_root),
+        repo_root / "specs" / "script_inventory.toml": script_inventory_toml(repo_root),
         repo_root / "tools" / "docs" / "generated-docs.manifest.json": generated_manifest(repo_root),
     }
 

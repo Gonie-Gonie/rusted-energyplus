@@ -247,6 +247,7 @@ foreach ($file in $docsSourceFiles) {
 }
 
 Invoke-DevCommand -Command "docs-generate" -Arguments @("-Check")
+Invoke-DevCommand -Command "script-inventory-check"
 
 $mdbook = Get-Command mdbook -ErrorAction SilentlyContinue
 if ($null -ne $mdbook) {

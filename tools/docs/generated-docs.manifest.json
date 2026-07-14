@@ -7,7 +7,8 @@
     "docs/src/generated/object-coverage.md",
     "docs/src/generated/variable-coverage.md",
     "docs/src/generated/script-index.md",
-    "docs/src/generated/docs-inventory.md"
+    "docs/src/generated/docs-inventory.md",
+    "specs/script_inventory.toml"
   ],
   "sources": [
     "specs/milestones.toml",
@@ -18,6 +19,8 @@
     "data/conformance_cases/*/case.toml",
     "scripts/**/*",
     "scripts/dev/commands.json",
+    "tools/docs/generate_docs.py",
+    "tools/docs/script_inventory.py",
     "README.md",
     "docs/src/**/*.md",
     "docs/src/SUMMARY.md"

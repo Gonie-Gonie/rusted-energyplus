@@ -76,6 +76,12 @@
                          "help":  "Generate mdBook reference pages from specs and case manifests."
                      },
                      {
+                         "name":  "script-inventory-check",
+                         "path":  "quality\\script-inventory-check.ps1",
+                         "group":  "quality",
+                         "help":  "Validate generated script callers, artifacts, classifications, and public entrypoints."
+                     },
+                     {
                          "name":  "file-size-check",
                          "path":  "quality\\file-size-check.ps1",
                          "group":  "quality",

@@ -124,7 +124,7 @@ none
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-06-07 |
 | docs/src/introduction.md | spec-explanation | Summary | n/a | present | active | docs | 2026-06-05 |
 | docs/src/operations/documentation-framework.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
-| docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
+| docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-07-14 |
 | docs/src/operations/setup-checklist.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-08 |
 | docs/src/operations/supported-object-coverage.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-15 |

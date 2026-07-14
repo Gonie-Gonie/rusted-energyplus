@@ -8,6 +8,9 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |
 |---|---|---|---|---|---|---|---|
 | air_side_node_diagnostic_001 | v0.11-air-side-node-diagnostic | diagnostic-only | false | B | zone, hvac, node | baseline | data/conformance_cases/air_side_node_diagnostic_001/case.toml |
+| airloop_5zone_aircooled_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node, zone | baseline | data/conformance_cases/airloop_5zone_aircooled_diagnostic_001/case.toml |
+| airloop_coil_only_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node | baseline | data/conformance_cases/airloop_coil_only_diagnostic_001/case.toml |
+| airloop_fan_only_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node | baseline | data/conformance_cases/airloop_fan_only_diagnostic_001/case.toml |
 | construction_materials_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/construction_materials_001/case.toml |
 | heat_balance_nomass_001 | v0.8-heat-balance | conformance | true | A | zone, surface | conformance | data/conformance_cases/heat_balance_nomass_001/case.toml |
 | ideal_loads_blank_fuel_efficiency_conformance_candidate_001 | ideal-loads-blank-fuel-efficiency-conformance | conformance | true | B | hvac | conformance, diagnostic | data/conformance_cases/ideal_loads_blank_fuel_efficiency_conformance_candidate_001/case.toml |
@@ -67,6 +70,7 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | official_1zone_uncontrolled_dynamic_conformance_candidate_001 | v0.33-official-dynamic-conformance | conformance | true | B | zone, surface | conformance | data/conformance_cases/official_1zone_uncontrolled_dynamic_conformance_candidate_001/case.toml |
 | official_1zone_uncontrolled_dynamic_diagnostic_001 | v0.33-official-dynamic-diagnostic | diagnostic-only | false | B | zone, surface | diagnostic | data/conformance_cases/official_1zone_uncontrolled_dynamic_diagnostic_001/case.toml |
 | plant_loop_diagnostic_001 | v0.15-plant-loop-diagnostic | diagnostic-only | false | B | plant | baseline | data/conformance_cases/plant_loop_diagnostic_001/case.toml |
+| ptac_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node, zone | baseline | data/conformance_cases/ptac_diagnostic_001/case.toml |
 | schedule_constant_001 | v0.22-time-weather-schedule-conformance | conformance | true | A | schedule | conformance | data/conformance_cases/schedule_constant_001/case.toml |
 | surface_geometry_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface | diagnostic | data/conformance_cases/surface_geometry_001/case.toml |
 | surface_temperature_nomass_001 | v0.9-surface-temperature | conformance | true | A | zone, surface | conformance | data/conformance_cases/surface_temperature_nomass_001/case.toml |
