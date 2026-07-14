@@ -197,7 +197,11 @@ $runSupport = "crates\ep_run\src\support.rs"
 $cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
 $weather = "crates\ep_runtime\src\weather.rs"
+$weatherCalendar = "crates\ep_runtime\src\weather_calendar.rs"
+$timeAxis = "crates\ep_runtime\src\time_axis.rs"
+$daylightSaving = "crates\ep_runtime\src\time_axis\daylight_saving.rs"
 $schedules = "crates\ep_runtime\src\schedules.rs"
+$timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -205,6 +209,7 @@ $runtimeTestSourceOrder = "crates\ep_runtime\src\runtime\tests\part01.rs"
 $runtimeTestDynamic = "crates\ep_runtime\src\runtime\tests\part03.rs"
 $runtimeTestResults = "crates\ep_runtime\src\runtime\tests\part05.rs"
 $runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
+$runtimeTestCalendar = "crates\ep_runtime\src\runtime\tests\part10.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -242,14 +247,19 @@ foreach ($entry in @(
         @($cli, "CLI conformance gate"),
         @($runtime, "runtime orchestration root"),
         @($weather, "runtime weather module"),
+        @($weatherCalendar, "EPW calendar metadata parser"),
+        @($timeAxis, "runtime time-axis module"),
+        @($daylightSaving, "runtime daylight-saving resolver"),
         @($schedules, "runtime schedules module"),
+        @($timeWeatherSchedule, "time/weather/schedule report module"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
         @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
         @($runtimeTestSourceOrder, "runtime source-order tests"),
         @($runtimeTestDynamic, "runtime dynamic heat-balance tests"),
         @($runtimeTestResults, "runtime heat-balance result tests"),
-        @($runtimeTestRadiation, "runtime heat-balance radiation tests")
+        @($runtimeTestRadiation, "runtime heat-balance radiation tests"),
+        @($runtimeTestCalendar, "runtime calendar and DST tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -568,6 +578,19 @@ Assert-Contains -Path $initialization -Pattern 'construction_ctf_coefficients_by
 Assert-Contains -Path $weather -Pattern 'pub struct WeatherTimestepSeries' -Description "precomputed weather timestep series"
 Assert-Contains -Path $weather -Pattern 'pub fn precompute_weather_timestep_series' -Description "weather timestep precompute entry"
 Assert-Contains -Path $weather -Pattern 'pub\(crate\) fn next_solar_weather_record_within_day\s*\(' -Description "day-local solar NextHr weather selector"
+Assert-Contains -Path $weatherCalendar -Pattern 'pub enum EpwCalendarDateRule' -Description "typed EPW calendar date rule"
+Assert-Contains -Path $weatherCalendar -Pattern 'pub daylight_saving_period: Option<EpwDaylightSavingPeriod>' -Description "EPW daylight-saving metadata"
+Assert-Contains -Path $weatherCalendar -Pattern 'fn parse_calendar_date_rule\s*\(' -Description "EPW daylight-saving date-rule parser"
+Assert-Contains -Path $daylightSaving -Pattern 'pub struct DaylightSavingAxisState' -Description "shared time-axis daylight-saving state"
+Assert-Contains -Path $daylightSaving -Pattern 'fn resolve_daylight_saving_axis_state\s*\(' -Description "time-axis daylight-saving resolver"
+Assert-Contains -Path $timeAxis -Pattern 'dst: daylight_saving_is_active\(daylight_saving, weather_day_of_year\)' -Description "daily daylight-saving projection into time points"
+Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_fixed_date_daylight_saving_is_inclusive_on_both_time_axes\s*\(' -Description "fixed-date inclusive DST axis test"
+Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_nth_weekday_daylight_saving_rules_resolve_like_energyplus\s*\(' -Description "nth-weekday DST rule test"
+Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_nth_weekday_daylight_saving_preserves_run_period_month_weekdays\s*\(' -Description "leap-policy RunPeriod month-weekday DST test"
+Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_last_weekday_daylight_saving_rules_resolve_like_energyplus\s*\(' -Description "last-weekday DST rule test"
+Assert-Contains -Path $runtimeTestCalendar -Pattern 'fn weather_file_daylight_saving_range_wraps_across_the_weather_year\s*\(' -Description "year-wrapping DST range test"
+Assert-Contains -Path $timeWeatherSchedule -Pattern 'Site Daylight Saving Time Status' -Description "DST status report mapping"
+Assert-Contains -Path $timeWeatherSchedule -Pattern 'daylight_saving_hourly_samples' -Description "DST report diagnostic sample count"
 Assert-Contains -Path $solar -Pattern 'next_solar_weather_record_within_day\s*\(' -Description "solar interpolation consumes day-local NextHr weather selector"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'fn solar_next_hour_record_wraps_within_each_accepted_day\s*\(' -Description "accepted-day solar Hour24 NextHr wrap test"
 Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'solar_weather_interpolation_weights\(1,\s*1\),\s*\(0\.0,\s*1\.0,\s*0\.0\)' -Description "single-timestep current-only solar weather weights"

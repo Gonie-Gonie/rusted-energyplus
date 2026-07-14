@@ -72,7 +72,7 @@ equivalent to advancing the reported run-period calendar.
 | environment materialization | `Weather::SetupEnvironmentTypes` | Copies each run period into `Environment`, derives `StartJDay`, `EndJDay`, `RawSimDays`, `TotalDays`, leap-year handling, environment kind/name, weekday map seed, and the run-period policy flags. This is descriptor construction, not current-day state. |
 | environment selection | `Weather::GetNextEnvironment` | Advances `Envrn`, selects the descriptor, and seeds `KindOfSim`, `CalendarYear`, month/day/day-of-year, `NumOfDayInEnvrn`, `CurEnvirNum`, and environment name. For a weather run it resolves `CurrentYearIsLeapYear`, weekday tables, active DST ranges, special-day dates, and the effective weather policy switches. |
 | nested traversal | `SimulationManager::ManageSimulation` | Owns `DayOfSim`, `HourOfDay`, `TimeStep`, warmup repetition, and the environment/day/hour/timestep begin/end flags. Calendar and weather routines consume these counters; they do not own the nested loop. |
-| EPW header intake | `Weather::ProcessEPWHeader` | Parses `DATA PERIODS` record frequency, names, start weekdays, and start/end dates before environment weather rows are positioned. This metadata constrains later source reads; it is not itself a selected weather stream. |
+| EPW header intake | `Weather::ProcessEPWHeader` | Parses the `HOLIDAYS/DAYLIGHT SAVINGS` leap-year flag and optional daylight-saving boundaries plus `DATA PERIODS` record frequency, names, start weekdays, and start/end dates before environment weather rows are positioned. This metadata constrains later calendar and source reads; it is not itself a selected weather stream. |
 | weather driver | `Weather::ManageWeather` | Preserves the barrier `InitializeWeather` -> pre-weather EMS call -> `SetCurrentWeather` -> weather/time reporting for every zone timestep. |
 | environment/day initialization | `Weather::InitializeWeather` | On `BeginEnvrnFlag`, initializes missing-value state and reads the first weather day. On `BeginDayFlag`, calls `UpdateWeatherData` before reading or preparing the next tomorrow record, then exposes tomorrow date/day-type fields for rollover. |
 | source weather-day read | `Weather::ReadWeatherForDay`; `Weather::ReadEPlusWeatherForDay` | On the first read, validates data-period coverage and searches source order for the literal environment start month/day (and year only for actual weather). It reads the accepted source day into tomorrow state, applies the leap-day policy after positioning, and controls the restricted end-of-file rewind branch. Later reads advance one accepted source day at a time. |
@@ -130,10 +130,13 @@ counters, and begin/end flags are also state-backed. `schedule_day_of_year`
 retains a February 29 slot even in a non-leap year, matching the indexing shape
 consumed by EnergyPlus schedules.
 
-The checkpoint intentionally fixes `dst=false`, leaves
-`special_day_type=None`, and derives `DayType` from the simulation-effective
-weekday only. That weekday equals the Gregorian weekday on ordinary paths but
-does not advance across a February 29 skipped by EPW policy.
+Gregorian-only axes and metadata-aware axes without an active weather-file
+period keep `dst=false`. Metadata-aware axes now resolve the parsed EPW
+daylight-saving period when the RunPeriod enables that period, while still
+leaving `special_day_type=None` and deriving `DayType` from the
+simulation-effective weekday only. That weekday equals the Gregorian weekday
+on ordinary paths but does not advance across a February 29 skipped by EPW
+policy.
 Its `gregorian_year_is_leap_year` field is date arithmetic state, not
 EnergyPlus' weather-effective `CurrentYearIsLeapYear`; the latter also depends
 on EPW leap-year support. The paired weather-effective checkpoint below now
@@ -141,10 +144,11 @@ resolves that distinction for its declared local fixtures, without widening the
 claim to general EPW environment traversal.
 The typed `RunPeriod` holiday, DST, weekend-observation, rain, snow, actual
 weather, and first-hour policy fields are intake state. The first-hour policy
-is carried by the axis. Metadata-aware axes reject all actual-weather and
-cross-year run periods rather than returning a partial calendar; their full
-record traversal is not ported.
-The other five policy booleans are not yet active calendar or weather behavior.
+is carried by the axis, and the weather-file DST use flag now gates the parsed
+EPW period. Metadata-aware axes reject all actual-weather and cross-year run
+periods rather than returning a partial calendar; their full record traversal
+is not ported. The holiday, weekend-observation, rain, and snow booleans are not
+yet active calendar or weather behavior.
 The checkpoint also excludes warmup points, design days,
 `RunPeriod:CustomRange`, EnergyPlus environment filtering, and EnergyPlus'
 invalid/default `Timestep` normalization rules. Those exclusions prevent the
@@ -280,16 +284,54 @@ The selector feeds both the dedicated time/weather report boundary and
 That arbitrary-run wiring is runtime plumbing, not independent oracle evidence
 or a completion claim for any mapped EnergyPlus routine.
 
+## Fixed-Date EPW Daylight-Saving Evidence Checkpoint
+
+`EpwCalendarMetadata` now retains an optional typed
+`EpwDaylightSavingPeriod`. Its two `EpwCalendarDateRule` boundaries support the
+EnergyPlus EPW forms used by `ProcessDateString`: fixed month/day, an Nth
+weekday in a month, and the last weekday in a month. A zero start and zero end
+mean that the weather file declares no period; a one-sided zero or an invalid
+date rule is rejected rather than silently activating a partial range.
+`ProcessDateString` also accepts a nonzero single-number Julian-date form; that
+form is not parsed or claimed at this checkpoint.
+
+For a supported same-year metadata-aware axis, the RunPeriod's
+`use_weather_file_daylight_saving_period` flag controls whether the EPW period
+is active. Month/day validity and final ordinals use the weather-effective year,
+while Nth/last-weekday selection preserves EnergyPlus' RunPeriod `MonWeekDay`
+projection seeded before the environment-specific `LeapYearAdd`. The resolved
+start/end ordinal range is inclusive. The resulting daily state is projected
+to both `EnvironmentTimePoint.dst` and hourly `TimePoint.dst`. Unit tests cover
+fixed dates, Nth-weekday and last-weekday rules, the leap-policy/`MonWeekDay`
+split, an inactive RunPeriod flag, invalid occurrences, and the
+southern-hemisphere start-after-end range. The Nth/last-weekday and southern
+year-wrap paths are source-mapped unit evidence only.
+
+`calendar_dst_fixed_date_hourly_exact_001` is the sole external DST claim at
+this checkpoint. Its EPW declares a fixed February 29 through March 1 period,
+and its 2016 RunPeriod explicitly enables the weather-file period. The blocking
+zero-tolerance gate requires exactly 72 ordered, unique hourly `Site Daylight
+Saving Time Status` samples and normalized timestamps: 24 inactive samples on
+February 28 followed by 48 active samples on February 29 and March 1. It also
+checks that the shared metadata-aware `TimeAxis` reports the same resolved
+period and active-sample count.
+
+This case does not claim the IDF
+`RunPeriodControl:DaylightSavingTime` object, DST-shifted schedule lookup,
+schedule hour-24/tomorrow rollover, holidays or special days, raw ESO timestamp
+serialization, actual-weather execution, cross-year EPW traversal, or broad
+`WeatherManager` compatibility.
+
 ## Current Rust Boundary
 
 | Boundary | Current Rust status | Missing source behavior |
 |---|---|---|
-| run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, metadata-aware actual-weather and cross-year inputs fail explicitly, and the other five RunPeriod weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active RunPeriod holiday/DST/weather behavior, actual-weather and cross-year traversal, and full EnergyPlus warning-text parity |
-| canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias) and `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday | warmup lifecycle, DST ranges, special-day overrides, actual-weather and cross-year behavior, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
-| hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, calendar projections beyond the declared pair, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
-| EPW weather | `EpwWeatherFile` keeps parsed calendar and `DATA PERIODS` metadata with `EpwRecord` rows; the dedicated hourly report applies `Leap Year Observed` and selects a complete same-year non-actual, one-record-per-hour stream by source date. Weather-required heat-balance `ep_run` setup now applies the same selector before weather-timestep precomputation. The external offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order; unit tests separately lock Today/Tomorrow source-index transitions, interpolation seeds, the day-local hour-24 solar `NextHr`, and the one-timestep-per-hour current-only solar branch | actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, subhourly solar interpolation, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather`/solar/`WeatherManager` parity |
+| run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, and the weather-file DST use flag gates a parsed EPW period. Metadata-aware actual-weather and cross-year inputs fail explicitly; holiday, weekend-observation, rain, and snow flags remain typed intake only | custom ranges, design-day environments, environment filtering, active RunPeriod holiday/special-day/weather behavior, the IDF DST object, actual-weather and cross-year traversal, and full EnergyPlus warning-text parity |
+| canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias). The metadata-aware axis resolves an enabled EPW DST rule into inclusive daily `dst` state; `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday | warmup lifecycle, special-day overrides, the IDF DST object, schedule/timestamp DST consumers, actual-weather and cross-year behavior, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
+| hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. The fixed-date DST case separately locks 72 ordered state/timestamp samples, 24 inactive then 48 active. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, DST behavior beyond the fixed-date case, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
+| EPW weather | `EpwWeatherFile` keeps parsed leap policy, typed optional DST rules, `DATA PERIODS` metadata, and `EpwRecord` rows. The dedicated hourly report applies the leap policy and enabled DST period and selects a complete same-year non-actual, one-record-per-hour stream by source date. The fixed-date case externally locks only its DST state/timestamps; the offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order. Unit tests separately lock Today/Tomorrow source-index transitions, interpolation seeds, the day-local hour-24 solar `NextHr`, and the one-timestep-per-hour current-only solar branch | IDF DST input, holidays/special days, actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, subhourly solar interpolation, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather`/solar/`WeatherManager` parity |
 | schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the paired exact cases lock the same 1-through-24 daily profile for 72 versus 48 weather-effective hours | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
-| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy schedule cases and the record-selection weather case enforce ordered, unique, exact normalized labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
+| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy schedule cases, record-selection weather case, and fixed-date DST case enforce their declared ordered, unique, exact normalized labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`; DST/day-type serialization remains unclaimed even though the fixed-date normalized labels include resolved DST state |
 
 Existing dry-bulb, dew-point, relative-humidity, pressure, wind, radiation, and
 precipitation diagnostics remain useful evidence for individual weather
@@ -302,10 +344,11 @@ calendar selection, internal weather-day handoff, or timestamp conformance.
 Gates are sequential because each later lookup consumes state owned by the
 earlier gate.
 
-1. **DST gate.** Port effective `UseDST` policy, EPW/IDF DST range selection,
-   northern- and southern-hemisphere year-boundary behavior, daily
-   `DSTIndicator`, and the hour-24 rollover fields consumed by
-   `ScheduleDetailed::getHrTsVal`.
+1. **Remaining DST gate.** The fixed-date EPW period, RunPeriod use flag, and
+   daily/hourly state now have one external exact gate. Promote Nth/last-weekday
+   and southern year-wrap rules beyond unit evidence, add the IDF DST object,
+   and port the DST-shifted schedule lookup plus hour-24/tomorrow rollover
+   consumed by `ScheduleDetailed::getHrTsVal`.
 2. **Special-day gate.** Port EPW and `RunPeriodControl:SpecialDays` dates,
    `UseHolidays`, `ApplyWeekendRule`, special-day precedence, `HolidayIndex`,
    tomorrow's holiday/day type, and the weekday-versus-special `DayType`
@@ -349,6 +392,13 @@ one-timestep-per-hour current-only solar unit evidence into an external state
 claim, and it does not complete `ProcessEPWHeader`, `ReadWeatherForDay`,
 `ReadEPlusWeatherForDay`, `UpdateWeatherData`, or `SetCurrentWeather`.
 
+The fixed-date DST fixture adds only its EPW February 29 through March 1 period,
+the enabled RunPeriod weather-file policy, and 72 ordered normalized hourly
+timestamps and `Site Daylight Saving Time Status` values: 24 inactive followed
+by 48 active. Nth/last-weekday and southern year-wrap behavior remains unit
+evidence. The IDF DST object, schedule DST shift and hour-24 rollover, special
+days, and raw ESO timestamp serialization remain outside this claim.
+
 Promotion requires all of the following on the same canonical axis:
 
 - exact environment/day/hour/zone-timestep ordering, including warmup and
@@ -363,10 +413,11 @@ Until those gates pass, broader results remain foundation, smoke, or diagnostic
 evidence only; the declared 72-label/48-label pair keeps only the narrow
 normalized hourly Schedule Value conformance boundary stated above, and the
 offset case keeps only its narrow non-actual ordered record-date/dry-bulb
-boundary. Its consumption by weather-required heat-balance `ep_run` setup adds
-no independent conformance evidence. Record selection beyond that case,
-weather consumers outside the stated setup, DST, holidays, raw ESO output,
-actual-weather execution, cross-year traversal, multiple-data-period execution,
-records-per-hour greater than one, subhourly solar interpolation, and complete
-`SetCurrentWeather`/solar/`WeatherManager` conformance remain explicitly
-deferred.
+boundary, and the fixed-date DST case keeps only its 72-sample boundary. Their
+consumption by weather-required heat-balance `ep_run` setup adds no independent
+conformance evidence. Record selection beyond the offset case, DST behavior
+beyond the fixed-date case, weather consumers outside the stated setup,
+holidays, raw ESO output, actual-weather execution, cross-year traversal,
+multiple-data-period execution, records-per-hour greater than one, subhourly
+solar interpolation, and complete `SetCurrentWeather`/solar/`WeatherManager`
+conformance remain explicitly deferred.

@@ -66,10 +66,16 @@ CLAIM_BOUNDARY = (
     "complete buffer value-state parity is not claimed. The day-local hour-24 solar NextHr selection "
     "and one-timestep-per-hour current-only solar branch are also only "
     "source-mapped unit evidence, not external oracle evidence. Weather consumers outside that "
-    "setup, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
-    "records-per-hour greater than one, DST, holidays, subhourly solar interpolation, complete "
-    "SetCurrentWeather/solar/WeatherManager conformance, raw ESO serialization, and general time, "
-    "weather, and schedule compatibility are not claimed."
+    "setup remain outside the claim. The fixed-date EPW DST case proves only that its RunPeriod "
+    "weather-file use flag activates the declared February 29 through March 1 period: 72 ordered, "
+    "unique Site Daylight Saving Time Status samples and normalized timestamps match exactly, with "
+    "24 inactive followed by 48 active. Nth/last-weekday rules, southern year-wrap ranges, and "
+    "RunPeriod disabling remain source-mapped unit evidence only. The IDF "
+    "RunPeriodControl:DaylightSavingTime object, DST-shifted schedule lookup and hour-24 rollover, "
+    "holidays and special days, raw ESO timestamp serialization, actual-weather year matching, "
+    "cross-year traversal, multiple-data-period execution, records-per-hour greater than one, "
+    "subhourly solar interpolation, complete SetCurrentWeather/solar/WeatherManager conformance, "
+    "and general time, weather, and schedule compatibility are not claimed."
 )
 
 CASE_LABELS = {
@@ -78,6 +84,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
+    "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
     "weather_fields_001": "Weather fields",
     "internal_gains_001": "Internal gains",
@@ -90,6 +97,7 @@ KEY_LABELS = {
     "ALWAYSON": "AlwaysOn",
     "CALENDAR HOURLY 1 TO 24": "Calendar 1-24",
     "Environment": "Env",
+    "ENVIRONMENT": "Env",
 }
 
 VARIABLE_LABELS = {
@@ -103,6 +111,7 @@ VARIABLE_LABELS = {
     "Surface Heat Storage Rate": "Surface storage",
     "Zone Opaque Surface Inside Faces Conduction Rate": "Zone opaque cond",
     "Schedule Value": "Schedule value",
+    "Site Daylight Saving Time Status": "DST status",
     "Site Outdoor Air Drybulb Temperature": "Outdoor drybulb",
     "Zone Total Internal Convective Heating Rate": "Internal convective",
     "Zone Thermostat Heating Setpoint Temperature": "Heat SP",
@@ -182,6 +191,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_weather_leap_policy_no_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Calendar DST",
+        command="compare-calendar-dst-fixed-date-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weather records",

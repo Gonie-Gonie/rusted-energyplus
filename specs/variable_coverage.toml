@@ -847,6 +847,14 @@ first_evidence = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
 support_boundary = "Tolerance-gated official 1ZoneUncontrolled dynamic floor storage-flux conformance only for the declared Surface Heat Storage Rate per Area row under the source-order compatibility lane; broad CTF storage parity and other storage rows remain outside the claim."
 
 [[variable]]
+name = "Site Daylight Saving Time Status"
+domain = "weather"
+status = "conformance"
+first_case = "calendar_dst_fixed_date_hourly_exact_001"
+first_evidence = "calendar_dst_fixed_date_hourly_exact_001"
+support_boundary = "Zero-tolerance-gated, ordered-exact-unique hourly conformance for calendar_dst_fixed_date_hourly_exact_001 only. The case proves an EPW fixed 2/29 through 3/1 daylight-saving period enabled by RunPeriod, with 24 inactive then 48 active hourly samples on the shared metadata-aware TimeAxis. Nth/last-weekday rules and southern year-wrap ranges remain source-mapped unit evidence only. IDF RunPeriodControl:DaylightSavingTime, DST-shifted schedule lookup and hour-24 rollover, holidays/special days, raw ESO timestamp serialization, actual-weather execution, cross-year EPW record traversal, and broad WeatherManager compatibility remain outside the claim."
+
+[[variable]]
 name = "Site Outdoor Air Drybulb Temperature"
 domain = "weather"
 status = "conformance"

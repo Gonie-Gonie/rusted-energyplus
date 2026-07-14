@@ -1,0 +1,59 @@
+id = "calendar_dst_fixed_date_hourly_exact_001"
+title = "EPW fixed-date daylight-saving daily state exact order"
+milestone = "full-source-order-calendar-dst-fixed-date"
+purpose = "Block on exact ordered hourly DST state and timestamps across one EPW fixed-date daylight-saving transition."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to 72 ordered, unique hour-ending Site Daylight Saving Time Status samples from 2016-02-28 through 2016-03-01.",
+  "The EPW declares a fixed 2/29 through 3/1 daylight-saving period and the RunPeriod explicitly enables the weather-file period, proving 24 zero samples followed by 48 one samples.",
+  "Weather-file holidays, weekend-holiday adjustment, rain, snow, actual-weather execution, and cross-year record traversal are disabled so this fixture isolates fixed-date EPW DST activation.",
+  "Nth/last-weekday date rules and southern-hemisphere year-boundary ranges remain source-mapped unit evidence; IDF RunPeriodControl:DaylightSavingTime, DST-shifted schedule lookup, and raw ESO timestamp serialization remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Daylight Saving Time Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_dst_fixed_date_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-dst-fixed-date-exact"
+blocking = true

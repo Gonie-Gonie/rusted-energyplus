@@ -21,6 +21,7 @@ fn parses_leap_year_observed_yes_and_no() -> Result<(), Box<dyn std::error::Erro
 
     assert!(leap_weather.calendar_metadata.leap_year_observed);
     assert!(!non_leap_weather.calendar_metadata.leap_year_observed);
+    assert_eq!(leap_weather.calendar_metadata.daylight_saving_period, None);
     assert_eq!(leap_weather.data_periods.records_per_hour, 1);
     assert_eq!(leap_weather.data_periods.periods.len(), 1);
     assert_eq!(
@@ -39,6 +40,170 @@ fn parses_leap_year_observed_yes_and_no() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(leap_weather.records[0].day, 29);
 
     Ok(())
+}
+
+#[test]
+fn parses_fixed_month_day_daylight_saving_period() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = epw_text("No").replace(
+        "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0",
+        "HOLIDAYS/DAYLIGHT SAVINGS,No,3/10,November 3,0",
+    );
+
+    let metadata = parse_epw_weather_file(&contents)?.calendar_metadata;
+
+    assert_eq!(
+        metadata.daylight_saving_period,
+        Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::MonthDay {
+                month: 3,
+                day_of_month: 10,
+            },
+            end: EpwCalendarDateRule::MonthDay {
+                month: 11,
+                day_of_month: 3,
+            },
+        })
+    );
+    Ok(())
+}
+
+#[test]
+fn parses_nth_and_last_weekday_daylight_saving_rules() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = epw_text("Yes").replace(
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0",
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,2nd Sunday in March,Last Sunday in November,0",
+    );
+
+    let metadata = parse_epw_weather_file(&contents)?.calendar_metadata;
+
+    assert_eq!(
+        metadata.daylight_saving_period,
+        Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 2,
+                weekday: ep_model::DayOfWeek::Sunday,
+                month: 3,
+            },
+            end: EpwCalendarDateRule::LastWeekdayInMonth {
+                weekday: ep_model::DayOfWeek::Sunday,
+                month: 11,
+            },
+        })
+    );
+    Ok(())
+}
+
+#[test]
+fn accepts_energyplus_month_weekday_order_and_case() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = epw_text("Yes").replace(
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0",
+        "HOLIDAYS/DAYLIGHT SAVINGS,Yes,1st may monday,LAST friday OF october,0",
+    );
+
+    let metadata = parse_epw_weather_file(&contents)?.calendar_metadata;
+
+    assert_eq!(
+        metadata.daylight_saving_period,
+        Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: ep_model::DayOfWeek::Monday,
+                month: 5,
+            },
+            end: EpwCalendarDateRule::LastWeekdayInMonth {
+                weekday: ep_model::DayOfWeek::Friday,
+                month: 10,
+            },
+        })
+    );
+    Ok(())
+}
+
+#[test]
+fn zero_dst_endpoints_disable_the_epw_period() -> Result<(), Box<dyn std::error::Error>> {
+    let contents = epw_text("No").replace(
+        "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0",
+        "HOLIDAYS/DAYLIGHT SAVINGS,No,0.0,0,0",
+    );
+
+    assert_eq!(
+        parse_epw_weather_file(&contents)?
+            .calendar_metadata
+            .daylight_saving_period,
+        None
+    );
+    Ok(())
+}
+
+#[test]
+fn rejects_a_single_zero_daylight_saving_endpoint() {
+    for (start, end, expected_field) in [
+        ("0", "11/3", "daylight saving start date"),
+        ("3/10", "0.0", "daylight saving end date"),
+    ] {
+        let contents = epw_text("No").replace(
+            "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0",
+            &format!("HOLIDAYS/DAYLIGHT SAVINGS,No,{start},{end},0"),
+        );
+
+        assert!(matches!(
+            parse_epw_weather_file(&contents),
+            Err(EpwError::InvalidValue { line: 5, field, value })
+                if field == expected_field && (value == start || value == end)
+        ));
+    }
+}
+
+#[test]
+fn rejects_invalid_daylight_saving_date_rules() {
+    for (field_index, value) in [
+        (2, "2/30"),
+        (2, "6th Sunday in March"),
+        (2, "2nd Funday in March"),
+        (2, "May 1st Monday"),
+        (3, "Last Sunday in Smarch"),
+        (3, "366"),
+    ] {
+        let mut fields = ["HOLIDAYS/DAYLIGHT SAVINGS", "Yes", "3/10", "11/3", "0"];
+        fields[field_index] = value;
+        let contents =
+            epw_text("Yes").replace("HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0", &fields.join(","));
+        let expected_field = if field_index == 2 {
+            "daylight saving start date"
+        } else {
+            "daylight saving end date"
+        };
+
+        assert!(matches!(
+            parse_epw_weather_file(&contents),
+            Err(EpwError::InvalidValue {
+                line: 5,
+                field,
+                value: actual_value,
+            }) if field == expected_field && actual_value == value
+        ));
+    }
+}
+
+#[test]
+fn rejects_missing_daylight_saving_endpoint_fields() {
+    for (header, expected_field) in [
+        (
+            "HOLIDAYS/DAYLIGHT SAVINGS,Yes",
+            "daylight saving start date",
+        ),
+        (
+            "HOLIDAYS/DAYLIGHT SAVINGS,Yes,3/10",
+            "daylight saving end date",
+        ),
+    ] {
+        let contents = epw_text("Yes").replace("HOLIDAYS/DAYLIGHT SAVINGS,Yes,0,0,0", header);
+
+        assert!(matches!(
+            parse_epw_weather_file(&contents),
+            Err(EpwError::MissingField { line: 5, field }) if field == expected_field
+        ));
+    }
 }
 
 #[test]

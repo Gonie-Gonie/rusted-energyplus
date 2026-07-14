@@ -305,6 +305,12 @@
                          "help":  "Gate paired EPW Leap Year Observed Yes/No calendar and Schedule:Compact evidence."
                      },
                      {
+                         "name":  "compare-calendar-dst-fixed-date-exact",
+                         "path":  "compare\\compare-calendar-dst-fixed-date-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact EPW fixed-date daylight-saving state and ordered hourly timestamps."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",

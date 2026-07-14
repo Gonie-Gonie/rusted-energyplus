@@ -58,7 +58,10 @@ fn weather_file(
     records: Vec<EpwRecord>,
 ) -> EpwWeatherFile {
     EpwWeatherFile {
-        calendar_metadata: EpwCalendarMetadata { leap_year_observed },
+        calendar_metadata: EpwCalendarMetadata {
+            leap_year_observed,
+            ..EpwCalendarMetadata::default()
+        },
         data_periods: EpwDataPeriods {
             records_per_hour: 1,
             periods,
@@ -96,7 +99,10 @@ fn axis_for(
 ) -> Result<TimeAxis, Box<dyn std::error::Error>> {
     Ok(build_hourly_time_axis_for_run_period_with_weather_metadata(
         run_period,
-        &EpwCalendarMetadata { leap_year_observed },
+        &EpwCalendarMetadata {
+            leap_year_observed,
+            ..EpwCalendarMetadata::default()
+        },
     )?)
 }
 

@@ -12,6 +12,7 @@ const EPW_HEADER_LINE_COUNT: usize = 8;
 #[path = "weather_calendar.rs"]
 mod weather_calendar;
 use weather_calendar::parse_epw_calendar_metadata;
+pub use weather_calendar::{EpwCalendarDateRule, EpwCalendarMetadata, EpwDaylightSavingPeriod};
 
 #[path = "weather_data_periods.rs"]
 mod weather_data_periods;
@@ -103,13 +104,6 @@ impl From<std::io::Error> for EpwError {
     fn from(error: std::io::Error) -> Self {
         Self::Io(error)
     }
-}
-
-/// Calendar policy carried by an EPW weather file header.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub struct EpwCalendarMetadata {
-    /// Whether the EPW `Leap Year Observed` field starts with `Y` after trimming.
-    pub leap_year_observed: bool,
 }
 
 /// One month/day endpoint declared by an EPW `DATA PERIODS` header.
