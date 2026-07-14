@@ -1,6 +1,7 @@
 //! Numeric series comparison summaries.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt;
 
 use crate::Tolerance;
 
@@ -187,6 +188,96 @@ impl SeriesComparisonV2 {
     }
 }
 
+/// Reason the ordered timestamp contract first diverged.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OrderedTimestampDivergenceReason {
+    /// An expected sample exists but has no timestamp label.
+    MissingExpectedTimestamp,
+    /// An observed sample exists but has no timestamp label.
+    MissingObservedTimestamp,
+    /// A timestamp label occurs more than once in the expected slice.
+    DuplicateExpectedTimestamp,
+    /// A timestamp label occurs more than once in the observed slice.
+    DuplicateObservedTimestamp,
+    /// The observed slice has a sample after the expected slice ended.
+    MissingExpectedSample,
+    /// The expected slice has a sample after the observed slice ended.
+    MissingObservedSample,
+    /// The timestamp strings at the same slice index are not exactly equal.
+    TimestampMismatch,
+}
+
+impl OrderedTimestampDivergenceReason {
+    /// Returns a stable label suitable for machine-readable reports.
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::MissingExpectedTimestamp => "missing_expected_timestamp",
+            Self::MissingObservedTimestamp => "missing_observed_timestamp",
+            Self::DuplicateExpectedTimestamp => "duplicate_expected_timestamp",
+            Self::DuplicateObservedTimestamp => "duplicate_observed_timestamp",
+            Self::MissingExpectedSample => "missing_expected_sample",
+            Self::MissingObservedSample => "missing_observed_sample",
+            Self::TimestampMismatch => "timestamp_mismatch",
+        }
+    }
+}
+
+impl fmt::Display for OrderedTimestampDivergenceReason {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+/// First violation of the ordered, exact, unique timestamp contract.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrderedTimestampDivergence {
+    /// Zero-based slice index where the timestamp contract first diverged.
+    pub index: usize,
+    /// Expected timestamp at the divergent index, if present.
+    pub expected: Option<String>,
+    /// Observed timestamp at the divergent index, if present.
+    pub observed: Option<String>,
+    /// Timestamp contract violation at this index.
+    pub reason: OrderedTimestampDivergenceReason,
+}
+
+/// Ordered timestamp contract result paired with same-index numeric metrics.
+///
+/// This is intentionally separate from [`compare_series_samples_v2`]. The
+/// existing comparator remains timestamp-set aligned and order-insensitive,
+/// while this result requires complete, unique timestamp slices whose strings
+/// match exactly at every slice index.
+#[derive(Clone, Debug, PartialEq)]
+pub struct OrderedTimestampComparison {
+    /// Same-index value comparison, reported as timestamp alignment.
+    pub comparison: SeriesComparisonV2,
+    /// Status of the timestamp-only contract.
+    pub contract_status: SeriesComparisonStatus,
+    /// Whether all present expected timestamp labels are unique.
+    pub expected_unique_timestamps: bool,
+    /// Whether all present observed timestamp labels are unique.
+    pub observed_unique_timestamps: bool,
+    /// Whether lengths match and every same-index timestamp string is present and exact.
+    pub timestamp_order_match: bool,
+    /// First timestamp contract divergence, independent of numeric tolerance.
+    pub first_timestamp_divergence: Option<OrderedTimestampDivergence>,
+}
+
+impl OrderedTimestampComparison {
+    /// Returns true when both the timestamp contract and numeric tolerance pass.
+    #[must_use]
+    pub fn passed(&self) -> bool {
+        self.contract_status == SeriesComparisonStatus::Pass && self.comparison.passed()
+    }
+
+    /// Returns true when only the ordered timestamp contract passed.
+    #[must_use]
+    pub fn timestamp_contract_passed(&self) -> bool {
+        self.contract_status == SeriesComparisonStatus::Pass
+    }
+}
+
 /// Compares raw numeric slices with the v2 metric engine using index alignment.
 #[must_use]
 pub fn compare_series_v2(
@@ -222,6 +313,123 @@ pub fn compare_series_samples_v2(
     } else {
         compare_indexed_samples(expected, observed, tolerance)
     }
+}
+
+/// Compares complete, unique timestamps in exact slice order and values by the
+/// same slice index.
+///
+/// Unlike [`compare_series_samples_v2`], this contract never sorts timestamps
+/// and never coalesces duplicate labels. Numeric metrics, including RMSE, are
+/// returned through [`OrderedTimestampComparison::comparison`].
+#[must_use]
+pub fn compare_ordered_timestamp_samples_v2(
+    expected: &[SeriesSample],
+    observed: &[SeriesSample],
+    tolerance: Tolerance,
+) -> OrderedTimestampComparison {
+    let expected_unique_timestamps = timestamps_are_unique(expected);
+    let observed_unique_timestamps = timestamps_are_unique(observed);
+    let timestamp_order_match = timestamps_match_in_exact_order(expected, observed);
+    let first_timestamp_divergence = first_ordered_timestamp_divergence(expected, observed);
+    let contract_status = if first_timestamp_divergence.is_none() {
+        SeriesComparisonStatus::Pass
+    } else {
+        SeriesComparisonStatus::Fail
+    };
+
+    let mut comparison = compare_indexed_samples(expected, observed, tolerance);
+    comparison.alignment = SeriesAlignment::Timestamp;
+    if let Some(divergence) = comparison.first_divergence.as_mut() {
+        divergence.timestamp = expected
+            .get(divergence.index)
+            .and_then(|sample| sample.timestamp.clone())
+            .or_else(|| {
+                observed
+                    .get(divergence.index)
+                    .and_then(|sample| sample.timestamp.clone())
+            });
+    }
+
+    OrderedTimestampComparison {
+        comparison,
+        contract_status,
+        expected_unique_timestamps,
+        observed_unique_timestamps,
+        timestamp_order_match,
+        first_timestamp_divergence,
+    }
+}
+
+fn timestamps_are_unique(samples: &[SeriesSample]) -> bool {
+    let mut timestamps = BTreeSet::new();
+    samples.iter().all(|sample| {
+        sample
+            .timestamp
+            .as_deref()
+            .is_none_or(|timestamp| timestamps.insert(timestamp))
+    })
+}
+
+fn timestamps_match_in_exact_order(expected: &[SeriesSample], observed: &[SeriesSample]) -> bool {
+    expected.len() == observed.len()
+        && expected.iter().zip(observed).all(|(left, right)| {
+            matches!(
+                (left.timestamp.as_deref(), right.timestamp.as_deref()),
+                (Some(expected_timestamp), Some(observed_timestamp))
+                    if expected_timestamp == observed_timestamp
+            )
+        })
+}
+
+fn first_ordered_timestamp_divergence(
+    expected: &[SeriesSample],
+    observed: &[SeriesSample],
+) -> Option<OrderedTimestampDivergence> {
+    let mut expected_timestamps = BTreeSet::new();
+    let mut observed_timestamps = BTreeSet::new();
+
+    for index in 0..expected.len().max(observed.len()) {
+        let expected_sample = expected.get(index);
+        let observed_sample = observed.get(index);
+        let expected_timestamp = expected_sample.and_then(|sample| sample.timestamp.as_deref());
+        let observed_timestamp = observed_sample.and_then(|sample| sample.timestamp.as_deref());
+
+        let duplicate_expected = expected_timestamp
+            .map(|timestamp| !expected_timestamps.insert(timestamp))
+            .unwrap_or(false);
+        let duplicate_observed = observed_timestamp
+            .map(|timestamp| !observed_timestamps.insert(timestamp))
+            .unwrap_or(false);
+
+        let reason = if duplicate_expected {
+            Some(OrderedTimestampDivergenceReason::DuplicateExpectedTimestamp)
+        } else if duplicate_observed {
+            Some(OrderedTimestampDivergenceReason::DuplicateObservedTimestamp)
+        } else if expected_sample.is_some() && expected_timestamp.is_none() {
+            Some(OrderedTimestampDivergenceReason::MissingExpectedTimestamp)
+        } else if observed_sample.is_some() && observed_timestamp.is_none() {
+            Some(OrderedTimestampDivergenceReason::MissingObservedTimestamp)
+        } else if expected_sample.is_none() {
+            Some(OrderedTimestampDivergenceReason::MissingExpectedSample)
+        } else if observed_sample.is_none() {
+            Some(OrderedTimestampDivergenceReason::MissingObservedSample)
+        } else if expected_timestamp != observed_timestamp {
+            Some(OrderedTimestampDivergenceReason::TimestampMismatch)
+        } else {
+            None
+        };
+
+        if let Some(reason) = reason {
+            return Some(OrderedTimestampDivergence {
+                index,
+                expected: expected_timestamp.map(str::to_owned),
+                observed: observed_timestamp.map(str::to_owned),
+                reason,
+            });
+        }
+    }
+
+    None
 }
 
 fn all_samples_have_timestamps(samples: &[SeriesSample]) -> bool {

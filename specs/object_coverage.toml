@@ -17,14 +17,14 @@ name = "Timestep"
 family = "time"
 status = "typed"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Typed for fixed time-axis plumbing; no full EnergyPlus timestep-manager parity claim."
+support_boundary = "Typed for fixed time-axis plumbing. The calendar_schedule_hourly_exact_001 fixture carries Timestep,4 through the canonical calendar state but proves hourly projection only; EnergyPlus invalid/default normalization, zone/system timestep separation, and full timestep-manager parity remain outside the claim."
 
 [[object]]
 name = "RunPeriod"
 family = "time"
 status = "typed"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Typed for simple run-period time axes; no design-day, sizing-period, or warmup claim."
+support_boundary = "Typed for run-period time axes, with ordered exact normalized hourly timestamp evidence for the explicit 2016-02-28 through 2016-03-01 range in calendar_schedule_hourly_exact_001 using a local leap-observed EPW. Standard non-leap TMY policy, DST, special days, general EPW date selection, design-day, sizing-period, warmup, and raw ESO timestamp serialization remain outside the claim."
 
 [[object]]
 name = "Site:Location"
@@ -73,7 +73,7 @@ name = "Schedule:Compact"
 family = "schedule"
 status = "typed"
 first_evidence = "ideal_loads_thermostat_001"
-support_boundary = "Typed for selected AllDays/Until segments and the no-OA all-days Schedule:Compact IdealLoads fuel-efficiency conformance candidate; no broad compact-schedule grammar claim."
+support_boundary = "Typed for selected AllDays/Until segments, with ordered hourly Schedule Value conformance for the 1-through-24 daily profile in calendar_schedule_hourly_exact_001 and the no-OA all-days Schedule:Compact IdealLoads fuel-efficiency conformance candidate. Through/For day-type expansion, DST/holiday lookup, zone-timestep lookup, and broad compact-schedule grammar remain outside the claim."
 
 [[object]]
 name = "OtherEquipment"

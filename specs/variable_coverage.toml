@@ -724,7 +724,7 @@ domain = "schedule"
 status = "conformance"
 first_case = "schedule_constant_001"
 first_evidence = "schedule_constant_001"
-support_boundary = "Tolerance-gated time-series conformance only for the listed evidence case, variable, frequency, and gate."
+support_boundary = "Tolerance-gated hourly conformance for Schedule:Constant in schedule_constant_001 and ordered-exact-unique normalized hourly timestamp plus AllDays/Until Schedule:Compact value conformance for the explicit three-day leap-date range in calendar_schedule_hourly_exact_001 using its local leap-observed EPW. Raw ESO serialization, standard non-leap TMY policy, subhourly lookup, DST, holidays, and broader schedule grammar remain outside the claim."
 
 [[variable]]
 name = "HeatTransfer Surface Area (Gross)"

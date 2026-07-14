@@ -1,6 +1,6 @@
 use crate::{
     CASE_MANIFEST_V2_SCHEMA, CaseTier, ComparisonClass, ManifestError, OutputFrequency,
-    OutputLevel, OutputRegistry, SourceArtifact, ValidationError, VariableClass,
+    OutputLevel, OutputRegistry, SourceArtifact, TimestampContract, ValidationError, VariableClass,
     WarmupOutputPolicy, load_case_file, load_suite_file, parse_case_str, parse_case_v2_str,
 };
 use std::path::PathBuf;
@@ -1027,7 +1027,10 @@ fn loads_foundation_suite_fixture() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(manifest.id, "foundation");
     assert_eq!(manifest.oracle_version, "26.1.0");
-    assert_eq!(manifest.cases.len(), 7);
+    assert_eq!(manifest.cases.len(), 8);
+    assert!(manifest.cases.iter().any(|case| {
+        case.ends_with("data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml")
+    }));
     assert!(
         manifest
             .cases
@@ -1368,6 +1371,128 @@ source = "eso"
             ValidationError::DuplicateOutputRequest { .. }
         ))
     ));
+}
+
+#[test]
+fn parses_optional_ordered_exact_unique_timestamp_contract()
+-> Result<(), Box<dyn std::error::Error>> {
+    let manifest = parse_case_str(
+        r#"
+id = "ordered_timestamps"
+title = "Ordered timestamps"
+milestone = "P1"
+purpose = "Exercise the optional timestamp contract."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "ordered.idf"
+
+[[outputs]]
+key = "*"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+timestamp_contract = "ordered-exact-unique"
+"#,
+    )?;
+
+    assert_eq!(
+        manifest.outputs[0].timestamp_contract,
+        Some(TimestampContract::OrderedExactUnique)
+    );
+    let registry = OutputRegistry::from_case(&manifest)?;
+    assert_eq!(
+        registry.series()[0].timestamp_contract,
+        Some(TimestampContract::OrderedExactUnique)
+    );
+    Ok(())
+}
+
+#[test]
+fn absent_timestamp_contract_remains_backward_compatible() -> Result<(), Box<dyn std::error::Error>>
+{
+    let manifest = parse_case_str(&timestamp_contract_case("eso", "hourly", None))?;
+
+    assert_eq!(manifest.outputs[0].timestamp_contract, None);
+    Ok(())
+}
+
+#[test]
+fn rejects_timestamp_contract_outside_hourly_schedule_eso_boundary() {
+    for (source, frequency) in [
+        ("eso", "static"),
+        ("eso", "timestep"),
+        ("mtr", "hourly"),
+        ("sql", "hourly"),
+        ("csv", "daily"),
+    ] {
+        let result = parse_case_str(&timestamp_contract_case(
+            source,
+            frequency,
+            Some("ordered-exact-unique"),
+        ));
+
+        assert!(matches!(
+            result,
+            Err(ManifestError::Validation(
+                ValidationError::InvalidTimestampContractOutput { index: 0 }
+            ))
+        ));
+    }
+
+    let wrong_class = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
+        .replace("class = \"schedule\"", "class = \"weather\"");
+    assert!(matches!(
+        parse_case_str(&wrong_class),
+        Err(ManifestError::Validation(
+            ValidationError::InvalidTimestampContractOutput { index: 0 }
+        ))
+    ));
+}
+
+#[test]
+fn rejects_unknown_timestamp_contract_during_deserialization() {
+    let result = parse_case_str(&timestamp_contract_case(
+        "eso",
+        "hourly",
+        Some("ordered-but-not-exact"),
+    ));
+
+    assert!(matches!(result, Err(ManifestError::Toml(_))));
+}
+
+fn timestamp_contract_case(
+    source: &str,
+    frequency: &str,
+    timestamp_contract: Option<&str>,
+) -> String {
+    let timestamp_contract = timestamp_contract
+        .map(|value| format!("timestamp_contract = \"{value}\"\n"))
+        .unwrap_or_default();
+    format!(
+        r#"
+id = "timestamp_contract_case"
+title = "Timestamp contract case"
+milestone = "P1"
+purpose = "Exercise timestamp contract validation."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "timestamp.idf"
+
+[[outputs]]
+key = "*"
+variable = "Schedule Value"
+frequency = "{frequency}"
+class = "schedule"
+source = "{source}"
+{timestamp_contract}"#
+    )
 }
 
 fn repo_root() -> PathBuf {

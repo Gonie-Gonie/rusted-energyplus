@@ -2,6 +2,7 @@ id = "foundation"
 title = "Foundation comparison evidence suite"
 oracle_version = "26.1.0"
 cases = [
+  "data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml",
   "data/conformance_cases/schedule_constant_001/case.toml",
   "data/conformance_cases/weather_fields_001/case.toml",
   "data/conformance_cases/official_1zone_static_model_001/case.toml",

@@ -249,13 +249,14 @@ rust_target = [
 status = "scaffold"
 first_case = "schedule_constant_001"
 family_cases = [
+  "calendar_schedule_hourly_exact_001",
   "weather_fields_001",
 ]
 proof_variables = [
   "Schedule Value",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold for EnergyPlus environment, calendar, weather-update, schedule-update, and timestamp ownership. This scaffold adds no conformance. The current checkpoint preserves existing hourly consumers while adding canonical run-period and zone-timestep state; DST, special-day, EPW-header, design-day, and broad schedule/weather conformance remain outside the claim."
+support_boundary = "Source-order scaffold for EnergyPlus environment, calendar, weather-update, schedule-update, and timestamp ownership. calendar_schedule_hourly_exact_001 adds case-scoped conformance for 72 ordered, unique normalized hourly labels and an AllDays/Until Schedule:Compact value trace across an explicit leap day using a local leap-observed EPW, but does not complete any mapped EnergyPlus routine. Standard non-leap TMY policy, DST, special-day, general EPW selection, warmup, design-day, raw timestamp serialization, and broad schedule/weather conformance remain outside the claim."
 routine.manage_simulation.source_file = "src/EnergyPlus/SimulationManager.cc"
 routine.manage_simulation.source_routine = "ManageSimulation"
 routine.manage_simulation.source_map = "docs/src/porting-map/time-weather-schedule.md"

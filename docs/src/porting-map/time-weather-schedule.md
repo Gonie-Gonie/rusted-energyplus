@@ -138,16 +138,49 @@ invalid/default `Timestep` normalization rules. Those exclusions prevent the
 hourly projection from being described as a complete port of
 `ManageSimulation` or `GetNextEnvironment`.
 
+## Ordered Exact Hourly Evidence Checkpoint
+
+`calendar_schedule_hourly_exact_001` exercises the hourly projection across
+the explicit Gregorian range 2016-02-28 through 2016-03-01. It requests an
+all-days `Schedule:Compact` profile whose 24 hourly values are 1 through 24,
+so the oracle and Rust sides each produce 72 samples spanning the leap day.
+Its local 72-record EPW declares that leap years are observed; this keeps the
+oracle on the Gregorian 2016 calendar without pretending that Rust has already
+ported general EPW leap-policy selection. The fixture disables weather-file
+holidays, DST, weekend observation, rain, and snow so those unported branches
+cannot be mistaken for evidence.
+
+The case opts into an `ordered-exact-unique` timestamp contract. Unlike the
+existing label-alignment comparator, this contract treats each input slice as
+the ordering authority and requires every sample to have a timestamp, every
+timestamp on each side to be unique, equal lengths, and exact timestamp-string
+equality at every index before the numeric tolerance result can pass. The
+blocking gate also locks the first and last labels and zero schedule-value
+delta. Existing cases retain their prior order-independent timestamp alignment
+unless they explicitly request this contract.
+The manifest schema currently permits the option only for hourly schedule ESO
+series, the sole report boundary that consumes and gates it; other output
+families are rejected instead of silently ignoring the declaration.
+
+The exact strings are normalized comparison labels assembled from runtime-owned
+calendar fields and the EnergyPlus ESO parser's timestamp fields. This proves
+the ordered hourly projection for this declared fixture; it does not prove the
+raw text emitted by `OutputProcessor::WriteTimeStampFormatData`, subhourly
+records, environment selection, DST, holidays, warmup, or the full schedule
+lookup family. In particular, standard TMY files that do not observe leap years
+follow a different EnergyPlus calendar shape and remain a later EPW environment
+gate.
+
 ## Current Rust Boundary
 
 | Boundary | Current Rust status | Missing source behavior |
 |---|---|---|
 | run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, while the six weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active weather-policy behavior, and full EnergyPlus warning-text parity |
 | canonical calendar | `ResolvedRunPeriodCalendar`, `EnvironmentTimeAxis`, and `EnvironmentTimePoint` provide the first run-period/zone-timestep spine | warmup lifecycle, weather-effective leap state, DST ranges, special-day overrides, EnergyPlus `Timestep` default/invalid-value normalization, environment kinds beyond weather run periods, and source-order environment selection |
-| legacy hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar with inclusive run-period dates and the same resolved years/weekdays | all remaining calendar-dependent output semantics |
+| legacy hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar with inclusive run-period dates and the same resolved years/weekdays; `calendar_schedule_hourly_exact_001` locks 72 normalized labels in source order across the 2016 leap day | calendar projections beyond the declared fixture and all remaining calendar-dependent output semantics |
 | EPW weather | `EpwRecord` parses multiple weather fields; `WeatherTimestepSeries` precomputes the current interpolation subset | environment-date selection, today/tomorrow lifecycle, EPW data-period rules, actual-weather traversal, missing/range handling, and complete `SetCurrentWeather` parity |
-| schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
-| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
+| schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the exact case locks one 1-through-24 profile for three days | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
+| output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; one explicit leap-day case enforces ordered, unique, exact labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
 
 Existing dry-bulb, dew-point, relative-humidity, pressure, wind, radiation, and
 precipitation diagnostics remain useful evidence for individual weather
@@ -187,9 +220,11 @@ script-side timestamp reconstruction to substitute for missing runtime state.
 
 ## Claim Boundary and Stop Rule
 
-No EnergyPlus time, weather, schedule, or timestamp conformance is claimed by
-the first calendar checkpoint. In particular, an exact Gregorian hourly count,
-a parsed EPW row, or a matching constant schedule is not evidence that
+The calendar spine by itself claims no EnergyPlus time, weather, schedule, or
+timestamp conformance. The later exact fixture claims only its declared 72
+normalized hourly labels and AllDays/Until schedule values. In particular,
+that case, an exact Gregorian hourly count, a parsed EPW row, or a matching
+constant schedule is not evidence that
 `ManageSimulation`, `ManageWeather`, `getHrTsVal`, or
 `WriteTimeStampFormatData` has been fully ported.
 
@@ -203,5 +238,6 @@ Promotion requires all of the following on the same canonical axis:
 - exact schedule values at every declared zone timestep; and
 - exact time-family timestamps and reporting-frequency boundary rows.
 
-Until those gates pass, the current results remain foundation, smoke, or
-diagnostic evidence only.
+Until those gates pass, broader results remain foundation, smoke, or diagnostic
+evidence only; the declared 72-label exact case keeps only the narrow
+case-scoped conformance boundary stated above.

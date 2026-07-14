@@ -1,6 +1,7 @@
 use crate::{
-    SeriesAlignment, SeriesDivergenceKind, SeriesSample, Tolerance, compare_series,
-    compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
+    OrderedTimestampDivergenceReason, SeriesAlignment, SeriesComparisonStatus,
+    SeriesDivergenceKind, SeriesSample, Tolerance, compare_ordered_timestamp_samples_v2,
+    compare_series, compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
     parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
     parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
@@ -290,6 +291,160 @@ fn series_v2_reports_missing_observed_timestamp() -> Result<(), Box<dyn std::err
     assert_eq!(divergence.observed, None);
 
     Ok(())
+}
+
+#[test]
+fn ordered_timestamp_contract_passes_exact_unique_series() {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+    let observed = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+
+    let result = compare_ordered_timestamp_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(result.passed());
+    assert!(result.timestamp_contract_passed());
+    assert_eq!(result.comparison.alignment, SeriesAlignment::Timestamp);
+    assert_eq!(result.comparison.compared_samples, 2);
+    assert_eq!(result.comparison.rmse_delta, 0.0);
+    assert!(result.expected_unique_timestamps);
+    assert!(result.observed_unique_timestamps);
+    assert!(result.timestamp_order_match);
+    assert_eq!(result.first_timestamp_divergence, None);
+}
+
+#[test]
+fn ordered_timestamp_contract_rejects_reordered_series() -> Result<(), Box<dyn std::error::Error>> {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+    let observed = vec![
+        SeriesSample::timestamped(0, "t2", 2.0),
+        SeriesSample::timestamped(1, "t1", 1.0),
+    ];
+
+    let result = compare_ordered_timestamp_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(!result.passed());
+    assert_eq!(result.contract_status, SeriesComparisonStatus::Fail);
+    assert!(!result.timestamp_order_match);
+    let divergence = result
+        .first_timestamp_divergence
+        .ok_or_else(|| std::io::Error::other("expected timestamp divergence"))?;
+    assert_eq!(divergence.index, 0);
+    assert_eq!(divergence.expected.as_deref(), Some("t1"));
+    assert_eq!(divergence.observed.as_deref(), Some("t2"));
+    assert_eq!(
+        divergence.reason,
+        OrderedTimestampDivergenceReason::TimestampMismatch
+    );
+    assert_eq!(divergence.reason.as_str(), "timestamp_mismatch");
+
+    Ok(())
+}
+
+#[test]
+fn ordered_timestamp_contract_rejects_duplicate_before_length_divergence()
+-> Result<(), Box<dyn std::error::Error>> {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t1", 1.0),
+    ];
+    let observed = vec![SeriesSample::timestamped(0, "t1", 1.0)];
+
+    let result = compare_ordered_timestamp_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(!result.passed());
+    assert!(!result.expected_unique_timestamps);
+    assert!(result.observed_unique_timestamps);
+    let divergence = result
+        .first_timestamp_divergence
+        .ok_or_else(|| std::io::Error::other("expected timestamp divergence"))?;
+    assert_eq!(divergence.index, 1);
+    assert_eq!(divergence.expected.as_deref(), Some("t1"));
+    assert_eq!(divergence.observed, None);
+    assert_eq!(
+        divergence.reason,
+        OrderedTimestampDivergenceReason::DuplicateExpectedTimestamp
+    );
+
+    Ok(())
+}
+
+#[test]
+fn ordered_timestamp_contract_rejects_missing_timestamp() -> Result<(), Box<dyn std::error::Error>>
+{
+    let expected = vec![SeriesSample::indexed(0, 1.0)];
+    let observed = vec![SeriesSample::timestamped(0, "t1", 1.0)];
+
+    let result = compare_ordered_timestamp_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(!result.passed());
+    assert!(!result.timestamp_order_match);
+    let divergence = result
+        .first_timestamp_divergence
+        .ok_or_else(|| std::io::Error::other("expected timestamp divergence"))?;
+    assert_eq!(divergence.index, 0);
+    assert_eq!(divergence.expected, None);
+    assert_eq!(divergence.observed.as_deref(), Some("t1"));
+    assert_eq!(
+        divergence.reason,
+        OrderedTimestampDivergenceReason::MissingExpectedTimestamp
+    );
+
+    Ok(())
+}
+
+#[test]
+fn ordered_timestamp_contract_reports_value_tolerance_and_rmse()
+-> Result<(), Box<dyn std::error::Error>> {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+    let observed = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.5),
+    ];
+
+    let result = compare_ordered_timestamp_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(!result.passed());
+    assert!(result.timestamp_contract_passed());
+    assert_eq!(result.first_timestamp_divergence, None);
+    assert_eq!(result.comparison.max_abs_delta, 0.5);
+    assert!((result.comparison.rmse_delta - 0.5 / 2.0_f64.sqrt()).abs() < 1.0e-12);
+    let divergence = result
+        .comparison
+        .first_divergence
+        .ok_or_else(|| std::io::Error::other("expected value divergence"))?;
+    assert_eq!(divergence.index, 1);
+    assert_eq!(divergence.timestamp.as_deref(), Some("t2"));
+    assert_eq!(divergence.kind, SeriesDivergenceKind::Tolerance);
+
+    Ok(())
+}
+
+#[test]
+fn legacy_timestamp_alignment_remains_order_insensitive() {
+    let expected = vec![
+        SeriesSample::timestamped(0, "t1", 1.0),
+        SeriesSample::timestamped(1, "t2", 2.0),
+    ];
+    let observed = vec![
+        SeriesSample::timestamped(0, "t2", 2.0),
+        SeriesSample::timestamped(1, "t1", 1.0),
+    ];
+
+    let result = compare_series_samples_v2(&expected, &observed, Tolerance::default());
+
+    assert!(result.passed());
+    assert_eq!(result.alignment, SeriesAlignment::Timestamp);
 }
 
 #[test]

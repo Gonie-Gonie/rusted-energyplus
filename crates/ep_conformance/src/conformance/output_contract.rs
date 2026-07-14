@@ -36,6 +36,9 @@ pub struct OutputRequest {
     pub class: VariableClass,
     /// EnergyPlus artifact that should be used as the oracle source.
     pub source: SourceArtifact,
+    /// Optional timestamp ordering and uniqueness contract for the supported
+    /// hourly schedule ESO series.
+    pub timestamp_contract: Option<TimestampContract>,
     /// v2 domain label used by release coverage matrices.
     pub domain: Option<EvidenceDomain>,
     /// v2 output evidence level.
@@ -60,6 +63,17 @@ impl OutputRequest {
         }
     }
 
+    pub(super) fn validate(&self, index: usize) -> Result<(), ValidationError> {
+        if self.timestamp_contract.is_some()
+            && !(self.frequency == OutputFrequency::Hourly
+                && self.source == SourceArtifact::Eso
+                && self.class == VariableClass::Schedule)
+        {
+            return Err(ValidationError::InvalidTimestampContractOutput { index });
+        }
+        Ok(())
+    }
+
     pub(super) fn validate_v2(&self, index: usize) -> Result<(), ValidationError> {
         if self.domain.is_none() {
             return Err(ValidationError::MissingOutputDomain { index });
@@ -71,6 +85,14 @@ impl OutputRequest {
         validate_output_non_negative(index, "rmse_tol", self.rmse_tol)?;
         validate_output_non_negative(index, "rel_tol", self.rel_tol)
     }
+}
+
+/// Timestamp comparison policy applied to one time-series output.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum TimestampContract {
+    /// Require timestamps to match in order, with no duplicate labels.
+    OrderedExactUnique,
 }
 
 /// v2 evidence level for a requested output or meter.
@@ -210,6 +232,8 @@ pub struct OutputSeriesSpec {
     pub class: VariableClass,
     /// Oracle artifact source.
     pub source: SourceArtifact,
+    /// Optional timestamp contract retained from the manifest.
+    pub timestamp_contract: Option<TimestampContract>,
     /// Normalized identity used by comparison reports and gates.
     pub identity: OutputRequestIdentity,
 }
@@ -223,6 +247,7 @@ impl From<OutputRequest> for OutputSeriesSpec {
             frequency: output.frequency,
             class: output.class,
             source: output.source,
+            timestamp_contract: output.timestamp_contract,
             identity,
         }
     }

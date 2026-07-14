@@ -9,15 +9,15 @@ Object coverage is maintained in `specs/object_coverage.toml`.
 |---|---|---|---|---|
 | Version | project | typed | heat_balance_nomass_001 | Accepted for oracle-version tracking; no runtime compatibility claim by itself. |
 | Building | building | typed | heat_balance_nomass_001 | Typed for model metadata and simple building scope; no global building simulation claim. |
-| Timestep | time | typed | heat_balance_nomass_001 | Typed for fixed time-axis plumbing; no full EnergyPlus timestep-manager parity claim. |
-| RunPeriod | time | typed | heat_balance_nomass_001 | Typed for simple run-period time axes; no design-day, sizing-period, or warmup claim. |
+| Timestep | time | typed | heat_balance_nomass_001 | Typed for fixed time-axis plumbing. The calendar_schedule_hourly_exact_001 fixture carries Timestep,4 through the canonical calendar state but proves hourly projection only; EnergyPlus invalid/default normalization, zone/system timestep separation, and full timestep-manager parity remain outside the claim. |
+| RunPeriod | time | typed | heat_balance_nomass_001 | Typed for run-period time axes, with ordered exact normalized hourly timestamp evidence for the explicit 2016-02-28 through 2016-03-01 range in calendar_schedule_hourly_exact_001 using a local leap-observed EPW. Standard non-leap TMY policy, DST, special days, general EPW date selection, design-day, sizing-period, warmup, and raw ESO timestamp serialization remain outside the claim. |
 | Site:Location | site | typed | weather_fields_001 | Typed for location metadata; weather conformance is limited to declared dry-bulb output. |
 | Material | material | typed | construction_materials_001 | Typed for static material and construction evidence; no broad dynamic material algorithm claim. |
 | Material:NoMass | material | typed | heat_balance_nomass_001 | Typed for declared opaque no-mass heat-balance cases only. |
 | Construction | construction | typed | heat_balance_nomass_001 | Typed for surface/material links and declared static construction evidence. |
 | ScheduleTypeLimits | schedule | typed | schedule_constant_001 | Typed for schedule metadata; no full schedule validation claim. |
 | Schedule:Constant | schedule | typed | schedule_constant_001 | Typed and tolerance-gated for declared Schedule Value evidence. |
-| Schedule:Compact | schedule | typed | ideal_loads_thermostat_001 | Typed for selected AllDays/Until segments and the no-OA all-days Schedule:Compact IdealLoads fuel-efficiency conformance candidate; no broad compact-schedule grammar claim. |
+| Schedule:Compact | schedule | typed | ideal_loads_thermostat_001 | Typed for selected AllDays/Until segments, with ordered hourly Schedule Value conformance for the 1-through-24 daily profile in calendar_schedule_hourly_exact_001 and the no-OA all-days Schedule:Compact IdealLoads fuel-efficiency conformance candidate. Through/For day-type expansion, DST/holiday lookup, zone-timestep lookup, and broad compact-schedule grammar remain outside the claim. |
 | OtherEquipment | internal_gains | typed | internal_gains_001 | Typed for nominal EIO evidence and declared convective-gain trace only. |
 | People | internal_gains | typed | ideal_loads_outdoor_air_flow_person_diagnostic_001 | Typed for zone design occupant count used by the limited IdealLoads Flow/Person outdoor-air conformance candidate, current People occupancy schedule values used by the limited Flow/Person OccupancySchedule DCV outdoor-air conformance candidate, and the diagnostic Flow/Person design-flow evidence; no people heat-gain numerical conformance claim. |
 | ThermostatSetpoint:DualSetpoint | thermostat | typed | ideal_loads_thermostat_001 | Typed for thermostat graph wiring; no HVAC control algorithm conformance. |

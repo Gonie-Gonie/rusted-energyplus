@@ -1,0 +1,59 @@
+id = "calendar_schedule_hourly_exact_001"
+title = "Explicit leap-day calendar and hourly Schedule:Compact exact order"
+milestone = "full-source-order-calendar-time-exact"
+purpose = "Block on the exact ordered, unique hourly calendar timestamps and Schedule:Compact values for an explicit leap-day-spanning RunPeriod."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to 72 ordered, unique hour-ending samples from 2016-02-28 through 2016-03-01.",
+  "The local 72-record EPW explicitly observes leap years so the EnergyPlus oracle includes 2016-02-29 instead of applying a non-leap TMY weather calendar.",
+  "Weather-file holidays, daylight saving time, weekend-holiday adjustment, rain, and snow policies are disabled so this fixture isolates explicit Gregorian calendar state and AllDays Schedule:Compact evaluation.",
+  "This fixture does not claim raw ESO timestamp serialization, daylight-saving transitions, special-day overrides, or broader Schedule:Compact compatibility.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_hourly_exact_001/calendar_schedule_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_hourly_exact_001/calendar_schedule_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_hourly_exact_001/calendar_schedule_hourly_exact.epw"
+
+[[outputs]]
+key = "CALENDAR HOURLY 1 TO 24"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-hourly-exact"
+blocking = true

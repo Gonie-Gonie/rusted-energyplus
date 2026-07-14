@@ -11,6 +11,7 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | airloop_5zone_aircooled_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node, zone | baseline | data/conformance_cases/airloop_5zone_aircooled_diagnostic_001/case.toml |
 | airloop_coil_only_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node | baseline | data/conformance_cases/airloop_coil_only_diagnostic_001/case.toml |
 | airloop_fan_only_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node | baseline | data/conformance_cases/airloop_fan_only_diagnostic_001/case.toml |
+| calendar_schedule_hourly_exact_001 | full-source-order-calendar-time-exact | conformance | true | A | schedule | conformance | data/conformance_cases/calendar_schedule_hourly_exact_001/case.toml |
 | construction_materials_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/construction_materials_001/case.toml |
 | heat_balance_nomass_001 | v0.8-heat-balance | conformance | true | A | zone, surface | conformance | data/conformance_cases/heat_balance_nomass_001/case.toml |
 | ideal_loads_blank_fuel_efficiency_conformance_candidate_001 | ideal-loads-blank-fuel-efficiency-conformance | conformance | true | B | hvac | conformance, diagnostic | data/conformance_cases/ideal_loads_blank_fuel_efficiency_conformance_candidate_001/case.toml |

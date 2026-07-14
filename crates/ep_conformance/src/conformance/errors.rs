@@ -94,6 +94,11 @@ pub enum ValidationError {
         /// Field name inside the output request.
         field: &'static str,
     },
+    /// A timestamp contract was attached to a non-time-series output.
+    InvalidTimestampContractOutput {
+        /// Zero-based output request index.
+        index: usize,
+    },
     /// v2 output request had no domain.
     MissingOutputDomain {
         /// Zero-based output request index.
@@ -204,6 +209,10 @@ impl Display for ValidationError {
             Self::EmptyOutputField { index, field } => {
                 write!(formatter, "output {index} has empty field {field}")
             }
+            Self::InvalidTimestampContractOutput { index } => write!(
+                formatter,
+                "output {index} timestamp_contract is currently supported only for hourly schedule eso series"
+            ),
             Self::MissingOutputDomain { index } => {
                 write!(formatter, "output {index} is missing v2 domain")
             }

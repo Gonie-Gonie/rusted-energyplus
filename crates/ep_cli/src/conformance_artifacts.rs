@@ -1,5 +1,5 @@
 use ep_compare::load_eso_series;
-use ep_conformance::{ConformanceCase, OutputRegistry, SourceArtifact};
+use ep_conformance::{ConformanceCase, OutputRegistry, SourceArtifact, TimestampContract};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
@@ -385,6 +385,13 @@ fn render_expanded_case_manifest(
         );
         push_toml_string_field(&mut toml, "class", variable_class_label(output.class));
         push_toml_string_field(&mut toml, "source", source_artifact_label(output.source));
+        if let Some(timestamp_contract) = output.timestamp_contract {
+            push_toml_string_field(
+                &mut toml,
+                "timestamp_contract",
+                timestamp_contract_label(timestamp_contract),
+            );
+        }
         toml.push('\n');
     }
 
@@ -401,6 +408,12 @@ fn render_expanded_case_manifest(
     }
 
     toml
+}
+
+fn timestamp_contract_label(contract: TimestampContract) -> &'static str {
+    match contract {
+        TimestampContract::OrderedExactUnique => "ordered-exact-unique",
+    }
 }
 
 fn push_toml_string_field(output: &mut String, key: &str, value: &str) {
@@ -586,6 +599,43 @@ fn append_text_tail(message: &mut String, label: &str, text: &str) {
 mod tests {
     use super::*;
     use ep_conformance::parse_case_str;
+
+    #[test]
+    fn expanded_manifest_preserves_output_timestamp_contract()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = parse_case_str(
+            r#"
+id = "ordered_timestamps_001"
+title = "ordered timestamps"
+milestone = "test"
+purpose = "test expanded timestamp contract"
+comparison_class = "diagnostic-only"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+
+[[outputs]]
+key = "*"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+timestamp_contract = "ordered-exact-unique"
+"#,
+        )?;
+        let injection = OutputInjectionSummary {
+            outputs: 1,
+            meters: 0,
+            surface_details: false,
+        };
+
+        let expanded = render_expanded_case_manifest(&manifest, None, &injection);
+
+        assert!(expanded.contains("timestamp_contract = \"ordered-exact-unique\""));
+        Ok(())
+    }
 
     #[test]
     fn output_injection_distinguishes_existing_variable_frequency()

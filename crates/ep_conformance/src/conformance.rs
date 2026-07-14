@@ -91,6 +91,7 @@ impl ConformanceCase {
         for (index, output) in self.outputs.iter().enumerate() {
             require_output_non_empty(index, "key", &output.key)?;
             require_output_non_empty(index, "variable", &output.variable)?;
+            output.validate(index)?;
         }
         validate_unique_outputs(&self.outputs)?;
 
