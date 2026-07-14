@@ -81,8 +81,14 @@ CLAIM_BOUNDARY = (
     "24 Holiday=8, and 24 Tuesday=3 samples; with No, it remains on Sunday 2/28, producing 24 "
     "Holiday=8, 24 Monday=2, and 24 Tuesday=3 samples. Both 72-sample series and normalized "
     "timestamps are ordered, exact, unique, and zero-tolerance gated. This pair proves only the "
-    "fixed-Sunday plus-one-day observation branch. Saturday plus-two-day observation, blank/default "
-    "policy behavior, EPW holidays, other special-day types, duration greater than one, Nth/last "
+    "fixed-Sunday plus-one-day observation branch. The separate paired fixed-Saturday input-file "
+    "Holiday cases also differ only in the explicit weekend-rule flag. With Yes, the duration-one "
+    "MonthDay 2/27 Holiday is observed on Monday 2/29, producing 24 Saturday=7, 24 Sunday=1, and "
+    "24 Holiday=8 samples; with No, it remains on Saturday 2/27, producing 24 Holiday=8, 24 "
+    "Sunday=1, and 24 Monday=2 samples. Both 72-sample series and normalized timestamps are "
+    "ordered, exact, unique, and zero-tolerance gated. This second pair proves only the "
+    "fixed-Saturday plus-two-day observation branch; the Sunday plus-one-day branch remains the "
+    "separate pair above. Blank/default policy behavior, EPW holidays, other special-day types, duration greater than one, Nth/last "
     "rules, overlap/order, leap-policy behavior beyond the declared 2016 dates, year-end/cross-year "
     "behavior, schedule lookup, tomorrow state, and raw ESO timestamp serialization remain outside "
     "this claim. The paired fixed EPW "
@@ -109,6 +115,8 @@ CASE_LABELS = {
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "calendar_special_day_weekend_rule_enabled_hourly_exact_001": "Weekend holiday enabled",
     "calendar_special_day_weekend_rule_disabled_hourly_exact_001": "Weekend holiday disabled",
+    "calendar_special_day_weekend_saturday_enabled_hourly_exact_001": "Saturday holiday enabled",
+    "calendar_special_day_weekend_saturday_disabled_hourly_exact_001": "Saturday holiday disabled",
     "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001": "EPW holiday enabled",
     "calendar_epw_holiday_fixed_date_disabled_hourly_exact_001": "EPW holiday disabled",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
@@ -246,6 +254,20 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_rule_disabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Saturday holiday enabled",
+        command="compare-calendar-weekend-saturday-policy-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_enabled_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_enabled_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_enabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Saturday holiday disabled",
+        command="compare-calendar-weekend-saturday-policy-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_weekend_saturday_disabled_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="EPW holiday enabled",
