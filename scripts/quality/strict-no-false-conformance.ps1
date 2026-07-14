@@ -195,6 +195,8 @@ Assert-Contains -Path "docs\src\generated\current-status-classification.md" -Pat
 Assert-Contains -Path "docs\src\generated\conformance-case-index.md" -Pattern "| Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |" -Description "generated conformance case source"
 Assert-Contains -Path "docs\src\generated\variable-coverage.md" -Pattern 'Variable coverage is maintained in `specs/variable_coverage.toml`.' -Description "generated variable coverage source"
 Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'Algorithm status is maintained in `specs/algorithm_ledger.toml`.' -Description "generated algorithm ledger source"
+Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'Routine completion status is a separate six-step axis' -Description "generated routine completion source"
+Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'Full-Domain Claim Readiness' -Description "generated full-domain readiness"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern 'id = "ideal_loads_no_oa_sensible"' -Description "IdealLoads no-OA capability"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern 'id = "ideal_loads_finite_limits"' -Description "IdealLoads finite-limit capability"
 Assert-Contains -Path "specs\capabilities.toml" -Pattern 'id = "ideal_loads_constant_shr"' -Description "IdealLoads ConstantSHR capability"

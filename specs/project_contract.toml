@@ -1,3 +1,5 @@
+routine_completion_schema = "routine_completion.v1"
+
 [oracle]
 energyplus_version = "26.1.0"
 compatibility_mode_required = true
@@ -22,6 +24,40 @@ requirements = [
   "compare_summary_json",
   "compare_report_md",
   "blocking_gate",
+]
+
+[[domain_claim]]
+id = "heat_balance"
+claim_key = "broad_heat_balance_compatibility"
+routine_inventory_complete = false
+required_routines = [
+  "manage_heat_balance",
+  "manage_surface_heat_balance",
+  "manage_air_heat_balance",
+  "manage_zone_air_updates",
+]
+
+[[domain_claim]]
+id = "hvac"
+claim_key = "hvac_compatibility"
+routine_inventory_complete = false
+required_routines = [
+  "manage_zone_equipment",
+  "sim_zone_equipment",
+  "sim_purchased_air",
+  "get_purchased_air",
+  "init_purchased_air",
+  "calc_purch_air_loads",
+  "update_purchased_air",
+  "report_purchased_air",
+]
+
+[[domain_claim]]
+id = "plant"
+claim_key = "plant_compatibility"
+routine_inventory_complete = false
+required_routines = [
+  "manage_plant_loops",
 ]
 
 [optimization]

@@ -3,13 +3,23 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import sys
 import tomllib
 from pathlib import Path
 from typing import Any
 
+from validate_algorithm_ledger import (
+    collect_routines,
+    command_names,
+    validate_domain_completion_contract,
+    validate_routine,
+    variable_names,
+)
+
 
 EXPECTED_VERSION = "26.1.0"
+EXPECTED_ROUTINE_COMPLETION_SCHEMA = "routine_completion.v1"
 REQUIRED_CLAIM_REQUIREMENTS = {
     "case_manifest",
     "declared_variables_or_meters",
@@ -75,6 +85,9 @@ GENERATED_DOC_REQUIRED_PHRASES = [
     "| Case | Milestone | Class | Claim | Tier | Domains | Evidence levels | Manifest |",
     "Variable coverage is maintained in `specs/variable_coverage.toml`.",
     "Algorithm status is maintained in `specs/algorithm_ledger.toml`.",
+    "Routine completion status is a separate six-step axis",
+    "| Routine ID | Domain | Parent algorithm | Completion status | Required | EnergyPlus routine |",
+    "| Domain | Claim key | Claimed | Inventory complete | Family-gated required routines | Ready | Blockers |",
     "| Classification | Source of truth | Current boundary |",
     "README and current-status prose are mirrors, not claim sources.",
 ]
@@ -83,6 +96,7 @@ GENERATED_DOC_REQUIRED_PHRASES = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate project contract source-of-truth alignment.")
     parser.add_argument("--repo-root", required=True, type=Path)
+    parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
 
 
@@ -118,14 +132,23 @@ def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
     documentation = contract.get("documentation", {})
     current_status_classifications = contract.get("current_status_classification", [])
 
+    require(
+        contract.get("routine_completion_schema") == EXPECTED_ROUTINE_COMPLETION_SCHEMA,
+        errors,
+        "project contract must pin routine_completion_schema to routine_completion.v1",
+    )
     require(oracle.get("energyplus_version") == EXPECTED_VERSION, errors, "project contract must pin EnergyPlus 26.1.0")
     require(oracle.get("compatibility_mode_required") is True, errors, "project contract must require compatibility mode")
     require(language.get("core") == "Rust", errors, "project contract must keep core language Rust")
     require(language.get("mixed_language_kernels") is False, errors, "project contract must forbid mixed-language kernels")
     require(claims.get("arbitrary_runs_are_release_evidence") is False, errors, "arbitrary runs must not be release evidence")
+    for claim_key in [
+        "broad_heat_balance_compatibility",
+        "hvac_compatibility",
+        "plant_compatibility",
+    ]:
+        require(isinstance(claims.get(claim_key), bool), errors, f"{claim_key} must be boolean")
     require(claims.get("full_runtime_compatibility") is False, errors, "full runtime compatibility must not be claimed")
-    require(claims.get("hvac_compatibility") is False, errors, "HVAC compatibility must not be broadly claimed")
-    require(claims.get("plant_compatibility") is False, errors, "plant compatibility must not be broadly claimed")
 
     claim_requirements = set(str(value) for value in claims.get("requirements", []))
     require(
@@ -174,10 +197,246 @@ def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
         )
 
 
+def run_domain_claim_self_tests(
+    repo_root: Path,
+    ledger: dict[str, Any],
+    contract: dict[str, Any],
+) -> list[str]:
+    passed: list[str] = []
+
+    def raw_routine(candidate: dict[str, Any], routine_id: str) -> dict[str, Any]:
+        for algorithm in candidate.get("algorithm", []):
+            value = algorithm.get("routine", {}).get(routine_id)
+            if isinstance(value, dict):
+                return value
+        raise KeyError(routine_id)
+
+    def completion_errors(candidate_ledger: dict[str, Any], candidate_contract: dict[str, Any]) -> list[str]:
+        errors: list[str] = []
+        routines = collect_routines(candidate_ledger.get("algorithm", []), errors)
+        validate_domain_completion_contract(candidate_contract, routines, errors)
+        return errors
+
+    def contract_errors(candidate_contract: dict[str, Any]) -> list[str]:
+        errors: list[str] = []
+        validate_contract(candidate_contract, errors)
+        return errors
+
+    def shallow_routine_errors(candidate_ledger: dict[str, Any]) -> list[str]:
+        errors: list[str] = []
+        routines = collect_routines(candidate_ledger.get("algorithm", []), errors)
+        covered_variables = variable_names(repo_root)
+        commands = command_names(repo_root)
+        for routine in routines:
+            validate_routine(repo_root, None, routine, covered_variables, commands, errors)
+        return errors
+
+    def expect_error(name: str, errors: list[str], token: str) -> None:
+        if not any(token in error for error in errors):
+            raise AssertionError(f"{name}: expected error containing {token!r}; got {errors}")
+        passed.append(name)
+
+    baseline_errors = completion_errors(ledger, contract)
+    if baseline_errors:
+        raise AssertionError(f"baseline domain claim contract is invalid: {baseline_errors}")
+    baseline_routine_errors = shallow_routine_errors(ledger)
+    if baseline_routine_errors:
+        raise AssertionError(f"baseline shallow routine contract is invalid: {baseline_routine_errors}")
+
+    candidate_contract = copy.deepcopy(contract)
+    candidate_contract.pop("routine_completion_schema")
+    expect_error(
+        "routine_completion_schema_marker_required",
+        contract_errors(candidate_contract),
+        "routine_completion_schema to routine_completion.v1",
+    )
+
+    candidate = copy.deepcopy(ledger)
+    raw_routine(candidate, "manage_heat_balance")["completion_status"] = "ported"
+    expect_error("unknown_completion_status", completion_errors(candidate, contract), "unsupported routine completion_status")
+
+    candidate = copy.deepcopy(ledger)
+    first = raw_routine(candidate, "manage_heat_balance")
+    second = raw_routine(candidate, "manage_surface_heat_balance")
+    second["source_file"] = first["source_file"]
+    second["source_routine"] = first["source_routine"]
+    expect_error("duplicate_source_routine", completion_errors(candidate, contract), "duplicate routine source mapping")
+
+    candidate_contract = copy.deepcopy(contract)
+    candidate_contract["domain_claim"][0]["required_routines"] = []
+    expect_error("empty_required_routines", completion_errors(ledger, candidate_contract), "required_routines must not be empty")
+
+    candidate_contract = copy.deepcopy(contract)
+    required = candidate_contract["domain_claim"][0]["required_routines"]
+    required.append(required[0])
+    expect_error("duplicate_required_routines", completion_errors(ledger, candidate_contract), "must not contain duplicates")
+
+    candidate_contract = copy.deepcopy(contract)
+    candidate_contract["domain_claim"][0]["required_routines"][0] = "zone_air_heat_balance"
+    expect_error("algorithm_row_is_not_a_routine", completion_errors(ledger, candidate_contract), "unknown required routine")
+
+    candidate_contract = copy.deepcopy(contract)
+    plant_routine = candidate_contract["domain_claim"][2]["required_routines"][0]
+    candidate_contract["domain_claim"][0]["required_routines"][0] = plant_routine
+    expect_error("wrong_domain_routine", completion_errors(ledger, candidate_contract), "required routine belongs to plant")
+
+    candidate_contract = copy.deepcopy(contract)
+    candidate_contract["domain_claim"][1]["required_routines"].remove("sim_purchased_air")
+    expect_error(
+        "tracked_required_routine_cannot_be_omitted",
+        completion_errors(ledger, candidate_contract),
+        "must exactly match required_for_full_domain routine records",
+    )
+
+    candidate_ledger = copy.deepcopy(ledger)
+    candidate_contract = copy.deepcopy(contract)
+    heat_claim = candidate_contract["domain_claim"][0]
+    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
+    for routine_id in heat_claim["required_routines"]:
+        raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
+    expect_error("claim_requires_complete_inventory", completion_errors(candidate_ledger, candidate_contract), "routine_inventory_complete=true")
+
+    candidate_ledger = copy.deepcopy(ledger)
+    candidate_contract = copy.deepcopy(contract)
+    heat_claim = candidate_contract["domain_claim"][0]
+    heat_claim["routine_inventory_complete"] = True
+    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
+    for routine_id in heat_claim["required_routines"]:
+        raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
+    raw_routine(candidate_ledger, heat_claim["required_routines"][0])["completion_status"] = "implemented"
+    expect_error("claim_rejects_implemented_routine", completion_errors(candidate_ledger, candidate_contract), "every required routine at family_gated or complete")
+
+    candidate_ledger = copy.deepcopy(ledger)
+    raw_routine(candidate_ledger, "manage_heat_balance")["completion_status"] = "family_gated"
+    expect_error(
+        "status_inflation_requires_phase_evidence",
+        shallow_routine_errors(candidate_ledger),
+        "state_mapping_ref must not be empty",
+    )
+
+    candidate_ledger = copy.deepcopy(ledger)
+    candidate_contract = copy.deepcopy(contract)
+    heat_claim = candidate_contract["domain_claim"][0]
+    heat_claim["routine_inventory_complete"] = True
+    candidate_contract["claims"]["broad_heat_balance_compatibility"] = True
+    for routine_id in heat_claim["required_routines"]:
+        raw_routine(candidate_ledger, routine_id)["completion_status"] = "family_gated"
+    positive_errors = completion_errors(candidate_ledger, candidate_contract)
+    if positive_errors:
+        raise AssertionError(f"family_gated full-domain threshold should pass: {positive_errors}")
+    passed.append("family_gated_full_domain_threshold")
+
+    candidate_ledger = copy.deepcopy(ledger)
+    routine = raw_routine(candidate_ledger, "sim_purchased_air")
+    routine.update(
+        {
+            "completion_status": "family_gated",
+            "state_mapping_ref": routine["source_map"],
+            "read_state": ["self-test input state"],
+            "write_state": ["self-test output state"],
+            "history_state_ownership": "self-test runtime ownership",
+            "unsupported_state": [],
+            "inactive_branches": [],
+            "unsupported_active_branches": [],
+            "not_claimed_branches": [],
+            "rust_target": ["crates/ep_runtime/src/ideal_loads/dispatch.rs::sim_purchased_air_compat"],
+            "family_gate_ids": ["plant_loop_diagnostic_001"],
+            "proof_variables": ["Plant Supply Side Inlet Temperature"],
+        }
+    )
+    expect_error("diagnostic_case_cannot_family_gate", shallow_routine_errors(candidate_ledger), "family_gated requires a conformance case")
+
+    candidate_ledger = copy.deepcopy(ledger)
+    for algorithm in candidate_ledger.get("algorithm", []):
+        if algorithm.get("id") == "plant_loop_state_projection":
+            algorithm["family_cases"] = ["ideal_loads_no_oa_sensible_conformance_001"]
+            break
+    routine = raw_routine(candidate_ledger, "manage_plant_loops")
+    routine.update(
+        {
+            "completion_status": "family_gated",
+            "state_mapping_ref": routine["source_map"],
+            "read_state": ["self-test input state"],
+            "write_state": ["self-test output state"],
+            "history_state_ownership": "self-test runtime ownership",
+            "unsupported_state": [],
+            "inactive_branches": [],
+            "unsupported_active_branches": [],
+            "not_claimed_branches": [],
+            "rust_target": ["crates/ep_runtime/src/plant/state.rs::simulate_plant_state_projection"],
+            "family_gate_ids": ["ideal_loads_no_oa_sensible_conformance_001"],
+            "proof_variables": ["Zone Ideal Loads Zone Total Heating Rate"],
+        }
+    )
+    expect_error(
+        "cross_domain_case_cannot_family_gate",
+        shallow_routine_errors(candidate_ledger),
+        "scope does not cover routine domain plant",
+    )
+
+    candidate_ledger = copy.deepcopy(ledger)
+    for algorithm in candidate_ledger.get("algorithm", []):
+        if algorithm.get("id") == "heat_balance_manager_source_order":
+            algorithm["family_cases"] = ["official_1zone_static_model_001"]
+            break
+    routine = raw_routine(candidate_ledger, "manage_heat_balance")
+    routine.update(
+        {
+            "completion_status": "family_gated",
+            "state_mapping_ref": routine["source_map"],
+            "read_state": [routine["source_routine"]],
+            "write_state": [routine["source_routine"]],
+            "history_state_ownership": routine["source_routine"],
+            "unsupported_state": [],
+            "inactive_branches": [],
+            "unsupported_active_branches": [],
+            "not_claimed_branches": [],
+            "rust_target": ["crates/ep_runtime/src/heat_balance/manager.rs::manage_heat_balance_source_order_stages"],
+            "family_gate_ids": ["official_1zone_static_model_001"],
+            "proof_variables": ["HeatTransfer Surface Area (Net)"],
+        }
+    )
+    expect_error(
+        "same_domain_case_requires_explicit_routine_coverage",
+        shallow_routine_errors(candidate_ledger),
+        "family gate must declare routine in routine_coverage.routine_ids",
+    )
+
+    candidate_ledger = copy.deepcopy(ledger)
+    routine = raw_routine(candidate_ledger, "sim_purchased_air")
+    routine.update(
+        {
+            "completion_status": "family_gated",
+            "state_mapping_ref": routine["source_map"],
+            "read_state": ["self-test input state"],
+            "write_state": ["self-test output state"],
+            "history_state_ownership": "self-test runtime ownership",
+            "unsupported_state": [],
+            "inactive_branches": [],
+            "unsupported_active_branches": [],
+            "not_claimed_branches": [],
+            "rust_target": ["crates/ep_runtime/src/ideal_loads/dispatch.rs::sim_purchased_air_compat"],
+            "family_gate_ids": ["ideal_loads_no_oa_sensible_conformance_001"],
+            "proof_variables": ["Zone Ideal Loads Supply Air Total Heating Energy"],
+        }
+    )
+    expect_error(
+        "diagnostic_output_cannot_prove_family_gate",
+        shallow_routine_errors(candidate_ledger),
+        "proof variable is not requested by any family gate",
+    )
+
+    candidate_contract = copy.deepcopy(contract)
+    candidate_contract["claims"]["full_runtime_compatibility"] = True
+    expect_error("full_runtime_stays_locked", completion_errors(ledger, candidate_contract), "full runtime compatibility remains locked")
+    return passed
+
+
 def main() -> int:
     args = parse_args()
     repo_root = args.repo_root.resolve()
     contract_path = repo_root / "specs" / "project_contract.toml"
+    ledger_path = repo_root / "specs" / "algorithm_ledger.toml"
     readme_path = repo_root / "README.md"
     current_doc_path = repo_root / "docs" / "src" / "current" / "project-contract.md"
     current_status_path = repo_root / "docs" / "src" / "current" / "current-status.md"
@@ -187,8 +446,11 @@ def main() -> int:
     generated_current_status_path = repo_root / "docs" / "src" / "generated" / "current-status-classification.md"
     errors: list[str] = []
     contract: dict[str, Any] = {}
+    ledger: dict[str, Any] = {}
+    self_test_results: list[str] = []
 
     require(contract_path.is_file(), errors, f"missing project contract spec: {contract_path}")
+    require(ledger_path.is_file(), errors, f"missing algorithm ledger spec: {ledger_path}")
     require(readme_path.is_file(), errors, f"missing README: {readme_path}")
     require(current_doc_path.is_file(), errors, f"missing current project contract doc: {current_doc_path}")
     require(current_status_path.is_file(), errors, f"missing current status doc: {current_status_path}")
@@ -211,6 +473,19 @@ def main() -> int:
     if contract_path.is_file():
         contract = load_toml(contract_path)
         validate_contract(contract, errors)
+    if ledger_path.is_file():
+        ledger = load_toml(ledger_path)
+        algorithms = ledger.get("algorithm", [])
+        require(isinstance(algorithms, list), errors, "algorithm ledger must contain [[algorithm]] records")
+        if isinstance(algorithms, list):
+            routines = collect_routines(algorithms, errors)
+            require(bool(routines), errors, "algorithm ledger must contain routine completion records")
+            covered_variables = variable_names(repo_root)
+            commands = command_names(repo_root)
+            for routine in routines:
+                validate_routine(repo_root, None, routine, covered_variables, commands, errors)
+            if contract:
+                validate_domain_completion_contract(contract, routines, errors)
     if readme_path.is_file():
         require_contains_all(readme_path.read_text(encoding="utf-8"), README_REQUIRED_PHRASES, errors, "README.md")
     if current_doc_path.is_file():
@@ -251,6 +526,12 @@ def main() -> int:
                 f"generated current-status classification missing row: {item.get('id', '')}",
             )
 
+    if args.self_test and not errors:
+        try:
+            self_test_results = run_domain_claim_self_tests(repo_root, ledger, contract)
+        except AssertionError as error:
+            errors.append(f"domain claim self-test failed: {error}")
+
     if errors:
         print("Project contract validation failed:", file=sys.stderr)
         for error in errors:
@@ -261,6 +542,9 @@ def main() -> int:
     print(f"  oracle: EnergyPlus {EXPECTED_VERSION}")
     print("  rust_only: valid")
     print("  compatibility_contract: valid")
+    print("  routine_completion_gate: valid")
+    if args.self_test:
+        print(f"  mutation_self_tests: {len(self_test_results)}")
     print("  readme_alignment: valid")
     return 0
 

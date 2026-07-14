@@ -146,7 +146,7 @@
                          "name":  "algorithm-ledger-check",
                          "path":  "quality\\algorithm-ledger-check.ps1",
                          "group":  "quality",
-                         "help":  "Validate source-map, EnergyPlus source, Rust target, case evidence, and port-ticket review contract."
+                         "help":  "Validate algorithm evidence, routine completion phases, full-domain readiness, and the port-ticket review contract."
                      },
                      {
                          "name":  "variable-coverage-check",

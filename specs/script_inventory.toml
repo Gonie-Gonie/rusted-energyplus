@@ -2584,8 +2584,8 @@ callers = ["scripts/dev.ps1", "scripts/quality/check.ps1"]
 caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::invoke_dev_command"]
 callees = ["scripts/quality/pr-port-ticket-check/changed-files.ps1", "scripts/quality/pr-port-ticket-check/contract-diff.ps1", "scripts/quality/pr-port-ticket-check/self-tests.ps1"]
 callee_evidence = ["scripts/quality/pr-port-ticket-check/changed-files.ps1::dot_sources", "scripts/quality/pr-port-ticket-check/contract-diff.ps1::dot_sources", "scripts/quality/pr-port-ticket-check/self-tests.ps1::dot_sources"]
-calls = ["script:scripts/quality/pr-port-ticket-check/changed-files.ps1", "script:scripts/quality/pr-port-ticket-check/contract-diff.ps1", "script:scripts/quality/pr-port-ticket-check/self-tests.ps1"]
-generated_artifacts = []
+calls = ["script:scripts/quality/pr-port-ticket-check/changed-files.ps1", "script:scripts/quality/pr-port-ticket-check/contract-diff.ps1", "script:scripts/quality/pr-port-ticket-check/self-tests.ps1", "tools/docs/algorithm_ledger_self_tests.py", "tools/docs/fetch_energyplus_reference_subset.py", "tools/docs/generate_docs.py", "tools/docs/routine_completion_contract.py", "tools/docs/validate_algorithm_ledger.py", "tools/docs/validate_project_contract.py"]
+generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/docs-inventory.md", "docs/src/generated/script-index.md", "tools/docs/generated-docs.manifest.json"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 

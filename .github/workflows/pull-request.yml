@@ -29,6 +29,23 @@ jobs:
       - name: Cross-check capability, algorithm, case, and variable specs
         run: .\scripts\dev.cmd spec-cross-check -SelfTest
 
+      - name: Gate full-domain claims on routine completion
+        run: .\scripts\dev.cmd project-contract-check -SelfTest
+
+      - name: Verify generated routine readiness docs
+        run: python tools/docs/generate_docs.py --repo-root . --check
+
+      - name: Fetch locked EnergyPlus source subset
+        run: |
+          python tools/docs/fetch_energyplus_reference_subset.py --repo-root . --self-test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/docs/fetch_energyplus_reference_subset.py --repo-root . --force
+
+      - name: Validate source-order routine evidence
+        run: |
+          .\scripts\dev.cmd algorithm-ledger-check
+          .\scripts\dev.cmd algorithm-ledger-check -SelfTest
+
   algorithm-port-ticket:
     name: Algorithm Port Ticket
     runs-on: windows-latest

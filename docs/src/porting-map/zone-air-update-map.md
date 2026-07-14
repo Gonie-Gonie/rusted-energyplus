@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-06-12
+last_reviewed: 2026-07-14
 ---
 
 # Zone Air Update Map
@@ -16,12 +16,17 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 
 | EnergyPlus area | Source anchor | Rust target | Current status |
 |---|---|---|---|
-| zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `advance_heat_balance_state_one_timestep` successor | scalar shell only |
+| zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | source-order barrier plus scalar shell; routine semantics not complete |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
 | surface convection coupling | `HeatBalanceSurfaceManager.cc` | future surface convection aggregate | not ported |
 | HVAC and infiltration coupling | zone equipment and air balance managers | future zone load inputs | not ported |
+
+`HVACManager.cc` calls `ManageZoneAirUpdates` for setpoint acquisition,
+prediction, and correction. It is a predictor/corrector orchestration routine,
+not a direct child of the `ManageHeatBalance` -> `ManageSurfaceHeatBalance` ->
+`ManageAirHeatBalance` call chain.
 
 ## Promotion Requirements
 

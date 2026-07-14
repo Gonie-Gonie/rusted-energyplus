@@ -107,7 +107,7 @@ none
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-07-14 |
 | docs/src/current/launcher-and-run-framework.md | current | Current | n/a | present | active | core | 2026-06-23 |
-| docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-06-23 |
+| docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-07-14 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-06-23 |
 | docs/src/current/verification.md | current | Current | n/a | present | active | qa | 2026-06-23 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
@@ -128,7 +128,7 @@ none
 | docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-07-14 |
 | docs/src/operations/setup-checklist.md | spec-explanation | not in SUMMARY | n/a | present | active | core | 2026-06-08 |
 | docs/src/operations/supported-object-coverage.md | spec-explanation | not in SUMMARY | n/a | none |  |  |  |
-| docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-15 |
+| docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-07-14 |
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
@@ -146,7 +146,7 @@ none
 | docs/src/porting-map/surface-balance-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-20 |
 | docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
-| docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
+| docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
 | docs/src/quick-start.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |
 | docs/src/releases/README.md | release-note | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/releases/v0.1.0.md | release-note | not in SUMMARY | n/a | present | ready | release | 2026-06-18 |

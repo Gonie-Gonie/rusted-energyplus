@@ -702,6 +702,28 @@ function Invoke-PrPortTicketSelfTest {
     }
     Write-Host "OK PR port-ticket self-test: gate_command_boundary_union"
 
+    $familyCaseLedgerBlock = @"
+id = "algorithm_with_family"
+first_case = "first_case_001"
+family_cases = [
+    "family_case_001",
+    "family_case_002",
+]
+support_boundary = "support_boundary_case_001 only"
+"@
+    $familyAllowedCaseIds = @(Get-LedgerAllowedCaseIds -LedgerBlock $familyCaseLedgerBlock)
+    if (
+        $familyAllowedCaseIds -notcontains "family_case_001" -or
+        $familyAllowedCaseIds -notcontains "family_case_002"
+    ) {
+        throw "Family-case boundary self-test rejected a declared family case."
+    }
+    Write-Host "OK PR port-ticket self-test: family_case_allowed_boundary"
+    if ($familyAllowedCaseIds -contains "unrelated_case_001") {
+        throw "Family-case boundary self-test accepted an unrelated case."
+    }
+    Write-Host "OK PR port-ticket self-test: unrelated_case_rejected_boundary"
+
     $missingBaseCaseCommand = Get-GateCommandNameForCase `
         -CaseId "__definitely_new_case_001" `
         -Revision $headRevision
@@ -735,6 +757,139 @@ function Invoke-PrPortTicketSelfTest {
         throw "TOML block-diff self-test treated CRLF/LF-only ledger differences as changed."
     }
     Write-Host "OK PR port-ticket self-test: ledger_newline_normalization"
+
+    $routineBootstrapBase = @"
+schema = "test.v1"
+
+[[algorithm]]
+id = "algorithm_a"
+status = "scaffold"
+
+[[algorithm]]
+id = "algorithm_b"
+status = "diagnostic_only"
+"@
+    $routineBootstrapHead = @"
+schema = "test.v1"
+
+[[algorithm]]
+id = "algorithm_a"
+status = "scaffold"
+routine.manage_a.source_file = "src/EnergyPlus/ManagerA.cc"
+routine.manage_a.source_routine = "ManageA"
+routine.manage_a.source_map = "docs/src/porting-map/manager-a.md"
+routine.manage_a.completion_status = "source_mapped"
+routine.manage_a.required_for_full_domain = true
+
+[[algorithm]]
+id = "algorithm_b"
+status = "diagnostic_only"
+routine.manage_b.source_file = "src/EnergyPlus/ManagerB.cc"
+routine.manage_b.source_routine = "ManageB"
+routine.manage_b.source_map = "docs/src/porting-map/manager-b.md"
+routine.manage_b.completion_status = "source_mapped"
+routine.manage_b.required_for_full_domain = true
+"@
+    if (-not (Test-RoutineCompletionMetadataBootstrap `
+        -BaseText $routineBootstrapBase `
+        -HeadText $routineBootstrapHead)) {
+        throw "Routine completion bootstrap self-test rejected valid multi-algorithm metadata additions."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_metadata_bootstrap"
+
+    $routineBootstrapPromotion = $routineBootstrapHead.Replace(
+        'routine.manage_a.completion_status = "source_mapped"',
+        'routine.manage_a.completion_status = "implemented"'
+    )
+    if (Test-RoutineCompletionMetadataBootstrap `
+        -BaseText $routineBootstrapBase `
+        -HeadText $routineBootstrapPromotion) {
+        throw "Routine completion bootstrap self-test accepted a status promotion."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_promotion"
+
+    $routineBootstrapNonRoutine = $routineBootstrapHead.Replace(
+        'status = "scaffold"',
+        'status = "conformance"'
+    )
+    if (Test-RoutineCompletionMetadataBootstrap `
+        -BaseText $routineBootstrapBase `
+        -HeadText $routineBootstrapNonRoutine) {
+        throw "Routine completion bootstrap self-test accepted a non-routine algorithm change."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_non_routine_change"
+
+    $existingRoutineBase = $routineBootstrapHead
+    $existingRoutineModification = $routineBootstrapHead.Replace(
+        'routine.manage_a.source_map = "docs/src/porting-map/manager-a.md"',
+        'routine.manage_a.source_map = "docs/src/porting-map/changed-manager-a.md"'
+    )
+    if (Test-RoutineCompletionMetadataBootstrap `
+        -BaseText $existingRoutineBase `
+        -HeadText $existingRoutineModification) {
+        throw "Routine completion bootstrap self-test accepted an existing routine modification."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_existing_modification"
+
+    $routineBootstrapBaseContract = @"
+[oracle]
+energyplus_version = "26.1.0"
+"@
+    $routineBootstrapHeadContract = @"
+routine_completion_schema = "routine_completion.v1"
+
+[oracle]
+energyplus_version = "26.1.0"
+"@
+    $routineBootstrapAllowedPaths = @(
+        "specs/algorithm_ledger.toml",
+        "specs/project_contract.toml",
+        "docs/src/current/project-contract.md"
+    )
+    if (-not (Test-RoutineCompletionMetadataBootstrapTransition `
+        -BaseLedgerText $routineBootstrapBase `
+        -HeadLedgerText $routineBootstrapHead `
+        -BaseContractText $routineBootstrapBaseContract `
+        -HeadContractText $routineBootstrapHeadContract `
+        -ChangedFiles $routineBootstrapAllowedPaths)) {
+        throw "One-time routine completion schema transition self-test rejected the valid bootstrap."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_schema_transition"
+
+    if (Test-RoutineCompletionMetadataBootstrapTransition `
+        -BaseLedgerText $routineBootstrapBase `
+        -HeadLedgerText $routineBootstrapHead `
+        -BaseContractText $routineBootstrapBaseContract `
+        -HeadContractText $routineBootstrapBaseContract `
+        -ChangedFiles $routineBootstrapAllowedPaths) {
+        throw "Routine completion schema transition self-test accepted a missing head marker."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_missing_marker"
+
+    if (Test-RoutineCompletionMetadataBootstrapTransition `
+        -BaseLedgerText $routineBootstrapBase `
+        -HeadLedgerText $routineBootstrapHead `
+        -BaseContractText $routineBootstrapHeadContract `
+        -HeadContractText $routineBootstrapHeadContract `
+        -ChangedFiles $routineBootstrapAllowedPaths) {
+        throw "Routine completion schema transition self-test accepted an already-present base marker."
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_existing_marker"
+
+    foreach ($disallowedPath in @(
+        "tools/oracle/energyplus.lock.toml",
+        "crates/ep_runtime/src/runtime.rs"
+    )) {
+        if (Test-RoutineCompletionMetadataBootstrapTransition `
+            -BaseLedgerText $routineBootstrapBase `
+            -HeadLedgerText $routineBootstrapHead `
+            -BaseContractText $routineBootstrapBaseContract `
+            -HeadContractText $routineBootstrapHeadContract `
+            -ChangedFiles @($routineBootstrapAllowedPaths + $disallowedPath)) {
+            throw "Routine completion schema transition self-test accepted disallowed path: $disallowedPath"
+        }
+    }
+    Write-Host "OK PR port-ticket self-test: routine_completion_bootstrap_rejects_disallowed_paths"
 
     $syntheticCapabilityBase = @"
 schema = "test.v1"

@@ -12,6 +12,35 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")).Path
+$script:RoutineCompletionMetadataBootstrapAllowedPaths = @(
+    ".github/workflows/pull-request.yml",
+    "docs/src/current/current-status.md",
+    "docs/src/current/project-contract.md",
+    "docs/src/generated/algorithm-ledger.md",
+    "docs/src/generated/docs-inventory.md",
+    "docs/src/generated/script-index.md",
+    "docs/src/porting-map/algorithm-ledger.md",
+    "docs/src/porting-map/zone-air-update-map.md",
+    "scripts/dev/commands.json",
+    "scripts/quality/algorithm-ledger-check.ps1",
+    "scripts/quality/check.ps1",
+    "scripts/quality/pr-port-ticket-check.ps1",
+    "scripts/quality/pr-port-ticket-check/contract-diff.ps1",
+    "scripts/quality/pr-port-ticket-check/self-tests.ps1",
+    "scripts/quality/project-contract-check.ps1",
+    "scripts/quality/strict-no-false-conformance.ps1",
+    "specs/algorithm_ledger.toml",
+    "specs/project_contract.toml",
+    "specs/script_inventory.toml",
+    "tools/docs/algorithm_ledger_self_tests.py",
+    "tools/docs/fetch_energyplus_reference_subset.py",
+    "tools/docs/generate_docs.py",
+    "tools/docs/generated-docs.manifest.json",
+    "tools/docs/routine_completion_contract.py",
+    "tools/docs/testdata/routine-state-map-v1.md",
+    "tools/docs/validate_algorithm_ledger.py",
+    "tools/docs/validate_project_contract.py"
+)
 
 function Get-PrBodyText {
     param(
@@ -476,24 +505,9 @@ function Assert-TicketReferences {
     if ($caseId -notmatch "^[a-z0-9][a-z0-9_-]*$") {
         throw "First target case must be a case-manifest id: $caseId"
     }
-    $allowedCaseIds = [System.Collections.Generic.HashSet[string]]::new(
-        [System.StringComparer]::OrdinalIgnoreCase
-    )
-    foreach ($field in @("first_case", "first_evidence")) {
-        $candidate = Get-TomlStringValue -Text $ledgerBlock -Name $field
-        if (-not [string]::IsNullOrWhiteSpace($candidate)) {
-            [void]$allowedCaseIds.Add($candidate)
-        }
-    }
-    $supportBoundary = Get-TomlStringValue -Text $ledgerBlock -Name "support_boundary"
-    $caseRoot = Join-Path $RepoRoot "data\conformance_cases"
-    foreach ($caseDirectory in Get-ChildItem -LiteralPath $caseRoot -Directory) {
-        if ($supportBoundary -match "(?<![A-Za-z0-9_])$([regex]::Escape($caseDirectory.Name))(?![A-Za-z0-9_])") {
-            [void]$allowedCaseIds.Add($caseDirectory.Name)
-        }
-    }
-    if (-not $allowedCaseIds.Contains($caseId)) {
-        throw "First target case is not linked by algorithm $algorithmId first evidence or support boundary: $caseId"
+    $allowedCaseIds = @(Get-LedgerAllowedCaseIds -LedgerBlock $ledgerBlock)
+    if ($allowedCaseIds -notcontains $caseId) {
+        throw "First target case is not linked by algorithm $algorithmId first evidence, family cases, or support boundary: $caseId"
     }
     $casePath = Join-Path $RepoRoot "data\conformance_cases\$caseId\case.toml"
     if (-not (Test-Path -LiteralPath $casePath -PathType Leaf)) {
@@ -625,6 +639,42 @@ function Test-AlgorithmPortTicketBody {
         -not (Test-EvidenceCommandCatalogChange -BaseRevision $BaseRevision)
     ) {
         $sourceOrderFiles = @($sourceOrderFiles | Where-Object { $_ -ne "scripts/dev/commands.json" })
+    }
+    # A one-time routine inventory bootstrap may span algorithm blocks. Only
+    # exact source_mapped metadata additions qualify; promotions and all other
+    # source-order changes continue through the single-algorithm ticket path.
+    if (
+        $ChangedFilesProvided -and
+        $sourceOrderFiles.Count -eq 1 -and
+        $sourceOrderFiles[0] -eq "specs/algorithm_ledger.toml" -and
+        -not [string]::IsNullOrWhiteSpace($BaseRevision)
+    ) {
+        $baseLedgerText = Get-GitFileText `
+            -Revision $BaseRevision `
+            -Path "specs/algorithm_ledger.toml"
+        $baseContractText = Get-GitFileText `
+            -Revision $BaseRevision `
+            -Path "specs/project_contract.toml"
+        $headLedgerPath = Join-Path $RepoRoot "specs\algorithm_ledger.toml"
+        $headContractPath = Join-Path $RepoRoot "specs\project_contract.toml"
+        $headLedgerText = Get-Content -Encoding UTF8 -Raw -LiteralPath $headLedgerPath
+        $headContractText = Get-Content -Encoding UTF8 -Raw -LiteralPath $headContractPath
+        if (
+            -not [string]::IsNullOrWhiteSpace($baseLedgerText) -and
+            -not [string]::IsNullOrWhiteSpace($baseContractText) -and
+            (Test-RoutineCompletionMetadataBootstrapTransition `
+                -BaseLedgerText $baseLedgerText `
+                -HeadLedgerText $headLedgerText `
+                -BaseContractText $baseContractText `
+                -HeadContractText $headContractText `
+                -ChangedFiles $ChangedFiles)
+        ) {
+            return [pscustomobject]@{
+                status = "pass"
+                classification = "routine_completion_metadata_bootstrap"
+                sensitive_file_count = 1
+            }
+        }
     }
     if ($ChangedFilesProvided -and $sourceOrderFiles.Count -eq 0) {
         return [pscustomobject]@{

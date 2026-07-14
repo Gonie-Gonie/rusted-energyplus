@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-06-23
+last_reviewed: 2026-07-14
 ---
 
 # Project Contract
@@ -53,6 +53,21 @@ case manifest
 
 Markdown wording, smoke tests, diagnostics, arbitrary IDF runs, and performance
 results do not create compatibility claims.
+
+## Full-Domain Claims
+
+Heat-balance, HVAC, and plant full-domain claims use canonical required-routine
+lists in `specs/project_contract.toml`. A domain can be claimed only when its
+routine inventory is explicitly complete and every listed routine is
+`family_gated` or `complete` in `specs/algorithm_ledger.toml`. Limited
+algorithm conformance does not satisfy this rule. Full runtime compatibility
+remains locked until all EnergyPlus domains have complete inventories.
+
+The root marker `routine_completion_schema = "routine_completion.v1"` records
+the one-time introduction of routine-level completion metadata. The PR-ticket
+bootstrap exemption applies only while this marker changes from absent to
+present and only to the explicit governance and documentation file allowlist;
+after that transition, routine promotions use the normal Algorithm Port Ticket.
 
 ## Run States
 

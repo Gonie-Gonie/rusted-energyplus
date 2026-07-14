@@ -126,6 +126,260 @@ function Get-ChangedTomlSectionKeys {
     )
 }
 
+function Get-RoutineCompletionIds {
+    param([AllowEmptyString()][Parameter(Mandatory = $true)][string]$Text)
+
+    return @(
+        [regex]::Matches(
+            $Text,
+            '(?m)^[ \t]*routine\.(?<id>[a-z0-9][a-z0-9_]*)\.[a-z][a-z0-9_]*[ \t]*='
+        ) |
+            ForEach-Object { $_.Groups["id"].Value } |
+            Sort-Object -Unique
+    )
+}
+
+function Remove-NewRoutineCompletionAssignments {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$Text,
+        [AllowEmptyCollection()][string[]]$RoutineIds = @()
+    )
+
+    $routineIdSet = @{}
+    foreach ($routineId in $RoutineIds) {
+        $routineIdSet[$routineId] = $true
+    }
+    $keptLines = [System.Collections.Generic.List[string]]::new()
+    foreach ($line in [regex]::Split(($Text -replace "\r\n?", "`n"), "`n")) {
+        $match = [regex]::Match(
+            $line,
+            '^[ \t]*routine\.(?<id>[a-z0-9][a-z0-9_]*)\.[a-z][a-z0-9_]*[ \t]*='
+        )
+        if ($match.Success -and $routineIdSet.ContainsKey($match.Groups["id"].Value)) {
+            continue
+        }
+        $keptLines.Add($line)
+    }
+    return ($keptLines -join "`n").Trim()
+}
+
+function Test-NewRoutineCompletionAssignments {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$AlgorithmText,
+        [Parameter(Mandatory = $true)][string]$RoutineId
+    )
+
+    if ($RoutineId -notmatch '^[a-z0-9][a-z0-9_]*$') {
+        return $false
+    }
+    $assignmentPattern = (
+        '^[ \t]*routine\.{0}\.(?<field>[a-z][a-z0-9_]*)[ \t]*=[ \t]*(?<value>.+?)[ \t]*$' -f
+            [regex]::Escape($RoutineId)
+    )
+    $prefixPattern = '^[ \t]*routine\.{0}\.' -f [regex]::Escape($RoutineId)
+    $assignments = @{}
+    $routineLines = @(
+        [regex]::Split(($AlgorithmText -replace "\r\n?", "`n"), "`n") |
+            Where-Object { $_ -match $prefixPattern }
+    )
+    foreach ($line in $routineLines) {
+        $match = [regex]::Match($line, $assignmentPattern)
+        if (-not $match.Success) {
+            return $false
+        }
+        $field = $match.Groups["field"].Value
+        if ($assignments.ContainsKey($field)) {
+            return $false
+        }
+        $assignments[$field] = $match.Groups["value"].Value
+    }
+
+    $requiredFields = @(
+        "source_file",
+        "source_routine",
+        "source_map",
+        "completion_status",
+        "required_for_full_domain"
+    )
+    if ($assignments.Count -ne $requiredFields.Count) {
+        return $false
+    }
+    foreach ($field in $requiredFields) {
+        if (-not $assignments.ContainsKey($field)) {
+            return $false
+        }
+    }
+    foreach ($field in @("source_file", "source_routine", "source_map")) {
+        if ($assignments[$field] -notmatch '^"[^"\r\n]+"$') {
+            return $false
+        }
+    }
+    $sourceFile = $assignments["source_file"].Trim('"')
+    $sourceMap = $assignments["source_map"].Trim('"')
+    if (
+        $sourceFile -notmatch '^src/EnergyPlus/.+\.(cc|hh)$' -or
+        $sourceMap -notmatch '^docs/src/porting-map/.+\.md$' -or
+        $sourceFile -match '\\' -or
+        $sourceMap -match '\\' -or
+        $sourceFile -match '(^|/)\.\.(/|$)' -or
+        $sourceMap -match '(^|/)\.\.(/|$)' -or
+        $assignments["source_routine"] -notmatch '^"[A-Za-z_][A-Za-z0-9_]*"$'
+    ) {
+        return $false
+    }
+    if ($assignments["completion_status"] -cne '"source_mapped"') {
+        return $false
+    }
+    if ($assignments["required_for_full_domain"] -cne "true") {
+        return $false
+    }
+    return $true
+}
+
+function Test-RoutineCompletionMetadataBootstrap {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$BaseText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$HeadText
+    )
+
+    try {
+        $baseSections = Get-TomlDocumentSectionMap -Text $BaseText
+        $headSections = Get-TomlDocumentSectionMap -Text $HeadText
+    }
+    catch {
+        return $false
+    }
+    $sectionKeys = @($baseSections.Keys + $headSections.Keys | Sort-Object -Unique)
+    if ($sectionKeys.Count -ne $baseSections.Count -or $sectionKeys.Count -ne $headSections.Count) {
+        return $false
+    }
+    $changedSections = @(
+        $sectionKeys | Where-Object { $baseSections[$_] -ne $headSections[$_] }
+    )
+    if (
+        $changedSections.Count -eq 0 -or
+        @($changedSections | Where-Object { $_ -notlike "array:algorithm:*" }).Count -gt 0
+    ) {
+        return $false
+    }
+
+    $baseRoutineIdsById = @{}
+    foreach ($sectionKey in $sectionKeys) {
+        if ($sectionKey -notlike "array:algorithm:*") {
+            continue
+        }
+        foreach ($routineId in @(Get-RoutineCompletionIds -Text ([string]$baseSections[$sectionKey]))) {
+            if ($baseRoutineIdsById.ContainsKey($routineId)) {
+                return $false
+            }
+            $baseRoutineIdsById[$routineId] = $true
+        }
+    }
+    $seenNewRoutineIds = @{}
+    foreach ($sectionKey in $changedSections) {
+        $baseBlock = [string]$baseSections[$sectionKey]
+        $headBlock = [string]$headSections[$sectionKey]
+        $baseRoutineIds = @(Get-RoutineCompletionIds -Text $baseBlock)
+        $headRoutineIds = @(Get-RoutineCompletionIds -Text $headBlock)
+        $newRoutineIds = @($headRoutineIds | Where-Object { $baseRoutineIds -notcontains $_ })
+        if ($newRoutineIds.Count -eq 0) {
+            return $false
+        }
+        foreach ($routineId in $newRoutineIds) {
+            if (
+                $baseRoutineIdsById.ContainsKey($routineId) -or
+                $seenNewRoutineIds.ContainsKey($routineId) -or
+                -not (Test-NewRoutineCompletionAssignments -AlgorithmText $headBlock -RoutineId $routineId)
+            ) {
+                return $false
+            }
+            $seenNewRoutineIds[$routineId] = $true
+        }
+        $strippedHead = Remove-NewRoutineCompletionAssignments `
+            -Text $headBlock `
+            -RoutineIds $newRoutineIds
+        $normalizedBase = ($baseBlock -replace "\r\n?", "`n").Trim()
+        if ($strippedHead -cne $normalizedBase) {
+            return $false
+        }
+    }
+    return $seenNewRoutineIds.Count -gt 0
+}
+
+function Test-RoutineCompletionSchemaMarkerTransition {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$BaseText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$HeadText
+    )
+
+    if (
+        [string]::IsNullOrWhiteSpace($BaseText) -or
+        [string]::IsNullOrWhiteSpace($HeadText)
+    ) {
+        return $false
+    }
+    try {
+        $baseSections = Get-TomlDocumentSectionMap -Text $BaseText
+        $headSections = Get-TomlDocumentSectionMap -Text $HeadText
+    }
+    catch {
+        return $false
+    }
+    $baseRoot = if ($baseSections.ContainsKey("root")) { [string]$baseSections["root"] } else { "" }
+    $headRoot = if ($headSections.ContainsKey("root")) { [string]$headSections["root"] } else { "" }
+    $markerKeyPattern = '(?m)^[ \t]*routine_completion_schema[ \t]*='
+    $exactMarkerPattern = (
+        '(?m)^[ \t]*routine_completion_schema[ \t]*=[ \t]*' +
+        '"routine_completion\.v1"[ \t]*(?:#.*)?$'
+    )
+    return (
+        [regex]::Matches($baseRoot, $markerKeyPattern).Count -eq 0 -and
+        [regex]::Matches($headRoot, $markerKeyPattern).Count -eq 1 -and
+        [regex]::Matches($headRoot, $exactMarkerPattern).Count -eq 1
+    )
+}
+
+function Test-RoutineCompletionMetadataBootstrapTransition {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$BaseLedgerText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$HeadLedgerText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$BaseContractText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$HeadContractText,
+        [AllowEmptyCollection()][string[]]$ChangedFiles = @()
+    )
+
+    if (-not (Test-RoutineCompletionMetadataBootstrap `
+        -BaseText $BaseLedgerText `
+        -HeadText $HeadLedgerText)) {
+        return $false
+    }
+    if (-not (Test-RoutineCompletionSchemaMarkerTransition `
+        -BaseText $BaseContractText `
+        -HeadText $HeadContractText)) {
+        return $false
+    }
+
+    $normalizedChangedFiles = @(
+        $ChangedFiles |
+            ForEach-Object { ConvertTo-NormalizedRepoPath -Path ([string]$_) } |
+            Sort-Object -Unique
+    )
+    if (
+        $normalizedChangedFiles.Count -eq 0 -or
+        $normalizedChangedFiles -notcontains "specs/algorithm_ledger.toml" -or
+        $normalizedChangedFiles -notcontains "specs/project_contract.toml"
+    ) {
+        return $false
+    }
+    $disallowedPaths = @(
+        $normalizedChangedFiles |
+            Where-Object {
+                $script:RoutineCompletionMetadataBootstrapAllowedPaths -notcontains $_
+            }
+    )
+    return $disallowedPaths.Count -eq 0
+}
+
 function Get-ChangedCommandNames {
     param([Parameter(Mandatory = $true)][string]$BaseRevision)
 
@@ -260,6 +514,11 @@ function Get-LedgerAllowedCaseIds {
     )
     foreach ($field in @("first_case", "first_evidence")) {
         $value = Get-TomlStringValue -Text $LedgerBlock -Name $field
+        if (-not [string]::IsNullOrWhiteSpace($value)) {
+            [void]$ids.Add($value)
+        }
+    }
+    foreach ($value in @(Get-TomlStringArrayValues -Text $LedgerBlock -Name "family_cases")) {
         if (-not [string]::IsNullOrWhiteSpace($value)) {
             [void]$ids.Add($value)
         }

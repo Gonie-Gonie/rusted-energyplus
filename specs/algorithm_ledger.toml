@@ -111,6 +111,11 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Source-order scaffold only for HeatBalanceManager stage barriers: GetHeatBalanceInput, InitHeatBalance, RecKeepHeatBalance, ReportHeatBalance, CheckWarmupConvergence, and EMS callback placeholders. This entry does not add a numerical conformance claim."
+routine.manage_heat_balance.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.manage_heat_balance.source_routine = "ManageHeatBalance"
+routine.manage_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.manage_heat_balance.completion_status = "source_mapped"
+routine.manage_heat_balance.required_for_full_domain = true
 
 [[algorithm]]
 id = "heat_balance_surface_manager_source_order"
@@ -134,6 +139,11 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Source-order scaffold only for HeatBalanceSurfaceManager barriers. This entry does not add numerical surface-temperature or heat-flux conformance beyond promoted conformance entries and their declared variables."
+routine.manage_surface_heat_balance.source_file = "src/EnergyPlus/HeatBalanceSurfaceManager.cc"
+routine.manage_surface_heat_balance.source_routine = "ManageSurfaceHeatBalance"
+routine.manage_surface_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.manage_surface_heat_balance.completion_status = "source_mapped"
+routine.manage_surface_heat_balance.required_for_full_domain = true
 
 [[algorithm]]
 id = "heat_balance_air_manager_source_order"
@@ -152,6 +162,11 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Source-order scaffold only for the ManageAirHeatBalance barrier. Zone-air numerical claims remain bounded by promoted cases and do not imply broad HVAC or air-balance compatibility."
+routine.manage_air_heat_balance.source_file = "src/EnergyPlus/HeatBalanceAirManager.cc"
+routine.manage_air_heat_balance.source_routine = "ManageAirHeatBalance"
+routine.manage_air_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.manage_air_heat_balance.completion_status = "source_mapped"
+routine.manage_air_heat_balance.required_for_full_domain = true
 
 [[algorithm]]
 id = "zone_temp_predictor_corrector_source_order"
@@ -170,6 +185,11 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Source-order scaffold only for ManageZoneAirUpdates and its MAT history/output-timing ownership. This entry does not add zone-air conformance beyond promoted variables."
+routine.manage_zone_air_updates.source_file = "src/EnergyPlus/ZoneTempPredictorCorrector.cc"
+routine.manage_zone_air_updates.source_routine = "ManageZoneAirUpdates"
+routine.manage_zone_air_updates.source_map = "docs/src/porting-map/zone-air-update-map.md"
+routine.manage_zone_air_updates.completion_status = "source_mapped"
+routine.manage_zone_air_updates.required_for_full_domain = true
 
 [[algorithm]]
 id = "surface_inside_temperature"
@@ -331,6 +351,46 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Source-order scaffold for ZoneEquipmentManager dispatch into PurchasedAirManager. It records ManageZoneEquipment, SimZoneEquipment, SimPurchasedAir, GetPurchasedAir, InitPurchasedAir, CalcPurchAirLoads, UpdatePurchasedAir, and ReportPurchasedAir barriers and does not add IdealLoads or HVAC conformance."
+routine.manage_zone_equipment.source_file = "src/EnergyPlus/ZoneEquipmentManager.cc"
+routine.manage_zone_equipment.source_routine = "ManageZoneEquipment"
+routine.manage_zone_equipment.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.manage_zone_equipment.completion_status = "source_mapped"
+routine.manage_zone_equipment.required_for_full_domain = true
+routine.sim_zone_equipment.source_file = "src/EnergyPlus/ZoneEquipmentManager.cc"
+routine.sim_zone_equipment.source_routine = "SimZoneEquipment"
+routine.sim_zone_equipment.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.sim_zone_equipment.completion_status = "source_mapped"
+routine.sim_zone_equipment.required_for_full_domain = true
+routine.sim_purchased_air.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.sim_purchased_air.source_routine = "SimPurchasedAir"
+routine.sim_purchased_air.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.sim_purchased_air.completion_status = "source_mapped"
+routine.sim_purchased_air.required_for_full_domain = true
+routine.get_purchased_air.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.get_purchased_air.source_routine = "GetPurchasedAir"
+routine.get_purchased_air.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.get_purchased_air.completion_status = "source_mapped"
+routine.get_purchased_air.required_for_full_domain = true
+routine.init_purchased_air.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.init_purchased_air.source_routine = "InitPurchasedAir"
+routine.init_purchased_air.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.init_purchased_air.completion_status = "source_mapped"
+routine.init_purchased_air.required_for_full_domain = true
+routine.calc_purch_air_loads.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.calc_purch_air_loads.source_routine = "CalcPurchAirLoads"
+routine.calc_purch_air_loads.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.calc_purch_air_loads.completion_status = "source_mapped"
+routine.calc_purch_air_loads.required_for_full_domain = true
+routine.update_purchased_air.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.update_purchased_air.source_routine = "UpdatePurchasedAir"
+routine.update_purchased_air.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.update_purchased_air.completion_status = "source_mapped"
+routine.update_purchased_air.required_for_full_domain = true
+routine.report_purchased_air.source_file = "src/EnergyPlus/PurchasedAirManager.cc"
+routine.report_purchased_air.source_routine = "ReportPurchasedAir"
+routine.report_purchased_air.source_map = "docs/src/porting-map/ideal-loads-source-map.md"
+routine.report_purchased_air.completion_status = "source_mapped"
+routine.report_purchased_air.required_for_full_domain = true
 
 [[algorithm]]
 id = "ideal_loads_constant_shr_humidity_control"
@@ -748,3 +808,8 @@ proof_variables = [
 ]
 claim_level = "none"
 support_boundary = "Diagnostic plant-state projection only; no plant loop, equipment, flow, or load numerical conformance."
+routine.manage_plant_loops.source_file = "src/EnergyPlus/Plant/PlantManager.cc"
+routine.manage_plant_loops.source_routine = "ManagePlantLoops"
+routine.manage_plant_loops.source_map = "docs/src/porting-map/plant-source-map.md"
+routine.manage_plant_loops.completion_status = "source_mapped"
+routine.manage_plant_loops.required_for_full_domain = true

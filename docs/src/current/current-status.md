@@ -41,6 +41,11 @@ The exact case list is generated in
 `docs/src/generated/conformance-case-index.md`. The exact algorithm and
 coverage boundaries are generated from `specs/algorithm_ledger.toml`,
 `specs/object_coverage.toml`, and `specs/variable_coverage.toml`.
+The generated algorithm ledger also reports routine completion and full-domain
+readiness from `specs/algorithm_ledger.toml` and
+`specs/project_contract.toml`. Existing limited algorithm conformance does not
+count as routine completion; every required routine must reach
+`family_gated` or `complete` before a full-domain claim can be enabled.
 
 The classification table is generated from `specs/project_contract.toml`:
 

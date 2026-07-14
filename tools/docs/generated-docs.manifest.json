@@ -22,7 +22,9 @@
     "scripts/**/*",
     "scripts/dev/commands.json",
     "tools/docs/generate_docs.py",
+    "tools/docs/routine_completion_contract.py",
     "tools/docs/script_inventory.py",
+    "tools/docs/validate_algorithm_ledger.py",
     "README.md",
     "docs/src/**/*.md",
     "docs/src/SUMMARY.md"

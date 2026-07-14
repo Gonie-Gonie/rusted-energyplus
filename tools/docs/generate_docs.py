@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from script_inventory import collect_script_inventory, script_inventory_toml
+from validate_algorithm_ledger import ROUTINE_COMPLETION_RANK
 
 
 GENERATED_NOTICE = """<!-- DO NOT EDIT.
@@ -28,6 +29,7 @@ SCRIPT_INVENTORY_NOTICE = """<!-- DO NOT EDIT.
      Generated from scripts/ and scripts/dev/commands.json by tools/docs/generate_docs.py. -->
 
 """
+
 
 def load_toml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
@@ -148,12 +150,18 @@ def milestone_map(repo_root: Path) -> str:
 
 def algorithm_ledger(repo_root: Path) -> str:
     spec = load_toml(repo_root / "specs" / "algorithm_ledger.toml")
-    rows = []
+    contract = load_toml(repo_root / "specs" / "project_contract.toml")
+    domain_claims = {str(item.get("id", "")): item for item in contract.get("domain_claim", [])}
+    algorithm_rows = []
+    routine_rows = []
+    routine_status: dict[str, str] = {}
     for item in spec.get("algorithm", []):
-        rows.append(
+        algorithm_id = str(item.get("id", ""))
+        domain = str(item.get("domain", ""))
+        algorithm_rows.append(
             [
-                str(item.get("id", "")),
-                str(item.get("domain", "")),
+                algorithm_id,
+                domain,
                 str(item.get("status", "")),
                 str(item.get("source_map", "")),
                 list_value(item.get("energyplus_source", [])),
@@ -164,11 +172,60 @@ def algorithm_ledger(repo_root: Path) -> str:
                 str(item.get("support_boundary", "")),
             ]
         )
+        for routine_id, routine in item.get("routine", {}).items():
+            completion_status = str(routine.get("completion_status", ""))
+            routine_status[str(routine_id)] = completion_status
+            routine_rows.append(
+                [
+                    str(routine_id),
+                    domain,
+                    algorithm_id,
+                    completion_status,
+                    "yes" if routine.get("required_for_full_domain") is True else "no",
+                    f"{routine.get('source_file', '')}::{routine.get('source_routine', '')}",
+                    str(routine.get("source_map", "")),
+                    str(routine.get("state_mapping_ref", "")),
+                    list_value(routine.get("rust_target", [])),
+                    list_value(routine.get("family_gate_ids", [])),
+                ]
+            )
+
+    claims = contract.get("claims", {})
+    readiness_rows = []
+    for domain, domain_claim in domain_claims.items():
+        required = [str(value) for value in domain_claim.get("required_routines", [])]
+        gated = sum(
+            ROUTINE_COMPLETION_RANK.get(routine_status.get(routine_id, ""), -1)
+            >= ROUTINE_COMPLETION_RANK["family_gated"]
+            for routine_id in required
+        )
+        inventory_complete = domain_claim.get("routine_inventory_complete") is True
+        ready = inventory_complete and bool(required) and gated == len(required)
+        blockers = []
+        if not inventory_complete:
+            blockers.append("routine inventory incomplete")
+        if gated != len(required):
+            blockers.append(f"{len(required) - gated} below family_gated")
+        claim_key = str(domain_claim.get("claim_key", ""))
+        readiness_rows.append(
+            [
+                domain,
+                claim_key,
+                str(claims.get(claim_key, False)).lower(),
+                str(inventory_complete).lower(),
+                f"{gated}/{len(required)}",
+                str(ready).lower(),
+                "; ".join(blockers) or "none",
+            ]
+        )
 
     return (
         GENERATED_NOTICE
         + "# Algorithm Ledger\n\n"
-        + "Algorithm status is maintained in `specs/algorithm_ledger.toml`.\n\n"
+        + "Algorithm status is maintained in `specs/algorithm_ledger.toml`. "
+        + "Routine completion status is a separate six-step axis in the same ledger; "
+        + "full-domain claim readiness is maintained in `specs/project_contract.toml`.\n\n"
+        + "## Algorithm Evidence\n\n"
         + table(
             [
                 "ID",
@@ -182,8 +239,38 @@ def algorithm_ledger(repo_root: Path) -> str:
                 "Claim level",
                 "Boundary",
             ],
-            rows,
+            algorithm_rows,
         )
+        + "\n## Routine Completion\n\n"
+        + table(
+            [
+                "Routine ID",
+                "Domain",
+                "Parent algorithm",
+                "Completion status",
+                "Required",
+                "EnergyPlus routine",
+                "Source map",
+                "State map",
+                "Rust target",
+                "Family gates",
+            ],
+            routine_rows,
+        )
+        + "\n## Full-Domain Claim Readiness\n\n"
+        + table(
+            [
+                "Domain",
+                "Claim key",
+                "Claimed",
+                "Inventory complete",
+                "Family-gated required routines",
+                "Ready",
+                "Blockers",
+            ],
+            readiness_rows,
+        )
+        + "\n`full_runtime_compatibility` remains locked until every EnergyPlus domain has a complete routine inventory.\n"
     )
 
 
@@ -719,7 +806,9 @@ def generated_manifest(repo_root: Path) -> str:
             "scripts/**/*",
             "scripts/dev/commands.json",
             "tools/docs/generate_docs.py",
+            "tools/docs/routine_completion_contract.py",
             "tools/docs/script_inventory.py",
+            "tools/docs/validate_algorithm_ledger.py",
             "README.md",
             "docs/src/**/*.md",
             "docs/src/SUMMARY.md",
