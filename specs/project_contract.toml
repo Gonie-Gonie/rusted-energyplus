@@ -12,6 +12,7 @@ mixed_language_kernels = false
 broad_heat_balance_compatibility = false
 hvac_compatibility = false
 plant_compatibility = false
+time_compatibility = false
 full_runtime_compatibility = false
 arbitrary_runs_are_release_evidence = false
 
@@ -59,6 +60,23 @@ claim_key = "plant_compatibility"
 routine_inventory_complete = false
 required_routines = [
   "manage_plant_loops",
+]
+
+[[domain_claim]]
+id = "time"
+claim_key = "time_compatibility"
+routine_inventory_complete = false
+required_routines = [
+  "manage_simulation",
+  "get_run_period_data",
+  "setup_environment_types",
+  "get_next_environment",
+  "manage_weather",
+  "initialize_weather",
+  "update_weather_data",
+  "set_current_weather",
+  "update_schedule_vals",
+  "write_time_stamp_format_data",
 ]
 
 [optimization]

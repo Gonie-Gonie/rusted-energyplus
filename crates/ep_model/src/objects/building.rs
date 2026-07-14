@@ -186,6 +186,18 @@ pub struct RunPeriod {
     pub day_of_week_for_start_day: Option<DayOfWeek>,
     /// First-hour weather interpolation starting point.
     pub first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    /// Whether holidays and special days declared by the weather file are active.
+    pub use_weather_file_holidays_and_special_days: bool,
+    /// Whether the daylight-saving period declared by the weather file is active.
+    pub use_weather_file_daylight_saving_period: bool,
+    /// Whether a holiday falling on a weekend is observed on a weekday.
+    pub apply_weekend_holiday_rule: bool,
+    /// Whether rain indicators from the weather file are active.
+    pub use_weather_file_rain_indicators: bool,
+    /// Whether snow indicators from the weather file are active.
+    pub use_weather_file_snow_indicators: bool,
+    /// Whether weather-file dates are treated as an actual consecutive calendar.
+    pub treat_weather_as_actual: bool,
 }
 
 /// Site location.

@@ -56,12 +56,13 @@ results do not create compatibility claims.
 
 ## Full-Domain Claims
 
-Heat-balance, HVAC, and plant full-domain claims use canonical required-routine
-lists in `specs/project_contract.toml`. A domain can be claimed only when its
-routine inventory is explicitly complete and every listed routine is
-`family_gated` or `complete` in `specs/algorithm_ledger.toml`. Limited
-algorithm conformance does not satisfy this rule. Full runtime compatibility
-remains locked until all EnergyPlus domains have complete inventories.
+Heat-balance, HVAC, plant, and time full-domain claims use canonical
+required-routine lists in `specs/project_contract.toml`. A domain can be
+claimed only when its routine inventory is explicitly complete and every
+listed routine is `family_gated` or `complete` in
+`specs/algorithm_ledger.toml`. Limited algorithm conformance does not satisfy
+this rule. Full runtime compatibility remains locked until all EnergyPlus
+domains have complete inventories.
 
 The root marker `routine_completion_schema = "routine_completion.v1"` records
 the one-time introduction of routine-level completion metadata. The PR-ticket

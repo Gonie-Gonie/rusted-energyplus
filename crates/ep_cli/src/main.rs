@@ -30,8 +30,8 @@ use ep_conformance::{
     load_case_v2_file,
 };
 use ep_model::{
-    Construction, DayOfWeek, Material, ModelGraph, OtherEquipment, OutsideBoundaryCondition,
-    ScheduleId, SimulationModel, SurfaceType, TypedModel,
+    Construction, Material, ModelGraph, OtherEquipment, OutsideBoundaryCondition, ScheduleId,
+    SimulationModel, SurfaceType, TypedModel,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModelSummary, load_epjson_file};
@@ -92,9 +92,10 @@ use ep_runtime::{
     ZoneGeometrySummary, append_surface_incident_solar_radiation_series, build_execution_plan,
     build_hourly_time_axis, energyplus_heat_balance_compatibility_stages,
     energyplus_zone_air_heat_capacity_j_per_k, load_epw_dry_bulb_series, load_epw_records,
-    output_store_type_for_variable, precompute_schedule_value_series_for_time_axis,
-    precompute_weather_timestep_series, simulate_constant_schedules,
-    simulate_first_zone_uncontrolled, simulate_heat_balance_zone_air_temperatures,
+    normalized_hourly_timestamp_label, output_store_type_for_variable,
+    precompute_schedule_value_series_for_time_axis, precompute_weather_timestep_series,
+    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    simulate_heat_balance_zone_air_temperatures,
     simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection, surface_area_m2,
     surface_geometry_summaries, zone_geometry_summaries,
@@ -8902,27 +8903,10 @@ fn eso_timestamp_environment(timestamp: &str) -> Option<&str> {
 
 fn heat_balance_rust_hourly_timestamp_labels(model: &TypedModel) -> Result<Vec<String>, String> {
     let axis = build_hourly_time_axis(model).map_err(|error| error.to_string())?;
-    let start_day = model
-        .run_periods
-        .first()
-        .and_then(|run_period| run_period.day_of_week_for_start_day)
-        .unwrap_or(DayOfWeek::Monday);
     Ok(axis
         .points
         .iter()
-        .map(|point| {
-            let day_index = point.sample_index / 24;
-            let day_of_week = day_of_week_after(start_day, day_index);
-            format!(
-                "env={};day={};month={};date={};dst=0;hour={};start=0.00;end=60.00;day_type={}",
-                axis.run_period_name,
-                day_index + 1,
-                point.month,
-                point.day_of_month,
-                point.hour,
-                day_of_week_label(day_of_week)
-            )
-        })
+        .map(|point| normalized_hourly_timestamp_label(&axis, point))
         .collect())
 }
 
@@ -8948,39 +8932,6 @@ fn eso_timestamp_field<'a>(timestamp: &'a str, field: &str) -> Option<&'a str> {
         let (key, value) = part.split_once('=')?;
         (key == field).then_some(value)
     })
-}
-
-fn day_of_week_after(start_day: DayOfWeek, day_offset: usize) -> DayOfWeek {
-    let start_index = match start_day {
-        DayOfWeek::Monday => 0,
-        DayOfWeek::Tuesday => 1,
-        DayOfWeek::Wednesday => 2,
-        DayOfWeek::Thursday => 3,
-        DayOfWeek::Friday => 4,
-        DayOfWeek::Saturday => 5,
-        DayOfWeek::Sunday => 6,
-    };
-    match (start_index + day_offset) % 7 {
-        0 => DayOfWeek::Monday,
-        1 => DayOfWeek::Tuesday,
-        2 => DayOfWeek::Wednesday,
-        3 => DayOfWeek::Thursday,
-        4 => DayOfWeek::Friday,
-        5 => DayOfWeek::Saturday,
-        _ => DayOfWeek::Sunday,
-    }
-}
-
-fn day_of_week_label(day: DayOfWeek) -> &'static str {
-    match day {
-        DayOfWeek::Monday => "Monday",
-        DayOfWeek::Tuesday => "Tuesday",
-        DayOfWeek::Wednesday => "Wednesday",
-        DayOfWeek::Thursday => "Thursday",
-        DayOfWeek::Friday => "Friday",
-        DayOfWeek::Saturday => "Saturday",
-        DayOfWeek::Sunday => "Sunday",
-    }
 }
 
 fn eio_run_period_warmup_days(path: &Path) -> Result<Option<u32>, ep_compare::EioError> {

@@ -3,6 +3,7 @@
 mod diagnostics;
 mod meter_registry;
 mod result_store;
+mod timestamp;
 
 pub use diagnostics::*;
 use ep_model::{
@@ -12,6 +13,7 @@ use ep_model::{
 pub use meter_registry::*;
 pub use result_store::*;
 use std::collections::BTreeSet;
+pub use timestamp::*;
 
 use crate::ideal_loads::{
     ZONE_IDEAL_LOADS_SUPPLY_AIR_TOTAL_COOLING_ENERGY,

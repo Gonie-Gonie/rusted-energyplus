@@ -32,6 +32,12 @@ fn ideal_loads_timestep_context_does_not_validate_unrelated_run_period_dates() {
         end_year: None,
         day_of_week_for_start_day: None,
         first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+        use_weather_file_holidays_and_special_days: true,
+        use_weather_file_daylight_saving_period: true,
+        apply_weekend_holiday_rule: true,
+        use_weather_file_rain_indicators: true,
+        use_weather_file_snow_indicators: true,
+        treat_weather_as_actual: false,
     });
 
     let context = ideal_loads_timestep_context(&model).expect("timestep profile should be valid");

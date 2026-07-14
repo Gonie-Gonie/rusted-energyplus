@@ -10,12 +10,13 @@ use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputLevel, OutputRequest, SourceArtifact,
     VariableClass,
 };
-use ep_model::{DayOfWeek, TypedModel};
+use ep_model::TypedModel;
 use ep_raw_model::load_epjson_file;
 use ep_runtime::{
-    TimeAxis, TimePoint, ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
+    TimeAxis, ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
     ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE, build_hourly_time_axis,
-    simulate_zone_internal_convective_gains, simulate_zone_internal_radiant_gains,
+    normalized_hourly_timestamp_label, simulate_zone_internal_convective_gains,
+    simulate_zone_internal_radiant_gains,
 };
 
 use crate::conformance_artifacts::{
@@ -422,86 +423,13 @@ fn samples_with_time_axis(values: &[f64], time_axis: &TimeAxis) -> Vec<SeriesSam
         .copied()
         .zip(&time_axis.points)
         .map(|(value, point)| {
-            SeriesSample::timestamped(point.sample_index, timestamp_label(time_axis, point), value)
+            SeriesSample::timestamped(
+                point.sample_index,
+                normalized_hourly_timestamp_label(time_axis, point),
+                value,
+            )
         })
         .collect()
-}
-
-fn timestamp_label(time_axis: &TimeAxis, point: &TimePoint) -> String {
-    format!(
-        "env={};day={};month={};date={};dst=0;hour={};start=0.00;end=60.00;day_type={}",
-        time_axis.run_period_name.to_ascii_uppercase(),
-        point.sample_index / 24 + 1,
-        point.month,
-        point.day_of_month,
-        point.hour,
-        day_type_label(day_of_week_for_point(time_axis, point))
-    )
-}
-
-fn day_of_week_for_point(time_axis: &TimeAxis, point: &TimePoint) -> DayOfWeek {
-    let first = time_axis
-        .points
-        .first()
-        .map(|first| weekday_from_date(first.year, first.month, first.day_of_month))
-        .unwrap_or(DayOfWeek::Tuesday);
-    let offset = point.sample_index / 24;
-    advance_day(first, offset)
-}
-
-fn weekday_from_date(year: u32, month: u32, day: u32) -> DayOfWeek {
-    let mut y = i64::from(year);
-    let mut m = i64::from(month);
-    let d = i64::from(day);
-    if m < 3 {
-        m += 12;
-        y -= 1;
-    }
-    let k = y % 100;
-    let j = y / 100;
-    let h = (d + (13 * (m + 1)) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
-    match h {
-        0 => DayOfWeek::Saturday,
-        1 => DayOfWeek::Sunday,
-        2 => DayOfWeek::Monday,
-        3 => DayOfWeek::Tuesday,
-        4 => DayOfWeek::Wednesday,
-        5 => DayOfWeek::Thursday,
-        _ => DayOfWeek::Friday,
-    }
-}
-
-fn advance_day(day: DayOfWeek, offset_days: usize) -> DayOfWeek {
-    let start = match day {
-        DayOfWeek::Monday => 0,
-        DayOfWeek::Tuesday => 1,
-        DayOfWeek::Wednesday => 2,
-        DayOfWeek::Thursday => 3,
-        DayOfWeek::Friday => 4,
-        DayOfWeek::Saturday => 5,
-        DayOfWeek::Sunday => 6,
-    };
-    match (start + offset_days) % 7 {
-        0 => DayOfWeek::Monday,
-        1 => DayOfWeek::Tuesday,
-        2 => DayOfWeek::Wednesday,
-        3 => DayOfWeek::Thursday,
-        4 => DayOfWeek::Friday,
-        5 => DayOfWeek::Saturday,
-        _ => DayOfWeek::Sunday,
-    }
-}
-
-fn day_type_label(day: DayOfWeek) -> &'static str {
-    match day {
-        DayOfWeek::Monday => "Monday",
-        DayOfWeek::Tuesday => "Tuesday",
-        DayOfWeek::Wednesday => "Wednesday",
-        DayOfWeek::Thursday => "Thursday",
-        DayOfWeek::Friday => "Friday",
-        DayOfWeek::Saturday => "Saturday",
-        DayOfWeek::Sunday => "Sunday",
-    }
 }
 
 fn tolerance_for_output(

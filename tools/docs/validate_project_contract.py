@@ -72,6 +72,11 @@ CURRENT_DOC_REQUIRED_PHRASES = [
     "The machine-readable contract is `specs/project_contract.toml`.",
     "Markdown wording, smoke tests, diagnostics, arbitrary IDF runs, and performance",
     "results do not create compatibility claims.",
+    "Heat-balance, HVAC, plant, and time full-domain claims use canonical required-routine lists",
+]
+ALGORITHM_LEDGER_DOC_REQUIRED_PHRASES = [
+    "The first 23 source-order routines form an immutable minimum seed across heat balance, HVAC, plant, and time.",
+    "A heat-balance, HVAC, plant, or time full-domain claim is valid only",
 ]
 CURRENT_STATUS_REQUIRED_PHRASES = [
     "The exact case list is generated in `docs/src/generated/conformance-case-index.md`.",
@@ -146,6 +151,7 @@ def validate_contract(contract: dict[str, Any], errors: list[str]) -> None:
         "broad_heat_balance_compatibility",
         "hvac_compatibility",
         "plant_compatibility",
+        "time_compatibility",
     ]:
         require(isinstance(claims.get(claim_key), bool), errors, f"{claim_key} must be boolean")
     require(claims.get("full_runtime_compatibility") is False, errors, "full runtime compatibility must not be claimed")
@@ -242,6 +248,66 @@ def run_domain_claim_self_tests(
     baseline_routine_errors = shallow_routine_errors(ledger)
     if baseline_routine_errors:
         raise AssertionError(f"baseline shallow routine contract is invalid: {baseline_routine_errors}")
+
+    current_doc = (repo_root / "docs" / "src" / "current" / "project-contract.md").read_text(
+        encoding="utf-8"
+    )
+    candidate_doc = current_doc.replace(
+        "Heat-balance, HVAC, plant, and time",
+        "Heat-balance, HVAC, and plant",
+        1,
+    )
+    mirror_errors: list[str] = []
+    require_contains_all(
+        candidate_doc,
+        CURRENT_DOC_REQUIRED_PHRASES,
+        mirror_errors,
+        "docs/src/current/project-contract.md",
+    )
+    expect_error(
+        "current_doc_requires_time_domain_mirror",
+        mirror_errors,
+        "missing required phrase",
+    )
+
+    algorithm_ledger_doc = (
+        repo_root / "docs" / "src" / "porting-map" / "algorithm-ledger.md"
+    ).read_text(encoding="utf-8")
+    candidate_doc = algorithm_ledger_doc.replace(
+        "The first 23\nsource-order routines",
+        "The first 13\nsource-order routines",
+        1,
+    )
+    mirror_errors = []
+    require_contains_all(
+        candidate_doc,
+        ALGORITHM_LEDGER_DOC_REQUIRED_PHRASES,
+        mirror_errors,
+        "docs/src/porting-map/algorithm-ledger.md",
+    )
+    expect_error(
+        "algorithm_ledger_doc_requires_time_domain_seed",
+        mirror_errors,
+        "missing required phrase",
+    )
+
+    candidate_doc = algorithm_ledger_doc.replace(
+        "HVAC, plant, or time full-domain claim",
+        "HVAC, or plant full-domain claim",
+        1,
+    )
+    mirror_errors = []
+    require_contains_all(
+        candidate_doc,
+        ALGORITHM_LEDGER_DOC_REQUIRED_PHRASES,
+        mirror_errors,
+        "docs/src/porting-map/algorithm-ledger.md",
+    )
+    expect_error(
+        "algorithm_ledger_doc_requires_time_domain_claim",
+        mirror_errors,
+        "missing required phrase",
+    )
 
     candidate_contract = copy.deepcopy(contract)
     candidate_contract.pop("routine_completion_schema")
@@ -439,6 +505,7 @@ def main() -> int:
     ledger_path = repo_root / "specs" / "algorithm_ledger.toml"
     readme_path = repo_root / "README.md"
     current_doc_path = repo_root / "docs" / "src" / "current" / "project-contract.md"
+    algorithm_ledger_doc_path = repo_root / "docs" / "src" / "porting-map" / "algorithm-ledger.md"
     current_status_path = repo_root / "docs" / "src" / "current" / "current-status.md"
     generated_case_index_path = repo_root / "docs" / "src" / "generated" / "conformance-case-index.md"
     generated_variable_coverage_path = repo_root / "docs" / "src" / "generated" / "variable-coverage.md"
@@ -453,6 +520,7 @@ def main() -> int:
     require(ledger_path.is_file(), errors, f"missing algorithm ledger spec: {ledger_path}")
     require(readme_path.is_file(), errors, f"missing README: {readme_path}")
     require(current_doc_path.is_file(), errors, f"missing current project contract doc: {current_doc_path}")
+    require(algorithm_ledger_doc_path.is_file(), errors, f"missing algorithm ledger doc: {algorithm_ledger_doc_path}")
     require(current_status_path.is_file(), errors, f"missing current status doc: {current_status_path}")
     require(generated_case_index_path.is_file(), errors, f"missing generated case index: {generated_case_index_path}")
     require(
@@ -494,6 +562,13 @@ def main() -> int:
             CURRENT_DOC_REQUIRED_PHRASES,
             errors,
             "docs/src/current/project-contract.md",
+        )
+    if algorithm_ledger_doc_path.is_file():
+        require_contains_all(
+            algorithm_ledger_doc_path.read_text(encoding="utf-8"),
+            ALGORITHM_LEDGER_DOC_REQUIRED_PHRASES,
+            errors,
+            "docs/src/porting-map/algorithm-ledger.md",
         )
     if current_status_path.is_file():
         require_contains_all(

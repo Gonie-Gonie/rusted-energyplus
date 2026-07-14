@@ -26,6 +26,7 @@ ROUTINE_EVIDENCE_DOMAINS = {
     "heat_balance": {"heat_balance", "surface", "zone"},
     "hvac": {"hvac", "node"},
     "plant": {"plant"},
+    "time": {"time", "schedule", "weather"},
 }
 STATE_CONTRACT_FIELDS = (
     "read_state",
@@ -415,7 +416,8 @@ def contains_cpp_routine_definition(text: str, routine: str) -> bool:
         rf"(?ms)^[ \t]*"
         rf"(?:[A-Za-z_][A-Za-z0-9_:<>,*&\[\] \t]*[ \t]+)+"
         rf"(?:[A-Za-z_][A-Za-z0-9_]*::)*{re.escape(routine)}[ \t]*"
-        rf"\([^;{{}}]*\)[ \t\r\n]*(?:const[ \t\r\n]+)?(?:noexcept[ \t\r\n]+)?\{{"
+        rf"\([^;{{}}]*\)[ \t\r\n]*(?:const[ \t\r\n]+)?(?:noexcept[ \t\r\n]+)?"
+        rf"(?:[ \t\r\n]|\/\/[^\r\n]*(?:\r?\n|$)|\/\*.*?\*\/)*\{{"
     )
     return pattern.search(text) is not None
 

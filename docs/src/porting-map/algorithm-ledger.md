@@ -162,19 +162,19 @@ routine_ids = ["manage_example"]
 Set `required_for_full_domain = true` only for routines that belong to the
 domain's canonical complete inventory. The corresponding
 `domain_claim.required_routines` list must match all and only those flagged
-routines; the validator rejects list-only omissions or additions. The first 13
+routines; the validator rejects list-only omissions or additions. The first 23
 source-order routines form an immutable minimum seed across heat balance,
-HVAC, and plant. A change cannot remove a seed routine by clearing both its
-ledger flag and its project-contract list entry; future inventories may only
-add required routines to that minimum.
+HVAC, plant, and time. A change cannot remove a seed routine by clearing both
+its ledger flag and its project-contract list entry; future inventories may
+only add required routines to that minimum.
 
 `specs/project_contract.toml` owns the canonical required-routine list for each
-full domain. A heat-balance, HVAC, or plant full-domain claim is valid only
-when its routine inventory is explicitly complete and every required routine
-is `family_gated` or `complete`. Missing, empty, duplicate, unknown, or
-cross-domain required-routine entries fail the contract check. Full runtime
+full domain. A heat-balance, HVAC, plant, or time full-domain claim is valid
+only when its routine inventory is explicitly complete and every required
+routine is `family_gated` or `complete`. Missing, empty, duplicate, unknown,
+or cross-domain required-routine entries fail the contract check. Full runtime
 compatibility remains locked until every EnergyPlus domain, including domains
-outside these first three inventories, has the same machine-readable closure.
+outside these first four inventories, has the same machine-readable closure.
 
 Low-level development checks should be retired from release evidence when a
 higher-level conformance case covers the same behavior more directly.

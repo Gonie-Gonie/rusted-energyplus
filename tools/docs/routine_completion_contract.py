@@ -17,6 +17,7 @@ DOMAIN_CLAIM_KEYS = {
     "heat_balance": "broad_heat_balance_compatibility",
     "hvac": "hvac_compatibility",
     "plant": "plant_compatibility",
+    "time": "time_compatibility",
 }
 MINIMUM_REQUIRED_ROUTINES = {
     "heat_balance": {
@@ -36,6 +37,18 @@ MINIMUM_REQUIRED_ROUTINES = {
         "report_purchased_air",
     },
     "plant": {"manage_plant_loops"},
+    "time": {
+        "manage_simulation",
+        "get_run_period_data",
+        "setup_environment_types",
+        "get_next_environment",
+        "manage_weather",
+        "initialize_weather",
+        "update_weather_data",
+        "set_current_weather",
+        "update_schedule_vals",
+        "write_time_stamp_format_data",
+    },
 }
 
 
@@ -71,7 +84,7 @@ def validate_domain_completion_contract(
     require(
         set(by_domain) == set(DOMAIN_CLAIM_KEYS),
         errors,
-        "domain_claim ids must be exactly heat_balance, hvac, and plant",
+        "domain_claim ids must be exactly heat_balance, hvac, plant, and time",
     )
 
     routine_by_id = {str(routine.get("_id", "")): routine for routine in routines}

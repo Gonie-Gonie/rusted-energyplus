@@ -505,6 +505,54 @@ impl<'a> Compiler<'a> {
                     "Hour24",
                     parse_first_hour_interpolation_starting_values,
                 ),
+                use_weather_file_holidays_and_special_days: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "use_weather_file_holidays_and_special_days"),
+                    true,
+                    "Yes",
+                    parse_yes_no,
+                ),
+                use_weather_file_daylight_saving_period: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "use_weather_file_daylight_saving_period"),
+                    true,
+                    "Yes",
+                    parse_yes_no,
+                ),
+                apply_weekend_holiday_rule: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "apply_weekend_holiday_rule"),
+                    true,
+                    "Yes",
+                    parse_yes_no,
+                ),
+                use_weather_file_rain_indicators: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "use_weather_file_rain_indicators"),
+                    true,
+                    "Yes",
+                    parse_yes_no,
+                ),
+                use_weather_file_snow_indicators: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "use_weather_file_snow_indicators"),
+                    true,
+                    "Yes",
+                    parse_yes_no,
+                ),
+                treat_weather_as_actual: self.enum_default(
+                    "RunPeriod",
+                    &name,
+                    (&object, "treat_weather_as_actual"),
+                    false,
+                    "No",
+                    parse_yes_no,
+                ),
             });
         }
     }
@@ -4588,6 +4636,14 @@ fn parse_first_hour_interpolation_starting_values(
     }
 }
 
+fn parse_yes_no(value: &str) -> Option<bool> {
+    match value {
+        value if value.eq_ignore_ascii_case("Yes") => Some(true),
+        value if value.eq_ignore_ascii_case("No") => Some(false),
+        _ => None,
+    }
+}
+
 fn parse_surface_type(value: &str) -> Option<SurfaceType> {
     match value {
         value if value.eq_ignore_ascii_case("Ceiling") => Some(SurfaceType::Ceiling),
@@ -4937,7 +4993,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_run_period_dates() -> Result<(), Box<dyn std::error::Error>> {
+    fn parses_run_period_dates_and_policies() -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
                 "RunPeriod": {
@@ -4949,7 +5005,13 @@ mod tests {
                         "end_day_of_month": 3,
                         "end_year": 2013,
                         "day_of_week_for_start_day": "Wednesday",
-                        "first_hour_interpolation_starting_values": "Hour1"
+                        "first_hour_interpolation_starting_values": "Hour1",
+                        "use_weather_file_holidays_and_special_days": "No",
+                        "use_weather_file_daylight_saving_period": "No",
+                        "apply_weekend_holiday_rule": "No",
+                        "use_weather_file_rain_indicators": "No",
+                        "use_weather_file_snow_indicators": "No",
+                        "treat_weather_as_actual": "Yes"
                     }
                 }
             }"#,
@@ -4974,6 +5036,99 @@ mod tests {
             model.run_periods[0].first_hour_interpolation_starting_values,
             FirstHourInterpolationStartingValues::Hour1
         );
+        assert!(!model.run_periods[0].use_weather_file_holidays_and_special_days);
+        assert!(!model.run_periods[0].use_weather_file_daylight_saving_period);
+        assert!(!model.run_periods[0].apply_weekend_holiday_rule);
+        assert!(!model.run_periods[0].use_weather_file_rain_indicators);
+        assert!(!model.run_periods[0].use_weather_file_snow_indicators);
+        assert!(model.run_periods[0].treat_weather_as_actual);
+
+        Ok(())
+    }
+
+    #[test]
+    fn defaults_run_period_policies_to_energyplus_values() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriod": {
+                    "Run Period 1": {
+                        "apply_weekend_holiday_rule": ""
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        let run_period = &model.run_periods[0];
+        assert!(run_period.use_weather_file_holidays_and_special_days);
+        assert!(run_period.use_weather_file_daylight_saving_period);
+        assert!(run_period.apply_weekend_holiday_rule);
+        assert!(run_period.use_weather_file_rain_indicators);
+        assert!(run_period.use_weather_file_snow_indicators);
+        assert!(!run_period.treat_weather_as_actual);
+
+        for (field, value) in [
+            ("use_weather_file_holidays_and_special_days", "Yes"),
+            ("use_weather_file_daylight_saving_period", "Yes"),
+            ("apply_weekend_holiday_rule", "Yes"),
+            ("use_weather_file_rain_indicators", "Yes"),
+            ("use_weather_file_snow_indicators", "Yes"),
+            ("treat_weather_as_actual", "No"),
+        ] {
+            assert!(result.report.defaults_applied.iter().any(|application| {
+                application.object_type == "RunPeriod"
+                    && application.object_name == "Run Period 1"
+                    && application.field == field
+                    && application.value == value
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_non_yes_no_run_period_policies() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriod": {
+                    "Run Period 1": {
+                        "use_weather_file_holidays_and_special_days": "Sometimes",
+                        "use_weather_file_daylight_saving_period": "Sometimes",
+                        "apply_weekend_holiday_rule": "Sometimes",
+                        "use_weather_file_rain_indicators": "Sometimes",
+                        "use_weather_file_snow_indicators": "Sometimes",
+                        "treat_weather_as_actual": "Sometimes"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.model.is_none());
+        for field in [
+            "use_weather_file_holidays_and_special_days",
+            "use_weather_file_daylight_saving_period",
+            "apply_weekend_holiday_rule",
+            "use_weather_file_rain_indicators",
+            "use_weather_file_snow_indicators",
+            "treat_weather_as_actual",
+        ] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.severity == DiagnosticSeverity::Error
+                    && diagnostic.code == "InvalidEnumValue"
+                    && diagnostic.object_type == "RunPeriod"
+                    && diagnostic.object_name.as_deref() == Some("Run Period 1")
+                    && diagnostic.field.as_deref() == Some(field)
+            }));
+        }
 
         Ok(())
     }

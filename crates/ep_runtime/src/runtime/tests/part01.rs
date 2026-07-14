@@ -96,8 +96,9 @@
     use crate::time_axis::{Date, next_day};
     use crate::{
         ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
-        build_execution_plan, build_hourly_time_axis, build_hourly_time_axis_for_run_period,
-        energyplus_heat_balance_compatibility_stages, precompute_runtime_data,
+        TimeAxisError, build_environment_time_axes, build_execution_plan, build_hourly_time_axis,
+        build_hourly_time_axis_for_run_period, energyplus_heat_balance_compatibility_stages,
+        normalized_hourly_timestamp_label, precompute_runtime_data, resolve_run_period_calendar,
     };
     use crate::{
         COMPONENT_OUTPUT_TO_FACILITY_METER_SOURCE_MAP, COOLING_ENERGY_TRANSFER_METER,
@@ -108,20 +109,21 @@
         meter_rate_to_energy_j, meter_value_is_zero_near_j,
     };
     use ep_model::{
-        AutoOrNumber, AutosizeOrNumber, Construction, ConstructionId, DehumidificationControlType,
-        DemandControlledVentilationType, FirstHourInterpolationStartingValues, HeatRecoveryType,
-        HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-        IdealLoadsLimit, InternalGainId, LoadDistributionScheme, Material, MaterialId,
-        MaterialKind, MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName,
-        OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
-        OutputHandle, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+        AutoOrNumber, AutosizeOrNumber, Construction, ConstructionId, DayOfWeek,
+        DehumidificationControlType, DemandControlledVentilationType,
+        FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
+        IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+        InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind,
+        MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment,
+        OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutputHandle,
+        OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
         PeopleNumberCalculationMethod, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
         ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel, SiteLocation,
         SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
-        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure,
-        Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
-        ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
+        ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+        ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat,
+        ZoneThermostatControl, ZoneThermostatId,
     };
     use std::collections::BTreeMap;
 
@@ -630,6 +632,12 @@
             end_year: Some(2013),
             day_of_week_for_start_day: None,
             first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour1,
+            use_weather_file_holidays_and_special_days: true,
+            use_weather_file_daylight_saving_period: true,
+            apply_weekend_holiday_rule: true,
+            use_weather_file_rain_indicators: true,
+            use_weather_file_snow_indicators: true,
+            treat_weather_as_actual: false,
         });
         let axis = build_hourly_time_axis(&model)?;
         let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
@@ -738,6 +746,12 @@
             end_year: Some(2013),
             day_of_week_for_start_day: None,
             first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+            use_weather_file_holidays_and_special_days: true,
+            use_weather_file_daylight_saving_period: true,
+            apply_weekend_holiday_rule: true,
+            use_weather_file_rain_indicators: true,
+            use_weather_file_snow_indicators: true,
+            treat_weather_as_actual: false,
         })?;
 
         assert_eq!(axis.sample_count(), 72);
@@ -761,10 +775,29 @@
             end_year: Some(2020),
             day_of_week_for_start_day: None,
             first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+            use_weather_file_holidays_and_special_days: true,
+            use_weather_file_daylight_saving_period: true,
+            apply_weekend_holiday_rule: true,
+            use_weather_file_rain_indicators: true,
+            use_weather_file_snow_indicators: true,
+            treat_weather_as_actual: false,
         })?;
 
         assert_eq!(axis.sample_count(), 72);
         assert_eq!(axis.points[24].day_of_month, 29);
+        assert_eq!(axis.points[0].day_of_year, 59);
+        assert_eq!(axis.points[24].day_of_year, 60);
+        assert_eq!(axis.points[48].day_of_year, 61);
+        assert_eq!(axis.points[48].schedule_day_of_year, 61);
+        assert!(axis.points[0].gregorian_year_is_leap_year);
+
+        let mut non_leap = test_run_period("Non-Leap Window", 2, 28, 3, 1);
+        non_leap.begin_year = Some(2019);
+        non_leap.end_year = Some(2019);
+        let non_leap_axis = build_hourly_time_axis_for_run_period(&non_leap)?;
+        assert_eq!(non_leap_axis.points[24].day_of_year, 60);
+        assert_eq!(non_leap_axis.points[24].schedule_day_of_year, 61);
+        assert!(!non_leap_axis.points[0].gregorian_year_is_leap_year);
 
         Ok(())
     }

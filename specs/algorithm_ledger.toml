@@ -217,6 +217,97 @@ claim_level = "limited-conformance"
 support_boundary = "Limited conformance only for declared opaque no-mass surface face-temperature proof variables; no solar, fenestration, or general exterior boundary claim."
 
 [[algorithm]]
+id = "calendar_time_state"
+domain = "time"
+source_map = "docs/src/porting-map/time-weather-schedule.md"
+energyplus_source = [
+  "src/EnergyPlus/SimulationManager.cc",
+  "src/EnergyPlus/WeatherManager.cc",
+  "src/EnergyPlus/ScheduleManager.cc",
+  "src/EnergyPlus/OutputProcessor.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/SimulationManager.cc|ManageSimulation|ManageSimulation|Environment",
+  "src/EnergyPlus/WeatherManager.cc|GetRunPeriodData|GetRunPeriodData|Environment",
+  "src/EnergyPlus/WeatherManager.cc|SetupEnvironmentTypes|SetupEnvironmentTypes|Environment",
+  "src/EnergyPlus/WeatherManager.cc|GetNextEnvironment|GetNextEnvironment|Environment",
+  "src/EnergyPlus/WeatherManager.cc|ManageWeather|ManageWeather|Environment",
+  "src/EnergyPlus/WeatherManager.cc|InitializeWeather|InitializeWeather|Environment",
+  "src/EnergyPlus/WeatherManager.cc|UpdateWeatherData|UpdateWeatherData|Environment",
+  "src/EnergyPlus/WeatherManager.cc|SetCurrentWeather|SetCurrentWeather|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|UpdateScheduleVals|UpdateScheduleVals|Environment",
+  "src/EnergyPlus/OutputProcessor.cc|WriteTimeStampFormatData|WriteTimeStampFormatData|Output",
+]
+rust_target = [
+  "crates/ep_runtime/src/time_axis.rs::ResolvedRunPeriodCalendar",
+  "crates/ep_runtime/src/time_axis.rs::EnvironmentTimePoint",
+  "crates/ep_runtime/src/time_axis.rs::EnvironmentTimeAxis",
+  "crates/ep_runtime/src/time_axis.rs::build_environment_time_axes",
+  "crates/ep_runtime/src/time_axis.rs::build_hourly_time_axis",
+  "crates/ep_runtime/src/output/timestamp.rs::normalized_hourly_timestamp_label",
+]
+status = "scaffold"
+first_case = "schedule_constant_001"
+family_cases = [
+  "weather_fields_001",
+]
+proof_variables = [
+  "Schedule Value",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold for EnergyPlus environment, calendar, weather-update, schedule-update, and timestamp ownership. This scaffold adds no conformance. The current checkpoint preserves existing hourly consumers while adding canonical run-period and zone-timestep state; DST, special-day, EPW-header, design-day, and broad schedule/weather conformance remain outside the claim."
+routine.manage_simulation.source_file = "src/EnergyPlus/SimulationManager.cc"
+routine.manage_simulation.source_routine = "ManageSimulation"
+routine.manage_simulation.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.manage_simulation.completion_status = "source_mapped"
+routine.manage_simulation.required_for_full_domain = true
+routine.get_run_period_data.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.get_run_period_data.source_routine = "GetRunPeriodData"
+routine.get_run_period_data.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.get_run_period_data.completion_status = "source_mapped"
+routine.get_run_period_data.required_for_full_domain = true
+routine.setup_environment_types.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.setup_environment_types.source_routine = "SetupEnvironmentTypes"
+routine.setup_environment_types.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.setup_environment_types.completion_status = "source_mapped"
+routine.setup_environment_types.required_for_full_domain = true
+routine.get_next_environment.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.get_next_environment.source_routine = "GetNextEnvironment"
+routine.get_next_environment.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.get_next_environment.completion_status = "source_mapped"
+routine.get_next_environment.required_for_full_domain = true
+routine.manage_weather.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.manage_weather.source_routine = "ManageWeather"
+routine.manage_weather.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.manage_weather.completion_status = "source_mapped"
+routine.manage_weather.required_for_full_domain = true
+routine.initialize_weather.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.initialize_weather.source_routine = "InitializeWeather"
+routine.initialize_weather.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.initialize_weather.completion_status = "source_mapped"
+routine.initialize_weather.required_for_full_domain = true
+routine.update_weather_data.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.update_weather_data.source_routine = "UpdateWeatherData"
+routine.update_weather_data.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.update_weather_data.completion_status = "source_mapped"
+routine.update_weather_data.required_for_full_domain = true
+routine.set_current_weather.source_file = "src/EnergyPlus/WeatherManager.cc"
+routine.set_current_weather.source_routine = "SetCurrentWeather"
+routine.set_current_weather.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.set_current_weather.completion_status = "source_mapped"
+routine.set_current_weather.required_for_full_domain = true
+routine.update_schedule_vals.source_file = "src/EnergyPlus/ScheduleManager.cc"
+routine.update_schedule_vals.source_routine = "UpdateScheduleVals"
+routine.update_schedule_vals.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.update_schedule_vals.completion_status = "source_mapped"
+routine.update_schedule_vals.required_for_full_domain = true
+routine.write_time_stamp_format_data.source_file = "src/EnergyPlus/OutputProcessor.cc"
+routine.write_time_stamp_format_data.source_routine = "WriteTimeStampFormatData"
+routine.write_time_stamp_format_data.source_map = "docs/src/porting-map/time-weather-schedule.md"
+routine.write_time_stamp_format_data.completion_status = "source_mapped"
+routine.write_time_stamp_format_data.required_for_full_domain = true
+
+[[algorithm]]
 id = "air_side_node_state"
 domain = "hvac"
 source_map = "docs/src/porting-map/node-state-source-map.md"
