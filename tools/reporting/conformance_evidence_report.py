@@ -132,15 +132,24 @@ CLAIM_BOUNDARY = (
     "are ordered, exact, unique, and zero-tolerance gated. This claim is limited to original IDF "
     "declaration-order recovery for RunPeriodControl:SpecialDays and later-definition overwrite on "
     "one identical fixed date. Declaration order for other object types, native epJSON ordering, "
-    "other overlap shapes/counts/durations/types, EPW-versus-IDF precedence, and EnergyPlus warning "
-    "text or repetition parity remain unclaimed. The paired fixed EPW "
+    "other overlap shapes/counts/durations/types, and EnergyPlus warning text or repetition parity "
+    "remain unclaimed by that pair. The separate mixed-source precedence case uses the explicit "
+    "2016-02-28 through 2016-03-01 RunPeriod with weather-file holidays enabled, one fixed February "
+    "29 EPW Holiday resolved first as the source-exact Sunday type, and one later duration-one "
+    "input-file CustomDay1 definition on the same date. Its 72 ordered, exact, unique, zero-tolerance "
+    "samples have daily indices 1/11/3. This locks only weather-file-then-input-file resolution and "
+    "the later IDF CustomDay1 overwrite for that one mixed collision. Reversed or multiple input "
+    "definitions, other EPW or IDF rules/types/durations/overlap shapes, warning text/count/repetition "
+    "parity, schedule lookup, tomorrow state, raw ESO serialization, actual-weather behavior, and "
+    "cross-year execution or reprojection remain unclaimed. The paired fixed EPW "
     "holiday cases share one "
     "February 29 weather-file holiday and differ only in the RunPeriod use flag. Their 72 ordered, "
     "unique Site Day Type Index samples and normalized timestamps match exactly: enabled is 24 "
     "Sunday=1, 24 source-exact EPW-holiday Sunday=1, and 24 Tuesday=3; disabled is 24 Sunday=1, "
     "24 Monday=2, and 24 Tuesday=3. This pair proves only fixed-date EPW holiday intake and "
     "RunPeriod enable/disable filtering. Weekend shifting, EPW Nth/Last rules, multiple or overlapping "
-    "holidays, EPW/IDF precedence, schedule day-type lookup, tomorrow state, raw ESO timestamp "
+    "holidays, EPW/IDF precedence beyond the separate exact mixed collision, schedule day-type "
+    "lookup, tomorrow state, raw ESO timestamp "
     "serialization, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
     "records-per-hour greater than one, "
     "subhourly solar interpolation, complete SetCurrentWeather/solar/WeatherManager conformance, "
@@ -165,6 +174,7 @@ CASE_LABELS = {
     "calendar_special_day_duration_wrap_leap_year_hourly_exact_001": "Duration wrap leap",
     "calendar_special_day_overlap_zulu_then_alpha_hourly_exact_001": "Overlap Zulu then Alpha",
     "calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001": "Overlap Alpha then Zulu",
+    "calendar_special_day_epw_idf_precedence_hourly_exact_001": "EPW then IDF precedence",
     "calendar_epw_holiday_fixed_date_enabled_hourly_exact_001": "EPW holiday enabled",
     "calendar_epw_holiday_fixed_date_disabled_hourly_exact_001": "EPW holiday disabled",
     "weather_record_start_offset_nonactual_001": "Weather record offset",
@@ -358,6 +368,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_overlap_alpha_then_zulu_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW then IDF precedence",
+        command="compare-calendar-special-day-epw-idf-precedence-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_epw_idf_precedence_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_epw_idf_precedence_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_epw_idf_precedence_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="EPW holiday enabled",

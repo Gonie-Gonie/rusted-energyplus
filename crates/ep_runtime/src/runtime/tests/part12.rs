@@ -132,3 +132,58 @@ fn disabling_epw_holidays_does_not_disable_input_file_special_days()
 
     Ok(())
 }
+
+#[test]
+fn input_file_custom_day_overwrites_weather_file_holiday_on_the_same_date()
+-> Result<(), Box<dyn std::error::Error>> {
+    let model = special_day_test_model(
+        epw_holiday_test_run_period(true),
+        vec![special_day_input(
+            0,
+            "Input File Custom Day",
+            SpecialDayDateRule::MonthDay {
+                month: 2,
+                day_of_month: 29,
+            },
+            1,
+            SpecialDayType::CustomDay1,
+        )],
+    );
+
+    let axis = crate::build_hourly_time_axis_with_weather_metadata(
+        &model,
+        &fixed_epw_holiday_metadata(),
+    )?;
+
+    assert_eq!(axis.special_days.resolved_days.len(), 2);
+    assert_eq!(
+        axis.special_days
+            .resolved_days
+            .iter()
+            .map(|day| (day.source, day.name.as_str(), day.day_type))
+            .collect::<Vec<_>>(),
+        vec![
+            (
+                crate::SpecialDaySource::WeatherFile,
+                "EPW LEAP HOLIDAY",
+                crate::DayType::Sunday,
+            ),
+            (
+                crate::SpecialDaySource::InputFile,
+                "INPUT FILE CUSTOM DAY",
+                crate::DayType::CustomDay1,
+            ),
+        ]
+    );
+    assert_hourly_special_day(
+        &axis,
+        (2016, 2, 29),
+        (
+            crate::DayType::CustomDay1,
+            Some(crate::DayType::CustomDay1),
+            11,
+        ),
+    );
+
+    Ok(())
+}

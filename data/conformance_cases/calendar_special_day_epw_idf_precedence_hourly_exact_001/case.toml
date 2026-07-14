@@ -1,0 +1,59 @@
+id = "calendar_special_day_epw_idf_precedence_hourly_exact_001"
+title = "Input-file special day overrides an EPW holiday"
+milestone = "full-source-order-calendar-special-day-epw-idf-precedence"
+purpose = "Block on exact ordered hourly day types when an input-file CustomDay1 definition overrides an enabled EPW holiday on the same fixed date."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case reuses the leap-observed EPW and IDF from calendar_epw_holiday_fixed_date_enabled_hourly_exact_001, whose one EPW holiday falls on 2/29, and differs only by adding one input-file CustomDay1 definition on the same date.",
+  "The RunPeriod explicitly enables weather-file holidays. EnergyPlus resolves the weather-file holiday before the input-file special day, so the later input-file CustomDay1 state wins the exact overlap; the 72 ordered hourly values are 24 Sunday=1, 24 CustomDay1=11, and 24 Tuesday=3.",
+  "Weather-file daylight saving, weekend adjustment, rain, snow, and actual-weather handling are explicitly disabled so the case isolates fixed-date EPW-versus-IDF special-day precedence.",
+  "The numerical claim covers only the 72 successful ordered, unique hour-ending Site Day Type Index values and timestamps and the weather-file-then-input-file resolved source order for this one exact overlap. EnergyPlus-versus-Rust warning text, count, repetition, and diagnostics parity; reversed or multiple input definitions, other dates, durations, day types, overlap shapes, disabled weather-file holidays, weekend shifting, schedule lookup, tomorrow state, raw ESO serialization, actual weather, and cross-year traversal remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_epw_idf_precedence_hourly_exact_001/calendar_special_day_epw_idf_precedence_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_epw_idf_precedence_hourly_exact_001/calendar_special_day_epw_idf_precedence_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_holiday_fixed_date_enabled_hourly_exact_001/calendar_epw_holiday_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_epw_idf_precedence_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-epw-idf-precedence-exact"
+blocking = true
