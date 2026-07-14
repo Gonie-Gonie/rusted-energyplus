@@ -48,9 +48,9 @@ use ep_runtime::{
     IDEAL_LOADS_NODE_OUTPUT_UPDATE_SOURCE, IDEAL_LOADS_RATE_OUTPUT_SOURCE,
     IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_RUNTIME_BINDING_SOURCE,
     IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
-    IdealLoadsFeatureFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
-    IdealLoadsOutdoorAirSensibleResult, IdealLoadsReportSnapshot, IdealLoadsSensibleLimitContext,
-    IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature,
+    IdealLoadsFeatureFlags, IdealLoadsMinimumOutdoorAirCompatInput, IdealLoadsOutdoorAirContext,
+    IdealLoadsOutdoorAirNodeState, IdealLoadsOutdoorAirSensibleResult, IdealLoadsReportSnapshot,
+    IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature,
     IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState, NoOaHumidistatClosedLoopState,
     NoOaHumidistatZoneTimestepError, NoOaHumidistatZoneTimestepInput,
     NoOaThirdOrderMoistureDemandInput, OutputSeries, ResultStore, RuntimeMeterRequest,
@@ -95,12 +95,8 @@ use ep_runtime::{
     ZONE_SYSTEM_PREDICTED_DEHUMIDIFYING_MOISTURE_LOAD,
     ZONE_SYSTEM_PREDICTED_HUMIDIFYING_MOISTURE_LOAD, ZONE_THERMOSTAT_COOLING_SETPOINT_TEMPERATURE,
     ZONE_THERMOSTAT_HEATING_SETPOINT_TEMPERATURE, ZoneSysEnergyDemand,
-    advance_no_oa_humidistat_zone_timestep_compat,
-    calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s,
-    calc_no_oa_third_order_moisture_demand_compat,
-    calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s,
-    calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s, classify_no_oa_no_limit_sensible_subset,
-    classify_no_oa_sensible_subset, design_outdoor_air_volume_flow_components_m3_per_s,
+    advance_no_oa_humidistat_zone_timestep_compat, calc_no_oa_third_order_moisture_demand_compat,
+    classify_no_oa_no_limit_sensible_subset, classify_no_oa_sensible_subset,
     energyplus_moist_air_density_kg_per_m3, ideal_loads_facility_meter_binding,
     ideal_loads_zone_equipment_stages, load_epw_records, meter_rate_to_energy_j,
     purchased_air_source_order_stages, select_purchased_air_branch, sim_purchased_air_compat,
@@ -330,7 +326,7 @@ const IDEAL_LOADS_TRACE_RESULT_INVARIANCE_POLICY: &str = "trace level selects ev
 const IDEAL_LOADS_TRACE_OVERHEAD_ACCOUNTING: &str = "trace/report serialization overhead is outside numerical conformance comparison and measured separately from simulation results";
 const IDEAL_LOADS_NO_OA_TRACE_PAYLOAD: &str =
     "mode_counts, source-order demand inputs, selected branch, supply state, and report rates";
-const IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD: &str = "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates";
+const IDEAL_LOADS_OUTDOOR_AIR_TRACE_PAYLOAD: &str = "source-order zone/recirculation/outdoor-air states, raw schedule/occupancy/CO2 minimum-flow inputs, resolved design/DCV minimum outdoor-air mass flow, mixed-air state, supply state, and report rates";
 
 struct IdealLoadsDiagnosticContext<'a> {
     manifest: &'a ConformanceCase,
@@ -1559,23 +1555,6 @@ fn build_outdoor_air_design_flow_context<'a>(
         })?;
     let standard_air_density_kg_per_m3 = limit_context.standard_air_density_kg_per_m3;
     let outdoor_air_context = ideal_loads_outdoor_air_context(&model.typed, zone);
-    let design_flow_components = design_outdoor_air_volume_flow_components_m3_per_s(
-        outdoor_air_specification,
-        outdoor_air_context,
-    )
-    .ok_or_else(|| {
-        "failed to calculate IdealLoads outdoor-air design-flow components".to_string()
-    })?;
-    let outdoor_air_design_mass_flow_rate_kg_per_s =
-        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
-            outdoor_air_specification,
-            outdoor_air_context,
-            None,
-            standard_air_density_kg_per_m3,
-        )
-        .ok_or_else(|| "failed to calculate IdealLoads outdoor-air mass flow".to_string())?;
-    let design_volume_flow_rate_m3_per_s =
-        outdoor_air_design_mass_flow_rate_kg_per_s / standard_air_density_kg_per_m3;
 
     let mut expected_series = Vec::with_capacity(manifest.outputs.len());
     for output in &manifest.outputs {
@@ -1703,43 +1682,6 @@ fn build_outdoor_air_design_flow_context<'a>(
         co2_setpoint_required_mass_flow_rate_min_kg_per_s,
         co2_setpoint_required_mass_flow_rate_max_kg_per_s,
     ) = finite_min_max(&co2_setpoint_required_mass_flow_rates);
-    let outdoor_air_mass_flow_rates = if system.demand_controlled_ventilation_type
-        == DemandControlledVentilationType::OccupancySchedule
-    {
-        current_people_counts
-            .iter()
-            .map(|current_people_count| {
-                calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s(
-                    outdoor_air_specification,
-                    outdoor_air_context,
-                    *current_people_count,
-                    None,
-                    standard_air_density_kg_per_m3,
-                )
-                .ok_or_else(|| {
-                    "failed to calculate IdealLoads OccupancySchedule DCV outdoor-air mass flow"
-                        .to_string()
-                })
-            })
-            .collect::<Result<Vec<_>, _>>()?
-    } else if system.demand_controlled_ventilation_type
-        == DemandControlledVentilationType::Co2Setpoint
-    {
-        co2_setpoint_required_mass_flow_rates
-            .iter()
-            .map(|co2_required_mass_flow_rate_kg_per_s| {
-                calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s(
-                    outdoor_air_design_mass_flow_rate_kg_per_s,
-                    *co2_required_mass_flow_rate_kg_per_s,
-                )
-            })
-            .collect::<Vec<_>>()
-    } else {
-        vec![outdoor_air_design_mass_flow_rate_kg_per_s; sample_count]
-    };
-    let (outdoor_air_mass_flow_rate_min_kg_per_s, outdoor_air_mass_flow_rate_max_kg_per_s) =
-        finite_min_max(&outdoor_air_mass_flow_rates);
-
     let zone_timestep_hours = timestep.zone_timestep_seconds / 3600.0;
     let sample_timestep_hours = expected_series
         .first()
@@ -1769,6 +1711,7 @@ fn build_outdoor_air_design_flow_context<'a>(
     )?;
 
     let mut sensible_results = Vec::with_capacity(sample_count);
+    let mut minimum_outdoor_air_results = Vec::with_capacity(sample_count);
     for index in 0..sample_count {
         let calc_zone_state_index = index.saturating_sub(1);
         let zone_state = IdealLoadsOutdoorAirNodeState {
@@ -1796,6 +1739,13 @@ fn build_outdoor_air_design_flow_context<'a>(
             heating_demand.samples[index].value,
             cooling_demand.samples[index].value,
         );
+        let current_people_count = (system.demand_controlled_ventilation_type
+            == DemandControlledVentilationType::OccupancySchedule)
+            .then_some(current_people_counts[index]);
+        let co2_setpoint_required_mass_flow_rate_kg_per_s = (system
+            .demand_controlled_ventilation_type
+            == DemandControlledVentilationType::Co2Setpoint)
+            .then_some(co2_setpoint_required_mass_flow_rates[index]);
         let purchased_air =
             sim_purchased_air_outdoor_air_compat(SimPurchasedAirOutdoorAirCompatInput {
                 system,
@@ -1804,13 +1754,44 @@ fn build_outdoor_air_design_flow_context<'a>(
                 recirculation_state,
                 outdoor_air_state,
                 demand,
-                minimum_outdoor_air_mass_flow_rate_kg_per_s: outdoor_air_mass_flow_rates[index],
+                minimum_outdoor_air: IdealLoadsMinimumOutdoorAirCompatInput {
+                    specification: outdoor_air_specification,
+                    context: outdoor_air_context,
+                    outdoor_air_schedule_value: None,
+                    current_people_count,
+                    co2_setpoint_required_mass_flow_rate_kg_per_s,
+                },
                 system_timestep_hours: sample_timestep_hours[index],
-                barometric_pressure_pa: barometric_pressure_trace[index],
+                limit_context: limit_context
+                    .with_barometric_pressure_pa(barometric_pressure_trace[index]),
                 unit_available: true,
-            });
+            })
+            .map_err(|error| {
+                format!(
+                    "failed to resolve IdealLoads source-order outdoor-air minimum flow: {error:?}"
+                )
+            })?;
+        minimum_outdoor_air_results.push(purchased_air.minimum_outdoor_air.ok_or_else(|| {
+            "IdealLoads outdoor-air diagnostic unexpectedly resolved an unavailable unit"
+                .to_string()
+        })?);
         sensible_results.push(purchased_air.calculation);
     }
+    let first_minimum_outdoor_air = minimum_outdoor_air_results
+        .first()
+        .copied()
+        .ok_or_else(|| "IdealLoads outdoor-air diagnostic has no resolved samples".to_string())?;
+    let design_flow_components = first_minimum_outdoor_air.design_flow_components;
+    let design_volume_flow_rate_m3_per_s =
+        design_flow_components.final_design_volume_flow_rate_m3_per_s;
+    let outdoor_air_design_mass_flow_rate_kg_per_s =
+        first_minimum_outdoor_air.scheduled_design_mass_flow_rate_kg_per_s;
+    let outdoor_air_mass_flow_rates = minimum_outdoor_air_results
+        .iter()
+        .map(|result| result.final_minimum_mass_flow_rate_kg_per_s)
+        .collect::<Vec<_>>();
+    let (outdoor_air_mass_flow_rate_min_kg_per_s, outdoor_air_mass_flow_rate_max_kg_per_s) =
+        finite_min_max(&outdoor_air_mass_flow_rates);
 
     let output_handles = resolve_ideal_loads_output_handles(manifest)?;
     let mut rows = Vec::new();

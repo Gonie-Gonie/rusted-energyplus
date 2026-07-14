@@ -10,11 +10,13 @@ use ep_model::{
 use crate::{
     OutputSeries, ResultStore,
     ideal_loads::{
-        IdealLoadsCompiledBranchFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
-        IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, IdealLoadsZoneState,
-        SimPurchasedAirCompatError, SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
-        SimPurchasedAirOutdoorAirCompatInput, SimPurchasedAirOutdoorAirCompatOutput,
-        ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME, ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
+        IdealLoadsCompiledBranchFlags, IdealLoadsMinimumOutdoorAirCompatInput,
+        IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsPurchasedAirBranch,
+        IdealLoadsSensibleLimitContext, IdealLoadsZoneState, SimPurchasedAirCompatError,
+        SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
+        SimPurchasedAirOutdoorAirCompatError, SimPurchasedAirOutdoorAirCompatInput,
+        SimPurchasedAirOutdoorAirCompatOutput, ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME,
+        ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME,
         ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_COOLING_RATE,
         ZONE_IDEAL_LOADS_HEAT_RECOVERY_LATENT_HEATING_RATE,
         ZONE_IDEAL_LOADS_HEAT_RECOVERY_SENSIBLE_COOLING_RATE,
@@ -44,9 +46,8 @@ use crate::{
         ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_SENSIBLE_COOLING_RATE,
         ZONE_IDEAL_LOADS_ZONE_SENSIBLE_HEATING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_ENERGY,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
-        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s,
-        sim_purchased_air_compat_with_branch_flags, sim_purchased_air_outdoor_air_compat,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE, sim_purchased_air_compat_with_branch_flags,
+        sim_purchased_air_outdoor_air_compat,
     },
     zone_equipment::{
         IdealLoadsZoneEquipmentDispatchIssue, ZoneSysEnergyDemand,
@@ -163,10 +164,12 @@ pub enum IdealLoadsCompatibilityRuntimeError {
         /// IdealLoads object name.
         system_name: String,
     },
-    /// The selected OA branch uses an unsupported or unresolved design-flow method.
-    UnsupportedOutdoorAirDesignFlow {
+    /// The selected OA branch could not resolve its timestep minimum-flow inputs.
+    OutdoorAirCalculation {
         /// IdealLoads object name.
         system_name: String,
+        /// Error returned by the outdoor-air source-order wrapper.
+        error: SimPurchasedAirOutdoorAirCompatError,
     },
     /// The selected PurchasedAir branch is not inside the compatibility subset.
     UnsupportedPurchasedAirBranch {
@@ -201,9 +204,9 @@ impl Display for IdealLoadsCompatibilityRuntimeError {
                 formatter,
                 "IdealLoads system {system_name} has no resolved DesignSpecification:OutdoorAir"
             ),
-            Self::UnsupportedOutdoorAirDesignFlow { system_name } => write!(
+            Self::OutdoorAirCalculation { system_name, error } => write!(
                 formatter,
-                "IdealLoads system {system_name} has an unsupported outdoor-air design-flow method"
+                "IdealLoads system {system_name} could not resolve minimum outdoor-air flow: {error:?}"
             ),
             Self::UnsupportedPurchasedAirBranch { error } => write!(
                 formatter,
@@ -364,18 +367,6 @@ fn simulate_outdoor_air_purchased_air_system(
         }
     })?;
     let context = outdoor_air_context(model, zone);
-    let minimum_outdoor_air_mass_flow_rate_kg_per_s =
-        calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s(
-            specification,
-            context,
-            None,
-            limit_context.standard_air_density_kg_per_m3,
-        )
-        .ok_or_else(|| {
-            IdealLoadsCompatibilityRuntimeError::UnsupportedOutdoorAirDesignFlow {
-                system_name: system.name.0.clone(),
-            }
-        })?;
     let zone_state = IdealLoadsOutdoorAirNodeState {
         air_temperature_c: options.default_zone_air_temperature_c,
         air_humidity_ratio: options.default_zone_air_humidity_ratio,
@@ -385,20 +376,33 @@ fn simulate_outdoor_air_purchased_air_system(
         air_humidity_ratio: options.default_outdoor_air_humidity_ratio,
     };
 
-    Ok(sim_purchased_air_outdoor_air_compat(
-        SimPurchasedAirOutdoorAirCompatInput {
-            system,
-            supply_node,
-            zone_state,
-            recirculation_state: zone_state,
-            outdoor_air_state,
-            demand,
-            minimum_outdoor_air_mass_flow_rate_kg_per_s,
-            system_timestep_hours: 1.0,
-            barometric_pressure_pa: limit_context.barometric_pressure_pa,
-            unit_available: options.unit_available,
+    sim_purchased_air_outdoor_air_compat(SimPurchasedAirOutdoorAirCompatInput {
+        system,
+        supply_node,
+        zone_state,
+        recirculation_state: zone_state,
+        outdoor_air_state,
+        demand,
+        minimum_outdoor_air: IdealLoadsMinimumOutdoorAirCompatInput {
+            specification,
+            context,
+            // The arbitrary-run compatibility path has no timestep OA schedule,
+            // occupancy, or contaminant evaluator yet. `None` deliberately
+            // produces a typed wrapper error when any of those signals is active.
+            outdoor_air_schedule_value: None,
+            current_people_count: None,
+            co2_setpoint_required_mass_flow_rate_kg_per_s: None,
         },
-    ))
+        system_timestep_hours: 1.0,
+        limit_context,
+        unit_available: options.unit_available,
+    })
+    .map_err(
+        |error| IdealLoadsCompatibilityRuntimeError::OutdoorAirCalculation {
+            system_name: system.name.0.clone(),
+            error,
+        },
+    )
 }
 
 fn outdoor_air_specification<'a>(

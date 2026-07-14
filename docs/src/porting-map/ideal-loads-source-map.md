@@ -54,6 +54,24 @@ implement `SystemTimeStepState`.
 comparison CLI consumes that snapshot from the source-order PurchasedAir and
 Humidistat wrappers; it does not import or assemble `IdealLoadsSensibleResult`.
 
+`sim_purchased_air_outdoor_air_compat` also owns the
+`CalcPurchAirMinOAMassFlow` boundary. Callers provide the resolved outdoor-air
+specification plus raw timestep schedule, occupancy, and CO2-demand signals;
+the runtime resolves design components, schedule and standard-density
+conversion, and the selected DCV branch before the OA load calculation. The
+comparison CLI consumes the wrapper result for component and min/max metadata
+and does not call design-flow or DCV physics helpers directly.
+When the unit is unavailable, the wrapper follows `SimPurchasedAir` by
+skipping minimum-OA resolution and returning an explicit absent result with
+zero OA flow. For an available unit, the resolved flow applies the EnergyPlus
+`HVAC::VerySmallMassFlow` cutoff: values at or below 1e-30 kg/s become zero.
+
+The arbitrary-run compatibility runtime does not yet own timestep evaluators
+for nonblank OA schedules, current occupancy, or CO2 contaminant demand. Those
+active inputs therefore return a typed `OutdoorAirCalculation` error rather
+than silently falling back to design flow; the conformance harness supplies
+the declared occupancy and CO2 proof signals to the wrapper directly.
+
 autosized IdealLoads flow/capacity conformance remains outside the current
 claim; `SizePurchasedAir` is represented by the runtime policy constant
 `IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY`, and arbitrary-run compatibility blocks
@@ -96,7 +114,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
-| `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s` |
+| `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result` |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j` |
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
@@ -367,9 +385,15 @@ Sensible/Enthalpy heat-recovery candidate rows. The current Rust surface is:
   System/Average proof input for
   `ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP`
 - `calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s` in
-  `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs` owns the source-order
-  `CalcPurchAirMinOAMassFlow` `max(minimum OA, CO2 demand)` branch for the
-  declared Flow/Person CO2Setpoint DCV candidate
+  `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs` implements the
+  `max(minimum OA, CO2 demand)` scalar operation used by the declared
+  Flow/Person CO2Setpoint DCV candidate
+- `resolve_minimum_outdoor_air_compat` in
+  `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs` owns the
+  source-order design-components, OA-schedule, `StdRhoAir`, OccupancySchedule,
+  CO2Setpoint, `HVAC::VerySmallMassFlow`, and final finite-value guard sequence. The
+  `sim_purchased_air_outdoor_air_compat` wrapper calls it before the OA load
+  calculation and exposes both design and selected component snapshots.
 - `calc_outdoor_air_sensible_report_rates_compat` for the no-humidity
   Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, and
   DifferentialDryBulb/DifferentialEnthalpy economizer OA report-rate and

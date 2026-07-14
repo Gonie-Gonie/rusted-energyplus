@@ -3,16 +3,21 @@
 mod dcv;
 mod design_flow;
 mod economizer;
+mod minimum_flow;
 mod mixed_air;
 mod psychrometrics;
 mod supply;
 
 pub use dcv::*;
 pub use design_flow::*;
+pub use minimum_flow::*;
 
 use crate::{
     energyplus_moist_air_specific_heat_j_per_kg_k,
-    ideal_loads::{IdealLoadsInitFlags, IdealLoadsSensibleMode, moist_air_enthalpy_j_per_kg},
+    ideal_loads::{
+        IdealLoadsInitFlags, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
+        moist_air_enthalpy_j_per_kg,
+    },
     node::IdealLoadsSupplyNodeUpdate,
     zone_equipment::ZoneSysEnergyDemand,
 };
@@ -105,12 +110,12 @@ pub struct SimPurchasedAirOutdoorAirCompatInput<'a> {
     pub outdoor_air_state: IdealLoadsOutdoorAirNodeState,
     /// Source-order zone demand snapshot.
     pub demand: ZoneSysEnergyDemand,
-    /// Minimum outdoor-air mass flow after design-flow/DCV scheduling.
-    pub minimum_outdoor_air_mass_flow_rate_kg_per_s: f64,
+    /// Raw source-order inputs used to resolve minimum outdoor-air flow.
+    pub minimum_outdoor_air: IdealLoadsMinimumOutdoorAirCompatInput<'a>,
     /// System timestep used by active-time report variables.
     pub system_timestep_hours: f64,
-    /// Barometric pressure used by heat-recovery saturation handling.
-    pub barometric_pressure_pa: f64,
+    /// Standard density and timestep barometric pressure.
+    pub limit_context: IdealLoadsSensibleLimitContext,
     /// Availability-schedule result for this timestep.
     pub unit_available: bool,
 }
@@ -124,6 +129,8 @@ pub struct SimPurchasedAirOutdoorAirCompatOutput {
     pub selected_branch: &'static str,
     /// `InitPurchasedAir` equivalent flags.
     pub init_flags: IdealLoadsInitFlags,
+    /// `CalcPurchAirMinOAMassFlow` equivalent result, absent when the unit is off.
+    pub minimum_outdoor_air: Option<IdealLoadsMinimumOutdoorAirCompatResult>,
     /// `CalcPurchAirLoads` equivalent outdoor-air result.
     pub calculation: IdealLoadsOutdoorAirSensibleResult,
     /// `UpdatePurchasedAir` equivalent node write.
@@ -143,6 +150,12 @@ pub struct IdealLoadsOutdoorAirPurchasedAirTrace {
     pub outdoor_air_state: IdealLoadsOutdoorAirNodeState,
     /// Zone demand consumed by the calc stage.
     pub demand: ZoneSysEnergyDemand,
+    /// Evaluated OA schedule value supplied at the timestep boundary.
+    pub outdoor_air_schedule_value: Option<f64>,
+    /// Current occupants supplied for OccupancySchedule DCV.
+    pub current_people_count: Option<f64>,
+    /// CO2 setpoint demand supplied for CO2Setpoint DCV in kg/s.
+    pub co2_setpoint_required_mass_flow_rate_kg_per_s: Option<f64>,
     /// Minimum outdoor-air mass flow consumed by the calc stage.
     pub minimum_outdoor_air_mass_flow_rate_kg_per_s: f64,
 }
@@ -151,17 +164,29 @@ pub struct IdealLoadsOutdoorAirPurchasedAirTrace {
 #[must_use]
 pub fn sim_purchased_air_outdoor_air_compat(
     input: SimPurchasedAirOutdoorAirCompatInput<'_>,
-) -> SimPurchasedAirOutdoorAirCompatOutput {
+) -> Result<SimPurchasedAirOutdoorAirCompatOutput, SimPurchasedAirOutdoorAirCompatError> {
     let init_flags = IdealLoadsInitFlags::source_order_candidate();
+    let minimum_outdoor_air = if input.unit_available {
+        Some(resolve_minimum_outdoor_air_compat(
+            input.system,
+            input.minimum_outdoor_air,
+            input.limit_context,
+        )?)
+    } else {
+        None
+    };
+    let minimum_outdoor_air_mass_flow_rate_kg_per_s = minimum_outdoor_air
+        .map(|result| result.final_minimum_mass_flow_rate_kg_per_s)
+        .unwrap_or(0.0);
     let calculation = calc_outdoor_air_sensible_report_rates_compat(
         input.system,
         input.zone_state,
         input.recirculation_state,
         input.outdoor_air_state,
         input.demand,
-        input.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s,
         input.system_timestep_hours,
-        input.barometric_pressure_pa,
+        input.limit_context.barometric_pressure_pa,
         input.unit_available,
     );
     let supply_node_update = IdealLoadsSupplyNodeUpdate {
@@ -179,18 +204,23 @@ pub fn sim_purchased_air_outdoor_air_compat(
         recirculation_state: input.recirculation_state,
         outdoor_air_state: input.outdoor_air_state,
         demand: input.demand,
-        minimum_outdoor_air_mass_flow_rate_kg_per_s: input
-            .minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        outdoor_air_schedule_value: input.minimum_outdoor_air.outdoor_air_schedule_value,
+        current_people_count: input.minimum_outdoor_air.current_people_count,
+        co2_setpoint_required_mass_flow_rate_kg_per_s: input
+            .minimum_outdoor_air
+            .co2_setpoint_required_mass_flow_rate_kg_per_s,
+        minimum_outdoor_air_mass_flow_rate_kg_per_s,
     };
 
-    SimPurchasedAirOutdoorAirCompatOutput {
+    Ok(SimPurchasedAirOutdoorAirCompatOutput {
         system_id: input.system.id,
         selected_branch: "outdoor_air",
         init_flags,
+        minimum_outdoor_air,
         calculation,
         supply_node_update,
         trace,
-    }
+    })
 }
 
 /// Calculates diagnostic-only IdealLoads outdoor-air report rates and mixed-air state.
@@ -372,3 +402,7 @@ mod outdoor_air_dcv_tests;
 #[cfg(test)]
 #[path = "outdoor_air_tests.rs"]
 mod outdoor_air_tests;
+
+#[cfg(test)]
+#[path = "outdoor_air_wrapper_tests.rs"]
+mod outdoor_air_wrapper_tests;

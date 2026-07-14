@@ -89,8 +89,10 @@ $idealLoadsUpdate = "crates\ep_runtime\src\ideal_loads\update.rs"
 $outdoorAir = "crates\ep_runtime\src\ideal_loads\outdoor_air.rs"
 $outdoorAirTests = "crates\ep_runtime\src\ideal_loads\outdoor_air_tests.rs"
 $outdoorAirDcvTests = "crates\ep_runtime\src\ideal_loads\outdoor_air_dcv_tests.rs"
+$outdoorAirWrapperTests = "crates\ep_runtime\src\ideal_loads\outdoor_air_wrapper_tests.rs"
 $outdoorAirDesignFlow = "crates\ep_runtime\src\ideal_loads\outdoor_air\design_flow.rs"
 $outdoorAirDcv = "crates\ep_runtime\src\ideal_loads\outdoor_air\dcv.rs"
+$outdoorAirMinimumFlow = "crates\ep_runtime\src\ideal_loads\outdoor_air\minimum_flow.rs"
 $outdoorAirEconomizer = "crates\ep_runtime\src\ideal_loads\outdoor_air\economizer.rs"
 $outdoorAirMixedAir = "crates\ep_runtime\src\ideal_loads\outdoor_air\mixed_air.rs"
 $outdoorAirPsychrometrics = "crates\ep_runtime\src\ideal_loads\outdoor_air\psychrometrics.rs"
@@ -106,6 +108,11 @@ $idealLoadsCliOutdoorAirReports = "crates\ep_cli\src\ideal_loads\reports\outdoor
 $idealLoadsCliOutdoorAirMarkdown = "crates\ep_cli\src\ideal_loads\reports\outdoor_air\markdown.rs"
 $idealLoadsCliOutdoorAirJson = "crates\ep_cli\src\ideal_loads\reports\outdoor_air\json.rs"
 $idealLoadsCliOutdoorAirCsv = "crates\ep_cli\src\ideal_loads\reports\outdoor_air\csv.rs"
+$idealLoadsCliPhysicsBoundaryFiles = @($idealLoadsCli)
+$idealLoadsCliPhysicsBoundaryFiles += @(
+    Get-ChildItem -LiteralPath "crates\ep_cli\src\ideal_loads" -Recurse -File -Filter "*.rs" |
+        ForEach-Object { $_.FullName }
+)
 $outdoorAirSumCompare = "scripts\compare\compare-ideal-loads-outdoor-air-sum-conformance-candidate.ps1"
 $outdoorAirMaximumCompare = "scripts\compare\compare-ideal-loads-outdoor-air-maximum-conformance-candidate.ps1"
 $conformanceManifest = "crates\ep_conformance\src\conformance.rs"
@@ -152,8 +159,10 @@ Assert-FileExists -Path $idealLoadsUpdate -Description "IdealLoads node-update m
 Assert-FileExists -Path $outdoorAir -Description "IdealLoads outdoor-air module"
 Assert-FileExists -Path $outdoorAirTests -Description "IdealLoads outdoor-air tests module"
 Assert-FileExists -Path $outdoorAirDcvTests -Description "IdealLoads outdoor-air DCV tests module"
+Assert-FileExists -Path $outdoorAirWrapperTests -Description "IdealLoads outdoor-air wrapper tests module"
 Assert-FileExists -Path $outdoorAirDesignFlow -Description "IdealLoads outdoor-air design-flow module"
 Assert-FileExists -Path $outdoorAirDcv -Description "IdealLoads outdoor-air DCV module"
+Assert-FileExists -Path $outdoorAirMinimumFlow -Description "IdealLoads minimum outdoor-air flow resolver module"
 Assert-FileExists -Path $outdoorAirEconomizer -Description "IdealLoads outdoor-air economizer module"
 Assert-FileExists -Path $outdoorAirMixedAir -Description "IdealLoads outdoor-air mixed-air module"
 Assert-FileExists -Path $outdoorAirPsychrometrics -Description "IdealLoads outdoor-air psychrometrics module"
@@ -212,8 +221,10 @@ Assert-LineLimit -Path $idealLoadsUpdate -Limit 120 -Description "IdealLoads nod
 Assert-LineLimit -Path $outdoorAir -Limit 450 -Description "IdealLoads outdoor-air module"
 Assert-LineLimit -Path $outdoorAirTests -Limit 450 -Description "IdealLoads outdoor-air tests module"
 Assert-LineLimit -Path $outdoorAirDcvTests -Limit 240 -Description "IdealLoads outdoor-air DCV tests module"
+Assert-LineLimit -Path $outdoorAirWrapperTests -Limit 500 -Description "IdealLoads outdoor-air wrapper tests module"
 Assert-LineLimit -Path $outdoorAirDesignFlow -Limit 220 -Description "IdealLoads outdoor-air design-flow module"
 Assert-LineLimit -Path $outdoorAirDcv -Limit 120 -Description "IdealLoads outdoor-air DCV module"
+Assert-LineLimit -Path $outdoorAirMinimumFlow -Limit 240 -Description "IdealLoads minimum outdoor-air flow resolver module"
 Assert-LineLimit -Path $outdoorAirEconomizer -Limit 150 -Description "IdealLoads outdoor-air economizer module"
 Assert-LineLimit -Path $outdoorAirMixedAir -Limit 260 -Description "IdealLoads outdoor-air mixed-air module"
 Assert-LineLimit -Path $outdoorAirPsychrometrics -Limit 160 -Description "IdealLoads outdoor-air psychrometrics module"
@@ -350,13 +361,16 @@ Assert-NotContains -Path $idealLoadsReport -Pattern 'pub const IDEAL_LOADS_RATE_
 
 Assert-Contains -Path $outdoorAir -Pattern 'mod dcv;' -Description "outdoor-air DCV submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'mod design_flow;' -Description "outdoor-air design-flow submodule declaration"
+Assert-Contains -Path $outdoorAir -Pattern 'mod minimum_flow;' -Description "minimum outdoor-air flow resolver submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'mod economizer;' -Description "outdoor-air economizer submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'mod mixed_air;' -Description "outdoor-air mixed-air submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'mod psychrometrics;' -Description "outdoor-air psychrometrics submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'mod supply;' -Description "outdoor-air supply submodule declaration"
 Assert-Contains -Path $outdoorAir -Pattern '#\[path = "outdoor_air_tests\.rs"\]' -Description "outdoor-air test module path declaration"
+Assert-Contains -Path $outdoorAir -Pattern '#\[path = "outdoor_air_wrapper_tests\.rs"\]' -Description "outdoor-air wrapper test module path declaration"
 Assert-Contains -Path $outdoorAir -Pattern 'pub use dcv::\*;' -Description "outdoor-air DCV public re-export"
 Assert-Contains -Path $outdoorAir -Pattern 'pub use design_flow::\*;' -Description "outdoor-air design-flow public re-export"
+Assert-Contains -Path $outdoorAir -Pattern 'pub use minimum_flow::\*;' -Description "minimum outdoor-air flow public types"
 Assert-Contains -Path $outdoorAirTests -Pattern '#\[test\]' -Description "outdoor-air root unit tests"
 Assert-Contains -Path $outdoorAirDesignFlow -Pattern 'pub fn design_outdoor_air_volume_flow_components_m3_per_s\s*\(' -Description "outdoor-air design-flow component helper"
 Assert-Contains -Path $outdoorAirDesignFlow -Pattern 'pub fn calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s\s*\(' -Description "outdoor-air scheduled mass-flow helper"
@@ -367,6 +381,14 @@ Assert-Contains -Path $outdoorAirDcv -Pattern 'pub fn calc_occupancy_schedule_dc
 Assert-Contains -Path $outdoorAirDcv -Pattern 'pub fn calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s\s*\(' -Description "CO2Setpoint DCV helper"
 Assert-Contains -Path $outdoorAirDcvTests -Pattern 'fn co2_setpoint_dcv_selects_required_flow_above_minimum\s*\(' -Description "CO2Setpoint controlling-demand runtime test"
 Assert-Contains -Path $outdoorAirDcvTests -Pattern 'fn co2_setpoint_dcv_preserves_minimum_for_noncontrolling_requirements\s*\(' -Description "CO2Setpoint minimum-flow runtime test"
+Assert-Contains -Path $outdoorAirMinimumFlow -Pattern 'fn resolve_minimum_outdoor_air_compat\s*\(' -Description "source-order minimum outdoor-air resolver"
+Assert-Contains -Path $outdoorAirMinimumFlow -Pattern 'pub enum SimPurchasedAirOutdoorAirCompatError' -Description "minimum outdoor-air typed error boundary"
+Assert-Contains -Path $outdoorAir -Pattern 'resolve_minimum_outdoor_air_compat\s*\(' -Description "outdoor-air wrapper owns minimum-flow resolution"
+Assert-Contains -Path $outdoorAirWrapperTests -Pattern 'fn wrapper_resolves_design_flow_before_calc_update_and_trace\s*\(' -Description "outdoor-air wrapper design-flow ownership test"
+Assert-Contains -Path $outdoorAirWrapperTests -Pattern 'fn wrapper_occupancy_dcv_recomputes_sum_before_schedule_and_density\s*\(' -Description "outdoor-air wrapper OccupancySchedule source-order test"
+Assert-Contains -Path $outdoorAirWrapperTests -Pattern 'fn wrapper_co2_dcv_applies_max_then_explicit_nonfinite_guard\s*\(' -Description "outdoor-air wrapper CO2Setpoint source-order test"
+Assert-Contains -Path $outdoorAirWrapperTests -Pattern 'fn wrapper_applies_energyplus_very_small_mass_flow_cutoff\s*\(' -Description "outdoor-air wrapper VerySmallMassFlow cutoff test"
+Assert-Contains -Path $outdoorAirWrapperTests -Pattern 'fn wrapper_reports_missing_or_unsupported_minimum_flow_inputs\s*\(' -Description "outdoor-air wrapper typed error tests"
 Assert-Contains -Path $outdoorAirEconomizer -Pattern 'fn calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s\s*\(' -Description "economizer OA flow helper"
 Assert-Contains -Path $outdoorAirMixedAir -Pattern 'fn mixed_air_state\s*\(' -Description "mixed-air state helper"
 Assert-Contains -Path $outdoorAirMixedAir -Pattern 'fn heat_recovery_allows_outdoor_air_tempering\s*\(' -Description "heat recovery activation helper"
@@ -588,22 +610,43 @@ Assert-Contains -Path $idealLoadsCli -Pattern 'ideal_loads_runtime_binding_sourc
 Assert-Contains -Path $idealLoadsCli -Pattern 'purchased_air_name_lookup_policy' -Description "IdealLoads report string lookup policy metadata"
 Assert-Contains -Path $idealLoadsCli -Pattern 'sim_purchased_air_compat' -Description "IdealLoads no-OA report generator uses source-order wrapper"
 Assert-Contains -Path $idealLoadsCli -Pattern 'sim_purchased_air_outdoor_air_compat' -Description "IdealLoads outdoor-air report generator uses source-order wrapper"
-Assert-Contains -Path $idealLoadsCli -Pattern 'calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s' -Description "IdealLoads CO2Setpoint reporter uses runtime helper"
+Assert-Contains -Path $idealLoadsCli -Pattern 'IdealLoadsMinimumOutdoorAirCompatInput' -Description "IdealLoads outdoor-air reporter passes raw minimum-flow inputs to runtime"
+foreach ($minimumFlowHelper in @(
+        'design_outdoor_air_volume_flow_components_m3_per_s',
+        'calc_scheduled_outdoor_air_mass_flow_rate_kg_per_s',
+        'calc_occupancy_schedule_dcv_outdoor_air_mass_flow_rate_kg_per_s',
+        'calc_co2_setpoint_dcv_outdoor_air_mass_flow_rate_kg_per_s'
+    )) {
+    foreach ($idealLoadsCliPhysicsFile in $idealLoadsCliPhysicsBoundaryFiles) {
+        Assert-NotContains -Path $idealLoadsCliPhysicsFile -Pattern $minimumFlowHelper -Description "minimum outdoor-air physics helper in CLI IdealLoads tree"
+    }
+    Assert-NotContains -Path $idealLoadsRuntime -Pattern $minimumFlowHelper -Description "minimum outdoor-air physics helper in compatibility runtime root"
+}
+foreach ($idealLoadsCliPhysicsFile in $idealLoadsCliPhysicsBoundaryFiles) {
+    Assert-NotContains -Path $idealLoadsCliPhysicsFile -Pattern 'IdealLoadsSensibleResult' -Description "IdealLoads calculation result type in CLI IdealLoads tree"
+}
 Assert-Contains -Path $idealLoadsCli -Pattern 'meter_rate_to_energy_j\s*\(' -Description "IdealLoads report energy uses runtime rate-to-energy helper"
 Assert-Contains -Path $calcMoistureDemand -Pattern 'pub fn third_order_humidity_history_term\s*\(' -Description "ThirdOrder humidity history runtime helper"
 Assert-Contains -Path $calcMoistureDemandTests -Pattern 'fn third_order_humidity_history_term_matches_energyplus_coefficients\s*\(' -Description "ThirdOrder humidity history runtime test"
 Assert-Contains -Path $idealLoadsCli -Pattern 'third_order_humidity_history_term\s*\(' -Description "IdealLoads residual diagnostic uses runtime ThirdOrder helper"
 Assert-Contains -Path $idealLoadsCli -Pattern 'advance_no_oa_humidistat_zone_timestep_compat\s*\(' -Description "IdealLoads CLI uses runtime Humidistat zone-timestep state transition"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'outdoor_air_design_mass_flow_rate_kg_per_s\s*\.max\s*\(' -Description "CO2Setpoint DCV physics in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'rate\([^\r\n]*\)\s*\*\s*interval_seconds' -Description "IdealLoads rate-to-energy physics in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'fn third_order_humidity_history_term\s*\(' -Description "ThirdOrder humidity history helper in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern '3\.0\s*\*\s*history\[0\].*1\.5\s*\*\s*history\[1\]' -Description "raw ThirdOrder humidity history coefficients in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'NoOaThirdOrderHumidityCorrectorInput|correct_no_oa_third_order_humidity_ratio_compat' -Description "Humidistat corrector physics in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'zone_(air|mean)_humidity_history\s*=\s*\[' -Description "Humidistat history mutation in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'remaining_output_req_to_humid_sp_kg_per_s\s*=\s*predicted' -Description "Humidistat predicted-demand injection in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'remaining_output_req_to_dehumid_sp_kg_per_s\s*=\s*predicted' -Description "Humidistat predicted-demand injection in CLI reporter"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'calc_no_oa_no_limit_sensible_compat' -Description "direct no-limit no-OA calc helper call in report generator"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'calc_no_oa_sensible_with_limits_compat' -Description "direct finite-limit no-OA calc helper call in report generator"
-Assert-NotContains -Path $idealLoadsCli -Pattern 'calc_outdoor_air_sensible_report_rates_compat' -Description "direct outdoor-air calc helper call in report generator"
+$cliForbiddenPhysicsPatterns = @(
+    [pscustomobject]@{ Pattern = 'outdoor_air_design_mass_flow_rate_kg_per_s\s*\.max\s*\('; Description = "CO2Setpoint DCV physics in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'rate\([^\r\n]*\)\s*\*\s*interval_seconds'; Description = "IdealLoads rate-to-energy physics in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'fn third_order_humidity_history_term\s*\('; Description = "ThirdOrder humidity history helper in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = '3\.0\s*\*\s*history\[0\].*1\.5\s*\*\s*history\[1\]'; Description = "raw ThirdOrder humidity history coefficients in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'NoOaThirdOrderHumidityCorrectorInput|correct_no_oa_third_order_humidity_ratio_compat'; Description = "Humidistat corrector physics in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'zone_(air|mean)_humidity_history\s*=\s*\['; Description = "Humidistat history mutation in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'remaining_output_req_to_humid_sp_kg_per_s\s*=\s*predicted'; Description = "Humidistat predicted-demand injection in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'remaining_output_req_to_dehumid_sp_kg_per_s\s*=\s*predicted'; Description = "Humidistat predicted-demand injection in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'calc_no_oa_no_limit_sensible_compat'; Description = "direct no-limit no-OA calc helper call in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'calc_no_oa_sensible_with_limits_compat'; Description = "direct finite-limit no-OA calc helper call in CLI IdealLoads tree" },
+    [pscustomobject]@{ Pattern = 'calc_outdoor_air_sensible_report_rates_compat'; Description = "direct outdoor-air calc helper call in CLI IdealLoads tree" }
+)
+foreach ($idealLoadsCliPhysicsFile in $idealLoadsCliPhysicsBoundaryFiles) {
+    foreach ($forbiddenPhysics in $cliForbiddenPhysicsPatterns) {
+        Assert-NotContains -Path $idealLoadsCliPhysicsFile -Pattern $forbiddenPhysics.Pattern -Description $forbiddenPhysics.Description
+    }
+}
 
 Write-Host "IdealLoads structure audit complete."

@@ -459,7 +459,7 @@ foreach ($case in $promotedCases) {
     Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_detailed_output_lookup_policy" -Expected $expectedIdealLoadsDetailedOutputLookupPolicy -Description "$($case.Id) compare summary"
     Assert-JsonPropertyEquals -Object $summary -PropertyName "ideal_loads_duplicate_output_handle_policy" -Expected $expectedIdealLoadsDuplicateOutputHandlePolicy -Description "$($case.Id) compare summary"
     $expectedTracePayload = if ($summary.selected_purchased_air_branch -eq "outdoor_air") {
-        "source-order zone/recirculation/outdoor-air states, minimum outdoor-air mass flow, mixed-air state, supply state, and report rates"
+        "source-order zone/recirculation/outdoor-air states, raw schedule/occupancy/CO2 minimum-flow inputs, resolved design/DCV minimum outdoor-air mass flow, mixed-air state, supply state, and report rates"
     }
     else {
         "mode_counts, source-order demand inputs, selected branch, supply state, and report rates"

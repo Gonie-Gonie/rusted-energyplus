@@ -618,6 +618,8 @@ energyplus_source = [
   "src/EnergyPlus/OutputProcessor.cc",
 ]
 rust_target = [
+  "crates/ep_runtime/src/ideal_loads/outdoor_air.rs::sim_purchased_air_outdoor_air_compat",
+  "crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat",
   "crates/ep_runtime/src/ideal_loads/outdoor_air/design_flow.rs::design_outdoor_air_volume_flow_components_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s",
   "crates/ep_runtime/src/ideal_loads/outdoor_air/design_flow.rs::calc_design_outdoor_air_volume_flow_m3_per_s",
