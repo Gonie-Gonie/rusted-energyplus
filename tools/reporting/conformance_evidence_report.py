@@ -88,16 +88,24 @@ CLAIM_BOUNDARY = (
     "Sunday=1, and 24 Monday=2 samples. Both 72-sample series and normalized timestamps are "
     "ordered, exact, unique, and zero-tolerance gated. This second pair proves only the "
     "fixed-Saturday plus-two-day observation branch; the Sunday plus-one-day branch remains the "
-    "separate pair above. Blank/default policy behavior, EPW holidays, other special-day types, duration greater than one, Nth/last "
-    "rules, overlap/order, leap-policy behavior beyond the declared 2016 dates, year-end/cross-year "
-    "behavior, schedule lookup, tomorrow state, and raw ESO timestamp serialization remain outside "
+    "separate pair above. The paired input-file weekday-rule cases use only the explicit 2032-02-22 "
+    "through 2032-03-01 calendar and two literal IDF forms. `4th Sunday in February` resolves to "
+    "2/22, day of year 53, and matches 216 ordered, exact, unique, zero-tolerance samples with "
+    "daily indices 8/2/3/4/5/6/7/1/2. `Last Sunday in February` resolves to leap day 2/29, day "
+    "of year 60, and matches 216 samples with daily indices 1/2/3/4/5/6/7/8/2. Apply Weekend "
+    "Holiday Rule is explicitly Yes and the shift is zero in both. Other Nth ordinals, weekdays, "
+    "months, years, or date strings; nonexistent fifth-weekday fatal handling until a negative gate "
+    "exists; EPW Nth/Last rules; blank/default policy behavior; EPW holidays beyond the paired "
+    "fixed use-policy cases below; other special-day types; duration, overlap, precedence, "
+    "declaration order, year wrap, or cross-year behavior; schedule lookup; "
+    "tomorrow state; and raw ESO timestamp serialization remain outside "
     "this claim. The paired fixed EPW "
     "holiday cases share one "
     "February 29 weather-file holiday and differ only in the RunPeriod use flag. Their 72 ordered, "
     "unique Site Day Type Index samples and normalized timestamps match exactly: enabled is 24 "
     "Sunday=1, 24 source-exact EPW-holiday Sunday=1, and 24 Tuesday=3; disabled is 24 Sunday=1, "
     "24 Monday=2, and 24 Tuesday=3. This pair proves only fixed-date EPW holiday intake and "
-    "RunPeriod enable/disable filtering. Weekend shifting, Nth/last rules, multiple or overlapping "
+    "RunPeriod enable/disable filtering. Weekend shifting, EPW Nth/Last rules, multiple or overlapping "
     "holidays, EPW/IDF precedence, schedule day-type lookup, tomorrow state, raw ESO timestamp "
     "serialization, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
     "records-per-hour greater than one, "
@@ -113,6 +121,8 @@ CASE_LABELS = {
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
+    "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
+    "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
     "calendar_special_day_weekend_rule_enabled_hourly_exact_001": "Weekend holiday enabled",
     "calendar_special_day_weekend_rule_disabled_hourly_exact_001": "Weekend holiday disabled",
     "calendar_special_day_weekend_saturday_enabled_hourly_exact_001": "Saturday holiday enabled",
@@ -240,6 +250,20 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="IDF fourth Sunday",
+        command="compare-calendar-special-day-weekday-rules-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_nth_weekday_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_nth_weekday_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_nth_weekday_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="IDF last Sunday",
+        command="compare-calendar-special-day-weekday-rules-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_last_weekday_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_last_weekday_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_last_weekday_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weekend holiday enabled",

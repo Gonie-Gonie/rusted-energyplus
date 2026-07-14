@@ -1,0 +1,59 @@
+id = "calendar_special_day_last_weekday_hourly_exact_001"
+title = "Last-Sunday input-file special-day state exact order"
+milestone = "full-source-order-calendar-special-day-weekday-rules"
+purpose = "Block on exact ordered hourly day types for the 2032 last-Sunday-in-February input-file Holiday rule."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to the exact 2032 `Last Sunday in February` rule form, 216 ordered and unique hour-ending Site Day Type Index samples from 2032-02-22 through 2032-03-01, and the resulting Holiday timestamps.",
+  "The duration-one input-file Holiday resolves on Sunday 2/29 and remains on that date even though Apply Weekend Holiday Rule is explicitly Yes; the nine daily indices are 1, 2, 3, 4, 5, 6, 7, 8, and 2.",
+  "The EPW observes leap years but declares no holidays or daylight-saving period, and the RunPeriod explicitly disables weather-file holidays, daylight saving, rain, snow, and actual-weather handling.",
+  "Other Nth values, weekdays, months, and years; nonexistent or fifth-weekday fatal handling; fixed-date and weekend-shift branches; EPW date rules; duration, overlap, precedence, declaration order, year wrap, cross-year traversal, schedule lookup, tomorrow state, and raw ESO serialization remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_last_weekday_hourly_exact_001/calendar_special_day_last_weekday_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_last_weekday_hourly_exact_001/calendar_special_day_last_weekday_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_special_day_nth_weekday_hourly_exact_001/calendar_special_day_weekday_rules_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_last_weekday_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-weekday-rules-exact"
+blocking = true

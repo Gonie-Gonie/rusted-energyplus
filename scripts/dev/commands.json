@@ -335,6 +335,12 @@
                          "help":  "Gate paired exact fixed-Saturday input-file Holiday plus-two-day weekend-observation Yes/No policy state and ordered hourly day types."
                      },
                      {
+                         "name":  "compare-calendar-special-day-weekday-rules-exact",
+                         "path":  "compare\\compare-calendar-special-day-weekday-rules-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired exact fourth-Sunday and last-Sunday input-file Holiday rules and ordered hourly day types."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",
