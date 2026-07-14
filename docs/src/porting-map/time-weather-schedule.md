@@ -78,7 +78,7 @@ equivalent to advancing the reported run-period calendar.
 | special-day intake | `Weather::GetSpecialDayPeriodData` | Parses ordered `RunPeriodControl:SpecialDays` definitions into date rule, duration, and special day type after any weather-file entries have been allocated. Intake does not select today's day type. |
 | environment materialization | `Weather::SetupEnvironmentTypes` | Copies each run period into `Environment`, derives `StartJDay`, `EndJDay`, `RawSimDays`, `TotalDays`, leap-year handling, environment kind/name, weekday map seed, and the run-period policy flags. This is descriptor construction, not current-day state. |
 | environment selection | `Weather::GetNextEnvironment` | Advances `Envrn`, selects the descriptor, and seeds `KindOfSim`, `CalendarYear`, month/day/day-of-year, `NumOfDayInEnvrn`, `CurEnvirNum`, and environment name. For a weather run it resolves `CurrentYearIsLeapYear`, weekday tables, active DST ranges, special-day dates, and the effective weather policy switches. |
-| special-day projection | `Weather::SetSpecialDayDates` | Resets the annual special-day table and resolves enabled definitions against the environment weekday/leap shape before weather-day reads consume the resulting day type. External evidence is limited to the fixed IDF case, two exact 2032 IDF weekday-rule forms, the fixed-Sunday and fixed-Saturday weekend-rule pairs, and the fixed EPW use-policy pair below; all other date forms, duration, ordering, weekend, and EPW branches remain unit/source evidence or unclaimed. |
+| special-day projection | `Weather::SetSpecialDayDates` | Resets the annual special-day table and resolves enabled definitions against the environment weekday/leap shape before weather-day reads consume the resulting day type. External numerical evidence is limited to the fixed IDF case, two exact 2032 IDF weekday-rule forms, the fixed-Sunday and fixed-Saturday weekend-rule pairs, and the fixed EPW use-policy pair below. One blocking smoke/nonclaim case separately locks rejection of an explicit nonexistent 2016 fifth Sunday; all other date forms, duration, ordering, weekend, and EPW branches remain unit/source evidence or unclaimed. |
 | nested traversal | `SimulationManager::ManageSimulation` | Owns `DayOfSim`, `HourOfDay`, `TimeStep`, warmup repetition, and the environment/day/hour/timestep begin/end flags. Calendar and weather routines consume these counters; they do not own the nested loop. |
 | weather driver | `Weather::ManageWeather` | Preserves the barrier `InitializeWeather` -> pre-weather EMS call -> `SetCurrentWeather` -> weather/time reporting for every zone timestep. |
 | environment/day initialization | `Weather::InitializeWeather` | On `BeginEnvrnFlag`, initializes missing-value state and reads the first weather day. On `BeginDayFlag`, calls `UpdateWeatherData` before reading or preparing the next tomorrow record, then exposes tomorrow date/day-type fields for rollover. |
@@ -156,7 +156,9 @@ ordered typed-vector overwrite. Those broader branches are not external
 conformance evidence. The fixed duration-one IDF Holiday, the explicit 2032
 `4th Sunday in February` and `Last Sunday in February` IDF cases, paired
 fixed-Sunday and fixed-Saturday weekend-rule cases, and paired fixed EPW holiday
-use-policy cases below are the only external special-day boundaries.
+use-policy cases below are the only external numerical special-day boundaries.
+The explicit nonexistent-fifth-Sunday fixture below is blocking negative
+evidence only and produces no day-type samples.
 
 Its `gregorian_year_is_leap_year` field is date arithmetic state, not
 EnergyPlus' weather-effective `CurrentYearIsLeapYear`; the latter also depends
@@ -402,10 +404,44 @@ shift is exactly zero.
   `1/2/3/4/5/6/7/8/2`.
 
 This checkpoint claims only those two literal IDF forms on that explicit 2032
-calendar. Other Nth ordinals, weekdays, months, years, or date strings;
-nonexistent fifth-weekday fatal handling until a negative gate exists; EPW
+calendar. Other Nth ordinals, weekdays, months, years, or date strings remain
+outside its numerical claim. The one explicit nonexistent fifth-Sunday
+rejection is covered only by the blocking smoke/nonclaim checkpoint below. EPW
 Nth/Last rules; duration, overlap, precedence, declaration order, year wrap,
 cross-year reprojection, schedule lookup, tomorrow state, and raw ESO timestamp
+serialization remain outside the claim.
+
+## Nonexistent Fifth-Weekday Expected-Failure Checkpoint
+
+`calendar_special_day_nonexistent_fifth_weekday_failure_001` is blocking
+smoke/nonclaim negative evidence for only one duration-one input-file Holiday
+using the exact `5th Sunday in February` form over 2016-02-28 through
+2016-03-01. February 2016 has only four Sundays. `Apply Weekend Holiday Rule`
+is explicitly Yes, but weekend observation applies only after a date resolves
+and therefore does not rescue this nonexistent Nth rule.
+
+The blocking `compare-calendar-special-day-nonexistent-nth-error` gate locks
+two engine-specific failure contracts before hourly data is produced:
+
+- EnergyPlus exits 1 through the `SetSpecialDayDates` not-enough-Nths Severe
+  followed by Fatal path. Its summary has 0 counted warnings and 1 severe
+  error, and its data-row count is zero. The locked messages identify
+  `Special Day Date, Nth Day of Month, not enough Nths` for
+  `MISSING FIFTH SUNDAY HOLIDAY`, followed by the `SetSpecialDayDates`
+  program-termination condition.
+- The Rust arbitrary-run CLI exits 6 with diagnostic phase `runtime`, code
+  `RuntimeConvergenceFailure`, and the exact diagnostic `failed to build
+  weather-aware time axis: run period MISSING FIFTH SUNDAY RUN PERIOD special
+  day MISSING FIFTH SUNDAY HOLIDAY has no occurrence 5 of Sunday in month 2`.
+  It produces zero hourly samples.
+
+The different numeric exit statuses are each interface contracts, not values
+that are expected to equal one another. This smoke case makes no numerical
+`Site Day Type Index` conformance claim. Other ordinals, weekdays, months,
+years, or strings; EPW rules; multiple errors or definitions; partial-artifact
+parity; weekend behavior beyond this explicit non-rescue; duration greater than
+one; overlap, precedence, declaration order, year wrap, cross-year
+reprojection, schedule lookup, tomorrow state, and successful-run raw ESO
 serialization remain outside the claim.
 
 ## Fixed-Sunday IDF Weekend-Observation Policy Evidence Checkpoint
@@ -497,8 +533,8 @@ no input-file special day.
 | Boundary | Current Rust status | Missing source behavior |
 |---|---|---|
 | run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, the weather-file DST use flag gates a parsed EPW period, the weather-file holiday use flag gates parsed EPW holiday definitions, the explicit weekend rule gates the fixed-Sunday and fixed-Saturday observation pairs, and typed IDF `RunPeriodControl:SpecialDays` definitions feed the shared day-type projection. Metadata-aware actual-weather/cross-year inputs and Gregorian cross-year inputs with typed special days fail explicitly | custom ranges, design-day environments, environment filtering, overlapping IDF source-order preservation, blank/default weekend-policy behavior, multi-holiday behavior, EPW-versus-IDF precedence, the IDF DST object, actual-weather traversal, cross-year weather traversal, per-year special-day reprojection, and full EnergyPlus warning-text parity |
-| canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias). The metadata-aware axis resolves an enabled EPW DST rule into inclusive daily `dst` state, enabled EPW holidays into source-exact Sunday day type, and typed IDF special-day rules into effective `DayType`/`special_day_type`; `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday. External special-day evidence is limited to the fixed duration-one IDF Holiday, the exact 2032 `4th Sunday in February` and `Last Sunday in February` IDF forms, the paired fixed-Sunday and fixed-Saturday weekend-policy cases, and the paired fixed EPW holiday use-policy cases | warmup lifecycle, the IDF DST object, overlapping IDF source-order preservation, weekend shifting beyond the fixed-Sunday plus-one-day and fixed-Saturday plus-two-day explicit Yes/No pairs, other Nth ordinals/weekdays/months/years/strings, nonexistent fifth-weekday fatal handling without a negative gate, EPW Nth/Last, other special-day types, duration greater than one, multiple or overlapping holidays, EPW-versus-IDF precedence, schedule/timestamp DST or special-day consumers, tomorrow special-day state, actual-weather behavior, cross-year weather traversal or per-year special-day reprojection, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
-| hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. The fixed-date DST case separately locks 72 ordered state/timestamp samples, 24 inactive then 48 active. The fixed IDF special-day case locks 72 ordered day-type/timestamp samples as 24 each of 1/8/3. The two exact 2032 IDF weekday-rule cases each lock 216 ordered samples: fourth Sunday uses daily indices 8/2/3/4/5/6/7/1/2, and last Sunday uses 1/2/3/4/5/6/7/8/2. The fixed-Sunday weekend-policy pair locks 72 samples each as enabled 24 each of 1/8/3 and disabled 24 each of 8/2/3. The fixed-Saturday weekend-policy pair locks 72 samples each as enabled 24 each of 7/1/8 and disabled 24 each of 8/1/2. The paired EPW holiday cases lock 72 samples each as enabled 24 each of 1/1/3 and disabled 24 each of 1/2/3. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, DST behavior beyond the fixed-date case, special-day behavior beyond the declared fixed-date, two exact weekday-rule forms, and policy cases, schedule day-type lookup, tomorrow state, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
+| canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias). The metadata-aware axis resolves an enabled EPW DST rule into inclusive daily `dst` state, enabled EPW holidays into source-exact Sunday day type, and typed IDF special-day rules into effective `DayType`/`special_day_type`; `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday. External numerical special-day evidence is limited to the fixed duration-one IDF Holiday, the exact 2032 `4th Sunday in February` and `Last Sunday in February` IDF forms, the paired fixed-Sunday and fixed-Saturday weekend-policy cases, and the paired fixed EPW holiday use-policy cases. The blocking smoke/nonclaim fifth-Sunday case separately locks only rejection of the explicit nonexistent 2016 rule and zero produced samples | warmup lifecycle, the IDF DST object, overlapping IDF source-order preservation, weekend shifting beyond the fixed-Sunday plus-one-day and fixed-Saturday plus-two-day explicit Yes/No pairs, other Nth ordinals/weekdays/months/years/strings beyond the two exact successes and one exact failure, other nonexistent-occurrence combinations or multi-error behavior, EPW Nth/Last, other special-day types, duration greater than one, multiple or overlapping holidays, EPW-versus-IDF precedence, schedule/timestamp DST or special-day consumers, tomorrow special-day state, actual-weather behavior, cross-year weather traversal or per-year special-day reprojection, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
+| hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. The fixed-date DST case separately locks 72 ordered state/timestamp samples, 24 inactive then 48 active. The fixed IDF special-day case locks 72 ordered day-type/timestamp samples as 24 each of 1/8/3. The two exact 2032 IDF weekday-rule cases each lock 216 ordered samples: fourth Sunday uses daily indices 8/2/3/4/5/6/7/1/2, and last Sunday uses 1/2/3/4/5/6/7/8/2. The nonexistent fifth-Sunday blocking smoke case separately locks engine-specific rejection and zero produced samples without adding numerical day-type evidence. The fixed-Sunday weekend-policy pair locks 72 samples each as enabled 24 each of 1/8/3 and disabled 24 each of 8/2/3. The fixed-Saturday weekend-policy pair locks 72 samples each as enabled 24 each of 7/1/8 and disabled 24 each of 8/1/2. The paired EPW holiday cases lock 72 samples each as enabled 24 each of 1/1/3 and disabled 24 each of 1/2/3. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, DST behavior beyond the fixed-date case, special-day behavior beyond the declared fixed-date, two exact successful weekday-rule forms, one exact expected-failure form, and policy cases, schedule day-type lookup, tomorrow state, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
 | EPW weather | `EpwWeatherFile` keeps parsed leap policy, typed optional DST and holiday rules, `DATA PERIODS` metadata, and `EpwRecord` rows. The dedicated hourly report applies the leap policy and enabled DST/holiday policies and selects a complete same-year non-actual, one-record-per-hour stream by source date. The fixed-date DST case externally locks only its DST state/timestamps; the paired EPW holiday cases lock one fixed holiday enabled as source-exact Sunday index 1 versus disabled as the underlying Monday index 2; the offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order. Unit tests separately lock Today/Tomorrow source-index transitions, interpolation seeds, the day-local hour-24 solar `NextHr`, and the one-timestep-per-hour current-only solar branch | IDF DST input, EPW holiday weekend/Nth/last/multiple/overlap/precedence behavior, actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, subhourly solar interpolation, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather`/solar/`WeatherManager` parity |
 | schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the paired exact cases lock the same 1-through-24 daily profile for 72 versus 48 weather-effective hours | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
 | output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy schedule cases, record-selection weather case, fixed-date DST case, fixed IDF special-day case, exact 2032 fourth-/last-Sunday IDF cases, fixed-Sunday and fixed-Saturday weekend-policy pairs, and paired EPW holiday policy cases enforce only their declared ordered, unique, exact normalized labels and variables | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`; DST/day-type serialization and tomorrow-state formatting remain unclaimed |
@@ -523,9 +559,11 @@ earlier gate.
    2032 `4th Sunday in February` and `Last Sunday in February` IDF forms,
    explicit fixed-Sunday plus-one-day and fixed-Saturday plus-two-day
    weekend-rule Yes/No branches, and paired fixed EPW holiday use-policy branch
-   now have external exact gates. Promote other Nth ordinals, weekdays, months,
-   years, and date strings; add a negative gate for nonexistent fifth-weekday
-   fatal handling; promote EPW Nth/Last, same-year annual-table duration/wrap,
+   now have external exact gates. The explicit 2016 nonexistent fifth-Sunday
+   form has a blocking smoke/nonclaim rejection gate. Promote other Nth
+   ordinals, weekdays, months, years, and date strings; add negative gates for
+   other nonexistent occurrences and multiple-error interactions; promote EPW
+   Nth/Last, same-year annual-table duration/wrap,
    directly ordered typed-vector overwrite, blank/default weekend behavior, and
    multiple/overlapping definitions beyond unit/source evidence; add per-year
    cross-year reprojection and EPW-versus-IDF precedence; then port tomorrow's
@@ -593,9 +631,22 @@ samples have daily indices 8/2/3/4/5/6/7/1/2. The last Sunday resolves to leap
 day 2/29, day of year 60, and its 216 samples have daily indices
 1/2/3/4/5/6/7/8/2. `Apply Weekend Holiday Rule` is explicitly Yes in both, and
 the Sunday rules shift zero days. Other Nth/weekday/month/year strings,
-nonexistent fifth-weekday fatal behavior until a negative gate exists, EPW
-Nth/Last, duration, overlap/order, year wrap/cross-year behavior, schedule
-lookup, tomorrow state, and raw ESO serialization remain outside the claim.
+EPW Nth/Last, duration, overlap/order, year wrap/cross-year behavior, schedule
+lookup, tomorrow state, and raw ESO serialization remain outside the numerical
+claim.
+
+The blocking nonexistent-fifth-Sunday fixture adds only semantic
+expected-failure evidence for the exact 2016 `5th Sunday in February` rule.
+WeekendRule Yes does not rescue it. EnergyPlus exits 1 through its
+`SetSpecialDayDates`
+not-enough-Nths Severe-to-Fatal path with 0 warnings, 1 severe error, and zero
+data rows. Rust arbitrary-run exits 6 with phase `runtime`, code
+`RuntimeConvergenceFailure`, the exact special-day rejection, and zero hourly
+samples. Numeric exit-code equality, numerical day-type conformance, other
+ordinal/weekday/month/year combinations, EPW rules, multiple errors or
+definitions, partial-artifact parity, duration/overlap/precedence/order,
+year-wrap/cross-year behavior, schedule/tomorrow state, and successful-run raw
+ESO serialization remain outside this smoke/nonclaim boundary.
 
 The paired fixed-Sunday IDF fixtures add only the explicit RunPeriod weekend
 rule toggle around one MonthDay 2/28 duration-one Holiday. Their 72 ordered,
@@ -654,11 +705,15 @@ ordered 72-sample enabled 7/1/8 and disabled 8/1/2 boundaries. The paired EPW
 holiday cases keep only their ordered 72-sample enabled 1/1/3 and disabled
 1/2/3 boundaries. The paired IDF weekday-rule cases keep only their explicit
 2032 forms and ordered 216-sample daily-index boundaries: fourth Sunday
-8/2/3/4/5/6/7/1/2 and last Sunday 1/2/3/4/5/6/7/8/2.
+8/2/3/4/5/6/7/1/2 and last Sunday 1/2/3/4/5/6/7/8/2. The
+nonexistent-fifth-Sunday case keeps only its blocking smoke/nonclaim
+engine-specific rejection contracts and zero-data boundary; it adds no
+numerical day-type evidence.
 Their consumption by weather-required heat-balance `ep_run` setup adds no
 independent conformance evidence. Record selection beyond the offset case, DST
 behavior beyond the fixed-date case, special-day behavior beyond the fixed IDF,
-exact 2032 fourth-/last-Sunday IDF, fixed-Sunday and fixed-Saturday
+exact 2032 fourth-/last-Sunday successes, exact 2016 fifth-Sunday failure,
+fixed-Sunday and fixed-Saturday
 weekend-policy, and paired fixed EPW cases,
 EPW-versus-IDF
 precedence, schedule day-type lookup, tomorrow special-day state, weather

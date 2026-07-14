@@ -341,6 +341,12 @@
                          "help":  "Gate paired exact fourth-Sunday and last-Sunday input-file Holiday rules and ordered hourly day types."
                      },
                      {
+                         "name":  "compare-calendar-special-day-nonexistent-nth-error",
+                         "path":  "compare\\compare-calendar-special-day-nonexistent-nth-error.ps1",
+                         "group":  "compare",
+                         "help":  "Gate the EnergyPlus and Rust expected-failure paths for a nonexistent fifth-Sunday input-file special day."
+                     },
+                     {
                          "name":  "compare-weather-record-selection",
                          "path":  "compare\\compare-weather-record-selection.ps1",
                          "group":  "compare",

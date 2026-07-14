@@ -1,0 +1,52 @@
+id = "calendar_special_day_nonexistent_fifth_weekday_failure_001"
+title = "Nonexistent fifth-Sunday special-day expected failure"
+milestone = "full-source-order-calendar-special-day-weekday-rules"
+purpose = "Block unless EnergyPlus 26.1 and the Rust runtime both reject the explicit nonexistent `5th Sunday in February` input-file special-day rule before producing hourly samples."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The expected-failure claim is limited to one duration-one input-file Holiday named `Missing Fifth Sunday Holiday` on the explicit 2016 calendar, whose February contains only four Sundays.",
+  "Apply Weekend Holiday Rule is explicitly Yes, but this nonexistent Nth-weekday rule is not rescued or shifted; EnergyPlus and Rust both reject it during date resolution. Other weekend-rule behavior remains outside the claim.",
+  "EnergyPlus must terminate with its SetSpecialDayDates not-enough-Nths Severe/Fatal path, while the Rust arbitrary-run CLI must project the corresponding typed TimeAxis error as RuntimeConvergenceFailure and runtime exit status.",
+  "The engines have distinct process exit-code contracts; this case compares semantic rejection and zero produced hourly samples, not equality of numeric exit codes or numerical Site Day Type Index values.",
+  "Other ordinals, weekdays, months, years, date strings, EPW Nth/Last rules, weekend shifting, duration greater than one, overlap, precedence, declaration order, year wrap, cross-year reprojection, schedule lookup, tomorrow state, and raw successful-run ESO serialization remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_nonexistent_fifth_weekday_failure_001/calendar_special_day_nonexistent_fifth_weekday_failure.idf"
+tier = "B"
+
+[scope]
+domains = ["weather", "zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_nonexistent_fifth_weekday_failure_001/calendar_special_day_nonexistent_fifth_weekday_failure.idf"
+weather = "data/conformance_cases/calendar_special_day_fixed_date_hourly_exact_001/calendar_special_day_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_nonexistent_fifth_weekday_failure_001/compare/negative-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-nonexistent-nth-error"
+blocking = true
