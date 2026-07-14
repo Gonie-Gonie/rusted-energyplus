@@ -245,6 +245,17 @@ prior-day-hour-24 interpolation seeds. These are source-mapped internal tests;
 they are not additional oracle claims for EnergyPlus' internal buffers or
 subhourly values.
 
+Separate unit tests lock a narrow solar-sampling boundary on the dense accepted
+hourly stream. `next_solar_weather_record_within_day` wraps each source day's
+hour 24 to hour 1 of that same 24-record day, so record indexes 23 and 47 use
+indexes 0 and 24 as solar `NextHr` rather than crossing into the following
+accepted day. With one zone timestep per hour, the solar weights are
+`(previous, current, next) = (0, 1, 0)`, so the current hourly record is used
+without interpolation. This is source-mapped internal evidence only: it adds no
+external oracle claim and does not prove subhourly solar interpolation, the
+other `SetCurrentWeather` fields, complete solar processing, or broad
+`WeatherManager` compatibility.
+
 `weather_record_start_offset_nonactual_001` is the external record-selection
 gate. Its EPW has 72 rows in source order: 24 June 30 decoy rows followed by the
 requested July 1 and July 2 rows. The three source days use 1999, 2004, and 2007
@@ -257,11 +268,13 @@ Temperature` values.
 
 That external case proves only same-year, non-actual, single-data-period,
 one-record-per-hour record-date selection, order, timestamp labels, and declared
-dry-bulb values. It does not independently prove Today/Tomorrow storage,
-subhourly interpolation, `SetCurrentWeather` field parity, actual-weather year
-matching, cross-year traversal, execution across multiple data periods,
-records-per-hour greater than one, DST, holidays or special days, missing-value
-repair, cyclic multi-year execution, or broad WeatherManager compatibility.
+dry-bulb values. It does not independently prove Today/Tomorrow storage, the
+internal day-local hour-24 solar `NextHr` or one-timestep-per-hour
+no-interpolation behavior, subhourly weather values, `SetCurrentWeather` field
+parity, actual-weather year matching, cross-year traversal, execution across
+multiple data periods, records-per-hour greater than one, DST, holidays or
+special days, missing-value repair, cyclic multi-year execution, or broad
+WeatherManager compatibility.
 The selector feeds both the dedicated time/weather report boundary and
 `ep_run::prepare_runtime_inputs` for weather-required heat-balance classes.
 That arbitrary-run wiring is runtime plumbing, not independent oracle evidence
@@ -274,7 +287,7 @@ or a completion claim for any mapped EnergyPlus routine.
 | run-period input | typed dates, optional years, and start weekday feed EnergyPlus-style year and weekday resolution; the first-hour policy is carried on the axis, metadata-aware actual-weather and cross-year inputs fail explicitly, and the other five RunPeriod weather-policy booleans remain typed intake only | custom ranges, design-day environments, environment filtering, active RunPeriod holiday/DST/weather behavior, actual-weather and cross-year traversal, and full EnergyPlus warning-text parity |
 | canonical calendar | `ResolvedRunPeriodCalendar` retains Gregorian interpretation, while same-year non-actual `ResolvedWeatherEnvironmentCalendar` applies the EPW leap-year header (including the February 29 endpoint ordinal alias) and `EnvironmentTimePoint` separately owns Gregorian, weather-effective, and schedule day-of-year plus simulation weekday | warmup lifecycle, DST ranges, special-day overrides, actual-weather and cross-year behavior, EnergyPlus `Timestep` default/invalid-value normalization, and environment kinds beyond weather run periods |
 | hourly consumers | `TimeAxis` is an hour-ending projection of the resolved environment calendar; the paired calendar cases lock 72 leap-observed labels ending Tuesday versus 48 no-leap-policy labels ending simulation Monday from the same IDF and 72 raw EPW rows. Weather-required heat-balance `ep_run` setup now builds the same metadata-aware axis before runtime execution | runtime consumers outside those weather-required heat-balance classes, calendar projections beyond the declared pair, runtime consumption of the precomputed Schedule Value series, and all remaining calendar-dependent output semantics |
-| EPW weather | `EpwWeatherFile` keeps parsed calendar and `DATA PERIODS` metadata with `EpwRecord` rows; the dedicated hourly report applies `Leap Year Observed` and selects a complete same-year non-actual, one-record-per-hour stream by source date. Weather-required heat-balance `ep_run` setup now applies the same selector before weather-timestep precomputation. The external offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order; unit tests separately lock Today/Tomorrow source-index transitions and interpolation seeds | actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, hour-24 solar day-boundary parity, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather` parity |
+| EPW weather | `EpwWeatherFile` keeps parsed calendar and `DATA PERIODS` metadata with `EpwRecord` rows; the dedicated hourly report applies `Leap Year Observed` and selects a complete same-year non-actual, one-record-per-hour stream by source date. Weather-required heat-balance `ep_run` setup now applies the same selector before weather-timestep precomputation. The external offset case locks 24 decoy rows skipped and 48 dry-bulb rows in exact timestamp/value order; unit tests separately lock Today/Tomorrow source-index transitions, interpolation seeds, the day-local hour-24 solar `NextHr`, and the one-timestep-per-hour current-only solar branch | actual-weather year matching, cross-year traversal, multiple-data-period execution, records-per-hour greater than one, complete Today/Tomorrow value-state parity, missing/range repair, cyclic multi-year execution, weather consumers outside the stated `ep_run` setup, subhourly solar interpolation, and complete `ReadEPlusWeatherForDay`/`SetCurrentWeather`/solar/`WeatherManager` parity |
 | schedules | `Schedule:Constant` and an all-days `Schedule:Compact` `Until` subset can produce hourly series; the paired exact cases lock the same 1-through-24 daily profile for 72 versus 48 weather-effective hours | `Through`/`For` day-type expansion, zone-timestep lookup, holiday/DST rollover, full day schedules, EMS current-value semantics, and exact `getHrTsVal` parity |
 | output time | hourly consumers use an output-owned normalized comparison label projected from the shared axis; the paired leap-policy schedule cases and the record-selection weather case enforce ordered, unique, exact normalized labels | raw and exact timestep/hour/day/month/run-period ESO, MTR, and SQL records from `WriteTimeStampFormatData`, including DST and day type |
 
@@ -331,8 +344,9 @@ are not evidence that
 The separate offset fixture adds only exact same-year non-actual source-date
 positioning and 48 ordered hourly dry-bulb timestamp/value samples after 24
 decoy rows. Its report-visible buffer counts do not turn the internal
-Today/Tomorrow or interpolation unit evidence into an external state claim, and
-it does not complete `ProcessEPWHeader`, `ReadWeatherForDay`,
+Today/Tomorrow, interpolation, day-local hour-24 solar `NextHr`, or
+one-timestep-per-hour current-only solar unit evidence into an external state
+claim, and it does not complete `ProcessEPWHeader`, `ReadWeatherForDay`,
 `ReadEPlusWeatherForDay`, `UpdateWeatherData`, or `SetCurrentWeather`.
 
 Promotion requires all of the following on the same canonical axis:
@@ -353,4 +367,6 @@ boundary. Its consumption by weather-required heat-balance `ep_run` setup adds
 no independent conformance evidence. Record selection beyond that case,
 weather consumers outside the stated setup, DST, holidays, raw ESO output,
 actual-weather execution, cross-year traversal, multiple-data-period execution,
-and records-per-hour greater than one remain explicitly deferred.
+records-per-hour greater than one, subhourly solar interpolation, and complete
+`SetCurrentWeather`/solar/`WeatherManager` conformance remain explicitly
+deferred.

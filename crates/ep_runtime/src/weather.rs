@@ -530,9 +530,13 @@ pub(crate) fn previous_weather_record_with_first_hour_starting_values(
     }
 }
 
-pub(crate) fn next_weather_record(records: &[EpwRecord], record_index: usize) -> &EpwRecord {
-    let next_index = if record_index + 1 >= records.len() {
-        0
+pub(crate) fn next_solar_weather_record_within_day(
+    records: &[EpwRecord],
+    record_index: usize,
+) -> &EpwRecord {
+    let day_start_index = record_index - record_index % 24;
+    let next_index = if record_index % 24 == 23 || record_index + 1 >= records.len() {
+        day_start_index
     } else {
         record_index + 1
     };

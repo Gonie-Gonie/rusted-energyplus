@@ -4,7 +4,8 @@ use crate::geometry::{surface_azimuth_deg, surface_tilt_deg};
 use crate::heat_balance::state::SurfaceIncidentSolarComponents;
 use crate::time_axis::{DEFAULT_RUN_PERIOD_YEAR, day_of_year};
 use crate::weather::{
-    EpwRecord, next_weather_record, previous_weather_record_with_first_hour_starting_values,
+    EpwRecord, next_solar_weather_record_within_day,
+    previous_weather_record_with_first_hour_starting_values,
 };
 use crate::{OutputSeries, ResultStore};
 use ep_model::{
@@ -168,7 +169,7 @@ fn solar_interpolation_weight(zone_steps_per_hour: u32, timestep: u32) -> f64 {
     }
 
     if steps == 1 {
-        0.5
+        1.0
     } else if steps == 3 {
         match timestep {
             1 | 2 => 5.0 / 6.0,
@@ -487,7 +488,7 @@ fn surface_incident_solar_components_at_weather_timestep_w_per_m2(
         record_index,
         first_hour_interpolation_starting_values,
     );
-    let next = next_weather_record(weather_records, record_index);
+    let next = next_solar_weather_record_within_day(weather_records, record_index);
     let direct_normal = weighted_solar_value(
         previous.direct_normal_radiation_wh_per_m2,
         record.direct_normal_radiation_wh_per_m2,

@@ -62,10 +62,14 @@ CLAIM_BOUNDARY = (
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
     "Weather-required heat-balance ep_run setup consumes the same selector before weather-timestep "
     "precomputation, but that arbitrary-run wiring adds no independent conformance evidence. "
-    "Today/Tomorrow buffers and subhourly interpolation remain unit evidence. Weather consumers "
-    "outside that setup, actual-weather year matching, cross-year traversal, multiple-data-period "
-    "execution, records-per-hour greater than one, DST, holidays, hour-24 solar day-boundary parity, "
-    "raw ESO serialization, and general time, weather, and schedule compatibility are not claimed."
+    "Today/Tomorrow source-index transitions and non-solar interpolation seeds remain unit evidence; "
+    "complete buffer value-state parity is not claimed. The day-local hour-24 solar NextHr selection "
+    "and one-timestep-per-hour current-only solar branch are also only "
+    "source-mapped unit evidence, not external oracle evidence. Weather consumers outside that "
+    "setup, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
+    "records-per-hour greater than one, DST, holidays, subhourly solar interpolation, complete "
+    "SetCurrentWeather/solar/WeatherManager conformance, raw ESO serialization, and general time, "
+    "weather, and schedule compatibility are not claimed."
 )
 
 CASE_LABELS = {

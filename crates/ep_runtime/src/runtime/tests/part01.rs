@@ -88,6 +88,7 @@
     };
     use crate::diagnostic_probes::HeatBalanceZoneAirAlgorithm;
     use crate::heat_balance::HeatBalanceAlgorithmLane;
+    use crate::next_solar_weather_record_within_day;
     use crate::node::{
         NODE_STATE_SETPOINT_VARIABLE, NODE_STATE_SOURCE_MAP_PATH,
         NODE_TEMPERATURE_SETPOINT_SENTINEL_C, NodeStateProjectionOptions, NodeStateRole,
@@ -132,6 +133,29 @@
     };
     use std::collections::BTreeMap;
 
+    fn two_day_solar_weather_records() -> Vec<EpwRecord> {
+        (0..48)
+            .map(|record_index| EpwRecord {
+                year: 2013,
+                month: 6,
+                day: 20 + record_index / 24,
+                hour: record_index % 24 + 1,
+                minute: 60,
+                dry_bulb_c: f64::from(record_index),
+                dew_point_c: 0.0,
+                relative_humidity_percent: 50.0,
+                atmospheric_pressure_pa: 101_325.0,
+                horizontal_infrared_radiation_wh_per_m2: 0.0,
+                global_horizontal_radiation_wh_per_m2: 0.0,
+                direct_normal_radiation_wh_per_m2: 100.0,
+                diffuse_horizontal_radiation_wh_per_m2: 0.0,
+                wind_direction_deg: 0.0,
+                wind_speed_m_per_s: 0.0,
+                liquid_precipitation_depth_mm: 0.0,
+            })
+            .collect()
+    }
+
     #[test]
     fn state_defaults_to_first_timestep() {
         let state = SimulationState::new(SimulationMode::Compatibility);
@@ -143,10 +167,74 @@
 
     #[test]
     fn solar_weather_interpolation_matches_energyplus_even_timestep_weights() {
+        assert_eq!(solar_weather_interpolation_weights(1, 1), (0.0, 1.0, 0.0));
         assert_eq!(solar_weather_interpolation_weights(4, 1), (0.25, 0.75, 0.0));
         assert_eq!(solar_weather_interpolation_weights(4, 2), (0.0, 1.0, 0.0));
         assert_eq!(solar_weather_interpolation_weights(4, 3), (0.0, 0.75, 0.25));
         assert_eq!(solar_weather_interpolation_weights(4, 4), (0.0, 0.5, 0.5));
+    }
+
+    #[test]
+    fn solar_next_hour_record_wraps_within_each_accepted_day() {
+        let records = two_day_solar_weather_records();
+
+        assert!(std::ptr::eq(
+            next_solar_weather_record_within_day(&records, 23),
+            &records[0]
+        ));
+        assert!(std::ptr::eq(
+            next_solar_weather_record_within_day(&records, 47),
+            &records[24]
+        ));
+    }
+
+    #[test]
+    fn hour_24_solar_is_independent_of_the_next_accepted_days_hour_1() {
+        let site = SiteLocation {
+            name: NormalizedName::new("Date Line Test Site"),
+            latitude_deg: 0.0,
+            longitude_deg: -180.0,
+            time_zone_hours: 0.0,
+            elevation_m: 0.0,
+        };
+        let roof = surface(
+            100,
+            "Hour 24 Roof",
+            SurfaceType::Roof,
+            [
+                point(0.0, 0.0, 1.0),
+                point(0.0, 1.0, 1.0),
+                point(1.0, 1.0, 1.0),
+                point(1.0, 0.0, 1.0),
+            ],
+        );
+        let mut records = two_day_solar_weather_records();
+        records[0].direct_normal_radiation_wh_per_m2 = 300.0;
+        records[23].direct_normal_radiation_wh_per_m2 = 100.0;
+        records[24].direct_normal_radiation_wh_per_m2 = 0.0;
+        let baseline = surface_incident_solar_radiation_for_weather_context_w_per_m2(
+            &roof,
+            &site,
+            &records,
+            23,
+            4,
+            Some(4),
+            FirstHourInterpolationStartingValues::Hour24,
+        );
+
+        records[24].direct_normal_radiation_wh_per_m2 = 10_000.0;
+        let changed_next_day = surface_incident_solar_radiation_for_weather_context_w_per_m2(
+            &roof,
+            &site,
+            &records,
+            23,
+            4,
+            Some(4),
+            FirstHourInterpolationStartingValues::Hour24,
+        );
+
+        assert!(baseline > 0.0);
+        assert!((baseline - changed_next_day).abs() < 1.0e-12);
     }
 
     #[test]
