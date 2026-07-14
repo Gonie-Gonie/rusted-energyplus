@@ -49,8 +49,8 @@ use ep_runtime::{
     IDEAL_LOADS_RATE_OUTPUT_TIMESTEP_SOURCE, IDEAL_LOADS_RUNTIME_BINDING_SOURCE,
     IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY, IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH,
     IdealLoadsFeatureFlags, IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState,
-    IdealLoadsOutdoorAirSensibleResult, IdealLoadsSensibleLimitContext, IdealLoadsSensibleMode,
-    IdealLoadsSensibleResult, IdealLoadsUnsupportedFeature,
+    IdealLoadsOutdoorAirSensibleResult, IdealLoadsReportSnapshot, IdealLoadsSensibleLimitContext,
+    IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature,
     IdealLoadsZoneEquipmentDispatchValidation, IdealLoadsZoneState, NoOaHumidistatClosedLoopState,
     NoOaHumidistatZoneTimestepError, NoOaHumidistatZoneTimestepInput,
     NoOaThirdOrderMoistureDemandInput, OutputSeries, ResultStore, RuntimeMeterRequest,
@@ -377,7 +377,7 @@ struct IdealLoadsMoisturePredictorSummary {
     zone_multiplier: f64,
     closed_loop_humidifying_values: Vec<f64>,
     closed_loop_dehumidifying_values: Vec<f64>,
-    closed_loop_results: Vec<IdealLoadsSensibleResult>,
+    closed_loop_results: Vec<IdealLoadsReportSnapshot>,
     latent_gain: Vec<IdealLoadsMoisturePredictorComparison>,
     humidifying: IdealLoadsMoisturePredictorComparison,
     dehumidifying: IdealLoadsMoisturePredictorComparison,
@@ -389,7 +389,7 @@ struct IdealLoadsHumidistatClosedLoopSummary {
     comparisons: Vec<IdealLoadsMoisturePredictorComparison>,
     humidifying_values: Vec<f64>,
     dehumidifying_values: Vec<f64>,
-    results: Vec<IdealLoadsSensibleResult>,
+    results: Vec<IdealLoadsReportSnapshot>,
 }
 
 #[derive(Clone)]
@@ -3281,7 +3281,7 @@ fn evaluate_rows(
                     error.system_id, error.unsupported_features
                 )
             })?;
-            let result = purchased_air.calculation;
+            let result = purchased_air.report;
             record_mode(&mut mode_counts, result.mode);
             calc_results.push(result);
         }
@@ -5351,7 +5351,7 @@ fn humidistat_closed_loop_comparisons(
         humidifying.push(predicted.humidifying_setpoint_load_kg_per_s);
         dehumidifying.push(predicted.dehumidifying_setpoint_load_kg_per_s);
 
-        let result = step.purchased_air.calculation;
+        let result = step.purchased_air.report;
         results.push(result);
         supply_mass_flow.push(result.supply_mass_flow_rate_kg_per_s);
         supply_humidity.push(result.supply_humidity_ratio);
@@ -5695,11 +5695,11 @@ fn thermostat_setpoint_values(
 fn add_result_series(
     observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
     key: &str,
-    results: &[IdealLoadsSensibleResult],
+    results: &[IdealLoadsReportSnapshot],
     variable: &str,
     units: &'static str,
     source: &'static str,
-    value: impl Fn(IdealLoadsSensibleResult) -> f64,
+    value: impl Fn(IdealLoadsReportSnapshot) -> f64,
 ) {
     observed_by_variable.insert(
         (key.to_string(), variable.to_string()),
@@ -5710,11 +5710,11 @@ fn add_result_series(
 fn add_result_series_indexed(
     observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
     key: &str,
-    results: &[IdealLoadsSensibleResult],
+    results: &[IdealLoadsReportSnapshot],
     variable: &str,
     units: &'static str,
     source: &'static str,
-    value: impl Fn(usize, IdealLoadsSensibleResult) -> f64,
+    value: impl Fn(usize, IdealLoadsReportSnapshot) -> f64,
 ) {
     observed_by_variable.insert(
         (key.to_string(), variable.to_string()),
@@ -5734,12 +5734,12 @@ fn add_result_series_indexed(
 fn add_result_energy_series(
     observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
     key: &str,
-    results: &[IdealLoadsSensibleResult],
+    results: &[IdealLoadsReportSnapshot],
     variable: &str,
     source: &'static str,
     timestamps: &[Option<String>],
     default_report_interval_seconds: f64,
-    rate: impl Fn(IdealLoadsSensibleResult) -> f64,
+    rate: impl Fn(IdealLoadsReportSnapshot) -> f64,
 ) {
     let values = results
         .iter()
@@ -5764,12 +5764,12 @@ fn add_result_energy_series(
 fn add_result_energy_series_indexed(
     observed_by_variable: &mut BTreeMap<(String, String), ObservedSeries>,
     key: &str,
-    results: &[IdealLoadsSensibleResult],
+    results: &[IdealLoadsReportSnapshot],
     variable: &str,
     source: &'static str,
     timestamps: &[Option<String>],
     default_report_interval_seconds: f64,
-    rate: impl Fn(usize, IdealLoadsSensibleResult) -> f64,
+    rate: impl Fn(usize, IdealLoadsReportSnapshot) -> f64,
 ) {
     let values = results
         .iter()

@@ -154,7 +154,7 @@ pub const ZONE_IDEAL_LOADS_ECONOMIZER_ACTIVE_TIME: &str = "Zone Ideal Loads Econ
 pub const ZONE_IDEAL_LOADS_HEAT_RECOVERY_ACTIVE_TIME: &str =
     "Zone Ideal Loads Heat Recovery Active Time";
 
-/// Report payload produced by the no-OA/no-limit sensible calculation.
+/// `ReportPurchasedAir` payload produced by the source-order compatibility wrapper.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IdealLoadsReportSnapshot {
     /// Operating mode.
@@ -167,10 +167,28 @@ pub struct IdealLoadsReportSnapshot {
     pub zone_sensible_heating_rate_w: f64,
     /// Zone sensible cooling rate in W.
     pub zone_sensible_cooling_rate_w: f64,
+    /// Zone latent heating rate in W.
+    pub zone_latent_heating_rate_w: f64,
+    /// Zone latent cooling rate in W.
+    pub zone_latent_cooling_rate_w: f64,
+    /// Supply air sensible heating rate in W.
+    pub supply_air_sensible_heating_rate_w: f64,
+    /// Supply air sensible cooling rate in W.
+    pub supply_air_sensible_cooling_rate_w: f64,
+    /// Supply air latent heating rate in W.
+    pub supply_air_latent_heating_rate_w: f64,
+    /// Supply air latent cooling rate in W.
+    pub supply_air_latent_cooling_rate_w: f64,
     /// Supply air total heating rate in W.
     pub supply_air_total_heating_rate_w: f64,
     /// Supply air total cooling rate in W.
     pub supply_air_total_cooling_rate_w: f64,
+    /// Final supply air mass flow rate in kg/s.
+    pub supply_mass_flow_rate_kg_per_s: f64,
+    /// Final supply air temperature in C.
+    pub supply_temperature_c: f64,
+    /// Final supply air humidity ratio in kgWater/kgDryAir.
+    pub supply_humidity_ratio: f64,
 }
 
 impl From<IdealLoadsSensibleResult> for IdealLoadsReportSnapshot {
@@ -181,8 +199,21 @@ impl From<IdealLoadsSensibleResult> for IdealLoadsReportSnapshot {
             zone_total_cooling_rate_w: result.zone_total_cooling_rate_w,
             zone_sensible_heating_rate_w: result.zone_sensible_heating_rate_w,
             zone_sensible_cooling_rate_w: result.zone_sensible_cooling_rate_w,
+            zone_latent_heating_rate_w: result.zone_latent_heating_rate_w,
+            zone_latent_cooling_rate_w: result.zone_latent_cooling_rate_w,
+            supply_air_sensible_heating_rate_w: result.supply_air_sensible_heating_rate_w,
+            supply_air_sensible_cooling_rate_w: result.supply_air_sensible_cooling_rate_w,
+            supply_air_latent_heating_rate_w: result.supply_air_latent_heating_rate_w,
+            supply_air_latent_cooling_rate_w: result.supply_air_latent_cooling_rate_w,
             supply_air_total_heating_rate_w: result.supply_air_total_heating_rate_w,
             supply_air_total_cooling_rate_w: result.supply_air_total_cooling_rate_w,
+            supply_mass_flow_rate_kg_per_s: result.supply_mass_flow_rate_kg_per_s,
+            supply_temperature_c: result.supply_temperature_c,
+            supply_humidity_ratio: result.supply_humidity_ratio,
         }
     }
 }
+
+#[cfg(test)]
+#[path = "report_tests.rs"]
+mod report_tests;

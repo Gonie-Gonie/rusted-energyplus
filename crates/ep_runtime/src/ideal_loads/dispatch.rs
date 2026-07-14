@@ -473,6 +473,42 @@ mod tests {
             output.report.zone_total_heating_rate_w,
             output.calculation.zone_total_heating_rate_w
         );
+        assert_eq!(
+            output.report.zone_latent_heating_rate_w,
+            output.calculation.zone_latent_heating_rate_w
+        );
+        assert_eq!(
+            output.report.supply_air_sensible_heating_rate_w,
+            output.calculation.supply_air_sensible_heating_rate_w
+        );
+        assert_eq!(
+            output.report.supply_air_latent_heating_rate_w,
+            output.calculation.supply_air_latent_heating_rate_w
+        );
+        assert_eq!(
+            output.report.supply_mass_flow_rate_kg_per_s,
+            output.calculation.supply_mass_flow_rate_kg_per_s
+        );
+        assert_eq!(
+            output.report.supply_temperature_c,
+            output.calculation.supply_temperature_c
+        );
+        assert_eq!(
+            output.report.supply_humidity_ratio,
+            output.calculation.supply_humidity_ratio
+        );
+        assert_eq!(
+            output.report.supply_mass_flow_rate_kg_per_s,
+            output.supply_node_update.mass_flow_rate_kg_per_s
+        );
+        assert_eq!(
+            output.report.supply_temperature_c,
+            output.supply_node_update.temperature_c
+        );
+        assert_eq!(
+            output.report.supply_humidity_ratio,
+            output.supply_node_update.humidity_ratio
+        );
     }
 
     #[test]

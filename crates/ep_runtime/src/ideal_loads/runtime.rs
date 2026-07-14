@@ -704,7 +704,6 @@ fn write_purchased_air_output_series(
     sample_count: usize,
 ) {
     let key = system.name.0.as_str();
-    let calculation = output.calculation;
     let report = output.report;
     add_constant_output_series(
         results,
@@ -748,7 +747,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_ZONE_LATENT_HEATING_RATE,
         "W",
-        calculation.zone_latent_heating_rate_w,
+        report.zone_latent_heating_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -757,7 +756,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_ZONE_LATENT_COOLING_RATE,
         "W",
-        calculation.zone_latent_cooling_rate_w,
+        report.zone_latent_cooling_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -766,7 +765,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_HEATING_RATE,
         "W",
-        calculation.supply_air_sensible_heating_rate_w,
+        report.supply_air_sensible_heating_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -775,7 +774,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_SENSIBLE_COOLING_RATE,
         "W",
-        calculation.supply_air_sensible_cooling_rate_w,
+        report.supply_air_sensible_cooling_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -784,7 +783,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_HEATING_RATE,
         "W",
-        calculation.supply_air_latent_heating_rate_w,
+        report.supply_air_latent_heating_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -793,7 +792,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_LATENT_COOLING_RATE,
         "W",
-        calculation.supply_air_latent_cooling_rate_w,
+        report.supply_air_latent_cooling_rate_w,
         sample_count,
     );
     add_constant_output_series(
@@ -857,7 +856,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
         "kg/s",
-        output.supply_node_update.mass_flow_rate_kg_per_s,
+        report.supply_mass_flow_rate_kg_per_s,
         sample_count,
     );
     add_constant_output_series(
@@ -866,8 +865,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_STANDARD_DENSITY_VOLUME_FLOW_RATE,
         "m3/s",
-        output.supply_node_update.mass_flow_rate_kg_per_s
-            / limit_context.standard_air_density_kg_per_m3,
+        report.supply_mass_flow_rate_kg_per_s / limit_context.standard_air_density_kg_per_m3,
         sample_count,
     );
     add_constant_output_series(
@@ -876,7 +874,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
         "C",
-        output.supply_node_update.temperature_c,
+        report.supply_temperature_c,
         sample_count,
     );
     add_constant_output_series(
@@ -885,7 +883,7 @@ fn write_purchased_air_output_series(
         key,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
         "kgWater/kgDryAir",
-        output.supply_node_update.humidity_ratio,
+        report.supply_humidity_ratio,
         sample_count,
     );
 

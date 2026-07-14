@@ -49,6 +49,11 @@ zone timestep for missing or invalid timestamps. The adapter explicitly keeps
 adaptive system timestep behavior outside the current claim; it does not
 implement `SystemTimeStepState`.
 
+`ep_runtime::IdealLoadsReportSnapshot` owns the complete no-OA
+`ReportPurchasedAir` rate and final supply-state payload used by reports. The
+comparison CLI consumes that snapshot from the source-order PurchasedAir and
+Humidistat wrappers; it does not import or assemble `IdealLoadsSensibleResult`.
+
 autosized IdealLoads flow/capacity conformance remains outside the current
 claim; `SizePurchasedAir` is represented by the runtime policy constant
 `IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY`, and arbitrary-run compatibility blocks
