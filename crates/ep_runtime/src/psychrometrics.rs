@@ -325,6 +325,33 @@ pub fn energyplus_psy_rhov_fn_tdb_w_pb_fast(
     energyplus_psy_rhov_fn_tdb_w_pb_raw(dry_bulb_c, humidity_ratio, atmospheric_pressure_pa)
 }
 
+/// Canonical EnergyPlus 26.1 `PsyRhFnTdbRhovLBnd0C` numerical path.
+///
+/// This preserves the source's pre-formula positive-vapor test and its
+/// out-of-range-only `0.01..=1.0` correction. The optional `EP_psych_stats`
+/// counter and `EP_psych_errors` warmup/recurring-warning state are separate
+/// stateful source contracts and are not represented by this pure helper.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rh_fn_tdb_rhov_lbnd0c(dry_bulb_c: f64, vapor_density_kg_per_m3: f64) -> f64 {
+    let relative_humidity = if vapor_density_kg_per_m3 > 0.0 {
+        vapor_density_kg_per_m3
+            * 461.52
+            * (dry_bulb_c + KELVIN_OFFSET)
+            * (-23.709_3 + 4_111.0 / ((dry_bulb_c + KELVIN_OFFSET) - 35.45)).exp()
+    } else {
+        0.0
+    };
+
+    if relative_humidity < 0.0 {
+        0.01
+    } else if relative_humidity > 1.0 {
+        1.0
+    } else {
+        relative_humidity
+    }
+}
+
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
 ///
 /// This compatibility wrapper retains its pre-existing validation contract and
@@ -466,3 +493,7 @@ mod tests;
 #[cfg(test)]
 #[path = "psychrometrics_inverse_density_tests.rs"]
 mod inverse_density_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_relative_humidity_tests.rs"]
+mod relative_humidity_tests;
