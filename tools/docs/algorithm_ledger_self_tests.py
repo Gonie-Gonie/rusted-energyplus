@@ -77,6 +77,156 @@ def run_completion_self_tests(repo_root: Path) -> int:
     if baseline_domain_errors:
         raise AssertionError(f"baseline domain completion contract is invalid: {baseline_domain_errors}")
 
+    expected_source_suffixes = (".cc", ".cpp", ".cxx", ".hh", ".hpp")
+    if ledger_validator.ENERGYPLUS_SOURCE_SUFFIXES != expected_source_suffixes:
+        raise AssertionError(
+            "EnergyPlus source suffixes must match the reference fetcher: "
+            f"{ledger_validator.ENERGYPLUS_SOURCE_SUFFIXES}"
+        )
+    passed.append("energyplus_header_source_suffixes")
+
+    psychrometrics_header = (
+        reference_root / "src" / "EnergyPlus" / "Psychrometrics.hh"
+    ).read_text(encoding="utf-8", errors="replace")
+    psychrometrics_source = (
+        reference_root / "src" / "EnergyPlus" / "Psychrometrics.cc"
+    ).read_text(encoding="utf-8", errors="replace")
+    cpp_definition_cases = [
+        (
+            "cpp_header_inline_definition_with_unit_comments",
+            psychrometrics_header,
+            "PsyCpAirFnW",
+        ),
+        (
+            "cpp_header_split_return_overload_definition",
+            psychrometrics_header,
+            "PsyRhoAirFnPbTdbW",
+        ),
+        (
+            "cpp_header_cached_inline_definition",
+            psychrometrics_header,
+            "PsyPsatFnTemp",
+        ),
+        (
+            "cpp_header_split_return_f7_definition",
+            psychrometrics_header,
+            "F7",
+        ),
+        (
+            "cpp_source_definition",
+            psychrometrics_source,
+            "CSplineint",
+        ),
+        (
+            "cpp_source_conditional_shared_body_definition",
+            psychrometrics_source,
+            "PsyPsatFnTemp_raw",
+        ),
+        (
+            "cpp_source_conditional_alternative_shared_body_definition",
+            psychrometrics_source,
+            "PsyPsatFnTemp",
+        ),
+        (
+            "cpp_balanced_parameters_and_qualifier_tail",
+            """struct ScannerFixture {
+    Real64 QualifiedDefinition(
+        std::function<Real64(Real64)> callback,
+        Real64 value = nested(1, 2)
+    ) const noexcept(noexcept(callback(value))) &
+    {
+        return callback(value);
+    }
+};""",
+            "QualifiedDefinition",
+        ),
+    ]
+    for name, source_text, routine_name in cpp_definition_cases:
+        if not ledger_validator.contains_cpp_routine_definition(
+            source_text,
+            routine_name,
+        ):
+            raise AssertionError(
+                f"{name}: C++ routine definition was not detected: {routine_name}"
+            )
+        passed.append(name)
+
+    cpp_declaration_cases = [
+        (
+            "cpp_plain_declaration_is_not_definition",
+            "Real64 PlainDeclaration(Real64 value);",
+            "PlainDeclaration",
+        ),
+        (
+            "cpp_unit_comment_brace_declaration_is_not_definition",
+            """Real64 UnitCommentDeclaration(
+    Real64 pressure, // pressure (N/M**2) {Pascals}
+    Real64 temperature // dry-bulb {C}
+);""",
+            "UnitCommentDeclaration",
+        ),
+        (
+            "cpp_raw_string_text_is_not_definition",
+            """constexpr auto text = R"cpp(
+Real64 StringOnly(Real64 value) { return value; }
+)cpp";""",
+            "StringOnly",
+        ),
+        (
+            "cpp_preprocessor_definition_is_not_routine_definition",
+            """#define PreprocessorOnly(value) \\
+    if (value) {""",
+            "PreprocessorOnly",
+        ),
+        (
+            "cpp_control_call_block_is_not_definition",
+            """void enclosing(bool value)
+{
+    if (ControlOnly(value)) {
+        value = false;
+    }
+}""",
+            "ControlOnly",
+        ),
+        (
+            "cpp_macro_invocation_block_is_not_definition",
+            """#define MacroBlock(value) if (value)
+void enclosing(bool value)
+{
+    MacroBlock(value) {
+        value = false;
+    }
+}""",
+            "MacroBlock",
+        ),
+        (
+            "cpp_identifier_suffix_is_not_definition",
+            "Real64 NotExactIdentifier(Real64 value) { return value; }",
+            "ExactIdentifier",
+        ),
+        (
+            "cpp_conditional_else_control_flow_is_not_declarator",
+            """#ifdef USE_DECLARATION
+Real64 ConditionalTail(Real64 value)
+#else
+return AlternativeCall(value)
+#endif
+{
+    return value;
+}""",
+            "ConditionalTail",
+        ),
+    ]
+    for name, source_text, routine_name in cpp_declaration_cases:
+        if ledger_validator.contains_cpp_routine_definition(
+            source_text,
+            routine_name,
+        ):
+            raise AssertionError(
+                f"{name}: non-definition was misclassified: {routine_name}"
+            )
+        passed.append(name)
+
     candidate = copy.deepcopy(ledger)
     find_raw_routine(candidate, "manage_heat_balance")["completion_status"] = "ported"
     expect_error("unknown_completion_status", routine_errors(candidate), "unsupported routine completion_status")

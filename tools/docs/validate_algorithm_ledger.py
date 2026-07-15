@@ -6,6 +6,7 @@ import argparse
 import re
 import sys
 import tomllib
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +39,29 @@ STATE_CONTRACT_FIELDS = (
     "not_claimed_branches",
 )
 ALLOWED_PORT_TYPES = {"compatibility", "diagnostic_probe", "refactor_only"}
+ENERGYPLUS_SOURCE_SUFFIXES = (".cc", ".cpp", ".cxx", ".hh", ".hpp")
+_CPP_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_CPP_RAW_STRING_PREFIX = re.compile(
+    r'(?:u8|u|U|L)?R"(?P<delimiter>[^ ()\\\t\r\n]{0,16})\('
+)
+_CPP_CONDITIONAL_ALTERNATIVE = re.compile(
+    r"(?m)^[ \t]*#[ \t]*(?:else|elif)\b"
+)
+_CPP_FUNCTION_QUALIFIERS = {"const", "volatile", "override", "final"}
+_CPP_CONTROL_PREFIX_WORDS = {
+    "case",
+    "catch",
+    "delete",
+    "do",
+    "else",
+    "for",
+    "if",
+    "new",
+    "return",
+    "switch",
+    "throw",
+    "while",
+}
 PORT_TICKET_REQUIRED_FIELDS = {
     "algorithm_port_ticket": ["algorithm_id", "domain", "port_type"],
     "energyplus": ["version", "source_file", "routine", "source_order_stage"],
@@ -411,15 +435,228 @@ def contains_symbol(text: str, symbol: str) -> bool:
     return re.search(rf"(?<![A-Za-z0-9_]){re.escape(symbol)}(?![A-Za-z0-9_])", text) is not None
 
 
-def contains_cpp_routine_definition(text: str, routine: str) -> bool:
-    pattern = re.compile(
-        rf"(?ms)^[ \t]*"
-        rf"(?:[A-Za-z_][A-Za-z0-9_:<>,*&\[\] \t]*[ \t]+)+"
-        rf"(?:[A-Za-z_][A-Za-z0-9_]*::)*{re.escape(routine)}[ \t]*"
-        rf"\([^;{{}}]*\)[ \t\r\n]*(?:const[ \t\r\n]+)?(?:noexcept[ \t\r\n]+)?"
-        rf"(?:[ \t\r\n]|\/\/[^\r\n]*(?:\r?\n|$)|\/\*.*?\*\/)*\{{"
+@lru_cache(maxsize=32)
+def _sanitize_cpp_for_routine_scan(text: str) -> str:
+    """Blank comments and literals while preserving offsets and line boundaries."""
+
+    sanitized = list(text)
+
+    def blank(start: int, end: int) -> None:
+        for position in range(start, end):
+            if sanitized[position] not in "\r\n":
+                sanitized[position] = " "
+
+    offset = 0
+    while offset < len(text):
+        if text.startswith("//", offset):
+            end = text.find("\n", offset + 2)
+            end = len(text) if end < 0 else end
+            blank(offset, end)
+            offset = end
+            continue
+
+        if text.startswith("/*", offset):
+            end = text.find("*/", offset + 2)
+            end = len(text) if end < 0 else end + 2
+            blank(offset, end)
+            offset = end
+            continue
+
+        raw_string = _CPP_RAW_STRING_PREFIX.match(text, offset)
+        if raw_string is not None:
+            terminator = f'){raw_string.group("delimiter")}"'
+            end = text.find(terminator, raw_string.end())
+            end = len(text) if end < 0 else end + len(terminator)
+            blank(offset, end)
+            offset = end
+            continue
+
+        if text[offset] in {'"', "'"}:
+            quote = text[offset]
+            end = offset + 1
+            escaped = False
+            while end < len(text):
+                character = text[end]
+                if escaped:
+                    escaped = False
+                elif character == "\\":
+                    escaped = True
+                elif character == quote:
+                    end += 1
+                    break
+                end += 1
+            blank(offset, end)
+            offset = end
+            continue
+
+        offset += 1
+
+    return "".join(sanitized)
+
+
+def _matching_cpp_delimiter(
+    text: str,
+    opening_offset: int,
+    opening: str,
+    closing: str,
+) -> int | None:
+    if opening_offset >= len(text) or text[opening_offset] != opening:
+        return None
+
+    depth = 0
+    for offset in range(opening_offset, len(text)):
+        if text[offset] == opening:
+            depth += 1
+        elif text[offset] == closing:
+            depth -= 1
+            if depth == 0:
+                return offset
+    return None
+
+
+def _skip_cpp_whitespace_and_directives(text: str, offset: int) -> int:
+    while offset < len(text):
+        while offset < len(text) and text[offset].isspace():
+            offset += 1
+        if offset >= len(text) or text[offset] != "#":
+            return offset
+
+        line_start = text.rfind("\n", 0, offset) + 1
+        if text[line_start:offset].strip():
+            return offset
+        line_end = text.find("\n", offset + 1)
+        offset = len(text) if line_end < 0 else line_end + 1
+    return offset
+
+
+def _cpp_declarator_prefix_is_plausible(text: str, routine_offset: int) -> bool:
+    boundary = max(
+        text.rfind(";", 0, routine_offset),
+        text.rfind("{", 0, routine_offset),
+        text.rfind("}", 0, routine_offset),
     )
-    return pattern.search(text) is not None
+    prefix_start = boundary + 1
+    for directive in _CPP_CONDITIONAL_ALTERNATIVE.finditer(
+        text, prefix_start, routine_offset
+    ):
+        line_end = text.find("\n", directive.end(), routine_offset)
+        prefix_start = line_end + 1 if line_end >= 0 else prefix_start
+    prefix = text[prefix_start:routine_offset]
+    prefix = "\n".join(
+        line for line in prefix.splitlines() if not line.lstrip().startswith("#")
+    )
+    stripped = prefix.strip()
+    if not stripped or re.search(r"[=().!?+/%|^]", stripped):
+        return False
+
+    words = _CPP_IDENTIFIER.findall(stripped)
+    return bool(words) and not any(word in _CPP_CONTROL_PREFIX_WORDS for word in words)
+
+
+def _cpp_conditional_alternative_declarator_end(
+    text: str,
+    offset: int,
+) -> int | None:
+    opening = text.find("(", offset)
+    if opening < 0:
+        return None
+    if any(
+        boundary >= 0 and boundary < opening
+        for boundary in (
+            text.find(";", offset),
+            text.find("{", offset),
+            text.find("}", offset),
+        )
+    ):
+        return None
+
+    prefix = text[offset:opening].strip()
+    if re.search(r"[=;{}().!?+/%|^]", prefix):
+        return None
+    identifiers = list(_CPP_IDENTIFIER.finditer(prefix))
+    if (
+        len(identifiers) < 2
+        or prefix[identifiers[-1].end() :].strip()
+        or any(match.group(0) in _CPP_CONTROL_PREFIX_WORDS for match in identifiers)
+    ):
+        return None
+
+    closing = _matching_cpp_delimiter(text, opening, "(", ")")
+    return None if closing is None else closing + 1
+
+
+def _cpp_qualifier_tail_opens_body(text: str, offset: int) -> bool:
+    while True:
+        directive_start = offset
+        offset = _skip_cpp_whitespace_and_directives(text, offset)
+        conditional_alternative = _CPP_CONDITIONAL_ALTERNATIVE.search(
+            text, directive_start, offset
+        )
+        if offset >= len(text):
+            return False
+        if text[offset] == "{":
+            return True
+        if conditional_alternative is not None:
+            alternative_end = _cpp_conditional_alternative_declarator_end(text, offset)
+            if alternative_end is not None:
+                offset = alternative_end
+                continue
+
+        if text.startswith("[[", offset):
+            attribute_end = text.find("]]", offset + 2)
+            if attribute_end < 0:
+                return False
+            offset = attribute_end + 2
+            continue
+
+        if text[offset] == "&":
+            offset += 2 if text.startswith("&&", offset) else 1
+            continue
+
+        qualifier = _CPP_IDENTIFIER.match(text, offset)
+        if qualifier is None:
+            return False
+        qualifier_name = qualifier.group(0)
+        offset = qualifier.end()
+        if qualifier_name in _CPP_FUNCTION_QUALIFIERS:
+            continue
+        if qualifier_name != "noexcept":
+            return False
+
+        offset = _skip_cpp_whitespace_and_directives(text, offset)
+        if offset < len(text) and text[offset] == "(":
+            closing = _matching_cpp_delimiter(text, offset, "(", ")")
+            if closing is None:
+                return False
+            offset = closing + 1
+
+
+def contains_cpp_routine_definition(text: str, routine: str) -> bool:
+    sanitized = _sanitize_cpp_for_routine_scan(text)
+    identifier = re.compile(
+        rf"(?<![A-Za-z0-9_]){re.escape(routine)}(?![A-Za-z0-9_])"
+    )
+    for match in identifier.finditer(sanitized):
+        line_start = sanitized.rfind("\n", 0, match.start()) + 1
+        if sanitized[line_start : match.start()].lstrip().startswith("#"):
+            continue
+        if not _cpp_declarator_prefix_is_plausible(sanitized, match.start()):
+            continue
+
+        opening = _skip_cpp_whitespace_and_directives(sanitized, match.end())
+        if opening >= len(sanitized) or sanitized[opening] != "(":
+            continue
+        closing = _matching_cpp_delimiter(sanitized, opening, "(", ")")
+        if closing is None:
+            continue
+        if _cpp_qualifier_tail_opens_body(sanitized, closing + 1):
+            return True
+    return False
+
+
+@lru_cache(maxsize=32)
+def _read_cpp_source_text(source_path: Path) -> str:
+    return source_path.read_text(encoding="utf-8", errors="replace")
 
 
 def routine_state_contract(text: str, routine_id: str) -> str:
@@ -581,7 +818,7 @@ def validate_routine(
         source_file_safe = (
             is_safe_repo_relative_ref(source_file)
             and source_file.replace("\\", "/").startswith("src/EnergyPlus/")
-            and source_file.lower().endswith((".cc", ".cpp", ".cxx"))
+            and source_file.lower().endswith(ENERGYPLUS_SOURCE_SUFFIXES)
         )
         require(
             source_file_safe,
@@ -598,7 +835,7 @@ def validate_routine(
             source_path = reference_root / source_file
             require(source_path.is_file(), errors, f"{routine_id}: EnergyPlus source does not exist: {source_file}")
             if source_path.is_file() and source_routine_valid:
-                source_text = source_path.read_text(encoding="utf-8", errors="replace")
+                source_text = _read_cpp_source_text(source_path)
                 require(
                     contains_cpp_routine_definition(source_text, source_routine),
                     errors,
