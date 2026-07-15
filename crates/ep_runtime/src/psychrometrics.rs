@@ -352,6 +352,31 @@ pub fn energyplus_psy_rh_fn_tdb_rhov_lbnd0c(dry_bulb_c: f64, vapor_density_kg_pe
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyVFnTdbWPb` numerical path in m3/kg.
+///
+/// This preserves the source humidity-ratio floor, arithmetic grouping, and
+/// unconditional `0.83` fallback for every negative calculated volume. The
+/// optional `EP_psych_stats` counter and `EP_psych_errors` warmup/recurring
+/// warning state are separate stateful contracts and are not represented by
+/// this pure helper.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_v_fn_tdb_w_pb(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
+    let specific_volume = 1.594_73e2 * (1.0 + 1.6078 * humidity_ratio) * (1.8 * dry_bulb_c + 492.0)
+        / atmospheric_pressure_pa;
+
+    if specific_volume < 0.0 {
+        0.83
+    } else {
+        specific_volume
+    }
+}
+
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
 ///
 /// This compatibility wrapper retains its pre-existing validation contract and
@@ -497,3 +522,7 @@ mod inverse_density_tests;
 #[cfg(test)]
 #[path = "psychrometrics_relative_humidity_tests.rs"]
 mod relative_humidity_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_specific_volume_tests.rs"]
+mod specific_volume_tests;
