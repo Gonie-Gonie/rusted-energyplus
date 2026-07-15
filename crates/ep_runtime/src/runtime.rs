@@ -140,7 +140,7 @@ pub use crate::psychrometrics::{
     energyplus_psy_rh_fn_tdb_rhov_lbnd0c, energyplus_psy_rho_air_fn_pb_tdb_w,
     energyplus_psy_rho_air_fn_pb_tdb_w_fast, energyplus_psy_rhov_fn_tdb_rh_lbnd0c,
     energyplus_psy_rhov_fn_tdb_w_pb, energyplus_psy_rhov_fn_tdb_w_pb_fast,
-    energyplus_psy_tdb_fn_h_w, energyplus_psy_v_fn_tdb_w_pb,
+    energyplus_psy_tdb_fn_h_w, energyplus_psy_v_fn_tdb_w_pb, energyplus_psy_w_fn_tdb_h,
     energyplus_psychrometric_humidity_ratio_from_rh,
     energyplus_standard_zone_air_heat_capacity_j_per_k,
     energyplus_water_vapor_gas_enthalpy_j_per_kg, energyplus_zone_air_heat_capacity_j_per_k,

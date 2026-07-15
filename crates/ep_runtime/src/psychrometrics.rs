@@ -377,6 +377,26 @@ pub fn energyplus_psy_v_fn_tdb_w_pb(
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyWFnTdbH` numerical path.
+///
+/// The raw inverse is returned unchanged unless it is strictly negative, in
+/// which case EnergyPlus returns literal `1.0e-5`. This ordered comparison
+/// preserves source NaN and negative-zero behavior. Optional statistics and
+/// the `CalledFrom`/`SuppressWarnings` diagnostic state are not represented by
+/// this pure helper.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_w_fn_tdb_h(dry_bulb_c: f64, enthalpy_j_per_kg: f64) -> f64 {
+    let humidity_ratio =
+        (enthalpy_j_per_kg - 1.004_84e3 * dry_bulb_c) / (2.500_94e6 + 1.858_95e3 * dry_bulb_c);
+
+    if humidity_ratio < 0.0 {
+        ENERGYPLUS_MIN_HUMIDITY_RATIO
+    } else {
+        humidity_ratio
+    }
+}
+
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
 ///
 /// This compatibility wrapper retains its pre-existing validation contract and
@@ -526,3 +546,7 @@ mod relative_humidity_tests;
 #[cfg(test)]
 #[path = "psychrometrics_specific_volume_tests.rs"]
 mod specific_volume_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_humidity_ratio_tests.rs"]
+mod humidity_ratio_tests;
