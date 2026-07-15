@@ -1,0 +1,63 @@
+id = "calendar_epw_dst_southern_wrap_hourly_exact_001"
+title = "EPW last-Sunday October through last-Sunday March end-side exact"
+milestone = "full-source-order-calendar-epw-dst-southern-wrap"
+purpose = "Block on exact end-side hourly daylight-saving state for the EPW Last Sunday in October through Last Sunday in March declaration."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to the exact EPW pair `Last Sunday in October` through `Last Sunday in March` and its 2032 resolutions on October 31 and March 28.",
+  "External numerical evidence consists of all 72 EnergyPlus ESO values and timestamp fields plus the exact EnergyPlus EIO WeatherFile row with resolved dates 10/31 and 03/28; the Rust summary day-of-year values 305 and 88 and wraps-year=true field are locked against source-mapped expected values and are not fields emitted by EIO.",
+  "The execution claim covers only the 2032-03-27 through 2032-03-29 end-side window: 72 ordered and unique hour-ending Site Daylight Saving Time Status samples with daily states 1, 1, and 0, proving 48 active and 24 inactive samples.",
+  "The RunPeriod explicitly enables the weather-file daylight-saving period while disabling weather-file holidays, weekend observation, rain, snow, and actual-weather handling; no input-file special-day or daylight-saving object is present.",
+  "The EnergyPlus oracle completes with exactly 0 Warning and 0 Severe errors.",
+  "Cross-year RunPeriod or weather-record traversal, full-year range execution, and execution around the October start boundary remain outside this claim.",
+  "Generic southern-hemisphere or year-wrap behavior; other months, weekdays, years, fixed-date, Nth-weekday, or Last-weekday rules; Leap Year Observed No comparisons; disabled weather-file daylight saving; IDF RunPeriodControl:DaylightSavingTime; and EPW-versus-IDF precedence remain outside this claim.",
+  "DST-shifted schedule lookup, hour-24 transition behavior, tomorrow-state or civil-clock behavior, actual-weather execution, Rust raw ESO serialization, broad WeatherManager compatibility, and other output variables remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_epw_dst_southern_wrap_hourly_exact_001/calendar_epw_dst_southern_wrap_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_epw_dst_southern_wrap_hourly_exact_001/calendar_epw_dst_southern_wrap_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_dst_southern_wrap_hourly_exact_001/calendar_epw_dst_southern_wrap_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Daylight Saving Time Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_epw_dst_southern_wrap_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-epw-dst-southern-wrap-exact"
+blocking = true

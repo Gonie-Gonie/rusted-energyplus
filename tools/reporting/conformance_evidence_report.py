@@ -75,8 +75,17 @@ CLAIM_BOUNDARY = (
     "boundaries resolve to days of year 54 through 56 without wrap; 120 ordered, unique, exact "
     "samples follow daily status 0/1/1/1/0 with exactly 72 active hours. Its promoted series "
     "metadata, all raw EnergyPlus oracle ESO timestamp fields and values, exact WeatherFile EIO "
-    "row, and clean 0 Warning/0 Severe completion are gate-locked. Other Nth/last-weekday forms, "
-    "southern year-wrap ranges, RunPeriod disabling, malformed headers, and policy precedence "
+    "row, and clean 0 Warning/0 Severe completion are gate-locked. The southern-wrap case proves "
+    "only the literal EPW pair `Last Sunday in October` through `Last Sunday in March` and its "
+    "2032 calendar dates October 31 and March 28. External numerical evidence consists of all 72 "
+    "EnergyPlus ESO values and timestamp fields over the same-year March 27 through March 29 "
+    "end-side window, matching daily status 1/1/0 with 48 active and 24 inactive hours, plus the "
+    "exact EnergyPlus EIO WeatherFile row with dates 10/31 and 03/28. The Rust summary day-of-year "
+    "values 305 and 88 and wraps_year=true field are locked against source-mapped expected values "
+    "and are not fields emitted by EIO. Cross-year RunPeriod or weather-record traversal, full-year "
+    "range execution, execution around the October start boundary, generic southern-hemisphere or "
+    "year-wrap behavior, and other date-rule pairs are not proved. Other "
+    "Nth/last-weekday forms, RunPeriod disabling, malformed headers, and policy precedence "
     "remain unit/source evidence or unclaimed. The IDF RunPeriodControl:DaylightSavingTime object, "
     "DST-shifted schedule lookup, hour-24 rollover, and Rust raw ESO serialization remain outside "
     "this checkpoint. "
@@ -189,6 +198,7 @@ CASE_LABELS = {
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
     "calendar_epw_dst_weekday_rules_hourly_exact_001": "EPW DST weekday pair",
+    "calendar_epw_dst_southern_wrap_hourly_exact_001": "EPW DST southern wrap",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
     "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
@@ -326,6 +336,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW DST southern wrap",
+        command="compare-calendar-epw-dst-southern-wrap-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Calendar special day",
@@ -1891,7 +1908,7 @@ def build_single_bar_figure(
     if max_value <= 0.0:
         max_value = 1.0
 
-    height = max(2.2, 1.1 + len(rows) * 0.38)
+    height = min(7.0, max(2.2, 1.1 + len(rows) * 0.38))
     fig, ax = plt.subplots(figsize=(7.2, height), dpi=180)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")

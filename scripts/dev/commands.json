@@ -317,6 +317,12 @@
                          "help":  "Gate one exact EPW fourth-Monday-to-last-Wednesday daylight-saving boundary pair and ordered hourly state."
                      },
                      {
+                         "name":  "compare-calendar-epw-dst-southern-wrap-exact",
+                         "path":  "compare\\compare-calendar-epw-dst-southern-wrap-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate one exact EPW last-Sunday-October-to-last-Sunday-March end-side daylight-saving wrap and ordered hourly state."
+                     },
+                     {
                          "name":  "compare-calendar-special-day-fixed-date-exact",
                          "path":  "compare\\compare-calendar-special-day-fixed-date-exact.ps1",
                          "group":  "compare",

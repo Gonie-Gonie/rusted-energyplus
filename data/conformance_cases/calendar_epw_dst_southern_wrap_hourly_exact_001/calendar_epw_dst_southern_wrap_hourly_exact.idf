@@ -1,0 +1,39 @@
+Version,26.1;
+
+Building,
+  Calendar EPW DST Southern Wrap Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Calendar EPW DST Southern Wrap Run Period,
+  3,
+  27,
+  2032,
+  3,
+  29,
+  2032,
+  Saturday,
+  No,  !- Use Weather File Holidays and Special Days
+  Yes, !- Use Weather File Daylight Saving Period
+  No,  !- Apply Weekend Holiday Rule
+  No,  !- Use Weather File Rain Indicators
+  No,  !- Use Weather File Snow Indicators
+  No;  !- Treat Weather as Actual
+
+Output:Variable,
+  Environment,
+  Site Daylight Saving Time Status,
+  Hourly;
